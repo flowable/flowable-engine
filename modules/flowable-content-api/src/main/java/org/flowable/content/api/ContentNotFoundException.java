@@ -13,8 +13,7 @@
 package org.flowable.content.api;
 
 /**
- * Exception indicating an operation is requested on a {@link ContentObject} that does not
- * exist.
+ * Exception indicating an operation is requested on a {@link ContentObject} that does not exist.
  * 
  * @author Frederik Heremans
  *
@@ -22,7 +21,7 @@ package org.flowable.content.api;
 public class ContentNotFoundException extends ContentStorageException {
 
     private static final long serialVersionUID = 1L;
-    
+
     public ContentNotFoundException(String message) {
         super(message);
     }

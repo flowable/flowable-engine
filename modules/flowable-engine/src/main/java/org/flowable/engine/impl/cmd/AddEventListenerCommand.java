@@ -25,32 +25,32 @@ import org.flowable.engine.impl.interceptor.CommandContext;
  */
 public class AddEventListenerCommand implements Command<Void> {
 
-  protected FlowableEventListener listener;
-  protected FlowableEngineEventType[] types;
+    protected FlowableEventListener listener;
+    protected FlowableEngineEventType[] types;
 
-  public AddEventListenerCommand(FlowableEventListener listener, FlowableEngineEventType[] types) {
-    this.listener = listener;
-    this.types = types;
-  }
-
-  public AddEventListenerCommand(FlowableEventListener listener) {
-    super();
-    this.listener = listener;
-  }
-
-  @Override
-  public Void execute(CommandContext commandContext) {
-    if (listener == null) {
-      throw new FlowableIllegalArgumentException("listener is null.");
+    public AddEventListenerCommand(FlowableEventListener listener, FlowableEngineEventType[] types) {
+        this.listener = listener;
+        this.types = types;
     }
 
-    if (types != null) {
-      commandContext.getProcessEngineConfiguration().getEventDispatcher().addEventListener(listener, types);
-    } else {
-      commandContext.getProcessEngineConfiguration().getEventDispatcher().addEventListener(listener);
+    public AddEventListenerCommand(FlowableEventListener listener) {
+        super();
+        this.listener = listener;
     }
 
-    return null;
-  }
+    @Override
+    public Void execute(CommandContext commandContext) {
+        if (listener == null) {
+            throw new FlowableIllegalArgumentException("listener is null.");
+        }
+
+        if (types != null) {
+            commandContext.getProcessEngineConfiguration().getEventDispatcher().addEventListener(listener, types);
+        } else {
+            commandContext.getProcessEngineConfiguration().getEventDispatcher().addEventListener(listener);
+        }
+
+        return null;
+    }
 
 }

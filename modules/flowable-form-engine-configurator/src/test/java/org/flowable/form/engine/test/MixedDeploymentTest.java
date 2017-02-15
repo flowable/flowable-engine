@@ -27,28 +27,27 @@ import static org.junit.Assert.assertNotNull;
  */
 public class MixedDeploymentTest extends AbstractFlowableFormEngineConfiguratorTest {
 
-  @Test
-  @Deployment(resources = {"org/flowable/form/engine/test/deployment/oneTaskWithFormKeyProcess.bpmn20.xml",
-      "org/flowable/form/engine/test/deployment/simple.form"})
-  public void deploySingleProcessAndForm() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-        .latestVersion()
-        .processDefinitionKey("oneTaskWithFormProcess")
-        .singleResult();
+    @Test
+    @Deployment(resources = { "org/flowable/form/engine/test/deployment/oneTaskWithFormKeyProcess.bpmn20.xml",
+            "org/flowable/form/engine/test/deployment/simple.form" })
+    public void deploySingleProcessAndForm() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                .latestVersion()
+                .processDefinitionKey("oneTaskWithFormProcess")
+                .singleResult();
 
-    assertNotNull(processDefinition);
-    assertEquals("oneTaskWithFormProcess", processDefinition.getKey());
+        assertNotNull(processDefinition);
+        assertEquals("oneTaskWithFormProcess", processDefinition.getKey());
 
-    FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery()
-        .latestVersion()
-        .formDefinitionKey("form1")
-        .singleResult();
-    assertNotNull(formDefinition);
-    assertEquals("form1", formDefinition.getKey());
+        FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery()
+                .latestVersion()
+                .formDefinitionKey("form1")
+                .singleResult();
+        assertNotNull(formDefinition);
+        assertEquals("form1", formDefinition.getKey());
 
-
-    List<FormDefinition> formDefinitionList = repositoryService.getFormDefinitionsForProcessDefinition(processDefinition.getId());
-    assertEquals(1l, formDefinitionList.size());
-    assertEquals("form1", formDefinitionList.get(0).getKey());
-  }
+        List<FormDefinition> formDefinitionList = repositoryService.getFormDefinitionsForProcessDefinition(processDefinition.getId());
+        assertEquals(1l, formDefinitionList.size());
+        assertEquals("form1", formDefinitionList.get(0).getKey());
+    }
 }

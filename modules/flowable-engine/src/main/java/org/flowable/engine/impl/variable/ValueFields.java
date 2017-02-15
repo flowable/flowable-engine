@@ -13,7 +13,6 @@
 
 package org.flowable.engine.impl.variable;
 
-
 /**
  * Common interface for regular and historic variable entities.
  * 
@@ -21,78 +20,78 @@ package org.flowable.engine.impl.variable;
  */
 public interface ValueFields {
 
-  /**
-   * @return the name of the variable
-   */
-  String getName();
-  
-  /**
-   * @return the process instance id of the variable
-   */
-  String getProcessInstanceId();
-  
-  /**
-   * @return the execution id of the variable
-   */
-  String getExecutionId();
+    /**
+     * @return the name of the variable
+     */
+    String getName();
 
-  /**
-   * @return the task id of the variable
-   */
-  String getTaskId();
+    /**
+     * @return the process instance id of the variable
+     */
+    String getProcessInstanceId();
 
-  /**
-   * @return the first text value, if any, or null.
-   */
-  String getTextValue();
+    /**
+     * @return the execution id of the variable
+     */
+    String getExecutionId();
 
-  /**
-   * Sets the first text value. A value of null is allowed.
-   */
-  void setTextValue(String textValue);
+    /**
+     * @return the task id of the variable
+     */
+    String getTaskId();
 
-  /**
-   * @return the second text value, if any, or null.
-   */
-  String getTextValue2();
+    /**
+     * @return the first text value, if any, or null.
+     */
+    String getTextValue();
 
-  /**
-   * Sets second text value. A value of null is allowed.
-   */
-  void setTextValue2(String textValue2);
+    /**
+     * Sets the first text value. A value of null is allowed.
+     */
+    void setTextValue(String textValue);
 
-  /**
-   * @return the long value, if any, or null.
-   */
-  Long getLongValue();
+    /**
+     * @return the second text value, if any, or null.
+     */
+    String getTextValue2();
 
-  /**
-   * Sets the long value. A value of null is allowed.
-   */
-  void setLongValue(Long longValue);
+    /**
+     * Sets second text value. A value of null is allowed.
+     */
+    void setTextValue2(String textValue2);
 
-  /**
-   * @return the double value, if any, or null.
-   */
-  Double getDoubleValue();
+    /**
+     * @return the long value, if any, or null.
+     */
+    Long getLongValue();
 
-  /**
-   * Sets the double value. A value of null is allowed.
-   */
-  void setDoubleValue(Double doubleValue);
+    /**
+     * Sets the long value. A value of null is allowed.
+     */
+    void setLongValue(Long longValue);
 
-  /**
-   * @return the byte array value, if any, or null.
-   */
-  byte[] getBytes();
+    /**
+     * @return the double value, if any, or null.
+     */
+    Double getDoubleValue();
 
-  /**
-   * Sets the byte array value. A value of null is allowed.
-   */
-  void setBytes(byte[] bytes);
+    /**
+     * Sets the double value. A value of null is allowed.
+     */
+    void setDoubleValue(Double doubleValue);
 
-  Object getCachedValue();
+    /**
+     * @return the byte array value, if any, or null.
+     */
+    byte[] getBytes();
 
-  void setCachedValue(Object cachedValue);
+    /**
+     * Sets the byte array value. A value of null is allowed.
+     */
+    void setBytes(byte[] bytes);
+
+    Object getCachedValue();
+
+    void setCachedValue(Object cachedValue);
 
 }

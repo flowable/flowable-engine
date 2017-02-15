@@ -25,22 +25,22 @@ import org.springframework.stereotype.Component;
  */
 @Component("testExecutionListener")
 public class TestExecutionListener implements ExecutionListener {
-  
-  public static AtomicInteger INSTANCE_COUNT = new AtomicInteger(0);
-  
-  public TestExecutionListener() {
-    INSTANCE_COUNT.incrementAndGet();
-  }
 
-  @Override
-  public void notify(DelegateExecution execution) {
-    Expression inputExpression = DelegateHelper.getFieldExpression(execution, "input");
-    Number input = (Number) inputExpression.getValue(execution);
-    
-    int result = input.intValue() * 100;
-    
-    Expression resultVarExpression = DelegateHelper.getFieldExpression(execution, "resultVar");
-    execution.setVariable(resultVarExpression.getValue(execution).toString(), result);
-  }
+    public static AtomicInteger INSTANCE_COUNT = new AtomicInteger(0);
+
+    public TestExecutionListener() {
+        INSTANCE_COUNT.incrementAndGet();
+    }
+
+    @Override
+    public void notify(DelegateExecution execution) {
+        Expression inputExpression = DelegateHelper.getFieldExpression(execution, "input");
+        Number input = (Number) inputExpression.getValue(execution);
+
+        int result = input.intValue() * 100;
+
+        Expression resultVarExpression = DelegateHelper.getFieldExpression(execution, "resultVar");
+        execution.setVariable(resultVarExpression.getValue(execution).toString(), result);
+    }
 
 }

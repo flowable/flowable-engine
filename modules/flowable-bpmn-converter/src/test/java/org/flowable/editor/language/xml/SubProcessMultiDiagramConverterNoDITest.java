@@ -21,62 +21,62 @@ import org.junit.Test;
 
 public class SubProcessMultiDiagramConverterNoDITest extends AbstractConverterTest {
 
-  @Override
-  protected BpmnModel readXMLFile() throws Exception {
-    InputStream xmlStream = this.getClass().getClassLoader().getResourceAsStream(getResource());
-    XMLInputFactory xif = XMLInputFactory.newInstance();
-    InputStreamReader in = new InputStreamReader(xmlStream, "UTF-8");
-    XMLStreamReader xtr = xif.createXMLStreamReader(in);
-    return new SubprocessXMLConverter().convertToBpmnModel(xtr);
-  }
+    @Override
+    protected BpmnModel readXMLFile() throws Exception {
+        InputStream xmlStream = this.getClass().getClassLoader().getResourceAsStream(getResource());
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        InputStreamReader in = new InputStreamReader(xmlStream, "UTF-8");
+        XMLStreamReader xtr = xif.createXMLStreamReader(in);
+        return new SubprocessXMLConverter().convertToBpmnModel(xtr);
+    }
 
-  @Override
-  protected BpmnModel exportAndReadXMLFile(BpmnModel bpmnModel) throws Exception {
-    byte[] xml = new SubprocessXMLConverter().convertToXML(bpmnModel);
-    System.out.println("xml " + new String(xml, "UTF-8"));
-    XMLInputFactory xif = XMLInputFactory.newInstance();
-    InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(xml), "UTF-8");
-    XMLStreamReader xtr = xif.createXMLStreamReader(in);
-    return new SubprocessXMLConverter().convertToBpmnModel(xtr);
-  }
+    @Override
+    protected BpmnModel exportAndReadXMLFile(BpmnModel bpmnModel) throws Exception {
+        byte[] xml = new SubprocessXMLConverter().convertToXML(bpmnModel);
+        System.out.println("xml " + new String(xml, "UTF-8"));
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(xml), "UTF-8");
+        XMLStreamReader xtr = xif.createXMLStreamReader(in);
+        return new SubprocessXMLConverter().convertToBpmnModel(xtr);
+    }
 
-  @Test
-  public void convertXMLToModel() throws Exception {
-    BpmnModel bpmnModel = readXMLFile();
-    validateModel(bpmnModel);
-  }
+    @Test
+    public void convertXMLToModel() throws Exception {
+        BpmnModel bpmnModel = readXMLFile();
+        validateModel(bpmnModel);
+    }
 
-  @Test
-  public void convertModelToXML() throws Exception {
-    BpmnModel bpmnModel = readXMLFile();
-    BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-    validateModel(parsedModel);
-    deployProcess(parsedModel);
-  }
+    @Test
+    public void convertModelToXML() throws Exception {
+        BpmnModel bpmnModel = readXMLFile();
+        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
+        validateModel(parsedModel);
+        deployProcess(parsedModel);
+    }
 
-  protected String getResource() {
-    return "subprocessmultidiagrammodel-noDI.bpmn";
-  }
+    protected String getResource() {
+        return "subprocessmultidiagrammodel-noDI.bpmn";
+    }
 
-  private void validateModel(BpmnModel model) {
-    FlowElement flowElement = model.getMainProcess().getFlowElement("start1");
-    assertNotNull(flowElement);
-    assertTrue(flowElement instanceof StartEvent);
-    assertEquals("start1", flowElement.getId());
+    private void validateModel(BpmnModel model) {
+        FlowElement flowElement = model.getMainProcess().getFlowElement("start1");
+        assertNotNull(flowElement);
+        assertTrue(flowElement instanceof StartEvent);
+        assertEquals("start1", flowElement.getId());
 
-    flowElement = model.getMainProcess().getFlowElement("userTask1");
-    assertNotNull(flowElement);
-    assertTrue(flowElement instanceof UserTask);
-    assertEquals("userTask1", flowElement.getId());
-    UserTask userTask = (UserTask) flowElement;
-    assertEquals(1, userTask.getCandidateUsers().size());
-    assertEquals(1, userTask.getCandidateGroups().size());
+        flowElement = model.getMainProcess().getFlowElement("userTask1");
+        assertNotNull(flowElement);
+        assertTrue(flowElement instanceof UserTask);
+        assertEquals("userTask1", flowElement.getId());
+        UserTask userTask = (UserTask) flowElement;
+        assertEquals(1, userTask.getCandidateUsers().size());
+        assertEquals(1, userTask.getCandidateGroups().size());
 
-    flowElement = model.getMainProcess().getFlowElement("subprocess1");
-    assertNotNull(flowElement);
-    assertTrue(flowElement instanceof SubProcess);
-    assertEquals("subprocess1", flowElement.getId());
-    SubProcess subProcess = (SubProcess) flowElement;
-    assertEquals(11, subProcess.getFlowElements().size());
-  }
+        flowElement = model.getMainProcess().getFlowElement("subprocess1");
+        assertNotNull(flowElement);
+        assertTrue(flowElement instanceof SubProcess);
+        assertEquals("subprocess1", flowElement.getId());
+        SubProcess subProcess = (SubProcess) flowElement;
+        assertEquals(11, subProcess.getFlowElements().size());
+    }
 }

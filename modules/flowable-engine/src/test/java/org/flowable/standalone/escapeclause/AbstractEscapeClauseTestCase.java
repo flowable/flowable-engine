@@ -16,12 +16,12 @@ import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 
 public class AbstractEscapeClauseTestCase extends ResourceFlowableTestCase {
 
-  public AbstractEscapeClauseTestCase() {
-    this(null);
-  }
-  
-  public AbstractEscapeClauseTestCase(String activitiConfigurationResource) {
-    super("org/flowable/standalone/escapeclause/flowable.cfg.xml");
-  }
-  
+    public AbstractEscapeClauseTestCase() {
+        this(null);
+    }
+
+    public AbstractEscapeClauseTestCase(String activitiConfigurationResource) {
+        super("org/flowable/standalone/escapeclause/flowable.cfg.xml");
+    }
+
 }

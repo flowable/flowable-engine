@@ -42,7 +42,7 @@ public class MvelExpressionExecutor {
         if (inputEntry == null) {
             throw new IllegalArgumentException("input entry is required");
         }
-        
+
         for (Class<?> variableClass : executionContext.getPropertyHandlers().keySet()) {
             PropertyHandlerFactory.registerPropertyHandler(variableClass, executionContext.getPropertyHandlers().get(variableClass));
         }

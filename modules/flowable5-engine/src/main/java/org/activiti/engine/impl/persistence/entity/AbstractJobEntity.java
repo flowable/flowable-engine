@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.runtime.Job;
 
-
 /**
  * Abstract job entity class.
  *
@@ -34,174 +33,203 @@ import org.flowable.engine.runtime.Job;
  */
 public abstract class AbstractJobEntity implements Job, PersistentObject, HasRevision, BulkDeleteable, Serializable {
 
-  public static final boolean DEFAULT_EXCLUSIVE = true;
-  public static final int DEFAULT_RETRIES = 3;
-  private static final int MAX_EXCEPTION_MESSAGE_LENGTH = 255;
+    public static final boolean DEFAULT_EXCLUSIVE = true;
+    public static final int DEFAULT_RETRIES = 3;
+    private static final int MAX_EXCEPTION_MESSAGE_LENGTH = 255;
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String id;
-  protected int revision;
+    protected String id;
+    protected int revision;
 
-  protected Date duedate;
+    protected Date duedate;
 
-  protected String executionId;
-  protected String processInstanceId;
-  protected String processDefinitionId;
+    protected String executionId;
+    protected String processInstanceId;
+    protected String processDefinitionId;
 
-  protected boolean isExclusive = DEFAULT_EXCLUSIVE;
+    protected boolean isExclusive = DEFAULT_EXCLUSIVE;
 
-  protected int retries = DEFAULT_RETRIES;
+    protected int retries = DEFAULT_RETRIES;
 
-  protected String jobHandlerType;
-  protected String jobHandlerConfiguration;
-  protected int maxIterations;
-  protected String repeat;
-  protected Date endDate;
-  
-  protected final ByteArrayRef exceptionByteArrayRef = new ByteArrayRef();
-  
-  protected String exceptionMessage;
-  
-  protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
-  protected String jobType;
+    protected String jobHandlerType;
+    protected String jobHandlerConfiguration;
+    protected int maxIterations;
+    protected String repeat;
+    protected Date endDate;
 
-  public void setExecution(ExecutionEntity execution) {
-    executionId = execution.getId();
-    processInstanceId = execution.getProcessInstanceId();
-    processDefinitionId = execution.getProcessDefinitionId();
-  }
+    protected final ByteArrayRef exceptionByteArrayRef = new ByteArrayRef();
 
-  public String getExceptionStacktrace() {
-    byte[] bytes = exceptionByteArrayRef.getBytes();
-    if (bytes == null) {
-      return null;
+    protected String exceptionMessage;
+
+    protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
+    protected String jobType;
+
+    public void setExecution(ExecutionEntity execution) {
+        executionId = execution.getId();
+        processInstanceId = execution.getProcessInstanceId();
+        processDefinitionId = execution.getProcessDefinitionId();
     }
-    try {
-      return new String(bytes, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      throw new ActivitiException("UTF-8 is not a supported encoding");
-    }
-  }
-  
-  public void setExceptionStacktrace(String exception) {
-    exceptionByteArrayRef.setValue("stacktrace", getUtf8Bytes(exception));
-  }
 
-  private byte[] getUtf8Bytes(String str) {
-    if (str == null) {
-      return null;
+    public String getExceptionStacktrace() {
+        byte[] bytes = exceptionByteArrayRef.getBytes();
+        if (bytes == null) {
+            return null;
+        }
+        try {
+            return new String(bytes, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new ActivitiException("UTF-8 is not a supported encoding");
+        }
     }
-    try {
-      return str.getBytes("UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      throw new ActivitiException("UTF-8 is not a supported encoding");
+
+    public void setExceptionStacktrace(String exception) {
+        exceptionByteArrayRef.setValue("stacktrace", getUtf8Bytes(exception));
     }
-  }
-  
-  public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
-    persistentState.put("retries", retries);
-    persistentState.put("duedate", duedate);
-    persistentState.put("exceptionMessage", exceptionMessage);
-    persistentState.put("exceptionByteArrayId", exceptionByteArrayRef.getId());      
-    return persistentState;
-  }
-  
-  public int getRevisionNext() {
-    return revision+1;
-  }
 
-  // getters and setters //////////////////////////////////////////////////////
+    private byte[] getUtf8Bytes(String str) {
+        if (str == null) {
+            return null;
+        }
+        try {
+            return str.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new ActivitiException("UTF-8 is not a supported encoding");
+        }
+    }
 
-  public String getId() {
-    return id;
-  }
-  public void setId(String id) {
-    this.id = id;
-  }
-  public int getRevision() {
-    return revision;
-  }
-  public void setRevision(int revision) {
-    this.revision = revision;
-  }
-  public Date getDuedate() {
-    return duedate;
-  }
-  public void setDuedate(Date duedate) {
-    this.duedate = duedate;
-  }
-  public String getExecutionId() {
-    return executionId;
-  }
-  public void setExecutionId(String executionId) {
-    this.executionId = executionId;
-  }
-  public int getRetries() {
-    return retries;
-  }
-  public void setRetries(int retries) {
-    this.retries = retries;
-  }
-  public String getProcessInstanceId() {
-    return processInstanceId;
-  }
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
-  public boolean isExclusive() {
-    return isExclusive;
-  }
-  public void setExclusive(boolean isExclusive) {
-    this.isExclusive = isExclusive;
-  }
-  public String getProcessDefinitionId() {
-    return processDefinitionId;
-  }
-  public void setProcessDefinitionId(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
-  public String getJobHandlerType() {
-    return jobHandlerType;
-  }
-  public void setJobHandlerType(String jobHandlerType) {
-    this.jobHandlerType = jobHandlerType;
-  }
-  public String getJobHandlerConfiguration() {
-    return jobHandlerConfiguration;
-  }
-  public void setJobHandlerConfiguration(String jobHandlerConfiguration) {
-    this.jobHandlerConfiguration = jobHandlerConfiguration;
-  }
-  public String getRepeat() {
-    return repeat;
-  }
-  public void setRepeat(String repeat) {
-    this.repeat = repeat;
-  }
-  public Date getEndDate() {
-    return endDate;
-  }
-  public void setEndDate(Date endDate) {
-    this.endDate = endDate;
-  }
-  public String getExceptionMessage() {
-    return exceptionMessage;
-  }
-  public void setExceptionMessage(String exceptionMessage) {
-    this.exceptionMessage = StringUtils.abbreviate(exceptionMessage, MAX_EXCEPTION_MESSAGE_LENGTH);
-  }
-  public String getJobType() {
-    return jobType;
-  }
-  public void setJobType(String jobType) {
-    this.jobType = jobType;
-  }
-  public String getTenantId() {
-    return tenantId;
-  }
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
+    public Object getPersistentState() {
+        Map<String, Object> persistentState = new HashMap<String, Object>();
+        persistentState.put("retries", retries);
+        persistentState.put("duedate", duedate);
+        persistentState.put("exceptionMessage", exceptionMessage);
+        persistentState.put("exceptionByteArrayId", exceptionByteArrayRef.getId());
+        return persistentState;
+    }
+
+    public int getRevisionNext() {
+        return revision + 1;
+    }
+
+    // getters and setters //////////////////////////////////////////////////////
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public int getRevision() {
+        return revision;
+    }
+
+    public void setRevision(int revision) {
+        this.revision = revision;
+    }
+
+    public Date getDuedate() {
+        return duedate;
+    }
+
+    public void setDuedate(Date duedate) {
+        this.duedate = duedate;
+    }
+
+    public String getExecutionId() {
+        return executionId;
+    }
+
+    public void setExecutionId(String executionId) {
+        this.executionId = executionId;
+    }
+
+    public int getRetries() {
+        return retries;
+    }
+
+    public void setRetries(int retries) {
+        this.retries = retries;
+    }
+
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+
+    public boolean isExclusive() {
+        return isExclusive;
+    }
+
+    public void setExclusive(boolean isExclusive) {
+        this.isExclusive = isExclusive;
+    }
+
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
+
+    public String getJobHandlerType() {
+        return jobHandlerType;
+    }
+
+    public void setJobHandlerType(String jobHandlerType) {
+        this.jobHandlerType = jobHandlerType;
+    }
+
+    public String getJobHandlerConfiguration() {
+        return jobHandlerConfiguration;
+    }
+
+    public void setJobHandlerConfiguration(String jobHandlerConfiguration) {
+        this.jobHandlerConfiguration = jobHandlerConfiguration;
+    }
+
+    public String getRepeat() {
+        return repeat;
+    }
+
+    public void setRepeat(String repeat) {
+        this.repeat = repeat;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getExceptionMessage() {
+        return exceptionMessage;
+    }
+
+    public void setExceptionMessage(String exceptionMessage) {
+        this.exceptionMessage = StringUtils.abbreviate(exceptionMessage, MAX_EXCEPTION_MESSAGE_LENGTH);
+    }
+
+    public String getJobType() {
+        return jobType;
+    }
+
+    public void setJobType(String jobType) {
+        this.jobType = jobType;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
 }

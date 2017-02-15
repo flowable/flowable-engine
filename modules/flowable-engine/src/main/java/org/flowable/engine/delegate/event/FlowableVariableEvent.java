@@ -24,23 +24,23 @@ import org.flowable.engine.impl.variable.VariableType;
  */
 public interface FlowableVariableEvent extends FlowableEngineEvent {
 
-  /**
-   * @return the name of the variable involved.
-   */
-  String getVariableName();
+    /**
+     * @return the name of the variable involved.
+     */
+    String getVariableName();
 
-  /**
-   * @return the current value of the variable.
-   */
-  Object getVariableValue();
+    /**
+     * @return the current value of the variable.
+     */
+    Object getVariableValue();
 
-  /**
-   * @return The {@link VariableType} of the variable.
-   */
-  VariableType getVariableType();
+    /**
+     * @return The {@link VariableType} of the variable.
+     */
+    VariableType getVariableType();
 
-  /**
-   * @return the id of the task the variable has been set on.
-   */
-  String getTaskId();
+    /**
+     * @return the id of the task the variable has been set on.
+     */
+    String getTaskId();
 }

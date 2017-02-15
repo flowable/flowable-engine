@@ -50,19 +50,19 @@ import org.flowable.engine.delegate.VariableScope;
  * 
  */
 public class MockResolverFactory implements ResolverFactory {
-  @Override
-  public Resolver createResolver(VariableScope variableScope) {
-    return new Resolver() {
+    @Override
+    public Resolver createResolver(VariableScope variableScope) {
+        return new Resolver() {
 
-      @Override
-      public Object get(Object key) {
-        return Mocks.get(key);
-      }
+            @Override
+            public Object get(Object key) {
+                return Mocks.get(key);
+            }
 
-      @Override
-      public boolean containsKey(Object key) {
-        return Mocks.get(key) != null;
-      }
-    };
-  }
+            @Override
+            public boolean containsKey(Object key) {
+                return Mocks.get(key) != null;
+            }
+        };
+    }
 }

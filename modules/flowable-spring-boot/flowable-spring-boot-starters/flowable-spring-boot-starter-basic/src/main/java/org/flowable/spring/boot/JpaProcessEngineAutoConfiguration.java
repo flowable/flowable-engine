@@ -39,31 +39,31 @@ import org.springframework.transaction.PlatformTransactionManager;
 @AutoConfigureAfter(DataSourceAutoConfiguration.class)
 public class JpaProcessEngineAutoConfiguration {
 
-  @Configuration
-  @ConditionalOnClass(name= "javax.persistence.EntityManagerFactory")
-  @EnableConfigurationProperties(FlowableProperties.class)
-  public static class JpaConfiguration extends AbstractProcessEngineAutoConfiguration {
+    @Configuration
+    @ConditionalOnClass(name = "javax.persistence.EntityManagerFactory")
+    @EnableConfigurationProperties(FlowableProperties.class)
+    public static class JpaConfiguration extends AbstractProcessEngineAutoConfiguration {
 
-    @Bean
-    @ConditionalOnMissingBean
-    public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
-      return new JpaTransactionManager(emf);
+        @Bean
+        @ConditionalOnMissingBean
+        public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
+            return new JpaTransactionManager(emf);
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public SpringProcessEngineConfiguration springProcessEngineConfiguration(
+                DataSource dataSource, EntityManagerFactory entityManagerFactory,
+                PlatformTransactionManager transactionManager, SpringAsyncExecutor springAsyncExecutor) throws IOException {
+
+            SpringProcessEngineConfiguration config = this.baseSpringProcessEngineConfiguration(dataSource,
+                    transactionManager, springAsyncExecutor);
+            config.setJpaEntityManagerFactory(entityManagerFactory);
+            config.setTransactionManager(transactionManager);
+            config.setJpaHandleTransaction(false);
+            config.setJpaCloseEntityManager(false);
+            return config;
+        }
     }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public SpringProcessEngineConfiguration springProcessEngineConfiguration(
-            DataSource dataSource, EntityManagerFactory entityManagerFactory,
-            PlatformTransactionManager transactionManager, SpringAsyncExecutor springAsyncExecutor) throws IOException {
-
-      SpringProcessEngineConfiguration config = this.baseSpringProcessEngineConfiguration(dataSource, 
-          transactionManager, springAsyncExecutor);
-      config.setJpaEntityManagerFactory(entityManagerFactory);
-      config.setTransactionManager(transactionManager);
-      config.setJpaHandleTransaction(false);
-      config.setJpaCloseEntityManager(false);
-      return config;
-    }
-  }
 
 }

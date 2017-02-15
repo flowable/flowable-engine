@@ -13,8 +13,7 @@
 package org.flowable.app.service.exception;
 
 /**
- * Exception thrown when an operation is performed for which the current user has insufficient
- * permissions.
+ * Exception thrown when an operation is performed for which the current user has insufficient permissions.
  * 
  * @author Frederik Heremans
  */
@@ -22,8 +21,9 @@ public class NotPermittedException extends BaseModelerRestException {
 
     private static final long serialVersionUID = 1L;
 
-    public NotPermittedException() {}
-    
+    public NotPermittedException() {
+    }
+
     public NotPermittedException(String message, Throwable cause) {
         super(message, cause);
     }

@@ -28,8 +28,7 @@ import org.springframework.boot.actuate.endpoint.AbstractEndpoint;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Registers a Boot Actuator endpoint that provides information on the
- * running process instance and renders BPMN diagrams of the deployed processes.
+ * Registers a Boot Actuator endpoint that provides information on the running process instance and renders BPMN diagrams of the deployed processes.
  *
  * @author Josh Long
  */
@@ -76,7 +75,6 @@ public class ProcessEngineEndpoint extends AbstractEndpoint<Map<String, Object>>
         // Open tasks
         metrics.put("openTaskCount", processEngine.getTaskService().createTaskQuery().count());
         metrics.put("completedTaskCount", processEngine.getHistoryService().createHistoricTaskInstanceQuery().finished().count());
-
 
         // Tasks completed today
         metrics.put("completedTaskCountToday", processEngine.getHistoryService().createHistoricTaskInstanceQuery().finished().taskCompletedAfter(

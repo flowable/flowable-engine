@@ -21,34 +21,32 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.flowable.engine.delegate.DelegateExecution;
 
-
 /**
  * @author Daniel Meyer
  */
-public class CancelBoundaryEventActivityBehavior  extends FlowNodeActivityBehavior {
-    
-  @Override
-  public void execute(DelegateExecution execution) {
-    ActivityExecution activityExecution = (ActivityExecution) execution;
-    List<CompensateEventSubscriptionEntity> eventSubscriptions = ((ExecutionEntity)execution).getCompensateEventSubscriptions();
-    
-    if (eventSubscriptions.isEmpty()) {
-      leave(activityExecution);                
-    } else {
-      // cancel boundary is always sync
-      ScopeUtil.throwCompensationEvent(eventSubscriptions, activityExecution, false);        
+public class CancelBoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
+
+    @Override
+    public void execute(DelegateExecution execution) {
+        ActivityExecution activityExecution = (ActivityExecution) execution;
+        List<CompensateEventSubscriptionEntity> eventSubscriptions = ((ExecutionEntity) execution).getCompensateEventSubscriptions();
+
+        if (eventSubscriptions.isEmpty()) {
+            leave(activityExecution);
+        } else {
+            // cancel boundary is always sync
+            ScopeUtil.throwCompensationEvent(eventSubscriptions, activityExecution, false);
+        }
     }
-  }
-  
-  @Override
-  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
-    // join compensating executions    
-    if (execution.getExecutions().isEmpty()) {
-      leave(execution);   
-    } else {      
-      ((ExecutionEntity)execution).forceUpdate();  
+
+    @Override
+    public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+        // join compensating executions
+        if (execution.getExecutions().isEmpty()) {
+            leave(execution);
+        } else {
+            ((ExecutionEntity) execution).forceUpdate();
+        }
     }
-  }
-  
 
 }

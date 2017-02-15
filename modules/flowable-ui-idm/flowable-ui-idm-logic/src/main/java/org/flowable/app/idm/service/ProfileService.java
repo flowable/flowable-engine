@@ -21,13 +21,13 @@ import org.flowable.idm.api.User;
  * @author Joram Barrez
  */
 public interface ProfileService {
-  
-  User updateProfile(String firstName, String lastName, String email);
-  
-  void changePassword(String originalPassword, String newPassword);
-  
-  Pair<String, InputStream> getProfilePicture();
-  
-  void uploadProfilePicture(String contentType, byte[] bytes);
+
+    User updateProfile(String firstName, String lastName, String email);
+
+    void changePassword(String originalPassword, String newPassword);
+
+    Pair<String, InputStream> getProfilePicture();
+
+    void uploadProfilePicture(String contentType, byte[] bytes);
 
 }

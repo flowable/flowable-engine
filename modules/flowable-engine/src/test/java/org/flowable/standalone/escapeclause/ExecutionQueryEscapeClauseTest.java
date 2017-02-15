@@ -20,89 +20,89 @@ import org.flowable.engine.runtime.ProcessInstance;
 
 public class ExecutionQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 
-  private String deploymentOneId;
+    private String deploymentOneId;
 
-  private String deploymentTwoId;
-  
-  private ProcessInstance processInstance1;
-  
-  private ProcessInstance processInstance2;
-  
-  @Override
-  protected void setUp() throws Exception {
-    deploymentOneId = repositoryService
-      .createDeployment()
-      .tenantId("One%")
-      .addClasspathResource("org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
-      .deploy()
-      .getId();
+    private String deploymentTwoId;
 
-    deploymentTwoId = repositoryService
-      .createDeployment()
-      .tenantId("Two_")
-      .addClasspathResource("org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
-      .deploy()
-      .getId();
-    
-    Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var1", "One%");
-    processInstance1 = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", vars, "One%");
-    
-    vars = new HashMap<String, Object>();
-    vars.put("var1", "Two_");
-    processInstance2 = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", vars, "Two_");
-    
-    super.setUp();
-  }
+    private ProcessInstance processInstance1;
 
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
-    repositoryService.deleteDeployment(deploymentOneId, true);
-    repositoryService.deleteDeployment(deploymentTwoId, true);
-  }
-  
-  public void testQueryByTenantIdLike() {
-    Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().executionTenantIdLike("%\\%%").singleResult();
-    assertNotNull(execution);
-    
-    execution = runtimeService.createExecutionQuery().onlyChildExecutions().executionTenantIdLike("%\\_%").singleResult();
-    assertNotNull(execution);
-  }
-  
-  public void testQueryLikeByQueryVariableValue() {
-    Execution execution = runtimeService.createExecutionQuery().variableValueLike("var1", "%\\%%").singleResult();
-    assertNotNull(execution);
-    assertEquals(processInstance1.getId(), execution.getId());
-    
-    execution = runtimeService.createExecutionQuery().variableValueLike("var1", "%\\_%").singleResult();
-    assertNotNull(execution);
-    assertEquals(processInstance2.getId(), execution.getId());
-  }
-  
-  public void testQueryLikeIgnoreCaseByQueryVariableValue() {
-    Execution execution = runtimeService.createExecutionQuery().variableValueLikeIgnoreCase("var1", "%\\%%").singleResult();
-    assertNotNull(execution);
-    assertEquals(processInstance1.getId(), execution.getId());
-    
-    execution = runtimeService.createExecutionQuery().variableValueLikeIgnoreCase("var1", "%\\_%").singleResult();
-    assertNotNull(execution);
-    assertEquals(processInstance2.getId(), execution.getId());
-  }
-  
-  public void testQueryLikeByQueryProcessVariableValue() {
-    Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().processVariableValueLike("var1", "%\\%%").singleResult();
-    assertNotNull(execution);
-    
-    execution = runtimeService.createExecutionQuery().onlyChildExecutions().processVariableValueLike("var1", "%\\_%").singleResult();
-    assertNotNull(execution);
-  }
-  
-  public void testQueryLikeIgnoreCaseByQueryProcessVariableValue() {
-    Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().processVariableValueLikeIgnoreCase("var1", "%\\%%").singleResult();
-    assertNotNull(execution);
-    
-    execution = runtimeService.createExecutionQuery().onlyChildExecutions().processVariableValueLikeIgnoreCase("var1", "%\\_%").singleResult();
-    assertNotNull(execution);
-  }
+    private ProcessInstance processInstance2;
+
+    @Override
+    protected void setUp() throws Exception {
+        deploymentOneId = repositoryService
+                .createDeployment()
+                .tenantId("One%")
+                .addClasspathResource("org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+                .deploy()
+                .getId();
+
+        deploymentTwoId = repositoryService
+                .createDeployment()
+                .tenantId("Two_")
+                .addClasspathResource("org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+                .deploy()
+                .getId();
+
+        Map<String, Object> vars = new HashMap<String, Object>();
+        vars.put("var1", "One%");
+        processInstance1 = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", vars, "One%");
+
+        vars = new HashMap<String, Object>();
+        vars.put("var1", "Two_");
+        processInstance2 = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", vars, "Two_");
+
+        super.setUp();
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        repositoryService.deleteDeployment(deploymentOneId, true);
+        repositoryService.deleteDeployment(deploymentTwoId, true);
+    }
+
+    public void testQueryByTenantIdLike() {
+        Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().executionTenantIdLike("%\\%%").singleResult();
+        assertNotNull(execution);
+
+        execution = runtimeService.createExecutionQuery().onlyChildExecutions().executionTenantIdLike("%\\_%").singleResult();
+        assertNotNull(execution);
+    }
+
+    public void testQueryLikeByQueryVariableValue() {
+        Execution execution = runtimeService.createExecutionQuery().variableValueLike("var1", "%\\%%").singleResult();
+        assertNotNull(execution);
+        assertEquals(processInstance1.getId(), execution.getId());
+
+        execution = runtimeService.createExecutionQuery().variableValueLike("var1", "%\\_%").singleResult();
+        assertNotNull(execution);
+        assertEquals(processInstance2.getId(), execution.getId());
+    }
+
+    public void testQueryLikeIgnoreCaseByQueryVariableValue() {
+        Execution execution = runtimeService.createExecutionQuery().variableValueLikeIgnoreCase("var1", "%\\%%").singleResult();
+        assertNotNull(execution);
+        assertEquals(processInstance1.getId(), execution.getId());
+
+        execution = runtimeService.createExecutionQuery().variableValueLikeIgnoreCase("var1", "%\\_%").singleResult();
+        assertNotNull(execution);
+        assertEquals(processInstance2.getId(), execution.getId());
+    }
+
+    public void testQueryLikeByQueryProcessVariableValue() {
+        Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().processVariableValueLike("var1", "%\\%%").singleResult();
+        assertNotNull(execution);
+
+        execution = runtimeService.createExecutionQuery().onlyChildExecutions().processVariableValueLike("var1", "%\\_%").singleResult();
+        assertNotNull(execution);
+    }
+
+    public void testQueryLikeIgnoreCaseByQueryProcessVariableValue() {
+        Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().processVariableValueLikeIgnoreCase("var1", "%\\%%").singleResult();
+        assertNotNull(execution);
+
+        execution = runtimeService.createExecutionQuery().onlyChildExecutions().processVariableValueLikeIgnoreCase("var1", "%\\_%").singleResult();
+        assertNotNull(execution);
+    }
 }

@@ -25,51 +25,51 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ModelRelationRepositoryImpl implements ModelRelationRepository {
-  
-  private static final String NAMESPACE = "org.flowable.app.domain.editor.ModelRelation.";
-  
-  @Autowired
-  protected SqlSessionTemplate sqlSessionTemplate;
-  
-  @Autowired
-  protected UuidIdGenerator idGenerator;
 
-  @Override
-  public List<ModelRelation> findByParentModelIdAndType(String parentModelId, String type) {
-    Map<String, Object> params = new HashMap<String, Object>();
-    params.put("parentModelId", parentModelId);
-    params.put("type", type);
-    return sqlSessionTemplate.selectList("selectModelRelationByParentModelIdAndType", params);
-  }
-  
-  @Override
-  public List<ModelInformation> findModelInformationByParentModelId(String parentModelId) {
-    return sqlSessionTemplate.selectList(NAMESPACE + "selectModelInformationByParentModelId", parentModelId);
-  }
-  
-  @Override
-  public List<ModelInformation> findModelInformationByChildModelId(String modelId) {
-    return sqlSessionTemplate.selectList(NAMESPACE + "selectModelInformationModelId", modelId);
-  }
-  
-  @Override
-  public void deleteModelRelationsForParentModel(String parentModelId) {
-    sqlSessionTemplate.delete(NAMESPACE + "deleteModelRelationByParentModelId", parentModelId);
-  }
-  
-  @Override
-  public void save(ModelRelation modelRelation) {
-    if (modelRelation.getId() == null) {
-      modelRelation.setId(idGenerator.generateId());
-      sqlSessionTemplate.insert(NAMESPACE + "insertModelRelation", modelRelation);
-    } else {
-      sqlSessionTemplate.update(NAMESPACE + "updateModelRelation", modelRelation);
+    private static final String NAMESPACE = "org.flowable.app.domain.editor.ModelRelation.";
+
+    @Autowired
+    protected SqlSessionTemplate sqlSessionTemplate;
+
+    @Autowired
+    protected UuidIdGenerator idGenerator;
+
+    @Override
+    public List<ModelRelation> findByParentModelIdAndType(String parentModelId, String type) {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("parentModelId", parentModelId);
+        params.put("type", type);
+        return sqlSessionTemplate.selectList("selectModelRelationByParentModelIdAndType", params);
     }
-  }
-  
-  @Override
-  public void delete(ModelRelation modelRelation) {
-    sqlSessionTemplate.delete(NAMESPACE + "deleteModelRelation", modelRelation);
-  }
+
+    @Override
+    public List<ModelInformation> findModelInformationByParentModelId(String parentModelId) {
+        return sqlSessionTemplate.selectList(NAMESPACE + "selectModelInformationByParentModelId", parentModelId);
+    }
+
+    @Override
+    public List<ModelInformation> findModelInformationByChildModelId(String modelId) {
+        return sqlSessionTemplate.selectList(NAMESPACE + "selectModelInformationModelId", modelId);
+    }
+
+    @Override
+    public void deleteModelRelationsForParentModel(String parentModelId) {
+        sqlSessionTemplate.delete(NAMESPACE + "deleteModelRelationByParentModelId", parentModelId);
+    }
+
+    @Override
+    public void save(ModelRelation modelRelation) {
+        if (modelRelation.getId() == null) {
+            modelRelation.setId(idGenerator.generateId());
+            sqlSessionTemplate.insert(NAMESPACE + "insertModelRelation", modelRelation);
+        } else {
+            sqlSessionTemplate.update(NAMESPACE + "updateModelRelation", modelRelation);
+        }
+    }
+
+    @Override
+    public void delete(ModelRelation modelRelation) {
+        sqlSessionTemplate.delete(NAMESPACE + "deleteModelRelation", modelRelation);
+    }
 
 }

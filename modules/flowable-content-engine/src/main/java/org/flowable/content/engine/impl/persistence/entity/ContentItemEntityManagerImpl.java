@@ -28,44 +28,44 @@ import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
  */
 public class ContentItemEntityManagerImpl extends AbstractEntityManager<ContentItemEntity> implements ContentItemEntityManager {
 
-  protected ContentItemDataManager contentItemDataManager;
-  
-  public ContentItemEntityManagerImpl(ContentEngineConfiguration contentEngineConfiguration, ContentItemDataManager contentItemDataManager) {
-    super(contentEngineConfiguration);
-    this.contentItemDataManager = contentItemDataManager;
-  }
-  
-  @Override
-  public long findContentItemCountByQueryCriteria(ContentItemQueryImpl contentItemQuery) {
-    return contentItemDataManager.findContentItemCountByQueryCriteria(contentItemQuery);
-  }
+    protected ContentItemDataManager contentItemDataManager;
 
-  @Override
-  public List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl contentItemQuery, Page page) {
-    return contentItemDataManager.findContentItemsByQueryCriteria(contentItemQuery, page);
-  }
-  
-  @Override
-  public void deleteContentItemsByTaskId(String taskId) {
-    contentItemDataManager.deleteContentItemsByTaskId(taskId);
-  }
+    public ContentItemEntityManagerImpl(ContentEngineConfiguration contentEngineConfiguration, ContentItemDataManager contentItemDataManager) {
+        super(contentEngineConfiguration);
+        this.contentItemDataManager = contentItemDataManager;
+    }
 
-  @Override
-  public void deleteContentItemsByProcessInstanceId(String processInstanceId) {
-    contentItemDataManager.deleteContentItemsByProcessInstanceId(processInstanceId);
-  }
+    @Override
+    public long findContentItemCountByQueryCriteria(ContentItemQueryImpl contentItemQuery) {
+        return contentItemDataManager.findContentItemCountByQueryCriteria(contentItemQuery);
+    }
 
-  @Override
-  protected DataManager<ContentItemEntity> getDataManager() {
-    return contentItemDataManager;
-  }
+    @Override
+    public List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl contentItemQuery, Page page) {
+        return contentItemDataManager.findContentItemsByQueryCriteria(contentItemQuery, page);
+    }
 
-  public ContentItemDataManager getContentItemDataManager() {
-    return contentItemDataManager;
-  }
+    @Override
+    public void deleteContentItemsByTaskId(String taskId) {
+        contentItemDataManager.deleteContentItemsByTaskId(taskId);
+    }
 
-  public void setContentItemDataManager(ContentItemDataManager contentItemDataManager) {
-    this.contentItemDataManager = contentItemDataManager;
-  }
-  
+    @Override
+    public void deleteContentItemsByProcessInstanceId(String processInstanceId) {
+        contentItemDataManager.deleteContentItemsByProcessInstanceId(processInstanceId);
+    }
+
+    @Override
+    protected DataManager<ContentItemEntity> getDataManager() {
+        return contentItemDataManager;
+    }
+
+    public ContentItemDataManager getContentItemDataManager() {
+        return contentItemDataManager;
+    }
+
+    public void setContentItemDataManager(ContentItemDataManager contentItemDataManager) {
+        this.contentItemDataManager = contentItemDataManager;
+    }
+
 }

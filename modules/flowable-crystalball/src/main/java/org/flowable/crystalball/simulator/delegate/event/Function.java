@@ -15,10 +15,10 @@ package org.flowable.crystalball.simulator.delegate.event;
 /**
  * 
  * @param <S>
- *          function's input
+ *            function's input
  * @param <D>
- *          function's output
+ *            function's output
  */
 public interface Function<S, D> {
-  D apply(S sourceObject);
+    D apply(S sourceObject);
 }

@@ -36,133 +36,133 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
  */
 public class WebConfigurer implements ServletContextListener {
 
-  private final Logger log = LoggerFactory.getLogger(WebConfigurer.class);
+    private final Logger log = LoggerFactory.getLogger(WebConfigurer.class);
 
-  public AnnotationConfigWebApplicationContext context;
+    public AnnotationConfigWebApplicationContext context;
 
-  public void setContext(AnnotationConfigWebApplicationContext context) {
-    this.context = context;
-  }
-
-  @Override
-  public void contextInitialized(ServletContextEvent sce) {
-    log.debug("Configuring Spring root application context");
-
-    ServletContext servletContext = sce.getServletContext();
-
-    AnnotationConfigWebApplicationContext rootContext = null;
-
-    if (context == null) {
-      rootContext = new AnnotationConfigWebApplicationContext();
-      rootContext.register(ApplicationConfiguration.class);
-
-      if (rootContext.getServletContext() == null) {
-        rootContext.setServletContext(servletContext);
-      }
-
-      rootContext.refresh();
-      context = rootContext;
-
-    } else {
-      rootContext = context;
-      if (rootContext.getServletContext() == null) {
-        rootContext.setServletContext(servletContext);
-      }
+    public void setContext(AnnotationConfigWebApplicationContext context) {
+        this.context = context;
     }
 
-    servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, rootContext);
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+        log.debug("Configuring Spring root application context");
 
-    EnumSet<DispatcherType> disps = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.ASYNC);
+        ServletContext servletContext = sce.getServletContext();
 
-    initSpring(servletContext, rootContext);
-    initSpringSecurity(servletContext, disps);
+        AnnotationConfigWebApplicationContext rootContext = null;
 
-    log.debug("Web application fully configured");
-  }
+        if (context == null) {
+            rootContext = new AnnotationConfigWebApplicationContext();
+            rootContext.register(ApplicationConfiguration.class);
 
-  /**
-   * Initializes Spring and Spring MVC.
-   */
-  private void initSpring(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
-    log.debug("Configuring Spring Web application context");
-    AnnotationConfigWebApplicationContext appDispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
-    appDispatcherServletConfiguration.setParent(rootContext);
-    appDispatcherServletConfiguration.register(AppDispatcherServletConfiguration.class);
+            if (rootContext.getServletContext() == null) {
+                rootContext.setServletContext(servletContext);
+            }
 
-    log.debug("Registering Spring MVC Servlet");
-    ServletRegistration.Dynamic appDispatcherServlet = servletContext.addServlet("appDispatcher", new DispatcherServlet(appDispatcherServletConfiguration));
-    appDispatcherServlet.addMapping("/app/*");
-    appDispatcherServlet.setLoadOnStartup(1);
-    appDispatcherServlet.setAsyncSupported(true);
+            rootContext.refresh();
+            context = rootContext;
 
-    initSpringProcessRest(servletContext, rootContext);
-    initSpringDMNRest(servletContext, rootContext);
-    initSpringFormRest(servletContext, rootContext);
-    initSpringContentRest(servletContext, rootContext);
-  }
-  
-  /**
-   * Initializes Process Spring and Spring MVC .
-   */
-  private ServletRegistration.Dynamic initSpringProcessRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
-    return initSpringRestComponent(servletContext, rootContext, "process-api", ProcessDispatcherServletConfiguration.class);
-  }
+        } else {
+            rootContext = context;
+            if (rootContext.getServletContext() == null) {
+                rootContext.setServletContext(servletContext);
+            }
+        }
 
-  /**
-   * Initializes DMN Spring and Spring MVC.
-   */
-  protected ServletRegistration.Dynamic initSpringDMNRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
-    return initSpringRestComponent(servletContext, rootContext, "dmn-api", DmnDispatcherServletConfiguration.class);
-  }
+        servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, rootContext);
 
-  /**
-   * Initializes Form Spring and Spring MVC.
-   */
-  protected ServletRegistration.Dynamic initSpringFormRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
-    return initSpringRestComponent(servletContext, rootContext, "form-api", FormDispatcherServletConfiguration.class);
-  }
-  
-  /**
-   * Initializes Content Spring and Spring MVC.
-   */
-  protected ServletRegistration.Dynamic initSpringContentRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
-    return initSpringRestComponent(servletContext, rootContext, "content-api", ContentDispatcherServletConfiguration.class);
-  }
-  
-  protected ServletRegistration.Dynamic initSpringRestComponent(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext,
-      String restContextRoot, Class<? extends WebMvcConfigurationSupport> webConfigClass) {
+        EnumSet<DispatcherType> disps = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.ASYNC);
 
-    log.debug("Configuring Spring Web application context - {} REST", restContextRoot);
-    AnnotationConfigWebApplicationContext dispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
-    dispatcherServletConfiguration.setParent(rootContext);
-    dispatcherServletConfiguration.register(webConfigClass);
+        initSpring(servletContext, rootContext);
+        initSpringSecurity(servletContext, disps);
 
-    log.debug("Registering Spring MVC Servlet - {} REST", restContextRoot);
-    ServletRegistration.Dynamic dispatcherServlet = servletContext.addServlet(restContextRoot + "-dispatcher", new DispatcherServlet(dispatcherServletConfiguration));
-    dispatcherServlet.addMapping("/" + restContextRoot + "/*");
-    dispatcherServlet.setLoadOnStartup(1);
-    dispatcherServlet.setAsyncSupported(true);
+        log.debug("Web application fully configured");
+    }
 
-    return dispatcherServlet;
-  }
+    /**
+     * Initializes Spring and Spring MVC.
+     */
+    private void initSpring(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
+        log.debug("Configuring Spring Web application context");
+        AnnotationConfigWebApplicationContext appDispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
+        appDispatcherServletConfiguration.setParent(rootContext);
+        appDispatcherServletConfiguration.register(AppDispatcherServletConfiguration.class);
 
-  /**
-   * Initializes Spring Security.
-   */
-  private void initSpringSecurity(ServletContext servletContext, EnumSet<DispatcherType> disps) {
-    log.debug("Registering Spring Security Filter");
-    FilterRegistration.Dynamic springSecurityFilter = servletContext.addFilter("springSecurityFilterChain", new DelegatingFilterProxy());
+        log.debug("Registering Spring MVC Servlet");
+        ServletRegistration.Dynamic appDispatcherServlet = servletContext.addServlet("appDispatcher", new DispatcherServlet(appDispatcherServletConfiguration));
+        appDispatcherServlet.addMapping("/app/*");
+        appDispatcherServlet.setLoadOnStartup(1);
+        appDispatcherServlet.setAsyncSupported(true);
 
-    springSecurityFilter.addMappingForUrlPatterns(disps, false, "/*");
-    springSecurityFilter.setAsyncSupported(true);
-  }
+        initSpringProcessRest(servletContext, rootContext);
+        initSpringDMNRest(servletContext, rootContext);
+        initSpringFormRest(servletContext, rootContext);
+        initSpringContentRest(servletContext, rootContext);
+    }
 
-  @Override
-  public void contextDestroyed(ServletContextEvent sce) {
-    log.info("Destroying Web application");
-    WebApplicationContext ac = WebApplicationContextUtils.getRequiredWebApplicationContext(sce.getServletContext());
-    AnnotationConfigWebApplicationContext gwac = (AnnotationConfigWebApplicationContext) ac;
-    gwac.close();
-    log.debug("Web application destroyed");
-  }
+    /**
+     * Initializes Process Spring and Spring MVC .
+     */
+    private ServletRegistration.Dynamic initSpringProcessRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
+        return initSpringRestComponent(servletContext, rootContext, "process-api", ProcessDispatcherServletConfiguration.class);
+    }
+
+    /**
+     * Initializes DMN Spring and Spring MVC.
+     */
+    protected ServletRegistration.Dynamic initSpringDMNRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
+        return initSpringRestComponent(servletContext, rootContext, "dmn-api", DmnDispatcherServletConfiguration.class);
+    }
+
+    /**
+     * Initializes Form Spring and Spring MVC.
+     */
+    protected ServletRegistration.Dynamic initSpringFormRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
+        return initSpringRestComponent(servletContext, rootContext, "form-api", FormDispatcherServletConfiguration.class);
+    }
+
+    /**
+     * Initializes Content Spring and Spring MVC.
+     */
+    protected ServletRegistration.Dynamic initSpringContentRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
+        return initSpringRestComponent(servletContext, rootContext, "content-api", ContentDispatcherServletConfiguration.class);
+    }
+
+    protected ServletRegistration.Dynamic initSpringRestComponent(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext,
+            String restContextRoot, Class<? extends WebMvcConfigurationSupport> webConfigClass) {
+
+        log.debug("Configuring Spring Web application context - {} REST", restContextRoot);
+        AnnotationConfigWebApplicationContext dispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
+        dispatcherServletConfiguration.setParent(rootContext);
+        dispatcherServletConfiguration.register(webConfigClass);
+
+        log.debug("Registering Spring MVC Servlet - {} REST", restContextRoot);
+        ServletRegistration.Dynamic dispatcherServlet = servletContext.addServlet(restContextRoot + "-dispatcher", new DispatcherServlet(dispatcherServletConfiguration));
+        dispatcherServlet.addMapping("/" + restContextRoot + "/*");
+        dispatcherServlet.setLoadOnStartup(1);
+        dispatcherServlet.setAsyncSupported(true);
+
+        return dispatcherServlet;
+    }
+
+    /**
+     * Initializes Spring Security.
+     */
+    private void initSpringSecurity(ServletContext servletContext, EnumSet<DispatcherType> disps) {
+        log.debug("Registering Spring Security Filter");
+        FilterRegistration.Dynamic springSecurityFilter = servletContext.addFilter("springSecurityFilterChain", new DelegatingFilterProxy());
+
+        springSecurityFilter.addMappingForUrlPatterns(disps, false, "/*");
+        springSecurityFilter.setAsyncSupported(true);
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        log.info("Destroying Web application");
+        WebApplicationContext ac = WebApplicationContextUtils.getRequiredWebApplicationContext(sce.getServletContext());
+        AnnotationConfigWebApplicationContext gwac = (AnnotationConfigWebApplicationContext) ac;
+        gwac.close();
+        log.debug("Web application destroyed");
+    }
 }

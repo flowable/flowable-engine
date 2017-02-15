@@ -25,22 +25,22 @@ import org.springframework.stereotype.Component;
  */
 @Component("testTaskListener")
 public class TestTaskListener implements TaskListener {
-  
- public static AtomicInteger INSTANCE_COUNT = new AtomicInteger(0);
-  
-  public TestTaskListener() {
-    INSTANCE_COUNT.incrementAndGet();
-  }
 
-  @Override
-  public void notify(DelegateTask delegateTask) {
-    Expression inputExpression = DelegateHelper.getFieldExpression(delegateTask, "input");
-    Number input = (Number) inputExpression.getValue(delegateTask);
-    
-    int result = input.intValue() / 2;
-    
-    Expression resultVarExpression = DelegateHelper.getFieldExpression(delegateTask, "resultVar");
-    delegateTask.setVariable(resultVarExpression.getValue(delegateTask).toString(), result);
-  }
+    public static AtomicInteger INSTANCE_COUNT = new AtomicInteger(0);
+
+    public TestTaskListener() {
+        INSTANCE_COUNT.incrementAndGet();
+    }
+
+    @Override
+    public void notify(DelegateTask delegateTask) {
+        Expression inputExpression = DelegateHelper.getFieldExpression(delegateTask, "input");
+        Number input = (Number) inputExpression.getValue(delegateTask);
+
+        int result = input.intValue() / 2;
+
+        Expression resultVarExpression = DelegateHelper.getFieldExpression(delegateTask, "resultVar");
+        delegateTask.setVariable(resultVarExpression.getValue(delegateTask).toString(), result);
+    }
 
 }

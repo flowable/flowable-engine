@@ -28,44 +28,44 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
  */
 public class SetDeploymentTenantIdCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String deploymentId;
-  protected String newTenantId;
+    protected String deploymentId;
+    protected String newTenantId;
 
-  public SetDeploymentTenantIdCmd(String deploymentId, String newTenantId) {
-    this.deploymentId = deploymentId;
-    this.newTenantId = newTenantId;
-  }
-
-  public Void execute(CommandContext commandContext) {
-    if (deploymentId == null) {
-      throw new FlowableIllegalArgumentException("deploymentId is null");
+    public SetDeploymentTenantIdCmd(String deploymentId, String newTenantId) {
+        this.deploymentId = deploymentId;
+        this.newTenantId = newTenantId;
     }
 
-    // Update all entities
+    public Void execute(CommandContext commandContext) {
+        if (deploymentId == null) {
+            throw new FlowableIllegalArgumentException("deploymentId is null");
+        }
 
-    DmnDeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
-    if (deployment == null) {
-      throw new FlowableObjectNotFoundException("Could not find deployment with id " + deploymentId);
+        // Update all entities
+
+        DmnDeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
+        if (deployment == null) {
+            throw new FlowableObjectNotFoundException("Could not find deployment with id " + deploymentId);
+        }
+
+        deployment.setTenantId(newTenantId);
+
+        // Doing process instances, executions and tasks with direct SQL updates
+        // (otherwise would not be performant)
+        commandContext.getDecisionTableEntityManager().updateDecisionTableTenantIdForDeployment(deploymentId, newTenantId);
+
+        // Doing decision tables in memory, cause we need to clear the decision table cache
+        List<DmnDecisionTable> decisionTables = new DecisionTableQueryImpl().deploymentId(deploymentId).list();
+        for (DmnDecisionTable decisionTable : decisionTables) {
+            commandContext.getDmnEngineConfiguration().getDecisionCache().remove(decisionTable.getId());
+        }
+
+        commandContext.getDeploymentEntityManager().update(deployment);
+
+        return null;
+
     }
-    
-    deployment.setTenantId(newTenantId);
-
-    // Doing process instances, executions and tasks with direct SQL updates
-    // (otherwise would not be performant)
-    commandContext.getDecisionTableEntityManager().updateDecisionTableTenantIdForDeployment(deploymentId, newTenantId);
-
-    // Doing decision tables in memory, cause we need to clear the decision table cache
-    List<DmnDecisionTable> decisionTables = new DecisionTableQueryImpl().deploymentId(deploymentId).list();
-    for (DmnDecisionTable decisionTable : decisionTables) {
-      commandContext.getDmnEngineConfiguration().getDecisionCache().remove(decisionTable.getId());
-    }
-    
-    commandContext.getDeploymentEntityManager().update(deployment);
-
-    return null;
-
-  }
 
 }

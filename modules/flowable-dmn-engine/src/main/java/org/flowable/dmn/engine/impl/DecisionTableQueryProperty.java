@@ -25,31 +25,31 @@ import org.flowable.engine.common.api.query.QueryProperty;
  */
 public class DecisionTableQueryProperty implements QueryProperty {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private static final Map<String, DecisionTableQueryProperty> properties = new HashMap<String, DecisionTableQueryProperty>();
+    private static final Map<String, DecisionTableQueryProperty> properties = new HashMap<String, DecisionTableQueryProperty>();
 
-  public static final DecisionTableQueryProperty DECISION_TABLE_KEY = new DecisionTableQueryProperty("RES.KEY_");
-  public static final DecisionTableQueryProperty DECISION_TABLE_CATEGORY = new DecisionTableQueryProperty("RES.CATEGORY_");
-  public static final DecisionTableQueryProperty DECISION_TABLE_ID = new DecisionTableQueryProperty("RES.ID_");
-  public static final DecisionTableQueryProperty DECISION_TABLE_VERSION = new DecisionTableQueryProperty("RES.VERSION_");
-  public static final DecisionTableQueryProperty DECISION_TABLE_NAME = new DecisionTableQueryProperty("RES.NAME_");
-  public static final DecisionTableQueryProperty DEPLOYMENT_ID = new DecisionTableQueryProperty("RES.DEPLOYMENT_ID_");
-  public static final DecisionTableQueryProperty DECISION_TABLE_TENANT_ID = new DecisionTableQueryProperty("RES.TENANT_ID_");
+    public static final DecisionTableQueryProperty DECISION_TABLE_KEY = new DecisionTableQueryProperty("RES.KEY_");
+    public static final DecisionTableQueryProperty DECISION_TABLE_CATEGORY = new DecisionTableQueryProperty("RES.CATEGORY_");
+    public static final DecisionTableQueryProperty DECISION_TABLE_ID = new DecisionTableQueryProperty("RES.ID_");
+    public static final DecisionTableQueryProperty DECISION_TABLE_VERSION = new DecisionTableQueryProperty("RES.VERSION_");
+    public static final DecisionTableQueryProperty DECISION_TABLE_NAME = new DecisionTableQueryProperty("RES.NAME_");
+    public static final DecisionTableQueryProperty DEPLOYMENT_ID = new DecisionTableQueryProperty("RES.DEPLOYMENT_ID_");
+    public static final DecisionTableQueryProperty DECISION_TABLE_TENANT_ID = new DecisionTableQueryProperty("RES.TENANT_ID_");
 
-  private String name;
+    private String name;
 
-  public DecisionTableQueryProperty(String name) {
-    this.name = name;
-    properties.put(name, this);
-  }
+    public DecisionTableQueryProperty(String name) {
+        this.name = name;
+        properties.put(name, this);
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public static DecisionTableQueryProperty findByName(String propertyName) {
-    return properties.get(propertyName);
-  }
+    public static DecisionTableQueryProperty findByName(String propertyName) {
+        return properties.get(propertyName);
+    }
 
 }

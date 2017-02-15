@@ -22,6 +22,6 @@ package org.flowable.engine.impl.bpmn.behavior;
  */
 public class ManualTaskActivityBehavior extends TaskActivityBehavior {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
 }

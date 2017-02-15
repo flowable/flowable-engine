@@ -19,37 +19,37 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class ExpressionExecution {
 
-  protected String id;
-  
-  @JsonProperty("exception")
-  protected String exceptionMessage;
-  
-  protected Object result;
+    protected String id;
 
-  private ExpressionExecution() {
+    @JsonProperty("exception")
+    protected String exceptionMessage;
 
-  }
+    protected Object result;
 
-  public ExpressionExecution(String id, Object result) {
-    this.id = id;
-    this.result = result;
-  }
+    private ExpressionExecution() {
 
-  public ExpressionExecution(String id, String exceptionMessage, Object result) {
-    this.id = id;
-    this.exceptionMessage = exceptionMessage;
-    this.result = result;
-  }
+    }
 
-  public String getId() {
-    return id;
-  }
+    public ExpressionExecution(String id, Object result) {
+        this.id = id;
+        this.result = result;
+    }
 
-  public String getException() {
-    return exceptionMessage;
-  }
+    public ExpressionExecution(String id, String exceptionMessage, Object result) {
+        this.id = id;
+        this.exceptionMessage = exceptionMessage;
+        this.result = result;
+    }
 
-  public Object getResult() {
-    return result;
-  }
+    public String getId() {
+        return id;
+    }
+
+    public String getException() {
+        return exceptionMessage;
+    }
+
+    public Object getResult() {
+        return result;
+    }
 }

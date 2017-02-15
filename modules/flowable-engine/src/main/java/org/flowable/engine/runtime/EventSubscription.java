@@ -21,53 +21,53 @@ import java.util.Date;
  */
 public interface EventSubscription {
 
-  /**
-   * The unique identifier of the execution.
-   */
-  String getId();
+    /**
+     * The unique identifier of the execution.
+     */
+    String getId();
 
-  /**
-   * Returns the type of subscription, for example signal or message.
-   */
-  String getEventType();
+    /**
+     * Returns the type of subscription, for example signal or message.
+     */
+    String getEventType();
 
-  /**
-   * The event name for the signal or message event.
-   */
-  String getEventName();
+    /**
+     * The event name for the signal or message event.
+     */
+    String getEventName();
 
-  /**
-   * Gets the id of the execution for this event subscription.
-   */
-  String getExecutionId();
-  
-  /**
-   * Gets the activity id of the BPMN definition where this event subscription is defined.
-   */
-  String getActivityId();
+    /**
+     * Gets the id of the execution for this event subscription.
+     */
+    String getExecutionId();
 
-  /**
-   * Id of the process instance for this event subscription.
-   */
-  String getProcessInstanceId();
-  
-  /**
-   * Id of the process definition for this event subscription.
-   */
-  String getProcessDefinitionId();
-  
-  /**
-   * Returns the configuration with additional info about this event subscription.
-   */
-  String getConfiguration();
-  
-  /**
-   * Gets the date/time when this event subscription was created.
-   */
-  Date getCreated();
+    /**
+     * Gets the activity id of the BPMN definition where this event subscription is defined.
+     */
+    String getActivityId();
 
-  /**
-   * The tenant identifier of this process instance
-   */
-  String getTenantId();
+    /**
+     * Id of the process instance for this event subscription.
+     */
+    String getProcessInstanceId();
+
+    /**
+     * Id of the process definition for this event subscription.
+     */
+    String getProcessDefinitionId();
+
+    /**
+     * Returns the configuration with additional info about this event subscription.
+     */
+    String getConfiguration();
+
+    /**
+     * Gets the date/time when this event subscription was created.
+     */
+    Date getCreated();
+
+    /**
+     * The tenant identifier of this process instance
+     */
+    String getTenantId();
 }

@@ -15,60 +15,60 @@ import org.junit.Test;
 
 public class StartEventConverterTest extends AbstractConverterTest {
 
-  @Test
-  public void connvertJsonToModel() throws Exception {
-    BpmnModel bpmnModel = readJsonFile();
-    validateModel(bpmnModel);
-  }
+    @Test
+    public void connvertJsonToModel() throws Exception {
+        BpmnModel bpmnModel = readJsonFile();
+        validateModel(bpmnModel);
+    }
 
-  @Test
-  public void doubleConversionValidation() throws Exception {
-    BpmnModel bpmnModel = readJsonFile();
-    bpmnModel = convertToJsonAndBack(bpmnModel);
-    validateModel(bpmnModel);
-  }
+    @Test
+    public void doubleConversionValidation() throws Exception {
+        BpmnModel bpmnModel = readJsonFile();
+        bpmnModel = convertToJsonAndBack(bpmnModel);
+        validateModel(bpmnModel);
+    }
 
-  @Override
-  protected String getResource() {
-    return "test.starteventmodel.json";
-  }
+    @Override
+    protected String getResource() {
+        return "test.starteventmodel.json";
+    }
 
-  private void validateModel(BpmnModel model) {
+    private void validateModel(BpmnModel model) {
 
-    FlowElement flowElement = model.getMainProcess().getFlowElement("start", true);
-    assertTrue(flowElement instanceof StartEvent);
+        FlowElement flowElement = model.getMainProcess().getFlowElement("start", true);
+        assertTrue(flowElement instanceof StartEvent);
 
-    StartEvent startEvent = (StartEvent) flowElement;
-    assertEquals("start", startEvent.getId());
-    assertEquals("startName", startEvent.getName());
-    assertEquals("startFormKey", startEvent.getFormKey());
-    assertEquals("startInitiator", startEvent.getInitiator());
-    assertEquals("startDoc", startEvent.getDocumentation());
-    
-    assertEquals(2, startEvent.getExecutionListeners().size());
-    FlowableListener executionListener = startEvent.getExecutionListeners().get(0);
-    assertEquals("start", executionListener.getEvent());
-    assertEquals("org.test.TestClass", executionListener.getImplementation());
-    assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, executionListener.getImplementationType());
-    
-    executionListener = startEvent.getExecutionListeners().get(1);
-    assertEquals("end", executionListener.getEvent());
-    assertEquals("${someExpression}", executionListener.getImplementation());
-    assertEquals(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, executionListener.getImplementationType());
+        StartEvent startEvent = (StartEvent) flowElement;
+        assertEquals("start", startEvent.getId());
+        assertEquals("startName", startEvent.getName());
+        assertEquals("startFormKey", startEvent.getFormKey());
+        assertEquals("startInitiator", startEvent.getInitiator());
+        assertEquals("startDoc", startEvent.getDocumentation());
 
-    List<FormProperty> formProperties = startEvent.getFormProperties();
-    assertEquals(2, formProperties.size());
+        assertEquals(2, startEvent.getExecutionListeners().size());
+        FlowableListener executionListener = startEvent.getExecutionListeners().get(0);
+        assertEquals("start", executionListener.getEvent());
+        assertEquals("org.test.TestClass", executionListener.getImplementation());
+        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, executionListener.getImplementationType());
 
-    FormProperty formProperty = formProperties.get(0);
-    assertEquals("startFormProp1", formProperty.getId());
-    assertEquals("startFormProp1", formProperty.getName());
-    assertEquals("string", formProperty.getType());
+        executionListener = startEvent.getExecutionListeners().get(1);
+        assertEquals("end", executionListener.getEvent());
+        assertEquals("${someExpression}", executionListener.getImplementation());
+        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, executionListener.getImplementationType());
 
-    formProperty = formProperties.get(1);
-    assertEquals("startFormProp2", formProperty.getId());
-    assertEquals("startFormProp2", formProperty.getName());
-    assertEquals("boolean", formProperty.getType());
+        List<FormProperty> formProperties = startEvent.getFormProperties();
+        assertEquals(2, formProperties.size());
 
-  }
+        FormProperty formProperty = formProperties.get(0);
+        assertEquals("startFormProp1", formProperty.getId());
+        assertEquals("startFormProp1", formProperty.getName());
+        assertEquals("string", formProperty.getType());
+
+        formProperty = formProperties.get(1);
+        assertEquals("startFormProp2", formProperty.getId());
+        assertEquals("startFormProp2", formProperty.getName());
+        assertEquals("boolean", formProperty.getType());
+
+    }
 
 }

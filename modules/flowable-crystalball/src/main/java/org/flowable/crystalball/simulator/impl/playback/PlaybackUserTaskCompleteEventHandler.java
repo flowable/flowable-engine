@@ -28,23 +28,23 @@ import java.util.Map;
  */
 public class PlaybackUserTaskCompleteEventHandler implements SimulationEventHandler {
 
-  private static Logger log = LoggerFactory.getLogger(PlaybackUserTaskCompleteEventHandler.class);
+    private static Logger log = LoggerFactory.getLogger(PlaybackUserTaskCompleteEventHandler.class);
 
-  @Override
-  public void handle(SimulationEvent event) {
-    String taskId = (String) event.getProperty("taskId");
-    Task task = SimulationRunContext.getTaskService().createTaskQuery().taskId(taskId).singleResult();
-    String assignee = task.getAssignee();
+    @Override
+    public void handle(SimulationEvent event) {
+        String taskId = (String) event.getProperty("taskId");
+        Task task = SimulationRunContext.getTaskService().createTaskQuery().taskId(taskId).singleResult();
+        String assignee = task.getAssignee();
 
-    @SuppressWarnings("unchecked")
-    Map<String, Object> variables = (Map<String, Object>) event.getProperty("variables");
+        @SuppressWarnings("unchecked")
+        Map<String, Object> variables = (Map<String, Object>) event.getProperty("variables");
 
-    SimulationRunContext.getTaskService().complete(taskId, variables);
-    log.debug("completed {}, {}, {}, {}", task, task.getName(), assignee, variables);
-  }
+        SimulationRunContext.getTaskService().complete(taskId, variables);
+        log.debug("completed {}, {}, {}, {}", task, task.getName(), assignee, variables);
+    }
 
-  @Override
-  public void init() {
+    @Override
+    public void init() {
 
-  }
+    }
 }

@@ -32,53 +32,52 @@ import org.flowable.engine.repository.ProcessDefinition;
  * @author Joram Barrez
  */
 public class FormHandlerUtil {
-  
-  public static StartFormHandler getStartFormHandler(CommandContext commandContext, ProcessDefinition processDefinition) {
-    StartFormHandler startFormHandler = new DefaultStartFormHandler();
-    org.flowable.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(processDefinition.getId());
-    
-    FlowElement initialFlowElement = process.getInitialFlowElement();
-    if (initialFlowElement instanceof StartEvent) {
-      
-      StartEvent startEvent = (StartEvent) initialFlowElement;
-      
-      List<FormProperty> formProperties = startEvent.getFormProperties();
-      String formKey = startEvent.getFormKey();
-      DeploymentEntity deploymentEntity = commandContext.getDeploymentEntityManager().findById(processDefinition.getDeploymentId());
-      
-      startFormHandler.parseConfiguration(formProperties, formKey, deploymentEntity, processDefinition);
-      return startFormHandler;
+
+    public static StartFormHandler getStartFormHandler(CommandContext commandContext, ProcessDefinition processDefinition) {
+        StartFormHandler startFormHandler = new DefaultStartFormHandler();
+        org.flowable.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(processDefinition.getId());
+
+        FlowElement initialFlowElement = process.getInitialFlowElement();
+        if (initialFlowElement instanceof StartEvent) {
+
+            StartEvent startEvent = (StartEvent) initialFlowElement;
+
+            List<FormProperty> formProperties = startEvent.getFormProperties();
+            String formKey = startEvent.getFormKey();
+            DeploymentEntity deploymentEntity = commandContext.getDeploymentEntityManager().findById(processDefinition.getDeploymentId());
+
+            startFormHandler.parseConfiguration(formProperties, formKey, deploymentEntity, processDefinition);
+            return startFormHandler;
+        }
+
+        return null;
+
     }
-    
-    return null;
-    
-  }
-  
-  public static TaskFormHandler getTaskFormHandlder(String processDefinitionId, String taskId) {
-    org.flowable.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(processDefinitionId);
-    FlowElement flowElement = process.getFlowElement(taskId, true);
-    if (flowElement instanceof UserTask) {
-      UserTask userTask = (UserTask) flowElement;
-      
-      ProcessDefinition processDefinitionEntity = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
-      DeploymentEntity deploymentEntity = Context.getProcessEngineConfiguration()
-          .getDeploymentEntityManager().findById(processDefinitionEntity.getDeploymentId());
-      
-      TaskFormHandler taskFormHandler = new DefaultTaskFormHandler();
-      taskFormHandler.parseConfiguration(userTask.getFormProperties(), userTask.getFormKey(), deploymentEntity, processDefinitionEntity);
-      
-      return taskFormHandler;
+
+    public static TaskFormHandler getTaskFormHandlder(String processDefinitionId, String taskId) {
+        org.flowable.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(processDefinitionId);
+        FlowElement flowElement = process.getFlowElement(taskId, true);
+        if (flowElement instanceof UserTask) {
+            UserTask userTask = (UserTask) flowElement;
+
+            ProcessDefinition processDefinitionEntity = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
+            DeploymentEntity deploymentEntity = Context.getProcessEngineConfiguration()
+                    .getDeploymentEntityManager().findById(processDefinitionEntity.getDeploymentId());
+
+            TaskFormHandler taskFormHandler = new DefaultTaskFormHandler();
+            taskFormHandler.parseConfiguration(userTask.getFormProperties(), userTask.getFormKey(), deploymentEntity, processDefinitionEntity);
+
+            return taskFormHandler;
+        }
+
+        return null;
     }
-    
-    return null;
-  }
-  
-  public static TaskFormHandler getTaskFormHandlder(TaskEntity taskEntity) {
-    if (taskEntity.getProcessDefinitionId() != null) {
-      return getTaskFormHandlder(taskEntity.getProcessDefinitionId(), taskEntity.getTaskDefinitionKey());
+
+    public static TaskFormHandler getTaskFormHandlder(TaskEntity taskEntity) {
+        if (taskEntity.getProcessDefinitionId() != null) {
+            return getTaskFormHandlder(taskEntity.getProcessDefinitionId(), taskEntity.getTaskDefinitionKey());
+        }
+        return null;
     }
-    return null;
-  }
-  
 
 }

@@ -26,53 +26,51 @@ import org.activiti.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.flowable.engine.delegate.DelegateExecution;
 
-
 /**
- * Implementation of the BPMN 2.0 subprocess (formally known as 'embedded' subprocess):
- * a subprocess defined within another process definition.
+ * Implementation of the BPMN 2.0 subprocess (formally known as 'embedded' subprocess): a subprocess defined within another process definition.
  * 
  * @author Joram Barrez
  */
 public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior implements CompositeActivityBehavior {
-  
-  public void execute(DelegateExecution execution) {
-    ActivityExecution activityExecution = (ActivityExecution) execution;
-    PvmActivity activity = activityExecution.getActivity();
-    ActivityImpl initialActivity = (ActivityImpl) activity.getProperty(BpmnParse.PROPERTYNAME_INITIAL);
-    
-    if (initialActivity == null) {
-      throw new ActivitiException("No initial activity found for subprocess " 
-              + activityExecution.getActivity().getId());
+
+    public void execute(DelegateExecution execution) {
+        ActivityExecution activityExecution = (ActivityExecution) execution;
+        PvmActivity activity = activityExecution.getActivity();
+        ActivityImpl initialActivity = (ActivityImpl) activity.getProperty(BpmnParse.PROPERTYNAME_INITIAL);
+
+        if (initialActivity == null) {
+            throw new ActivitiException("No initial activity found for subprocess "
+                    + activityExecution.getActivity().getId());
+        }
+
+        // initialize the template-defined data objects as variables
+        initializeDataObjects(activityExecution, activity);
+
+        if (initialActivity.getActivityBehavior() != null
+                && initialActivity.getActivityBehavior() instanceof NoneStartEventActivityBehavior) { // embedded subprocess: only none start allowed
+            ((ExecutionEntity) execution).setActivity(initialActivity);
+            Context.getCommandContext().getHistoryManager().recordActivityStart((ExecutionEntity) execution);
+        }
+
+        activityExecution.executeActivity(initialActivity);
     }
 
-    // initialize the template-defined data objects as variables
-    initializeDataObjects(activityExecution, activity);
-    
-    if (initialActivity.getActivityBehavior() != null 
-          && initialActivity.getActivityBehavior() instanceof NoneStartEventActivityBehavior) { // embedded subprocess: only none start allowed
-        ((ExecutionEntity) execution).setActivity(initialActivity);
-        Context.getCommandContext().getHistoryManager().recordActivityStart((ExecutionEntity) execution);
+    public void lastExecutionEnded(ActivityExecution execution) {
+        ScopeUtil.createEventScopeExecution((ExecutionEntity) execution);
+
+        // remove the template-defined data object variables
+        Map<String, Object> dataObjectVars = ((ActivityImpl) execution.getActivity()).getVariables();
+        if (dataObjectVars != null) {
+            execution.removeVariablesLocal(dataObjectVars.keySet());
+        }
+
+        bpmnActivityBehavior.performDefaultOutgoingBehavior(execution);
     }
 
-    activityExecution.executeActivity(initialActivity);
-  }
-  
-  public void lastExecutionEnded(ActivityExecution execution) {
-    ScopeUtil.createEventScopeExecution((ExecutionEntity) execution);
-    
-    // remove the template-defined data object variables
-    Map<String, Object> dataObjectVars = ((ActivityImpl) execution.getActivity()).getVariables();
-    if (dataObjectVars != null) {
-      execution.removeVariablesLocal(dataObjectVars.keySet());
+    protected void initializeDataObjects(ActivityExecution execution, PvmActivity activity) {
+        Map<String, Object> dataObjectVars = ((ActivityImpl) activity).getVariables();
+        if (dataObjectVars != null) {
+            execution.setVariablesLocal(dataObjectVars);
+        }
     }
-
-    bpmnActivityBehavior.performDefaultOutgoingBehavior(execution);
-  }
-
-  protected void initializeDataObjects(ActivityExecution execution, PvmActivity activity) {
-    Map<String, Object> dataObjectVars = ((ActivityImpl) activity).getVariables();
-    if (dataObjectVars != null) {
-      execution.setVariablesLocal(dataObjectVars);
-    }
-  }
 }

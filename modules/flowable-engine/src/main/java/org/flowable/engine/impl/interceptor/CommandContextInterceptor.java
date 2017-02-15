@@ -24,80 +24,80 @@ import org.slf4j.LoggerFactory;
  * @author Joram Barrez
  */
 public class CommandContextInterceptor extends AbstractCommandInterceptor {
-  
-  private static final Logger log = LoggerFactory.getLogger(CommandContextInterceptor.class);
 
-  protected CommandContextFactory commandContextFactory;
-  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    private static final Logger log = LoggerFactory.getLogger(CommandContextInterceptor.class);
 
-  public CommandContextInterceptor() {
-  }
+    protected CommandContextFactory commandContextFactory;
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  public CommandContextInterceptor(CommandContextFactory commandContextFactory, ProcessEngineConfigurationImpl processEngineConfiguration) {
-    this.commandContextFactory = commandContextFactory;
-    this.processEngineConfiguration = processEngineConfiguration;
-  }
-
-  public <T> T execute(CommandConfig config, Command<T> command) {
-    CommandContext context = Context.getCommandContext();
-
-    boolean contextReused = false;
-    // We need to check the exception, because the transaction can be in a
-    // rollback state, and some other command is being fired to compensate (eg. decrementing job retries)
-    if (!config.isContextReusePossible() || context == null || context.getException() != null) {
-      context = commandContextFactory.createCommandContext(command);
-    } else {
-      log.debug("Valid context found. Reusing it for the current command '{}'", command.getClass().getCanonicalName());
-      contextReused = true;
-      context.setReused(true);
+    public CommandContextInterceptor() {
     }
 
-    try {
-      
-      // Push on stack
-      Context.setCommandContext(context);
-      Context.setProcessEngineConfiguration(processEngineConfiguration);
-      if (processEngineConfiguration.getFlowable5CompatibilityHandler() != null) {
-        Context.setFlowable5CompatibilityHandler(processEngineConfiguration.getFlowable5CompatibilityHandler());
-      }
+    public CommandContextInterceptor(CommandContextFactory commandContextFactory, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        this.commandContextFactory = commandContextFactory;
+        this.processEngineConfiguration = processEngineConfiguration;
+    }
 
-      return next.execute(config, command);
+    public <T> T execute(CommandConfig config, Command<T> command) {
+        CommandContext context = Context.getCommandContext();
 
-    } catch (Exception e) {
-
-      context.exception(e);
-      
-    } finally {
-      try {
-        if (!contextReused) {
-          context.close();
+        boolean contextReused = false;
+        // We need to check the exception, because the transaction can be in a
+        // rollback state, and some other command is being fired to compensate (eg. decrementing job retries)
+        if (!config.isContextReusePossible() || context == null || context.getException() != null) {
+            context = commandContextFactory.createCommandContext(command);
+        } else {
+            log.debug("Valid context found. Reusing it for the current command '{}'", command.getClass().getCanonicalName());
+            contextReused = true;
+            context.setReused(true);
         }
-      } finally {
-        
-        // Pop from stack
-        Context.removeCommandContext();
-        Context.removeProcessEngineConfiguration();
-        Context.removeBpmnOverrideContext();
-        Context.removeFlowable5CompatibilityHandler();
-      }
+
+        try {
+
+            // Push on stack
+            Context.setCommandContext(context);
+            Context.setProcessEngineConfiguration(processEngineConfiguration);
+            if (processEngineConfiguration.getFlowable5CompatibilityHandler() != null) {
+                Context.setFlowable5CompatibilityHandler(processEngineConfiguration.getFlowable5CompatibilityHandler());
+            }
+
+            return next.execute(config, command);
+
+        } catch (Exception e) {
+
+            context.exception(e);
+
+        } finally {
+            try {
+                if (!contextReused) {
+                    context.close();
+                }
+            } finally {
+
+                // Pop from stack
+                Context.removeCommandContext();
+                Context.removeProcessEngineConfiguration();
+                Context.removeBpmnOverrideContext();
+                Context.removeFlowable5CompatibilityHandler();
+            }
+        }
+
+        return null;
     }
 
-    return null;
-  }
+    public CommandContextFactory getCommandContextFactory() {
+        return commandContextFactory;
+    }
 
-  public CommandContextFactory getCommandContextFactory() {
-    return commandContextFactory;
-  }
+    public void setCommandContextFactory(CommandContextFactory commandContextFactory) {
+        this.commandContextFactory = commandContextFactory;
+    }
 
-  public void setCommandContextFactory(CommandContextFactory commandContextFactory) {
-    this.commandContextFactory = commandContextFactory;
-  }
+    public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
+        return processEngineConfiguration;
+    }
 
-  public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
-    return processEngineConfiguration;
-  }
-
-  public void setProcessEngineContext(ProcessEngineConfigurationImpl processEngineContext) {
-    this.processEngineConfiguration = processEngineContext;
-  }
+    public void setProcessEngineContext(ProcessEngineConfigurationImpl processEngineContext) {
+        this.processEngineConfiguration = processEngineContext;
+    }
 }

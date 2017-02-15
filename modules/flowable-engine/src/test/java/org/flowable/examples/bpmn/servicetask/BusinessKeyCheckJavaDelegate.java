@@ -23,7 +23,7 @@ import org.flowable.engine.delegate.JavaDelegate;
  */
 public class BusinessKeyCheckJavaDelegate implements JavaDelegate {
 
-  public void execute(DelegateExecution execution) {
-    execution.setVariable("businessKeySetOnExecution", execution.getProcessInstanceBusinessKey());
-  }
+    public void execute(DelegateExecution execution) {
+        execution.setVariable("businessKeySetOnExecution", execution.getProcessInstanceBusinessKey());
+    }
 }

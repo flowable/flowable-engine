@@ -12,28 +12,27 @@
  */
 package org.flowable.engine.common.impl.persistence.entity;
 
-
 /**
  * @author Joram Barrez
  */
 public interface EntityManager<EntityImpl extends Entity> {
-  
-  EntityImpl create();
-  
-  EntityImpl findById(String entityId);
-  
-  void insert(EntityImpl entity);
 
-  void insert(EntityImpl entity, boolean fireCreateEvent);
-  
-  EntityImpl update(EntityImpl entity);
-  
-  EntityImpl update(EntityImpl entity, boolean fireUpdateEvent);
+    EntityImpl create();
 
-  void delete(String id);
-  
-  void delete(EntityImpl entity);
-  
-  void delete(EntityImpl entity, boolean fireDeleteEvent);
-  
+    EntityImpl findById(String entityId);
+
+    void insert(EntityImpl entity);
+
+    void insert(EntityImpl entity, boolean fireCreateEvent);
+
+    EntityImpl update(EntityImpl entity);
+
+    EntityImpl update(EntityImpl entity, boolean fireUpdateEvent);
+
+    void delete(String id);
+
+    void delete(EntityImpl entity);
+
+    void delete(EntityImpl entity, boolean fireDeleteEvent);
+
 }

@@ -18,22 +18,21 @@ import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.ManualTask;
 
-
 /**
  * @author Joram Barrez
  */
 public class ManualTaskParseHandler extends AbstractActivityBpmnParseHandler<ManualTask> {
-  
-  public Class< ? extends BaseElement> getHandledType() {
-    return ManualTask.class;
-  }
-  
-  protected void executeParse(BpmnParse bpmnParse, ManualTask manualTask) {
-    ActivityImpl activity = createActivityOnCurrentScope(bpmnParse, manualTask, BpmnXMLConstants.ELEMENT_TASK_MANUAL);
-    activity.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createManualTaskActivityBehavior(manualTask));
-    
-    activity.setAsync(manualTask.isAsynchronous());
-    activity.setExclusive(!manualTask.isNotExclusive());
-  }
+
+    public Class<? extends BaseElement> getHandledType() {
+        return ManualTask.class;
+    }
+
+    protected void executeParse(BpmnParse bpmnParse, ManualTask manualTask) {
+        ActivityImpl activity = createActivityOnCurrentScope(bpmnParse, manualTask, BpmnXMLConstants.ELEMENT_TASK_MANUAL);
+        activity.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createManualTaskActivityBehavior(manualTask));
+
+        activity.setAsync(manualTask.isAsynchronous());
+        activity.setExclusive(!manualTask.isNotExclusive());
+    }
 
 }

@@ -16,20 +16,21 @@ package org.flowable.form.model;
  * @author Tijs Rademakers
  */
 public class LayoutDefinition {
-	
-	protected Integer row;
-	
-	public LayoutDefinition() {}
-	
-	public LayoutDefinition(Integer row) {
-	    this.row = row;
-	}
-	
-	public Integer getRow() {
-		return row;
-	}
-	
-	public void setRow(Integer row) {
-		this.row = row;
-	}
+
+    protected Integer row;
+
+    public LayoutDefinition() {
+    }
+
+    public LayoutDefinition(Integer row) {
+        this.row = row;
+    }
+
+    public Integer getRow() {
+        return row;
+    }
+
+    public void setRow(Integer row) {
+        this.row = row;
+    }
 }

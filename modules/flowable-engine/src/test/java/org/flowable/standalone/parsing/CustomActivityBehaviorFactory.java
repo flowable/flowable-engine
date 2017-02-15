@@ -22,14 +22,14 @@ import org.flowable.engine.impl.bpmn.parser.factory.DefaultActivityBehaviorFacto
  */
 public class CustomActivityBehaviorFactory extends DefaultActivityBehaviorFactory {
 
-  @Override
-  public NoneStartEventActivityBehavior createNoneStartEventActivityBehavior(StartEvent startEvent) {
-    return new NoneStartEventActivityBehavior() {
-      public void execute(DelegateExecution execution) {
-        super.execute(execution);
-        CustomActivityBehaviorFactoryTest.COUNTER.addAndGet(1);
-      }
-    };
-  }
+    @Override
+    public NoneStartEventActivityBehavior createNoneStartEventActivityBehavior(StartEvent startEvent) {
+        return new NoneStartEventActivityBehavior() {
+            public void execute(DelegateExecution execution) {
+                super.execute(execution);
+                CustomActivityBehaviorFactoryTest.COUNTER.addAndGet(1);
+            }
+        };
+    }
 
 }

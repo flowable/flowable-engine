@@ -21,8 +21,8 @@ package org.flowable.engine.common.impl.interceptor;
  */
 public interface SessionFactory {
 
-  Class<?> getSessionType();
+    Class<?> getSessionType();
 
-  Session openSession(AbstractCommandContext commandContext);
+    Session openSession(AbstractCommandContext commandContext);
 
 }

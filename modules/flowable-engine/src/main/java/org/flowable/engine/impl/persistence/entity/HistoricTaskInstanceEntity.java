@@ -25,40 +25,40 @@ import org.flowable.engine.history.HistoricTaskInstance;
  */
 public interface HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity, HistoricTaskInstance, Entity {
 
-  void setExecutionId(String executionId);
+    void setExecutionId(String executionId);
 
-  void setName(String name);
-  
-  /** Sets an optional localized name for the task. */
-  void setLocalizedName(String name);
+    void setName(String name);
 
-  void setDescription(String description);
-  
-  /** Sets an optional localized description for the task. */
-  void setLocalizedDescription(String description);
+    /** Sets an optional localized name for the task. */
+    void setLocalizedName(String name);
 
-  void setAssignee(String assignee);
+    void setDescription(String description);
 
-  void setTaskDefinitionKey(String taskDefinitionKey);
+    /** Sets an optional localized description for the task. */
+    void setLocalizedDescription(String description);
 
-  void setFormKey(String formKey);
+    void setAssignee(String assignee);
 
-  void setPriority(int priority);
+    void setTaskDefinitionKey(String taskDefinitionKey);
 
-  void setDueDate(Date dueDate);
+    void setFormKey(String formKey);
 
-  void setCategory(String category);
+    void setPriority(int priority);
 
-  void setOwner(String owner);
+    void setDueDate(Date dueDate);
 
-  void setParentTaskId(String parentTaskId);
+    void setCategory(String category);
 
-  void setClaimTime(Date claimTime);
+    void setOwner(String owner);
 
-  void setTenantId(String tenantId);
+    void setParentTaskId(String parentTaskId);
 
-  List<HistoricVariableInstanceEntity> getQueryVariables();
+    void setClaimTime(Date claimTime);
 
-  void setQueryVariables(List<HistoricVariableInstanceEntity> queryVariables);
-  
+    void setTenantId(String tenantId);
+
+    List<HistoricVariableInstanceEntity> getQueryVariables();
+
+    void setQueryVariables(List<HistoricVariableInstanceEntity> queryVariables);
+
 }

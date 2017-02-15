@@ -23,15 +23,15 @@ import org.flowable.bpmn.model.Lane;
  */
 public class FlowNodeRefParser extends BaseChildElementParser {
 
-  public String getElementName() {
-    return ELEMENT_FLOWNODE_REF;
-  }
+    public String getElementName() {
+        return ELEMENT_FLOWNODE_REF;
+    }
 
-  public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-    if (!(parentElement instanceof Lane))
-      return;
+    public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
+        if (!(parentElement instanceof Lane))
+            return;
 
-    Lane lane = (Lane) parentElement;
-    lane.getFlowReferences().add(xtr.getElementText());
-  }
+        Lane lane = (Lane) parentElement;
+        lane.getFlowReferences().add(xtr.getElementText());
+    }
 }

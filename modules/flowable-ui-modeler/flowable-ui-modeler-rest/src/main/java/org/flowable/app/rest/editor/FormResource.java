@@ -33,27 +33,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/rest/form-models")
 public class FormResource {
 
-  @Autowired
-  protected FlowableFormService formService;
+    @Autowired
+    protected FlowableFormService formService;
 
-  @RequestMapping(value = "/{formId}", method = RequestMethod.GET, produces = "application/json")
-  public FormRepresentation getForm(@PathVariable String formId) {
-    return formService.getForm(formId);
-  }
+    @RequestMapping(value = "/{formId}", method = RequestMethod.GET, produces = "application/json")
+    public FormRepresentation getForm(@PathVariable String formId) {
+        return formService.getForm(formId);
+    }
 
-  @RequestMapping(value = "/values", method = RequestMethod.GET, produces = "application/json")
-  public List<FormRepresentation> getForms(HttpServletRequest request) {
-    String[] formIds = request.getParameterValues("formId");
-    return formService.getForms(formIds);
-  }
+    @RequestMapping(value = "/values", method = RequestMethod.GET, produces = "application/json")
+    public List<FormRepresentation> getForms(HttpServletRequest request) {
+        String[] formIds = request.getParameterValues("formId");
+        return formService.getForms(formIds);
+    }
 
-  @RequestMapping(value = "/{formId}/history/{formHistoryId}", method = RequestMethod.GET, produces = "application/json")
-  public FormRepresentation getFormHistory(@PathVariable String formId, @PathVariable String formHistoryId) {
-    return formService.getFormHistory(formId, formHistoryId);
-  }
+    @RequestMapping(value = "/{formId}/history/{formHistoryId}", method = RequestMethod.GET, produces = "application/json")
+    public FormRepresentation getFormHistory(@PathVariable String formId, @PathVariable String formHistoryId) {
+        return formService.getFormHistory(formId, formHistoryId);
+    }
 
-  @RequestMapping(value = "/{formId}", method = RequestMethod.PUT, produces = "application/json")
-  public FormRepresentation saveForm(@PathVariable String formId, @RequestBody FormSaveRepresentation saveRepresentation) {
-    return formService.saveForm(formId, saveRepresentation);
-  }
+    @RequestMapping(value = "/{formId}", method = RequestMethod.PUT, produces = "application/json")
+    public FormRepresentation saveForm(@PathVariable String formId, @RequestBody FormSaveRepresentation saveRepresentation) {
+        return formService.saveForm(formId, saveRepresentation);
+    }
 }

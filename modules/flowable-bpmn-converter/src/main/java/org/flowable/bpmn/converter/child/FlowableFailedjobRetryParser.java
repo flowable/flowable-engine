@@ -8,20 +8,20 @@ import org.flowable.bpmn.model.BpmnModel;
 
 public class FlowableFailedjobRetryParser extends BaseChildElementParser {
 
-  @Override
-  public String getElementName() {
-    return FAILED_JOB_RETRY_TIME_CYCLE;
-  }
-
-  @Override
-  public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-    if (!(parentElement instanceof Activity))
-      return;
-    String cycle = xtr.getElementText();
-    if (cycle == null || cycle.isEmpty()) {
-      return;
+    @Override
+    public String getElementName() {
+        return FAILED_JOB_RETRY_TIME_CYCLE;
     }
-    ((Activity) parentElement).setFailedJobRetryTimeCycleValue(cycle);
-  }
+
+    @Override
+    public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
+        if (!(parentElement instanceof Activity))
+            return;
+        String cycle = xtr.getElementText();
+        if (cycle == null || cycle.isEmpty()) {
+            return;
+        }
+        ((Activity) parentElement).setFailedJobRetryTimeCycleValue(cycle);
+    }
 
 }

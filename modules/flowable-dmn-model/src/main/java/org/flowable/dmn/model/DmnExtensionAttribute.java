@@ -12,7 +12,6 @@
  */
 package org.flowable.dmn.model;
 
-
 /**
  * @author Bassam Al-Sarori
  */
@@ -38,27 +37,35 @@ public class DmnExtensionAttribute {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     public String getValue() {
         return value;
     }
+
     public void setValue(String value) {
         this.value = value;
     }
+
     public String getNamespacePrefix() {
         return namespacePrefix;
     }
+
     public void setNamespacePrefix(String namespacePrefix) {
         this.namespacePrefix = namespacePrefix;
     }
+
     public String getNamespace() {
         return namespace;
     }
+
     public void setNamespace(String namespace) {
         this.namespace = namespace;
     }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

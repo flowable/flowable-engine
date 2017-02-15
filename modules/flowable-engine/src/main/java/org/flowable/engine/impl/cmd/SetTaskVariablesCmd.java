@@ -26,51 +26,51 @@ import org.flowable.engine.impl.util.Flowable5Util;
  */
 public class SetTaskVariablesCmd extends NeedsActiveTaskCmd<Object> {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected Map<String, ? extends Object> variables;
-  protected boolean isLocal;
+    protected Map<String, ? extends Object> variables;
+    protected boolean isLocal;
 
-  public SetTaskVariablesCmd(String taskId, Map<String, ? extends Object> variables, boolean isLocal) {
-    super(taskId);
-    this.taskId = taskId;
-    this.variables = variables;
-    this.isLocal = isLocal;
-  }
-
-  protected Object execute(CommandContext commandContext, TaskEntity task) {
-    
-    if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      compatibilityHandler.setTaskVariables(taskId, variables, isLocal);
-      return null;
+    public SetTaskVariablesCmd(String taskId, Map<String, ? extends Object> variables, boolean isLocal) {
+        super(taskId);
+        this.taskId = taskId;
+        this.variables = variables;
+        this.isLocal = isLocal;
     }
 
-    if (isLocal) {
-      if (variables != null) {
-        for (String variableName : variables.keySet()) {
-          task.setVariableLocal(variableName, variables.get(variableName), false);
-        }
-      }
+    protected Object execute(CommandContext commandContext, TaskEntity task) {
 
-    } else {
-      if (variables != null) {
-        for (String variableName : variables.keySet()) {
-          task.setVariable(variableName, variables.get(variableName), false);
+        if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
+            Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+            compatibilityHandler.setTaskVariables(taskId, variables, isLocal);
+            return null;
         }
-      }
+
+        if (isLocal) {
+            if (variables != null) {
+                for (String variableName : variables.keySet()) {
+                    task.setVariableLocal(variableName, variables.get(variableName), false);
+                }
+            }
+
+        } else {
+            if (variables != null) {
+                for (String variableName : variables.keySet()) {
+                    task.setVariable(variableName, variables.get(variableName), false);
+                }
+            }
+        }
+
+        // ACT-1887: Force an update of the task's revision to prevent
+        // simultaneous inserts of the same variable. If not, duplicate variables may occur since optimistic
+        // locking doesn't work on inserts
+        task.forceUpdate();
+        return null;
     }
 
-    // ACT-1887: Force an update of the task's revision to prevent
-    // simultaneous inserts of the same variable. If not, duplicate variables may occur since optimistic
-    // locking doesn't work on inserts
-    task.forceUpdate();
-    return null;
-  }
-
-  @Override
-  protected String getSuspendedTaskException() {
-    return "Cannot add variables to a suspended task";
-  }
+    @Override
+    protected String getSuspendedTaskException() {
+        return "Cannot add variables to a suspended task";
+    }
 
 }

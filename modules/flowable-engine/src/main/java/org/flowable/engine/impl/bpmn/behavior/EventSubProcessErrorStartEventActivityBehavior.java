@@ -31,37 +31,37 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
  */
 public class EventSubProcessErrorStartEventActivityBehavior extends AbstractBpmnActivityBehavior {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public void execute(DelegateExecution execution) {
-    StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
-    EventSubProcess eventSubProcess = (EventSubProcess) startEvent.getSubProcess();
-    ExecutionEntity executionEntity = (ExecutionEntity) execution;
-    
-    executionEntity.setCurrentFlowElement(eventSubProcess);
-    executionEntity.setEventScope(false);
-    executionEntity.setScope(true);
+    public void execute(DelegateExecution execution) {
+        StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
+        EventSubProcess eventSubProcess = (EventSubProcess) startEvent.getSubProcess();
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
-    // initialize the template-defined data objects as variables
-    Map<String, Object> dataObjectVars = processDataObjects(eventSubProcess.getDataObjects());
-    if (dataObjectVars != null) {
-      executionEntity.setVariablesLocal(dataObjectVars);
+        executionEntity.setCurrentFlowElement(eventSubProcess);
+        executionEntity.setEventScope(false);
+        executionEntity.setScope(true);
+
+        // initialize the template-defined data objects as variables
+        Map<String, Object> dataObjectVars = processDataObjects(eventSubProcess.getDataObjects());
+        if (dataObjectVars != null) {
+            executionEntity.setVariablesLocal(dataObjectVars);
+        }
+
+        ExecutionEntity startSubProcessExecution = Context.getCommandContext()
+                .getExecutionEntityManager().createChildExecution(executionEntity);
+        startSubProcessExecution.setCurrentFlowElement(startEvent);
+        Context.getAgenda().planTakeOutgoingSequenceFlowsOperation(startSubProcessExecution, true);
     }
 
-    ExecutionEntity startSubProcessExecution = Context.getCommandContext()
-        .getExecutionEntityManager().createChildExecution(executionEntity); 
-    startSubProcessExecution.setCurrentFlowElement(startEvent);
-    Context.getAgenda().planTakeOutgoingSequenceFlowsOperation(startSubProcessExecution, true);
-  }
-
-  protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
-    Map<String, Object> variablesMap = new HashMap<String, Object>();
-    // convert data objects to process variables
-    if (dataObjects != null) {
-      for (ValuedDataObject dataObject : dataObjects) {
-        variablesMap.put(dataObject.getName(), dataObject.getValue());
-      }
+    protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
+        Map<String, Object> variablesMap = new HashMap<String, Object>();
+        // convert data objects to process variables
+        if (dataObjects != null) {
+            for (ValuedDataObject dataObject : dataObjects) {
+                variablesMap.put(dataObject.getName(), dataObject.getValue());
+            }
+        }
+        return variablesMap;
     }
-    return variablesMap;
-  }
 }

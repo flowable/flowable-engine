@@ -31,69 +31,69 @@ import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity
 
 public class IntermediateCatchSignalEventActivityBehavior extends IntermediateCatchEventActivityBehavior {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected SignalEventDefinition signalEventDefinition;
-  protected Signal signal;
+    protected SignalEventDefinition signalEventDefinition;
+    protected Signal signal;
 
-  public IntermediateCatchSignalEventActivityBehavior(SignalEventDefinition signalEventDefinition, Signal signal) {
-    this.signalEventDefinition = signalEventDefinition;
-    this.signal = signal;
-  }
-
-  public void execute(DelegateExecution execution) {
-    CommandContext commandContext = Context.getCommandContext();
-    ExecutionEntity executionEntity = (ExecutionEntity) execution;
-    
-    String signalName = null;
-    if (StringUtils.isNotEmpty(signalEventDefinition.getSignalRef())) {
-      signalName = signalEventDefinition.getSignalRef();
-    } else {
-      Expression signalExpression = commandContext.getProcessEngineConfiguration().getExpressionManager()
-          .createExpression(signalEventDefinition.getSignalExpression());
-      signalName = signalExpression.getValue(execution).toString();
-    }
-    
-    commandContext.getEventSubscriptionEntityManager().insertSignalEvent(signalName, signal, executionEntity);
-    
-    if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-      commandContext.getProcessEngineConfiguration().getEventDispatcher()
-              .dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING, executionEntity.getActivityId(), signalName,
-                      null, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()));
-    }
-  }
-
-  @Override
-  public void trigger(DelegateExecution execution, String triggerName, Object triggerData) {
-    ExecutionEntity executionEntity = deleteSignalEventSubscription(execution);
-    leaveIntermediateCatchEvent(executionEntity);
-  }
-  
-  @Override
-  public void eventCancelledByEventGateway(DelegateExecution execution) {
-    deleteSignalEventSubscription(execution);
-    Context.getCommandContext().getExecutionEntityManager().deleteExecutionAndRelatedData((ExecutionEntity) execution, 
-        DeleteReason.EVENT_BASED_GATEWAY_CANCEL, false);
-  }
-
-  protected ExecutionEntity deleteSignalEventSubscription(DelegateExecution execution) {
-    ExecutionEntity executionEntity = (ExecutionEntity) execution;
-
-    String eventName = null;
-    if (signal != null) {
-      eventName = signal.getName();
-    } else {
-      eventName = signalEventDefinition.getSignalRef();
+    public IntermediateCatchSignalEventActivityBehavior(SignalEventDefinition signalEventDefinition, Signal signal) {
+        this.signalEventDefinition = signalEventDefinition;
+        this.signal = signal;
     }
 
-    EventSubscriptionEntityManager eventSubscriptionEntityManager = Context.getCommandContext().getEventSubscriptionEntityManager();
-    List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
-    for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
-      if (eventSubscription instanceof SignalEventSubscriptionEntity && eventSubscription.getEventName().equals(eventName)) {
+    public void execute(DelegateExecution execution) {
+        CommandContext commandContext = Context.getCommandContext();
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
-        eventSubscriptionEntityManager.delete(eventSubscription);
-      }
+        String signalName = null;
+        if (StringUtils.isNotEmpty(signalEventDefinition.getSignalRef())) {
+            signalName = signalEventDefinition.getSignalRef();
+        } else {
+            Expression signalExpression = commandContext.getProcessEngineConfiguration().getExpressionManager()
+                    .createExpression(signalEventDefinition.getSignalExpression());
+            signalName = signalExpression.getValue(execution).toString();
+        }
+
+        commandContext.getEventSubscriptionEntityManager().insertSignalEvent(signalName, signal, executionEntity);
+
+        if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            commandContext.getProcessEngineConfiguration().getEventDispatcher()
+                    .dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING, executionEntity.getActivityId(), signalName,
+                            null, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()));
+        }
     }
-    return executionEntity;
-  }
+
+    @Override
+    public void trigger(DelegateExecution execution, String triggerName, Object triggerData) {
+        ExecutionEntity executionEntity = deleteSignalEventSubscription(execution);
+        leaveIntermediateCatchEvent(executionEntity);
+    }
+
+    @Override
+    public void eventCancelledByEventGateway(DelegateExecution execution) {
+        deleteSignalEventSubscription(execution);
+        Context.getCommandContext().getExecutionEntityManager().deleteExecutionAndRelatedData((ExecutionEntity) execution,
+                DeleteReason.EVENT_BASED_GATEWAY_CANCEL, false);
+    }
+
+    protected ExecutionEntity deleteSignalEventSubscription(DelegateExecution execution) {
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+
+        String eventName = null;
+        if (signal != null) {
+            eventName = signal.getName();
+        } else {
+            eventName = signalEventDefinition.getSignalRef();
+        }
+
+        EventSubscriptionEntityManager eventSubscriptionEntityManager = Context.getCommandContext().getEventSubscriptionEntityManager();
+        List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
+        for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
+            if (eventSubscription instanceof SignalEventSubscriptionEntity && eventSubscription.getEventName().equals(eventName)) {
+
+                eventSubscriptionEntityManager.delete(eventSubscription);
+            }
+        }
+        return executionEntity;
+    }
 }

@@ -17,28 +17,32 @@ import java.util.List;
 
 import org.flowable.app.model.common.AbstractRepresentation;
 
-
 public class FormFieldValuesRepresentation extends AbstractRepresentation {
 
     protected Long formId;
     protected String formName;
     protected List<FormFieldSummaryRepresentation> fields = new ArrayList<FormFieldSummaryRepresentation>();
-    
+
     public Long getFormId() {
         return formId;
     }
+
     public void setFormId(Long formId) {
         this.formId = formId;
     }
+
     public String getFormName() {
         return formName;
     }
+
     public void setFormName(String formName) {
         this.formName = formName;
     }
+
     public List<FormFieldSummaryRepresentation> getFields() {
         return fields;
     }
+
     public void setFields(List<FormFieldSummaryRepresentation> fields) {
         this.fields = fields;
     }

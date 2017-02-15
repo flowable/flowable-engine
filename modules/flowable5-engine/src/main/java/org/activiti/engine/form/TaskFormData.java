@@ -16,13 +16,13 @@ package org.activiti.engine.form;
 import org.activiti.engine.task.Task;
 import org.flowable.engine.form.FormData;
 
-
-/** Specific {@link FormData} for completing a task.
+/**
+ * Specific {@link FormData} for completing a task.
  * 
  * @author Tom Baeyens
  */
 public interface TaskFormData extends FormData {
 
-  /** The task for which this form is used to complete it. */
-  Task getTask();
+    /** The task for which this form is used to complete it. */
+    Task getTask();
 }

@@ -28,42 +28,42 @@ import org.flowable.engine.impl.util.ReflectUtil;
  */
 public class DelegateFlowableEventListener extends BaseDelegateEventListener {
 
-  protected String className;
-  protected FlowableEventListener delegateInstance;
-  protected boolean failOnException;
+    protected String className;
+    protected FlowableEventListener delegateInstance;
+    protected boolean failOnException;
 
-  public DelegateFlowableEventListener(String className, Class<?> entityClass) {
-    this.className = className;
-    setEntityClass(entityClass);
-  }
-
-  @Override
-  public void onEvent(FlowableEvent event) {
-    if (isValidEvent(event)) {
-      getDelegateInstance().onEvent(event);
+    public DelegateFlowableEventListener(String className, Class<?> entityClass) {
+        this.className = className;
+        setEntityClass(entityClass);
     }
-  }
 
-  @Override
-  public boolean isFailOnException() {
-    if (delegateInstance != null) {
-      return delegateInstance.isFailOnException();
+    @Override
+    public void onEvent(FlowableEvent event) {
+        if (isValidEvent(event)) {
+            getDelegateInstance().onEvent(event);
+        }
     }
-    return failOnException;
-  }
 
-  protected FlowableEventListener getDelegateInstance() {
-    if (delegateInstance == null) {
-      Object instance = ReflectUtil.instantiate(className);
-      if (instance instanceof FlowableEventListener) {
-        delegateInstance = (FlowableEventListener) instance;
-      } else {
-        // Force failing of the listener invocation, since the delegate
-        // cannot be created
-        failOnException = true;
-        throw new FlowableIllegalArgumentException("Class " + className + " does not implement " + FlowableEventListener.class.getName());
-      }
+    @Override
+    public boolean isFailOnException() {
+        if (delegateInstance != null) {
+            return delegateInstance.isFailOnException();
+        }
+        return failOnException;
     }
-    return delegateInstance;
-  }
+
+    protected FlowableEventListener getDelegateInstance() {
+        if (delegateInstance == null) {
+            Object instance = ReflectUtil.instantiate(className);
+            if (instance instanceof FlowableEventListener) {
+                delegateInstance = (FlowableEventListener) instance;
+            } else {
+                // Force failing of the listener invocation, since the delegate
+                // cannot be created
+                failOnException = true;
+                throw new FlowableIllegalArgumentException("Class " + className + " does not implement " + FlowableEventListener.class.getName());
+            }
+        }
+        return delegateInstance;
+    }
 }

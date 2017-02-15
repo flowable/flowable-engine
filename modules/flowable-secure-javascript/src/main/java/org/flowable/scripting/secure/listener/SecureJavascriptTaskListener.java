@@ -21,18 +21,18 @@ import org.flowable.scripting.secure.impl.SecureJavascriptUtil;
  * @author Joram Barrez
  */
 public class SecureJavascriptTaskListener extends ScriptTaskListener {
-  
-  @Override
-  public void notify(DelegateTask delegateTask) {
-    validateParameters();
-    if (SecureJavascriptTaskParseHandler.LANGUAGE_JAVASCRIPT.equalsIgnoreCase(language.getValue(delegateTask).toString())) {
-      Object result = SecureJavascriptUtil.evaluateScript(delegateTask, script.getExpressionText());
-      if (resultVariable != null) {
-        delegateTask.setVariable(resultVariable.getExpressionText(), result);
-      }
-    } else {
-      super.notify(delegateTask);
+
+    @Override
+    public void notify(DelegateTask delegateTask) {
+        validateParameters();
+        if (SecureJavascriptTaskParseHandler.LANGUAGE_JAVASCRIPT.equalsIgnoreCase(language.getValue(delegateTask).toString())) {
+            Object result = SecureJavascriptUtil.evaluateScript(delegateTask, script.getExpressionText());
+            if (resultVariable != null) {
+                delegateTask.setVariable(resultVariable.getExpressionText(), result);
+            }
+        } else {
+            super.notify(delegateTask);
+        }
     }
-  }
 
 }

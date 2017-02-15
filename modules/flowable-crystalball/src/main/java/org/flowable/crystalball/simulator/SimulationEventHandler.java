@@ -17,17 +17,17 @@ package org.flowable.crystalball.simulator;
  */
 public interface SimulationEventHandler {
 
-  /**
-   * initialize event handler
-   */
-  void init();
+    /**
+     * initialize event handler
+     */
+    void init();
 
-  /**
-   * execute event in the context
-   * 
-   * @param event
-   *          event to handle
-   */
-  void handle(SimulationEvent event);
+    /**
+     * execute event in the context
+     * 
+     * @param event
+     *            event to handle
+     */
+    void handle(SimulationEvent event);
 
 }

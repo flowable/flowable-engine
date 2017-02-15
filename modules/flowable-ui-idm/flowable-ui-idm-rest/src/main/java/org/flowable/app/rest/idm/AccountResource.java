@@ -37,51 +37,51 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @RestController
 public class AccountResource {
-	
-	@Autowired
-	private ObjectMapper objectMapper;
-	
-	@Autowired
-	private UserService userService;
 
-  /**
-   * GET  /rest/authenticate -> check if the user is authenticated, and return its full name.
-   */
-  @RequestMapping(value = "/rest/authenticate", method = RequestMethod.GET, produces = {"application/json"})
-  public ObjectNode isAuthenticated(HttpServletRequest request) {
-    String user = request.getRemoteUser();
-    
-    if(user == null) {
-        throw new UnauthorizedException("Request did not contain valid authorization");
-    }
-    
-    ObjectNode result = objectMapper.createObjectNode();
-    result.put("login", user);
-    return result;
-  }
+    @Autowired
+    private ObjectMapper objectMapper;
 
-  /**
-   * GET  /rest/account -> get the current user.
-   */
-  @RequestMapping(value = "/rest/account", method = RequestMethod.GET, produces = "application/json")
-  public UserRepresentation getAccount() {
-    String userId = SecurityUtils.getCurrentFlowableAppUser().getUserObject().getId();
-    UserInformation userInformation = userService.getUserInformation(userId);
-    if (userInformation != null) {
-      UserRepresentation userRepresentation = new UserRepresentation(userInformation.getUser());
-      if (userInformation.getGroups() != null) {
-        for (Group group : userInformation.getGroups()) {
-          userRepresentation.getGroups().add(new GroupRepresentation(group));
+    @Autowired
+    private UserService userService;
+
+    /**
+     * GET /rest/authenticate -> check if the user is authenticated, and return its full name.
+     */
+    @RequestMapping(value = "/rest/authenticate", method = RequestMethod.GET, produces = { "application/json" })
+    public ObjectNode isAuthenticated(HttpServletRequest request) {
+        String user = request.getRemoteUser();
+
+        if (user == null) {
+            throw new UnauthorizedException("Request did not contain valid authorization");
         }
-      }
-      if (userInformation.getPrivileges() != null) {
-        for (String privilege : userInformation.getPrivileges()) {
-          userRepresentation.getPrivileges().add(privilege);
-        }
-      }
-      return userRepresentation;
-    } else {
-      throw new NotFoundException();
+
+        ObjectNode result = objectMapper.createObjectNode();
+        result.put("login", user);
+        return result;
     }
-  }
+
+    /**
+     * GET /rest/account -> get the current user.
+     */
+    @RequestMapping(value = "/rest/account", method = RequestMethod.GET, produces = "application/json")
+    public UserRepresentation getAccount() {
+        String userId = SecurityUtils.getCurrentFlowableAppUser().getUserObject().getId();
+        UserInformation userInformation = userService.getUserInformation(userId);
+        if (userInformation != null) {
+            UserRepresentation userRepresentation = new UserRepresentation(userInformation.getUser());
+            if (userInformation.getGroups() != null) {
+                for (Group group : userInformation.getGroups()) {
+                    userRepresentation.getGroups().add(new GroupRepresentation(group));
+                }
+            }
+            if (userInformation.getPrivileges() != null) {
+                for (String privilege : userInformation.getPrivileges()) {
+                    userRepresentation.getPrivileges().add(privilege);
+                }
+            }
+            return userRepresentation;
+        } else {
+            throw new NotFoundException();
+        }
+    }
 }

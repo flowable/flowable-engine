@@ -32,31 +32,31 @@ import liquibase.resource.ClassLoaderResourceAccessor;
  */
 public class DbSchemaDrop {
 
-  public static void main(String[] args) {
-    try {
-      ContentEngine contentEngine = ContentEngines.getDefaultContentEngine();
-      DataSource dataSource = contentEngine.getContentEngineConfiguration().getDataSource();
-      
-      DatabaseConnection connection = new JdbcConnection(dataSource.getConnection());
-      Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
-      database.setDatabaseChangeLogTableName(ContentEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX+database.getDatabaseChangeLogTableName());
-      database.setDatabaseChangeLogLockTableName(ContentEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX+database.getDatabaseChangeLogLockTableName());
-      
-      if (StringUtils.isNotEmpty(contentEngine.getContentEngineConfiguration().getDatabaseSchema())) {
-        database.setDefaultSchemaName(contentEngine.getContentEngineConfiguration().getDatabaseSchema());
-        database.setLiquibaseSchemaName(contentEngine.getContentEngineConfiguration().getDatabaseSchema());
-      }
-      
-      if (StringUtils.isNotEmpty(contentEngine.getContentEngineConfiguration().getDatabaseCatalog())) {
-        database.setDefaultCatalogName(contentEngine.getContentEngineConfiguration().getDatabaseCatalog());
-        database.setLiquibaseCatalogName(contentEngine.getContentEngineConfiguration().getDatabaseCatalog());
-      }
-  
-      Liquibase liquibase = new Liquibase("org/flowable/content/db/liquibase/flowable-content-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
-      liquibase.dropAll();
-      
-    } catch (Exception e) {
-      e.printStackTrace();
+    public static void main(String[] args) {
+        try {
+            ContentEngine contentEngine = ContentEngines.getDefaultContentEngine();
+            DataSource dataSource = contentEngine.getContentEngineConfiguration().getDataSource();
+
+            DatabaseConnection connection = new JdbcConnection(dataSource.getConnection());
+            Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
+            database.setDatabaseChangeLogTableName(ContentEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
+            database.setDatabaseChangeLogLockTableName(ContentEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
+
+            if (StringUtils.isNotEmpty(contentEngine.getContentEngineConfiguration().getDatabaseSchema())) {
+                database.setDefaultSchemaName(contentEngine.getContentEngineConfiguration().getDatabaseSchema());
+                database.setLiquibaseSchemaName(contentEngine.getContentEngineConfiguration().getDatabaseSchema());
+            }
+
+            if (StringUtils.isNotEmpty(contentEngine.getContentEngineConfiguration().getDatabaseCatalog())) {
+                database.setDefaultCatalogName(contentEngine.getContentEngineConfiguration().getDatabaseCatalog());
+                database.setLiquibaseCatalogName(contentEngine.getContentEngineConfiguration().getDatabaseCatalog());
+            }
+
+            Liquibase liquibase = new Liquibase("org/flowable/content/db/liquibase/flowable-content-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
+            liquibase.dropAll();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-  }
 }

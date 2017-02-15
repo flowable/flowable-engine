@@ -36,35 +36,35 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Groups" }, description = "Manage Groups", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Groups" }, description = "Manage Groups", authorizations = { @Authorization(value = "basicAuth") })
 public class GroupMembershipCollectionResource extends BaseGroupResource {
 
-  @ApiOperation(value = "Add a member to a group", tags = {"Groups"})
-  @ApiResponses(value = {
-          @ApiResponse(code = 201, message = "Indicates the group was found and the member has been added."),
-          @ApiResponse(code = 400, message = "Indicates the userId was not included in the request body."),
-          @ApiResponse(code = 404, message = "Indicates the requested group was not found."),
-          @ApiResponse(code = 409, message = "Indicates the requested user is already a member of the group.")
-  })
-  @RequestMapping(value = "/identity/groups/{groupId}/members", method = RequestMethod.POST, produces = "application/json")
-  public MembershipResponse createMembership(@ApiParam(name = "groupId") @PathVariable String groupId, @RequestBody MembershipRequest memberShip, HttpServletRequest request, HttpServletResponse response) {
+    @ApiOperation(value = "Add a member to a group", tags = { "Groups" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Indicates the group was found and the member has been added."),
+            @ApiResponse(code = 400, message = "Indicates the userId was not included in the request body."),
+            @ApiResponse(code = 404, message = "Indicates the requested group was not found."),
+            @ApiResponse(code = 409, message = "Indicates the requested user is already a member of the group.")
+    })
+    @RequestMapping(value = "/identity/groups/{groupId}/members", method = RequestMethod.POST, produces = "application/json")
+    public MembershipResponse createMembership(@ApiParam(name = "groupId") @PathVariable String groupId, @RequestBody MembershipRequest memberShip, HttpServletRequest request, HttpServletResponse response) {
 
-    Group group = getGroupFromRequest(groupId);
+        Group group = getGroupFromRequest(groupId);
 
-    if (memberShip.getUserId() == null) {
-      throw new FlowableIllegalArgumentException("UserId cannot be null.");
+        if (memberShip.getUserId() == null) {
+            throw new FlowableIllegalArgumentException("UserId cannot be null.");
+        }
+
+        // Check if user is member of group since API doesn't return typed
+        // exception
+        if (identityService.createUserQuery().memberOfGroup(group.getId()).userId(memberShip.getUserId()).count() > 0) {
+
+            throw new FlowableConflictException("User '" + memberShip.getUserId() + "' is already part of group '" + group.getId() + "'.");
+        }
+
+        identityService.createMembership(memberShip.getUserId(), group.getId());
+        response.setStatus(HttpStatus.CREATED.value());
+
+        return restResponseFactory.createMembershipResponse(memberShip.getUserId(), group.getId());
     }
-
-    // Check if user is member of group since API doesn't return typed
-    // exception
-    if (identityService.createUserQuery().memberOfGroup(group.getId()).userId(memberShip.getUserId()).count() > 0) {
-
-      throw new FlowableConflictException("User '" + memberShip.getUserId() + "' is already part of group '" + group.getId() + "'.");
-    }
-
-    identityService.createMembership(memberShip.getUserId(), group.getId());
-    response.setStatus(HttpStatus.CREATED.value());
-
-    return restResponseFactory.createMembershipResponse(memberShip.getUserId(), group.getId());
-  }
 }

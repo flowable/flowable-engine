@@ -18,20 +18,19 @@ import org.activiti.engine.impl.bpmn.parser.handler.AbstractBpmnParseHandler;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.Process;
 
-
 /**
  * @author Frederik Heremans
  * @author Joram Barrez
  */
 public class TestBPMNParseHandler extends AbstractBpmnParseHandler<Process> {
 
-  protected Class< ? extends BaseElement> getHandledType() {
-    return Process.class;
-  }
-  
-  protected void executeParse(BpmnParse bpmnParse, Process element) {
-    // Change the key of all deployed process-definitions
-    bpmnParse.getCurrentProcessDefinition().setKey(bpmnParse.getCurrentProcessDefinition().getKey() + "-modified");
-  }
+    protected Class<? extends BaseElement> getHandledType() {
+        return Process.class;
+    }
+
+    protected void executeParse(BpmnParse bpmnParse, Process element) {
+        // Change the key of all deployed process-definitions
+        bpmnParse.getCurrentProcessDefinition().setKey(bpmnParse.getCurrentProcessDefinition().getKey() + "-modified");
+    }
 
 }

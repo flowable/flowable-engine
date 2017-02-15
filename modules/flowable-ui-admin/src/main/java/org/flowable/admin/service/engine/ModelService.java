@@ -29,14 +29,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class ModelService {
 
     public static final String MODEL_LIST_URL = "enterprise/models";
-    
+
     @Autowired
     protected FlowableClientService clientUtil;
 
     public JsonNode listModels(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
-        URIBuilder builder =  clientUtil.createUriBuilder(MODEL_LIST_URL);
+        URIBuilder builder = clientUtil.createUriBuilder(MODEL_LIST_URL);
         addParametersToBuilder(builder, parameterMap);
-        
+
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
         return clientUtil.executeRequest(get, serverConfig);
     }

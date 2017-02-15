@@ -26,13 +26,12 @@ import org.flowable.engine.repository.Model;
  */
 public interface ModelDataManager extends DataManager<ModelEntity> {
 
-  List<Model> findModelsByQueryCriteria(ModelQueryImpl query, Page page);
+    List<Model> findModelsByQueryCriteria(ModelQueryImpl query, Page page);
 
-  long findModelCountByQueryCriteria(ModelQueryImpl query);
-  
-  List<Model> findModelsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    long findModelCountByQueryCriteria(ModelQueryImpl query);
 
-  long findModelCountByNativeQuery(Map<String, Object> parameterMap);
+    List<Model> findModelsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
 
-  
+    long findModelCountByNativeQuery(Map<String, Object> parameterMap);
+
 }

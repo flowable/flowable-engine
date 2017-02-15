@@ -21,14 +21,14 @@ import org.flowable.idm.api.User;
 
 public interface AppDefinitionService {
 
-  AppDefinitionRepresentation getAppDefinition(String appDefinitionId);
-  
-  AppDefinitionRepresentation getAppDefinitionHistory(String modelId, String modelHistoryId);
-  
-  AppDefinitionUpdateResultRepresentation updateAppDefinition(String modelId, AppDefinitionSaveRepresentation updatedModel);
-  
-	List<AppDefinitionServiceRepresentation> getAppDefinitions();
-	
-	List<AppDefinitionServiceRepresentation> getDeployableAppDefinitions(User user);
+    AppDefinitionRepresentation getAppDefinition(String appDefinitionId);
+
+    AppDefinitionRepresentation getAppDefinitionHistory(String modelId, String modelHistoryId);
+
+    AppDefinitionUpdateResultRepresentation updateAppDefinition(String modelId, AppDefinitionSaveRepresentation updatedModel);
+
+    List<AppDefinitionServiceRepresentation> getAppDefinitions();
+
+    List<AppDefinitionServiceRepresentation> getDeployableAppDefinitions(User user);
 
 }

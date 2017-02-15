@@ -22,31 +22,31 @@ import org.flowable.engine.common.api.FlowableException;
  */
 public class MapBusinessCalendarManager implements BusinessCalendarManager {
 
-  private final Map<String, BusinessCalendar> businessCalendars;
-  
-  public MapBusinessCalendarManager(){
-    this.businessCalendars = new HashMap<String, BusinessCalendar>();
-  }
-  
-  public MapBusinessCalendarManager(Map<String, BusinessCalendar> businessCalendars) {
-    if (businessCalendars == null) {
-      throw new IllegalArgumentException("businessCalendars can not be null");
-    }
-  
-    this.businessCalendars = new HashMap<String, BusinessCalendar>(businessCalendars);
-  }
+    private final Map<String, BusinessCalendar> businessCalendars;
 
-  public BusinessCalendar getBusinessCalendar(String businessCalendarRef) {
-    BusinessCalendar businessCalendar = businessCalendars.get(businessCalendarRef);
-    if (businessCalendar == null) {
-      throw new FlowableException("Requested business calendar " + businessCalendarRef +
-          " does not exist. Allowed calendars are " + this.businessCalendars.keySet() + ".");
+    public MapBusinessCalendarManager() {
+        this.businessCalendars = new HashMap<String, BusinessCalendar>();
     }
-    return businessCalendar;
-  }
 
-  public BusinessCalendarManager addBusinessCalendar(String businessCalendarRef, BusinessCalendar businessCalendar) {
-    businessCalendars.put(businessCalendarRef, businessCalendar);
-    return this;
-  }
+    public MapBusinessCalendarManager(Map<String, BusinessCalendar> businessCalendars) {
+        if (businessCalendars == null) {
+            throw new IllegalArgumentException("businessCalendars can not be null");
+        }
+
+        this.businessCalendars = new HashMap<String, BusinessCalendar>(businessCalendars);
+    }
+
+    public BusinessCalendar getBusinessCalendar(String businessCalendarRef) {
+        BusinessCalendar businessCalendar = businessCalendars.get(businessCalendarRef);
+        if (businessCalendar == null) {
+            throw new FlowableException("Requested business calendar " + businessCalendarRef +
+                    " does not exist. Allowed calendars are " + this.businessCalendars.keySet() + ".");
+        }
+        return businessCalendar;
+    }
+
+    public BusinessCalendarManager addBusinessCalendar(String businessCalendarRef, BusinessCalendar businessCalendar) {
+        businessCalendars.put(businessCalendarRef, businessCalendar);
+        return this;
+    }
 }

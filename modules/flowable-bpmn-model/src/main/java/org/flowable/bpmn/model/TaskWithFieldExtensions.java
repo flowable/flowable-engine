@@ -20,13 +20,14 @@ import java.util.List;
  */
 public abstract class TaskWithFieldExtensions extends Task {
 
-  protected List<FieldExtension> fieldExtensions = new ArrayList<FieldExtension>();
-  
-  public List<FieldExtension> getFieldExtensions() {
-    return fieldExtensions;
-  }
-  public void setFieldExtensions(List<FieldExtension> fieldExtensions) {
-    this.fieldExtensions = fieldExtensions;
-  }
-  
+    protected List<FieldExtension> fieldExtensions = new ArrayList<FieldExtension>();
+
+    public List<FieldExtension> getFieldExtensions() {
+        return fieldExtensions;
+    }
+
+    public void setFieldExtensions(List<FieldExtension> fieldExtensions) {
+        this.fieldExtensions = fieldExtensions;
+    }
+
 }

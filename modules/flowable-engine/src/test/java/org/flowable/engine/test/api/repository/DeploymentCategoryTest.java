@@ -27,123 +27,123 @@ import org.flowable.engine.repository.DeploymentQuery;
  */
 public class DeploymentCategoryTest extends PluggableFlowableTestCase {
 
-  public void testDeploymentCategory() {
-    String noCategoryDeploymentId = null;
-    String deploymentOneId = null;
-    String deploymentTwoV1Id = null;
-    String deploymentTwoV2Id = null;
-    String deploymentTwoNoCategory = null;
+    public void testDeploymentCategory() {
+        String noCategoryDeploymentId = null;
+        String deploymentOneId = null;
+        String deploymentTwoV1Id = null;
+        String deploymentTwoV2Id = null;
+        String deploymentTwoNoCategory = null;
 
-    try {
-      noCategoryDeploymentId = repositoryService.createDeployment().name("0").addClasspathResource("org/flowable/engine/test/service/oneTaskProcess.bpmn20.xml").deploy().getId();
+        try {
+            noCategoryDeploymentId = repositoryService.createDeployment().name("0").addClasspathResource("org/flowable/engine/test/service/oneTaskProcess.bpmn20.xml").deploy().getId();
 
-      deploymentOneId = repositoryService.createDeployment().name("1").category("one").addClasspathResource("org/flowable/engine/test/repository/one.bpmn20.xml").deploy().getId();
+            deploymentOneId = repositoryService.createDeployment().name("1").category("one").addClasspathResource("org/flowable/engine/test/repository/one.bpmn20.xml").deploy().getId();
 
-      deploymentTwoV1Id = repositoryService.createDeployment().name("2v1").category("two").addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml").deploy().getId();
+            deploymentTwoV1Id = repositoryService.createDeployment().name("2v1").category("two").addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml").deploy().getId();
 
-      deploymentTwoV2Id = repositoryService.createDeployment().name("2v2").category("two").addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml").deploy().getId();
+            deploymentTwoV2Id = repositoryService.createDeployment().name("2v2").category("two").addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml").deploy().getId();
 
-      DeploymentQuery query = repositoryService.createDeploymentQuery();
-      assertEquals(4, query.list().size());
+            DeploymentQuery query = repositoryService.createDeploymentQuery();
+            assertEquals(4, query.list().size());
 
-      Set<String> deploymentNames = getDeploymentNames(repositoryService.createDeploymentQuery().deploymentCategory("one").list());
+            Set<String> deploymentNames = getDeploymentNames(repositoryService.createDeploymentQuery().deploymentCategory("one").list());
 
-      Set<String> expectedDeploymentNames = new HashSet<String>();
-      expectedDeploymentNames.add("1");
+            Set<String> expectedDeploymentNames = new HashSet<String>();
+            expectedDeploymentNames.add("1");
 
-      assertEquals(expectedDeploymentNames, deploymentNames);
+            assertEquals(expectedDeploymentNames, deploymentNames);
 
-      deploymentNames = getDeploymentNames(repositoryService.createDeploymentQuery().deploymentCategoryNotEquals("two").list());
+            deploymentNames = getDeploymentNames(repositoryService.createDeploymentQuery().deploymentCategoryNotEquals("two").list());
 
-      expectedDeploymentNames.add("0");
+            expectedDeploymentNames.add("0");
 
-      assertEquals(expectedDeploymentNames, deploymentNames);
+            assertEquals(expectedDeploymentNames, deploymentNames);
 
-      deploymentTwoNoCategory = repositoryService.createDeployment().name("noCategory").addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml").deploy().getId();
+            deploymentTwoNoCategory = repositoryService.createDeployment().name("noCategory").addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml").deploy().getId();
 
-      Deployment deploymentNoCategory = repositoryService.createDeploymentQuery().deploymentId(deploymentTwoNoCategory).singleResult();
-      assertNull(deploymentNoCategory.getCategory());
+            Deployment deploymentNoCategory = repositoryService.createDeploymentQuery().deploymentId(deploymentTwoNoCategory).singleResult();
+            assertNull(deploymentNoCategory.getCategory());
 
-      repositoryService.setDeploymentCategory(deploymentTwoNoCategory, "newCategory");
-      deploymentNoCategory = repositoryService.createDeploymentQuery().deploymentId(deploymentTwoNoCategory).singleResult();
-      assertEquals("newCategory", deploymentNoCategory.getCategory());
+            repositoryService.setDeploymentCategory(deploymentTwoNoCategory, "newCategory");
+            deploymentNoCategory = repositoryService.createDeploymentQuery().deploymentId(deploymentTwoNoCategory).singleResult();
+            assertEquals("newCategory", deploymentNoCategory.getCategory());
 
-    } finally {
-      if (noCategoryDeploymentId != null)
-        undeploy(noCategoryDeploymentId);
-      if (deploymentOneId != null)
-        undeploy(deploymentOneId);
-      if (deploymentTwoV1Id != null)
-        undeploy(deploymentTwoV1Id);
-      if (deploymentTwoV2Id != null)
-        undeploy(deploymentTwoV2Id);
-      if (deploymentTwoNoCategory != null)
-        undeploy(deploymentTwoNoCategory);
+        } finally {
+            if (noCategoryDeploymentId != null)
+                undeploy(noCategoryDeploymentId);
+            if (deploymentOneId != null)
+                undeploy(deploymentOneId);
+            if (deploymentTwoV1Id != null)
+                undeploy(deploymentTwoV1Id);
+            if (deploymentTwoV2Id != null)
+                undeploy(deploymentTwoV2Id);
+            if (deploymentTwoNoCategory != null)
+                undeploy(deploymentTwoNoCategory);
+        }
     }
-  }
-  
-  public void testDeploymentKey() {
-    String noKeyDeploymentId = null;
-    String deploymentOneId = null;
-    String deploymentTwoV1Id = null;
-    String deploymentTwoV2Id = null;
-    String deploymentTwoNoKey = null;
 
-    try {
-      noKeyDeploymentId = repositoryService.createDeployment().name("0").addClasspathResource("org/flowable/engine/test/service/oneTaskProcess.bpmn20.xml").deploy().getId();
+    public void testDeploymentKey() {
+        String noKeyDeploymentId = null;
+        String deploymentOneId = null;
+        String deploymentTwoV1Id = null;
+        String deploymentTwoV2Id = null;
+        String deploymentTwoNoKey = null;
 
-      deploymentOneId = repositoryService.createDeployment().name("1").key("one").addClasspathResource("org/flowable/engine/test/repository/one.bpmn20.xml").deploy().getId();
+        try {
+            noKeyDeploymentId = repositoryService.createDeployment().name("0").addClasspathResource("org/flowable/engine/test/service/oneTaskProcess.bpmn20.xml").deploy().getId();
 
-      deploymentTwoV1Id = repositoryService.createDeployment().name("2v1").key("two").addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml").deploy().getId();
+            deploymentOneId = repositoryService.createDeployment().name("1").key("one").addClasspathResource("org/flowable/engine/test/repository/one.bpmn20.xml").deploy().getId();
 
-      deploymentTwoV2Id = repositoryService.createDeployment().name("2v2").key("two").addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml").deploy().getId();
+            deploymentTwoV1Id = repositoryService.createDeployment().name("2v1").key("two").addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml").deploy().getId();
 
-      DeploymentQuery query = repositoryService.createDeploymentQuery();
-      assertEquals(4, query.list().size());
+            deploymentTwoV2Id = repositoryService.createDeployment().name("2v2").key("two").addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml").deploy().getId();
 
-      Set<String> deploymentNames = getDeploymentNames(repositoryService.createDeploymentQuery().deploymentKey("one").list());
+            DeploymentQuery query = repositoryService.createDeploymentQuery();
+            assertEquals(4, query.list().size());
 
-      Set<String> expectedDeploymentNames = new HashSet<String>();
-      expectedDeploymentNames.add("1");
+            Set<String> deploymentNames = getDeploymentNames(repositoryService.createDeploymentQuery().deploymentKey("one").list());
 
-      assertEquals(expectedDeploymentNames, deploymentNames);
+            Set<String> expectedDeploymentNames = new HashSet<String>();
+            expectedDeploymentNames.add("1");
 
-      deploymentTwoNoKey = repositoryService.createDeployment().name("noCategory").addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml").deploy().getId();
+            assertEquals(expectedDeploymentNames, deploymentNames);
 
-      Deployment deploymentNoCategory = repositoryService.createDeploymentQuery().deploymentId(deploymentTwoNoKey).singleResult();
-      assertNull(deploymentNoCategory.getCategory());
+            deploymentTwoNoKey = repositoryService.createDeployment().name("noCategory").addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml").deploy().getId();
 
-      repositoryService.setDeploymentKey(deploymentTwoNoKey, "newKey");
-      deploymentNoCategory = repositoryService.createDeploymentQuery().deploymentId(deploymentTwoNoKey).singleResult();
-      assertEquals("newKey", deploymentNoCategory.getKey());
+            Deployment deploymentNoCategory = repositoryService.createDeploymentQuery().deploymentId(deploymentTwoNoKey).singleResult();
+            assertNull(deploymentNoCategory.getCategory());
 
-    } finally {
-      if (noKeyDeploymentId != null)
-        undeploy(noKeyDeploymentId);
-      if (deploymentOneId != null)
-        undeploy(deploymentOneId);
-      if (deploymentTwoV1Id != null)
-        undeploy(deploymentTwoV1Id);
-      if (deploymentTwoV2Id != null)
-        undeploy(deploymentTwoV2Id);
-      if (deploymentTwoNoKey != null)
-        undeploy(deploymentTwoNoKey);
+            repositoryService.setDeploymentKey(deploymentTwoNoKey, "newKey");
+            deploymentNoCategory = repositoryService.createDeploymentQuery().deploymentId(deploymentTwoNoKey).singleResult();
+            assertEquals("newKey", deploymentNoCategory.getKey());
+
+        } finally {
+            if (noKeyDeploymentId != null)
+                undeploy(noKeyDeploymentId);
+            if (deploymentOneId != null)
+                undeploy(deploymentOneId);
+            if (deploymentTwoV1Id != null)
+                undeploy(deploymentTwoV1Id);
+            if (deploymentTwoV2Id != null)
+                undeploy(deploymentTwoV2Id);
+            if (deploymentTwoNoKey != null)
+                undeploy(deploymentTwoNoKey);
+        }
     }
-  }
 
-  private Set<String> getDeploymentNames(List<Deployment> deployments) {
-    Set<String> deploymentNames = new HashSet<String>();
-    for (Deployment deployment : deployments) {
-      deploymentNames.add(deployment.getName());
+    private Set<String> getDeploymentNames(List<Deployment> deployments) {
+        Set<String> deploymentNames = new HashSet<String>();
+        for (Deployment deployment : deployments) {
+            deploymentNames.add(deployment.getName());
+        }
+        return deploymentNames;
     }
-    return deploymentNames;
-  }
 
-  private void undeploy(String deploymentId) {
-    try {
-      repositoryService.deleteDeployment(deploymentId);
-    } catch (Exception e) {
-      e.printStackTrace();
+    private void undeploy(String deploymentId) {
+        try {
+            repositoryService.deleteDeployment(deploymentId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-  }
 }

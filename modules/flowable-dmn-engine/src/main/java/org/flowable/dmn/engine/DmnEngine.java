@@ -31,7 +31,7 @@ public interface DmnEngine {
     void close();
 
     DmnManagementService getDmnManagementService();
-    
+
     DmnRepositoryService getDmnRepositoryService();
 
     DmnRuleService getDmnRuleService();

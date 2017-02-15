@@ -48,175 +48,175 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public class CallActivityBehavior extends AbstractBpmnActivityBehavior implements SubProcessActivityBehavior {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String processDefinitonKey;
-  protected Expression processDefinitionExpression;
-  protected List<MapExceptionEntry> mapExceptions;
+    protected String processDefinitonKey;
+    protected Expression processDefinitionExpression;
+    protected List<MapExceptionEntry> mapExceptions;
 
-  public CallActivityBehavior(String processDefinitionKey, List<MapExceptionEntry> mapExceptions) {
-    this.processDefinitonKey = processDefinitionKey;
-    this.mapExceptions = mapExceptions;
-  }
-
-  public CallActivityBehavior(Expression processDefinitionExpression, List<MapExceptionEntry> mapExceptions) {
-    this.processDefinitionExpression = processDefinitionExpression;
-    this.mapExceptions = mapExceptions;
-  }
-
-  public void execute(DelegateExecution execution) {
-
-    String finalProcessDefinitonKey = null;
-    if (processDefinitionExpression != null) {
-      finalProcessDefinitonKey = (String) processDefinitionExpression.getValue(execution);
-    } else {
-      finalProcessDefinitonKey = processDefinitonKey;
+    public CallActivityBehavior(String processDefinitionKey, List<MapExceptionEntry> mapExceptions) {
+        this.processDefinitonKey = processDefinitionKey;
+        this.mapExceptions = mapExceptions;
     }
 
-    ProcessDefinition processDefinition = findProcessDefinition(finalProcessDefinitonKey, execution.getTenantId());
-
-    // Get model from cache
-    Process subProcess = ProcessDefinitionUtil.getProcess(processDefinition.getId());
-    if (subProcess == null) {
-      throw new FlowableException("Cannot start a sub process instance. Process model " + processDefinition.getName() + " (id = " + processDefinition.getId() + ") could not be found");
+    public CallActivityBehavior(Expression processDefinitionExpression, List<MapExceptionEntry> mapExceptions) {
+        this.processDefinitionExpression = processDefinitionExpression;
+        this.mapExceptions = mapExceptions;
     }
 
-    FlowElement initialFlowElement = subProcess.getInitialFlowElement();
-    if (initialFlowElement == null) {
-      throw new FlowableException("No start element found for process definition " + processDefinition.getId());
+    public void execute(DelegateExecution execution) {
+
+        String finalProcessDefinitonKey = null;
+        if (processDefinitionExpression != null) {
+            finalProcessDefinitonKey = (String) processDefinitionExpression.getValue(execution);
+        } else {
+            finalProcessDefinitonKey = processDefinitonKey;
+        }
+
+        ProcessDefinition processDefinition = findProcessDefinition(finalProcessDefinitonKey, execution.getTenantId());
+
+        // Get model from cache
+        Process subProcess = ProcessDefinitionUtil.getProcess(processDefinition.getId());
+        if (subProcess == null) {
+            throw new FlowableException("Cannot start a sub process instance. Process model " + processDefinition.getName() + " (id = " + processDefinition.getId() + ") could not be found");
+        }
+
+        FlowElement initialFlowElement = subProcess.getInitialFlowElement();
+        if (initialFlowElement == null) {
+            throw new FlowableException("No start element found for process definition " + processDefinition.getId());
+        }
+
+        // Do not start a process instance if the process definition is suspended
+        if (ProcessDefinitionUtil.isProcessDefinitionSuspended(processDefinition.getId())) {
+            throw new FlowableException("Cannot start process instance. Process definition " + processDefinition.getName() + " (id = " + processDefinition.getId() + ") is suspended");
+        }
+
+        ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+        ExecutionEntityManager executionEntityManager = Context.getCommandContext().getExecutionEntityManager();
+        ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
+
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+        CallActivity callActivity = (CallActivity) executionEntity.getCurrentFlowElement();
+
+        String businessKey = null;
+
+        if (!StringUtils.isEmpty(callActivity.getBusinessKey())) {
+            Expression expression = expressionManager.createExpression(callActivity.getBusinessKey());
+            businessKey = expression.getValue(execution).toString();
+
+        } else if (callActivity.isInheritBusinessKey()) {
+            ExecutionEntity processInstance = executionEntityManager.findById(execution.getProcessInstanceId());
+            businessKey = processInstance.getBusinessKey();
+        }
+
+        ExecutionEntity subProcessInstance = Context.getCommandContext().getExecutionEntityManager().createSubprocessInstance(
+                processDefinition, executionEntity, businessKey);
+        Context.getCommandContext().getHistoryManager().recordSubProcessInstanceStart(executionEntity, subProcessInstance, initialFlowElement);
+
+        boolean eventDispatcherEnabled = Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled();
+        if (eventDispatcherEnabled) {
+            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance));
+        }
+
+        // process template-defined data objects
+        subProcessInstance.setVariables(processDataObjects(subProcess.getDataObjects()));
+
+        Map<String, Object> variables = new HashMap<String, Object>();
+
+        if (callActivity.isInheritVariables()) {
+            Map<String, Object> executionVariables = execution.getVariables();
+            for (Map.Entry<String, Object> entry : executionVariables.entrySet()) {
+                variables.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        // copy process variables
+        for (IOParameter ioParameter : callActivity.getInParameters()) {
+            Object value = null;
+            if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
+                Expression expression = expressionManager.createExpression(ioParameter.getSourceExpression().trim());
+                value = expression.getValue(execution);
+
+            } else {
+                value = execution.getVariable(ioParameter.getSource());
+            }
+            variables.put(ioParameter.getTarget(), value);
+        }
+
+        if (!variables.isEmpty()) {
+            initializeVariables(subProcessInstance, variables);
+        }
+
+        // Create the first execution that will visit all the process definition elements
+        ExecutionEntity subProcessInitialExecution = executionEntityManager.createChildExecution(subProcessInstance);
+        subProcessInitialExecution.setCurrentFlowElement(initialFlowElement);
+
+        Context.getAgenda().planContinueProcessOperation(subProcessInitialExecution);
+
+        if (eventDispatcherEnabled) {
+            Context.getProcessEngineConfiguration().getEventDispatcher()
+                    .dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(subProcessInitialExecution, variables, false));
+        }
     }
 
-    // Do not start a process instance if the process definition is suspended
-    if (ProcessDefinitionUtil.isProcessDefinitionSuspended(processDefinition.getId())) {
-      throw new FlowableException("Cannot start process instance. Process definition " + processDefinition.getName() + " (id = " + processDefinition.getId() + ") is suspended");
-    }
-    
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    ExecutionEntityManager executionEntityManager = Context.getCommandContext().getExecutionEntityManager();
-    ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
+    public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {
+        // only data. no control flow available on this execution.
 
-    ExecutionEntity executionEntity = (ExecutionEntity) execution;
-    CallActivity callActivity = (CallActivity) executionEntity.getCurrentFlowElement();
+        ExpressionManager expressionManager = Context.getProcessEngineConfiguration().getExpressionManager();
 
-    String businessKey = null;
+        // copy process variables
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+        CallActivity callActivity = (CallActivity) executionEntity.getCurrentFlowElement();
+        for (IOParameter ioParameter : callActivity.getOutParameters()) {
+            Object value = null;
+            if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
+                Expression expression = expressionManager.createExpression(ioParameter.getSourceExpression().trim());
+                value = expression.getValue(subProcessInstance);
 
-    if (!StringUtils.isEmpty(callActivity.getBusinessKey())) {
-      Expression expression = expressionManager.createExpression(callActivity.getBusinessKey());
-      businessKey = expression.getValue(execution).toString();
-      
-    } else if (callActivity.isInheritBusinessKey()) {
-      ExecutionEntity processInstance = executionEntityManager.findById(execution.getProcessInstanceId());
-      businessKey = processInstance.getBusinessKey();
+            } else {
+                value = subProcessInstance.getVariable(ioParameter.getSource());
+            }
+            execution.setVariable(ioParameter.getTarget(), value);
+        }
     }
 
-    ExecutionEntity subProcessInstance = Context.getCommandContext().getExecutionEntityManager().createSubprocessInstance(
-        processDefinition,executionEntity, businessKey);
-    Context.getCommandContext().getHistoryManager().recordSubProcessInstanceStart(executionEntity, subProcessInstance, initialFlowElement);
-
-    boolean eventDispatcherEnabled = Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled();
-    if (eventDispatcherEnabled) {
-      Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance));
+    public void completed(DelegateExecution execution) throws Exception {
+        // only control flow. no sub process instance data available
+        leave(execution);
     }
 
-    // process template-defined data objects
-    subProcessInstance.setVariables(processDataObjects(subProcess.getDataObjects()));
-    
-    Map<String, Object> variables = new HashMap<String,Object>();
-    
-    if (callActivity.isInheritVariables()) {
-      Map<String, Object> executionVariables = execution.getVariables();
-      for (Map.Entry<String, Object> entry : executionVariables.entrySet()) {
-        variables.put(entry.getKey(), entry.getValue());
-      }
+    // Allow subclass to determine which version of a process to start.
+    protected ProcessDefinition findProcessDefinition(String processDefinitionKey, String tenantId) {
+        if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+            return Context.getProcessEngineConfiguration().getDeploymentManager().findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
+        } else {
+            return Context.getProcessEngineConfiguration().getDeploymentManager().findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+        }
     }
 
-    // copy process variables
-    for (IOParameter ioParameter : callActivity.getInParameters()) {
-      Object value = null;
-      if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
-        Expression expression = expressionManager.createExpression(ioParameter.getSourceExpression().trim());
-        value = expression.getValue(execution);
-
-      } else {
-        value = execution.getVariable(ioParameter.getSource());
-      }
-      variables.put(ioParameter.getTarget(), value);
+    protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
+        Map<String, Object> variablesMap = new HashMap<String, Object>();
+        // convert data objects to process variables
+        if (dataObjects != null) {
+            variablesMap = new HashMap<String, Object>(dataObjects.size());
+            for (ValuedDataObject dataObject : dataObjects) {
+                variablesMap.put(dataObject.getName(), dataObject.getValue());
+            }
+        }
+        return variablesMap;
     }
 
-    if (!variables.isEmpty()) {
-      initializeVariables(subProcessInstance, variables);
+    // Allow a subclass to override how variables are initialized.
+    protected void initializeVariables(ExecutionEntity subProcessInstance, Map<String, Object> variables) {
+        subProcessInstance.setVariables(variables);
     }
 
-    // Create the first execution that will visit all the process definition elements
-    ExecutionEntity subProcessInitialExecution = executionEntityManager.createChildExecution(subProcessInstance); 
-    subProcessInitialExecution.setCurrentFlowElement(initialFlowElement);
-
-    Context.getAgenda().planContinueProcessOperation(subProcessInitialExecution);
-    
-    if (eventDispatcherEnabled) {
-      Context.getProcessEngineConfiguration().getEventDispatcher()
-        .dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(subProcessInitialExecution, variables, false));
+    public void setProcessDefinitonKey(String processDefinitonKey) {
+        this.processDefinitonKey = processDefinitonKey;
     }
-  }
-  
-  public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {
-    // only data. no control flow available on this execution.
 
-    ExpressionManager expressionManager = Context.getProcessEngineConfiguration().getExpressionManager();
-
-    // copy process variables
-    ExecutionEntity executionEntity = (ExecutionEntity) execution;
-    CallActivity callActivity = (CallActivity) executionEntity.getCurrentFlowElement();
-    for (IOParameter ioParameter : callActivity.getOutParameters()) {
-      Object value = null;
-      if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
-        Expression expression = expressionManager.createExpression(ioParameter.getSourceExpression().trim());
-        value = expression.getValue(subProcessInstance);
-
-      } else {
-        value = subProcessInstance.getVariable(ioParameter.getSource());
-      }
-      execution.setVariable(ioParameter.getTarget(), value);
+    public String getProcessDefinitonKey() {
+        return processDefinitonKey;
     }
-  }
-
-  public void completed(DelegateExecution execution) throws Exception {
-    // only control flow. no sub process instance data available
-    leave(execution);
-  }
-
-  // Allow subclass to determine which version of a process to start.
-  protected ProcessDefinition findProcessDefinition(String processDefinitionKey, String tenantId) {
-    if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-      return Context.getProcessEngineConfiguration().getDeploymentManager().findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
-    } else {
-      return Context.getProcessEngineConfiguration().getDeploymentManager().findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
-    }
-  }
-  
-  protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
-  	Map<String, Object> variablesMap = new HashMap<String,Object>();
-  	// convert data objects to process variables
-  	if (dataObjects != null) {
-        variablesMap = new HashMap<String, Object>(dataObjects.size());
-  	  for (ValuedDataObject dataObject : dataObjects) {
-  	    variablesMap.put(dataObject.getName(), dataObject.getValue());
-  	  }
-  	}
-  	return variablesMap;
-  }
-
-  // Allow a subclass to override how variables are initialized.
-  protected void initializeVariables(ExecutionEntity subProcessInstance, Map<String,Object> variables) {
-    subProcessInstance.setVariables(variables);
-  }
-  
-  public void setProcessDefinitonKey(String processDefinitonKey) {
-    this.processDefinitonKey = processDefinitonKey;
-  }
-
-  public String getProcessDefinitonKey() {
-    return processDefinitonKey;
-  }
 }

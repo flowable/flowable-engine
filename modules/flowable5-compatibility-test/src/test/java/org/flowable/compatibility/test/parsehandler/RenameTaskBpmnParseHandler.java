@@ -24,16 +24,16 @@ import org.flowable.bpmn.model.UserTask;
  */
 public class RenameTaskBpmnParseHandler extends AbstractBpmnParseHandler<UserTask> {
 
-  @Override
-  protected Class<? extends BaseElement> getHandledType() {
-    return UserTask.class;
-  }
-
-  @Override
-  protected void executeParse(BpmnParse bpmnParse, UserTask userTask) {
-    if (bpmnParse.getCurrentProcessDefinition().getKey().equals("parseHandlerTestProcess")) {
-      userTask.setName(userTask.getName() + "-activiti 5");
+    @Override
+    protected Class<? extends BaseElement> getHandledType() {
+        return UserTask.class;
     }
-  }
+
+    @Override
+    protected void executeParse(BpmnParse bpmnParse, UserTask userTask) {
+        if (bpmnParse.getCurrentProcessDefinition().getKey().equals("parseHandlerTestProcess")) {
+            userTask.setName(userTask.getName() + "-activiti 5");
+        }
+    }
 
 }

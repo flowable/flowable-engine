@@ -17,6 +17,6 @@ package org.flowable.osgi;
  */
 public class Constants {
 
-  public static final String BUNDLE_FLOWABLE_HEADER = "Flowable-Bundle";
+    public static final String BUNDLE_FLOWABLE_HEADER = "Flowable-Bundle";
 
 }

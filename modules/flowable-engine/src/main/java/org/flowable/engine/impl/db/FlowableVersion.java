@@ -26,48 +26,48 @@ import java.util.List;
  */
 public class FlowableVersion {
 
-  protected String mainVersion;
-  protected List<String> alternativeVersionStrings;
+    protected String mainVersion;
+    protected List<String> alternativeVersionStrings;
 
-  public FlowableVersion(String mainVersion) {
-    this.mainVersion = mainVersion;
-    this.alternativeVersionStrings = Collections.singletonList(mainVersion);
-  }
-
-  public FlowableVersion(String mainVersion, List<String> alternativeVersionStrings) {
-    this.mainVersion = mainVersion;
-    this.alternativeVersionStrings = alternativeVersionStrings;
-  }
-
-  public String getMainVersion() {
-    return mainVersion;
-  }
-
-  public boolean matches(String version) {
-    if (version.equals(mainVersion)) {
-      return true;
-    } else if (!alternativeVersionStrings.isEmpty()) {
-      return alternativeVersionStrings.contains(version);
-    } else {
-      return false;
+    public FlowableVersion(String mainVersion) {
+        this.mainVersion = mainVersion;
+        this.alternativeVersionStrings = Collections.singletonList(mainVersion);
     }
-  }
 
-  public boolean equals(Object obj) {
-    if (!(obj instanceof FlowableVersion)) {
-      return false;
+    public FlowableVersion(String mainVersion, List<String> alternativeVersionStrings) {
+        this.mainVersion = mainVersion;
+        this.alternativeVersionStrings = alternativeVersionStrings;
     }
-    FlowableVersion other = (FlowableVersion) obj;
-    boolean mainVersionEqual = mainVersion.equals(other.mainVersion);
-    if (!mainVersionEqual) {
-      return false;
-    } else {
-      if (alternativeVersionStrings != null) {
-        return alternativeVersionStrings.equals(other.alternativeVersionStrings);
-      } else {
-        return other.alternativeVersionStrings == null;
-      }
+
+    public String getMainVersion() {
+        return mainVersion;
     }
-  }
+
+    public boolean matches(String version) {
+        if (version.equals(mainVersion)) {
+            return true;
+        } else if (!alternativeVersionStrings.isEmpty()) {
+            return alternativeVersionStrings.contains(version);
+        } else {
+            return false;
+        }
+    }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof FlowableVersion)) {
+            return false;
+        }
+        FlowableVersion other = (FlowableVersion) obj;
+        boolean mainVersionEqual = mainVersion.equals(other.mainVersion);
+        if (!mainVersionEqual) {
+            return false;
+        } else {
+            if (alternativeVersionStrings != null) {
+                return alternativeVersionStrings.equals(other.alternativeVersionStrings);
+            } else {
+                return other.alternativeVersionStrings == null;
+            }
+        }
+    }
 
 }

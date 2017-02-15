@@ -30,7 +30,7 @@ import java.util.Map;
 @Service
 public class ContentItemService {
 
-  private final Logger log = LoggerFactory.getLogger(ContentItemService.class);
+    private final Logger log = LoggerFactory.getLogger(ContentItemService.class);
 
     @Autowired
     protected FlowableClientService clientUtil;

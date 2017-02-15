@@ -22,17 +22,17 @@ import org.flowable.engine.impl.JobQueryProperty;
  * @author Joram Barrez
  */
 public class JobQueryProperties {
-  
-  public static Map<String, QueryProperty> PROPERTIES;
 
-  static {
-    PROPERTIES = new HashMap<String, QueryProperty>();
-    PROPERTIES.put("id", JobQueryProperty.JOB_ID);
-    PROPERTIES.put("dueDate", JobQueryProperty.DUEDATE);
-    PROPERTIES.put("executionId", JobQueryProperty.EXECUTION_ID);
-    PROPERTIES.put("processInstanceId", JobQueryProperty.PROCESS_INSTANCE_ID);
-    PROPERTIES.put("retries", JobQueryProperty.RETRIES);
-    PROPERTIES.put("tenantId", JobQueryProperty.TENANT_ID);
-  }
+    public static Map<String, QueryProperty> PROPERTIES;
+
+    static {
+        PROPERTIES = new HashMap<String, QueryProperty>();
+        PROPERTIES.put("id", JobQueryProperty.JOB_ID);
+        PROPERTIES.put("dueDate", JobQueryProperty.DUEDATE);
+        PROPERTIES.put("executionId", JobQueryProperty.EXECUTION_ID);
+        PROPERTIES.put("processInstanceId", JobQueryProperty.PROCESS_INSTANCE_ID);
+        PROPERTIES.put("retries", JobQueryProperty.RETRIES);
+        PROPERTIES.put("tenantId", JobQueryProperty.TENANT_ID);
+    }
 
 }

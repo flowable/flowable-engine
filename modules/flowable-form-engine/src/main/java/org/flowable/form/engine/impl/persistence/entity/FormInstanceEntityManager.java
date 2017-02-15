@@ -24,7 +24,7 @@ import org.flowable.form.engine.impl.FormInstanceQueryImpl;
  */
 public interface FormInstanceEntityManager extends EntityManager<FormInstanceEntity> {
 
-  List<FormInstance> findFormInstancesByQueryCriteria(FormInstanceQueryImpl formInstanceQuery, Page page);
+    List<FormInstance> findFormInstancesByQueryCriteria(FormInstanceQueryImpl formInstanceQuery, Page page);
 
-  long findFormInstanceCountByQueryCriteria(FormInstanceQueryImpl formInstanceQuery);
+    long findFormInstanceCountByQueryCriteria(FormInstanceQueryImpl formInstanceQuery);
 }

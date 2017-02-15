@@ -21,21 +21,21 @@ import org.junit.Before;
 import org.junit.Rule;
 
 public abstract class AbstractFlowable6CompatibilityTest {
-  
-  protected RepositoryService repositoryService;
-  protected RuntimeService runtimeService;
-  protected TaskService taskService;
-  protected ManagementService managementService;
-  
-  @Rule
-  public FlowableRule flowableRule = new FlowableRule();
-  
-  @Before
-  public void setupServices() {
-    this.repositoryService = flowableRule.getRepositoryService();
-    this.runtimeService = flowableRule.getRuntimeService();
-    this.taskService = flowableRule.getTaskService();
-    this.managementService = flowableRule.getManagementService();
-  }
+
+    protected RepositoryService repositoryService;
+    protected RuntimeService runtimeService;
+    protected TaskService taskService;
+    protected ManagementService managementService;
+
+    @Rule
+    public FlowableRule flowableRule = new FlowableRule();
+
+    @Before
+    public void setupServices() {
+        this.repositoryService = flowableRule.getRepositoryService();
+        this.runtimeService = flowableRule.getRuntimeService();
+        this.taskService = flowableRule.getTaskService();
+        this.managementService = flowableRule.getManagementService();
+    }
 
 }

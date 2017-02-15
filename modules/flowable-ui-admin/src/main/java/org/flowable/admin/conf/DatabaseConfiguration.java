@@ -156,58 +156,57 @@ public class DatabaseConfiguration {
 
     @Bean
     public PlatformTransactionManager annotationDrivenTransactionManager() {
-      DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
-      dataSourceTransactionManager.setDataSource(dataSource());
-      return dataSourceTransactionManager;
+        DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
+        dataSourceTransactionManager.setDataSource(dataSource());
+        return dataSourceTransactionManager;
     }
 
     @Bean
     public SqlSessionFactory sqlSessionFactory() {
-      SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-      sqlSessionFactoryBean.setDataSource(dataSource());
+        SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+        sqlSessionFactoryBean.setDataSource(dataSource());
 
-      try {
-        Properties properties = new Properties();
-        properties.put("prefix", env.getProperty("datasource.prefix", ""));
-        sqlSessionFactoryBean.setConfigurationProperties(properties);
-        sqlSessionFactoryBean
-          .setMapperLocations(ResourcePatternUtils.getResourcePatternResolver(resourceLoader).getResources("classpath:/META-INF/admin-mybatis-mappings/*.xml"));
-        sqlSessionFactoryBean.afterPropertiesSet();
-        return sqlSessionFactoryBean.getObject();
-      } catch (Exception e) {
-        throw new RuntimeException("Could not create sqlSessionFactory", e);
-      }
+        try {
+            Properties properties = new Properties();
+            properties.put("prefix", env.getProperty("datasource.prefix", ""));
+            sqlSessionFactoryBean.setConfigurationProperties(properties);
+            sqlSessionFactoryBean
+                    .setMapperLocations(ResourcePatternUtils.getResourcePatternResolver(resourceLoader).getResources("classpath:/META-INF/admin-mybatis-mappings/*.xml"));
+            sqlSessionFactoryBean.afterPropertiesSet();
+            return sqlSessionFactoryBean.getObject();
+        } catch (Exception e) {
+            throw new RuntimeException("Could not create sqlSessionFactory", e);
+        }
 
     }
 
-    @Bean(destroyMethod="clearCache") // destroyMethod: see https://github.com/mybatis/old-google-code-issues/issues/778
+    @Bean(destroyMethod = "clearCache") // destroyMethod: see https://github.com/mybatis/old-google-code-issues/issues/778
     public SqlSessionTemplate SqlSessionTemplate() {
-      return new SqlSessionTemplate(sqlSessionFactory());
+        return new SqlSessionTemplate(sqlSessionFactory());
     }
 
-    @Bean(name="liquibase")
+    @Bean(name = "liquibase")
     public Liquibase liquibase() {
-      log.debug("Configuring Liquibase");
+        log.debug("Configuring Liquibase");
 
-      try {
+        try {
 
-        DatabaseConnection connection = new JdbcConnection(dataSource().getConnection());
-        Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
-        database.setDatabaseChangeLogTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
-        database.setDatabaseChangeLogLockTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
+            DatabaseConnection connection = new JdbcConnection(dataSource().getConnection());
+            Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
+            database.setDatabaseChangeLogTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
+            database.setDatabaseChangeLogLockTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
 
-        Liquibase liquibase = new Liquibase("META-INF/liquibase/flowable-admin-app-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
-        liquibase.update("flowable");
-        return liquibase;
+            Liquibase liquibase = new Liquibase("META-INF/liquibase/flowable-admin-app-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
+            liquibase.update("flowable");
+            return liquibase;
 
-      } catch (Exception e) {
-        throw new InternalServerErrorException("Error creating liquibase database");
-      }
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Error creating liquibase database");
+        }
     }
 
-    @Bean(name="minimalDataGenerator")
+    @Bean(name = "minimalDataGenerator")
     public MinimalDataGenerator minimalDataGenerator() {
-    	return new MinimalDataGenerator();
+        return new MinimalDataGenerator();
     }
 }
-

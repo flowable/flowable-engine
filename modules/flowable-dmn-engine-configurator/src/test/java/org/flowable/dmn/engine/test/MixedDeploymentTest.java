@@ -27,28 +27,27 @@ import static org.junit.Assert.assertNotNull;
  */
 public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTest {
 
-  @Test
-  @Deployment(resources = {"org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcess.bpmn20.xml",
-      "org/flowable/dmn/engine/test/deployment/simple.dmn"})
-  public void deploySingleProcessAndDecisionTable() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-        .latestVersion()
-        .processDefinitionKey("oneDecisionTaskProcess")
-        .singleResult();
+    @Test
+    @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcess.bpmn20.xml",
+            "org/flowable/dmn/engine/test/deployment/simple.dmn" })
+    public void deploySingleProcessAndDecisionTable() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                .latestVersion()
+                .processDefinitionKey("oneDecisionTaskProcess")
+                .singleResult();
 
-    assertNotNull(processDefinition);
-    assertEquals("oneDecisionTaskProcess", processDefinition.getKey());
+        assertNotNull(processDefinition);
+        assertEquals("oneDecisionTaskProcess", processDefinition.getKey());
 
-    DmnDecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery()
-        .latestVersion()
-        .decisionTableKey("decision1")
-        .singleResult();
-    assertNotNull(decisionTable);
-    assertEquals("decision1", decisionTable.getKey());
+        DmnDecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery()
+                .latestVersion()
+                .decisionTableKey("decision1")
+                .singleResult();
+        assertNotNull(decisionTable);
+        assertEquals("decision1", decisionTable.getKey());
 
-
-    List<DmnDecisionTable> decisionTableList = repositoryService.getDecisionTablesForProcessDefinition(processDefinition.getId());
-    assertEquals(1l, decisionTableList.size());
-    assertEquals("decision1", decisionTableList.get(0).getKey());
-  }
+        List<DmnDecisionTable> decisionTableList = repositoryService.getDecisionTablesForProcessDefinition(processDefinition.getId());
+        assertEquals(1l, decisionTableList.size());
+        assertEquals("decision1", decisionTableList.get(0).getKey());
+    }
 }

@@ -24,97 +24,97 @@ import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
  */
 public class IdentityInfoEntityImpl extends AbstractEntity implements IdentityInfoEntity, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String type;
-  protected String userId;
-  protected String key;
-  protected String value;
-  protected String password;
-  protected byte[] passwordBytes;
-  protected String parentId;
-  protected Map<String, String> details;
-  
-  public IdentityInfoEntityImpl() {
-    
-  }
+    protected String type;
+    protected String userId;
+    protected String key;
+    protected String value;
+    protected String password;
+    protected byte[] passwordBytes;
+    protected String parentId;
+    protected Map<String, String> details;
 
-  public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
-    persistentState.put("value", value);
-    persistentState.put("password", passwordBytes);
-    return persistentState;
-  }
+    public IdentityInfoEntityImpl() {
 
-  public String getType() {
-    return type;
-  }
+    }
 
-  public void setType(String type) {
-    this.type = type;
-  }
+    public Object getPersistentState() {
+        Map<String, Object> persistentState = new HashMap<String, Object>();
+        persistentState.put("value", value);
+        persistentState.put("password", passwordBytes);
+        return persistentState;
+    }
 
-  public String getUserId() {
-    return userId;
-  }
+    public String getType() {
+        return type;
+    }
 
-  public void setUserId(String userId) {
-    this.userId = userId;
-  }
+    public void setType(String type) {
+        this.type = type;
+    }
 
-  public String getKey() {
-    return key;
-  }
+    public String getUserId() {
+        return userId;
+    }
 
-  public void setKey(String key) {
-    this.key = key;
-  }
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
-  public String getValue() {
-    return value;
-  }
+    public String getKey() {
+        return key;
+    }
 
-  public void setValue(String value) {
-    this.value = value;
-  }
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-  public byte[] getPasswordBytes() {
-    return passwordBytes;
-  }
+    public String getValue() {
+        return value;
+    }
 
-  public void setPasswordBytes(byte[] passwordBytes) {
-    this.passwordBytes = passwordBytes;
-  }
+    public void setValue(String value) {
+        this.value = value;
+    }
 
-  public String getPassword() {
-    return password;
-  }
+    public byte[] getPasswordBytes() {
+        return passwordBytes;
+    }
 
-  public void setPassword(String password) {
-    this.password = password;
-  }
+    public void setPasswordBytes(byte[] passwordBytes) {
+        this.passwordBytes = passwordBytes;
+    }
 
-  public String getName() {
-    return key;
-  }
+    public String getPassword() {
+        return password;
+    }
 
-  public String getUsername() {
-    return value;
-  }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-  public String getParentId() {
-    return parentId;
-  }
+    public String getName() {
+        return key;
+    }
 
-  public void setParentId(String parentId) {
-    this.parentId = parentId;
-  }
+    public String getUsername() {
+        return value;
+    }
 
-  public Map<String, String> getDetails() {
-    return details;
-  }
+    public String getParentId() {
+        return parentId;
+    }
 
-  public void setDetails(Map<String, String> details) {
-    this.details = details;
-  }
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
+    public Map<String, String> getDetails() {
+        return details;
+    }
+
+    public void setDetails(Map<String, String> details) {
+        this.details = details;
+    }
 }

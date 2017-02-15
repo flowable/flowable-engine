@@ -44,83 +44,83 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 @Service
 public class UserCacheImpl implements UserCache {
 
-  @Autowired
-  protected Environment environment;
+    @Autowired
+    protected Environment environment;
 
-  @Autowired
-  protected RemoteIdmService remoteIdmService;
+    @Autowired
+    protected RemoteIdmService remoteIdmService;
 
-  protected LoadingCache<String, CachedUser> userCache;
+    protected LoadingCache<String, CachedUser> userCache;
 
-  @PostConstruct
-  protected void initCache() {
-    Long userCacheMaxSize = environment.getProperty("cache.users.max.size", Long.class);
-    Long userCacheMaxAge = environment.getProperty("cache.users.max.age", Long.class);
+    @PostConstruct
+    protected void initCache() {
+        Long userCacheMaxSize = environment.getProperty("cache.users.max.size", Long.class);
+        Long userCacheMaxAge = environment.getProperty("cache.users.max.age", Long.class);
 
-    userCache = CacheBuilder.newBuilder().maximumSize(userCacheMaxSize != null ? userCacheMaxSize : 2048)
-        .expireAfterAccess(userCacheMaxAge != null ? userCacheMaxAge : (24 * 60 * 60), TimeUnit.SECONDS).recordStats().build(new CacheLoader<String, CachedUser>() {
+        userCache = CacheBuilder.newBuilder().maximumSize(userCacheMaxSize != null ? userCacheMaxSize : 2048)
+                .expireAfterAccess(userCacheMaxAge != null ? userCacheMaxAge : (24 * 60 * 60), TimeUnit.SECONDS).recordStats().build(new CacheLoader<String, CachedUser>() {
 
-          public CachedUser load(final String userId) throws Exception {
-            User user = remoteIdmService.getUser(userId);
-            if (user == null) {
-              throw new UsernameNotFoundException("User " + userId + " was not found in the database");
-            }
-            
-            Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
-            
-            return new CachedUser(user, grantedAuthorities);
-          }
+                    public CachedUser load(final String userId) throws Exception {
+                        User user = remoteIdmService.getUser(userId);
+                        if (user == null) {
+                            throw new UsernameNotFoundException("User " + userId + " was not found in the database");
+                        }
 
-        });
-  }
+                        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
 
-  public void putUser(String userId, CachedUser cachedUser) {
-    userCache.put(userId, cachedUser);
-  }
+                        return new CachedUser(user, grantedAuthorities);
+                    }
 
-  public CachedUser getUser(String userId) {
-    return getUser(userId, false, false, true); // always check validity by default
-  }
-
-  public CachedUser getUser(String userId, boolean throwExceptionOnNotFound, boolean throwExceptionOnInactive, boolean checkValidity) {
-    try {
-      // The cache is a LoadingCache and will fetch the value itself
-      CachedUser cachedUser = userCache.get(userId);
-      return cachedUser;
-
-    } catch (ExecutionException e) {
-      return null;
-    } catch (UncheckedExecutionException uee) {
-
-      // Some magic with the exceptions is needed:
-      // the exceptions like UserNameNotFound and Locked cannot
-      // bubble up, since Spring security will react on them otherwise
-      if (uee.getCause() instanceof RuntimeException) {
-        RuntimeException runtimeException = (RuntimeException) uee.getCause();
-
-        if (runtimeException instanceof UsernameNotFoundException) {
-          if (throwExceptionOnNotFound) {
-            throw runtimeException;
-          } else {
-            return null;
-          }
-        }
-
-        if (runtimeException instanceof LockedException) {
-          if (throwExceptionOnNotFound) {
-            throw runtimeException;
-          } else {
-            return null;
-          }
-        }
-
-      }
-      throw uee;
+                });
     }
-  }
 
-  @Override
-  public void invalidate(String userId) {
-    userCache.invalidate(userId);
-  }
+    public void putUser(String userId, CachedUser cachedUser) {
+        userCache.put(userId, cachedUser);
+    }
+
+    public CachedUser getUser(String userId) {
+        return getUser(userId, false, false, true); // always check validity by default
+    }
+
+    public CachedUser getUser(String userId, boolean throwExceptionOnNotFound, boolean throwExceptionOnInactive, boolean checkValidity) {
+        try {
+            // The cache is a LoadingCache and will fetch the value itself
+            CachedUser cachedUser = userCache.get(userId);
+            return cachedUser;
+
+        } catch (ExecutionException e) {
+            return null;
+        } catch (UncheckedExecutionException uee) {
+
+            // Some magic with the exceptions is needed:
+            // the exceptions like UserNameNotFound and Locked cannot
+            // bubble up, since Spring security will react on them otherwise
+            if (uee.getCause() instanceof RuntimeException) {
+                RuntimeException runtimeException = (RuntimeException) uee.getCause();
+
+                if (runtimeException instanceof UsernameNotFoundException) {
+                    if (throwExceptionOnNotFound) {
+                        throw runtimeException;
+                    } else {
+                        return null;
+                    }
+                }
+
+                if (runtimeException instanceof LockedException) {
+                    if (throwExceptionOnNotFound) {
+                        throw runtimeException;
+                    } else {
+                        return null;
+                    }
+                }
+
+            }
+            throw uee;
+        }
+    }
+
+    @Override
+    public void invalidate(String userId) {
+        userCache.invalidate(userId);
+    }
 }

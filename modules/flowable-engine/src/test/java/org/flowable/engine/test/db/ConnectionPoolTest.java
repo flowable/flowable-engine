@@ -25,33 +25,33 @@ import org.flowable.engine.impl.test.AbstractTestCase;
  */
 public class ConnectionPoolTest extends AbstractTestCase {
 
-  public void testMyBatisConnectionPoolProperlyConfigured() {
-    ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource("org/flowable/engine/test/db/connection-pool.flowable.cfg.xml");
+    public void testMyBatisConnectionPoolProperlyConfigured() {
+        ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
+                .createProcessEngineConfigurationFromResource("org/flowable/engine/test/db/connection-pool.flowable.cfg.xml");
 
-    config.buildProcessEngine();
+        config.buildProcessEngine();
 
-    // Expected values
-    int maxActive = 25;
-    int maxIdle = 10;
-    int maxCheckoutTime = 30000;
-    int maxWaitTime = 25000;
+        // Expected values
+        int maxActive = 25;
+        int maxIdle = 10;
+        int maxCheckoutTime = 30000;
+        int maxWaitTime = 25000;
 
-    assertEquals(maxActive, config.getJdbcMaxActiveConnections());
-    assertEquals(maxIdle, config.getJdbcMaxIdleConnections());
-    assertEquals(maxCheckoutTime, config.getJdbcMaxCheckoutTime());
-    assertEquals(maxWaitTime, config.getJdbcMaxWaitTime());
+        assertEquals(maxActive, config.getJdbcMaxActiveConnections());
+        assertEquals(maxIdle, config.getJdbcMaxIdleConnections());
+        assertEquals(maxCheckoutTime, config.getJdbcMaxCheckoutTime());
+        assertEquals(maxWaitTime, config.getJdbcMaxWaitTime());
 
-    // Verify that these properties are correctly set in the MyBatis
-    // datasource
-    DataSource datasource = config.getDbSqlSessionFactory().getSqlSessionFactory().getConfiguration().getEnvironment().getDataSource();
-    assertTrue(datasource instanceof PooledDataSource);
+        // Verify that these properties are correctly set in the MyBatis
+        // datasource
+        DataSource datasource = config.getDbSqlSessionFactory().getSqlSessionFactory().getConfiguration().getEnvironment().getDataSource();
+        assertTrue(datasource instanceof PooledDataSource);
 
-    PooledDataSource pooledDataSource = (PooledDataSource) datasource;
-    assertEquals(maxActive, pooledDataSource.getPoolMaximumActiveConnections());
-    assertEquals(maxIdle, pooledDataSource.getPoolMaximumIdleConnections());
-    assertEquals(maxCheckoutTime, pooledDataSource.getPoolMaximumCheckoutTime());
-    assertEquals(maxWaitTime, pooledDataSource.getPoolTimeToWait());
-  }
+        PooledDataSource pooledDataSource = (PooledDataSource) datasource;
+        assertEquals(maxActive, pooledDataSource.getPoolMaximumActiveConnections());
+        assertEquals(maxIdle, pooledDataSource.getPoolMaximumIdleConnections());
+        assertEquals(maxCheckoutTime, pooledDataSource.getPoolMaximumCheckoutTime());
+        assertEquals(maxWaitTime, pooledDataSource.getPoolTimeToWait());
+    }
 
 }

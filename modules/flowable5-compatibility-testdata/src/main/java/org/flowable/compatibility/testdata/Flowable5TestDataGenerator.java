@@ -15,7 +15,7 @@ package org.flowable.compatibility.testdata;
 import org.activiti.engine.ProcessEngine;
 
 public interface Flowable5TestDataGenerator {
-  
-  void generateTestData(ProcessEngine processEngine);
+
+    void generateTestData(ProcessEngine processEngine);
 
 }

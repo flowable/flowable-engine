@@ -30,48 +30,48 @@ import org.flowable.engine.impl.util.Flowable5Util;
  */
 public class ErrorThrowingEventListener extends BaseDelegateEventListener {
 
-  protected String errorCode;
+    protected String errorCode;
 
-  @Override
-  public void onEvent(FlowableEvent event) {
-    if (isValidEvent(event) && event instanceof FlowableEngineEvent) {
-      
-      FlowableEngineEvent engineEvent = (FlowableEngineEvent) event;
-      CommandContext commandContext = Context.getCommandContext();
-      
-      if (engineEvent.getProcessDefinitionId() != null && 
-          Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, engineEvent.getProcessDefinitionId())) {
-        
-        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-        compatibilityHandler.throwErrorEvent(event);
-        return;
-      }
-      
-      ExecutionEntity execution = null;
+    @Override
+    public void onEvent(FlowableEvent event) {
+        if (isValidEvent(event) && event instanceof FlowableEngineEvent) {
 
-      if (engineEvent.getExecutionId() != null) {
-        // Get the execution based on the event's execution ID instead
-        execution = Context.getCommandContext().getExecutionEntityManager().findById(engineEvent.getExecutionId());
-      }
+            FlowableEngineEvent engineEvent = (FlowableEngineEvent) event;
+            CommandContext commandContext = Context.getCommandContext();
 
-      if (execution == null) {
-        throw new FlowableException("No execution context active and event is not related to an execution. No compensation event can be thrown.");
-      }
+            if (engineEvent.getProcessDefinitionId() != null &&
+                    Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, engineEvent.getProcessDefinitionId())) {
 
-      try {
-        ErrorPropagation.propagateError(errorCode, execution);
-      } catch (Exception e) {
-        throw new FlowableException("Error while propagating error-event", e);
-      }
+                Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+                compatibilityHandler.throwErrorEvent(event);
+                return;
+            }
+
+            ExecutionEntity execution = null;
+
+            if (engineEvent.getExecutionId() != null) {
+                // Get the execution based on the event's execution ID instead
+                execution = Context.getCommandContext().getExecutionEntityManager().findById(engineEvent.getExecutionId());
+            }
+
+            if (execution == null) {
+                throw new FlowableException("No execution context active and event is not related to an execution. No compensation event can be thrown.");
+            }
+
+            try {
+                ErrorPropagation.propagateError(errorCode, execution);
+            } catch (Exception e) {
+                throw new FlowableException("Error while propagating error-event", e);
+            }
+        }
     }
-  }
 
-  public void setErrorCode(String errorCode) {
-    this.errorCode = errorCode;
-  }
+    public void setErrorCode(String errorCode) {
+        this.errorCode = errorCode;
+    }
 
-  @Override
-  public boolean isFailOnException() {
-    return true;
-  }
+    @Override
+    public boolean isFailOnException() {
+        return true;
+    }
 }

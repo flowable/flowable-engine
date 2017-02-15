@@ -22,28 +22,28 @@ import org.flowable.engine.delegate.event.FlowableSignalEvent;
  */
 public class FlowableSignalEventImpl extends FlowableActivityEventImpl implements FlowableSignalEvent {
 
-  protected String signalName;
-  protected Object signalData;
+    protected String signalName;
+    protected Object signalData;
 
-  public FlowableSignalEventImpl(FlowableEngineEventType type) {
-    super(type);
-  }
+    public FlowableSignalEventImpl(FlowableEngineEventType type) {
+        super(type);
+    }
 
-  @Override
-  public String getSignalName() {
-    return signalName;
-  }
+    @Override
+    public String getSignalName() {
+        return signalName;
+    }
 
-  public void setSignalName(String signalName) {
-    this.signalName = signalName;
-  }
+    public void setSignalName(String signalName) {
+        this.signalName = signalName;
+    }
 
-  @Override
-  public Object getSignalData() {
-    return signalData;
-  }
+    @Override
+    public Object getSignalData() {
+        return signalData;
+    }
 
-  public void setSignalData(Object signalData) {
-    this.signalData = signalData;
-  }
+    public void setSignalData(Object signalData) {
+        this.signalData = signalData;
+    }
 }

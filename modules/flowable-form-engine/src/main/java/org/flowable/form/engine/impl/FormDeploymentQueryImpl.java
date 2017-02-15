@@ -29,195 +29,195 @@ import org.flowable.form.engine.impl.interceptor.CommandExecutor;
  */
 public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, FormDeployment> implements FormDeploymentQuery, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String deploymentId;
-  protected String name;
-  protected String nameLike;
-  protected String category;
-  protected String categoryNotEquals;
-  protected String tenantId;
-  protected String tenantIdLike;
-  protected boolean withoutTenantId;
-  protected String parentDeploymentId;
-  protected String parentDeploymentIdLike;
-  protected String formDefinitionKey;
-  protected String formDefinitionKeyLike;
+    private static final long serialVersionUID = 1L;
+    protected String deploymentId;
+    protected String name;
+    protected String nameLike;
+    protected String category;
+    protected String categoryNotEquals;
+    protected String tenantId;
+    protected String tenantIdLike;
+    protected boolean withoutTenantId;
+    protected String parentDeploymentId;
+    protected String parentDeploymentIdLike;
+    protected String formDefinitionKey;
+    protected String formDefinitionKeyLike;
 
-  public FormDeploymentQueryImpl() {
-  }
-
-  public FormDeploymentQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
-  public FormDeploymentQueryImpl(CommandExecutor commandExecutor) {
-    super(commandExecutor);
-  }
-
-  public FormDeploymentQueryImpl deploymentId(String deploymentId) {
-    if (deploymentId == null) {
-      throw new FlowableIllegalArgumentException("Deployment id is null");
+    public FormDeploymentQueryImpl() {
     }
-    this.deploymentId = deploymentId;
-    return this;
-  }
 
-  public FormDeploymentQueryImpl deploymentName(String deploymentName) {
-    if (deploymentName == null) {
-      throw new FlowableIllegalArgumentException("deploymentName is null");
+    public FormDeploymentQueryImpl(CommandContext commandContext) {
+        super(commandContext);
     }
-    this.name = deploymentName;
-    return this;
-  }
 
-  public FormDeploymentQueryImpl deploymentNameLike(String nameLike) {
-    if (nameLike == null) {
-      throw new FlowableIllegalArgumentException("deploymentNameLike is null");
+    public FormDeploymentQueryImpl(CommandExecutor commandExecutor) {
+        super(commandExecutor);
     }
-    this.nameLike = nameLike;
-    return this;
-  }
 
-  public FormDeploymentQueryImpl deploymentCategory(String deploymentCategory) {
-    if (deploymentCategory == null) {
-      throw new FlowableIllegalArgumentException("deploymentCategory is null");
+    public FormDeploymentQueryImpl deploymentId(String deploymentId) {
+        if (deploymentId == null) {
+            throw new FlowableIllegalArgumentException("Deployment id is null");
+        }
+        this.deploymentId = deploymentId;
+        return this;
     }
-    this.category = deploymentCategory;
-    return this;
-  }
 
-  public FormDeploymentQueryImpl deploymentCategoryNotEquals(String deploymentCategoryNotEquals) {
-    if (deploymentCategoryNotEquals == null) {
-      throw new FlowableIllegalArgumentException("deploymentCategoryExclude is null");
+    public FormDeploymentQueryImpl deploymentName(String deploymentName) {
+        if (deploymentName == null) {
+            throw new FlowableIllegalArgumentException("deploymentName is null");
+        }
+        this.name = deploymentName;
+        return this;
     }
-    this.categoryNotEquals = deploymentCategoryNotEquals;
-    return this;
-  }
 
-  public FormDeploymentQueryImpl parentDeploymentId(String parentDeploymentId) {
-    if (parentDeploymentId == null) {
-      throw new FlowableIllegalArgumentException("parentDeploymentId is null");
+    public FormDeploymentQueryImpl deploymentNameLike(String nameLike) {
+        if (nameLike == null) {
+            throw new FlowableIllegalArgumentException("deploymentNameLike is null");
+        }
+        this.nameLike = nameLike;
+        return this;
     }
-    this.parentDeploymentId = parentDeploymentId;
-    return this;
-  }
 
-  public FormDeploymentQueryImpl parentDeploymentIdLike(String parentDeploymentIdLike) {
-    if (parentDeploymentIdLike == null) {
-      throw new FlowableIllegalArgumentException("parentDeploymentIdLike is null");
+    public FormDeploymentQueryImpl deploymentCategory(String deploymentCategory) {
+        if (deploymentCategory == null) {
+            throw new FlowableIllegalArgumentException("deploymentCategory is null");
+        }
+        this.category = deploymentCategory;
+        return this;
     }
-    this.parentDeploymentIdLike = parentDeploymentIdLike;
-    return this;
-  }
 
-  public FormDeploymentQueryImpl deploymentWithoutTenantId() {
-    this.withoutTenantId = true;
-    return this;
-  }
-  
-  public FormDeploymentQueryImpl deploymentTenantId(String tenantId) {
-    if (tenantId == null) {
-      throw new FlowableIllegalArgumentException("deploymentTenantId is null");
+    public FormDeploymentQueryImpl deploymentCategoryNotEquals(String deploymentCategoryNotEquals) {
+        if (deploymentCategoryNotEquals == null) {
+            throw new FlowableIllegalArgumentException("deploymentCategoryExclude is null");
+        }
+        this.categoryNotEquals = deploymentCategoryNotEquals;
+        return this;
     }
-    this.tenantId = tenantId;
-    return this;
-  }
 
-  public FormDeploymentQueryImpl deploymentTenantIdLike(String tenantIdLike) {
-    if (tenantIdLike == null) {
-      throw new FlowableIllegalArgumentException("deploymentTenantIdLike is null");
+    public FormDeploymentQueryImpl parentDeploymentId(String parentDeploymentId) {
+        if (parentDeploymentId == null) {
+            throw new FlowableIllegalArgumentException("parentDeploymentId is null");
+        }
+        this.parentDeploymentId = parentDeploymentId;
+        return this;
     }
-    this.tenantIdLike = tenantIdLike;
-    return this;
-  }
 
-  public FormDeploymentQueryImpl formDefinitionKey(String key) {
-    if (key == null) {
-      throw new FlowableIllegalArgumentException("key is null");
+    public FormDeploymentQueryImpl parentDeploymentIdLike(String parentDeploymentIdLike) {
+        if (parentDeploymentIdLike == null) {
+            throw new FlowableIllegalArgumentException("parentDeploymentIdLike is null");
+        }
+        this.parentDeploymentIdLike = parentDeploymentIdLike;
+        return this;
     }
-    this.formDefinitionKey = key;
-    return this;
-  }
 
-  public FormDeploymentQueryImpl formDefinitionKeyLike(String keyLike) {
-    if (keyLike == null) {
-      throw new FlowableIllegalArgumentException("keyLike is null");
+    public FormDeploymentQueryImpl deploymentWithoutTenantId() {
+        this.withoutTenantId = true;
+        return this;
     }
-    this.formDefinitionKeyLike = keyLike;
-    return this;
-  }
 
-  // sorting ////////////////////////////////////////////////////////
+    public FormDeploymentQueryImpl deploymentTenantId(String tenantId) {
+        if (tenantId == null) {
+            throw new FlowableIllegalArgumentException("deploymentTenantId is null");
+        }
+        this.tenantId = tenantId;
+        return this;
+    }
 
-  public FormDeploymentQuery orderByDeploymentId() {
-    return orderBy(DeploymentQueryProperty.DEPLOYMENT_ID);
-  }
+    public FormDeploymentQueryImpl deploymentTenantIdLike(String tenantIdLike) {
+        if (tenantIdLike == null) {
+            throw new FlowableIllegalArgumentException("deploymentTenantIdLike is null");
+        }
+        this.tenantIdLike = tenantIdLike;
+        return this;
+    }
 
-  public FormDeploymentQuery orderByDeploymentTime() {
-    return orderBy(DeploymentQueryProperty.DEPLOY_TIME);
-  }
+    public FormDeploymentQueryImpl formDefinitionKey(String key) {
+        if (key == null) {
+            throw new FlowableIllegalArgumentException("key is null");
+        }
+        this.formDefinitionKey = key;
+        return this;
+    }
 
-  public FormDeploymentQuery orderByDeploymentName() {
-    return orderBy(DeploymentQueryProperty.DEPLOYMENT_NAME);
-  }
+    public FormDeploymentQueryImpl formDefinitionKeyLike(String keyLike) {
+        if (keyLike == null) {
+            throw new FlowableIllegalArgumentException("keyLike is null");
+        }
+        this.formDefinitionKeyLike = keyLike;
+        return this;
+    }
 
-  public FormDeploymentQuery orderByTenantId() {
-    return orderBy(DeploymentQueryProperty.DEPLOYMENT_TENANT_ID);
-  }
+    // sorting ////////////////////////////////////////////////////////
 
-  // results ////////////////////////////////////////////////////////
+    public FormDeploymentQuery orderByDeploymentId() {
+        return orderBy(DeploymentQueryProperty.DEPLOYMENT_ID);
+    }
 
-  @Override
-  public long executeCount(CommandContext commandContext) {
-    checkQueryOk();
-    return commandContext.getDeploymentEntityManager().findDeploymentCountByQueryCriteria(this);
-  }
+    public FormDeploymentQuery orderByDeploymentTime() {
+        return orderBy(DeploymentQueryProperty.DEPLOY_TIME);
+    }
 
-  @Override
-  public List<FormDeployment> executeList(CommandContext commandContext, Page page) {
-    checkQueryOk();
-    return commandContext.getDeploymentEntityManager().findDeploymentsByQueryCriteria(this, page);
-  }
+    public FormDeploymentQuery orderByDeploymentName() {
+        return orderBy(DeploymentQueryProperty.DEPLOYMENT_NAME);
+    }
 
-  // getters ////////////////////////////////////////////////////////
+    public FormDeploymentQuery orderByTenantId() {
+        return orderBy(DeploymentQueryProperty.DEPLOYMENT_TENANT_ID);
+    }
 
-  public String getDeploymentId() {
-    return deploymentId;
-  }
+    // results ////////////////////////////////////////////////////////
 
-  public String getName() {
-    return name;
-  }
+    @Override
+    public long executeCount(CommandContext commandContext) {
+        checkQueryOk();
+        return commandContext.getDeploymentEntityManager().findDeploymentCountByQueryCriteria(this);
+    }
 
-  public String getNameLike() {
-    return nameLike;
-  }
+    @Override
+    public List<FormDeployment> executeList(CommandContext commandContext, Page page) {
+        checkQueryOk();
+        return commandContext.getDeploymentEntityManager().findDeploymentsByQueryCriteria(this, page);
+    }
 
-  public String getCategory() {
-    return category;
-  }
+    // getters ////////////////////////////////////////////////////////
 
-  public String getCategoryNotEquals() {
-    return categoryNotEquals;
-  }
+    public String getDeploymentId() {
+        return deploymentId;
+    }
 
-  public String getTenantId() {
-    return tenantId;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String getTenantIdLike() {
-    return tenantIdLike;
-  }
+    public String getNameLike() {
+        return nameLike;
+    }
 
-  public boolean isWithoutTenantId() {
-    return withoutTenantId;
-  }
+    public String getCategory() {
+        return category;
+    }
 
-  public String getFormDefinitionKey() {
-    return formDefinitionKey;
-  }
+    public String getCategoryNotEquals() {
+        return categoryNotEquals;
+    }
 
-  public String getFormDefinitionKeyLike() {
-    return formDefinitionKeyLike;
-  }
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public String getTenantIdLike() {
+        return tenantIdLike;
+    }
+
+    public boolean isWithoutTenantId() {
+        return withoutTenantId;
+    }
+
+    public String getFormDefinitionKey() {
+        return formDefinitionKey;
+    }
+
+    public String getFormDefinitionKeyLike() {
+        return formDefinitionKeyLike;
+    }
 }

@@ -49,89 +49,89 @@ import de.odysseus.el.ExpressionFactoryImpl;
  */
 public class ExpressionManager {
 
-  protected ExpressionFactory expressionFactory;
-  protected ProcessEngineConfigurationImpl processEngineConfiguration;
-  
-  // Default implementation (does nothing)
-  protected ELContext parsingElContext;
-  protected Map<Object, Object> beans;
+    protected ExpressionFactory expressionFactory;
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  public ExpressionManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    this(null, processEngineConfiguration);
-  }
+    // Default implementation (does nothing)
+    protected ELContext parsingElContext;
+    protected Map<Object, Object> beans;
 
-  public ExpressionManager(ProcessEngineConfigurationImpl processEngineConfiguration, boolean initFactory) {
-    this(null, processEngineConfiguration, false);
-  }
-
-  public ExpressionManager(Map<Object, Object> beans, ProcessEngineConfigurationImpl processEngineConfiguration) {
-    this(beans, processEngineConfiguration, true);
-  }
-
-  public ExpressionManager(Map<Object, Object> beans, ProcessEngineConfigurationImpl processEngineConfiguration, boolean initFactory) {
-    // Use the ExpressionFactoryImpl in flowable build in version of juel, with parametrised method expressions enabled
-    this.expressionFactory = new ExpressionFactoryImpl();
-    this.processEngineConfiguration = processEngineConfiguration;
-    this.beans = beans;
-    this.parsingElContext = new ParsingElContext(processEngineConfiguration);
-  }
-
-  public Expression createExpression(String expression) {
-    ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expression.trim(), Object.class);
-    return new JuelExpression(valueExpression, expression);
-  }
-
-  public void setExpressionFactory(ExpressionFactory expressionFactory) {
-    this.expressionFactory = expressionFactory;
-  }
-
-  public ELContext getElContext(VariableScope variableScope) {
-    ELContext elContext = null;
-    if (variableScope instanceof VariableScopeImpl) {
-      VariableScopeImpl variableScopeImpl = (VariableScopeImpl) variableScope;
-      elContext = variableScopeImpl.getCachedElContext();
+    public ExpressionManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        this(null, processEngineConfiguration);
     }
 
-    if (elContext == null) {
-      elContext = createElContext(variableScope);
-      if (variableScope instanceof VariableScopeImpl) {
-        ((VariableScopeImpl) variableScope).setCachedElContext(elContext);
-      }
+    public ExpressionManager(ProcessEngineConfigurationImpl processEngineConfiguration, boolean initFactory) {
+        this(null, processEngineConfiguration, false);
     }
 
-    return elContext;
-  }
-
-  protected FlowableElContext createElContext(VariableScope variableScope) {
-    ELResolver elResolver = createElResolver(variableScope);
-    return new FlowableElContext(elResolver, processEngineConfiguration);
-  }
-
-  protected ELResolver createElResolver(VariableScope variableScope) {
-    CompositeELResolver elResolver = new CompositeELResolver();
-    elResolver.add(new VariableScopeElResolver(variableScope));
-
-    if (beans != null) {
-      // ACT-1102: Also expose all beans in configuration when using
-      // standalone flowable, not in spring-context
-      elResolver.add(new ReadOnlyMapELResolver(beans));
+    public ExpressionManager(Map<Object, Object> beans, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        this(beans, processEngineConfiguration, true);
     }
 
-    elResolver.add(new ArrayELResolver());
-    elResolver.add(new ListELResolver());
-    elResolver.add(new MapELResolver());
-    elResolver.add(new JsonNodeELResolver());
-    elResolver.add(new DynamicBeanPropertyELResolver(ItemInstance.class, "getFieldValue", "setFieldValue"));
-    elResolver.add(new BeanELResolver());
-    return elResolver;
-  }
+    public ExpressionManager(Map<Object, Object> beans, ProcessEngineConfigurationImpl processEngineConfiguration, boolean initFactory) {
+        // Use the ExpressionFactoryImpl in flowable build in version of juel, with parametrised method expressions enabled
+        this.expressionFactory = new ExpressionFactoryImpl();
+        this.processEngineConfiguration = processEngineConfiguration;
+        this.beans = beans;
+        this.parsingElContext = new ParsingElContext(processEngineConfiguration);
+    }
 
-  public Map<Object, Object> getBeans() {
-    return beans;
-  }
+    public Expression createExpression(String expression) {
+        ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expression.trim(), Object.class);
+        return new JuelExpression(valueExpression, expression);
+    }
 
-  public void setBeans(Map<Object, Object> beans) {
-    this.beans = beans;
-  }
+    public void setExpressionFactory(ExpressionFactory expressionFactory) {
+        this.expressionFactory = expressionFactory;
+    }
+
+    public ELContext getElContext(VariableScope variableScope) {
+        ELContext elContext = null;
+        if (variableScope instanceof VariableScopeImpl) {
+            VariableScopeImpl variableScopeImpl = (VariableScopeImpl) variableScope;
+            elContext = variableScopeImpl.getCachedElContext();
+        }
+
+        if (elContext == null) {
+            elContext = createElContext(variableScope);
+            if (variableScope instanceof VariableScopeImpl) {
+                ((VariableScopeImpl) variableScope).setCachedElContext(elContext);
+            }
+        }
+
+        return elContext;
+    }
+
+    protected FlowableElContext createElContext(VariableScope variableScope) {
+        ELResolver elResolver = createElResolver(variableScope);
+        return new FlowableElContext(elResolver, processEngineConfiguration);
+    }
+
+    protected ELResolver createElResolver(VariableScope variableScope) {
+        CompositeELResolver elResolver = new CompositeELResolver();
+        elResolver.add(new VariableScopeElResolver(variableScope));
+
+        if (beans != null) {
+            // ACT-1102: Also expose all beans in configuration when using
+            // standalone flowable, not in spring-context
+            elResolver.add(new ReadOnlyMapELResolver(beans));
+        }
+
+        elResolver.add(new ArrayELResolver());
+        elResolver.add(new ListELResolver());
+        elResolver.add(new MapELResolver());
+        elResolver.add(new JsonNodeELResolver());
+        elResolver.add(new DynamicBeanPropertyELResolver(ItemInstance.class, "getFieldValue", "setFieldValue"));
+        elResolver.add(new BeanELResolver());
+        return elResolver;
+    }
+
+    public Map<Object, Object> getBeans() {
+        return beans;
+    }
+
+    public void setBeans(Map<Object, Object> beans) {
+        this.beans = beans;
+    }
 
 }

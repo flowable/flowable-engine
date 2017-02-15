@@ -16,21 +16,22 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.interceptor.CommandExecutor;
 
 public abstract class ServiceImpl {
-    
-  protected DmnEngineConfiguration engineConfig;
-  protected CommandExecutor commandExecutor;
-  
-  public ServiceImpl() {}
 
-  public ServiceImpl(DmnEngineConfiguration engineConfig) {
-    this.engineConfig = engineConfig;
-  }
-  
-  public CommandExecutor getCommandExecutor() {
-    return commandExecutor;
-  }
+    protected DmnEngineConfiguration engineConfig;
+    protected CommandExecutor commandExecutor;
 
-  public void setCommandExecutor(CommandExecutor commandExecutor) {
-    this.commandExecutor = commandExecutor;
-  }
+    public ServiceImpl() {
+    }
+
+    public ServiceImpl(DmnEngineConfiguration engineConfig) {
+        this.engineConfig = engineConfig;
+    }
+
+    public CommandExecutor getCommandExecutor() {
+        return commandExecutor;
+    }
+
+    public void setCommandExecutor(CommandExecutor commandExecutor) {
+        this.commandExecutor = commandExecutor;
+    }
 }

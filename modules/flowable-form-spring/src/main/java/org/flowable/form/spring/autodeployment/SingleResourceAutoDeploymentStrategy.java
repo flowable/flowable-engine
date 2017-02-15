@@ -27,35 +27,35 @@ import org.springframework.core.io.Resource;
  */
 public class SingleResourceAutoDeploymentStrategy extends AbstractAutoDeploymentStrategy {
 
-  /**
-   * The deployment mode this strategy handles.
-   */
-  public static final String DEPLOYMENT_MODE = "single-resource";
+    /**
+     * The deployment mode this strategy handles.
+     */
+    public static final String DEPLOYMENT_MODE = "single-resource";
 
-  @Override
-  protected String getDeploymentMode() {
-    return DEPLOYMENT_MODE;
-  }
-
-  @Override
-  public void deployResources(final String deploymentNameHint, final Resource[] resources, final FormRepositoryService repositoryService) {
-
-    // Create a separate deployment for each resource using the resource name
-
-    for (final Resource resource : resources) {
-
-      final String resourceName = determineResourceName(resource);
-      final FormDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(resourceName);
-
-      try {
-        deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
-       
-      } catch (IOException e) {
-        throw new FlowableException("couldn't auto deploy resource '" + resource + "': " + e.getMessage(), e);
-      }
-
-      deploymentBuilder.deploy();
+    @Override
+    protected String getDeploymentMode() {
+        return DEPLOYMENT_MODE;
     }
-  }
+
+    @Override
+    public void deployResources(final String deploymentNameHint, final Resource[] resources, final FormRepositoryService repositoryService) {
+
+        // Create a separate deployment for each resource using the resource name
+
+        for (final Resource resource : resources) {
+
+            final String resourceName = determineResourceName(resource);
+            final FormDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(resourceName);
+
+            try {
+                deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
+
+            } catch (IOException e) {
+                throw new FlowableException("couldn't auto deploy resource '" + resource + "': " + e.getMessage(), e);
+            }
+
+            deploymentBuilder.deploy();
+        }
+    }
 
 }

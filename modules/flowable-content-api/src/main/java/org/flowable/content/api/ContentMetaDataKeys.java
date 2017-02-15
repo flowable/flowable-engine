@@ -18,11 +18,11 @@ package org.flowable.content.api;
  * @author Joram Barrez
  */
 public interface ContentMetaDataKeys {
-  
-  String TASK_ID = "taskId";
-  
-  String PROCESS_INSTANCE_ID = "processInstanceId";
-  
-  String FIELD_ID = "fieldId";
+
+    String TASK_ID = "taskId";
+
+    String PROCESS_INSTANCE_ID = "processInstanceId";
+
+    String FIELD_ID = "fieldId";
 
 }

@@ -54,4 +54,3 @@ public class ContentEngineInfoResponse {
         this.version = version;
     }
 }
-

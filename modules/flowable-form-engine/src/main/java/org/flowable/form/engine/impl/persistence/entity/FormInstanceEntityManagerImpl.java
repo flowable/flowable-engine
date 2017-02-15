@@ -28,34 +28,34 @@ import org.flowable.form.engine.impl.persistence.entity.data.FormInstanceDataMan
  */
 public class FormInstanceEntityManagerImpl extends AbstractEntityManager<FormInstanceEntity> implements FormInstanceEntityManager {
 
-  protected FormInstanceDataManager formInstanceDataManager;
-  
-  public FormInstanceEntityManagerImpl(FormEngineConfiguration formEngineConfiguration, FormInstanceDataManager formInstanceDataManager) {
-    super(formEngineConfiguration);
-    this.formInstanceDataManager = formInstanceDataManager;
-  }
-  
-  @Override
-  public long findFormInstanceCountByQueryCriteria(FormInstanceQueryImpl formInstanceQuery) {
-    return formInstanceDataManager.findFormInstanceCountByQueryCriteria(formInstanceQuery);
-  }
+    protected FormInstanceDataManager formInstanceDataManager;
 
-  @Override
-  public List<FormInstance> findFormInstancesByQueryCriteria(FormInstanceQueryImpl formInstanceQuery, Page page) {
-    return formInstanceDataManager.findFormInstancesByQueryCriteria(formInstanceQuery, page);
-  }
+    public FormInstanceEntityManagerImpl(FormEngineConfiguration formEngineConfiguration, FormInstanceDataManager formInstanceDataManager) {
+        super(formEngineConfiguration);
+        this.formInstanceDataManager = formInstanceDataManager;
+    }
 
-  @Override
-  protected DataManager<FormInstanceEntity> getDataManager() {
-    return formInstanceDataManager;
-  }
+    @Override
+    public long findFormInstanceCountByQueryCriteria(FormInstanceQueryImpl formInstanceQuery) {
+        return formInstanceDataManager.findFormInstanceCountByQueryCriteria(formInstanceQuery);
+    }
 
-  public FormInstanceDataManager getFormInstanceDataManager() {
-    return formInstanceDataManager;
-  }
+    @Override
+    public List<FormInstance> findFormInstancesByQueryCriteria(FormInstanceQueryImpl formInstanceQuery, Page page) {
+        return formInstanceDataManager.findFormInstancesByQueryCriteria(formInstanceQuery, page);
+    }
 
-  public void setFormInstanceDataManager(FormInstanceDataManager formInstanceDataManager) {
-    this.formInstanceDataManager = formInstanceDataManager;
-  }
-  
+    @Override
+    protected DataManager<FormInstanceEntity> getDataManager() {
+        return formInstanceDataManager;
+    }
+
+    public FormInstanceDataManager getFormInstanceDataManager() {
+        return formInstanceDataManager;
+    }
+
+    public void setFormInstanceDataManager(FormInstanceDataManager formInstanceDataManager) {
+        this.formInstanceDataManager = formInstanceDataManager;
+    }
+
 }

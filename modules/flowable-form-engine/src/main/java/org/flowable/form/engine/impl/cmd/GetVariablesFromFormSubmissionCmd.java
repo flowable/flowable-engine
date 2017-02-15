@@ -32,126 +32,120 @@ import org.joda.time.LocalDate;
  */
 public class GetVariablesFromFormSubmissionCmd implements Command<Map<String, Object>>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected FormModel formDefinition;
-  protected Map<String, Object> values;
-  protected String outcome;
-  
-  public GetVariablesFromFormSubmissionCmd(FormModel formDefinition, Map<String, Object> values) {
-    this.formDefinition = formDefinition;
-    this.values = values;
-  }
+    protected FormModel formDefinition;
+    protected Map<String, Object> values;
+    protected String outcome;
 
-  public GetVariablesFromFormSubmissionCmd(FormModel formDefinition, Map<String, Object> values, String outcome) {
-    this(formDefinition, values);
-    this.outcome = outcome;
-  }
-
-  public Map<String, Object> execute(CommandContext commandContext) {
-    // When no values are given, use an empty map to ensure validation is performed (eg. for required fields)
-    if (values == null) {
-      values = Collections.emptyMap();
+    public GetVariablesFromFormSubmissionCmd(FormModel formDefinition, Map<String, Object> values) {
+        this.formDefinition = formDefinition;
+        this.values = values;
     }
 
-    // Loop over all form fields and see if a value was provided
-    Map<String, FormField> fieldMap = formDefinition.allFieldsAsMap();
-    Map<String, Object> variables = new HashMap<String, Object>();
-    for (String fieldId : fieldMap.keySet()) {
-      Object variableValue = null;
-      FormField formField = fieldMap.get(fieldId);
-
-      if (FormFieldTypes.EXPRESSION.equals(formField.getType()) || FormFieldTypes.CONTAINER.equals(formField.getType())) {
-        continue;
-      }
-
-      if (values.containsKey(fieldId)) {
-        variableValue = transformFormFieldValueToVariableValue(formField, values.get(fieldId));
-        variables.put(formField.getId(), variableValue);
-      }
-
-      if (formField.isRequired() && variableValue == null && !FormFieldTypes.UPLOAD.equals(formField.getType())) {
-        throw new FlowableFormValidationException("Form field " + formField.getId() + " is required, but no value was found");
-      }
+    public GetVariablesFromFormSubmissionCmd(FormModel formDefinition, Map<String, Object> values, String outcome) {
+        this(formDefinition, values);
+        this.outcome = outcome;
     }
 
-    // Handle outcomes
-    if (outcome != null) {
-      String targetVariable = null;
-      if (formDefinition.getOutcomeVariableName() != null) {
-        targetVariable = formDefinition.getOutcomeVariableName();
-      } else {
-        targetVariable = "form_" + formDefinition.getKey() + "_outcome";
-      }
-      
-      variables.put(targetVariable, outcome);
-    }
-
-    return variables;
-  }
-  
-  @SuppressWarnings("unchecked")
-  protected Object transformFormFieldValueToVariableValue(FormField formField, Object formFieldValue) {
-
-    Object result = formFieldValue;
-    if (formField.getType().equals(FormFieldTypes.DATE)) {
-      if (StringUtils.isNotEmpty((String) formFieldValue)) {
-        try {
-          result = LocalDate.parse((String) formFieldValue);
-  
-        } catch (Exception e) {
-          e.printStackTrace();
-          result = null;
+    public Map<String, Object> execute(CommandContext commandContext) {
+        // When no values are given, use an empty map to ensure validation is performed (eg. for required fields)
+        if (values == null) {
+            values = Collections.emptyMap();
         }
-      }
 
-    } else if (formField.getType().equals(FormFieldTypes.INTEGER) && formFieldValue instanceof String) {
-      String strFieldValue = (String) formFieldValue;
-      if (StringUtils.isNotEmpty(strFieldValue) && NumberUtils.isNumber(strFieldValue)) {
-        result = Long.valueOf(strFieldValue);
-        
-      } else {
-        result = null;
-      }
+        // Loop over all form fields and see if a value was provided
+        Map<String, FormField> fieldMap = formDefinition.allFieldsAsMap();
+        Map<String, Object> variables = new HashMap<String, Object>();
+        for (String fieldId : fieldMap.keySet()) {
+            Object variableValue = null;
+            FormField formField = fieldMap.get(fieldId);
 
-    } else if (formField.getType().equals(FormFieldTypes.AMOUNT) && formFieldValue instanceof String) {
-      try {
-        result = Double.parseDouble((String) formFieldValue);
-        
-      } catch (NumberFormatException e) {
-        result = null;
-      }
-      
-    } else if (formField.getType().equals(FormFieldTypes.DROPDOWN)) {
-      if (formFieldValue instanceof Map<?, ?>) {
-        result = ((Map<?, ?>) formFieldValue).get("id");
-        if (result == null) {
-          // fallback to name for manual config options
-          result = ((Map<?, ?>) formFieldValue).get("name");
+            if (FormFieldTypes.EXPRESSION.equals(formField.getType()) || FormFieldTypes.CONTAINER.equals(formField.getType())) {
+                continue;
+            }
+
+            if (values.containsKey(fieldId)) {
+                variableValue = transformFormFieldValueToVariableValue(formField, values.get(fieldId));
+                variables.put(formField.getId(), variableValue);
+            }
+
+            if (formField.isRequired() && variableValue == null && !FormFieldTypes.UPLOAD.equals(formField.getType())) {
+                throw new FlowableFormValidationException("Form field " + formField.getId() + " is required, but no value was found");
+            }
         }
-      }
 
-    } else if (formField.getType().equals(FormFieldTypes.UPLOAD)) {
-      result = (String) formFieldValue;
+        // Handle outcomes
+        if (outcome != null) {
+            String targetVariable = null;
+            if (formDefinition.getOutcomeVariableName() != null) {
+                targetVariable = formDefinition.getOutcomeVariableName();
+            } else {
+                targetVariable = "form_" + formDefinition.getKey() + "_outcome";
+            }
 
-    } else if (formField.getType().equals(FormFieldTypes.PEOPLE) || formField.getType().equals(FormFieldTypes.FUNCTIONAL_GROUP)) {
-      if (formFieldValue instanceof Map<?, ?>) {
-        Map<String, Object> value = (Map<String, Object>) formFieldValue;
-        Object id = value.get("id");
-        if (id instanceof Number) {
-          result = ((Number) id).longValue();
-          
-        } else {
-          // Wrong type, ignore
-          result = null;
+            variables.put(targetVariable, outcome);
         }
-      } else {
-        // Incorrect or empty map, ignore
-        result = null;
-      }
+
+        return variables;
     }
 
-    // Default: no processing needs to be done, can be stored as-is
-    return result;
-  }
+    @SuppressWarnings("unchecked")
+    protected Object transformFormFieldValueToVariableValue(FormField formField, Object formFieldValue) {
+
+        Object result = formFieldValue;
+        if (formField.getType().equals(FormFieldTypes.DATE)) {
+            if (StringUtils.isNotEmpty((String) formFieldValue)) {
+                try {
+                    result = LocalDate.parse((String) formFieldValue);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    result = null;
+                }
+            }
+
+        } else if (formField.getType().equals(FormFieldTypes.INTEGER) && formFieldValue instanceof String) {
+            String strFieldValue = (String) formFieldValue;
+            if (StringUtils.isNotEmpty(strFieldValue) && NumberUtils.isNumber(strFieldValue)) {
+                result = Long.valueOf(strFieldValue);
+
+            } else {
+                result = null;
+            }
+
+        } else if (formField.getType().equals(FormFieldTypes.AMOUNT) && formFieldValue instanceof String) {
+            try {
+                result = Double.parseDouble((String) formFieldValue);
+
+            } catch (NumberFormatException e) {
+                result = null;
+            }
+
+        } else if (formField.getType().equals(FormFieldTypes.DROPDOWN)) {
+            if (formFieldValue instanceof Map<?, ?>) {
+                result = ((Map<?, ?>) formFieldValue).get("id");
+                if (result == null) {
+                    // fallback to name for manual config options
+                    result = ((Map<?, ?>) formFieldValue).get("name");
+                }
+            }
+
+        } else if (formField.getType().equals(FormFieldTypes.UPLOAD)) {
+            result = (String) formFieldValue;
+
+        } else if (formField.getType().equals(FormFieldTypes.PEOPLE) || formField.getType().equals(FormFieldTypes.FUNCTIONAL_GROUP)) {
+            if (formFieldValue instanceof Map<?, ?>) {
+                Map<String, Object> value = (Map<String, Object>) formFieldValue;
+                result = value.get("id").toString();
+
+            } else {
+                // Incorrect or empty map, ignore
+                result = null;
+            }
+        }
+
+        // Default: no processing needs to be done, can be stored as-is
+        return result;
+    }
 }

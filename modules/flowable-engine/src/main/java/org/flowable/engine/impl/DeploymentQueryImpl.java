@@ -29,237 +29,237 @@ import org.flowable.engine.repository.DeploymentQuery;
  */
 public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployment> implements DeploymentQuery, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String deploymentId;
-  protected List<String> deploymentIds;
-  protected String name;
-  protected String nameLike;
-  protected String category;
-  protected String categoryLike;
-  protected String categoryNotEquals;
-  protected String key;
-  protected String keyLike;
-  protected String tenantId;
-  protected String tenantIdLike;
-  protected boolean withoutTenantId;
-  protected String engineVersion;
-  protected String processDefinitionKey;
-  protected String processDefinitionKeyLike;
-  protected boolean latest;
+    private static final long serialVersionUID = 1L;
+    protected String deploymentId;
+    protected List<String> deploymentIds;
+    protected String name;
+    protected String nameLike;
+    protected String category;
+    protected String categoryLike;
+    protected String categoryNotEquals;
+    protected String key;
+    protected String keyLike;
+    protected String tenantId;
+    protected String tenantIdLike;
+    protected boolean withoutTenantId;
+    protected String engineVersion;
+    protected String processDefinitionKey;
+    protected String processDefinitionKeyLike;
+    protected boolean latest;
 
-  public DeploymentQueryImpl() {
-  }
-
-  public DeploymentQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
-  public DeploymentQueryImpl(CommandExecutor commandExecutor) {
-    super(commandExecutor);
-  }
-
-  public DeploymentQueryImpl deploymentId(String deploymentId) {
-    if (deploymentId == null) {
-      throw new FlowableIllegalArgumentException("Deployment id is null");
+    public DeploymentQueryImpl() {
     }
-    this.deploymentId = deploymentId;
-    return this;
-  }
-  
-  public DeploymentQueryImpl deploymentIds(List<String> deploymentIds) {
-    if (deploymentIds == null) {
-      throw new FlowableIllegalArgumentException("Deployment ids is null");
+
+    public DeploymentQueryImpl(CommandContext commandContext) {
+        super(commandContext);
     }
-    this.deploymentIds = deploymentIds;
-    return this;
-  }
 
-  public DeploymentQueryImpl deploymentName(String deploymentName) {
-    if (deploymentName == null) {
-      throw new FlowableIllegalArgumentException("deploymentName is null");
+    public DeploymentQueryImpl(CommandExecutor commandExecutor) {
+        super(commandExecutor);
     }
-    this.name = deploymentName;
-    return this;
-  }
 
-  public DeploymentQueryImpl deploymentNameLike(String nameLike) {
-    if (nameLike == null) {
-      throw new FlowableIllegalArgumentException("deploymentNameLike is null");
+    public DeploymentQueryImpl deploymentId(String deploymentId) {
+        if (deploymentId == null) {
+            throw new FlowableIllegalArgumentException("Deployment id is null");
+        }
+        this.deploymentId = deploymentId;
+        return this;
     }
-    this.nameLike = nameLike;
-    return this;
-  }
 
-  public DeploymentQueryImpl deploymentCategory(String deploymentCategory) {
-    if (deploymentCategory == null) {
-      throw new FlowableIllegalArgumentException("deploymentCategory is null");
+    public DeploymentQueryImpl deploymentIds(List<String> deploymentIds) {
+        if (deploymentIds == null) {
+            throw new FlowableIllegalArgumentException("Deployment ids is null");
+        }
+        this.deploymentIds = deploymentIds;
+        return this;
     }
-    this.category = deploymentCategory;
-    return this;
-  }
-  
-  public DeploymentQueryImpl deploymentCategoryLike(String categoryLike) {
-    if (categoryLike == null) {
-      throw new FlowableIllegalArgumentException("deploymentCategoryLike is null");
+
+    public DeploymentQueryImpl deploymentName(String deploymentName) {
+        if (deploymentName == null) {
+            throw new FlowableIllegalArgumentException("deploymentName is null");
+        }
+        this.name = deploymentName;
+        return this;
     }
-    this.categoryLike = categoryLike;
-    return this;
-  }
 
-  public DeploymentQueryImpl deploymentCategoryNotEquals(String deploymentCategoryNotEquals) {
-    if (deploymentCategoryNotEquals == null) {
-      throw new FlowableIllegalArgumentException("deploymentCategoryExclude is null");
+    public DeploymentQueryImpl deploymentNameLike(String nameLike) {
+        if (nameLike == null) {
+            throw new FlowableIllegalArgumentException("deploymentNameLike is null");
+        }
+        this.nameLike = nameLike;
+        return this;
     }
-    this.categoryNotEquals = deploymentCategoryNotEquals;
-    return this;
-  }
-  
-  public DeploymentQueryImpl deploymentKey(String deploymentKey) {
-    if (deploymentKey == null) {
-      throw new FlowableIllegalArgumentException("deploymentKey is null");
+
+    public DeploymentQueryImpl deploymentCategory(String deploymentCategory) {
+        if (deploymentCategory == null) {
+            throw new FlowableIllegalArgumentException("deploymentCategory is null");
+        }
+        this.category = deploymentCategory;
+        return this;
     }
-    this.key = deploymentKey;
-    return this;
-  }
-  
-  public DeploymentQueryImpl deploymentKeyLike(String deploymentKeyLike) {
-    if (deploymentKeyLike == null) {
-      throw new FlowableIllegalArgumentException("deploymentKeyLike is null");
+
+    public DeploymentQueryImpl deploymentCategoryLike(String categoryLike) {
+        if (categoryLike == null) {
+            throw new FlowableIllegalArgumentException("deploymentCategoryLike is null");
+        }
+        this.categoryLike = categoryLike;
+        return this;
     }
-    this.keyLike = deploymentKeyLike;
-    return this;
-  }
 
-  public DeploymentQueryImpl deploymentTenantId(String tenantId) {
-    if (tenantId == null) {
-      throw new FlowableIllegalArgumentException("deploymentTenantId is null");
+    public DeploymentQueryImpl deploymentCategoryNotEquals(String deploymentCategoryNotEquals) {
+        if (deploymentCategoryNotEquals == null) {
+            throw new FlowableIllegalArgumentException("deploymentCategoryExclude is null");
+        }
+        this.categoryNotEquals = deploymentCategoryNotEquals;
+        return this;
     }
-    this.tenantId = tenantId;
-    return this;
-  }
 
-  public DeploymentQueryImpl deploymentTenantIdLike(String tenantIdLike) {
-    if (tenantIdLike == null) {
-      throw new FlowableIllegalArgumentException("deploymentTenantIdLike is null");
+    public DeploymentQueryImpl deploymentKey(String deploymentKey) {
+        if (deploymentKey == null) {
+            throw new FlowableIllegalArgumentException("deploymentKey is null");
+        }
+        this.key = deploymentKey;
+        return this;
     }
-    this.tenantIdLike = tenantIdLike;
-    return this;
-  }
 
-  public DeploymentQueryImpl deploymentWithoutTenantId() {
-    this.withoutTenantId = true;
-    return this;
-  }
-  
-  public DeploymentQueryImpl deploymentEngineVersion(String engineVersion) {
-    this.engineVersion = engineVersion;
-    return this;
-  }
-
-  public DeploymentQueryImpl processDefinitionKey(String key) {
-    if (key == null) {
-      throw new FlowableIllegalArgumentException("key is null");
+    public DeploymentQueryImpl deploymentKeyLike(String deploymentKeyLike) {
+        if (deploymentKeyLike == null) {
+            throw new FlowableIllegalArgumentException("deploymentKeyLike is null");
+        }
+        this.keyLike = deploymentKeyLike;
+        return this;
     }
-    this.processDefinitionKey = key;
-    return this;
-  }
 
-  public DeploymentQueryImpl processDefinitionKeyLike(String keyLike) {
-    if (keyLike == null) {
-      throw new FlowableIllegalArgumentException("keyLike is null");
+    public DeploymentQueryImpl deploymentTenantId(String tenantId) {
+        if (tenantId == null) {
+            throw new FlowableIllegalArgumentException("deploymentTenantId is null");
+        }
+        this.tenantId = tenantId;
+        return this;
     }
-    this.processDefinitionKeyLike = keyLike;
-    return this;
-  }
-  
-  public DeploymentQueryImpl latest() {
-    if (key == null) {
-      throw new FlowableIllegalArgumentException("latest can only be used together with a deployment key");
+
+    public DeploymentQueryImpl deploymentTenantIdLike(String tenantIdLike) {
+        if (tenantIdLike == null) {
+            throw new FlowableIllegalArgumentException("deploymentTenantIdLike is null");
+        }
+        this.tenantIdLike = tenantIdLike;
+        return this;
     }
-    
-    this.latest = true;
-    return this;
-  }
 
-  // sorting ////////////////////////////////////////////////////////
+    public DeploymentQueryImpl deploymentWithoutTenantId() {
+        this.withoutTenantId = true;
+        return this;
+    }
 
-  public DeploymentQuery orderByDeploymentId() {
-    return orderBy(DeploymentQueryProperty.DEPLOYMENT_ID);
-  }
+    public DeploymentQueryImpl deploymentEngineVersion(String engineVersion) {
+        this.engineVersion = engineVersion;
+        return this;
+    }
 
-  public DeploymentQuery orderByDeploymenTime() {
-    return orderBy(DeploymentQueryProperty.DEPLOY_TIME);
-  }
+    public DeploymentQueryImpl processDefinitionKey(String key) {
+        if (key == null) {
+            throw new FlowableIllegalArgumentException("key is null");
+        }
+        this.processDefinitionKey = key;
+        return this;
+    }
 
-  public DeploymentQuery orderByDeploymentName() {
-    return orderBy(DeploymentQueryProperty.DEPLOYMENT_NAME);
-  }
+    public DeploymentQueryImpl processDefinitionKeyLike(String keyLike) {
+        if (keyLike == null) {
+            throw new FlowableIllegalArgumentException("keyLike is null");
+        }
+        this.processDefinitionKeyLike = keyLike;
+        return this;
+    }
 
-  public DeploymentQuery orderByTenantId() {
-    return orderBy(DeploymentQueryProperty.DEPLOYMENT_TENANT_ID);
-  }
+    public DeploymentQueryImpl latest() {
+        if (key == null) {
+            throw new FlowableIllegalArgumentException("latest can only be used together with a deployment key");
+        }
 
-  // results ////////////////////////////////////////////////////////
+        this.latest = true;
+        return this;
+    }
 
-  @Override
-  public long executeCount(CommandContext commandContext) {
-    checkQueryOk();
-    return commandContext.getDeploymentEntityManager().findDeploymentCountByQueryCriteria(this);
-  }
+    // sorting ////////////////////////////////////////////////////////
 
-  @Override
-  public List<Deployment> executeList(CommandContext commandContext, Page page) {
-    checkQueryOk();
-    return commandContext.getDeploymentEntityManager().findDeploymentsByQueryCriteria(this, page);
-  }
+    public DeploymentQuery orderByDeploymentId() {
+        return orderBy(DeploymentQueryProperty.DEPLOYMENT_ID);
+    }
 
-  // getters ////////////////////////////////////////////////////////
+    public DeploymentQuery orderByDeploymenTime() {
+        return orderBy(DeploymentQueryProperty.DEPLOY_TIME);
+    }
 
-  public String getDeploymentId() {
-    return deploymentId;
-  }
-  
-  public List<String> getDeploymentIds() {
-    return deploymentIds;
-  }
+    public DeploymentQuery orderByDeploymentName() {
+        return orderBy(DeploymentQueryProperty.DEPLOYMENT_NAME);
+    }
 
-  public String getName() {
-    return name;
-  }
+    public DeploymentQuery orderByTenantId() {
+        return orderBy(DeploymentQueryProperty.DEPLOYMENT_TENANT_ID);
+    }
 
-  public String getNameLike() {
-    return nameLike;
-  }
+    // results ////////////////////////////////////////////////////////
 
-  public String getCategory() {
-    return category;
-  }
+    @Override
+    public long executeCount(CommandContext commandContext) {
+        checkQueryOk();
+        return commandContext.getDeploymentEntityManager().findDeploymentCountByQueryCriteria(this);
+    }
 
-  public String getCategoryNotEquals() {
-    return categoryNotEquals;
-  }
+    @Override
+    public List<Deployment> executeList(CommandContext commandContext, Page page) {
+        checkQueryOk();
+        return commandContext.getDeploymentEntityManager().findDeploymentsByQueryCriteria(this, page);
+    }
 
-  public String getTenantId() {
-    return tenantId;
-  }
+    // getters ////////////////////////////////////////////////////////
 
-  public String getTenantIdLike() {
-    return tenantIdLike;
-  }
+    public String getDeploymentId() {
+        return deploymentId;
+    }
 
-  public boolean isWithoutTenantId() {
-    return withoutTenantId;
-  }
-  
-  public String getEngineVersion() {
-    return engineVersion;
-  }
+    public List<String> getDeploymentIds() {
+        return deploymentIds;
+    }
 
-  public String getProcessDefinitionKey() {
-    return processDefinitionKey;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String getProcessDefinitionKeyLike() {
-    return processDefinitionKeyLike;
-  }
+    public String getNameLike() {
+        return nameLike;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getCategoryNotEquals() {
+        return categoryNotEquals;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public String getTenantIdLike() {
+        return tenantIdLike;
+    }
+
+    public boolean isWithoutTenantId() {
+        return withoutTenantId;
+    }
+
+    public String getEngineVersion() {
+        return engineVersion;
+    }
+
+    public String getProcessDefinitionKey() {
+        return processDefinitionKey;
+    }
+
+    public String getProcessDefinitionKeyLike() {
+        return processDefinitionKeyLike;
+    }
 }

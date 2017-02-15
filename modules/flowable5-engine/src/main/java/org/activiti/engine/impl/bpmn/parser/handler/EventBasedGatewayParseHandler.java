@@ -18,23 +18,22 @@ import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.EventGateway;
 
-
 /**
  * @author Joram Barrez
  */
 public class EventBasedGatewayParseHandler extends AbstractActivityBpmnParseHandler<EventGateway> {
-  
-  public Class< ? extends BaseElement> getHandledType() {
-    return EventGateway.class;
-  }
-  
-  protected void executeParse(BpmnParse bpmnParse, EventGateway gateway) {
-    ActivityImpl activity = createActivityOnCurrentScope(bpmnParse, gateway, BpmnXMLConstants.ELEMENT_GATEWAY_EVENT);   
-    activity.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createEventBasedGatewayActivityBehavior(gateway));
-    
-    activity.setAsync(gateway.isAsynchronous());
-    activity.setExclusive(!gateway.isNotExclusive());
-    activity.setScope(true);
-  }
+
+    public Class<? extends BaseElement> getHandledType() {
+        return EventGateway.class;
+    }
+
+    protected void executeParse(BpmnParse bpmnParse, EventGateway gateway) {
+        ActivityImpl activity = createActivityOnCurrentScope(bpmnParse, gateway, BpmnXMLConstants.ELEMENT_GATEWAY_EVENT);
+        activity.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createEventBasedGatewayActivityBehavior(gateway));
+
+        activity.setAsync(gateway.isAsynchronous());
+        activity.setExclusive(!gateway.isNotExclusive());
+        activity.setScope(true);
+    }
 
 }

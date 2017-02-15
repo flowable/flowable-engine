@@ -24,149 +24,149 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  */
 public class ContentItemResponse {
 
-  protected String id;
-  protected String name;
-  protected String mimeType;
-  protected String taskId;
-  protected String processInstanceId;
-  protected String contentStoreId;
-  protected String contentStoreName;
-  protected boolean contentAvailable;
-  protected String tenantId;
-  @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
-  protected Date created; 
-  protected String createdBy;
-  @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
-  protected Date lastModified; 
-  protected String lastModifiedBy;
-  protected String url;
+    protected String id;
+    protected String name;
+    protected String mimeType;
+    protected String taskId;
+    protected String processInstanceId;
+    protected String contentStoreId;
+    protected String contentStoreName;
+    protected boolean contentAvailable;
+    protected String tenantId;
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
+    protected Date created;
+    protected String createdBy;
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
+    protected Date lastModified;
+    protected String lastModifiedBy;
+    protected String url;
 
-  public ContentItemResponse(ContentItem contentItem, String url) {
-    setId(contentItem.getId());
-    setName(contentItem.getName());
-    setMimeType(contentItem.getMimeType());
-    setTaskId(contentItem.getTaskId());
-    setProcessInstanceId(contentItem.getProcessInstanceId());
-    setContentStoreId(contentItem.getContentStoreId());
-    setContentStoreName(contentItem.getContentStoreName());
-    setContentAvailable(contentItem.isContentAvailable());
-    setTenantId(contentItem.getTenantId());
-    setCreated(contentItem.getCreated());
-    setCreatedBy(contentItem.getCreatedBy());
-    setLastModified(contentItem.getLastModified());
-    setLastModifiedBy(contentItem.getLastModifiedBy());
-    setUrl(url);
-  }
+    public ContentItemResponse(ContentItem contentItem, String url) {
+        setId(contentItem.getId());
+        setName(contentItem.getName());
+        setMimeType(contentItem.getMimeType());
+        setTaskId(contentItem.getTaskId());
+        setProcessInstanceId(contentItem.getProcessInstanceId());
+        setContentStoreId(contentItem.getContentStoreId());
+        setContentStoreName(contentItem.getContentStoreName());
+        setContentAvailable(contentItem.isContentAvailable());
+        setTenantId(contentItem.getTenantId());
+        setCreated(contentItem.getCreated());
+        setCreatedBy(contentItem.getCreatedBy());
+        setLastModified(contentItem.getLastModified());
+        setLastModifiedBy(contentItem.getLastModifiedBy());
+        setUrl(url);
+    }
 
-  public String getId() {
-    return id;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public void setId(String id) {
-    this.id = id;
-  }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public String getMimeType() {
-    return mimeType;
-  }
+    public String getMimeType() {
+        return mimeType;
+    }
 
-  public void setMimeType(String mimeType) {
-    this.mimeType = mimeType;
-  }
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
 
-  public String getTaskId() {
-    return taskId;
-  }
+    public String getTaskId() {
+        return taskId;
+    }
 
-  public void setTaskId(String taskId) {
-    this.taskId = taskId;
-  }
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
 
-  public String getProcessInstanceId() {
-    return processInstanceId;
-  }
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
 
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
 
-  public String getContentStoreId() {
-    return contentStoreId;
-  }
+    public String getContentStoreId() {
+        return contentStoreId;
+    }
 
-  public void setContentStoreId(String contentStoreId) {
-    this.contentStoreId = contentStoreId;
-  }
+    public void setContentStoreId(String contentStoreId) {
+        this.contentStoreId = contentStoreId;
+    }
 
-  public String getContentStoreName() {
-    return contentStoreName;
-  }
+    public String getContentStoreName() {
+        return contentStoreName;
+    }
 
-  public void setContentStoreName(String contentStoreName) {
-    this.contentStoreName = contentStoreName;
-  }
+    public void setContentStoreName(String contentStoreName) {
+        this.contentStoreName = contentStoreName;
+    }
 
-  public boolean isContentAvailable() {
-    return contentAvailable;
-  }
+    public boolean isContentAvailable() {
+        return contentAvailable;
+    }
 
-  public void setContentAvailable(boolean contentAvailable) {
-    this.contentAvailable = contentAvailable;
-  }
+    public void setContentAvailable(boolean contentAvailable) {
+        this.contentAvailable = contentAvailable;
+    }
 
-  public String getTenantId() {
-    return tenantId;
-  }
+    public String getTenantId() {
+        return tenantId;
+    }
 
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
 
-  public Date getCreated() {
-    return created;
-  }
+    public Date getCreated() {
+        return created;
+    }
 
-  public void setCreated(Date created) {
-    this.created = created;
-  }
+    public void setCreated(Date created) {
+        this.created = created;
+    }
 
-  public String getCreatedBy() {
-    return createdBy;
-  }
+    public String getCreatedBy() {
+        return createdBy;
+    }
 
-  public void setCreatedBy(String createdBy) {
-    this.createdBy = createdBy;
-  }
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 
-  public Date getLastModified() {
-    return lastModified;
-  }
+    public Date getLastModified() {
+        return lastModified;
+    }
 
-  public void setLastModified(Date lastModified) {
-    this.lastModified = lastModified;
-  }
+    public void setLastModified(Date lastModified) {
+        this.lastModified = lastModified;
+    }
 
-  public String getLastModifiedBy() {
-    return lastModifiedBy;
-  }
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
-    this.lastModifiedBy = lastModifiedBy;
-  }
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
 
-  public String getUrl() {
-    return url;
-  }
+    public String getUrl() {
+        return url;
+    }
 
-  public void setUrl(String url) {
-    this.url = url;
-  }
+    public void setUrl(String url) {
+        this.url = url;
+    }
 }

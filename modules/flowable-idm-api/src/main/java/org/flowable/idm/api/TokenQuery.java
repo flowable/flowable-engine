@@ -25,71 +25,71 @@ import org.flowable.engine.common.api.query.Query;
  */
 public interface TokenQuery extends Query<TokenQuery, Token> {
 
-  /** Only select {@link Token}s with the given id/ */
-  TokenQuery tokenId(String id);
-  
-  /** Only select {@link Token}s with the given ids/ */
-  TokenQuery tokenIds(List<String> ids);
+    /** Only select {@link Token}s with the given id/ */
+    TokenQuery tokenId(String id);
 
-  /** Only select {@link Token}s with the given token value. */
-  TokenQuery tokenValue(String tokenValue);
-  
-  /**
-   * Only select {@link Token}s that have a token date on the given date.
-   */
-  TokenQuery tokenDate(Date tokenDate);
+    /** Only select {@link Token}s with the given ids/ */
+    TokenQuery tokenIds(List<String> ids);
 
-  /**
-   * Only select {@link Token}s that have a token date before the given date.
-   */
-  TokenQuery tokenDateBefore(Date before);
+    /** Only select {@link Token}s with the given token value. */
+    TokenQuery tokenValue(String tokenValue);
 
-  /**
-   * Only select {@link Token}s that have a token date after the given date.
-   */
-  TokenQuery tokenDateAfter(Date after);
-  
-  /** Only select {@link Token}s with the given ip address. */
-  TokenQuery ipAddress(String ipAddress);
+    /**
+     * Only select {@link Token}s that have a token date on the given date.
+     */
+    TokenQuery tokenDate(Date tokenDate);
 
-  /**
-   * Only select {@link Token}s where the ip address matches the given parameter. The syntax is that of SQL, eg. %127%.
-   */
-  TokenQuery ipAddressLike(String ipAddressLike);
+    /**
+     * Only select {@link Token}s that have a token date before the given date.
+     */
+    TokenQuery tokenDateBefore(Date before);
 
-  /** Only select {@link Token}s with the given user agent. */
-  TokenQuery userAgent(String userAgent);
+    /**
+     * Only select {@link Token}s that have a token date after the given date.
+     */
+    TokenQuery tokenDateAfter(Date after);
 
-  /**
-   * Only select {@link Token}s where the user agent matches the given parameter. The syntax is that of SQL, eg. %chrome%.
-   */
-  TokenQuery userAgentLike(String userAgentLike);
-  
-  /** Only select {@link Token}s with the given user id. */
-  TokenQuery userId(String userId);
+    /** Only select {@link Token}s with the given ip address. */
+    TokenQuery ipAddress(String ipAddress);
 
-  /**
-   * Only select {@link Token}s where the user id matches the given parameter. The syntax is that of SQL, eg. %test%.
-   */
-  TokenQuery userIdLike(String userIdLike);
-  
-  /** Only select {@link Token}s with the given token data. */
-  TokenQuery tokenData(String tokenData);
-  
-  /**
-   * Only select {@link Token}s where the token data matches the given parameter. The syntax is that of SQL, eg. %test%.
-   */
-  TokenQuery tokenDataLike(String tokenDataLike);
+    /**
+     * Only select {@link Token}s where the ip address matches the given parameter. The syntax is that of SQL, eg. %127%.
+     */
+    TokenQuery ipAddressLike(String ipAddressLike);
 
-  // sorting ////////////////////////////////////////////////////////
+    /** Only select {@link Token}s with the given user agent. */
+    TokenQuery userAgent(String userAgent);
 
-  /**
-   * Order by token id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  TokenQuery orderByTokenId();
+    /**
+     * Only select {@link Token}s where the user agent matches the given parameter. The syntax is that of SQL, eg. %chrome%.
+     */
+    TokenQuery userAgentLike(String userAgentLike);
 
-  /**
-   * Order by token date (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  TokenQuery orderByTokenDate();
+    /** Only select {@link Token}s with the given user id. */
+    TokenQuery userId(String userId);
+
+    /**
+     * Only select {@link Token}s where the user id matches the given parameter. The syntax is that of SQL, eg. %test%.
+     */
+    TokenQuery userIdLike(String userIdLike);
+
+    /** Only select {@link Token}s with the given token data. */
+    TokenQuery tokenData(String tokenData);
+
+    /**
+     * Only select {@link Token}s where the token data matches the given parameter. The syntax is that of SQL, eg. %test%.
+     */
+    TokenQuery tokenDataLike(String tokenDataLike);
+
+    // sorting ////////////////////////////////////////////////////////
+
+    /**
+     * Order by token id (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    TokenQuery orderByTokenId();
+
+    /**
+     * Order by token date (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    TokenQuery orderByTokenDate();
 }

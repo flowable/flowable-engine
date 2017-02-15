@@ -32,40 +32,40 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 @TestExecutionListeners(DependencyInjectionTestExecutionListener.class)
 public abstract class SpringFlowableIdmTestCase extends AbstractFlowableIdmTestCase implements ApplicationContextAware {
 
-  // we need a data structure to store all the resolved ProcessEngines and map them to something
-  protected Map<Object, IdmEngine> cachedIdmEngines = new ConcurrentHashMap<Object, IdmEngine>();
+    // we need a data structure to store all the resolved ProcessEngines and map them to something
+    protected Map<Object, IdmEngine> cachedIdmEngines = new ConcurrentHashMap<Object, IdmEngine>();
 
-  // protected static Map<String, ProcessEngine> cachedProcessEngines = new
-  // HashMap<String, ProcessEngine>();
+    // protected static Map<String, ProcessEngine> cachedProcessEngines = new
+    // HashMap<String, ProcessEngine>();
 
-  protected TestContextManager testContextManager;
+    protected TestContextManager testContextManager;
 
-  @Autowired
-  protected ApplicationContext applicationContext;
+    @Autowired
+    protected ApplicationContext applicationContext;
 
-  public SpringFlowableIdmTestCase() {
-    this.testContextManager = new TestContextManager(getClass());
-  }
+    public SpringFlowableIdmTestCase() {
+        this.testContextManager = new TestContextManager(getClass());
+    }
 
-  @Override
-  public void runBare() throws Throwable {
-    testContextManager.prepareTestInstance(this); // this will initialize all dependencies
-    super.runBare();
-  }
+    @Override
+    public void runBare() throws Throwable {
+        testContextManager.prepareTestInstance(this); // this will initialize all dependencies
+        super.runBare();
+    }
 
-  @Override
-  protected void initializeIdmEngine() {
-    ContextConfiguration contextConfiguration = getClass().getAnnotation(ContextConfiguration.class);
-    String[] value = contextConfiguration.value();
-    boolean hasOneArg = value != null && value.length == 1;
-    String key = hasOneArg ? value[0] : IdmEngine.class.getName();
-    IdmEngine engine = this.cachedIdmEngines.containsKey(key) ? this.cachedIdmEngines.get(key) : this.applicationContext.getBean(IdmEngine.class);
+    @Override
+    protected void initializeIdmEngine() {
+        ContextConfiguration contextConfiguration = getClass().getAnnotation(ContextConfiguration.class);
+        String[] value = contextConfiguration.value();
+        boolean hasOneArg = value != null && value.length == 1;
+        String key = hasOneArg ? value[0] : IdmEngine.class.getName();
+        IdmEngine engine = this.cachedIdmEngines.containsKey(key) ? this.cachedIdmEngines.get(key) : this.applicationContext.getBean(IdmEngine.class);
 
-    this.cachedIdmEngines.put(key, engine);
-    this.idmEngine = engine;
-  }
+        this.cachedIdmEngines.put(key, engine);
+        this.idmEngine = engine;
+    }
 
-  public void setApplicationContext(ApplicationContext applicationContext) {
-    this.applicationContext = applicationContext;
-  }
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 }

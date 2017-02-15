@@ -21,9 +21,9 @@ import org.flowable.form.engine.impl.interceptor.CommandContext;
  */
 public interface TransactionContext extends BaseTransactionContext<TransactionListener, CommandContext> {
 
-  void commit();
+    void commit();
 
-  void rollback();
+    void rollback();
 
-  void addTransactionListener(TransactionState transactionState, TransactionListener transactionListener);
+    void addTransactionListener(TransactionState transactionState, TransactionListener transactionListener);
 }

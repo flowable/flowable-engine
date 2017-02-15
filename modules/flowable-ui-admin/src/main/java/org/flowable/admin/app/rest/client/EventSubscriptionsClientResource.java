@@ -33,25 +33,25 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RestController
 public class EventSubscriptionsClientResource extends AbstractClientResource {
 
-  private static final Logger logger = LoggerFactory.getLogger(EventSubscriptionsClientResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(EventSubscriptionsClientResource.class);
 
-  @Autowired
-  protected EventSubscriptionService eventSubscriptionService;
+    @Autowired
+    protected EventSubscriptionService eventSubscriptionService;
 
-  /**
-   * GET /rest/admin/event-subscriptions -> Get a list of event subscriptions.
-   */
-  @RequestMapping(value = "/rest/admin/event-subscriptions", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode listEventSubscriptions(HttpServletRequest request) {
-    logger.debug("REST request to get a list of event subscriptions");
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
+    /**
+     * GET /rest/admin/event-subscriptions -> Get a list of event subscriptions.
+     */
+    @RequestMapping(value = "/rest/admin/event-subscriptions", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode listEventSubscriptions(HttpServletRequest request) {
+        logger.debug("REST request to get a list of event subscriptions");
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
 
-    try {
-      return eventSubscriptionService.listEventSubscriptions(serverConfig, parameterMap);
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting event subscriptions");
-      throw new BadRequestException(e.getMessage());
+        try {
+            return eventSubscriptionService.listEventSubscriptions(serverConfig, parameterMap);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting event subscriptions");
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
 }

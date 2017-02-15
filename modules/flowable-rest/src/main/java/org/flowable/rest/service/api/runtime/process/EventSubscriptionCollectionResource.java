@@ -41,68 +41,68 @@ import io.swagger.annotations.ApiResponses;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Event subscriptions" }, description = "Query event subscriptions", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Event subscriptions" }, description = "Query event subscriptions", authorizations = { @Authorization(value = "basicAuth") })
 public class EventSubscriptionCollectionResource {
 
-  @Autowired
-  protected RestResponseFactory restResponseFactory;
+    @Autowired
+    protected RestResponseFactory restResponseFactory;
 
-  @Autowired
-  protected RuntimeService runtimeService;
+    @Autowired
+    protected RuntimeService runtimeService;
 
-  @ApiOperation(value = "Get a list of event subscriptions", tags = {"Event subscriptions"}, nickname = "listEventSubscriptions")
-  @ApiImplicitParams({
-          @ApiImplicitParam(name = "id", dataType = "string", value = "Only return event subscriptions with the given id", paramType = "query"),
-          @ApiImplicitParam(name = "eventType", dataType = "string", value = "Only return event subscriptions with the given event type", paramType = "query"),
-          @ApiImplicitParam(name = "eventName", dataType = "string", value = "Only return event subscriptions with the given event name", paramType = "query"),
-          @ApiImplicitParam(name = "activityId", dataType = "string", value = "Only return event subscriptions with the given activity id", paramType = "query"),
-          @ApiImplicitParam(name = "executionId", dataType = "string", value = "Only return event subscriptions with the given execution id", paramType = "query"),
-          @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return event subscriptions part of a process with the given id", paramType = "query"),
-          @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "Only return event subscriptions with the given process definition id", paramType = "query"),
-          @ApiImplicitParam(name = "createdBefore", dataType = "string", value = "Only return event subscriptions which are created before the given date.", paramType = "query"),
-          @ApiImplicitParam(name = "createdAfter", dataType = "string", value = "Only return event subscriptions which are created after the given date.", paramType = "query"),
-          @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return event subscriptions with the given tenant id.", paramType = "query"),
-          @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues ="id,created,executionId,processInstanceId,processDefinitionId,tenantId", paramType = "query")
-  })
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates the requested event subscriptions were returned."),
-          @ApiResponse(code = 400, message = "Indicates an illegal value has been used in a url query parameter. Status description contains additional details about the error.")
-  })
-  @RequestMapping(value = "/runtime/event-subscriptions", method = RequestMethod.GET, produces = "application/json")
-  public DataResponse getJobs(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
-    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
+    @ApiOperation(value = "Get a list of event subscriptions", tags = { "Event subscriptions" }, nickname = "listEventSubscriptions")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", dataType = "string", value = "Only return event subscriptions with the given id", paramType = "query"),
+            @ApiImplicitParam(name = "eventType", dataType = "string", value = "Only return event subscriptions with the given event type", paramType = "query"),
+            @ApiImplicitParam(name = "eventName", dataType = "string", value = "Only return event subscriptions with the given event name", paramType = "query"),
+            @ApiImplicitParam(name = "activityId", dataType = "string", value = "Only return event subscriptions with the given activity id", paramType = "query"),
+            @ApiImplicitParam(name = "executionId", dataType = "string", value = "Only return event subscriptions with the given execution id", paramType = "query"),
+            @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return event subscriptions part of a process with the given id", paramType = "query"),
+            @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "Only return event subscriptions with the given process definition id", paramType = "query"),
+            @ApiImplicitParam(name = "createdBefore", dataType = "string", value = "Only return event subscriptions which are created before the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "createdAfter", dataType = "string", value = "Only return event subscriptions which are created after the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return event subscriptions with the given tenant id.", paramType = "query"),
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,created,executionId,processInstanceId,processDefinitionId,tenantId", paramType = "query")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the requested event subscriptions were returned."),
+            @ApiResponse(code = 400, message = "Indicates an illegal value has been used in a url query parameter. Status description contains additional details about the error.")
+    })
+    @RequestMapping(value = "/runtime/event-subscriptions", method = RequestMethod.GET, produces = "application/json")
+    public DataResponse getJobs(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+        EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
 
-    if (allRequestParams.containsKey("id")) {
-      query.id(allRequestParams.get("id"));
-    }
-    if (allRequestParams.containsKey("eventType")) {
-      query.eventType(allRequestParams.get("eventType"));
-    }
-    if (allRequestParams.containsKey("eventName")) {
-      query.eventName(allRequestParams.get("eventName"));
-    }
-    if (allRequestParams.containsKey("activityId")) {
-      query.activityId(allRequestParams.get("activityId"));
-    }
-    if (allRequestParams.containsKey("executionId")) {
-      query.executionId(allRequestParams.get("executionId"));
-    }
-    if (allRequestParams.containsKey("processInstanceId")) {
-      query.processInstanceId(allRequestParams.get("processInstanceId"));
-    }
-    if (allRequestParams.containsKey("processDefinitionId")) {
-      query.processDefinitionId(allRequestParams.get("processDefinitionId"));
-    }
-    if (allRequestParams.containsKey("createdBefore")) {
-      query.createdBefore(RequestUtil.getDate(allRequestParams, "createdBefore"));
-    }
-    if (allRequestParams.containsKey("createdAfter")) {
-      query.createdAfter(RequestUtil.getDate(allRequestParams, "createdAfter"));
-    }
-    if (allRequestParams.containsKey("tenantId")) {
-      query.tenantId(allRequestParams.get("tenantId"));
-    }
+        if (allRequestParams.containsKey("id")) {
+            query.id(allRequestParams.get("id"));
+        }
+        if (allRequestParams.containsKey("eventType")) {
+            query.eventType(allRequestParams.get("eventType"));
+        }
+        if (allRequestParams.containsKey("eventName")) {
+            query.eventName(allRequestParams.get("eventName"));
+        }
+        if (allRequestParams.containsKey("activityId")) {
+            query.activityId(allRequestParams.get("activityId"));
+        }
+        if (allRequestParams.containsKey("executionId")) {
+            query.executionId(allRequestParams.get("executionId"));
+        }
+        if (allRequestParams.containsKey("processInstanceId")) {
+            query.processInstanceId(allRequestParams.get("processInstanceId"));
+        }
+        if (allRequestParams.containsKey("processDefinitionId")) {
+            query.processDefinitionId(allRequestParams.get("processDefinitionId"));
+        }
+        if (allRequestParams.containsKey("createdBefore")) {
+            query.createdBefore(RequestUtil.getDate(allRequestParams, "createdBefore"));
+        }
+        if (allRequestParams.containsKey("createdAfter")) {
+            query.createdAfter(RequestUtil.getDate(allRequestParams, "createdAfter"));
+        }
+        if (allRequestParams.containsKey("tenantId")) {
+            query.tenantId(allRequestParams.get("tenantId"));
+        }
 
-    return new EventSubscriptionPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", EventSubscriptionQueryProperties.PROPERTIES);
-  }
+        return new EventSubscriptionPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", EventSubscriptionQueryProperties.PROPERTIES);
+    }
 }

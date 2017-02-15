@@ -32,37 +32,37 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 @TestExecutionListeners(DependencyInjectionTestExecutionListener.class)
 public abstract class SpringFlowableTestCase extends AbstractFlowableDmnTestCase implements ApplicationContextAware {
 
-  // we need a data structure to store all the resolved FormEngines and map them to something
-  protected Map<Object, DmnEngine> cachedDmnEngines = new ConcurrentHashMap<Object, DmnEngine>();
+    // we need a data structure to store all the resolved FormEngines and map them to something
+    protected Map<Object, DmnEngine> cachedDmnEngines = new ConcurrentHashMap<Object, DmnEngine>();
 
-  protected TestContextManager testContextManager;
+    protected TestContextManager testContextManager;
 
-  @Autowired
-  protected ApplicationContext applicationContext;
+    @Autowired
+    protected ApplicationContext applicationContext;
 
-  public SpringFlowableTestCase() {
-    this.testContextManager = new TestContextManager(getClass());
-  }
+    public SpringFlowableTestCase() {
+        this.testContextManager = new TestContextManager(getClass());
+    }
 
-  @Override
-  public void runBare() throws Throwable {
-    testContextManager.prepareTestInstance(this); // this will initialize all dependencies
-    super.runBare();
-  }
+    @Override
+    public void runBare() throws Throwable {
+        testContextManager.prepareTestInstance(this); // this will initialize all dependencies
+        super.runBare();
+    }
 
-  @Override
-  protected void initializeDmnEngine() {
-    ContextConfiguration contextConfiguration = getClass().getAnnotation(ContextConfiguration.class);
-    String[] value = contextConfiguration.value();
-    boolean hasOneArg = value != null && value.length == 1;
-    String key = hasOneArg ? value[0] : DmnEngine.class.getName();
-    DmnEngine engine = this.cachedDmnEngines.containsKey(key) ? this.cachedDmnEngines.get(key) : this.applicationContext.getBean(DmnEngine.class);
+    @Override
+    protected void initializeDmnEngine() {
+        ContextConfiguration contextConfiguration = getClass().getAnnotation(ContextConfiguration.class);
+        String[] value = contextConfiguration.value();
+        boolean hasOneArg = value != null && value.length == 1;
+        String key = hasOneArg ? value[0] : DmnEngine.class.getName();
+        DmnEngine engine = this.cachedDmnEngines.containsKey(key) ? this.cachedDmnEngines.get(key) : this.applicationContext.getBean(DmnEngine.class);
 
-    this.cachedDmnEngines.put(key, engine);
-    this.dmnEngine = engine;
-  }
+        this.cachedDmnEngines.put(key, engine);
+        this.dmnEngine = engine;
+    }
 
-  public void setApplicationContext(ApplicationContext applicationContext) {
-    this.applicationContext = applicationContext;
-  }
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 }

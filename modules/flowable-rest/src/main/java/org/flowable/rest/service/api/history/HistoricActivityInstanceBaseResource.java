@@ -29,85 +29,85 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class HistoricActivityInstanceBaseResource {
 
-  private static Map<String, QueryProperty> allowedSortProperties = new HashMap<String, QueryProperty>();
+    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<String, QueryProperty>();
 
-  static {
-    allowedSortProperties.put("activityId", HistoricActivityInstanceQueryProperty.ACTIVITY_ID);
-    allowedSortProperties.put("activityName", HistoricActivityInstanceQueryProperty.ACTIVITY_NAME);
-    allowedSortProperties.put("activityType", HistoricActivityInstanceQueryProperty.ACTIVITY_TYPE);
-    allowedSortProperties.put("duration", HistoricActivityInstanceQueryProperty.DURATION);
-    allowedSortProperties.put("endTime", HistoricActivityInstanceQueryProperty.END);
-    allowedSortProperties.put("executionId", HistoricActivityInstanceQueryProperty.EXECUTION_ID);
-    allowedSortProperties.put("activityInstanceId", HistoricActivityInstanceQueryProperty.HISTORIC_ACTIVITY_INSTANCE_ID);
-    allowedSortProperties.put("processDefinitionId", HistoricActivityInstanceQueryProperty.PROCESS_DEFINITION_ID);
-    allowedSortProperties.put("processInstanceId", HistoricActivityInstanceQueryProperty.PROCESS_INSTANCE_ID);
-    allowedSortProperties.put("startTime", HistoricActivityInstanceQueryProperty.START);
-    allowedSortProperties.put("tenantId", HistoricActivityInstanceQueryProperty.TENANT_ID);
-  }
-
-  @Autowired
-  protected RestResponseFactory restResponseFactory;
-
-  @Autowired
-  protected HistoryService historyService;
-
-  protected DataResponse getQueryResponse(HistoricActivityInstanceQueryRequest queryRequest, Map<String, String> allRequestParams) {
-    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
-
-    // Populate query based on request
-    if (queryRequest.getActivityId() != null) {
-      query.activityId(queryRequest.getActivityId());
+    static {
+        allowedSortProperties.put("activityId", HistoricActivityInstanceQueryProperty.ACTIVITY_ID);
+        allowedSortProperties.put("activityName", HistoricActivityInstanceQueryProperty.ACTIVITY_NAME);
+        allowedSortProperties.put("activityType", HistoricActivityInstanceQueryProperty.ACTIVITY_TYPE);
+        allowedSortProperties.put("duration", HistoricActivityInstanceQueryProperty.DURATION);
+        allowedSortProperties.put("endTime", HistoricActivityInstanceQueryProperty.END);
+        allowedSortProperties.put("executionId", HistoricActivityInstanceQueryProperty.EXECUTION_ID);
+        allowedSortProperties.put("activityInstanceId", HistoricActivityInstanceQueryProperty.HISTORIC_ACTIVITY_INSTANCE_ID);
+        allowedSortProperties.put("processDefinitionId", HistoricActivityInstanceQueryProperty.PROCESS_DEFINITION_ID);
+        allowedSortProperties.put("processInstanceId", HistoricActivityInstanceQueryProperty.PROCESS_INSTANCE_ID);
+        allowedSortProperties.put("startTime", HistoricActivityInstanceQueryProperty.START);
+        allowedSortProperties.put("tenantId", HistoricActivityInstanceQueryProperty.TENANT_ID);
     }
 
-    if (queryRequest.getActivityInstanceId() != null) {
-      query.activityInstanceId(queryRequest.getActivityInstanceId());
-    }
+    @Autowired
+    protected RestResponseFactory restResponseFactory;
 
-    if (queryRequest.getActivityName() != null) {
-      query.activityName(queryRequest.getActivityName());
-    }
+    @Autowired
+    protected HistoryService historyService;
 
-    if (queryRequest.getActivityType() != null) {
-      query.activityType(queryRequest.getActivityType());
-    }
+    protected DataResponse getQueryResponse(HistoricActivityInstanceQueryRequest queryRequest, Map<String, String> allRequestParams) {
+        HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
 
-    if (queryRequest.getExecutionId() != null) {
-      query.executionId(queryRequest.getExecutionId());
-    }
+        // Populate query based on request
+        if (queryRequest.getActivityId() != null) {
+            query.activityId(queryRequest.getActivityId());
+        }
 
-    if (queryRequest.getFinished() != null) {
-      Boolean finished = queryRequest.getFinished();
-      if (finished) {
-        query.finished();
-      } else {
-        query.unfinished();
-      }
-    }
+        if (queryRequest.getActivityInstanceId() != null) {
+            query.activityInstanceId(queryRequest.getActivityInstanceId());
+        }
 
-    if (queryRequest.getTaskAssignee() != null) {
-      query.taskAssignee(queryRequest.getTaskAssignee());
-    }
+        if (queryRequest.getActivityName() != null) {
+            query.activityName(queryRequest.getActivityName());
+        }
 
-    if (queryRequest.getProcessInstanceId() != null) {
-      query.processInstanceId(queryRequest.getProcessInstanceId());
-    }
+        if (queryRequest.getActivityType() != null) {
+            query.activityType(queryRequest.getActivityType());
+        }
 
-    if (queryRequest.getProcessDefinitionId() != null) {
-      query.processDefinitionId(queryRequest.getProcessDefinitionId());
-    }
+        if (queryRequest.getExecutionId() != null) {
+            query.executionId(queryRequest.getExecutionId());
+        }
 
-    if (queryRequest.getTenantId() != null) {
-      query.activityTenantId(queryRequest.getTenantId());
-    }
+        if (queryRequest.getFinished() != null) {
+            Boolean finished = queryRequest.getFinished();
+            if (finished) {
+                query.finished();
+            } else {
+                query.unfinished();
+            }
+        }
 
-    if (queryRequest.getTenantIdLike() != null) {
-      query.activityTenantIdLike(queryRequest.getTenantIdLike());
-    }
+        if (queryRequest.getTaskAssignee() != null) {
+            query.taskAssignee(queryRequest.getTaskAssignee());
+        }
 
-    if (Boolean.TRUE.equals(queryRequest.getWithoutTenantId())) {
-      query.activityWithoutTenantId();
-    }
+        if (queryRequest.getProcessInstanceId() != null) {
+            query.processInstanceId(queryRequest.getProcessInstanceId());
+        }
 
-    return new HistoricActivityInstancePaginateList(restResponseFactory).paginateList(allRequestParams, queryRequest, query, "startTime", allowedSortProperties);
-  }
+        if (queryRequest.getProcessDefinitionId() != null) {
+            query.processDefinitionId(queryRequest.getProcessDefinitionId());
+        }
+
+        if (queryRequest.getTenantId() != null) {
+            query.activityTenantId(queryRequest.getTenantId());
+        }
+
+        if (queryRequest.getTenantIdLike() != null) {
+            query.activityTenantIdLike(queryRequest.getTenantIdLike());
+        }
+
+        if (Boolean.TRUE.equals(queryRequest.getWithoutTenantId())) {
+            query.activityWithoutTenantId();
+        }
+
+        return new HistoricActivityInstancePaginateList(restResponseFactory).paginateList(allRequestParams, queryRequest, query, "startTime", allowedSortProperties);
+    }
 }

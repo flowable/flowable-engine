@@ -23,47 +23,47 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AppVersionService {
-	
-	private static final Logger logger = LoggerFactory.getLogger(AppVersionService.class);
-	
-	private static final String VERSION_FILE = "/version.properties";
-	private static final String TYPE = "type";
-	private static final String MAJOR_VERSION = "version.major";
-	private static final String MINOR_VERSION = "version.minor";
-	private static final String REVISION_VERSION = "version.revision";
-	private static final String EDITION = "version.edition";
-	private static final String MAVEN_VERSION = "maven.version";
-	private static final String GIT_VERSION = "git.version";
-	
-	private Map<String, String> versionInfo;
-	
-	public Map<String, String> getVersionInfo() {
-		if (versionInfo == null) {
-			Properties properties = new Properties();
-			try {
-	            properties.load(this.getClass().getResourceAsStream(VERSION_FILE));
+
+    private static final Logger logger = LoggerFactory.getLogger(AppVersionService.class);
+
+    private static final String VERSION_FILE = "/version.properties";
+    private static final String TYPE = "type";
+    private static final String MAJOR_VERSION = "version.major";
+    private static final String MINOR_VERSION = "version.minor";
+    private static final String REVISION_VERSION = "version.revision";
+    private static final String EDITION = "version.edition";
+    private static final String MAVEN_VERSION = "maven.version";
+    private static final String GIT_VERSION = "git.version";
+
+    private Map<String, String> versionInfo;
+
+    public Map<String, String> getVersionInfo() {
+        if (versionInfo == null) {
+            Properties properties = new Properties();
+            try {
+                properties.load(this.getClass().getResourceAsStream(VERSION_FILE));
             } catch (IOException e) {
-            	logger.warn("Could not load version.properties", e);
+                logger.warn("Could not load version.properties", e);
             }
-			
-			Map<String, String> temp = new HashMap<String, String>();
-			putIfExists(properties, TYPE, temp, "type");
-			putIfExists(properties, MAJOR_VERSION, temp, "majorVersion");
-			putIfExists(properties, MINOR_VERSION, temp, "minorVersion");
-			putIfExists(properties, REVISION_VERSION, temp, "revisionVersion");
-			putIfExists(properties, EDITION, temp, "edition");
-			putIfExists(properties, MAVEN_VERSION, temp, "mavenVersion");
-			putIfExists(properties, GIT_VERSION, temp, "gitVersion");
-			versionInfo = temp;
-		}
-		return versionInfo;
-	}
-	
-	protected void putIfExists(Properties properties, String property, Map<String, String> map, String mapKey) {
-		String value = properties.getProperty(property);
-		if (value != null) {
-			map.put(mapKey, value);
-		}
-	}
- 
+
+            Map<String, String> temp = new HashMap<String, String>();
+            putIfExists(properties, TYPE, temp, "type");
+            putIfExists(properties, MAJOR_VERSION, temp, "majorVersion");
+            putIfExists(properties, MINOR_VERSION, temp, "minorVersion");
+            putIfExists(properties, REVISION_VERSION, temp, "revisionVersion");
+            putIfExists(properties, EDITION, temp, "edition");
+            putIfExists(properties, MAVEN_VERSION, temp, "mavenVersion");
+            putIfExists(properties, GIT_VERSION, temp, "gitVersion");
+            versionInfo = temp;
+        }
+        return versionInfo;
+    }
+
+    protected void putIfExists(Properties properties, String property, Map<String, String> map, String mapKey) {
+        String value = properties.getProperty(property);
+        if (value != null) {
+            map.put(mapKey, value);
+        }
+    }
+
 }

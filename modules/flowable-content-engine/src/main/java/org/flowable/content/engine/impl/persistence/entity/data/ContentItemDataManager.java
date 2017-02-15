@@ -24,12 +24,12 @@ import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
  * @author Tijs Rademakers
  */
 public interface ContentItemDataManager extends DataManager<ContentItemEntity> {
-  
-  long findContentItemCountByQueryCriteria(ContentItemQueryImpl contentItemQuery);
 
-  List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl contentItemQuery, Page page);
-  
-  void deleteContentItemsByTaskId(String taskId);
+    long findContentItemCountByQueryCriteria(ContentItemQueryImpl contentItemQuery);
 
-  void deleteContentItemsByProcessInstanceId(String processInstanceId);
+    List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl contentItemQuery, Page page);
+
+    void deleteContentItemsByTaskId(String taskId);
+
+    void deleteContentItemsByProcessInstanceId(String processInstanceId);
 }

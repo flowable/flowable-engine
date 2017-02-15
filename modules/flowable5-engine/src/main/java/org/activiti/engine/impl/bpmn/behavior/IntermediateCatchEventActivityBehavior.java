@@ -15,17 +15,14 @@ package org.activiti.engine.impl.bpmn.behavior;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.flowable.engine.delegate.DelegateExecution;
 
-
 public class IntermediateCatchEventActivityBehavior extends AbstractBpmnActivityBehavior {
 
+    public void execute(DelegateExecution execution) {
+        // Do nothing: waitstate behavior
+    }
 
-  public void execute(DelegateExecution execution) {
-    // Do nothing: waitstate behavior
-  }
-
-  @Override
-  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
-    leave(execution);
-  }
+    @Override
+    public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+        leave(execution);
+    }
 }
-

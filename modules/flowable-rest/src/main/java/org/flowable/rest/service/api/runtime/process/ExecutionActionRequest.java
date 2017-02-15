@@ -26,47 +26,47 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
  */
 public class ExecutionActionRequest extends RestActionRequest {
 
-  public static final String ACTION_SIGNAL = "signal";
-  public static final String ACTION_TRIGGER = "trigger";
-  public static final String ACTION_SIGNAL_EVENT_RECEIVED = "signalEventReceived";
-  public static final String ACTION_MESSAGE_EVENT_RECEIVED = "messageEventReceived";
+    public static final String ACTION_SIGNAL = "signal";
+    public static final String ACTION_TRIGGER = "trigger";
+    public static final String ACTION_SIGNAL_EVENT_RECEIVED = "signalEventReceived";
+    public static final String ACTION_MESSAGE_EVENT_RECEIVED = "messageEventReceived";
 
-  protected String signalName;
-  protected String messageName;
-  protected List<RestVariable> variables;
-  protected List<RestVariable> transientVariables;
+    protected String signalName;
+    protected String messageName;
+    protected List<RestVariable> variables;
+    protected List<RestVariable> transientVariables;
 
-  public void setVariables(List<RestVariable> variables) {
-    this.variables = variables;
-  }
+    public void setVariables(List<RestVariable> variables) {
+        this.variables = variables;
+    }
 
-  @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
-  public List<RestVariable> getVariables() {
-    return variables;
-  }
-  
-  public void setTransientVariables(List<RestVariable> transientVariables) {
-    this.transientVariables = transientVariables;
-  }
-  
-  @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
-  public List<RestVariable> getTransientVariables() {
-    return transientVariables;
-  }
+    @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
+    public List<RestVariable> getVariables() {
+        return variables;
+    }
 
-  public String getSignalName() {
-    return signalName;
-  }
+    public void setTransientVariables(List<RestVariable> transientVariables) {
+        this.transientVariables = transientVariables;
+    }
 
-  public void setSignalName(String signalName) {
-    this.signalName = signalName;
-  }
+    @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
+    public List<RestVariable> getTransientVariables() {
+        return transientVariables;
+    }
 
-  public String getMessageName() {
-    return messageName;
-  }
+    public String getSignalName() {
+        return signalName;
+    }
 
-  public void setMessageName(String messageName) {
-    this.messageName = messageName;
-  }
+    public void setSignalName(String signalName) {
+        this.signalName = signalName;
+    }
+
+    public String getMessageName() {
+        return messageName;
+    }
+
+    public void setMessageName(String messageName) {
+        this.messageName = messageName;
+    }
 }

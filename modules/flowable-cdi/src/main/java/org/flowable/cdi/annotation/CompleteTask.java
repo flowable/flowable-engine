@@ -48,9 +48,9 @@ import org.flowable.cdi.BusinessProcess;
 @Target({ ElementType.METHOD, ElementType.TYPE })
 public @interface CompleteTask {
 
-  /**
-   * Specifies whether the current conversation should be ended.
-   */
-  @Nonbinding
-  boolean endConversation() default false;
+    /**
+     * Specifies whether the current conversation should be ended.
+     */
+    @Nonbinding
+    boolean endConversation() default false;
 }

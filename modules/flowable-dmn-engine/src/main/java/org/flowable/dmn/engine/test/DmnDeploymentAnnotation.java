@@ -49,7 +49,7 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DmnDeploymentAnnotation {
 
-  /** Specify resources that make up the process definition. */
-  public String[] resources() default {};
+    /** Specify resources that make up the process definition. */
+    public String[] resources() default {};
 
 }

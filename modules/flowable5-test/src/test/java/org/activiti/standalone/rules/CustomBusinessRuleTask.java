@@ -22,38 +22,38 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.Expression;
 
 public class CustomBusinessRuleTask extends AbstractBpmnActivityBehavior implements BusinessRuleTaskDelegate {
-  
-  private static final long serialVersionUID = 1L;
-  
-  public static List<Expression> ruleInputVariables = new ArrayList<Expression>();
-  public static List<Expression> ruleIds = new ArrayList<Expression>();
-  public static Boolean exclude;
-  public static String resultVariableName;
 
-  @Override
-  public void execute(DelegateExecution execution) {
-    execution.setVariable("test", "test2");
-    leave((ActivityExecution) execution); 
-  }
+    private static final long serialVersionUID = 1L;
 
-  @Override
-  public void addRuleVariableInputIdExpression(Expression inputId) {
-    ruleInputVariables.add(inputId);
-  }
+    public static List<Expression> ruleInputVariables = new ArrayList<Expression>();
+    public static List<Expression> ruleIds = new ArrayList<Expression>();
+    public static Boolean exclude;
+    public static String resultVariableName;
 
-  @Override
-  public void addRuleIdExpression(Expression inputId) {
-    ruleIds.add(inputId);
-  }
+    @Override
+    public void execute(DelegateExecution execution) {
+        execution.setVariable("test", "test2");
+        leave((ActivityExecution) execution);
+    }
 
-  @Override
-  public void setExclude(boolean exclude) {
-    CustomBusinessRuleTask.exclude = exclude;
-  }
+    @Override
+    public void addRuleVariableInputIdExpression(Expression inputId) {
+        ruleInputVariables.add(inputId);
+    }
 
-  @Override
-  public void setResultVariable(String resultVariableName) {
-    CustomBusinessRuleTask.resultVariableName = resultVariableName;
-  }
+    @Override
+    public void addRuleIdExpression(Expression inputId) {
+        ruleIds.add(inputId);
+    }
+
+    @Override
+    public void setExclude(boolean exclude) {
+        CustomBusinessRuleTask.exclude = exclude;
+    }
+
+    @Override
+    public void setResultVariable(String resultVariableName) {
+        CustomBusinessRuleTask.resultVariableName = resultVariableName;
+    }
 
 }

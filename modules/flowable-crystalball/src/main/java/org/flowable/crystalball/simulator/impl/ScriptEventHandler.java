@@ -29,32 +29,32 @@ import org.slf4j.LoggerFactory;
  */
 public class ScriptEventHandler implements SimulationEventHandler {
 
-  private static Logger log = LoggerFactory.getLogger(ScriptEventHandler.class);
+    private static Logger log = LoggerFactory.getLogger(ScriptEventHandler.class);
 
-  protected String scriptPropertyName;
-  protected String language;
+    protected String scriptPropertyName;
+    protected String language;
 
-  public ScriptEventHandler(String scriptPropertyName, String language) {
-    this.scriptPropertyName = scriptPropertyName;
-    this.language = language;
-  }
-
-  @Override
-  public void init() {
-
-  }
-
-  @Override
-  public void handle(SimulationEvent event) {
-    ScriptingEngines scriptingEngines = Context.getProcessEngineConfiguration().getScriptingEngines();
-
-    VariableScope execution = SimulationRunContext.getExecution();
-    try {
-      scriptingEngines.evaluate((String) event.getProperty(this.scriptPropertyName), language, execution, false);
-
-    } catch (FlowableException e) {
-        log.warn("Exception while executing simulation event {} scriptPropertyName :{}\n script: {}\n exception is:{}", event, this.scriptPropertyName, event.getProperty(this.scriptPropertyName), e.getMessage());
-      throw e;
+    public ScriptEventHandler(String scriptPropertyName, String language) {
+        this.scriptPropertyName = scriptPropertyName;
+        this.language = language;
     }
-  }
+
+    @Override
+    public void init() {
+
+    }
+
+    @Override
+    public void handle(SimulationEvent event) {
+        ScriptingEngines scriptingEngines = Context.getProcessEngineConfiguration().getScriptingEngines();
+
+        VariableScope execution = SimulationRunContext.getExecution();
+        try {
+            scriptingEngines.evaluate((String) event.getProperty(this.scriptPropertyName), language, execution, false);
+
+        } catch (FlowableException e) {
+            log.warn("Exception while executing simulation event {} scriptPropertyName :{}\n script: {}\n exception is:{}", event, this.scriptPropertyName, event.getProperty(this.scriptPropertyName), e.getMessage());
+            throw e;
+        }
+    }
 }

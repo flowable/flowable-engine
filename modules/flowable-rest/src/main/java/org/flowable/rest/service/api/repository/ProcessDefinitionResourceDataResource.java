@@ -33,30 +33,30 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionResourceDataResource extends BaseDeploymentResourceDataResource {
 
-  @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/resourcedata", method = RequestMethod.GET)
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates both process definition and resource have been found and the resource data has been returned."),
-          @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or there is no resource with the given id present in the process definition. The status-description contains additional information.")
-  })
-  @ApiOperation(value = "Get a process definition resource content", tags = {"Process Definitions"})
-  @ResponseBody
-  public byte[] getProcessDefinitionResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId, HttpServletResponse response) {
-    ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
-    return getDeploymentResourceData(processDefinition.getDeploymentId(), processDefinition.getResourceName(), response);
-  }
-
-  /**
-   * Returns the {@link ProcessDefinition} that is requested. Throws the right exceptions when bad request was made or definition is not found.
-   */
-  protected ProcessDefinition getProcessDefinitionFromRequest(String processDefinitionId) {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
-
-    if (processDefinition == null) {
-      throw new FlowableObjectNotFoundException("Could not find a process definition with id '" + processDefinitionId + "'.", ProcessDefinition.class);
+    @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/resourcedata", method = RequestMethod.GET)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates both process definition and resource have been found and the resource data has been returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or there is no resource with the given id present in the process definition. The status-description contains additional information.")
+    })
+    @ApiOperation(value = "Get a process definition resource content", tags = { "Process Definitions" })
+    @ResponseBody
+    public byte[] getProcessDefinitionResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId, HttpServletResponse response) {
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        return getDeploymentResourceData(processDefinition.getDeploymentId(), processDefinition.getResourceName(), response);
     }
-    return processDefinition;
-  }
+
+    /**
+     * Returns the {@link ProcessDefinition} that is requested. Throws the right exceptions when bad request was made or definition is not found.
+     */
+    protected ProcessDefinition getProcessDefinitionFromRequest(String processDefinitionId) {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
+
+        if (processDefinition == null) {
+            throw new FlowableObjectNotFoundException("Could not find a process definition with id '" + processDefinitionId + "'.", ProcessDefinition.class);
+        }
+        return processDefinition;
+    }
 }

@@ -18,8 +18,8 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CheckStatus {
-  
-  /** Specify resources that make up the process definition. */
-  public String methodName() default "";
+
+    /** Specify resources that make up the process definition. */
+    public String methodName() default "";
 
 }

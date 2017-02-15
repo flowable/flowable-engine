@@ -21,135 +21,135 @@ import org.flowable.engine.test.Deployment;
  */
 public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
-  @Deployment(resources = { "org/flowable/engine/test/db/oneJobProcess.bpmn20.xml" })
-  public void testJobsNotVisibleToAcquisitionIfInstanceSuspended() {
+    @Deployment(resources = { "org/flowable/engine/test/db/oneJobProcess.bpmn20.xml" })
+    public void testJobsNotVisibleToAcquisitionIfInstanceSuspended() {
 
-    ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey(pd.getKey());
+        ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().singleResult();
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey(pd.getKey());
 
-    // now there is one job:
-    Job job = managementService.createTimerJobQuery().singleResult();
-    assertNotNull(job);
+        // now there is one job:
+        Job job = managementService.createTimerJobQuery().singleResult();
+        assertNotNull(job);
 
-    makeSureJobDue(job);
+        makeSureJobDue(job);
 
-    // the acquirejobs command sees the job:
-    List<TimerJobEntity> acquiredJobs = executeAcquireJobsCommand();
-    assertEquals(1, acquiredJobs.size());
+        // the acquirejobs command sees the job:
+        List<TimerJobEntity> acquiredJobs = executeAcquireJobsCommand();
+        assertEquals(1, acquiredJobs.size());
 
-    // suspend the process instance:
-    runtimeService.suspendProcessInstanceById(pi.getId());
+        // suspend the process instance:
+        runtimeService.suspendProcessInstanceById(pi.getId());
 
-    // now, the acquirejobs command does not see the job:
-    acquiredJobs = executeAcquireJobsCommand();
-    assertEquals(0, acquiredJobs.size());
-  }
+        // now, the acquirejobs command does not see the job:
+        acquiredJobs = executeAcquireJobsCommand();
+        assertEquals(0, acquiredJobs.size());
+    }
 
-  @Deployment(resources = { "org/flowable/engine/test/db/oneJobProcess.bpmn20.xml" })
-  public void testJobsNotVisibleToAcquisitionIfDefinitionSuspended() {
+    @Deployment(resources = { "org/flowable/engine/test/db/oneJobProcess.bpmn20.xml" })
+    public void testJobsNotVisibleToAcquisitionIfDefinitionSuspended() {
 
-    ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().singleResult();
-    runtimeService.startProcessInstanceByKey(pd.getKey());
-    
-    // now there is one job:
-    Job job = managementService.createTimerJobQuery().singleResult();
-    assertNotNull(job);
+        ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().singleResult();
+        runtimeService.startProcessInstanceByKey(pd.getKey());
 
-    makeSureJobDue(job);
+        // now there is one job:
+        Job job = managementService.createTimerJobQuery().singleResult();
+        assertNotNull(job);
 
-    // the acquire jobs command sees the job:
-    List<TimerJobEntity> acquiredJobs = executeAcquireJobsCommand();
-    assertEquals(1, acquiredJobs.size());
+        makeSureJobDue(job);
 
-    // suspend the process instance:
-    repositoryService.suspendProcessDefinitionById(pd.getId(), true, null);
+        // the acquire jobs command sees the job:
+        List<TimerJobEntity> acquiredJobs = executeAcquireJobsCommand();
+        assertEquals(1, acquiredJobs.size());
 
-    // now, the acquire jobs command does not see the job:
-    acquiredJobs = executeAcquireJobsCommand();
-    assertEquals(0, acquiredJobs.size());
-  }
-  
-  @Deployment(resources = { "org/flowable/engine/test/db/oneJobProcess.bpmn20.xml" })
-  public void testJobsVisibleToAcquisitionIfDefinitionSuspendedWithoutProcessInstances() {
+        // suspend the process instance:
+        repositoryService.suspendProcessDefinitionById(pd.getId(), true, null);
 
-    ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().singleResult();
-    runtimeService.startProcessInstanceByKey(pd.getKey());
-    
-    // now there is one job:
-    Job job = managementService.createTimerJobQuery().singleResult();
-    assertNotNull(job);
+        // now, the acquire jobs command does not see the job:
+        acquiredJobs = executeAcquireJobsCommand();
+        assertEquals(0, acquiredJobs.size());
+    }
 
-    makeSureJobDue(job);
+    @Deployment(resources = { "org/flowable/engine/test/db/oneJobProcess.bpmn20.xml" })
+    public void testJobsVisibleToAcquisitionIfDefinitionSuspendedWithoutProcessInstances() {
 
-    // the acquire jobs command sees the job:
-    List<TimerJobEntity> acquiredJobs = executeAcquireJobsCommand();
-    assertEquals(1, acquiredJobs.size());
+        ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().singleResult();
+        runtimeService.startProcessInstanceByKey(pd.getKey());
 
-    // suspend the process instance:
-    repositoryService.suspendProcessDefinitionById(pd.getId());
+        // now there is one job:
+        Job job = managementService.createTimerJobQuery().singleResult();
+        assertNotNull(job);
 
-    // the acquire jobs command still sees the job, because the process instances are not suspended:
-    acquiredJobs = executeAcquireJobsCommand();
-    assertEquals(1, acquiredJobs.size());
-  }
+        makeSureJobDue(job);
 
-  @Deployment
-  public void testSuspendedProcessTimerExecution() throws Exception {
-    // Process with boundary timer-event that fires in 1 hour
-    ProcessInstance procInst = runtimeService.startProcessInstanceByKey("suspendProcess");
-    assertNotNull(procInst);
-    assertEquals(1, managementService.createTimerJobQuery().processInstanceId(procInst.getId()).count());
+        // the acquire jobs command sees the job:
+        List<TimerJobEntity> acquiredJobs = executeAcquireJobsCommand();
+        assertEquals(1, acquiredJobs.size());
 
-    // Roll time ahead to be sure timer is due to fire
-    Calendar tomorrow = Calendar.getInstance();
-    tomorrow.add(Calendar.DAY_OF_YEAR, 1);
-    processEngineConfiguration.getClock().setCurrentTime(tomorrow.getTime());
+        // suspend the process instance:
+        repositoryService.suspendProcessDefinitionById(pd.getId());
 
-    // Check if timer is eligible to be executed, when process in not yet suspended
-    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
-    List<TimerJobEntity> jobs = commandExecutor.execute(new Command<List<TimerJobEntity>>() {
+        // the acquire jobs command still sees the job, because the process instances are not suspended:
+        acquiredJobs = executeAcquireJobsCommand();
+        assertEquals(1, acquiredJobs.size());
+    }
 
-      @Override
-      public List<TimerJobEntity> execute(CommandContext commandContext) {
-        return processEngineConfiguration.getTimerJobEntityManager().findTimerJobsToExecute(new Page(0, 1));
-      }
-      
-    });
-    assertEquals(1, jobs.size());
+    @Deployment
+    public void testSuspendedProcessTimerExecution() throws Exception {
+        // Process with boundary timer-event that fires in 1 hour
+        ProcessInstance procInst = runtimeService.startProcessInstanceByKey("suspendProcess");
+        assertNotNull(procInst);
+        assertEquals(1, managementService.createTimerJobQuery().processInstanceId(procInst.getId()).count());
 
-    // Suspend process instance
-    runtimeService.suspendProcessInstanceById(procInst.getId());
+        // Roll time ahead to be sure timer is due to fire
+        Calendar tomorrow = Calendar.getInstance();
+        tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+        processEngineConfiguration.getClock().setCurrentTime(tomorrow.getTime());
 
-    // Check if the timer is NOT acquired, even though the duedate is reached
-    jobs = commandExecutor.execute(new Command<List<TimerJobEntity>>() {
+        // Check if timer is eligible to be executed, when process in not yet suspended
+        CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
+        List<TimerJobEntity> jobs = commandExecutor.execute(new Command<List<TimerJobEntity>>() {
 
-      @Override
-      public List<TimerJobEntity> execute(CommandContext commandContext) {
-        return processEngineConfiguration.getTimerJobEntityManager().findTimerJobsToExecute(new Page(0, 1));
-      }
-    });
-    
-    assertEquals(0, jobs.size());
-  }
+            @Override
+            public List<TimerJobEntity> execute(CommandContext commandContext) {
+                return processEngineConfiguration.getTimerJobEntityManager().findTimerJobsToExecute(new Page(0, 1));
+            }
 
-  protected void makeSureJobDue(final Job job) {
-    processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-        Date currentTime = processEngineConfiguration.getClock().getCurrentTime();
-        commandContext.getTimerJobEntityManager().findById(job.getId()).setDuedate(new Date(currentTime.getTime() - 10000));
-        return null;
-      }
+        });
+        assertEquals(1, jobs.size());
 
-    });
-  }
+        // Suspend process instance
+        runtimeService.suspendProcessInstanceById(procInst.getId());
 
-  protected List<TimerJobEntity> executeAcquireJobsCommand() {
-    return processEngineConfiguration.getCommandExecutor().execute(new Command<List<TimerJobEntity>>() {
-      public List<TimerJobEntity> execute(CommandContext commandContext) {
-        return commandContext.getTimerJobEntityManager().findTimerJobsToExecute(new Page(0, 1));
-      }
-      
-    });
-  }
+        // Check if the timer is NOT acquired, even though the duedate is reached
+        jobs = commandExecutor.execute(new Command<List<TimerJobEntity>>() {
+
+            @Override
+            public List<TimerJobEntity> execute(CommandContext commandContext) {
+                return processEngineConfiguration.getTimerJobEntityManager().findTimerJobsToExecute(new Page(0, 1));
+            }
+        });
+
+        assertEquals(0, jobs.size());
+    }
+
+    protected void makeSureJobDue(final Job job) {
+        processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+            public Void execute(CommandContext commandContext) {
+                Date currentTime = processEngineConfiguration.getClock().getCurrentTime();
+                commandContext.getTimerJobEntityManager().findById(job.getId()).setDuedate(new Date(currentTime.getTime() - 10000));
+                return null;
+            }
+
+        });
+    }
+
+    protected List<TimerJobEntity> executeAcquireJobsCommand() {
+        return processEngineConfiguration.getCommandExecutor().execute(new Command<List<TimerJobEntity>>() {
+            public List<TimerJobEntity> execute(CommandContext commandContext) {
+                return commandContext.getTimerJobEntityManager().findTimerJobsToExecute(new Page(0, 1));
+            }
+
+        });
+    }
 
 }

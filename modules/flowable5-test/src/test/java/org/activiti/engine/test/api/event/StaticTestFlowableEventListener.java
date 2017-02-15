@@ -25,24 +25,24 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
  */
 public class StaticTestFlowableEventListener implements FlowableEventListener {
 
-	private static List<FlowableEvent> eventsReceived = new ArrayList<FlowableEvent>();
-	
-	public static List<FlowableEvent> getEventsReceived() {
-	  return eventsReceived;
-  }
-	
-	public static void clearEventsReceived() {
-		eventsReceived.clear();
-	}
-	
-	@Override
-	public void onEvent(FlowableEvent event) {
-		eventsReceived.add(event);
-	}
+    private static List<FlowableEvent> eventsReceived = new ArrayList<FlowableEvent>();
 
-	@Override
-	public boolean isFailOnException() {
-		return false;
-	}
+    public static List<FlowableEvent> getEventsReceived() {
+        return eventsReceived;
+    }
+
+    public static void clearEventsReceived() {
+        eventsReceived.clear();
+    }
+
+    @Override
+    public void onEvent(FlowableEvent event) {
+        eventsReceived.add(event);
+    }
+
+    @Override
+    public boolean isFailOnException() {
+        return false;
+    }
 
 }

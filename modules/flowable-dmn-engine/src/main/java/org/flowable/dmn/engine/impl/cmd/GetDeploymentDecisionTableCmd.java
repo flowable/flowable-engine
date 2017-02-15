@@ -24,14 +24,14 @@ import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
  */
 public class GetDeploymentDecisionTableCmd implements Command<DecisionTableEntity>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String decisionTableId;
+    private static final long serialVersionUID = 1L;
+    protected String decisionTableId;
 
-  public GetDeploymentDecisionTableCmd(String decisionTableId) {
-    this.decisionTableId = decisionTableId;
-  }
+    public GetDeploymentDecisionTableCmd(String decisionTableId) {
+        this.decisionTableId = decisionTableId;
+    }
 
-  public DecisionTableEntity execute(CommandContext commandContext) {
-    return commandContext.getDmnEngineConfiguration().getDeploymentManager().findDeployedDecisionById(decisionTableId);
-  }
+    public DecisionTableEntity execute(CommandContext commandContext) {
+        return commandContext.getDmnEngineConfiguration().getDeploymentManager().findDeployedDecisionById(decisionTableId);
+    }
 }

@@ -24,36 +24,36 @@ import org.flowable.engine.test.Deployment;
  */
 public class UncaughtErrorEventTest extends PluggableFlowableTestCase {
 
-  private TestFlowableEventListener listener;
+    private TestFlowableEventListener listener;
 
-  /**
-   * Test events related to error-events, thrown from within process-execution (eg. service-task).
-   */
-  @Deployment
-  public void testUncaughtError() throws Exception {
-    try {
-      runtimeService.startProcessInstanceByKey("errorProcess");
-      fail("Exception BPMN  error excepted due to not caught exception");
-    } catch (BpmnError e) {
+    /**
+     * Test events related to error-events, thrown from within process-execution (eg. service-task).
+     */
+    @Deployment
+    public void testUncaughtError() throws Exception {
+        try {
+            runtimeService.startProcessInstanceByKey("errorProcess");
+            fail("Exception BPMN  error excepted due to not caught exception");
+        } catch (BpmnError e) {
 
+        }
     }
-  }
 
-  @Override
-  protected void initializeServices() {
-    super.initializeServices();
+    @Override
+    protected void initializeServices() {
+        super.initializeServices();
 
-    listener = new TestFlowableEventListener();
-    processEngineConfiguration.getEventDispatcher().addEventListener(listener);
-  }
-
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
-
-    if (listener != null) {
-      listener.clearEventsReceived();
-      processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
+        listener = new TestFlowableEventListener();
+        processEngineConfiguration.getEventDispatcher().addEventListener(listener);
     }
-  }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+
+        if (listener != null) {
+            listener.clearEventsReceived();
+            processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
+        }
+    }
 }

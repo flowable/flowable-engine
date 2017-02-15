@@ -29,34 +29,34 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Engine" }, description = "Manage Form Engine", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Engine" }, description = "Manage Form Engine", authorizations = { @Authorization(value = "basicAuth") })
 public class FormEngineResource {
 
-  @ApiOperation(value = "Get form engine info", tags = {"Engine"})
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message =  "Indicates the engine info is returned."),
-  })
-  @RequestMapping(value = "/form-management/engine", method = RequestMethod.GET, produces = "application/json")
-  public FormEngineInfoResponse getEngineInfo() {
-    FormEngineInfoResponse response = new FormEngineInfoResponse();
+    @ApiOperation(value = "Get form engine info", tags = { "Engine" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the engine info is returned."),
+    })
+    @RequestMapping(value = "/form-management/engine", method = RequestMethod.GET, produces = "application/json")
+    public FormEngineInfoResponse getEngineInfo() {
+        FormEngineInfoResponse response = new FormEngineInfoResponse();
 
-    try {
-      FormEngine formEngine = FormEngines.getDefaultFormEngine();
-      EngineInfo formEngineInfo = FormEngines.getFormEngineInfo(formEngine.getName());
+        try {
+            FormEngine formEngine = FormEngines.getDefaultFormEngine();
+            EngineInfo formEngineInfo = FormEngines.getFormEngineInfo(formEngine.getName());
 
-      if (formEngineInfo != null) {
-        response.setName(formEngineInfo.getName());
-        response.setResourceUrl(formEngineInfo.getResourceUrl());
-        response.setException(formEngineInfo.getException());
-      } else {
-        response.setName(formEngine.getName());
-      }
-    } catch (Exception e) {
-      throw new FlowableException("Error retrieving form engine info", e);
+            if (formEngineInfo != null) {
+                response.setName(formEngineInfo.getName());
+                response.setResourceUrl(formEngineInfo.getResourceUrl());
+                response.setException(formEngineInfo.getException());
+            } else {
+                response.setName(formEngine.getName());
+            }
+        } catch (Exception e) {
+            throw new FlowableException("Error retrieving form engine info", e);
+        }
+
+        response.setVersion(FormEngine.VERSION);
+
+        return response;
     }
-
-    response.setVersion(FormEngine.VERSION);
-
-    return response;
-  }
 }

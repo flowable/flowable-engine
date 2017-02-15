@@ -22,38 +22,38 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
  */
 public class DebugInfoEntityEventListener extends BaseEntityEventListener {
 
-  protected ProcessExecutionLogger processExecutionLogger;
+    protected ProcessExecutionLogger processExecutionLogger;
 
-  public DebugInfoEntityEventListener(ProcessExecutionLogger processExecutionLogger) {
-    this.processExecutionLogger = processExecutionLogger;
-  }
-
-  @Override
-  protected void onCreate(FlowableEvent event) {
-    ExecutionEntity executionEntity = getExecutionEntity(event);
-    if (executionEntity != null) {
-      processExecutionLogger.executionCreated(executionEntity);
-      processExecutionLogger.addDebugInfo(new DebugInfoExecutionCreated(executionEntity));
+    public DebugInfoEntityEventListener(ProcessExecutionLogger processExecutionLogger) {
+        this.processExecutionLogger = processExecutionLogger;
     }
-  }
 
-  @Override
-  protected void onDelete(FlowableEvent event) {
-    ExecutionEntity executionEntity = getExecutionEntity(event);
-    if (executionEntity != null) {
-      processExecutionLogger.executionDeleted(executionEntity);
-      processExecutionLogger.addDebugInfo(new DebugInfoExecutionDeleted(executionEntity));
+    @Override
+    protected void onCreate(FlowableEvent event) {
+        ExecutionEntity executionEntity = getExecutionEntity(event);
+        if (executionEntity != null) {
+            processExecutionLogger.executionCreated(executionEntity);
+            processExecutionLogger.addDebugInfo(new DebugInfoExecutionCreated(executionEntity));
+        }
     }
-  }
 
-  protected ExecutionEntity getExecutionEntity(FlowableEvent event) {
-    FlowableEntityEvent entityEvent = (FlowableEntityEvent) event;
-    Object entity = entityEvent.getEntity();
-    if (entity instanceof ExecutionEntity) {
-      ExecutionEntity executionEntity = (ExecutionEntity) entity;
-      return executionEntity;
+    @Override
+    protected void onDelete(FlowableEvent event) {
+        ExecutionEntity executionEntity = getExecutionEntity(event);
+        if (executionEntity != null) {
+            processExecutionLogger.executionDeleted(executionEntity);
+            processExecutionLogger.addDebugInfo(new DebugInfoExecutionDeleted(executionEntity));
+        }
     }
-    return null;
-  }
+
+    protected ExecutionEntity getExecutionEntity(FlowableEvent event) {
+        FlowableEntityEvent entityEvent = (FlowableEntityEvent) event;
+        Object entity = entityEvent.getEntity();
+        if (entity instanceof ExecutionEntity) {
+            ExecutionEntity executionEntity = (ExecutionEntity) entity;
+            return executionEntity;
+        }
+        return null;
+    }
 
 }

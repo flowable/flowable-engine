@@ -35,41 +35,41 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Deployment" }, description = "Manage Decision Table Deployments", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Deployment" }, description = "Manage Decision Table Deployments", authorizations = { @Authorization(value = "basicAuth") })
 public class DmnDeploymentResource {
 
-  @Autowired
-  protected DmnRestResponseFactory dmnRestResponseFactory;
+    @Autowired
+    protected DmnRestResponseFactory dmnRestResponseFactory;
 
-  @Autowired
-  protected DmnRepositoryService dmnRepositoryService;
+    @Autowired
+    protected DmnRepositoryService dmnRepositoryService;
 
-  @ApiOperation(value = "Get a decision table deployment", tags = {"Deployment"})
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Indicates the deployment was found and returned."),
-      @ApiResponse(code = 404, message = "Indicates the requested deployment was not found.")
-  })
-  @RequestMapping(value = "/dmn-repository/deployments/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
-  public DmnDeploymentResponse getDmnDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId) {
-    DmnDeployment deployment = dmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
+    @ApiOperation(value = "Get a decision table deployment", tags = { "Deployment" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the deployment was found and returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested deployment was not found.")
+    })
+    @RequestMapping(value = "/dmn-repository/deployments/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
+    public DmnDeploymentResponse getDmnDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId) {
+        DmnDeployment deployment = dmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
 
-    if (deployment == null) {
-      throw new FlowableObjectNotFoundException("Could not find a DMN deployment with id '" + deploymentId);
+        if (deployment == null) {
+            throw new FlowableObjectNotFoundException("Could not find a DMN deployment with id '" + deploymentId);
+        }
+
+        return dmnRestResponseFactory.createDmnDeploymentResponse(deployment);
     }
 
-    return dmnRestResponseFactory.createDmnDeploymentResponse(deployment);
-  }
+    @ApiOperation(value = "Delete a decision table deployment", tags = { "Deployment" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the deployment was found and has been deleted. Response-body is intentionally empty."),
+            @ApiResponse(code = 404, message = "Indicates the requested deployment was not found.")
+    })
+    @RequestMapping(value = "/dmn-repository/deployments/{deploymentId}", method = RequestMethod.DELETE, produces = "application/json")
+    public void deleteDmnDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, HttpServletResponse response) {
 
-  @ApiOperation(value = "Delete a decision table deployment", tags = {"Deployment"})
-  @ApiResponses(value = {
-      @ApiResponse(code = 204, message = "Indicates the deployment was found and has been deleted. Response-body is intentionally empty."),
-      @ApiResponse(code = 404, message = "Indicates the requested deployment was not found.")
-  })
-  @RequestMapping(value = "/dmn-repository/deployments/{deploymentId}", method = RequestMethod.DELETE, produces = "application/json")
-  public void deleteDmnDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, HttpServletResponse response) {
+        dmnRepositoryService.deleteDeployment(deploymentId);
 
-    dmnRepositoryService.deleteDeployment(deploymentId);
-
-    response.setStatus(HttpStatus.NO_CONTENT.value());
-  }
+        response.setStatus(HttpStatus.NO_CONTENT.value());
+    }
 }

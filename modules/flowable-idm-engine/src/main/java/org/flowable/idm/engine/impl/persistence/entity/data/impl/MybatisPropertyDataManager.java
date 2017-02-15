@@ -24,25 +24,25 @@ import org.flowable.idm.engine.impl.persistence.entity.data.PropertyDataManager;
  * @author Joram Barrez
  */
 public class MybatisPropertyDataManager extends AbstractDataManager<PropertyEntity> implements PropertyDataManager {
-  
-  public MybatisPropertyDataManager(IdmEngineConfiguration idmEngineConfiguration) {
-    super(idmEngineConfiguration);
-  }
 
-  @Override
-  public Class<? extends PropertyEntity> getManagedEntityClass() {
-    return PropertyEntityImpl.class;
-  }
-  
-  @Override
-  public PropertyEntity create() {
-    return new PropertyEntityImpl();
-  }
-  
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<PropertyEntity> findAll() {
-    return getDbSqlSession().selectList("selectProperties");
-  }
-  
+    public MybatisPropertyDataManager(IdmEngineConfiguration idmEngineConfiguration) {
+        super(idmEngineConfiguration);
+    }
+
+    @Override
+    public Class<? extends PropertyEntity> getManagedEntityClass() {
+        return PropertyEntityImpl.class;
+    }
+
+    @Override
+    public PropertyEntity create() {
+        return new PropertyEntityImpl();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<PropertyEntity> findAll() {
+        return getDbSqlSession().selectList("selectProperties");
+    }
+
 }

@@ -25,7 +25,8 @@ public interface Debugger {
     /**
      * evaluates whether given invocation is defined as a break point or not
      *
-     * @param runnable the runnable to execute
+     * @param runnable
+     *            the runnable to execute
      * @return true in the case when the execution should be stopped, false otherwise
      */
     boolean isBreakPoint(Runnable runnable);
@@ -33,15 +34,18 @@ public interface Debugger {
     /**
      * Continue in the broken operation execution
      *
-     * @param commandExecutor executor to run command with
-     * @param agenda          agenda to execute
+     * @param commandExecutor
+     *            executor to run command with
+     * @param agenda
+     *            agenda to execute
      */
     void continueOperationExecution(CommandExecutor commandExecutor, Agenda agenda);
 
     /**
      * Break current operation execution
      *
-     * @param commandContext command context for which execution is broken
+     * @param commandContext
+     *            command context for which execution is broken
      */
     void breakOperationExecution(CommandContext commandContext);
 }

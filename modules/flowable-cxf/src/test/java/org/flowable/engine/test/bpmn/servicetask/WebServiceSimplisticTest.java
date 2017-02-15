@@ -23,46 +23,46 @@ import org.flowable.engine.test.Deployment;
  */
 public class WebServiceSimplisticTest extends AbstractWebServiceTaskTest {
 
-  protected boolean isValidating() {
-    return false;
-  }
-  
-  @Deployment
-  public void testWebServiceInvocationWithSimplisticDataFlow() throws Exception {
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("PrefixVariable", "The counter has the value ");
-    variables.put("SuffixVariable", ". Good news");
+    protected boolean isValidating() {
+        return false;
+    }
 
-    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey("webServiceInvocationWithSimplisticDataFlow", variables);
-    waitForJobExecutorToProcessAllJobs(10000L, 250L);
+    @Deployment
+    public void testWebServiceInvocationWithSimplisticDataFlow() throws Exception {
+        Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put("PrefixVariable", "The counter has the value ");
+        variables.put("SuffixVariable", ". Good news");
 
-    String response = (String) processEngine.getRuntimeService().getVariable(instance.getId(), "OutputVariable");
-    assertEquals("The counter has the value -1. Good news", response);
-  }
+        ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey("webServiceInvocationWithSimplisticDataFlow", variables);
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
 
-  @Deployment
-  public void testWebResponseNoName() throws Exception {
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("PrefixVariable", "The counter has the value ");
-    variables.put("SuffixVariable", ". Good news (NO NAME)");
+        String response = (String) processEngine.getRuntimeService().getVariable(instance.getId(), "OutputVariable");
+        assertEquals("The counter has the value -1. Good news", response);
+    }
 
-    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey("webServiceInvocationWithSimplisticDataFlow", variables);
-    waitForJobExecutorToProcessAllJobs(10000L, 250L);
+    @Deployment
+    public void testWebResponseNoName() throws Exception {
+        Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put("PrefixVariable", "The counter has the value ");
+        variables.put("SuffixVariable", ". Good news (NO NAME)");
 
-    String response = (String) processEngine.getRuntimeService().getVariable(instance.getId(), "OutputVariable");
-    assertEquals("The counter has the value -1. Good news (NO NAME)", response);
-  }
+        ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey("webServiceInvocationWithSimplisticDataFlow", variables);
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
 
-  @Deployment
-  public void testWebResponseKeywordName() throws Exception {
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("PrefixVariable", "The counter has the value ");
-    variables.put("SuffixVariable", ". Good news Keyword");
+        String response = (String) processEngine.getRuntimeService().getVariable(instance.getId(), "OutputVariable");
+        assertEquals("The counter has the value -1. Good news (NO NAME)", response);
+    }
 
-    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey("webServiceInvocationWithSimplisticDataFlow", variables);
-    waitForJobExecutorToProcessAllJobs(10000L, 250L);
+    @Deployment
+    public void testWebResponseKeywordName() throws Exception {
+        Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put("PrefixVariable", "The counter has the value ");
+        variables.put("SuffixVariable", ". Good news Keyword");
 
-    String response = (String) processEngine.getRuntimeService().getVariable(instance.getId(), "OutputVariable");
-    assertEquals("The counter has the value -1. Good news Keyword", response);
-  }
+        ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey("webServiceInvocationWithSimplisticDataFlow", variables);
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
+
+        String response = (String) processEngine.getRuntimeService().getVariable(instance.getId(), "OutputVariable");
+        assertEquals("The counter has the value -1. Good news Keyword", response);
+    }
 }

@@ -22,28 +22,28 @@ import org.springframework.beans.factory.FactoryBean;
  * @author martin.grofcik
  */
 public class SimulationProcessEngineFactory implements FactoryBean<ProcessEngineImpl> {
-  protected final ProcessEngineConfiguration processEngineConfiguration;
-  protected final AtomicLong uniqueLongId;
+    protected final ProcessEngineConfiguration processEngineConfiguration;
+    protected final AtomicLong uniqueLongId;
 
-  public SimulationProcessEngineFactory(ProcessEngineConfiguration processEngineConfiguration) {
-    this.processEngineConfiguration = processEngineConfiguration;
-    this.uniqueLongId = new AtomicLong(0);
-  }
+    public SimulationProcessEngineFactory(ProcessEngineConfiguration processEngineConfiguration) {
+        this.processEngineConfiguration = processEngineConfiguration;
+        this.uniqueLongId = new AtomicLong(0);
+    }
 
-  @Override
-  public ProcessEngineImpl getObject() {
-    this.processEngineConfiguration.setEngineName("simRunProcessEngine-" + uniqueLongId.getAndIncrement());
+    @Override
+    public ProcessEngineImpl getObject() {
+        this.processEngineConfiguration.setEngineName("simRunProcessEngine-" + uniqueLongId.getAndIncrement());
 
-    return (ProcessEngineImpl) this.processEngineConfiguration.buildProcessEngine();
-  }
+        return (ProcessEngineImpl) this.processEngineConfiguration.buildProcessEngine();
+    }
 
-  @Override
-  public Class<?> getObjectType() {
-    return ProcessEngineImpl.class;
-  }
+    @Override
+    public Class<?> getObjectType() {
+        return ProcessEngineImpl.class;
+    }
 
-  @Override
-  public boolean isSingleton() {
-    return false;
-  }
+    @Override
+    public boolean isSingleton() {
+        return false;
+    }
 }

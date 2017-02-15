@@ -17,13 +17,13 @@ package org.flowable.bpmn.model;
  */
 public class EndEvent extends Event {
 
-  public EndEvent clone() {
-    EndEvent clone = new EndEvent();
-    clone.setValues(this);
-    return clone;
-  }
+    public EndEvent clone() {
+        EndEvent clone = new EndEvent();
+        clone.setValues(this);
+        return clone;
+    }
 
-  public void setValues(EndEvent otherEvent) {
-    super.setValues(otherEvent);
-  }
+    public void setValues(EndEvent otherEvent) {
+        super.setValues(otherEvent);
+    }
 }

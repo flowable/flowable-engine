@@ -32,51 +32,51 @@ import org.slf4j.LoggerFactory;
  */
 public class CommandContext extends AbstractCommandContext {
 
-  private static Logger log = LoggerFactory.getLogger(CommandContext.class);
+    private static Logger log = LoggerFactory.getLogger(CommandContext.class);
 
-  protected FormEngineConfiguration formEngineConfiguration;
-  
-  public CommandContext(Command<?> command, FormEngineConfiguration formEngineConfiguration) {
-    super(command);
-    this.formEngineConfiguration = formEngineConfiguration;
-    sessionFactories = formEngineConfiguration.getSessionFactories();
-  }
+    protected FormEngineConfiguration formEngineConfiguration;
 
-  public void addCloseListener(CommandContextCloseListener commandContextCloseListener) {
-    if (closeListeners == null) {
-      closeListeners = new ArrayList<BaseCommandContextCloseListener<AbstractCommandContext>>(1);
+    public CommandContext(Command<?> command, FormEngineConfiguration formEngineConfiguration) {
+        super(command);
+        this.formEngineConfiguration = formEngineConfiguration;
+        sessionFactories = formEngineConfiguration.getSessionFactories();
     }
-    closeListeners.add((BaseCommandContextCloseListener) commandContextCloseListener);
-  }
 
-  public DbSqlSession getDbSqlSession() {
-    return getSession(DbSqlSession.class);
-  }
+    public void addCloseListener(CommandContextCloseListener commandContextCloseListener) {
+        if (closeListeners == null) {
+            closeListeners = new ArrayList<BaseCommandContextCloseListener<AbstractCommandContext>>(1);
+        }
+        closeListeners.add((BaseCommandContextCloseListener) commandContextCloseListener);
+    }
 
-  public FormDeploymentEntityManager getDeploymentEntityManager() {
-    return formEngineConfiguration.getDeploymentEntityManager();
-  }
-  
-  public FormDefinitionEntityManager getFormDefinitionEntityManager() {
-    return formEngineConfiguration.getFormDefinitionEntityManager();
-  }
+    public DbSqlSession getDbSqlSession() {
+        return getSession(DbSqlSession.class);
+    }
 
-  public ResourceEntityManager getResourceEntityManager() {
-    return formEngineConfiguration.getResourceEntityManager();
-  }
-  
-  public FormInstanceEntityManager getFormInstanceEntityManager() {
-    return formEngineConfiguration.getFormInstanceEntityManager();
-  }
-  
-  public TableDataManager getTableDataManager() {
-    return formEngineConfiguration.getTableDataManager();
-  }
+    public FormDeploymentEntityManager getDeploymentEntityManager() {
+        return formEngineConfiguration.getDeploymentEntityManager();
+    }
 
-  // getters and setters
-  // //////////////////////////////////////////////////////
-  
-  public FormEngineConfiguration getFormEngineConfiguration() {
-    return formEngineConfiguration;
-  }
+    public FormDefinitionEntityManager getFormDefinitionEntityManager() {
+        return formEngineConfiguration.getFormDefinitionEntityManager();
+    }
+
+    public ResourceEntityManager getResourceEntityManager() {
+        return formEngineConfiguration.getResourceEntityManager();
+    }
+
+    public FormInstanceEntityManager getFormInstanceEntityManager() {
+        return formEngineConfiguration.getFormInstanceEntityManager();
+    }
+
+    public TableDataManager getTableDataManager() {
+        return formEngineConfiguration.getTableDataManager();
+    }
+
+    // getters and setters
+    // //////////////////////////////////////////////////////
+
+    public FormEngineConfiguration getFormEngineConfiguration() {
+        return formEngineConfiguration;
+    }
 }

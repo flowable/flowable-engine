@@ -30,90 +30,90 @@ import org.flowable.form.engine.impl.persistence.entity.data.FormDeploymentDataM
  */
 public class FormDeploymentEntityManagerImpl extends AbstractEntityManager<FormDeploymentEntity> implements FormDeploymentEntityManager {
 
-  protected FormDeploymentDataManager deploymentDataManager;
-  
-  public FormDeploymentEntityManagerImpl(FormEngineConfiguration formEngineConfiguration, FormDeploymentDataManager deploymentDataManager) {
-    super(formEngineConfiguration);
-    this.deploymentDataManager = deploymentDataManager;
-  }
-  
-  @Override
-  protected DataManager<FormDeploymentEntity> getDataManager() {
-    return deploymentDataManager;
-  }
-  
-  @Override
-  public void insert(FormDeploymentEntity deployment) {
-    insert(deployment, true);
-  }
-  
-  @Override
-  public void insert(FormDeploymentEntity deployment, boolean fireEvent) {
-    super.insert(deployment, fireEvent);
+    protected FormDeploymentDataManager deploymentDataManager;
 
-    for (ResourceEntity resource : deployment.getResources().values()) {
-      resource.setDeploymentId(deployment.getId());
-      getResourceEntityManager().insert(resource);
+    public FormDeploymentEntityManagerImpl(FormEngineConfiguration formEngineConfiguration, FormDeploymentDataManager deploymentDataManager) {
+        super(formEngineConfiguration);
+        this.deploymentDataManager = deploymentDataManager;
     }
-  }
 
-  @Override
-  public void deleteDeployment(String deploymentId) {
-    deleteDecisionTablesForDeployment(deploymentId);
-    getResourceEntityManager().deleteResourcesByDeploymentId(deploymentId);
-    delete(findById(deploymentId));
-  }
-  
-  protected void deleteDecisionTablesForDeployment(String deploymentId) {
-    getFormDefinitionEntityManager().deleteFormDefinitionsByDeploymentId(deploymentId);
-  }
-  
-  protected FormDefinitionEntity findLatestFormDefinition(FormDefinition formDefinition) {
-    FormDefinitionEntity latestForm = null;
-    if (formDefinition.getTenantId() != null && !FormEngineConfiguration.NO_TENANT_ID.equals(formDefinition.getTenantId())) {
-      latestForm = getFormDefinitionEntityManager().findLatestFormDefinitionByKeyAndTenantId(formDefinition.getKey(), formDefinition.getTenantId());
-    } else {
-      latestForm = getFormDefinitionEntityManager().findLatestFormDefinitionByKey(formDefinition.getKey());
+    @Override
+    protected DataManager<FormDeploymentEntity> getDataManager() {
+        return deploymentDataManager;
     }
-    return latestForm;
-  }
 
-  @Override
-  public FormDeploymentEntity findLatestDeploymentByName(String deploymentName) {
-    return deploymentDataManager.findLatestDeploymentByName(deploymentName);
-  }
+    @Override
+    public void insert(FormDeploymentEntity deployment) {
+        insert(deployment, true);
+    }
 
-  @Override
-  public long findDeploymentCountByQueryCriteria(FormDeploymentQueryImpl deploymentQuery) {
-    return deploymentDataManager.findDeploymentCountByQueryCriteria(deploymentQuery);
-  }
+    @Override
+    public void insert(FormDeploymentEntity deployment, boolean fireEvent) {
+        super.insert(deployment, fireEvent);
 
-  @Override
-  public List<FormDeployment> findDeploymentsByQueryCriteria(FormDeploymentQueryImpl deploymentQuery, Page page) {
-    return deploymentDataManager.findDeploymentsByQueryCriteria(deploymentQuery, page);
-  }
+        for (ResourceEntity resource : deployment.getResources().values()) {
+            resource.setDeploymentId(deployment.getId());
+            getResourceEntityManager().insert(resource);
+        }
+    }
 
-  @Override
-  public List<String> getDeploymentResourceNames(String deploymentId) {
-    return deploymentDataManager.getDeploymentResourceNames(deploymentId);
-  }
+    @Override
+    public void deleteDeployment(String deploymentId) {
+        deleteDecisionTablesForDeployment(deploymentId);
+        getResourceEntityManager().deleteResourcesByDeploymentId(deploymentId);
+        delete(findById(deploymentId));
+    }
 
-  @Override
-  public List<FormDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return deploymentDataManager.findDeploymentsByNativeQuery(parameterMap, firstResult, maxResults);
-  }
+    protected void deleteDecisionTablesForDeployment(String deploymentId) {
+        getFormDefinitionEntityManager().deleteFormDefinitionsByDeploymentId(deploymentId);
+    }
 
-  @Override
-  public long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap) {
-    return deploymentDataManager.findDeploymentCountByNativeQuery(parameterMap);
-  }
+    protected FormDefinitionEntity findLatestFormDefinition(FormDefinition formDefinition) {
+        FormDefinitionEntity latestForm = null;
+        if (formDefinition.getTenantId() != null && !FormEngineConfiguration.NO_TENANT_ID.equals(formDefinition.getTenantId())) {
+            latestForm = getFormDefinitionEntityManager().findLatestFormDefinitionByKeyAndTenantId(formDefinition.getKey(), formDefinition.getTenantId());
+        } else {
+            latestForm = getFormDefinitionEntityManager().findLatestFormDefinitionByKey(formDefinition.getKey());
+        }
+        return latestForm;
+    }
 
-  public FormDeploymentDataManager getDeploymentDataManager() {
-    return deploymentDataManager;
-  }
+    @Override
+    public FormDeploymentEntity findLatestDeploymentByName(String deploymentName) {
+        return deploymentDataManager.findLatestDeploymentByName(deploymentName);
+    }
 
-  public void setDeploymentDataManager(FormDeploymentDataManager deploymentDataManager) {
-    this.deploymentDataManager = deploymentDataManager;
-  }
-  
+    @Override
+    public long findDeploymentCountByQueryCriteria(FormDeploymentQueryImpl deploymentQuery) {
+        return deploymentDataManager.findDeploymentCountByQueryCriteria(deploymentQuery);
+    }
+
+    @Override
+    public List<FormDeployment> findDeploymentsByQueryCriteria(FormDeploymentQueryImpl deploymentQuery, Page page) {
+        return deploymentDataManager.findDeploymentsByQueryCriteria(deploymentQuery, page);
+    }
+
+    @Override
+    public List<String> getDeploymentResourceNames(String deploymentId) {
+        return deploymentDataManager.getDeploymentResourceNames(deploymentId);
+    }
+
+    @Override
+    public List<FormDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
+        return deploymentDataManager.findDeploymentsByNativeQuery(parameterMap, firstResult, maxResults);
+    }
+
+    @Override
+    public long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap) {
+        return deploymentDataManager.findDeploymentCountByNativeQuery(parameterMap);
+    }
+
+    public FormDeploymentDataManager getDeploymentDataManager() {
+        return deploymentDataManager;
+    }
+
+    public void setDeploymentDataManager(FormDeploymentDataManager deploymentDataManager) {
+        this.deploymentDataManager = deploymentDataManager;
+    }
+
 }

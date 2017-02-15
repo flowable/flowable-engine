@@ -81,13 +81,10 @@ public class Application {
                 runtimeService.startProcessInstanceByKey(
                         integrationGatewayProcess, Collections.singletonMap("customerId", (Object) 232L));
 
-
                 System.out.println("projectId=" + analysingService.getStringAtomicReference().get());
 
             }
         };
     } // ...
 
-
 }
-

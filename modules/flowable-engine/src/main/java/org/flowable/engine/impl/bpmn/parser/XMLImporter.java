@@ -26,18 +26,18 @@ import org.flowable.engine.impl.webservice.WSService;
  */
 public interface XMLImporter {
 
-  /**
-   * Imports the definitions in the XML declared in element
-   * 
-   * @param theImport
-   *          the declarations to be imported
-   * @param sourceSystemId
-   */
-  void importFrom(Import theImport, String sourceSystemId);
-  
-  Map<String, StructureDefinition> getStructures();
-  
-  Map<String, WSService> getServices();
-  
-  Map<String, WSOperation> getOperations();
+    /**
+     * Imports the definitions in the XML declared in element
+     * 
+     * @param theImport
+     *            the declarations to be imported
+     * @param sourceSystemId
+     */
+    void importFrom(Import theImport, String sourceSystemId);
+
+    Map<String, StructureDefinition> getStructures();
+
+    Map<String, WSService> getServices();
+
+    Map<String, WSOperation> getOperations();
 }

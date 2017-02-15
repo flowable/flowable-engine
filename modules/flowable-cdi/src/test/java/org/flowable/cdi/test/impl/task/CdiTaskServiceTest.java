@@ -6,12 +6,12 @@ import org.junit.Test;
 
 public class CdiTaskServiceTest extends CdiFlowableTestCase {
 
-  @Test
-  public void testClaimTask() {
-    Task newTask = taskService.newTask();
-    taskService.saveTask(newTask);
-    taskService.claim(newTask.getId(), "kermit");
-    taskService.deleteTask(newTask.getId(), true);
-  }
+    @Test
+    public void testClaimTask() {
+        Task newTask = taskService.newTask();
+        taskService.saveTask(newTask);
+        taskService.claim(newTask.getId(), "kermit");
+        taskService.deleteTask(newTask.getId(), true);
+    }
 
 }

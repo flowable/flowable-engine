@@ -23,30 +23,30 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
  */
 public interface HistoricScopeInstanceEntity extends Entity {
 
-  void markEnded(String deleteReason);
+    void markEnded(String deleteReason);
 
-  String getProcessInstanceId();
+    String getProcessInstanceId();
 
-  String getProcessDefinitionId();
+    String getProcessDefinitionId();
 
-  Date getStartTime();
+    Date getStartTime();
 
-  Date getEndTime();
+    Date getEndTime();
 
-  Long getDurationInMillis();
+    Long getDurationInMillis();
 
-  void setProcessInstanceId(String processInstanceId);
+    void setProcessInstanceId(String processInstanceId);
 
-  void setProcessDefinitionId(String processDefinitionId);
+    void setProcessDefinitionId(String processDefinitionId);
 
-  void setStartTime(Date startTime);
+    void setStartTime(Date startTime);
 
-  void setEndTime(Date endTime);
+    void setEndTime(Date endTime);
 
-  void setDurationInMillis(Long durationInMillis);
+    void setDurationInMillis(Long durationInMillis);
 
-  String getDeleteReason();
+    String getDeleteReason();
 
-  void setDeleteReason(String deleteReason);
-  
+    void setDeleteReason(String deleteReason);
+
 }

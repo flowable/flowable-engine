@@ -21,17 +21,17 @@ import org.mozilla.javascript.Scriptable;
  */
 public class SecureJavascriptUtil {
 
-  public static Object evaluateScript(VariableScope variableScope, String script) {
-    Context context = Context.enter();
-    try {
-        Scriptable scope = context.initStandardObjects();
-        SecureScriptScope secureScriptScope = new SecureScriptScope(variableScope);
-        scope.setPrototype(secureScriptScope);
+    public static Object evaluateScript(VariableScope variableScope, String script) {
+        Context context = Context.enter();
+        try {
+            Scriptable scope = context.initStandardObjects();
+            SecureScriptScope secureScriptScope = new SecureScriptScope(variableScope);
+            scope.setPrototype(secureScriptScope);
 
-        return context.evaluateString(scope, script, "<script>", 0, null);
-    } finally {
-        Context.exit();
+            return context.evaluateString(scope, script, "<script>", 0, null);
+        } finally {
+            Context.exit();
+        }
     }
-  }
-  
+
 }

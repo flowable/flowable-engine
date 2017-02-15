@@ -28,87 +28,87 @@ import org.joda.time.format.ISODateTimeFormat;
 
 public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompatibilityTest {
 
-  @Deployment
-  public void testRepeatWithoutEnd() throws Throwable {
-    Clock clock = processEngineConfiguration.getClock();
-    
-    Calendar calendar = Calendar.getInstance();
-    Date baseTime = calendar.getTime();
+    @Deployment
+    public void testRepeatWithoutEnd() throws Throwable {
+        Clock clock = processEngineConfiguration.getClock();
 
-    calendar.add(Calendar.MINUTE, 20);
-    //expect to stop boundary jobs after 20 minutes
-    DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
-    DateTime dt = new DateTime(calendar.getTime());
-    String dateStr = fmt.print(dt);
+        Calendar calendar = Calendar.getInstance();
+        Date baseTime = calendar.getTime();
 
-    //reset the timer
-    Calendar nextTimeCal = Calendar.getInstance();
-    nextTimeCal.setTime(baseTime);
-    clock.setCurrentCalendar(nextTimeCal);
-    processEngineConfiguration.setClock(clock);
+        calendar.add(Calendar.MINUTE, 20);
+        // expect to stop boundary jobs after 20 minutes
+        DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
+        DateTime dt = new DateTime(calendar.getTime());
+        String dateStr = fmt.print(dt);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("repeatWithEnd");
+        // reset the timer
+        Calendar nextTimeCal = Calendar.getInstance();
+        nextTimeCal.setTime(baseTime);
+        clock.setCurrentCalendar(nextTimeCal);
+        processEngineConfiguration.setClock(clock);
 
-    runtimeService.setVariable(processInstance.getId(), "EndDateForBoundary", dateStr);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("repeatWithEnd");
 
-    List<Task> tasks = taskService.createTaskQuery().list();
-    assertEquals(1, tasks.size());
+        runtimeService.setVariable(processInstance.getId(), "EndDateForBoundary", dateStr);
 
-    Task task = tasks.get(0);
-    assertEquals("Task A", task.getName());
+        List<Task> tasks = taskService.createTaskQuery().list();
+        assertEquals(1, tasks.size());
 
-    // Test Boundary Events
-    // complete will cause timer to be created
-    taskService.complete(task.getId());
+        Task task = tasks.get(0);
+        assertEquals("Task A", task.getName());
 
-    List<Job> jobs = managementService.createTimerJobQuery().list();
-    assertEquals(1, jobs.size());
+        // Test Boundary Events
+        // complete will cause timer to be created
+        taskService.complete(task.getId());
 
-    //boundary events
+        List<Job> jobs = managementService.createTimerJobQuery().list();
+        assertEquals(1, jobs.size());
 
-    waitForJobExecutorToProcessAllJobs(2000, 200);
-    // a new job must be prepared because there are 10 repeats 2 seconds interval
+        // boundary events
 
-    for (int i = 0; i < 9; i++) {
-      nextTimeCal.add(Calendar.SECOND, 2);
-      clock.setCurrentCalendar(nextTimeCal);
-      processEngineConfiguration.setClock(clock);
-      waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
+        waitForJobExecutorToProcessAllJobs(2000, 200);
+        // a new job must be prepared because there are 10 repeats 2 seconds interval
+
+        for (int i = 0; i < 9; i++) {
+            nextTimeCal.add(Calendar.SECOND, 2);
+            clock.setCurrentCalendar(nextTimeCal);
+            processEngineConfiguration.setClock(clock);
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
+        }
+
+        nextTimeCal.add(Calendar.SECOND, 2);
+        clock.setCurrentCalendar(nextTimeCal);
+        processEngineConfiguration.setClock(clock);
+
+        waitForJobExecutorToProcessAllJobs(2000, 200);
+
+        // Should not have any other jobs because the endDate is reached
+        jobs = managementService.createTimerJobQuery().list();
+        assertEquals(0, jobs.size());
+
+        tasks = taskService.createTaskQuery().list();
+        task = tasks.get(0);
+        assertEquals("Task B", task.getName());
+        assertEquals(1, tasks.size());
+        taskService.complete(task.getId());
+
+        waitForJobExecutorToProcessAllJobs(2000, 200);
+
+        // now All the process instances should be completed
+        List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
+        assertEquals(0, processInstances.size());
+
+        // no jobs
+        jobs = managementService.createJobQuery().list();
+        assertEquals(0, jobs.size());
+        jobs = managementService.createTimerJobQuery().list();
+        assertEquals(0, jobs.size());
+
+        // no tasks
+        tasks = taskService.createTaskQuery().list();
+        assertEquals(0, tasks.size());
+
+        processEngineConfiguration.resetClock();
     }
-
-    nextTimeCal.add(Calendar.SECOND, 2);
-    clock.setCurrentCalendar(nextTimeCal);
-    processEngineConfiguration.setClock(clock);
-
-    waitForJobExecutorToProcessAllJobs(2000, 200);
-    
-    // Should not have any other jobs because the endDate is reached
-    jobs = managementService.createTimerJobQuery().list();
-    assertEquals(0, jobs.size());
-    
-    tasks = taskService.createTaskQuery().list();
-    task = tasks.get(0);
-    assertEquals("Task B", task.getName());
-    assertEquals(1, tasks.size());
-    taskService.complete(task.getId());
-
-    waitForJobExecutorToProcessAllJobs(2000, 200);
-
-    // now All the process instances should be completed
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
-    assertEquals(0, processInstances.size());
-
-    // no jobs
-    jobs = managementService.createJobQuery().list();
-    assertEquals(0, jobs.size());
-    jobs = managementService.createTimerJobQuery().list();
-    assertEquals(0, jobs.size());
-
-    // no tasks
-    tasks = taskService.createTaskQuery().list();
-    assertEquals(0, tasks.size());
-
-    processEngineConfiguration.resetClock();
-  }
 
 }

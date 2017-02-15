@@ -22,25 +22,25 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
  */
 public class ThrowsExceptionBehavior implements ActivityBehavior {
 
-  public void execute(DelegateExecution execution) {
-    String var = (String) execution.getVariable("var");
-    
-    String sequenceFlowToTake = null; 
-    
-    try {
-      executeLogic(var);
-      sequenceFlowToTake = "no-exception";
-    } catch (Exception e) {
-      sequenceFlowToTake = "exception";
-    }
-    
-    DelegateHelper.leaveDelegate(execution, sequenceFlowToTake);
-  }
+    public void execute(DelegateExecution execution) {
+        String var = (String) execution.getVariable("var");
 
-  protected void executeLogic(String value) {
-    if (value.equals("throw-exception")) {
-      throw new RuntimeException();
+        String sequenceFlowToTake = null;
+
+        try {
+            executeLogic(var);
+            sequenceFlowToTake = "no-exception";
+        } catch (Exception e) {
+            sequenceFlowToTake = "exception";
+        }
+
+        DelegateHelper.leaveDelegate(execution, sequenceFlowToTake);
     }
-  }
-  
+
+    protected void executeLogic(String value) {
+        if (value.equals("throw-exception")) {
+            throw new RuntimeException();
+        }
+    }
+
 }

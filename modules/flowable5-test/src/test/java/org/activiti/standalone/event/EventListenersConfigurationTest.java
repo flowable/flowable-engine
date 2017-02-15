@@ -25,23 +25,23 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
  */
 public class EventListenersConfigurationTest extends ResourceFlowableTestCase {
 
-  public EventListenersConfigurationTest() {
-    super("org/activiti/standalone/event/flowable-eventlistener.cfg.xml");
-  }
-  
-  public void testEventListenerConfiguration() {
-  	// Fetch the listener to check received events
-  	TestFlowableEventListener listener = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("eventListener");
-  	assertNotNull(listener);
-  	
-  	// Clear any events received (eg. engine initialisation)
-    listener.clearEventsReceived();
-  	
-  	// Dispath a custom event
-  	FlowableEvent event = new ActivitiEventImpl(FlowableEngineEventType.CUSTOM);
-  	processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
-  	
-  	assertEquals(1, listener.getEventsReceived().size());
-  	assertEquals(event, listener.getEventsReceived().get(0));
-  }
+    public EventListenersConfigurationTest() {
+        super("org/activiti/standalone/event/flowable-eventlistener.cfg.xml");
+    }
+
+    public void testEventListenerConfiguration() {
+        // Fetch the listener to check received events
+        TestFlowableEventListener listener = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("eventListener");
+        assertNotNull(listener);
+
+        // Clear any events received (eg. engine initialisation)
+        listener.clearEventsReceived();
+
+        // Dispath a custom event
+        FlowableEvent event = new ActivitiEventImpl(FlowableEngineEventType.CUSTOM);
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
+
+        assertEquals(1, listener.getEventsReceived().size());
+        assertEquals(event, listener.getEventsReceived().get(0));
+    }
 }

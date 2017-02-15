@@ -33,112 +33,112 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
  */
 public abstract class AbstractEventHandler implements EventHandler {
 
-  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
-    ExecutionEntity execution = eventSubscription.getExecution();
-    FlowNode currentFlowElement = (FlowNode) execution.getCurrentFlowElement();
+    public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
+        ExecutionEntity execution = eventSubscription.getExecution();
+        FlowNode currentFlowElement = (FlowNode) execution.getCurrentFlowElement();
 
-    if (currentFlowElement == null) {
-      throw new FlowableException("Error while sending signal for event subscription '" + eventSubscription.getId() + "': " + "no activity associated with event subscription");
-    }
-
-    if (payload instanceof Map) {
-      @SuppressWarnings("unchecked")
-      Map<String, Object> processVariables = (Map<String, Object>) payload;
-      execution.setVariables(processVariables);
-    }
-
-    if (currentFlowElement instanceof BoundaryEvent || currentFlowElement instanceof EventSubProcess) {
-      try {
-        dispatchActivitiesCanceledIfNeeded(eventSubscription, execution, currentFlowElement, commandContext);
-
-      } catch (RuntimeException e) {
-        throw e;
-      } catch (Exception e) {
-        throw new FlowableException("exception while sending signal for event subscription '" + eventSubscription + "':" + e.getMessage(), e);
-      }
-    }
-
-    Context.getAgenda().planTriggerExecutionOperation(execution);
-  }
-
-  protected void dispatchActivitiesCanceledIfNeeded(EventSubscriptionEntity eventSubscription, ExecutionEntity execution, FlowElement currentFlowElement, CommandContext commandContext) {
-    if (currentFlowElement instanceof BoundaryEvent) {
-      BoundaryEvent boundaryEvent = (BoundaryEvent) currentFlowElement;
-      if (boundaryEvent.isCancelActivity()) {
-        dispatchExecutionCancelled(eventSubscription, execution, commandContext);
-      }
-    }
-  }
-
-  protected void dispatchExecutionCancelled(EventSubscriptionEntity eventSubscription, ExecutionEntity execution, CommandContext commandContext) {
-    // subprocesses
-    for (ExecutionEntity subExecution : execution.getExecutions()) {
-      dispatchExecutionCancelled(eventSubscription, subExecution, commandContext);
-    }
-
-    // call activities
-    ExecutionEntity subProcessInstance = commandContext.getExecutionEntityManager().findSubProcessInstanceBySuperExecutionId(execution.getId());
-    if (subProcessInstance != null) {
-      dispatchExecutionCancelled(eventSubscription, subProcessInstance, commandContext);
-    }
-
-    // activity with message/signal boundary events
-    FlowElement flowElement = execution.getCurrentFlowElement();
-    if (flowElement instanceof BoundaryEvent) {
-      BoundaryEvent boundaryEvent = (BoundaryEvent) flowElement;
-      if (boundaryEvent.getAttachedToRef() != null) {
-        dispatchActivityCancelled(eventSubscription, execution, boundaryEvent.getAttachedToRef(), commandContext);
-      }
-    }
-  }
-
-  protected void dispatchActivityCancelled(EventSubscriptionEntity eventSubscription, ExecutionEntity boundaryEventExecution, FlowNode flowNode, CommandContext commandContext) {
-    
-    // Scope
-    commandContext.getEventDispatcher().dispatchEvent(
-        FlowableEventBuilder.createActivityCancelledEvent(flowNode.getId(), flowNode.getName(), boundaryEventExecution.getId(), 
-            boundaryEventExecution.getProcessInstanceId(), boundaryEventExecution.getProcessDefinitionId(),
-            parseActivityType(flowNode), eventSubscription));
-    
-    if (flowNode instanceof SubProcess) {
-      // The parent of the boundary event execution will be the one on which the boundary event is set
-      ExecutionEntity parentExecutionEntity = commandContext.getExecutionEntityManager().findById(boundaryEventExecution.getParentId());
-      if (parentExecutionEntity != null) {
-        dispatchActivityCancelledForChildExecution(eventSubscription, parentExecutionEntity, boundaryEventExecution, commandContext);
-      }
-    }
-  }
-
-  protected void dispatchActivityCancelledForChildExecution(EventSubscriptionEntity eventSubscription, 
-      ExecutionEntity parentExecutionEntity, ExecutionEntity boundaryEventExecution, CommandContext commandContext) {
-    
-    List<ExecutionEntity> executionEntities = commandContext.getExecutionEntityManager().findChildExecutionsByParentExecutionId(parentExecutionEntity.getId());
-    for (ExecutionEntity childExecution : executionEntities) {
-      
-      if (!boundaryEventExecution.getId().equals(childExecution.getId())
-          && childExecution.getCurrentFlowElement() != null 
-          && childExecution.getCurrentFlowElement() instanceof FlowNode) {
-        
-        FlowNode flowNode = (FlowNode) childExecution.getCurrentFlowElement();
-        commandContext.getEventDispatcher().dispatchEvent(
-            FlowableEventBuilder.createActivityCancelledEvent(flowNode.getId(), flowNode.getName(), childExecution.getId(), 
-                childExecution.getProcessInstanceId(), childExecution.getProcessDefinitionId(),
-                parseActivityType(flowNode), eventSubscription));
-        
-        if (childExecution.isScope()) {
-          dispatchActivityCancelledForChildExecution(eventSubscription, childExecution, boundaryEventExecution, commandContext);
+        if (currentFlowElement == null) {
+            throw new FlowableException("Error while sending signal for event subscription '" + eventSubscription.getId() + "': " + "no activity associated with event subscription");
         }
-        
-      }
-      
-    }
-    
-  }
 
-  protected String parseActivityType(FlowNode flowNode) {
-    String elementType = flowNode.getClass().getSimpleName();
-    elementType = elementType.substring(0, 1).toLowerCase() + elementType.substring(1);
-    return elementType;
-  }
+        if (payload instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> processVariables = (Map<String, Object>) payload;
+            execution.setVariables(processVariables);
+        }
+
+        if (currentFlowElement instanceof BoundaryEvent || currentFlowElement instanceof EventSubProcess) {
+            try {
+                dispatchActivitiesCanceledIfNeeded(eventSubscription, execution, currentFlowElement, commandContext);
+
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new FlowableException("exception while sending signal for event subscription '" + eventSubscription + "':" + e.getMessage(), e);
+            }
+        }
+
+        Context.getAgenda().planTriggerExecutionOperation(execution);
+    }
+
+    protected void dispatchActivitiesCanceledIfNeeded(EventSubscriptionEntity eventSubscription, ExecutionEntity execution, FlowElement currentFlowElement, CommandContext commandContext) {
+        if (currentFlowElement instanceof BoundaryEvent) {
+            BoundaryEvent boundaryEvent = (BoundaryEvent) currentFlowElement;
+            if (boundaryEvent.isCancelActivity()) {
+                dispatchExecutionCancelled(eventSubscription, execution, commandContext);
+            }
+        }
+    }
+
+    protected void dispatchExecutionCancelled(EventSubscriptionEntity eventSubscription, ExecutionEntity execution, CommandContext commandContext) {
+        // subprocesses
+        for (ExecutionEntity subExecution : execution.getExecutions()) {
+            dispatchExecutionCancelled(eventSubscription, subExecution, commandContext);
+        }
+
+        // call activities
+        ExecutionEntity subProcessInstance = commandContext.getExecutionEntityManager().findSubProcessInstanceBySuperExecutionId(execution.getId());
+        if (subProcessInstance != null) {
+            dispatchExecutionCancelled(eventSubscription, subProcessInstance, commandContext);
+        }
+
+        // activity with message/signal boundary events
+        FlowElement flowElement = execution.getCurrentFlowElement();
+        if (flowElement instanceof BoundaryEvent) {
+            BoundaryEvent boundaryEvent = (BoundaryEvent) flowElement;
+            if (boundaryEvent.getAttachedToRef() != null) {
+                dispatchActivityCancelled(eventSubscription, execution, boundaryEvent.getAttachedToRef(), commandContext);
+            }
+        }
+    }
+
+    protected void dispatchActivityCancelled(EventSubscriptionEntity eventSubscription, ExecutionEntity boundaryEventExecution, FlowNode flowNode, CommandContext commandContext) {
+
+        // Scope
+        commandContext.getEventDispatcher().dispatchEvent(
+                FlowableEventBuilder.createActivityCancelledEvent(flowNode.getId(), flowNode.getName(), boundaryEventExecution.getId(),
+                        boundaryEventExecution.getProcessInstanceId(), boundaryEventExecution.getProcessDefinitionId(),
+                        parseActivityType(flowNode), eventSubscription));
+
+        if (flowNode instanceof SubProcess) {
+            // The parent of the boundary event execution will be the one on which the boundary event is set
+            ExecutionEntity parentExecutionEntity = commandContext.getExecutionEntityManager().findById(boundaryEventExecution.getParentId());
+            if (parentExecutionEntity != null) {
+                dispatchActivityCancelledForChildExecution(eventSubscription, parentExecutionEntity, boundaryEventExecution, commandContext);
+            }
+        }
+    }
+
+    protected void dispatchActivityCancelledForChildExecution(EventSubscriptionEntity eventSubscription,
+            ExecutionEntity parentExecutionEntity, ExecutionEntity boundaryEventExecution, CommandContext commandContext) {
+
+        List<ExecutionEntity> executionEntities = commandContext.getExecutionEntityManager().findChildExecutionsByParentExecutionId(parentExecutionEntity.getId());
+        for (ExecutionEntity childExecution : executionEntities) {
+
+            if (!boundaryEventExecution.getId().equals(childExecution.getId())
+                    && childExecution.getCurrentFlowElement() != null
+                    && childExecution.getCurrentFlowElement() instanceof FlowNode) {
+
+                FlowNode flowNode = (FlowNode) childExecution.getCurrentFlowElement();
+                commandContext.getEventDispatcher().dispatchEvent(
+                        FlowableEventBuilder.createActivityCancelledEvent(flowNode.getId(), flowNode.getName(), childExecution.getId(),
+                                childExecution.getProcessInstanceId(), childExecution.getProcessDefinitionId(),
+                                parseActivityType(flowNode), eventSubscription));
+
+                if (childExecution.isScope()) {
+                    dispatchActivityCancelledForChildExecution(eventSubscription, childExecution, boundaryEventExecution, commandContext);
+                }
+
+            }
+
+        }
+
+    }
+
+    protected String parseActivityType(FlowNode flowNode) {
+        String elementType = flowNode.getClass().getSimpleName();
+        elementType = elementType.substring(0, 1).toLowerCase() + elementType.substring(1);
+        return elementType;
+    }
 
 }

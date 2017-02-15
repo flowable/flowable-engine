@@ -22,9 +22,9 @@ import org.flowable.engine.delegate.JavaDelegate;
  */
 public class StartProcessInstanceTestDelegate implements JavaDelegate {
 
-  public void execute(DelegateExecution execution) {
-    RuntimeService runtimeService = Context.getProcessEngineConfiguration().getRuntimeService();
-    runtimeService.startProcessInstanceByKey("oneTaskProcess");
-  }
+    public void execute(DelegateExecution execution) {
+        RuntimeService runtimeService = Context.getProcessEngineConfiguration().getRuntimeService();
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    }
 
 }

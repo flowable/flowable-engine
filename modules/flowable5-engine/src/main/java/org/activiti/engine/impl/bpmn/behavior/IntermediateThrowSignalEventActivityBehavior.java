@@ -24,45 +24,44 @@ import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.engine.delegate.DelegateExecution;
 
-
 /**
  * @author Daniel Meyer
  */
-public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnActivityBehavior {    
-      
-  private static final long serialVersionUID = -2961893934810190972L;
-  
-  protected final boolean processInstanceScope;
-  protected final EventSubscriptionDeclaration signalDefinition;
+public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnActivityBehavior {
 
-  public IntermediateThrowSignalEventActivityBehavior(ThrowEvent throwEvent, Signal signal, EventSubscriptionDeclaration signalDefinition) {
-    this.processInstanceScope = Signal.SCOPE_PROCESS_INSTANCE.equals(signal.getScope());
-    this.signalDefinition = signalDefinition;
-  }
-  
-  public void execute(DelegateExecution execution) {
-    
-    CommandContext commandContext = Context.getCommandContext();
-    
-    List<SignalEventSubscriptionEntity> subscriptionEntities = null;
-    if (processInstanceScope) {
-      subscriptionEntities = commandContext
-              .getEventSubscriptionEntityManager()
-              .findSignalEventSubscriptionsByProcessInstanceAndEventName(execution.getProcessInstanceId(), signalDefinition.getEventName());
-    } else {
-      subscriptionEntities = commandContext
-              .getEventSubscriptionEntityManager()
-              .findSignalEventSubscriptionsByEventName(signalDefinition.getEventName(), execution.getTenantId());
+    private static final long serialVersionUID = -2961893934810190972L;
+
+    protected final boolean processInstanceScope;
+    protected final EventSubscriptionDeclaration signalDefinition;
+
+    public IntermediateThrowSignalEventActivityBehavior(ThrowEvent throwEvent, Signal signal, EventSubscriptionDeclaration signalDefinition) {
+        this.processInstanceScope = Signal.SCOPE_PROCESS_INSTANCE.equals(signal.getScope());
+        this.signalDefinition = signalDefinition;
     }
-    
-    for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : subscriptionEntities) {
-      signalEventSubscriptionEntity.eventReceived(null, signalDefinition.isAsync());
+
+    public void execute(DelegateExecution execution) {
+
+        CommandContext commandContext = Context.getCommandContext();
+
+        List<SignalEventSubscriptionEntity> subscriptionEntities = null;
+        if (processInstanceScope) {
+            subscriptionEntities = commandContext
+                    .getEventSubscriptionEntityManager()
+                    .findSignalEventSubscriptionsByProcessInstanceAndEventName(execution.getProcessInstanceId(), signalDefinition.getEventName());
+        } else {
+            subscriptionEntities = commandContext
+                    .getEventSubscriptionEntityManager()
+                    .findSignalEventSubscriptionsByEventName(signalDefinition.getEventName(), execution.getTenantId());
+        }
+
+        for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : subscriptionEntities) {
+            signalEventSubscriptionEntity.eventReceived(null, signalDefinition.isAsync());
+        }
+
+        ActivityExecution activityExecution = (ActivityExecution) execution;
+        if (activityExecution.getActivity() != null) { // don't continue if process has already finished
+            leave(activityExecution);
+        }
     }
-    
-    ActivityExecution activityExecution = (ActivityExecution) execution;
-    if (activityExecution.getActivity() != null) { // don't continue if process has already finished
-      leave(activityExecution);
-    }
-  }
- 
+
 }

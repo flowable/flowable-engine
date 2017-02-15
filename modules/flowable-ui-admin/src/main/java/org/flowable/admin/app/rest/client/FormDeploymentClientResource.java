@@ -35,25 +35,25 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RestController
 public class FormDeploymentClientResource extends AbstractClientResource {
 
-  private static final Logger logger = LoggerFactory.getLogger(FormDeploymentClientResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(FormDeploymentClientResource.class);
 
-  @Autowired
-  protected FormDeploymentService clientService;
+    @Autowired
+    protected FormDeploymentService clientService;
 
-  @RequestMapping(value = "/rest/admin/form-deployments/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getDeployment(@PathVariable String deploymentId) throws BadRequestException {
+    @RequestMapping(value = "/rest/admin/form-deployments/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getDeployment(@PathVariable String deploymentId) throws BadRequestException {
 
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
-    try {
-      return clientService.getDeployment(serverConfig, deploymentId);
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting form deployment {}", deploymentId, e);
-      throw new BadRequestException(e.getMessage());
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+        try {
+            return clientService.getDeployment(serverConfig, deploymentId);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting form deployment {}", deploymentId, e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
 
-  @RequestMapping(value = "/rest/admin/form-deployments/{deploymentId}", method = RequestMethod.DELETE)
-  public void deleteDeployment(@PathVariable String deploymentId, HttpServletResponse httpResponse) {
-    clientService.deleteDeployment(retrieveServerConfig(EndpointType.FORM), httpResponse, deploymentId);
-  }
+    @RequestMapping(value = "/rest/admin/form-deployments/{deploymentId}", method = RequestMethod.DELETE)
+    public void deleteDeployment(@PathVariable String deploymentId, HttpServletResponse httpResponse) {
+        clientService.deleteDeployment(retrieveServerConfig(EndpointType.FORM), httpResponse, deploymentId);
+    }
 }

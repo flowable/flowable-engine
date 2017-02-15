@@ -33,54 +33,54 @@ import org.springframework.jms.core.MessageCreator;
  * @author Joram Barrez
  */
 public class MessageBasedJobManager extends DefaultJobManager {
-  
-  protected JmsTemplate jmsTemplate;
-  
-  public MessageBasedJobManager() {
-    super(null);
-  }
 
-  public MessageBasedJobManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    super(processEngineConfiguration);
-  }
-  
-  @Override
-  protected void triggerExecutorIfNeeded(final JobEntity jobEntity) {
-    sendMessage(jobEntity);
-  }
+    protected JmsTemplate jmsTemplate;
 
-  @Override
-  public void unacquire(final Job job) {
-    
-    if (job instanceof JobEntity) {
-      JobEntity jobEntity = (JobEntity) job;
-      
-      // When unacquiring, we up the lock time again., so that it isn't cleared by the reset expired thread.
-      jobEntity.setLockExpirationTime(new Date(processEngineConfiguration.getClock().getCurrentTime().getTime() 
-          + processEngineConfiguration.getAsyncExecutor().getAsyncJobLockTimeInMillis()));
+    public MessageBasedJobManager() {
+        super(null);
     }
-    
-    sendMessage(job);
-  }
-  
-  protected void sendMessage(final Job jobEntity) {
-    Context.getTransactionContext().addTransactionListener(TransactionState.COMMITTED, new TransactionListener() {
-      public void execute(CommandContext commandContext) {
-        jmsTemplate.send(new MessageCreator() {
-          public Message createMessage(Session session) throws JMSException {
-            return session.createTextMessage(jobEntity.getId());
-          }
-        });
-      }
-    });
-  }
-  
-  public JmsTemplate getJmsTemplate() {
-    return jmsTemplate;
-  }
 
-  public void setJmsTemplate(JmsTemplate jmsTemplate) {
-    this.jmsTemplate = jmsTemplate;
-  }
+    public MessageBasedJobManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+
+    @Override
+    protected void triggerExecutorIfNeeded(final JobEntity jobEntity) {
+        sendMessage(jobEntity);
+    }
+
+    @Override
+    public void unacquire(final Job job) {
+
+        if (job instanceof JobEntity) {
+            JobEntity jobEntity = (JobEntity) job;
+
+            // When unacquiring, we up the lock time again., so that it isn't cleared by the reset expired thread.
+            jobEntity.setLockExpirationTime(new Date(processEngineConfiguration.getClock().getCurrentTime().getTime()
+                    + processEngineConfiguration.getAsyncExecutor().getAsyncJobLockTimeInMillis()));
+        }
+
+        sendMessage(job);
+    }
+
+    protected void sendMessage(final Job jobEntity) {
+        Context.getTransactionContext().addTransactionListener(TransactionState.COMMITTED, new TransactionListener() {
+            public void execute(CommandContext commandContext) {
+                jmsTemplate.send(new MessageCreator() {
+                    public Message createMessage(Session session) throws JMSException {
+                        return session.createTextMessage(jobEntity.getId());
+                    }
+                });
+            }
+        });
+    }
+
+    public JmsTemplate getJmsTemplate() {
+        return jmsTemplate;
+    }
+
+    public void setJmsTemplate(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+    }
 
 }

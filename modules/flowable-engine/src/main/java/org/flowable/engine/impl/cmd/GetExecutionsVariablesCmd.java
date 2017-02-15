@@ -26,32 +26,32 @@ import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
 /**
  * @author Daisuke Yoshimoto
  */
-public class GetExecutionsVariablesCmd implements Command<List<VariableInstance>>, Serializable{
+public class GetExecutionsVariablesCmd implements Command<List<VariableInstance>>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected Set<String> executionIds;
-  
-  public GetExecutionsVariablesCmd(Set<String> executionIds) {
-    this.executionIds = executionIds;
-  }
-  
-  @Override
-  public List<VariableInstance> execute(CommandContext commandContext) {
-    // Verify existence of executions
-    if (executionIds == null) {
-      throw new FlowableIllegalArgumentException("executionIds is null");
+    private static final long serialVersionUID = 1L;
+    protected Set<String> executionIds;
+
+    public GetExecutionsVariablesCmd(Set<String> executionIds) {
+        this.executionIds = executionIds;
     }
-    if (executionIds.isEmpty()){
-      throw new FlowableIllegalArgumentException("Set of executionIds is empty");
+
+    @Override
+    public List<VariableInstance> execute(CommandContext commandContext) {
+        // Verify existence of executions
+        if (executionIds == null) {
+            throw new FlowableIllegalArgumentException("executionIds is null");
+        }
+        if (executionIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Set of executionIds is empty");
+        }
+
+        List<VariableInstance> instances = new ArrayList<VariableInstance>();
+        List<VariableInstanceEntity> entities = commandContext.getVariableInstanceEntityManager().findVariableInstancesByExecutionIds(executionIds);
+        for (VariableInstanceEntity entity : entities) {
+            entity.getValue();
+            instances.add(entity);
+        }
+        return instances;
     }
-    
-    List<VariableInstance> instances = new ArrayList<VariableInstance>();
-    List<VariableInstanceEntity> entities = commandContext.getVariableInstanceEntityManager().findVariableInstancesByExecutionIds(executionIds);
-    for (VariableInstanceEntity entity : entities){
-        entity.getValue();
-        instances.add(entity);
-    }
-    return instances;
-  }
 
 }

@@ -25,52 +25,52 @@ import org.flowable.idm.engine.impl.persistence.entity.data.MembershipDataManage
  */
 public class MembershipEntityManagerImpl extends AbstractEntityManager<MembershipEntity> implements MembershipEntityManager {
 
-  protected MembershipDataManager membershipDataManager;
-  
-  public MembershipEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, MembershipDataManager membershipDataManager) {
-    super(idmEngineConfiguration);
-    this.membershipDataManager = membershipDataManager;
-  }
- 
-  @Override
-  protected DataManager<MembershipEntity> getDataManager() {
-    return membershipDataManager;
-  }
- 
-  public void createMembership(String userId, String groupId) {
-    MembershipEntity membershipEntity = create();
-    membershipEntity.setUserId(userId);
-    membershipEntity.setGroupId(groupId);
-    insert(membershipEntity, false);
+    protected MembershipDataManager membershipDataManager;
 
-    if (getEventDispatcher().isEnabled()) {
-      getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createMembershipEvent(FlowableIdmEventType.MEMBERSHIP_CREATED, groupId, userId));
+    public MembershipEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, MembershipDataManager membershipDataManager) {
+        super(idmEngineConfiguration);
+        this.membershipDataManager = membershipDataManager;
     }
-  }
 
-  public void deleteMembership(String userId, String groupId) {
-    membershipDataManager.deleteMembership(userId, groupId);  
-    if (getEventDispatcher().isEnabled()) {
-      getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createMembershipEvent(FlowableIdmEventType.MEMBERSHIP_DELETED, groupId, userId));
+    @Override
+    protected DataManager<MembershipEntity> getDataManager() {
+        return membershipDataManager;
     }
-  }
-  
-  @Override
-  public void deleteMembershipByGroupId(String groupId) {
-    membershipDataManager.deleteMembershipByGroupId(groupId);
-  }
-  
-  @Override
-  public void deleteMembershipByUserId(String userId) {
-    membershipDataManager.deleteMembershipByUserId(userId);
-  }
 
-  public MembershipDataManager getMembershipDataManager() {
-    return membershipDataManager;
-  }
+    public void createMembership(String userId, String groupId) {
+        MembershipEntity membershipEntity = create();
+        membershipEntity.setUserId(userId);
+        membershipEntity.setGroupId(groupId);
+        insert(membershipEntity, false);
 
-  public void setMembershipDataManager(MembershipDataManager membershipDataManager) {
-    this.membershipDataManager = membershipDataManager;
-  }
-  
+        if (getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createMembershipEvent(FlowableIdmEventType.MEMBERSHIP_CREATED, groupId, userId));
+        }
+    }
+
+    public void deleteMembership(String userId, String groupId) {
+        membershipDataManager.deleteMembership(userId, groupId);
+        if (getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createMembershipEvent(FlowableIdmEventType.MEMBERSHIP_DELETED, groupId, userId));
+        }
+    }
+
+    @Override
+    public void deleteMembershipByGroupId(String groupId) {
+        membershipDataManager.deleteMembershipByGroupId(groupId);
+    }
+
+    @Override
+    public void deleteMembershipByUserId(String userId) {
+        membershipDataManager.deleteMembershipByUserId(userId);
+    }
+
+    public MembershipDataManager getMembershipDataManager() {
+        return membershipDataManager;
+    }
+
+    public void setMembershipDataManager(MembershipDataManager membershipDataManager) {
+        this.membershipDataManager = membershipDataManager;
+    }
+
 }

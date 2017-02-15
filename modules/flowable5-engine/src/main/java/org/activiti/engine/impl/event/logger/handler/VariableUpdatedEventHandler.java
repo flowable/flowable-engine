@@ -22,14 +22,14 @@ import org.flowable.engine.delegate.event.FlowableVariableEvent;
  * @author Joram Barrez
  */
 public class VariableUpdatedEventHandler extends VariableEventHandler {
-	
-	@Override
-	public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
-		FlowableVariableEvent variableEvent = (FlowableVariableEvent) event;
-		Map<String, Object> data = createData(variableEvent);
 
-    return createEventLogEntry(variableEvent.getProcessDefinitionId(), variableEvent.getProcessInstanceId(), 
-    		variableEvent.getExecutionId(), variableEvent.getTaskId(), data);
-	}
+    @Override
+    public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
+        FlowableVariableEvent variableEvent = (FlowableVariableEvent) event;
+        Map<String, Object> data = createData(variableEvent);
+
+        return createEventLogEntry(variableEvent.getProcessDefinitionId(), variableEvent.getProcessInstanceId(),
+                variableEvent.getExecutionId(), variableEvent.getTaskId(), data);
+    }
 
 }

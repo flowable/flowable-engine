@@ -25,22 +25,22 @@ import org.flowable.engine.runtime.Job;
  * @author Vasile Dirla
  */
 public interface TimerJobDataManager extends DataManager<TimerJobEntity> {
-  
-  List<TimerJobEntity> findTimerJobsToExecute(Page page);
 
-  List<TimerJobEntity> findJobsByTypeAndProcessDefinitionId(String jobHandlerType, String processDefinitionId);
-  
-  List<TimerJobEntity> findJobsByTypeAndProcessDefinitionKeyNoTenantId(String jobHandlerType, String processDefinitionKey);
-  
-  List<TimerJobEntity> findJobsByTypeAndProcessDefinitionKeyAndTenantId(String jobHandlerType, String processDefinitionKey, String tenantId);
+    List<TimerJobEntity> findTimerJobsToExecute(Page page);
 
-  List<TimerJobEntity> findJobsByExecutionId(String executionId);
-  
-  List<TimerJobEntity> findJobsByProcessInstanceId(String processInstanceId);
+    List<TimerJobEntity> findJobsByTypeAndProcessDefinitionId(String jobHandlerType, String processDefinitionId);
 
-  List<Job> findJobsByQueryCriteria(TimerJobQueryImpl jobQuery, Page page);
+    List<TimerJobEntity> findJobsByTypeAndProcessDefinitionKeyNoTenantId(String jobHandlerType, String processDefinitionKey);
 
-  long findJobCountByQueryCriteria(TimerJobQueryImpl jobQuery);
-  
-  void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
+    List<TimerJobEntity> findJobsByTypeAndProcessDefinitionKeyAndTenantId(String jobHandlerType, String processDefinitionKey, String tenantId);
+
+    List<TimerJobEntity> findJobsByExecutionId(String executionId);
+
+    List<TimerJobEntity> findJobsByProcessInstanceId(String processInstanceId);
+
+    List<Job> findJobsByQueryCriteria(TimerJobQueryImpl jobQuery, Page page);
+
+    long findJobCountByQueryCriteria(TimerJobQueryImpl jobQuery);
+
+    void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
 }

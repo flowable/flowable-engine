@@ -33,223 +33,221 @@ import org.slf4j.LoggerFactory;
  */
 public class DbSqlSession implements Session {
 
-  private static final Logger log = LoggerFactory.getLogger(DbSqlSession.class);
-  
-  public static String[] JDBC_METADATA_TABLE_TYPES = { "TABLE" };
+    private static final Logger log = LoggerFactory.getLogger(DbSqlSession.class);
 
-  protected SqlSession sqlSession;
-  protected DbSqlSessionFactory dbSqlSessionFactory;
-  protected String connectionMetadataDefaultCatalog;
-  protected String connectionMetadataDefaultSchema;
+    public static String[] JDBC_METADATA_TABLE_TYPES = { "TABLE" };
 
-  public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory) {
-    this.dbSqlSessionFactory = dbSqlSessionFactory;
-    this.sqlSession = dbSqlSessionFactory.getSqlSessionFactory().openSession();
-  }
+    protected SqlSession sqlSession;
+    protected DbSqlSessionFactory dbSqlSessionFactory;
+    protected String connectionMetadataDefaultCatalog;
+    protected String connectionMetadataDefaultSchema;
 
-  public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, Connection connection, String catalog, String schema) {
-    this.dbSqlSessionFactory = dbSqlSessionFactory;
-    this.sqlSession = dbSqlSessionFactory.getSqlSessionFactory().openSession(connection); // Note the use of connection param here, different from other constructor
-    this.connectionMetadataDefaultCatalog = catalog;
-    this.connectionMetadataDefaultSchema = schema;
-  }
-  
-  // insert ///////////////////////////////////////////////////////////////////
-  
-  
-  public void insert(Entity entity) {
-    if (entity.getId() == null) {
-      String id = dbSqlSessionFactory.getIdGenerator().getNextId();
-      entity.setId(id);
-    }
-    
-    String insertStatement = dbSqlSessionFactory.getInsertStatement(entity);
-    insertStatement = dbSqlSessionFactory.mapStatement(insertStatement);
-
-    if (insertStatement==null) {
-      throw new FlowableException("no insert statement for " + entity.getClass() + " in the ibatis mapping files");
-    }
-    
-    log.debug("inserting: {}", entity);
-    sqlSession.insert(insertStatement, entity);
-  }
-
-  // update
-  // ///////////////////////////////////////////////////////////////////
-
-  public void update(Entity entity) {
-    String updateStatement = dbSqlSessionFactory.getUpdateStatement(entity);
-    updateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
-
-    if (updateStatement == null) {
-      throw new FlowableException("no update statement for " + entity.getClass() + " in the ibatis mapping files");
+    public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory) {
+        this.dbSqlSessionFactory = dbSqlSessionFactory;
+        this.sqlSession = dbSqlSessionFactory.getSqlSessionFactory().openSession();
     }
 
-    log.debug("updating: {}", entity);
-    int updatedRecords = sqlSession.update(updateStatement, entity);
-    if (updatedRecords == 0) {
-      throw new FlowableOptimisticLockingException(entity + " was updated by another transaction concurrently");
-    }
-  }
-
-  public int update(String statement, Object parameters) {
-    String updateStatement = dbSqlSessionFactory.mapStatement(statement);
-    return sqlSession.update(updateStatement, parameters);
-  }
-
-  // delete
-  // ///////////////////////////////////////////////////////////////////
-
-  public void delete(String statement, Object parameter) {
-    sqlSession.delete(statement, parameter);
-  }
-
-  public void delete(Entity entity) {
-    String deleteStatement = dbSqlSessionFactory.getDeleteStatement(entity.getClass());
-    deleteStatement = dbSqlSessionFactory.mapStatement(deleteStatement);
-    if (deleteStatement == null) {
-      throw new FlowableException("no delete statement for " + entity.getClass() + " in the ibatis mapping files");
+    public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, Connection connection, String catalog, String schema) {
+        this.dbSqlSessionFactory = dbSqlSessionFactory;
+        this.sqlSession = dbSqlSessionFactory.getSqlSessionFactory().openSession(connection); // Note the use of connection param here, different from other constructor
+        this.connectionMetadataDefaultCatalog = catalog;
+        this.connectionMetadataDefaultSchema = schema;
     }
 
-    sqlSession.delete(deleteStatement, entity);
-  }
+    // insert ///////////////////////////////////////////////////////////////////
 
-  // select
-  // ///////////////////////////////////////////////////////////////////
+    public void insert(Entity entity) {
+        if (entity.getId() == null) {
+            String id = dbSqlSessionFactory.getIdGenerator().getNextId();
+            entity.setId(id);
+        }
 
-  @SuppressWarnings({ "rawtypes" })
-  public List selectList(String statement) {
-    return selectList(statement, null, 0, Integer.MAX_VALUE);
-  }
+        String insertStatement = dbSqlSessionFactory.getInsertStatement(entity);
+        insertStatement = dbSqlSessionFactory.mapStatement(insertStatement);
 
-  @SuppressWarnings("rawtypes")
-  public List selectList(String statement, Object parameter) {
-    return selectList(statement, parameter, 0, Integer.MAX_VALUE);
-  }
+        if (insertStatement == null) {
+            throw new FlowableException("no insert statement for " + entity.getClass() + " in the ibatis mapping files");
+        }
 
-  @SuppressWarnings("rawtypes")
-  public List selectList(String statement, Object parameter, Page page) {
-    if (page != null) {
-      return selectList(statement, parameter, page.getFirstResult(), page.getMaxResults());
-    } else {
-      return selectList(statement, parameter, 0, Integer.MAX_VALUE);
+        log.debug("inserting: {}", entity);
+        sqlSession.insert(insertStatement, entity);
     }
-  }
 
-  @SuppressWarnings("rawtypes")
-  public List selectList(String statement, ListQueryParameterObject parameter, Page page) {
-    if (page != null) {
-      parameter.setFirstResult(page.getFirstResult());
-      parameter.setMaxResults(page.getMaxResults());
+    // update
+    // ///////////////////////////////////////////////////////////////////
+
+    public void update(Entity entity) {
+        String updateStatement = dbSqlSessionFactory.getUpdateStatement(entity);
+        updateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
+
+        if (updateStatement == null) {
+            throw new FlowableException("no update statement for " + entity.getClass() + " in the ibatis mapping files");
+        }
+
+        log.debug("updating: {}", entity);
+        int updatedRecords = sqlSession.update(updateStatement, entity);
+        if (updatedRecords == 0) {
+            throw new FlowableOptimisticLockingException(entity + " was updated by another transaction concurrently");
+        }
     }
-    return selectList(statement, parameter);
-  }
 
-  @SuppressWarnings("rawtypes")
-  public List selectList(String statement, Object parameter, int firstResult, int maxResults) {
-    return selectList(statement, new ListQueryParameterObject(parameter, firstResult, maxResults));
-  }
-
-  @SuppressWarnings("rawtypes")
-  public List selectList(String statement, ListQueryParameterObject parameter) {
-    return selectListWithRawParameter(statement, parameter, parameter.getFirstResult(), parameter.getMaxResults());
-  }
-
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  public List selectListWithRawParameter(String statement, Object parameter, int firstResult, int maxResults) {
-    statement = dbSqlSessionFactory.mapStatement(statement);
-    if (firstResult == -1 || maxResults == -1) {
-      return Collections.EMPTY_LIST;
+    public int update(String statement, Object parameters) {
+        String updateStatement = dbSqlSessionFactory.mapStatement(statement);
+        return sqlSession.update(updateStatement, parameters);
     }
-    List loadedObjects = sqlSession.selectList(statement, parameter);
-    return loadedObjects;
-  }
 
-  @SuppressWarnings({ "rawtypes" })
-  public List selectListWithRawParameterWithoutFilter(String statement, Object parameter, int firstResult, int maxResults) {
-    statement = dbSqlSessionFactory.mapStatement(statement);
-    if (firstResult == -1 || maxResults == -1) {
-      return Collections.EMPTY_LIST;
+    // delete
+    // ///////////////////////////////////////////////////////////////////
+
+    public void delete(String statement, Object parameter) {
+        sqlSession.delete(statement, parameter);
     }
-    return sqlSession.selectList(statement, parameter);
-  }
 
-  public Object selectOne(String statement, Object parameter) {
-    statement = dbSqlSessionFactory.mapStatement(statement);
-    Object result = sqlSession.selectOne(statement, parameter);
-    return result;
-  }
-  
-  @SuppressWarnings("unchecked")
-  public <T extends Entity> T selectById(Class<T> entityClass, String id) {
-    T entity = null;
-    
-    String selectStatement = dbSqlSessionFactory.getSelectStatement(entityClass);
-    selectStatement = dbSqlSessionFactory.mapStatement(selectStatement);
-    entity = (T) sqlSession.selectOne(selectStatement, id);
-    if (entity == null) {
-      return null;
+    public void delete(Entity entity) {
+        String deleteStatement = dbSqlSessionFactory.getDeleteStatement(entity.getClass());
+        deleteStatement = dbSqlSessionFactory.mapStatement(deleteStatement);
+        if (deleteStatement == null) {
+            throw new FlowableException("no delete statement for " + entity.getClass() + " in the ibatis mapping files");
+        }
+
+        sqlSession.delete(deleteStatement, entity);
     }
-    
-    return entity;
-  }
-  
-  public void flush() {
-    sqlSession.flushStatements();
-  }
 
-  public void close() {
-    sqlSession.close();
-  }
+    // select
+    // ///////////////////////////////////////////////////////////////////
 
-  public void commit() {
-    sqlSession.commit();
-  }
+    @SuppressWarnings({ "rawtypes" })
+    public List selectList(String statement) {
+        return selectList(statement, null, 0, Integer.MAX_VALUE);
+    }
 
-  public void rollback() {
-    sqlSession.rollback();
-  }
+    @SuppressWarnings("rawtypes")
+    public List selectList(String statement, Object parameter) {
+        return selectList(statement, parameter, 0, Integer.MAX_VALUE);
+    }
 
-  // schema operations
-  // ////////////////////////////////////////////////////////
+    @SuppressWarnings("rawtypes")
+    public List selectList(String statement, Object parameter, Page page) {
+        if (page != null) {
+            return selectList(statement, parameter, page.getFirstResult(), page.getMaxResults());
+        } else {
+            return selectList(statement, parameter, 0, Integer.MAX_VALUE);
+        }
+    }
 
-  public void dbSchemaCheckVersion() {
-    log.debug("flowable dmn db schema check successful");
-  }
+    @SuppressWarnings("rawtypes")
+    public List selectList(String statement, ListQueryParameterObject parameter, Page page) {
+        if (page != null) {
+            parameter.setFirstResult(page.getFirstResult());
+            parameter.setMaxResults(page.getMaxResults());
+        }
+        return selectList(statement, parameter);
+    }
 
-  public void dbSchemaCreate() {
-    
-  }
+    @SuppressWarnings("rawtypes")
+    public List selectList(String statement, Object parameter, int firstResult, int maxResults) {
+        return selectList(statement, new ListQueryParameterObject(parameter, firstResult, maxResults));
+    }
 
-  public void dbSchemaDrop() {
-    
-  }
+    @SuppressWarnings("rawtypes")
+    public List selectList(String statement, ListQueryParameterObject parameter) {
+        return selectListWithRawParameter(statement, parameter, parameter.getFirstResult(), parameter.getMaxResults());
+    }
 
-  public <T> T getCustomMapper(Class<T> type) {
-    return sqlSession.getMapper(type);
-  }
-  
-  public boolean isMysql() {
-    return dbSqlSessionFactory.getDatabaseType().equals("mysql");
-  }
-  
-  public boolean isOracle() {
-    return dbSqlSessionFactory.getDatabaseType().equals("oracle");
-  }
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public List selectListWithRawParameter(String statement, Object parameter, int firstResult, int maxResults) {
+        statement = dbSqlSessionFactory.mapStatement(statement);
+        if (firstResult == -1 || maxResults == -1) {
+            return Collections.EMPTY_LIST;
+        }
+        List loadedObjects = sqlSession.selectList(statement, parameter);
+        return loadedObjects;
+    }
 
-  // query factory methods
-  // ////////////////////////////////////////////////////
+    @SuppressWarnings({ "rawtypes" })
+    public List selectListWithRawParameterWithoutFilter(String statement, Object parameter, int firstResult, int maxResults) {
+        statement = dbSqlSessionFactory.mapStatement(statement);
+        if (firstResult == -1 || maxResults == -1) {
+            return Collections.EMPTY_LIST;
+        }
+        return sqlSession.selectList(statement, parameter);
+    }
 
+    public Object selectOne(String statement, Object parameter) {
+        statement = dbSqlSessionFactory.mapStatement(statement);
+        Object result = sqlSession.selectOne(statement, parameter);
+        return result;
+    }
 
-  // getters and setters
-  // //////////////////////////////////////////////////////
+    @SuppressWarnings("unchecked")
+    public <T extends Entity> T selectById(Class<T> entityClass, String id) {
+        T entity = null;
 
-  public SqlSession getSqlSession() {
-    return sqlSession;
-  }
+        String selectStatement = dbSqlSessionFactory.getSelectStatement(entityClass);
+        selectStatement = dbSqlSessionFactory.mapStatement(selectStatement);
+        entity = (T) sqlSession.selectOne(selectStatement, id);
+        if (entity == null) {
+            return null;
+        }
 
-  public DbSqlSessionFactory getDbSqlSessionFactory() {
-    return dbSqlSessionFactory;
-  }
+        return entity;
+    }
+
+    public void flush() {
+        sqlSession.flushStatements();
+    }
+
+    public void close() {
+        sqlSession.close();
+    }
+
+    public void commit() {
+        sqlSession.commit();
+    }
+
+    public void rollback() {
+        sqlSession.rollback();
+    }
+
+    // schema operations
+    // ////////////////////////////////////////////////////////
+
+    public void dbSchemaCheckVersion() {
+        log.debug("flowable dmn db schema check successful");
+    }
+
+    public void dbSchemaCreate() {
+
+    }
+
+    public void dbSchemaDrop() {
+
+    }
+
+    public <T> T getCustomMapper(Class<T> type) {
+        return sqlSession.getMapper(type);
+    }
+
+    public boolean isMysql() {
+        return dbSqlSessionFactory.getDatabaseType().equals("mysql");
+    }
+
+    public boolean isOracle() {
+        return dbSqlSessionFactory.getDatabaseType().equals("oracle");
+    }
+
+    // query factory methods
+    // ////////////////////////////////////////////////////
+
+    // getters and setters
+    // //////////////////////////////////////////////////////
+
+    public SqlSession getSqlSession() {
+        return sqlSession;
+    }
+
+    public DbSqlSessionFactory getDbSqlSessionFactory() {
+        return dbSqlSessionFactory;
+    }
 
 }

@@ -23,47 +23,47 @@ import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
  */
 public class PropertyEntityImpl extends AbstractEntity implements PropertyEntity, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String name;
-  protected  String value;
+    protected String name;
+    protected String value;
 
-  public PropertyEntityImpl() {
-  }
+    public PropertyEntityImpl() {
+    }
 
-  public String getName() {
-    return name;
-  }
-  
-  public void setName(String name) {
-    this.name = name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String getValue() {
-    return value;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public void setValue(String value) {
-    this.value = value;
-  }
+    public String getValue() {
+        return value;
+    }
 
-  public String getId() {
-    return name;
-  }
+    public void setValue(String value) {
+        this.value = value;
+    }
 
-  public Object getPersistentState() {
-    return value;
-  }
+    public String getId() {
+        return name;
+    }
 
-  public void setId(String id) {
-    throw new FlowableException("only provided id generation allowed for properties");
-  }
+    public Object getPersistentState() {
+        return value;
+    }
 
-  // common methods //////////////////////////////////////////////////////////
+    public void setId(String id) {
+        throw new FlowableException("only provided id generation allowed for properties");
+    }
 
-  @Override
-  public String toString() {
-    return "PropertyEntity[name=" + name + ", value=" + value + "]";
-  }
+    // common methods //////////////////////////////////////////////////////////
+
+    @Override
+    public String toString() {
+        return "PropertyEntity[name=" + name + ", value=" + value + "]";
+    }
 
 }

@@ -38,105 +38,101 @@ import io.swagger.annotations.ApiResponses;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Instances" }, description = "Manage Process Instances", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Process Instances" }, description = "Manage Process Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceResource extends BaseProcessInstanceResource {
 
-  @ApiOperation(value = "Get a process instance", tags = {"Process Instances"}, nickname = "getProcessInstance")
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates the process instance was found and returned."),
-          @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
-  })
-  @RequestMapping(value = "/runtime/process-instances/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
-  public ProcessInstanceResponse getProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
-    return restResponseFactory.createProcessInstanceResponse(getProcessInstanceFromRequest(processInstanceId));
-  }
-
-  @ApiOperation(value = "Delete a process instance", tags = {"Process Instances"}, nickname = "deleteProcessInstance")
-  @ApiResponses(value = {
-          @ApiResponse(code = 204, message = "Indicates the process instance was found and deleted. Response body is left empty intentionally."),
-          @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
-  })
-  @RequestMapping(value = "/runtime/process-instances/{processInstanceId}", method = RequestMethod.DELETE)
-  public void deleteProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
-
-    ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
-
-    runtimeService.deleteProcessInstance(processInstance.getId(), deleteReason);
-    response.setStatus(HttpStatus.NO_CONTENT.value());
-  }
-
-  @ApiOperation(value = "Activate or suspend a process instance", tags = {"Process Instances"},
-          notes="## Activate a process instance\n\n"
-                  + " ```JSON\n" + "{\n" + "  \"action\" : \"suspend\"\n" + "} ```"
-                  + "\n\n\n"
-                  + "## Suspend a process instance\n\n"
-                  + " ```JSON\n" + "{\n" + "  \"action\" : \"activate\"\n" + "} ```"
-                  + "\n\n\n"
-  )
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates the process instance was found and action was executed."),
-          @ApiResponse(code = 400, message = "\t\n" + "Indicates an invalid action was supplied."),
-          @ApiResponse(code = 409, message = "Indicates the requested process instance action cannot be executed since the process-instance is already activated/suspended."),
-          @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
-  })
-  @RequestMapping(value = "/runtime/process-instances/{processInstanceId}", method = RequestMethod.PUT, produces = "application/json")
-  public ProcessInstanceResponse performProcessInstanceAction(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestBody ProcessInstanceActionRequest actionRequest, HttpServletRequest request) {
-
-    ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
-
-    if (ProcessInstanceActionRequest.ACTION_ACTIVATE.equals(actionRequest.getAction())) {
-      return activateProcessInstance(processInstance);
-
-    } else if (ProcessInstanceActionRequest.ACTION_SUSPEND.equals(actionRequest.getAction())) {
-      return suspendProcessInstance(processInstance);
+    @ApiOperation(value = "Get a process instance", tags = { "Process Instances" }, nickname = "getProcessInstance")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the process instance was found and returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
+    })
+    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
+    public ProcessInstanceResponse getProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
+        return restResponseFactory.createProcessInstanceResponse(getProcessInstanceFromRequest(processInstanceId));
     }
-    throw new FlowableIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
-  }
-  
-  @ApiOperation(value = "Change the state a process instance", tags = {"Process Instances"},
-          notes="```JSON\n" + "{\n" + "  \"cancelActivityId\" : \"task2\"\n" 
-                  + "  \"startActivityId\" : \"task1\"\n } ```"
-                  + "\n\n\n"
-  )
-  @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Indicates the process instance was found and change state activity was executed."),
-        @ApiResponse(code = 409, message = "Indicates the requested process instance action cannot be executed since the process-instance is already activated/suspended."),
-        @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
-  })
-  @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/change-state", method = RequestMethod.POST, produces = "application/json")
-  public void changeActivityState(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, 
-      @RequestBody ProcessInstanceChangeActivityStateRequest activityStateRequest, HttpServletRequest request) {
 
-    runtimeService.createChangeActivityStateBuilder()
-        .processInstanceId(processInstanceId)
-        .cancelActivityId(activityStateRequest.getCancelActivityId())
-        .startActivityId(activityStateRequest.getStartActivityId())
-        .changeState();
-  }
+    @ApiOperation(value = "Delete a process instance", tags = { "Process Instances" }, nickname = "deleteProcessInstance")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the process instance was found and deleted. Response body is left empty intentionally."),
+            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
+    })
+    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}", method = RequestMethod.DELETE)
+    public void deleteProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
 
-  protected ProcessInstanceResponse activateProcessInstance(ProcessInstance processInstance) {
-    if (!processInstance.isSuspended()) {
-      throw new FlowableConflictException("Process instance with id '" + processInstance.getId() + "' is already active.");
+        ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
+
+        runtimeService.deleteProcessInstance(processInstance.getId(), deleteReason);
+        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
-    runtimeService.activateProcessInstanceById(processInstance.getId());
 
-    ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(processInstance);
+    @ApiOperation(value = "Activate or suspend a process instance", tags = { "Process Instances" }, notes = "## Activate a process instance\n\n"
+            + " ```JSON\n" + "{\n" + "  \"action\" : \"suspend\"\n" + "} ```"
+            + "\n\n\n"
+            + "## Suspend a process instance\n\n"
+            + " ```JSON\n" + "{\n" + "  \"action\" : \"activate\"\n" + "} ```"
+            + "\n\n\n")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the process instance was found and action was executed."),
+            @ApiResponse(code = 400, message = "\t\n" + "Indicates an invalid action was supplied."),
+            @ApiResponse(code = 409, message = "Indicates the requested process instance action cannot be executed since the process-instance is already activated/suspended."),
+            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
+    })
+    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}", method = RequestMethod.PUT, produces = "application/json")
+    public ProcessInstanceResponse performProcessInstanceAction(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestBody ProcessInstanceActionRequest actionRequest, HttpServletRequest request) {
 
-    // No need to re-fetch the instance, just alter the suspended state of the result-object
-    response.setSuspended(false);
-    return response;
-  }
+        ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
 
-  protected ProcessInstanceResponse suspendProcessInstance(ProcessInstance processInstance) {
-    if (processInstance.isSuspended()) {
-      throw new FlowableConflictException("Process instance with id '" + processInstance.getId() + "' is already suspended.");
+        if (ProcessInstanceActionRequest.ACTION_ACTIVATE.equals(actionRequest.getAction())) {
+            return activateProcessInstance(processInstance);
+
+        } else if (ProcessInstanceActionRequest.ACTION_SUSPEND.equals(actionRequest.getAction())) {
+            return suspendProcessInstance(processInstance);
+        }
+        throw new FlowableIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
     }
-    runtimeService.suspendProcessInstanceById(processInstance.getId());
 
-    ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(processInstance);
+    @ApiOperation(value = "Change the state a process instance", tags = { "Process Instances" }, notes = "```JSON\n" + "{\n" + "  \"cancelActivityId\" : \"task2\"\n"
+            + "  \"startActivityId\" : \"task1\"\n } ```"
+            + "\n\n\n")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the process instance was found and change state activity was executed."),
+            @ApiResponse(code = 409, message = "Indicates the requested process instance action cannot be executed since the process-instance is already activated/suspended."),
+            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
+    })
+    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/change-state", method = RequestMethod.POST, produces = "application/json")
+    public void changeActivityState(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId,
+            @RequestBody ProcessInstanceChangeActivityStateRequest activityStateRequest, HttpServletRequest request) {
 
-    // No need to re-fetch the instance, just alter the suspended state of the result-object
-    response.setSuspended(true);
-    return response;
-  }
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstanceId)
+                .cancelActivityId(activityStateRequest.getCancelActivityId())
+                .startActivityId(activityStateRequest.getStartActivityId())
+                .changeState();
+    }
+
+    protected ProcessInstanceResponse activateProcessInstance(ProcessInstance processInstance) {
+        if (!processInstance.isSuspended()) {
+            throw new FlowableConflictException("Process instance with id '" + processInstance.getId() + "' is already active.");
+        }
+        runtimeService.activateProcessInstanceById(processInstance.getId());
+
+        ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(processInstance);
+
+        // No need to re-fetch the instance, just alter the suspended state of the result-object
+        response.setSuspended(false);
+        return response;
+    }
+
+    protected ProcessInstanceResponse suspendProcessInstance(ProcessInstance processInstance) {
+        if (processInstance.isSuspended()) {
+            throw new FlowableConflictException("Process instance with id '" + processInstance.getId() + "' is already suspended.");
+        }
+        runtimeService.suspendProcessInstanceById(processInstance.getId());
+
+        ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(processInstance);
+
+        // No need to re-fetch the instance, just alter the suspended state of the result-object
+        response.setSuspended(true);
+        return response;
+    }
 }

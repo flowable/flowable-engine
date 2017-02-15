@@ -21,36 +21,36 @@ import org.apache.commons.lang3.StringUtils;
  */
 public final class ContentRestUrls {
 
-  public static final String SEGMENT_CONTENT_SERVICE_RESOURCES = "content-service";
-  public static final String SEGMENT_CONTENT_ITEMS_RESOURCE = "content-items";
-  public static final String SEGMENT_QUERY_RESOURCE = "query";
-  public static final String SEGMENT_CONTENT_ITEM_DATA = "data";
+    public static final String SEGMENT_CONTENT_SERVICE_RESOURCES = "content-service";
+    public static final String SEGMENT_CONTENT_ITEMS_RESOURCE = "content-items";
+    public static final String SEGMENT_QUERY_RESOURCE = "query";
+    public static final String SEGMENT_CONTENT_ITEM_DATA = "data";
 
-  /**
-   * URL template for a content item collection: <i>/content-service/content-items</i>
-   */
-  public static final String[] URL_CONTENT_ITEM_COLLECTION = { SEGMENT_CONTENT_SERVICE_RESOURCES, SEGMENT_CONTENT_ITEMS_RESOURCE };
+    /**
+     * URL template for a content item collection: <i>/content-service/content-items</i>
+     */
+    public static final String[] URL_CONTENT_ITEM_COLLECTION = { SEGMENT_CONTENT_SERVICE_RESOURCES, SEGMENT_CONTENT_ITEMS_RESOURCE };
 
-  /**
-   * URL template for a single content item: <i>/content-service/content-items/{0:contentId}</i>
-   */
-  public static final String[] URL_CONTENT_ITEM = { SEGMENT_CONTENT_SERVICE_RESOURCES, SEGMENT_CONTENT_ITEMS_RESOURCE, "{0}" };
+    /**
+     * URL template for a single content item: <i>/content-service/content-items/{0:contentId}</i>
+     */
+    public static final String[] URL_CONTENT_ITEM = { SEGMENT_CONTENT_SERVICE_RESOURCES, SEGMENT_CONTENT_ITEMS_RESOURCE, "{0}" };
 
-  /**
-   * URL template for the data of a content item: <i>/content-service/content-items/{0:contentId}/data</i>
-   */
-  public static final String[] URL_CONTENT_ITEM_DATA = { SEGMENT_CONTENT_SERVICE_RESOURCES, SEGMENT_CONTENT_ITEMS_RESOURCE, "{0}", SEGMENT_CONTENT_ITEM_DATA };
-  
-  /**
-   * URL template for a content item query resource: <i>/query/content-items</i>
-   */
-  public static final String[] URL_QUERY_CONTENT_ITEM = { SEGMENT_QUERY_RESOURCE, SEGMENT_CONTENT_ITEMS_RESOURCE };
+    /**
+     * URL template for the data of a content item: <i>/content-service/content-items/{0:contentId}/data</i>
+     */
+    public static final String[] URL_CONTENT_ITEM_DATA = { SEGMENT_CONTENT_SERVICE_RESOURCES, SEGMENT_CONTENT_ITEMS_RESOURCE, "{0}", SEGMENT_CONTENT_ITEM_DATA };
 
-  /**
-   * Creates an url based on the passed fragments and replaces any placeholders with the given arguments. The placeholders are following the {@link MessageFormat} convention (eg. {0} is replaced by
-   * first argument value).
-   */
-  public static final String createRelativeResourceUrl(String[] segments, Object... arguments) {
-    return MessageFormat.format(StringUtils.join(segments, '/'), arguments);
-  }
+    /**
+     * URL template for a content item query resource: <i>/query/content-items</i>
+     */
+    public static final String[] URL_QUERY_CONTENT_ITEM = { SEGMENT_QUERY_RESOURCE, SEGMENT_CONTENT_ITEMS_RESOURCE };
+
+    /**
+     * Creates an url based on the passed fragments and replaces any placeholders with the given arguments. The placeholders are following the {@link MessageFormat} convention (eg. {0} is replaced by
+     * first argument value).
+     */
+    public static final String createRelativeResourceUrl(String[] segments, Object... arguments) {
+        return MessageFormat.format(StringUtils.join(segments, '/'), arguments);
+    }
 }

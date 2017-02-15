@@ -30,7 +30,7 @@ public interface IdmEngine {
     void close();
 
     IdmIdentityService getIdmIdentityService();
-    
+
     IdmManagementService getIdmManagementService();
 
     IdmEngineConfiguration getIdmEngineConfiguration();

@@ -27,72 +27,72 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:org/activiti/spring/test/servicetask/servicetaskSpringTest-context.xml")
 public class UseFlowableServiceInServiceTaskTest extends SpringFlowableTestCase {
 
-  /**
-   * This test will use the regular mechanism (delegateExecution.getProcessEngine().getRuntimeService()) to obtain the {@link RuntimeService} to start a new process.
-   */
-  @Deployment
-  public void testUseRuntimeServiceNotInjectedInServiceTask() {
-    runtimeService.startProcessInstanceByKey("startProcessFromDelegate");
+    /**
+     * This test will use the regular mechanism (delegateExecution.getProcessEngine().getRuntimeService()) to obtain the {@link RuntimeService} to start a new process.
+     */
+    @Deployment
+    public void testUseRuntimeServiceNotInjectedInServiceTask() {
+        runtimeService.startProcessInstanceByKey("startProcessFromDelegate");
 
-    // Starting the process should lead to two processes being started,
-    // The other one started from the java delegate in the service task
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
-    assertEquals(2, processInstances.size());
+        // Starting the process should lead to two processes being started,
+        // The other one started from the java delegate in the service task
+        List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
+        assertEquals(2, processInstances.size());
 
-    boolean startProcessFromDelegateFound = false;
-    boolean oneTaskProcessFound = false;
-    for (ProcessInstance processInstance : processInstances) {
-      ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
-      if (processDefinition.getKey().equals("startProcessFromDelegate")) {
-        startProcessFromDelegateFound = true;
-      } else if (processDefinition.getKey().equals("oneTaskProcess")) {
-        oneTaskProcessFound = true;
-      }
+        boolean startProcessFromDelegateFound = false;
+        boolean oneTaskProcessFound = false;
+        for (ProcessInstance processInstance : processInstances) {
+            ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
+            if (processDefinition.getKey().equals("startProcessFromDelegate")) {
+                startProcessFromDelegateFound = true;
+            } else if (processDefinition.getKey().equals("oneTaskProcess")) {
+                oneTaskProcessFound = true;
+            }
+        }
+
+        assertTrue(startProcessFromDelegateFound);
+        assertTrue(oneTaskProcessFound);
     }
 
-    assertTrue(startProcessFromDelegateFound);
-    assertTrue(oneTaskProcessFound);
-  }
+    /**
+     * This test will use the dependency injection of Spring to inject the runtime service in the Java delegate.
+     */
+    @Deployment
+    public void testUseInjectedRuntimeServiceInServiceTask() {
+        runtimeService.startProcessInstanceByKey("startProcessFromDelegate");
 
-  /**
-   * This test will use the dependency injection of Spring to inject the runtime service in the Java delegate.
-   */
-  @Deployment
-  public void testUseInjectedRuntimeServiceInServiceTask() {
-    runtimeService.startProcessInstanceByKey("startProcessFromDelegate");
+        // Starting the process should lead to two processes being started,
+        // The other one started from the java delegate in the service task
+        List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
+        assertEquals(2, processInstances.size());
 
-    // Starting the process should lead to two processes being started,
-    // The other one started from the java delegate in the service task
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
-    assertEquals(2, processInstances.size());
+        boolean startProcessFromDelegateFound = false;
+        boolean oneTaskProcessFound = false;
+        for (ProcessInstance processInstance : processInstances) {
+            ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
+            if (processDefinition.getKey().equals("startProcessFromDelegate")) {
+                startProcessFromDelegateFound = true;
+            } else if (processDefinition.getKey().equals("oneTaskProcess")) {
+                oneTaskProcessFound = true;
+            }
+        }
 
-    boolean startProcessFromDelegateFound = false;
-    boolean oneTaskProcessFound = false;
-    for (ProcessInstance processInstance : processInstances) {
-      ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
-      if (processDefinition.getKey().equals("startProcessFromDelegate")) {
-        startProcessFromDelegateFound = true;
-      } else if (processDefinition.getKey().equals("oneTaskProcess")) {
-        oneTaskProcessFound = true;
-      }
+        assertTrue(startProcessFromDelegateFound);
+        assertTrue(oneTaskProcessFound);
     }
 
-    assertTrue(startProcessFromDelegateFound);
-    assertTrue(oneTaskProcessFound);
-  }
+    @Deployment
+    public void testRollBackOnException() {
+        Exception expectedException = null;
+        try {
+            runtimeService.startProcessInstanceByKey("startProcessFromDelegate");
+        } catch (Exception e) {
+            expectedException = e;
+        }
+        assertNotNull(expectedException);
 
-  @Deployment
-  public void testRollBackOnException() {
-    Exception expectedException = null;
-    try {
-      runtimeService.startProcessInstanceByKey("startProcessFromDelegate");
-    } catch (Exception e) {
-      expectedException = e;
+        // Starting the process should cause a rollback of both processes
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
-    assertNotNull(expectedException);
-
-    // Starting the process should cause a rollback of both processes
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-  }
 
 }

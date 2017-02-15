@@ -30,7 +30,7 @@ public interface ContentEngine {
     void close();
 
     ContentManagementService getContentManagementService();
-    
+
     ContentService getContentService();
 
     ContentEngineConfiguration getContentEngineConfiguration();

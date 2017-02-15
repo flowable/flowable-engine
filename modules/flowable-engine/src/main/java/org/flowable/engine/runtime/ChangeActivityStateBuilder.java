@@ -24,29 +24,29 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
  */
 public interface ChangeActivityStateBuilder {
 
-  /** 
-   * Set the id of the process instance 
-   **/
-  ChangeActivityStateBuilder processInstanceId(String processInstanceId);
-  
-  /**
-   * Set the activity that should be cancelled.
-   */
-  ChangeActivityStateBuilder cancelActivityId(String cancelActivityId);
+    /**
+     * Set the id of the process instance
+     **/
+    ChangeActivityStateBuilder processInstanceId(String processInstanceId);
 
-  /** 
-   * Set the activity that should be started
-   **/
-  ChangeActivityStateBuilder startActivityId(String startActivityId);
+    /**
+     * Set the activity that should be cancelled.
+     */
+    ChangeActivityStateBuilder cancelActivityId(String cancelActivityId);
 
-  /**
-   * Start the process instance
-   * 
-   * @throws FlowableObjectNotFoundException
-   *           when no process instance is found
-   * @throws FlowableException
-   *           activity could not be canceled or started
-   **/
-  void changeState();
-  
+    /**
+     * Set the activity that should be started
+     **/
+    ChangeActivityStateBuilder startActivityId(String startActivityId);
+
+    /**
+     * Start the process instance
+     * 
+     * @throws FlowableObjectNotFoundException
+     *             when no process instance is found
+     * @throws FlowableException
+     *             activity could not be canceled or started
+     **/
+    void changeState();
+
 }

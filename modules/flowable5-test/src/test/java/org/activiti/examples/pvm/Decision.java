@@ -17,24 +17,23 @@ import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 
-
 /**
  * @author Tom Baeyens
  */
 public class Decision implements ActivityBehavior {
 
-  public void execute(DelegateExecution execution) {
-    PvmTransition transition;
-    ActivityExecution activityExecution = (ActivityExecution) execution;
-    String creditRating = (String) execution.getVariable("creditRating");
-    if (creditRating.equals("AAA+")) {
-      transition = activityExecution.getActivity().findOutgoingTransition("wow");
-    } else if (creditRating.equals("Aaa-")) {
-      transition = activityExecution.getActivity().findOutgoingTransition("nice");
-    } else {
-      transition = activityExecution.getActivity().findOutgoingTransition("default");
-    }
+    public void execute(DelegateExecution execution) {
+        PvmTransition transition;
+        ActivityExecution activityExecution = (ActivityExecution) execution;
+        String creditRating = (String) execution.getVariable("creditRating");
+        if (creditRating.equals("AAA+")) {
+            transition = activityExecution.getActivity().findOutgoingTransition("wow");
+        } else if (creditRating.equals("Aaa-")) {
+            transition = activityExecution.getActivity().findOutgoingTransition("nice");
+        } else {
+            transition = activityExecution.getActivity().findOutgoingTransition("default");
+        }
 
-    activityExecution.take(transition);
-  }
+        activityExecution.take(transition);
+    }
 }

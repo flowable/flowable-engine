@@ -12,47 +12,46 @@
  */
 package org.flowable.dmn.api;
 
-
 /**
- * An object structure representing an executable decision table 
+ * An object structure representing an executable decision table
  * 
  * @author Tijs Rademakers
  * @author Joram Barez
  */
 public interface DmnDecisionTable {
 
-  /** unique identifier */
-  String getId();
+    /** unique identifier */
+    String getId();
 
-  /**
-   * category name of this decision table
-   */
-  String getCategory();
+    /**
+     * category name of this decision table
+     */
+    String getCategory();
 
-  /** label used for display purposes */
-  String getName();
+    /** label used for display purposes */
+    String getName();
 
-  /** unique name for all versions this decision table */
-  String getKey();
+    /** unique name for all versions this decision table */
+    String getKey();
 
-  /** description of this decision table **/
-  String getDescription();
+    /** description of this decision table **/
+    String getDescription();
 
-  /** version of this decision table */
-  int getVersion();
+    /** version of this decision table */
+    int getVersion();
 
-  /**
-   * name of {@link DmnRepositoryService#getResourceAsStream(String, String) the resource} of this decision table.
-   */
-  String getResourceName();
+    /**
+     * name of {@link DmnRepositoryService#getResourceAsStream(String, String) the resource} of this decision table.
+     */
+    String getResourceName();
 
-  /** The deployment in which this decision table is contained. */
-  String getDeploymentId();
-  
-  /** The parent deployment in which this decision table is contained. */
-  String getParentDeploymentId();
+    /** The deployment in which this decision table is contained. */
+    String getDeploymentId();
 
-  /** The tenant identifier of this decision table */
-  String getTenantId();
+    /** The parent deployment in which this decision table is contained. */
+    String getParentDeploymentId();
+
+    /** The tenant identifier of this decision table */
+    String getTenantId();
 
 }

@@ -37,94 +37,93 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @RestController
 public class TaskClientResource extends AbstractClientResource {
-  
-  private final Logger logger = LoggerFactory.getLogger(TaskClientResource.class);
-	
-	@Autowired
-	protected TaskService clientService;
 
-	/**
-	 * GET /rest/authenticate -> check if the user is authenticated, and return
-	 * its login.
-	 */
-	@RequestMapping(value = "/rest/admin/tasks/{taskId}", method = RequestMethod.GET, produces = "application/json")
-	public JsonNode getTask(@PathVariable String taskId, @RequestParam(required=false, defaultValue="false") boolean runtime) throws BadRequestException {
-		
-		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-		try {
-			return clientService.getTask(serverConfig, taskId, runtime);
-		} catch (FlowableServiceException e) {
-		  logger.error("Error getting task {}", taskId);
-			throw new BadRequestException(e.getMessage());
-		}
-	}
-	
-	@RequestMapping(value = "/rest/admin/tasks/{taskId}", method = RequestMethod.DELETE)
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
-	public void deleteTask(@PathVariable String taskId) throws BadRequestException {
-		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-		try {
-			clientService.deleteTask(serverConfig, taskId);
-		} catch (FlowableServiceException e) {
-		  logger.error("Error deleting task {}", taskId);
-			throw new BadRequestException(e.getMessage());
-		}
-	}
-	
-	@RequestMapping(value = "/rest/admin/tasks/{taskId}", method = RequestMethod.POST)
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
-	public void executeTaskAction(@PathVariable String taskId, @RequestBody ObjectNode actionBody) throws BadRequestException {
-		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-		try {
-			clientService.executeTaskAction(serverConfig, taskId, actionBody);
-		} catch (FlowableServiceException e) {
-		  logger.error("Error executing action on task {}", taskId);
-			throw new BadRequestException(e.getMessage());
-		}
-	}
-	
-	@RequestMapping(value = "/rest/admin/tasks/{taskId}", method = RequestMethod.PUT)
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
-	public void updateTask(@PathVariable String taskId, @RequestBody ObjectNode actionBody) throws BadRequestException {
-		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-		try {
-			clientService.updateTask(serverConfig, taskId, actionBody);
-		} catch (FlowableServiceException e) {
-		  logger.error("Error updating task {}", taskId);
-			throw new BadRequestException(e.getMessage());
-		}
-	}
-	
-	@RequestMapping(value = "/rest/admin/tasks/{taskId}/subtasks", method = RequestMethod.GET)
-	public JsonNode getSubtasks(@PathVariable String taskId) throws BadRequestException {
-		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-		try {
-			return clientService.getSubTasks(serverConfig, taskId);
-		} catch (FlowableServiceException e) {
-		  logger.error("Error getting sub tasks {}", taskId);
-			throw new BadRequestException(e.getMessage());
-		}
-	}
-	
-	@RequestMapping(value = "/rest/admin/tasks/{taskId}/variables", method = RequestMethod.GET)
-	public JsonNode getVariables(@PathVariable String taskId) throws BadRequestException {
-		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-		try {
-			return clientService.getVariables(serverConfig, taskId);
-		} catch (FlowableServiceException e) {
-			throw new BadRequestException(e.getMessage());
-		}
-	}
-	
-	@RequestMapping(value = "/rest/admin/tasks/{taskId}/identitylinks", method = RequestMethod.GET)
-	public JsonNode getIdentityLinks(@PathVariable String taskId) throws BadRequestException {
-		ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-		try {
-			return clientService.getIdentityLinks(serverConfig, taskId);
-		} catch (FlowableServiceException e) {
-		  logger.error("Error getting identity links for task {}", taskId);
-			throw new BadRequestException(e.getMessage());
-		}
-	}
-	
+    private final Logger logger = LoggerFactory.getLogger(TaskClientResource.class);
+
+    @Autowired
+    protected TaskService clientService;
+
+    /**
+     * GET /rest/authenticate -> check if the user is authenticated, and return its login.
+     */
+    @RequestMapping(value = "/rest/admin/tasks/{taskId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getTask(@PathVariable String taskId, @RequestParam(required = false, defaultValue = "false") boolean runtime) throws BadRequestException {
+
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            return clientService.getTask(serverConfig, taskId, runtime);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting task {}", taskId);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/rest/admin/tasks/{taskId}", method = RequestMethod.DELETE)
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void deleteTask(@PathVariable String taskId) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            clientService.deleteTask(serverConfig, taskId);
+        } catch (FlowableServiceException e) {
+            logger.error("Error deleting task {}", taskId);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/rest/admin/tasks/{taskId}", method = RequestMethod.POST)
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void executeTaskAction(@PathVariable String taskId, @RequestBody ObjectNode actionBody) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            clientService.executeTaskAction(serverConfig, taskId, actionBody);
+        } catch (FlowableServiceException e) {
+            logger.error("Error executing action on task {}", taskId);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/rest/admin/tasks/{taskId}", method = RequestMethod.PUT)
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void updateTask(@PathVariable String taskId, @RequestBody ObjectNode actionBody) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            clientService.updateTask(serverConfig, taskId, actionBody);
+        } catch (FlowableServiceException e) {
+            logger.error("Error updating task {}", taskId);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/rest/admin/tasks/{taskId}/subtasks", method = RequestMethod.GET)
+    public JsonNode getSubtasks(@PathVariable String taskId) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            return clientService.getSubTasks(serverConfig, taskId);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting sub tasks {}", taskId);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/rest/admin/tasks/{taskId}/variables", method = RequestMethod.GET)
+    public JsonNode getVariables(@PathVariable String taskId) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            return clientService.getVariables(serverConfig, taskId);
+        } catch (FlowableServiceException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/rest/admin/tasks/{taskId}/identitylinks", method = RequestMethod.GET)
+    public JsonNode getIdentityLinks(@PathVariable String taskId) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            return clientService.getIdentityLinks(serverConfig, taskId);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting identity links for task {}", taskId);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
 }

@@ -15,11 +15,9 @@ package org.flowable.scripting.secure.impl;
 import java.lang.management.ManagementFactory;
 
 /**
- * This class wraps access to the com.sun.management.ThreadMXBean and makes sure that
- * on JDK's without the class no ClassNotFoundException (or others) are thrown.
+ * This class wraps access to the com.sun.management.ThreadMXBean and makes sure that on JDK's without the class no ClassNotFoundException (or others) are thrown.
  *
- * This class should only be used if it is verified this class is on the classpath,
- * for example by checking the class through reflection.
+ * This class should only be used if it is verified this class is on the classpath, for example by checking the class through reflection.
  *
  * @author Joram Barrez
  */

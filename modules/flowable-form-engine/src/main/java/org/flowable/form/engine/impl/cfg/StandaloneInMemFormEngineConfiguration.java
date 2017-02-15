@@ -17,7 +17,7 @@ package org.flowable.form.engine.impl.cfg;
  */
 public class StandaloneInMemFormEngineConfiguration extends StandaloneFormEngineConfiguration {
 
-  public StandaloneInMemFormEngineConfiguration() {
-    this.jdbcUrl = "jdbc:h2:mem:flowable";
-  }
+    public StandaloneInMemFormEngineConfiguration() {
+        this.jdbcUrl = "jdbc:h2:mem:flowable";
+    }
 }

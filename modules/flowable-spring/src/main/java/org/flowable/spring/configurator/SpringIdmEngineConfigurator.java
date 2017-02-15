@@ -26,51 +26,51 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
  * @author Tijs Rademakers
  */
 public class SpringIdmEngineConfigurator extends AbstractProcessEngineConfigurator {
-  
-  protected SpringIdmEngineConfiguration idmEngineConfiguration;
-  
-  @Override
-  public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    if (idmEngineConfiguration == null) {
-      idmEngineConfiguration = new SpringIdmEngineConfiguration();
-    }
-    
-    if (processEngineConfiguration.getDataSource() != null) {
-      DataSource originalDatasource = processEngineConfiguration.getDataSource();
-      idmEngineConfiguration.setDataSource(originalDatasource);
-      
-    } else {
-      throw new FlowableException("A datasource is required for initializing the IDM engine ");
-    }
-    
-    idmEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
-    idmEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
-    idmEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
-    
-    idmEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
-    
-    if (processEngineConfiguration.getEventDispatcher() != null) {
-      idmEngineConfiguration.setEventDispatcher(processEngineConfiguration.getEventDispatcher());
-    }
-    
-    IdmEngine idmEngine = idmEngineConfiguration.buildIdmEngine();
-    
-    processEngineConfiguration.setIdmEngineInitialized(true);
-    processEngineConfiguration.setIdmIdentityService(idmEngine.getIdmIdentityService());
-  }
-  
-  @Override
-  public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    // Nothing to do in the before init: we boot up the IDM engine once the process engine is ready
-  }
 
-  public IdmEngineConfiguration getIdmEngineConfiguration() {
-    return idmEngineConfiguration;
-  }
+    protected SpringIdmEngineConfiguration idmEngineConfiguration;
 
-  public SpringIdmEngineConfigurator setIdmEngineConfiguration(SpringIdmEngineConfiguration idmEngineConfiguration) {
-    this.idmEngineConfiguration = idmEngineConfiguration;
-    return this;
-  }
+    @Override
+    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        if (idmEngineConfiguration == null) {
+            idmEngineConfiguration = new SpringIdmEngineConfiguration();
+        }
+
+        if (processEngineConfiguration.getDataSource() != null) {
+            DataSource originalDatasource = processEngineConfiguration.getDataSource();
+            idmEngineConfiguration.setDataSource(originalDatasource);
+
+        } else {
+            throw new FlowableException("A datasource is required for initializing the IDM engine ");
+        }
+
+        idmEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
+        idmEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
+        idmEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
+
+        idmEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
+
+        if (processEngineConfiguration.getEventDispatcher() != null) {
+            idmEngineConfiguration.setEventDispatcher(processEngineConfiguration.getEventDispatcher());
+        }
+
+        IdmEngine idmEngine = idmEngineConfiguration.buildIdmEngine();
+
+        processEngineConfiguration.setIdmEngineInitialized(true);
+        processEngineConfiguration.setIdmIdentityService(idmEngine.getIdmIdentityService());
+    }
+
+    @Override
+    public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        // Nothing to do in the before init: we boot up the IDM engine once the process engine is ready
+    }
+
+    public IdmEngineConfiguration getIdmEngineConfiguration() {
+        return idmEngineConfiguration;
+    }
+
+    public SpringIdmEngineConfigurator setIdmEngineConfiguration(SpringIdmEngineConfiguration idmEngineConfiguration) {
+        this.idmEngineConfiguration = idmEngineConfiguration;
+        return this;
+    }
 
 }

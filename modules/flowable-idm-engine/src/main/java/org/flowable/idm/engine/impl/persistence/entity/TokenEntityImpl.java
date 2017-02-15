@@ -25,93 +25,93 @@ import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
  */
 public class TokenEntityImpl extends AbstractEntity implements TokenEntity, Serializable, HasRevision {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String tokenValue;
-  protected Date tokenDate;
-  protected String ipAddress;
-  protected String userAgent;
-  protected String userId;
-  protected String tokenData;
+    protected String tokenValue;
+    protected Date tokenDate;
+    protected String ipAddress;
+    protected String userAgent;
+    protected String userId;
+    protected String tokenData;
 
-  @Override
-  public String getTokenValue() {
-    return tokenValue;
-  }
+    @Override
+    public String getTokenValue() {
+        return tokenValue;
+    }
 
-  @Override
-  public void setTokenValue(String tokenValue) {
-    this.tokenValue = tokenValue;
-  }
+    @Override
+    public void setTokenValue(String tokenValue) {
+        this.tokenValue = tokenValue;
+    }
 
-  @Override
-  public Date getTokenDate() {
-    return tokenDate;
-  }
+    @Override
+    public Date getTokenDate() {
+        return tokenDate;
+    }
 
-  @Override
-  public void setTokenDate(Date tokenDate) {
-    this.tokenDate = tokenDate;
-  }
+    @Override
+    public void setTokenDate(Date tokenDate) {
+        this.tokenDate = tokenDate;
+    }
 
-  @Override
-  public String getIpAddress() {
-    return ipAddress;
-  }
+    @Override
+    public String getIpAddress() {
+        return ipAddress;
+    }
 
-  @Override
-  public void setIpAddress(String ipAddress) {
-    this.ipAddress = ipAddress;
-  }
+    @Override
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
 
-  @Override
-  public String getUserAgent() {
-    return userAgent;
-  }
+    @Override
+    public String getUserAgent() {
+        return userAgent;
+    }
 
-  @Override
-  public void setUserAgent(String userAgent) {
-    this.userAgent = userAgent;
-  }
+    @Override
+    public void setUserAgent(String userAgent) {
+        this.userAgent = userAgent;
+    }
 
-  @Override
-  public String getUserId() {
-    return userId;
-  }
+    @Override
+    public String getUserId() {
+        return userId;
+    }
 
-  @Override
-  public void setUserId(String userId) {
-    this.userId = userId;
-  }
+    @Override
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
-  @Override
-  public String getTokenData() {
-    return tokenData;
-  }
+    @Override
+    public String getTokenData() {
+        return tokenData;
+    }
 
-  @Override
-  public void setTokenData(String tokenData) {
-    this.tokenData = tokenData;
-  }
+    @Override
+    public void setTokenData(String tokenData) {
+        this.tokenData = tokenData;
+    }
 
-  @Override
-  public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
-    persistentState.put("tokenValue", tokenValue);
-    persistentState.put("tokenDate", tokenDate);
-    persistentState.put("ipAddress", ipAddress);
-    persistentState.put("userAgent", userAgent);
-    persistentState.put("userId", userId);
-    persistentState.put("tokenData", tokenData);
-    
-    return persistentState;
-  }
+    @Override
+    public Object getPersistentState() {
+        Map<String, Object> persistentState = new HashMap<String, Object>();
+        persistentState.put("tokenValue", tokenValue);
+        persistentState.put("tokenDate", tokenDate);
+        persistentState.put("ipAddress", ipAddress);
+        persistentState.put("userAgent", userAgent);
+        persistentState.put("userId", userId);
+        persistentState.put("tokenData", tokenData);
 
-  // common methods //////////////////////////////////////////////////////////
+        return persistentState;
+    }
 
-  @Override
-  public String toString() {
-    return "TokenEntity[tokenValue=" + tokenValue + ", userId=" + userId + "]";
-  }
+    // common methods //////////////////////////////////////////////////////////
+
+    @Override
+    public String toString() {
+        return "TokenEntity[tokenValue=" + tokenValue + ", userId=" + userId + "]";
+    }
 
 }

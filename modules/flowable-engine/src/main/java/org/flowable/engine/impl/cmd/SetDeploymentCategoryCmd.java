@@ -27,54 +27,54 @@ import org.flowable.engine.repository.Deployment;
  */
 public class SetDeploymentCategoryCmd implements Command<Void> {
 
-  protected String deploymentId;
-  protected String category;
+    protected String deploymentId;
+    protected String category;
 
-  public SetDeploymentCategoryCmd(String deploymentId, String category) {
-    this.deploymentId = deploymentId;
-    this.category = category;
-  }
-
-  public Void execute(CommandContext commandContext) {
-
-    if (deploymentId == null) {
-      throw new FlowableIllegalArgumentException("Deployment id is null");
+    public SetDeploymentCategoryCmd(String deploymentId, String category) {
+        this.deploymentId = deploymentId;
+        this.category = category;
     }
 
-    DeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
+    public Void execute(CommandContext commandContext) {
 
-    if (deployment == null) {
-      throw new FlowableObjectNotFoundException("No deployment found for id = '" + deploymentId + "'", Deployment.class);
+        if (deploymentId == null) {
+            throw new FlowableIllegalArgumentException("Deployment id is null");
+        }
+
+        DeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
+
+        if (deployment == null) {
+            throw new FlowableObjectNotFoundException("No deployment found for id = '" + deploymentId + "'", Deployment.class);
+        }
+
+        if (Flowable5Util.isFlowable5Deployment(deployment, commandContext)) {
+            commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().setDeploymentCategory(deploymentId, category);
+        }
+
+        // Update category
+        deployment.setCategory(category);
+
+        if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, deployment));
+        }
+
+        return null;
     }
-    
-    if (Flowable5Util.isFlowable5Deployment(deployment, commandContext)) {
-      commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().setDeploymentCategory(deploymentId, category);
+
+    public String getDeploymentId() {
+        return deploymentId;
     }
 
-    // Update category
-    deployment.setCategory(category);
-
-    if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-      commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, deployment));
+    public void setDeploymentId(String deploymentId) {
+        this.deploymentId = deploymentId;
     }
 
-    return null;
-  }
+    public String getCategory() {
+        return category;
+    }
 
-  public String getDeploymentId() {
-    return deploymentId;
-  }
-
-  public void setDeploymentId(String deploymentId) {
-    this.deploymentId = deploymentId;
-  }
-
-  public String getCategory() {
-    return category;
-  }
-
-  public void setCategory(String category) {
-    this.category = category;
-  }
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
 }

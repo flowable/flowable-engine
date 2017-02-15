@@ -29,45 +29,45 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RestController
 public class AbstractModelHistoryResource {
 
-  @Autowired
-  protected ModelService modelService;
-  
-  @Autowired
-  protected ModelHistoryRepository modelHistoryRepository;
+    @Autowired
+    protected ModelService modelService;
 
-  @Autowired
-  protected ObjectMapper objectMapper;
+    @Autowired
+    protected ModelHistoryRepository modelHistoryRepository;
 
-  public ResultListDataRepresentation getModelHistoryCollection(String modelId, Boolean includeLatestVersion) {
+    @Autowired
+    protected ObjectMapper objectMapper;
 
-    Model model = modelService.getModel(modelId);
-    List<ModelHistory> history = modelHistoryRepository.findByModelId(model.getId());
-    ResultListDataRepresentation result = new ResultListDataRepresentation();
+    public ResultListDataRepresentation getModelHistoryCollection(String modelId, Boolean includeLatestVersion) {
 
-    List<ModelRepresentation> representations = new ArrayList<ModelRepresentation>();
+        Model model = modelService.getModel(modelId);
+        List<ModelHistory> history = modelHistoryRepository.findByModelId(model.getId());
+        ResultListDataRepresentation result = new ResultListDataRepresentation();
 
-    // Also include the latest version of the model
-    if (Boolean.TRUE.equals(includeLatestVersion)) {
-      representations.add(new ModelRepresentation(model));
+        List<ModelRepresentation> representations = new ArrayList<ModelRepresentation>();
+
+        // Also include the latest version of the model
+        if (Boolean.TRUE.equals(includeLatestVersion)) {
+            representations.add(new ModelRepresentation(model));
+        }
+        if (history.size() > 0) {
+            for (ModelHistory modelHistory : history) {
+                representations.add(new ModelRepresentation(modelHistory));
+            }
+            result.setData(representations);
+        }
+
+        // Set size and total
+        result.setSize(representations.size());
+        result.setTotal(Long.valueOf(representations.size()));
+        result.setStart(0);
+        return result;
     }
-    if (history.size() > 0) {
-      for (ModelHistory modelHistory : history) {
-        representations.add(new ModelRepresentation(modelHistory));
-      }
-      result.setData(representations);
+
+    public ModelRepresentation getProcessModelHistory(String modelId, String modelHistoryId) {
+        // Check if the user has read-rights on the process-model in order to fetch history
+        ModelHistory modelHistory = modelService.getModelHistory(modelId, modelHistoryId);
+        return new ModelRepresentation(modelHistory);
     }
-
-    // Set size and total
-    result.setSize(representations.size());
-    result.setTotal(Long.valueOf(representations.size()));
-    result.setStart(0);
-    return result;
-  }
-
-  public ModelRepresentation getProcessModelHistory(String modelId, String modelHistoryId) {
-    // Check if the user has read-rights on the process-model in order to fetch history
-    ModelHistory modelHistory = modelService.getModelHistory(modelId, modelHistoryId);
-    return new ModelRepresentation(modelHistory);
-  }
 
 }

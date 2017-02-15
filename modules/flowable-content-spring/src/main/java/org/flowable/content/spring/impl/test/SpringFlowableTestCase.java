@@ -32,37 +32,37 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 @TestExecutionListeners(DependencyInjectionTestExecutionListener.class)
 public abstract class SpringFlowableTestCase extends AbstractFlowableTestCase implements ApplicationContextAware {
 
-  // we need a data structure to store all the resolved FormEngines and map them to something
-  protected Map<Object, ContentEngine> cachedContentEngines = new ConcurrentHashMap<Object, ContentEngine>();
+    // we need a data structure to store all the resolved FormEngines and map them to something
+    protected Map<Object, ContentEngine> cachedContentEngines = new ConcurrentHashMap<Object, ContentEngine>();
 
-  protected TestContextManager testContextManager;
+    protected TestContextManager testContextManager;
 
-  @Autowired
-  protected ApplicationContext applicationContext;
+    @Autowired
+    protected ApplicationContext applicationContext;
 
-  public SpringFlowableTestCase() {
-    this.testContextManager = new TestContextManager(getClass());
-  }
+    public SpringFlowableTestCase() {
+        this.testContextManager = new TestContextManager(getClass());
+    }
 
-  @Override
-  public void runBare() throws Throwable {
-    testContextManager.prepareTestInstance(this); // this will initialize all dependencies
-    super.runBare();
-  }
+    @Override
+    public void runBare() throws Throwable {
+        testContextManager.prepareTestInstance(this); // this will initialize all dependencies
+        super.runBare();
+    }
 
-  @Override
-  protected void initializeContentEngine() {
-    ContextConfiguration contextConfiguration = getClass().getAnnotation(ContextConfiguration.class);
-    String[] value = contextConfiguration.value();
-    boolean hasOneArg = value != null && value.length == 1;
-    String key = hasOneArg ? value[0] : ContentEngine.class.getName();
-    ContentEngine engine = this.cachedContentEngines.containsKey(key) ? this.cachedContentEngines.get(key) : this.applicationContext.getBean(ContentEngine.class);
+    @Override
+    protected void initializeContentEngine() {
+        ContextConfiguration contextConfiguration = getClass().getAnnotation(ContextConfiguration.class);
+        String[] value = contextConfiguration.value();
+        boolean hasOneArg = value != null && value.length == 1;
+        String key = hasOneArg ? value[0] : ContentEngine.class.getName();
+        ContentEngine engine = this.cachedContentEngines.containsKey(key) ? this.cachedContentEngines.get(key) : this.applicationContext.getBean(ContentEngine.class);
 
-    this.cachedContentEngines.put(key, engine);
-    this.contentEngine = engine;
-  }
+        this.cachedContentEngines.put(key, engine);
+        this.contentEngine = engine;
+    }
 
-  public void setApplicationContext(ApplicationContext applicationContext) {
-    this.applicationContext = applicationContext;
-  }
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 }

@@ -20,18 +20,18 @@ import org.flowable.engine.impl.variable.VariableType;
  * @author Joram Barrez
  */
 public interface VariableInstanceEntity extends VariableInstance {
-  
-  void setDeleted(boolean isDeleted);
 
-  boolean isDeleted();
-  
-  void setExecution(ExecutionEntity execution);
+    void setDeleted(boolean isDeleted);
 
-  void forceUpdate();
+    boolean isDeleted();
 
-  ByteArrayRef getByteArrayRef();
+    void setExecution(ExecutionEntity execution);
 
-  VariableType getType();
+    void forceUpdate();
 
-  void setType(VariableType type);
+    ByteArrayRef getByteArrayRef();
+
+    VariableType getType();
+
+    void setType(VariableType type);
 }

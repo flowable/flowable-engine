@@ -49,192 +49,192 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PermissionService {
 
-  @Autowired
-  protected TaskService taskService;
+    @Autowired
+    protected TaskService taskService;
 
-  @Autowired
-  protected RuntimeService runtimeService;
+    @Autowired
+    protected RuntimeService runtimeService;
 
-  @Autowired
-  protected RepositoryService repositoryService;
+    @Autowired
+    protected RepositoryService repositoryService;
 
-  @Autowired
-  protected HistoryService historyService;
-  
-  @Autowired
-  protected RemoteIdmService remoteIdmService;
+    @Autowired
+    protected HistoryService historyService;
 
-  /**
-   * Check if the given user is allowed to read the task.
-   */
-  public HistoricTaskInstance validateReadPermissionOnTask(User user, String taskId) {
+    @Autowired
+    protected RemoteIdmService remoteIdmService;
 
-    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().taskId(taskId).taskInvolvedUser(String.valueOf(user.getId())).list();
+    /**
+     * Check if the given user is allowed to read the task.
+     */
+    public HistoricTaskInstance validateReadPermissionOnTask(User user, String taskId) {
 
-    if (CollectionUtils.isNotEmpty(tasks)) {
-      return tasks.get(0);
-    }
+        List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().taskId(taskId).taskInvolvedUser(String.valueOf(user.getId())).list();
 
-    // Task is maybe accessible through groups of user
-    HistoricTaskInstanceQuery historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery();
-    historicTaskInstanceQuery.taskId(taskId);
-
-    List<String> groupIds = getGroupIdsForUser(user);
-    if (!groupIds.isEmpty()) {
-      historicTaskInstanceQuery.taskCandidateGroupIn(getGroupIdsForUser(user));
-    }
-
-    tasks = historicTaskInstanceQuery.list();
-    if (CollectionUtils.isNotEmpty(tasks)) {
-      return tasks.get(0);
-    }
-
-    // Last resort: user has access to proc inst -> can see task
-    tasks = historyService.createHistoricTaskInstanceQuery().taskId(taskId).list();
-    if (CollectionUtils.isNotEmpty(tasks)) {
-      HistoricTaskInstance task = tasks.get(0);
-      if (task != null && task.getProcessInstanceId() != null) {
-        boolean hasReadPermissionOnProcessInstance = hasReadPermissionOnProcessInstance(user, task.getProcessInstanceId());
-        if (hasReadPermissionOnProcessInstance) {
-          return task;
+        if (CollectionUtils.isNotEmpty(tasks)) {
+            return tasks.get(0);
         }
-      }
-    }
-    throw new NotPermittedException("User is not allowed to work with task " + taskId);
-  }
 
-  private List<String> getGroupIdsForUser(User user) {
-    List<String> groupIds = new ArrayList<String>();
-    for (Group group : remoteIdmService.getUser(user.getId()).getGroups()) {
-      groupIds.add(String.valueOf(group.getId()));
-    }
-    return groupIds;
-  }
+        // Task is maybe accessible through groups of user
+        HistoricTaskInstanceQuery historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery();
+        historicTaskInstanceQuery.taskId(taskId);
 
-  public boolean isTaskOwnerOrAssignee(User user, String taskId) {
-    return isTaskOwnerOrAssignee(user, taskService.createTaskQuery().taskId(taskId).singleResult());
-  }
+        List<String> groupIds = getGroupIdsForUser(user);
+        if (!groupIds.isEmpty()) {
+            historicTaskInstanceQuery.taskCandidateGroupIn(getGroupIdsForUser(user));
+        }
 
-  public boolean isTaskOwnerOrAssignee(User user, Task task) {
-    String currentUser = String.valueOf(user.getId());
-    return currentUser.equals(task.getAssignee()) || currentUser.equals(task.getOwner());
-  }
+        tasks = historicTaskInstanceQuery.list();
+        if (CollectionUtils.isNotEmpty(tasks)) {
+            return tasks.get(0);
+        }
 
-  public boolean validateIfUserIsInitiatorAndCanCompleteTask(User user, Task task) {
-    boolean canCompleteTask = false;
-    if (task.getProcessInstanceId() != null) {
-      HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
-      if (historicProcessInstance != null && StringUtils.isNotEmpty(historicProcessInstance.getStartUserId())) {
-        String processInstanceStartUserId = historicProcessInstance.getStartUserId();
-        if (String.valueOf(user.getId()).equals(processInstanceStartUserId)) {
-          BpmnModel bpmnModel = repositoryService.getBpmnModel(task.getProcessDefinitionId());
-          FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
-          if (flowElement instanceof UserTask) {
-            UserTask userTask = (UserTask) flowElement;
-            List<ExtensionElement> extensionElements = userTask.getExtensionElements().get("initiator-can-complete");
-            if (CollectionUtils.isNotEmpty(extensionElements)) {
-              String value = extensionElements.get(0).getElementText();
-              if (StringUtils.isNotEmpty(value) && Boolean.valueOf(value)) {
-                canCompleteTask = true;
-              }
+        // Last resort: user has access to proc inst -> can see task
+        tasks = historyService.createHistoricTaskInstanceQuery().taskId(taskId).list();
+        if (CollectionUtils.isNotEmpty(tasks)) {
+            HistoricTaskInstance task = tasks.get(0);
+            if (task != null && task.getProcessInstanceId() != null) {
+                boolean hasReadPermissionOnProcessInstance = hasReadPermissionOnProcessInstance(user, task.getProcessInstanceId());
+                if (hasReadPermissionOnProcessInstance) {
+                    return task;
+                }
             }
-          }
         }
-      }
-    }
-    return canCompleteTask;
-  }
-
-  public boolean isInvolved(User user, String taskId) {
-    return historyService.createHistoricTaskInstanceQuery().taskId(taskId).taskInvolvedUser(String.valueOf(user.getId())).count() == 1;
-  }
-
-  /**
-   * Check if the given user is allowed to read the process instance.
-   */
-  public boolean hasReadPermissionOnProcessInstance(User user, String processInstanceId) {
-    HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-    return hasReadPermissionOnProcessInstance(user, historicProcessInstance, processInstanceId);
-  }
-
-  /**
-   * Check if the given user is allowed to read the process instance.
-   */
-  public boolean hasReadPermissionOnProcessInstance(User user, HistoricProcessInstance historicProcessInstance, String processInstanceId) {
-    if (historicProcessInstance == null) {
-      throw new NotFoundException("Process instance not found for id " + processInstanceId);
+        throw new NotPermittedException("User is not allowed to work with task " + taskId);
     }
 
-    // Start user check
-    if (historicProcessInstance.getStartUserId() != null && historicProcessInstance.getStartUserId().equals(user.getId())) {
-      return true;
+    private List<String> getGroupIdsForUser(User user) {
+        List<String> groupIds = new ArrayList<String>();
+        for (Group group : remoteIdmService.getUser(user.getId()).getGroups()) {
+            groupIds.add(String.valueOf(group.getId()));
+        }
+        return groupIds;
     }
 
-    // check if the user is involved in the task
-    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
-    historicProcessInstanceQuery.processInstanceId(processInstanceId);
-    historicProcessInstanceQuery.involvedUser(user.getId());
-    if (historicProcessInstanceQuery.count() > 0) {
-      return true;
+    public boolean isTaskOwnerOrAssignee(User user, String taskId) {
+        return isTaskOwnerOrAssignee(user, taskService.createTaskQuery().taskId(taskId).singleResult());
     }
 
-    // Visibility: check if there are any tasks for the current user
-    HistoricTaskInstanceQuery historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery();
-    historicTaskInstanceQuery.processInstanceId(processInstanceId);
-    historicTaskInstanceQuery.taskInvolvedUser(user.getId());
-    if (historicTaskInstanceQuery.count() > 0) {
-      return true;
+    public boolean isTaskOwnerOrAssignee(User user, Task task) {
+        String currentUser = String.valueOf(user.getId());
+        return currentUser.equals(task.getAssignee()) || currentUser.equals(task.getOwner());
     }
 
-    List<String> groupIds = getGroupIdsForUser(user);
-    if (!groupIds.isEmpty()) {
-      historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery();
-      historicTaskInstanceQuery.processInstanceId(processInstanceId).taskCandidateGroupIn(groupIds);
-      return historicTaskInstanceQuery.count() > 0;
+    public boolean validateIfUserIsInitiatorAndCanCompleteTask(User user, Task task) {
+        boolean canCompleteTask = false;
+        if (task.getProcessInstanceId() != null) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
+            if (historicProcessInstance != null && StringUtils.isNotEmpty(historicProcessInstance.getStartUserId())) {
+                String processInstanceStartUserId = historicProcessInstance.getStartUserId();
+                if (String.valueOf(user.getId()).equals(processInstanceStartUserId)) {
+                    BpmnModel bpmnModel = repositoryService.getBpmnModel(task.getProcessDefinitionId());
+                    FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
+                    if (flowElement instanceof UserTask) {
+                        UserTask userTask = (UserTask) flowElement;
+                        List<ExtensionElement> extensionElements = userTask.getExtensionElements().get("initiator-can-complete");
+                        if (CollectionUtils.isNotEmpty(extensionElements)) {
+                            String value = extensionElements.get(0).getElementText();
+                            if (StringUtils.isNotEmpty(value) && Boolean.valueOf(value)) {
+                                canCompleteTask = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return canCompleteTask;
     }
 
-    return false;
-  }
-
-  public boolean canAddRelatedContentToTask(User user, String taskId) {
-    validateReadPermissionOnTask(user, taskId);
-    return true;
-  }
-
-  public boolean canAddRelatedContentToProcessInstance(User user, String processInstanceId) {
-    return hasReadPermissionOnProcessInstance(user, processInstanceId);
-  }
-
-  public boolean canDownloadContent(User currentUserObject, ContentItem content) {
-    if (content.getTaskId() != null) {
-      validateReadPermissionOnTask(currentUserObject, content.getTaskId());
-      return true;
-    } else if (content.getProcessInstanceId() != null) {
-      return hasReadPermissionOnProcessInstance(currentUserObject, content.getProcessInstanceId());
-    } else {
-      return false;
+    public boolean isInvolved(User user, String taskId) {
+        return historyService.createHistoricTaskInstanceQuery().taskId(taskId).taskInvolvedUser(String.valueOf(user.getId())).count() == 1;
     }
-  }
 
-  public boolean hasWritePermissionOnRelatedContent(User user, ContentItem content) {
-    if (content.getProcessInstanceId() != null) {
-      return hasReadPermissionOnProcessInstance(user, content.getProcessInstanceId());
-    } else {
-      if (content.getCreatedBy() != null) {
-        return content.getCreatedBy().equals(user.getId());
-      } else {
+    /**
+     * Check if the given user is allowed to read the process instance.
+     */
+    public boolean hasReadPermissionOnProcessInstance(User user, String processInstanceId) {
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        return hasReadPermissionOnProcessInstance(user, historicProcessInstance, processInstanceId);
+    }
+
+    /**
+     * Check if the given user is allowed to read the process instance.
+     */
+    public boolean hasReadPermissionOnProcessInstance(User user, HistoricProcessInstance historicProcessInstance, String processInstanceId) {
+        if (historicProcessInstance == null) {
+            throw new NotFoundException("Process instance not found for id " + processInstanceId);
+        }
+
+        // Start user check
+        if (historicProcessInstance.getStartUserId() != null && historicProcessInstance.getStartUserId().equals(user.getId())) {
+            return true;
+        }
+
+        // check if the user is involved in the task
+        HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+        historicProcessInstanceQuery.processInstanceId(processInstanceId);
+        historicProcessInstanceQuery.involvedUser(user.getId());
+        if (historicProcessInstanceQuery.count() > 0) {
+            return true;
+        }
+
+        // Visibility: check if there are any tasks for the current user
+        HistoricTaskInstanceQuery historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery();
+        historicTaskInstanceQuery.processInstanceId(processInstanceId);
+        historicTaskInstanceQuery.taskInvolvedUser(user.getId());
+        if (historicTaskInstanceQuery.count() > 0) {
+            return true;
+        }
+
+        List<String> groupIds = getGroupIdsForUser(user);
+        if (!groupIds.isEmpty()) {
+            historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery();
+            historicTaskInstanceQuery.processInstanceId(processInstanceId).taskCandidateGroupIn(groupIds);
+            return historicTaskInstanceQuery.count() > 0;
+        }
+
         return false;
-      }
-    }
-  }
-
-  public boolean canDeleteProcessInstance(User currentUser, HistoricProcessInstance processInstance) {
-    boolean canDelete = false;
-    if (processInstance.getStartUserId() != null) {
-      canDelete = processInstance.getStartUserId().equals(currentUser.getId());
     }
 
-    return canDelete;
-  }
+    public boolean canAddRelatedContentToTask(User user, String taskId) {
+        validateReadPermissionOnTask(user, taskId);
+        return true;
+    }
+
+    public boolean canAddRelatedContentToProcessInstance(User user, String processInstanceId) {
+        return hasReadPermissionOnProcessInstance(user, processInstanceId);
+    }
+
+    public boolean canDownloadContent(User currentUserObject, ContentItem content) {
+        if (content.getTaskId() != null) {
+            validateReadPermissionOnTask(currentUserObject, content.getTaskId());
+            return true;
+        } else if (content.getProcessInstanceId() != null) {
+            return hasReadPermissionOnProcessInstance(currentUserObject, content.getProcessInstanceId());
+        } else {
+            return false;
+        }
+    }
+
+    public boolean hasWritePermissionOnRelatedContent(User user, ContentItem content) {
+        if (content.getProcessInstanceId() != null) {
+            return hasReadPermissionOnProcessInstance(user, content.getProcessInstanceId());
+        } else {
+            if (content.getCreatedBy() != null) {
+                return content.getCreatedBy().equals(user.getId());
+            } else {
+                return false;
+            }
+        }
+    }
+
+    public boolean canDeleteProcessInstance(User currentUser, HistoricProcessInstance processInstance) {
+        boolean canDelete = false;
+        if (processInstance.getStartUserId() != null) {
+            canDelete = processInstance.getStartUserId().equals(currentUser.getId());
+        }
+
+        return canDelete;
+    }
 
 }

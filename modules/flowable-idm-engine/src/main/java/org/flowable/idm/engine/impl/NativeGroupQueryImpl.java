@@ -22,24 +22,24 @@ import org.flowable.idm.engine.impl.interceptor.CommandExecutor;
 
 public class NativeGroupQueryImpl extends AbstractNativeQuery<NativeGroupQuery, Group> implements NativeGroupQuery {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public NativeGroupQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
+    public NativeGroupQueryImpl(CommandContext commandContext) {
+        super(commandContext);
+    }
 
-  public NativeGroupQueryImpl(CommandExecutor commandExecutor) {
-    super(commandExecutor);
-  }
+    public NativeGroupQueryImpl(CommandExecutor commandExecutor) {
+        super(commandExecutor);
+    }
 
-  // results ////////////////////////////////////////////////////////////////
+    // results ////////////////////////////////////////////////////////////////
 
-  public List<Group> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return commandContext.getGroupEntityManager().findGroupsByNativeQuery(parameterMap, firstResult, maxResults);
-  }
+    public List<Group> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
+        return commandContext.getGroupEntityManager().findGroupsByNativeQuery(parameterMap, firstResult, maxResults);
+    }
 
-  public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-    return commandContext.getGroupEntityManager().findGroupCountByNativeQuery(parameterMap);
-  }
+    public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
+        return commandContext.getGroupEntityManager().findGroupCountByNativeQuery(parameterMap);
+    }
 
 }

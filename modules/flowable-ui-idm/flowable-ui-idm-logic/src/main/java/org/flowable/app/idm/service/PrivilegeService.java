@@ -24,21 +24,21 @@ import org.flowable.idm.api.User;
  * @author Joram Barrez
  */
 public interface PrivilegeService {
-  
-  Privilege findPrivilege(String id);
 
-  List<Privilege> findPrivileges();
-  
-  List<User> findUsersWithPrivilege(String privilegeId);
-  
-  void addUserPrivilege(String privilegeId, String userId);
-  
-  void deleteUserPrivilege(String privilegeId, String userId);
-  
-  List<Group> findGroupsWithPrivilege(String privilegeId);
-  
-  void addGroupPrivilege(String privilegeId, String groupId);
-  
-  void deleteGroupPrivilege(String privilegeId, String groupId);
-  
+    Privilege findPrivilege(String id);
+
+    List<Privilege> findPrivileges();
+
+    List<User> findUsersWithPrivilege(String privilegeId);
+
+    void addUserPrivilege(String privilegeId, String userId);
+
+    void deleteUserPrivilege(String privilegeId, String userId);
+
+    List<Group> findGroupsWithPrivilege(String privilegeId);
+
+    void addGroupPrivilege(String privilegeId, String groupId);
+
+    void deleteGroupPrivilege(String privilegeId, String groupId);
+
 }

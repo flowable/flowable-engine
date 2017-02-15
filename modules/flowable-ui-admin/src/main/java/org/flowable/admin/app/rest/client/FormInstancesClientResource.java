@@ -39,51 +39,51 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @RestController
 public class FormInstancesClientResource extends AbstractClientResource {
-  
-  private static final Logger logger = LoggerFactory.getLogger(FormInstancesClientResource.class);
 
-  @Autowired
-  protected FormInstanceService clientService;
+    private static final Logger logger = LoggerFactory.getLogger(FormInstancesClientResource.class);
 
-  @Autowired
-  protected ObjectMapper objectMapper;
+    @Autowired
+    protected FormInstanceService clientService;
 
-  @RequestMapping(value = "/rest/admin/form-definition-form-instances/{formDefinitionId}", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode listFormInstances(HttpServletRequest request, @PathVariable String formDefinitionId) {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+    @Autowired
+    protected ObjectMapper objectMapper;
 
-    try {
-      ObjectNode bodyNode = objectMapper.createObjectNode();
-      bodyNode.put("formDefinitionId", formDefinitionId);
+    @RequestMapping(value = "/rest/admin/form-definition-form-instances/{formDefinitionId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode listFormInstances(HttpServletRequest request, @PathVariable String formDefinitionId) {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
-      return clientService.getFormInstances(serverConfig, bodyNode);
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting form instance", e);
-      throw new BadRequestException(e.getMessage());
+        try {
+            ObjectNode bodyNode = objectMapper.createObjectNode();
+            bodyNode.put("formDefinitionId", formDefinitionId);
+
+            return clientService.getFormInstances(serverConfig, bodyNode);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting form instance", e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
 
-  @RequestMapping(value = "/rest/admin/process-form-instances/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getProcessFormInstances(@PathVariable String processInstanceId) {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+    @RequestMapping(value = "/rest/admin/process-form-instances/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getProcessFormInstances(@PathVariable String processInstanceId) {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
-    try {
-      ObjectNode bodyNode = objectMapper.createObjectNode();
-      bodyNode.put("processInstanceId", processInstanceId);
+        try {
+            ObjectNode bodyNode = objectMapper.createObjectNode();
+            bodyNode.put("processInstanceId", processInstanceId);
 
-      return clientService.getFormInstances(serverConfig, bodyNode);
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting form instances for process instance id {}", processInstanceId, e);
-      throw new BadRequestException(e.getMessage());
+            return clientService.getFormInstances(serverConfig, bodyNode);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting form instances for process instance id {}", processInstanceId, e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
 
-  @RequestMapping(value = "/rest/admin/form-instances", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getSubmittedForm(HttpServletRequest request) {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+    @RequestMapping(value = "/rest/admin/form-instances", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getSubmittedForm(HttpServletRequest request) {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
-    Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
+        Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
 
-    return clientService.listFormInstances(serverConfig, parameterMap);
-  }
+        return clientService.listFormInstances(serverConfig, parameterMap);
+    }
 }

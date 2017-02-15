@@ -18,31 +18,31 @@ import org.flowable.idm.engine.impl.persistence.entity.data.PrivilegeMappingData
 
 public class PrivilegeMappingEntityManagerImpl extends AbstractEntityManager<PrivilegeMappingEntity> implements PrivilegeMappingEntityManager {
 
-  protected PrivilegeMappingDataManager privilegeMappingDataManager;
-  
-  public PrivilegeMappingEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, PrivilegeMappingDataManager privilegeMappingDataManager) {
-    super(idmEngineConfiguration);
-    this.privilegeMappingDataManager = privilegeMappingDataManager;
-  }
+    protected PrivilegeMappingDataManager privilegeMappingDataManager;
 
-  @Override
-  protected DataManager<PrivilegeMappingEntity> getDataManager() {
-    return privilegeMappingDataManager;
-  }
-  
-  @Override
-  public void deleteByPrivilegeId(String privilegeId) {
-    privilegeMappingDataManager.deleteByPrivilegeId(privilegeId);
-  }
-  
-  @Override
-  public void deleteByPrivilegeIdAndUserId(String privilegeId, String userId) {
-    privilegeMappingDataManager.deleteByPrivilegeIdAndUserId(privilegeId, userId);
-  }
-  
-  @Override
-  public void deleteByPrivilegeIdAndGroupId(String privilegeId, String groupId) {
-    privilegeMappingDataManager.deleteByPrivilegeIdAndGroupId(privilegeId, groupId);
-  }
-  
+    public PrivilegeMappingEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, PrivilegeMappingDataManager privilegeMappingDataManager) {
+        super(idmEngineConfiguration);
+        this.privilegeMappingDataManager = privilegeMappingDataManager;
+    }
+
+    @Override
+    protected DataManager<PrivilegeMappingEntity> getDataManager() {
+        return privilegeMappingDataManager;
+    }
+
+    @Override
+    public void deleteByPrivilegeId(String privilegeId) {
+        privilegeMappingDataManager.deleteByPrivilegeId(privilegeId);
+    }
+
+    @Override
+    public void deleteByPrivilegeIdAndUserId(String privilegeId, String userId) {
+        privilegeMappingDataManager.deleteByPrivilegeIdAndUserId(privilegeId, userId);
+    }
+
+    @Override
+    public void deleteByPrivilegeIdAndGroupId(String privilegeId, String groupId) {
+        privilegeMappingDataManager.deleteByPrivilegeIdAndGroupId(privilegeId, groupId);
+    }
+
 }

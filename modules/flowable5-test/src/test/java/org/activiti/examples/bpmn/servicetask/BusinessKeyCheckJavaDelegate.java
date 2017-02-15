@@ -16,16 +16,14 @@ package org.activiti.examples.bpmn.servicetask;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
-
 /**
- * Delegate that gets the business-key from the delegate-execution and puts the
- * value in a variable.
+ * Delegate that gets the business-key from the delegate-execution and puts the value in a variable.
  * 
  * @author Frederik Heremans
  */
 public class BusinessKeyCheckJavaDelegate implements JavaDelegate {
 
-  public void execute(DelegateExecution execution) {
-    execution.setVariable("businessKeySetOnExecution", execution.getProcessInstanceBusinessKey());
-  }
+    public void execute(DelegateExecution execution) {
+        execution.setVariable("businessKeySetOnExecution", execution.getProcessInstanceBusinessKey());
+    }
 }

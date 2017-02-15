@@ -17,13 +17,13 @@ import org.flowable.bpmn.model.UserTask;
 
 public class UserTaskInfoMapper extends AbstractInfoMapper {
 
-	protected void mapProperties(Object element) {
-		UserTask userTask = (UserTask) element;
-		createPropertyNode("Assignee", userTask.getAssignee());
-		createPropertyNode("Candidate users", userTask.getCandidateUsers());
-		createPropertyNode("Candidate groups", userTask.getCandidateGroups());
-		createPropertyNode("Due date", userTask.getDueDate());
-		createPropertyNode("Form key", userTask.getFormKey());
-		createPropertyNode("Priority", userTask.getPriority());
-	}
+    protected void mapProperties(Object element) {
+        UserTask userTask = (UserTask) element;
+        createPropertyNode("Assignee", userTask.getAssignee());
+        createPropertyNode("Candidate users", userTask.getCandidateUsers());
+        createPropertyNode("Candidate groups", userTask.getCandidateGroups());
+        createPropertyNode("Due date", userTask.getDueDate());
+        createPropertyNode("Form key", userTask.getFormKey());
+        createPropertyNode("Priority", userTask.getPriority());
+    }
 }

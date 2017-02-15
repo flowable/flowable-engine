@@ -40,98 +40,98 @@ import org.flowable.form.model.FormModel;
  */
 public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected String taskId;
+    private static final long serialVersionUID = 1L;
 
-  public GetTaskFormModelCmd(String taskId) {
-    this.taskId = taskId;
-  }
+    protected String taskId;
 
-  public FormModel execute(CommandContext commandContext) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    if (!processEngineConfiguration.isFormEngineInitialized()) {
-      throw new FlowableIllegalArgumentException("Form engine is not initialized");
-    }
-    
-    HistoricTaskInstance task = processEngineConfiguration.getHistoricTaskInstanceEntityManager().findById(taskId);
-    if (task == null) {
-      throw new FlowableObjectNotFoundException("Task not found with id " + taskId);
-    }
-    
-    Map<String, Object> variables = new HashMap<String, Object>();
-    if (task.getProcessInstanceId() != null) {
-      List<HistoricVariableInstance> variableInstances = processEngineConfiguration.getHistoryService()
-          .createHistoricVariableInstanceQuery()
-          .processInstanceId(task.getProcessInstanceId())
-          .list();
-      
-      for (HistoricVariableInstance historicVariableInstance : variableInstances) {
-        variables.put(historicVariableInstance.getVariableName(), historicVariableInstance.getValue());
-      }
-    }
-    
-    String parentDeploymentId = null;
-    if (StringUtils.isNotEmpty(task.getProcessDefinitionId())) {
-      ProcessDefinition processDefinition = processEngineConfiguration.getRepositoryService()
-          .getProcessDefinition(task.getProcessDefinitionId());
-      parentDeploymentId = processDefinition.getDeploymentId();
-    }
-    
-    FormModel formModel = null;
-    if (task.getEndTime() != null) {
-      formModel = processEngineConfiguration.getFormEngineFormService()
-          .getFormInstanceModelByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId, 
-              taskId, task.getProcessInstanceId(), variables, task.getTenantId());
-      
-    } else {
-      formModel = processEngineConfiguration.getFormEngineFormService()
-          .getFormModelWithVariablesByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId, 
-              task.getProcessInstanceId(), variables, task.getTenantId());
+    public GetTaskFormModelCmd(String taskId) {
+        this.taskId = taskId;
     }
 
-    // If form does not exists, we don't want to leak out this info to just anyone
-    if (formModel == null) {
-      throw new FlowableObjectNotFoundException("Form model for task " + task.getTaskDefinitionKey() + " cannot be found for form key " + task.getFormKey());
-    }
-    
-    fetchRelatedContentInfoIfNeeded(formModel, processEngineConfiguration);
-
-    return formModel;
-  }
-  
-  protected void fetchRelatedContentInfoIfNeeded(FormModel formModel, ProcessEngineConfigurationImpl processEngineConfiguration) {
-    if (!processEngineConfiguration.isContentEngineInitialized()) {
-      return;
-    }
-    
-    if (formModel.getFields() != null) {
-      for (FormField formField : formModel.getFields()) {
-        if (FormFieldTypes.UPLOAD.equals(formField.getType())) {
-          
-          List<String> contentItemIds = null;
-          if (formField.getValue() instanceof List) {
-            contentItemIds = (List<String>) formField.getValue();
-            
-          } else if (formField.getValue() instanceof String) {
-            String[] splittedString = ((String) formField.getValue()).split(",");
-            contentItemIds = new ArrayList<String>();
-            Collections.addAll(contentItemIds, splittedString);
-          }
-          
-          if (contentItemIds != null) {
-            Set<String> contentItemIdSet = new HashSet<>(contentItemIds);
-            
-            List<ContentItem> contentItems = processEngineConfiguration.getContentService()
-                .createContentItemQuery()
-                .ids(contentItemIdSet)
-                .list();
-            
-            formField.setValue(contentItems);
-          }
+    public FormModel execute(CommandContext commandContext) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+        if (!processEngineConfiguration.isFormEngineInitialized()) {
+            throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }
-      }
+
+        HistoricTaskInstance task = processEngineConfiguration.getHistoricTaskInstanceEntityManager().findById(taskId);
+        if (task == null) {
+            throw new FlowableObjectNotFoundException("Task not found with id " + taskId);
+        }
+
+        Map<String, Object> variables = new HashMap<String, Object>();
+        if (task.getProcessInstanceId() != null) {
+            List<HistoricVariableInstance> variableInstances = processEngineConfiguration.getHistoryService()
+                    .createHistoricVariableInstanceQuery()
+                    .processInstanceId(task.getProcessInstanceId())
+                    .list();
+
+            for (HistoricVariableInstance historicVariableInstance : variableInstances) {
+                variables.put(historicVariableInstance.getVariableName(), historicVariableInstance.getValue());
+            }
+        }
+
+        String parentDeploymentId = null;
+        if (StringUtils.isNotEmpty(task.getProcessDefinitionId())) {
+            ProcessDefinition processDefinition = processEngineConfiguration.getRepositoryService()
+                    .getProcessDefinition(task.getProcessDefinitionId());
+            parentDeploymentId = processDefinition.getDeploymentId();
+        }
+
+        FormModel formModel = null;
+        if (task.getEndTime() != null) {
+            formModel = processEngineConfiguration.getFormEngineFormService()
+                    .getFormInstanceModelByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
+                            taskId, task.getProcessInstanceId(), variables, task.getTenantId());
+
+        } else {
+            formModel = processEngineConfiguration.getFormEngineFormService()
+                    .getFormModelWithVariablesByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
+                            task.getProcessInstanceId(), variables, task.getTenantId());
+        }
+
+        // If form does not exists, we don't want to leak out this info to just anyone
+        if (formModel == null) {
+            throw new FlowableObjectNotFoundException("Form model for task " + task.getTaskDefinitionKey() + " cannot be found for form key " + task.getFormKey());
+        }
+
+        fetchRelatedContentInfoIfNeeded(formModel, processEngineConfiguration);
+
+        return formModel;
     }
-  }
+
+    protected void fetchRelatedContentInfoIfNeeded(FormModel formModel, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        if (!processEngineConfiguration.isContentEngineInitialized()) {
+            return;
+        }
+
+        if (formModel.getFields() != null) {
+            for (FormField formField : formModel.getFields()) {
+                if (FormFieldTypes.UPLOAD.equals(formField.getType())) {
+
+                    List<String> contentItemIds = null;
+                    if (formField.getValue() instanceof List) {
+                        contentItemIds = (List<String>) formField.getValue();
+
+                    } else if (formField.getValue() instanceof String) {
+                        String[] splittedString = ((String) formField.getValue()).split(",");
+                        contentItemIds = new ArrayList<String>();
+                        Collections.addAll(contentItemIds, splittedString);
+                    }
+
+                    if (contentItemIds != null) {
+                        Set<String> contentItemIdSet = new HashSet<>(contentItemIds);
+
+                        List<ContentItem> contentItems = processEngineConfiguration.getContentService()
+                                .createContentItemQuery()
+                                .ids(contentItemIdSet)
+                                .list();
+
+                        formField.setValue(contentItems);
+                    }
+                }
+            }
+        }
+    }
 
 }

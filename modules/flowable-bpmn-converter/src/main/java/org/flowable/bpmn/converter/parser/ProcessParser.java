@@ -28,35 +28,35 @@ import org.flowable.bpmn.model.Process;
  */
 public class ProcessParser implements BpmnXMLConstants {
 
-  public Process parse(XMLStreamReader xtr, BpmnModel model) throws Exception {
-    Process process = null;
-    if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_ID))) {
-      String processId = xtr.getAttributeValue(null, ATTRIBUTE_ID);
-      process = new Process();
-      process.setId(processId);
-      BpmnXMLUtil.addXMLLocation(process, xtr);
-      process.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
-      if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_PROCESS_EXECUTABLE))) {
-        process.setExecutable(Boolean.parseBoolean(xtr.getAttributeValue(null, ATTRIBUTE_PROCESS_EXECUTABLE)));
-      }
-      
-      String candidateUsersString = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_PROCESS_CANDIDATE_USERS, xtr);
-      if (StringUtils.isNotEmpty(candidateUsersString)) {
-        List<String> candidateUsers = BpmnXMLUtil.parseDelimitedList(candidateUsersString);
-        process.setCandidateStarterUsers(candidateUsers);
-      }
-      
-      String candidateGroupsString = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_PROCESS_CANDIDATE_GROUPS, xtr);
-      if (StringUtils.isNotEmpty(candidateGroupsString)) {
-        List<String> candidateGroups = BpmnXMLUtil.parseDelimitedList(candidateGroupsString);
-        process.setCandidateStarterGroups(candidateGroups);
-      }
+    public Process parse(XMLStreamReader xtr, BpmnModel model) throws Exception {
+        Process process = null;
+        if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_ID))) {
+            String processId = xtr.getAttributeValue(null, ATTRIBUTE_ID);
+            process = new Process();
+            process.setId(processId);
+            BpmnXMLUtil.addXMLLocation(process, xtr);
+            process.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
+            if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_PROCESS_EXECUTABLE))) {
+                process.setExecutable(Boolean.parseBoolean(xtr.getAttributeValue(null, ATTRIBUTE_PROCESS_EXECUTABLE)));
+            }
 
-      BpmnXMLUtil.addCustomAttributes(xtr, process, ProcessExport.defaultProcessAttributes);
+            String candidateUsersString = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_PROCESS_CANDIDATE_USERS, xtr);
+            if (StringUtils.isNotEmpty(candidateUsersString)) {
+                List<String> candidateUsers = BpmnXMLUtil.parseDelimitedList(candidateUsersString);
+                process.setCandidateStarterUsers(candidateUsers);
+            }
 
-      model.getProcesses().add(process);
+            String candidateGroupsString = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_PROCESS_CANDIDATE_GROUPS, xtr);
+            if (StringUtils.isNotEmpty(candidateGroupsString)) {
+                List<String> candidateGroups = BpmnXMLUtil.parseDelimitedList(candidateGroupsString);
+                process.setCandidateStarterGroups(candidateGroups);
+            }
 
+            BpmnXMLUtil.addCustomAttributes(xtr, process, ProcessExport.defaultProcessAttributes);
+
+            model.getProcesses().add(process);
+
+        }
+        return process;
     }
-    return process;
-  }
 }

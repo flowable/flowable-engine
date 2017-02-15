@@ -15,12 +15,10 @@ package org.activiti.engine.impl.pvm.delegate;
 
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 
-
-
 /**
  * @author Tom Baeyens
  */
 public interface CompositeActivityBehavior extends ActivityBehavior {
 
-  void lastExecutionEnded(ActivityExecution execution);
+    void lastExecutionEnded(ActivityExecution execution);
 }

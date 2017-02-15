@@ -23,47 +23,47 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 
 public class TestMultipleFlowableEventListener implements FlowableEventListener {
 
-	private List<FlowableEvent> eventsReceived;
-	private List<Class<?>> entityClasses;
-	private List<Class<?>> eventClasses;
+    private List<FlowableEvent> eventsReceived;
+    private List<Class<?>> entityClasses;
+    private List<Class<?>> eventClasses;
 
-	public TestMultipleFlowableEventListener() {
-		eventsReceived = new ArrayList<FlowableEvent>();
-  }
+    public TestMultipleFlowableEventListener() {
+        eventsReceived = new ArrayList<FlowableEvent>();
+    }
 
-	public List<FlowableEvent> getEventsReceived() {
-	  return eventsReceived;
-  }
-	
-	public void clearEventsReceived() {
-		eventsReceived.clear();
-	}
-	
-	@Override
-	public void onEvent(FlowableEvent event) {
-		if(isAssignableFrom(eventClasses, event) && isAssignableFrom(entityClasses, ((FlowableEntityEvent) event).getEntity())) {
-			eventsReceived.add(event);
-		}
-	}
+    public List<FlowableEvent> getEventsReceived() {
+        return eventsReceived;
+    }
 
-  private boolean isAssignableFrom(Collection<Class<?>>classes, Object entity) {
-    for (Class<?> itemClass : classes) {
-      if (itemClass.isAssignableFrom(entity.getClass()))
+    public void clearEventsReceived() {
+        eventsReceived.clear();
+    }
+
+    @Override
+    public void onEvent(FlowableEvent event) {
+        if (isAssignableFrom(eventClasses, event) && isAssignableFrom(entityClasses, ((FlowableEntityEvent) event).getEntity())) {
+            eventsReceived.add(event);
+        }
+    }
+
+    private boolean isAssignableFrom(Collection<Class<?>> classes, Object entity) {
+        for (Class<?> itemClass : classes) {
+            if (itemClass.isAssignableFrom(entity.getClass()))
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isFailOnException() {
         return true;
     }
-    return false;
-  }
 
-	@Override
-	public boolean isFailOnException() {
-		return true;
-	}
+    public void setEntityClasses(Class<?>... entityClasses) {
+        this.entityClasses = Arrays.asList(entityClasses);
+    }
 
-  public void setEntityClasses(Class<?>... entityClasses) {
-    this.entityClasses = Arrays.asList(entityClasses);
-  }
-
-  public void setEventClasses(Class<?>... eventClasses) {
-    this.eventClasses = Arrays.asList(eventClasses);
-  }
+    public void setEventClasses(Class<?>... eventClasses) {
+        this.eventClasses = Arrays.asList(eventClasses);
+    }
 }

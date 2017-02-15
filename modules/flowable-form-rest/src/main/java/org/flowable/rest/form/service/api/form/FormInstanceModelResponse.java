@@ -20,32 +20,32 @@ import org.flowable.form.model.FormModel;
  */
 public class FormInstanceModelResponse extends FormInstanceModel {
 
-  private String url;
+    private String url;
 
-  public FormInstanceModelResponse(FormModel formModel, String url) {
-    super(formModel);
-    this.url = url;
-  }
+    public FormInstanceModelResponse(FormModel formModel, String url) {
+        super(formModel);
+        this.url = url;
+    }
 
-  public FormInstanceModelResponse(FormInstanceModel formInstanceModel) {
+    public FormInstanceModelResponse(FormInstanceModel formInstanceModel) {
 
-    super(formInstanceModel);
+        super(formInstanceModel);
 
-    setFormInstanceId(formInstanceModel.getFormInstanceId());
-    setSubmittedBy(formInstanceModel.getSubmittedBy());
-    setSubmittedDate(formInstanceModel.getSubmittedDate());
-    setSelectedOutcome(formInstanceModel.getSelectedOutcome());
-    setTaskId(formInstanceModel.getTaskId());
-    setProcessInstanceId(formInstanceModel.getProcessInstanceId());
-    setProcessDefinitionId(formInstanceModel.getProcessDefinitionId());
-    setTenantId(formInstanceModel.getTenantId());
-  }
+        setFormInstanceId(formInstanceModel.getFormInstanceId());
+        setSubmittedBy(formInstanceModel.getSubmittedBy());
+        setSubmittedDate(formInstanceModel.getSubmittedDate());
+        setSelectedOutcome(formInstanceModel.getSelectedOutcome());
+        setTaskId(formInstanceModel.getTaskId());
+        setProcessInstanceId(formInstanceModel.getProcessInstanceId());
+        setProcessDefinitionId(formInstanceModel.getProcessDefinitionId());
+        setTenantId(formInstanceModel.getTenantId());
+    }
 
-  public String getUrl() {
-    return url;
-  }
+    public String getUrl() {
+        return url;
+    }
 
-  public void setUrl(String url) {
-    this.url = url;
-  }
+    public void setUrl(String url) {
+        this.url = url;
+    }
 }

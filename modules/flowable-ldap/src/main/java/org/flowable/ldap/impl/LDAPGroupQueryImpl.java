@@ -35,94 +35,94 @@ import org.flowable.ldap.LDAPGroupCache;
 import org.flowable.ldap.LDAPTemplate;
 
 public class LDAPGroupQueryImpl extends GroupQueryImpl {
-  
-  private static final long serialVersionUID = 1L;
-  
-  protected LDAPConfigurator ldapConfigurator;
-  protected LDAPGroupCache ldapGroupCache;
-  
-  public LDAPGroupQueryImpl(LDAPConfigurator ldapConfigurator, LDAPGroupCache ldapGroupCache) {
-    this.ldapConfigurator = ldapConfigurator;
-    this.ldapGroupCache = ldapGroupCache;
-  }
 
-  @Override
-  public long executeCount(CommandContext commandContext) {
-    return executeQuery().size();
-  }
+    private static final long serialVersionUID = 1L;
 
-  @Override
-  public List<Group> executeList(CommandContext commandContext, Page page) {
-    return executeQuery();
-  }
-  
-  protected List<Group> executeQuery() {
-    if (getUserId() != null) {
-      return findGroupsByUser(getUserId());
-    } else {
-      throw new FlowableIllegalArgumentException("This query is not supported by the LDAPGroupManager");
-    }
-  }
-  
-  protected List<Group> findGroupsByUser(final String userId) {
+    protected LDAPConfigurator ldapConfigurator;
+    protected LDAPGroupCache ldapGroupCache;
 
-    // First try the cache (if one is defined)
-    if (ldapGroupCache != null) {
-      List<Group> groups = ldapGroupCache.get(userId);
-      if (groups != null) {
-        return groups;
-      }
+    public LDAPGroupQueryImpl(LDAPConfigurator ldapConfigurator, LDAPGroupCache ldapGroupCache) {
+        this.ldapConfigurator = ldapConfigurator;
+        this.ldapGroupCache = ldapGroupCache;
     }
 
-    // Do the search against Ldap
-    LDAPTemplate ldapTemplate = new LDAPTemplate(ldapConfigurator);
-    return ldapTemplate.execute(new LDAPCallBack<List<Group>>() {
+    @Override
+    public long executeCount(CommandContext commandContext) {
+        return executeQuery().size();
+    }
 
-      public List<Group> executeInContext(InitialDirContext initialDirContext) {
+    @Override
+    public List<Group> executeList(CommandContext commandContext, Page page) {
+        return executeQuery();
+    }
 
-        String searchExpression = ldapConfigurator.getLdapQueryBuilder().buildQueryGroupsForUser(ldapConfigurator, userId);
-
-        List<Group> groups = new ArrayList<Group>();
-        try {
-          String baseDn = ldapConfigurator.getGroupBaseDn() != null ? ldapConfigurator.getGroupBaseDn() : ldapConfigurator.getBaseDn();
-          NamingEnumeration<?> namingEnum = initialDirContext.search(baseDn, searchExpression, createSearchControls());
-          while (namingEnum.hasMore()) { // Should be only one
-            SearchResult result = (SearchResult) namingEnum.next();
-
-            GroupEntity group = new GroupEntityImpl();
-            if (ldapConfigurator.getGroupIdAttribute() != null) {
-              group.setId(result.getAttributes().get(ldapConfigurator.getGroupIdAttribute()).get().toString());
-            }
-            if (ldapConfigurator.getGroupNameAttribute() != null) {
-              group.setName(result.getAttributes().get(ldapConfigurator.getGroupNameAttribute()).get().toString());
-            }
-            if (ldapConfigurator.getGroupTypeAttribute() != null) {
-              group.setType(result.getAttributes().get(ldapConfigurator.getGroupTypeAttribute()).get().toString());
-            }
-            groups.add(group);
-          }
-
-          namingEnum.close();
-
-          // Cache results for later
-          if (ldapGroupCache != null) {
-            ldapGroupCache.add(userId, groups);
-          }
-
-          return groups;
-
-        } catch (NamingException e) {
-          throw new FlowableException("Could not find groups for user " + userId, e);
+    protected List<Group> executeQuery() {
+        if (getUserId() != null) {
+            return findGroupsByUser(getUserId());
+        } else {
+            throw new FlowableIllegalArgumentException("This query is not supported by the LDAPGroupManager");
         }
-      }
+    }
 
-    });
-  }
-  
-  protected SearchControls createSearchControls() {
-    SearchControls searchControls = new SearchControls();
-    searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-    searchControls.setTimeLimit(ldapConfigurator.getSearchTimeLimit());
-    return searchControls;
-  }
+    protected List<Group> findGroupsByUser(final String userId) {
+
+        // First try the cache (if one is defined)
+        if (ldapGroupCache != null) {
+            List<Group> groups = ldapGroupCache.get(userId);
+            if (groups != null) {
+                return groups;
+            }
+        }
+
+        // Do the search against Ldap
+        LDAPTemplate ldapTemplate = new LDAPTemplate(ldapConfigurator);
+        return ldapTemplate.execute(new LDAPCallBack<List<Group>>() {
+
+            public List<Group> executeInContext(InitialDirContext initialDirContext) {
+
+                String searchExpression = ldapConfigurator.getLdapQueryBuilder().buildQueryGroupsForUser(ldapConfigurator, userId);
+
+                List<Group> groups = new ArrayList<Group>();
+                try {
+                    String baseDn = ldapConfigurator.getGroupBaseDn() != null ? ldapConfigurator.getGroupBaseDn() : ldapConfigurator.getBaseDn();
+                    NamingEnumeration<?> namingEnum = initialDirContext.search(baseDn, searchExpression, createSearchControls());
+                    while (namingEnum.hasMore()) { // Should be only one
+                        SearchResult result = (SearchResult) namingEnum.next();
+
+                        GroupEntity group = new GroupEntityImpl();
+                        if (ldapConfigurator.getGroupIdAttribute() != null) {
+                            group.setId(result.getAttributes().get(ldapConfigurator.getGroupIdAttribute()).get().toString());
+                        }
+                        if (ldapConfigurator.getGroupNameAttribute() != null) {
+                            group.setName(result.getAttributes().get(ldapConfigurator.getGroupNameAttribute()).get().toString());
+                        }
+                        if (ldapConfigurator.getGroupTypeAttribute() != null) {
+                            group.setType(result.getAttributes().get(ldapConfigurator.getGroupTypeAttribute()).get().toString());
+                        }
+                        groups.add(group);
+                    }
+
+                    namingEnum.close();
+
+                    // Cache results for later
+                    if (ldapGroupCache != null) {
+                        ldapGroupCache.add(userId, groups);
+                    }
+
+                    return groups;
+
+                } catch (NamingException e) {
+                    throw new FlowableException("Could not find groups for user " + userId, e);
+                }
+            }
+
+        });
+    }
+
+    protected SearchControls createSearchControls() {
+        SearchControls searchControls = new SearchControls();
+        searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        searchControls.setTimeLimit(ldapConfigurator.getSearchTimeLimit());
+        return searchControls;
+    }
 }

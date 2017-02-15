@@ -25,18 +25,18 @@ import org.flowable.engine.repository.Deployment;
  */
 public interface DeploymentEntityManager extends EntityManager<DeploymentEntity> {
 
-  DeploymentEntity findLatestDeploymentByName(String deploymentName);
+    DeploymentEntity findLatestDeploymentByName(String deploymentName);
 
-  List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery, Page page);
+    List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery, Page page);
 
-  List<String> getDeploymentResourceNames(String deploymentId);
+    List<String> getDeploymentResourceNames(String deploymentId);
 
-  List<Deployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<Deployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
 
-  long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap);
+    long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap);
 
-  long findDeploymentCountByQueryCriteria(DeploymentQueryImpl deploymentQuery);
-  
-  void deleteDeployment(String deploymentId, boolean cascade);
+    long findDeploymentCountByQueryCriteria(DeploymentQueryImpl deploymentQuery);
+
+    void deleteDeployment(String deploymentId, boolean cascade);
 
 }

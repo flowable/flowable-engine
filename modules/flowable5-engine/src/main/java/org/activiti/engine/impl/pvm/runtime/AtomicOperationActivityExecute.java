@@ -24,48 +24,47 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * @author Tom Baeyens
  */
 public class AtomicOperationActivityExecute implements AtomicOperation {
-  
-  private static Logger log = LoggerFactory.getLogger(AtomicOperationActivityExecute.class);
 
-  public boolean isAsync(InterpretableExecution execution) {
-    return false;
-  }
+    private static Logger log = LoggerFactory.getLogger(AtomicOperationActivityExecute.class);
 
-  public void execute(InterpretableExecution execution) {
-    ActivityImpl activity = (ActivityImpl) execution.getActivity();
-    
-    ActivityBehavior activityBehavior = activity.getActivityBehavior();
-    if (activityBehavior==null) {
-      throw new PvmException("no behavior specified in "+activity);
+    public boolean isAsync(InterpretableExecution execution) {
+        return false;
     }
 
-    log.debug("{} executes {}: {}", execution, activity, activityBehavior.getClass().getName());
-    
-    try {
-    	if(Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-      	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-      			ActivitiEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, 
-      					execution.getActivity().getId(),
-      					(String) execution.getActivity().getProperty("name"),
-      					execution.getId(), 
-      					execution.getProcessInstanceId(), 
-      					execution.getProcessDefinitionId(),
-      					(String) activity.getProperties().get("type"),
-      					activity.getActivityBehavior().getClass().getCanonicalName()));
-      }
-    	
-      activityBehavior.execute(execution);
-      
-    } catch (ActivitiException e) {
-      throw e;
-    } catch (Throwable t) {
-      LogMDC.putMDCExecution(execution);
-      throw new ActivitiActivityExecutionException("couldn't execute activity <"+activity.getProperty("type")+" id=\""+activity.getId()+"\" ...>: "+t.getMessage(), t);
+    public void execute(InterpretableExecution execution) {
+        ActivityImpl activity = (ActivityImpl) execution.getActivity();
+
+        ActivityBehavior activityBehavior = activity.getActivityBehavior();
+        if (activityBehavior == null) {
+            throw new PvmException("no behavior specified in " + activity);
+        }
+
+        log.debug("{} executes {}: {}", execution, activity, activityBehavior.getClass().getName());
+
+        try {
+            if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+                Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                        ActivitiEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED,
+                                execution.getActivity().getId(),
+                                (String) execution.getActivity().getProperty("name"),
+                                execution.getId(),
+                                execution.getProcessInstanceId(),
+                                execution.getProcessDefinitionId(),
+                                (String) activity.getProperties().get("type"),
+                                activity.getActivityBehavior().getClass().getCanonicalName()));
+            }
+
+            activityBehavior.execute(execution);
+
+        } catch (ActivitiException e) {
+            throw e;
+        } catch (Throwable t) {
+            LogMDC.putMDCExecution(execution);
+            throw new ActivitiActivityExecutionException("couldn't execute activity <" + activity.getProperty("type") + " id=\"" + activity.getId() + "\" ...>: " + t.getMessage(), t);
+        }
     }
-  }
 }

@@ -46,156 +46,156 @@ import org.slf4j.LoggerFactory;
  */
 public class ProcessEngineImpl implements ProcessEngine {
 
-  private static Logger log = LoggerFactory.getLogger(ProcessEngineImpl.class);
+    private static Logger log = LoggerFactory.getLogger(ProcessEngineImpl.class);
 
-  protected String name;
-  protected RepositoryService repositoryService;
-  protected RuntimeService runtimeService;
-  protected HistoryService historicDataService;
-  protected IdentityService identityService;
-  protected TaskService taskService;
-  protected FormService formService;
-  protected ManagementService managementService;
-  protected DynamicBpmnService dynamicBpmnService;
-  protected FormRepositoryService formEngineRepositoryService;
-  protected org.flowable.form.api.FormService formEngineFormService;
-  protected DmnRepositoryService dmnRepositoryService;
-  protected DmnRuleService dmnRuleService;
-  protected IdmIdentityService idmIdentityService;
-  protected ContentService contentService;
-  protected AsyncExecutor asyncExecutor;
-  protected CommandExecutor commandExecutor;
-  protected Map<Class<?>, SessionFactory> sessionFactories;
-  protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
-  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    protected String name;
+    protected RepositoryService repositoryService;
+    protected RuntimeService runtimeService;
+    protected HistoryService historicDataService;
+    protected IdentityService identityService;
+    protected TaskService taskService;
+    protected FormService formService;
+    protected ManagementService managementService;
+    protected DynamicBpmnService dynamicBpmnService;
+    protected FormRepositoryService formEngineRepositoryService;
+    protected org.flowable.form.api.FormService formEngineFormService;
+    protected DmnRepositoryService dmnRepositoryService;
+    protected DmnRuleService dmnRuleService;
+    protected IdmIdentityService idmIdentityService;
+    protected ContentService contentService;
+    protected AsyncExecutor asyncExecutor;
+    protected CommandExecutor commandExecutor;
+    protected Map<Class<?>, SessionFactory> sessionFactories;
+    protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  public ProcessEngineImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    this.processEngineConfiguration = processEngineConfiguration;
-    this.name = processEngineConfiguration.getEngineName();
-    this.repositoryService = processEngineConfiguration.getRepositoryService();
-    this.runtimeService = processEngineConfiguration.getRuntimeService();
-    this.historicDataService = processEngineConfiguration.getHistoryService();
-    this.identityService = processEngineConfiguration.getIdentityService();
-    this.taskService = processEngineConfiguration.getTaskService();
-    this.formService = processEngineConfiguration.getFormService();
-    this.managementService = processEngineConfiguration.getManagementService();
-    this.dynamicBpmnService = processEngineConfiguration.getDynamicBpmnService();
-    this.asyncExecutor = processEngineConfiguration.getAsyncExecutor();
-    this.commandExecutor = processEngineConfiguration.getCommandExecutor();
-    this.sessionFactories = processEngineConfiguration.getSessionFactories();
-    this.transactionContextFactory = processEngineConfiguration.getTransactionContextFactory();
-    this.formEngineRepositoryService = processEngineConfiguration.getFormEngineRepositoryService();
-    this.formEngineFormService = processEngineConfiguration.getFormEngineFormService();
-    this.dmnRepositoryService = processEngineConfiguration.getDmnEngineRepositoryService();
-    this.dmnRuleService = processEngineConfiguration.getDmnEngineRuleService();
-    this.idmIdentityService = processEngineConfiguration.getIdmIdentityService();
-    this.contentService = processEngineConfiguration.getContentService();
+    public ProcessEngineImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        this.processEngineConfiguration = processEngineConfiguration;
+        this.name = processEngineConfiguration.getEngineName();
+        this.repositoryService = processEngineConfiguration.getRepositoryService();
+        this.runtimeService = processEngineConfiguration.getRuntimeService();
+        this.historicDataService = processEngineConfiguration.getHistoryService();
+        this.identityService = processEngineConfiguration.getIdentityService();
+        this.taskService = processEngineConfiguration.getTaskService();
+        this.formService = processEngineConfiguration.getFormService();
+        this.managementService = processEngineConfiguration.getManagementService();
+        this.dynamicBpmnService = processEngineConfiguration.getDynamicBpmnService();
+        this.asyncExecutor = processEngineConfiguration.getAsyncExecutor();
+        this.commandExecutor = processEngineConfiguration.getCommandExecutor();
+        this.sessionFactories = processEngineConfiguration.getSessionFactories();
+        this.transactionContextFactory = processEngineConfiguration.getTransactionContextFactory();
+        this.formEngineRepositoryService = processEngineConfiguration.getFormEngineRepositoryService();
+        this.formEngineFormService = processEngineConfiguration.getFormEngineFormService();
+        this.dmnRepositoryService = processEngineConfiguration.getDmnEngineRepositoryService();
+        this.dmnRuleService = processEngineConfiguration.getDmnEngineRuleService();
+        this.idmIdentityService = processEngineConfiguration.getIdmIdentityService();
+        this.contentService = processEngineConfiguration.getContentService();
 
-    if (processEngineConfiguration.isUsingRelationalDatabase() && processEngineConfiguration.getDatabaseSchemaUpdate() != null) {
-      commandExecutor.execute(processEngineConfiguration.getSchemaCommandConfig(), new SchemaOperationsProcessEngineBuild());
+        if (processEngineConfiguration.isUsingRelationalDatabase() && processEngineConfiguration.getDatabaseSchemaUpdate() != null) {
+            commandExecutor.execute(processEngineConfiguration.getSchemaCommandConfig(), new SchemaOperationsProcessEngineBuild());
+        }
+
+        if (name == null) {
+            log.info("default ProcessEngine created");
+        } else {
+            log.info("ProcessEngine {} created", name);
+        }
+
+        ProcessEngines.registerProcessEngine(this);
+
+        if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
+            processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineBuilt(this);
+        }
+
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CREATED));
+
+        if (asyncExecutor != null && asyncExecutor.isAutoActivate()) {
+            asyncExecutor.start();
+        }
     }
 
-    if (name == null) {
-      log.info("default ProcessEngine created");
-    } else {
-      log.info("ProcessEngine {} created", name);
+    public void close() {
+        ProcessEngines.unregister(this);
+        if (asyncExecutor != null && asyncExecutor.isActive()) {
+            asyncExecutor.shutdown();
+        }
+
+        Runnable closeRunnable = processEngineConfiguration.getProcessEngineCloseRunnable();
+        if (closeRunnable != null) {
+            closeRunnable.run();
+        }
+
+        if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
+            processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineClosed(this);
+        }
+
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CLOSED));
     }
 
-    ProcessEngines.registerProcessEngine(this);
-    
-    if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
-      processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineBuilt(this);
-    }
-    
-    processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CREATED));
+    // getters and setters
+    // //////////////////////////////////////////////////////
 
-    if (asyncExecutor != null && asyncExecutor.isAutoActivate()) {
-      asyncExecutor.start();
-    }
-  }
-
-  public void close() {
-    ProcessEngines.unregister(this);
-    if (asyncExecutor != null && asyncExecutor.isActive()) {
-      asyncExecutor.shutdown();
-    }
-    
-    Runnable closeRunnable = processEngineConfiguration.getProcessEngineCloseRunnable();
-    if (closeRunnable != null) {
-      closeRunnable.run();
+    public String getName() {
+        return name;
     }
 
-    if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
-      processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineClosed(this);
+    public IdentityService getIdentityService() {
+        return identityService;
     }
-    
-    processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CLOSED));
-  }
 
-  // getters and setters
-  // //////////////////////////////////////////////////////
+    public ManagementService getManagementService() {
+        return managementService;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public TaskService getTaskService() {
+        return taskService;
+    }
 
-  public IdentityService getIdentityService() {
-    return identityService;
-  }
+    public HistoryService getHistoryService() {
+        return historicDataService;
+    }
 
-  public ManagementService getManagementService() {
-    return managementService;
-  }
+    public RuntimeService getRuntimeService() {
+        return runtimeService;
+    }
 
-  public TaskService getTaskService() {
-    return taskService;
-  }
+    public RepositoryService getRepositoryService() {
+        return repositoryService;
+    }
 
-  public HistoryService getHistoryService() {
-    return historicDataService;
-  }
+    public FormService getFormService() {
+        return formService;
+    }
 
-  public RuntimeService getRuntimeService() {
-    return runtimeService;
-  }
+    public DynamicBpmnService getDynamicBpmnService() {
+        return dynamicBpmnService;
+    }
 
-  public RepositoryService getRepositoryService() {
-    return repositoryService;
-  }
+    public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
+        return processEngineConfiguration;
+    }
 
-  public FormService getFormService() {
-    return formService;
-  }
-  
-  public DynamicBpmnService getDynamicBpmnService() {
-    return dynamicBpmnService;
-  }
+    public FormRepositoryService getFormEngineRepositoryService() {
+        return formEngineRepositoryService;
+    }
 
-  public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
-    return processEngineConfiguration;
-  }
-  
-  public FormRepositoryService getFormEngineRepositoryService() {
-    return formEngineRepositoryService;
-  }
-  
-  public org.flowable.form.api.FormService getFormEngineFormService() {
-    return formEngineFormService;
-  }
-  
-  public DmnRepositoryService getDmnRepositoryService() {
-    return dmnRepositoryService;
-  }
-  
-  public DmnRuleService getDmnRuleService() {
-    return dmnRuleService;
-  }
-  
-  public IdmIdentityService getIdmIdentityService() {
-    return idmIdentityService;
-  }
-  
-  public ContentService getContentService() {
-    return contentService;
-  }
+    public org.flowable.form.api.FormService getFormEngineFormService() {
+        return formEngineFormService;
+    }
+
+    public DmnRepositoryService getDmnRepositoryService() {
+        return dmnRepositoryService;
+    }
+
+    public DmnRuleService getDmnRuleService() {
+        return dmnRuleService;
+    }
+
+    public IdmIdentityService getIdmIdentityService() {
+        return idmIdentityService;
+    }
+
+    public ContentService getContentService() {
+        return contentService;
+    }
 }

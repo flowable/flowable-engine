@@ -34,119 +34,119 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class SpringAutoDeployTest extends AbstractTestCase {
 
-  protected static final String CTX_PATH = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml";
-  protected static final String CTX_NO_DROP_PATH = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-no-drop-context.xml";
-  protected static final String CTX_CREATE_DROP_CLEAN_DB = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-create-drop-clean-db-context.xml";
-  protected static final String CTX_DEPLOYMENT_MODE_DEFAULT = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-deploymentmode-default-context.xml";
-  protected static final String CTX_DEPLOYMENT_MODE_SINGLE_RESOURCE = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-deploymentmode-single-resource-context.xml";
-  protected static final String CTX_DEPLOYMENT_MODE_RESOURCE_PARENT_FOLDER = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-deploymentmode-resource-parent-folder-context.xml";
+    protected static final String CTX_PATH = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml";
+    protected static final String CTX_NO_DROP_PATH = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-no-drop-context.xml";
+    protected static final String CTX_CREATE_DROP_CLEAN_DB = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-create-drop-clean-db-context.xml";
+    protected static final String CTX_DEPLOYMENT_MODE_DEFAULT = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-deploymentmode-default-context.xml";
+    protected static final String CTX_DEPLOYMENT_MODE_SINGLE_RESOURCE = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-deploymentmode-single-resource-context.xml";
+    protected static final String CTX_DEPLOYMENT_MODE_RESOURCE_PARENT_FOLDER = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-deploymentmode-resource-parent-folder-context.xml";
 
-  protected ApplicationContext applicationContext;
-  protected FormRepositoryService repositoryService;
+    protected ApplicationContext applicationContext;
+    protected FormRepositoryService repositoryService;
 
-  protected void createAppContext(String path) {
-    this.applicationContext = new ClassPathXmlApplicationContext(path);
-    this.repositoryService = applicationContext.getBean(FormRepositoryService.class);
-  }
-
-  protected void tearDown() throws Exception {
-    removeAllDeployments();
-    this.applicationContext = null;
-    this.repositoryService = null;
-    super.tearDown();
-  }
-
-  public void testBasicFlowableSpringIntegration() {
-    createAppContext("org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml");
-    List<FormDefinition> formDefinitions = repositoryService.createFormDefinitionQuery().orderByFormDefinitionKey().asc().list();
-
-    Set<String> formDefinitionKeys = new HashSet<String>();
-    for (FormDefinition formDefinition : formDefinitions) {
-      formDefinitionKeys.add(formDefinition.getKey());
+    protected void createAppContext(String path) {
+        this.applicationContext = new ClassPathXmlApplicationContext(path);
+        this.repositoryService = applicationContext.getBean(FormRepositoryService.class);
     }
 
-    Set<String> expectedFormDefinitionKeys = new HashSet<String>();
-    expectedFormDefinitionKeys.add("form1");
-    expectedFormDefinitionKeys.add("form2");
-
-    assertEquals(expectedFormDefinitionKeys, formDefinitionKeys);
-  }
-
-  public void testNoRedeploymentForSpringContainerRestart() throws Exception {
-    createAppContext(CTX_PATH);
-    FormDeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
-    assertEquals(1, deploymentQuery.count());
-    FormDefinitionQuery formDefinitionQuery = repositoryService.createFormDefinitionQuery();
-    assertEquals(2, formDefinitionQuery.count());
-
-    // Creating a new app context with same resources doesn't lead to more deployments
-    new ClassPathXmlApplicationContext(CTX_NO_DROP_PATH);
-    assertEquals(1, deploymentQuery.count());
-    assertEquals(2, formDefinitionQuery.count());
-  }
-
-  // Updating the form file should lead to a new deployment when restarting the Spring container
-  public void testResourceRedeploymentAfterFormDefinitionChange() throws Exception {
-    createAppContext(CTX_PATH);
-    assertEquals(1, repositoryService.createDeploymentQuery().count());
-    ((AbstractXmlApplicationContext) applicationContext).destroy();
-
-    String filePath = "org/flowable/spring/test/autodeployment/simple.form";
-    String originalFormFileContent = IoUtil.readFileAsString(filePath);
-    String updatedFormFileContent = originalFormFileContent.replace("My first form", "My first forms");
-    assertTrue(updatedFormFileContent.length() > originalFormFileContent.length());
-    IoUtil.writeStringToFile(updatedFormFileContent, filePath);
-
-    // Classic produced/consumer problem here:
-    // The file is already written in Java, but not yet completely persisted by the OS
-    // Constructing the new app context reads the same file which is sometimes not yet fully written to disk
-    Thread.sleep(2000);
-
-    try {
-      applicationContext = new ClassPathXmlApplicationContext(CTX_NO_DROP_PATH);
-      repositoryService = (FormRepositoryService) applicationContext.getBean("formRepositoryService");
-    } finally {
-      // Reset file content such that future test are not seeing something funny
-      IoUtil.writeStringToFile(originalFormFileContent, filePath);
+    protected void tearDown() throws Exception {
+        removeAllDeployments();
+        this.applicationContext = null;
+        this.repositoryService = null;
+        super.tearDown();
     }
 
-    // Assertions come AFTER the file write! Otherwise the form file is
-    // messed up if the assertions fail.
-    assertEquals(2, repositoryService.createDeploymentQuery().count());
-    assertEquals(4, repositoryService.createFormDefinitionQuery().count());
-  }
+    public void testBasicFlowableSpringIntegration() {
+        createAppContext("org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml");
+        List<FormDefinition> formDefinitions = repositoryService.createFormDefinitionQuery().orderByFormDefinitionKey().asc().list();
 
-  public void testAutoDeployWithCreateDropOnCleanDb() {
-    createAppContext(CTX_CREATE_DROP_CLEAN_DB);
-    assertEquals(1, repositoryService.createDeploymentQuery().count());
-    assertEquals(2, repositoryService.createFormDefinitionQuery().count());
-  }
+        Set<String> formDefinitionKeys = new HashSet<String>();
+        for (FormDefinition formDefinition : formDefinitions) {
+            formDefinitionKeys.add(formDefinition.getKey());
+        }
 
-  public void testAutoDeployWithDeploymentModeDefault() {
-    createAppContext(CTX_DEPLOYMENT_MODE_DEFAULT);
-    assertEquals(1, repositoryService.createDeploymentQuery().count());
-    assertEquals(2, repositoryService.createFormDefinitionQuery().count());
-  }
+        Set<String> expectedFormDefinitionKeys = new HashSet<String>();
+        expectedFormDefinitionKeys.add("form1");
+        expectedFormDefinitionKeys.add("form2");
 
-  public void testAutoDeployWithDeploymentModeSingleResource() {
-    createAppContext(CTX_DEPLOYMENT_MODE_SINGLE_RESOURCE);
-    assertEquals(2, repositoryService.createDeploymentQuery().count());
-    assertEquals(2, repositoryService.createFormDefinitionQuery().count());
-  }
-
-  public void testAutoDeployWithDeploymentModeResourceParentFolder() {
-    createAppContext(CTX_DEPLOYMENT_MODE_RESOURCE_PARENT_FOLDER);
-    assertEquals(2, repositoryService.createDeploymentQuery().count());
-    assertEquals(3, repositoryService.createFormDefinitionQuery().count());
-  }
-
-  // --Helper methods
-  // ----------------------------------------------------------
-
-  private void removeAllDeployments() {
-    for (FormDeployment deployment : repositoryService.createDeploymentQuery().list()) {
-      repositoryService.deleteDeployment(deployment.getId());
+        assertEquals(expectedFormDefinitionKeys, formDefinitionKeys);
     }
-  }
+
+    public void testNoRedeploymentForSpringContainerRestart() throws Exception {
+        createAppContext(CTX_PATH);
+        FormDeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
+        assertEquals(1, deploymentQuery.count());
+        FormDefinitionQuery formDefinitionQuery = repositoryService.createFormDefinitionQuery();
+        assertEquals(2, formDefinitionQuery.count());
+
+        // Creating a new app context with same resources doesn't lead to more deployments
+        new ClassPathXmlApplicationContext(CTX_NO_DROP_PATH);
+        assertEquals(1, deploymentQuery.count());
+        assertEquals(2, formDefinitionQuery.count());
+    }
+
+    // Updating the form file should lead to a new deployment when restarting the Spring container
+    public void testResourceRedeploymentAfterFormDefinitionChange() throws Exception {
+        createAppContext(CTX_PATH);
+        assertEquals(1, repositoryService.createDeploymentQuery().count());
+        ((AbstractXmlApplicationContext) applicationContext).destroy();
+
+        String filePath = "org/flowable/spring/test/autodeployment/simple.form";
+        String originalFormFileContent = IoUtil.readFileAsString(filePath);
+        String updatedFormFileContent = originalFormFileContent.replace("My first form", "My first forms");
+        assertTrue(updatedFormFileContent.length() > originalFormFileContent.length());
+        IoUtil.writeStringToFile(updatedFormFileContent, filePath);
+
+        // Classic produced/consumer problem here:
+        // The file is already written in Java, but not yet completely persisted by the OS
+        // Constructing the new app context reads the same file which is sometimes not yet fully written to disk
+        Thread.sleep(2000);
+
+        try {
+            applicationContext = new ClassPathXmlApplicationContext(CTX_NO_DROP_PATH);
+            repositoryService = (FormRepositoryService) applicationContext.getBean("formRepositoryService");
+        } finally {
+            // Reset file content such that future test are not seeing something funny
+            IoUtil.writeStringToFile(originalFormFileContent, filePath);
+        }
+
+        // Assertions come AFTER the file write! Otherwise the form file is
+        // messed up if the assertions fail.
+        assertEquals(2, repositoryService.createDeploymentQuery().count());
+        assertEquals(4, repositoryService.createFormDefinitionQuery().count());
+    }
+
+    public void testAutoDeployWithCreateDropOnCleanDb() {
+        createAppContext(CTX_CREATE_DROP_CLEAN_DB);
+        assertEquals(1, repositoryService.createDeploymentQuery().count());
+        assertEquals(2, repositoryService.createFormDefinitionQuery().count());
+    }
+
+    public void testAutoDeployWithDeploymentModeDefault() {
+        createAppContext(CTX_DEPLOYMENT_MODE_DEFAULT);
+        assertEquals(1, repositoryService.createDeploymentQuery().count());
+        assertEquals(2, repositoryService.createFormDefinitionQuery().count());
+    }
+
+    public void testAutoDeployWithDeploymentModeSingleResource() {
+        createAppContext(CTX_DEPLOYMENT_MODE_SINGLE_RESOURCE);
+        assertEquals(2, repositoryService.createDeploymentQuery().count());
+        assertEquals(2, repositoryService.createFormDefinitionQuery().count());
+    }
+
+    public void testAutoDeployWithDeploymentModeResourceParentFolder() {
+        createAppContext(CTX_DEPLOYMENT_MODE_RESOURCE_PARENT_FOLDER);
+        assertEquals(2, repositoryService.createDeploymentQuery().count());
+        assertEquals(3, repositoryService.createFormDefinitionQuery().count());
+    }
+
+    // --Helper methods
+    // ----------------------------------------------------------
+
+    private void removeAllDeployments() {
+        for (FormDeployment deployment : repositoryService.createDeploymentQuery().list()) {
+            repositoryService.deleteDeployment(deployment.getId());
+        }
+    }
 
 }

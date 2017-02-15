@@ -27,26 +27,26 @@ import java.util.Map;
  */
 public class ExpressionCustomPropertiesResolver implements CustomPropertiesResolver {
 
-  protected Expression expression;
+    protected Expression expression;
 
-  public ExpressionCustomPropertiesResolver(Expression expression) {
-    this.expression = expression;
-  }
-
-  @Override
-  public Map<String, Object> getCustomPropertiesMap(DelegateExecution execution) {
-    Object expressionValue = expression.getValue(execution);
-    if (expressionValue instanceof Map) {
-      return (Map<String, Object>) expressionValue;
-    } else {
-      throw new FlowableIllegalArgumentException("Custom properties resolver expression " + expression + " did not return a Map<String, Object>");
+    public ExpressionCustomPropertiesResolver(Expression expression) {
+        this.expression = expression;
     }
-  }
 
-  /**
-   * returns the expression text for this execution listener. Comes in handy if you want to check which listeners you already have.
-   */
-  public String getExpressionText() {
-    return expression.getExpressionText();
-  }
+    @Override
+    public Map<String, Object> getCustomPropertiesMap(DelegateExecution execution) {
+        Object expressionValue = expression.getValue(execution);
+        if (expressionValue instanceof Map) {
+            return (Map<String, Object>) expressionValue;
+        } else {
+            throw new FlowableIllegalArgumentException("Custom properties resolver expression " + expression + " did not return a Map<String, Object>");
+        }
+    }
+
+    /**
+     * returns the expression text for this execution listener. Comes in handy if you want to check which listeners you already have.
+     */
+    public String getExpressionText() {
+        return expression.getExpressionText();
+    }
 }

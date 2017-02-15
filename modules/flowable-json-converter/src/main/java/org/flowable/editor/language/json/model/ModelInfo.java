@@ -14,37 +14,37 @@ package org.flowable.editor.language.json.model;
 
 public class ModelInfo {
 
-  protected String id;
-  protected String name;
-  protected String key;
-  
-  public ModelInfo(String id, String name, String key) {
-    this.id = id;
-    this.name = name;
-    this.key = key;
-  }
-  
-  public String getId() {
-    return id;
-  }
-  
-  public void setId(String id) {
-    this.id = id;
-  }
-  
-  public String getName() {
-    return name;
-  }
-  
-  public void setName(String name) {
-    this.name = name;
-  }
-  
-  public String getKey() {
-    return key;
-  }
-  
-  public void setKey(String key) {
-    this.key = key;
-  }
+    protected String id;
+    protected String name;
+    protected String key;
+
+    public ModelInfo(String id, String name, String key) {
+        this.id = id;
+        this.name = name;
+        this.key = key;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
 }

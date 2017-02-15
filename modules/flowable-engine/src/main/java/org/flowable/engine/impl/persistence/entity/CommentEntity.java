@@ -24,30 +24,30 @@ import org.flowable.engine.task.Event;
  * @author Joram Barrez
  */
 public interface CommentEntity extends Comment, Event, Entity {
-  
-  String TYPE_EVENT = "event";
-  String TYPE_COMMENT = "comment";
 
-  byte[] getFullMessageBytes();
+    String TYPE_EVENT = "event";
+    String TYPE_COMMENT = "comment";
 
-  void setFullMessageBytes(byte[] fullMessageBytes);
+    byte[] getFullMessageBytes();
 
-  void setMessage(String[] messageParts);
+    void setFullMessageBytes(byte[] fullMessageBytes);
 
-  void setUserId(String userId);
+    void setMessage(String[] messageParts);
 
-  void setTaskId(String taskId);
+    void setUserId(String userId);
 
-  void setMessage(String message);
+    void setTaskId(String taskId);
 
-  void setTime(Date time);
+    void setMessage(String message);
 
-  void setProcessInstanceId(String processInstanceId);
+    void setTime(Date time);
 
-  void setType(String type);
+    void setProcessInstanceId(String processInstanceId);
 
-  void setFullMessage(String fullMessage);
+    void setType(String type);
 
-  void setAction(String action);
-    
+    void setFullMessage(String fullMessage);
+
+    void setAction(String action);
+
 }

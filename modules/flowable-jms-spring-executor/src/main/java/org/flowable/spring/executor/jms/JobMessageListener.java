@@ -24,32 +24,32 @@ import org.slf4j.LoggerFactory;
  * @author Joram Barrez
  */
 public class JobMessageListener implements javax.jms.MessageListener {
-  
-  private static final Logger logger = LoggerFactory.getLogger(JobMessageListener.class);
-  
-  protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  public void onMessage(final Message message) {
-    try {
-      if (message instanceof TextMessage) {
-        TextMessage textMessage = (TextMessage) message;
-        String jobId = textMessage.getText();
-        
-        ExecuteAsyncRunnable executeAsyncRunnable = new ExecuteAsyncRunnable(jobId, processEngineConfiguration);
-        executeAsyncRunnable.run();
-        
-      }
-    } catch (Exception e) {
-      logger.error("Exception when handling message from job queue", e);
+    private static final Logger logger = LoggerFactory.getLogger(JobMessageListener.class);
+
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+
+    public void onMessage(final Message message) {
+        try {
+            if (message instanceof TextMessage) {
+                TextMessage textMessage = (TextMessage) message;
+                String jobId = textMessage.getText();
+
+                ExecuteAsyncRunnable executeAsyncRunnable = new ExecuteAsyncRunnable(jobId, processEngineConfiguration);
+                executeAsyncRunnable.run();
+
+            }
+        } catch (Exception e) {
+            logger.error("Exception when handling message from job queue", e);
+        }
     }
-  }
 
-  public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
-    return processEngineConfiguration;
-  }
+    public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
+        return processEngineConfiguration;
+    }
 
-  public void setProcessEngineConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    this.processEngineConfiguration = processEngineConfiguration;
-  }
-  
+    public void setProcessEngineConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        this.processEngineConfiguration = processEngineConfiguration;
+    }
+
 }

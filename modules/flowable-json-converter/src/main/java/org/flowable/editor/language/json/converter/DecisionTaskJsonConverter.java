@@ -28,55 +28,55 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter implements DecisionTableAwareConverter {
 
-  protected Map<String, String> decisionTableMap;
+    protected Map<String, String> decisionTableMap;
 
-  public static void fillTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap,
-      Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
+    public static void fillTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap,
+            Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
 
-    fillJsonTypes(convertersToBpmnMap);
-    fillBpmnTypes(convertersToJsonMap);
-  }
-
-  public static void fillJsonTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap) {
-    convertersToBpmnMap.put(STENCIL_TASK_DECISION, DecisionTaskJsonConverter.class);
-  }
-
-  public static void fillBpmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
-  }
-
-  protected String getStencilId(BaseElement baseElement) {
-    return STENCIL_TASK_DECISION;
-  }
-
-  protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
-
-    ServiceTask serviceTask = new ServiceTask();
-    serviceTask.setType(ServiceTask.DMN_TASK);
-    
-    JsonNode decisionTableReferenceNode = getProperty(PROPERTY_DECISIONTABLE_REFERENCE, elementNode);
-    if (decisionTableReferenceNode != null && decisionTableReferenceNode.has("id") && !decisionTableReferenceNode.get("id").isNull()) {
-
-      String decisionTableId = decisionTableReferenceNode.get("id").asText();
-      if (decisionTableMap != null) {
-        String decisionTableKey = decisionTableMap.get(decisionTableId);
-
-        FieldExtension decisionTableKeyField = new FieldExtension();
-        decisionTableKeyField.setFieldName(PROPERTY_DECISIONTABLE_REFERENCE_KEY);
-        decisionTableKeyField.setStringValue(decisionTableKey);
-        serviceTask.getFieldExtensions().add(decisionTableKeyField);
-      }
+        fillJsonTypes(convertersToBpmnMap);
+        fillBpmnTypes(convertersToJsonMap);
     }
 
-    return serviceTask;
-  }
+    public static void fillJsonTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap) {
+        convertersToBpmnMap.put(STENCIL_TASK_DECISION, DecisionTaskJsonConverter.class);
+    }
 
-  @Override
-  protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    public static void fillBpmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
+    }
 
-  }
-  
-  @Override
-  public void setDecisionTableMap(Map<String, String> decisionTableMap) {
-    this.decisionTableMap = decisionTableMap;
-  }
+    protected String getStencilId(BaseElement baseElement) {
+        return STENCIL_TASK_DECISION;
+    }
+
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+
+        ServiceTask serviceTask = new ServiceTask();
+        serviceTask.setType(ServiceTask.DMN_TASK);
+
+        JsonNode decisionTableReferenceNode = getProperty(PROPERTY_DECISIONTABLE_REFERENCE, elementNode);
+        if (decisionTableReferenceNode != null && decisionTableReferenceNode.has("id") && !decisionTableReferenceNode.get("id").isNull()) {
+
+            String decisionTableId = decisionTableReferenceNode.get("id").asText();
+            if (decisionTableMap != null) {
+                String decisionTableKey = decisionTableMap.get(decisionTableId);
+
+                FieldExtension decisionTableKeyField = new FieldExtension();
+                decisionTableKeyField.setFieldName(PROPERTY_DECISIONTABLE_REFERENCE_KEY);
+                decisionTableKeyField.setStringValue(decisionTableKey);
+                serviceTask.getFieldExtensions().add(decisionTableKeyField);
+            }
+        }
+
+        return serviceTask;
+    }
+
+    @Override
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+
+    }
+
+    @Override
+    public void setDecisionTableMap(Map<String, String> decisionTableMap) {
+        this.decisionTableMap = decisionTableMap;
+    }
 }

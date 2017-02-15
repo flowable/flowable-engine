@@ -26,159 +26,159 @@ import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevisi
  */
 public class ContentItemEntityImpl extends AbstractEntityNoRevision implements ContentItemEntity, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String name;
-  protected String mimeType;
-  protected String taskId;
-  protected String processInstanceId;
-  protected String contentStoreId;
-  protected String contentStoreName;
-  protected boolean contentAvailable;
-  protected String field;
-  protected Long contentSize;
-  protected Date created;
-  protected String createdBy;
-  protected Date lastModified;
-  protected String lastModifiedBy;
-  protected String tenantId = ContentEngineConfiguration.NO_TENANT_ID;
-  
-  public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
-    persistentState.put("name", this.name);
-    persistentState.put("mimeType", this.mimeType);
-    persistentState.put("taskId", this.taskId);
-    persistentState.put("processInstanceId", this.processInstanceId);
-    persistentState.put("contentStoreId", this.contentStoreId);
-    persistentState.put("contentStoreName", this.contentStoreName);
-    persistentState.put("contentAvailable", this.contentAvailable);
-    persistentState.put("field", this.field);
-    persistentState.put("contentSize", this.contentSize);
-    persistentState.put("created", this.created);
-    persistentState.put("createdBy", this.createdBy);
-    persistentState.put("lastModified", this.lastModified);
-    persistentState.put("lastModifiedBy", this.lastModifiedBy);
-    persistentState.put("tenantId", this.tenantId);
-    return persistentState;
-  }
+    protected String name;
+    protected String mimeType;
+    protected String taskId;
+    protected String processInstanceId;
+    protected String contentStoreId;
+    protected String contentStoreName;
+    protected boolean contentAvailable;
+    protected String field;
+    protected Long contentSize;
+    protected Date created;
+    protected String createdBy;
+    protected Date lastModified;
+    protected String lastModifiedBy;
+    protected String tenantId = ContentEngineConfiguration.NO_TENANT_ID;
 
-  // getters and setters
-  // //////////////////////////////////////////////////////
+    public Object getPersistentState() {
+        Map<String, Object> persistentState = new HashMap<String, Object>();
+        persistentState.put("name", this.name);
+        persistentState.put("mimeType", this.mimeType);
+        persistentState.put("taskId", this.taskId);
+        persistentState.put("processInstanceId", this.processInstanceId);
+        persistentState.put("contentStoreId", this.contentStoreId);
+        persistentState.put("contentStoreName", this.contentStoreName);
+        persistentState.put("contentAvailable", this.contentAvailable);
+        persistentState.put("field", this.field);
+        persistentState.put("contentSize", this.contentSize);
+        persistentState.put("created", this.created);
+        persistentState.put("createdBy", this.createdBy);
+        persistentState.put("lastModified", this.lastModified);
+        persistentState.put("lastModifiedBy", this.lastModifiedBy);
+        persistentState.put("tenantId", this.tenantId);
+        return persistentState;
+    }
 
-  public String getName() {
-    return name;
-  }
+    // getters and setters
+    // //////////////////////////////////////////////////////
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String getMimeType() {
-    return mimeType;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public void setMimeType(String mimeType) {
-    this.mimeType = mimeType;
-  }
-  
-  public String getTaskId() {
-    return taskId;
-  }
+    public String getMimeType() {
+        return mimeType;
+    }
 
-  public void setTaskId(String taskId) {
-    this.taskId = taskId;
-  }
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
 
-  public String getProcessInstanceId() {
-    return processInstanceId;
-  }
+    public String getTaskId() {
+        return taskId;
+    }
 
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
 
-  public String getContentStoreId() {
-    return contentStoreId;
-  }
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
 
-  public void setContentStoreId(String contentStoreId) {
-    this.contentStoreId = contentStoreId;
-  }
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
 
-  public String getContentStoreName() {
-    return contentStoreName;
-  }
+    public String getContentStoreId() {
+        return contentStoreId;
+    }
 
-  public void setContentStoreName(String contentStoreName) {
-    this.contentStoreName = contentStoreName;
-  }
+    public void setContentStoreId(String contentStoreId) {
+        this.contentStoreId = contentStoreId;
+    }
 
-  public boolean isContentAvailable() {
-    return contentAvailable;
-  }
+    public String getContentStoreName() {
+        return contentStoreName;
+    }
 
-  public void setContentAvailable(boolean contentAvailable) {
-    this.contentAvailable = contentAvailable;
-  }
+    public void setContentStoreName(String contentStoreName) {
+        this.contentStoreName = contentStoreName;
+    }
 
-  public String getField() {
-    return field;
-  }
+    public boolean isContentAvailable() {
+        return contentAvailable;
+    }
 
-  public void setField(String field) {
-    this.field = field;
-  }
+    public void setContentAvailable(boolean contentAvailable) {
+        this.contentAvailable = contentAvailable;
+    }
 
-  public Long getContentSize() {
-    return contentSize;
-  }
+    public String getField() {
+        return field;
+    }
 
-  public void setContentSize(Long contentSize) {
-    this.contentSize = contentSize;
-  }
+    public void setField(String field) {
+        this.field = field;
+    }
 
-  public Date getCreated() {
-    return created;
-  }
+    public Long getContentSize() {
+        return contentSize;
+    }
 
-  public void setCreated(Date created) {
-    this.created = created;
-  }
+    public void setContentSize(Long contentSize) {
+        this.contentSize = contentSize;
+    }
 
-  public String getCreatedBy() {
-    return createdBy;
-  }
+    public Date getCreated() {
+        return created;
+    }
 
-  public void setCreatedBy(String createdBy) {
-    this.createdBy = createdBy;
-  }
+    public void setCreated(Date created) {
+        this.created = created;
+    }
 
-  public Date getLastModified() {
-    return lastModified;
-  }
+    public String getCreatedBy() {
+        return createdBy;
+    }
 
-  public void setLastModified(Date lastModified) {
-    this.lastModified = lastModified;
-  }
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 
-  public String getLastModifiedBy() {
-    return lastModifiedBy;
-  }
+    public Date getLastModified() {
+        return lastModified;
+    }
 
-  public void setLastModifiedBy(String lastModifiedBy) {
-    this.lastModifiedBy = lastModifiedBy;
-  }
+    public void setLastModified(Date lastModified) {
+        this.lastModified = lastModified;
+    }
 
-  public String getTenantId() {
-    return tenantId;
-  }
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
 
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
-  
-  public String toString() {
-    return "ContentItemEntity[" + id + "]";
-  }
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public String toString() {
+        return "ContentItemEntity[" + id + "]";
+    }
 
 }

@@ -29,25 +29,25 @@ import org.flowable.engine.impl.persistence.entity.HistoricFormPropertyEntity;
  * @author Joram Barrez
  */
 public interface HistoricDetailDataManager extends DataManager<HistoricDetailEntity> {
-  
-  HistoricDetailAssignmentEntity createHistoricDetailAssignment();
-  
-  HistoricDetailTransitionInstanceEntity createHistoricDetailTransitionInstance();
-  
-  HistoricDetailVariableInstanceUpdateEntity createHistoricDetailVariableInstanceUpdate();
-  
-  HistoricFormPropertyEntity createHistoricFormProperty();
 
-  List<HistoricDetailEntity> findHistoricDetailsByProcessInstanceId(String processInstanceId);
-  
-  List<HistoricDetailEntity> findHistoricDetailsByTaskId(String taskId);
-  
-  long findHistoricDetailCountByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery);
+    HistoricDetailAssignmentEntity createHistoricDetailAssignment();
 
-  List<HistoricDetail> findHistoricDetailsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery, Page page);
-  
-  List<HistoricDetail> findHistoricDetailsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    HistoricDetailTransitionInstanceEntity createHistoricDetailTransitionInstance();
 
-  long findHistoricDetailCountByNativeQuery(Map<String, Object> parameterMap);
-  
+    HistoricDetailVariableInstanceUpdateEntity createHistoricDetailVariableInstanceUpdate();
+
+    HistoricFormPropertyEntity createHistoricFormProperty();
+
+    List<HistoricDetailEntity> findHistoricDetailsByProcessInstanceId(String processInstanceId);
+
+    List<HistoricDetailEntity> findHistoricDetailsByTaskId(String taskId);
+
+    long findHistoricDetailCountByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery);
+
+    List<HistoricDetail> findHistoricDetailsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery, Page page);
+
+    List<HistoricDetail> findHistoricDetailsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+
+    long findHistoricDetailCountByNativeQuery(Map<String, Object> parameterMap);
+
 }

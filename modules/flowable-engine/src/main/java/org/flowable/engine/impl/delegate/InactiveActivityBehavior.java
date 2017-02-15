@@ -23,6 +23,6 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
  */
 public interface InactiveActivityBehavior {
 
-  void executeInactive(ExecutionEntity executionEntity);
+    void executeInactive(ExecutionEntity executionEntity);
 
 }

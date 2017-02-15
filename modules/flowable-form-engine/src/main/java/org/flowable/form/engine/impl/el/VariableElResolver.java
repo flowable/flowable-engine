@@ -27,48 +27,48 @@ import javax.el.ELResolver;
  */
 public class VariableElResolver extends ELResolver {
 
-  protected Map<String, Object> variables;
+    protected Map<String, Object> variables;
 
-  public VariableElResolver(Map<String, Object> variables) {
-    this.variables = variables;
-  }
-
-  public Object getValue(ELContext context, Object base, Object property) {
-
-    if (base == null) {
-      String variable = (String) property; // according to javadoc, can only be a String
-
-      if (variables.containsKey(variable)) {
-        context.setPropertyResolved(true); // if not set, the next elResolver in the CompositeElResolver will be called
-        return variables.get(variable);
-      }
+    public VariableElResolver(Map<String, Object> variables) {
+        this.variables = variables;
     }
 
-    // property resolution (eg. bean.value) will be done by the
-    // BeanElResolver (part of the CompositeElResolver)
-    // It will use the bean resolved in this resolver as base.
+    public Object getValue(ELContext context, Object base, Object property) {
 
-    return null;
-  }
+        if (base == null) {
+            String variable = (String) property; // according to javadoc, can only be a String
 
-  public boolean isReadOnly(ELContext context, Object base, Object property) {
-    return true;
-  }
+            if (variables.containsKey(variable)) {
+                context.setPropertyResolved(true); // if not set, the next elResolver in the CompositeElResolver will be called
+                return variables.get(variable);
+            }
+        }
 
-  public void setValue(ELContext context, Object base, Object property, Object value) {
-    // setting value is not implemented for form value expressions
-  }
+        // property resolution (eg. bean.value) will be done by the
+        // BeanElResolver (part of the CompositeElResolver)
+        // It will use the bean resolved in this resolver as base.
 
-  public Class<?> getCommonPropertyType(ELContext arg0, Object arg1) {
-    return Object.class;
-  }
+        return null;
+    }
 
-  public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext arg0, Object arg1) {
-    return null;
-  }
+    public boolean isReadOnly(ELContext context, Object base, Object property) {
+        return true;
+    }
 
-  public Class<?> getType(ELContext arg0, Object arg1, Object arg2) {
-    return Object.class;
-  }
+    public void setValue(ELContext context, Object base, Object property, Object value) {
+        // setting value is not implemented for form value expressions
+    }
+
+    public Class<?> getCommonPropertyType(ELContext arg0, Object arg1) {
+        return Object.class;
+    }
+
+    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext arg0, Object arg1) {
+        return null;
+    }
+
+    public Class<?> getType(ELContext arg0, Object arg1, Object arg2) {
+        return Object.class;
+    }
 
 }

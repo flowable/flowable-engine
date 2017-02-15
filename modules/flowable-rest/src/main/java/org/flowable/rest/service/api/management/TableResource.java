@@ -36,35 +36,35 @@ import java.util.Map.Entry;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Database tables" }, description = "Manage Database tables", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Database tables" }, description = "Manage Database tables", authorizations = { @Authorization(value = "basicAuth") })
 public class TableResource {
 
-  @Autowired
-  protected RestResponseFactory restResponseFactory;
+    @Autowired
+    protected RestResponseFactory restResponseFactory;
 
-  @Autowired
-  protected ManagementService managementService;
+    @Autowired
+    protected ManagementService managementService;
 
-  @ApiOperation(value = "Get a single table", tags = {"Database tables"})
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates the table exists and the table count is returned."),
-          @ApiResponse(code = 404, message = "Indicates the requested table does not exist.")
-  })
-  @RequestMapping(value = "/management/tables/{tableName}", method = RequestMethod.GET, produces = "application/json")
-  public TableResponse getTable(@ApiParam(name = "tableName") @PathVariable String tableName, HttpServletRequest request) {
-    Map<String, Long> tableCounts = managementService.getTableCount();
+    @ApiOperation(value = "Get a single table", tags = { "Database tables" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the table exists and the table count is returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested table does not exist.")
+    })
+    @RequestMapping(value = "/management/tables/{tableName}", method = RequestMethod.GET, produces = "application/json")
+    public TableResponse getTable(@ApiParam(name = "tableName") @PathVariable String tableName, HttpServletRequest request) {
+        Map<String, Long> tableCounts = managementService.getTableCount();
 
-    TableResponse response = null;
-    for (Entry<String, Long> entry : tableCounts.entrySet()) {
-      if (entry.getKey().equals(tableName)) {
-        response = restResponseFactory.createTableResponse(entry.getKey(), entry.getValue());
-        break;
-      }
+        TableResponse response = null;
+        for (Entry<String, Long> entry : tableCounts.entrySet()) {
+            if (entry.getKey().equals(tableName)) {
+                response = restResponseFactory.createTableResponse(entry.getKey(), entry.getValue());
+                break;
+            }
+        }
+
+        if (response == null) {
+            throw new FlowableObjectNotFoundException("Could not find a table with name '" + tableName + "'.", String.class);
+        }
+        return response;
     }
-
-    if (response == null) {
-      throw new FlowableObjectNotFoundException("Could not find a table with name '" + tableName + "'.", String.class);
-    }
-    return response;
-  }
 }

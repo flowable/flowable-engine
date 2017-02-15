@@ -29,21 +29,21 @@ import java.util.Map;
  */
 public class StandaloneRuntimeTest {
 
-  @Rule
-  public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
+    @Rule
+    public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
 
-  @Test
-  @DmnDeploymentAnnotation
-  public void ruleUsageExample() {
-    DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-    DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+    @Test
+    @DmnDeploymentAnnotation
+    public void ruleUsageExample() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
 
-    Map<String, Object> inputVariables = new HashMap<>();
-    inputVariables.put("inputVariable1", 2);
-    inputVariables.put("inputVariable2", "test2");
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.put("inputVariable1", 2);
+        inputVariables.put("inputVariable2", "test2");
 
-    RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
+        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-    Assert.assertEquals("result2", result.getResultVariables().get("outputVariable1"));
-  }
+        Assert.assertEquals("result2", result.getResultVariables().get("outputVariable1"));
+    }
 }

@@ -16,31 +16,30 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
-
 /**
  * @author Tijs Rademakers
  */
 public class BusinessRuleTaskTest extends PluggableFlowableTestCase {
 
-  @Deployment
-  public void testBusinessRuleTask() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("customRule");
-    assertEquals("test2", runtimeService.getVariable(processInstance.getId(), "test"));
+    @Deployment
+    public void testBusinessRuleTask() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("customRule");
+        assertEquals("test2", runtimeService.getVariable(processInstance.getId(), "test"));
 
-    assertEquals(1, CustomBusinessRuleTask.ruleInputVariables.size());
-    assertEquals("order", CustomBusinessRuleTask.ruleInputVariables.get(0).getExpressionText());
+        assertEquals(1, CustomBusinessRuleTask.ruleInputVariables.size());
+        assertEquals("order", CustomBusinessRuleTask.ruleInputVariables.get(0).getExpressionText());
 
-    assertEquals(2, CustomBusinessRuleTask.ruleIds.size());
-    assertEquals("rule1", CustomBusinessRuleTask.ruleIds.get(0).getExpressionText());
-    assertEquals("rule2", CustomBusinessRuleTask.ruleIds.get(1).getExpressionText());
-    
-    assertTrue(CustomBusinessRuleTask.exclude);
-    assertEquals("rulesOutput", CustomBusinessRuleTask.resultVariableName);
-    
-    runtimeService.trigger(runtimeService.createExecutionQuery()
-        .processInstanceId(processInstance.getId())
-        .singleResult()
-        .getId());
-    assertProcessEnded(processInstance.getId());
-  }
+        assertEquals(2, CustomBusinessRuleTask.ruleIds.size());
+        assertEquals("rule1", CustomBusinessRuleTask.ruleIds.get(0).getExpressionText());
+        assertEquals("rule2", CustomBusinessRuleTask.ruleIds.get(1).getExpressionText());
+
+        assertTrue(CustomBusinessRuleTask.exclude);
+        assertEquals("rulesOutput", CustomBusinessRuleTask.resultVariableName);
+
+        runtimeService.trigger(runtimeService.createExecutionQuery()
+                .processInstanceId(processInstance.getId())
+                .singleResult()
+                .getId());
+        assertProcessEnded(processInstance.getId());
+    }
 }

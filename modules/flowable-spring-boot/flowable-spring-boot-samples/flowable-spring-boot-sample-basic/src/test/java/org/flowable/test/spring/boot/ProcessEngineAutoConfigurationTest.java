@@ -1,6 +1,5 @@
 package org.flowable.test.spring.boot;
 
-
 import java.util.List;
 
 import org.flowable.engine.ProcessEngine;
@@ -41,8 +40,7 @@ public class ProcessEngineAutoConfigurationTest {
     }
 
     private AnnotationConfigApplicationContext context(Class<?>... clzz) {
-        AnnotationConfigApplicationContext annotationConfigApplicationContext
-                = new AnnotationConfigApplicationContext();
+        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext();
         annotationConfigApplicationContext.register(clzz);
         annotationConfigApplicationContext.refresh();
         return annotationConfigApplicationContext;

@@ -19,41 +19,40 @@ import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.data.ByteArrayDataManager;
 
-
 /**
  * @author Joram Barrez
  * @author Marcus Klimstra (CGI)
  */
 public class ByteArrayEntityManagerImpl extends AbstractEntityManager<ByteArrayEntity> implements ByteArrayEntityManager {
-  
-  protected ByteArrayDataManager byteArrayDataManager;
-  
-  public ByteArrayEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, ByteArrayDataManager byteArrayDataManager) {
-    super(idmEngineConfiguration);
-    this.byteArrayDataManager = byteArrayDataManager;
-  }
-   
-  @Override
-  protected DataManager<ByteArrayEntity> getDataManager() {
-    return byteArrayDataManager;
-  }
-  
-  @Override
-  public List<ByteArrayEntity> findAll() {
-    return byteArrayDataManager.findAll();
-  }
-  
-  @Override
-  public void deleteByteArrayById(String byteArrayEntityId) {
-    byteArrayDataManager.deleteByteArrayNoRevisionCheck(byteArrayEntityId);
-  }
 
-  public ByteArrayDataManager getByteArrayDataManager() {
-    return byteArrayDataManager;
-  }
+    protected ByteArrayDataManager byteArrayDataManager;
 
-  public void setByteArrayDataManager(ByteArrayDataManager byteArrayDataManager) {
-    this.byteArrayDataManager = byteArrayDataManager;
-  }
-  
+    public ByteArrayEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, ByteArrayDataManager byteArrayDataManager) {
+        super(idmEngineConfiguration);
+        this.byteArrayDataManager = byteArrayDataManager;
+    }
+
+    @Override
+    protected DataManager<ByteArrayEntity> getDataManager() {
+        return byteArrayDataManager;
+    }
+
+    @Override
+    public List<ByteArrayEntity> findAll() {
+        return byteArrayDataManager.findAll();
+    }
+
+    @Override
+    public void deleteByteArrayById(String byteArrayEntityId) {
+        byteArrayDataManager.deleteByteArrayNoRevisionCheck(byteArrayEntityId);
+    }
+
+    public ByteArrayDataManager getByteArrayDataManager() {
+        return byteArrayDataManager;
+    }
+
+    public void setByteArrayDataManager(ByteArrayDataManager byteArrayDataManager) {
+        this.byteArrayDataManager = byteArrayDataManager;
+    }
+
 }

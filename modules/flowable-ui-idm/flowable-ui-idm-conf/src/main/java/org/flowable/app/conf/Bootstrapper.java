@@ -33,58 +33,58 @@ import org.springframework.stereotype.Component;
 @Component
 public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> {
 
-  private final Logger log = LoggerFactory.getLogger(Bootstrapper.class);
+    private final Logger log = LoggerFactory.getLogger(Bootstrapper.class);
 
-  @Autowired
-  private IdmIdentityService identityService;
+    @Autowired
+    private IdmIdentityService identityService;
 
-  @Autowired
-  private Environment env;
+    @Autowired
+    private Environment env;
 
-  @Override
-  public void onApplicationEvent(ContextRefreshedEvent event) {
-    if (event.getApplicationContext().getParent() == null) { // Using Spring MVC, there are multiple child contexts. We only care about the root
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        if (event.getApplicationContext().getParent() == null) { // Using Spring MVC, there are multiple child contexts. We only care about the root
 
-      // First create the default IDM entities
-      createDefaultAdmin();
+            // First create the default IDM entities
+            createDefaultAdmin();
+        }
     }
-  }
 
-  protected void createDefaultAdmin() {
-    if (identityService.createUserQuery().count() == 0) {
-      log.info("No users found, initializing default entities");
-      User user = initializeSuperUser();
-      initializeDefaultPrivileges(user.getId());
+    protected void createDefaultAdmin() {
+        if (identityService.createUserQuery().count() == 0) {
+            log.info("No users found, initializing default entities");
+            User user = initializeSuperUser();
+            initializeDefaultPrivileges(user.getId());
+        }
     }
-  }
 
-  protected User initializeSuperUser() {
-    String adminPassword = env.getRequiredProperty("admin.password");
-    String adminFirstname = env.getRequiredProperty("admin.firstname");
-    String adminLastname = env.getRequiredProperty("admin.lastname");
-    String adminEmail = env.getRequiredProperty("admin.email");
+    protected User initializeSuperUser() {
+        String adminPassword = env.getRequiredProperty("admin.password");
+        String adminFirstname = env.getRequiredProperty("admin.firstname");
+        String adminLastname = env.getRequiredProperty("admin.lastname");
+        String adminEmail = env.getRequiredProperty("admin.email");
 
-    User admin = identityService.newUser(adminEmail);
-    admin.setFirstName(adminFirstname);
-    admin.setLastName(adminLastname);
-    admin.setEmail(adminEmail);
-    admin.setPassword(adminPassword);
-    identityService.saveUser(admin);
-    return admin;
-  }
-  
-  protected void initializeDefaultPrivileges(String adminId) {
-    Privilege idmAppPrivilege = identityService.createPrivilege(DefaultPrivileges.ACCESS_IDM);
-    identityService.addUserPrivilegeMapping(idmAppPrivilege.getId(), adminId);
-    
-    Privilege adminAppPrivilege = identityService.createPrivilege(DefaultPrivileges.ACCESS_ADMIN);
-    identityService.addUserPrivilegeMapping(adminAppPrivilege.getId(), adminId);
-    
-    Privilege modelerAppPrivilege = identityService.createPrivilege(DefaultPrivileges.ACCESS_MODELER);
-    identityService.addUserPrivilegeMapping(modelerAppPrivilege.getId(), adminId);
-    
-    Privilege taskAppPrivilege = identityService.createPrivilege(DefaultPrivileges.ACCESS_TASK);
-    identityService.addUserPrivilegeMapping(taskAppPrivilege.getId(), adminId);
-  }
+        User admin = identityService.newUser(adminEmail);
+        admin.setFirstName(adminFirstname);
+        admin.setLastName(adminLastname);
+        admin.setEmail(adminEmail);
+        admin.setPassword(adminPassword);
+        identityService.saveUser(admin);
+        return admin;
+    }
+
+    protected void initializeDefaultPrivileges(String adminId) {
+        Privilege idmAppPrivilege = identityService.createPrivilege(DefaultPrivileges.ACCESS_IDM);
+        identityService.addUserPrivilegeMapping(idmAppPrivilege.getId(), adminId);
+
+        Privilege adminAppPrivilege = identityService.createPrivilege(DefaultPrivileges.ACCESS_ADMIN);
+        identityService.addUserPrivilegeMapping(adminAppPrivilege.getId(), adminId);
+
+        Privilege modelerAppPrivilege = identityService.createPrivilege(DefaultPrivileges.ACCESS_MODELER);
+        identityService.addUserPrivilegeMapping(modelerAppPrivilege.getId(), adminId);
+
+        Privilege taskAppPrivilege = identityService.createPrivilege(DefaultPrivileges.ACCESS_TASK);
+        identityService.addUserPrivilegeMapping(taskAppPrivilege.getId(), adminId);
+    }
 
 }

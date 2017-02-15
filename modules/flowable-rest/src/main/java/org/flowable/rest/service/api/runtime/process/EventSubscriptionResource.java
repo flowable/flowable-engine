@@ -36,28 +36,28 @@ import io.swagger.annotations.ApiResponses;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Event subscriptions" }, description = "Manage event subscriptions", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Event subscriptions" }, description = "Manage event subscriptions", authorizations = { @Authorization(value = "basicAuth") })
 public class EventSubscriptionResource {
 
-  @Autowired
-  protected RestResponseFactory restResponseFactory;
+    @Autowired
+    protected RestResponseFactory restResponseFactory;
 
-  @Autowired
-  protected RuntimeService runtimeService;
+    @Autowired
+    protected RuntimeService runtimeService;
 
-  @ApiOperation(value = "Get a single event subscription", tags = {"Event subscriptions"})
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates the event subscription exists and is returned."),
-          @ApiResponse(code = 404, message = "Indicates the requested event subscription does not exist.")
-  })
-  @RequestMapping(value = "/runtime/event-subscriptions/{eventSubscriptionId}", method = RequestMethod.GET, produces = "application/json")
-  public EventSubscriptionResponse getEventSubscription(@ApiParam(name = "eventSubscriptionId") @PathVariable String eventSubscriptionId, HttpServletRequest request) {
-    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().id(eventSubscriptionId).singleResult();
+    @ApiOperation(value = "Get a single event subscription", tags = { "Event subscriptions" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the event subscription exists and is returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested event subscription does not exist.")
+    })
+    @RequestMapping(value = "/runtime/event-subscriptions/{eventSubscriptionId}", method = RequestMethod.GET, produces = "application/json")
+    public EventSubscriptionResponse getEventSubscription(@ApiParam(name = "eventSubscriptionId") @PathVariable String eventSubscriptionId, HttpServletRequest request) {
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().id(eventSubscriptionId).singleResult();
 
-    if (eventSubscription == null) {
-      throw new FlowableObjectNotFoundException("Could not find a event subscription with id '" + eventSubscriptionId + "'.", EventSubscription.class);
+        if (eventSubscription == null) {
+            throw new FlowableObjectNotFoundException("Could not find a event subscription with id '" + eventSubscriptionId + "'.", EventSubscription.class);
+        }
+
+        return restResponseFactory.createEventSubscriptionResponse(eventSubscription);
     }
-
-    return restResponseFactory.createEventSubscriptionResponse(eventSubscription);
-  }
 }

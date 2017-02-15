@@ -16,7 +16,7 @@ package org.flowable.dmn.engine.impl;
  * @author Tijs Rademakers
  */
 public interface DeploymentSettings {
-	
-	String IS_DMN_XSD_VALIDATION_ENABLED = "isDmnXsdValidationEnabled";
+
+    String IS_DMN_XSD_VALIDATION_ENABLED = "isDmnXsdValidationEnabled";
 
 }

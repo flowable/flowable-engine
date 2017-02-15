@@ -27,24 +27,24 @@ import org.flowable.engine.impl.variable.VariableType;
  */
 public interface HistoricVariableInstanceEntity extends ValueFields, HistoricVariableInstance, Entity, HasRevision {
 
-  VariableType getVariableType();
+    VariableType getVariableType();
 
-  void setName(String name);
+    void setName(String name);
 
-  void setVariableType(VariableType variableType);
+    void setVariableType(VariableType variableType);
 
-  void setProcessInstanceId(String processInstanceId);
+    void setProcessInstanceId(String processInstanceId);
 
-  void setTaskId(String taskId);
+    void setTaskId(String taskId);
 
-  void setCreateTime(Date createTime);
+    void setCreateTime(Date createTime);
 
-  void setLastUpdatedTime(Date lastUpdatedTime);
+    void setLastUpdatedTime(Date lastUpdatedTime);
 
-  String getExecutionId();
+    String getExecutionId();
 
-  void setExecutionId(String executionId);
+    void setExecutionId(String executionId);
 
-  ByteArrayRef getByteArrayRef();
-  
+    ByteArrayRef getByteArrayRef();
+
 }

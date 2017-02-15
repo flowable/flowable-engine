@@ -27,16 +27,16 @@ import org.flowable.idm.engine.impl.persistence.entity.PropertyEntity;
  */
 public class GetPropertiesCmd implements Command<Map<String, String>>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  
-  public Map<String, String> execute(CommandContext commandContext) {
-    List<PropertyEntity> propertyEntities = commandContext.getPropertyEntityManager().findAll();
+    private static final long serialVersionUID = 1L;
 
-    Map<String, String> properties = new HashMap<String, String>();
-    for (PropertyEntity propertyEntity : propertyEntities) {
-      properties.put(propertyEntity.getName(), propertyEntity.getValue());
+    public Map<String, String> execute(CommandContext commandContext) {
+        List<PropertyEntity> propertyEntities = commandContext.getPropertyEntityManager().findAll();
+
+        Map<String, String> properties = new HashMap<String, String>();
+        for (PropertyEntity propertyEntity : propertyEntities) {
+            properties.put(propertyEntity.getName(), propertyEntity.getValue());
+        }
+        return properties;
     }
-    return properties;
-  }
 
 }

@@ -26,34 +26,34 @@ import org.flowable.engine.impl.persistence.entity.TaskEntity;
  */
 public class TaskCompletedEventHandler extends AbstractTaskEventHandler {
 
-  @Override
-  public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
-    
-    FlowableEntityEvent entityEvent = (FlowableEntityEvent) event;
+    @Override
+    public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
 
-    TaskEntity task = (TaskEntity) entityEvent.getEntity();
-    Map<String, Object> data = handleCommonTaskFields(task);
+        FlowableEntityEvent entityEvent = (FlowableEntityEvent) event;
 
-    long duration = timeStamp.getTime() - task.getCreateTime().getTime();
-    putInMapIfNotNull(data, Fields.DURATION, duration);
+        TaskEntity task = (TaskEntity) entityEvent.getEntity();
+        Map<String, Object> data = handleCommonTaskFields(task);
 
-    if (event instanceof FlowableEntityWithVariablesEvent) {
-      FlowableEntityWithVariablesEvent activitiEntityWithVariablesEvent = (FlowableEntityWithVariablesEvent) event;
-      if (activitiEntityWithVariablesEvent.getVariables() != null && !activitiEntityWithVariablesEvent.getVariables().isEmpty()) {
-        Map<String, Object> variableMap = new HashMap<String, Object>();
-        for (Object variableName : activitiEntityWithVariablesEvent.getVariables().keySet()) {
-          putInMapIfNotNull(variableMap, (String) variableName, activitiEntityWithVariablesEvent.getVariables().get(variableName));
+        long duration = timeStamp.getTime() - task.getCreateTime().getTime();
+        putInMapIfNotNull(data, Fields.DURATION, duration);
+
+        if (event instanceof FlowableEntityWithVariablesEvent) {
+            FlowableEntityWithVariablesEvent activitiEntityWithVariablesEvent = (FlowableEntityWithVariablesEvent) event;
+            if (activitiEntityWithVariablesEvent.getVariables() != null && !activitiEntityWithVariablesEvent.getVariables().isEmpty()) {
+                Map<String, Object> variableMap = new HashMap<String, Object>();
+                for (Object variableName : activitiEntityWithVariablesEvent.getVariables().keySet()) {
+                    putInMapIfNotNull(variableMap, (String) variableName, activitiEntityWithVariablesEvent.getVariables().get(variableName));
+                }
+                if (activitiEntityWithVariablesEvent.isLocalScope()) {
+                    putInMapIfNotNull(data, Fields.LOCAL_VARIABLES, variableMap);
+                } else {
+                    putInMapIfNotNull(data, Fields.VARIABLES, variableMap);
+                }
+            }
+
         }
-        if (activitiEntityWithVariablesEvent.isLocalScope()) {
-          putInMapIfNotNull(data, Fields.LOCAL_VARIABLES, variableMap);
-        } else {
-          putInMapIfNotNull(data, Fields.VARIABLES, variableMap);
-        }
-      }
-  
+
+        return createEventLogEntry(task.getProcessDefinitionId(), task.getProcessInstanceId(), task.getExecutionId(), task.getId(), data);
     }
-    
-    return createEventLogEntry(task.getProcessDefinitionId(), task.getProcessInstanceId(), task.getExecutionId(), task.getId(), data);
-  }
 
 }

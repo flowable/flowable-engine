@@ -46,8 +46,7 @@ public class ItemDefinitionXMLConverter extends BaseDmnXMLConverter {
                 xtr.next();
                 if (xtr.isStartElement() && ELEMENT_TYPE_DEFINITION.equalsIgnoreCase(xtr.getLocalName())) {
                     itemDefinition.setTypeDefinition(xtr.getElementText());
-                }
-                else if (xtr.isEndElement() && getXMLElementName().equalsIgnoreCase(xtr.getLocalName())) {
+                } else if (xtr.isEndElement() && getXMLElementName().equalsIgnoreCase(xtr.getLocalName())) {
                     readyWithItemDefinition = true;
                 }
             }

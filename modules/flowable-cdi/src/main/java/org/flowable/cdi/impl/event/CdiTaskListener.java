@@ -41,67 +41,67 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public class CdiTaskListener implements TaskListener, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected final BusinessProcessEventType type;
-  protected final String transitionName;
-  protected final String activityId;
+    protected final BusinessProcessEventType type;
+    protected final String transitionName;
+    protected final String activityId;
 
-  public CdiTaskListener(String transitionName) {
-    this.type = BusinessProcessEventType.TAKE;
-    this.transitionName = transitionName;
-    this.activityId = null;
-  }
-
-  public CdiTaskListener(String activityId, BusinessProcessEventType type) {
-    this.type = type;
-    this.transitionName = null;
-    this.activityId = activityId;
-  }
-
-  @Override
-  public void notify(DelegateTask task) {
-    // test whether cdi is setup correctly. (if not, just do not deliver the
-    // event)
-    try {
-      ProgrammaticBeanLookup.lookup(ProcessEngine.class);
-    } catch (Exception e) {
-      return;
+    public CdiTaskListener(String transitionName) {
+        this.type = BusinessProcessEventType.TAKE;
+        this.transitionName = transitionName;
+        this.activityId = null;
     }
 
-    BusinessProcessEvent event = createEvent(task);
-    Annotation[] qualifiers = getQualifiers(event);
-    getBeanManager().fireEvent(event, qualifiers);
-  }
+    public CdiTaskListener(String activityId, BusinessProcessEventType type) {
+        this.type = type;
+        this.transitionName = null;
+        this.activityId = activityId;
+    }
 
-  protected BusinessProcessEvent createEvent(DelegateTask task) {
-    ProcessDefinition processDefinition = Context.getProcessEngineConfiguration().getProcessDefinitionCache().get(task.getExecution().getProcessDefinitionId()).getProcessDefinition();
-    Date now = Context.getProcessEngineConfiguration().getClock().getCurrentTime();
-    return new CdiBusinessProcessEvent(activityId, transitionName, processDefinition, task, type, task.getExecution().getProcessInstanceId(), task.getExecutionId(), now);
-  }
+    @Override
+    public void notify(DelegateTask task) {
+        // test whether cdi is setup correctly. (if not, just do not deliver the
+        // event)
+        try {
+            ProgrammaticBeanLookup.lookup(ProcessEngine.class);
+        } catch (Exception e) {
+            return;
+        }
 
-  protected BeanManager getBeanManager() {
-    BeanManager bm = BeanManagerLookup.getBeanManager();
-    if (bm == null) {
-      throw new FlowableException("No cdi bean manager available, cannot publish event.");
+        BusinessProcessEvent event = createEvent(task);
+        Annotation[] qualifiers = getQualifiers(event);
+        getBeanManager().fireEvent(event, qualifiers);
     }
-    return bm;
-  }
 
-  protected Annotation[] getQualifiers(BusinessProcessEvent event) {
-    Annotation businessProcessQualifier = new BusinessProcessLiteral(event.getProcessDefinition().getKey());
-    if (type == BusinessProcessEventType.CREATE_TASK) {
-      return new Annotation[] { businessProcessQualifier, new CreateTaskLiteral(activityId) };
+    protected BusinessProcessEvent createEvent(DelegateTask task) {
+        ProcessDefinition processDefinition = Context.getProcessEngineConfiguration().getProcessDefinitionCache().get(task.getExecution().getProcessDefinitionId()).getProcessDefinition();
+        Date now = Context.getProcessEngineConfiguration().getClock().getCurrentTime();
+        return new CdiBusinessProcessEvent(activityId, transitionName, processDefinition, task, type, task.getExecution().getProcessInstanceId(), task.getExecutionId(), now);
     }
-    if (type == BusinessProcessEventType.ASSIGN_TASK) {
-      return new Annotation[] { businessProcessQualifier, new AssignTaskLiteral(activityId) };
+
+    protected BeanManager getBeanManager() {
+        BeanManager bm = BeanManagerLookup.getBeanManager();
+        if (bm == null) {
+            throw new FlowableException("No cdi bean manager available, cannot publish event.");
+        }
+        return bm;
     }
-    if (type == BusinessProcessEventType.COMPLETE_TASK) {
-      return new Annotation[] { businessProcessQualifier, new CompleteTaskLiteral(activityId) };
+
+    protected Annotation[] getQualifiers(BusinessProcessEvent event) {
+        Annotation businessProcessQualifier = new BusinessProcessLiteral(event.getProcessDefinition().getKey());
+        if (type == BusinessProcessEventType.CREATE_TASK) {
+            return new Annotation[] { businessProcessQualifier, new CreateTaskLiteral(activityId) };
+        }
+        if (type == BusinessProcessEventType.ASSIGN_TASK) {
+            return new Annotation[] { businessProcessQualifier, new AssignTaskLiteral(activityId) };
+        }
+        if (type == BusinessProcessEventType.COMPLETE_TASK) {
+            return new Annotation[] { businessProcessQualifier, new CompleteTaskLiteral(activityId) };
+        }
+        if (type == BusinessProcessEventType.DELETE_TASK) {
+            return new Annotation[] { businessProcessQualifier, new DeleteTaskLiteral(activityId) };
+        }
+        return new Annotation[] {};
     }
-    if (type == BusinessProcessEventType.DELETE_TASK) {
-      return new Annotation[] { businessProcessQualifier, new DeleteTaskLiteral(activityId) };
-    }
-    return new Annotation[] {};
-  }
 }

@@ -29,21 +29,21 @@ import org.springframework.core.io.UrlResource;
  */
 public class SpringFormConfigurationHelper {
 
-  private static Logger log = LoggerFactory.getLogger(SpringFormConfigurationHelper.class);
+    private static Logger log = LoggerFactory.getLogger(SpringFormConfigurationHelper.class);
 
-  public static FormEngine buildFormEngine(URL resource) {
-    log.debug("==== BUILDING SPRING APPLICATION CONTEXT AND FORM ENGINE =========================================");
+    public static FormEngine buildFormEngine(URL resource) {
+        log.debug("==== BUILDING SPRING APPLICATION CONTEXT AND FORM ENGINE =========================================");
 
-    ApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource));
-    Map<String, FormEngine> beansOfType = applicationContext.getBeansOfType(FormEngine.class);
-    if ((beansOfType == null) || (beansOfType.isEmpty())) {
-      throw new FlowableException("no " + FormEngine.class.getName() + " defined in the application context " + resource.toString());
+        ApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource));
+        Map<String, FormEngine> beansOfType = applicationContext.getBeansOfType(FormEngine.class);
+        if ((beansOfType == null) || (beansOfType.isEmpty())) {
+            throw new FlowableException("no " + FormEngine.class.getName() + " defined in the application context " + resource.toString());
+        }
+
+        FormEngine formEngine = beansOfType.values().iterator().next();
+
+        log.debug("==== SPRING FORM ENGINE CREATED ==================================================================");
+        return formEngine;
     }
-
-    FormEngine formEngine = beansOfType.values().iterator().next();
-
-    log.debug("==== SPRING FORM ENGINE CREATED ==================================================================");
-    return formEngine;
-  }
 
 }

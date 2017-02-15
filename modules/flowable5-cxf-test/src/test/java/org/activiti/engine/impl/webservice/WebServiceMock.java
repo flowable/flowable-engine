@@ -26,62 +26,65 @@ import javax.jws.WebService;
 @WebService
 public interface WebServiceMock {
 
-  /**
-   * Increase the counter in 1
-   */
+    /**
+     * Increase the counter in 1
+     */
     void inc() throws MaxValueReachedFault;
 
-  /**
-   * Returns the current count
-   *
-   * @return the count
-   */
-  @WebResult(name="count")
-  int getCount();
+    /**
+     * Returns the current count
+     *
+     * @return the count
+     */
+    @WebResult(name = "count")
+    int getCount();
 
-  /**
-   * Resets the counter to 0
-   */
-  void reset();
+    /**
+     * Resets the counter to 0
+     */
+    void reset();
 
-  /**
-   * Sets the counter to value
-   *
-   * @param value the value of the new counter
-   */
-  void setTo(@WebParam(name="value") int value);
+    /**
+     * Sets the counter to value
+     *
+     * @param value
+     *            the value of the new counter
+     */
+    void setTo(@WebParam(name = "value") int value);
 
-  /**
-   * Returns a formated string composed of prefix + current count + suffix
-   *
-   * @param prefix the prefix
-   * @param suffix the suffix
-   * @return the formated string
-   */
-  @WebResult(name="prettyPrint")
-  String prettyPrintCount(@WebParam(name="prefix") String prefix, @WebParam(name="suffix") String suffix);
+    /**
+     * Returns a formated string composed of prefix + current count + suffix
+     *
+     * @param prefix
+     *            the prefix
+     * @param suffix
+     *            the suffix
+     * @return the formated string
+     */
+    @WebResult(name = "prettyPrint")
+    String prettyPrintCount(@WebParam(name = "prefix") String prefix, @WebParam(name = "suffix") String suffix);
 
-  /**
-   * Sets the current data structure
-   *
-   * @param str
-   *            the new string of data structure
-   * @param date
-   *            the new date of data structure
-   */
+    /**
+     * Sets the current data structure
+     *
+     * @param str
+     *            the new string of data structure
+     * @param date
+     *            the new date of data structure
+     */
     void setDataStructure(@WebParam(name = "eltStr") String str, @WebParam(name = "eltDate") Date date);
-  
-  /**
-   * Returns the current data structure
-   *
-   * @return the current data structure
-   */
-  @WebResult(name="currentStructure")
-  WebServiceDataStructure getDataStructure();
 
-  @WebResult
-  String noNameResult(@WebParam(name="prefix") String prefix, @WebParam(name="suffix") String suffix);
+    /**
+     * Returns the current data structure
+     *
+     * @return the current data structure
+     */
+    @WebResult(name = "currentStructure")
+    WebServiceDataStructure getDataStructure();
 
-  @WebResult(name = "static")
-  String reservedWordAsName(@WebParam(name="prefix") String prefix, @WebParam(name="suffix") String suffix);
+    @WebResult
+    String noNameResult(@WebParam(name = "prefix") String prefix, @WebParam(name = "suffix") String suffix);
+
+    @WebResult(name = "static")
+    String reservedWordAsName(@WebParam(name = "prefix") String prefix, @WebParam(name = "suffix") String suffix);
 }

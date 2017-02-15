@@ -31,128 +31,128 @@ import org.slf4j.LoggerFactory;
  */
 public class DmnDeployer implements Deployer {
 
-  private static final Logger log = LoggerFactory.getLogger(DmnDeployer.class);
+    private static final Logger log = LoggerFactory.getLogger(DmnDeployer.class);
 
-  protected IdGenerator idGenerator;
-  protected ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory;
-  protected DmnDeploymentHelper dmnDeploymentHelper;
-  protected CachingAndArtifactsManager cachingAndArtifactsManager;
+    protected IdGenerator idGenerator;
+    protected ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory;
+    protected DmnDeploymentHelper dmnDeploymentHelper;
+    protected CachingAndArtifactsManager cachingAndArtifactsManager;
 
-  public void deploy(DmnDeploymentEntity deployment, Map<String, Object> deploymentSettings) {
-    log.debug("Processing deployment {}", deployment.getName());
+    public void deploy(DmnDeploymentEntity deployment, Map<String, Object> deploymentSettings) {
+        log.debug("Processing deployment {}", deployment.getName());
 
-    // The ParsedDeployment represents the deployment, the decision tables, and the DMN
-    // resource, parse, and model associated with each decision table.
-    ParsedDeployment parsedDeployment = parsedDeploymentBuilderFactory.getBuilderForDeploymentAndSettings(deployment, deploymentSettings).build();
+        // The ParsedDeployment represents the deployment, the decision tables, and the DMN
+        // resource, parse, and model associated with each decision table.
+        ParsedDeployment parsedDeployment = parsedDeploymentBuilderFactory.getBuilderForDeploymentAndSettings(deployment, deploymentSettings).build();
 
-    dmnDeploymentHelper.verifyDecisionTablesDoNotShareKeys(parsedDeployment.getAllDecisionTables());
+        dmnDeploymentHelper.verifyDecisionTablesDoNotShareKeys(parsedDeployment.getAllDecisionTables());
 
-    dmnDeploymentHelper.copyDeploymentValuesToDecisionTables(parsedDeployment.getDeployment(), parsedDeployment.getAllDecisionTables());
-    dmnDeploymentHelper.setResourceNamesOnDecisionTables(parsedDeployment);
+        dmnDeploymentHelper.copyDeploymentValuesToDecisionTables(parsedDeployment.getDeployment(), parsedDeployment.getAllDecisionTables());
+        dmnDeploymentHelper.setResourceNamesOnDecisionTables(parsedDeployment);
 
-    if (deployment.isNew()) {
-      Map<DecisionTableEntity, DecisionTableEntity> mapOfNewDecisionTableToPreviousVersion = getPreviousVersionsOfDecisionTables(parsedDeployment);
-      setDecisionTableVersionsAndIds(parsedDeployment, mapOfNewDecisionTableToPreviousVersion);
-      persistDecisionTables(parsedDeployment);
-    } else {
-      makeDecisionTablesConsistentWithPersistedVersions(parsedDeployment);
+        if (deployment.isNew()) {
+            Map<DecisionTableEntity, DecisionTableEntity> mapOfNewDecisionTableToPreviousVersion = getPreviousVersionsOfDecisionTables(parsedDeployment);
+            setDecisionTableVersionsAndIds(parsedDeployment, mapOfNewDecisionTableToPreviousVersion);
+            persistDecisionTables(parsedDeployment);
+        } else {
+            makeDecisionTablesConsistentWithPersistedVersions(parsedDeployment);
+        }
+
+        cachingAndArtifactsManager.updateCachingAndArtifacts(parsedDeployment);
     }
 
-    cachingAndArtifactsManager.updateCachingAndArtifacts(parsedDeployment);
-  }
+    /**
+     * Constructs a map from new DecisionTableEntities to the previous version by key and tenant. If no previous version exists, no map entry is created.
+     */
+    protected Map<DecisionTableEntity, DecisionTableEntity> getPreviousVersionsOfDecisionTables(ParsedDeployment parsedDeployment) {
 
-  /**
-   * Constructs a map from new DecisionTableEntities to the previous version by key and tenant. If no previous version exists, no map entry is created.
-   */
-  protected Map<DecisionTableEntity, DecisionTableEntity> getPreviousVersionsOfDecisionTables(ParsedDeployment parsedDeployment) {
+        Map<DecisionTableEntity, DecisionTableEntity> result = new LinkedHashMap<DecisionTableEntity, DecisionTableEntity>();
 
-    Map<DecisionTableEntity, DecisionTableEntity> result = new LinkedHashMap<DecisionTableEntity, DecisionTableEntity>();
+        for (DecisionTableEntity newDefinition : parsedDeployment.getAllDecisionTables()) {
+            DecisionTableEntity existingDefinition = dmnDeploymentHelper.getMostRecentVersionOfDecisionTable(newDefinition);
 
-    for (DecisionTableEntity newDefinition : parsedDeployment.getAllDecisionTables()) {
-      DecisionTableEntity existingDefinition = dmnDeploymentHelper.getMostRecentVersionOfDecisionTable(newDefinition);
+            if (existingDefinition != null) {
+                result.put(newDefinition, existingDefinition);
+            }
+        }
 
-      if (existingDefinition != null) {
-        result.put(newDefinition, existingDefinition);
-      }
+        return result;
     }
 
-    return result;
-  }
+    /**
+     * Sets the version on each decision table entity, and the identifier. If the map contains an older version for a decision table, then the version is set to that older entity's version plus one;
+     * otherwise it is set to 1.
+     */
+    protected void setDecisionTableVersionsAndIds(ParsedDeployment parsedDeployment, Map<DecisionTableEntity, DecisionTableEntity> mapNewToOldDecisionTables) {
 
-  /**
-   * Sets the version on each decision table entity, and the identifier. If the map contains an older version for a decision table, then the version is set to that older entity's version plus one;
-   * otherwise it is set to 1.
-   */
-  protected void setDecisionTableVersionsAndIds(ParsedDeployment parsedDeployment, Map<DecisionTableEntity, DecisionTableEntity> mapNewToOldDecisionTables) {
+        for (DecisionTableEntity decisionTable : parsedDeployment.getAllDecisionTables()) {
+            int version = 1;
 
-    for (DecisionTableEntity decisionTable : parsedDeployment.getAllDecisionTables()) {
-      int version = 1;
+            DecisionTableEntity latest = mapNewToOldDecisionTables.get(decisionTable);
+            if (latest != null) {
+                version = latest.getVersion() + 1;
+            }
 
-      DecisionTableEntity latest = mapNewToOldDecisionTables.get(decisionTable);
-      if (latest != null) {
-        version = latest.getVersion() + 1;
-      }
-
-      decisionTable.setVersion(version);
-      decisionTable.setId(idGenerator.getNextId());
+            decisionTable.setVersion(version);
+            decisionTable.setId(idGenerator.getNextId());
+        }
     }
-  }
 
-  /**
-   * Saves each decision table. It is assumed that the deployment is new, the definitions have never been saved before, and that they have all their values properly set up.
-   */
-  protected void persistDecisionTables(ParsedDeployment parsedDeployment) {
-    CommandContext commandContext = Context.getCommandContext();
-    DecisionTableEntityManager decisionTableEntityManager = commandContext.getDecisionTableEntityManager();
+    /**
+     * Saves each decision table. It is assumed that the deployment is new, the definitions have never been saved before, and that they have all their values properly set up.
+     */
+    protected void persistDecisionTables(ParsedDeployment parsedDeployment) {
+        CommandContext commandContext = Context.getCommandContext();
+        DecisionTableEntityManager decisionTableEntityManager = commandContext.getDecisionTableEntityManager();
 
-    for (DecisionTableEntity decisionTable : parsedDeployment.getAllDecisionTables()) {
-      decisionTableEntityManager.insert(decisionTable);
+        for (DecisionTableEntity decisionTable : parsedDeployment.getAllDecisionTables()) {
+            decisionTableEntityManager.insert(decisionTable);
+        }
     }
-  }
 
-  /**
-   * Loads the persisted version of each decision table and set values on the in-memory version to be consistent.
-   */
-  protected void makeDecisionTablesConsistentWithPersistedVersions(ParsedDeployment parsedDeployment) {
-    for (DecisionTableEntity decisionTable : parsedDeployment.getAllDecisionTables()) {
-      DecisionTableEntity persistedDecisionTable = dmnDeploymentHelper.getPersistedInstanceOfDecisionTable(decisionTable);
+    /**
+     * Loads the persisted version of each decision table and set values on the in-memory version to be consistent.
+     */
+    protected void makeDecisionTablesConsistentWithPersistedVersions(ParsedDeployment parsedDeployment) {
+        for (DecisionTableEntity decisionTable : parsedDeployment.getAllDecisionTables()) {
+            DecisionTableEntity persistedDecisionTable = dmnDeploymentHelper.getPersistedInstanceOfDecisionTable(decisionTable);
 
-      if (persistedDecisionTable != null) {
-        decisionTable.setId(persistedDecisionTable.getId());
-        decisionTable.setVersion(persistedDecisionTable.getVersion());
-      }
+            if (persistedDecisionTable != null) {
+                decisionTable.setId(persistedDecisionTable.getId());
+                decisionTable.setVersion(persistedDecisionTable.getVersion());
+            }
+        }
     }
-  }
 
-  public IdGenerator getIdGenerator() {
-    return idGenerator;
-  }
+    public IdGenerator getIdGenerator() {
+        return idGenerator;
+    }
 
-  public void setIdGenerator(IdGenerator idGenerator) {
-    this.idGenerator = idGenerator;
-  }
+    public void setIdGenerator(IdGenerator idGenerator) {
+        this.idGenerator = idGenerator;
+    }
 
-  public ParsedDeploymentBuilderFactory getExParsedDeploymentBuilderFactory() {
-    return parsedDeploymentBuilderFactory;
-  }
+    public ParsedDeploymentBuilderFactory getExParsedDeploymentBuilderFactory() {
+        return parsedDeploymentBuilderFactory;
+    }
 
-  public void setParsedDeploymentBuilderFactory(ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory) {
-    this.parsedDeploymentBuilderFactory = parsedDeploymentBuilderFactory;
-  }
+    public void setParsedDeploymentBuilderFactory(ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory) {
+        this.parsedDeploymentBuilderFactory = parsedDeploymentBuilderFactory;
+    }
 
-  public DmnDeploymentHelper getDmnDeploymentHelper() {
-    return dmnDeploymentHelper;
-  }
+    public DmnDeploymentHelper getDmnDeploymentHelper() {
+        return dmnDeploymentHelper;
+    }
 
-  public void setDmnDeploymentHelper(DmnDeploymentHelper dmnDeploymentHelper) {
-    this.dmnDeploymentHelper = dmnDeploymentHelper;
-  }
+    public void setDmnDeploymentHelper(DmnDeploymentHelper dmnDeploymentHelper) {
+        this.dmnDeploymentHelper = dmnDeploymentHelper;
+    }
 
-  public CachingAndArtifactsManager getCachingAndArtifcatsManager() {
-    return cachingAndArtifactsManager;
-  }
+    public CachingAndArtifactsManager getCachingAndArtifcatsManager() {
+        return cachingAndArtifactsManager;
+    }
 
-  public void setCachingAndArtifactsManager(CachingAndArtifactsManager manager) {
-    this.cachingAndArtifactsManager = manager;
-  }
+    public void setCachingAndArtifactsManager(CachingAndArtifactsManager manager) {
+        this.cachingAndArtifactsManager = manager;
+    }
 }

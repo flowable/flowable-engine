@@ -19,11 +19,11 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
  * @author Joram Barrez
  */
 public class ExecutionsByParentExecutionIdEntityMatcher extends CachedEntityMatcherAdapter<ExecutionEntity> {
-  
-  @Override
-  public boolean isRetained(ExecutionEntity entity, Object parameter) {
-    // parameter = parent execution id
-    return entity.getParentId() != null && entity.getParentId().equals((String) parameter);
-  }
+
+    @Override
+    public boolean isRetained(ExecutionEntity entity, Object parameter) {
+        // parameter = parent execution id
+        return entity.getParentId() != null && entity.getParentId().equals((String) parameter);
+    }
 
 }

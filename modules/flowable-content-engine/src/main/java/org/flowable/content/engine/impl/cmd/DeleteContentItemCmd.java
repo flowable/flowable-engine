@@ -26,34 +26,34 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
  */
 public class DeleteContentItemCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected String contentItemId;
+    private static final long serialVersionUID = 1L;
 
-  public DeleteContentItemCmd(String contentItemId) {
-    this.contentItemId = contentItemId;
-  }
-  
-  public Void execute(CommandContext commandContext) {
-    if (contentItemId == null) {
-      throw new FlowableIllegalArgumentException("contentItemId is null");
+    protected String contentItemId;
+
+    public DeleteContentItemCmd(String contentItemId) {
+        this.contentItemId = contentItemId;
     }
-    
-    ContentItemEntity contentItem = (ContentItemEntity) commandContext.getContentItemEntityManager().findById(contentItemId);
-    if (contentItem == null) {
-      throw new FlowableObjectNotFoundException("content item could not be found with id " + contentItemId);
+
+    public Void execute(CommandContext commandContext) {
+        if (contentItemId == null) {
+            throw new FlowableIllegalArgumentException("contentItemId is null");
+        }
+
+        ContentItemEntity contentItem = (ContentItemEntity) commandContext.getContentItemEntityManager().findById(contentItemId);
+        if (contentItem == null) {
+            throw new FlowableObjectNotFoundException("content item could not be found with id " + contentItemId);
+        }
+
+        if (contentItem.getContentStoreId() != null) {
+            ContentStorage contentStorage = commandContext.getContentEngineConfiguration().getContentStorage();
+            if (contentItem.isContentAvailable()) {
+                contentStorage.deleteContentObject(contentItem.getContentStoreId());
+            }
+        }
+
+        commandContext.getContentItemEntityManager().delete(contentItem);
+
+        return null;
     }
-    
-    if (contentItem.getContentStoreId() != null) {
-      ContentStorage contentStorage = commandContext.getContentEngineConfiguration().getContentStorage();
-      if (contentItem.isContentAvailable()) {
-        contentStorage.deleteContentObject(contentItem.getContentStoreId());
-      }
-    }
-    
-    commandContext.getContentItemEntityManager().delete(contentItem);
-    
-    return null;
-  }
 
 }

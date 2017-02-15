@@ -36,50 +36,51 @@ import java.util.Map;
 
 /**
  * Service for invoking Flowable REST services.
+ * 
  * @author Yvo Swillens
  */
 @Service
 public class FormDeploymentService {
 
-	private final Logger log = LoggerFactory.getLogger(FormDeploymentService.class);
+    private final Logger log = LoggerFactory.getLogger(FormDeploymentService.class);
 
-	@Autowired
-	protected FlowableClientService clientUtil;
+    @Autowired
+    protected FlowableClientService clientUtil;
 
-	public JsonNode listDeployments(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
+    public JsonNode listDeployments(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
 
-		URIBuilder builder = null;
-		try {
-			builder = new URIBuilder("form-repository/deployments");
-		} catch (Exception e) {
-			log.error("Error building uri", e);
-			throw new FlowableServiceException("Error building uri", e);
-		}
+        URIBuilder builder = null;
+        try {
+            builder = new URIBuilder("form-repository/deployments");
+        } catch (Exception e) {
+            log.error("Error building uri", e);
+            throw new FlowableServiceException("Error building uri", e);
+        }
 
-		for (String name : parameterMap.keySet()) {
-			builder.addParameter(name, parameterMap.get(name)[0]);
-		}
-		HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder.toString()));
-		return clientUtil.executeRequest(get, serverConfig);
-	}
+        for (String name : parameterMap.keySet()) {
+            builder.addParameter(name, parameterMap.get(name)[0]);
+        }
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder.toString()));
+        return clientUtil.executeRequest(get, serverConfig);
+    }
 
-	public JsonNode getDeployment(ServerConfig serverConfig, String deploymentId) {
-		HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "form-repository/deployments/" + deploymentId));
-		return clientUtil.executeRequest(get, serverConfig);
-	}
+    public JsonNode getDeployment(ServerConfig serverConfig, String deploymentId) {
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "form-repository/deployments/" + deploymentId));
+        return clientUtil.executeRequest(get, serverConfig);
+    }
 
-	public JsonNode uploadDeployment(ServerConfig serverConfig, String name, InputStream inputStream) throws IOException {
-		HttpPost post = new HttpPost(clientUtil.getServerUrl(serverConfig, "form-repository/deployments"));
-		HttpEntity reqEntity = MultipartEntityBuilder.create()
-				.addBinaryBody(name, IOUtils.toByteArray(inputStream), ContentType.APPLICATION_OCTET_STREAM, name)
-				.build();
-		post.setEntity(reqEntity);
-		return clientUtil.executeRequest(post, serverConfig, 201);
-	}
-	
-	public void deleteDeployment(ServerConfig serverConfig, HttpServletResponse httpResponse, String appDeploymentId) {
+    public JsonNode uploadDeployment(ServerConfig serverConfig, String name, InputStream inputStream) throws IOException {
+        HttpPost post = new HttpPost(clientUtil.getServerUrl(serverConfig, "form-repository/deployments"));
+        HttpEntity reqEntity = MultipartEntityBuilder.create()
+                .addBinaryBody(name, IOUtils.toByteArray(inputStream), ContentType.APPLICATION_OCTET_STREAM, name)
+                .build();
+        post.setEntity(reqEntity);
+        return clientUtil.executeRequest(post, serverConfig, 201);
+    }
+
+    public void deleteDeployment(ServerConfig serverConfig, HttpServletResponse httpResponse, String appDeploymentId) {
         HttpDelete delete = new HttpDelete(clientUtil.getServerUrl(serverConfig, clientUtil.createUriBuilder("form-repository/deployments/" + appDeploymentId)));
         clientUtil.execute(delete, httpResponse, serverConfig);
     }
-	
+
 }

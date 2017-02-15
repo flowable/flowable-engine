@@ -24,14 +24,14 @@ import org.flowable.engine.impl.TablePageQueryImpl;
  */
 public interface TableDataManager {
 
-  Map<String, Long> getTableCount();
+    Map<String, Long> getTableCount();
 
-  List<String> getTablesPresentInDatabase();
+    List<String> getTablesPresentInDatabase();
 
-  TablePage getTablePage(TablePageQueryImpl tablePageQuery, int firstResult, int maxResults);
+    TablePage getTablePage(TablePageQueryImpl tablePageQuery, int firstResult, int maxResults);
 
-  String getTableName(Class<?> entityClass, boolean withPrefix);
+    String getTableName(Class<?> entityClass, boolean withPrefix);
 
-  TableMetaData getTableMetaData(String tableName);
+    TableMetaData getTableMetaData(String tableName);
 
 }

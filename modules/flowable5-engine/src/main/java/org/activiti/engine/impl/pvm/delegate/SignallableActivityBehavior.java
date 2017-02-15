@@ -14,12 +14,11 @@ package org.activiti.engine.impl.pvm.delegate;
 
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 
-
 /**
  * @author Tom Baeyens
  */
 public interface SignallableActivityBehavior extends ActivityBehavior {
 
-  void signal(ActivityExecution execution, String signalEvent, Object signalData) throws Exception;
-  
+    void signal(ActivityExecution execution, String signalEvent, Object signalData) throws Exception;
+
 }

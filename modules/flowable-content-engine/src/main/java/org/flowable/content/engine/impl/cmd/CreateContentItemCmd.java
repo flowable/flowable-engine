@@ -23,9 +23,9 @@ import org.flowable.content.engine.impl.interceptor.CommandContext;
  */
 public class CreateContentItemCmd implements Command<ContentItem>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public ContentItem execute(CommandContext commandContext) {
-    return commandContext.getContentItemEntityManager().create();
-  }
+    public ContentItem execute(CommandContext commandContext) {
+        return commandContext.getContentItemEntityManager().create();
+    }
 }

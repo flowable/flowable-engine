@@ -25,50 +25,50 @@ import org.flowable.engine.impl.util.Flowable5Util;
  */
 public class SetExecutionVariablesCmd extends NeedsActiveExecutionCmd<Object> {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected Map<String, ? extends Object> variables;
-  protected boolean isLocal;
+    protected Map<String, ? extends Object> variables;
+    protected boolean isLocal;
 
-  public SetExecutionVariablesCmd(String executionId, Map<String, ? extends Object> variables, boolean isLocal) {
-    super(executionId);
-    this.variables = variables;
-    this.isLocal = isLocal;
-  }
-
-  protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
-    
-    if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      compatibilityHandler.setExecutionVariables(executionId, variables, isLocal);
-      return null;
-    }
-    
-    if (isLocal) {
-      if (variables != null) {
-        for (String variableName : variables.keySet()) {
-          execution.setVariableLocal(variableName, variables.get(variableName), false);
-        }
-      }
-    } else {
-      if (variables != null) {
-        for (String variableName : variables.keySet()) {
-          execution.setVariable(variableName, variables.get(variableName), false);
-        }
-      }
+    public SetExecutionVariablesCmd(String executionId, Map<String, ? extends Object> variables, boolean isLocal) {
+        super(executionId);
+        this.variables = variables;
+        this.isLocal = isLocal;
     }
 
-    // ACT-1887: Force an update of the execution's revision to prevent
-    // simultaneous inserts of the same
-    // variable. If not, duplicate variables may occur since optimistic
-    // locking doesn't work on inserts
-    execution.forceUpdate();
-    return null;
-  }
+    protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
 
-  @Override
-  protected String getSuspendedExceptionMessage() {
-    return "Cannot set variables because execution '" + executionId + "' is suspended";
-  }
+        if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
+            Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+            compatibilityHandler.setExecutionVariables(executionId, variables, isLocal);
+            return null;
+        }
+
+        if (isLocal) {
+            if (variables != null) {
+                for (String variableName : variables.keySet()) {
+                    execution.setVariableLocal(variableName, variables.get(variableName), false);
+                }
+            }
+        } else {
+            if (variables != null) {
+                for (String variableName : variables.keySet()) {
+                    execution.setVariable(variableName, variables.get(variableName), false);
+                }
+            }
+        }
+
+        // ACT-1887: Force an update of the execution's revision to prevent
+        // simultaneous inserts of the same
+        // variable. If not, duplicate variables may occur since optimistic
+        // locking doesn't work on inserts
+        execution.forceUpdate();
+        return null;
+    }
+
+    @Override
+    protected String getSuspendedExceptionMessage() {
+        return "Cannot set variables because execution '" + executionId + "' is suspended";
+    }
 
 }

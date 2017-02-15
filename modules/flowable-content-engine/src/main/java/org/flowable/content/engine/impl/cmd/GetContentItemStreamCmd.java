@@ -28,27 +28,27 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
  */
 public class GetContentItemStreamCmd implements Command<InputStream>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected String contentItemId;
+    private static final long serialVersionUID = 1L;
 
-  public GetContentItemStreamCmd(String contentItemId) {
-    this.contentItemId = contentItemId;
-  }
-  
-  public InputStream execute(CommandContext commandContext) {
-    if (contentItemId == null) {
-      throw new FlowableIllegalArgumentException("contentItemId is null");
+    protected String contentItemId;
+
+    public GetContentItemStreamCmd(String contentItemId) {
+        this.contentItemId = contentItemId;
     }
-    
-    ContentItem contentItem = commandContext.getContentItemEntityManager().findById(contentItemId);
-    if (contentItem == null) {
-      throw new FlowableObjectNotFoundException("content item could not be found with id " + contentItemId);
+
+    public InputStream execute(CommandContext commandContext) {
+        if (contentItemId == null) {
+            throw new FlowableIllegalArgumentException("contentItemId is null");
+        }
+
+        ContentItem contentItem = commandContext.getContentItemEntityManager().findById(contentItemId);
+        if (contentItem == null) {
+            throw new FlowableObjectNotFoundException("content item could not be found with id " + contentItemId);
+        }
+
+        ContentStorage contentStorage = commandContext.getContentEngineConfiguration().getContentStorage();
+        ContentObject contentObject = contentStorage.getContentObject(contentItem.getContentStoreId());
+        return contentObject.getContent();
     }
-    
-    ContentStorage contentStorage = commandContext.getContentEngineConfiguration().getContentStorage();
-    ContentObject contentObject = contentStorage.getContentObject(contentItem.getContentStoreId());
-    return contentObject.getContent();
-  }
 
 }

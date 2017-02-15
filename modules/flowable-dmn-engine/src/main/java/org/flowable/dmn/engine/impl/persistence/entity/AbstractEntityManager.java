@@ -23,62 +23,62 @@ import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
  */
 public abstract class AbstractEntityManager<EntityImpl extends Entity> extends AbstractManager implements EntityManager<EntityImpl> {
 
-  public AbstractEntityManager(DmnEngineConfiguration dmnEngineConfiguration) {
-    super(dmnEngineConfiguration);
-  }
-  
-  /*
-   * CRUD operations
-   */
-  
-  @Override
-  public EntityImpl findById(String entityId) {
-    return getDataManager().findById(entityId);
-  }
-  
-  @Override
-  public EntityImpl create() {
-    return getDataManager().create();
-  }
+    public AbstractEntityManager(DmnEngineConfiguration dmnEngineConfiguration) {
+        super(dmnEngineConfiguration);
+    }
 
-  @Override
-  public void insert(EntityImpl entity) {
-    insert(entity, true);
-  }
-  
-  @Override
-  public void insert(EntityImpl entity, boolean fireEvent) {
-    getDataManager().insert(entity);
-  }
-  
-  @Override
-  public EntityImpl update(EntityImpl entity) {
-    return update(entity, true);
-  }
-  
-  @Override
-  public EntityImpl update(EntityImpl entity, boolean fireEvent) {
-    EntityImpl updatedEntity = getDataManager().update(entity);
-    
-    return updatedEntity;
-  }
-  
-  @Override
-  public void delete(String id) {
-    EntityImpl entity = findById(id);
-    delete(entity);
-  }
-  
-  @Override
-  public void delete(EntityImpl entity) {
-    delete(entity, true);
-  }
-  
-  @Override
-  public void delete(EntityImpl entity, boolean fireEvent) {
-    getDataManager().delete(entity);
-  }
+    /*
+     * CRUD operations
+     */
 
-  protected abstract DataManager<EntityImpl> getDataManager();
+    @Override
+    public EntityImpl findById(String entityId) {
+        return getDataManager().findById(entityId);
+    }
+
+    @Override
+    public EntityImpl create() {
+        return getDataManager().create();
+    }
+
+    @Override
+    public void insert(EntityImpl entity) {
+        insert(entity, true);
+    }
+
+    @Override
+    public void insert(EntityImpl entity, boolean fireEvent) {
+        getDataManager().insert(entity);
+    }
+
+    @Override
+    public EntityImpl update(EntityImpl entity) {
+        return update(entity, true);
+    }
+
+    @Override
+    public EntityImpl update(EntityImpl entity, boolean fireEvent) {
+        EntityImpl updatedEntity = getDataManager().update(entity);
+
+        return updatedEntity;
+    }
+
+    @Override
+    public void delete(String id) {
+        EntityImpl entity = findById(id);
+        delete(entity);
+    }
+
+    @Override
+    public void delete(EntityImpl entity) {
+        delete(entity, true);
+    }
+
+    @Override
+    public void delete(EntityImpl entity, boolean fireEvent) {
+        getDataManager().delete(entity);
+    }
+
+    protected abstract DataManager<EntityImpl> getDataManager();
 
 }

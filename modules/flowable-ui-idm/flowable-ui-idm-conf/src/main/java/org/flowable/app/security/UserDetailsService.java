@@ -35,73 +35,73 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService, CustomUserDetailService {
 
-  @Autowired
-  private UserCache userCache;
+    @Autowired
+    private UserCache userCache;
 
-  @Autowired
-  protected IdmIdentityService identityService;
-  
-  @Autowired
-  protected UserService userService;
+    @Autowired
+    protected IdmIdentityService identityService;
 
-  private long userValidityPeriod;
+    @Autowired
+    protected UserService userService;
 
-  @Override
-  @Transactional
-  public UserDetails loadUserByUsername(final String login) {
+    private long userValidityPeriod;
 
-    // This method is only called during the login.
-    // All subsequent calls use the method with the long userId as parameter.
-    // (Hence why the cache is NOT used here, but it is used in the loadByUserId)
+    @Override
+    @Transactional
+    public UserDetails loadUserByUsername(final String login) {
 
-    String actualLogin = login;
-    User userFromDatabase = null;
+        // This method is only called during the login.
+        // All subsequent calls use the method with the long userId as parameter.
+        // (Hence why the cache is NOT used here, but it is used in the loadByUserId)
 
-    actualLogin = login.toLowerCase();
-    userFromDatabase = identityService.createUserQuery().userIdIgnoreCase(actualLogin).singleResult();
+        String actualLogin = login;
+        User userFromDatabase = null;
 
-    // Verify user
-    if (userFromDatabase == null) {
-      throw new UsernameNotFoundException("User " + actualLogin + " was not found in the database");
+        actualLogin = login.toLowerCase();
+        userFromDatabase = identityService.createUserQuery().userIdIgnoreCase(actualLogin).singleResult();
+
+        // Verify user
+        if (userFromDatabase == null) {
+            throw new UsernameNotFoundException("User " + actualLogin + " was not found in the database");
+        }
+
+        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
+        UserInformation userInformation = userService.getUserInformation(userFromDatabase.getId());
+        for (String privilege : userInformation.getPrivileges()) {
+            grantedAuthorities.add(new SimpleGrantedAuthority(privilege));
+        }
+
+        userCache.putUser(userFromDatabase.getId(), new CachedUser(userFromDatabase, grantedAuthorities));
+        return new FlowableAppUser(userFromDatabase, actualLogin, grantedAuthorities);
     }
 
-    Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
-    UserInformation userInformation = userService.getUserInformation(userFromDatabase.getId());
-    for (String privilege : userInformation.getPrivileges()) {
-      grantedAuthorities.add(new SimpleGrantedAuthority(privilege));
-    }
-    
-    userCache.putUser(userFromDatabase.getId(), new CachedUser(userFromDatabase, grantedAuthorities));
-    return new FlowableAppUser(userFromDatabase, actualLogin, grantedAuthorities);
-  }
+    @Transactional
+    public UserDetails loadByUserId(final String userId) {
 
-  @Transactional
-  public UserDetails loadByUserId(final String userId) {
+        CachedUser cachedUser = userCache.getUser(userId, true, true, false); // Do not check for validity. This would lead to A LOT of db requests! For login, there is a validity period (see below)
+        if (cachedUser == null) {
+            throw new UsernameNotFoundException("User " + userId + " was not found in the database");
+        }
 
-    CachedUser cachedUser = userCache.getUser(userId, true, true, false); // Do not check for validity. This would lead to A LOT of db requests! For login, there is a validity period (see below)
-    if (cachedUser == null) {
-      throw new UsernameNotFoundException("User " + userId + " was not found in the database");
-    }
+        long lastDatabaseCheck = cachedUser.getLastDatabaseCheck();
+        long currentTime = System.currentTimeMillis(); // No need to create a Date object. The Date constructor simply calls this method too!
 
-    long lastDatabaseCheck = cachedUser.getLastDatabaseCheck();
-    long currentTime = System.currentTimeMillis(); // No need to create a Date object. The Date constructor simply calls this method too!
+        if (userValidityPeriod <= 0L || (currentTime - lastDatabaseCheck >= userValidityPeriod)) {
 
-    if (userValidityPeriod <= 0L || (currentTime - lastDatabaseCheck >= userValidityPeriod)) {
+            userCache.invalidate(userId);
+            cachedUser = userCache.getUser(userId, true, true, false); // Fetching it again will refresh data
 
-      userCache.invalidate(userId);
-      cachedUser = userCache.getUser(userId, true, true, false); // Fetching it again will refresh data
+            cachedUser.setLastDatabaseCheck(currentTime);
+        }
 
-      cachedUser.setLastDatabaseCheck(currentTime);
+        // The Spring security docs clearly state a new instance must be returned on every invocation
+        User user = cachedUser.getUser();
+        String actualUserId = user.getEmail();
+
+        return new FlowableAppUser(cachedUser.getUser(), actualUserId, cachedUser.getGrantedAuthorities());
     }
 
-    // The Spring security docs clearly state a new instance must be returned on every invocation
-    User user = cachedUser.getUser();
-    String actualUserId = user.getEmail();
-
-    return new FlowableAppUser(cachedUser.getUser(), actualUserId, cachedUser.getGrantedAuthorities());
-  }
-
-  public void setUserValidityPeriod(long userValidityPeriod) {
-    this.userValidityPeriod = userValidityPeriod;
-  }
+    public void setUserValidityPeriod(long userValidityPeriod) {
+        this.userValidityPeriod = userValidityPeriod;
+    }
 }

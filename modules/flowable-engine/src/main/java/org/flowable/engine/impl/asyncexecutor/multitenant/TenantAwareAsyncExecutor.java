@@ -19,18 +19,16 @@ import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
 
 /**
- * Interface for {@link AsyncExecutor} implementations used in conjunction with the
- * {@link MultiSchemaMultiTenantProcessEngineConfiguration}. Allows to dynamically
- * add tenant executors to the engine.
+ * Interface for {@link AsyncExecutor} implementations used in conjunction with the {@link MultiSchemaMultiTenantProcessEngineConfiguration}. Allows to dynamically add tenant executors to the engine.
  * 
  * @author Joram Barrez
  */
 public interface TenantAwareAsyncExecutor extends AsyncExecutor {
-  
-  Set<String> getTenantIds();
-  
-  void addTenantAsyncExecutor(String tenantId, boolean startExecutor);
-  
-  void removeTenantAsyncExecutor(String tenantId);
+
+    Set<String> getTenantIds();
+
+    void addTenantAsyncExecutor(String tenantId, boolean startExecutor);
+
+    void removeTenantAsyncExecutor(String tenantId);
 
 }

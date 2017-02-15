@@ -24,14 +24,14 @@ import org.flowable.engine.runtime.Job;
  * @author Tijs Rademakers
  */
 public interface SuspendedJobDataManager extends DataManager<SuspendedJobEntity> {
-  
-  List<SuspendedJobEntity> findJobsByExecutionId(String executionId);
-  
-  List<SuspendedJobEntity> findJobsByProcessInstanceId(String processInstanceId);
 
-  List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery, Page page);
+    List<SuspendedJobEntity> findJobsByExecutionId(String executionId);
 
-  long findJobCountByQueryCriteria(SuspendedJobQueryImpl jobQuery);
-  
-  void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
+    List<SuspendedJobEntity> findJobsByProcessInstanceId(String processInstanceId);
+
+    List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery, Page page);
+
+    long findJobCountByQueryCriteria(SuspendedJobQueryImpl jobQuery);
+
+    void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
 }

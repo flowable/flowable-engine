@@ -20,16 +20,16 @@ import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 /**
  * @author Joram Barrez
  */
-public interface IdentityInfoEntityManager extends EntityManager<IdentityInfoEntity>{
+public interface IdentityInfoEntityManager extends EntityManager<IdentityInfoEntity> {
 
-  IdentityInfoEntity findUserInfoByUserIdAndKey(String userId, String key);
+    IdentityInfoEntity findUserInfoByUserIdAndKey(String userId, String key);
 
-  List<String> findUserInfoKeysByUserIdAndType(String userId, String type);
-  
-  List<IdentityInfoEntity> findIdentityInfoByUserId(String userId);
-  
-  void updateUserInfo(String userId, String userPassword, String type, String key, String value, String accountPassword, Map<String, String> accountDetails);
-  
-  void deleteUserInfoByUserIdAndKey(String userId, String key);
+    List<String> findUserInfoKeysByUserIdAndType(String userId, String type);
+
+    List<IdentityInfoEntity> findIdentityInfoByUserId(String userId);
+
+    void updateUserInfo(String userId, String userPassword, String type, String key, String value, String accountPassword, Map<String, String> accountDetails);
+
+    void deleteUserInfoByUserIdAndKey(String userId, String key);
 
 }

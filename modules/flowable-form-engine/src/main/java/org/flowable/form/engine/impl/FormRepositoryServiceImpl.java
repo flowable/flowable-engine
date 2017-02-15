@@ -44,83 +44,83 @@ import org.flowable.form.model.FormModel;
 public class FormRepositoryServiceImpl extends ServiceImpl implements FormRepositoryService {
 
     public FormDeploymentBuilder createDeployment() {
-      return commandExecutor.execute(new Command<FormDeploymentBuilder>() {
-        @Override
-        public FormDeploymentBuilder execute(CommandContext commandContext) {
-          return new FormDeploymentBuilderImpl();
-        }
-      });
+        return commandExecutor.execute(new Command<FormDeploymentBuilder>() {
+            @Override
+            public FormDeploymentBuilder execute(CommandContext commandContext) {
+                return new FormDeploymentBuilderImpl();
+            }
+        });
     }
-    
+
     public FormDeployment deploy(FormDeploymentBuilderImpl deploymentBuilder) {
-      return commandExecutor.execute(new DeployCmd<FormDeployment>(deploymentBuilder));
+        return commandExecutor.execute(new DeployCmd<FormDeployment>(deploymentBuilder));
     }
-    
+
     public void deleteDeployment(String deploymentId) {
-      commandExecutor.execute(new DeleteDeploymentCmd(deploymentId));
+        commandExecutor.execute(new DeleteDeploymentCmd(deploymentId));
     }
-    
+
     public FormDefinitionQuery createFormDefinitionQuery() {
-      return new FormDefinitionQueryImpl(commandExecutor);
+        return new FormDefinitionQueryImpl(commandExecutor);
     }
 
     public NativeFormDefinitionQuery createNativeFormDefinitionQuery() {
-      return new NativeFormDefinitionQueryImpl(commandExecutor);
+        return new NativeFormDefinitionQueryImpl(commandExecutor);
     }
-    
+
     public List<String> getDeploymentResourceNames(String deploymentId) {
-      return commandExecutor.execute(new GetDeploymentResourceNamesCmd(deploymentId));
+        return commandExecutor.execute(new GetDeploymentResourceNamesCmd(deploymentId));
     }
 
     public InputStream getResourceAsStream(String deploymentId, String resourceName) {
-      return commandExecutor.execute(new GetDeploymentResourceCmd(deploymentId, resourceName));
+        return commandExecutor.execute(new GetDeploymentResourceCmd(deploymentId, resourceName));
     }
 
     public void setDeploymentCategory(String deploymentId, String category) {
-      commandExecutor.execute(new SetDeploymentCategoryCmd(deploymentId, category));
+        commandExecutor.execute(new SetDeploymentCategoryCmd(deploymentId, category));
     }
-    
+
     public void setDeploymentTenantId(String deploymentId, String newTenantId) {
-      commandExecutor.execute(new SetDeploymentTenantIdCmd(deploymentId, newTenantId));
+        commandExecutor.execute(new SetDeploymentTenantIdCmd(deploymentId, newTenantId));
     }
 
     public FormDeploymentQuery createDeploymentQuery() {
-      return new FormDeploymentQueryImpl(commandExecutor);
+        return new FormDeploymentQueryImpl(commandExecutor);
     }
 
     public NativeFormDeploymentQuery createNativeDeploymentQuery() {
-      return new NativeFormDeploymentQueryImpl(commandExecutor);
+        return new NativeFormDeploymentQueryImpl(commandExecutor);
     }
-    
+
     public FormDefinition getFormDefinition(String formDefinitionId) {
-      return commandExecutor.execute(new GetFormDefinitionCmd(formDefinitionId));
+        return commandExecutor.execute(new GetFormDefinitionCmd(formDefinitionId));
     }
-    
+
     public FormModel getFormModelById(String formId) {
-      return commandExecutor.execute(new GetFormModelCmd(null, formId));
+        return commandExecutor.execute(new GetFormModelCmd(null, formId));
     }
-    
+
     public FormModel getFormModelByKey(String formDefinitionKey) {
-      return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null));
+        return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null));
     }
-    
+
     public FormModel getFormModelByKey(String formDefinitionKey, String tenantId) {
-      return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null, tenantId));
+        return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null, tenantId));
     }
-    
+
     public FormModel getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId) {
-      return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null, null, parentDeploymentId));
+        return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null, null, parentDeploymentId));
     }
-    
+
     public FormModel getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String tenantId) {
-      return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null, tenantId, parentDeploymentId));
+        return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null, tenantId, parentDeploymentId));
     }
-    
+
     public InputStream getFormDefinitionResource(String formId) {
-      return commandExecutor.execute(new GetFormDefinitionResourceCmd(formId));
+        return commandExecutor.execute(new GetFormDefinitionResourceCmd(formId));
     }
-    
+
     public void setFormDefinitionCategory(String formId, String category) {
-      commandExecutor.execute(new SetFormDefinitionCategoryCmd(formId, category));
+        commandExecutor.execute(new SetFormDefinitionCategoryCmd(formId, category));
     }
 }

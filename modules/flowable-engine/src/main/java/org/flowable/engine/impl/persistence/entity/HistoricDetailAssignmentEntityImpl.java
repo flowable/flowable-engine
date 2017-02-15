@@ -18,5 +18,5 @@ package org.flowable.engine.impl.persistence.entity;
  */
 public class HistoricDetailAssignmentEntityImpl extends HistoricDetailEntityImpl implements HistoricDetailAssignmentEntity {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 }

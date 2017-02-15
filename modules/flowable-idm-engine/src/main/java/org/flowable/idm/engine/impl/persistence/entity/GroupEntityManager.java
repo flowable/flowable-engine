@@ -27,22 +27,22 @@ import org.flowable.idm.engine.impl.GroupQueryImpl;
  */
 public interface GroupEntityManager extends EntityManager<GroupEntity> {
 
-  Group createNewGroup(String groupId);
+    Group createNewGroup(String groupId);
 
-  GroupQuery createNewGroupQuery();
+    GroupQuery createNewGroupQuery();
 
-  List<Group> findGroupByQueryCriteria(GroupQueryImpl query, Page page);
+    List<Group> findGroupByQueryCriteria(GroupQueryImpl query, Page page);
 
-  long findGroupCountByQueryCriteria(GroupQueryImpl query);
+    long findGroupCountByQueryCriteria(GroupQueryImpl query);
 
-  List<Group> findGroupsByUser(String userId);
+    List<Group> findGroupsByUser(String userId);
 
-  List<Group> findGroupsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<Group> findGroupsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
 
-  long findGroupCountByNativeQuery(Map<String, Object> parameterMap);
+    long findGroupCountByNativeQuery(Map<String, Object> parameterMap);
 
-  boolean isNewGroup(Group group);
+    boolean isNewGroup(Group group);
 
-  List<Group> findGroupsByPrivilegeId(String privilegeId);
-  
+    List<Group> findGroupsByPrivilegeId(String privilegeId);
+
 }

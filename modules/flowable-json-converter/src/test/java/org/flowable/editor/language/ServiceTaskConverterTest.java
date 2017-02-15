@@ -16,54 +16,54 @@ import org.junit.Test;
 
 public class ServiceTaskConverterTest extends AbstractConverterTest {
 
-  @Test
-  public void connvertJsonToModel() throws Exception {
-    BpmnModel bpmnModel = readJsonFile();
-    validateModel(bpmnModel);
-  }
+    @Test
+    public void connvertJsonToModel() throws Exception {
+        BpmnModel bpmnModel = readJsonFile();
+        validateModel(bpmnModel);
+    }
 
-  @Test
-  public void doubleConversionValidation() throws Exception {
-    BpmnModel bpmnModel = readJsonFile();
-    bpmnModel = convertToJsonAndBack(bpmnModel);
-    validateModel(bpmnModel);
-  }
+    @Test
+    public void doubleConversionValidation() throws Exception {
+        BpmnModel bpmnModel = readJsonFile();
+        bpmnModel = convertToJsonAndBack(bpmnModel);
+        validateModel(bpmnModel);
+    }
 
-  protected String getResource() {
-    return "test.servicetaskmodel.json";
-  }
+    protected String getResource() {
+        return "test.servicetaskmodel.json";
+    }
 
-  private void validateModel(BpmnModel model) {
-    FlowElement flowElement = model.getMainProcess().getFlowElement("servicetask", true);
-    assertNotNull(flowElement);
-    assertTrue(flowElement instanceof ServiceTask);
-    assertEquals("servicetask", flowElement.getId());
-    ServiceTask serviceTask = (ServiceTask) flowElement;
-    assertEquals("servicetask", serviceTask.getId());
-    assertEquals("Service task", serviceTask.getName());
+    private void validateModel(BpmnModel model) {
+        FlowElement flowElement = model.getMainProcess().getFlowElement("servicetask", true);
+        assertNotNull(flowElement);
+        assertTrue(flowElement instanceof ServiceTask);
+        assertEquals("servicetask", flowElement.getId());
+        ServiceTask serviceTask = (ServiceTask) flowElement;
+        assertEquals("servicetask", serviceTask.getId());
+        assertEquals("Service task", serviceTask.getName());
 
-    List<FieldExtension> fields = serviceTask.getFieldExtensions();
-    assertEquals(2, fields.size());
-    FieldExtension field = fields.get(0);
-    assertEquals("testField", field.getFieldName());
-    assertEquals("test", field.getStringValue());
-    field = fields.get(1);
-    assertEquals("testField2", field.getFieldName());
-    assertEquals("${test}", field.getExpression());
+        List<FieldExtension> fields = serviceTask.getFieldExtensions();
+        assertEquals(2, fields.size());
+        FieldExtension field = fields.get(0);
+        assertEquals("testField", field.getFieldName());
+        assertEquals("test", field.getStringValue());
+        field = fields.get(1);
+        assertEquals("testField2", field.getFieldName());
+        assertEquals("${test}", field.getExpression());
 
-    List<FlowableListener> listeners = serviceTask.getExecutionListeners();
-    assertEquals(3, listeners.size());
-    FlowableListener listener = listeners.get(0);
-    assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, listener.getImplementationType());
-    assertEquals("org.test.TestClass", listener.getImplementation());
-    assertEquals("start", listener.getEvent());
-    listener = listeners.get(1);
-    assertEquals(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, listener.getImplementationType());
-    assertEquals("${testExpression}", listener.getImplementation());
-    assertEquals("end", listener.getEvent());
-    listener = listeners.get(2);
-    assertEquals(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, listener.getImplementationType());
-    assertEquals("${delegateExpression}", listener.getImplementation());
-    assertEquals("start", listener.getEvent());
-  }
+        List<FlowableListener> listeners = serviceTask.getExecutionListeners();
+        assertEquals(3, listeners.size());
+        FlowableListener listener = listeners.get(0);
+        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, listener.getImplementationType());
+        assertEquals("org.test.TestClass", listener.getImplementation());
+        assertEquals("start", listener.getEvent());
+        listener = listeners.get(1);
+        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, listener.getImplementationType());
+        assertEquals("${testExpression}", listener.getImplementation());
+        assertEquals("end", listener.getEvent());
+        listener = listeners.get(2);
+        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, listener.getImplementationType());
+        assertEquals("${delegateExpression}", listener.getImplementation());
+        assertEquals("start", listener.getEvent());
+    }
 }

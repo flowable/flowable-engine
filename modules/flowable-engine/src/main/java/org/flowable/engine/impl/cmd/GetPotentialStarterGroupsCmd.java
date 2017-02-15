@@ -30,41 +30,41 @@ import org.flowable.idm.api.Group;
  */
 public class GetPotentialStarterGroupsCmd implements Command<List<Group>>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected String processDefinitionId;
+    private static final long serialVersionUID = 1L;
 
-  public GetPotentialStarterGroupsCmd(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
+    protected String processDefinitionId;
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public List<Group> execute(CommandContext commandContext) {
-    ProcessDefinitionEntity processDefinition = commandContext.getProcessDefinitionEntityManager().findById(processDefinitionId);
-
-    if (processDefinition == null) {
-      throw new FlowableObjectNotFoundException("Cannot find process definition with id " + processDefinitionId, ProcessDefinition.class);
+    public GetPotentialStarterGroupsCmd(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
     }
-    
-    IdentityService identityService = commandContext.getProcessEngineConfiguration().getIdentityService();
 
-    List<String> groupIds = new ArrayList<String>();
-    List<IdentityLink> identityLinks = (List) processDefinition.getIdentityLinks();
-    for (IdentityLink identityLink : identityLinks) {
-      if (identityLink.getGroupId() != null && identityLink.getGroupId().length() > 0) {
-        
-        if (!groupIds.contains(identityLink.getGroupId())) {
-          groupIds.add(identityLink.getGroupId());
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public List<Group> execute(CommandContext commandContext) {
+        ProcessDefinitionEntity processDefinition = commandContext.getProcessDefinitionEntityManager().findById(processDefinitionId);
+
+        if (processDefinition == null) {
+            throw new FlowableObjectNotFoundException("Cannot find process definition with id " + processDefinitionId, ProcessDefinition.class);
         }
-      }
+
+        IdentityService identityService = commandContext.getProcessEngineConfiguration().getIdentityService();
+
+        List<String> groupIds = new ArrayList<String>();
+        List<IdentityLink> identityLinks = (List) processDefinition.getIdentityLinks();
+        for (IdentityLink identityLink : identityLinks) {
+            if (identityLink.getGroupId() != null && identityLink.getGroupId().length() > 0) {
+
+                if (!groupIds.contains(identityLink.getGroupId())) {
+                    groupIds.add(identityLink.getGroupId());
+                }
+            }
+        }
+
+        if (groupIds.size() > 0) {
+            return identityService.createGroupQuery().groupIds(groupIds).list();
+
+        } else {
+            return new ArrayList<Group>();
+        }
     }
-    
-    if (groupIds.size() > 0) {
-      return identityService.createGroupQuery().groupIds(groupIds).list();
-      
-    } else {
-      return new ArrayList<Group>();
-    }
-  }
 
 }

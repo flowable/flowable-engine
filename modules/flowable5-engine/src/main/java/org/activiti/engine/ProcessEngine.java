@@ -12,68 +12,52 @@
  */
 package org.activiti.engine;
 
-
 /**
  * Provides access to all the services that expose the BPM and workflow operations.
  * 
  * <ul>
- * <li>
- * <b>{@link org.activiti.engine.RuntimeService}: </b> Allows the creation of
- * {@link org.activiti.engine.repository.Deployment}s and the starting of and searching on
+ * <li><b>{@link org.activiti.engine.RuntimeService}: </b> Allows the creation of {@link org.activiti.engine.repository.Deployment}s and the starting of and searching on
  * {@link org.activiti.engine.runtime.ProcessInstance}s.</li>
- * <li>
- * <b>{@link org.activiti.engine.TaskService}: </b> Exposes operations to manage human
- * (standalone) {@link org.activiti.engine.task.Task}s, such as claiming, completing and
- * assigning tasks</li>
- * <li>
- * <b>{@link org.activiti.engine.IdentityService}: </b> Used for managing
- * {@link org.flowable.idm.api.User}s, {@link org.flowable.idm.api.Group}s and
- * the relations between them<</li>
- * <li>
- * <b>{@link org.activiti.engine.ManagementService}: </b> Exposes engine admin and
- * maintenance operations</li>
- *  <li>
- * <b>{@link org.activiti.engine.HistoryService}: </b> Service exposing information about 
- * ongoing and past process instances.</li>
+ * <li><b>{@link org.activiti.engine.TaskService}: </b> Exposes operations to manage human (standalone) {@link org.activiti.engine.task.Task}s, such as claiming, completing and assigning tasks</li>
+ * <li><b>{@link org.activiti.engine.IdentityService}: </b> Used for managing {@link org.flowable.idm.api.User}s, {@link org.flowable.idm.api.Group}s and the relations between them<</li>
+ * <li><b>{@link org.activiti.engine.ManagementService}: </b> Exposes engine admin and maintenance operations</li>
+ * <li><b>{@link org.activiti.engine.HistoryService}: </b> Service exposing information about ongoing and past process instances.</li>
  * </ul>
  * 
- * Typically, there will be only one central ProcessEngine instance needed in a
- * end-user application. Building a ProcessEngine is done through a
- * {@link ProcessEngineConfiguration} instance and is a costly operation which should be
- * avoided. For that purpose, it is advised to store it in a static field or
- * JNDI location (or something similar). This is a thread-safe object, so no
- * special precautions need to be taken.
+ * Typically, there will be only one central ProcessEngine instance needed in a end-user application. Building a ProcessEngine is done through a {@link ProcessEngineConfiguration} instance and is a
+ * costly operation which should be avoided. For that purpose, it is advised to store it in a static field or JNDI location (or something similar). This is a thread-safe object, so no special
+ * precautions need to be taken.
  * 
  * @author Tom Baeyens
  * @author Joram Barrez
  */
 public interface ProcessEngine {
 
-  /** the version of the activiti library */
-  public static String VERSION = "6.0.0.3";
+    /** the version of the activiti library */
+    public static String VERSION = "6.0.0.3";
 
-  /** The name as specified in 'process-engine-name' in 
-   * the flowable.cfg.xml configuration file.
-   * The default name for a process engine is 'default */
-  String getName();
+    /**
+     * The name as specified in 'process-engine-name' in the flowable.cfg.xml configuration file. The default name for a process engine is 'default
+     */
+    String getName();
 
-  void close();
-  
-  RepositoryService getRepositoryService();
+    void close();
 
-  RuntimeService getRuntimeService();
+    RepositoryService getRepositoryService();
 
-  FormService getFormService();
+    RuntimeService getRuntimeService();
 
-  TaskService getTaskService();
+    FormService getFormService();
 
-  HistoryService getHistoryService();
+    TaskService getTaskService();
 
-  IdentityService getIdentityService();
+    HistoryService getHistoryService();
 
-  ManagementService getManagementService();
-  
-  DynamicBpmnService getDynamicBpmnService();
+    IdentityService getIdentityService();
 
-  ProcessEngineConfiguration getProcessEngineConfiguration();
+    ManagementService getManagementService();
+
+    DynamicBpmnService getDynamicBpmnService();
+
+    ProcessEngineConfiguration getProcessEngineConfiguration();
 }

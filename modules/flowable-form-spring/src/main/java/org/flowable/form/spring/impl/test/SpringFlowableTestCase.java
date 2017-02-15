@@ -32,37 +32,37 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 @TestExecutionListeners(DependencyInjectionTestExecutionListener.class)
 public abstract class SpringFlowableTestCase extends AbstractFlowableTestCase implements ApplicationContextAware {
 
-  // we need a data structure to store all the resolved FormEngines and map them to something
-  protected Map<Object, FormEngine> cachedFormEngines = new ConcurrentHashMap<Object, FormEngine>();
+    // we need a data structure to store all the resolved FormEngines and map them to something
+    protected Map<Object, FormEngine> cachedFormEngines = new ConcurrentHashMap<Object, FormEngine>();
 
-  protected TestContextManager testContextManager;
+    protected TestContextManager testContextManager;
 
-  @Autowired
-  protected ApplicationContext applicationContext;
+    @Autowired
+    protected ApplicationContext applicationContext;
 
-  public SpringFlowableTestCase() {
-    this.testContextManager = new TestContextManager(getClass());
-  }
+    public SpringFlowableTestCase() {
+        this.testContextManager = new TestContextManager(getClass());
+    }
 
-  @Override
-  public void runBare() throws Throwable {
-    testContextManager.prepareTestInstance(this); // this will initialize all dependencies
-    super.runBare();
-  }
+    @Override
+    public void runBare() throws Throwable {
+        testContextManager.prepareTestInstance(this); // this will initialize all dependencies
+        super.runBare();
+    }
 
-  @Override
-  protected void initializeFormEngine() {
-    ContextConfiguration contextConfiguration = getClass().getAnnotation(ContextConfiguration.class);
-    String[] value = contextConfiguration.value();
-    boolean hasOneArg = value != null && value.length == 1;
-    String key = hasOneArg ? value[0] : FormEngine.class.getName();
-    FormEngine engine = this.cachedFormEngines.containsKey(key) ? this.cachedFormEngines.get(key) : this.applicationContext.getBean(FormEngine.class);
+    @Override
+    protected void initializeFormEngine() {
+        ContextConfiguration contextConfiguration = getClass().getAnnotation(ContextConfiguration.class);
+        String[] value = contextConfiguration.value();
+        boolean hasOneArg = value != null && value.length == 1;
+        String key = hasOneArg ? value[0] : FormEngine.class.getName();
+        FormEngine engine = this.cachedFormEngines.containsKey(key) ? this.cachedFormEngines.get(key) : this.applicationContext.getBean(FormEngine.class);
 
-    this.cachedFormEngines.put(key, engine);
-    this.formEngine = engine;
-  }
+        this.cachedFormEngines.put(key, engine);
+        this.formEngine = engine;
+    }
 
-  public void setApplicationContext(ApplicationContext applicationContext) {
-    this.applicationContext = applicationContext;
-  }
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 }

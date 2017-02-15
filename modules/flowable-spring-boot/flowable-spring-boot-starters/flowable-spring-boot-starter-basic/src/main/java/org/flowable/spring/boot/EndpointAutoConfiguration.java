@@ -21,14 +21,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * The idea behind this module is that Spring Security could
- * talk to the {@link org.flowable.engine.IdentityService}
- * as required.
+ * The idea behind this module is that Spring Security could talk to the {@link org.flowable.engine.IdentityService} as required.
  *
  * @author Josh Long
  */
 @Configuration
-@ConditionalOnClass (name = "org.springframework.boot.actuate.endpoint.AbstractEndpoint")
+@ConditionalOnClass(name = "org.springframework.boot.actuate.endpoint.AbstractEndpoint")
 public class EndpointAutoConfiguration {
 
     @Bean

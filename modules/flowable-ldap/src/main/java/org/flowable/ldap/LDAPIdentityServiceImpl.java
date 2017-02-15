@@ -33,149 +33,149 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LDAPIdentityServiceImpl extends IdmIdentityServiceImpl {
-  
-  private static Logger logger = LoggerFactory.getLogger(LDAPIdentityServiceImpl.class);
-  
-  protected ProcessEngineConfigurationImpl processEngineConfiguration;
-  protected LDAPConfigurator ldapConfigurator;
-  protected LDAPGroupCache ldapGroupCache;
-  
-  public LDAPIdentityServiceImpl(ProcessEngineConfigurationImpl processEngineConfiguration, 
-      LDAPConfigurator ldapConfigurator, LDAPGroupCache ldapGroupCache) {
-    
-    this.processEngineConfiguration = processEngineConfiguration;
-    this.ldapConfigurator = ldapConfigurator;
-    this.ldapGroupCache = ldapGroupCache;
-  }
-  
-  @Override
-  public UserQuery createUserQuery() {
-    return new LDAPUserQueryImpl(ldapConfigurator);
-  }
-  
-  @Override
-  public GroupQuery createGroupQuery() {
-    return new LDAPGroupQueryImpl(ldapConfigurator, ldapGroupCache);
-  }
-  
-  @Override
-  public boolean checkPassword(String userId, String password) {
-    return executeCheckPassword(userId, password);
-  }
 
-  @Override
-  public User newUser(String userId) {
-    throw new FlowableException("LDAP identity service doesn't support creating a new user");
-  }
+    private static Logger logger = LoggerFactory.getLogger(LDAPIdentityServiceImpl.class);
 
-  @Override
-  public void saveUser(User user) {
-    throw new FlowableException("LDAP identity service doesn't support saving an user");
-  }
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    protected LDAPConfigurator ldapConfigurator;
+    protected LDAPGroupCache ldapGroupCache;
 
-  @Override
-  public NativeUserQuery createNativeUserQuery() {
-    throw new FlowableException("LDAP identity service doesn't support native querying");
-  }
+    public LDAPIdentityServiceImpl(ProcessEngineConfigurationImpl processEngineConfiguration,
+            LDAPConfigurator ldapConfigurator, LDAPGroupCache ldapGroupCache) {
 
-  @Override
-  public void deleteUser(String userId) {
-    throw new FlowableException("LDAP identity service doesn't support deleting an user");
-  }
-
-  @Override
-  public Group newGroup(String groupId) {
-    throw new FlowableException("LDAP identity service doesn't support creating a new group");
-  }
-
-  @Override
-  public NativeGroupQuery createNativeGroupQuery() {
-    throw new FlowableException("LDAP identity service doesn't support native querying");
-  }
-
-  @Override
-  public void saveGroup(Group group) {
-    throw new FlowableException("LDAP identity service doesn't support saving a group");
-  }
-
-  @Override
-  public void deleteGroup(String groupId) {
-    throw new FlowableException("LDAP identity service doesn't support deleting a group");
-  }
-  
-  protected boolean executeCheckPassword(final String userId, final String password) {
-    // Extra password check, see http://forums.activiti.org/comment/22312
-    if (password == null || password.length() == 0) {
-      throw new FlowableException("Null or empty passwords are not allowed!");
+        this.processEngineConfiguration = processEngineConfiguration;
+        this.ldapConfigurator = ldapConfigurator;
+        this.ldapGroupCache = ldapGroupCache;
     }
 
-    try {
-      LDAPTemplate ldapTemplate = new LDAPTemplate(ldapConfigurator);
-      return ldapTemplate.execute(new LDAPCallBack<Boolean>() {
+    @Override
+    public UserQuery createUserQuery() {
+        return new LDAPUserQueryImpl(ldapConfigurator);
+    }
 
-        public Boolean executeInContext(InitialDirContext initialDirContext) {
+    @Override
+    public GroupQuery createGroupQuery() {
+        return new LDAPGroupQueryImpl(ldapConfigurator, ldapGroupCache);
+    }
 
-          if (initialDirContext == null) {
-            return false;
-          }
+    @Override
+    public boolean checkPassword(String userId, String password) {
+        return executeCheckPassword(userId, password);
+    }
 
-          // Do the actual search for the user
-          String userDn = null;
-          try {
+    @Override
+    public User newUser(String userId) {
+        throw new FlowableException("LDAP identity service doesn't support creating a new user");
+    }
 
-            String searchExpression = ldapConfigurator.getLdapQueryBuilder().buildQueryByUserId(ldapConfigurator, userId);
-            String baseDn = ldapConfigurator.getUserBaseDn() != null ? ldapConfigurator.getUserBaseDn() : ldapConfigurator.getBaseDn();
-            NamingEnumeration<?> namingEnum = initialDirContext.search(baseDn, searchExpression, createSearchControls());
+    @Override
+    public void saveUser(User user) {
+        throw new FlowableException("LDAP identity service doesn't support saving an user");
+    }
 
-            while (namingEnum.hasMore()) { // Should be only one
-              SearchResult result = (SearchResult) namingEnum.next();
-              userDn = result.getNameInNamespace();
-            }
-            namingEnum.close();
+    @Override
+    public NativeUserQuery createNativeUserQuery() {
+        throw new FlowableException("LDAP identity service doesn't support native querying");
+    }
 
-          } catch (NamingException ne) {
-              logger.info("Could not authenticate user {} : {}", userId, ne.getMessage(), ne);
-            return false;
-          }
+    @Override
+    public void deleteUser(String userId) {
+        throw new FlowableException("LDAP identity service doesn't support deleting an user");
+    }
 
-          // Now we have the user DN, we can need to create a connection it ('bind' in ldap lingo) to check if the user is valid
-          if (userDn != null) {
-            InitialDirContext verificationContext = null;
-            try {
-              verificationContext = LDAPConnectionUtil.createDirectoryContext(ldapConfigurator, userDn, password);
-            } catch (FlowableException e) {
-              // Do nothing, an exception will be thrown if the login fails
-            }
+    @Override
+    public Group newGroup(String groupId) {
+        throw new FlowableException("LDAP identity service doesn't support creating a new group");
+    }
 
-            if (verificationContext != null) {
-              LDAPConnectionUtil.closeDirectoryContext(verificationContext);
-              return true;
-            }
-          }
+    @Override
+    public NativeGroupQuery createNativeGroupQuery() {
+        throw new FlowableException("LDAP identity service doesn't support native querying");
+    }
 
-          return false;
+    @Override
+    public void saveGroup(Group group) {
+        throw new FlowableException("LDAP identity service doesn't support saving a group");
+    }
 
+    @Override
+    public void deleteGroup(String groupId) {
+        throw new FlowableException("LDAP identity service doesn't support deleting a group");
+    }
+
+    protected boolean executeCheckPassword(final String userId, final String password) {
+        // Extra password check, see http://forums.activiti.org/comment/22312
+        if (password == null || password.length() == 0) {
+            throw new FlowableException("Null or empty passwords are not allowed!");
         }
-      });
 
-    } catch (FlowableException e) {
-        logger.info("Could not authenticate user : {}", userId, e);
-      return false;
+        try {
+            LDAPTemplate ldapTemplate = new LDAPTemplate(ldapConfigurator);
+            return ldapTemplate.execute(new LDAPCallBack<Boolean>() {
+
+                public Boolean executeInContext(InitialDirContext initialDirContext) {
+
+                    if (initialDirContext == null) {
+                        return false;
+                    }
+
+                    // Do the actual search for the user
+                    String userDn = null;
+                    try {
+
+                        String searchExpression = ldapConfigurator.getLdapQueryBuilder().buildQueryByUserId(ldapConfigurator, userId);
+                        String baseDn = ldapConfigurator.getUserBaseDn() != null ? ldapConfigurator.getUserBaseDn() : ldapConfigurator.getBaseDn();
+                        NamingEnumeration<?> namingEnum = initialDirContext.search(baseDn, searchExpression, createSearchControls());
+
+                        while (namingEnum.hasMore()) { // Should be only one
+                            SearchResult result = (SearchResult) namingEnum.next();
+                            userDn = result.getNameInNamespace();
+                        }
+                        namingEnum.close();
+
+                    } catch (NamingException ne) {
+                        logger.info("Could not authenticate user {} : {}", userId, ne.getMessage(), ne);
+                        return false;
+                    }
+
+                    // Now we have the user DN, we can need to create a connection it ('bind' in ldap lingo) to check if the user is valid
+                    if (userDn != null) {
+                        InitialDirContext verificationContext = null;
+                        try {
+                            verificationContext = LDAPConnectionUtil.createDirectoryContext(ldapConfigurator, userDn, password);
+                        } catch (FlowableException e) {
+                            // Do nothing, an exception will be thrown if the login fails
+                        }
+
+                        if (verificationContext != null) {
+                            LDAPConnectionUtil.closeDirectoryContext(verificationContext);
+                            return true;
+                        }
+                    }
+
+                    return false;
+
+                }
+            });
+
+        } catch (FlowableException e) {
+            logger.info("Could not authenticate user : {}", userId, e);
+            return false;
+        }
     }
-  }
 
-  protected SearchControls createSearchControls() {
-    SearchControls searchControls = new SearchControls();
-    searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-    searchControls.setTimeLimit(ldapConfigurator.getSearchTimeLimit());
-    return searchControls;
-  }
+    protected SearchControls createSearchControls() {
+        SearchControls searchControls = new SearchControls();
+        searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        searchControls.setTimeLimit(ldapConfigurator.getSearchTimeLimit());
+        return searchControls;
+    }
 
-  public LDAPGroupCache getLdapGroupCache() {
-    return ldapGroupCache;
-  }
+    public LDAPGroupCache getLdapGroupCache() {
+        return ldapGroupCache;
+    }
 
-  public void setLdapGroupCache(LDAPGroupCache ldapGroupCache) {
-    this.ldapGroupCache = ldapGroupCache;
-  }
+    public void setLdapGroupCache(LDAPGroupCache ldapGroupCache) {
+        this.ldapGroupCache = ldapGroupCache;
+    }
 }

@@ -21,43 +21,43 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
  */
 public abstract class AbstractEntityNoRevision implements Entity {
 
-  protected String id;
-  protected boolean isInserted;
-  protected boolean isUpdated;
-  protected boolean isDeleted;
-  
-  @Override
-  public String getId() {
-    return id;
-  }
-  
-  @Override
-  public void setId(String id) {
-    this.id = id;
-  }
-  
-  public boolean isInserted() {
-    return isInserted;
-  }
+    protected String id;
+    protected boolean isInserted;
+    protected boolean isUpdated;
+    protected boolean isDeleted;
 
-  public void setInserted(boolean isInserted) {
-    this.isInserted = isInserted;
-  }
+    @Override
+    public String getId() {
+        return id;
+    }
 
-  public boolean isUpdated() {
-    return isUpdated;
-  }
+    @Override
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public void setUpdated(boolean isUpdated) {
-    this.isUpdated = isUpdated;
-  }
+    public boolean isInserted() {
+        return isInserted;
+    }
 
-  public boolean isDeleted() {
-    return isDeleted;
-  }
+    public void setInserted(boolean isInserted) {
+        this.isInserted = isInserted;
+    }
 
-  public void setDeleted(boolean isDeleted) {
-    this.isDeleted = isDeleted;
-  }
-  
+    public boolean isUpdated() {
+        return isUpdated;
+    }
+
+    public void setUpdated(boolean isUpdated) {
+        this.isUpdated = isUpdated;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
 }

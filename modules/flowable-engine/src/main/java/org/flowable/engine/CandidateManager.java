@@ -16,6 +16,6 @@ import java.util.List;
 
 public interface CandidateManager {
 
-  List<String> getGroupsForCandidateUser(String candidateUser);
-  
+    List<String> getGroupsForCandidateUser(String candidateUser);
+
 }

@@ -22,38 +22,34 @@ import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.TaskListener;
 
 /**
- * Factory class used by the {@link BpmnParser} and {@link BpmnParse} to instantiate
- * the behaviour classes for {@link TaskListener} and {@link ExecutionListener} usages.
+ * Factory class used by the {@link BpmnParser} and {@link BpmnParse} to instantiate the behaviour classes for {@link TaskListener} and {@link ExecutionListener} usages.
  *
- * You can provide your own implementation of this class. This way, you can give
- * different execution semantics to the standard construct. 
+ * You can provide your own implementation of this class. This way, you can give different execution semantics to the standard construct.
  * 
- * The easiest and advisable way to implement your own {@link ListenerFactory} 
- * is to extend the {@link DefaultListenerFactory}.
+ * The easiest and advisable way to implement your own {@link ListenerFactory} is to extend the {@link DefaultListenerFactory}.
  * 
- * An instance of this interface can be injected in the {@link ProcessEngineConfigurationImpl}
- * and its subclasses. 
+ * An instance of this interface can be injected in the {@link ProcessEngineConfigurationImpl} and its subclasses.
  * 
  * @author Joram Barrez
  */
 public interface ListenerFactory {
 
-  public abstract TaskListener createClassDelegateTaskListener(FlowableListener activitiListener);
+    public abstract TaskListener createClassDelegateTaskListener(FlowableListener activitiListener);
 
-  public abstract TaskListener createExpressionTaskListener(FlowableListener activitiListener);
+    public abstract TaskListener createExpressionTaskListener(FlowableListener activitiListener);
 
-  public abstract TaskListener createDelegateExpressionTaskListener(FlowableListener activitiListener);
+    public abstract TaskListener createDelegateExpressionTaskListener(FlowableListener activitiListener);
 
-  public abstract ExecutionListener createClassDelegateExecutionListener(FlowableListener activitiListener);
+    public abstract ExecutionListener createClassDelegateExecutionListener(FlowableListener activitiListener);
 
-  public abstract ExecutionListener createExpressionExecutionListener(FlowableListener activitiListener);
+    public abstract ExecutionListener createExpressionExecutionListener(FlowableListener activitiListener);
 
-  public abstract ExecutionListener createDelegateExpressionExecutionListener(FlowableListener activitiListener);
-  
-  public abstract FlowableEventListener createClassDelegateEventListener(EventListener eventListener);
-  
-  public abstract FlowableEventListener createDelegateExpressionEventListener(EventListener eventListener);
-  
-  public abstract FlowableEventListener createEventThrowingEventListener(EventListener eventListener);
+    public abstract ExecutionListener createDelegateExpressionExecutionListener(FlowableListener activitiListener);
+
+    public abstract FlowableEventListener createClassDelegateEventListener(EventListener eventListener);
+
+    public abstract FlowableEventListener createDelegateExpressionEventListener(EventListener eventListener);
+
+    public abstract FlowableEventListener createEventThrowingEventListener(EventListener eventListener);
 
 }

@@ -19,22 +19,22 @@ import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 
 public class ParsedDeploymentBuilderFactory {
 
-  protected DmnParseFactory dmnParseFactory;
+    protected DmnParseFactory dmnParseFactory;
 
-  public ParsedDeploymentBuilder getBuilderForDeployment(DmnDeploymentEntity deployment) {
-    return getBuilderForDeploymentAndSettings(deployment, null);
-  }
+    public ParsedDeploymentBuilder getBuilderForDeployment(DmnDeploymentEntity deployment) {
+        return getBuilderForDeploymentAndSettings(deployment, null);
+    }
 
-  public ParsedDeploymentBuilder getBuilderForDeploymentAndSettings(DmnDeploymentEntity deployment, Map<String, Object> deploymentSettings) {
-    return new ParsedDeploymentBuilder(deployment, dmnParseFactory, deploymentSettings);
-  }
-  
-  public DmnParseFactory getDmnParseFactory() {
-    return dmnParseFactory;
-  }
+    public ParsedDeploymentBuilder getBuilderForDeploymentAndSettings(DmnDeploymentEntity deployment, Map<String, Object> deploymentSettings) {
+        return new ParsedDeploymentBuilder(deployment, dmnParseFactory, deploymentSettings);
+    }
 
-  public void setDmnParseFactory(DmnParseFactory dmnParseFactory) {
-    this.dmnParseFactory = dmnParseFactory;
-  }
-  
+    public DmnParseFactory getDmnParseFactory() {
+        return dmnParseFactory;
+    }
+
+    public void setDmnParseFactory(DmnParseFactory dmnParseFactory) {
+        this.dmnParseFactory = dmnParseFactory;
+    }
+
 }

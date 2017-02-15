@@ -8,10 +8,10 @@ import org.flowable.engine.delegate.DelegateExecution;
  * @author Andreas Karnahl
  */
 public class TestSampleServiceTask extends AbstractBpmnActivityBehavior {
-  @Override
-  public void execute(DelegateExecution execution) {
-    ActivityExecution activityExecution = (ActivityExecution) execution;
-    System.out.println("###: execution: " + execution.getId() + "; " + execution.getVariable("value") + "; " + getMultiInstanceActivityBehavior());
-    leave(activityExecution);
-  }
+    @Override
+    public void execute(DelegateExecution execution) {
+        ActivityExecution activityExecution = (ActivityExecution) execution;
+        System.out.println("###: execution: " + execution.getId() + "; " + execution.getVariable("value") + "; " + getMultiInstanceActivityBehavior());
+        leave(activityExecution);
+    }
 }

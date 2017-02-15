@@ -23,45 +23,45 @@ import org.springframework.security.core.GrantedAuthority;
  * @author Joram Barrez
  */
 public interface UserCache {
-  
-  CachedUser getUser(String userId);
 
-  CachedUser getUser(String userId, boolean throwExceptionOnNotFound, boolean throwExceptionOnInactive, boolean checkValidity);
+    CachedUser getUser(String userId);
 
-  void putUser(String userId, CachedUser cachedUser);
+    CachedUser getUser(String userId, boolean throwExceptionOnNotFound, boolean throwExceptionOnInactive, boolean checkValidity);
 
-  void invalidate(String userId);
+    void putUser(String userId, CachedUser cachedUser);
 
-  public static class CachedUser {
+    void invalidate(String userId);
 
-    private Collection<GrantedAuthority> grantedAuthorities;
+    public static class CachedUser {
 
-    private User user;
+        private Collection<GrantedAuthority> grantedAuthorities;
 
-    private long lastDatabaseCheck;
+        private User user;
 
-    public CachedUser(User user, Collection<GrantedAuthority> grantedAuthorities) {
-      this.user = user;
-      this.grantedAuthorities = grantedAuthorities;
-      this.lastDatabaseCheck = System.currentTimeMillis();
+        private long lastDatabaseCheck;
+
+        public CachedUser(User user, Collection<GrantedAuthority> grantedAuthorities) {
+            this.user = user;
+            this.grantedAuthorities = grantedAuthorities;
+            this.lastDatabaseCheck = System.currentTimeMillis();
+        }
+
+        public User getUser() {
+            return user;
+        }
+
+        public Collection<GrantedAuthority> getGrantedAuthorities() {
+            return grantedAuthorities;
+        }
+
+        public long getLastDatabaseCheck() {
+            return lastDatabaseCheck;
+        }
+
+        public void setLastDatabaseCheck(long lastDatabaseCheck) {
+            this.lastDatabaseCheck = lastDatabaseCheck;
+        }
+
     }
-
-    public User getUser() {
-      return user;
-    }
-
-    public Collection<GrantedAuthority> getGrantedAuthorities() {
-      return grantedAuthorities;
-    }
-
-    public long getLastDatabaseCheck() {
-      return lastDatabaseCheck;
-    }
-
-    public void setLastDatabaseCheck(long lastDatabaseCheck) {
-      this.lastDatabaseCheck = lastDatabaseCheck;
-    }
-
-  }
 
 }

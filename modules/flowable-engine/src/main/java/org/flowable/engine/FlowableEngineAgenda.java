@@ -19,23 +19,23 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
  */
 public interface FlowableEngineAgenda extends Agenda {
 
-  void planOperation(Runnable operation, ExecutionEntity executionEntity);
+    void planOperation(Runnable operation, ExecutionEntity executionEntity);
 
-  void planContinueProcessOperation(ExecutionEntity execution);
+    void planContinueProcessOperation(ExecutionEntity execution);
 
-  void planContinueProcessSynchronousOperation(ExecutionEntity execution);
+    void planContinueProcessSynchronousOperation(ExecutionEntity execution);
 
-  void planContinueProcessInCompensation(ExecutionEntity execution);
+    void planContinueProcessInCompensation(ExecutionEntity execution);
 
-  void planContinueMultiInstanceOperation(ExecutionEntity execution);
+    void planContinueMultiInstanceOperation(ExecutionEntity execution);
 
-  void planTakeOutgoingSequenceFlowsOperation(ExecutionEntity execution, boolean evaluateConditions);
+    void planTakeOutgoingSequenceFlowsOperation(ExecutionEntity execution, boolean evaluateConditions);
 
-  void planEndExecutionOperation(ExecutionEntity execution);
+    void planEndExecutionOperation(ExecutionEntity execution);
 
-  void planTriggerExecutionOperation(ExecutionEntity execution);
+    void planTriggerExecutionOperation(ExecutionEntity execution);
 
-  void planDestroyScopeOperation(ExecutionEntity execution);
+    void planDestroyScopeOperation(ExecutionEntity execution);
 
-  void planExecuteInactiveBehaviorsOperation();
+    void planExecuteInactiveBehaviorsOperation();
 }

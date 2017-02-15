@@ -23,26 +23,26 @@ public class ResponseInfo {
 
     protected int statusCode;
     protected JsonNode content;
-    
+
     public ResponseInfo(int statusCode) {
         this(statusCode, null);
     }
-    
+
     public ResponseInfo(int statusCode, JsonNode content) {
         this.statusCode = statusCode;
         this.content = content;
     }
-    
+
     public int getStatusCode() {
         return statusCode;
     }
-    
+
     public JsonNode getContent() {
         return content;
     }
-    
+
     public boolean isSuccess() {
         return statusCode == HttpStatus.SC_OK;
     }
-    
+
 }

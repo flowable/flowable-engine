@@ -17,19 +17,19 @@ import org.apache.camel.impl.DefaultConsumer;
 
 public class FlowableConsumer extends DefaultConsumer {
 
-  public FlowableConsumer(FlowableEndpoint endpoint, Processor processor) {
-    super(endpoint, processor);
-  }
+    public FlowableConsumer(FlowableEndpoint endpoint, Processor processor) {
+        super(endpoint, processor);
+    }
 
-  @Override
-  protected void doStart() throws Exception {
-    super.doStart();
-    ((FlowableEndpoint) getEndpoint()).addConsumer(this);
-  }
+    @Override
+    protected void doStart() throws Exception {
+        super.doStart();
+        ((FlowableEndpoint) getEndpoint()).addConsumer(this);
+    }
 
-  @Override
-  protected void doStop() throws Exception {
-    super.doStop();
-    ((FlowableEndpoint) getEndpoint()).removeConsumer();
-  }
+    @Override
+    protected void doStop() throws Exception {
+        super.doStop();
+        ((FlowableEndpoint) getEndpoint()).removeConsumer();
+    }
 }

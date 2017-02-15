@@ -20,31 +20,31 @@ package org.flowable.engine.common.api;
  */
 public class FlowableObjectNotFoundException extends FlowableException {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private Class<?> objectClass;
+    private Class<?> objectClass;
 
-  public FlowableObjectNotFoundException(String message) {
-    super(message);
-  }
+    public FlowableObjectNotFoundException(String message) {
+        super(message);
+    }
 
-  public FlowableObjectNotFoundException(String message, Class<?> objectClass) {
-    this(message, objectClass, null);
-  }
+    public FlowableObjectNotFoundException(String message, Class<?> objectClass) {
+        this(message, objectClass, null);
+    }
 
-  public FlowableObjectNotFoundException(Class<?> objectClass) {
-    this(null, objectClass, null);
-  }
+    public FlowableObjectNotFoundException(Class<?> objectClass) {
+        this(null, objectClass, null);
+    }
 
-  public FlowableObjectNotFoundException(String message, Class<?> objectClass, Throwable cause) {
-    super(message, cause);
-    this.objectClass = objectClass;
-  }
+    public FlowableObjectNotFoundException(String message, Class<?> objectClass, Throwable cause) {
+        super(message, cause);
+        this.objectClass = objectClass;
+    }
 
-  /**
-   * The class of the object that was not found. Contains the interface-class of the object that was not found.
-   */
-  public Class<?> getObjectClass() {
-    return objectClass;
-  }
+    /**
+     * The class of the object that was not found. Contains the interface-class of the object that was not found.
+     */
+    public Class<?> getObjectClass() {
+        return objectClass;
+    }
 }

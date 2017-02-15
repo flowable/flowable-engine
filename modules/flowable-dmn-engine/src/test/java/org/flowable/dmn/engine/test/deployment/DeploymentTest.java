@@ -145,9 +145,9 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
     public void deployMultipleDecisions() throws Exception {
 
         DmnDecisionTable decision = repositoryService.createDecisionTableQuery()
-            .latestVersion()
-            .decisionTableKey("decision")
-            .singleResult();
+                .latestVersion()
+                .decisionTableKey("decision")
+                .singleResult();
         assertNotNull(decision);
         assertEquals("decision", decision.getKey());
 
@@ -159,11 +159,10 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
         assertNotNull(decision);
         assertEquals("decision", decision.getKey());
 
-
         DmnDecisionTable decision2 = repositoryService.createDecisionTableQuery()
-            .latestVersion()
-            .decisionTableKey("decision2")
-            .singleResult();
+                .latestVersion()
+                .decisionTableKey("decision2")
+                .singleResult();
         assertNotNull(decision2);
         assertEquals("decision2", decision2.getKey());
 
@@ -180,10 +179,10 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
     public void deployWithCategory() throws Exception {
 
         repositoryService.createDeployment().name("secondDeployment")
-            .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn")
-            .tenantId("testTenant")
-            .category("TEST_DEPLOYMENT_CATEGORY")
-            .deploy();
+                .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn")
+                .tenantId("testTenant")
+                .category("TEST_DEPLOYMENT_CATEGORY")
+                .deploy();
 
         DmnDeployment deployment = repositoryService.createDeploymentQuery().deploymentCategory("TEST_DEPLOYMENT_CATEGORY").singleResult();
         assertNotNull(deployment);
@@ -191,7 +190,7 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
         DmnDecisionTable decisionTable = repositoryService.createDecisionTableQuery().decisionTableKey("decision").singleResult();
         assertNotNull(decisionTable);
 
-        repositoryService.setDecisionTableCategory(decisionTable.getId(),"TEST_DECISION_TABLE_CATEGORY");
+        repositoryService.setDecisionTableCategory(decisionTable.getId(), "TEST_DECISION_TABLE_CATEGORY");
 
         DmnDecisionTable decisionTableWithCategory = repositoryService.createDecisionTableQuery().decisionTableCategory("TEST_DECISION_TABLE_CATEGORY").singleResult();
         assertNotNull(decisionTableWithCategory);
@@ -206,12 +205,12 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
         assertNotNull(deployment);
 
         long count = repositoryService.createNativeDeploymentQuery()
-            .sql("SELECT count(*) FROM " + managementService.getTableName(DmnDeploymentEntity.class) + " D1, "
-                + managementService.getTableName(DecisionTableEntity.class) + " D2 "
-                + "WHERE D1.ID_ = D2.DEPLOYMENT_ID_ "
-                + "AND D1.ID_ = #{deploymentId}")
-            .parameter("deploymentId", deployment.getId())
-            .count();
+                .sql("SELECT count(*) FROM " + managementService.getTableName(DmnDeploymentEntity.class) + " D1, "
+                        + managementService.getTableName(DecisionTableEntity.class) + " D2 "
+                        + "WHERE D1.ID_ = D2.DEPLOYMENT_ID_ "
+                        + "AND D1.ID_ = #{deploymentId}")
+                .parameter("deploymentId", deployment.getId())
+                .count();
 
         assertEquals(2, count);
     }

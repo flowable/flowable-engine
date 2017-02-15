@@ -26,32 +26,32 @@ import org.flowable.scripting.secure.impl.SecureJavascriptUtil;
 public class SecureJavascriptTaskActivityBehavior extends ScriptTaskActivityBehavior {
 
     public SecureJavascriptTaskActivityBehavior(String scriptTaskId, String script,
-                                            String language, String resultVariable, boolean storeScriptVariables) {
+            String language, String resultVariable, boolean storeScriptVariables) {
         super(scriptTaskId, script, language, resultVariable, storeScriptVariables);
     }
 
     @Override
     public void execute(DelegateExecution execution) {
-      boolean noErrors = true;
-      try {
-        Object result = SecureJavascriptUtil.evaluateScript(execution, script);
+        boolean noErrors = true;
+        try {
+            Object result = SecureJavascriptUtil.evaluateScript(execution, script);
 
-        if (resultVariable != null) {
-          execution.setVariable(resultVariable, result);
-        }
+            if (resultVariable != null) {
+                execution.setVariable(resultVariable, result);
+            }
 
-      } catch (FlowableException e) {
-        noErrors = false;
-        Throwable rootCause = ExceptionUtils.getRootCause(e);
-        if (rootCause instanceof BpmnError) {
-          ErrorPropagation.propagateError((BpmnError) rootCause, execution);
-        } else {
-          throw e;
+        } catch (FlowableException e) {
+            noErrors = false;
+            Throwable rootCause = ExceptionUtils.getRootCause(e);
+            if (rootCause instanceof BpmnError) {
+                ErrorPropagation.propagateError((BpmnError) rootCause, execution);
+            } else {
+                throw e;
+            }
         }
-      }
-      if (noErrors) {
-        leave(execution);
-      }
+        if (noErrors) {
+            leave(execution);
+        }
     }
 
 }

@@ -17,77 +17,92 @@ package org.flowable.app.model.editor.form;
  * @author Yvo Swillens
  */
 public class ConditionRepresentation {
-	
-	// Condition
-	private String leftFormFieldId;
-	private String leftRestResponseId;
-	private String operator;
-	private Object rightValue;
-	private String rightType;
-	private String rightFormFieldId;
-	private String rightRestResponseId;
 
-	// Next condition
-	private String nextConditionOperator;
-	private ConditionRepresentation nextCondition;
-	
+    // Condition
+    private String leftFormFieldId;
+    private String leftRestResponseId;
+    private String operator;
+    private Object rightValue;
+    private String rightType;
+    private String rightFormFieldId;
+    private String rightRestResponseId;
 
-	public String getLeftFormFieldId() {
-		return leftFormFieldId;
-	}
-	public ConditionRepresentation setLeftFormFieldId(String leftFormFieldId) {
-		this.leftFormFieldId = leftFormFieldId;
-		return this;
-	}
-	public String getLeftRestResponseId() {
-		return leftRestResponseId;
-	}
-	public void setLeftRestResponseId(String leftRestResponseId) {
-		this.leftRestResponseId = leftRestResponseId;
-	}
-	public String getOperator() {
-		return operator;
-	}
-	public ConditionRepresentation setOperator(String operator) {
-		this.operator = operator;
-		return  this;
-	}
-	public Object getRightValue() {
-		return rightValue;
-	}
-	public ConditionRepresentation setRightValue(Object value) {
-		this.rightValue = value;
-		return this;
-	}
-	public String getRightType() {
+    // Next condition
+    private String nextConditionOperator;
+    private ConditionRepresentation nextCondition;
+
+    public String getLeftFormFieldId() {
+        return leftFormFieldId;
+    }
+
+    public ConditionRepresentation setLeftFormFieldId(String leftFormFieldId) {
+        this.leftFormFieldId = leftFormFieldId;
+        return this;
+    }
+
+    public String getLeftRestResponseId() {
+        return leftRestResponseId;
+    }
+
+    public void setLeftRestResponseId(String leftRestResponseId) {
+        this.leftRestResponseId = leftRestResponseId;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public ConditionRepresentation setOperator(String operator) {
+        this.operator = operator;
+        return this;
+    }
+
+    public Object getRightValue() {
+        return rightValue;
+    }
+
+    public ConditionRepresentation setRightValue(Object value) {
+        this.rightValue = value;
+        return this;
+    }
+
+    public String getRightType() {
         return rightType;
     }
+
     public ConditionRepresentation setRightType(String rightType) {
         this.rightType = rightType;
         return this;
     }
-	public String getRightFormFieldId() {
-		return rightFormFieldId;
-	}
-	public ConditionRepresentation setRightFormFieldId(String rightFormFieldId) {
-		this.rightFormFieldId = rightFormFieldId;
-		return this;
-	}
+
+    public String getRightFormFieldId() {
+        return rightFormFieldId;
+    }
+
+    public ConditionRepresentation setRightFormFieldId(String rightFormFieldId) {
+        this.rightFormFieldId = rightFormFieldId;
+        return this;
+    }
+
     public String getRightRestResponseId() {
         return rightRestResponseId;
     }
+
     public void setRightRestResponseId(String rightRestResponseId) {
         this.rightRestResponseId = rightRestResponseId;
     }
-	public String getNextConditionOperator() {
-		return nextConditionOperator;
-	}
-	public ConditionRepresentation getNextCondition() {
-		return nextCondition;
-	}
-	public ConditionRepresentation setNextCondition(String operator, ConditionRepresentation nextCondition) {
-		this.nextConditionOperator = operator;
-		this.nextCondition = nextCondition;
-		return this;
-	}
+
+    public String getNextConditionOperator() {
+        return nextConditionOperator;
+    }
+
+    public ConditionRepresentation getNextCondition() {
+        return nextCondition;
+    }
+
+    public ConditionRepresentation setNextCondition(String operator, ConditionRepresentation nextCondition) {
+        this.nextConditionOperator = operator;
+        this.nextCondition = nextCondition;
+        return this;
+    }
 }

@@ -21,17 +21,17 @@ import java.util.Random;
  */
 
 public class SimUtils {
-  /** main random number generator */
-  private static volatile ThreadLocal<Random> randomGenerator = new ThreadLocal<Random>();
+    /** main random number generator */
+    private static volatile ThreadLocal<Random> randomGenerator = new ThreadLocal<Random>();
 
-  public static void setSeed(long seed) {
-    randomGenerator.set(new Random(seed));
-  }
-
-  public static int getRandomInt(int max) {
-    if (randomGenerator.get() == null) {
-      randomGenerator.set(new Random());
+    public static void setSeed(long seed) {
+        randomGenerator.set(new Random(seed));
     }
-    return randomGenerator.get().nextInt(max);
-  }
+
+    public static int getRandomInt(int max) {
+        if (randomGenerator.get() == null) {
+            randomGenerator.set(new Random());
+        }
+        return randomGenerator.get().nextInt(max);
+    }
 }

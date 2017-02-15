@@ -20,16 +20,16 @@ import org.flowable.engine.impl.cfg.JtaProcessEngineConfiguration;
  */
 public class CdiJtaProcessEngineConfiguration extends JtaProcessEngineConfiguration {
 
-  @Override
-  public void initExpressionManager() {
-    expressionManager = new CdiExpressionManager(this);
-  }
-  
-  @Override
-  public void initCommandInvoker() {
-    if (commandInvoker == null) {
-      commandInvoker = new CdiCommandInvoker();
+    @Override
+    public void initExpressionManager() {
+        expressionManager = new CdiExpressionManager(this);
     }
-  }
-  
+
+    @Override
+    public void initCommandInvoker() {
+        if (commandInvoker == null) {
+            commandInvoker = new CdiCommandInvoker();
+        }
+    }
+
 }

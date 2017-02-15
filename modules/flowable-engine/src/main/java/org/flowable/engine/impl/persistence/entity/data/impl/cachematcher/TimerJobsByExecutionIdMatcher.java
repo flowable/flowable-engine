@@ -19,11 +19,10 @@ import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
  * @author Joram Barrez
  */
 public class TimerJobsByExecutionIdMatcher extends CachedEntityMatcherAdapter<TimerJobEntity> {
-  
-  @Override
-  public boolean isRetained(TimerJobEntity jobEntity, Object param) {
-    return jobEntity.getExecutionId() != null && jobEntity.getExecutionId().equals(param); // param = executionId
-  }
-  
-  
+
+    @Override
+    public boolean isRetained(TimerJobEntity jobEntity, Object param) {
+        return jobEntity.getExecutionId() != null && jobEntity.getExecutionId().equals(param); // param = executionId
+    }
+
 }

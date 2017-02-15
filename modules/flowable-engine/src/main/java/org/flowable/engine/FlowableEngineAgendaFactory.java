@@ -15,6 +15,6 @@ package org.flowable.engine;
 import org.flowable.engine.impl.interceptor.CommandContext;
 
 public interface FlowableEngineAgendaFactory {
-  
-  FlowableEngineAgenda createAgenda(CommandContext commandContext);
+
+    FlowableEngineAgenda createAgenda(CommandContext commandContext);
 }

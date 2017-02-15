@@ -39,23 +39,23 @@ import org.flowable.engine.impl.el.VariableScopeElResolver;
  * @author Daniel Meyer
  */
 public class CdiExpressionManager extends ExpressionManager {
-  
-  public CdiExpressionManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    super(processEngineConfiguration);
-  }
 
-  @Override
-  protected ELResolver createElResolver(VariableScope variableScope) {
-    CompositeELResolver compositeElResolver = new CompositeELResolver();
-    compositeElResolver.add(new VariableScopeElResolver(variableScope));
+    public CdiExpressionManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
 
-    compositeElResolver.add(new CdiResolver());
+    @Override
+    protected ELResolver createElResolver(VariableScope variableScope) {
+        CompositeELResolver compositeElResolver = new CompositeELResolver();
+        compositeElResolver.add(new VariableScopeElResolver(variableScope));
 
-    compositeElResolver.add(new ArrayELResolver());
-    compositeElResolver.add(new ListELResolver());
-    compositeElResolver.add(new MapELResolver());
-    compositeElResolver.add(new BeanELResolver());
-    return compositeElResolver;
-  }
+        compositeElResolver.add(new CdiResolver());
+
+        compositeElResolver.add(new ArrayELResolver());
+        compositeElResolver.add(new ListELResolver());
+        compositeElResolver.add(new MapELResolver());
+        compositeElResolver.add(new BeanELResolver());
+        return compositeElResolver;
+    }
 
 }

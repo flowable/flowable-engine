@@ -28,8 +28,7 @@ import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 
 /**
- * Convenience for DmnEngine and services initialization in the form of a JUnit
- * rule.
+ * Convenience for DmnEngine and services initialization in the form of a JUnit rule.
  * 
  * <p>
  * Usage:
@@ -46,31 +45,20 @@ import org.junit.runners.model.Statement;
  * </pre>
  * 
  * <p>
- * The DmnEngine and the services will be made available to the test class
- * through the getters of the FlowableRule. The dmnEngine will be initialized by
- * default with the flowable.dmn.cfg.xml resource on the classpath. To specify a
- * different configuration file, pass the resource location in
- * {@link #FlowableDmnRule(String) the appropriate constructor}. Process engines
- * will be cached statically. Right before the first time the setUp is called
- * for a given configuration resource, the process engine will be constructed.
+ * The DmnEngine and the services will be made available to the test class through the getters of the FlowableRule. The dmnEngine will be initialized by default with the flowable.dmn.cfg.xml resource
+ * on the classpath. To specify a different configuration file, pass the resource location in {@link #FlowableDmnRule(String) the appropriate constructor}. Process engines will be cached statically.
+ * Right before the first time the setUp is called for a given configuration resource, the process engine will be constructed.
  * </p>
  * 
  * <p>
- * You can declare a deployment with the {@link DmnDeploymentAnnotation}
- * annotation. This base class will make sure that this deployment gets deployed
- * before the setUp and
- * {@link RepositoryService#deleteDeployment(String, boolean) cascade deleted}
- * after the tearDown.
+ * You can declare a deployment with the {@link DmnDeploymentAnnotation} annotation. This base class will make sure that this deployment gets deployed before the setUp and
+ * {@link RepositoryService#deleteDeployment(String, boolean) cascade deleted} after the tearDown.
  * </p>
  * 
  * <p>
- * The FlowableRule also lets you {@link FlowableDmnRule#setCurrentTime(Date)
- * set the current time used by the process engine}. This can be handy to
- * control the exact time that is used by the engine in order to verify e.g.
- * e.g. due dates of timers. Or start, end and duration times in the history
- * service. In the tearDown, the internal clock will automatically be reset to
- * use the current system time rather then the time that was set during a test
- * method.
+ * The FlowableRule also lets you {@link FlowableDmnRule#setCurrentTime(Date) set the current time used by the process engine}. This can be handy to control the exact time that is used by the engine
+ * in order to verify e.g. e.g. due dates of timers. Or start, end and duration times in the history service. In the tearDown, the internal clock will automatically be reset to use the current system
+ * time rather then the time that was set during a test method.
  * </p>
  * 
  * @author Tijs Rademakers

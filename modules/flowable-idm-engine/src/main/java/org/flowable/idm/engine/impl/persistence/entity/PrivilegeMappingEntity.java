@@ -16,16 +16,16 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
 
 public interface PrivilegeMappingEntity extends Entity {
 
-  String getPrivilegeId();
-  
-  void setPrivilegeId(String privilegeId);
-  
-  String getUserId();
-  
-  void setUserId(String userId);
-  
-  String getGroupId();
-  
-  void setGroupId(String groupId);
-  
+    String getPrivilegeId();
+
+    void setPrivilegeId(String privilegeId);
+
+    String getUserId();
+
+    void setUserId(String userId);
+
+    String getGroupId();
+
+    void setGroupId(String groupId);
+
 }

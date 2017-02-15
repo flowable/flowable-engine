@@ -21,8 +21,8 @@ import org.flowable.engine.test.Deployment;
  */
 public class ParallelTest extends PluggableFlowableTestCase {
 
-  @Deployment
-  public void testParallel() {
-    runtimeService.startProcessInstanceByKey("myProc");
-  }
+    @Deployment
+    public void testParallel() {
+        runtimeService.startProcessInstanceByKey("myProc");
+    }
 }

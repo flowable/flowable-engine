@@ -24,18 +24,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ApiTokensResource {
-  
-  @Autowired
-  protected TokenService tokenService;
-  
-  @RequestMapping(value = "/idm/tokens/{tokenId}", method = RequestMethod.GET, produces = {"application/json"})
-  public TokenRepresentation getToken(@PathVariable String tokenId) {
-    Token token = tokenService.findTokenById(tokenId);
-    if (token == null) {
-      throw new NotFoundException();
-    } else {
-      return new TokenRepresentation(token);
+
+    @Autowired
+    protected TokenService tokenService;
+
+    @RequestMapping(value = "/idm/tokens/{tokenId}", method = RequestMethod.GET, produces = { "application/json" })
+    public TokenRepresentation getToken(@PathVariable String tokenId) {
+        Token token = tokenService.findTokenById(tokenId);
+        if (token == null) {
+            throw new NotFoundException();
+        } else {
+            return new TokenRepresentation(token);
+        }
     }
-  }
 
 }

@@ -27,31 +27,31 @@ import org.flowable.idm.api.User;
  */
 public class CreateUserAndMembershipTestDelegate implements JavaDelegate {
 
-  @Override
-  public void execute(DelegateExecution execution) {
-    
-    ManagementService managementService = Context.getProcessEngineConfiguration().getManagementService();
-    managementService.executeCommand(new Command<Void>() {
-      @Override
-      public Void execute(CommandContext commandContext) {
-        return null;
-      }
-    });
+    @Override
+    public void execute(DelegateExecution execution) {
 
-    IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
+        ManagementService managementService = Context.getProcessEngineConfiguration().getManagementService();
+        managementService.executeCommand(new Command<Void>() {
+            @Override
+            public Void execute(CommandContext commandContext) {
+                return null;
+            }
+        });
 
-    String username = "Kermit";
-    User user = identityService.newUser(username);
-    user.setPassword("123");
-    user.setFirstName("Manually");
-    user.setLastName("created");
-    identityService.saveUser(user);
+        IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
 
-    // Add admin group
-    Group group = identityService.newGroup("admin");
-    identityService.saveGroup(group);
+        String username = "Kermit";
+        User user = identityService.newUser(username);
+        user.setPassword("123");
+        user.setFirstName("Manually");
+        user.setLastName("created");
+        identityService.saveUser(user);
 
-    identityService.createMembership(username, "admin");
-  }
+        // Add admin group
+        Group group = identityService.newGroup("admin");
+        identityService.saveGroup(group);
+
+        identityService.createMembership(username, "admin");
+    }
 
 }

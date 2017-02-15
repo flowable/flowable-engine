@@ -42,7 +42,7 @@ public class SecureScriptScope implements Scriptable {
         if (KEYWORD_EXECUTION.equals(s) && variableScope instanceof DelegateExecution) {
             return variableScope;
         } else if (KEYWORD_TASK.equals(s) && variableScope instanceof DelegateTask) {
-          return variableScope;
+            return variableScope;
         } else if (variableScope.hasVariable(s)) {
             return variableScope.getVariable(s);
         }

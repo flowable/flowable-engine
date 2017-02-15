@@ -45,123 +45,123 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Transactional
 public class FlowableProcessInstanceQueryService {
 
-  private static final Logger logger = LoggerFactory.getLogger(FlowableProcessInstanceQueryService.class);
+    private static final Logger logger = LoggerFactory.getLogger(FlowableProcessInstanceQueryService.class);
 
-  private static final int DEFAULT_PAGE_SIZE = 25;
+    private static final int DEFAULT_PAGE_SIZE = 25;
 
-  @Autowired
-  protected RepositoryService repositoryService;
+    @Autowired
+    protected RepositoryService repositoryService;
 
-  @Autowired
-  protected HistoryService historyService;
+    @Autowired
+    protected HistoryService historyService;
 
-  @Autowired
-  protected UserCache userCache;
+    @Autowired
+    protected UserCache userCache;
 
-  public ResultListDataRepresentation getProcessInstances(ObjectNode requestNode) {
+    public ResultListDataRepresentation getProcessInstances(ObjectNode requestNode) {
 
-    HistoricProcessInstanceQuery instanceQuery = historyService.createHistoricProcessInstanceQuery();
+        HistoricProcessInstanceQuery instanceQuery = historyService.createHistoricProcessInstanceQuery();
 
-    User currentUser = SecurityUtils.getCurrentUserObject();
-    instanceQuery.involvedUser(String.valueOf(currentUser.getId()));
+        User currentUser = SecurityUtils.getCurrentUserObject();
+        instanceQuery.involvedUser(String.valueOf(currentUser.getId()));
 
-    // Process definition
-    JsonNode processDefinitionIdNode = requestNode.get("processDefinitionId");
-    if (processDefinitionIdNode != null && !processDefinitionIdNode.isNull()) {
-      instanceQuery.processDefinitionId(processDefinitionIdNode.asText());
-    }
-
-    JsonNode deploymentKeyNode = requestNode.get("deploymentKey");
-    if (deploymentKeyNode != null && !deploymentKeyNode.isNull()) {
-      // Results need to be filtered in an app-context. We need to fetch the deployment id for this app and use that in the query
-      List<Deployment> deployments = repositoryService.createDeploymentQuery().deploymentKey(deploymentKeyNode.asText()).list();
-
-      List<String> deploymentIds = new ArrayList<String>();
-      for (Deployment deployment : deployments) {
-        deploymentIds.add(deployment.getId());
-      }
-
-      instanceQuery.deploymentIdIn(deploymentIds);
-    }
-
-    // State filtering
-    JsonNode stateNode = requestNode.get("state");
-    if (stateNode != null && !stateNode.isNull()) {
-      String state = stateNode.asText();
-      if ("running".equals(state)) {
-        instanceQuery.unfinished();
-      } else if ("completed".equals(state)) {
-        instanceQuery.finished();
-      } else if (!"all".equals(state)) {
-        throw new BadRequestException("Illegal state filter value passed, only 'running', 'completed' or 'all' are supported");
-      }
-    } else {
-      // Default filtering, only running
-      instanceQuery.unfinished();
-    }
-
-    // Sort and ordering
-    JsonNode sortNode = requestNode.get("sort");
-    if (sortNode != null && !sortNode.isNull()) {
-
-      if ("created-desc".equals(sortNode.asText())) {
-        instanceQuery.orderByProcessInstanceStartTime().desc();
-      } else if ("created-asc".equals(sortNode.asText())) {
-        instanceQuery.orderByProcessInstanceStartTime().asc();
-      } else if ("ended-desc".equals(sortNode.asText())) {
-        instanceQuery.orderByProcessInstanceEndTime().desc();
-      } else if ("ended-asc".equals(sortNode.asText())) {
-        instanceQuery.orderByProcessInstanceEndTime().asc();
-      }
-
-    } else {
-      // Revert to default
-      instanceQuery.orderByProcessInstanceStartTime().desc();
-    }
-
-    int page = 0;
-    JsonNode pageNode = requestNode.get("page");
-    if (pageNode != null && !pageNode.isNull()) {
-      page = pageNode.asInt(0);
-    }
-
-    int size = DEFAULT_PAGE_SIZE;
-    JsonNode sizeNode = requestNode.get("size");
-    if (sizeNode != null && !sizeNode.isNull()) {
-      size = sizeNode.asInt(DEFAULT_PAGE_SIZE);
-    }
-
-    List<HistoricProcessInstance> instances = instanceQuery.listPage(page * size, size);
-    ResultListDataRepresentation result = new ResultListDataRepresentation(convertInstanceList(instances));
-
-    // In case we're not on the first page and the size exceeds the page size, we need to do an additional count for the total
-    if (page != 0 || instances.size() == size) {
-      Long totalCount = instanceQuery.count();
-      result.setTotal(Long.valueOf(totalCount.intValue()));
-      result.setStart(page * size);
-    }
-    return result;
-  }
-
-  protected List<ProcessInstanceRepresentation> convertInstanceList(List<HistoricProcessInstance> instances) {
-    List<ProcessInstanceRepresentation> result = new ArrayList<ProcessInstanceRepresentation>();
-    if (CollectionUtils.isNotEmpty(instances)) {
-
-      for (HistoricProcessInstance processInstance : instances) {
-        User userRep = null;
-        if (processInstance.getStartUserId() != null) {
-          CachedUser user = userCache.getUser(processInstance.getStartUserId());
-          if (user != null && user.getUser() != null) {
-            userRep = user.getUser();
-          }
+        // Process definition
+        JsonNode processDefinitionIdNode = requestNode.get("processDefinitionId");
+        if (processDefinitionIdNode != null && !processDefinitionIdNode.isNull()) {
+            instanceQuery.processDefinitionId(processDefinitionIdNode.asText());
         }
 
-        ProcessDefinitionEntity procDef = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
-        ProcessInstanceRepresentation instanceRepresentation = new ProcessInstanceRepresentation(processInstance, procDef, procDef.isGraphicalNotationDefined(), userRep);
-        result.add(instanceRepresentation);
-      }
+        JsonNode deploymentKeyNode = requestNode.get("deploymentKey");
+        if (deploymentKeyNode != null && !deploymentKeyNode.isNull()) {
+            // Results need to be filtered in an app-context. We need to fetch the deployment id for this app and use that in the query
+            List<Deployment> deployments = repositoryService.createDeploymentQuery().deploymentKey(deploymentKeyNode.asText()).list();
 
+            List<String> deploymentIds = new ArrayList<String>();
+            for (Deployment deployment : deployments) {
+                deploymentIds.add(deployment.getId());
+            }
+
+            instanceQuery.deploymentIdIn(deploymentIds);
+        }
+
+        // State filtering
+        JsonNode stateNode = requestNode.get("state");
+        if (stateNode != null && !stateNode.isNull()) {
+            String state = stateNode.asText();
+            if ("running".equals(state)) {
+                instanceQuery.unfinished();
+            } else if ("completed".equals(state)) {
+                instanceQuery.finished();
+            } else if (!"all".equals(state)) {
+                throw new BadRequestException("Illegal state filter value passed, only 'running', 'completed' or 'all' are supported");
+            }
+        } else {
+            // Default filtering, only running
+            instanceQuery.unfinished();
+        }
+
+        // Sort and ordering
+        JsonNode sortNode = requestNode.get("sort");
+        if (sortNode != null && !sortNode.isNull()) {
+
+            if ("created-desc".equals(sortNode.asText())) {
+                instanceQuery.orderByProcessInstanceStartTime().desc();
+            } else if ("created-asc".equals(sortNode.asText())) {
+                instanceQuery.orderByProcessInstanceStartTime().asc();
+            } else if ("ended-desc".equals(sortNode.asText())) {
+                instanceQuery.orderByProcessInstanceEndTime().desc();
+            } else if ("ended-asc".equals(sortNode.asText())) {
+                instanceQuery.orderByProcessInstanceEndTime().asc();
+            }
+
+        } else {
+            // Revert to default
+            instanceQuery.orderByProcessInstanceStartTime().desc();
+        }
+
+        int page = 0;
+        JsonNode pageNode = requestNode.get("page");
+        if (pageNode != null && !pageNode.isNull()) {
+            page = pageNode.asInt(0);
+        }
+
+        int size = DEFAULT_PAGE_SIZE;
+        JsonNode sizeNode = requestNode.get("size");
+        if (sizeNode != null && !sizeNode.isNull()) {
+            size = sizeNode.asInt(DEFAULT_PAGE_SIZE);
+        }
+
+        List<HistoricProcessInstance> instances = instanceQuery.listPage(page * size, size);
+        ResultListDataRepresentation result = new ResultListDataRepresentation(convertInstanceList(instances));
+
+        // In case we're not on the first page and the size exceeds the page size, we need to do an additional count for the total
+        if (page != 0 || instances.size() == size) {
+            Long totalCount = instanceQuery.count();
+            result.setTotal(Long.valueOf(totalCount.intValue()));
+            result.setStart(page * size);
+        }
+        return result;
     }
-    return result;
-  }
+
+    protected List<ProcessInstanceRepresentation> convertInstanceList(List<HistoricProcessInstance> instances) {
+        List<ProcessInstanceRepresentation> result = new ArrayList<ProcessInstanceRepresentation>();
+        if (CollectionUtils.isNotEmpty(instances)) {
+
+            for (HistoricProcessInstance processInstance : instances) {
+                User userRep = null;
+                if (processInstance.getStartUserId() != null) {
+                    CachedUser user = userCache.getUser(processInstance.getStartUserId());
+                    if (user != null && user.getUser() != null) {
+                        userRep = user.getUser();
+                    }
+                }
+
+                ProcessDefinitionEntity procDef = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
+                ProcessInstanceRepresentation instanceRepresentation = new ProcessInstanceRepresentation(processInstance, procDef, procDef.isGraphicalNotationDefined(), userRep);
+                result.add(instanceRepresentation);
+            }
+
+        }
+        return result;
+    }
 }

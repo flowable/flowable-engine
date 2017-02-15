@@ -78,7 +78,6 @@ public class ConsoleLogger {
                     System.out.println(delete + " : " + stats.getDbDeletes().get(delete));
                 }
 
-
                 System.out.println();
                 System.out.println();
             }

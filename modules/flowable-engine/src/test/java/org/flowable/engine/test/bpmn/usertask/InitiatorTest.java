@@ -21,29 +21,29 @@ import org.flowable.engine.test.Deployment;
  */
 public class InitiatorTest extends PluggableFlowableTestCase {
 
-  @Deployment
-  public void testInitiator() {
-    try {
-      identityService.setAuthenticatedUserId("bono");
-      runtimeService.startProcessInstanceByKey("InitiatorProcess");
-    } finally {
-      identityService.setAuthenticatedUserId(null);
+    @Deployment
+    public void testInitiator() {
+        try {
+            identityService.setAuthenticatedUserId("bono");
+            runtimeService.startProcessInstanceByKey("InitiatorProcess");
+        } finally {
+            identityService.setAuthenticatedUserId(null);
+        }
+
+        assertEquals(1, taskService.createTaskQuery().taskAssignee("bono").count());
     }
 
-    assertEquals(1, taskService.createTaskQuery().taskAssignee("bono").count());
-  }
+    // See ACT-1372
+    @Deployment
+    public void testInitiatorWithWhiteSpaceInExpression() {
+        try {
+            identityService.setAuthenticatedUserId("bono");
+            runtimeService.startProcessInstanceByKey("InitiatorProcess");
+        } finally {
+            identityService.setAuthenticatedUserId(null);
+        }
 
-  // See ACT-1372
-  @Deployment
-  public void testInitiatorWithWhiteSpaceInExpression() {
-    try {
-      identityService.setAuthenticatedUserId("bono");
-      runtimeService.startProcessInstanceByKey("InitiatorProcess");
-    } finally {
-      identityService.setAuthenticatedUserId(null);
+        assertEquals(1, taskService.createTaskQuery().taskAssignee("bono").count());
     }
-
-    assertEquals(1, taskService.createTaskQuery().taskAssignee("bono").count());
-  }
 
 }

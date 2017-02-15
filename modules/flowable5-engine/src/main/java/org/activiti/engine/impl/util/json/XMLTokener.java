@@ -25,31 +25,32 @@ SOFTWARE.
 */
 
 /**
- * The XMLTokener extends the JSONTokener to provide additional methods
- * for the parsing of XML texts.
+ * The XMLTokener extends the JSONTokener to provide additional methods for the parsing of XML texts.
+ * 
  * @author JSON.org
  * @version 2010-01-30
  */
 public class XMLTokener extends JSONTokener {
 
+    /**
+     * The table of entity values. It initially contains Character values for amp, apos, gt, lt, quot.
+     */
+    public static final java.util.HashMap entity;
 
-   /** The table of entity values. It initially contains Character values for
-    * amp, apos, gt, lt, quot.
-    */
-   public static final java.util.HashMap entity;
-
-   static {
-       entity = new java.util.HashMap(8);
-       entity.put("amp",  XML.AMP);
-       entity.put("apos", XML.APOS);
-       entity.put("gt",   XML.GT);
-       entity.put("lt",   XML.LT);
-       entity.put("quot", XML.QUOT);
-   }
+    static {
+        entity = new java.util.HashMap(8);
+        entity.put("amp", XML.AMP);
+        entity.put("apos", XML.APOS);
+        entity.put("gt", XML.GT);
+        entity.put("lt", XML.LT);
+        entity.put("quot", XML.QUOT);
+    }
 
     /**
      * Construct an XMLTokener from a string.
-     * @param s A source string.
+     * 
+     * @param s
+     *            A source string.
      */
     public XMLTokener(String s) {
         super(s);
@@ -57,12 +58,14 @@ public class XMLTokener extends JSONTokener {
 
     /**
      * Get the text in the CDATA block.
+     * 
      * @return The string up to the <code>]]&gt;</code>.
-     * @throws JSONException If the <code>]]&gt;</code> is not found.
+     * @throws JSONException
+     *             If the <code>]]&gt;</code> is not found.
      */
     public String nextCDATA() throws JSONException {
-        char         c;
-        int          i;
+        char c;
+        int i;
         StringBuilder sb = new StringBuilder();
         for (;;) {
             c = next();
@@ -72,25 +75,21 @@ public class XMLTokener extends JSONTokener {
             sb.append(c);
             i = sb.length() - 3;
             if (i >= 0 && sb.charAt(i) == ']' &&
-                          sb.charAt(i + 1) == ']' && sb.charAt(i + 2) == '>') {
+                    sb.charAt(i + 1) == ']' && sb.charAt(i + 2) == '>') {
                 sb.setLength(i);
                 return sb.toString();
             }
         }
     }
 
-
     /**
-     * Get the next XML outer token, trimming whitespace. There are two kinds
-     * of tokens: the '<' character which begins a markup tag, and the content
-     * text between markup tags.
+     * Get the next XML outer token, trimming whitespace. There are two kinds of tokens: the '<' character which begins a markup tag, and the content text between markup tags.
      *
-     * @return  A string, or a '<' Character, or null if there is no more
-     * source text.
+     * @return A string, or a '<' Character, or null if there is no more source text.
      * @throws JSONException
      */
     public Object nextContent() throws JSONException {
-        char         c;
+        char c;
         StringBuffer sb;
         do {
             c = next();
@@ -116,13 +115,14 @@ public class XMLTokener extends JSONTokener {
         }
     }
 
-
     /**
-     * Return the next entity. These entities are translated to Characters:
-     *     <code>&amp;  &apos;  &gt;  &lt;  &quot;</code>.
-     * @param a An ampersand character.
-     * @return  A Character or an entity String if the entity is not recognized.
-     * @throws JSONException If missing ';' in XML entity.
+     * Return the next entity. These entities are translated to Characters: <code>&amp;  &apos;  &gt;  &lt;  &quot;</code>.
+     * 
+     * @param a
+     *            An ampersand character.
+     * @return A Character or an entity String if the entity is not recognized.
+     * @throws JSONException
+     *             If missing ';' in XML entity.
      */
     public Object nextEntity(char a) throws JSONException {
         StringBuilder sb = new StringBuilder();
@@ -141,15 +141,12 @@ public class XMLTokener extends JSONTokener {
         return e != null ? e : a + s + ";";
     }
 
-
     /**
-     * Returns the next XML meta token. This is used for skipping over <!...>
-     * and <?...?> structures.
-     * @return Syntax characters (<code>< > / = ! ?</code>) are returned as
-     *  Character, and strings and names are returned as Boolean. We don't care
-     *  what the values actually are.
-     * @throws JSONException If a string is not properly closed or if the XML
-     *  is badly structured.
+     * Returns the next XML meta token. This is used for skipping over <!...> and <?...?> structures.
+     * 
+     * @return Syntax characters (<code>< > / = ! ?</code>) are returned as Character, and strings and names are returned as Boolean. We don't care what the values actually are.
+     * @throws JSONException
+     *             If a string is not properly closed or if the XML is badly structured.
      */
     public Object nextMeta() throws JSONException {
         char c;
@@ -207,14 +204,13 @@ public class XMLTokener extends JSONTokener {
         }
     }
 
-
     /**
-     * Get the next XML Token. These tokens are found inside of angle
-     * brackets. It may be one of these characters: <code>/ > = ! ?</code> or it
-     * may be a string wrapped in single quotes or double quotes, or it may be a
-     * name.
+     * Get the next XML Token. These tokens are found inside of angle brackets. It may be one of these characters: <code>/ > = ! ?</code> or it may be a string wrapped in single quotes or double
+     * quotes, or it may be a name.
+     * 
      * @return a String or a Character.
-     * @throws JSONException If the XML is not well formed.
+     * @throws JSONException
+     *             If the XML is not well formed.
      */
     public Object nextToken() throws JSONException {
         char c;
@@ -239,7 +235,7 @@ public class XMLTokener extends JSONTokener {
         case '?':
             return XML.QUEST;
 
-// Quoted string
+        // Quoted string
 
         case '"':
         case '\'':
@@ -261,7 +257,7 @@ public class XMLTokener extends JSONTokener {
             }
         default:
 
-// Name
+            // Name
 
             sb = new StringBuffer();
             for (;;) {
@@ -272,7 +268,7 @@ public class XMLTokener extends JSONTokener {
                 }
                 switch (c) {
                 case 0:
-                	return sb.toString();
+                    return sb.toString();
                 case '>':
                 case '/':
                 case '=':
@@ -290,76 +286,74 @@ public class XMLTokener extends JSONTokener {
             }
         }
     }
-    
-    
+
     /**
-     * Skip characters until past the requested string.
-     * If it is not found, we are left at the end of the source with a result of false.
-     * @param to A string to skip past.
+     * Skip characters until past the requested string. If it is not found, we are left at the end of the source with a result of false.
+     * 
+     * @param to
+     *            A string to skip past.
      * @throws JSONException
      */
     public boolean skipPast(String to) throws JSONException {
-    	boolean b;
-    	char c;
-    	int i;
-    	int j;
-    	int offset = 0;
-    	int n = to.length();
+        boolean b;
+        char c;
+        int i;
+        int j;
+        int offset = 0;
+        int n = to.length();
         char[] circle = new char[n];
-        
+
         /*
-         * First fill the circle buffer with as many characters as are in the
-         * to string. If we reach an early end, bail.
+         * First fill the circle buffer with as many characters as are in the to string. If we reach an early end, bail.
          */
-        
-    	for (i = 0; i < n; i += 1) {
-    		c = next();
-    		if (c == 0) {
-    			return false;
-    		}
-    		circle[i] = c;
-    	}
-    	/*
-    	 * We will loop, possibly for all of the remaining characters.
-    	 */
-    	for (;;) {
-    		j = offset;
-    		b = true;
-    		/*
-    		 * Compare the circle buffer with the to string. 
-    		 */
-    		for (i = 0; i < n; i += 1) {
-    			if (circle[j] != to.charAt(i)) {
-    				b = false;
-    				break;
-    			}
-    			j += 1;
-    			if (j >= n) {
-    				j -= n;
-    			}
-    		}
-    		/*
-    		 * If we exit the loop with b intact, then victory is ours.
-    		 */
-    		if (b) {
-    			return true;
-    		}
-    		/*
-    		 * Get the next character. If there isn't one, then defeat is ours.
-    		 */
-    		c = next();
-    		if (c == 0) {
-    			return false;
-    		}
-    		/*
-    		 * Shove the character in the circle buffer and advance the 
-    		 * circle offset. The offset is mod n.
-    		 */
-    		circle[offset] = c;
-    		offset += 1;
-    		if (offset >= n) {
-    			offset -= n;
-    		}
-    	}
+
+        for (i = 0; i < n; i += 1) {
+            c = next();
+            if (c == 0) {
+                return false;
+            }
+            circle[i] = c;
+        }
+        /*
+         * We will loop, possibly for all of the remaining characters.
+         */
+        for (;;) {
+            j = offset;
+            b = true;
+            /*
+             * Compare the circle buffer with the to string.
+             */
+            for (i = 0; i < n; i += 1) {
+                if (circle[j] != to.charAt(i)) {
+                    b = false;
+                    break;
+                }
+                j += 1;
+                if (j >= n) {
+                    j -= n;
+                }
+            }
+            /*
+             * If we exit the loop with b intact, then victory is ours.
+             */
+            if (b) {
+                return true;
+            }
+            /*
+             * Get the next character. If there isn't one, then defeat is ours.
+             */
+            c = next();
+            if (c == 0) {
+                return false;
+            }
+            /*
+             * Shove the character in the circle buffer and advance the circle offset. The offset is mod n.
+             */
+            circle[offset] = c;
+            offset += 1;
+            if (offset >= n) {
+                offset -= n;
+            }
+        }
     }
 }

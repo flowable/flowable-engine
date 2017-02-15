@@ -23,30 +23,30 @@ import org.flowable.engine.common.EngineInfo;
  * @author Tom Baeyens
  */
 public class ProcessEnginesTest extends PvmTestCase {
-  
-  protected void setUp() throws Exception {
-    super.setUp();
-    ProcessEngines.destroy();
-    ProcessEngines.init();
-  }
-  
-  protected void tearDown() throws Exception {
-    ProcessEngines.destroy();
-    super.tearDown();
-  }
 
-  public void testProcessEngineInfo() {
+    protected void setUp() throws Exception {
+        super.setUp();
+        ProcessEngines.destroy();
+        ProcessEngines.init();
+    }
 
-    List<EngineInfo> processEngineInfos = ProcessEngines.getProcessEngineInfos();
-    assertEquals(1, processEngineInfos.size());
+    protected void tearDown() throws Exception {
+        ProcessEngines.destroy();
+        super.tearDown();
+    }
 
-    EngineInfo processEngineInfo = processEngineInfos.get(0);
-    assertNull(processEngineInfo.getException());
-    assertNotNull(processEngineInfo.getName());
-    assertNotNull(processEngineInfo.getResourceUrl());
+    public void testProcessEngineInfo() {
 
-    ProcessEngine processEngine = ProcessEngines.getProcessEngine(ProcessEngines.NAME_DEFAULT);
-    assertNotNull(processEngine);
-  }
+        List<EngineInfo> processEngineInfos = ProcessEngines.getProcessEngineInfos();
+        assertEquals(1, processEngineInfos.size());
+
+        EngineInfo processEngineInfo = processEngineInfos.get(0);
+        assertNull(processEngineInfo.getException());
+        assertNotNull(processEngineInfo.getName());
+        assertNotNull(processEngineInfo.getResourceUrl());
+
+        ProcessEngine processEngine = ProcessEngines.getProcessEngine(ProcessEngines.NAME_DEFAULT);
+        assertNotNull(processEngine);
+    }
 
 }

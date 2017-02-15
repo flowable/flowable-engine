@@ -22,53 +22,50 @@ import org.flowable.form.engine.impl.persistence.entity.ResourceEntity;
 import org.flowable.form.model.FormModel;
 
 /**
- * An intermediate representation of a DeploymentEntity which keeps track of all of the entity's
- * DecisionTableEntities and resources, and BPMN parses, models, and processes associated
- * with each DecisionTableEntity - all produced by parsing the deployment.
+ * An intermediate representation of a DeploymentEntity which keeps track of all of the entity's DecisionTableEntities and resources, and BPMN parses, models, and processes associated with each
+ * DecisionTableEntity - all produced by parsing the deployment.
  * 
- * The DecisionTableEntities are expected to be "not fully set-up" - they may be inconsistent with the 
- * DeploymentEntity and/or the persisted versions, and if the deployment is new, they will not yet be persisted.
+ * The DecisionTableEntities are expected to be "not fully set-up" - they may be inconsistent with the DeploymentEntity and/or the persisted versions, and if the deployment is new, they will not yet
+ * be persisted.
  */
 public class ParsedDeployment {
-  
-  protected FormDeploymentEntity deploymentEntity;
 
-  protected List<FormDefinitionEntity> formDefinitions;
-  protected Map<FormDefinitionEntity, FormDefinitionParse> mapFormDefinitionsToParses;
-  protected Map<FormDefinitionEntity, ResourceEntity> mapFormDefinitionsToResources;
-  
-  public ParsedDeployment(
-      FormDeploymentEntity entity, List<FormDefinitionEntity> formDefinitions,
-      Map<FormDefinitionEntity, FormDefinitionParse> mapFormDefinitionsToParses,
-      Map<FormDefinitionEntity, ResourceEntity> mapFormDefinitionsToResources) {
-    
-    this.deploymentEntity = entity;
-    this.formDefinitions = formDefinitions;
-    this.mapFormDefinitionsToParses = mapFormDefinitionsToParses;
-    this.mapFormDefinitionsToResources = mapFormDefinitionsToResources;
-  }
+    protected FormDeploymentEntity deploymentEntity;
 
-  
-  public FormDeploymentEntity getDeployment() {
-    return deploymentEntity;
-  }
+    protected List<FormDefinitionEntity> formDefinitions;
+    protected Map<FormDefinitionEntity, FormDefinitionParse> mapFormDefinitionsToParses;
+    protected Map<FormDefinitionEntity, ResourceEntity> mapFormDefinitionsToResources;
 
-  public List<FormDefinitionEntity> getAllFormDefinitions() {
-    return formDefinitions;
-  }
+    public ParsedDeployment(
+            FormDeploymentEntity entity, List<FormDefinitionEntity> formDefinitions,
+            Map<FormDefinitionEntity, FormDefinitionParse> mapFormDefinitionsToParses,
+            Map<FormDefinitionEntity, ResourceEntity> mapFormDefinitionsToResources) {
 
-  public ResourceEntity getResourceForFormDefinition(FormDefinitionEntity formDefinition) {
-    return mapFormDefinitionsToResources.get(formDefinition);
-  }
+        this.deploymentEntity = entity;
+        this.formDefinitions = formDefinitions;
+        this.mapFormDefinitionsToParses = mapFormDefinitionsToParses;
+        this.mapFormDefinitionsToResources = mapFormDefinitionsToResources;
+    }
 
-  public FormDefinitionParse getFormDefinitionParseForFormDefinition(FormDefinitionEntity formDefinition) {
-    return mapFormDefinitionsToParses.get(formDefinition);
-  }
+    public FormDeploymentEntity getDeployment() {
+        return deploymentEntity;
+    }
 
-  public FormModel getFormModelForFormDefinition(FormDefinitionEntity formDefinition) {
-    FormDefinitionParse parse = getFormDefinitionParseForFormDefinition(formDefinition);
-    
-    return (parse == null ? null : parse.getFormModel());
-  } 
+    public List<FormDefinitionEntity> getAllFormDefinitions() {
+        return formDefinitions;
+    }
+
+    public ResourceEntity getResourceForFormDefinition(FormDefinitionEntity formDefinition) {
+        return mapFormDefinitionsToResources.get(formDefinition);
+    }
+
+    public FormDefinitionParse getFormDefinitionParseForFormDefinition(FormDefinitionEntity formDefinition) {
+        return mapFormDefinitionsToParses.get(formDefinition);
+    }
+
+    public FormModel getFormModelForFormDefinition(FormDefinitionEntity formDefinition) {
+        FormDefinitionParse parse = getFormDefinitionParseForFormDefinition(formDefinition);
+
+        return (parse == null ? null : parse.getFormModel());
+    }
 }
-

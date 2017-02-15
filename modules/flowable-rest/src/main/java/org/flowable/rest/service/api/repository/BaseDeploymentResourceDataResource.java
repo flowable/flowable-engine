@@ -32,42 +32,42 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class BaseDeploymentResourceDataResource {
 
-  @Autowired
-  protected ContentTypeResolver contentTypeResolver;
+    @Autowired
+    protected ContentTypeResolver contentTypeResolver;
 
-  @Autowired
-  protected RepositoryService repositoryService;
+    @Autowired
+    protected RepositoryService repositoryService;
 
-  protected byte[] getDeploymentResourceData(String deploymentId, String resourceName, HttpServletResponse response) {
+    protected byte[] getDeploymentResourceData(String deploymentId, String resourceName, HttpServletResponse response) {
 
-    if (deploymentId == null) {
-      throw new FlowableIllegalArgumentException("No deployment id provided");
+        if (deploymentId == null) {
+            throw new FlowableIllegalArgumentException("No deployment id provided");
+        }
+        if (resourceName == null) {
+            throw new FlowableIllegalArgumentException("No resource name provided");
+        }
+
+        // Check if deployment exists
+        Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
+        if (deployment == null) {
+            throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.", Deployment.class);
+        }
+
+        List<String> resourceList = repositoryService.getDeploymentResourceNames(deploymentId);
+
+        if (resourceList.contains(resourceName)) {
+            final InputStream resourceStream = repositoryService.getResourceAsStream(deploymentId, resourceName);
+
+            String contentType = contentTypeResolver.resolveContentType(resourceName);
+            response.setContentType(contentType);
+            try {
+                return IOUtils.toByteArray(resourceStream);
+            } catch (Exception e) {
+                throw new FlowableException("Error converting resource stream", e);
+            }
+        } else {
+            // Resource not found in deployment
+            throw new FlowableObjectNotFoundException("Could not find a resource with name '" + resourceName + "' in deployment '" + deploymentId + "'.", String.class);
+        }
     }
-    if (resourceName == null) {
-      throw new FlowableIllegalArgumentException("No resource name provided");
-    }
-
-    // Check if deployment exists
-    Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
-    if (deployment == null) {
-      throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.", Deployment.class);
-    }
-
-    List<String> resourceList = repositoryService.getDeploymentResourceNames(deploymentId);
-
-    if (resourceList.contains(resourceName)) {
-      final InputStream resourceStream = repositoryService.getResourceAsStream(deploymentId, resourceName);
-
-      String contentType = contentTypeResolver.resolveContentType(resourceName);
-      response.setContentType(contentType);
-      try {
-        return IOUtils.toByteArray(resourceStream);
-      } catch (Exception e) {
-        throw new FlowableException("Error converting resource stream", e);
-      }
-    } else {
-      // Resource not found in deployment
-      throw new FlowableObjectNotFoundException("Could not find a resource with name '" + resourceName + "' in deployment '" + deploymentId + "'.", String.class);
-    }
-  }
 }

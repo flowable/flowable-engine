@@ -17,70 +17,70 @@ import org.flowable.engine.delegate.event.BaseEntityEventListener;
 
 public class TestBaseEntityEventListener extends BaseEntityEventListener {
 
-	private boolean updateReceived;
-	private boolean createReceived;
-	private boolean deleteReceived;
-	private boolean initializeReceived;
-	private boolean customReceived;
+    private boolean updateReceived;
+    private boolean createReceived;
+    private boolean deleteReceived;
+    private boolean initializeReceived;
+    private boolean customReceived;
 
-	public TestBaseEntityEventListener() {
-		super();
-  }
-	
-	public TestBaseEntityEventListener(Class<?> entityClass) {
-		super(false, entityClass);
-  }
-	
-	public void reset() {
-		updateReceived = false;
-		createReceived = false;
-		deleteReceived = false;
-		customReceived = false;
-		initializeReceived = false;
-	}
-	
-	public boolean isCreateReceived() {
-	  return createReceived;
-  }
-	
-	public boolean isCustomReceived() {
-	  return customReceived;
-  }
-	
-	public boolean isDeleteReceived() {
-	  return deleteReceived;
-  }
-	
-	public boolean isUpdateReceived() {
-	  return updateReceived;
-  }
-	
-	public boolean isInitializeReceived() {
-	  return initializeReceived;
-  }
-	
-	@Override
-	protected void onCreate(FlowableEvent event) {
-		createReceived = true;
-	}
-	
-	@Override
-	protected void onDelete(FlowableEvent event) {
-		deleteReceived = true;
-	}
-	
-	@Override
-	protected void onUpdate(FlowableEvent event) {
-		updateReceived = true;
-	}
-	
-	@Override
-	protected void onEntityEvent(FlowableEvent event) {
-		customReceived = true;
-	}
-	
-	@Override
-	protected void onInitialized(FlowableEvent event) {
-		initializeReceived = true;
-	}
+    public TestBaseEntityEventListener() {
+        super();
+    }
+
+    public TestBaseEntityEventListener(Class<?> entityClass) {
+        super(false, entityClass);
+    }
+
+    public void reset() {
+        updateReceived = false;
+        createReceived = false;
+        deleteReceived = false;
+        customReceived = false;
+        initializeReceived = false;
+    }
+
+    public boolean isCreateReceived() {
+        return createReceived;
+    }
+
+    public boolean isCustomReceived() {
+        return customReceived;
+    }
+
+    public boolean isDeleteReceived() {
+        return deleteReceived;
+    }
+
+    public boolean isUpdateReceived() {
+        return updateReceived;
+    }
+
+    public boolean isInitializeReceived() {
+        return initializeReceived;
+    }
+
+    @Override
+    protected void onCreate(FlowableEvent event) {
+        createReceived = true;
+    }
+
+    @Override
+    protected void onDelete(FlowableEvent event) {
+        deleteReceived = true;
+    }
+
+    @Override
+    protected void onUpdate(FlowableEvent event) {
+        updateReceived = true;
+    }
+
+    @Override
+    protected void onEntityEvent(FlowableEvent event) {
+        customReceived = true;
+    }
+
+    @Override
+    protected void onInitialized(FlowableEvent event) {
+        initializeReceived = true;
+    }
 }

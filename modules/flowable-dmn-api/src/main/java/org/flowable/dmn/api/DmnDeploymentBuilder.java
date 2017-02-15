@@ -30,48 +30,48 @@ import org.flowable.dmn.model.DmnDefinition;
  */
 public interface DmnDeploymentBuilder {
 
-  DmnDeploymentBuilder addInputStream(String resourceName, InputStream inputStream);
+    DmnDeploymentBuilder addInputStream(String resourceName, InputStream inputStream);
 
-  DmnDeploymentBuilder addClasspathResource(String resource);
+    DmnDeploymentBuilder addClasspathResource(String resource);
 
-  DmnDeploymentBuilder addString(String resourceName, String text);
-  
-  DmnDeploymentBuilder addDmnBytes(String resourceName, byte[] dmnBytes);
+    DmnDeploymentBuilder addString(String resourceName, String text);
 
-  DmnDeploymentBuilder addDmnModel(String resourceName, DmnDefinition dmnDefinition);
+    DmnDeploymentBuilder addDmnBytes(String resourceName, byte[] dmnBytes);
 
-  /**
-   * If called, no XML schema validation against the BPMN 2.0 XSD.
-   * 
-   * Not recommended in general.
-   */
-  DmnDeploymentBuilder disableSchemaValidation();
+    DmnDeploymentBuilder addDmnModel(String resourceName, DmnDefinition dmnDefinition);
 
-  /**
-   * Gives the deployment the given name.
-   */
-  DmnDeploymentBuilder name(String name);
+    /**
+     * If called, no XML schema validation against the BPMN 2.0 XSD.
+     * 
+     * Not recommended in general.
+     */
+    DmnDeploymentBuilder disableSchemaValidation();
 
-  /**
-   * Gives the deployment the given category.
-   */
-  DmnDeploymentBuilder category(String category);
+    /**
+     * Gives the deployment the given name.
+     */
+    DmnDeploymentBuilder name(String name);
 
-  /**
-   * Gives the deployment the given tenant id.
-   */
-  DmnDeploymentBuilder tenantId(String tenantId);
-  
-  /**
-   * Gives the deployment the given parent deployment id.
-   */
-  DmnDeploymentBuilder parentDeploymentId(String parentDeploymentId);
-  
-  DmnDeploymentBuilder enableDuplicateFiltering();
+    /**
+     * Gives the deployment the given category.
+     */
+    DmnDeploymentBuilder category(String category);
 
-  /**
-   * Deploys all provided sources to the DMN engine.
-   */
-  DmnDeployment deploy();
+    /**
+     * Gives the deployment the given tenant id.
+     */
+    DmnDeploymentBuilder tenantId(String tenantId);
+
+    /**
+     * Gives the deployment the given parent deployment id.
+     */
+    DmnDeploymentBuilder parentDeploymentId(String parentDeploymentId);
+
+    DmnDeploymentBuilder enableDuplicateFiltering();
+
+    /**
+     * Deploys all provided sources to the DMN engine.
+     */
+    DmnDeployment deploy();
 
 }

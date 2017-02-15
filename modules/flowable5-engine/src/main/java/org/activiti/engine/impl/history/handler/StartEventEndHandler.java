@@ -18,17 +18,16 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 
-
 /**
  * @author Tom Baeyens
  */
 public class StartEventEndHandler implements ExecutionListener {
 
-  public void notify(DelegateExecution execution) {
-    String activityId = ((ExecutionEntity)execution).getActivityId();
-    
-    Context.getCommandContext().getHistoryManager()
-      .recordStartEventEnded((ExecutionEntity) execution, activityId);
-  }
+    public void notify(DelegateExecution execution) {
+        String activityId = ((ExecutionEntity) execution).getActivityId();
+
+        Context.getCommandContext().getHistoryManager()
+                .recordStartEventEnded((ExecutionEntity) execution, activityId);
+    }
 
 }

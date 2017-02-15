@@ -30,52 +30,52 @@ import org.flowable.engine.runtime.Job;
  * @author Tijs Rademakers
  */
 public class MybatisSuspendedJobDataManager extends AbstractDataManager<SuspendedJobEntity> implements SuspendedJobDataManager {
-  
-  protected CachedEntityMatcher<SuspendedJobEntity> suspendedJobsByExecutionIdMatcher = new SuspendedJobsByExecutionIdMatcher();
 
-  public MybatisSuspendedJobDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    super(processEngineConfiguration);
-  }
+    protected CachedEntityMatcher<SuspendedJobEntity> suspendedJobsByExecutionIdMatcher = new SuspendedJobsByExecutionIdMatcher();
 
-  @Override
-  public Class<? extends SuspendedJobEntity> getManagedEntityClass() {
-    return SuspendedJobEntityImpl.class;
-  }
+    public MybatisSuspendedJobDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
 
-  @Override
-  public SuspendedJobEntity create() {
-    return new SuspendedJobEntityImpl();
-  }
+    @Override
+    public Class<? extends SuspendedJobEntity> getManagedEntityClass() {
+        return SuspendedJobEntityImpl.class;
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery, Page page) {
-    String query = "selectSuspendedJobByQueryCriteria";
-    return getDbSqlSession().selectList(query, jobQuery, page);
-  }
+    @Override
+    public SuspendedJobEntity create() {
+        return new SuspendedJobEntityImpl();
+    }
 
-  @Override
-  public long findJobCountByQueryCriteria(SuspendedJobQueryImpl jobQuery) {
-    return (Long) getDbSqlSession().selectOne("selectSuspendedJobCountByQueryCriteria", jobQuery);
-  }
-  
-  @Override
-  public List<SuspendedJobEntity> findJobsByExecutionId(final String executionId) {
-    return getList("selectSuspendedJobsByExecutionId", executionId, suspendedJobsByExecutionIdMatcher, true);
-  }
-  
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<SuspendedJobEntity> findJobsByProcessInstanceId(final String processInstanceId) {
-    return getDbSqlSession().selectList("selectSuspendedJobsByProcessInstanceId", processInstanceId);
-  }
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery, Page page) {
+        String query = "selectSuspendedJobByQueryCriteria";
+        return getDbSqlSession().selectList(query, jobQuery, page);
+    }
 
-  @Override
-  public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-    HashMap<String, Object> params = new HashMap<String, Object>();
-    params.put("deploymentId", deploymentId);
-    params.put("tenantId", newTenantId);
-    getDbSqlSession().update("updateSuspendedJobTenantIdForDeployment", params);
-  }
+    @Override
+    public long findJobCountByQueryCriteria(SuspendedJobQueryImpl jobQuery) {
+        return (Long) getDbSqlSession().selectOne("selectSuspendedJobCountByQueryCriteria", jobQuery);
+    }
+
+    @Override
+    public List<SuspendedJobEntity> findJobsByExecutionId(final String executionId) {
+        return getList("selectSuspendedJobsByExecutionId", executionId, suspendedJobsByExecutionIdMatcher, true);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<SuspendedJobEntity> findJobsByProcessInstanceId(final String processInstanceId) {
+        return getDbSqlSession().selectList("selectSuspendedJobsByProcessInstanceId", processInstanceId);
+    }
+
+    @Override
+    public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("deploymentId", deploymentId);
+        params.put("tenantId", newTenantId);
+        getDbSqlSession().update("updateSuspendedJobTenantIdForDeployment", params);
+    }
 
 }

@@ -22,6 +22,6 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
  */
 public interface ResolverFactory {
 
-  Resolver createResolver(ProcessEngineConfigurationImpl processEngineConfiguration, VariableScope variableScope);
-  
+    Resolver createResolver(ProcessEngineConfigurationImpl processEngineConfiguration, VariableScope variableScope);
+
 }

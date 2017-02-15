@@ -19,6 +19,6 @@ import org.flowable.engine.common.impl.interceptor.BaseCommand;
  */
 public interface Command<T> extends BaseCommand<T, CommandContext> {
 
-  T execute(CommandContext commandContext);
+    T execute(CommandContext commandContext);
 
 }

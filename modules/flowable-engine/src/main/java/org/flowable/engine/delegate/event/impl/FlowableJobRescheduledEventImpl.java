@@ -4,7 +4,7 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableJobRescheduledEvent;
 import org.flowable.engine.runtime.Job;
 
-public class FlowableJobRescheduledEventImpl  extends FlowableEntityEventImpl implements FlowableJobRescheduledEvent {
+public class FlowableJobRescheduledEventImpl extends FlowableEntityEventImpl implements FlowableJobRescheduledEvent {
 
     /**
      * The id of the original job that was rescheduled.

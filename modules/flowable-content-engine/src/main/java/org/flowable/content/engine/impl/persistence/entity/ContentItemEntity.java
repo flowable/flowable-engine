@@ -23,11 +23,11 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
  */
 public interface ContentItemEntity extends ContentItem, Entity {
 
-  void setContentAvailable(boolean contentAvailable);
-  
-  void setContentSize(Long contentSize);
+    void setContentAvailable(boolean contentAvailable);
 
-  void setCreated(Date created);
+    void setContentSize(Long contentSize);
 
-  void setLastModified(Date lastModified);
+    void setCreated(Date created);
+
+    void setLastModified(Date lastModified);
 }

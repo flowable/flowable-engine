@@ -25,30 +25,29 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public abstract class NeedsActiveProcessDefinitionCmd<T> implements Command<T>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected String processDefinitionId;
-  
-  public NeedsActiveProcessDefinitionCmd(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
-  
-  public T execute(CommandContext commandContext) {
-    DeploymentManager deploymentManager = commandContext.getProcessEngineConfiguration().getDeploymentManager();
-    ProcessDefinition processDefinition = deploymentManager.findDeployedProcessDefinitionById(processDefinitionId);
+    private static final long serialVersionUID = 1L;
 
-    if (deploymentManager.isProcessDefinitionSuspended(processDefinitionId)) {
-      throw new ActivitiException("Cannot execute operation because process definition '" 
-              + processDefinition.getName() + "' (id=" + processDefinition.getId() + ") is suspended");
+    protected String processDefinitionId;
+
+    public NeedsActiveProcessDefinitionCmd(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
     }
-    
-    return execute(commandContext, processDefinition);
-  }
-  
-  /**
-   * Subclasses should implement this. The provided {@link ProcessDefinition} is 
-   * guaranteed to be an active process definition (ie. not suspended).
-   */
-  protected abstract T execute(CommandContext commandContext, ProcessDefinition processDefinition);
+
+    public T execute(CommandContext commandContext) {
+        DeploymentManager deploymentManager = commandContext.getProcessEngineConfiguration().getDeploymentManager();
+        ProcessDefinition processDefinition = deploymentManager.findDeployedProcessDefinitionById(processDefinitionId);
+
+        if (deploymentManager.isProcessDefinitionSuspended(processDefinitionId)) {
+            throw new ActivitiException("Cannot execute operation because process definition '"
+                    + processDefinition.getName() + "' (id=" + processDefinition.getId() + ") is suspended");
+        }
+
+        return execute(commandContext, processDefinition);
+    }
+
+    /**
+     * Subclasses should implement this. The provided {@link ProcessDefinition} is guaranteed to be an active process definition (ie. not suspended).
+     */
+    protected abstract T execute(CommandContext commandContext, ProcessDefinition processDefinition);
 
 }

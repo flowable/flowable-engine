@@ -24,14 +24,14 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class BaseDecisionExecutorResource {
 
-  @Autowired
-  protected DmnRestResponseFactory dmnRestResponseFactory;
+    @Autowired
+    protected DmnRestResponseFactory dmnRestResponseFactory;
 
-  @Autowired
-  protected DmnRuleService dmnRuleService;
+    @Autowired
+    protected DmnRuleService dmnRuleService;
 
-  protected RuleEngineExecutionResult executeDecisionByKeyAndTenantId(String decisionKey, String tenantId, Map<String, Object> inputVariables) {
+    protected RuleEngineExecutionResult executeDecisionByKeyAndTenantId(String decisionKey, String tenantId, Map<String, Object> inputVariables) {
 
-    return dmnRuleService.executeDecisionByKeyAndTenantId(decisionKey, inputVariables, tenantId);
-  }
+        return dmnRuleService.executeDecisionByKeyAndTenantId(decisionKey, inputVariables, tenantId);
+    }
 }

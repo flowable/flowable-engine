@@ -31,108 +31,107 @@ import org.flowable.engine.common.api.query.Query;
  */
 public interface DeploymentQuery extends Query<DeploymentQuery, Deployment> {
 
-  /**
-   * Only select deployments with the given deployment id.
-   */
-  DeploymentQuery deploymentId(String deploymentId);
-  
-  /**
-   * Only select deployments with an id in the given set of ids.
-   */
-  DeploymentQuery deploymentIds(List<String> deploymentId);
+    /**
+     * Only select deployments with the given deployment id.
+     */
+    DeploymentQuery deploymentId(String deploymentId);
 
-  /**
-   * Only select deployments with the given name.
-   */
-  DeploymentQuery deploymentName(String name);
+    /**
+     * Only select deployments with an id in the given set of ids.
+     */
+    DeploymentQuery deploymentIds(List<String> deploymentId);
 
-  /**
-   * Only select deployments with a name like the given string.
-   */
-  DeploymentQuery deploymentNameLike(String nameLike);
+    /**
+     * Only select deployments with the given name.
+     */
+    DeploymentQuery deploymentName(String name);
 
-  /**
-   * Only select deployments with the given category.
-   * 
-   * @see DeploymentBuilder#category(String)
-   */
-  DeploymentQuery deploymentCategory(String category);
-  
-  /**
-   * Only select deployments with a category like the given string.
-   */
-  DeploymentQuery deploymentCategoryLike(String categoryLike);
+    /**
+     * Only select deployments with a name like the given string.
+     */
+    DeploymentQuery deploymentNameLike(String nameLike);
 
-  /**
-   * Only select deployments that have a different category then the given one.
-   * 
-   * @see DeploymentBuilder#category(String)
-   */
-  DeploymentQuery deploymentCategoryNotEquals(String categoryNotEquals);
-  
-  /**
-   * Only select deployments with the given key.
-   */
-  DeploymentQuery deploymentKey(String key);
-  
-  /**
-   * Only select deployments with a key like the given string.
-   */
-  DeploymentQuery deploymentKeyLike(String keyLike);
+    /**
+     * Only select deployments with the given category.
+     * 
+     * @see DeploymentBuilder#category(String)
+     */
+    DeploymentQuery deploymentCategory(String category);
 
-  /**
-   * Only select deployment that have the given tenant id.
-   */
-  DeploymentQuery deploymentTenantId(String tenantId);
+    /**
+     * Only select deployments with a category like the given string.
+     */
+    DeploymentQuery deploymentCategoryLike(String categoryLike);
 
-  /**
-   * Only select deployments with a tenant id like the given one.
-   */
-  DeploymentQuery deploymentTenantIdLike(String tenantIdLike);
+    /**
+     * Only select deployments that have a different category then the given one.
+     * 
+     * @see DeploymentBuilder#category(String)
+     */
+    DeploymentQuery deploymentCategoryNotEquals(String categoryNotEquals);
 
-  /**
-   * Only select deployments that do not have a tenant id.
-   */
-  DeploymentQuery deploymentWithoutTenantId();
-  
-  /**
-   * Only select deployment that have the given engine version.
-   */
-  DeploymentQuery deploymentEngineVersion(String engineVersion);
+    /**
+     * Only select deployments with the given key.
+     */
+    DeploymentQuery deploymentKey(String key);
 
-  /** Only select deployments with the given process definition key. */
-  DeploymentQuery processDefinitionKey(String key);
+    /**
+     * Only select deployments with a key like the given string.
+     */
+    DeploymentQuery deploymentKeyLike(String keyLike);
 
-  /**
-   * Only select deployments with a process definition key like the given string.
-   */
-  DeploymentQuery processDefinitionKeyLike(String keyLike);
-  
-  /**
-   * Only select deployments where the deployment time is the latest value.
-   * Can only be used together with the deployment key.
-   */
-  DeploymentQuery latest();
+    /**
+     * Only select deployment that have the given tenant id.
+     */
+    DeploymentQuery deploymentTenantId(String tenantId);
 
-  // sorting ////////////////////////////////////////////////////////
+    /**
+     * Only select deployments with a tenant id like the given one.
+     */
+    DeploymentQuery deploymentTenantIdLike(String tenantIdLike);
 
-  /**
-   * Order by deployment id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  DeploymentQuery orderByDeploymentId();
+    /**
+     * Only select deployments that do not have a tenant id.
+     */
+    DeploymentQuery deploymentWithoutTenantId();
 
-  /**
-   * Order by deployment name (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  DeploymentQuery orderByDeploymentName();
+    /**
+     * Only select deployment that have the given engine version.
+     */
+    DeploymentQuery deploymentEngineVersion(String engineVersion);
 
-  /**
-   * Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  DeploymentQuery orderByDeploymenTime();
+    /** Only select deployments with the given process definition key. */
+    DeploymentQuery processDefinitionKey(String key);
 
-  /**
-   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  DeploymentQuery orderByTenantId();
+    /**
+     * Only select deployments with a process definition key like the given string.
+     */
+    DeploymentQuery processDefinitionKeyLike(String keyLike);
+
+    /**
+     * Only select deployments where the deployment time is the latest value. Can only be used together with the deployment key.
+     */
+    DeploymentQuery latest();
+
+    // sorting ////////////////////////////////////////////////////////
+
+    /**
+     * Order by deployment id (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    DeploymentQuery orderByDeploymentId();
+
+    /**
+     * Order by deployment name (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    DeploymentQuery orderByDeploymentName();
+
+    /**
+     * Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    DeploymentQuery orderByDeploymenTime();
+
+    /**
+     * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    DeploymentQuery orderByTenantId();
 }

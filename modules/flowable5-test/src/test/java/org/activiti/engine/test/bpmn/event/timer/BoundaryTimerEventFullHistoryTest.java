@@ -21,15 +21,15 @@ import org.flowable.engine.test.Deployment;
  * @author Frederik Heremans
  */
 public class BoundaryTimerEventFullHistoryTest extends ResourceFlowableTestCase {
-  
-  public BoundaryTimerEventFullHistoryTest() {
-    super("org/activiti/standalone/history/fullhistory.flowable.cfg.xml");
-  }
-  
-  @Deployment
-  public void testSetProcessVariablesFromTaskWhenTimerOnTask() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerVariablesProcess");
-    runtimeService.setVariable(processInstance.getId(), "myVar", 123456L);
-  }
+
+    public BoundaryTimerEventFullHistoryTest() {
+        super("org/activiti/standalone/history/fullhistory.flowable.cfg.xml");
+    }
+
+    @Deployment
+    public void testSetProcessVariablesFromTaskWhenTimerOnTask() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerVariablesProcess");
+        runtimeService.setVariable(processInstance.getId(), "myVar", 123456L);
+    }
 
 }

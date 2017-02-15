@@ -34,263 +34,262 @@ import org.flowable.engine.test.bpmn.event.compensate.helper.SetVariablesDelegat
 @EnableVerboseExecutionTreeLogging
 public class CompensateEventTest extends PluggableFlowableTestCase {
 
-  @Deployment
-  public void testCompensateSubprocess() {
+    @Deployment
+    public void testCompensateSubprocess() {
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
-    assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
+        assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
 
-    Execution execution = runtimeService.createExecutionQuery().activityId("beforeEnd").singleResult();
-    runtimeService.trigger(execution.getId());
-    assertProcessEnded(processInstance.getId());
-  }
-  
-  @Deployment
-  public void testCompensateSubprocessWithoutActivityRef() {
-
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
-
-    assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
-
-    Execution execution = runtimeService.createExecutionQuery().activityId("beforeEnd").singleResult();
-    runtimeService.trigger(execution.getId());
-    assertProcessEnded(processInstance.getId());
-  }
-  
-  @Deployment
-  public void testCompensateSubprocessWithUserTask() {
-
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
-    
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertEquals("Manually undo book hotel", task.getName());
-    taskService.complete(task.getId());
-
-    Execution execution = runtimeService.createExecutionQuery().activityId("beforeEnd").singleResult();
-    runtimeService.trigger(execution.getId());
-    assertProcessEnded(processInstance.getId());
-  }
-  
-  @Deployment
-  public void testCompensateSubprocessWithUserTask2() {
-    
-    // Same process as testCompensateSubprocessWithUserTask, but now the end event is reached first
-    // (giving an exception before)
-
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
-    Execution execution = runtimeService.createExecutionQuery().activityId("beforeEnd").singleResult();
-    runtimeService.trigger(execution.getId());
-    
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertEquals("Manually undo book hotel", task.getName());
-    taskService.complete(task.getId());
-    
-    assertProcessEnded(processInstance.getId());
-  }
-  
-  @Deployment
-  public void testCompensateMiSubprocess() {
-
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
-
-    assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
-
-    Execution execution = runtimeService.createExecutionQuery().activityId("beforeEnd").singleResult();
-    runtimeService.trigger(execution.getId());
-    assertProcessEnded(processInstance.getId());
-
-  }
-
-  @Deployment
-  public void testCompensateScope() {
-
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
-
-    assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
-    assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookFlight"));
-
-    Execution execution = runtimeService.createExecutionQuery().activityId("beforeEnd").singleResult();
-    runtimeService.trigger(execution.getId());
-    assertProcessEnded(processInstance.getId());
-
-  }
-
-  @Deployment(resources = {"org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.SubProcess1.bpmn20.xml",
-          "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.SubProcess2.bpmn20.xml",
-          "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensateTwoSubprocesses.bpmn20.xml" })
-  public void testCompensateTwoSubprocesses() {
-
-    Map<String, Object> initialVariables = new HashMap<String, Object>();
-    initialVariables.put("test", "begin");
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess", initialVariables);
-
-    assertNotNull(processInstance);
-
-    // get task from first subprocess
-    Task task = taskService.createTaskQuery().singleResult();
-
-    Map<String, String> taskFormVariables = new HashMap<String, String>();
-    taskFormVariables.put("test", "begin");
-    formService.submitTaskFormData(task.getId(), new HashMap<String, String>());
-
-    // get task from second subprocess
-    task = taskService.createTaskQuery().singleResult();
-
-    formService.submitTaskFormData(task.getId(), new HashMap<String, String>());
-
-    // get first task from main process
-    task = taskService.createTaskQuery().singleResult();
-
-    Object testVariable2 = runtimeService.getVariable(processInstance.getId(), "test2");
-    assertNotNull(testVariable2);
-    assertEquals("compensated2", testVariable2.toString());
-
-    Object testVariable1 = runtimeService.getVariable(processInstance.getId(), "test1");
-    assertNotNull(testVariable1);
-    assertEquals("compensated1", testVariable1.toString());
-  }
-
-  @Deployment(resources = { "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testCallActivityCompensationHandler.bpmn20.xml",
-      "org/flowable/engine/test/bpmn/event/compensate/CompensationHandler.bpmn20.xml" })
-  public void testCallActivityCompensationHandler() {
-
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
-
-    if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-      assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
+        Execution execution = runtimeService.createExecutionQuery().activityId("beforeEnd").singleResult();
+        runtimeService.trigger(execution.getId());
+        assertProcessEnded(processInstance.getId());
     }
 
-    Execution execution = runtimeService.createExecutionQuery().activityId("beforeEnd").singleResult();
-    runtimeService.trigger(execution.getId());
-    assertProcessEnded(processInstance.getId());
+    @Deployment
+    public void testCompensateSubprocessWithoutActivityRef() {
 
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
-    if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-      assertEquals(6, historyService.createHistoricProcessInstanceQuery().count());
+        assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
+
+        Execution execution = runtimeService.createExecutionQuery().activityId("beforeEnd").singleResult();
+        runtimeService.trigger(execution.getId());
+        assertProcessEnded(processInstance.getId());
     }
 
-  }
+    @Deployment
+    public void testCompensateSubprocessWithUserTask() {
 
-  @Deployment
-  public void testCompensateMiSubprocessVariableSnapshots() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
-    // see referenced java delegates in the process definition.
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("Manually undo book hotel", task.getName());
+        taskService.complete(task.getId());
 
-    SetVariablesDelegate.variablesMap.clear();
-
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
-
-    if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-      assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
+        Execution execution = runtimeService.createExecutionQuery().activityId("beforeEnd").singleResult();
+        runtimeService.trigger(execution.getId());
+        assertProcessEnded(processInstance.getId());
     }
 
-    assertProcessEnded(processInstance.getId());
+    @Deployment
+    public void testCompensateSubprocessWithUserTask2() {
 
-  }
+        // Same process as testCompensateSubprocessWithUserTask, but now the end event is reached first
+        // (giving an exception before)
 
-  public void testMultipleCompensationCatchEventsFails() {
-    try {
-      repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testMultipleCompensationCatchEventsFails.bpmn20.xml").deploy();
-      fail("exception expected");
-    } catch (Exception e) {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+        Execution execution = runtimeService.createExecutionQuery().activityId("beforeEnd").singleResult();
+        runtimeService.trigger(execution.getId());
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("Manually undo book hotel", task.getName());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
     }
-  }
 
-  public void testInvalidActivityRefFails() {
-    try {
-      repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testInvalidActivityRefFails.bpmn20.xml").deploy();
-      fail("exception expected");
-    } catch (Exception e) {
-      if (!e.getMessage().contains("Invalid attribute value for 'activityRef':")) {
-        fail("different exception expected");
-      }
-    }
-  }
+    @Deployment
+    public void testCompensateMiSubprocess() {
 
-  @Deployment(resources = { "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationStepEndRecorded.bpmn20.xml" })
-  public void testCompensationStepEndTimeRecorded() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensationStepEndRecordedProcess");
-    assertProcessEnded(processInstance.getId());
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
-    if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-      final HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery().activityId("compensationScriptTask");
-      assertEquals(1, query.count());
-      final HistoricActivityInstance compensationScriptTask = query.singleResult();
-      assertNotNull(compensationScriptTask);
-      assertNotNull(compensationScriptTask.getEndTime());
-      assertNotNull(compensationScriptTask.getDurationInMillis());
+        assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
+
+        Execution execution = runtimeService.createExecutionQuery().activityId("beforeEnd").singleResult();
+        runtimeService.trigger(execution.getId());
+        assertProcessEnded(processInstance.getId());
+
     }
-  }
-  
-  @Deployment
-  public void testCompensateWithSubprocess() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
-    
-    if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-      HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
-          .processInstanceId(processInstance.getId()).activityId("bookHotel").singleResult();
-      assertNotNull(historicActivityInstance.getEndTime());
+
+    @Deployment
+    public void testCompensateScope() {
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+        assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
+        assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookFlight"));
+
+        Execution execution = runtimeService.createExecutionQuery().activityId("beforeEnd").singleResult();
+        runtimeService.trigger(execution.getId());
+        assertProcessEnded(processInstance.getId());
+
     }
-    
-    // Triggering the task will trigger the compensation subprocess
-    Task afterBookHotelTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
-        .taskDefinitionKey("afterBookHotel").singleResult();
-    taskService.complete(afterBookHotelTask.getId());
-    
-    Task compensationTask1 = taskService.createTaskQuery().processInstanceId(processInstance.getId())
-        .taskDefinitionKey("compensateTask1").singleResult();
-    assertNotNull(compensationTask1);
-    
-    Task compensationTask2 = taskService.createTaskQuery().processInstanceId(processInstance.getId())
-        .taskDefinitionKey("compensateTask2").singleResult();
-    assertNotNull(compensationTask2);
-    
-    taskService.complete(compensationTask1.getId());
-    taskService.complete(compensationTask2.getId());
-    
-    Task compensationTask3 = taskService.createTaskQuery().processInstanceId(processInstance.getId())
-        .taskDefinitionKey("compensateTask3").singleResult();
-    assertNotNull(compensationTask3);
-    taskService.complete(compensationTask3.getId());
-    
-    assertProcessEnded(processInstance.getId());
-  }
-  
-  @Deployment(resources = { "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensateWithSubprocess.bpmn20.xml" })
-  public void testCompensateWithSubprocess2() {
-    
-    // Same as testCompensateWithSubprocess, but without throwing the compensation event
-    // As such, to verify that the extra compensation executions have no effect on the regular process execution
-    
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess", 
-        CollectionUtil.singletonMap("doCompensation", false));
-    
-    Task afterBookHotelTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
-        .taskDefinitionKey("afterBookHotel").singleResult();
-    taskService.complete(afterBookHotelTask.getId());
-    
-    assertProcessEnded(processInstance.getId());
-  }
-  
-  
-  @Deployment
-  public void testCompensateNestedSubprocess() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
-    
-    // Completing should trigger the compensations
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("afterNestedSubProcess").singleResult();
-    assertNotNull(task);
-    taskService.complete(task.getId());
-    
-    Task compensationTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("undoBookHotel").singleResult();
-    assertNotNull(compensationTask);
-    taskService.complete(compensationTask.getId());
-    
-    assertProcessEnded(processInstance.getId());
-    
-  }
-  
+
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.SubProcess1.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.SubProcess2.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensateTwoSubprocesses.bpmn20.xml" })
+    public void testCompensateTwoSubprocesses() {
+
+        Map<String, Object> initialVariables = new HashMap<String, Object>();
+        initialVariables.put("test", "begin");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess", initialVariables);
+
+        assertNotNull(processInstance);
+
+        // get task from first subprocess
+        Task task = taskService.createTaskQuery().singleResult();
+
+        Map<String, String> taskFormVariables = new HashMap<String, String>();
+        taskFormVariables.put("test", "begin");
+        formService.submitTaskFormData(task.getId(), new HashMap<String, String>());
+
+        // get task from second subprocess
+        task = taskService.createTaskQuery().singleResult();
+
+        formService.submitTaskFormData(task.getId(), new HashMap<String, String>());
+
+        // get first task from main process
+        task = taskService.createTaskQuery().singleResult();
+
+        Object testVariable2 = runtimeService.getVariable(processInstance.getId(), "test2");
+        assertNotNull(testVariable2);
+        assertEquals("compensated2", testVariable2.toString());
+
+        Object testVariable1 = runtimeService.getVariable(processInstance.getId(), "test1");
+        assertNotNull(testVariable1);
+        assertEquals("compensated1", testVariable1.toString());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testCallActivityCompensationHandler.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/event/compensate/CompensationHandler.bpmn20.xml" })
+    public void testCallActivityCompensationHandler() {
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
+        }
+
+        Execution execution = runtimeService.createExecutionQuery().activityId("beforeEnd").singleResult();
+        runtimeService.trigger(execution.getId());
+        assertProcessEnded(processInstance.getId());
+
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            assertEquals(6, historyService.createHistoricProcessInstanceQuery().count());
+        }
+
+    }
+
+    @Deployment
+    public void testCompensateMiSubprocessVariableSnapshots() {
+
+        // see referenced java delegates in the process definition.
+
+        SetVariablesDelegate.variablesMap.clear();
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
+        }
+
+        assertProcessEnded(processInstance.getId());
+
+    }
+
+    public void testMultipleCompensationCatchEventsFails() {
+        try {
+            repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testMultipleCompensationCatchEventsFails.bpmn20.xml").deploy();
+            fail("exception expected");
+        } catch (Exception e) {
+        }
+    }
+
+    public void testInvalidActivityRefFails() {
+        try {
+            repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testInvalidActivityRefFails.bpmn20.xml").deploy();
+            fail("exception expected");
+        } catch (Exception e) {
+            if (!e.getMessage().contains("Invalid attribute value for 'activityRef':")) {
+                fail("different exception expected");
+            }
+        }
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationStepEndRecorded.bpmn20.xml" })
+    public void testCompensationStepEndTimeRecorded() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensationStepEndRecordedProcess");
+        assertProcessEnded(processInstance.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            final HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery().activityId("compensationScriptTask");
+            assertEquals(1, query.count());
+            final HistoricActivityInstance compensationScriptTask = query.singleResult();
+            assertNotNull(compensationScriptTask);
+            assertNotNull(compensationScriptTask.getEndTime());
+            assertNotNull(compensationScriptTask.getDurationInMillis());
+        }
+    }
+
+    @Deployment
+    public void testCompensateWithSubprocess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
+                    .processInstanceId(processInstance.getId()).activityId("bookHotel").singleResult();
+            assertNotNull(historicActivityInstance.getEndTime());
+        }
+
+        // Triggering the task will trigger the compensation subprocess
+        Task afterBookHotelTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .taskDefinitionKey("afterBookHotel").singleResult();
+        taskService.complete(afterBookHotelTask.getId());
+
+        Task compensationTask1 = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .taskDefinitionKey("compensateTask1").singleResult();
+        assertNotNull(compensationTask1);
+
+        Task compensationTask2 = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .taskDefinitionKey("compensateTask2").singleResult();
+        assertNotNull(compensationTask2);
+
+        taskService.complete(compensationTask1.getId());
+        taskService.complete(compensationTask2.getId());
+
+        Task compensationTask3 = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .taskDefinitionKey("compensateTask3").singleResult();
+        assertNotNull(compensationTask3);
+        taskService.complete(compensationTask3.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensateWithSubprocess.bpmn20.xml" })
+    public void testCompensateWithSubprocess2() {
+
+        // Same as testCompensateWithSubprocess, but without throwing the compensation event
+        // As such, to verify that the extra compensation executions have no effect on the regular process execution
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess",
+                CollectionUtil.singletonMap("doCompensation", false));
+
+        Task afterBookHotelTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .taskDefinitionKey("afterBookHotel").singleResult();
+        taskService.complete(afterBookHotelTask.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment
+    public void testCompensateNestedSubprocess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+        // Completing should trigger the compensations
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("afterNestedSubProcess").singleResult();
+        assertNotNull(task);
+        taskService.complete(task.getId());
+
+        Task compensationTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("undoBookHotel").singleResult();
+        assertNotNull(compensationTask);
+        taskService.complete(compensationTask.getId());
+
+        assertProcessEnded(processInstance.getId());
+
+    }
+
 }

@@ -33,26 +33,26 @@ import org.springframework.orm.jpa.EntityManagerFactoryUtils;
  */
 public class SpringEntityManagerSessionFactory implements SessionFactory {
 
-  protected EntityManagerFactory entityManagerFactory;
-  protected boolean handleTransactions;
-  protected boolean closeEntityManager;
+    protected EntityManagerFactory entityManagerFactory;
+    protected boolean handleTransactions;
+    protected boolean closeEntityManager;
 
-  public SpringEntityManagerSessionFactory(Object entityManagerFactory, boolean handleTransactions, boolean closeEntityManager) {
-    this.entityManagerFactory = (EntityManagerFactory) entityManagerFactory;
-    this.handleTransactions = handleTransactions;
-    this.closeEntityManager = closeEntityManager;
-  }
-
-  public Class<?> getSessionType() {
-    return EntityManagerFactory.class;
-  }
-
-  public Session openSession(AbstractCommandContext commandContext) {
-    EntityManager entityManager = EntityManagerFactoryUtils.getTransactionalEntityManager(entityManagerFactory);
-    if (entityManager == null) {
-      return new EntityManagerSessionImpl(entityManagerFactory, handleTransactions, closeEntityManager);
+    public SpringEntityManagerSessionFactory(Object entityManagerFactory, boolean handleTransactions, boolean closeEntityManager) {
+        this.entityManagerFactory = (EntityManagerFactory) entityManagerFactory;
+        this.handleTransactions = handleTransactions;
+        this.closeEntityManager = closeEntityManager;
     }
-    return new EntityManagerSessionImpl(entityManagerFactory, entityManager, false, false);
-  }
+
+    public Class<?> getSessionType() {
+        return EntityManagerFactory.class;
+    }
+
+    public Session openSession(AbstractCommandContext commandContext) {
+        EntityManager entityManager = EntityManagerFactoryUtils.getTransactionalEntityManager(entityManagerFactory);
+        if (entityManager == null) {
+            return new EntityManagerSessionImpl(entityManagerFactory, handleTransactions, closeEntityManager);
+        }
+        return new EntityManagerSessionImpl(entityManagerFactory, entityManager, false, false);
+    }
 
 }

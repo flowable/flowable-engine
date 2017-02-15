@@ -25,30 +25,30 @@ import org.flowable.form.engine.impl.FormDefinitionQueryImpl;
  */
 public interface FormDefinitionEntityManager extends EntityManager<FormDefinitionEntity> {
 
-  FormDefinitionEntity findLatestFormDefinitionByKey(String formDefinitionKey);
+    FormDefinitionEntity findLatestFormDefinitionByKey(String formDefinitionKey);
 
-  FormDefinitionEntity findLatestFormDefinitionByKeyAndTenantId(String formDefinitionKey, String tenantId);
-  
-  FormDefinitionEntity findLatestFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId);
-  
-  FormDefinitionEntity findLatestFormDefinitionByKeyParentDeploymentIdAndTenantId(String formDefinitionKey, String parentDeploymentId, String tenantId);
+    FormDefinitionEntity findLatestFormDefinitionByKeyAndTenantId(String formDefinitionKey, String tenantId);
 
-  List<FormDefinition> findFormDefinitionsByQueryCriteria(FormDefinitionQueryImpl formQuery, Page page);
+    FormDefinitionEntity findLatestFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId);
 
-  long findFormDefinitionCountByQueryCriteria(FormDefinitionQueryImpl formQuery);
+    FormDefinitionEntity findLatestFormDefinitionByKeyParentDeploymentIdAndTenantId(String formDefinitionKey, String parentDeploymentId, String tenantId);
 
-  FormDefinitionEntity findFormDefinitionByDeploymentAndKey(String deploymentId, String formDefinitionKey);
+    List<FormDefinition> findFormDefinitionsByQueryCriteria(FormDefinitionQueryImpl formQuery, Page page);
 
-  FormDefinitionEntity findFormDefinitionByDeploymentAndKeyAndTenantId(String deploymentId, String formDefinitionKey, String tenantId);
+    long findFormDefinitionCountByQueryCriteria(FormDefinitionQueryImpl formQuery);
 
-  FormDefinitionEntity findFormDefinitionByKeyAndVersionAndTenantId(String formDefinitionKey, Integer formVersion, String tenantId);
+    FormDefinitionEntity findFormDefinitionByDeploymentAndKey(String deploymentId, String formDefinitionKey);
 
-  List<FormDefinition> findFormDefinitionsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    FormDefinitionEntity findFormDefinitionByDeploymentAndKeyAndTenantId(String deploymentId, String formDefinitionKey, String tenantId);
 
-  long findFormDefinitionCountByNativeQuery(Map<String, Object> parameterMap);
+    FormDefinitionEntity findFormDefinitionByKeyAndVersionAndTenantId(String formDefinitionKey, Integer formVersion, String tenantId);
 
-  void updateFormDefinitionTenantIdForDeployment(String deploymentId, String newTenantId);
-  
-  void deleteFormDefinitionsByDeploymentId(String deploymentId);
+    List<FormDefinition> findFormDefinitionsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+
+    long findFormDefinitionCountByNativeQuery(Map<String, Object> parameterMap);
+
+    void updateFormDefinitionTenantIdForDeployment(String deploymentId, String newTenantId);
+
+    void deleteFormDefinitionsByDeploymentId(String deploymentId);
 
 }

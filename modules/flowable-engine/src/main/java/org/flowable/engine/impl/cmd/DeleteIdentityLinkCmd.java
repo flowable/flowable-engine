@@ -27,65 +27,65 @@ import org.flowable.engine.task.IdentityLinkType;
  */
 public class DeleteIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
 
-  private static final long serialVersionUID = 1L;
-  
-  public static int IDENTITY_USER = 1;
-  public static int IDENTITY_GROUP = 2;
+    private static final long serialVersionUID = 1L;
 
-  protected String userId;
+    public static int IDENTITY_USER = 1;
+    public static int IDENTITY_GROUP = 2;
 
-  protected String groupId;
+    protected String userId;
 
-  protected String type;
+    protected String groupId;
 
-  public DeleteIdentityLinkCmd(String taskId, String userId, String groupId, String type) {
-    super(taskId);
-    validateParams(userId, groupId, type, taskId);
-    this.taskId = taskId;
-    this.userId = userId;
-    this.groupId = groupId;
-    this.type = type;
-  }
+    protected String type;
 
-  protected void validateParams(String userId, String groupId, String type, String taskId) {
-    if (taskId == null) {
-      throw new FlowableIllegalArgumentException("taskId is null");
+    public DeleteIdentityLinkCmd(String taskId, String userId, String groupId, String type) {
+        super(taskId);
+        validateParams(userId, groupId, type, taskId);
+        this.taskId = taskId;
+        this.userId = userId;
+        this.groupId = groupId;
+        this.type = type;
     }
 
-    if (type == null) {
-      throw new FlowableIllegalArgumentException("type is required when adding a new task identity link");
+    protected void validateParams(String userId, String groupId, String type, String taskId) {
+        if (taskId == null) {
+            throw new FlowableIllegalArgumentException("taskId is null");
+        }
+
+        if (type == null) {
+            throw new FlowableIllegalArgumentException("type is required when adding a new task identity link");
+        }
+
+        // Special treatment for assignee and owner: group cannot be used and userId may be null
+        if (IdentityLinkType.ASSIGNEE.equals(type) || IdentityLinkType.OWNER.equals(type)) {
+            if (groupId != null) {
+                throw new FlowableIllegalArgumentException("Incompatible usage: cannot use type '" + type + "' together with a groupId");
+            }
+        } else {
+            if (userId == null && groupId == null) {
+                throw new FlowableIllegalArgumentException("userId and groupId cannot both be null");
+            }
+        }
     }
 
-    // Special treatment for assignee and owner: group cannot be used and userId may be null
-    if (IdentityLinkType.ASSIGNEE.equals(type) || IdentityLinkType.OWNER.equals(type)) {
-      if (groupId != null) {
-        throw new FlowableIllegalArgumentException("Incompatible usage: cannot use type '" + type + "' together with a groupId");
-      }
-    } else {
-      if (userId == null && groupId == null) {
-        throw new FlowableIllegalArgumentException("userId and groupId cannot both be null");
-      }
+    protected Void execute(CommandContext commandContext, TaskEntity task) {
+        if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
+            Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+            compatibilityHandler.deleteIdentityLink(taskId, userId, groupId, type);
+            return null;
+        }
+
+        if (IdentityLinkType.ASSIGNEE.equals(type)) {
+            commandContext.getTaskEntityManager().changeTaskAssignee(task, null);
+        } else if (IdentityLinkType.OWNER.equals(type)) {
+            commandContext.getTaskEntityManager().changeTaskOwner(task, null);
+        } else {
+            commandContext.getIdentityLinkEntityManager().deleteIdentityLink(task, userId, groupId, type);
+        }
+
+        commandContext.getHistoryManager().createIdentityLinkComment(taskId, userId, groupId, type, false);
+
+        return null;
     }
-  }
-
-  protected Void execute(CommandContext commandContext, TaskEntity task) {
-    if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      compatibilityHandler.deleteIdentityLink(taskId, userId, groupId, type);
-      return null;
-    }
-
-    if (IdentityLinkType.ASSIGNEE.equals(type)) {
-      commandContext.getTaskEntityManager().changeTaskAssignee(task, null);
-    } else if (IdentityLinkType.OWNER.equals(type)) {
-      commandContext.getTaskEntityManager().changeTaskOwner(task, null);
-    } else {
-      commandContext.getIdentityLinkEntityManager().deleteIdentityLink(task, userId, groupId, type);
-    }
-
-    commandContext.getHistoryManager().createIdentityLinkComment(taskId, userId, groupId, type, false);
-
-    return null;
-  }
 
 }

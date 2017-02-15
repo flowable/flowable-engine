@@ -25,25 +25,23 @@ import org.flowable.dmn.model.DmnDefinition;
  * Updates caches and artifacts for a deployment and its decision tables
  */
 public class CachingAndArtifactsManager {
-  
-  /**
-   * Ensures that the decision table is cached in the appropriate places, including the
-   * deployment's collection of deployed artifacts and the deployment manager's cache.
-   */
-  public void updateCachingAndArtifacts(ParsedDeployment parsedDeployment) {
-    final DmnEngineConfiguration dmnEngineConfiguration = Context.getDmnEngineConfiguration();
-    DeploymentCache<DecisionTableCacheEntry> decisionTableCache = dmnEngineConfiguration.getDeploymentManager().getDecisionCache();
-    DmnDeploymentEntity deployment = parsedDeployment.getDeployment();
 
-    for (DecisionTableEntity decisionTable : parsedDeployment.getAllDecisionTables()) {
-      DmnDefinition dmnDefinition = parsedDeployment.getDmnDefinitionForDecisionTable(decisionTable);
-      Decision decision = parsedDeployment.getDecisionForDecisionTable(decisionTable);
-      DecisionTableCacheEntry cacheEntry = new DecisionTableCacheEntry(decisionTable, dmnDefinition, decision);
-      decisionTableCache.add(decisionTable.getId(), cacheEntry);
-    
-      // Add to deployment for further usage
-      deployment.addDeployedArtifact(decisionTable);
+    /**
+     * Ensures that the decision table is cached in the appropriate places, including the deployment's collection of deployed artifacts and the deployment manager's cache.
+     */
+    public void updateCachingAndArtifacts(ParsedDeployment parsedDeployment) {
+        final DmnEngineConfiguration dmnEngineConfiguration = Context.getDmnEngineConfiguration();
+        DeploymentCache<DecisionTableCacheEntry> decisionTableCache = dmnEngineConfiguration.getDeploymentManager().getDecisionCache();
+        DmnDeploymentEntity deployment = parsedDeployment.getDeployment();
+
+        for (DecisionTableEntity decisionTable : parsedDeployment.getAllDecisionTables()) {
+            DmnDefinition dmnDefinition = parsedDeployment.getDmnDefinitionForDecisionTable(decisionTable);
+            Decision decision = parsedDeployment.getDecisionForDecisionTable(decisionTable);
+            DecisionTableCacheEntry cacheEntry = new DecisionTableCacheEntry(decisionTable, dmnDefinition, decision);
+            decisionTableCache.add(decisionTable.getId(), cacheEntry);
+
+            // Add to deployment for further usage
+            deployment.addDeployedArtifact(decisionTable);
+        }
     }
-  }
 }
-

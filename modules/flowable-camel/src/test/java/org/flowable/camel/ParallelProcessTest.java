@@ -27,35 +27,35 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class ParallelProcessTest extends SpringFlowableTestCase {
 
-  @Autowired
-  protected CamelContext camelContext;
+    @Autowired
+    protected CamelContext camelContext;
 
-  public void setUp() throws Exception {
-    camelContext.addRoutes(new RouteBuilder() {
+    public void setUp() throws Exception {
+        camelContext.addRoutes(new RouteBuilder() {
 
-      @Override
-      public void configure() throws Exception {
-        from("flowable:parallelCamelProcess:serviceTaskAsync1").to("seda:parallelQueue");
-        from("seda:parallelQueue").to("bean:sleepBean?method=sleep");
+            @Override
+            public void configure() throws Exception {
+                from("flowable:parallelCamelProcess:serviceTaskAsync1").to("seda:parallelQueue");
+                from("seda:parallelQueue").to("bean:sleepBean?method=sleep");
 
-        from("flowable:parallelCamelProcess:serviceTaskAsync2").to("seda:parallelQueue2");
-        from("seda:parallelQueue2").to("bean:sleepBean?method=sleep");
-      }
-    });
-  }
-
-  public void tearDown() throws Exception {
-    List<Route> routes = camelContext.getRoutes();
-    for (Route r : routes) {
-      camelContext.stopRoute(r.getId());
-      camelContext.removeRoute(r.getId());
+                from("flowable:parallelCamelProcess:serviceTaskAsync2").to("seda:parallelQueue2");
+                from("seda:parallelQueue2").to("bean:sleepBean?method=sleep");
+            }
+        });
     }
-  }
 
-  @Deployment(resources = { "process/parallel.bpmn20.xml" })
-  public void testRunProcess() throws Exception {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelCamelProcess");
-    Thread.sleep(4000);
-    assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
-  }
+    public void tearDown() throws Exception {
+        List<Route> routes = camelContext.getRoutes();
+        for (Route r : routes) {
+            camelContext.stopRoute(r.getId());
+            camelContext.removeRoute(r.getId());
+        }
+    }
+
+    @Deployment(resources = { "process/parallel.bpmn20.xml" })
+    public void testRunProcess() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelCamelProcess");
+        Thread.sleep(4000);
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+    }
 }

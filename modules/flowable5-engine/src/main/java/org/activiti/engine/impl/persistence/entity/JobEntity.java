@@ -29,130 +29,131 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
  */
 public class JobEntity extends AbstractJobEntity {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String lockOwner;
-  protected Date lockExpirationTime;
-  
-  public JobEntity() {}
-  
-  public JobEntity(AbstractJobEntity te) {
-    this.id = te.getId();
-    this.jobType = te.getJobType();
-    this.revision = te.getRevision();
-    this.jobHandlerConfiguration = te.getJobHandlerConfiguration();
-    this.jobHandlerType = te.getJobHandlerType();
-    this.isExclusive = te.isExclusive();
-    this.repeat = te.getRepeat();
-    this.retries = te.getRetries();
-    this.endDate = te.getEndDate();
-    this.executionId = te.getExecutionId();
-    this.processInstanceId = te.getProcessInstanceId();
-    this.processDefinitionId = te.getProcessDefinitionId();
-    this.exceptionMessage = te.getExceptionMessage();
-    setExceptionStacktrace(te.getExceptionStacktrace());
+    protected String lockOwner;
+    protected Date lockExpirationTime;
 
-    // Inherit tenant
-    this.tenantId = te.getTenantId();
-  }
-
-  public void execute(CommandContext commandContext) {
-    ExecutionEntity execution = null;
-    if (executionId != null) {
-      execution = commandContext.getExecutionEntityManager().findExecutionById(executionId);
-    }
-    
-    Map<String, JobHandler> jobHandlers = Context.getProcessEngineConfiguration().getJobHandlers();
-    JobHandler jobHandler = jobHandlers.get(jobHandlerType);
-    jobHandler.execute(this, jobHandlerConfiguration, execution, commandContext);
-    delete();
-    
-    if (repeat != null) {
-      TimerJobEntity timerRepeatJob = new TimerJobEntity(this);
-      timerRepeatJob.scheduleNewTimer(commandContext);
-    }
-  }
-  
-  public void insert() {
-    Context.getCommandContext()
-      .getDbSqlSession()
-      .insert(this);
-    
-    // add link to execution
-    if (executionId != null) {
-      ExecutionEntity execution = Context.getCommandContext()
-        .getExecutionEntityManager()
-        .findExecutionById(executionId);
-      execution.addJob(this);
-      
-      // Inherit tenant if (if applicable)
-      if (execution.getTenantId() != null) {
-      	setTenantId(execution.getTenantId());
-      }
-    }
-    
-    if(Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-    	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, this));
-    	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, this));
-    }
-  }
-  
-  public void delete() {
-    Context.getCommandContext()
-      .getDbSqlSession()
-      .delete(this);
-
-    // Also delete the job's exception byte array
-    exceptionByteArrayRef.delete();
-
-    // remove link to execution
-    if (executionId != null) {
-      ExecutionEntity execution = Context.getCommandContext()
-        .getExecutionEntityManager()
-        .findExecutionById(executionId);
-      execution.removeJob(this);
+    public JobEntity() {
     }
 
-    if(Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-    	Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-    			ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+    public JobEntity(AbstractJobEntity te) {
+        this.id = te.getId();
+        this.jobType = te.getJobType();
+        this.revision = te.getRevision();
+        this.jobHandlerConfiguration = te.getJobHandlerConfiguration();
+        this.jobHandlerType = te.getJobHandlerType();
+        this.isExclusive = te.isExclusive();
+        this.repeat = te.getRepeat();
+        this.retries = te.getRetries();
+        this.endDate = te.getEndDate();
+        this.executionId = te.getExecutionId();
+        this.processInstanceId = te.getProcessInstanceId();
+        this.processDefinitionId = te.getProcessDefinitionId();
+        this.exceptionMessage = te.getExceptionMessage();
+        setExceptionStacktrace(te.getExceptionStacktrace());
+
+        // Inherit tenant
+        this.tenantId = te.getTenantId();
     }
-  }
 
-  public void setExecution(ExecutionEntity execution) {
-    super.setExecution(execution);
-    execution.addJob(this);
-  }
-  
-  @SuppressWarnings("unchecked")
-  public Object getPersistentState() {
-    Map<String, Object> persistentState = (Map<String, Object>) super.getPersistentState();
-    persistentState.put("lockOwner", lockOwner);
-    persistentState.put("lockExpirationTime", lockExpirationTime);
-    return persistentState;
-  }
-  
-	public String getLockOwner() {
-    return lockOwner;
-  }
+    public void execute(CommandContext commandContext) {
+        ExecutionEntity execution = null;
+        if (executionId != null) {
+            execution = commandContext.getExecutionEntityManager().findExecutionById(executionId);
+        }
 
-  public void setLockOwner(String lockOwner) {
-    this.lockOwner = lockOwner;
-  }
+        Map<String, JobHandler> jobHandlers = Context.getProcessEngineConfiguration().getJobHandlers();
+        JobHandler jobHandler = jobHandlers.get(jobHandlerType);
+        jobHandler.execute(this, jobHandlerConfiguration, execution, commandContext);
+        delete();
 
-  public Date getLockExpirationTime() {
-    return lockExpirationTime;
-  }
+        if (repeat != null) {
+            TimerJobEntity timerRepeatJob = new TimerJobEntity(this);
+            timerRepeatJob.scheduleNewTimer(commandContext);
+        }
+    }
 
-  public void setLockExpirationTime(Date lockExpirationTime) {
-    this.lockExpirationTime = lockExpirationTime;
-  }
+    public void insert() {
+        Context.getCommandContext()
+                .getDbSqlSession()
+                .insert(this);
 
-  @Override
-  public String toString() {
-    return "JobEntity [id=" + id + "]";
-  }
-  
+        // add link to execution
+        if (executionId != null) {
+            ExecutionEntity execution = Context.getCommandContext()
+                    .getExecutionEntityManager()
+                    .findExecutionById(executionId);
+            execution.addJob(this);
+
+            // Inherit tenant if (if applicable)
+            if (execution.getTenantId() != null) {
+                setTenantId(execution.getTenantId());
+            }
+        }
+
+        if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, this));
+            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, this));
+        }
+    }
+
+    public void delete() {
+        Context.getCommandContext()
+                .getDbSqlSession()
+                .delete(this);
+
+        // Also delete the job's exception byte array
+        exceptionByteArrayRef.delete();
+
+        // remove link to execution
+        if (executionId != null) {
+            ExecutionEntity execution = Context.getCommandContext()
+                    .getExecutionEntityManager()
+                    .findExecutionById(executionId);
+            execution.removeJob(this);
+        }
+
+        if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        }
+    }
+
+    public void setExecution(ExecutionEntity execution) {
+        super.setExecution(execution);
+        execution.addJob(this);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Object getPersistentState() {
+        Map<String, Object> persistentState = (Map<String, Object>) super.getPersistentState();
+        persistentState.put("lockOwner", lockOwner);
+        persistentState.put("lockExpirationTime", lockExpirationTime);
+        return persistentState;
+    }
+
+    public String getLockOwner() {
+        return lockOwner;
+    }
+
+    public void setLockOwner(String lockOwner) {
+        this.lockOwner = lockOwner;
+    }
+
+    public Date getLockExpirationTime() {
+        return lockExpirationTime;
+    }
+
+    public void setLockExpirationTime(Date lockExpirationTime) {
+        this.lockExpirationTime = lockExpirationTime;
+    }
+
+    @Override
+    public String toString() {
+        return "JobEntity [id=" + id + "]";
+    }
+
 }

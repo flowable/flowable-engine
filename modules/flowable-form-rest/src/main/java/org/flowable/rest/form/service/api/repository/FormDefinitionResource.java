@@ -34,28 +34,28 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Form Definitions" }, description = "Manage Form Definitions", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Form Definitions" }, description = "Manage Form Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class FormDefinitionResource {
 
-  @Autowired
-  protected FormRestResponseFactory formRestResponseFactory;
+    @Autowired
+    protected FormRestResponseFactory formRestResponseFactory;
 
-  @Autowired
-  protected FormRepositoryService formRepositoryService;
+    @Autowired
+    protected FormRepositoryService formRepositoryService;
 
-  @ApiOperation(value = "Get a form definition", tags = {"Form Definitions"})
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Indicates the form definition was found returned."),
-      @ApiResponse(code = 404, message = "Indicates the form definition was not found.")
-  })
-  @RequestMapping(value = "/form-repository/form-definitions/{formDefinitionId}", method = RequestMethod.GET, produces = "application/json")
-  public FormDefinitionResponse getForm(@ApiParam(name = "formDefinitionId") @PathVariable String formDefinitionId, HttpServletRequest request) {
-    FormDefinition formDefinition = formRepositoryService.getFormDefinition(formDefinitionId);
+    @ApiOperation(value = "Get a form definition", tags = { "Form Definitions" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the form definition was found returned."),
+            @ApiResponse(code = 404, message = "Indicates the form definition was not found.")
+    })
+    @RequestMapping(value = "/form-repository/form-definitions/{formDefinitionId}", method = RequestMethod.GET, produces = "application/json")
+    public FormDefinitionResponse getForm(@ApiParam(name = "formDefinitionId") @PathVariable String formDefinitionId, HttpServletRequest request) {
+        FormDefinition formDefinition = formRepositoryService.getFormDefinition(formDefinitionId);
 
-    if (formDefinition == null) {
-      throw new FlowableObjectNotFoundException("Could not find a form definition with id '" + formDefinitionId);
+        if (formDefinition == null) {
+            throw new FlowableObjectNotFoundException("Could not find a form definition with id '" + formDefinitionId);
+        }
+
+        return formRestResponseFactory.createFormDefinitionResponse(formDefinition);
     }
-
-    return formRestResponseFactory.createFormDefinitionResponse(formDefinition);
-  }
 }

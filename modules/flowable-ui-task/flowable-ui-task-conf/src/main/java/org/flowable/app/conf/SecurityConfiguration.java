@@ -45,98 +45,98 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
-	
-	private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
 
-	@Autowired
-  protected RemoteIdmAuthenticationProvider authenticationProvider;
-	
-	@Autowired
-	protected Environment env;
-	
-	@Bean
-  public FlowableCookieFilter flowableCookieFilter() {
-	  FlowableCookieFilter filter = new FlowableCookieFilter();
-    filter.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_TASK));
-    return filter;
-  }
-	
-	@Bean
-	public FlowableCookieFilterCallback flowableCookieFilterCallback() {
-	  return new EngineAuthenticationCookieFilterCallback();
-	}
-	
-	@Autowired
-  public void configureGlobal(AuthenticationManagerBuilder auth) {
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
 
-    // Default auth (database backed)
-    try {
-      auth.authenticationProvider(authenticationProvider);
-    } catch (Exception e) {
-      logger.error("Could not configure authentication mechanism:", e);
-    }
-  }
-	
-	//
-	// REGULAR WEBAP CONFIG
-	//
-	
-	@Configuration
-	@Order(10) // API config first (has Order(1))
-  public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
+    @Autowired
+    protected RemoteIdmAuthenticationProvider authenticationProvider;
 
     @Autowired
     protected Environment env;
-    
-    @Autowired
-    protected FlowableCookieFilter flowableCookieFilter;
 
-    @Autowired
-    protected AjaxLogoutSuccessHandler ajaxLogoutSuccessHandler;
-    
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-      http
-        .sessionManagement()
-          .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
-          .addFilterBefore(flowableCookieFilter, UsernamePasswordAuthenticationFilter.class)
-          .logout()
-              .logoutUrl("/app/logout")
-              .logoutSuccessHandler(ajaxLogoutSuccessHandler)
-              .addLogoutHandler(new ClearFlowableCookieLogoutHandler())
-              .and()
-          .csrf()
-              .disable() // Disabled, cause enabling it will cause sessions
-          .headers()
-              .frameOptions()
-              	.sameOrigin()
-              	.addHeaderWriter(new XXssProtectionHeaderWriter())
-              	.and()
-          .authorizeRequests()
-                .antMatchers("/app/rest/**").hasAuthority(DefaultPrivileges.ACCESS_TASK);
+    @Bean
+    public FlowableCookieFilter flowableCookieFilter() {
+        FlowableCookieFilter filter = new FlowableCookieFilter();
+        filter.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_TASK));
+        return filter;
     }
-	}
 
-	//
-	// BASIC AUTH
-	//
+    @Bean
+    public FlowableCookieFilterCallback flowableCookieFilterCallback() {
+        return new EngineAuthenticationCookieFilterCallback();
+    }
 
-	@Configuration
-	@Order(1)
-	public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) {
 
-		protected void configure(HttpSecurity http) throws Exception {
+        // Default auth (database backed)
+        try {
+            auth.authenticationProvider(authenticationProvider);
+        } catch (Exception e) {
+            logger.error("Could not configure authentication mechanism:", e);
+        }
+    }
 
-			http
-				.sessionManagement()
-					.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-					.and()
-				.csrf()
-					.disable()
-				.antMatcher("/*-api/**").authorizeRequests()
-  			  .antMatchers("/*-api/**").authenticated()
-  			.and().httpBasic();
-		}
-	}
+    //
+    // REGULAR WEBAP CONFIG
+    //
+
+    @Configuration
+    @Order(10) // API config first (has Order(1))
+    public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
+
+        @Autowired
+        protected Environment env;
+
+        @Autowired
+        protected FlowableCookieFilter flowableCookieFilter;
+
+        @Autowired
+        protected AjaxLogoutSuccessHandler ajaxLogoutSuccessHandler;
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http
+                    .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
+                    .addFilterBefore(flowableCookieFilter, UsernamePasswordAuthenticationFilter.class)
+                    .logout()
+                    .logoutUrl("/app/logout")
+                    .logoutSuccessHandler(ajaxLogoutSuccessHandler)
+                    .addLogoutHandler(new ClearFlowableCookieLogoutHandler())
+                    .and()
+                    .csrf()
+                    .disable() // Disabled, cause enabling it will cause sessions
+                    .headers()
+                    .frameOptions()
+                    .sameOrigin()
+                    .addHeaderWriter(new XXssProtectionHeaderWriter())
+                    .and()
+                    .authorizeRequests()
+                    .antMatchers("/app/rest/**").hasAuthority(DefaultPrivileges.ACCESS_TASK);
+        }
+    }
+
+    //
+    // BASIC AUTH
+    //
+
+    @Configuration
+    @Order(1)
+    public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+
+        protected void configure(HttpSecurity http) throws Exception {
+
+            http
+                    .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
+                    .csrf()
+                    .disable()
+                    .antMatcher("/*-api/**").authorizeRequests()
+                    .antMatchers("/*-api/**").authenticated()
+                    .and().httpBasic();
+        }
+    }
 }

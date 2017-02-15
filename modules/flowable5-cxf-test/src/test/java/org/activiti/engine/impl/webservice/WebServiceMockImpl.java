@@ -24,82 +24,82 @@ import javax.jws.WebService;
 @WebService(endpointInterface = "org.activiti.engine.impl.webservice.WebServiceMock", serviceName = "WebServiceMock")
 public class WebServiceMockImpl implements WebServiceMock {
 
-  protected int count;
+    protected int count;
 
-  protected WebServiceDataStructure dataStructure = new WebServiceDataStructure();
+    protected WebServiceDataStructure dataStructure = new WebServiceDataStructure();
 
-  public WebServiceMockImpl() {
-    this.count = -1;
-    this.dataStructure = new WebServiceDataStructure();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public int getCount() {
-    return this.count;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void inc() throws MaxValueReachedFault {
-    if (this.count == 123456) {
-      throw new RuntimeException("A runtime exception not expected in the processing of the web-service");
-    } else if (this.count != Integer.MAX_VALUE) {
-      this.count++;
-    } else  {
-      throw new MaxValueReachedFault();
+    public WebServiceMockImpl() {
+        this.count = -1;
+        this.dataStructure = new WebServiceDataStructure();
     }
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  public void reset() {
-    this.setTo(0);
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public int getCount() {
+        return this.count;
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  public void setTo(int value) {
-    this.count = value;
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public void inc() throws MaxValueReachedFault {
+        if (this.count == 123456) {
+            throw new RuntimeException("A runtime exception not expected in the processing of the web-service");
+        } else if (this.count != Integer.MAX_VALUE) {
+            this.count++;
+        } else {
+            throw new MaxValueReachedFault();
+        }
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  public String prettyPrintCount(String prefix, String suffix) {
-    return prefix + this.getCount() + suffix;
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public void reset() {
+        this.setTo(0);
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  public void setDataStructure(String str, Date date) {
-    this.dataStructure.eltString = str;
-    this.dataStructure.eltDate = date;
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public void setTo(int value) {
+        this.count = value;
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  public WebServiceDataStructure getDataStructure() {
-    return this.dataStructure;
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public String prettyPrintCount(String prefix, String suffix) {
+        return prefix + this.getCount() + suffix;
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  public String noNameResult(String prefix, String suffix) {
-    return prefix + this.getCount() + suffix;
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public void setDataStructure(String str, Date date) {
+        this.dataStructure.eltString = str;
+        this.dataStructure.eltDate = date;
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  public String reservedWordAsName(String prefix, String suffix) {
-    return prefix + this.getCount() + suffix;
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public WebServiceDataStructure getDataStructure() {
+        return this.dataStructure;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String noNameResult(String prefix, String suffix) {
+        return prefix + this.getCount() + suffix;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String reservedWordAsName(String prefix, String suffix) {
+        return prefix + this.getCount() + suffix;
+    }
 }

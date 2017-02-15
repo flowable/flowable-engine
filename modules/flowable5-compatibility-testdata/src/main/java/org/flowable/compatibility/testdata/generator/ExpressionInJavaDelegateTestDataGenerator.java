@@ -19,13 +19,13 @@ import org.flowable.compatibility.testdata.Flowable5TestDataGenerator;
 
 public class ExpressionInJavaDelegateTestDataGenerator implements Flowable5TestDataGenerator {
 
-  @Override
-  public void generateTestData(ProcessEngine processEngine) {
-    RepositoryService repositoryService = processEngine.getRepositoryService();
-    repositoryService.createDeployment().addClasspathResource("expressionInJavaDelegateProcess.bpmn20.xml").deploy();
-    
-    RuntimeService runtimeService = processEngine.getRuntimeService();
-    runtimeService.startProcessInstanceByKey("expressionInJavaDelegate");
-  }
+    @Override
+    public void generateTestData(ProcessEngine processEngine) {
+        RepositoryService repositoryService = processEngine.getRepositoryService();
+        repositoryService.createDeployment().addClasspathResource("expressionInJavaDelegateProcess.bpmn20.xml").deploy();
+
+        RuntimeService runtimeService = processEngine.getRuntimeService();
+        runtimeService.startProcessInstanceByKey("expressionInJavaDelegate");
+    }
 
 }

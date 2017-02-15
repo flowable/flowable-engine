@@ -38,41 +38,41 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Decision Executor" }, description = "Execute Decision Table", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Decision Executor" }, description = "Execute Decision Table", authorizations = { @Authorization(value = "basicAuth") })
 public class DecisionExecutorResource extends BaseDecisionExecutorResource {
 
-  @ApiOperation(value = "Execute a Decision", tags = {"Decision Executor"})
-  @ApiResponses(value = {
-      @ApiResponse(code = 201, message = "Indicates the Decision has been executed")
-  })
-  @RequestMapping(value = "/dmn-rule/decision-executor", method = RequestMethod.POST, produces = "application/json")
-  public ExecuteDecisionResponse executeDecision(@ApiParam("request") @RequestBody ExecuteDecisionRequest request, HttpServletRequest httpRequest, HttpServletResponse response) {
+    @ApiOperation(value = "Execute a Decision", tags = { "Decision Executor" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Indicates the Decision has been executed")
+    })
+    @RequestMapping(value = "/dmn-rule/decision-executor", method = RequestMethod.POST, produces = "application/json")
+    public ExecuteDecisionResponse executeDecision(@ApiParam("request") @RequestBody ExecuteDecisionRequest request, HttpServletRequest httpRequest, HttpServletResponse response) {
 
-    if (request.getDecisionKey() == null) {
-      throw new FlowableIllegalArgumentException("Decision key is required.");
-    }
-
-    Map<String, Object> inputVariables = null;
-    if (request.getInputVariables() != null) {
-      inputVariables = new HashMap<String, Object>();
-      for (EngineRestVariable variable : request.getInputVariables()) {
-        if (variable.getName() == null) {
-          throw new FlowableIllegalArgumentException("Variable name is required.");
+        if (request.getDecisionKey() == null) {
+            throw new FlowableIllegalArgumentException("Decision key is required.");
         }
-        inputVariables.put(variable.getName(), dmnRestResponseFactory.getVariableValue(variable));
-      }
+
+        Map<String, Object> inputVariables = null;
+        if (request.getInputVariables() != null) {
+            inputVariables = new HashMap<String, Object>();
+            for (EngineRestVariable variable : request.getInputVariables()) {
+                if (variable.getName() == null) {
+                    throw new FlowableIllegalArgumentException("Variable name is required.");
+                }
+                inputVariables.put(variable.getName(), dmnRestResponseFactory.getVariableValue(variable));
+            }
+        }
+
+        try {
+            RuleEngineExecutionResult executionResult = executeDecisionByKeyAndTenantId(request.getDecisionKey(), request.getTenantId(), inputVariables);
+
+            response.setStatus(HttpStatus.CREATED.value());
+
+            return dmnRestResponseFactory.createExecuteDecisionResponse(executionResult);
+
+            // TODO: add audit trail info
+        } catch (FlowableObjectNotFoundException aonfe) {
+            throw new FlowableIllegalArgumentException(aonfe.getMessage(), aonfe);
+        }
     }
-
-    try {
-      RuleEngineExecutionResult executionResult = executeDecisionByKeyAndTenantId(request.getDecisionKey(), request.getTenantId(), inputVariables);
-
-      response.setStatus(HttpStatus.CREATED.value());
-
-      return dmnRestResponseFactory.createExecuteDecisionResponse(executionResult);
-
-      // TODO: add audit trail info
-    } catch (FlowableObjectNotFoundException aonfe) {
-      throw new FlowableIllegalArgumentException(aonfe.getMessage(), aonfe);
-    }
-  }
 }

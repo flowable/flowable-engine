@@ -30,29 +30,29 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public class GetStartFormCmd implements Command<StartFormData>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String processDefinitionId;
+    private static final long serialVersionUID = 1L;
+    protected String processDefinitionId;
 
-  public GetStartFormCmd(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
-
-  public StartFormData execute(CommandContext commandContext) {
-    ProcessDefinition processDefinition = commandContext.getProcessEngineConfiguration().getDeploymentManager().findDeployedProcessDefinitionById(processDefinitionId);
-    if (processDefinition == null) {
-      throw new FlowableObjectNotFoundException("No process definition found for id '" + processDefinitionId + "'", ProcessDefinition.class);
-    }
-    
-    if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
-      return Flowable5Util.getFlowable5CompatibilityHandler().getStartFormData(processDefinitionId);
+    public GetStartFormCmd(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
     }
 
-    StartFormHandler startFormHandler = FormHandlerUtil.getStartFormHandler(commandContext, processDefinition);
-    if (startFormHandler == null) {
-      throw new FlowableException("No startFormHandler defined in process '" + processDefinitionId + "'");
+    public StartFormData execute(CommandContext commandContext) {
+        ProcessDefinition processDefinition = commandContext.getProcessEngineConfiguration().getDeploymentManager().findDeployedProcessDefinitionById(processDefinitionId);
+        if (processDefinition == null) {
+            throw new FlowableObjectNotFoundException("No process definition found for id '" + processDefinitionId + "'", ProcessDefinition.class);
+        }
+
+        if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
+            return Flowable5Util.getFlowable5CompatibilityHandler().getStartFormData(processDefinitionId);
+        }
+
+        StartFormHandler startFormHandler = FormHandlerUtil.getStartFormHandler(commandContext, processDefinition);
+        if (startFormHandler == null) {
+            throw new FlowableException("No startFormHandler defined in process '" + processDefinitionId + "'");
+        }
+
+        return startFormHandler.createStartFormData(processDefinition);
     }
 
-    return startFormHandler.createStartFormData(processDefinition);
-  }
-  
 }

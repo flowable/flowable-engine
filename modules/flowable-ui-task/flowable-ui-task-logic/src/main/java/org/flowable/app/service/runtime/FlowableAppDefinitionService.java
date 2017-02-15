@@ -38,66 +38,66 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Transactional
 public class FlowableAppDefinitionService {
 
-  private static final Logger logger = LoggerFactory.getLogger(FlowableAppDefinitionService.class);
+    private static final Logger logger = LoggerFactory.getLogger(FlowableAppDefinitionService.class);
 
-  @Autowired
-  protected RepositoryService repositoryService;
+    @Autowired
+    protected RepositoryService repositoryService;
 
-  @Autowired
-  protected ObjectMapper objectMapper;
+    @Autowired
+    protected ObjectMapper objectMapper;
 
-  protected static final AppDefinitionRepresentation taskAppDefinitionRepresentation = AppDefinitionRepresentation.createDefaultAppDefinitionRepresentation("tasks");
+    protected static final AppDefinitionRepresentation taskAppDefinitionRepresentation = AppDefinitionRepresentation.createDefaultAppDefinitionRepresentation("tasks");
 
-  public ResultListDataRepresentation getAppDefinitions() {
-    List<AppDefinitionRepresentation> resultList = new ArrayList<AppDefinitionRepresentation>();
+    public ResultListDataRepresentation getAppDefinitions() {
+        List<AppDefinitionRepresentation> resultList = new ArrayList<AppDefinitionRepresentation>();
 
-    // Default app: tasks (available for all)
-    resultList.add(taskAppDefinitionRepresentation);
-    
-    // Custom apps
-    Map<String, Deployment> deploymentMap = new HashMap<String, Deployment>();
-    List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
-    for (Deployment deployment : deployments) {
-      if (deployment.getKey() != null) {
-        if (!deploymentMap.containsKey(deployment.getKey())) {
-          deploymentMap.put(deployment.getKey(), deployment);
-        } else if (deploymentMap.get(deployment.getKey()).getDeploymentTime().before(deployment.getDeploymentTime())) {
-          deploymentMap.put(deployment.getKey(), deployment);
+        // Default app: tasks (available for all)
+        resultList.add(taskAppDefinitionRepresentation);
+
+        // Custom apps
+        Map<String, Deployment> deploymentMap = new HashMap<String, Deployment>();
+        List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
+        for (Deployment deployment : deployments) {
+            if (deployment.getKey() != null) {
+                if (!deploymentMap.containsKey(deployment.getKey())) {
+                    deploymentMap.put(deployment.getKey(), deployment);
+                } else if (deploymentMap.get(deployment.getKey()).getDeploymentTime().before(deployment.getDeploymentTime())) {
+                    deploymentMap.put(deployment.getKey(), deployment);
+                }
+            }
         }
-      }
-    }
-    
-    for (Deployment deployment : deploymentMap.values()) {
-      resultList.add(createRepresentation(deployment));
-    }
 
-    ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
-    return result;
-  }
-  
-  public AppDefinitionRepresentation getAppDefinition(String deploymentKey) {
-    Deployment deployment = repositoryService.createDeploymentQuery().deploymentKey(deploymentKey).latest().singleResult();
+        for (Deployment deployment : deploymentMap.values()) {
+            resultList.add(createRepresentation(deployment));
+        }
 
-    if (deployment == null) {
-      throw new NotFoundException("No app definition is found with key: " + deploymentKey);
+        ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
+        return result;
     }
 
-    return createRepresentation(deployment);
-  }
+    public AppDefinitionRepresentation getAppDefinition(String deploymentKey) {
+        Deployment deployment = repositoryService.createDeploymentQuery().deploymentKey(deploymentKey).latest().singleResult();
 
-  protected AppDefinitionRepresentation createDefaultAppDefinition(String id) {
-    AppDefinitionRepresentation app = new AppDefinitionRepresentation();
-    return app;
-  }
+        if (deployment == null) {
+            throw new NotFoundException("No app definition is found with key: " + deploymentKey);
+        }
 
-  protected AppDefinitionRepresentation createRepresentation(Deployment deployment) {
-    AppDefinitionRepresentation resultAppDef = new AppDefinitionRepresentation();
-    resultAppDef.setDeploymentId(deployment.getId());
-    resultAppDef.setDeploymentKey(deployment.getKey());
-    resultAppDef.setName(deployment.getName());
-    AppModel appModel = repositoryService.getAppResourceModel(deployment.getId());
-    resultAppDef.setTheme(appModel.getTheme());
-    resultAppDef.setIcon(appModel.getIcon());
-    return resultAppDef;
-  }
+        return createRepresentation(deployment);
+    }
+
+    protected AppDefinitionRepresentation createDefaultAppDefinition(String id) {
+        AppDefinitionRepresentation app = new AppDefinitionRepresentation();
+        return app;
+    }
+
+    protected AppDefinitionRepresentation createRepresentation(Deployment deployment) {
+        AppDefinitionRepresentation resultAppDef = new AppDefinitionRepresentation();
+        resultAppDef.setDeploymentId(deployment.getId());
+        resultAppDef.setDeploymentKey(deployment.getKey());
+        resultAppDef.setName(deployment.getName());
+        AppModel appModel = repositoryService.getAppResourceModel(deployment.getId());
+        resultAppDef.setTheme(appModel.getTheme());
+        resultAppDef.setIcon(appModel.getIcon());
+        return resultAppDef;
+    }
 }

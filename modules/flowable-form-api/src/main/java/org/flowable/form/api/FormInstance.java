@@ -27,37 +27,37 @@ import java.util.Date;
  */
 public interface FormInstance {
 
-  /** unique identifier */
-  String getId();
+    /** unique identifier */
+    String getId();
 
-  /**
-   * category name which is derived from the targetNamespace attribute in the definitions element
-   */
-  String getFormDefinitionId();
+    /**
+     * category name which is derived from the targetNamespace attribute in the definitions element
+     */
+    String getFormDefinitionId();
 
-  /** label used for display purposes */
-  String getTaskId();
+    /** label used for display purposes */
+    String getTaskId();
 
-  /** unique name for all versions this process definitions */
-  String getProcessInstanceId();
+    /** unique name for all versions this process definitions */
+    String getProcessInstanceId();
 
-  /** description of this process **/
-  String getProcessDefinitionId();
+    /** description of this process **/
+    String getProcessDefinitionId();
 
-  /** version of this process definition */
-  Date getSubmittedDate();
+    /** version of this process definition */
+    Date getSubmittedDate();
 
-  /**
-   * name of {@link RepositoryService#getResourceAsStream(String, String) the resource} of this process definition.
-   */
-  String getSubmittedBy();
+    /**
+     * name of {@link RepositoryService#getResourceAsStream(String, String) the resource} of this process definition.
+     */
+    String getSubmittedBy();
 
-  /** The deployment in which this process definition is contained. */
-  String getFormValuesId();
+    /** The deployment in which this process definition is contained. */
+    String getFormValuesId();
 
-  /** The tenant identifier of this process definition */
-  String getTenantId();
-  
-  byte[] getFormValueBytes();
+    /** The tenant identifier of this process definition */
+    String getTenantId();
+
+    byte[] getFormValueBytes();
 
 }

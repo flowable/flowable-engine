@@ -19,6 +19,6 @@ import org.slf4j.Logger;
  */
 public interface DebugInfo {
 
-  void printOut(Logger logger);
+    void printOut(Logger logger);
 
 }

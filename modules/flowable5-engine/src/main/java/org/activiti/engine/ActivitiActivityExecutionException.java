@@ -13,16 +13,15 @@
 
 package org.activiti.engine;
 
-
 public class ActivitiActivityExecutionException extends ActivitiException {
 
-  private static final long serialVersionUID = 1L;
-  
-  public ActivitiActivityExecutionException(String message) {
-    super(message);
-  }
-  
-  public ActivitiActivityExecutionException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    private static final long serialVersionUID = 1L;
+
+    public ActivitiActivityExecutionException(String message) {
+        super(message);
+    }
+
+    public ActivitiActivityExecutionException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

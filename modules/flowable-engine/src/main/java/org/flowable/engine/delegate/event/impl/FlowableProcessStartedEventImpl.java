@@ -25,41 +25,41 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
  */
 public class FlowableProcessStartedEventImpl extends FlowableEntityWithVariablesEventImpl implements FlowableProcessStartedEvent {
 
-  protected final String nestedProcessInstanceId;
+    protected final String nestedProcessInstanceId;
 
-  protected final String nestedProcessDefinitionId;
+    protected final String nestedProcessDefinitionId;
 
-  public FlowableProcessStartedEventImpl(final Object entity, final Map variables, final boolean localScope) {
-    super(entity, variables, localScope, FlowableEngineEventType.PROCESS_STARTED);
-    if (entity instanceof ExecutionEntity) {
-      ExecutionEntity executionEntity = (ExecutionEntity) entity;
-      if (!executionEntity.isProcessInstanceType()) {
-        executionEntity = executionEntity.getParent();
-      }
-      
-      final ExecutionEntity superExecution = executionEntity.getSuperExecution();
-      if (superExecution != null) {
-        this.nestedProcessDefinitionId = superExecution.getProcessDefinitionId();
-        this.nestedProcessInstanceId = superExecution.getProcessInstanceId();
-      } else {
-        this.nestedProcessDefinitionId = null;
-        this.nestedProcessInstanceId = null;
-      }
-      
-    } else {
-      this.nestedProcessDefinitionId = null;
-      this.nestedProcessInstanceId = null;
+    public FlowableProcessStartedEventImpl(final Object entity, final Map variables, final boolean localScope) {
+        super(entity, variables, localScope, FlowableEngineEventType.PROCESS_STARTED);
+        if (entity instanceof ExecutionEntity) {
+            ExecutionEntity executionEntity = (ExecutionEntity) entity;
+            if (!executionEntity.isProcessInstanceType()) {
+                executionEntity = executionEntity.getParent();
+            }
+
+            final ExecutionEntity superExecution = executionEntity.getSuperExecution();
+            if (superExecution != null) {
+                this.nestedProcessDefinitionId = superExecution.getProcessDefinitionId();
+                this.nestedProcessInstanceId = superExecution.getProcessInstanceId();
+            } else {
+                this.nestedProcessDefinitionId = null;
+                this.nestedProcessInstanceId = null;
+            }
+
+        } else {
+            this.nestedProcessDefinitionId = null;
+            this.nestedProcessInstanceId = null;
+        }
     }
-  }
 
-  @Override
-  public String getNestedProcessInstanceId() {
-    return this.nestedProcessInstanceId;
-  }
+    @Override
+    public String getNestedProcessInstanceId() {
+        return this.nestedProcessInstanceId;
+    }
 
-  @Override
-  public String getNestedProcessDefinitionId() {
-    return this.nestedProcessDefinitionId;
-  }
+    @Override
+    public String getNestedProcessDefinitionId() {
+        return this.nestedProcessDefinitionId;
+    }
 
 }

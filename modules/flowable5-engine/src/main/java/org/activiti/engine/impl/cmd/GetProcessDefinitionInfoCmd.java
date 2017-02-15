@@ -22,35 +22,34 @@ import org.activiti.engine.impl.persistence.deploy.ProcessDefinitionInfoCacheObj
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-
 /**
  * @author Tijs Rademakers
  */
 public class GetProcessDefinitionInfoCmd implements Command<ObjectNode>, Serializable {
-  
-  private static final long serialVersionUID = 1L;
-  
-  protected String processDefinitionId;
-  
-  public GetProcessDefinitionInfoCmd(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
-  
-  public ObjectNode execute(CommandContext commandContext) {
-    if (processDefinitionId == null) {
-      throw new ActivitiIllegalArgumentException("process definition id is null");
+
+    private static final long serialVersionUID = 1L;
+
+    protected String processDefinitionId;
+
+    public GetProcessDefinitionInfoCmd(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
     }
-    
-    ObjectNode resultNode = null;
-    DeploymentManager deploymentManager = commandContext.getProcessEngineConfiguration().getDeploymentManager();
-    // make sure the process definition is in the cache
-    deploymentManager.findDeployedProcessDefinitionById(processDefinitionId);
-    ProcessDefinitionInfoCacheObject definitionInfoCacheObject = deploymentManager.getProcessDefinitionInfoCache().get(processDefinitionId);
-    if (definitionInfoCacheObject != null) {
-      resultNode = definitionInfoCacheObject.getInfoNode();
+
+    public ObjectNode execute(CommandContext commandContext) {
+        if (processDefinitionId == null) {
+            throw new ActivitiIllegalArgumentException("process definition id is null");
+        }
+
+        ObjectNode resultNode = null;
+        DeploymentManager deploymentManager = commandContext.getProcessEngineConfiguration().getDeploymentManager();
+        // make sure the process definition is in the cache
+        deploymentManager.findDeployedProcessDefinitionById(processDefinitionId);
+        ProcessDefinitionInfoCacheObject definitionInfoCacheObject = deploymentManager.getProcessDefinitionInfoCache().get(processDefinitionId);
+        if (definitionInfoCacheObject != null) {
+            resultNode = definitionInfoCacheObject.getInfoNode();
+        }
+
+        return resultNode;
     }
-    
-    return resultNode;
-  }
 
 }

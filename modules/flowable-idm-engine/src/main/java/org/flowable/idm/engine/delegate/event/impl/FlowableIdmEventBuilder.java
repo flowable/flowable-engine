@@ -24,33 +24,33 @@ import org.flowable.idm.api.event.FlowableIdmMembershipEvent;
  */
 public class FlowableIdmEventBuilder {
 
-  /**
-   * @param type
-   *          type of event
-   * @return an {@link FlowableEvent} that doesn't have it's execution context-fields filled, as the event is a global event, independent of any running execution.
-   */
-  public static FlowableEvent createGlobalEvent(FlowableIdmEventType type) {
-    FlowableIdmEventImpl newEvent = new FlowableIdmEventImpl(type);
-    return newEvent;
-  }
+    /**
+     * @param type
+     *            type of event
+     * @return an {@link FlowableEvent} that doesn't have it's execution context-fields filled, as the event is a global event, independent of any running execution.
+     */
+    public static FlowableEvent createGlobalEvent(FlowableIdmEventType type) {
+        FlowableIdmEventImpl newEvent = new FlowableIdmEventImpl(type);
+        return newEvent;
+    }
 
-  /**
-   * @param type
-   *          type of event
-   * @param entity
-   *          the entity this event targets
-   * @return an {@link FlowableEntityEvent}. In case an {@link ExecutionContext} is active, the execution related event fields will be populated. If not, execution details will be retrieved from the
-   *         {@link Object} if possible.
-   */
-  public static FlowableEntityEvent createEntityEvent(FlowableIdmEventType type, Object entity) {
-    FlowableIdmEntityEventImpl newEvent = new FlowableIdmEntityEventImpl(entity, type);
-    return newEvent;
-  }
+    /**
+     * @param type
+     *            type of event
+     * @param entity
+     *            the entity this event targets
+     * @return an {@link FlowableEntityEvent}. In case an {@link ExecutionContext} is active, the execution related event fields will be populated. If not, execution details will be retrieved from the
+     *         {@link Object} if possible.
+     */
+    public static FlowableEntityEvent createEntityEvent(FlowableIdmEventType type, Object entity) {
+        FlowableIdmEntityEventImpl newEvent = new FlowableIdmEntityEventImpl(entity, type);
+        return newEvent;
+    }
 
-  public static FlowableIdmMembershipEvent createMembershipEvent(FlowableIdmEventType type, String groupId, String userId) {
-    FlowableIdmMembershipEventImpl newEvent = new FlowableIdmMembershipEventImpl(type);
-    newEvent.setUserId(userId);
-    newEvent.setGroupId(groupId);
-    return newEvent;
-  }
+    public static FlowableIdmMembershipEvent createMembershipEvent(FlowableIdmEventType type, String groupId, String userId) {
+        FlowableIdmMembershipEventImpl newEvent = new FlowableIdmMembershipEventImpl(type);
+        newEvent.setUserId(userId);
+        newEvent.setGroupId(groupId);
+        return newEvent;
+    }
 }

@@ -22,14 +22,14 @@ import org.flowable.engine.test.Deployment;
  */
 public class ScriptBeanAccessTest extends ResourceFlowableTestCase {
 
-  public ScriptBeanAccessTest() {
-    super("org/flowable/standalone/scripting/flowable.cfg.xml");
-  }
+    public ScriptBeanAccessTest() {
+        super("org/flowable/standalone/scripting/flowable.cfg.xml");
+    }
 
-  @Deployment
-  public void testConfigurationBeanAccess() {
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("ScriptBeanAccess");
-    assertEquals("myValue", runtimeService.getVariable(pi.getId(), "myVariable"));
-  }
+    @Deployment
+    public void testConfigurationBeanAccess() {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("ScriptBeanAccess");
+        assertEquals("myValue", runtimeService.getVariable(pi.getId(), "myVariable"));
+    }
 
 }

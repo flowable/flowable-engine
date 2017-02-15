@@ -21,10 +21,10 @@ import org.activiti.engine.delegate.JavaDelegate;
  * @author Joram Barrez
  */
 public class SetVariableJavaDelegate implements JavaDelegate {
-  
-  @Override
-  public void execute(DelegateExecution execution) throws Exception {
-    execution.setVariable("testVar", new Random().nextInt(100));
-  }
+
+    @Override
+    public void execute(DelegateExecution execution) throws Exception {
+        execution.setVariable("testVar", new Random().nextInt(100));
+    }
 
 }

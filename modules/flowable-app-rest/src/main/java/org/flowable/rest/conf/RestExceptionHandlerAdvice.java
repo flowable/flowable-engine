@@ -23,15 +23,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  *
- * Combined Spring MVC Exception handler
- * includes all engine (process, dmn, form and content) specific exceptions
+ * Combined Spring MVC Exception handler includes all engine (process, dmn, form and content) specific exceptions
  *
  * @author Yvo Swillens
  */
 @ControllerAdvice
 public class RestExceptionHandlerAdvice extends BaseExceptionHandlerAdvice {
 
-    @ResponseStatus(HttpStatus.CONFLICT)  // 409
+    @ResponseStatus(HttpStatus.CONFLICT) // 409
     @ExceptionHandler(FlowableTaskAlreadyClaimedException.class)
     @ResponseBody
     public ErrorInfo handleTaskAlreadyClaimed(FlowableTaskAlreadyClaimedException e) {

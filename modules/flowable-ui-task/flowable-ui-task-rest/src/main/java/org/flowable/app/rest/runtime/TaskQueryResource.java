@@ -24,13 +24,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
 public class TaskQueryResource {
-  
-  @Autowired
-  protected FlowableTaskQueryService taskQueryService;
-	
-	@RequestMapping(value = "/rest/query/tasks", method = RequestMethod.POST, produces = "application/json")
-	public ResultListDataRepresentation listTasks(@RequestBody ObjectNode requestNode) {
-		return taskQueryService.listTasks(requestNode);	
-	}
+
+    @Autowired
+    protected FlowableTaskQueryService taskQueryService;
+
+    @RequestMapping(value = "/rest/query/tasks", method = RequestMethod.POST, produces = "application/json")
+    public ResultListDataRepresentation listTasks(@RequestBody ObjectNode requestNode) {
+        return taskQueryService.listTasks(requestNode);
+    }
 
 }

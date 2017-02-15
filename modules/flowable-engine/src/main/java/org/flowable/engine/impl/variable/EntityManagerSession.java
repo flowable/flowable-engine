@@ -23,11 +23,11 @@ import org.flowable.engine.common.impl.interceptor.Session;
  * @author Frederik Heremans
  */
 public interface EntityManagerSession extends Session {
-  /**
-   * Get an {@link EntityManager} instance associated with this session.
-   * 
-   * @throws FlowableException
-   *           when no {@link EntityManagerFactory} instance is configured for the process engine.
-   */
-  EntityManager getEntityManager();
+    /**
+     * Get an {@link EntityManager} instance associated with this session.
+     * 
+     * @throws FlowableException
+     *             when no {@link EntityManagerFactory} instance is configured for the process engine.
+     */
+    EntityManager getEntityManager();
 }

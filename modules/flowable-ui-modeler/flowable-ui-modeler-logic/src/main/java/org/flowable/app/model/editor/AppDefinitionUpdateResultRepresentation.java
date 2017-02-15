@@ -16,61 +16,61 @@ import org.flowable.app.model.common.AbstractRepresentation;
 
 public class AppDefinitionUpdateResultRepresentation extends AbstractRepresentation {
 
-  public static final int CUSTOM_STENCIL_ITEM = 1;
-  public static final int MODEL_VALIDATION_ERRORS = 2;
+    public static final int CUSTOM_STENCIL_ITEM = 1;
+    public static final int MODEL_VALIDATION_ERRORS = 2;
 
-  protected AppDefinitionRepresentation appDefinition;
-  protected String message;
-  protected String messageKey;
-  protected boolean error;
-  protected int errorType;
-  protected String errorDescription;
+    protected AppDefinitionRepresentation appDefinition;
+    protected String message;
+    protected String messageKey;
+    protected boolean error;
+    protected int errorType;
+    protected String errorDescription;
 
-  public AppDefinitionRepresentation getAppDefinition() {
-    return appDefinition;
-  }
+    public AppDefinitionRepresentation getAppDefinition() {
+        return appDefinition;
+    }
 
-  public void setAppDefinition(AppDefinitionRepresentation appDefinition) {
-    this.appDefinition = appDefinition;
-  }
+    public void setAppDefinition(AppDefinitionRepresentation appDefinition) {
+        this.appDefinition = appDefinition;
+    }
 
-  public String getMessage() {
-    return message;
-  }
+    public String getMessage() {
+        return message;
+    }
 
-  public void setMessage(String message) {
-    this.message = message;
-  }
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
-  public String getMessageKey() {
-    return messageKey;
-  }
+    public String getMessageKey() {
+        return messageKey;
+    }
 
-  public void setMessageKey(String messageKey) {
-    this.messageKey = messageKey;
-  }
+    public void setMessageKey(String messageKey) {
+        this.messageKey = messageKey;
+    }
 
-  public boolean isError() {
-    return error;
-  }
+    public boolean isError() {
+        return error;
+    }
 
-  public void setError(boolean error) {
-    this.error = error;
-  }
+    public void setError(boolean error) {
+        this.error = error;
+    }
 
-  public int getErrorType() {
-    return errorType;
-  }
+    public int getErrorType() {
+        return errorType;
+    }
 
-  public void setErrorType(int errorType) {
-    this.errorType = errorType;
-  }
+    public void setErrorType(int errorType) {
+        this.errorType = errorType;
+    }
 
-  public String getErrorDescription() {
-    return errorDescription;
-  }
+    public String getErrorDescription() {
+        return errorDescription;
+    }
 
-  public void setErrorDescription(String errorDescription) {
-    this.errorDescription = errorDescription;
-  }
+    public void setErrorDescription(String errorDescription) {
+        this.errorDescription = errorDescription;
+    }
 }

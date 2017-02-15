@@ -23,23 +23,23 @@ import org.flowable.engine.test.api.event.TestFlowableEventListener;
  */
 public class EngineEventsTest extends ResourceFlowableTestCase {
 
-  public EngineEventsTest() {
-    super("org/flowable/standalone/event/flowable-eventlistener.cfg.xml");
-  }
+    public EngineEventsTest() {
+        super("org/flowable/standalone/event/flowable-eventlistener.cfg.xml");
+    }
 
-  public void testEngineEventsTest() {
-    // Fetch the listener to check received events
-    TestFlowableEventListener listener = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("eventListener");
-    assertNotNull(listener);
+    public void testEngineEventsTest() {
+        // Fetch the listener to check received events
+        TestFlowableEventListener listener = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("eventListener");
+        assertNotNull(listener);
 
-    // Check create-event
-    assertEquals(FlowableEngineEventType.ENGINE_CREATED, listener.getEventsReceived().get(0).getType());
-    listener.clearEventsReceived();
+        // Check create-event
+        assertEquals(FlowableEngineEventType.ENGINE_CREATED, listener.getEventsReceived().get(0).getType());
+        listener.clearEventsReceived();
 
-    // Check close-event
-    processEngine.close();
-    assertEquals(FlowableEngineEventType.ENGINE_CLOSED, listener.getEventsReceived().get(listener.getEventsReceived().size() - 1).getType());
+        // Check close-event
+        processEngine.close();
+        assertEquals(FlowableEngineEventType.ENGINE_CLOSED, listener.getEventsReceived().get(listener.getEventsReceived().size() - 1).getType());
 
-  }
+    }
 
 }

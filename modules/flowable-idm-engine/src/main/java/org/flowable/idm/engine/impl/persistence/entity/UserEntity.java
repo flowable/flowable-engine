@@ -23,32 +23,32 @@ import org.flowable.idm.api.User;
  */
 public interface UserEntity extends User, Entity, HasRevision {
 
-  Picture getPicture();
+    Picture getPicture();
 
-  void setPicture(Picture picture);
+    void setPicture(Picture picture);
 
-  String getId();
+    String getId();
 
-  void setId(String id);
+    void setId(String id);
 
-  String getFirstName();
+    String getFirstName();
 
-  void setFirstName(String firstName);
+    void setFirstName(String firstName);
 
-  String getLastName();
+    String getLastName();
 
-  void setLastName(String lastName);
+    void setLastName(String lastName);
 
-  String getEmail();
+    String getEmail();
 
-  void setEmail(String email);
+    void setEmail(String email);
 
-  String getPassword();
+    String getPassword();
 
-  void setPassword(String password);
+    void setPassword(String password);
 
-  boolean isPictureSet();
+    boolean isPictureSet();
 
-  ByteArrayRef getPictureByteArrayRef();
-  
+    ByteArrayRef getPictureByteArrayRef();
+
 }

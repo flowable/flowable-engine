@@ -17,42 +17,41 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
-
 /**
  * @author Joram Barrez
  */
 public class ProcessInstanceIdentityLinkTest extends PluggableFlowableTestCase {
-  
-  // Test specific for fix introduced by https://activiti.atlassian.net/browse/ACT-1591
-  // (Referential integrity constraint violation on PROC_INST and IDENTITY_LINK)
-  @Deployment
-  public void testSetAuthenticatedUserAndCompleteLastTask() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("identityLinktest");
-    
-    // There are two tasks
-    
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    taskService.complete(task.getId());
-    
-    identityService.setAuthenticatedUserId("kermit");
-    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    taskService.complete(task.getId());
-    identityService.setAuthenticatedUserId(null);
-    
-    assertProcessEnded(processInstance.getId());
-    
-  }
-  
-  // Test specific for fix introduced by https://activiti.atlassian.net/browse/ACT-1591
-  // (Referential integrity constraint violation on PROC_INST and IDENTITY_LINK)
-  @Deployment
-  public void testSetAuthenticatedUserWithNoWaitStates() {
-    identityService.setAuthenticatedUserId("kermit");
-    
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("identityLinktest");
-    assertProcessEnded(processInstance.getId());
-    
-    identityService.setAuthenticatedUserId(null);
-  }
+
+    // Test specific for fix introduced by https://activiti.atlassian.net/browse/ACT-1591
+    // (Referential integrity constraint violation on PROC_INST and IDENTITY_LINK)
+    @Deployment
+    public void testSetAuthenticatedUserAndCompleteLastTask() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("identityLinktest");
+
+        // There are two tasks
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        identityService.setAuthenticatedUserId("kermit");
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        identityService.setAuthenticatedUserId(null);
+
+        assertProcessEnded(processInstance.getId());
+
+    }
+
+    // Test specific for fix introduced by https://activiti.atlassian.net/browse/ACT-1591
+    // (Referential integrity constraint violation on PROC_INST and IDENTITY_LINK)
+    @Deployment
+    public void testSetAuthenticatedUserWithNoWaitStates() {
+        identityService.setAuthenticatedUserId("kermit");
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("identityLinktest");
+        assertProcessEnded(processInstance.getId());
+
+        identityService.setAuthenticatedUserId(null);
+    }
 
 }

@@ -26,32 +26,32 @@ import org.slf4j.LoggerFactory;
  */
 public class IntermediateThrowEventParseHandler extends AbstractActivityBpmnParseHandler<ThrowEvent> {
 
-  private static final Logger logger = LoggerFactory.getLogger(IntermediateThrowEventParseHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(IntermediateThrowEventParseHandler.class);
 
-  public Class<? extends BaseElement> getHandledType() {
-    return ThrowEvent.class;
-  }
-
-  protected void executeParse(BpmnParse bpmnParse, ThrowEvent intermediateEvent) {
-
-    EventDefinition eventDefinition = null;
-    if (!intermediateEvent.getEventDefinitions().isEmpty()) {
-      eventDefinition = intermediateEvent.getEventDefinitions().get(0);
+    public Class<? extends BaseElement> getHandledType() {
+        return ThrowEvent.class;
     }
 
-    if (eventDefinition instanceof SignalEventDefinition) {
-      SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
-      intermediateEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateThrowSignalEventActivityBehavior(intermediateEvent, signalEventDefinition,
-          bpmnParse.getBpmnModel().getSignal(signalEventDefinition.getSignalRef())));
-      
-    } else if (eventDefinition instanceof CompensateEventDefinition) { 
-      CompensateEventDefinition compensateEventDefinition = (CompensateEventDefinition) eventDefinition;
-      intermediateEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateThrowCompensationEventActivityBehavior(intermediateEvent, compensateEventDefinition));
-      
-    } else if (eventDefinition == null) {
-      intermediateEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateThrowNoneEventActivityBehavior(intermediateEvent));
-    } else {
-        logger.warn("Unsupported intermediate throw event type for throw event {}", intermediateEvent.getId());
+    protected void executeParse(BpmnParse bpmnParse, ThrowEvent intermediateEvent) {
+
+        EventDefinition eventDefinition = null;
+        if (!intermediateEvent.getEventDefinitions().isEmpty()) {
+            eventDefinition = intermediateEvent.getEventDefinitions().get(0);
+        }
+
+        if (eventDefinition instanceof SignalEventDefinition) {
+            SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
+            intermediateEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateThrowSignalEventActivityBehavior(intermediateEvent, signalEventDefinition,
+                    bpmnParse.getBpmnModel().getSignal(signalEventDefinition.getSignalRef())));
+
+        } else if (eventDefinition instanceof CompensateEventDefinition) {
+            CompensateEventDefinition compensateEventDefinition = (CompensateEventDefinition) eventDefinition;
+            intermediateEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateThrowCompensationEventActivityBehavior(intermediateEvent, compensateEventDefinition));
+
+        } else if (eventDefinition == null) {
+            intermediateEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateThrowNoneEventActivityBehavior(intermediateEvent));
+        } else {
+            logger.warn("Unsupported intermediate throw event type for throw event {}", intermediateEvent.getId());
+        }
     }
-  }
 }

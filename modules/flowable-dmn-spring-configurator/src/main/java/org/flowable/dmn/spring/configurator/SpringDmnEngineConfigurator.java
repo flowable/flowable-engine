@@ -31,66 +31,66 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
  * @author Joram Barrez
  */
 public class SpringDmnEngineConfigurator extends AbstractProcessEngineConfigurator {
-  
-  protected SpringDmnEngineConfiguration dmnEngineConfiguration;
-  
-  @Override
-  public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    
-    // Custom deployers need to be added before the process engine boots
-    List<Deployer> deployers = null;
-    if (processEngineConfiguration.getCustomPostDeployers() != null) {
-      deployers = processEngineConfiguration.getCustomPostDeployers();
-    } else {
-      deployers = new ArrayList<Deployer>();
-    }
-    deployers.add(new DmnDeployer());
-    processEngineConfiguration.setCustomPostDeployers(deployers);
-    
-  }
-  
-  @Override
-  public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    if (dmnEngineConfiguration == null) {
-      dmnEngineConfiguration = new SpringDmnEngineConfiguration();
-    }
-    
-    if (processEngineConfiguration.getDataSource() != null) {
-      DataSource originalDatasource = processEngineConfiguration.getDataSource();
-      dmnEngineConfiguration.setDataSource(originalDatasource);
-      
-    } else {
-      throw new FlowableException("A datasource is required for initializing the DMN engine ");
-    }
-    
-    dmnEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
-    
-    dmnEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
-    dmnEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
-    dmnEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
-    
-    DmnEngine dmnEngine = initDmnEngine();
-    
-    processEngineConfiguration.setDmnEngineInitialized(true);
-    processEngineConfiguration.setDmnEngineRepositoryService(dmnEngine.getDmnRepositoryService());
-    processEngineConfiguration.setDmnEngineRuleService(dmnEngine.getDmnRuleService());
-  }
 
-  protected synchronized DmnEngine initDmnEngine() {
-    if (dmnEngineConfiguration == null) {
-      throw new FlowableException("DMnEngineConfiguration is required");
+    protected SpringDmnEngineConfiguration dmnEngineConfiguration;
+
+    @Override
+    public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
+
+        // Custom deployers need to be added before the process engine boots
+        List<Deployer> deployers = null;
+        if (processEngineConfiguration.getCustomPostDeployers() != null) {
+            deployers = processEngineConfiguration.getCustomPostDeployers();
+        } else {
+            deployers = new ArrayList<Deployer>();
+        }
+        deployers.add(new DmnDeployer());
+        processEngineConfiguration.setCustomPostDeployers(deployers);
+
     }
-    
-    return dmnEngineConfiguration.buildDmnEngine();
-  }
 
-  public SpringDmnEngineConfiguration getDmnEngineConfiguration() {
-    return dmnEngineConfiguration;
-  }
+    @Override
+    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        if (dmnEngineConfiguration == null) {
+            dmnEngineConfiguration = new SpringDmnEngineConfiguration();
+        }
 
-  public SpringDmnEngineConfigurator setDmnEngineConfiguration(SpringDmnEngineConfiguration dmnEngineConfiguration) {
-    this.dmnEngineConfiguration = dmnEngineConfiguration;
-    return this;
-  }
+        if (processEngineConfiguration.getDataSource() != null) {
+            DataSource originalDatasource = processEngineConfiguration.getDataSource();
+            dmnEngineConfiguration.setDataSource(originalDatasource);
+
+        } else {
+            throw new FlowableException("A datasource is required for initializing the DMN engine ");
+        }
+
+        dmnEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
+
+        dmnEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
+        dmnEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
+        dmnEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
+
+        DmnEngine dmnEngine = initDmnEngine();
+
+        processEngineConfiguration.setDmnEngineInitialized(true);
+        processEngineConfiguration.setDmnEngineRepositoryService(dmnEngine.getDmnRepositoryService());
+        processEngineConfiguration.setDmnEngineRuleService(dmnEngine.getDmnRuleService());
+    }
+
+    protected synchronized DmnEngine initDmnEngine() {
+        if (dmnEngineConfiguration == null) {
+            throw new FlowableException("DMnEngineConfiguration is required");
+        }
+
+        return dmnEngineConfiguration.buildDmnEngine();
+    }
+
+    public SpringDmnEngineConfiguration getDmnEngineConfiguration() {
+        return dmnEngineConfiguration;
+    }
+
+    public SpringDmnEngineConfigurator setDmnEngineConfiguration(SpringDmnEngineConfiguration dmnEngineConfiguration) {
+        this.dmnEngineConfiguration = dmnEngineConfiguration;
+        return this;
+    }
 
 }

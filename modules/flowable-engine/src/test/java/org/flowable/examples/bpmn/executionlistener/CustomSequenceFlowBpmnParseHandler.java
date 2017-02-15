@@ -27,29 +27,29 @@ import org.flowable.engine.impl.bpmn.parser.handler.SequenceFlowParseHandler;
  */
 public class CustomSequenceFlowBpmnParseHandler extends SequenceFlowParseHandler {
 
-  protected void executeParse(BpmnParse bpmnParse, SequenceFlow flow) {
+    protected void executeParse(BpmnParse bpmnParse, SequenceFlow flow) {
 
-    // Do the regular stuff
-    super.executeParse(bpmnParse, flow);
+        // Do the regular stuff
+        super.executeParse(bpmnParse, flow);
 
-    // Add extension element conditions
-    Map<String, List<ExtensionElement>> extensionElements = flow.getExtensionElements();
-    if (extensionElements.containsKey("activiti_custom_condition")) {
-      List<ExtensionElement> conditionsElements = extensionElements.get("activiti_custom_condition");
-      
-      CustomSetConditionsExecutionListener customFlowListener = new CustomSetConditionsExecutionListener();
-      customFlowListener.setFlowId(flow.getId());
-      for (ExtensionElement conditionElement : conditionsElements) {
-        customFlowListener.addCondition(conditionElement.getElementText());
-      }
-      
-      FlowableListener activitiListener = new FlowableListener();
-      activitiListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_INSTANCE);
-      activitiListener.setInstance(customFlowListener);
-      activitiListener.setEvent("start");
-      flow.getSourceFlowElement().getExecutionListeners().add(activitiListener);
-      
+        // Add extension element conditions
+        Map<String, List<ExtensionElement>> extensionElements = flow.getExtensionElements();
+        if (extensionElements.containsKey("activiti_custom_condition")) {
+            List<ExtensionElement> conditionsElements = extensionElements.get("activiti_custom_condition");
+
+            CustomSetConditionsExecutionListener customFlowListener = new CustomSetConditionsExecutionListener();
+            customFlowListener.setFlowId(flow.getId());
+            for (ExtensionElement conditionElement : conditionsElements) {
+                customFlowListener.addCondition(conditionElement.getElementText());
+            }
+
+            FlowableListener activitiListener = new FlowableListener();
+            activitiListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_INSTANCE);
+            activitiListener.setInstance(customFlowListener);
+            activitiListener.setEvent("start");
+            flow.getSourceFlowElement().getExecutionListeners().add(activitiListener);
+
+        }
     }
-  }
 
 }

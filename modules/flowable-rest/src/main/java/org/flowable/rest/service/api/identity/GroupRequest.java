@@ -18,26 +18,26 @@ package org.flowable.rest.service.api.identity;
  */
 public class GroupRequest extends GroupResponse {
 
-  protected boolean isNameChanged;
-  protected boolean isTypeChanged;
+    protected boolean isNameChanged;
+    protected boolean isTypeChanged;
 
-  @Override
-  public void setType(String type) {
-    super.setType(type);
-    isTypeChanged = true;
-  }
+    @Override
+    public void setType(String type) {
+        super.setType(type);
+        isTypeChanged = true;
+    }
 
-  @Override
-  public void setName(String name) {
-    super.setName(name);
-    isNameChanged = true;
-  }
+    @Override
+    public void setName(String name) {
+        super.setName(name);
+        isNameChanged = true;
+    }
 
-  public boolean isNameChanged() {
-    return isNameChanged;
-  }
+    public boolean isNameChanged() {
+        return isNameChanged;
+    }
 
-  public boolean isTypeChanged() {
-    return isTypeChanged;
-  }
+    public boolean isTypeChanged() {
+        return isTypeChanged;
+    }
 }

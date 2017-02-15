@@ -17,23 +17,21 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.JavaDelegate;
 
-
 /**
  * @author Daniel Meyer
  */
 public class UndoService implements JavaDelegate {
-  
-  private Expression counterName;
 
-  public void execute(DelegateExecution execution) {
-    String variableName = (String) counterName.getValue(execution);
-    Object variable = execution.getVariable(variableName);
-    if(variable == null) {
-      execution.setVariable(variableName, 1);
+    private Expression counterName;
+
+    public void execute(DelegateExecution execution) {
+        String variableName = (String) counterName.getValue(execution);
+        Object variable = execution.getVariable(variableName);
+        if (variable == null) {
+            execution.setVariable(variableName, 1);
+        } else {
+            execution.setVariable(variableName, ((Integer) variable) + 1);
+        }
     }
-    else  {
-      execution.setVariable(variableName, ((Integer)variable)+1);
-    }
-  }
 
 }

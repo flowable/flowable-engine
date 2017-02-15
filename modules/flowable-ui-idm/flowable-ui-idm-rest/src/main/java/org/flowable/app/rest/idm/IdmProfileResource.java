@@ -47,70 +47,70 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping(value = "/rest/admin")
 public class IdmProfileResource {
-  
-  @Autowired
-  protected ProfileService profileService;
-  
-  @Autowired
-  protected GroupService groupService;
 
-  @RequestMapping(value = "/profile", method = RequestMethod.GET, produces = "application/json")
-  public UserRepresentation getProfile() {
-    User user = SecurityUtils.getCurrentFlowableAppUser().getUserObject();
-    UserRepresentation userRepresentation = new UserRepresentation(user);
-    for (Group group : groupService.getGroupsForUser(user.getId())) {
-      userRepresentation.getGroups().add(new GroupRepresentation(group));
-    }
-    return userRepresentation;
-  }
+    @Autowired
+    protected ProfileService profileService;
 
-  @RequestMapping(value = "/profile", method = RequestMethod.POST, produces = "application/json")
-  public UserRepresentation updateProfile(@RequestBody UserRepresentation userRepresentation) {
-    return new UserRepresentation(profileService.updateProfile(userRepresentation.getFirstName(), 
-        userRepresentation.getLastName(), 
-        userRepresentation.getEmail()));
-  }
-  
-  @ResponseStatus(value = HttpStatus.OK)
-  @RequestMapping(value = "/profile-password", method = RequestMethod.POST, produces = "application/json")
-  public void changePassword(@RequestBody ChangePasswordRepresentation changePasswordRepresentation) {
-    profileService.changePassword(changePasswordRepresentation.getOriginalPassword(), changePasswordRepresentation.getNewPassword());
-  }
-  
-  @RequestMapping(value = "/profile-picture", method = RequestMethod.GET)
-  public void getProfilePicture(HttpServletResponse response) {
-    try {
-      Pair<String, InputStream> picture = profileService.getProfilePicture();
-      if (picture == null) {
-        throw new NotFoundException();
-      }
-      response.setContentType(picture.getLeft());
-      ServletOutputStream servletOutputStream = response.getOutputStream();
-  
-      byte[] buffer = new byte[32384];
-      while (true) {
-        int count = picture.getRight().read(buffer);
-        if (count == -1)
-          break;
-        servletOutputStream.write(buffer, 0, count);
-      }
-  
-      // Flush and close stream
-      servletOutputStream.flush();
-      servletOutputStream.close();
-    } catch (Exception e) {
-      throw new InternalServerErrorException("Could not get profile picture", e);
-    }
-  }
+    @Autowired
+    protected GroupService groupService;
 
-  @ResponseStatus(value = HttpStatus.OK)
-  @RequestMapping(value = "/profile-picture", method = RequestMethod.POST, produces = "application/json")
-  public void uploadProfilePicture(@RequestParam("file") MultipartFile file) {
-    try {
-      profileService.uploadProfilePicture(file.getContentType(), file.getBytes());
-    } catch (IOException e) {
-      throw new InternalServerErrorException(e.getMessage(), e);
+    @RequestMapping(value = "/profile", method = RequestMethod.GET, produces = "application/json")
+    public UserRepresentation getProfile() {
+        User user = SecurityUtils.getCurrentFlowableAppUser().getUserObject();
+        UserRepresentation userRepresentation = new UserRepresentation(user);
+        for (Group group : groupService.getGroupsForUser(user.getId())) {
+            userRepresentation.getGroups().add(new GroupRepresentation(group));
+        }
+        return userRepresentation;
     }
-  }
-  
+
+    @RequestMapping(value = "/profile", method = RequestMethod.POST, produces = "application/json")
+    public UserRepresentation updateProfile(@RequestBody UserRepresentation userRepresentation) {
+        return new UserRepresentation(profileService.updateProfile(userRepresentation.getFirstName(),
+                userRepresentation.getLastName(),
+                userRepresentation.getEmail()));
+    }
+
+    @ResponseStatus(value = HttpStatus.OK)
+    @RequestMapping(value = "/profile-password", method = RequestMethod.POST, produces = "application/json")
+    public void changePassword(@RequestBody ChangePasswordRepresentation changePasswordRepresentation) {
+        profileService.changePassword(changePasswordRepresentation.getOriginalPassword(), changePasswordRepresentation.getNewPassword());
+    }
+
+    @RequestMapping(value = "/profile-picture", method = RequestMethod.GET)
+    public void getProfilePicture(HttpServletResponse response) {
+        try {
+            Pair<String, InputStream> picture = profileService.getProfilePicture();
+            if (picture == null) {
+                throw new NotFoundException();
+            }
+            response.setContentType(picture.getLeft());
+            ServletOutputStream servletOutputStream = response.getOutputStream();
+
+            byte[] buffer = new byte[32384];
+            while (true) {
+                int count = picture.getRight().read(buffer);
+                if (count == -1)
+                    break;
+                servletOutputStream.write(buffer, 0, count);
+            }
+
+            // Flush and close stream
+            servletOutputStream.flush();
+            servletOutputStream.close();
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Could not get profile picture", e);
+        }
+    }
+
+    @ResponseStatus(value = HttpStatus.OK)
+    @RequestMapping(value = "/profile-picture", method = RequestMethod.POST, produces = "application/json")
+    public void uploadProfilePicture(@RequestParam("file") MultipartFile file) {
+        try {
+            profileService.uploadProfilePicture(file.getContentType(), file.getBytes());
+        } catch (IOException e) {
+            throw new InternalServerErrorException(e.getMessage(), e);
+        }
+    }
+
 }

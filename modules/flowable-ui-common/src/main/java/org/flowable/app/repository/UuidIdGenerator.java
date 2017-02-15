@@ -16,25 +16,25 @@ import com.fasterxml.uuid.impl.TimeBasedGenerator;
 @Component
 public class UuidIdGenerator {
 
-  // different ProcessEngines on the same classloader share one generator.
-  protected static volatile TimeBasedGenerator timeBasedGenerator;
+    // different ProcessEngines on the same classloader share one generator.
+    protected static volatile TimeBasedGenerator timeBasedGenerator;
 
-  public UuidIdGenerator() {
-    ensureGeneratorInitialized();
-  }
-
-  protected void ensureGeneratorInitialized() {
-    if (timeBasedGenerator == null) {
-      synchronized (UuidIdGenerator.class) {
-        if (timeBasedGenerator == null) {
-          timeBasedGenerator = Generators.timeBasedGenerator(EthernetAddress.fromInterface());
-        }
-      }
+    public UuidIdGenerator() {
+        ensureGeneratorInitialized();
     }
-  }
 
-  public String generateId() {
-    return timeBasedGenerator.generate().toString();
-  }
+    protected void ensureGeneratorInitialized() {
+        if (timeBasedGenerator == null) {
+            synchronized (UuidIdGenerator.class) {
+                if (timeBasedGenerator == null) {
+                    timeBasedGenerator = Generators.timeBasedGenerator(EthernetAddress.fromInterface());
+                }
+            }
+        }
+    }
+
+    public String generateId() {
+        return timeBasedGenerator.generate().toString();
+    }
 
 }

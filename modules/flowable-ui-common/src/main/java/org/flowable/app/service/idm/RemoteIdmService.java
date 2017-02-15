@@ -19,15 +19,15 @@ import org.flowable.app.model.common.RemoteToken;
 import org.flowable.app.model.common.RemoteUser;
 
 public interface RemoteIdmService {
-  
-  RemoteUser authenticateUser(String username, String password);
-  
-  RemoteToken getToken(String tokenValue);
-  
-  RemoteUser getUser(String userId);
-  
-  List<RemoteUser> findUsersByNameFilter(String filter);
-  
-  List<RemoteGroup> findGroupsByNameFilter(String filter);
+
+    RemoteUser authenticateUser(String username, String password);
+
+    RemoteToken getToken(String tokenValue);
+
+    RemoteUser getUser(String userId);
+
+    List<RemoteUser> findUsersByNameFilter(String filter);
+
+    List<RemoteGroup> findGroupsByNameFilter(String filter);
 
 }

@@ -57,20 +57,19 @@ public class DmnXMLUtil implements DmnXMLConstants {
 
     public static void addXMLLocation(DmnElement element, XMLStreamReader xtr) {
         Location location = xtr.getLocation();
-        //element.setXmlRowNumber(location.getLineNumber());
-        //element.setXmlColumnNumber(location.getColumnNumber());
+        // element.setXmlRowNumber(location.getLineNumber());
+        // element.setXmlColumnNumber(location.getColumnNumber());
     }
 
-//    public static void parseChildElements(String elementName, DmnElement parentElement, XMLStreamReader xtr, DmnDefinition model) throws Exception {
-//        String test = ""
-//        parseChildElements(elementName, parentElement, xtr, null, model);
-//    }
+    // public static void parseChildElements(String elementName, DmnElement parentElement, XMLStreamReader xtr, DmnDefinition model) throws Exception {
+    // String test = ""
+    // parseChildElements(elementName, parentElement, xtr, null, model);
+    // }
 
     public static void parseChildElements(String elementName, DmnElement parentElement, XMLStreamReader xtr,
-                                          Map<String, BaseChildElementParser> childParsers, DecisionTable decisionTable) throws Exception {
+            Map<String, BaseChildElementParser> childParsers, DecisionTable decisionTable) throws Exception {
 
-        Map<String, BaseChildElementParser> localParserMap =
-                new HashMap<String, BaseChildElementParser>(genericChildParserMap);
+        Map<String, BaseChildElementParser> localParserMap = new HashMap<String, BaseChildElementParser>(genericChildParserMap);
         if (childParsers != null) {
             localParserMap.putAll(childParsers);
         }
@@ -79,32 +78,32 @@ public class DmnXMLUtil implements DmnXMLConstants {
         boolean readyWithChildElements = false;
         while (!readyWithChildElements && xtr.hasNext()) {
             xtr.next();
-            
+
             if (xtr.isStartElement()) {
-                
+
                 if (ELEMENT_EXTENSIONS.equals(xtr.getLocalName())) {
-                  inExtensionElements = true;
+                    inExtensionElements = true;
                 } else if (localParserMap.containsKey(xtr.getLocalName())) {
-                  BaseChildElementParser childParser = localParserMap.get(xtr.getLocalName());
-                  //if we're into an extension element but the current element is not accepted by this parentElement then is read as a custom extension element
-                  if (inExtensionElements && !childParser.accepts(parentElement)) {
-                    DmnExtensionElement extensionElement = parseExtensionElement(xtr);
-                    parentElement.addExtensionElement(extensionElement);
-                    continue;
-                  }
-                  localParserMap.get(xtr.getLocalName()).parseChildElement(xtr, parentElement, decisionTable);
+                    BaseChildElementParser childParser = localParserMap.get(xtr.getLocalName());
+                    // if we're into an extension element but the current element is not accepted by this parentElement then is read as a custom extension element
+                    if (inExtensionElements && !childParser.accepts(parentElement)) {
+                        DmnExtensionElement extensionElement = parseExtensionElement(xtr);
+                        parentElement.addExtensionElement(extensionElement);
+                        continue;
+                    }
+                    localParserMap.get(xtr.getLocalName()).parseChildElement(xtr, parentElement, decisionTable);
                 } else if (inExtensionElements) {
                     DmnExtensionElement extensionElement = parseExtensionElement(xtr);
-                  parentElement.addExtensionElement(extensionElement);
+                    parentElement.addExtensionElement(extensionElement);
                 }
 
-              } else if (xtr.isEndElement()) {
+            } else if (xtr.isEndElement()) {
                 if (ELEMENT_EXTENSIONS.equals(xtr.getLocalName())) {
-                  inExtensionElements = false;
+                    inExtensionElements = false;
                 } else if (elementName.equalsIgnoreCase(xtr.getLocalName())) {
-                  readyWithChildElements = true;
+                    readyWithChildElements = true;
                 }
-              }
+            }
         }
     }
 
@@ -119,47 +118,47 @@ public class DmnXMLUtil implements DmnXMLConstants {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, attributeName, value);
         }
     }
-    
+
     public static DmnExtensionElement parseExtensionElement(XMLStreamReader xtr) throws Exception {
         DmnExtensionElement extensionElement = new DmnExtensionElement();
         extensionElement.setName(xtr.getLocalName());
         if (StringUtils.isNotEmpty(xtr.getNamespaceURI())) {
-          extensionElement.setNamespace(xtr.getNamespaceURI());
+            extensionElement.setNamespace(xtr.getNamespaceURI());
         }
         if (StringUtils.isNotEmpty(xtr.getPrefix())) {
-          extensionElement.setNamespacePrefix(xtr.getPrefix());
+            extensionElement.setNamespacePrefix(xtr.getPrefix());
         }
-        
+
         for (int i = 0; i < xtr.getAttributeCount(); i++) {
-          DmnExtensionAttribute extensionAttribute = new DmnExtensionAttribute();
-          extensionAttribute.setName(xtr.getAttributeLocalName(i));
-          extensionAttribute.setValue(xtr.getAttributeValue(i));
-          if (StringUtils.isNotEmpty(xtr.getAttributeNamespace(i))) {
-            extensionAttribute.setNamespace(xtr.getAttributeNamespace(i));
-          }
-          if (StringUtils.isNotEmpty(xtr.getAttributePrefix(i))) {
-            extensionAttribute.setNamespacePrefix(xtr.getAttributePrefix(i));
-          }
-          extensionElement.addAttribute(extensionAttribute);
+            DmnExtensionAttribute extensionAttribute = new DmnExtensionAttribute();
+            extensionAttribute.setName(xtr.getAttributeLocalName(i));
+            extensionAttribute.setValue(xtr.getAttributeValue(i));
+            if (StringUtils.isNotEmpty(xtr.getAttributeNamespace(i))) {
+                extensionAttribute.setNamespace(xtr.getAttributeNamespace(i));
+            }
+            if (StringUtils.isNotEmpty(xtr.getAttributePrefix(i))) {
+                extensionAttribute.setNamespacePrefix(xtr.getAttributePrefix(i));
+            }
+            extensionElement.addAttribute(extensionAttribute);
         }
-        
+
         boolean readyWithExtensionElement = false;
         while (!readyWithExtensionElement && xtr.hasNext()) {
-          xtr.next();
-          if (xtr.isCharacters() || XMLStreamReader.CDATA == xtr.getEventType()) {
-            if (StringUtils.isNotEmpty(xtr.getText().trim())) {
-              extensionElement.setElementText(xtr.getText().trim());
+            xtr.next();
+            if (xtr.isCharacters() || XMLStreamReader.CDATA == xtr.getEventType()) {
+                if (StringUtils.isNotEmpty(xtr.getText().trim())) {
+                    extensionElement.setElementText(xtr.getText().trim());
+                }
+            } else if (xtr.isStartElement()) {
+                DmnExtensionElement childExtensionElement = parseExtensionElement(xtr);
+                extensionElement.addChildElement(childExtensionElement);
+            } else if (xtr.isEndElement() && extensionElement.getName().equalsIgnoreCase(xtr.getLocalName())) {
+                readyWithExtensionElement = true;
             }
-          } else if (xtr.isStartElement()) {
-              DmnExtensionElement childExtensionElement = parseExtensionElement(xtr);
-            extensionElement.addChildElement(childExtensionElement);
-          } else if (xtr.isEndElement() && extensionElement.getName().equalsIgnoreCase(xtr.getLocalName())) {
-            readyWithExtensionElement = true;
-          }
         }
         return extensionElement;
-      }
-    
+    }
+
     public static void writeElementDescription(DmnElement dmnElement, XMLStreamWriter xtw) throws Exception {
         if (StringUtils.isNotEmpty(dmnElement.getDescription()) && !"null".equalsIgnoreCase(dmnElement.getDescription())) {
             xtw.writeStartElement(ELEMENT_DESCRIPTION);
@@ -167,17 +166,17 @@ public class DmnXMLUtil implements DmnXMLConstants {
             xtw.writeEndElement();
         }
     }
-    
+
     public static void writeExtensionElements(DmnElement dmnElement, XMLStreamWriter xtw) throws Exception {
         if (writeExtensionElements(dmnElement, false, xtw)) {
             xtw.writeEndElement();
         }
     }
-    
+
     public static boolean writeExtensionElements(DmnElement dmnElement, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
         return writeExtensionElements(dmnElement, didWriteExtensionStartElement, null, xtw);
     }
-    
+
     public static boolean writeExtensionElements(DmnElement dmnElement, boolean didWriteExtensionStartElement, Map<String, String> namespaceMap, XMLStreamWriter xtw) throws Exception {
         if (!dmnElement.getExtensionElements().isEmpty()) {
             if (!didWriteExtensionStartElement) {

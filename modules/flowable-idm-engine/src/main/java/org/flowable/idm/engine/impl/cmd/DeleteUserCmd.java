@@ -23,19 +23,19 @@ import org.flowable.idm.engine.impl.interceptor.CommandContext;
  */
 public class DeleteUserCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  String userId;
+    private static final long serialVersionUID = 1L;
+    String userId;
 
-  public DeleteUserCmd(String userId) {
-    this.userId = userId;
-  }
-
-  public Void execute(CommandContext commandContext) {
-    if (userId == null) {
-      throw new FlowableIllegalArgumentException("userId is null");
+    public DeleteUserCmd(String userId) {
+        this.userId = userId;
     }
-    commandContext.getUserEntityManager().delete(userId);
 
-    return null;
-  }
+    public Void execute(CommandContext commandContext) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("userId is null");
+        }
+        commandContext.getUserEntityManager().delete(userId);
+
+        return null;
+    }
 }

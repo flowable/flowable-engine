@@ -17,7 +17,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-
 /**
  * @author Yvo Swillens
  * @author Bassam Al-Sarori
@@ -54,26 +53,25 @@ public abstract class DmnElement {
     public void setDescription(String description) {
         this.description = description;
     }
-    
+
     public Map<String, List<DmnExtensionElement>> getExtensionElements() {
         return extensionElements;
     }
-    
+
     public void addExtensionElement(DmnExtensionElement extensionElement) {
         if (extensionElement != null && extensionElement.getName() != null && !extensionElement.getName().trim().isEmpty()) {
-          List<DmnExtensionElement> elementList = null;
-          if (!this.extensionElements.containsKey(extensionElement.getName())) {
-            elementList = new ArrayList<DmnExtensionElement>();
-            this.extensionElements.put(extensionElement.getName(), elementList);
-          }
-          this.extensionElements.get(extensionElement.getName()).add(extensionElement);
+            List<DmnExtensionElement> elementList = null;
+            if (!this.extensionElements.containsKey(extensionElement.getName())) {
+                elementList = new ArrayList<DmnExtensionElement>();
+                this.extensionElements.put(extensionElement.getName(), elementList);
+            }
+            this.extensionElements.get(extensionElement.getName()).add(extensionElement);
         }
-      }
+    }
 
-      public void setExtensionElements(Map<String, List<DmnExtensionElement>> extensionElements) {
+    public void setExtensionElements(Map<String, List<DmnExtensionElement>> extensionElements) {
         this.extensionElements = extensionElements;
-      }
-
+    }
 
     public Map<String, List<DmnExtensionAttribute>> getAttributes() {
         return attributes;
@@ -87,8 +85,8 @@ public abstract class DmnElement {
         List<DmnExtensionAttribute> attributes = getAttributes().get(name);
         if (attributes != null && !attributes.isEmpty()) {
             for (DmnExtensionAttribute attribute : attributes) {
-                if ( (namespace == null && attribute.getNamespace() == null)
-                        || namespace.equals(attribute.getNamespace()) )
+                if ((namespace == null && attribute.getNamespace() == null)
+                        || namespace.equals(attribute.getNamespace()))
                     return attribute.getValue();
             }
         }

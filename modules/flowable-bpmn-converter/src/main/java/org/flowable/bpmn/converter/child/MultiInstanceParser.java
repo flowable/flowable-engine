@@ -25,48 +25,48 @@ import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
  */
 public class MultiInstanceParser extends BaseChildElementParser {
 
-  public String getElementName() {
-    return ELEMENT_MULTIINSTANCE;
-  }
-
-  public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-    if (!(parentElement instanceof Activity))
-      return;
-
-    MultiInstanceLoopCharacteristics multiInstanceDef = new MultiInstanceLoopCharacteristics();
-    BpmnXMLUtil.addXMLLocation(multiInstanceDef, xtr);
-    if (xtr.getAttributeValue(null, ATTRIBUTE_MULTIINSTANCE_SEQUENTIAL) != null) {
-      multiInstanceDef.setSequential(Boolean.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_MULTIINSTANCE_SEQUENTIAL)));
+    public String getElementName() {
+        return ELEMENT_MULTIINSTANCE;
     }
-    multiInstanceDef.setInputDataItem(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_MULTIINSTANCE_COLLECTION, xtr));
-    multiInstanceDef.setElementVariable(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_MULTIINSTANCE_VARIABLE, xtr));
-    multiInstanceDef.setElementIndexVariable(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_MULTIINSTANCE_INDEX_VARIABLE, xtr));
 
-    boolean readyWithMultiInstance = false;
-    try {
-      while (!readyWithMultiInstance && xtr.hasNext()) {
-        xtr.next();
-        if (xtr.isStartElement() && ELEMENT_MULTIINSTANCE_CARDINALITY.equalsIgnoreCase(xtr.getLocalName())) {
-          multiInstanceDef.setLoopCardinality(xtr.getElementText());
+    public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
+        if (!(parentElement instanceof Activity))
+            return;
 
-        } else if (xtr.isStartElement() && ELEMENT_MULTIINSTANCE_DATAINPUT.equalsIgnoreCase(xtr.getLocalName())) {
-          multiInstanceDef.setInputDataItem(xtr.getElementText());
-
-        } else if (xtr.isStartElement() && ELEMENT_MULTIINSTANCE_DATAITEM.equalsIgnoreCase(xtr.getLocalName())) {
-          if (xtr.getAttributeValue(null, ATTRIBUTE_NAME) != null) {
-            multiInstanceDef.setElementVariable(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
-          }
-
-        } else if (xtr.isStartElement() && ELEMENT_MULTIINSTANCE_CONDITION.equalsIgnoreCase(xtr.getLocalName())) {
-          multiInstanceDef.setCompletionCondition(xtr.getElementText());
-
-        } else if (xtr.isEndElement() && getElementName().equalsIgnoreCase(xtr.getLocalName())) {
-          readyWithMultiInstance = true;
+        MultiInstanceLoopCharacteristics multiInstanceDef = new MultiInstanceLoopCharacteristics();
+        BpmnXMLUtil.addXMLLocation(multiInstanceDef, xtr);
+        if (xtr.getAttributeValue(null, ATTRIBUTE_MULTIINSTANCE_SEQUENTIAL) != null) {
+            multiInstanceDef.setSequential(Boolean.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_MULTIINSTANCE_SEQUENTIAL)));
         }
-      }
-    } catch (Exception e) {
-      LOGGER.warn("Error parsing multi instance definition", e);
+        multiInstanceDef.setInputDataItem(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_MULTIINSTANCE_COLLECTION, xtr));
+        multiInstanceDef.setElementVariable(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_MULTIINSTANCE_VARIABLE, xtr));
+        multiInstanceDef.setElementIndexVariable(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_MULTIINSTANCE_INDEX_VARIABLE, xtr));
+
+        boolean readyWithMultiInstance = false;
+        try {
+            while (!readyWithMultiInstance && xtr.hasNext()) {
+                xtr.next();
+                if (xtr.isStartElement() && ELEMENT_MULTIINSTANCE_CARDINALITY.equalsIgnoreCase(xtr.getLocalName())) {
+                    multiInstanceDef.setLoopCardinality(xtr.getElementText());
+
+                } else if (xtr.isStartElement() && ELEMENT_MULTIINSTANCE_DATAINPUT.equalsIgnoreCase(xtr.getLocalName())) {
+                    multiInstanceDef.setInputDataItem(xtr.getElementText());
+
+                } else if (xtr.isStartElement() && ELEMENT_MULTIINSTANCE_DATAITEM.equalsIgnoreCase(xtr.getLocalName())) {
+                    if (xtr.getAttributeValue(null, ATTRIBUTE_NAME) != null) {
+                        multiInstanceDef.setElementVariable(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
+                    }
+
+                } else if (xtr.isStartElement() && ELEMENT_MULTIINSTANCE_CONDITION.equalsIgnoreCase(xtr.getLocalName())) {
+                    multiInstanceDef.setCompletionCondition(xtr.getElementText());
+
+                } else if (xtr.isEndElement() && getElementName().equalsIgnoreCase(xtr.getLocalName())) {
+                    readyWithMultiInstance = true;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Error parsing multi instance definition", e);
+        }
+        ((Activity) parentElement).setLoopCharacteristics(multiInstanceDef);
     }
-    ((Activity) parentElement).setLoopCharacteristics(multiInstanceDef);
-  }
 }

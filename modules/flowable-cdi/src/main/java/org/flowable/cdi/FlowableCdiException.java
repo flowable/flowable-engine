@@ -21,14 +21,14 @@ import org.flowable.engine.common.api.FlowableException;
  */
 public class FlowableCdiException extends FlowableException {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public FlowableCdiException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public FlowableCdiException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-  public FlowableCdiException(String message) {
-    super(message);
-  }
+    public FlowableCdiException(String message) {
+        super(message);
+    }
 
 }

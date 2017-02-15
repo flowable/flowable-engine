@@ -12,22 +12,21 @@
  */
 package org.flowable.app.service.exception;
 
-
 /**
  * @author jbarrez
  */
 public class InternalServerErrorException extends BaseModelerRestException {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public InternalServerErrorException() {
-	}
+    public InternalServerErrorException() {
+    }
 
-	public InternalServerErrorException(String message) {
-		super(message);
-	}
-	
-	public InternalServerErrorException(String message, Throwable t) {
-		super(message, t);
-	}
+    public InternalServerErrorException(String message) {
+        super(message);
+    }
+
+    public InternalServerErrorException(String message, Throwable t) {
+        super(message, t);
+    }
 }

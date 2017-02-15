@@ -47,161 +47,161 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Transactional
 public class AppDefinitionServiceImpl implements AppDefinitionService {
 
-  private final Logger logger = LoggerFactory.getLogger(AppDefinitionServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(AppDefinitionServiceImpl.class);
 
-  @Autowired
-  protected AppDefinitionPublishService appDefinitionPublishService;
-  
-  @Autowired
-  protected ModelService modelService;
-  
-  @Autowired
-  protected ModelRepository modelRepository;
+    @Autowired
+    protected AppDefinitionPublishService appDefinitionPublishService;
 
-  @Autowired
-  protected ModelHistoryRepository modelHistoryRepository;
+    @Autowired
+    protected ModelService modelService;
 
-  @Autowired
-  protected ObjectMapper objectMapper;
-  
-  public AppDefinitionRepresentation getAppDefinition(String modelId) {
-    Model model = modelService.getModel(modelId);
-    return createAppDefinitionRepresentation(model);
-  }
-  
-  public AppDefinitionRepresentation getAppDefinitionHistory(String modelId, String modelHistoryId) {
-    ModelHistory model = modelService.getModelHistory(modelId, modelHistoryId);
-    return createAppDefinitionRepresentation(model);
-  }
+    @Autowired
+    protected ModelRepository modelRepository;
 
-  @Override
-  public List<AppDefinitionServiceRepresentation> getAppDefinitions() {
-    Map<String, AbstractModel> modelMap = new HashMap<String, AbstractModel>();
-    List<AppDefinitionServiceRepresentation> resultList = new ArrayList<AppDefinitionServiceRepresentation>();
+    @Autowired
+    protected ModelHistoryRepository modelHistoryRepository;
 
-    List<Model> createdByModels = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_APP, ModelSort.NAME_ASC); 
-    for (Model model : createdByModels) {
-      modelMap.put(model.getId(), model);
+    @Autowired
+    protected ObjectMapper objectMapper;
+
+    public AppDefinitionRepresentation getAppDefinition(String modelId) {
+        Model model = modelService.getModel(modelId);
+        return createAppDefinitionRepresentation(model);
     }
 
-    for (AbstractModel model : modelMap.values()) {
-      resultList.add(createAppDefinition(model));
+    public AppDefinitionRepresentation getAppDefinitionHistory(String modelId, String modelHistoryId) {
+        ModelHistory model = modelService.getModelHistory(modelId, modelHistoryId);
+        return createAppDefinitionRepresentation(model);
     }
 
-    return resultList;
-  }
+    @Override
+    public List<AppDefinitionServiceRepresentation> getAppDefinitions() {
+        Map<String, AbstractModel> modelMap = new HashMap<String, AbstractModel>();
+        List<AppDefinitionServiceRepresentation> resultList = new ArrayList<AppDefinitionServiceRepresentation>();
 
-  /**
-   * Gathers all 'deployable' app definitions for the current user.
-   * 
-   * To find these: - All historical app models are fetched. Only the highest version of each app model is retained. - All historical app models shared with the groups the current user is part of are
-   * fetched. Only the highest version of each app model is retained.
-   */
-  @Override
-  public List<AppDefinitionServiceRepresentation> getDeployableAppDefinitions(User user) {
-    Map<String, ModelHistory> modelMap = new HashMap<String, ModelHistory>();
-    List<AppDefinitionServiceRepresentation> resultList = new ArrayList<AppDefinitionServiceRepresentation>();
-
-    List<ModelHistory> createdByModels = modelHistoryRepository.findByModelTypAndCreatedBy(
-        user.getId(), AbstractModel.MODEL_TYPE_APP);
-    for (ModelHistory modelHistory : createdByModels) {
-      if (modelMap.containsKey(modelHistory.getModelId())) {
-        if (modelHistory.getVersion() > modelMap.get(modelHistory.getModelId()).getVersion()) {
-          modelMap.put(modelHistory.getModelId(), modelHistory);
+        List<Model> createdByModels = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_APP, ModelSort.NAME_ASC);
+        for (Model model : createdByModels) {
+            modelMap.put(model.getId(), model);
         }
-      } else {
-        modelMap.put(modelHistory.getModelId(), modelHistory);
-      }
-    }
 
-    for (ModelHistory model : modelMap.values()) {
-      Model latestModel = modelRepository.get(model.getModelId());
-      if (latestModel != null) {
-        resultList.add(createAppDefinition(model));
-      }
-    }
-
-    return resultList;
-  }
-  
-  public AppDefinitionUpdateResultRepresentation updateAppDefinition(String modelId, AppDefinitionSaveRepresentation updatedModel) {
-
-    AppDefinitionUpdateResultRepresentation result = new AppDefinitionUpdateResultRepresentation();
-
-    User user = SecurityUtils.getCurrentUserObject();
-
-    Model model = modelService.getModel(modelId);
-
-    model.setName(updatedModel.getAppDefinition().getName());
-    model.setKey(updatedModel.getAppDefinition().getKey());
-    model.setDescription(updatedModel.getAppDefinition().getDescription());
-    String editorJson = null;
-    try {
-      editorJson = objectMapper.writeValueAsString(updatedModel.getAppDefinition().getDefinition());
-    } catch (Exception e) {
-      logger.error("Error while processing app definition json {}", modelId, e);
-      throw new InternalServerErrorException("App definition could not be saved " + modelId);
-    }
-
-    model = modelService.saveModel(model, editorJson, null, false, null, user);
-
-    AppDefinitionRepresentation appDefinition = createAppDefinitionRepresentation(model);
-    if (updatedModel.isPublish()) {
-      appDefinitionPublishService.publishAppDefinition(null, model, user);
-    } else {
-      appDefinition.setDefinition(updatedModel.getAppDefinition().getDefinition());
-    }
-    
-    result.setAppDefinition(appDefinition);
-    return result;
-  }
-
-  protected AppDefinitionServiceRepresentation createAppDefinition(AbstractModel model) {
-    AppDefinitionServiceRepresentation resultInfo = new AppDefinitionServiceRepresentation();
-    if (model instanceof ModelHistory) {
-      resultInfo.setId(((ModelHistory) model).getModelId());
-    } else {
-      resultInfo.setId(model.getId());
-    }
-    resultInfo.setName(model.getName());
-    resultInfo.setDescription(model.getDescription());
-    resultInfo.setVersion(model.getVersion());
-    resultInfo.setDefinition(model.getModelEditorJson());
-
-    AppDefinition appDefinition = null;
-    try {
-      appDefinition = objectMapper.readValue(model.getModelEditorJson(), AppDefinition.class);
-    } catch (Exception e) {
-      logger.error("Error deserializing app {}", model.getId(), e);
-      throw new InternalServerErrorException("Could not deserialize app definition");
-    }
-
-    if (appDefinition != null) {
-      resultInfo.setTheme(appDefinition.getTheme());
-      resultInfo.setIcon(appDefinition.getIcon());
-      List<AppModelDefinition> models = appDefinition.getModels();
-      if (CollectionUtils.isNotEmpty(models)) {
-        List<String> modelIds = new ArrayList<String>();
-        for (AppModelDefinition appModelDef : models) {
-          modelIds.add(appModelDef.getId());
+        for (AbstractModel model : modelMap.values()) {
+            resultList.add(createAppDefinition(model));
         }
-        resultInfo.setModels(modelIds);
-      }
+
+        return resultList;
     }
-    return resultInfo;
-  }
-  
-  protected AppDefinitionRepresentation createAppDefinitionRepresentation(AbstractModel model) {
-    AppDefinition appDefinition = null;
-    try {
-      appDefinition = objectMapper.readValue(model.getModelEditorJson(), AppDefinition.class);
-    } catch (Exception e) {
-      logger.error("Error deserializing app {}", model.getId(), e);
-      throw new InternalServerErrorException("Could not deserialize app definition");
+
+    /**
+     * Gathers all 'deployable' app definitions for the current user.
+     * 
+     * To find these: - All historical app models are fetched. Only the highest version of each app model is retained. - All historical app models shared with the groups the current user is part of
+     * are fetched. Only the highest version of each app model is retained.
+     */
+    @Override
+    public List<AppDefinitionServiceRepresentation> getDeployableAppDefinitions(User user) {
+        Map<String, ModelHistory> modelMap = new HashMap<String, ModelHistory>();
+        List<AppDefinitionServiceRepresentation> resultList = new ArrayList<AppDefinitionServiceRepresentation>();
+
+        List<ModelHistory> createdByModels = modelHistoryRepository.findByModelTypAndCreatedBy(
+                user.getId(), AbstractModel.MODEL_TYPE_APP);
+        for (ModelHistory modelHistory : createdByModels) {
+            if (modelMap.containsKey(modelHistory.getModelId())) {
+                if (modelHistory.getVersion() > modelMap.get(modelHistory.getModelId()).getVersion()) {
+                    modelMap.put(modelHistory.getModelId(), modelHistory);
+                }
+            } else {
+                modelMap.put(modelHistory.getModelId(), modelHistory);
+            }
+        }
+
+        for (ModelHistory model : modelMap.values()) {
+            Model latestModel = modelRepository.get(model.getModelId());
+            if (latestModel != null) {
+                resultList.add(createAppDefinition(model));
+            }
+        }
+
+        return resultList;
     }
-    AppDefinitionRepresentation result = new AppDefinitionRepresentation(model);
-    result.setDefinition(appDefinition);
-    return result;
-  }
+
+    public AppDefinitionUpdateResultRepresentation updateAppDefinition(String modelId, AppDefinitionSaveRepresentation updatedModel) {
+
+        AppDefinitionUpdateResultRepresentation result = new AppDefinitionUpdateResultRepresentation();
+
+        User user = SecurityUtils.getCurrentUserObject();
+
+        Model model = modelService.getModel(modelId);
+
+        model.setName(updatedModel.getAppDefinition().getName());
+        model.setKey(updatedModel.getAppDefinition().getKey());
+        model.setDescription(updatedModel.getAppDefinition().getDescription());
+        String editorJson = null;
+        try {
+            editorJson = objectMapper.writeValueAsString(updatedModel.getAppDefinition().getDefinition());
+        } catch (Exception e) {
+            logger.error("Error while processing app definition json {}", modelId, e);
+            throw new InternalServerErrorException("App definition could not be saved " + modelId);
+        }
+
+        model = modelService.saveModel(model, editorJson, null, false, null, user);
+
+        AppDefinitionRepresentation appDefinition = createAppDefinitionRepresentation(model);
+        if (updatedModel.isPublish()) {
+            appDefinitionPublishService.publishAppDefinition(null, model, user);
+        } else {
+            appDefinition.setDefinition(updatedModel.getAppDefinition().getDefinition());
+        }
+
+        result.setAppDefinition(appDefinition);
+        return result;
+    }
+
+    protected AppDefinitionServiceRepresentation createAppDefinition(AbstractModel model) {
+        AppDefinitionServiceRepresentation resultInfo = new AppDefinitionServiceRepresentation();
+        if (model instanceof ModelHistory) {
+            resultInfo.setId(((ModelHistory) model).getModelId());
+        } else {
+            resultInfo.setId(model.getId());
+        }
+        resultInfo.setName(model.getName());
+        resultInfo.setDescription(model.getDescription());
+        resultInfo.setVersion(model.getVersion());
+        resultInfo.setDefinition(model.getModelEditorJson());
+
+        AppDefinition appDefinition = null;
+        try {
+            appDefinition = objectMapper.readValue(model.getModelEditorJson(), AppDefinition.class);
+        } catch (Exception e) {
+            logger.error("Error deserializing app {}", model.getId(), e);
+            throw new InternalServerErrorException("Could not deserialize app definition");
+        }
+
+        if (appDefinition != null) {
+            resultInfo.setTheme(appDefinition.getTheme());
+            resultInfo.setIcon(appDefinition.getIcon());
+            List<AppModelDefinition> models = appDefinition.getModels();
+            if (CollectionUtils.isNotEmpty(models)) {
+                List<String> modelIds = new ArrayList<String>();
+                for (AppModelDefinition appModelDef : models) {
+                    modelIds.add(appModelDef.getId());
+                }
+                resultInfo.setModels(modelIds);
+            }
+        }
+        return resultInfo;
+    }
+
+    protected AppDefinitionRepresentation createAppDefinitionRepresentation(AbstractModel model) {
+        AppDefinition appDefinition = null;
+        try {
+            appDefinition = objectMapper.readValue(model.getModelEditorJson(), AppDefinition.class);
+        } catch (Exception e) {
+            logger.error("Error deserializing app {}", model.getId(), e);
+            throw new InternalServerErrorException("Could not deserialize app definition");
+        }
+        AppDefinitionRepresentation result = new AppDefinitionRepresentation(model);
+        result.setDefinition(appDefinition);
+        return result;
+    }
 
 }

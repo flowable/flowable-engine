@@ -25,31 +25,31 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_NULL)
 public class AppDefinition {
 
-  protected List<AppModelDefinition> models;
-  protected String theme;
-  protected String icon;
+    protected List<AppModelDefinition> models;
+    protected String theme;
+    protected String icon;
 
-  public String getTheme() {
-    return theme;
-  }
+    public String getTheme() {
+        return theme;
+    }
 
-  public void setTheme(String theme) {
-    this.theme = theme;
-  }
+    public void setTheme(String theme) {
+        this.theme = theme;
+    }
 
-  public String getIcon() {
-    return icon;
-  }
+    public String getIcon() {
+        return icon;
+    }
 
-  public void setIcon(String icon) {
-    this.icon = icon;
-  }
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
 
-  public List<AppModelDefinition> getModels() {
-    return models;
-  }
+    public List<AppModelDefinition> getModels() {
+        return models;
+    }
 
-  public void setModels(List<AppModelDefinition> models) {
-    this.models = models;
-  }
+    public void setModels(List<AppModelDefinition> models) {
+        this.models = models;
+    }
 }

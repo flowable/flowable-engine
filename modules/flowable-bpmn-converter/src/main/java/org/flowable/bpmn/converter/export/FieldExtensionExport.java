@@ -23,34 +23,34 @@ import org.flowable.bpmn.model.FieldExtension;
 
 public class FieldExtensionExport implements BpmnXMLConstants {
 
-  public static boolean writeFieldExtensions(List<FieldExtension> fieldExtensionList, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
+    public static boolean writeFieldExtensions(List<FieldExtension> fieldExtensionList, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
 
-    for (FieldExtension fieldExtension : fieldExtensionList) {
+        for (FieldExtension fieldExtension : fieldExtensionList) {
 
-      if (StringUtils.isNotEmpty(fieldExtension.getFieldName())) {
+            if (StringUtils.isNotEmpty(fieldExtension.getFieldName())) {
 
-        if (StringUtils.isNotEmpty(fieldExtension.getStringValue()) || StringUtils.isNotEmpty(fieldExtension.getExpression())) {
+                if (StringUtils.isNotEmpty(fieldExtension.getStringValue()) || StringUtils.isNotEmpty(fieldExtension.getExpression())) {
 
-          if (!didWriteExtensionStartElement) {
-            xtw.writeStartElement(ELEMENT_EXTENSIONS);
-            didWriteExtensionStartElement = true;
-          }
+                    if (!didWriteExtensionStartElement) {
+                        xtw.writeStartElement(ELEMENT_EXTENSIONS);
+                        didWriteExtensionStartElement = true;
+                    }
 
-          xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_FIELD, FLOWABLE_EXTENSIONS_NAMESPACE);
-          BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_FIELD_NAME, fieldExtension.getFieldName(), xtw);
+                    xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_FIELD, FLOWABLE_EXTENSIONS_NAMESPACE);
+                    BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_FIELD_NAME, fieldExtension.getFieldName(), xtw);
 
-          if (StringUtils.isNotEmpty(fieldExtension.getStringValue())) {
-            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_FIELD_STRING, FLOWABLE_EXTENSIONS_NAMESPACE);
-            xtw.writeCData(fieldExtension.getStringValue());
-          } else {
-            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ATTRIBUTE_FIELD_EXPRESSION, FLOWABLE_EXTENSIONS_NAMESPACE);
-            xtw.writeCData(fieldExtension.getExpression());
-          }
-          xtw.writeEndElement();
-          xtw.writeEndElement();
+                    if (StringUtils.isNotEmpty(fieldExtension.getStringValue())) {
+                        xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_FIELD_STRING, FLOWABLE_EXTENSIONS_NAMESPACE);
+                        xtw.writeCData(fieldExtension.getStringValue());
+                    } else {
+                        xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ATTRIBUTE_FIELD_EXPRESSION, FLOWABLE_EXTENSIONS_NAMESPACE);
+                        xtw.writeCData(fieldExtension.getExpression());
+                    }
+                    xtw.writeEndElement();
+                    xtw.writeEndElement();
+                }
+            }
         }
-      }
+        return didWriteExtensionStartElement;
     }
-    return didWriteExtensionStartElement;
-  }
 }

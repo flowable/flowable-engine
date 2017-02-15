@@ -39,7 +39,7 @@ public class MvelExecutionContext {
         }
 
         if (stackVariables == null || stackVariables.isEmpty()) {
-            throw new IllegalArgumentException("Variables cannot be empty when variable id: "+variableId+" is used");
+            throw new IllegalArgumentException("Variables cannot be empty when variable id: " + variableId + " is used");
         }
 
         if (variableId.contains(".")) {
@@ -47,7 +47,7 @@ public class MvelExecutionContext {
             if (!stackVariables.containsKey(rootVariableId)) {
                 throw new FlowableException("referred id: " + rootVariableId + " is not present on the context");
             }
-            
+
         } else if (!stackVariables.containsKey(variableId)) {
             throw new FlowableException("referred id: " + variableId + " is not present on the context");
         }
@@ -69,18 +69,18 @@ public class MvelExecutionContext {
         return resultVariables;
     }
 
-    public ParserContext getParserContext(){
+    public ParserContext getParserContext() {
         return parserContext;
     }
 
     public void setParserContext(ParserContext parserContext) {
         this.parserContext = parserContext;
     }
-    
+
     public Map<Class<?>, PropertyHandler> getPropertyHandlers() {
         return propertyHandlers;
     }
-    
+
     public void addPropertyHandler(Class<?> variableClass, PropertyHandler propertyHandler) {
         propertyHandlers.put(variableClass, propertyHandler);
     }

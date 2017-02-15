@@ -45,202 +45,202 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class GetFormModelWithVariablesCmd implements Command<FormModel>, Serializable {
 
-  private static Logger logger = LoggerFactory.getLogger(GetFormModelWithVariablesCmd.class);
-  
-  private static final long serialVersionUID = 1L;
+    private static Logger logger = LoggerFactory.getLogger(GetFormModelWithVariablesCmd.class);
 
-  protected String formDefinitionKey;
-  protected String parentDeploymentId;
-  protected String formDefinitionId;
-  protected String processInstanceId;
-  protected String tenantId;
-  protected Map<String, Object> variables;
-  
-  public GetFormModelWithVariablesCmd(String formDefinitionKey, String formDefinitionId, String processInstanceId, Map<String, Object> variables) {
-    initializeValues(formDefinitionKey, formDefinitionId, null, variables);
-    this.processInstanceId = processInstanceId;
-  }
-  
-  public GetFormModelWithVariablesCmd(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String processInstanceId, Map<String, Object> variables) {
-    initializeValues(formDefinitionKey, formDefinitionId, null, variables);
-    this.parentDeploymentId = parentDeploymentId;
-    this.processInstanceId = processInstanceId;
-  }
-  
-  public GetFormModelWithVariablesCmd(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String processInstanceId, String tenantId, Map<String, Object> variables) {
-    initializeValues(formDefinitionKey, formDefinitionId, null, variables);
-    this.parentDeploymentId = parentDeploymentId;
-    this.processInstanceId = processInstanceId;
-    this.tenantId = tenantId;
-  }
+    private static final long serialVersionUID = 1L;
 
-  public FormModel execute(CommandContext commandContext) {
-    FormDefinitionCacheEntry formCacheEntry = resolveFormDefinition(commandContext);
-    FormModel formModel = resolveFormModel(formCacheEntry, commandContext);
-    fillFormFieldValues(formModel, commandContext);
-    return formModel;
-  }
-  
-  protected void initializeValues(String formDefinitionKey, String formDefinitionId, String tenantId, Map<String, Object> variables) {
-    this.formDefinitionKey = formDefinitionKey;
-    this.formDefinitionId = formDefinitionId;
-    this.tenantId = tenantId;
-    if (variables != null) {
-      this.variables = variables;
-    } else {
-      this.variables = new HashMap<String, Object>();
+    protected String formDefinitionKey;
+    protected String parentDeploymentId;
+    protected String formDefinitionId;
+    protected String processInstanceId;
+    protected String tenantId;
+    protected Map<String, Object> variables;
+
+    public GetFormModelWithVariablesCmd(String formDefinitionKey, String formDefinitionId, String processInstanceId, Map<String, Object> variables) {
+        initializeValues(formDefinitionKey, formDefinitionId, null, variables);
+        this.processInstanceId = processInstanceId;
     }
-  }
 
-  protected void fillFormFieldValues(FormModel formDefinition, CommandContext commandContext) {
+    public GetFormModelWithVariablesCmd(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String processInstanceId, Map<String, Object> variables) {
+        initializeValues(formDefinitionKey, formDefinitionId, null, variables);
+        this.parentDeploymentId = parentDeploymentId;
+        this.processInstanceId = processInstanceId;
+    }
 
-    FormEngineConfiguration formEngineConfiguration = commandContext.getFormEngineConfiguration();
-    List<FormField> allFields = formDefinition.listAllFields();
-    if (allFields != null) {
+    public GetFormModelWithVariablesCmd(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String processInstanceId, String tenantId, Map<String, Object> variables) {
+        initializeValues(formDefinitionKey, formDefinitionId, null, variables);
+        this.parentDeploymentId = parentDeploymentId;
+        this.processInstanceId = processInstanceId;
+        this.tenantId = tenantId;
+    }
 
-      Map<String, JsonNode> formInstanceFieldMap = fillPreviousFormInstanceValues(formEngineConfiguration);
-      fillVariablesWithFormInstanceValues(formInstanceFieldMap, allFields);
-      
-      for (FormField field : allFields) {
-        if (field instanceof ExpressionFormField) {
-          ExpressionFormField expressionField = (ExpressionFormField) field;
-          FormExpression formExpression = formEngineConfiguration.getExpressionManager().createExpression(expressionField.getExpression());
-          try {
-            field.setValue(formExpression.getValue(variables));
-          } catch (Exception e) {
-              logger.error("Error getting value for expression {} {}", expressionField.getExpression(), e.getMessage(), e);
-          }
-          
+    public FormModel execute(CommandContext commandContext) {
+        FormDefinitionCacheEntry formCacheEntry = resolveFormDefinition(commandContext);
+        FormModel formModel = resolveFormModel(formCacheEntry, commandContext);
+        fillFormFieldValues(formModel, commandContext);
+        return formModel;
+    }
+
+    protected void initializeValues(String formDefinitionKey, String formDefinitionId, String tenantId, Map<String, Object> variables) {
+        this.formDefinitionKey = formDefinitionKey;
+        this.formDefinitionId = formDefinitionId;
+        this.tenantId = tenantId;
+        if (variables != null) {
+            this.variables = variables;
         } else {
-          field.setValue(variables.get(field.getId()));
+            this.variables = new HashMap<String, Object>();
         }
-      }
-    }
-  }
-  
-  protected FormDefinitionCacheEntry resolveFormDefinition(CommandContext commandContext) {
-    DeploymentManager deploymentManager = commandContext.getFormEngineConfiguration().getDeploymentManager();
-
-    // Find the form definition
-    FormDefinitionEntity formDefinitionEntity = null;
-    if (formDefinitionId != null) {
-
-      formDefinitionEntity = deploymentManager.findDeployedFormDefinitionById(formDefinitionId);
-      if (formDefinitionEntity == null) {
-        throw new FlowableObjectNotFoundException("No form definition found for id = '" + formDefinitionId + "'", FormDefinitionEntity.class);
-      }
-
-    } else if (formDefinitionKey != null && (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && parentDeploymentId == null) {
-
-      formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKey(formDefinitionKey);
-      if (formDefinitionEntity == null) {
-        throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey + "'", FormDefinitionEntity.class);
-      }
-
-    } else if (formDefinitionKey != null && tenantId != null && !FormEngineConfiguration.NO_TENANT_ID.equals(tenantId) && parentDeploymentId == null) {
-
-      formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, tenantId);
-      if (formDefinitionEntity == null) {
-        throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey + "' for tenant identifier " + tenantId, FormDefinitionEntity.class);
-      }
-      
-    } else if (formDefinitionKey != null && (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && parentDeploymentId != null) {
-
-      formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyAndParentDeploymentId(formDefinitionKey, parentDeploymentId);
-      if (formDefinitionEntity == null) {
-        throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey + 
-            "' for parent deployment id " + parentDeploymentId, FormDefinitionEntity.class);
-      }
-      
-    } else if (formDefinitionKey != null && tenantId != null && !FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)  && parentDeploymentId != null) {
-
-      formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyParentDeploymentIdAndTenantId(formDefinitionKey, parentDeploymentId, tenantId);
-      if (formDefinitionEntity == null) {
-        throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey + 
-            "' for parent deployment id '" + parentDeploymentId + "' and for tenant identifier " + tenantId, FormDefinitionEntity.class);
-      }
-
-    } else {
-      throw new FlowableObjectNotFoundException("formDefinitionKey and formDefinitionId are null");
     }
 
-    FormDefinitionCacheEntry formCacheEntry = deploymentManager.resolveFormDefinition(formDefinitionEntity);
-    
-    return formCacheEntry;
-  }
-  
-  protected Map<String, JsonNode> fillPreviousFormInstanceValues(FormEngineConfiguration formEngineConfiguration) {
-    Map<String, JsonNode> formInstanceMap = new HashMap<String, JsonNode>();
-    if (processInstanceId != null) {
-      List<FormInstance> formInstances = formEngineConfiguration.getFormService().createFormInstanceQuery()
-        .processInstanceId(processInstanceId)
-        .orderBySubmittedDate()
-        .desc()
-        .list();
+    protected void fillFormFieldValues(FormModel formDefinition, CommandContext commandContext) {
 
-      for (FormInstance otherFormInstance : formInstances) {
-        try {
-          JsonNode submittedNode = formEngineConfiguration.getObjectMapper().readTree(otherFormInstance.getFormValueBytes());
-          if (submittedNode == null || submittedNode.get("values") != null) {
-            continue;
-          }
-         
-          JsonNode valuesNode = submittedNode.get("values");
-          Iterator<String> fieldIdIterator = valuesNode.fieldNames();
-          while (fieldIdIterator.hasNext()) {
-            String fieldId = fieldIdIterator.next();
-            if (!formInstanceMap.containsKey(fieldId)) {
-  
-              JsonNode valueNode = valuesNode.get(fieldId);
-              formInstanceMap.put(fieldId, valueNode);
+        FormEngineConfiguration formEngineConfiguration = commandContext.getFormEngineConfiguration();
+        List<FormField> allFields = formDefinition.listAllFields();
+        if (allFields != null) {
+
+            Map<String, JsonNode> formInstanceFieldMap = fillPreviousFormInstanceValues(formEngineConfiguration);
+            fillVariablesWithFormInstanceValues(formInstanceFieldMap, allFields);
+
+            for (FormField field : allFields) {
+                if (field instanceof ExpressionFormField) {
+                    ExpressionFormField expressionField = (ExpressionFormField) field;
+                    FormExpression formExpression = formEngineConfiguration.getExpressionManager().createExpression(expressionField.getExpression());
+                    try {
+                        field.setValue(formExpression.getValue(variables));
+                    } catch (Exception e) {
+                        logger.error("Error getting value for expression {} {}", expressionField.getExpression(), e.getMessage(), e);
+                    }
+
+                } else {
+                    field.setValue(variables.get(field.getId()));
+                }
             }
-          }
+        }
+    }
 
-        } catch (Exception e) {
-          throw new FlowableException("Error parsing form instance " + otherFormInstance.getId());
+    protected FormDefinitionCacheEntry resolveFormDefinition(CommandContext commandContext) {
+        DeploymentManager deploymentManager = commandContext.getFormEngineConfiguration().getDeploymentManager();
+
+        // Find the form definition
+        FormDefinitionEntity formDefinitionEntity = null;
+        if (formDefinitionId != null) {
+
+            formDefinitionEntity = deploymentManager.findDeployedFormDefinitionById(formDefinitionId);
+            if (formDefinitionEntity == null) {
+                throw new FlowableObjectNotFoundException("No form definition found for id = '" + formDefinitionId + "'", FormDefinitionEntity.class);
+            }
+
+        } else if (formDefinitionKey != null && (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && parentDeploymentId == null) {
+
+            formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKey(formDefinitionKey);
+            if (formDefinitionEntity == null) {
+                throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey + "'", FormDefinitionEntity.class);
+            }
+
+        } else if (formDefinitionKey != null && tenantId != null && !FormEngineConfiguration.NO_TENANT_ID.equals(tenantId) && parentDeploymentId == null) {
+
+            formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, tenantId);
+            if (formDefinitionEntity == null) {
+                throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey + "' for tenant identifier " + tenantId, FormDefinitionEntity.class);
+            }
+
+        } else if (formDefinitionKey != null && (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && parentDeploymentId != null) {
+
+            formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyAndParentDeploymentId(formDefinitionKey, parentDeploymentId);
+            if (formDefinitionEntity == null) {
+                throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey +
+                        "' for parent deployment id " + parentDeploymentId, FormDefinitionEntity.class);
+            }
+
+        } else if (formDefinitionKey != null && tenantId != null && !FormEngineConfiguration.NO_TENANT_ID.equals(tenantId) && parentDeploymentId != null) {
+
+            formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyParentDeploymentIdAndTenantId(formDefinitionKey, parentDeploymentId, tenantId);
+            if (formDefinitionEntity == null) {
+                throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey +
+                        "' for parent deployment id '" + parentDeploymentId + "' and for tenant identifier " + tenantId, FormDefinitionEntity.class);
+            }
+
+        } else {
+            throw new FlowableObjectNotFoundException("formDefinitionKey and formDefinitionId are null");
         }
-      }
+
+        FormDefinitionCacheEntry formCacheEntry = deploymentManager.resolveFormDefinition(formDefinitionEntity);
+
+        return formCacheEntry;
     }
-    
-    return formInstanceMap;
-  }
-  
-  public void fillVariablesWithFormInstanceValues(Map<String, JsonNode> formInstanceFieldMap, List<FormField> allFields) {
-    for (FormField field : allFields) {
-      
-      JsonNode fieldValueNode = formInstanceFieldMap.get(field.getId());
-  
-      if (fieldValueNode == null || fieldValueNode.isNull()) {
-        continue;
-      }
-  
-      String fieldType = field.getType();
-      String fieldValue = fieldValueNode.asText();
-  
-      if (FormFieldTypes.DATE.equals(fieldType)) {
-        try {
-          if (StringUtils.isNotEmpty(fieldValue)) {
-            LocalDate dateValue = LocalDate.parse(fieldValue);
-            variables.put(field.getId(), dateValue);
-          }
-        } catch (Exception e) {
-            logger.error("Error parsing form date value for process instance {} with value {}", processInstanceId, fieldValue, e);
+
+    protected Map<String, JsonNode> fillPreviousFormInstanceValues(FormEngineConfiguration formEngineConfiguration) {
+        Map<String, JsonNode> formInstanceMap = new HashMap<String, JsonNode>();
+        if (processInstanceId != null) {
+            List<FormInstance> formInstances = formEngineConfiguration.getFormService().createFormInstanceQuery()
+                    .processInstanceId(processInstanceId)
+                    .orderBySubmittedDate()
+                    .desc()
+                    .list();
+
+            for (FormInstance otherFormInstance : formInstances) {
+                try {
+                    JsonNode submittedNode = formEngineConfiguration.getObjectMapper().readTree(otherFormInstance.getFormValueBytes());
+                    if (submittedNode == null || submittedNode.get("values") != null) {
+                        continue;
+                    }
+
+                    JsonNode valuesNode = submittedNode.get("values");
+                    Iterator<String> fieldIdIterator = valuesNode.fieldNames();
+                    while (fieldIdIterator.hasNext()) {
+                        String fieldId = fieldIdIterator.next();
+                        if (!formInstanceMap.containsKey(fieldId)) {
+
+                            JsonNode valueNode = valuesNode.get(fieldId);
+                            formInstanceMap.put(fieldId, valueNode);
+                        }
+                    }
+
+                } catch (Exception e) {
+                    throw new FlowableException("Error parsing form instance " + otherFormInstance.getId());
+                }
+            }
         }
-  
-      } else {
-        variables.put(field.getId(), fieldValue);
-      }
+
+        return formInstanceMap;
     }
-  }
-  
-  protected FormModel resolveFormModel(FormDefinitionCacheEntry formCacheEntry, CommandContext commandContext) {
-    FormDefinitionEntity formEntity = formCacheEntry.getFormDefinitionEntity();
-    FormJsonConverter formJsonConverter = commandContext.getFormEngineConfiguration().getFormJsonConverter();
-    FormModel formDefinition = formJsonConverter.convertToFormModel(formCacheEntry.getFormDefinitionJson(), formEntity.getId(), formEntity.getVersion());
-    formDefinition.setId(formEntity.getId());
-    formDefinition.setName(formEntity.getName());
-    formDefinition.setKey(formEntity.getKey());
-    
-    return formDefinition;
-  }
+
+    public void fillVariablesWithFormInstanceValues(Map<String, JsonNode> formInstanceFieldMap, List<FormField> allFields) {
+        for (FormField field : allFields) {
+
+            JsonNode fieldValueNode = formInstanceFieldMap.get(field.getId());
+
+            if (fieldValueNode == null || fieldValueNode.isNull()) {
+                continue;
+            }
+
+            String fieldType = field.getType();
+            String fieldValue = fieldValueNode.asText();
+
+            if (FormFieldTypes.DATE.equals(fieldType)) {
+                try {
+                    if (StringUtils.isNotEmpty(fieldValue)) {
+                        LocalDate dateValue = LocalDate.parse(fieldValue);
+                        variables.put(field.getId(), dateValue);
+                    }
+                } catch (Exception e) {
+                    logger.error("Error parsing form date value for process instance {} with value {}", processInstanceId, fieldValue, e);
+                }
+
+            } else {
+                variables.put(field.getId(), fieldValue);
+            }
+        }
+    }
+
+    protected FormModel resolveFormModel(FormDefinitionCacheEntry formCacheEntry, CommandContext commandContext) {
+        FormDefinitionEntity formEntity = formCacheEntry.getFormDefinitionEntity();
+        FormJsonConverter formJsonConverter = commandContext.getFormEngineConfiguration().getFormJsonConverter();
+        FormModel formDefinition = formJsonConverter.convertToFormModel(formCacheEntry.getFormDefinitionJson(), formEntity.getId(), formEntity.getVersion());
+        formDefinition.setId(formEntity.getId());
+        formDefinition.setName(formEntity.getName());
+        formDefinition.setKey(formEntity.getKey());
+
+        return formDefinition;
+    }
 }

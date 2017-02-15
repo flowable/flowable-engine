@@ -23,22 +23,22 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class SimpleCamelCallTest extends SpringFlowableTestCase {
 
-  @Autowired
-  protected CamelContext camelContext;
+    @Autowired
+    protected CamelContext camelContext;
 
-  public void setUp() throws Exception {
-    camelContext.addRoutes(new RouteBuilder() {
+    public void setUp() throws Exception {
+        camelContext.addRoutes(new RouteBuilder() {
 
-      @Override
-      public void configure() throws Exception {
-        from("flowable:SimpleCamelCallProcess:simpleCall").to("log: org.flowable.camel.examples.SimpleCamelCall");
-      }
-    });
-  }
+            @Override
+            public void configure() throws Exception {
+                from("flowable:SimpleCamelCallProcess:simpleCall").to("log: org.flowable.camel.examples.SimpleCamelCall");
+            }
+        });
+    }
 
-  @Deployment
-  public void testSimpleCamelCall() {
-    runtimeService.startProcessInstanceByKey("SimpleCamelCallProcess");
-  }
+    @Deployment
+    public void testSimpleCamelCall() {
+        runtimeService.startProcessInstanceByKey("SimpleCamelCallProcess");
+    }
 
 }

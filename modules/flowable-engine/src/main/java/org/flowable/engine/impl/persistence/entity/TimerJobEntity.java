@@ -22,11 +22,11 @@ import java.util.Date;
  */
 public interface TimerJobEntity extends AbstractJobEntity {
 
-  String getLockOwner();
+    String getLockOwner();
 
-  void setLockOwner(String claimedBy);
+    void setLockOwner(String claimedBy);
 
-  Date getLockExpirationTime();
+    Date getLockExpirationTime();
 
-  void setLockExpirationTime(Date claimedUntil);
+    void setLockExpirationTime(Date claimedUntil);
 }

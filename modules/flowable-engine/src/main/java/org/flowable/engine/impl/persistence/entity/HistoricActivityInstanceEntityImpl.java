@@ -26,106 +26,106 @@ import org.flowable.engine.ProcessEngineConfiguration;
  */
 public class HistoricActivityInstanceEntityImpl extends HistoricScopeInstanceEntityImpl implements HistoricActivityInstanceEntity {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String activityId;
-  protected String activityName;
-  protected String activityType;
-  protected String executionId;
-  protected String assignee;
-  protected String taskId;
-  protected String calledProcessInstanceId;
-  protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
-  
-  public HistoricActivityInstanceEntityImpl() {
-    
-  }
+    protected String activityId;
+    protected String activityName;
+    protected String activityType;
+    protected String executionId;
+    protected String assignee;
+    protected String taskId;
+    protected String calledProcessInstanceId;
+    protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
 
-  public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
-    persistentState.put("endTime", endTime);
-    persistentState.put("durationInMillis", durationInMillis);
-    persistentState.put("deleteReason", deleteReason);
-    persistentState.put("executionId", executionId);
-    persistentState.put("assignee", assignee);
-    return persistentState;
-  }
+    public HistoricActivityInstanceEntityImpl() {
 
-  // getters and setters //////////////////////////////////////////////////////
+    }
 
-  public String getActivityId() {
-    return activityId;
-  }
+    public Object getPersistentState() {
+        Map<String, Object> persistentState = new HashMap<String, Object>();
+        persistentState.put("endTime", endTime);
+        persistentState.put("durationInMillis", durationInMillis);
+        persistentState.put("deleteReason", deleteReason);
+        persistentState.put("executionId", executionId);
+        persistentState.put("assignee", assignee);
+        return persistentState;
+    }
 
-  public void setActivityId(String activityId) {
-    this.activityId = activityId;
-  }
+    // getters and setters //////////////////////////////////////////////////////
 
-  public String getActivityName() {
-    return activityName;
-  }
+    public String getActivityId() {
+        return activityId;
+    }
 
-  public void setActivityName(String activityName) {
-    this.activityName = activityName;
-  }
+    public void setActivityId(String activityId) {
+        this.activityId = activityId;
+    }
 
-  public String getActivityType() {
-    return activityType;
-  }
+    public String getActivityName() {
+        return activityName;
+    }
 
-  public void setActivityType(String activityType) {
-    this.activityType = activityType;
-  }
+    public void setActivityName(String activityName) {
+        this.activityName = activityName;
+    }
 
-  public String getExecutionId() {
-    return executionId;
-  }
+    public String getActivityType() {
+        return activityType;
+    }
 
-  public void setExecutionId(String executionId) {
-    this.executionId = executionId;
-  }
+    public void setActivityType(String activityType) {
+        this.activityType = activityType;
+    }
 
-  public String getAssignee() {
-    return assignee;
-  }
+    public String getExecutionId() {
+        return executionId;
+    }
 
-  public void setAssignee(String assignee) {
-    this.assignee = assignee;
-  }
+    public void setExecutionId(String executionId) {
+        this.executionId = executionId;
+    }
 
-  public String getTaskId() {
-    return taskId;
-  }
+    public String getAssignee() {
+        return assignee;
+    }
 
-  public void setTaskId(String taskId) {
-    this.taskId = taskId;
-  }
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
+    }
 
-  public String getCalledProcessInstanceId() {
-    return calledProcessInstanceId;
-  }
+    public String getTaskId() {
+        return taskId;
+    }
 
-  public void setCalledProcessInstanceId(String calledProcessInstanceId) {
-    this.calledProcessInstanceId = calledProcessInstanceId;
-  }
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
 
-  public String getTenantId() {
-    return tenantId;
-  }
+    public String getCalledProcessInstanceId() {
+        return calledProcessInstanceId;
+    }
 
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
+    public void setCalledProcessInstanceId(String calledProcessInstanceId) {
+        this.calledProcessInstanceId = calledProcessInstanceId;
+    }
 
-  public Date getTime() {
-    return getStartTime();
-  }
+    public String getTenantId() {
+        return tenantId;
+    }
 
-  // common methods //////////////////////////////////////////////////////////
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
 
-  @Override
-  public String toString() {
-    return "HistoricActivityInstanceEntity[id=" + id + ", activityId=" + activityId + ", activityName=" + activityName + "]";
-  }
+    public Date getTime() {
+        return getStartTime();
+    }
+
+    // common methods //////////////////////////////////////////////////////////
+
+    @Override
+    public String toString() {
+        return "HistoricActivityInstanceEntity[id=" + id + ", activityId=" + activityId + ", activityName=" + activityName + "]";
+    }
 
 }

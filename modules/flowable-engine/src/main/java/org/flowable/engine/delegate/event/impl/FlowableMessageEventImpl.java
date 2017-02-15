@@ -23,26 +23,26 @@ import org.flowable.engine.delegate.event.FlowableSignalEvent;
  */
 public class FlowableMessageEventImpl extends FlowableActivityEventImpl implements FlowableMessageEvent {
 
-  protected String messageName;
-  protected Object messageData;
+    protected String messageName;
+    protected Object messageData;
 
-  public FlowableMessageEventImpl(FlowableEngineEventType type) {
-    super(type);
-  }
+    public FlowableMessageEventImpl(FlowableEngineEventType type) {
+        super(type);
+    }
 
-  public void setMessageName(String messageName) {
-    this.messageName = messageName;
-  }
+    public void setMessageName(String messageName) {
+        this.messageName = messageName;
+    }
 
-  public String getMessageName() {
-    return messageName;
-  }
+    public String getMessageName() {
+        return messageName;
+    }
 
-  public void setMessageData(Object messageData) {
-    this.messageData = messageData;
-  }
+    public void setMessageData(Object messageData) {
+        this.messageData = messageData;
+    }
 
-  public Object getMessageData() {
-    return messageData;
-  }
+    public Object getMessageData() {
+        return messageData;
+    }
 }

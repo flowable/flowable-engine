@@ -22,22 +22,22 @@ import org.flowable.engine.impl.test.AbstractTestCase;
  */
 public class NoDbConnectionTest extends AbstractTestCase {
 
-  public void testNoDbConnection() {
-    try {
-      ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/nodbconnection.flowable.cfg.xml").buildProcessEngine();
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(containsSqlException(e));
+    public void testNoDbConnection() {
+        try {
+            ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/nodbconnection.flowable.cfg.xml").buildProcessEngine();
+            fail("expected exception");
+        } catch (RuntimeException e) {
+            assertTrue(containsSqlException(e));
+        }
     }
-  }
 
-  private boolean containsSqlException(Throwable e) {
-    if (e == null) {
-      return false;
+    private boolean containsSqlException(Throwable e) {
+        if (e == null) {
+            return false;
+        }
+        if (e instanceof SQLException) {
+            return true;
+        }
+        return containsSqlException(e.getCause());
     }
-    if (e instanceof SQLException) {
-      return true;
-    }
-    return containsSqlException(e.getCause());
-  }
 }

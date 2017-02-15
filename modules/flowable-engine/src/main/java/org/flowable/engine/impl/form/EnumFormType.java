@@ -23,49 +23,49 @@ import org.flowable.engine.form.AbstractFormType;
  */
 public class EnumFormType extends AbstractFormType {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected Map<String, String> values;
+    protected Map<String, String> values;
 
-  public EnumFormType(Map<String, String> values) {
-    this.values = values;
-  }
-
-  public String getName() {
-    return "enum";
-  }
-
-  @Override
-  public Object getInformation(String key) {
-    if (key.equals("values")) {
-      return values;
+    public EnumFormType(Map<String, String> values) {
+        this.values = values;
     }
-    return null;
-  }
 
-  @Override
-  public Object convertFormValueToModelValue(String propertyValue) {
-    validateValue(propertyValue);
-    return propertyValue;
-  }
-
-  @Override
-  public String convertModelValueToFormValue(Object modelValue) {
-    if (modelValue != null) {
-      if (!(modelValue instanceof String)) {
-        throw new FlowableIllegalArgumentException("Model value should be a String");
-      }
-      validateValue((String) modelValue);
+    public String getName() {
+        return "enum";
     }
-    return (String) modelValue;
-  }
 
-  protected void validateValue(String value) {
-    if (value != null) {
-      if (values != null && !values.containsKey(value)) {
-        throw new FlowableIllegalArgumentException("Invalid value for enum form property: " + value);
-      }
+    @Override
+    public Object getInformation(String key) {
+        if (key.equals("values")) {
+            return values;
+        }
+        return null;
     }
-  }
+
+    @Override
+    public Object convertFormValueToModelValue(String propertyValue) {
+        validateValue(propertyValue);
+        return propertyValue;
+    }
+
+    @Override
+    public String convertModelValueToFormValue(Object modelValue) {
+        if (modelValue != null) {
+            if (!(modelValue instanceof String)) {
+                throw new FlowableIllegalArgumentException("Model value should be a String");
+            }
+            validateValue((String) modelValue);
+        }
+        return (String) modelValue;
+    }
+
+    protected void validateValue(String value) {
+        if (value != null) {
+            if (values != null && !values.containsKey(value)) {
+                throw new FlowableIllegalArgumentException("Invalid value for enum form property: " + value);
+            }
+        }
+    }
 
 }

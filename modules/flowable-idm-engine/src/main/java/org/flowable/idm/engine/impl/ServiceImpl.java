@@ -16,21 +16,22 @@ import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.interceptor.CommandExecutor;
 
 public abstract class ServiceImpl {
-    
-  protected IdmEngineConfiguration engineConfig;
-  protected CommandExecutor commandExecutor;
-  
-  public ServiceImpl() {}
 
-  public ServiceImpl(IdmEngineConfiguration engineConfig) {
-    this.engineConfig = engineConfig;
-  }
-  
-  public CommandExecutor getCommandExecutor() {
-    return commandExecutor;
-  }
+    protected IdmEngineConfiguration engineConfig;
+    protected CommandExecutor commandExecutor;
 
-  public void setCommandExecutor(CommandExecutor commandExecutor) {
-    this.commandExecutor = commandExecutor;
-  }
+    public ServiceImpl() {
+    }
+
+    public ServiceImpl(IdmEngineConfiguration engineConfig) {
+        this.engineConfig = engineConfig;
+    }
+
+    public CommandExecutor getCommandExecutor() {
+        return commandExecutor;
+    }
+
+    public void setCommandExecutor(CommandExecutor commandExecutor) {
+        this.commandExecutor = commandExecutor;
+    }
 }

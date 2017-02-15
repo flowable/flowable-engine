@@ -34,26 +34,26 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 @RestController
 public class DecisionTableDeploymentClientResource extends AbstractClientResource {
-  
-  private static final Logger logger = LoggerFactory.getLogger(DecisionTableDeploymentClientResource.class);
 
-	@Autowired
-	protected DecisionTableDeploymentService clientService;
+    private static final Logger logger = LoggerFactory.getLogger(DecisionTableDeploymentClientResource.class);
 
-	@RequestMapping(value = "/rest/admin/decision-table-deployments/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
-	public JsonNode getDeployment(@PathVariable String deploymentId) throws BadRequestException {
-		
-		ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
-		try {
-			return clientService.getDeployment(serverConfig, deploymentId);
-		} catch (FlowableServiceException e) {
-		  logger.error("Error getting deployment {}", deploymentId, e);
-			throw new BadRequestException(e.getMessage());
-		}
-	}
-	
-	@RequestMapping(value = "/rest/admin/decision-table-deployments/{deploymentId}", method = RequestMethod.DELETE)
-	public void deleteDeployment(@PathVariable String deploymentId, HttpServletResponse httpResponse) {
-	    clientService.deleteDeployment(retrieveServerConfig(EndpointType.DMN), httpResponse, deploymentId);
-	}
+    @Autowired
+    protected DecisionTableDeploymentService clientService;
+
+    @RequestMapping(value = "/rest/admin/decision-table-deployments/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getDeployment(@PathVariable String deploymentId) throws BadRequestException {
+
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
+        try {
+            return clientService.getDeployment(serverConfig, deploymentId);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting deployment {}", deploymentId, e);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/rest/admin/decision-table-deployments/{deploymentId}", method = RequestMethod.DELETE)
+    public void deleteDeployment(@PathVariable String deploymentId, HttpServletResponse httpResponse) {
+        clientService.deleteDeployment(retrieveServerConfig(EndpointType.DMN), httpResponse, deploymentId);
+    }
 }

@@ -52,101 +52,101 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AppDefinitionPublishService extends BaseAppDefinitionService {
 
-  private static final Logger logger = LoggerFactory.getLogger(AppDefinitionPublishService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AppDefinitionPublishService.class);
 
-  @Autowired
-  protected Environment environment;
+    @Autowired
+    protected Environment environment;
 
-  public void publishAppDefinition(String comment, Model appDefinitionModel, User user) {
+    public void publishAppDefinition(String comment, Model appDefinitionModel, User user) {
 
-    // Create new version of the app model
-    modelService.createNewModelVersion(appDefinitionModel, comment, user);
+        // Create new version of the app model
+        modelService.createNewModelVersion(appDefinitionModel, comment, user);
 
-    String deployableZipName = appDefinitionModel.getKey() + ".zip";
+        String deployableZipName = appDefinitionModel.getKey() + ".zip";
 
-    AppDefinition appDefinition = null;
-    try {
-      appDefinition = resolveAppDefinition(appDefinitionModel);
-    } catch (Exception e) {
-      logger.error("Error deserializing app {}", appDefinitionModel.getId(), e);
-      throw new InternalServerErrorException("Could not deserialize app definition");
-    }
-
-    if (appDefinition != null) {
-      byte[] deployZipArtifact = createDeployableZipArtifact(appDefinitionModel, appDefinition);
-
-      if (deployZipArtifact != null) {
-        deployZipArtifact(deployableZipName, deployZipArtifact, appDefinitionModel.getKey(), appDefinitionModel.getName());
-      }
-    }
-  }
-
-  protected void deployZipArtifact(String artifactName, byte[] zipArtifact, String deploymentKey, String deploymentName) {
-    String deployApiUrl = environment.getRequiredProperty("deployment.api.url");
-    String basicAuthUser = environment.getRequiredProperty("idm.admin.user");
-    String basicAuthPassword = environment.getRequiredProperty("idm.admin.password");
-
-    if (!deployApiUrl.endsWith("/")) {
-      deployApiUrl = deployApiUrl.concat("/");
-    }
-    deployApiUrl = deployApiUrl.concat(String.format("repository/deployments?deploymentKey=%s&deploymentName=%s", 
-        encode(deploymentKey), encode(deploymentName)));
-
-    HttpPost httpPost = new HttpPost(deployApiUrl);
-    httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
-        Base64.encodeBase64((basicAuthUser + ":" + basicAuthPassword).getBytes(Charset.forName("UTF-8")))));
-
-    MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
-    entityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-    entityBuilder.addBinaryBody("artifact", zipArtifact, ContentType.DEFAULT_BINARY, artifactName);
-
-    HttpEntity entity = entityBuilder.build();
-    httpPost.setEntity(entity);
-
-    HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-    SSLConnectionSocketFactory sslsf = null;
-    try {
-      SSLContextBuilder builder = new SSLContextBuilder();
-      builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-      sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-      clientBuilder.setSSLSocketFactory(sslsf);
-    } catch (Exception e) {
-      logger.error("Could not configure SSL for http client", e);
-      throw new InternalServerErrorException("Could not configure SSL for http client", e);
-    }
-
-    CloseableHttpClient client = clientBuilder.build();
-
-    try {
-      HttpResponse response = client.execute(httpPost);
-      if (response.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
-        return;
-      } else {
-        logger.error("Invalid deploy result code: {}", response.getStatusLine());
-        throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
-      }
-    } catch (IOException ioe) {
-      logger.error("Error calling deploy endpoint", ioe);
-      throw new InternalServerErrorException("Error calling deploy endpoint: " + ioe.getMessage());
-    } finally {
-      if (client != null) {
+        AppDefinition appDefinition = null;
         try {
-          client.close();
-        } catch (IOException e) {
-          logger.warn("Exception while closing http client", e);
+            appDefinition = resolveAppDefinition(appDefinitionModel);
+        } catch (Exception e) {
+            logger.error("Error deserializing app {}", appDefinitionModel.getId(), e);
+            throw new InternalServerErrorException("Could not deserialize app definition");
         }
-      }
+
+        if (appDefinition != null) {
+            byte[] deployZipArtifact = createDeployableZipArtifact(appDefinitionModel, appDefinition);
+
+            if (deployZipArtifact != null) {
+                deployZipArtifact(deployableZipName, deployZipArtifact, appDefinitionModel.getKey(), appDefinitionModel.getName());
+            }
+        }
     }
-  }
-  
-  protected String encode(String string) {
-    if (string != null) {
-      try {
-        return URLEncoder.encode(string, "UTF-8");
-      } catch (UnsupportedEncodingException uee) {
-        throw new IllegalStateException("JVM does not support UTF-8 encoding.", uee);
-      }
+
+    protected void deployZipArtifact(String artifactName, byte[] zipArtifact, String deploymentKey, String deploymentName) {
+        String deployApiUrl = environment.getRequiredProperty("deployment.api.url");
+        String basicAuthUser = environment.getRequiredProperty("idm.admin.user");
+        String basicAuthPassword = environment.getRequiredProperty("idm.admin.password");
+
+        if (!deployApiUrl.endsWith("/")) {
+            deployApiUrl = deployApiUrl.concat("/");
+        }
+        deployApiUrl = deployApiUrl.concat(String.format("repository/deployments?deploymentKey=%s&deploymentName=%s",
+                encode(deploymentKey), encode(deploymentName)));
+
+        HttpPost httpPost = new HttpPost(deployApiUrl);
+        httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
+                Base64.encodeBase64((basicAuthUser + ":" + basicAuthPassword).getBytes(Charset.forName("UTF-8")))));
+
+        MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+        entityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+        entityBuilder.addBinaryBody("artifact", zipArtifact, ContentType.DEFAULT_BINARY, artifactName);
+
+        HttpEntity entity = entityBuilder.build();
+        httpPost.setEntity(entity);
+
+        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+        SSLConnectionSocketFactory sslsf = null;
+        try {
+            SSLContextBuilder builder = new SSLContextBuilder();
+            builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+            sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            clientBuilder.setSSLSocketFactory(sslsf);
+        } catch (Exception e) {
+            logger.error("Could not configure SSL for http client", e);
+            throw new InternalServerErrorException("Could not configure SSL for http client", e);
+        }
+
+        CloseableHttpClient client = clientBuilder.build();
+
+        try {
+            HttpResponse response = client.execute(httpPost);
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
+                return;
+            } else {
+                logger.error("Invalid deploy result code: {}", response.getStatusLine());
+                throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
+            }
+        } catch (IOException ioe) {
+            logger.error("Error calling deploy endpoint", ioe);
+            throw new InternalServerErrorException("Error calling deploy endpoint: " + ioe.getMessage());
+        } finally {
+            if (client != null) {
+                try {
+                    client.close();
+                } catch (IOException e) {
+                    logger.warn("Exception while closing http client", e);
+                }
+            }
+        }
     }
-    return null;
-  }
+
+    protected String encode(String string) {
+        if (string != null) {
+            try {
+                return URLEncoder.encode(string, "UTF-8");
+            } catch (UnsupportedEncodingException uee) {
+                throw new IllegalStateException("JVM does not support UTF-8 encoding.", uee);
+            }
+        }
+        return null;
+    }
 }

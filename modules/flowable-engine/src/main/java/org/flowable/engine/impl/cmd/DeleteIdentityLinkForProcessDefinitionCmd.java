@@ -29,47 +29,47 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public class DeleteIdentityLinkForProcessDefinitionCmd implements Command<Object>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String processDefinitionId;
+    protected String processDefinitionId;
 
-  protected String userId;
+    protected String userId;
 
-  protected String groupId;
+    protected String groupId;
 
-  public DeleteIdentityLinkForProcessDefinitionCmd(String processDefinitionId, String userId, String groupId) {
-    validateParams(userId, groupId, processDefinitionId);
-    this.processDefinitionId = processDefinitionId;
-    this.userId = userId;
-    this.groupId = groupId;
-  }
-
-  protected void validateParams(String userId, String groupId, String processDefinitionId) {
-    if (processDefinitionId == null) {
-      throw new FlowableIllegalArgumentException("processDefinitionId is null");
+    public DeleteIdentityLinkForProcessDefinitionCmd(String processDefinitionId, String userId, String groupId) {
+        validateParams(userId, groupId, processDefinitionId);
+        this.processDefinitionId = processDefinitionId;
+        this.userId = userId;
+        this.groupId = groupId;
     }
 
-    if (userId == null && groupId == null) {
-      throw new FlowableIllegalArgumentException("userId and groupId cannot both be null");
-    }
-  }
+    protected void validateParams(String userId, String groupId, String processDefinitionId) {
+        if (processDefinitionId == null) {
+            throw new FlowableIllegalArgumentException("processDefinitionId is null");
+        }
 
-  public Void execute(CommandContext commandContext) {
-    ProcessDefinitionEntity processDefinition = commandContext.getProcessDefinitionEntityManager().findById(processDefinitionId);
-
-    if (processDefinition == null) {
-      throw new FlowableObjectNotFoundException("Cannot find process definition with id " + processDefinitionId, ProcessDefinition.class);
-    }
-    
-    if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
-      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      compatibilityHandler.deleteCandidateStarter(processDefinitionId, userId, groupId);
-      return null;
+        if (userId == null && groupId == null) {
+            throw new FlowableIllegalArgumentException("userId and groupId cannot both be null");
+        }
     }
 
-    commandContext.getIdentityLinkEntityManager().deleteIdentityLink(processDefinition, userId, groupId);
+    public Void execute(CommandContext commandContext) {
+        ProcessDefinitionEntity processDefinition = commandContext.getProcessDefinitionEntityManager().findById(processDefinitionId);
 
-    return null;
-  }
+        if (processDefinition == null) {
+            throw new FlowableObjectNotFoundException("Cannot find process definition with id " + processDefinitionId, ProcessDefinition.class);
+        }
+
+        if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
+            Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+            compatibilityHandler.deleteCandidateStarter(processDefinitionId, userId, groupId);
+            return null;
+        }
+
+        commandContext.getIdentityLinkEntityManager().deleteIdentityLink(processDefinition, userId, groupId);
+
+        return null;
+    }
 
 }

@@ -24,52 +24,51 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
 
 /**
- * An {@link FlowableEventListener} that throws a message event when an event is
- * dispatched to it. Sends the message to the execution the event was fired from. If the execution
- * is not subscribed to a message, the process-instance is checked.
+ * An {@link FlowableEventListener} that throws a message event when an event is dispatched to it. Sends the message to the execution the event was fired from. If the execution is not subscribed to a
+ * message, the process-instance is checked.
  * 
  * @author Frederik Heremans
  * 
  */
 public class MessageThrowingEventListener extends BaseDelegateEventListener {
 
-	protected String messageName;
-	protected Class<?> entityClass;
-	
-	@Override
-	public void onEvent(FlowableEvent event) {
-	  if (isValidEvent(event) && event instanceof FlowableEngineEvent) {
-      FlowableEngineEvent engineEvent = (FlowableEngineEvent) event;
-		
-			if (engineEvent.getProcessInstanceId() == null) {
-				throw new ActivitiIllegalArgumentException(
-				    "Cannot throw process-instance scoped message, since the dispatched event is not part of an ongoing process instance");
-			}
-	
-			CommandContext commandContext = Context.getCommandContext();
-			List<EventSubscriptionEntity> subscriptionEntities = commandContext.getEventSubscriptionEntityManager()
-				    .findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, engineEvent.getExecutionId());
-	
-			// Revert to messaging the process instance
-			if (subscriptionEntities.isEmpty() && engineEvent.getProcessInstanceId() != null && 
-			    !engineEvent.getExecutionId().equals(engineEvent.getProcessInstanceId())) {
-			  
-				subscriptionEntities = commandContext.getEventSubscriptionEntityManager()
-				    .findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, engineEvent.getProcessInstanceId());
-			}
-			
-			for (EventSubscriptionEntity signalEventSubscriptionEntity : subscriptionEntities) {
-				signalEventSubscriptionEntity.eventReceived(null, false);
-			}
-		}
-	}
+    protected String messageName;
+    protected Class<?> entityClass;
 
-	public void setMessageName(String messageName) {
-	  this.messageName = messageName;
-  }
-	
-	@Override
-	public boolean isFailOnException() {
-		return true;
-	}
+    @Override
+    public void onEvent(FlowableEvent event) {
+        if (isValidEvent(event) && event instanceof FlowableEngineEvent) {
+            FlowableEngineEvent engineEvent = (FlowableEngineEvent) event;
+
+            if (engineEvent.getProcessInstanceId() == null) {
+                throw new ActivitiIllegalArgumentException(
+                        "Cannot throw process-instance scoped message, since the dispatched event is not part of an ongoing process instance");
+            }
+
+            CommandContext commandContext = Context.getCommandContext();
+            List<EventSubscriptionEntity> subscriptionEntities = commandContext.getEventSubscriptionEntityManager()
+                    .findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, engineEvent.getExecutionId());
+
+            // Revert to messaging the process instance
+            if (subscriptionEntities.isEmpty() && engineEvent.getProcessInstanceId() != null &&
+                    !engineEvent.getExecutionId().equals(engineEvent.getProcessInstanceId())) {
+
+                subscriptionEntities = commandContext.getEventSubscriptionEntityManager()
+                        .findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, engineEvent.getProcessInstanceId());
+            }
+
+            for (EventSubscriptionEntity signalEventSubscriptionEntity : subscriptionEntities) {
+                signalEventSubscriptionEntity.eventReceived(null, false);
+            }
+        }
+    }
+
+    public void setMessageName(String messageName) {
+        this.messageName = messageName;
+    }
+
+    @Override
+    public boolean isFailOnException() {
+        return true;
+    }
 }

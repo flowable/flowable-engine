@@ -18,17 +18,16 @@ import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.pvm.delegate.SignallableActivityBehavior;
 import org.flowable.engine.delegate.DelegateExecution;
 
-
 /**
  * @author Tom Baeyens
  */
 public class WaitState implements SignallableActivityBehavior {
 
-  public void execute(DelegateExecution execution) {
-  }
+    public void execute(DelegateExecution execution) {
+    }
 
-  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
-    PvmTransition transition = execution.getActivity().getOutgoingTransitions().get(0);
-    execution.take(transition);
-  }
+    public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+        PvmTransition transition = execution.getActivity().getOutgoingTransitions().get(0);
+        execution.take(transition);
+    }
 }

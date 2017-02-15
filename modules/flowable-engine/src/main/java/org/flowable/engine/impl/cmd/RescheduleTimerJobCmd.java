@@ -25,49 +25,48 @@ import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 
 public class RescheduleTimerJobCmd implements Command<TimerJobEntity>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private final String timerJobId;
-  private String timeDate;
-  private String timeDuration; 
-  private String timeCycle;
-  private String endDate;
-  private String calendarName;
+    private final String timerJobId;
+    private String timeDate;
+    private String timeDuration;
+    private String timeCycle;
+    private String endDate;
+    private String calendarName;
 
-  public RescheduleTimerJobCmd(String timerJobId, String timeDate, String timeDuration, String timeCycle, String endDate, String calendarName) {
-    if (timerJobId == null) {
-      throw new FlowableIllegalArgumentException("The timer job id is mandatory, but 'null' has been provided.");
-    }
-    
-    int timeValues = Collections.frequency(Arrays.asList(timeDate, timeDuration, timeCycle), null);
-    if(timeValues == 0) {
-      throw new FlowableIllegalArgumentException("A non-null value is required for one of timeDate, timeDuration, or timeCycle");
-    }
-    else if(timeValues != 2) {
-      throw new FlowableIllegalArgumentException("At most one non-null value can be provided for timeDate, timeDuration, or timeCycle");
-    }
-    
-    if(endDate != null && timeCycle == null) {
-      throw new FlowableIllegalArgumentException("An end date can only be provided when rescheduling a timer using timeDuration.");
-    }
-    
-    this.timerJobId = timerJobId;
-    this.timeDate = timeDate;
-    this.timeDuration = timeDuration;
-    this.timeCycle = timeCycle;
-    this.endDate = endDate;
-    this.calendarName = calendarName;
-  }
+    public RescheduleTimerJobCmd(String timerJobId, String timeDate, String timeDuration, String timeCycle, String endDate, String calendarName) {
+        if (timerJobId == null) {
+            throw new FlowableIllegalArgumentException("The timer job id is mandatory, but 'null' has been provided.");
+        }
 
-  public TimerJobEntity execute(CommandContext commandContext) {
-    TimerEventDefinition ted = new TimerEventDefinition();
-    ted.setTimeDate(timeDate);
-    ted.setTimeDuration(timeDuration);
-    ted.setTimeCycle(timeCycle);
-    ted.setEndDate(endDate);
-    ted.setCalendarName(calendarName);
-    TimerJobEntity timerJob = commandContext.getJobManager().rescheduleTimerJob(timerJobId, ted);
-    return timerJob;
-  }
+        int timeValues = Collections.frequency(Arrays.asList(timeDate, timeDuration, timeCycle), null);
+        if (timeValues == 0) {
+            throw new FlowableIllegalArgumentException("A non-null value is required for one of timeDate, timeDuration, or timeCycle");
+        } else if (timeValues != 2) {
+            throw new FlowableIllegalArgumentException("At most one non-null value can be provided for timeDate, timeDuration, or timeCycle");
+        }
+
+        if (endDate != null && timeCycle == null) {
+            throw new FlowableIllegalArgumentException("An end date can only be provided when rescheduling a timer using timeDuration.");
+        }
+
+        this.timerJobId = timerJobId;
+        this.timeDate = timeDate;
+        this.timeDuration = timeDuration;
+        this.timeCycle = timeCycle;
+        this.endDate = endDate;
+        this.calendarName = calendarName;
+    }
+
+    public TimerJobEntity execute(CommandContext commandContext) {
+        TimerEventDefinition ted = new TimerEventDefinition();
+        ted.setTimeDate(timeDate);
+        ted.setTimeDuration(timeDuration);
+        ted.setTimeCycle(timeCycle);
+        ted.setEndDate(endDate);
+        ted.setCalendarName(calendarName);
+        TimerJobEntity timerJob = commandContext.getJobManager().rescheduleTimerJob(timerJobId, ted);
+        return timerJob;
+    }
 
 }

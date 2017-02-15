@@ -35,79 +35,79 @@ import org.flowable.engine.test.Deployment;
  */
 public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
 
-  @Deployment
-  public void testWebServiceInvocation() throws Exception {
+    @Deployment
+    public void testWebServiceInvocation() throws Exception {
 
-    assertEquals(-1, webServiceMock.getCount());
+        assertEquals(-1, webServiceMock.getCount());
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("webServiceInvocation");
-    waitForJobExecutorToProcessAllJobs(10000L, 250L);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("webServiceInvocation");
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
 
-    assertEquals(0, webServiceMock.getCount());
-    assertTrue(processInstance.isEnded());
-  }
-
-  @Deployment
-  public void testWebServiceInvocationDataStructure() throws Exception {
-
-    final Calendar calendar = Calendar.getInstance();
-    calendar.set(2015, Calendar.APRIL, 23, 0, 0, 0);
-    final Date expectedDate = calendar.getTime();
-    final Map<String, Object> variables = new HashMap<String, Object>(1);
-    variables.put("startDate", expectedDate);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("webServiceInvocationDataStructure", variables);
-    waitForJobExecutorToProcessAllJobs(10000L, 250L);
-
-    assertEquals(expectedDate, webServiceMock.getDataStructure().eltDate);
-    assertTrue(processInstance.isEnded());
-  }
-
-  @Deployment
-  public void testFaultManagement() throws Exception {
-
-    assertEquals(-1, webServiceMock.getCount());
-
-    // Expected fault catched with a boundary error event
-
-    webServiceMock.setTo(Integer.MAX_VALUE);
-    ProcessInstance processInstanceWithExpectedFault = runtimeService.startProcessInstanceByKey("webServiceInvocation");
-    waitForJobExecutorToProcessAllJobs(10000L, 250L);
-    assertTrue(processInstanceWithExpectedFault.isEnded());
-    final List<HistoricProcessInstance> historicProcessInstanceWithExpectedFault = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceWithExpectedFault.getId()).list();
-    assertEquals(1, historicProcessInstanceWithExpectedFault.size());
-    assertEquals("theEndWithError", historicProcessInstanceWithExpectedFault.get(0).getEndActivityId());
-
-    // Runtime exception occurring during processing of the web-service, so not caught in the process definition
-    webServiceMock.setTo(123456);
-    try {
-      runtimeService.startProcessInstanceByKey("webServiceInvocation");
-    } catch (FlowableException e) {
-      assertTrue(e.getCause() instanceof SoapFault);
+        assertEquals(0, webServiceMock.getCount());
+        assertTrue(processInstance.isEnded());
     }
 
-    // Unexpected fault invoking the web-service, so not caught in the process definition
-    server.stop();
-    try {
-      runtimeService.startProcessInstanceByKey("webServiceInvocation");
-    } catch (FlowableException e) {
-      assertTrue(e.getCause() instanceof Fault);
-    } finally {
-      server.start();
+    @Deployment
+    public void testWebServiceInvocationDataStructure() throws Exception {
+
+        final Calendar calendar = Calendar.getInstance();
+        calendar.set(2015, Calendar.APRIL, 23, 0, 0, 0);
+        final Date expectedDate = calendar.getTime();
+        final Map<String, Object> variables = new HashMap<String, Object>(1);
+        variables.put("startDate", expectedDate);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("webServiceInvocationDataStructure", variables);
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
+
+        assertEquals(expectedDate, webServiceMock.getDataStructure().eltDate);
+        assertTrue(processInstance.isEnded());
     }
-  }
 
-  @Deployment
-  public void testWebServiceInvocationWithEndpointAddressConfigured() throws Exception {
+    @Deployment
+    public void testFaultManagement() throws Exception {
 
-    assertEquals(-1, webServiceMock.getCount());
+        assertEquals(-1, webServiceMock.getCount());
 
-    processEngineConfiguration.addWsEndpointAddress(new QName("http://webservice.impl.engine.activiti.org/", "CounterImplPort"), new URL("http://localhost:63081/webservicemock"));
+        // Expected fault catched with a boundary error event
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("webServiceInvocation");
-    waitForJobExecutorToProcessAllJobs(10000L, 250L);
+        webServiceMock.setTo(Integer.MAX_VALUE);
+        ProcessInstance processInstanceWithExpectedFault = runtimeService.startProcessInstanceByKey("webServiceInvocation");
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
+        assertTrue(processInstanceWithExpectedFault.isEnded());
+        final List<HistoricProcessInstance> historicProcessInstanceWithExpectedFault = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceWithExpectedFault.getId()).list();
+        assertEquals(1, historicProcessInstanceWithExpectedFault.size());
+        assertEquals("theEndWithError", historicProcessInstanceWithExpectedFault.get(0).getEndActivityId());
 
-    assertEquals(0, webServiceMock.getCount());
-    assertTrue(processInstance.isEnded());
-  }
+        // Runtime exception occurring during processing of the web-service, so not caught in the process definition
+        webServiceMock.setTo(123456);
+        try {
+            runtimeService.startProcessInstanceByKey("webServiceInvocation");
+        } catch (FlowableException e) {
+            assertTrue(e.getCause() instanceof SoapFault);
+        }
+
+        // Unexpected fault invoking the web-service, so not caught in the process definition
+        server.stop();
+        try {
+            runtimeService.startProcessInstanceByKey("webServiceInvocation");
+        } catch (FlowableException e) {
+            assertTrue(e.getCause() instanceof Fault);
+        } finally {
+            server.start();
+        }
+    }
+
+    @Deployment
+    public void testWebServiceInvocationWithEndpointAddressConfigured() throws Exception {
+
+        assertEquals(-1, webServiceMock.getCount());
+
+        processEngineConfiguration.addWsEndpointAddress(new QName("http://webservice.impl.engine.activiti.org/", "CounterImplPort"), new URL("http://localhost:63081/webservicemock"));
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("webServiceInvocation");
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
+
+        assertEquals(0, webServiceMock.getCount());
+        assertTrue(processInstance.isEnded());
+    }
 
 }

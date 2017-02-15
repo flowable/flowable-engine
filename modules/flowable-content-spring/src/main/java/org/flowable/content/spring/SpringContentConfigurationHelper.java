@@ -29,21 +29,21 @@ import org.springframework.core.io.UrlResource;
  */
 public class SpringContentConfigurationHelper {
 
-  private static Logger log = LoggerFactory.getLogger(SpringContentConfigurationHelper.class);
+    private static Logger log = LoggerFactory.getLogger(SpringContentConfigurationHelper.class);
 
-  public static ContentEngine buildContentEngine(URL resource) {
-    log.debug("==== BUILDING SPRING APPLICATION CONTEXT AND CONTENT ENGINE =========================================");
+    public static ContentEngine buildContentEngine(URL resource) {
+        log.debug("==== BUILDING SPRING APPLICATION CONTEXT AND CONTENT ENGINE =========================================");
 
-    ApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource));
-    Map<String, ContentEngine> beansOfType = applicationContext.getBeansOfType(ContentEngine.class);
-    if ((beansOfType == null) || (beansOfType.isEmpty())) {
-      throw new FlowableException("no " + ContentEngine.class.getName() + " defined in the application context " + resource.toString());
+        ApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource));
+        Map<String, ContentEngine> beansOfType = applicationContext.getBeansOfType(ContentEngine.class);
+        if ((beansOfType == null) || (beansOfType.isEmpty())) {
+            throw new FlowableException("no " + ContentEngine.class.getName() + " defined in the application context " + resource.toString());
+        }
+
+        ContentEngine contentEngine = beansOfType.values().iterator().next();
+
+        log.debug("==== SPRING CONTENT ENGINE CREATED ==================================================================");
+        return contentEngine;
     }
-
-    ContentEngine contentEngine = beansOfType.values().iterator().next();
-
-    log.debug("==== SPRING CONTENT ENGINE CREATED ==================================================================");
-    return contentEngine;
-  }
 
 }

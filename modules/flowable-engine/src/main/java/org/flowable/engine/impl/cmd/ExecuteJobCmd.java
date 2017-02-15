@@ -32,52 +32,52 @@ import org.slf4j.LoggerFactory;
  */
 public class ExecuteJobCmd implements Command<Object>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private static Logger log = LoggerFactory.getLogger(ExecuteJobCmd.class);
+    private static Logger log = LoggerFactory.getLogger(ExecuteJobCmd.class);
 
-  protected String jobId;
-  
-  public ExecuteJobCmd(String jobId) {
-    this.jobId = jobId;
-  }
+    protected String jobId;
 
-  public Object execute(CommandContext commandContext) {
-
-    if (jobId == null) {
-      throw new FlowableIllegalArgumentException("jobId and job is null");
+    public ExecuteJobCmd(String jobId) {
+        this.jobId = jobId;
     }
 
-    Job job = commandContext.getJobEntityManager().findById(jobId);
+    public Object execute(CommandContext commandContext) {
 
-    if (job == null) {
-      throw new JobNotFoundException(jobId);
+        if (jobId == null) {
+            throw new FlowableIllegalArgumentException("jobId and job is null");
+        }
+
+        Job job = commandContext.getJobEntityManager().findById(jobId);
+
+        if (job == null) {
+            throw new JobNotFoundException(jobId);
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Executing job {}", job.getId());
+        }
+
+        if (job.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, job.getProcessDefinitionId())) {
+            Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+            compatibilityHandler.executeJob(job);
+            return null;
+        }
+
+        commandContext.addCloseListener(new FailedJobListener(commandContext.getProcessEngineConfiguration().getCommandExecutor(), job));
+
+        try {
+            commandContext.getJobManager().execute(job);
+        } catch (Throwable exception) {
+            // Finally, Throw the exception to indicate the ExecuteJobCmd failed
+            throw new FlowableException("Job " + jobId + " failed", exception);
+        }
+
+        return null;
     }
 
-    if (log.isDebugEnabled()) {
-      log.debug("Executing job {}", job.getId());
-    }
-    
-    if (job.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, job.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      compatibilityHandler.executeJob(job);
-      return null;
-    }
-    
-    commandContext.addCloseListener(new FailedJobListener(commandContext.getProcessEngineConfiguration().getCommandExecutor(), job));
-
-    try {
-      commandContext.getJobManager().execute(job);
-    } catch (Throwable exception) {
-      // Finally, Throw the exception to indicate the ExecuteJobCmd failed
-      throw new FlowableException("Job " + jobId + " failed", exception);
+    public String getJobId() {
+        return jobId;
     }
 
-    return null;
-  }
-
-  public String getJobId() {
-    return jobId;
-  }
-  
 }

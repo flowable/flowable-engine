@@ -31,25 +31,25 @@ import org.flowable.engine.task.Task;
  */
 public class GetTaskFormCmd implements Command<TaskFormData>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String taskId;
+    private static final long serialVersionUID = 1L;
+    protected String taskId;
 
-  public GetTaskFormCmd(String taskId) {
-    this.taskId = taskId;
-  }
-
-  public TaskFormData execute(CommandContext commandContext) {
-    TaskEntity task = commandContext.getTaskEntityManager().findById(taskId);
-    if (task == null) {
-      throw new FlowableObjectNotFoundException("No task found for taskId '" + taskId + "'", Task.class);
-    }
-    
-    TaskFormHandler taskFormHandler = FormHandlerUtil.getTaskFormHandlder(task);
-    if (taskFormHandler == null) {
-      throw new FlowableException("No taskFormHandler specified for task '" + taskId + "'");
+    public GetTaskFormCmd(String taskId) {
+        this.taskId = taskId;
     }
 
-    return taskFormHandler.createTaskForm(task);
-  }
+    public TaskFormData execute(CommandContext commandContext) {
+        TaskEntity task = commandContext.getTaskEntityManager().findById(taskId);
+        if (task == null) {
+            throw new FlowableObjectNotFoundException("No task found for taskId '" + taskId + "'", Task.class);
+        }
+
+        TaskFormHandler taskFormHandler = FormHandlerUtil.getTaskFormHandlder(task);
+        if (taskFormHandler == null) {
+            throw new FlowableException("No taskFormHandler specified for task '" + taskId + "'");
+        }
+
+        return taskFormHandler.createTaskForm(task);
+    }
 
 }

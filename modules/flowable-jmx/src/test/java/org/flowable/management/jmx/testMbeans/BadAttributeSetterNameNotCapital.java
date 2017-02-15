@@ -21,7 +21,7 @@ import org.flowable.management.jmx.annotations.ManagedAttribute;
 
 public class BadAttributeSetterNameNotCapital {
 
-  @ManagedAttribute
-  public void settestAttribute1(String st) {
-  }
+    @ManagedAttribute
+    public void settestAttribute1(String st) {
+    }
 }

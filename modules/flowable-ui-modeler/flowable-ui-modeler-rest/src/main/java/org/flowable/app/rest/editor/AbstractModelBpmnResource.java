@@ -36,63 +36,63 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class AbstractModelBpmnResource {
 
-  private final Logger log = LoggerFactory.getLogger(AbstractModelBpmnResource.class);
+    private final Logger log = LoggerFactory.getLogger(AbstractModelBpmnResource.class);
 
-  @Autowired
-  protected ModelService modelService;
+    @Autowired
+    protected ModelService modelService;
 
-  public void getProcessModelBpmn20Xml(HttpServletResponse response, String processModelId) throws IOException {
+    public void getProcessModelBpmn20Xml(HttpServletResponse response, String processModelId) throws IOException {
 
-    if (processModelId == null) {
-      throw new BadRequestException("No process model id provided");
-    }
-
-    Model model = modelService.getModel(processModelId);
-    generateBpmn20Xml(response, model);
-  }
-
-  public void getHistoricProcessModelBpmn20Xml(HttpServletResponse response, String processModelId, String processModelHistoryId) throws IOException {
-
-    if (processModelId == null) {
-      throw new BadRequestException("No process model id provided");
-    }
-
-    ModelHistory historicModel = modelService.getModelHistory(processModelId, processModelHistoryId);
-    generateBpmn20Xml(response, historicModel);
-  }
-
-  protected void generateBpmn20Xml(HttpServletResponse response, AbstractModel model) {
-    String name = model.getName().replaceAll(" ", "_");
-    response.setHeader("Content-Disposition", "attachment; filename=" + name + ".bpmn20.xml");
-    if (model.getModelEditorJson() != null) {
-      try {
-        ServletOutputStream servletOutputStream = response.getOutputStream();
-        response.setContentType("application/xml");
-
-        BpmnModel bpmnModel = modelService.getBpmnModel(model);
-        byte[] xmlBytes = modelService.getBpmnXML(bpmnModel);
-        BufferedInputStream in = new BufferedInputStream(new ByteArrayInputStream(xmlBytes));
-
-        byte[] buffer = new byte[8096];
-        while (true) {
-          int count = in.read(buffer);
-          if (count == -1) {
-            break;
-          }
-          servletOutputStream.write(buffer, 0, count);
+        if (processModelId == null) {
+            throw new BadRequestException("No process model id provided");
         }
 
-        // Flush and close stream
-        servletOutputStream.flush();
-        servletOutputStream.close();
-
-      } catch (BaseModelerRestException e) {
-        throw e;
-
-      } catch (Exception e) {
-        log.error("Could not generate BPMN 2.0 XML", e);
-        throw new InternalServerErrorException("Could not generate BPMN 2.0 xml");
-      }
+        Model model = modelService.getModel(processModelId);
+        generateBpmn20Xml(response, model);
     }
-  }
+
+    public void getHistoricProcessModelBpmn20Xml(HttpServletResponse response, String processModelId, String processModelHistoryId) throws IOException {
+
+        if (processModelId == null) {
+            throw new BadRequestException("No process model id provided");
+        }
+
+        ModelHistory historicModel = modelService.getModelHistory(processModelId, processModelHistoryId);
+        generateBpmn20Xml(response, historicModel);
+    }
+
+    protected void generateBpmn20Xml(HttpServletResponse response, AbstractModel model) {
+        String name = model.getName().replaceAll(" ", "_");
+        response.setHeader("Content-Disposition", "attachment; filename=" + name + ".bpmn20.xml");
+        if (model.getModelEditorJson() != null) {
+            try {
+                ServletOutputStream servletOutputStream = response.getOutputStream();
+                response.setContentType("application/xml");
+
+                BpmnModel bpmnModel = modelService.getBpmnModel(model);
+                byte[] xmlBytes = modelService.getBpmnXML(bpmnModel);
+                BufferedInputStream in = new BufferedInputStream(new ByteArrayInputStream(xmlBytes));
+
+                byte[] buffer = new byte[8096];
+                while (true) {
+                    int count = in.read(buffer);
+                    if (count == -1) {
+                        break;
+                    }
+                    servletOutputStream.write(buffer, 0, count);
+                }
+
+                // Flush and close stream
+                servletOutputStream.flush();
+                servletOutputStream.close();
+
+            } catch (BaseModelerRestException e) {
+                throw e;
+
+            } catch (Exception e) {
+                log.error("Could not generate BPMN 2.0 XML", e);
+                throw new InternalServerErrorException("Could not generate BPMN 2.0 xml");
+            }
+        }
+    }
 }

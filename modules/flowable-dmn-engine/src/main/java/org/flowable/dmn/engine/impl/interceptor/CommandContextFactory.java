@@ -20,20 +20,20 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
  */
 public class CommandContextFactory {
 
-  protected DmnEngineConfiguration dmnEngineConfiguration;
+    protected DmnEngineConfiguration dmnEngineConfiguration;
 
-  public CommandContext createCommandContext(Command<?> cmd) {
-    return new CommandContext(cmd, dmnEngineConfiguration);
-  }
+    public CommandContext createCommandContext(Command<?> cmd) {
+        return new CommandContext(cmd, dmnEngineConfiguration);
+    }
 
-  // getters and setters
-  // //////////////////////////////////////////////////////
+    // getters and setters
+    // //////////////////////////////////////////////////////
 
-  public DmnEngineConfiguration getDmnEngineConfiguration() {
-    return dmnEngineConfiguration;
-  }
+    public DmnEngineConfiguration getDmnEngineConfiguration() {
+        return dmnEngineConfiguration;
+    }
 
-  public void setDmnEngineConfiguration(DmnEngineConfiguration dmnEngineConfiguration) {
-    this.dmnEngineConfiguration = dmnEngineConfiguration;
-  }
+    public void setDmnEngineConfiguration(DmnEngineConfiguration dmnEngineConfiguration) {
+        this.dmnEngineConfiguration = dmnEngineConfiguration;
+    }
 }

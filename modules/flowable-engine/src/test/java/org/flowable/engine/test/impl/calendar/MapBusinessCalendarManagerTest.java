@@ -32,32 +32,33 @@ import junit.framework.TestCase;
  */
 public class MapBusinessCalendarManagerTest extends TestCase {
 
-  public void testMapConstructor() {
-    Map<String, BusinessCalendar> calendars = new HashMap<String, BusinessCalendar>(1);
-    CycleBusinessCalendar calendar = new CycleBusinessCalendar(null);
-    calendars.put("someKey", calendar);
-    MapBusinessCalendarManager businessCalendarManager = new MapBusinessCalendarManager(calendars);
+    public void testMapConstructor() {
+        Map<String, BusinessCalendar> calendars = new HashMap<String, BusinessCalendar>(1);
+        CycleBusinessCalendar calendar = new CycleBusinessCalendar(null);
+        calendars.put("someKey", calendar);
+        MapBusinessCalendarManager businessCalendarManager = new MapBusinessCalendarManager(calendars);
 
-    assertEquals(calendar, businessCalendarManager.getBusinessCalendar("someKey"));
-  }
-
-  public void testInvalidCalendarNameRequest() {
-    @SuppressWarnings("unchecked") MapBusinessCalendarManager businessCalendarManager = new MapBusinessCalendarManager(Collections.EMPTY_MAP);
-
-    try {
-      businessCalendarManager.getBusinessCalendar("INVALID");
-      fail("ActivitiException expected");
-    } catch (FlowableException e) {
-      assertThat(e.getMessage(), containsString("INVALID does not exist"));
+        assertEquals(calendar, businessCalendarManager.getBusinessCalendar("someKey"));
     }
-  }
 
-  public void testNullCalendars() {
-    try {
-      new MapBusinessCalendarManager(null);
-      fail("AssertionError expected");
-    } catch(IllegalArgumentException e) {
-      // Expected error
+    public void testInvalidCalendarNameRequest() {
+        @SuppressWarnings("unchecked")
+        MapBusinessCalendarManager businessCalendarManager = new MapBusinessCalendarManager(Collections.EMPTY_MAP);
+
+        try {
+            businessCalendarManager.getBusinessCalendar("INVALID");
+            fail("ActivitiException expected");
+        } catch (FlowableException e) {
+            assertThat(e.getMessage(), containsString("INVALID does not exist"));
+        }
     }
-  }
+
+    public void testNullCalendars() {
+        try {
+            new MapBusinessCalendarManager(null);
+            fail("AssertionError expected");
+        } catch (IllegalArgumentException e) {
+            // Expected error
+        }
+    }
 }

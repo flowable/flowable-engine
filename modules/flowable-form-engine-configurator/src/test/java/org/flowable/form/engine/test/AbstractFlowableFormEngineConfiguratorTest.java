@@ -24,23 +24,23 @@ import org.junit.Rule;
  */
 public class AbstractFlowableFormEngineConfiguratorTest {
 
-  public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000";
+    public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000";
 
-  @Rule
-  public FlowableRule flowableRule = new FlowableRule();
+    @Rule
+    public FlowableRule flowableRule = new FlowableRule();
 
-  protected static ProcessEngine cachedProcessEngine;
-  protected RepositoryService repositoryService;
-  protected FormRepositoryService formRepositoryService;
+    protected static ProcessEngine cachedProcessEngine;
+    protected RepositoryService repositoryService;
+    protected FormRepositoryService formRepositoryService;
 
-  @Before
-  public void initProcessEngine() {
-    if (cachedProcessEngine == null) {
-      cachedProcessEngine = flowableRule.getProcessEngine();
+    @Before
+    public void initProcessEngine() {
+        if (cachedProcessEngine == null) {
+            cachedProcessEngine = flowableRule.getProcessEngine();
+        }
+
+        this.repositoryService = cachedProcessEngine.getRepositoryService();
+        this.formRepositoryService = cachedProcessEngine.getFormEngineRepositoryService();
     }
-
-    this.repositoryService = cachedProcessEngine.getRepositoryService();
-    this.formRepositoryService = cachedProcessEngine.getFormEngineRepositoryService();
-  }
 
 }

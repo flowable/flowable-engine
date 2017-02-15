@@ -35,113 +35,112 @@ import org.flowable.engine.task.TaskInfo;
  */
 public class SaveTaskCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected TaskEntity task;
+    protected TaskEntity task;
 
-  public SaveTaskCmd(Task task) {
-    this.task = (TaskEntity) task;
-  }
-
-  public Void execute(CommandContext commandContext) {
-    if (task == null) {
-      throw new FlowableIllegalArgumentException("task is null");
+    public SaveTaskCmd(Task task) {
+        this.task = (TaskEntity) task;
     }
 
-    if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
-      compatibilityHandler.saveTask(task);
-      return null;
+    public Void execute(CommandContext commandContext) {
+        if (task == null) {
+            throw new FlowableIllegalArgumentException("task is null");
+        }
+
+        if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
+            Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+            compatibilityHandler.saveTask(task);
+            return null;
+        }
+
+        if (task.getRevision() == 0) {
+            commandContext.getTaskEntityManager().insert(task, null);
+
+            if (commandContext.getEventDispatcher().isEnabled()) {
+                commandContext.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
+            }
+
+        } else {
+
+            TaskInfo originalTaskEntity = null;
+            if (commandContext.getProcessEngineConfiguration().getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+                originalTaskEntity = commandContext.getHistoricTaskInstanceEntityManager().findById(task.getId());
+            }
+
+            if (originalTaskEntity == null) {
+                originalTaskEntity = commandContext.getTaskEntityManager().findById(task.getId());
+            }
+
+            String originalName = originalTaskEntity.getName();
+            String originalAssignee = originalTaskEntity.getAssignee();
+            String originalOwner = originalTaskEntity.getOwner();
+            String originalDescription = originalTaskEntity.getDescription();
+            Date originalDueDate = originalTaskEntity.getDueDate();
+            int originalPriority = originalTaskEntity.getPriority();
+            String originalCategory = originalTaskEntity.getCategory();
+            String originalFormKey = originalTaskEntity.getFormKey();
+            String originalParentTaskId = originalTaskEntity.getParentTaskId();
+            String originalTaskDefinitionKey = originalTaskEntity.getTaskDefinitionKey();
+
+            // Only update history if history is enabled
+            if (commandContext.getProcessEngineConfiguration().getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+
+                if (!StringUtils.equals(originalName, task.getName())) {
+                    commandContext.getHistoryManager().recordTaskNameChange(task.getId(), task.getName());
+                }
+                if (!StringUtils.equals(originalDescription, task.getDescription())) {
+                    commandContext.getHistoryManager().recordTaskDescriptionChange(task.getId(), task.getDescription());
+                }
+                if ((originalDueDate == null && task.getDueDate() != null)
+                        || (originalDueDate != null && task.getDueDate() == null)
+                        || (originalDueDate != null && !originalDueDate.equals(task.getDueDate()))) {
+                    commandContext.getHistoryManager().recordTaskDueDateChange(task.getId(), task.getDueDate());
+                }
+                if (originalPriority != task.getPriority()) {
+                    commandContext.getHistoryManager().recordTaskPriorityChange(task.getId(), task.getPriority());
+                }
+                if (!StringUtils.equals(originalCategory, task.getCategory())) {
+                    commandContext.getHistoryManager().recordTaskCategoryChange(task.getId(), task.getCategory());
+                }
+                if (!StringUtils.equals(originalFormKey, task.getFormKey())) {
+                    commandContext.getHistoryManager().recordTaskFormKeyChange(task.getId(), task.getFormKey());
+                }
+                if (!StringUtils.equals(originalParentTaskId, task.getParentTaskId())) {
+                    commandContext.getHistoryManager().recordTaskParentTaskIdChange(task.getId(), task.getParentTaskId());
+                }
+                if (!StringUtils.equals(originalTaskDefinitionKey, task.getTaskDefinitionKey())) {
+                    commandContext.getHistoryManager().recordTaskDefinitionKeyChange(task.getId(), task.getTaskDefinitionKey());
+                }
+
+            }
+
+            if (!StringUtils.equals(originalOwner, task.getOwner())) {
+                if (task.getProcessInstanceId() != null) {
+                    commandContext.getIdentityLinkEntityManager().involveUser(task.getProcessInstance(), task.getOwner(), IdentityLinkType.PARTICIPANT);
+                }
+                commandContext.getHistoryManager().recordTaskOwnerChange(task.getId(), task.getOwner());
+            }
+            if (!StringUtils.equals(originalAssignee, task.getAssignee())) {
+                if (task.getProcessInstanceId() != null) {
+                    commandContext.getIdentityLinkEntityManager().involveUser(task.getProcessInstance(), task.getAssignee(), IdentityLinkType.PARTICIPANT);
+                }
+                commandContext.getHistoryManager().recordTaskAssigneeChange(task.getId(), task.getAssignee());
+
+                commandContext.getProcessEngineConfiguration().getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_ASSIGNMENT);
+                commandContext.getHistoryManager().recordTaskAssignment(task);
+
+                if (commandContext.getEventDispatcher().isEnabled()) {
+                    commandContext.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, task));
+                }
+
+            }
+
+            commandContext.getTaskEntityManager().update(task);
+
+        }
+
+        return null;
     }
-
-    if (task.getRevision() == 0) {
-      commandContext.getTaskEntityManager().insert(task, null);
-
-      if (commandContext.getEventDispatcher().isEnabled()) {
-        commandContext.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
-      }
-
-    } else {
-
-      TaskInfo originalTaskEntity = null;
-      if (commandContext.getProcessEngineConfiguration().getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-        originalTaskEntity = commandContext.getHistoricTaskInstanceEntityManager().findById(task.getId());
-      }
-
-      if (originalTaskEntity == null) {
-        originalTaskEntity = commandContext.getTaskEntityManager().findById(task.getId());
-      }
-
-      String originalName = originalTaskEntity.getName();
-      String originalAssignee = originalTaskEntity.getAssignee();
-      String originalOwner = originalTaskEntity.getOwner();
-      String originalDescription = originalTaskEntity.getDescription();
-      Date originalDueDate = originalTaskEntity.getDueDate();
-      int originalPriority = originalTaskEntity.getPriority();
-      String originalCategory = originalTaskEntity.getCategory();
-      String originalFormKey = originalTaskEntity.getFormKey();
-      String originalParentTaskId = originalTaskEntity.getParentTaskId();
-      String originalTaskDefinitionKey = originalTaskEntity.getTaskDefinitionKey();
-
-      // Only update history if history is enabled
-      if (commandContext.getProcessEngineConfiguration().getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-
-        if (!StringUtils.equals(originalName, task.getName())) {
-          commandContext.getHistoryManager().recordTaskNameChange(task.getId(), task.getName());
-        }
-        if (!StringUtils.equals(originalDescription, task.getDescription())) {
-          commandContext.getHistoryManager().recordTaskDescriptionChange(task.getId(), task.getDescription());
-        }
-        if ((originalDueDate == null && task.getDueDate() != null) 
-            || (originalDueDate != null && task.getDueDate() == null) 
-            || (originalDueDate != null && !originalDueDate.equals(task.getDueDate()))) {
-          commandContext.getHistoryManager().recordTaskDueDateChange(task.getId(), task.getDueDate());
-        }
-        if (originalPriority != task.getPriority()) {
-          commandContext.getHistoryManager().recordTaskPriorityChange(task.getId(), task.getPriority());
-        }
-        if (!StringUtils.equals(originalCategory, task.getCategory())) {
-          commandContext.getHistoryManager().recordTaskCategoryChange(task.getId(), task.getCategory());
-        }
-        if (!StringUtils.equals(originalFormKey, task.getFormKey())) {
-          commandContext.getHistoryManager().recordTaskFormKeyChange(task.getId(), task.getFormKey());
-        }
-        if (!StringUtils.equals(originalParentTaskId, task.getParentTaskId())) {
-          commandContext.getHistoryManager().recordTaskParentTaskIdChange(task.getId(), task.getParentTaskId());
-        }
-        if (!StringUtils.equals(originalTaskDefinitionKey, task.getTaskDefinitionKey())) {
-          commandContext.getHistoryManager().recordTaskDefinitionKeyChange(task.getId(), task.getTaskDefinitionKey());
-        }
-
-      }
-
-      if (!StringUtils.equals(originalOwner, task.getOwner())) {
-        if (task.getProcessInstanceId() != null) {
-          commandContext.getIdentityLinkEntityManager().involveUser(task.getProcessInstance(), task.getOwner(), IdentityLinkType.PARTICIPANT);
-        }
-        commandContext.getHistoryManager().recordTaskOwnerChange(task.getId(), task.getOwner());
-      }
-      if (!StringUtils.equals(originalAssignee, task.getAssignee())) {
-        if (task.getProcessInstanceId() != null) {
-          commandContext.getIdentityLinkEntityManager().involveUser(task.getProcessInstance(), task.getAssignee(), IdentityLinkType.PARTICIPANT);
-        }
-        commandContext.getHistoryManager().recordTaskAssigneeChange(task.getId(), task.getAssignee());
-
-        commandContext.getProcessEngineConfiguration().getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_ASSIGNMENT);
-        commandContext.getHistoryManager().recordTaskAssignment(task);
-
-        if (commandContext.getEventDispatcher().isEnabled()) {
-          commandContext.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, task));
-        }
-
-      }
-      
-      commandContext.getTaskEntityManager().update(task);
-
-    }
-
-
-    return null;
-  }
 
 }

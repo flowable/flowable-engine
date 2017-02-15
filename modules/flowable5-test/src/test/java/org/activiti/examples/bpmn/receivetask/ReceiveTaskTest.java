@@ -18,23 +18,22 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
-
 /**
  * @author Joram Barrez
  */
 public class ReceiveTaskTest extends PluggableFlowableTestCase {
 
-  @Deployment
-  public void testWaitStateBehavior() {
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("receiveTask");
-    Execution execution = runtimeService.createExecutionQuery()
-      .processInstanceId(pi.getId())
-      .activityId("waitState")
-      .singleResult();
-    assertNotNull(execution);
-    
-    runtimeService.trigger(execution.getId());
-    assertProcessEnded(pi.getId());
-  }
+    @Deployment
+    public void testWaitStateBehavior() {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("receiveTask");
+        Execution execution = runtimeService.createExecutionQuery()
+                .processInstanceId(pi.getId())
+                .activityId("waitState")
+                .singleResult();
+        assertNotNull(execution);
+
+        runtimeService.trigger(execution.getId());
+        assertProcessEnded(pi.getId());
+    }
 
 }

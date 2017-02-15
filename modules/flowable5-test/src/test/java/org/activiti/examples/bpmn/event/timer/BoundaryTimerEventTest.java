@@ -17,29 +17,30 @@ import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+
 /**
  * @author Joram Barrez
  */
 public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
-  @Deployment
-  public void testInterruptingTimerDuration() {
-    
-    // Start process instance
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("escalationExample");
+    @Deployment
+    public void testInterruptingTimerDuration() {
 
-    // There should be one task, with a timer : first line support
-    Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-    assertEquals("First line support", task.getName());
+        // Start process instance
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("escalationExample");
 
-    // Manually execute the job
-    Job timer = managementService.createTimerJobQuery().singleResult();
-    managementService.moveTimerToExecutableJob(timer.getId());
-    managementService.executeJob(timer.getId());
+        // There should be one task, with a timer : first line support
+        Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        assertEquals("First line support", task.getName());
 
-    // The timer has fired, and the second task (secondlinesupport) now exists
-    task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-    assertEquals("Handle escalated issue", task.getName());
-  }
+        // Manually execute the job
+        Job timer = managementService.createTimerJobQuery().singleResult();
+        managementService.moveTimerToExecutableJob(timer.getId());
+        managementService.executeJob(timer.getId());
+
+        // The timer has fired, and the second task (secondlinesupport) now exists
+        task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        assertEquals("Handle escalated issue", task.getName());
+    }
 
 }

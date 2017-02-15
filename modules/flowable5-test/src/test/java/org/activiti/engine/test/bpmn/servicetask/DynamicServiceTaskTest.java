@@ -25,144 +25,143 @@ import org.flowable.engine.test.Deployment;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-
 /**
  * @author Tijs Rademakers
  */
 public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
-  
-  @Deployment
-  public void testChangeClassName() {
-    // first test without changing the class name
-    Map<String, Object> varMap = new HashMap<String, Object>();
-    varMap.put("count", 0);
-    varMap.put("count2", 0);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
-    
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    taskService.complete(task.getId());
-    
-    assertEquals(1, runtimeService.getVariable(processInstance.getId(), "count"));
-    assertEquals(0, runtimeService.getVariable(processInstance.getId(), "count2"));
-    
-    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    taskService.complete(task.getId());
-    
-    assertProcessEnded(processInstance.getId());
-    
-    // now test with changing the class name
-    varMap = new HashMap<String, Object>();
-    varMap.put("count", 0);
-    varMap.put("count2", 0);
-    processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
-    
-    String processDefinitionId = processInstance.getProcessDefinitionId();
-    ObjectNode infoNode = dynamicBpmnService.changeServiceTaskClassName("service", "org.activiti.engine.test.bpmn.servicetask.DummyServiceTask2");
-    dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, infoNode);
-    
-    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    taskService.complete(task.getId());
-    
-    assertEquals(0, runtimeService.getVariable(processInstance.getId(), "count"));
-    assertEquals(1, runtimeService.getVariable(processInstance.getId(), "count2"));
-    
-    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    taskService.complete(task.getId());
-    
-    assertProcessEnded(processInstance.getId());
-  }
 
-  @Deployment
-  public void testChangeExpression() {
-    // first test without changing the class name
-    DummyTestBean testBean = new DummyTestBean();
-    Map<String, Object> varMap = new HashMap<String, Object>();
-    varMap.put("bean", testBean);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
-    
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    taskService.complete(task.getId());
-    
-    if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-      HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
-          .processInstanceId(processInstance.getId())
-          .variableName("executed")
-          .singleResult();
-      assertNotNull(historicVariableInstance);
-      assertTrue((Boolean) historicVariableInstance.getValue());
+    @Deployment
+    public void testChangeClassName() {
+        // first test without changing the class name
+        Map<String, Object> varMap = new HashMap<String, Object>();
+        varMap.put("count", 0);
+        varMap.put("count2", 0);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        assertEquals(1, runtimeService.getVariable(processInstance.getId(), "count"));
+        assertEquals(0, runtimeService.getVariable(processInstance.getId(), "count2"));
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+
+        // now test with changing the class name
+        varMap = new HashMap<String, Object>();
+        varMap.put("count", 0);
+        varMap.put("count2", 0);
+        processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
+
+        String processDefinitionId = processInstance.getProcessDefinitionId();
+        ObjectNode infoNode = dynamicBpmnService.changeServiceTaskClassName("service", "org.activiti.engine.test.bpmn.servicetask.DummyServiceTask2");
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, infoNode);
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        assertEquals(0, runtimeService.getVariable(processInstance.getId(), "count"));
+        assertEquals(1, runtimeService.getVariable(processInstance.getId(), "count2"));
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
     }
-    
-    assertProcessEnded(processInstance.getId());
-    
-    // now test with changing the class name
-    testBean = new DummyTestBean();
-    varMap = new HashMap<String, Object>();
-    varMap.put("bean2", testBean);
-    processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
-    
-    String processDefinitionId = processInstance.getProcessDefinitionId();
-    ObjectNode infoNode = dynamicBpmnService.changeServiceTaskExpression("service", "${bean2.test(execution)}");
-    dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, infoNode);
-    
-    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    taskService.complete(task.getId());
-    
-    if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-      HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
-          .processInstanceId(processInstance.getId())
-          .variableName("executed")
-          .singleResult();
-      assertNotNull(historicVariableInstance);
-      assertTrue((Boolean) historicVariableInstance.getValue());
+
+    @Deployment
+    public void testChangeExpression() {
+        // first test without changing the class name
+        DummyTestBean testBean = new DummyTestBean();
+        Map<String, Object> varMap = new HashMap<String, Object>();
+        varMap.put("bean", testBean);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("executed")
+                    .singleResult();
+            assertNotNull(historicVariableInstance);
+            assertTrue((Boolean) historicVariableInstance.getValue());
+        }
+
+        assertProcessEnded(processInstance.getId());
+
+        // now test with changing the class name
+        testBean = new DummyTestBean();
+        varMap = new HashMap<String, Object>();
+        varMap.put("bean2", testBean);
+        processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
+
+        String processDefinitionId = processInstance.getProcessDefinitionId();
+        ObjectNode infoNode = dynamicBpmnService.changeServiceTaskExpression("service", "${bean2.test(execution)}");
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, infoNode);
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("executed")
+                    .singleResult();
+            assertNotNull(historicVariableInstance);
+            assertTrue((Boolean) historicVariableInstance.getValue());
+        }
+
+        assertProcessEnded(processInstance.getId());
     }
-    
-    assertProcessEnded(processInstance.getId());
-  }
-  
-  @Deployment
-  public void testChangeDelegateExpression() {
-    // first test without changing the class name
-    DummyTestDelegateBean testBean = new DummyTestDelegateBean();
-    Map<String, Object> varMap = new HashMap<String, Object>();
-    varMap.put("bean", testBean);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
-    
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    taskService.complete(task.getId());
-    
-    if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-      HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
-          .processInstanceId(processInstance.getId())
-          .variableName("executed")
-          .singleResult();
-      assertNotNull(historicVariableInstance);
-      assertTrue((Boolean) historicVariableInstance.getValue());
+
+    @Deployment
+    public void testChangeDelegateExpression() {
+        // first test without changing the class name
+        DummyTestDelegateBean testBean = new DummyTestDelegateBean();
+        Map<String, Object> varMap = new HashMap<String, Object>();
+        varMap.put("bean", testBean);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("executed")
+                    .singleResult();
+            assertNotNull(historicVariableInstance);
+            assertTrue((Boolean) historicVariableInstance.getValue());
+        }
+
+        assertProcessEnded(processInstance.getId());
+
+        // now test with changing the class name
+        testBean = new DummyTestDelegateBean();
+        varMap = new HashMap<String, Object>();
+        varMap.put("bean2", testBean);
+        processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
+
+        String processDefinitionId = processInstance.getProcessDefinitionId();
+        ObjectNode infoNode = dynamicBpmnService.changeServiceTaskDelegateExpression("service", "${bean2}");
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, infoNode);
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("executed")
+                    .singleResult();
+            assertNotNull(historicVariableInstance);
+            assertTrue((Boolean) historicVariableInstance.getValue());
+        }
+
+        assertProcessEnded(processInstance.getId());
     }
-    
-    assertProcessEnded(processInstance.getId());
-    
-    // now test with changing the class name
-    testBean = new DummyTestDelegateBean();
-    varMap = new HashMap<String, Object>();
-    varMap.put("bean2", testBean);
-    processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
-    
-    String processDefinitionId = processInstance.getProcessDefinitionId();
-    ObjectNode infoNode = dynamicBpmnService.changeServiceTaskDelegateExpression("service", "${bean2}");
-    dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, infoNode);
-    
-    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    taskService.complete(task.getId());
-    
-    if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-      HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
-          .processInstanceId(processInstance.getId())
-          .variableName("executed")
-          .singleResult();
-      assertNotNull(historicVariableInstance);
-      assertTrue((Boolean) historicVariableInstance.getValue());
-    }
-    
-    assertProcessEnded(processInstance.getId());
-  }
 }

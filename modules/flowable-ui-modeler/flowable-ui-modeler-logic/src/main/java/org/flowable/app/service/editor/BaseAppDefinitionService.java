@@ -51,164 +51,163 @@ import java.util.zip.ZipOutputStream;
  */
 public class BaseAppDefinitionService {
 
-  @Autowired
-  protected ModelService modelService;
+    @Autowired
+    protected ModelService modelService;
 
-  @Autowired
-  protected ModelRepository modelRepository;
+    @Autowired
+    protected ModelRepository modelRepository;
 
-  @Autowired
-  protected ObjectMapper objectMapper;
+    @Autowired
+    protected ObjectMapper objectMapper;
 
+    protected DmnJsonConverter dmnJsonConverter = new DmnJsonConverter();
+    protected DmnXMLConverter dmnXMLConverter = new DmnXMLConverter();
 
-  protected DmnJsonConverter dmnJsonConverter = new DmnJsonConverter();
-  protected DmnXMLConverter dmnXMLConverter = new DmnXMLConverter();
-
-  protected Map<String, StartEvent> processNoneStartEvents(BpmnModel bpmnModel) {
-    Map<String, StartEvent> startEventMap = new HashMap<String, StartEvent>();
-    for (Process process : bpmnModel.getProcesses()) {
-      for (FlowElement flowElement : process.getFlowElements()) {
-        if (flowElement instanceof StartEvent) {
-          StartEvent startEvent = (StartEvent) flowElement;
-          if (org.apache.commons.collections.CollectionUtils.isEmpty(startEvent.getEventDefinitions())) {
-            if (StringUtils.isEmpty(startEvent.getInitiator())) {
-              startEvent.setInitiator("initiator");
-            }
-            startEventMap.put(process.getId(), startEvent);
-            break;
-          }
-        }
-      }
-    }
-    return startEventMap;
-  }
-
-  protected void processUserTasks(Collection<FlowElement> flowElements, Process process, Map<String, StartEvent> startEventMap) {
-
-    for (FlowElement flowElement : flowElements) {
-      if (flowElement instanceof UserTask) {
-        UserTask userTask = (UserTask) flowElement;
-        if ("$INITIATOR".equals(userTask.getAssignee())) {
-          if (startEventMap.get(process.getId()) != null) {
-            userTask.setAssignee("${" + startEventMap.get(process.getId()).getInitiator() + "}");
-          }
-        }
-
-      } else if (flowElement instanceof SubProcess) {
-        processUserTasks(((SubProcess) flowElement).getFlowElements(), process, startEventMap);
-      }
-    }
-  }
-
-  protected String getAppDefinitionJson(Model appDefinitionModel, AppDefinition appDefinition) {
-    ObjectNode appDefinitionNode = objectMapper.createObjectNode();
-    appDefinitionNode.put("key", appDefinitionModel.getKey());
-    appDefinitionNode.put("name", appDefinitionModel.getName());
-    appDefinitionNode.put("description", appDefinitionModel.getDescription());
-    appDefinitionNode.put("theme", appDefinition.getTheme());
-    appDefinitionNode.put("icon", appDefinition.getIcon());
-    return appDefinitionNode.toString();
-  }
-
-  protected AppDefinition resolveAppDefinition(Model appDefinitionModel) throws Exception {
-    AppDefinition appDefinition = objectMapper.readValue(appDefinitionModel.getModelEditorJson(), AppDefinition.class);
-    return appDefinition;
-  }
-
-  protected byte[] createDeployableZipArtifact(Model appDefinitionModel, AppDefinition appDefinition) {
-
-    byte[] deployZipArtifact = null;
-    Map<String, byte[]> deployableAssets = new HashMap<>();
-
-    if (CollectionUtils.isNotEmpty(appDefinition.getModels())) {
-      String appDefinitionJson = getAppDefinitionJson(appDefinitionModel, appDefinition);
-      byte[] appDefinitionJsonBytes = appDefinitionJson.getBytes(StandardCharsets.UTF_8);
-
-      deployableAssets.put(appDefinitionModel.getKey() + ".app", appDefinitionJsonBytes);
-
-      Map<String, Model> formMap = new HashMap<>();
-      Map<String, Model> decisionTableMap = new HashMap<>();
-
-      for (AppModelDefinition appModelDef : appDefinition.getModels()) {
-
-        AbstractModel processModel = modelService.getModel(appModelDef.getId());
-        if (processModel == null) {
-          throw new BadRequestException(String.format("Model %s for app definition %s could not be found", appModelDef.getId(), appDefinitionModel.getId()));
-        }
-
-        List<Model> referencedModels = modelRepository.findByParentModelId(processModel.getId());
-        for (Model childModel : referencedModels) {
-          if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
-            formMap.put(childModel.getId(), childModel);
-
-          } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
-            decisionTableMap.put(childModel.getId(), childModel);
-          }
-        }
-
-        BpmnModel bpmnModel = modelService.getBpmnModel(processModel, formMap, decisionTableMap);
-        Map<String, StartEvent> startEventMap = processNoneStartEvents(bpmnModel);
-
+    protected Map<String, StartEvent> processNoneStartEvents(BpmnModel bpmnModel) {
+        Map<String, StartEvent> startEventMap = new HashMap<String, StartEvent>();
         for (Process process : bpmnModel.getProcesses()) {
-          processUserTasks(process.getFlowElements(), process, startEventMap);
+            for (FlowElement flowElement : process.getFlowElements()) {
+                if (flowElement instanceof StartEvent) {
+                    StartEvent startEvent = (StartEvent) flowElement;
+                    if (org.apache.commons.collections.CollectionUtils.isEmpty(startEvent.getEventDefinitions())) {
+                        if (StringUtils.isEmpty(startEvent.getInitiator())) {
+                            startEvent.setInitiator("initiator");
+                        }
+                        startEventMap.put(process.getId(), startEvent);
+                        break;
+                    }
+                }
+            }
         }
-
-        byte[] modelXML = modelService.getBpmnXML(bpmnModel);
-        deployableAssets.put(processModel.getKey().replaceAll(" ", "") + ".bpmn", modelXML);
-      }
-
-      if (formMap.size() > 0) {
-        for (String formId : formMap.keySet()) {
-          Model formInfo = formMap.get(formId);
-          String formModelEditorJson = formInfo.getModelEditorJson();
-          byte[] formModelEditorJsonBytes = formModelEditorJson.getBytes(StandardCharsets.UTF_8);
-          deployableAssets.put("form-" + formInfo.getKey() + ".form", formModelEditorJsonBytes);
-        }
-      }
-
-      if (decisionTableMap.size() > 0) {
-        for (String decisionTableId : decisionTableMap.keySet()) {
-          Model decisionTableInfo = decisionTableMap.get(decisionTableId);
-          try {
-            JsonNode decisionTableNode = objectMapper.readTree(decisionTableInfo.getModelEditorJson());
-            DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionTableInfo.getId(),
-                decisionTableInfo.getVersion(), decisionTableInfo.getLastUpdated());
-            byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
-            deployableAssets.put("dmn-" + decisionTableInfo.getKey() + ".dmn", dmnXMLBytes);
-          } catch (Exception e) {
-            throw new InternalServerErrorException(String.format("Error converting decision table %s to XML",decisionTableInfo.getName()));
-          }
-        }
-      }
-
-      deployZipArtifact = createDeployZipArtifact(deployableAssets);
+        return startEventMap;
     }
 
-    return deployZipArtifact;
-  }
+    protected void processUserTasks(Collection<FlowElement> flowElements, Process process, Map<String, StartEvent> startEventMap) {
 
-  protected byte[] createDeployZipArtifact(Map<String, byte[]> deployableAssets) {
-    ByteArrayOutputStream baos = null;
-    ZipOutputStream zos = null;
-    byte[] deployZipArtifact = null;
-    try {
-      baos = new ByteArrayOutputStream();
-      zos = new ZipOutputStream(baos);
+        for (FlowElement flowElement : flowElements) {
+            if (flowElement instanceof UserTask) {
+                UserTask userTask = (UserTask) flowElement;
+                if ("$INITIATOR".equals(userTask.getAssignee())) {
+                    if (startEventMap.get(process.getId()) != null) {
+                        userTask.setAssignee("${" + startEventMap.get(process.getId()).getInitiator() + "}");
+                    }
+                }
 
-      for (Map.Entry<String, byte[]> entry : deployableAssets.entrySet()) {
-        ZipEntry zipEntry = new ZipEntry(entry.getKey());
-        zipEntry.setSize(entry.getValue().length);
-        zos.putNextEntry(zipEntry);
-        zos.write(entry.getValue());
-        zos.closeEntry();
-      }
-
-      // this is the zip file as byte[]
-      deployZipArtifact = baos.toByteArray();
-    } catch (IOException ioe) {
-      throw new InternalServerErrorException("Could not create deploy zip artifact");
+            } else if (flowElement instanceof SubProcess) {
+                processUserTasks(((SubProcess) flowElement).getFlowElements(), process, startEventMap);
+            }
+        }
     }
 
-    return deployZipArtifact;
-  }
+    protected String getAppDefinitionJson(Model appDefinitionModel, AppDefinition appDefinition) {
+        ObjectNode appDefinitionNode = objectMapper.createObjectNode();
+        appDefinitionNode.put("key", appDefinitionModel.getKey());
+        appDefinitionNode.put("name", appDefinitionModel.getName());
+        appDefinitionNode.put("description", appDefinitionModel.getDescription());
+        appDefinitionNode.put("theme", appDefinition.getTheme());
+        appDefinitionNode.put("icon", appDefinition.getIcon());
+        return appDefinitionNode.toString();
+    }
+
+    protected AppDefinition resolveAppDefinition(Model appDefinitionModel) throws Exception {
+        AppDefinition appDefinition = objectMapper.readValue(appDefinitionModel.getModelEditorJson(), AppDefinition.class);
+        return appDefinition;
+    }
+
+    protected byte[] createDeployableZipArtifact(Model appDefinitionModel, AppDefinition appDefinition) {
+
+        byte[] deployZipArtifact = null;
+        Map<String, byte[]> deployableAssets = new HashMap<>();
+
+        if (CollectionUtils.isNotEmpty(appDefinition.getModels())) {
+            String appDefinitionJson = getAppDefinitionJson(appDefinitionModel, appDefinition);
+            byte[] appDefinitionJsonBytes = appDefinitionJson.getBytes(StandardCharsets.UTF_8);
+
+            deployableAssets.put(appDefinitionModel.getKey() + ".app", appDefinitionJsonBytes);
+
+            Map<String, Model> formMap = new HashMap<>();
+            Map<String, Model> decisionTableMap = new HashMap<>();
+
+            for (AppModelDefinition appModelDef : appDefinition.getModels()) {
+
+                AbstractModel processModel = modelService.getModel(appModelDef.getId());
+                if (processModel == null) {
+                    throw new BadRequestException(String.format("Model %s for app definition %s could not be found", appModelDef.getId(), appDefinitionModel.getId()));
+                }
+
+                List<Model> referencedModels = modelRepository.findByParentModelId(processModel.getId());
+                for (Model childModel : referencedModels) {
+                    if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
+                        formMap.put(childModel.getId(), childModel);
+
+                    } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
+                        decisionTableMap.put(childModel.getId(), childModel);
+                    }
+                }
+
+                BpmnModel bpmnModel = modelService.getBpmnModel(processModel, formMap, decisionTableMap);
+                Map<String, StartEvent> startEventMap = processNoneStartEvents(bpmnModel);
+
+                for (Process process : bpmnModel.getProcesses()) {
+                    processUserTasks(process.getFlowElements(), process, startEventMap);
+                }
+
+                byte[] modelXML = modelService.getBpmnXML(bpmnModel);
+                deployableAssets.put(processModel.getKey().replaceAll(" ", "") + ".bpmn", modelXML);
+            }
+
+            if (formMap.size() > 0) {
+                for (String formId : formMap.keySet()) {
+                    Model formInfo = formMap.get(formId);
+                    String formModelEditorJson = formInfo.getModelEditorJson();
+                    byte[] formModelEditorJsonBytes = formModelEditorJson.getBytes(StandardCharsets.UTF_8);
+                    deployableAssets.put("form-" + formInfo.getKey() + ".form", formModelEditorJsonBytes);
+                }
+            }
+
+            if (decisionTableMap.size() > 0) {
+                for (String decisionTableId : decisionTableMap.keySet()) {
+                    Model decisionTableInfo = decisionTableMap.get(decisionTableId);
+                    try {
+                        JsonNode decisionTableNode = objectMapper.readTree(decisionTableInfo.getModelEditorJson());
+                        DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionTableInfo.getId(),
+                                decisionTableInfo.getVersion(), decisionTableInfo.getLastUpdated());
+                        byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
+                        deployableAssets.put("dmn-" + decisionTableInfo.getKey() + ".dmn", dmnXMLBytes);
+                    } catch (Exception e) {
+                        throw new InternalServerErrorException(String.format("Error converting decision table %s to XML", decisionTableInfo.getName()));
+                    }
+                }
+            }
+
+            deployZipArtifact = createDeployZipArtifact(deployableAssets);
+        }
+
+        return deployZipArtifact;
+    }
+
+    protected byte[] createDeployZipArtifact(Map<String, byte[]> deployableAssets) {
+        ByteArrayOutputStream baos = null;
+        ZipOutputStream zos = null;
+        byte[] deployZipArtifact = null;
+        try {
+            baos = new ByteArrayOutputStream();
+            zos = new ZipOutputStream(baos);
+
+            for (Map.Entry<String, byte[]> entry : deployableAssets.entrySet()) {
+                ZipEntry zipEntry = new ZipEntry(entry.getKey());
+                zipEntry.setSize(entry.getValue().length);
+                zos.putNextEntry(zipEntry);
+                zos.write(entry.getValue());
+                zos.closeEntry();
+            }
+
+            // this is the zip file as byte[]
+            deployZipArtifact = baos.toByteArray();
+        } catch (IOException ioe) {
+            throw new InternalServerErrorException("Could not create deploy zip artifact");
+        }
+
+        return deployZipArtifact;
+    }
 }

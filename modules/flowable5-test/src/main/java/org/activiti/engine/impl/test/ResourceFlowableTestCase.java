@@ -16,31 +16,30 @@ package org.activiti.engine.impl.test;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.ProcessEngines;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
 public abstract class ResourceFlowableTestCase extends AbstractFlowableTestCase {
-  
-  protected String activitiConfigurationResource;
-  
-  public ResourceFlowableTestCase(String activitiConfigurationResource) {
-    this.activitiConfigurationResource = activitiConfigurationResource;
-  }
-  
-  @Override
-  protected void closeDownProcessEngine() {
-    super.closeDownProcessEngine();
-    ProcessEngines.unregister(processEngine);
-    processEngine = null;
-  }
 
-  @Override
-  protected void initializeProcessEngine() {
-    processEngine = ProcessEngineConfiguration
-            .createProcessEngineConfigurationFromResource(activitiConfigurationResource)
-            .buildProcessEngine();
-  }
+    protected String activitiConfigurationResource;
+
+    public ResourceFlowableTestCase(String activitiConfigurationResource) {
+        this.activitiConfigurationResource = activitiConfigurationResource;
+    }
+
+    @Override
+    protected void closeDownProcessEngine() {
+        super.closeDownProcessEngine();
+        ProcessEngines.unregister(processEngine);
+        processEngine = null;
+    }
+
+    @Override
+    protected void initializeProcessEngine() {
+        processEngine = ProcessEngineConfiguration
+                .createProcessEngineConfigurationFromResource(activitiConfigurationResource)
+                .buildProcessEngine();
+    }
 
 }

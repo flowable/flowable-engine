@@ -24,23 +24,23 @@ import org.junit.Test;
  */
 public class ElTest extends CdiFlowableTestCase {
 
-  @Test
-  @Deployment
-  public void testSetBeanProperty() throws Exception {
-    MessageBean messageBean = getBeanInstance(MessageBean.class);
-    runtimeService.startProcessInstanceByKey("setBeanProperty");
-    assertEquals("Greetings from Flowable", messageBean.getMessage());
-  }
+    @Test
+    @Deployment
+    public void testSetBeanProperty() throws Exception {
+        MessageBean messageBean = getBeanInstance(MessageBean.class);
+        runtimeService.startProcessInstanceByKey("setBeanProperty");
+        assertEquals("Greetings from Flowable", messageBean.getMessage());
+    }
 
-  // @Test
-  // @Deployment(resources="org/flowable/cdi/test/impl/el/ElTest.testInvalidExpression.bpmn20.xml")
-  // public void testInvalidExpressions() throws Exception {
-  // ProcessInstance pi =
-  // runtimeService.startProcessInstanceByKey("invalidExpression");
-  //
-  // assertEquals("xxx", runtimeService.getVariable(pi.getId(), "test"));
-  //
-  // // runtimeService.startProcessInstanceByKey("invalidExpressionDelegate");
-  //
-  // }
+    // @Test
+    // @Deployment(resources="org/flowable/cdi/test/impl/el/ElTest.testInvalidExpression.bpmn20.xml")
+    // public void testInvalidExpressions() throws Exception {
+    // ProcessInstance pi =
+    // runtimeService.startProcessInstanceByKey("invalidExpression");
+    //
+    // assertEquals("xxx", runtimeService.getVariable(pi.getId(), "test"));
+    //
+    // // runtimeService.startProcessInstanceByKey("invalidExpressionDelegate");
+    //
+    // }
 }

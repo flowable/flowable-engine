@@ -31,18 +31,18 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Decision Tables" }, description = "Manage Decision Tables", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Decision Tables" }, description = "Manage Decision Tables", authorizations = { @Authorization(value = "basicAuth") })
 public class DecisionTableResourceDataResource extends BaseDecisionTableResource {
 
-  @ResponseBody
-  @ApiOperation(value = "Get a decision table resource content", tags = {"Decision Tables"})
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Indicates both decision table and resource have been found and the resource data has been returned."),
-      @ApiResponse(code = 404, message = "Indicates the requested decision table was not found or there is no resource with the given id present in the decision table. The status-description contains additional information.")
-  })
-  @RequestMapping(value = "/dmn-repository/decision-tables/{decisionTableId}/resourcedata", method = RequestMethod.GET, produces = "application/json")
-  public byte[] getDecisionTableResource(@ApiParam(name = "decisionTableId") @PathVariable String decisionTableId, HttpServletResponse response) {
-    DmnDecisionTable decisionTable = geDecisionTableFromRequest(decisionTableId);
-    return getDeploymentResourceData(decisionTable.getDeploymentId(), decisionTable.getResourceName(), response);
-  }
+    @ApiOperation(value = "Get a decision table resource content", tags = { "Decision Tables" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates both decision table and resource have been found and the resource data has been returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested decision table was not found or there is no resource with the given id present in the decision table. The status-description contains additional information.")
+    })
+    @RequestMapping(value = "/dmn-repository/decision-tables/{decisionTableId}/resourcedata", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public byte[] getDecisionTableResource(@ApiParam(name = "decisionTableId") @PathVariable String decisionTableId, HttpServletResponse response) {
+        DmnDecisionTable decisionTable = geDecisionTableFromRequest(decisionTableId);
+        return getDeploymentResourceData(decisionTable.getDeploymentId(), decisionTable.getResourceName(), response);
+    }
 }

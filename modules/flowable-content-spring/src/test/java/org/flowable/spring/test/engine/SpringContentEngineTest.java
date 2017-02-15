@@ -17,10 +17,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration("classpath:org/flowable/spring/test/engine/springContentEngine-context.xml")
 public class SpringContentEngineTest {
 
-  @Test
-  public void testGetEngineFromCache() {
-    assertNotNull(ContentEngines.getDefaultContentEngine());
-    assertNotNull(ContentEngines.getContentEngine("default"));
-  }
+    @Test
+    public void testGetEngineFromCache() {
+        assertNotNull(ContentEngines.getDefaultContentEngine());
+        assertNotNull(ContentEngines.getContentEngine("default"));
+    }
 
 }

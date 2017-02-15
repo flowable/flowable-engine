@@ -35,16 +35,16 @@ import org.flowable.cdi.BusinessProcess;
 @Target({ ElementType.METHOD, ElementType.TYPE })
 public @interface StartProcess {
 
-  /**
-   * The key of the process definition to start, as provided in the 'id' attribute of a bpmn20.xml process definition.
-   */
-  @Nonbinding
-  String value() default "";
+    /**
+     * The key of the process definition to start, as provided in the 'id' attribute of a bpmn20.xml process definition.
+     */
+    @Nonbinding
+    String value() default "";
 
-  /**
-   * The name of the process definition to start, as provided in the 'name' attribute of a bpmn20.xml process definition.
-   */
-  @Nonbinding
-  String name() default "";
+    /**
+     * The name of the process definition to start, as provided in the 'name' attribute of a bpmn20.xml process definition.
+     */
+    @Nonbinding
+    String name() default "";
 
 }

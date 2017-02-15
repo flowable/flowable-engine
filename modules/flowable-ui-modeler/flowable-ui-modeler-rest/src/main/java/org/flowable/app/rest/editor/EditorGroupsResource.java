@@ -31,16 +31,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class EditorGroupsResource {
 
-  @Autowired
-  protected RemoteIdmService remoteIdmService;
-  
-  @RequestMapping(value = "/rest/editor-groups", method = RequestMethod.GET)
-  public ResultListDataRepresentation getGroups(@RequestParam(required = false, value = "filter") String filter) {
-    List<GroupRepresentation> result = new ArrayList<GroupRepresentation>();
-    List<RemoteGroup> groups = remoteIdmService.findGroupsByNameFilter(filter);
-    for (RemoteGroup group : groups) {
-      result.add(new GroupRepresentation(group));
+    @Autowired
+    protected RemoteIdmService remoteIdmService;
+
+    @RequestMapping(value = "/rest/editor-groups", method = RequestMethod.GET)
+    public ResultListDataRepresentation getGroups(@RequestParam(required = false, value = "filter") String filter) {
+        List<GroupRepresentation> result = new ArrayList<GroupRepresentation>();
+        List<RemoteGroup> groups = remoteIdmService.findGroupsByNameFilter(filter);
+        for (RemoteGroup group : groups) {
+            result.add(new GroupRepresentation(group));
+        }
+        return new ResultListDataRepresentation(result);
     }
-    return new ResultListDataRepresentation(result);
-  }
 }

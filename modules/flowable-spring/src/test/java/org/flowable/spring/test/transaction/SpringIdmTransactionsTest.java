@@ -46,121 +46,93 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/transaction/SpringIdmTransactionsTest-context.xml")
 public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
-  
-  @Autowired
-  protected PlatformTransactionManager transactionManager;
-  
-  @Override
-  protected void tearDown() throws Exception {
-    
-    List<Group> allGroups = identityService.createGroupQuery().list();
-    for (Group group : allGroups) {
-      
-      List<User> members = identityService.createUserQuery().memberOfGroup(group.getId()).list();
-      for (User member : members) {
-        identityService.deleteMembership(member.getId(), group.getId());
-      }
-      
-      identityService.deleteGroup(group.getId());
+
+    @Autowired
+    protected PlatformTransactionManager transactionManager;
+
+    @Override
+    protected void tearDown() throws Exception {
+
+        List<Group> allGroups = identityService.createGroupQuery().list();
+        for (Group group : allGroups) {
+
+            List<User> members = identityService.createUserQuery().memberOfGroup(group.getId()).list();
+            for (User member : members) {
+                identityService.deleteMembership(member.getId(), group.getId());
+            }
+
+            identityService.deleteGroup(group.getId());
+        }
+
+        List<User> allUsers = identityService.createUserQuery().list();
+        for (User user : allUsers) {
+            identityService.deleteUser(user.getId());
+        }
+
+        super.tearDown();
     }
-    
-    List<User> allUsers = identityService.createUserQuery().list();
-    for (User user : allUsers) {
-      identityService.deleteUser(user.getId());
+
+    @Deployment
+    public void testCommitOnNoException() {
+
+        // No users should exist prior to this test
+        assertEquals(0, identityService.createUserQuery().list().size());
+
+        runtimeService.startProcessInstanceByKey("testProcess");
+        Task task = taskService.createTaskQuery().singleResult();
+
+        taskService.complete(task.getId());
+        assertEquals(1, identityService.createUserQuery().list().size());
+
     }
-    
-    super.tearDown();
-  }
-  
-  @Deployment
-  public void testCommitOnNoException() {
-    
-    // No users should exist prior to this test
-    assertEquals(0, identityService.createUserQuery().list().size());
-    
-    runtimeService.startProcessInstanceByKey("testProcess");
-    Task task = taskService.createTaskQuery().singleResult();
-    
-    taskService.complete(task.getId());
-    assertEquals(1, identityService.createUserQuery().list().size());
-    
-  }
-  
-  @Deployment
-  public void testTransactionRolledBackOnException() {
-    
-    // No users should exist prior to this test
-    assertEquals(0, identityService.createUserQuery().list().size());
-    
-    runtimeService.startProcessInstanceByKey("testProcess");
-    Task task = taskService.createTaskQuery().singleResult();
-    
-    // Completing the task throws an exception
-    try {
-      taskService.complete(task.getId());
-      fail();
-    } catch (Exception e) {
-      // Exception expected
+
+    @Deployment
+    public void testTransactionRolledBackOnException() {
+
+        // No users should exist prior to this test
+        assertEquals(0, identityService.createUserQuery().list().size());
+
+        runtimeService.startProcessInstanceByKey("testProcess");
+        Task task = taskService.createTaskQuery().singleResult();
+
+        // Completing the task throws an exception
+        try {
+            taskService.complete(task.getId());
+            fail();
+        } catch (Exception e) {
+            // Exception expected
+        }
+
+        // Should have rolled back to task
+        assertNotNull(taskService.createTaskQuery().singleResult());
+        assertEquals(0L, historyService.createHistoricProcessInstanceQuery().finished().count());
+
+        // The logic in the tasklistener (creating a new user) should rolled back too:
+        // no new user should have been created
+        assertEquals(0, identityService.createUserQuery().list().size());
+
     }
-    
-    // Should have rolled back to task
-    assertNotNull(taskService.createTaskQuery().singleResult());
-    assertEquals(0L, historyService.createHistoricProcessInstanceQuery().finished().count());
-    
-    // The logic in the tasklistener (creating a new user) should rolled back too: 
-    // no new user should have been created
-    assertEquals(0, identityService.createUserQuery().list().size());
-    
-  }
-  
-  @Deployment
-  public void testMultipleIdmCallsInDelegate() {
-    runtimeService.startProcessInstanceByKey("multipleServiceInvocations");
 
-    // The service task should have created a user which is part of the admin group
-    User user = identityService.createUserQuery().singleResult();
-    assertEquals("Kermit", user.getId());
-    Group group = identityService.createGroupQuery().groupMember(user.getId()).singleResult();
-    assertNotNull(group);
-    assertEquals("admin", group.getId());
+    @Deployment
+    public void testMultipleIdmCallsInDelegate() {
+        runtimeService.startProcessInstanceByKey("multipleServiceInvocations");
 
-    identityService.deleteMembership("Kermit", "admin");
-  }
-  
-  // From https://github.com/flowable/flowable-engine/issues/26
-  public void testCreateMemberships() {
-    Group group = identityService.newGroup("group");
-    User tom = identityService.newUser("tom");
-    User mat = identityService.newUser("mat");
-    
-    // save group
-    identityService.saveGroup(group);
-    // save users
-    identityService.saveUser(tom);
-    identityService.saveUser(mat);
-    // create memberships
-    identityService.createMembership(tom.getId(), group.getId());
-    identityService.createMembership(mat.getId(), group.getId());
+        // The service task should have created a user which is part of the admin group
+        User user = identityService.createUserQuery().singleResult();
+        assertEquals("Kermit", user.getId());
+        Group group = identityService.createGroupQuery().groupMember(user.getId()).singleResult();
+        assertNotNull(group);
+        assertEquals("admin", group.getId());
 
-    // verify that the group has been created
-    assertThat(identityService.createGroupQuery().groupId(group.getId()).singleResult(), is(notNullValue()));
-    // verify that the users have been created
-    assertThat(identityService.createUserQuery().userId(tom.getId()).singleResult(), is(notNullValue()));
-    assertThat(identityService.createUserQuery().userId(mat.getId()).singleResult(), is(notNullValue()));
-    // verify that the users are members of the group
-    assertThat(identityService.createGroupQuery().groupMember(tom.getId()).singleResult(), is(notNullValue()));
-    assertThat(identityService.createGroupQuery().groupMember(mat.getId()).singleResult(), is(notNullValue()));
-  }
+        identityService.deleteMembership("Kermit", "admin");
+    }
 
-  public void testCreateMembershipsWithinTransaction() {
-    final Group group = identityService.newGroup("group");
-    final User tom = identityService.newUser("tom");
-    final User mat = identityService.newUser("mat");
+    // From https://github.com/flowable/flowable-engine/issues/26
+    public void testCreateMemberships() {
+        Group group = identityService.newGroup("group");
+        User tom = identityService.newUser("tom");
+        User mat = identityService.newUser("mat");
 
-    TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
-    txTemplate.execute(new TransactionCallbackWithoutResult() {
-      @Override
-      protected void doInTransactionWithoutResult(TransactionStatus status) {
         // save group
         identityService.saveGroup(group);
         // save users
@@ -169,126 +141,153 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
         // create memberships
         identityService.createMembership(tom.getId(), group.getId());
         identityService.createMembership(mat.getId(), group.getId());
-      }
-    });
 
-    // verify that the group has been created
-    assertThat(identityService.createGroupQuery().groupId(group.getId()).singleResult(), is(notNullValue()));
-    // verify that the users have been created
-    assertThat(identityService.createUserQuery().userId(tom.getId()).singleResult(), is(notNullValue()));
-    assertThat(identityService.createUserQuery().userId(mat.getId()).singleResult(), is(notNullValue()));
-    // verify that the users are members of the group
-    assertThat(identityService.createGroupQuery().groupMember(tom.getId()).singleResult(), is(notNullValue()));
-    assertThat(identityService.createGroupQuery().groupMember(mat.getId()).singleResult(), is(notNullValue()));
-  }
-  
-  @Deployment
-  public void testCreateMembershipsInTaskListener() {
-    
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    
-    // start processing instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
-
-    // verify that the process instance has been started
-    assertThat(processInstance, is(notNullValue()));
-    // verify that the group has been created
-    assertThat(identityService.createGroupQuery().groupId("group").singleResult(), is(notNullValue()));
-    // verify that the users have been created
-    assertThat(identityService.createUserQuery().userId("tom").singleResult(), is(notNullValue()));
-    assertThat(identityService.createUserQuery().userId("mat").singleResult(), is(notNullValue()));
-    // verify that the users are members of the group
-    assertThat(identityService.createGroupQuery().groupMember("tom").singleResult(), is(notNullValue()));
-    assertThat(identityService.createGroupQuery().groupMember("mat").singleResult(), is(notNullValue()));
-  }
-  
-  
-  /*
-   * DELEGATE CLASSES
-   */
-  
-  public static class NoopDelegate implements JavaDelegate {
-
-    @Override
-    public void execute(DelegateExecution execution) {
+        // verify that the group has been created
+        assertThat(identityService.createGroupQuery().groupId(group.getId()).singleResult(), is(notNullValue()));
+        // verify that the users have been created
+        assertThat(identityService.createUserQuery().userId(tom.getId()).singleResult(), is(notNullValue()));
+        assertThat(identityService.createUserQuery().userId(mat.getId()).singleResult(), is(notNullValue()));
+        // verify that the users are members of the group
+        assertThat(identityService.createGroupQuery().groupMember(tom.getId()).singleResult(), is(notNullValue()));
+        assertThat(identityService.createGroupQuery().groupMember(mat.getId()).singleResult(), is(notNullValue()));
     }
-    
-  }
-  
-  public static class TestExceptionThrowingDelegate implements JavaDelegate {
 
-    @Override
-    public void execute(DelegateExecution execution) {
-      throw new RuntimeException("Fail!");
+    public void testCreateMembershipsWithinTransaction() {
+        final Group group = identityService.newGroup("group");
+        final User tom = identityService.newUser("tom");
+        final User mat = identityService.newUser("mat");
+
+        TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
+        txTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus status) {
+                // save group
+                identityService.saveGroup(group);
+                // save users
+                identityService.saveUser(tom);
+                identityService.saveUser(mat);
+                // create memberships
+                identityService.createMembership(tom.getId(), group.getId());
+                identityService.createMembership(mat.getId(), group.getId());
+            }
+        });
+
+        // verify that the group has been created
+        assertThat(identityService.createGroupQuery().groupId(group.getId()).singleResult(), is(notNullValue()));
+        // verify that the users have been created
+        assertThat(identityService.createUserQuery().userId(tom.getId()).singleResult(), is(notNullValue()));
+        assertThat(identityService.createUserQuery().userId(mat.getId()).singleResult(), is(notNullValue()));
+        // verify that the users are members of the group
+        assertThat(identityService.createGroupQuery().groupMember(tom.getId()).singleResult(), is(notNullValue()));
+        assertThat(identityService.createGroupQuery().groupMember(mat.getId()).singleResult(), is(notNullValue()));
     }
-    
-  }
-  
-  public static class TestCreateUserTaskListener implements TaskListener {
 
-    @Override
-    public void notify(DelegateTask delegateTask) {
-      IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
-      User user = identityService.newUser("Kermit");
-      user.setFirstName("Mr");
-      user.setLastName("Kermit");
-      identityService.saveUser(user);
+    @Deployment
+    public void testCreateMembershipsInTaskListener() {
+
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+
+        // start processing instance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+
+        // verify that the process instance has been started
+        assertThat(processInstance, is(notNullValue()));
+        // verify that the group has been created
+        assertThat(identityService.createGroupQuery().groupId("group").singleResult(), is(notNullValue()));
+        // verify that the users have been created
+        assertThat(identityService.createUserQuery().userId("tom").singleResult(), is(notNullValue()));
+        assertThat(identityService.createUserQuery().userId("mat").singleResult(), is(notNullValue()));
+        // verify that the users are members of the group
+        assertThat(identityService.createGroupQuery().groupMember("tom").singleResult(), is(notNullValue()));
+        assertThat(identityService.createGroupQuery().groupMember("mat").singleResult(), is(notNullValue()));
     }
-    
-  }
-  
-  public static class CreateUserAndMembershipTestDelegate implements JavaDelegate {
 
-    @Override
-    public void execute(DelegateExecution execution) {
-      
-      ManagementService managementService = Context.getProcessEngineConfiguration().getManagementService();
-      managementService.executeCommand(new Command<Void>() {
+    /*
+     * DELEGATE CLASSES
+     */
+
+    public static class NoopDelegate implements JavaDelegate {
+
         @Override
-        public Void execute(CommandContext commandContext) {
-          return null;
+        public void execute(DelegateExecution execution) {
         }
-      });
 
-      IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
-
-      String username = "Kermit";
-      User user = identityService.newUser(username);
-      user.setPassword("123");
-      user.setFirstName("Manually");
-      user.setLastName("created");
-      identityService.saveUser(user);
-
-      // Add admin group
-      Group group = identityService.newGroup("admin");
-      identityService.saveGroup(group);
-
-      identityService.createMembership(username, "admin");
     }
 
-  }
-  
-  public static class TestCreateMembershipTaskListener implements TaskListener {
+    public static class TestExceptionThrowingDelegate implements JavaDelegate {
 
-    @Autowired
-    private IdentityService identityService;
+        @Override
+        public void execute(DelegateExecution execution) {
+            throw new RuntimeException("Fail!");
+        }
 
-    @Override
-    public void notify(DelegateTask delegateTask) {
-
-      // save group
-      Group group = identityService.newGroup("group");
-      identityService.saveGroup(group);
-      // save users
-      User tom = identityService.newUser("tom");
-      identityService.saveUser(tom);
-
-      User mat = identityService.newUser("mat");
-      identityService.saveUser(mat);
-      // create memberships
-      identityService.createMembership(tom.getId(), group.getId());
-      identityService.createMembership(mat.getId(), group.getId());
     }
-  }
+
+    public static class TestCreateUserTaskListener implements TaskListener {
+
+        @Override
+        public void notify(DelegateTask delegateTask) {
+            IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
+            User user = identityService.newUser("Kermit");
+            user.setFirstName("Mr");
+            user.setLastName("Kermit");
+            identityService.saveUser(user);
+        }
+
+    }
+
+    public static class CreateUserAndMembershipTestDelegate implements JavaDelegate {
+
+        @Override
+        public void execute(DelegateExecution execution) {
+
+            ManagementService managementService = Context.getProcessEngineConfiguration().getManagementService();
+            managementService.executeCommand(new Command<Void>() {
+                @Override
+                public Void execute(CommandContext commandContext) {
+                    return null;
+                }
+            });
+
+            IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
+
+            String username = "Kermit";
+            User user = identityService.newUser(username);
+            user.setPassword("123");
+            user.setFirstName("Manually");
+            user.setLastName("created");
+            identityService.saveUser(user);
+
+            // Add admin group
+            Group group = identityService.newGroup("admin");
+            identityService.saveGroup(group);
+
+            identityService.createMembership(username, "admin");
+        }
+
+    }
+
+    public static class TestCreateMembershipTaskListener implements TaskListener {
+
+        @Autowired
+        private IdentityService identityService;
+
+        @Override
+        public void notify(DelegateTask delegateTask) {
+
+            // save group
+            Group group = identityService.newGroup("group");
+            identityService.saveGroup(group);
+            // save users
+            User tom = identityService.newUser("tom");
+            identityService.saveUser(tom);
+
+            User mat = identityService.newUser("mat");
+            identityService.saveUser(mat);
+            // create memberships
+            identityService.createMembership(tom.getId(), group.getId());
+            identityService.createMembership(mat.getId(), group.getId());
+        }
+    }
 
 }

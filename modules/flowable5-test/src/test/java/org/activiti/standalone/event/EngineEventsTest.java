@@ -24,27 +24,27 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
  */
 public class EngineEventsTest extends ResourceFlowableTestCase {
 
-  public EngineEventsTest() {
-    super("org/activiti/standalone/event/flowable-eventlistener.cfg.xml");
-  }
-  
-  public void testEngineEventsTest() {
-  	// Fetch the listener to check received events
-  	TestFlowableEventListener listener = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("eventListener");
-  	assertNotNull(listener);
-  	
-  	// Check create-event
-  	assertEquals(2, listener.getEventsReceived().size());
-  	assertEquals(FlowableEngineEventType.ENGINE_CREATED, listener.getEventsReceived().get(0).getType());
-  	assertEquals(FlowableEngineEventType.ENGINE_CREATED, listener.getEventsReceived().get(1).getType());
-  	listener.clearEventsReceived();
-  	
-  	// Check close-event
-  	ProcessEngine activiti5ProcessEngine = (ProcessEngine) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessEngine();
-  	activiti5ProcessEngine.close();
-  	assertEquals(1, listener.getEventsReceived().size());
-  	assertEquals(FlowableEngineEventType.ENGINE_CLOSED, listener.getEventsReceived().get(0).getType());
-  	
-  }
-  
+    public EngineEventsTest() {
+        super("org/activiti/standalone/event/flowable-eventlistener.cfg.xml");
+    }
+
+    public void testEngineEventsTest() {
+        // Fetch the listener to check received events
+        TestFlowableEventListener listener = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("eventListener");
+        assertNotNull(listener);
+
+        // Check create-event
+        assertEquals(2, listener.getEventsReceived().size());
+        assertEquals(FlowableEngineEventType.ENGINE_CREATED, listener.getEventsReceived().get(0).getType());
+        assertEquals(FlowableEngineEventType.ENGINE_CREATED, listener.getEventsReceived().get(1).getType());
+        listener.clearEventsReceived();
+
+        // Check close-event
+        ProcessEngine activiti5ProcessEngine = (ProcessEngine) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessEngine();
+        activiti5ProcessEngine.close();
+        assertEquals(1, listener.getEventsReceived().size());
+        assertEquals(FlowableEngineEventType.ENGINE_CLOSED, listener.getEventsReceived().get(0).getType());
+
+    }
+
 }

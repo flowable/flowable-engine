@@ -24,6 +24,6 @@ import org.flowable.engine.common.impl.db.IdBlock;
  */
 public interface IdGenerator {
 
-  String getNextId();
+    String getNextId();
 
 }

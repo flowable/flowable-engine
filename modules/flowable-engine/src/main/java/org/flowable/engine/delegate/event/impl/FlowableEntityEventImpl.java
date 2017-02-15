@@ -24,18 +24,18 @@ import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
  */
 public class FlowableEntityEventImpl extends FlowableEventImpl implements FlowableEngineEntityEvent {
 
-  protected Object entity;
+    protected Object entity;
 
-  public FlowableEntityEventImpl(Object entity, FlowableEngineEventType type) {
-    super(type);
-    if (entity == null) {
-      throw new FlowableIllegalArgumentException("Entity cannot be null.");
+    public FlowableEntityEventImpl(Object entity, FlowableEngineEventType type) {
+        super(type);
+        if (entity == null) {
+            throw new FlowableIllegalArgumentException("Entity cannot be null.");
+        }
+        this.entity = entity;
     }
-    this.entity = entity;
-  }
 
-  @Override
-  public Object getEntity() {
-    return entity;
-  }
+    @Override
+    public Object getEntity() {
+        return entity;
+    }
 }

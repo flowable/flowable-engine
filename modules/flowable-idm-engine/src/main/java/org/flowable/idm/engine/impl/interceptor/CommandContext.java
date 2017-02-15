@@ -37,72 +37,72 @@ import org.slf4j.LoggerFactory;
  */
 public class CommandContext extends AbstractCommandContext {
 
-  private static Logger log = LoggerFactory.getLogger(CommandContext.class);
+    private static Logger log = LoggerFactory.getLogger(CommandContext.class);
 
-  protected IdmEngineConfiguration idmEngineConfiguration;
-  
-  public CommandContext(Command<?> command, IdmEngineConfiguration idmEngineConfiguration) {
-    super(command);
-    this.idmEngineConfiguration = idmEngineConfiguration;
-    sessionFactories = idmEngineConfiguration.getSessionFactories();
-  }
+    protected IdmEngineConfiguration idmEngineConfiguration;
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public void addCloseListener(CommandContextCloseListener commandContextCloseListener) {
-    if (closeListeners == null) {
-      closeListeners = new ArrayList<BaseCommandContextCloseListener<AbstractCommandContext>>(1);
+    public CommandContext(Command<?> command, IdmEngineConfiguration idmEngineConfiguration) {
+        super(command);
+        this.idmEngineConfiguration = idmEngineConfiguration;
+        sessionFactories = idmEngineConfiguration.getSessionFactories();
     }
-    closeListeners.add((BaseCommandContextCloseListener) commandContextCloseListener);
-  }
 
-  public DbSqlSession getDbSqlSession() {
-    return getSession(DbSqlSession.class);
-  }
-  
-  public ByteArrayEntityManager getByteArrayEntityManager() {
-    return idmEngineConfiguration.getByteArrayEntityManager();
-  }
-  
-  public GroupEntityManager getGroupEntityManager() {
-    return idmEngineConfiguration.getGroupEntityManager();
-  }
-  
-  public IdentityInfoEntityManager getIdentityInfoEntityManager() {
-    return idmEngineConfiguration.getIdentityInfoEntityManager();
-  }
-  
-  public MembershipEntityManager getMembershipEntityManager() {
-    return idmEngineConfiguration.getMembershipEntityManager();
-  }
-  
-  public PropertyEntityManager getPropertyEntityManager() {
-    return idmEngineConfiguration.getPropertyEntityManager();
-  }
-  
-  public TokenEntityManager getTokenEntityManager() {
-    return idmEngineConfiguration.getTokenEntityManager();
-  }
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void addCloseListener(CommandContextCloseListener commandContextCloseListener) {
+        if (closeListeners == null) {
+            closeListeners = new ArrayList<BaseCommandContextCloseListener<AbstractCommandContext>>(1);
+        }
+        closeListeners.add((BaseCommandContextCloseListener) commandContextCloseListener);
+    }
 
-  public UserEntityManager getUserEntityManager() {
-    return idmEngineConfiguration.getUserEntityManager();
-  }
-  
-  public PrivilegeEntityManager getPrivilegeEntityManager() {
-    return idmEngineConfiguration.getPrivilegeEntityManager();
-  }
-  
-  public PrivilegeMappingEntityManager gePrivilegeMappingEntityManager() {
-    return idmEngineConfiguration.getPrivilegeMappingEntityManager();
-  }
-  
-  public TableDataManager getTableDataManager() {
-    return idmEngineConfiguration.getTableDataManager();
-  }
-  
-  // getters and setters
-  // //////////////////////////////////////////////////////
-  
-  public IdmEngineConfiguration getIdmEngineConfiguration() {
-    return idmEngineConfiguration;
-  }
+    public DbSqlSession getDbSqlSession() {
+        return getSession(DbSqlSession.class);
+    }
+
+    public ByteArrayEntityManager getByteArrayEntityManager() {
+        return idmEngineConfiguration.getByteArrayEntityManager();
+    }
+
+    public GroupEntityManager getGroupEntityManager() {
+        return idmEngineConfiguration.getGroupEntityManager();
+    }
+
+    public IdentityInfoEntityManager getIdentityInfoEntityManager() {
+        return idmEngineConfiguration.getIdentityInfoEntityManager();
+    }
+
+    public MembershipEntityManager getMembershipEntityManager() {
+        return idmEngineConfiguration.getMembershipEntityManager();
+    }
+
+    public PropertyEntityManager getPropertyEntityManager() {
+        return idmEngineConfiguration.getPropertyEntityManager();
+    }
+
+    public TokenEntityManager getTokenEntityManager() {
+        return idmEngineConfiguration.getTokenEntityManager();
+    }
+
+    public UserEntityManager getUserEntityManager() {
+        return idmEngineConfiguration.getUserEntityManager();
+    }
+
+    public PrivilegeEntityManager getPrivilegeEntityManager() {
+        return idmEngineConfiguration.getPrivilegeEntityManager();
+    }
+
+    public PrivilegeMappingEntityManager gePrivilegeMappingEntityManager() {
+        return idmEngineConfiguration.getPrivilegeMappingEntityManager();
+    }
+
+    public TableDataManager getTableDataManager() {
+        return idmEngineConfiguration.getTableDataManager();
+    }
+
+    // getters and setters
+    // //////////////////////////////////////////////////////
+
+    public IdmEngineConfiguration getIdmEngineConfiguration() {
+        return idmEngineConfiguration;
+    }
 }

@@ -19,11 +19,10 @@ import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntity;
  * @author Joram Barrez
  */
 public class DeadLetterJobsByExecutionIdMatcher extends CachedEntityMatcherAdapter<DeadLetterJobEntity> {
-  
-  @Override
-  public boolean isRetained(DeadLetterJobEntity jobEntity, Object param) {
-    return jobEntity.getExecutionId() != null && jobEntity.getExecutionId().equals(param); // param = executionId
-  }
-  
-  
+
+    @Override
+    public boolean isRetained(DeadLetterJobEntity jobEntity, Object param) {
+        return jobEntity.getExecutionId() != null && jobEntity.getExecutionId().equals(param); // param = executionId
+    }
+
 }

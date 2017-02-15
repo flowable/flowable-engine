@@ -24,10 +24,10 @@ import org.flowable.idm.engine.impl.interceptor.CommandContext;
  */
 public class CreateTokenQueryCmd implements Command<TokenQuery>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public TokenQuery execute(CommandContext commandContext) {
-    return commandContext.getTokenEntityManager().createNewTokenQuery();
-  }
+    public TokenQuery execute(CommandContext commandContext) {
+        return commandContext.getTokenEntityManager().createNewTokenQuery();
+    }
 
 }

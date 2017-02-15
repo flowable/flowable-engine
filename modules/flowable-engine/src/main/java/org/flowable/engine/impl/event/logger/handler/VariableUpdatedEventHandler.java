@@ -23,12 +23,12 @@ import org.flowable.engine.impl.persistence.entity.EventLogEntryEntity;
  */
 public class VariableUpdatedEventHandler extends VariableEventHandler {
 
-  @Override
-  public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
-    FlowableVariableEvent variableEvent = (FlowableVariableEvent) event;
-    Map<String, Object> data = createData(variableEvent);
+    @Override
+    public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
+        FlowableVariableEvent variableEvent = (FlowableVariableEvent) event;
+        Map<String, Object> data = createData(variableEvent);
 
-    return createEventLogEntry(variableEvent.getProcessDefinitionId(), variableEvent.getProcessInstanceId(), variableEvent.getExecutionId(), variableEvent.getTaskId(), data);
-  }
+        return createEventLogEntry(variableEvent.getProcessDefinitionId(), variableEvent.getProcessInstanceId(), variableEvent.getExecutionId(), variableEvent.getTaskId(), data);
+    }
 
 }

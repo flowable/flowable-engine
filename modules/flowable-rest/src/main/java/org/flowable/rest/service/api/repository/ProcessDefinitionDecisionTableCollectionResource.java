@@ -32,21 +32,21 @@ import java.util.List;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = {@Authorization(value="basicAuth")})
+@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionDecisionTableCollectionResource extends BaseProcessDefinitionResource {
 
-  @ApiOperation(value = "Get all decision tables for a process-definition", tags = {"Process Definitions"})
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Indicates the process definition was found and the decision tables are returned.", response = DmnDecisionTable.class, responseContainer = "List"),
-      @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
-  })
-  @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/decision-tables", method = RequestMethod.GET, produces = "application/json")
-  public List<DecisionTableResponse> getDecisionTablesForProcessDefinition(
-      @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
-      HttpServletRequest request) {
+    @ApiOperation(value = "Get all decision tables for a process-definition", tags = { "Process Definitions" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the process definition was found and the decision tables are returned.", response = DmnDecisionTable.class, responseContainer = "List"),
+            @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
+    })
+    @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/decision-tables", method = RequestMethod.GET, produces = "application/json")
+    public List<DecisionTableResponse> getDecisionTablesForProcessDefinition(
+            @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
+            HttpServletRequest request) {
 
-    List<DmnDecisionTable> decisionTables = repositoryService.getDecisionTablesForProcessDefinition(processDefinitionId);
+        List<DmnDecisionTable> decisionTables = repositoryService.getDecisionTablesForProcessDefinition(processDefinitionId);
 
-    return restResponseFactory.createDecisionTableResponseList(decisionTables, processDefinitionId);
-  }
+        return restResponseFactory.createDecisionTableResponseList(decisionTables, processDefinitionId);
+    }
 }

@@ -19,23 +19,22 @@ import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.repository.ProcessDefinition;
 
-
 /**
  * @author Tom Baeyens
  */
 public class GetDeploymentProcessDefinitionCmd implements Command<ProcessDefinition>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String processDefinitionId;
-  
-  public GetDeploymentProcessDefinitionCmd(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
+    private static final long serialVersionUID = 1L;
+    protected String processDefinitionId;
 
-  public ProcessDefinition execute(CommandContext commandContext) {
-    return commandContext
-      .getProcessEngineConfiguration()
-      .getDeploymentManager()
-      .findDeployedProcessDefinitionById(processDefinitionId);
-  }
+    public GetDeploymentProcessDefinitionCmd(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
+
+    public ProcessDefinition execute(CommandContext commandContext) {
+        return commandContext
+                .getProcessEngineConfiguration()
+                .getDeploymentManager()
+                .findDeployedProcessDefinitionById(processDefinitionId);
+    }
 }

@@ -26,49 +26,49 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class AbstractInfoMapper implements InfoMapper {
 
-	protected DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-	protected ObjectMapper objectMapper = new ObjectMapper();
-	protected ArrayNode propertiesNode;
+    protected DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ArrayNode propertiesNode;
 
-	public ArrayNode map(Object element) {
-		propertiesNode = objectMapper.createArrayNode();
-		mapProperties(element);
-		return propertiesNode;
-	}
+    public ArrayNode map(Object element) {
+        propertiesNode = objectMapper.createArrayNode();
+        mapProperties(element);
+        return propertiesNode;
+    }
 
-	protected abstract void mapProperties(Object element);
+    protected abstract void mapProperties(Object element);
 
-	protected void createPropertyNode(String name, String value) {
-		if (StringUtils.isNotEmpty(value)) {
-			ObjectNode propertyNode = objectMapper.createObjectNode();
-			propertyNode.put("name", name);
-			propertyNode.put("value", value);
-			propertiesNode.add(propertyNode);
-		}
-	}
+    protected void createPropertyNode(String name, String value) {
+        if (StringUtils.isNotEmpty(value)) {
+            ObjectNode propertyNode = objectMapper.createObjectNode();
+            propertyNode.put("name", name);
+            propertyNode.put("value", value);
+            propertiesNode.add(propertyNode);
+        }
+    }
 
-	protected void createPropertyNode(String name, Date value) {
-		if (value != null) {
-			createPropertyNode(name, dateFormat.format(value));
-		}
-	}
+    protected void createPropertyNode(String name, Date value) {
+        if (value != null) {
+            createPropertyNode(name, dateFormat.format(value));
+        }
+    }
 
-	protected void createPropertyNode(String name, Boolean value) {
-		if (value != null) {
-			createPropertyNode(name, value.toString());
-		}
-	}
+    protected void createPropertyNode(String name, Boolean value) {
+        if (value != null) {
+            createPropertyNode(name, value.toString());
+        }
+    }
 
-	protected void createPropertyNode(String name, List<String> values) {
-		if (CollectionUtils.isNotEmpty(values)) {
-			StringBuilder commaSeperatedString = new StringBuilder();
-			for (String value : values) {
-				if (commaSeperatedString.length() > 0) {
-					commaSeperatedString.append(", ");
-				}
-				commaSeperatedString.append(value);
-			}
-			createPropertyNode(name, commaSeperatedString.toString());
-		}
-	}
+    protected void createPropertyNode(String name, List<String> values) {
+        if (CollectionUtils.isNotEmpty(values)) {
+            StringBuilder commaSeperatedString = new StringBuilder();
+            for (String value : values) {
+                if (commaSeperatedString.length() > 0) {
+                    commaSeperatedString.append(", ");
+                }
+                commaSeperatedString.append(value);
+            }
+            createPropertyNode(name, commaSeperatedString.toString());
+        }
+    }
 }

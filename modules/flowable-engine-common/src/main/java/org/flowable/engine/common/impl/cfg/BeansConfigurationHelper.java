@@ -27,24 +27,24 @@ import org.springframework.core.io.Resource;
  */
 public class BeansConfigurationHelper {
 
-  public static AbstractEngineConfiguration parseEngineConfiguration(Resource springResource, String beanName) {
-    DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
-    XmlBeanDefinitionReader xmlBeanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
-    xmlBeanDefinitionReader.setValidationMode(XmlBeanDefinitionReader.VALIDATION_XSD);
-    xmlBeanDefinitionReader.loadBeanDefinitions(springResource);
-    AbstractEngineConfiguration engineConfiguration = (AbstractEngineConfiguration) beanFactory.getBean(beanName);
-    engineConfiguration.setBeans(new SpringBeanFactoryProxyMap(beanFactory));
-    return engineConfiguration;
-  }
+    public static AbstractEngineConfiguration parseEngineConfiguration(Resource springResource, String beanName) {
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+        XmlBeanDefinitionReader xmlBeanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+        xmlBeanDefinitionReader.setValidationMode(XmlBeanDefinitionReader.VALIDATION_XSD);
+        xmlBeanDefinitionReader.loadBeanDefinitions(springResource);
+        AbstractEngineConfiguration engineConfiguration = (AbstractEngineConfiguration) beanFactory.getBean(beanName);
+        engineConfiguration.setBeans(new SpringBeanFactoryProxyMap(beanFactory));
+        return engineConfiguration;
+    }
 
-  public static AbstractEngineConfiguration parseEngineConfigurationFromInputStream(InputStream inputStream, String beanName) {
-    Resource springResource = new InputStreamResource(inputStream);
-    return parseEngineConfiguration(springResource, beanName);
-  }
+    public static AbstractEngineConfiguration parseEngineConfigurationFromInputStream(InputStream inputStream, String beanName) {
+        Resource springResource = new InputStreamResource(inputStream);
+        return parseEngineConfiguration(springResource, beanName);
+    }
 
-  public static AbstractEngineConfiguration parseEngineConfigurationFromResource(String resource, String beanName) {
-    Resource springResource = new ClassPathResource(resource);
-    return parseEngineConfiguration(springResource, beanName);
-  }
+    public static AbstractEngineConfiguration parseEngineConfigurationFromResource(String resource, String beanName) {
+        Resource springResource = new ClassPathResource(resource);
+        return parseEngineConfiguration(springResource, beanName);
+    }
 
 }

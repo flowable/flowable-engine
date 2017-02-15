@@ -22,20 +22,20 @@ import org.flowable.engine.history.HistoricIdentityLink;
  */
 public interface HistoricIdentityLinkEntity extends HistoricIdentityLink, Entity {
 
-  boolean isUser();
+    boolean isUser();
 
-  boolean isGroup();
+    boolean isGroup();
 
-  void setType(String type);
+    void setType(String type);
 
-  void setUserId(String userId);
+    void setUserId(String userId);
 
-  void setGroupId(String groupId);
+    void setGroupId(String groupId);
 
-  void setTaskId(String taskId);
-  
-  void setCreateTime(Date createTime);
+    void setTaskId(String taskId);
 
-  void setProcessInstanceId(String processInstanceId);
-    
+    void setCreateTime(Date createTime);
+
+    void setProcessInstanceId(String processInstanceId);
+
 }

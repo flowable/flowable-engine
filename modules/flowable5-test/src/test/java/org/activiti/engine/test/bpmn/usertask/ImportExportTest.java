@@ -27,8 +27,8 @@ public class ImportExportTest extends ResourceFlowableTestCase {
         byte[] xml = new BpmnXMLConverter().convertToXML(bpmnModel);
 
         processEngine.getRepositoryService().createDeployment().name("test1").addString("test1.bpmn20.xml", new String(xml))
-            .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
-            .deploy();
+                .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
+                .deploy();
 
         String processInstanceKey = runtimeService.startProcessInstanceByKey("process").getId();
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstanceKey).messageEventSubscriptionName("InterruptMessage").singleResult();
@@ -42,7 +42,6 @@ public class ImportExportTest extends ResourceFlowableTestCase {
         }
         super.tearDown();
     }
-
 
     protected String getResource() {
         return "org/activiti/engine/test/bpmn/usertask/ImportExportTest.testImportExport.bpmn20.xml";

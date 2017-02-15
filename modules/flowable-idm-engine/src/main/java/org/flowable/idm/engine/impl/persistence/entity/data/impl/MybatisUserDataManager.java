@@ -28,44 +28,43 @@ import org.flowable.idm.engine.impl.persistence.entity.data.UserDataManager;
  * @author Joram Barrez
  */
 public class MybatisUserDataManager extends AbstractDataManager<UserEntity> implements UserDataManager {
-  
-  public MybatisUserDataManager(IdmEngineConfiguration idmEngineConfiguration) {
-    super(idmEngineConfiguration);
-  }
 
-  @Override
-  public Class<? extends UserEntity> getManagedEntityClass() {
-    return UserEntityImpl.class;
-  }
-  
-  @Override
-  public UserEntity create() {
-    return new UserEntityImpl();
-  }
-  
-  @SuppressWarnings("unchecked")
-  public List<User> findUserByQueryCriteria(UserQueryImpl query, Page page) {
-    return getDbSqlSession().selectList("selectUserByQueryCriteria", query, page);
-  }
+    public MybatisUserDataManager(IdmEngineConfiguration idmEngineConfiguration) {
+        super(idmEngineConfiguration);
+    }
 
-  public long findUserCountByQueryCriteria(UserQueryImpl query) {
-    return (Long) getDbSqlSession().selectOne("selectUserCountByQueryCriteria", query);
-  }
+    @Override
+    public Class<? extends UserEntity> getManagedEntityClass() {
+        return UserEntityImpl.class;
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<User> findUsersByPrivilegeId(String privilegeId) {
-    return getDbSqlSession().selectList("selectUsersWithPrivilegeId", privilegeId);
-  }
+    @Override
+    public UserEntity create() {
+        return new UserEntityImpl();
+    }
 
-  @SuppressWarnings("unchecked")
-  public List<User> findUsersByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return getDbSqlSession().selectListWithRawParameter("selectUserByNativeQuery", parameterMap, firstResult, maxResults);
-  }
+    @SuppressWarnings("unchecked")
+    public List<User> findUserByQueryCriteria(UserQueryImpl query, Page page) {
+        return getDbSqlSession().selectList("selectUserByQueryCriteria", query, page);
+    }
 
-  public long findUserCountByNativeQuery(Map<String, Object> parameterMap) {
-    return (Long) getDbSqlSession().selectOne("selectUserCountByNativeQuery", parameterMap);
-  }
+    public long findUserCountByQueryCriteria(UserQueryImpl query) {
+        return (Long) getDbSqlSession().selectOne("selectUserCountByQueryCriteria", query);
+    }
 
-  
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<User> findUsersByPrivilegeId(String privilegeId) {
+        return getDbSqlSession().selectList("selectUsersWithPrivilegeId", privilegeId);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<User> findUsersByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
+        return getDbSqlSession().selectListWithRawParameter("selectUserByNativeQuery", parameterMap, firstResult, maxResults);
+    }
+
+    public long findUserCountByNativeQuery(Map<String, Object> parameterMap) {
+        return (Long) getDbSqlSession().selectOne("selectUserCountByNativeQuery", parameterMap);
+    }
+
 }

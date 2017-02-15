@@ -32,51 +32,51 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public class SignalThrowingEventListener extends BaseDelegateEventListener {
 
-  protected String signalName;
-  protected boolean processInstanceScope = true;
+    protected String signalName;
+    protected boolean processInstanceScope = true;
 
-  @Override
-  public void onEvent(FlowableEvent event) {
-    if (isValidEvent(event) && event instanceof FlowableEngineEvent) {
-      
-      FlowableEngineEvent engineEvent = (FlowableEngineEvent) event;
+    @Override
+    public void onEvent(FlowableEvent event) {
+        if (isValidEvent(event) && event instanceof FlowableEngineEvent) {
 
-      if (engineEvent.getProcessInstanceId() == null && processInstanceScope) {
-        throw new FlowableIllegalArgumentException("Cannot throw process-instance scoped signal, since the dispatched event is not part of an ongoing process instance");
-      }
+            FlowableEngineEvent engineEvent = (FlowableEngineEvent) event;
 
-      CommandContext commandContext = Context.getCommandContext();
-      EventSubscriptionEntityManager eventSubscriptionEntityManager = commandContext.getEventSubscriptionEntityManager();
-      List<SignalEventSubscriptionEntity> subscriptionEntities = null;
-      if (processInstanceScope) {
-        subscriptionEntities = eventSubscriptionEntityManager.findSignalEventSubscriptionsByProcessInstanceAndEventName(engineEvent.getProcessInstanceId(), signalName);
-      } else {
-        String tenantId = null;
-        if (engineEvent.getProcessDefinitionId() != null) {
-          ProcessDefinition processDefinition = commandContext.getProcessEngineConfiguration()
-              .getDeploymentManager()
-              .findDeployedProcessDefinitionById(engineEvent.getProcessDefinitionId());
-          tenantId = processDefinition.getTenantId();
+            if (engineEvent.getProcessInstanceId() == null && processInstanceScope) {
+                throw new FlowableIllegalArgumentException("Cannot throw process-instance scoped signal, since the dispatched event is not part of an ongoing process instance");
+            }
+
+            CommandContext commandContext = Context.getCommandContext();
+            EventSubscriptionEntityManager eventSubscriptionEntityManager = commandContext.getEventSubscriptionEntityManager();
+            List<SignalEventSubscriptionEntity> subscriptionEntities = null;
+            if (processInstanceScope) {
+                subscriptionEntities = eventSubscriptionEntityManager.findSignalEventSubscriptionsByProcessInstanceAndEventName(engineEvent.getProcessInstanceId(), signalName);
+            } else {
+                String tenantId = null;
+                if (engineEvent.getProcessDefinitionId() != null) {
+                    ProcessDefinition processDefinition = commandContext.getProcessEngineConfiguration()
+                            .getDeploymentManager()
+                            .findDeployedProcessDefinitionById(engineEvent.getProcessDefinitionId());
+                    tenantId = processDefinition.getTenantId();
+                }
+                subscriptionEntities = eventSubscriptionEntityManager.findSignalEventSubscriptionsByEventName(signalName, tenantId);
+            }
+
+            for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : subscriptionEntities) {
+                eventSubscriptionEntityManager.eventReceived(signalEventSubscriptionEntity, null, false);
+            }
         }
-        subscriptionEntities = eventSubscriptionEntityManager.findSignalEventSubscriptionsByEventName(signalName, tenantId);
-      }
-
-      for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : subscriptionEntities) {
-        eventSubscriptionEntityManager.eventReceived(signalEventSubscriptionEntity, null, false);
-      }
     }
-  }
 
-  public void setSignalName(String signalName) {
-    this.signalName = signalName;
-  }
+    public void setSignalName(String signalName) {
+        this.signalName = signalName;
+    }
 
-  public void setProcessInstanceScope(boolean processInstanceScope) {
-    this.processInstanceScope = processInstanceScope;
-  }
+    public void setProcessInstanceScope(boolean processInstanceScope) {
+        this.processInstanceScope = processInstanceScope;
+    }
 
-  @Override
-  public boolean isFailOnException() {
-    return true;
-  }
+    @Override
+    public boolean isFailOnException() {
+        return true;
+    }
 }

@@ -39,31 +39,31 @@ import static org.junit.Assert.assertNotNull;
 @ContextConfiguration("classpath:org/flowable/spring/test/junit4/springTypicalUsageTest-context.xml")
 public class SpringJunit4Test {
 
-  @Autowired
-  private DmnEngine dmnEngine;
+    @Autowired
+    private DmnEngine dmnEngine;
 
-  @Autowired
-  private DmnRuleService ruleService;
+    @Autowired
+    private DmnRuleService ruleService;
 
-  @Autowired
-  @Rule
-  public FlowableDmnRule flowableDmnSpringRule;
+    @Autowired
+    @Rule
+    public FlowableDmnRule flowableDmnSpringRule;
 
-  @After
-  public void closeDmnEngine() {
-    // Required, since all the other tests seem to do a specific drop on the
-    // end
-    dmnEngine.close();
-  }
+    @After
+    public void closeDmnEngine() {
+        // Required, since all the other tests seem to do a specific drop on the
+        // end
+        dmnEngine.close();
+    }
 
-  @Test
-  @DmnDeploymentAnnotation
-  public void simpleDecisionTest() {
-    Map<String, Object> inputVariables = new HashMap<>();
-    inputVariables.put("input1", "testString");
-    RuleEngineExecutionResult executionResult = ruleService.executeDecisionByKey("decision1", inputVariables);
+    @Test
+    @DmnDeploymentAnnotation
+    public void simpleDecisionTest() {
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.put("input1", "testString");
+        RuleEngineExecutionResult executionResult = ruleService.executeDecisionByKey("decision1", inputVariables);
 
-    assertEquals("test1", executionResult.getResultVariables().get("output1"));
-    assertNotNull(flowableDmnSpringRule.getRepositoryService());
-  }
+        assertEquals("test1", executionResult.getResultVariables().get("output1"));
+        assertNotNull(flowableDmnSpringRule.getRepositoryService());
+    }
 }

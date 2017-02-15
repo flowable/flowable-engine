@@ -29,39 +29,39 @@ import org.slf4j.LoggerFactory;
  */
 public class CommandContext extends AbstractCommandContext {
 
-  private static Logger log = LoggerFactory.getLogger(CommandContext.class);
+    private static Logger log = LoggerFactory.getLogger(CommandContext.class);
 
-  protected ContentEngineConfiguration contentEngineConfiguration;
-  
-  public CommandContext(Command<?> command, ContentEngineConfiguration contentEngineConfiguration) {
-    super(command);
-    this.contentEngineConfiguration = contentEngineConfiguration;
-    sessionFactories = contentEngineConfiguration.getSessionFactories();
-  }
+    protected ContentEngineConfiguration contentEngineConfiguration;
 
-  public void addCloseListener(CommandContextCloseListener commandContextCloseListener) {
-    if (closeListeners == null) {
-      closeListeners = new ArrayList<BaseCommandContextCloseListener<AbstractCommandContext>>(1);
+    public CommandContext(Command<?> command, ContentEngineConfiguration contentEngineConfiguration) {
+        super(command);
+        this.contentEngineConfiguration = contentEngineConfiguration;
+        sessionFactories = contentEngineConfiguration.getSessionFactories();
     }
-    closeListeners.add((BaseCommandContextCloseListener) commandContextCloseListener);
-  }
 
-  public DbSqlSession getDbSqlSession() {
-    return getSession(DbSqlSession.class);
-  }
+    public void addCloseListener(CommandContextCloseListener commandContextCloseListener) {
+        if (closeListeners == null) {
+            closeListeners = new ArrayList<BaseCommandContextCloseListener<AbstractCommandContext>>(1);
+        }
+        closeListeners.add((BaseCommandContextCloseListener) commandContextCloseListener);
+    }
 
-  public ContentItemEntityManager getContentItemEntityManager() {
-    return contentEngineConfiguration.getContentItemEntityManager();
-  }
-  
-  public TableDataManager getTableDataManager() {
-    return contentEngineConfiguration.getTableDataManager();
-  }
+    public DbSqlSession getDbSqlSession() {
+        return getSession(DbSqlSession.class);
+    }
 
-  // getters and setters
-  // //////////////////////////////////////////////////////
-  
-  public ContentEngineConfiguration getContentEngineConfiguration() {
-    return contentEngineConfiguration;
-  }
+    public ContentItemEntityManager getContentItemEntityManager() {
+        return contentEngineConfiguration.getContentItemEntityManager();
+    }
+
+    public TableDataManager getTableDataManager() {
+        return contentEngineConfiguration.getTableDataManager();
+    }
+
+    // getters and setters
+    // //////////////////////////////////////////////////////
+
+    public ContentEngineConfiguration getContentEngineConfiguration() {
+        return contentEngineConfiguration;
+    }
 }

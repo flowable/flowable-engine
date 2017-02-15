@@ -19,7 +19,7 @@ import org.junit.Ignore;
 /**
  * This test shows that bpmn endless loop with activiti6 is not only fiction
  */
-public class StandardAgendaFailingTest extends PluggableFlowableTestCase{
+public class StandardAgendaFailingTest extends PluggableFlowableTestCase {
 
     @Ignore("Endless loop with the standard agenda implementation can run 'forever'.")
     @Deployment(resources = "org/flowable/examples/runtime/WatchDogAgendaTest-endlessloop.bpmn20.xml")

@@ -16,11 +16,10 @@ package org.activiti.engine.impl.form;
 import org.flowable.engine.form.StartFormData;
 import org.flowable.engine.repository.ProcessDefinition;
 
-
 /**
  * @author Tom Baeyens
  */
 public interface StartFormHandler extends FormHandler {
 
-  StartFormData createStartFormData(ProcessDefinition processDefinition);
+    StartFormData createStartFormData(ProcessDefinition processDefinition);
 }

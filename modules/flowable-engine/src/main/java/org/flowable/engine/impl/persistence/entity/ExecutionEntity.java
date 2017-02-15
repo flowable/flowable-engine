@@ -31,105 +31,105 @@ import org.flowable.engine.runtime.ProcessInstance;
  */
 
 public interface ExecutionEntity extends DelegateExecution, Execution, ProcessInstance, Entity, HasRevision {
-  
-  void setBusinessKey(String businessKey);
 
-  void setProcessDefinitionId(String processDefinitionId);
+    void setBusinessKey(String businessKey);
 
-  void setProcessDefinitionKey(String processDefinitionKey);
+    void setProcessDefinitionId(String processDefinitionId);
 
-  void setProcessDefinitionName(String processDefinitionName);
+    void setProcessDefinitionKey(String processDefinitionKey);
 
-  void setProcessDefinitionVersion(Integer processDefinitionVersion);
+    void setProcessDefinitionName(String processDefinitionName);
 
-  void setDeploymentId(String deploymentId);
+    void setProcessDefinitionVersion(Integer processDefinitionVersion);
 
-  ExecutionEntity getProcessInstance();
+    void setDeploymentId(String deploymentId);
 
-  void setProcessInstance(ExecutionEntity processInstance);
-  
-  ExecutionEntity getParent();
+    ExecutionEntity getProcessInstance();
 
-  void setParent(ExecutionEntity parent);
+    void setProcessInstance(ExecutionEntity processInstance);
 
-  ExecutionEntity getSuperExecution();
+    ExecutionEntity getParent();
 
-  void setSuperExecution(ExecutionEntity superExecution);
+    void setParent(ExecutionEntity parent);
 
-  ExecutionEntity getSubProcessInstance();
+    ExecutionEntity getSuperExecution();
 
-  void setSubProcessInstance(ExecutionEntity subProcessInstance);
+    void setSuperExecution(ExecutionEntity superExecution);
 
-  void setRootProcessInstanceId(String rootProcessInstanceId);
-  
-  ExecutionEntity getRootProcessInstance();
-  
-  void setRootProcessInstance(ExecutionEntity rootProcessInstance);
-  
-  List<? extends ExecutionEntity> getExecutions();
-  
-  void addChildExecution(ExecutionEntity executionEntity);
-  
-  List<TaskEntity> getTasks();
+    ExecutionEntity getSubProcessInstance();
 
-  List<EventSubscriptionEntity> getEventSubscriptions();
+    void setSubProcessInstance(ExecutionEntity subProcessInstance);
 
-  List<JobEntity> getJobs();
-  
-  List<TimerJobEntity> getTimerJobs();
-  
-  List<IdentityLinkEntity> getIdentityLinks();
+    void setRootProcessInstanceId(String rootProcessInstanceId);
 
-  void setProcessInstanceId(String processInstanceId);
+    ExecutionEntity getRootProcessInstance();
 
-  void setParentId(String parentId);
+    void setRootProcessInstance(ExecutionEntity rootProcessInstance);
 
-  void setEnded(boolean isEnded);
+    List<? extends ExecutionEntity> getExecutions();
 
-  void setEventName(String eventName);
+    void addChildExecution(ExecutionEntity executionEntity);
 
-  String getDeleteReason();
+    List<TaskEntity> getTasks();
 
-  void setDeleteReason(String deleteReason);
+    List<EventSubscriptionEntity> getEventSubscriptions();
 
-  int getSuspensionState();
+    List<JobEntity> getJobs();
 
-  void setSuspensionState(int suspensionState);
+    List<TimerJobEntity> getTimerJobs();
 
-  boolean isEventScope();
+    List<IdentityLinkEntity> getIdentityLinks();
 
-  void setEventScope(boolean isEventScope);
-  
-  boolean isMultiInstanceRoot();
-  
-  void setMultiInstanceRoot(boolean isMultiInstanceRoot);
+    void setProcessInstanceId(String processInstanceId);
 
-  void setName(String name);
-  
-  void setDescription(String description);
+    void setParentId(String parentId);
 
-  void setLocalizedName(String localizedName);
-  
-  void setLocalizedDescription(String localizedDescription);
-  
-  void setTenantId(String tenantId);
+    void setEnded(boolean isEnded);
 
-  Date getLockTime();
+    void setEventName(String eventName);
 
-  void setLockTime(Date lockTime);
+    String getDeleteReason();
 
-  boolean isDeleted();
+    void setDeleteReason(String deleteReason);
 
-  void setDeleted(boolean isDeleted);
-  
-  void forceUpdate();
+    int getSuspensionState();
 
-  String getStartUserId();
+    void setSuspensionState(int suspensionState);
 
-  void setStartUserId(String startUserId);
+    boolean isEventScope();
 
-  Date getStartTime();
+    void setEventScope(boolean isEventScope);
 
-  void setStartTime(Date startTime);
-  
+    boolean isMultiInstanceRoot();
+
+    void setMultiInstanceRoot(boolean isMultiInstanceRoot);
+
+    void setName(String name);
+
+    void setDescription(String description);
+
+    void setLocalizedName(String localizedName);
+
+    void setLocalizedDescription(String localizedDescription);
+
+    void setTenantId(String tenantId);
+
+    Date getLockTime();
+
+    void setLockTime(Date lockTime);
+
+    boolean isDeleted();
+
+    void setDeleted(boolean isDeleted);
+
+    void forceUpdate();
+
+    String getStartUserId();
+
+    void setStartUserId(String startUserId);
+
+    Date getStartTime();
+
+    void setStartTime(Date startTime);
+
 }

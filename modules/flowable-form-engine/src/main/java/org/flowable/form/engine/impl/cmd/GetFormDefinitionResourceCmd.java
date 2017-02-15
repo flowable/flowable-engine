@@ -28,24 +28,24 @@ import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
  */
 public class GetFormDefinitionResourceCmd implements Command<InputStream>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String formDefinitionId;
+    private static final long serialVersionUID = 1L;
+    protected String formDefinitionId;
 
-  public GetFormDefinitionResourceCmd(String formDefinitionId) {
-    if (formDefinitionId == null || formDefinitionId.length() < 1) {
-      throw new FlowableIllegalArgumentException("The form definition id is mandatory, but '" + formDefinitionId + "' has been provided.");
+    public GetFormDefinitionResourceCmd(String formDefinitionId) {
+        if (formDefinitionId == null || formDefinitionId.length() < 1) {
+            throw new FlowableIllegalArgumentException("The form definition id is mandatory, but '" + formDefinitionId + "' has been provided.");
+        }
+        this.formDefinitionId = formDefinitionId;
     }
-    this.formDefinitionId = formDefinitionId;
-  }
 
-  public InputStream execute(CommandContext commandContext) {
-    FormDefinitionEntity formDefinition = commandContext.getFormEngineConfiguration().getDeploymentManager()
-        .findDeployedFormDefinitionById(formDefinitionId);
-    
-    String deploymentId = formDefinition.getDeploymentId();
-    String resourceName = formDefinition.getResourceName();
-    InputStream formDefinitionStream = new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
-    return formDefinitionStream;
-  }
+    public InputStream execute(CommandContext commandContext) {
+        FormDefinitionEntity formDefinition = commandContext.getFormEngineConfiguration().getDeploymentManager()
+                .findDeployedFormDefinitionById(formDefinitionId);
+
+        String deploymentId = formDefinition.getDeploymentId();
+        String resourceName = formDefinition.getResourceName();
+        InputStream formDefinitionStream = new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
+        return formDefinitionStream;
+    }
 
 }

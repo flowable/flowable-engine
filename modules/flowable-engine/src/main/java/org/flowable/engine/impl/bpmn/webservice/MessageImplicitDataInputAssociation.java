@@ -25,21 +25,21 @@ import org.flowable.engine.impl.bpmn.data.FieldBaseStructureInstance;
  */
 public class MessageImplicitDataInputAssociation extends AbstractDataAssociation {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public MessageImplicitDataInputAssociation(String source, String target) {
-    super(source, target);
-  }
-
-  @Override
-  public void evaluate(DelegateExecution execution) {
-    if (StringUtils.isNotEmpty(this.source)) {
-      Object value = execution.getVariable(this.source);
-      MessageInstance message = (MessageInstance) execution.getVariable(WebServiceActivityBehavior.CURRENT_MESSAGE);
-      if (message.getStructureInstance() instanceof FieldBaseStructureInstance) {
-        FieldBaseStructureInstance structure = (FieldBaseStructureInstance) message.getStructureInstance();
-        structure.setFieldValue(this.target, value);
-      }
+    public MessageImplicitDataInputAssociation(String source, String target) {
+        super(source, target);
     }
-  }
+
+    @Override
+    public void evaluate(DelegateExecution execution) {
+        if (StringUtils.isNotEmpty(this.source)) {
+            Object value = execution.getVariable(this.source);
+            MessageInstance message = (MessageInstance) execution.getVariable(WebServiceActivityBehavior.CURRENT_MESSAGE);
+            if (message.getStructureInstance() instanceof FieldBaseStructureInstance) {
+                FieldBaseStructureInstance structure = (FieldBaseStructureInstance) message.getStructureInstance();
+                structure.setFieldValue(this.target, value);
+            }
+        }
+    }
 }

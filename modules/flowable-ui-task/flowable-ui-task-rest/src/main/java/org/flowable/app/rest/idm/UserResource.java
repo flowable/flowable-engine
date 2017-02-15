@@ -32,22 +32,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserResource {
 
-  @Autowired
-  protected RemoteIdmService remoteIdmService;
+    @Autowired
+    protected RemoteIdmService remoteIdmService;
 
-  @RequestMapping(value = "/rest/users/{userId}", method = RequestMethod.GET, produces = "application/json")
-  public UserRepresentation getUser(@PathVariable String userId, HttpServletResponse response) {
-    User user = remoteIdmService.getUser(userId); 
+    @RequestMapping(value = "/rest/users/{userId}", method = RequestMethod.GET, produces = "application/json")
+    public UserRepresentation getUser(@PathVariable String userId, HttpServletResponse response) {
+        User user = remoteIdmService.getUser(userId);
 
-    if (user == null) {
-      throw new NotFoundException("User with id: " + userId + " does not exist or is inactive");
+        if (user == null) {
+            throw new NotFoundException("User with id: " + userId + " does not exist or is inactive");
+        }
+
+        if (!user.getId().equals(SecurityUtils.getCurrentUserId())) {
+            throw new NotPermittedException("Can only get user details for authenticated user");
+        }
+
+        return new UserRepresentation(user);
     }
-
-    if (!user.getId().equals(SecurityUtils.getCurrentUserId())) {
-      throw new NotPermittedException("Can only get user details for authenticated user");
-    }
-
-    return new UserRepresentation(user);
-  }
 
 }

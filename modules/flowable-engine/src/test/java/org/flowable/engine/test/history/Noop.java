@@ -21,10 +21,10 @@ import org.flowable.engine.delegate.JavaDelegate;
  */
 public class Noop implements JavaDelegate {
 
-  @Override
-  public void execute(DelegateExecution execution) {
-    // TODO Auto-generated method stub
+    @Override
+    public void execute(DelegateExecution execution) {
+        // TODO Auto-generated method stub
 
-  }
+    }
 
 }

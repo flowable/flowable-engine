@@ -22,26 +22,26 @@ import org.flowable.rest.variable.EngineRestVariable;
  */
 public class ExecuteDecisionResponse {
 
-  protected List<EngineRestVariable> resultVariables = new ArrayList<>();
-  protected String url;
+    protected List<EngineRestVariable> resultVariables = new ArrayList<>();
+    protected String url;
 
-  public List<EngineRestVariable> getResultVariables() {
-    return resultVariables;
-  }
+    public List<EngineRestVariable> getResultVariables() {
+        return resultVariables;
+    }
 
-  public void setResultVariables(List<EngineRestVariable> resultVariables) {
-    this.resultVariables = resultVariables;
-  }
+    public void setResultVariables(List<EngineRestVariable> resultVariables) {
+        this.resultVariables = resultVariables;
+    }
 
-  public void addResultVariable(EngineRestVariable variable) {
-    resultVariables.add(variable);
-  }
+    public void addResultVariable(EngineRestVariable variable) {
+        resultVariables.add(variable);
+    }
 
-  public String getUrl() {
-    return url;
-  }
+    public String getUrl() {
+        return url;
+    }
 
-  public void setUrl(String url) {
-    this.url = url;
-  }
+    public void setUrl(String url) {
+        this.url = url;
+    }
 }

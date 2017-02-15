@@ -23,24 +23,24 @@ import org.flowable.idm.engine.impl.interceptor.CommandContext;
  */
 public class CreateMembershipCmd implements Command<Object>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  String userId;
-  String groupId;
+    String userId;
+    String groupId;
 
-  public CreateMembershipCmd(String userId, String groupId) {
-    this.userId = userId;
-    this.groupId = groupId;
-  }
-
-  public Object execute(CommandContext commandContext) {
-    if (userId == null) {
-      throw new FlowableIllegalArgumentException("userId is null");
+    public CreateMembershipCmd(String userId, String groupId) {
+        this.userId = userId;
+        this.groupId = groupId;
     }
-    if (groupId == null) {
-      throw new FlowableIllegalArgumentException("groupId is null");
+
+    public Object execute(CommandContext commandContext) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("userId is null");
+        }
+        if (groupId == null) {
+            throw new FlowableIllegalArgumentException("groupId is null");
+        }
+        commandContext.getMembershipEntityManager().createMembership(userId, groupId);
+        return null;
     }
-    commandContext.getMembershipEntityManager().createMembership(userId, groupId);
-    return null;
-  }
 }

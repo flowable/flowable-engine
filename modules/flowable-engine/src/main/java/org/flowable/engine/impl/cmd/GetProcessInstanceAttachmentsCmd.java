@@ -25,14 +25,14 @@ import org.flowable.engine.task.Attachment;
  */
 public class GetProcessInstanceAttachmentsCmd implements Command<List<? extends Attachment>>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String processInstanceId;
+    private static final long serialVersionUID = 1L;
+    protected String processInstanceId;
 
-  public GetProcessInstanceAttachmentsCmd(String taskId) {
-    this.processInstanceId = taskId;
-  }
+    public GetProcessInstanceAttachmentsCmd(String taskId) {
+        this.processInstanceId = taskId;
+    }
 
-  public List<? extends Attachment> execute(CommandContext commandContext) {
-    return commandContext.getAttachmentEntityManager().findAttachmentsByProcessInstanceId(processInstanceId);
-  }
+    public List<? extends Attachment> execute(CommandContext commandContext) {
+        return commandContext.getAttachmentEntityManager().findAttachmentsByProcessInstanceId(processInstanceId);
+    }
 }

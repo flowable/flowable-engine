@@ -40,150 +40,150 @@ import org.flowable.rest.variable.StringRestVariableConverter;
  */
 public class DmnRestResponseFactory {
 
-  public static final String BYTE_ARRAY_VARIABLE_TYPE = "binary";
-  public static final String SERIALIZABLE_VARIABLE_TYPE = "serializable";
+    public static final String BYTE_ARRAY_VARIABLE_TYPE = "binary";
+    public static final String SERIALIZABLE_VARIABLE_TYPE = "serializable";
 
-  protected List<RestVariableConverter> variableConverters = new ArrayList<>();
+    protected List<RestVariableConverter> variableConverters = new ArrayList<>();
 
-  public DmnRestResponseFactory() {
-    initializeVariableConverters();
-  }
-
-  public DecisionTableResponse createDecisionTableResponse(DmnDecisionTable decisionTable) {
-    return createDecisionTableResponse(decisionTable, createUrlBuilder());
-  }
-
-  public DecisionTableResponse createDecisionTableResponse(DmnDecisionTable decisionTable, DmnRestUrlBuilder urlBuilder) {
-    DecisionTableResponse response = new DecisionTableResponse(decisionTable);
-    response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_DECISION_TABLE, decisionTable.getId()));
-
-    return response;
-  }
-
-  public List<DecisionTableResponse> createDecisionTableResponseList(List<DmnDecisionTable> decisionTables) {
-    DmnRestUrlBuilder urlBuilder = createUrlBuilder();
-    List<DecisionTableResponse> responseList = new ArrayList<>();
-    for (DmnDecisionTable instance : decisionTables) {
-      responseList.add(createDecisionTableResponse(instance, urlBuilder));
-    }
-    return responseList;
-  }
-
-  public List<DmnDeploymentResponse> createDmnDeploymentResponseList(List<DmnDeployment> deployments) {
-    DmnRestUrlBuilder urlBuilder = createUrlBuilder();
-    List<DmnDeploymentResponse> responseList = new ArrayList<>();
-    for (DmnDeployment instance : deployments) {
-      responseList.add(createDmnDeploymentResponse(instance, urlBuilder));
-    }
-    return responseList;
-  }
-
-  public DmnDeploymentResponse createDmnDeploymentResponse(DmnDeployment deployment) {
-    return createDmnDeploymentResponse(deployment, createUrlBuilder());
-  }
-
-  public DmnDeploymentResponse createDmnDeploymentResponse(DmnDeployment deployment, DmnRestUrlBuilder urlBuilder) {
-    return new DmnDeploymentResponse(deployment, urlBuilder.buildUrl(DmnRestUrls.URL_DEPLOYMENT, deployment.getId()));
-  }
-
-  public ExecuteDecisionResponse createExecuteDecisionResponse(RuleEngineExecutionResult executionResult) {
-    return createExecuteDecisionResponse(executionResult, createUrlBuilder());
-  }
-
-  public ExecuteDecisionResponse createExecuteDecisionResponse(RuleEngineExecutionResult executionResult, DmnRestUrlBuilder urlBuilder) {
-    ExecuteDecisionResponse response = new ExecuteDecisionResponse();
-
-    if (executionResult.getResultVariables() != null) {
-      for (String name : executionResult.getResultVariables().keySet()) {
-        response.addResultVariable(createRestVariable(name, executionResult.getResultVariables().get(name),false));
-      }
+    public DmnRestResponseFactory() {
+        initializeVariableConverters();
     }
 
-    response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_DECISION_EXECUTOR));
+    public DecisionTableResponse createDecisionTableResponse(DmnDecisionTable decisionTable) {
+        return createDecisionTableResponse(decisionTable, createUrlBuilder());
+    }
 
-    return response;
-  }
+    public DecisionTableResponse createDecisionTableResponse(DmnDecisionTable decisionTable, DmnRestUrlBuilder urlBuilder) {
+        DecisionTableResponse response = new DecisionTableResponse(decisionTable);
+        response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_DECISION_TABLE, decisionTable.getId()));
 
-  public Object getVariableValue(EngineRestVariable restVariable) {
-    Object value = null;
+        return response;
+    }
 
-    if (restVariable.getType() != null) {
-      // Try locating a converter if the type has been specified
-      RestVariableConverter converter = null;
-      for (RestVariableConverter conv : variableConverters) {
-        if (conv.getRestTypeName().equals(restVariable.getType())) {
-          converter = conv;
-          break;
+    public List<DecisionTableResponse> createDecisionTableResponseList(List<DmnDecisionTable> decisionTables) {
+        DmnRestUrlBuilder urlBuilder = createUrlBuilder();
+        List<DecisionTableResponse> responseList = new ArrayList<>();
+        for (DmnDecisionTable instance : decisionTables) {
+            responseList.add(createDecisionTableResponse(instance, urlBuilder));
         }
-      }
-      if (converter == null) {
-        throw new FlowableIllegalArgumentException("Variable '" + restVariable.getName() + "' has unsupported type: '" + restVariable.getType() + "'.");
-      }
-      value = converter.getVariableValue(restVariable);
-
-    } else {
-      // Revert to type determined by REST-to-Java mapping when no
-      // explicit type has been provided
-      value = restVariable.getValue();
+        return responseList;
     }
-    return value;
-  }
 
-  public EngineRestVariable createRestVariable(String name, Object value, boolean includeBinaryValue) {
-    return createRestVariable(name, value, includeBinaryValue, createUrlBuilder());
-  }
-
-  public EngineRestVariable createRestVariable(String name, Object value, boolean includeBinaryValue, DmnRestUrlBuilder urlBuilder) {
-
-    RestVariableConverter converter = null;
-    EngineRestVariable restVar = new EngineRestVariable();
-    restVar.setName(name);
-
-    if (value != null) {
-      // Try converting the value
-      for (RestVariableConverter c : variableConverters) {
-        if (c.getVariableType().isAssignableFrom(value.getClass())) {
-          converter = c;
-          break;
+    public List<DmnDeploymentResponse> createDmnDeploymentResponseList(List<DmnDeployment> deployments) {
+        DmnRestUrlBuilder urlBuilder = createUrlBuilder();
+        List<DmnDeploymentResponse> responseList = new ArrayList<>();
+        for (DmnDeployment instance : deployments) {
+            responseList.add(createDmnDeploymentResponse(instance, urlBuilder));
         }
-      }
+        return responseList;
+    }
 
-      if (converter != null) {
-        converter.convertVariableValue(value, restVar);
-        restVar.setType(converter.getRestTypeName());
-      } else {
-        // Revert to default conversion, which is the
-        // serializable/byte-array form
-        if (value instanceof Byte[] || value instanceof byte[]) {
-          restVar.setType(BYTE_ARRAY_VARIABLE_TYPE);
+    public DmnDeploymentResponse createDmnDeploymentResponse(DmnDeployment deployment) {
+        return createDmnDeploymentResponse(deployment, createUrlBuilder());
+    }
+
+    public DmnDeploymentResponse createDmnDeploymentResponse(DmnDeployment deployment, DmnRestUrlBuilder urlBuilder) {
+        return new DmnDeploymentResponse(deployment, urlBuilder.buildUrl(DmnRestUrls.URL_DEPLOYMENT, deployment.getId()));
+    }
+
+    public ExecuteDecisionResponse createExecuteDecisionResponse(RuleEngineExecutionResult executionResult) {
+        return createExecuteDecisionResponse(executionResult, createUrlBuilder());
+    }
+
+    public ExecuteDecisionResponse createExecuteDecisionResponse(RuleEngineExecutionResult executionResult, DmnRestUrlBuilder urlBuilder) {
+        ExecuteDecisionResponse response = new ExecuteDecisionResponse();
+
+        if (executionResult.getResultVariables() != null) {
+            for (String name : executionResult.getResultVariables().keySet()) {
+                response.addResultVariable(createRestVariable(name, executionResult.getResultVariables().get(name), false));
+            }
+        }
+
+        response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_DECISION_EXECUTOR));
+
+        return response;
+    }
+
+    public Object getVariableValue(EngineRestVariable restVariable) {
+        Object value = null;
+
+        if (restVariable.getType() != null) {
+            // Try locating a converter if the type has been specified
+            RestVariableConverter converter = null;
+            for (RestVariableConverter conv : variableConverters) {
+                if (conv.getRestTypeName().equals(restVariable.getType())) {
+                    converter = conv;
+                    break;
+                }
+            }
+            if (converter == null) {
+                throw new FlowableIllegalArgumentException("Variable '" + restVariable.getName() + "' has unsupported type: '" + restVariable.getType() + "'.");
+            }
+            value = converter.getVariableValue(restVariable);
+
         } else {
-          restVar.setType(SERIALIZABLE_VARIABLE_TYPE);
+            // Revert to type determined by REST-to-Java mapping when no
+            // explicit type has been provided
+            value = restVariable.getValue();
         }
-
-        if (includeBinaryValue) {
-          restVar.setValue(value);
-        }
-      }
-      //TODO: set url
-
+        return value;
     }
-    return restVar;
-  }
 
-  /**
-   * Called once when the converters need to be initialized. Override of custom conversion needs to be done between Java and REST.
-   */
-  protected void initializeVariableConverters() {
-    variableConverters.add(new StringRestVariableConverter());
-    variableConverters.add(new IntegerRestVariableConverter());
-    variableConverters.add(new LongRestVariableConverter());
-    variableConverters.add(new ShortRestVariableConverter());
-    variableConverters.add(new DoubleRestVariableConverter());
-    variableConverters.add(new BooleanRestVariableConverter());
-    variableConverters.add(new DateRestVariableConverter());
-  }
+    public EngineRestVariable createRestVariable(String name, Object value, boolean includeBinaryValue) {
+        return createRestVariable(name, value, includeBinaryValue, createUrlBuilder());
+    }
 
-  protected DmnRestUrlBuilder createUrlBuilder() {
-    return DmnRestUrlBuilder.fromCurrentRequest();
-  }
+    public EngineRestVariable createRestVariable(String name, Object value, boolean includeBinaryValue, DmnRestUrlBuilder urlBuilder) {
+
+        RestVariableConverter converter = null;
+        EngineRestVariable restVar = new EngineRestVariable();
+        restVar.setName(name);
+
+        if (value != null) {
+            // Try converting the value
+            for (RestVariableConverter c : variableConverters) {
+                if (c.getVariableType().isAssignableFrom(value.getClass())) {
+                    converter = c;
+                    break;
+                }
+            }
+
+            if (converter != null) {
+                converter.convertVariableValue(value, restVar);
+                restVar.setType(converter.getRestTypeName());
+            } else {
+                // Revert to default conversion, which is the
+                // serializable/byte-array form
+                if (value instanceof Byte[] || value instanceof byte[]) {
+                    restVar.setType(BYTE_ARRAY_VARIABLE_TYPE);
+                } else {
+                    restVar.setType(SERIALIZABLE_VARIABLE_TYPE);
+                }
+
+                if (includeBinaryValue) {
+                    restVar.setValue(value);
+                }
+            }
+            // TODO: set url
+
+        }
+        return restVar;
+    }
+
+    /**
+     * Called once when the converters need to be initialized. Override of custom conversion needs to be done between Java and REST.
+     */
+    protected void initializeVariableConverters() {
+        variableConverters.add(new StringRestVariableConverter());
+        variableConverters.add(new IntegerRestVariableConverter());
+        variableConverters.add(new LongRestVariableConverter());
+        variableConverters.add(new ShortRestVariableConverter());
+        variableConverters.add(new DoubleRestVariableConverter());
+        variableConverters.add(new BooleanRestVariableConverter());
+        variableConverters.add(new DateRestVariableConverter());
+    }
+
+    protected DmnRestUrlBuilder createUrlBuilder() {
+        return DmnRestUrlBuilder.fromCurrentRequest();
+    }
 }

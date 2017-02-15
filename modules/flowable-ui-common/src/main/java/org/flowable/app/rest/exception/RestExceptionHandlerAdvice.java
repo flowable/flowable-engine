@@ -36,88 +36,88 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ControllerAdvice
 public class RestExceptionHandlerAdvice {
 
-  private static final String UNAUTHORIZED_MESSAGE_KEY = "GENERAL.ERROR.UNAUTHORIZED";
-  private static final String NOT_FOUND_MESSAGE_KEY = "GENERAL.ERROR.NOT-FOUND";
-  private static final String BAD_REQUEST_MESSAGE_KEY = "GENERAL.ERROR.BAD-REQUEST";
-  private static final String INTERNAL_SERVER_ERROR_MESSAGE_KEY = "GENERAL.ERROR.INTERNAL-SERVER_ERROR";
-  private static final String FORBIDDEN_MESSAGE_KEY = "GENERAL.ERROR.FORBIDDEN";
-  private static final String INACTIVE_USER_MESSAGE_KEY = "GENERAL.ERROR.INACTIVE_USER";
+    private static final String UNAUTHORIZED_MESSAGE_KEY = "GENERAL.ERROR.UNAUTHORIZED";
+    private static final String NOT_FOUND_MESSAGE_KEY = "GENERAL.ERROR.NOT-FOUND";
+    private static final String BAD_REQUEST_MESSAGE_KEY = "GENERAL.ERROR.BAD-REQUEST";
+    private static final String INTERNAL_SERVER_ERROR_MESSAGE_KEY = "GENERAL.ERROR.INTERNAL-SERVER_ERROR";
+    private static final String FORBIDDEN_MESSAGE_KEY = "GENERAL.ERROR.FORBIDDEN";
+    private static final String INACTIVE_USER_MESSAGE_KEY = "GENERAL.ERROR.INACTIVE_USER";
 
-  @ResponseStatus(HttpStatus.NOT_FOUND) // 404
-  @ExceptionHandler(NotFoundException.class)
-  @ResponseBody
-  public ErrorInfo handleNotFound(NotFoundException e) {
-    return createInfoFromException(e, NOT_FOUND_MESSAGE_KEY);
-  }
-
-  @ResponseStatus(HttpStatus.NOT_FOUND) // 404
-  @ExceptionHandler(NonJsonResourceNotFoundException.class)
-  public void handleNonJsonResourceNotFound(NonJsonResourceNotFoundException e) {
-  }
-
-  @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
-  @ExceptionHandler(BadRequestException.class)
-  @ResponseBody
-  public ErrorInfo handleBadRequest(BadRequestException e) {
-    return createInfoFromException(e, BAD_REQUEST_MESSAGE_KEY);
-  }
-
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // 500
-  @ExceptionHandler(InternalServerErrorException.class)
-  @ResponseBody
-  public ErrorInfo handleInternalServerError(InternalServerErrorException e) {
-    return createInfoFromException(e, INTERNAL_SERVER_ERROR_MESSAGE_KEY);
-  }
-
-  @ResponseStatus(HttpStatus.FORBIDDEN) // 403
-  @ExceptionHandler(NotPermittedException.class)
-  @ResponseBody
-  public ErrorInfo handleNoPermission(NotPermittedException e) {
-    return createInfoFromException(e, FORBIDDEN_MESSAGE_KEY);
-  }
-
-  @ResponseStatus(HttpStatus.UNAUTHORIZED) // 401
-  @ExceptionHandler(LockedException.class)
-  @ResponseBody
-  public ErrorInfo handleLockedUser(LockedException e) {
-    ErrorInfo result = new ErrorInfo(e.getMessage());
-    result.setMessageKey(INACTIVE_USER_MESSAGE_KEY);
-    return result;
-  }
-
-  @ResponseStatus(HttpStatus.UNAUTHORIZED) // 401
-  @ExceptionHandler(UnauthorizedException.class)
-  @ResponseBody
-  public ErrorInfo handleUnauthorized(UnauthorizedException e) {
-    return createInfoFromException(e, UNAUTHORIZED_MESSAGE_KEY);
-  }
-
-  @ResponseStatus(HttpStatus.CONFLICT) // 409
-  @ExceptionHandler(ConflictingRequestException.class)
-  @ResponseBody
-  public ErrorInfo handleConflict(ConflictingRequestException e) {
-    return createInfoFromException(e, BAD_REQUEST_MESSAGE_KEY);
-  }
-
-  protected ErrorInfo createInfoFromException(BaseModelerRestException exception, String defaultMessageKey) {
-    ErrorInfo result = null;
-    result = new ErrorInfo(exception.getMessage());
-    if (exception.getCustomData() != null) {
-      result.setCustomData(exception.getCustomData());
+    @ResponseStatus(HttpStatus.NOT_FOUND) // 404
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseBody
+    public ErrorInfo handleNotFound(NotFoundException e) {
+        return createInfoFromException(e, NOT_FOUND_MESSAGE_KEY);
     }
-    if (exception.getMessageKey() != null) {
-      result.setMessageKey(exception.getMessageKey());
-    } else {
-      result.setMessageKey(defaultMessageKey);
-    }
-    return result;
-  }
 
-  protected String getSafeMessageKey(String fragment) {
-    if (fragment != null) {
-      return fragment.toUpperCase();
+    @ResponseStatus(HttpStatus.NOT_FOUND) // 404
+    @ExceptionHandler(NonJsonResourceNotFoundException.class)
+    public void handleNonJsonResourceNotFound(NonJsonResourceNotFoundException e) {
     }
-    return "";
-  }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseBody
+    public ErrorInfo handleBadRequest(BadRequestException e) {
+        return createInfoFromException(e, BAD_REQUEST_MESSAGE_KEY);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // 500
+    @ExceptionHandler(InternalServerErrorException.class)
+    @ResponseBody
+    public ErrorInfo handleInternalServerError(InternalServerErrorException e) {
+        return createInfoFromException(e, INTERNAL_SERVER_ERROR_MESSAGE_KEY);
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN) // 403
+    @ExceptionHandler(NotPermittedException.class)
+    @ResponseBody
+    public ErrorInfo handleNoPermission(NotPermittedException e) {
+        return createInfoFromException(e, FORBIDDEN_MESSAGE_KEY);
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED) // 401
+    @ExceptionHandler(LockedException.class)
+    @ResponseBody
+    public ErrorInfo handleLockedUser(LockedException e) {
+        ErrorInfo result = new ErrorInfo(e.getMessage());
+        result.setMessageKey(INACTIVE_USER_MESSAGE_KEY);
+        return result;
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED) // 401
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseBody
+    public ErrorInfo handleUnauthorized(UnauthorizedException e) {
+        return createInfoFromException(e, UNAUTHORIZED_MESSAGE_KEY);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT) // 409
+    @ExceptionHandler(ConflictingRequestException.class)
+    @ResponseBody
+    public ErrorInfo handleConflict(ConflictingRequestException e) {
+        return createInfoFromException(e, BAD_REQUEST_MESSAGE_KEY);
+    }
+
+    protected ErrorInfo createInfoFromException(BaseModelerRestException exception, String defaultMessageKey) {
+        ErrorInfo result = null;
+        result = new ErrorInfo(exception.getMessage());
+        if (exception.getCustomData() != null) {
+            result.setCustomData(exception.getCustomData());
+        }
+        if (exception.getMessageKey() != null) {
+            result.setMessageKey(exception.getMessageKey());
+        } else {
+            result.setMessageKey(defaultMessageKey);
+        }
+        return result;
+    }
+
+    protected String getSafeMessageKey(String fragment) {
+        if (fragment != null) {
+            return fragment.toUpperCase();
+        }
+        return "";
+    }
 
 }

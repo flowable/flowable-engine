@@ -17,20 +17,20 @@ package org.flowable.bpmn.model;
  */
 public abstract class Gateway extends FlowNode {
 
-  protected String defaultFlow;
-  
-  public String getDefaultFlow() {
-    return defaultFlow;
-  }
+    protected String defaultFlow;
 
-  public void setDefaultFlow(String defaultFlow) {
-    this.defaultFlow = defaultFlow;
-  }
+    public String getDefaultFlow() {
+        return defaultFlow;
+    }
 
-  public abstract Gateway clone();
+    public void setDefaultFlow(String defaultFlow) {
+        this.defaultFlow = defaultFlow;
+    }
 
-  public void setValues(Gateway otherElement) {
-    super.setValues(otherElement);
-    setDefaultFlow(otherElement.getDefaultFlow());
-  }
+    public abstract Gateway clone();
+
+    public void setValues(Gateway otherElement) {
+        super.setValues(otherElement);
+        setDefaultFlow(otherElement.getDefaultFlow());
+    }
 }

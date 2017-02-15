@@ -27,28 +27,26 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class ModelRelationService {
-	
-	@Autowired
-	private ModelRelationRepository modelRelationRepository;
-	
-	/**
-	 * Returns the models which have a {@link ModelRelation} with the given model, 
-	 * where the model references those directly or indirectly.
-	 * 
-	 * ie modelId here is the parent of the relation.
-	 */
-	public List<ModelInformation> findReferencedModels(String modelId) {
-		return modelRelationRepository.findModelInformationByParentModelId(modelId);
-	}
-	
-	/**
-	 * Returns the models which have a {@link ModelRelation} with the given model,
-	 * where the given model is the one that is referenced.
-	 * 
-	 * ie modelId is the child of the relation
-	 */
-	public List<ModelInformation> findParentModels(String modelId) {
-		return modelRelationRepository.findModelInformationByChildModelId(modelId);
-	}
-	
+
+    @Autowired
+    private ModelRelationRepository modelRelationRepository;
+
+    /**
+     * Returns the models which have a {@link ModelRelation} with the given model, where the model references those directly or indirectly.
+     * 
+     * ie modelId here is the parent of the relation.
+     */
+    public List<ModelInformation> findReferencedModels(String modelId) {
+        return modelRelationRepository.findModelInformationByParentModelId(modelId);
+    }
+
+    /**
+     * Returns the models which have a {@link ModelRelation} with the given model, where the given model is the one that is referenced.
+     * 
+     * ie modelId is the child of the relation
+     */
+    public List<ModelInformation> findParentModels(String modelId) {
+        return modelRelationRepository.findModelInformationByChildModelId(modelId);
+    }
+
 }

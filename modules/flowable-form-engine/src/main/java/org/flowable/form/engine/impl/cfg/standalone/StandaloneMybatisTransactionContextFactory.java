@@ -22,7 +22,7 @@ import org.flowable.form.engine.impl.interceptor.CommandContext;
  */
 public class StandaloneMybatisTransactionContextFactory implements TransactionContextFactory<TransactionListener, CommandContext> {
 
-  public TransactionContext openTransactionContext(CommandContext commandContext) {
-    return new StandaloneMybatisTransactionContext(commandContext);
-  }
+    public TransactionContext openTransactionContext(CommandContext commandContext) {
+        return new StandaloneMybatisTransactionContext(commandContext);
+    }
 }

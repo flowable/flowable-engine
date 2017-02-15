@@ -22,54 +22,54 @@ import java.util.Date;
  */
 public interface ContentItem {
 
-  /** unique identifier */
-  String getId();
+    /** unique identifier */
+    String getId();
 
-  String getName();
-  
-  void setName(String name);
-  
-  String getMimeType();
-  
-  void setMimeType(String mimeType);
+    String getName();
 
-  String getTaskId();
-  
-  void setTaskId(String taskId);
+    void setName(String name);
 
-  String getProcessInstanceId();
-  
-  void setProcessInstanceId(String processInstanceId);
+    String getMimeType();
 
-  String getContentStoreId();
-  
-  void setContentStoreId(String contentStoreId);
-  
-  String getContentStoreName();
-  
-  void setContentStoreName(String contentStoreName);
-  
-  boolean isContentAvailable();
-  
-  String getField();
-  
-  void setField(String field);
-  
-  Long getContentSize();
+    void setMimeType(String mimeType);
 
-  String getTenantId();
-  
-  void setTenantId(String tenantId);
-  
-  Date getCreated();
+    String getTaskId();
 
-  String getCreatedBy();
-  
-  void setCreatedBy(String createdBy);
-  
-  Date getLastModified();
+    void setTaskId(String taskId);
 
-  String getLastModifiedBy();
-  
-  void setLastModifiedBy(String lastModifiedBy);
+    String getProcessInstanceId();
+
+    void setProcessInstanceId(String processInstanceId);
+
+    String getContentStoreId();
+
+    void setContentStoreId(String contentStoreId);
+
+    String getContentStoreName();
+
+    void setContentStoreName(String contentStoreName);
+
+    boolean isContentAvailable();
+
+    String getField();
+
+    void setField(String field);
+
+    Long getContentSize();
+
+    String getTenantId();
+
+    void setTenantId(String tenantId);
+
+    Date getCreated();
+
+    String getCreatedBy();
+
+    void setCreatedBy(String createdBy);
+
+    Date getLastModified();
+
+    String getLastModifiedBy();
+
+    void setLastModifiedBy(String lastModifiedBy);
 }

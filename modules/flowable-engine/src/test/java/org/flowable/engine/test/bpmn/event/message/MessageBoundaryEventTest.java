@@ -29,598 +29,598 @@ import org.flowable.engine.test.Deployment;
  */
 public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
 
-  @Deployment
-  public void testSingleBoundaryMessageEvent() {
-    runtimeService.startProcessInstanceByKey("process");
+    @Deployment
+    public void testSingleBoundaryMessageEvent() {
+        runtimeService.startProcessInstanceByKey("process");
 
-    assertEquals(3, runtimeService.createExecutionQuery().count());
+        assertEquals(3, runtimeService.createExecutionQuery().count());
 
-    Task userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
+        Task userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
 
-    Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
-    assertNotNull(execution);
+        Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
+        assertNotNull(execution);
 
-    // 1. case: message received cancels the task
+        // 1. case: message received cancels the task
 
-    runtimeService.messageEventReceived("messageName", execution.getId());
+        runtimeService.messageEventReceived("messageName", execution.getId());
 
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterMessage", userTask.getTaskDefinitionKey());
-    taskService.complete(userTask.getId());
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterMessage", userTask.getTaskDefinitionKey());
+        taskService.complete(userTask.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
-    // 2nd. case: complete the user task cancels the message subscription
+        // 2nd. case: complete the user task cancels the message subscription
 
-    runtimeService.startProcessInstanceByKey("process");
+        runtimeService.startProcessInstanceByKey("process");
 
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    taskService.complete(userTask.getId());
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        taskService.complete(userTask.getId());
 
-    execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
-    assertNull(execution);
+        execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
+        assertNull(execution);
 
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterTask", userTask.getTaskDefinitionKey());
-    taskService.complete(userTask.getId());
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterTask", userTask.getTaskDefinitionKey());
+        taskService.complete(userTask.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
-  }
-
-  public void testDoubleBoundaryMessageEventSameMessageId() {
-    // deployment fails when two boundary message events have the same
-    // messageId
-    try {
-      repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/message/MessageBoundaryEventTest.testDoubleBoundaryMessageEventSameMessageId.bpmn20.xml").deploy();
-      fail("Deployment should fail because Flowable cannot handle two boundary message events with same messageId.");
-    } catch (Exception e) {
-      assertEquals(0, repositoryService.createDeploymentQuery().count());
-    }
-  }
-
-  @Deployment
-  public void testDoubleBoundaryMessageEvent() {
-    runtimeService.startProcessInstanceByKey("process");
-
-    assertEquals(4, runtimeService.createExecutionQuery().count());
-
-    Task userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-
-    // the executions for both messageEventSubscriptionNames are not the same
-    Execution execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_1").singleResult();
-    assertNotNull(execution1);
-
-    Execution execution2 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_2").singleResult();
-    assertNotNull(execution2);
-
-    assertFalse(execution1.getId().equals(execution2.getId()));
-
-    // /////////////////////////////////////////////////////////////////////////////////
-    // 1. first message received cancels the task and the execution and both subscriptions
-    runtimeService.messageEventReceived("messageName_1", execution1.getId());
-
-    // this should then throw an exception because execution2 no longer exists
-    try {
-      runtimeService.messageEventReceived("messageName_2", execution2.getId());
-      fail();
-    } catch (Exception e) {
-      // This is good
     }
 
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterMessage_1", userTask.getTaskDefinitionKey());
-    taskService.complete(userTask.getId());
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-
-    // ///////////////////////////////////////////////////////////////////
-    // 2. complete the user task cancels the message subscriptions
-
-    runtimeService.startProcessInstanceByKey("process");
-
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    taskService.complete(userTask.getId());
-
-    execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_1").singleResult();
-    assertNull(execution1);
-    execution2 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_2").singleResult();
-    assertNull(execution2);
-
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterTask", userTask.getTaskDefinitionKey());
-    taskService.complete(userTask.getId());
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-  }
-
-  @Deployment
-  public void testDoubleBoundaryMessageEventMultiInstance() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
-    // assume we have 9 executions one process instance
-    // one execution for scope created for boundary message event
-    // five execution because we have loop cardinality 5
-    assertEquals(9, runtimeService.createExecutionQuery().count());
-
-    assertEquals(5, taskService.createTaskQuery().count());
-
-    Execution execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_1").singleResult();
-    Execution execution2 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_2").singleResult();
-    // both executions are not the same
-    assertFalse(execution1.getId().equals(execution2.getId()));
-
-    // /////////////////////////////////////////////////////////////////////////////////
-    // 1. first message received cancels all tasks and the executions and
-    // both subscriptions
-    runtimeService.messageEventReceived("messageName_1", execution1.getId());
-
-    // this should then throw an exception because execution2 no longer
-    // exists
-    try {
-      runtimeService.messageEventReceived("messageName_2", execution2.getId());
-      fail();
-    } catch (Exception e) {
-      // This is good
+    public void testDoubleBoundaryMessageEventSameMessageId() {
+        // deployment fails when two boundary message events have the same
+        // messageId
+        try {
+            repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/message/MessageBoundaryEventTest.testDoubleBoundaryMessageEventSameMessageId.bpmn20.xml").deploy();
+            fail("Deployment should fail because Flowable cannot handle two boundary message events with same messageId.");
+        } catch (Exception e) {
+            assertEquals(0, repositoryService.createDeploymentQuery().count());
+        }
     }
 
-    // only process instance and running execution left
-    assertEquals(2, runtimeService.createExecutionQuery().count());
+    @Deployment
+    public void testDoubleBoundaryMessageEvent() {
+        runtimeService.startProcessInstanceByKey("process");
 
-    Task userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterMessage_1", userTask.getTaskDefinitionKey());
-    taskService.complete(userTask.getId());
-    assertProcessEnded(processInstance.getId());
+        assertEquals(4, runtimeService.createExecutionQuery().count());
 
-    // /////////////////////////////////////////////////////////////////////////////////
-    // 2. complete the user task cancels the message subscriptions
+        Task userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
 
-    processInstance = runtimeService.startProcessInstanceByKey("process");
-    // assume we have 7 executions one process instance
-    // one execution for scope created for boundary message event
-    // five execution because we have loop cardinality 5
-    assertEquals(9, runtimeService.createExecutionQuery().count());
+        // the executions for both messageEventSubscriptionNames are not the same
+        Execution execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_1").singleResult();
+        assertNotNull(execution1);
 
-    assertEquals(5, taskService.createTaskQuery().count());
+        Execution execution2 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_2").singleResult();
+        assertNotNull(execution2);
 
-    execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_1").singleResult();
-    execution2 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_2").singleResult();
-    // executions are not the same
-    assertFalse(execution1.getId().equals(execution2.getId()));
+        assertFalse(execution1.getId().equals(execution2.getId()));
 
-    List<Task> userTasks = taskService.createTaskQuery().list();
-    assertNotNull(userTasks);
-    assertEquals(5, userTasks.size());
+        // /////////////////////////////////////////////////////////////////////////////////
+        // 1. first message received cancels the task and the execution and both subscriptions
+        runtimeService.messageEventReceived("messageName_1", execution1.getId());
 
-    // as long as tasks exists, the message subscriptions exist
-    for (int i = 0; i < userTasks.size() - 1; i++) {
-      Task task = userTasks.get(i);
-      taskService.complete(task.getId());
+        // this should then throw an exception because execution2 no longer exists
+        try {
+            runtimeService.messageEventReceived("messageName_2", execution2.getId());
+            fail();
+        } catch (Exception e) {
+            // This is good
+        }
 
-      execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_1").singleResult();
-      assertNotNull(execution1);
-      execution2 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_2").singleResult();
-      assertNotNull(execution2);
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterMessage_1", userTask.getTaskDefinitionKey());
+        taskService.complete(userTask.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+        // ///////////////////////////////////////////////////////////////////
+        // 2. complete the user task cancels the message subscriptions
+
+        runtimeService.startProcessInstanceByKey("process");
+
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        taskService.complete(userTask.getId());
+
+        execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_1").singleResult();
+        assertNull(execution1);
+        execution2 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_2").singleResult();
+        assertNull(execution2);
+
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterTask", userTask.getTaskDefinitionKey());
+        taskService.complete(userTask.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
 
-    // only one task left
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    taskService.complete(userTask.getId());
+    @Deployment
+    public void testDoubleBoundaryMessageEventMultiInstance() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+        // assume we have 9 executions one process instance
+        // one execution for scope created for boundary message event
+        // five execution because we have loop cardinality 5
+        assertEquals(9, runtimeService.createExecutionQuery().count());
+
+        assertEquals(5, taskService.createTaskQuery().count());
+
+        Execution execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_1").singleResult();
+        Execution execution2 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_2").singleResult();
+        // both executions are not the same
+        assertFalse(execution1.getId().equals(execution2.getId()));
+
+        // /////////////////////////////////////////////////////////////////////////////////
+        // 1. first message received cancels all tasks and the executions and
+        // both subscriptions
+        runtimeService.messageEventReceived("messageName_1", execution1.getId());
+
+        // this should then throw an exception because execution2 no longer
+        // exists
+        try {
+            runtimeService.messageEventReceived("messageName_2", execution2.getId());
+            fail();
+        } catch (Exception e) {
+            // This is good
+        }
+
+        // only process instance and running execution left
+        assertEquals(2, runtimeService.createExecutionQuery().count());
+
+        Task userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterMessage_1", userTask.getTaskDefinitionKey());
+        taskService.complete(userTask.getId());
+        assertProcessEnded(processInstance.getId());
+
+        // /////////////////////////////////////////////////////////////////////////////////
+        // 2. complete the user task cancels the message subscriptions
+
+        processInstance = runtimeService.startProcessInstanceByKey("process");
+        // assume we have 7 executions one process instance
+        // one execution for scope created for boundary message event
+        // five execution because we have loop cardinality 5
+        assertEquals(9, runtimeService.createExecutionQuery().count());
+
+        assertEquals(5, taskService.createTaskQuery().count());
+
+        execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_1").singleResult();
+        execution2 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_2").singleResult();
+        // executions are not the same
+        assertFalse(execution1.getId().equals(execution2.getId()));
+
+        List<Task> userTasks = taskService.createTaskQuery().list();
+        assertNotNull(userTasks);
+        assertEquals(5, userTasks.size());
+
+        // as long as tasks exists, the message subscriptions exist
+        for (int i = 0; i < userTasks.size() - 1; i++) {
+            Task task = userTasks.get(i);
+            taskService.complete(task.getId());
 
-    // after last task is completed, no message subscriptions left
-    execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_1").singleResult();
-    assertNull(execution1);
-    execution2 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_2").singleResult();
-    assertNull(execution2);
+            execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_1").singleResult();
+            assertNotNull(execution1);
+            execution2 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_2").singleResult();
+            assertNotNull(execution2);
+        }
 
-    // complete last task to end process
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterTask", userTask.getTaskDefinitionKey());
-    taskService.complete(userTask.getId());
-    assertProcessEnded(processInstance.getId());
-  }
+        // only one task left
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        taskService.complete(userTask.getId());
 
-  @Deployment
-  public void testBoundaryMessageEventInsideSubprocess() {
+        // after last task is completed, no message subscriptions left
+        execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_1").singleResult();
+        assertNull(execution1);
+        execution2 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_2").singleResult();
+        assertNull(execution2);
 
-    // this time the boundary events are placed on a user task that is
-    // contained inside a sub process
+        // complete last task to end process
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterTask", userTask.getTaskDefinitionKey());
+        taskService.complete(userTask.getId());
+        assertProcessEnded(processInstance.getId());
+    }
 
-    runtimeService.startProcessInstanceByKey("process");
+    @Deployment
+    public void testBoundaryMessageEventInsideSubprocess() {
 
-    assertEquals(4, runtimeService.createExecutionQuery().count());
+        // this time the boundary events are placed on a user task that is
+        // contained inside a sub process
 
-    Task userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
+        runtimeService.startProcessInstanceByKey("process");
 
-    Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
-    assertNotNull(execution);
+        assertEquals(4, runtimeService.createExecutionQuery().count());
 
-    // /////////////////////////////////////////////////
-    // 1. case: message received cancels the task
+        Task userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
 
-    runtimeService.messageEventReceived("messageName", execution.getId());
+        Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
+        assertNotNull(execution);
 
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterMessage", userTask.getTaskDefinitionKey());
-    taskService.complete(userTask.getId());
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        // /////////////////////////////////////////////////
+        // 1. case: message received cancels the task
 
-    // /////////////////////////////////////////////////
-    // 2nd. case: complete the user task cancels the message subscription
+        runtimeService.messageEventReceived("messageName", execution.getId());
 
-    runtimeService.startProcessInstanceByKey("process");
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterMessage", userTask.getTaskDefinitionKey());
+        taskService.complete(userTask.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    taskService.complete(userTask.getId());
+        // /////////////////////////////////////////////////
+        // 2nd. case: complete the user task cancels the message subscription
 
-    execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
-    assertNull(execution);
+        runtimeService.startProcessInstanceByKey("process");
 
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterTask", userTask.getTaskDefinitionKey());
-    taskService.complete(userTask.getId());
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-  }
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        taskService.complete(userTask.getId());
 
-  @Deployment
-  public void testBoundaryMessageEventOnSubprocessAndInsideSubprocess() {
+        execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
+        assertNull(execution);
 
-    // this time the boundary events are placed on a user task that is
-    // contained inside a sub process
-    // and on the subprocess itself
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterTask", userTask.getTaskDefinitionKey());
+        taskService.complete(userTask.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+    }
 
-    runtimeService.startProcessInstanceByKey("process");
+    @Deployment
+    public void testBoundaryMessageEventOnSubprocessAndInsideSubprocess() {
 
-    assertEquals(5, runtimeService.createExecutionQuery().count());
+        // this time the boundary events are placed on a user task that is
+        // contained inside a sub process
+        // and on the subprocess itself
 
-    Task userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
+        runtimeService.startProcessInstanceByKey("process");
 
-    Execution execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
-    assertNotNull(execution1);
+        assertEquals(5, runtimeService.createExecutionQuery().count());
 
-    Execution execution2 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName2").singleResult();
-    assertNotNull(execution2);
+        Task userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
 
-    assertNotSame(execution1.getId(), execution2.getId());
+        Execution execution1 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
+        assertNotNull(execution1);
 
-    // ///////////////////////////////////////////////////////////
-    // first case: we complete the inner usertask.
+        Execution execution2 = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName2").singleResult();
+        assertNotNull(execution2);
 
-    taskService.complete(userTask.getId());
+        assertNotSame(execution1.getId(), execution2.getId());
 
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterTask", userTask.getTaskDefinitionKey());
+        // ///////////////////////////////////////////////////////////
+        // first case: we complete the inner usertask.
 
-    // the inner subscription is cancelled
-    Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
-    assertNull(execution);
+        taskService.complete(userTask.getId());
 
-    // the outer subscription still exists
-    execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName2").singleResult();
-    assertNotNull(execution);
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterTask", userTask.getTaskDefinitionKey());
 
-    // now complete the second usertask
-    taskService.complete(userTask.getId());
+        // the inner subscription is cancelled
+        Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
+        assertNull(execution);
 
-    // now the outer event subscription is cancelled as well
-    execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName2").singleResult();
-    assertNull(execution);
+        // the outer subscription still exists
+        execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName2").singleResult();
+        assertNotNull(execution);
 
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterSubprocess", userTask.getTaskDefinitionKey());
+        // now complete the second usertask
+        taskService.complete(userTask.getId());
 
-    // now complete the outer usertask
-    taskService.complete(userTask.getId());
+        // now the outer event subscription is cancelled as well
+        execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName2").singleResult();
+        assertNull(execution);
 
-    // ///////////////////////////////////////////////////////////
-    // second case: we signal the inner message event
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterSubprocess", userTask.getTaskDefinitionKey());
 
-    runtimeService.startProcessInstanceByKey("process");
+        // now complete the outer usertask
+        taskService.complete(userTask.getId());
 
-    execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
-    runtimeService.messageEventReceived("messageName", execution.getId());
+        // ///////////////////////////////////////////////////////////
+        // second case: we signal the inner message event
 
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterMessage", userTask.getTaskDefinitionKey());
+        runtimeService.startProcessInstanceByKey("process");
 
-    // the inner subscription is removes
-    execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
-    assertNull(execution);
+        execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
+        runtimeService.messageEventReceived("messageName", execution.getId());
 
-    // the outer subscription still exists
-    execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName2").singleResult();
-    assertNotNull(execution);
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterMessage", userTask.getTaskDefinitionKey());
 
-    // now complete the second usertask
-    taskService.complete(userTask.getId());
+        // the inner subscription is removes
+        execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
+        assertNull(execution);
 
-    // now the outer event subscription is cancelled as well
-    execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName2").singleResult();
-    assertNull(execution);
+        // the outer subscription still exists
+        execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName2").singleResult();
+        assertNotNull(execution);
 
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterSubprocess", userTask.getTaskDefinitionKey());
+        // now complete the second usertask
+        taskService.complete(userTask.getId());
 
-    // now complete the outer usertask
-    taskService.complete(userTask.getId());
+        // now the outer event subscription is cancelled as well
+        execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName2").singleResult();
+        assertNull(execution);
 
-    // ///////////////////////////////////////////////////////////
-    // third case: we signal the outer message event
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterSubprocess", userTask.getTaskDefinitionKey());
 
-    runtimeService.startProcessInstanceByKey("process");
+        // now complete the outer usertask
+        taskService.complete(userTask.getId());
 
-    execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName2").singleResult();
-    runtimeService.messageEventReceived("messageName2", execution.getId());
+        // ///////////////////////////////////////////////////////////
+        // third case: we signal the outer message event
 
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterOuterMessageBoundary", userTask.getTaskDefinitionKey());
+        runtimeService.startProcessInstanceByKey("process");
 
-    // the inner subscription is removed
-    execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
-    assertNull(execution);
+        execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName2").singleResult();
+        runtimeService.messageEventReceived("messageName2", execution.getId());
 
-    // the outer subscription is removed
-    execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName2").singleResult();
-    assertNull(execution);
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterOuterMessageBoundary", userTask.getTaskDefinitionKey());
 
-    // now complete the second usertask
-    taskService.complete(userTask.getId());
+        // the inner subscription is removed
+        execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
+        assertNull(execution);
 
-    // and we are done
+        // the outer subscription is removed
+        execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName2").singleResult();
+        assertNull(execution);
 
-  }
+        // now complete the second usertask
+        taskService.complete(userTask.getId());
 
-  @Deployment
-  public void testBoundaryMessageEventOnSubprocess() {
-    runtimeService.startProcessInstanceByKey("process");
+        // and we are done
 
-    assertEquals(5, runtimeService.createExecutionQuery().count());
+    }
 
-    Task userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
+    @Deployment
+    public void testBoundaryMessageEventOnSubprocess() {
+        runtimeService.startProcessInstanceByKey("process");
 
-    // 1. case: message one received cancels the task
+        assertEquals(5, runtimeService.createExecutionQuery().count());
 
-    Execution executionMessageOne = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_one").singleResult();
-    assertNotNull(executionMessageOne);
+        Task userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
 
-    runtimeService.messageEventReceived("messageName_one", executionMessageOne.getId());
+        // 1. case: message one received cancels the task
 
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterMessage_one", userTask.getTaskDefinitionKey());
-    taskService.complete(userTask.getId());
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        Execution executionMessageOne = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_one").singleResult();
+        assertNotNull(executionMessageOne);
 
-    // 2nd. case: message two received cancels the task
+        runtimeService.messageEventReceived("messageName_one", executionMessageOne.getId());
 
-    runtimeService.startProcessInstanceByKey("process");
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterMessage_one", userTask.getTaskDefinitionKey());
+        taskService.complete(userTask.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
-    Execution executionMessageTwo = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_two").singleResult();
-    assertNotNull(executionMessageTwo);
+        // 2nd. case: message two received cancels the task
 
-    runtimeService.messageEventReceived("messageName_two", executionMessageTwo.getId());
+        runtimeService.startProcessInstanceByKey("process");
 
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterMessage_two", userTask.getTaskDefinitionKey());
-    taskService.complete(userTask.getId());
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        Execution executionMessageTwo = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_two").singleResult();
+        assertNotNull(executionMessageTwo);
 
-    // 3rd. case: complete the user task cancels the message subscription
+        runtimeService.messageEventReceived("messageName_two", executionMessageTwo.getId());
 
-    runtimeService.startProcessInstanceByKey("process");
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterMessage_two", userTask.getTaskDefinitionKey());
+        taskService.complete(userTask.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    taskService.complete(userTask.getId());
+        // 3rd. case: complete the user task cancels the message subscription
 
-    executionMessageOne = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_one").singleResult();
-    assertNull(executionMessageOne);
+        runtimeService.startProcessInstanceByKey("process");
 
-    executionMessageTwo = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_two").singleResult();
-    assertNull(executionMessageTwo);
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        taskService.complete(userTask.getId());
 
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterSubProcess", userTask.getTaskDefinitionKey());
-    taskService.complete(userTask.getId());
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        executionMessageOne = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_one").singleResult();
+        assertNull(executionMessageOne);
 
-  }
+        executionMessageTwo = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName_two").singleResult();
+        assertNull(executionMessageTwo);
 
-  @Deployment
-  public void testBoundaryMessageEventOnSubprocessAndInsideSubprocessMultiInstance() {
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterSubProcess", userTask.getTaskDefinitionKey());
+        taskService.complete(userTask.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
-    // this time the boundary events are placed on a user task that is
-    // contained inside a sub process
-    // and on the subprocess itself
+    }
 
-    runtimeService.startProcessInstanceByKey("process");
+    @Deployment
+    public void testBoundaryMessageEventOnSubprocessAndInsideSubprocessMultiInstance() {
 
-    assertEquals(18, runtimeService.createExecutionQuery().count());
+        // this time the boundary events are placed on a user task that is
+        // contained inside a sub process
+        // and on the subprocess itself
 
-    // 5 user tasks
-    List<Task> userTasks = taskService.createTaskQuery().list();
-    assertNotNull(userTasks);
-    assertEquals(5, userTasks.size());
+        runtimeService.startProcessInstanceByKey("process");
 
-    // there are 5 event subscriptions to the event on the inner user task
-    List<Execution> executions = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").list();
-    assertNotNull(executions);
-    assertEquals(5, executions.size());
+        assertEquals(18, runtimeService.createExecutionQuery().count());
 
-    // there is a single event subscription for the event on the subprocess
-    executions = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName2").list();
-    assertNotNull(executions);
-    assertEquals(1, executions.size());
+        // 5 user tasks
+        List<Task> userTasks = taskService.createTaskQuery().list();
+        assertNotNull(userTasks);
+        assertEquals(5, userTasks.size());
 
-    // if we complete the outer message event, all inner executions are
-    // removed
-    Execution outerScopeExecution = executions.get(0);
-    runtimeService.messageEventReceived("messageName2", outerScopeExecution.getId());
+        // there are 5 event subscriptions to the event on the inner user task
+        List<Execution> executions = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").list();
+        assertNotNull(executions);
+        assertEquals(5, executions.size());
 
-    executions = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").list();
-    assertEquals(0, executions.size());
+        // there is a single event subscription for the event on the subprocess
+        executions = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName2").list();
+        assertNotNull(executions);
+        assertEquals(1, executions.size());
 
-    Task userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterOuterMessageBoundary", userTask.getTaskDefinitionKey());
+        // if we complete the outer message event, all inner executions are
+        // removed
+        Execution outerScopeExecution = executions.get(0);
+        runtimeService.messageEventReceived("messageName2", outerScopeExecution.getId());
 
-    taskService.complete(userTask.getId());
+        executions = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").list();
+        assertEquals(0, executions.size());
 
-    // and we are done
+        Task userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterOuterMessageBoundary", userTask.getTaskDefinitionKey());
 
-  }
+        taskService.complete(userTask.getId());
 
-  @Deployment
-  public void testSingleBoundaryMessageEventWithBoundaryTimerEvent() {
-    final Date startTime = new Date();
-    processEngineConfiguration.getClock().setCurrentTime(startTime);
+        // and we are done
 
-    runtimeService.startProcessInstanceByKey("process");
+    }
 
-    assertEquals(3, runtimeService.createExecutionQuery().count());
+    @Deployment
+    public void testSingleBoundaryMessageEventWithBoundaryTimerEvent() {
+        final Date startTime = new Date();
+        processEngineConfiguration.getClock().setCurrentTime(startTime);
 
-    Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
-    assertNull(execution);
+        runtimeService.startProcessInstanceByKey("process");
 
-    // ///////////////////////////////////
-    // Verify the first task
-    Task userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("task", userTask.getTaskDefinitionKey());
+        assertEquals(3, runtimeService.createExecutionQuery().count());
 
-    // ///////////////////////////////////
-    // Advance the clock to trigger the timer.
-    final TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(userTask.getProcessInstanceId());
-    assertEquals(1, jobQuery.count());
+        Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
+        assertNull(execution);
 
-    // After setting the clock to time '1 hour and 5 seconds', the timer should fire.
-    processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
-    waitForJobExecutorOnCondition(5000L, 100L, new Callable<Boolean>() {
-      public Boolean call() throws Exception {
-        return taskService.createTaskQuery().count() == 2;
-      }
-    });
+        // ///////////////////////////////////
+        // Verify the first task
+        Task userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("task", userTask.getTaskDefinitionKey());
 
-    // It is a repeating job, so it will come back.
-    assertEquals(1L, jobQuery.count());
+        // ///////////////////////////////////
+        // Advance the clock to trigger the timer.
+        final TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(userTask.getProcessInstanceId());
+        assertEquals(1, jobQuery.count());
 
-    // ///////////////////////////////////
-    // Verify and complete the first task
-    userTask = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
-    assertNotNull(userTask);
-    taskService.complete(userTask.getId());
+        // After setting the clock to time '1 hour and 5 seconds', the timer should fire.
+        processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
+        waitForJobExecutorOnCondition(5000L, 100L, new Callable<Boolean>() {
+            public Boolean call() throws Exception {
+                return taskService.createTaskQuery().count() == 2;
+            }
+        });
 
-    // ///////////////////////////////////
-    // Complete the after timer task
-    userTask = taskService.createTaskQuery().taskDefinitionKey("taskTimer").singleResult();
-    assertNotNull(userTask);
-    taskService.complete(userTask.getId());
+        // It is a repeating job, so it will come back.
+        assertEquals(1L, jobQuery.count());
 
-    // Timer job of boundary event of task should be deleted and timer job
-    // of task timer boundary event should be created.
-    assertEquals(1L, jobQuery.count());
+        // ///////////////////////////////////
+        // Verify and complete the first task
+        userTask = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
+        assertNotNull(userTask);
+        taskService.complete(userTask.getId());
 
-    // ///////////////////////////////////
-    // Verify that the message exists
-    userTask = taskService.createTaskQuery().singleResult();
-    assertEquals("taskAfterTask", userTask.getTaskDefinitionKey());
+        // ///////////////////////////////////
+        // Complete the after timer task
+        userTask = taskService.createTaskQuery().taskDefinitionKey("taskTimer").singleResult();
+        assertNotNull(userTask);
+        taskService.complete(userTask.getId());
 
-    execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
-    assertNotNull(execution);
+        // Timer job of boundary event of task should be deleted and timer job
+        // of task timer boundary event should be created.
+        assertEquals(1L, jobQuery.count());
 
-    // ///////////////////////////////////
-    // Send the message and verify that we went back to the right spot.
-    runtimeService.messageEventReceived("messageName", execution.getId());
+        // ///////////////////////////////////
+        // Verify that the message exists
+        userTask = taskService.createTaskQuery().singleResult();
+        assertEquals("taskAfterTask", userTask.getTaskDefinitionKey());
 
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("task", userTask.getTaskDefinitionKey());
+        execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
+        assertNotNull(execution);
 
-    execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
-    assertNull(execution);
+        // ///////////////////////////////////
+        // Send the message and verify that we went back to the right spot.
+        runtimeService.messageEventReceived("messageName", execution.getId());
 
-    // ///////////////////////////////////
-    // Complete the first task (again).
-    taskService.complete(userTask.getId());
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("task", userTask.getTaskDefinitionKey());
 
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterTask", userTask.getTaskDefinitionKey());
+        execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
+        assertNull(execution);
 
-    execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
-    assertNotNull(execution);
+        // ///////////////////////////////////
+        // Complete the first task (again).
+        taskService.complete(userTask.getId());
 
-    // ///////////////////////////////////
-    // Verify timer firing.
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterTask", userTask.getTaskDefinitionKey());
 
-    // After setting the clock to time '2 hours and 5 seconds', the timer
-    // should fire.
-    processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((2 * 60 * 60 * 1000) + 5000)));
-    waitForJobExecutorOnCondition(2000L, 100L, new Callable<Boolean>() {
-      @Override
-      public Boolean call() throws Exception {
-        return taskService.createTaskQuery().count() == 2;
-      }
-    });
+        execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
+        assertNotNull(execution);
 
-    // It is a repeating job, so it will come back.
-    assertEquals(1L, jobQuery.count());
+        // ///////////////////////////////////
+        // Verify timer firing.
 
-    // After setting the clock to time '3 hours and 5 seconds', the timer should fire again.
-    processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((3 * 60 * 60 * 1000) + 5000)));
-    waitForJobExecutorOnCondition(2000L, 100L, new Callable<Boolean>() {
-      @Override
-      public Boolean call() throws Exception {
-        return taskService.createTaskQuery().list().size() == 3;
-      }
-    });
-    // It is a repeating job, so it will come back.
-    assertEquals(1L, jobQuery.count());
+        // After setting the clock to time '2 hours and 5 seconds', the timer
+        // should fire.
+        processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((2 * 60 * 60 * 1000) + 5000)));
+        waitForJobExecutorOnCondition(2000L, 100L, new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                return taskService.createTaskQuery().count() == 2;
+            }
+        });
 
-    // ///////////////////////////////////
-    // Complete the after timer tasks
-    final List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey("taskAfterTaskTimer").list();
-    assertEquals(2, tasks.size());
+        // It is a repeating job, so it will come back.
+        assertEquals(1L, jobQuery.count());
 
-    taskService.complete(tasks.get(0).getId());
-    taskService.complete(tasks.get(1).getId());
+        // After setting the clock to time '3 hours and 5 seconds', the timer should fire again.
+        processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((3 * 60 * 60 * 1000) + 5000)));
+        waitForJobExecutorOnCondition(2000L, 100L, new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                return taskService.createTaskQuery().list().size() == 3;
+            }
+        });
+        // It is a repeating job, so it will come back.
+        assertEquals(1L, jobQuery.count());
 
-    // ///////////////////////////////////
-    // Complete the second task
-    taskService.complete(userTask.getId());
+        // ///////////////////////////////////
+        // Complete the after timer tasks
+        final List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey("taskAfterTaskTimer").list();
+        assertEquals(2, tasks.size());
 
-    // ///////////////////////////////////
-    // Complete the third task
-    userTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(userTask);
-    assertEquals("taskAfterTaskAfterTask", userTask.getTaskDefinitionKey());
-    taskService.complete(userTask.getId());
+        taskService.complete(tasks.get(0).getId());
+        taskService.complete(tasks.get(1).getId());
 
-    // ///////////////////////////////////
-    // We should be done at this point
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        // ///////////////////////////////////
+        // Complete the second task
+        taskService.complete(userTask.getId());
 
-    execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
-    assertNull(execution);
-  }
+        // ///////////////////////////////////
+        // Complete the third task
+        userTask = taskService.createTaskQuery().singleResult();
+        assertNotNull(userTask);
+        assertEquals("taskAfterTaskAfterTask", userTask.getTaskDefinitionKey());
+        taskService.complete(userTask.getId());
+
+        // ///////////////////////////////////
+        // We should be done at this point
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+        execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
+        assertNull(execution);
+    }
 
 }

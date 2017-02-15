@@ -23,26 +23,26 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
  */
 public abstract class BaseDelegateEventListener implements FlowableEventListener {
 
-  protected Class<?> entityClass;
+    protected Class<?> entityClass;
 
-  public void setEntityClass(Class<?> entityClass) {
-    this.entityClass = entityClass;
-  }
-
-  protected boolean isValidEvent(FlowableEvent event) {
-    boolean valid = false;
-    if (entityClass != null) {
-      if (event instanceof FlowableEntityEvent) {
-        Object entity = ((FlowableEntityEvent) event).getEntity();
-        if (entity != null) {
-          valid = entityClass.isAssignableFrom(entity.getClass());
-        }
-      }
-    } else {
-      // If no class is specified, all events are valid
-      valid = true;
+    public void setEntityClass(Class<?> entityClass) {
+        this.entityClass = entityClass;
     }
-    return valid;
-  }
+
+    protected boolean isValidEvent(FlowableEvent event) {
+        boolean valid = false;
+        if (entityClass != null) {
+            if (event instanceof FlowableEntityEvent) {
+                Object entity = ((FlowableEntityEvent) event).getEntity();
+                if (entity != null) {
+                    valid = entityClass.isAssignableFrom(entity.getClass());
+                }
+            }
+        } else {
+            // If no class is specified, all events are valid
+            valid = true;
+        }
+        return valid;
+    }
 
 }

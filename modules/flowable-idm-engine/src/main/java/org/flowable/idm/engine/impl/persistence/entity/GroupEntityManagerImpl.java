@@ -31,81 +31,81 @@ import org.flowable.idm.engine.impl.persistence.entity.data.GroupDataManager;
  * @author Joram Barrez
  */
 public class GroupEntityManagerImpl extends AbstractEntityManager<GroupEntity> implements GroupEntityManager {
-  
-  protected GroupDataManager groupDataManager;
-  
-  public GroupEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, GroupDataManager groupDataManager) {
-    super(idmEngineConfiguration);
-    this.groupDataManager = groupDataManager;
-  }
 
-  @Override
-  protected DataManager<GroupEntity> getDataManager() {
-    return groupDataManager;
-  }
-  
-  public Group createNewGroup(String groupId) {
-    GroupEntity groupEntity = groupDataManager.create();
-    groupEntity.setId(groupId);
-    groupEntity.setRevision(0); // Needed as groups can be transient and not save when they are returned 
-    return groupEntity;
-  }
+    protected GroupDataManager groupDataManager;
 
-  @Override
-  public void delete(String groupId) {
-    GroupEntity group = groupDataManager.findById(groupId); 
-
-    if (group != null) {
-      
-      getMembershipEntityManager().deleteMembershipByGroupId(groupId);
-      if (getEventDispatcher().isEnabled()) {
-        getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createMembershipEvent(FlowableIdmEventType.MEMBERSHIPS_DELETED, groupId, null));
-      }
-      
-      delete(group);
+    public GroupEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, GroupDataManager groupDataManager) {
+        super(idmEngineConfiguration);
+        this.groupDataManager = groupDataManager;
     }
-  }
 
-  public GroupQuery createNewGroupQuery() {
-    return new GroupQueryImpl(getCommandExecutor());
-  }
+    @Override
+    protected DataManager<GroupEntity> getDataManager() {
+        return groupDataManager;
+    }
 
-  public List<Group> findGroupByQueryCriteria(GroupQueryImpl query, Page page) {
-    return groupDataManager.findGroupByQueryCriteria(query, page);
-  }
+    public Group createNewGroup(String groupId) {
+        GroupEntity groupEntity = groupDataManager.create();
+        groupEntity.setId(groupId);
+        groupEntity.setRevision(0); // Needed as groups can be transient and not save when they are returned
+        return groupEntity;
+    }
 
-  public long findGroupCountByQueryCriteria(GroupQueryImpl query) {
-    return groupDataManager.findGroupCountByQueryCriteria(query);
-  }
+    @Override
+    public void delete(String groupId) {
+        GroupEntity group = groupDataManager.findById(groupId);
 
-  public List<Group> findGroupsByUser(String userId) {
-    return groupDataManager.findGroupsByUser(userId);
-  }
+        if (group != null) {
 
-  public List<Group> findGroupsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return groupDataManager.findGroupsByNativeQuery(parameterMap, firstResult, maxResults);
-  }
+            getMembershipEntityManager().deleteMembershipByGroupId(groupId);
+            if (getEventDispatcher().isEnabled()) {
+                getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createMembershipEvent(FlowableIdmEventType.MEMBERSHIPS_DELETED, groupId, null));
+            }
 
-  public long findGroupCountByNativeQuery(Map<String, Object> parameterMap) {
-    return groupDataManager.findGroupCountByNativeQuery(parameterMap);
-  }
+            delete(group);
+        }
+    }
 
-  @Override
-  public boolean isNewGroup(Group group) {
-    return ((GroupEntity) group).getRevision() == 0;
-  }
-  
-  @Override
-  public List<Group> findGroupsByPrivilegeId(String privilegeId) {
-    return groupDataManager.findGroupsByPrivilegeId(privilegeId);
-  }
+    public GroupQuery createNewGroupQuery() {
+        return new GroupQueryImpl(getCommandExecutor());
+    }
 
-  public GroupDataManager getGroupDataManager() {
-    return groupDataManager;
-  }
+    public List<Group> findGroupByQueryCriteria(GroupQueryImpl query, Page page) {
+        return groupDataManager.findGroupByQueryCriteria(query, page);
+    }
 
-  public void setGroupDataManager(GroupDataManager groupDataManager) {
-    this.groupDataManager = groupDataManager;
-  }
-  
+    public long findGroupCountByQueryCriteria(GroupQueryImpl query) {
+        return groupDataManager.findGroupCountByQueryCriteria(query);
+    }
+
+    public List<Group> findGroupsByUser(String userId) {
+        return groupDataManager.findGroupsByUser(userId);
+    }
+
+    public List<Group> findGroupsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
+        return groupDataManager.findGroupsByNativeQuery(parameterMap, firstResult, maxResults);
+    }
+
+    public long findGroupCountByNativeQuery(Map<String, Object> parameterMap) {
+        return groupDataManager.findGroupCountByNativeQuery(parameterMap);
+    }
+
+    @Override
+    public boolean isNewGroup(Group group) {
+        return ((GroupEntity) group).getRevision() == 0;
+    }
+
+    @Override
+    public List<Group> findGroupsByPrivilegeId(String privilegeId) {
+        return groupDataManager.findGroupsByPrivilegeId(privilegeId);
+    }
+
+    public GroupDataManager getGroupDataManager() {
+        return groupDataManager;
+    }
+
+    public void setGroupDataManager(GroupDataManager groupDataManager) {
+        this.groupDataManager = groupDataManager;
+    }
+
 }

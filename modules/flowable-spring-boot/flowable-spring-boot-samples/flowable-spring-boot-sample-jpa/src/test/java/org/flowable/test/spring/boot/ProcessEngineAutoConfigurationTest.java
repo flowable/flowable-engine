@@ -1,6 +1,5 @@
 package org.flowable.test.spring.boot;
 
-
 import javax.persistence.EntityManagerFactory;
 
 import org.flowable.engine.ProcessEngine;
@@ -28,10 +27,8 @@ public class ProcessEngineAutoConfigurationTest {
         Assert.assertNotNull(configuration.getJpaEntityManagerFactory());
     }
 
-
     private AnnotationConfigApplicationContext context(Class<?>... clzz) {
-        AnnotationConfigApplicationContext annotationConfigApplicationContext
-                = new AnnotationConfigApplicationContext();
+        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext();
         annotationConfigApplicationContext.register(clzz);
         annotationConfigApplicationContext.refresh();
         return annotationConfigApplicationContext;

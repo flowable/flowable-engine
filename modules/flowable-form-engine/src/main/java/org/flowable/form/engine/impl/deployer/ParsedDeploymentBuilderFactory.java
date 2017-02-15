@@ -17,18 +17,18 @@ import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntity;
 
 public class ParsedDeploymentBuilderFactory {
 
-  protected FormDefinitionParseFactory formParseFactory;
+    protected FormDefinitionParseFactory formParseFactory;
 
-  public ParsedDeploymentBuilder getBuilderForDeployment(FormDeploymentEntity deployment) {
-    return new ParsedDeploymentBuilder(deployment, formParseFactory);
-  }
-  
-  public FormDefinitionParseFactory getFormParseFactory() {
-    return formParseFactory;
-  }
+    public ParsedDeploymentBuilder getBuilderForDeployment(FormDeploymentEntity deployment) {
+        return new ParsedDeploymentBuilder(deployment, formParseFactory);
+    }
 
-  public void setFormParseFactory(FormDefinitionParseFactory formParseFactory) {
-    this.formParseFactory = formParseFactory;
-  }
-  
+    public FormDefinitionParseFactory getFormParseFactory() {
+        return formParseFactory;
+    }
+
+    public void setFormParseFactory(FormDefinitionParseFactory formParseFactory) {
+        this.formParseFactory = formParseFactory;
+    }
+
 }

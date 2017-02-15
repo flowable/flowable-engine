@@ -27,18 +27,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class EditorUsersResource {
-  
-  @Autowired
-  protected RemoteIdmService remoteIdmService;
 
-  @RequestMapping(value = "/rest/editor-users", method = RequestMethod.GET)
-  public ResultListDataRepresentation getUsers(@RequestParam(value = "filter", required = false) String filter) {
-    List<? extends User> matchingUsers = remoteIdmService.findUsersByNameFilter(filter);
-    List<UserRepresentation> userRepresentations = new ArrayList<UserRepresentation>(matchingUsers.size());
-    for (User user : matchingUsers) {
-      userRepresentations.add(new UserRepresentation(user));
+    @Autowired
+    protected RemoteIdmService remoteIdmService;
+
+    @RequestMapping(value = "/rest/editor-users", method = RequestMethod.GET)
+    public ResultListDataRepresentation getUsers(@RequestParam(value = "filter", required = false) String filter) {
+        List<? extends User> matchingUsers = remoteIdmService.findUsersByNameFilter(filter);
+        List<UserRepresentation> userRepresentations = new ArrayList<UserRepresentation>(matchingUsers.size());
+        for (User user : matchingUsers) {
+            userRepresentations.add(new UserRepresentation(user));
+        }
+        return new ResultListDataRepresentation(userRepresentations);
     }
-    return new ResultListDataRepresentation(userRepresentations);
-  }
 
 }

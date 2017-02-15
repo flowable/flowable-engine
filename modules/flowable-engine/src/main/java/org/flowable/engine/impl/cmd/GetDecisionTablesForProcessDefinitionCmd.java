@@ -36,72 +36,72 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<DmnDecisionTable>>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String processDefinitionId;
-  protected DmnRepositoryService dmnRepositoryService;
+    private static final long serialVersionUID = 1L;
+    protected String processDefinitionId;
+    protected DmnRepositoryService dmnRepositoryService;
 
-  public GetDecisionTablesForProcessDefinitionCmd(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
-
-  public List<DmnDecisionTable> execute(CommandContext commandContext) {
-    ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
-
-    if (processDefinition == null) {
-      throw new FlowableObjectNotFoundException("Cannot find process definition for id: " + processDefinitionId, ProcessDefinition.class);
+    public GetDecisionTablesForProcessDefinitionCmd(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
     }
 
-    BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
+    public List<DmnDecisionTable> execute(CommandContext commandContext) {
+        ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
 
-    if (bpmnModel == null) {
-      throw new FlowableObjectNotFoundException("Cannot find bpmn model for process definition id: " + processDefinitionId, BpmnModel.class);
-    }
-
-    if (!commandContext.getProcessEngineConfiguration().isDmnEngineInitialized()) {
-      throw new FlowableException("DMN Engine is not initialized");
-    } else {
-      if (commandContext.getProcessEngineConfiguration().getDmnEngineRepositoryService() == null) {
-        throw new FlowableException("DMN repository service is not available");
-      }
-    }
-
-    dmnRepositoryService = commandContext.getProcessEngineConfiguration().getDmnEngineRepositoryService();
-    List<DmnDecisionTable> decisionTables = getDecisionTablesFromModel(bpmnModel, processDefinition);
-
-    return decisionTables;
-  }
-
-  protected List<DmnDecisionTable> getDecisionTablesFromModel(BpmnModel bpmnModel, ProcessDefinition processDefinition) {
-    Set<String> decisionTableKeys = new HashSet<>();
-    List<DmnDecisionTable> decisionTables = new ArrayList<>();
-    List<ServiceTask> serviceTasks = bpmnModel.getMainProcess().findFlowElementsOfType(ServiceTask.class, true);
-
-    for (ServiceTask serviceTask : serviceTasks) {
-      if ("dmn".equals(serviceTask.getType())) {
-        if (serviceTask.getFieldExtensions() != null && serviceTask.getFieldExtensions().size() > 0) {
-          for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
-            if ("decisionTableReferenceKey".equals(fieldExtension.getFieldName())) {
-              String decisionTableReferenceKey = fieldExtension.getStringValue();
-              if (!decisionTableKeys.contains(decisionTableReferenceKey)) {
-                addDecisionTableToCollection(decisionTables, decisionTableReferenceKey, processDefinition);
-                decisionTableKeys.add(decisionTableReferenceKey);
-              }
-              break;
-            }
-          }
+        if (processDefinition == null) {
+            throw new FlowableObjectNotFoundException("Cannot find process definition for id: " + processDefinitionId, ProcessDefinition.class);
         }
-      }
+
+        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
+
+        if (bpmnModel == null) {
+            throw new FlowableObjectNotFoundException("Cannot find bpmn model for process definition id: " + processDefinitionId, BpmnModel.class);
+        }
+
+        if (!commandContext.getProcessEngineConfiguration().isDmnEngineInitialized()) {
+            throw new FlowableException("DMN Engine is not initialized");
+        } else {
+            if (commandContext.getProcessEngineConfiguration().getDmnEngineRepositoryService() == null) {
+                throw new FlowableException("DMN repository service is not available");
+            }
+        }
+
+        dmnRepositoryService = commandContext.getProcessEngineConfiguration().getDmnEngineRepositoryService();
+        List<DmnDecisionTable> decisionTables = getDecisionTablesFromModel(bpmnModel, processDefinition);
+
+        return decisionTables;
     }
 
-    return decisionTables;
-  }
+    protected List<DmnDecisionTable> getDecisionTablesFromModel(BpmnModel bpmnModel, ProcessDefinition processDefinition) {
+        Set<String> decisionTableKeys = new HashSet<>();
+        List<DmnDecisionTable> decisionTables = new ArrayList<>();
+        List<ServiceTask> serviceTasks = bpmnModel.getMainProcess().findFlowElementsOfType(ServiceTask.class, true);
 
-  protected void addDecisionTableToCollection(List<DmnDecisionTable> decisionTables, String decisionTableKey, ProcessDefinition processDefinition) {
-    DmnDecisionTableQuery decisionTableQuery = dmnRepositoryService.createDecisionTableQuery();
-    DmnDecisionTable decisionTable = decisionTableQuery.decisionTableKey(decisionTableKey).parentDeploymentId(processDefinition.getDeploymentId()).singleResult();
+        for (ServiceTask serviceTask : serviceTasks) {
+            if ("dmn".equals(serviceTask.getType())) {
+                if (serviceTask.getFieldExtensions() != null && serviceTask.getFieldExtensions().size() > 0) {
+                    for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
+                        if ("decisionTableReferenceKey".equals(fieldExtension.getFieldName())) {
+                            String decisionTableReferenceKey = fieldExtension.getStringValue();
+                            if (!decisionTableKeys.contains(decisionTableReferenceKey)) {
+                                addDecisionTableToCollection(decisionTables, decisionTableReferenceKey, processDefinition);
+                                decisionTableKeys.add(decisionTableReferenceKey);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
 
-    if (decisionTable != null) {
-      decisionTables.add(decisionTable);
+        return decisionTables;
     }
-  }
+
+    protected void addDecisionTableToCollection(List<DmnDecisionTable> decisionTables, String decisionTableKey, ProcessDefinition processDefinition) {
+        DmnDecisionTableQuery decisionTableQuery = dmnRepositoryService.createDecisionTableQuery();
+        DmnDecisionTable decisionTable = decisionTableQuery.decisionTableKey(decisionTableKey).parentDeploymentId(processDefinition.getDeploymentId()).singleResult();
+
+        if (decisionTable != null) {
+            decisionTables.add(decisionTable);
+        }
+    }
 }

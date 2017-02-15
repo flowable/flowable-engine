@@ -21,19 +21,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 @Service
 public class EndpointUserProfileService extends AbstractEncryptingService {
 
-	@Autowired
+    @Autowired
     protected FlowableClientService clientUtil;
 
     public String getEndpointUserTenantIdUsingEncryptedPassword(String contextRoot, String restRoot,
-                                          String serverAddress, Integer port,
-                                          String userName, String encryptedPassword) {
+            String serverAddress, Integer port,
+            String userName, String encryptedPassword) {
         String decryptedPassword = decrypt(encryptedPassword);
         return getEndpointUserTenantId(contextRoot, restRoot, serverAddress, port, userName, decryptedPassword);
     }
 
     public String getEndpointUserTenantId(String contextRoot, String restRoot,
-                                          String serverAddress, Integer port,
-                                          String userName, String password) {
+            String serverAddress, Integer port,
+            String userName, String password) {
         JsonNode jsonNode = getEndpointUserProfile(contextRoot, restRoot, serverAddress, port, userName, password);
         if (jsonNode.has("tenantId") && !jsonNode.get("tenantId").isNull()) {
             JsonNode tenantIdNode = jsonNode.get("tenantId");
@@ -42,12 +42,12 @@ public class EndpointUserProfileService extends AbstractEncryptingService {
         return null;
     }
 
-	public JsonNode getEndpointUserProfile(String contextRoot, String restRoot,
-                                           String serverAddress, Integer port,
-                                           String userName, String password) {
+    public JsonNode getEndpointUserProfile(String contextRoot, String restRoot,
+            String serverAddress, Integer port,
+            String userName, String password) {
 
-		HttpGet get = new HttpGet(clientUtil.getServerUrl(contextRoot, restRoot, serverAddress, port, "enterprise/profile"));
-		return clientUtil.executeRequest(get, userName, password);
-	}
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(contextRoot, restRoot, serverAddress, port, "enterprise/profile"));
+        return clientUtil.executeRequest(get, userName, password);
+    }
 
 }

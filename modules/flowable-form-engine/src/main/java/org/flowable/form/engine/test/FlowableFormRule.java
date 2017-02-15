@@ -65,178 +65,178 @@ import org.junit.runners.model.Statement;
  */
 public class FlowableFormRule implements TestRule {
 
-  protected String configurationResource = "flowable.form.cfg.xml";
-  protected String deploymentId;
+    protected String configurationResource = "flowable.form.cfg.xml";
+    protected String deploymentId;
 
-  protected FormEngineConfiguration formEngineConfiguration;
-  protected FormEngine formEngine;
-  protected FormRepositoryService repositoryService;
+    protected FormEngineConfiguration formEngineConfiguration;
+    protected FormEngine formEngine;
+    protected FormRepositoryService repositoryService;
 
-  public FlowableFormRule() {
-  }
+    public FlowableFormRule() {
+    }
 
-  public FlowableFormRule(String configurationResource) {
-    this.configurationResource = configurationResource;
-  }
+    public FlowableFormRule(String configurationResource) {
+        this.configurationResource = configurationResource;
+    }
 
-  public FlowableFormRule(FormEngine formEngine) {
-    setFormEngine(formEngine);
-  }
+    public FlowableFormRule(FormEngine formEngine) {
+        setFormEngine(formEngine);
+    }
 
-  /**
-   * Implementation based on {@link TestWatcher}.
-   */
-  @Override
-  public Statement apply(final Statement base, final Description description) {
-    return new Statement() {
-      @Override
-      public void evaluate() throws Throwable {
-        List<Throwable> errors = new ArrayList<Throwable>();
+    /**
+     * Implementation based on {@link TestWatcher}.
+     */
+    @Override
+    public Statement apply(final Statement base, final Description description) {
+        return new Statement() {
+            @Override
+            public void evaluate() throws Throwable {
+                List<Throwable> errors = new ArrayList<Throwable>();
 
-        startingQuietly(description, errors);
+                startingQuietly(description, errors);
+                try {
+                    base.evaluate();
+                    succeededQuietly(description, errors);
+                } catch (AssumptionViolatedException e) {
+                    errors.add(e);
+                    skippedQuietly(e, description, errors);
+                } catch (Throwable t) {
+                    errors.add(t);
+                    failedQuietly(t, description, errors);
+                } finally {
+                    finishedQuietly(description, errors);
+                }
+
+                MultipleFailureException.assertEmpty(errors);
+            }
+        };
+    }
+
+    private void succeededQuietly(Description description, List<Throwable> errors) {
         try {
-          base.evaluate();
-          succeededQuietly(description, errors);
-        } catch (AssumptionViolatedException e) {
-          errors.add(e);
-          skippedQuietly(e, description, errors);
+            succeeded(description);
         } catch (Throwable t) {
-          errors.add(t);
-          failedQuietly(t, description, errors);
-        } finally {
-          finishedQuietly(description, errors);
+            errors.add(t);
+        }
+    }
+
+    private void failedQuietly(Throwable t, Description description, List<Throwable> errors) {
+        try {
+            failed(t, description);
+        } catch (Throwable t1) {
+            errors.add(t1);
+        }
+    }
+
+    private void skippedQuietly(AssumptionViolatedException e, Description description, List<Throwable> errors) {
+        try {
+            skipped(e, description);
+        } catch (Throwable t) {
+            errors.add(t);
+        }
+    }
+
+    private void startingQuietly(Description description, List<Throwable> errors) {
+        try {
+            starting(description);
+        } catch (Throwable t) {
+            errors.add(t);
+        }
+    }
+
+    private void finishedQuietly(Description description, List<Throwable> errors) {
+        try {
+            finished(description);
+        } catch (Throwable t) {
+            errors.add(t);
+        }
+    }
+
+    /**
+     * Invoked when a test succeeds
+     */
+    protected void succeeded(Description description) {
+    }
+
+    /**
+     * Invoked when a test fails
+     */
+    protected void failed(Throwable e, Description description) {
+    }
+
+    /**
+     * Invoked when a test is skipped due to a failed assumption.
+     */
+    protected void skipped(AssumptionViolatedException e, Description description) {
+    }
+
+    protected void starting(Description description) {
+        if (formEngine == null) {
+            initializeFormEngine();
         }
 
-        MultipleFailureException.assertEmpty(errors);
-      }
-    };
-  }
+        if (formEngineConfiguration == null) {
+            initializeServices();
+        }
 
-  private void succeededQuietly(Description description, List<Throwable> errors) {
-    try {
-      succeeded(description);
-    } catch (Throwable t) {
-      errors.add(t);
-    }
-  }
+        configureFormEngine();
 
-  private void failedQuietly(Throwable t, Description description, List<Throwable> errors) {
-    try {
-      failed(t, description);
-    } catch (Throwable t1) {
-      errors.add(t1);
-    }
-  }
-
-  private void skippedQuietly(AssumptionViolatedException e, Description description, List<Throwable> errors) {
-    try {
-      skipped(e, description);
-    } catch (Throwable t) {
-      errors.add(t);
-    }
-  }
-
-  private void startingQuietly(Description description, List<Throwable> errors) {
-    try {
-      starting(description);
-    } catch (Throwable t) {
-      errors.add(t);
-    }
-  }
-
-  private void finishedQuietly(Description description, List<Throwable> errors) {
-    try {
-      finished(description);
-    } catch (Throwable t) {
-      errors.add(t);
-    }
-  }
-
-  /**
-   * Invoked when a test succeeds
-   */
-  protected void succeeded(Description description) {
-  }
-
-  /**
-   * Invoked when a test fails
-   */
-  protected void failed(Throwable e, Description description) {
-  }
-
-  /**
-   * Invoked when a test is skipped due to a failed assumption.
-   */
-  protected void skipped(AssumptionViolatedException e, Description description) {
-  }
-
-  protected void starting(Description description) {
-    if (formEngine == null) {
-      initializeFormEngine();
+        try {
+            deploymentId = FormTestHelper.annotationDeploymentSetUp(formEngine, Class.forName(description.getClassName()), description.getMethodName());
+        } catch (ClassNotFoundException e) {
+            throw new FlowableException("Programmatic error: could not instantiate " + description.getClassName(), e);
+        }
     }
 
-    if (formEngineConfiguration == null) {
-      initializeServices();
+    protected void initializeFormEngine() {
+        formEngine = FormTestHelper.getFormEngine(configurationResource);
     }
 
-    configureFormEngine();
-
-    try {
-      deploymentId = FormTestHelper.annotationDeploymentSetUp(formEngine, Class.forName(description.getClassName()), description.getMethodName());
-    } catch (ClassNotFoundException e) {
-      throw new FlowableException("Programmatic error: could not instantiate " + description.getClassName(), e);
+    protected void initializeServices() {
+        formEngineConfiguration = formEngine.getFormEngineConfiguration();
+        repositoryService = formEngine.getFormRepositoryService();
     }
-  }
 
-  protected void initializeFormEngine() {
-    formEngine = FormTestHelper.getFormEngine(configurationResource);
-  }
-
-  protected void initializeServices() {
-    formEngineConfiguration = formEngine.getFormEngineConfiguration();
-    repositoryService = formEngine.getFormRepositoryService();
-  }
-
-  protected void configureFormEngine() {
-    /** meant to be overridden */
-  }
-
-  protected void finished(Description description) {
-
-    // Remove the test deployment
-    try {
-      FormTestHelper.annotationDeploymentTearDown(formEngine, deploymentId, Class.forName(description.getClassName()), description.getMethodName());
-    } catch (ClassNotFoundException e) {
-      throw new FlowableException("Programmatic error: could not instantiate " + description.getClassName(), e);
+    protected void configureFormEngine() {
+        /** meant to be overridden */
     }
-  }
 
-  public String getConfigurationResource() {
-    return configurationResource;
-  }
+    protected void finished(Description description) {
 
-  public void setConfigurationResource(String configurationResource) {
-    this.configurationResource = configurationResource;
-  }
+        // Remove the test deployment
+        try {
+            FormTestHelper.annotationDeploymentTearDown(formEngine, deploymentId, Class.forName(description.getClassName()), description.getMethodName());
+        } catch (ClassNotFoundException e) {
+            throw new FlowableException("Programmatic error: could not instantiate " + description.getClassName(), e);
+        }
+    }
 
-  public FormEngine getFormEngine() {
-    return formEngine;
-  }
+    public String getConfigurationResource() {
+        return configurationResource;
+    }
 
-  public void setFormEngine(FormEngine formEngine) {
-    this.formEngine = formEngine;
-    initializeServices();
-  }
+    public void setConfigurationResource(String configurationResource) {
+        this.configurationResource = configurationResource;
+    }
 
-  public FormRepositoryService getRepositoryService() {
-    return repositoryService;
-  }
+    public FormEngine getFormEngine() {
+        return formEngine;
+    }
 
-  public void setRepositoryService(FormRepositoryService repositoryService) {
-    this.repositoryService = repositoryService;
-  }
+    public void setFormEngine(FormEngine formEngine) {
+        this.formEngine = formEngine;
+        initializeServices();
+    }
 
-  public void setFormEngineConfiguration(FormEngineConfiguration formEngineConfiguration) {
-    this.formEngineConfiguration = formEngineConfiguration;
-  }
+    public FormRepositoryService getRepositoryService() {
+        return repositoryService;
+    }
+
+    public void setRepositoryService(FormRepositoryService repositoryService) {
+        this.repositoryService = repositoryService;
+    }
+
+    public void setFormEngineConfiguration(FormEngineConfiguration formEngineConfiguration) {
+        this.formEngineConfiguration = formEngineConfiguration;
+    }
 }

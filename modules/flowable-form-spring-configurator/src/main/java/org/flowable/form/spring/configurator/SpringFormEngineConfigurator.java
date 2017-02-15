@@ -31,65 +31,65 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
  * @author Joram Barrez
  */
 public class SpringFormEngineConfigurator extends AbstractProcessEngineConfigurator {
-  
-  protected SpringFormEngineConfiguration formEngineConfiguration;
-  
-  @Override
-  public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    
-    // Custom deployers need to be added before the process engine boots
-    List<Deployer> deployers = null;
-    if (processEngineConfiguration.getCustomPostDeployers() != null) {
-      deployers = processEngineConfiguration.getCustomPostDeployers();
-    } else {
-      deployers = new ArrayList<Deployer>();
-    }
-    deployers.add(new FormDeployer());
-    processEngineConfiguration.setCustomPostDeployers(deployers);
-    
-  }
-  
-  @Override
-  public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    if (formEngineConfiguration == null) {
-      formEngineConfiguration = new SpringFormEngineConfiguration();
-    }
-    
-    if (processEngineConfiguration.getDataSource() != null) {
-      DataSource originalDatasource = processEngineConfiguration.getDataSource();
-      formEngineConfiguration.setDataSource(originalDatasource);
-      
-    } else {
-      throw new FlowableException("A datasource is required for initializing the Form engine ");
-    }
-    
-    formEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
-    
-    formEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
-    formEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
-    formEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
-    
-    FormEngine formEngine = initFormEngine();
-    processEngineConfiguration.setFormEngineInitialized(true);
-    processEngineConfiguration.setFormEngineRepositoryService(formEngine.getFormRepositoryService());
-    processEngineConfiguration.setFormEngineFormService(formEngine.getFormService());
-  }
 
-  protected synchronized FormEngine initFormEngine() {
-    if (formEngineConfiguration == null) {
-      throw new FlowableException("FormEngineConfiguration is required");
+    protected SpringFormEngineConfiguration formEngineConfiguration;
+
+    @Override
+    public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
+
+        // Custom deployers need to be added before the process engine boots
+        List<Deployer> deployers = null;
+        if (processEngineConfiguration.getCustomPostDeployers() != null) {
+            deployers = processEngineConfiguration.getCustomPostDeployers();
+        } else {
+            deployers = new ArrayList<Deployer>();
+        }
+        deployers.add(new FormDeployer());
+        processEngineConfiguration.setCustomPostDeployers(deployers);
+
     }
-    
-    return formEngineConfiguration.buildFormEngine();
-  }
 
-  public SpringFormEngineConfiguration getFormEngineConfiguration() {
-    return formEngineConfiguration;
-  }
+    @Override
+    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        if (formEngineConfiguration == null) {
+            formEngineConfiguration = new SpringFormEngineConfiguration();
+        }
 
-  public SpringFormEngineConfigurator setFormEngineConfiguration(SpringFormEngineConfiguration formEngineConfiguration) {
-    this.formEngineConfiguration = formEngineConfiguration;
-    return this;
-  }
+        if (processEngineConfiguration.getDataSource() != null) {
+            DataSource originalDatasource = processEngineConfiguration.getDataSource();
+            formEngineConfiguration.setDataSource(originalDatasource);
+
+        } else {
+            throw new FlowableException("A datasource is required for initializing the Form engine ");
+        }
+
+        formEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
+
+        formEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
+        formEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
+        formEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
+
+        FormEngine formEngine = initFormEngine();
+        processEngineConfiguration.setFormEngineInitialized(true);
+        processEngineConfiguration.setFormEngineRepositoryService(formEngine.getFormRepositoryService());
+        processEngineConfiguration.setFormEngineFormService(formEngine.getFormService());
+    }
+
+    protected synchronized FormEngine initFormEngine() {
+        if (formEngineConfiguration == null) {
+            throw new FlowableException("FormEngineConfiguration is required");
+        }
+
+        return formEngineConfiguration.buildFormEngine();
+    }
+
+    public SpringFormEngineConfiguration getFormEngineConfiguration() {
+        return formEngineConfiguration;
+    }
+
+    public SpringFormEngineConfigurator setFormEngineConfiguration(SpringFormEngineConfiguration formEngineConfiguration) {
+        this.formEngineConfiguration = formEngineConfiguration;
+        return this;
+    }
 
 }

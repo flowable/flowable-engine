@@ -24,6 +24,6 @@ import org.mvel2.integration.PropertyHandler;
  */
 public interface RuleEngineExecutor {
 
-  RuleEngineExecutionResult execute(Decision decision, Map<String, Object> inputVariables,
-                                    Map<String, Method> customExpressionFunctions, Map<Class<?>, PropertyHandler> propertyHandlers);
+    RuleEngineExecutionResult execute(Decision decision, Map<String, Object> inputVariables,
+            Map<String, Method> customExpressionFunctions, Map<Class<?>, PropertyHandler> propertyHandlers);
 }

@@ -24,15 +24,15 @@ import org.flowable.engine.task.Attachment;
  */
 public class GetAttachmentCmd implements Command<Attachment>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String attachmentId;
+    private static final long serialVersionUID = 1L;
+    protected String attachmentId;
 
-  public GetAttachmentCmd(String attachmentId) {
-    this.attachmentId = attachmentId;
-  }
+    public GetAttachmentCmd(String attachmentId) {
+        this.attachmentId = attachmentId;
+    }
 
-  public Attachment execute(CommandContext commandContext) {
-    return commandContext.getAttachmentEntityManager().findById(attachmentId); 
-  }
+    public Attachment execute(CommandContext commandContext) {
+        return commandContext.getAttachmentEntityManager().findById(attachmentId);
+    }
 
 }

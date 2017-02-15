@@ -32,39 +32,39 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:flowable-context.xml")
 public class UserTaskSpringTest extends SpringFlowableTestCase {
 
-  @Deployment(resources="org/flowable/spring/test/usertask/VacationRequest.bpmn20.xml")
-  public void testFormProperties() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("vacationRequest").singleResult();
-    assertNull(formService.getStartFormKey(processDefinition.getId()));
-    StartFormData startFormData = formService.getStartFormData(processDefinition.getId());
-    assertEquals(3, startFormData.getFormProperties().size());
-    
-    List<FormProperty> formProperties = startFormData.getFormProperties();
-    assertEquals("numberOfDays", formProperties.get(0).getId());
-    assertEquals("startDate", formProperties.get(1).getId());
-    assertEquals("vacationMotivation", formProperties.get(2).getId());
-    
-    Map<String, String> startProperties = new HashMap<>();
-    startProperties.put("numberOfDays", "10");
-    startProperties.put("startDate", "02-02-2018 12:00");
-    startProperties.put("vacationMotivation", "Badly needed");
-    ProcessInstance processInstance = formService.submitStartFormData(processDefinition.getId(), startProperties);
-    
-    Task requestTask = taskService.createTaskQuery().taskDefinitionKey("handleRequest").processInstanceId(processInstance.getId()).singleResult();
-    assertNotNull(requestTask);
-    
-    TaskFormData taskFormData = formService.getTaskFormData(requestTask.getId());
-    assertEquals(2, taskFormData.getFormProperties().size());
-    
-    formProperties = taskFormData.getFormProperties();
-    assertEquals("vacationApproved", formProperties.get(0).getId());
-    assertEquals("managerMotivation", formProperties.get(1).getId());
-    
-    Map<String, String> taskProperties = new HashMap<>();
-    taskProperties.put("vacationApproved", "true");
-    formService.submitTaskFormData(requestTask.getId(), taskProperties);
-    
-    assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult());
-  }
+    @Deployment(resources = "org/flowable/spring/test/usertask/VacationRequest.bpmn20.xml")
+    public void testFormProperties() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("vacationRequest").singleResult();
+        assertNull(formService.getStartFormKey(processDefinition.getId()));
+        StartFormData startFormData = formService.getStartFormData(processDefinition.getId());
+        assertEquals(3, startFormData.getFormProperties().size());
+
+        List<FormProperty> formProperties = startFormData.getFormProperties();
+        assertEquals("numberOfDays", formProperties.get(0).getId());
+        assertEquals("startDate", formProperties.get(1).getId());
+        assertEquals("vacationMotivation", formProperties.get(2).getId());
+
+        Map<String, String> startProperties = new HashMap<>();
+        startProperties.put("numberOfDays", "10");
+        startProperties.put("startDate", "02-02-2018 12:00");
+        startProperties.put("vacationMotivation", "Badly needed");
+        ProcessInstance processInstance = formService.submitStartFormData(processDefinition.getId(), startProperties);
+
+        Task requestTask = taskService.createTaskQuery().taskDefinitionKey("handleRequest").processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(requestTask);
+
+        TaskFormData taskFormData = formService.getTaskFormData(requestTask.getId());
+        assertEquals(2, taskFormData.getFormProperties().size());
+
+        formProperties = taskFormData.getFormProperties();
+        assertEquals("vacationApproved", formProperties.get(0).getId());
+        assertEquals("managerMotivation", formProperties.get(1).getId());
+
+        Map<String, String> taskProperties = new HashMap<>();
+        taskProperties.put("vacationApproved", "true");
+        formService.submitTaskFormData(requestTask.getId(), taskProperties);
+
+        assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult());
+    }
 
 }

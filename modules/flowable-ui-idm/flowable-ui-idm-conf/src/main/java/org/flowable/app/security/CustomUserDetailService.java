@@ -21,8 +21,8 @@ import org.springframework.security.core.userdetails.UserDetails;
  */
 public interface CustomUserDetailService {
 
-  UserDetails loadByUserId(final String userId);
+    UserDetails loadByUserId(final String userId);
 
-  UserDetails loadUserByUsername(final String username);
+    UserDetails loadUserByUsername(final String username);
 
 }

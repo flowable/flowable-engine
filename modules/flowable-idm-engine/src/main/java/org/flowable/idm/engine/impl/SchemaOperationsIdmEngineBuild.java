@@ -22,11 +22,11 @@ import org.flowable.idm.engine.impl.interceptor.CommandContext;
  */
 public final class SchemaOperationsIdmEngineBuild implements Command<Object> {
 
-  public Object execute(CommandContext commandContext) {
-    DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
-    if (dbSqlSession != null) {
-      dbSqlSession.performSchemaOperationsIdmEngineBuild();
+    public Object execute(CommandContext commandContext) {
+        DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
+        if (dbSqlSession != null) {
+            dbSqlSession.performSchemaOperationsIdmEngineBuild();
+        }
+        return null;
     }
-    return null;
-  }
 }

@@ -22,26 +22,26 @@ import org.flowable.idm.api.event.FlowableIdmMembershipEvent;
  */
 public class FlowableIdmMembershipEventImpl extends FlowableIdmEventImpl implements FlowableIdmMembershipEvent {
 
-  protected String userId;
-  protected String groupId;
+    protected String userId;
+    protected String groupId;
 
-  public FlowableIdmMembershipEventImpl(FlowableIdmEventType type) {
-    super(type);
-  }
+    public FlowableIdmMembershipEventImpl(FlowableIdmEventType type) {
+        super(type);
+    }
 
-  public void setUserId(String userId) {
-    this.userId = userId;
-  }
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
-  public String getUserId() {
-    return userId;
-  }
+    public String getUserId() {
+        return userId;
+    }
 
-  public void setGroupId(String groupId) {
-    this.groupId = groupId;
-  }
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
 
-  public String getGroupId() {
-    return groupId;
-  }
+    public String getGroupId() {
+        return groupId;
+    }
 }

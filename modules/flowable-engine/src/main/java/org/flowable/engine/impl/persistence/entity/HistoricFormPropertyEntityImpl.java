@@ -13,35 +13,34 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
 public class HistoricFormPropertyEntityImpl extends HistoricDetailEntityImpl implements HistoricFormPropertyEntity {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String propertyId;
-  protected String propertyValue;
+    protected String propertyId;
+    protected String propertyValue;
 
-  public HistoricFormPropertyEntityImpl() {
-    this.detailType = "FormProperty";
-  }
+    public HistoricFormPropertyEntityImpl() {
+        this.detailType = "FormProperty";
+    }
 
-  public String getPropertyId() {
-    return propertyId;
-  }
+    public String getPropertyId() {
+        return propertyId;
+    }
 
-  public void setPropertyId(String propertyId) {
-    this.propertyId = propertyId;
-  }
+    public void setPropertyId(String propertyId) {
+        this.propertyId = propertyId;
+    }
 
-  public String getPropertyValue() {
-    return propertyValue;
-  }
+    public String getPropertyValue() {
+        return propertyValue;
+    }
 
-  public void setPropertyValue(String propertyValue) {
-    this.propertyValue = propertyValue;
-  }
+    public void setPropertyValue(String propertyValue) {
+        this.propertyValue = propertyValue;
+    }
 }

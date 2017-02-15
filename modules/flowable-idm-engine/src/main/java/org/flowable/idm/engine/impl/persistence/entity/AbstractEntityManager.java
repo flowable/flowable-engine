@@ -27,80 +27,80 @@ import org.flowable.idm.engine.impl.persistence.AbstractManager;
  */
 public abstract class AbstractEntityManager<EntityImpl extends Entity> extends AbstractManager implements EntityManager<EntityImpl> {
 
-  public AbstractEntityManager(IdmEngineConfiguration idmEngineConfiguration) {
-    super(idmEngineConfiguration);
-  }
-  
-  /*
-   * CRUD operations
-   */
-  
-  @Override
-  public EntityImpl findById(String entityId) {
-    return getDataManager().findById(entityId);
-  }
-  
-  @Override
-  public EntityImpl create() {
-    return getDataManager().create();
-  }
-
-  @Override
-  public void insert(EntityImpl entity) {
-    insert(entity, true);
-  }
-  
-  @Override
-  public void insert(EntityImpl entity, boolean fireCreateEvent) {
-    if (entity instanceof HasRevision) {
-      ((HasRevision) entity).setRevision(((HasRevision) entity).getRevisionNext());
+    public AbstractEntityManager(IdmEngineConfiguration idmEngineConfiguration) {
+        super(idmEngineConfiguration);
     }
-    
-    getDataManager().insert(entity);
 
-    FlowableEventDispatcher eventDispatcher = getEventDispatcher();
-    if (fireCreateEvent && eventDispatcher.isEnabled()) {
-      eventDispatcher.dispatchEvent(FlowableIdmEventBuilder.createEntityEvent(FlowableIdmEventType.ENTITY_CREATED, entity));
-      eventDispatcher.dispatchEvent(FlowableIdmEventBuilder.createEntityEvent(FlowableIdmEventType.ENTITY_INITIALIZED, entity));
-    }
-  }
-  
-  @Override
-  public EntityImpl update(EntityImpl entity) {
-    return update(entity, true);
-  }
-  
-  @Override
-  public EntityImpl update(EntityImpl entity, boolean fireUpdateEvent) {
-    EntityImpl updatedEntity = getDataManager().update(entity);
-    
-    if (fireUpdateEvent && getEventDispatcher().isEnabled()) {
-      getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createEntityEvent(FlowableIdmEventType.ENTITY_UPDATED, entity));
-    }
-    
-    return updatedEntity;
-  }
-  
-  @Override
-  public void delete(String id) {
-    EntityImpl entity = findById(id);
-    delete(entity);
-  }
-  
-  @Override
-  public void delete(EntityImpl entity) {
-    delete(entity, true);
-  }
+    /*
+     * CRUD operations
+     */
 
-  @Override
-  public void delete(EntityImpl entity, boolean fireDeleteEvent) {
-    getDataManager().delete(entity);
-    
-    if (fireDeleteEvent && getEventDispatcher().isEnabled()) {
-      getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createEntityEvent(FlowableIdmEventType.ENTITY_DELETED, entity));
+    @Override
+    public EntityImpl findById(String entityId) {
+        return getDataManager().findById(entityId);
     }
-  }
 
-  protected abstract DataManager<EntityImpl> getDataManager();
+    @Override
+    public EntityImpl create() {
+        return getDataManager().create();
+    }
+
+    @Override
+    public void insert(EntityImpl entity) {
+        insert(entity, true);
+    }
+
+    @Override
+    public void insert(EntityImpl entity, boolean fireCreateEvent) {
+        if (entity instanceof HasRevision) {
+            ((HasRevision) entity).setRevision(((HasRevision) entity).getRevisionNext());
+        }
+
+        getDataManager().insert(entity);
+
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        if (fireCreateEvent && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableIdmEventBuilder.createEntityEvent(FlowableIdmEventType.ENTITY_CREATED, entity));
+            eventDispatcher.dispatchEvent(FlowableIdmEventBuilder.createEntityEvent(FlowableIdmEventType.ENTITY_INITIALIZED, entity));
+        }
+    }
+
+    @Override
+    public EntityImpl update(EntityImpl entity) {
+        return update(entity, true);
+    }
+
+    @Override
+    public EntityImpl update(EntityImpl entity, boolean fireUpdateEvent) {
+        EntityImpl updatedEntity = getDataManager().update(entity);
+
+        if (fireUpdateEvent && getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createEntityEvent(FlowableIdmEventType.ENTITY_UPDATED, entity));
+        }
+
+        return updatedEntity;
+    }
+
+    @Override
+    public void delete(String id) {
+        EntityImpl entity = findById(id);
+        delete(entity);
+    }
+
+    @Override
+    public void delete(EntityImpl entity) {
+        delete(entity, true);
+    }
+
+    @Override
+    public void delete(EntityImpl entity, boolean fireDeleteEvent) {
+        getDataManager().delete(entity);
+
+        if (fireDeleteEvent && getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createEntityEvent(FlowableIdmEventType.ENTITY_DELETED, entity));
+        }
+    }
+
+    protected abstract DataManager<EntityImpl> getDataManager();
 
 }

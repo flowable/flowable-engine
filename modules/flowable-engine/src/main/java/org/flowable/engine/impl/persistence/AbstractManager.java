@@ -51,142 +51,142 @@ import org.flowable.engine.impl.persistence.entity.VariableInstanceEntityManager
  * @author Joram Barrez
  */
 public abstract class AbstractManager {
-  
-  protected ProcessEngineConfigurationImpl processEngineConfiguration;
-  
-  public AbstractManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    this.processEngineConfiguration = processEngineConfiguration;
-  }
-  
-  // Command scoped 
-  
-  protected CommandContext getCommandContext() {
-    return Context.getCommandContext();
-  }
 
-  protected <T> T getSession(Class<T> sessionClass) {
-    return getCommandContext().getSession(sessionClass);
-  }
-  
-  // Engine scoped
-  
-  protected ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
-    return processEngineConfiguration;
-  }
-  
-  protected CommandExecutor getCommandExecutor() {
-    return getProcessEngineConfiguration().getCommandExecutor();
-  }
-  
-  protected Clock getClock() {
-    return getProcessEngineConfiguration().getClock();
-  }
-  
-  protected AsyncExecutor getAsyncExecutor() {
-    return getProcessEngineConfiguration().getAsyncExecutor();
-  }
-  
-  protected FlowableEventDispatcher getEventDispatcher() {
-    return getProcessEngineConfiguration().getEventDispatcher();
-  }
-  
-  protected HistoryManager getHistoryManager() {
-    return getProcessEngineConfiguration().getHistoryManager();
-  }
-  
-  protected JobManager getJobManager() {
-    return getProcessEngineConfiguration().getJobManager();
-  }
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  protected DeploymentEntityManager getDeploymentEntityManager() {
-    return getProcessEngineConfiguration().getDeploymentEntityManager();
-  }
+    public AbstractManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        this.processEngineConfiguration = processEngineConfiguration;
+    }
 
-  protected ResourceEntityManager getResourceEntityManager() {
-    return getProcessEngineConfiguration().getResourceEntityManager();
-  }
+    // Command scoped
 
-  protected ByteArrayEntityManager getByteArrayEntityManager() {
-    return getProcessEngineConfiguration().getByteArrayEntityManager();
-  }
+    protected CommandContext getCommandContext() {
+        return Context.getCommandContext();
+    }
 
-  protected ProcessDefinitionEntityManager getProcessDefinitionEntityManager() {
-    return getProcessEngineConfiguration().getProcessDefinitionEntityManager();
-  }
-  
-  protected ProcessDefinitionInfoEntityManager getProcessDefinitionInfoEntityManager() {
-    return getProcessEngineConfiguration().getProcessDefinitionInfoEntityManager();
-  }
+    protected <T> T getSession(Class<T> sessionClass) {
+        return getCommandContext().getSession(sessionClass);
+    }
 
-  protected ModelEntityManager getModelEntityManager() {
-    return getProcessEngineConfiguration().getModelEntityManager();
-  }
+    // Engine scoped
 
-  protected ExecutionEntityManager getExecutionEntityManager() {
-    return getProcessEngineConfiguration().getExecutionEntityManager();
-  }
+    protected ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
+        return processEngineConfiguration;
+    }
 
-  protected TaskEntityManager getTaskEntityManager() {
-    return getProcessEngineConfiguration().getTaskEntityManager();
-  }
+    protected CommandExecutor getCommandExecutor() {
+        return getProcessEngineConfiguration().getCommandExecutor();
+    }
 
-  protected IdentityLinkEntityManager getIdentityLinkEntityManager() {
-    return getProcessEngineConfiguration().getIdentityLinkEntityManager();
-  }
+    protected Clock getClock() {
+        return getProcessEngineConfiguration().getClock();
+    }
 
-  protected EventSubscriptionEntityManager getEventSubscriptionEntityManager() {
-    return getProcessEngineConfiguration().getEventSubscriptionEntityManager();
-  }
+    protected AsyncExecutor getAsyncExecutor() {
+        return getProcessEngineConfiguration().getAsyncExecutor();
+    }
 
-  protected VariableInstanceEntityManager getVariableInstanceEntityManager() {
-    return getProcessEngineConfiguration().getVariableInstanceEntityManager();
-  }
-  
-  protected JobEntityManager getJobEntityManager() {
-    return getProcessEngineConfiguration().getJobEntityManager();
-  }
-  
-  protected TimerJobEntityManager getTimerJobEntityManager() {
-    return getProcessEngineConfiguration().getTimerJobEntityManager();
-  }
-  
-  protected SuspendedJobEntityManager getSuspendedJobEntityManager() {
-    return getProcessEngineConfiguration().getSuspendedJobEntityManager();
-  }
-  
-  protected DeadLetterJobEntityManager getDeadLetterJobEntityManager() {
-    return getProcessEngineConfiguration().getDeadLetterJobEntityManager();
-  }
+    protected FlowableEventDispatcher getEventDispatcher() {
+        return getProcessEngineConfiguration().getEventDispatcher();
+    }
 
-  protected HistoricProcessInstanceEntityManager getHistoricProcessInstanceEntityManager() {
-    return getProcessEngineConfiguration().getHistoricProcessInstanceEntityManager();
-  }
+    protected HistoryManager getHistoryManager() {
+        return getProcessEngineConfiguration().getHistoryManager();
+    }
 
-  protected HistoricDetailEntityManager getHistoricDetailEntityManager() {
-    return getProcessEngineConfiguration().getHistoricDetailEntityManager();
-  }
+    protected JobManager getJobManager() {
+        return getProcessEngineConfiguration().getJobManager();
+    }
 
-  protected HistoricActivityInstanceEntityManager getHistoricActivityInstanceEntityManager() {
-    return getProcessEngineConfiguration().getHistoricActivityInstanceEntityManager();
-  }
+    protected DeploymentEntityManager getDeploymentEntityManager() {
+        return getProcessEngineConfiguration().getDeploymentEntityManager();
+    }
 
-  protected HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {
-    return getProcessEngineConfiguration().getHistoricVariableInstanceEntityManager();
-  }
+    protected ResourceEntityManager getResourceEntityManager() {
+        return getProcessEngineConfiguration().getResourceEntityManager();
+    }
 
-  protected HistoricTaskInstanceEntityManager getHistoricTaskInstanceEntityManager() {
-    return getProcessEngineConfiguration().getHistoricTaskInstanceEntityManager();
-  }
+    protected ByteArrayEntityManager getByteArrayEntityManager() {
+        return getProcessEngineConfiguration().getByteArrayEntityManager();
+    }
 
-  protected HistoricIdentityLinkEntityManager getHistoricIdentityLinkEntityManager() {
-    return getProcessEngineConfiguration().getHistoricIdentityLinkEntityManager();
-  }
+    protected ProcessDefinitionEntityManager getProcessDefinitionEntityManager() {
+        return getProcessEngineConfiguration().getProcessDefinitionEntityManager();
+    }
 
-  protected AttachmentEntityManager getAttachmentEntityManager() {
-    return getProcessEngineConfiguration().getAttachmentEntityManager();
-  }
-  
-  protected CommentEntityManager getCommentEntityManager() {
-    return getProcessEngineConfiguration().getCommentEntityManager();
-  }
+    protected ProcessDefinitionInfoEntityManager getProcessDefinitionInfoEntityManager() {
+        return getProcessEngineConfiguration().getProcessDefinitionInfoEntityManager();
+    }
+
+    protected ModelEntityManager getModelEntityManager() {
+        return getProcessEngineConfiguration().getModelEntityManager();
+    }
+
+    protected ExecutionEntityManager getExecutionEntityManager() {
+        return getProcessEngineConfiguration().getExecutionEntityManager();
+    }
+
+    protected TaskEntityManager getTaskEntityManager() {
+        return getProcessEngineConfiguration().getTaskEntityManager();
+    }
+
+    protected IdentityLinkEntityManager getIdentityLinkEntityManager() {
+        return getProcessEngineConfiguration().getIdentityLinkEntityManager();
+    }
+
+    protected EventSubscriptionEntityManager getEventSubscriptionEntityManager() {
+        return getProcessEngineConfiguration().getEventSubscriptionEntityManager();
+    }
+
+    protected VariableInstanceEntityManager getVariableInstanceEntityManager() {
+        return getProcessEngineConfiguration().getVariableInstanceEntityManager();
+    }
+
+    protected JobEntityManager getJobEntityManager() {
+        return getProcessEngineConfiguration().getJobEntityManager();
+    }
+
+    protected TimerJobEntityManager getTimerJobEntityManager() {
+        return getProcessEngineConfiguration().getTimerJobEntityManager();
+    }
+
+    protected SuspendedJobEntityManager getSuspendedJobEntityManager() {
+        return getProcessEngineConfiguration().getSuspendedJobEntityManager();
+    }
+
+    protected DeadLetterJobEntityManager getDeadLetterJobEntityManager() {
+        return getProcessEngineConfiguration().getDeadLetterJobEntityManager();
+    }
+
+    protected HistoricProcessInstanceEntityManager getHistoricProcessInstanceEntityManager() {
+        return getProcessEngineConfiguration().getHistoricProcessInstanceEntityManager();
+    }
+
+    protected HistoricDetailEntityManager getHistoricDetailEntityManager() {
+        return getProcessEngineConfiguration().getHistoricDetailEntityManager();
+    }
+
+    protected HistoricActivityInstanceEntityManager getHistoricActivityInstanceEntityManager() {
+        return getProcessEngineConfiguration().getHistoricActivityInstanceEntityManager();
+    }
+
+    protected HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {
+        return getProcessEngineConfiguration().getHistoricVariableInstanceEntityManager();
+    }
+
+    protected HistoricTaskInstanceEntityManager getHistoricTaskInstanceEntityManager() {
+        return getProcessEngineConfiguration().getHistoricTaskInstanceEntityManager();
+    }
+
+    protected HistoricIdentityLinkEntityManager getHistoricIdentityLinkEntityManager() {
+        return getProcessEngineConfiguration().getHistoricIdentityLinkEntityManager();
+    }
+
+    protected AttachmentEntityManager getAttachmentEntityManager() {
+        return getProcessEngineConfiguration().getAttachmentEntityManager();
+    }
+
+    protected CommentEntityManager getCommentEntityManager() {
+        return getProcessEngineConfiguration().getCommentEntityManager();
+    }
 }

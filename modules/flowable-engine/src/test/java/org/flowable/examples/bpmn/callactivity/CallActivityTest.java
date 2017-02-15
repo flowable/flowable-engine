@@ -28,63 +28,63 @@ import org.flowable.engine.test.Deployment;
  */
 public class CallActivityTest extends PluggableFlowableTestCase {
 
-  @Deployment(resources = { "org/flowable/examples/bpmn/callactivity/orderProcess.bpmn20.xml", "org/flowable/examples/bpmn/callactivity/checkCreditProcess.bpmn20.xml" })
-  public void testOrderProcessWithCallActivity() {
-    // After the process has started, the 'verify credit history' task
-    // should be active
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("orderProcess");
-    TaskQuery taskQuery = taskService.createTaskQuery();
-    Task verifyCreditTask = taskQuery.singleResult();
-    assertEquals("Verify credit history", verifyCreditTask.getName());
+    @Deployment(resources = { "org/flowable/examples/bpmn/callactivity/orderProcess.bpmn20.xml", "org/flowable/examples/bpmn/callactivity/checkCreditProcess.bpmn20.xml" })
+    public void testOrderProcessWithCallActivity() {
+        // After the process has started, the 'verify credit history' task
+        // should be active
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("orderProcess");
+        TaskQuery taskQuery = taskService.createTaskQuery();
+        Task verifyCreditTask = taskQuery.singleResult();
+        assertEquals("Verify credit history", verifyCreditTask.getName());
 
-    // Verify with Query API
-    ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(pi.getId()).singleResult();
-    assertNotNull(subProcessInstance);
-    assertEquals(pi.getId(), runtimeService.createProcessInstanceQuery().subProcessInstanceId(subProcessInstance.getId()).singleResult().getId());
+        // Verify with Query API
+        ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(pi.getId()).singleResult();
+        assertNotNull(subProcessInstance);
+        assertEquals(pi.getId(), runtimeService.createProcessInstanceQuery().subProcessInstanceId(subProcessInstance.getId()).singleResult().getId());
 
-    // Completing the task with approval, will end the subprocess and
-    // continue the original process
-    taskService.complete(verifyCreditTask.getId(), CollectionUtil.singletonMap("creditApproved", true));
-    Task prepareAndShipTask = taskQuery.singleResult();
-    assertEquals("Prepare and Ship", prepareAndShipTask.getName());
-  }
+        // Completing the task with approval, will end the subprocess and
+        // continue the original process
+        taskService.complete(verifyCreditTask.getId(), CollectionUtil.singletonMap("creditApproved", true));
+        Task prepareAndShipTask = taskQuery.singleResult();
+        assertEquals("Prepare and Ship", prepareAndShipTask.getName());
+    }
 
-  @Deployment(resources = { "org/flowable/examples/bpmn/callactivity/mainProcess.bpmn20.xml", "org/flowable/examples/bpmn/callactivity/childProcess.bpmn20.xml" })
-  public void testCallActivityWithModeledDataObjectsInSubProcess() {
-    // After the process has started, the 'verify credit history' task should be active
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("mainProcess");
-    TaskQuery taskQuery = taskService.createTaskQuery();
-    Task verifyCreditTask = taskQuery.singleResult();
-    assertEquals("User Task 1", verifyCreditTask.getName());
+    @Deployment(resources = { "org/flowable/examples/bpmn/callactivity/mainProcess.bpmn20.xml", "org/flowable/examples/bpmn/callactivity/childProcess.bpmn20.xml" })
+    public void testCallActivityWithModeledDataObjectsInSubProcess() {
+        // After the process has started, the 'verify credit history' task should be active
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("mainProcess");
+        TaskQuery taskQuery = taskService.createTaskQuery();
+        Task verifyCreditTask = taskQuery.singleResult();
+        assertEquals("User Task 1", verifyCreditTask.getName());
 
-    // Verify with Query API
-    ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(pi.getId()).singleResult();
-    assertNotNull(subProcessInstance);
-    assertEquals(pi.getId(), runtimeService.createProcessInstanceQuery().subProcessInstanceId(subProcessInstance.getId()).singleResult().getId());
+        // Verify with Query API
+        ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(pi.getId()).singleResult();
+        assertNotNull(subProcessInstance);
+        assertEquals(pi.getId(), runtimeService.createProcessInstanceQuery().subProcessInstanceId(subProcessInstance.getId()).singleResult().getId());
 
-    assertEquals("Batman", runtimeService.getVariable(subProcessInstance.getId(), "Name"));
-  }
+        assertEquals("Batman", runtimeService.getVariable(subProcessInstance.getId(), "Name"));
+    }
 
-  @Deployment(resources = { "org/flowable/examples/bpmn/callactivity/mainProcess.bpmn20.xml",
-                            "org/flowable/examples/bpmn/callactivity/childProcess.bpmn20.xml",
-                            "org/flowable/examples/bpmn/callactivity/mainProcessBusinessKey.bpmn20.xml",
-                            "org/flowable/examples/bpmn/callactivity/mainProcessInheritBusinessKey.bpmn20.xml"})
-  public void testCallActivityWithBusinessKey() {
-    // No use of business key attributes
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("mainProcess");
-    ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(pi.getId()).singleResult();
-    assertNull(subProcessInstance.getBusinessKey());
+    @Deployment(resources = { "org/flowable/examples/bpmn/callactivity/mainProcess.bpmn20.xml",
+            "org/flowable/examples/bpmn/callactivity/childProcess.bpmn20.xml",
+            "org/flowable/examples/bpmn/callactivity/mainProcessBusinessKey.bpmn20.xml",
+            "org/flowable/examples/bpmn/callactivity/mainProcessInheritBusinessKey.bpmn20.xml" })
+    public void testCallActivityWithBusinessKey() {
+        // No use of business key attributes
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("mainProcess");
+        ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(pi.getId()).singleResult();
+        assertNull(subProcessInstance.getBusinessKey());
 
-    // Modeled using expression: businessKey="${busKey}"
-    Map<String,Object> variables = new HashMap<>();
-    variables.put("busKey", "123");
-    pi = runtimeService.startProcessInstanceByKey("mainProcessBusinessKey", variables);
-    subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(pi.getId()).singleResult();
-    assertEquals("123", subProcessInstance.getBusinessKey());
+        // Modeled using expression: businessKey="${busKey}"
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("busKey", "123");
+        pi = runtimeService.startProcessInstanceByKey("mainProcessBusinessKey", variables);
+        subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(pi.getId()).singleResult();
+        assertEquals("123", subProcessInstance.getBusinessKey());
 
-    // Inherit business key
-    pi = runtimeService.startProcessInstanceByKey("mainProcessInheritBusinessKey", "123");
-    subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(pi.getId()).singleResult();
-    assertEquals("123", subProcessInstance.getBusinessKey());
-  }
+        // Inherit business key
+        pi = runtimeService.startProcessInstanceByKey("mainProcessInheritBusinessKey", "123");
+        subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(pi.getId()).singleResult();
+        assertEquals("123", subProcessInstance.getBusinessKey());
+    }
 }

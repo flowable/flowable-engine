@@ -25,63 +25,63 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public class AppResourceDeploymentTest extends PluggableFlowableTestCase {
 
-  public void testSingleAppResource() {
-    InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("org/flowable/engine/test/api/app/test.app");
-    Deployment deployment = repositoryService.createDeployment().addInputStream("test.app", inputStream).deploy();
+    public void testSingleAppResource() {
+        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("org/flowable/engine/test/api/app/test.app");
+        Deployment deployment = repositoryService.createDeployment().addInputStream("test.app", inputStream).deploy();
 
-    Object appObject = repositoryService.getAppResourceObject(deployment.getId());
-    assertNotNull(appObject);
-    assertTrue(appObject instanceof AppModel);
-    AppModel appModel = (AppModel) appObject;
-    assertEquals("testTheme", appModel.getTheme());
-    assertEquals("testIcon", appModel.getIcon());
-    
-    appModel = repositoryService.getAppResourceModel(deployment.getId());
-    assertEquals("testTheme", appModel.getTheme());
-    assertEquals("testIcon", appModel.getIcon());
-    
-    repositoryService.deleteDeployment(deployment.getId(), true);
-    
-    try {
-      appObject = repositoryService.getAppResourceObject(deployment.getId());
-      fail("exception excepted");
-    } catch (Exception e) {
-      // expected exception
-    }
-  }
-  
-  public void testAppResourceWithProcessDefinition() {
-    InputStream appInputStream = this.getClass().getClassLoader().getResourceAsStream("org/flowable/engine/test/api/app/test.app");
-    InputStream bpmnInputStream = this.getClass().getClassLoader().getResourceAsStream("org/flowable/engine/test/repository/one.bpmn20.xml");
-    
-    Deployment deployment = repositoryService.createDeployment()
-        .addInputStream("test.app", appInputStream)
-        .addInputStream("one.bpmn20.xml", bpmnInputStream)
-        .deploy();
+        Object appObject = repositoryService.getAppResourceObject(deployment.getId());
+        assertNotNull(appObject);
+        assertTrue(appObject instanceof AppModel);
+        AppModel appModel = (AppModel) appObject;
+        assertEquals("testTheme", appModel.getTheme());
+        assertEquals("testIcon", appModel.getIcon());
 
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("one").singleResult();
-    assertEquals("one", processDefinition.getKey());
-    assertEquals(deployment.getId(), processDefinition.getDeploymentId());
-    
-    Object appObject = repositoryService.getAppResourceObject(deployment.getId());
-    assertNotNull(appObject);
-    assertTrue(appObject instanceof AppModel);
-    AppModel appModel = (AppModel) appObject;
-    assertEquals("testTheme", appModel.getTheme());
-    assertEquals("testIcon", appModel.getIcon());
-    
-    appModel = repositoryService.getAppResourceModel(deployment.getId());
-    assertEquals("testTheme", appModel.getTheme());
-    assertEquals("testIcon", appModel.getIcon());
-    
-    repositoryService.deleteDeployment(deployment.getId(), true);
-    
-    try {
-      appObject = repositoryService.getAppResourceObject(deployment.getId());
-      fail("exception excepted");
-    } catch (Exception e) {
-      // expected exception
+        appModel = repositoryService.getAppResourceModel(deployment.getId());
+        assertEquals("testTheme", appModel.getTheme());
+        assertEquals("testIcon", appModel.getIcon());
+
+        repositoryService.deleteDeployment(deployment.getId(), true);
+
+        try {
+            appObject = repositoryService.getAppResourceObject(deployment.getId());
+            fail("exception excepted");
+        } catch (Exception e) {
+            // expected exception
+        }
     }
-  }
+
+    public void testAppResourceWithProcessDefinition() {
+        InputStream appInputStream = this.getClass().getClassLoader().getResourceAsStream("org/flowable/engine/test/api/app/test.app");
+        InputStream bpmnInputStream = this.getClass().getClassLoader().getResourceAsStream("org/flowable/engine/test/repository/one.bpmn20.xml");
+
+        Deployment deployment = repositoryService.createDeployment()
+                .addInputStream("test.app", appInputStream)
+                .addInputStream("one.bpmn20.xml", bpmnInputStream)
+                .deploy();
+
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("one").singleResult();
+        assertEquals("one", processDefinition.getKey());
+        assertEquals(deployment.getId(), processDefinition.getDeploymentId());
+
+        Object appObject = repositoryService.getAppResourceObject(deployment.getId());
+        assertNotNull(appObject);
+        assertTrue(appObject instanceof AppModel);
+        AppModel appModel = (AppModel) appObject;
+        assertEquals("testTheme", appModel.getTheme());
+        assertEquals("testIcon", appModel.getIcon());
+
+        appModel = repositoryService.getAppResourceModel(deployment.getId());
+        assertEquals("testTheme", appModel.getTheme());
+        assertEquals("testIcon", appModel.getIcon());
+
+        repositoryService.deleteDeployment(deployment.getId(), true);
+
+        try {
+            appObject = repositoryService.getAppResourceObject(deployment.getId());
+            fail("exception excepted");
+        } catch (Exception e) {
+            // expected exception
+        }
+    }
 
 }

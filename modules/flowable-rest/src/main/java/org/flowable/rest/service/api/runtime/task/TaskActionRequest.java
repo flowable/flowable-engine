@@ -26,40 +26,39 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
  */
 public class TaskActionRequest extends RestActionRequest {
 
-  public static final String ACTION_COMPLETE = "complete";
-  public static final String ACTION_CLAIM = "claim";
-  public static final String ACTION_DELEGATE = "delegate";
-  public static final String ACTION_RESOLVE = "resolve";
+    public static final String ACTION_COMPLETE = "complete";
+    public static final String ACTION_CLAIM = "claim";
+    public static final String ACTION_DELEGATE = "delegate";
+    public static final String ACTION_RESOLVE = "resolve";
 
-  private String assignee;
-  private List<RestVariable> variables;
-  private List<RestVariable> transientVariables;
+    private String assignee;
+    private List<RestVariable> variables;
+    private List<RestVariable> transientVariables;
 
-  public void setAssignee(String assignee) {
-    this.assignee = assignee;
-  }
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
+    }
 
-  public String getAssignee() {
-    return assignee;
-  }
+    public String getAssignee() {
+        return assignee;
+    }
 
-  public void setVariables(List<RestVariable> variables) {
-    this.variables = variables;
-  }
+    public void setVariables(List<RestVariable> variables) {
+        this.variables = variables;
+    }
 
-  @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
-  public List<RestVariable> getVariables() {
-    return variables;
-  }
+    @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
+    public List<RestVariable> getVariables() {
+        return variables;
+    }
 
-  public List<RestVariable> getTransientVariables() {
-    return transientVariables;
-  }
+    public List<RestVariable> getTransientVariables() {
+        return transientVariables;
+    }
 
-  @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
-  public void setTransientVariables(List<RestVariable> transientVariables) {
-    this.transientVariables = transientVariables;
-  }
-  
-  
+    @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
+    public void setTransientVariables(List<RestVariable> transientVariables) {
+        this.transientVariables = transientVariables;
+    }
+
 }

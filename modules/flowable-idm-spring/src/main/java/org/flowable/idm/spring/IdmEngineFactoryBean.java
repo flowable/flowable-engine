@@ -29,50 +29,50 @@ import org.springframework.context.ApplicationContextAware;
  */
 public class IdmEngineFactoryBean implements FactoryBean<IdmEngine>, DisposableBean, ApplicationContextAware {
 
-  protected IdmEngineConfiguration idmEngineConfiguration;
+    protected IdmEngineConfiguration idmEngineConfiguration;
 
-  protected ApplicationContext applicationContext;
-  protected IdmEngine idmEngine;
+    protected ApplicationContext applicationContext;
+    protected IdmEngine idmEngine;
 
-  public void destroy() throws Exception {
-    if (idmEngine != null) {
-      idmEngine.close();
+    public void destroy() throws Exception {
+        if (idmEngine != null) {
+            idmEngine.close();
+        }
     }
-  }
 
-  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    this.applicationContext = applicationContext;
-  }
-
-  public IdmEngine getObject() throws Exception {
-    configureExternallyManagedTransactions();
-
-    this.idmEngine = idmEngineConfiguration.buildIdmEngine();
-    return this.idmEngine;
-  }
-
-  protected void configureExternallyManagedTransactions() {
-    if (idmEngineConfiguration instanceof SpringIdmEngineConfiguration) { // remark: any config can be injected, so we cannot have SpringConfiguration as member
-      SpringIdmEngineConfiguration engineConfiguration = (SpringIdmEngineConfiguration) idmEngineConfiguration;
-      if (engineConfiguration.getTransactionManager() != null) {
-        idmEngineConfiguration.setTransactionsExternallyManaged(true);
-      }
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
-  }
 
-  public Class<IdmEngine> getObjectType() {
-    return IdmEngine.class;
-  }
+    public IdmEngine getObject() throws Exception {
+        configureExternallyManagedTransactions();
 
-  public boolean isSingleton() {
-    return true;
-  }
+        this.idmEngine = idmEngineConfiguration.buildIdmEngine();
+        return this.idmEngine;
+    }
 
-  public IdmEngineConfiguration getIdmEngineConfiguration() {
-    return idmEngineConfiguration;
-  }
+    protected void configureExternallyManagedTransactions() {
+        if (idmEngineConfiguration instanceof SpringIdmEngineConfiguration) { // remark: any config can be injected, so we cannot have SpringConfiguration as member
+            SpringIdmEngineConfiguration engineConfiguration = (SpringIdmEngineConfiguration) idmEngineConfiguration;
+            if (engineConfiguration.getTransactionManager() != null) {
+                idmEngineConfiguration.setTransactionsExternallyManaged(true);
+            }
+        }
+    }
 
-  public void setIdmEngineConfiguration(IdmEngineConfiguration idmEngineConfiguration) {
-    this.idmEngineConfiguration = idmEngineConfiguration;
-  }
+    public Class<IdmEngine> getObjectType() {
+        return IdmEngine.class;
+    }
+
+    public boolean isSingleton() {
+        return true;
+    }
+
+    public IdmEngineConfiguration getIdmEngineConfiguration() {
+        return idmEngineConfiguration;
+    }
+
+    public void setIdmEngineConfiguration(IdmEngineConfiguration idmEngineConfiguration) {
+        this.idmEngineConfiguration = idmEngineConfiguration;
+    }
 }

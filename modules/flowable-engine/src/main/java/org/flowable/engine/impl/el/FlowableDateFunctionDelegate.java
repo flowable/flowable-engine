@@ -21,21 +21,21 @@ import java.lang.reflect.Method;
  * @author Tijs Rademakers
  */
 public class FlowableDateFunctionDelegate extends AbstractFlowableFunctionDelegate {
-  
-  public String prefix() {
-    return "date";
-  }
-  
-  public String localName() {
-    return "format";
-  }
-  
-  public Class<?> functionClass() {
-    return DateUtil.class;
-  }
 
-  public Method functionMethod() {
-    return getSingleObjectParameterMethod();
-  }
+    public String prefix() {
+        return "date";
+    }
+
+    public String localName() {
+        return "format";
+    }
+
+    public Class<?> functionClass() {
+        return DateUtil.class;
+    }
+
+    public Method functionMethod() {
+        return getSingleObjectParameterMethod();
+    }
 
 }

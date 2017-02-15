@@ -20,12 +20,12 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
  */
 public class RepeatingServiceTaskTest extends PluggableFlowableTestCase {
 
-  // @Deployment
-  public void testMultipleInvocationsInSameTransation() {
-    // ProcessInstance processInstance =
-    // runtimeService.startProcessInstanceByKey("repeating",
-    // CollectionUtil.singletonMap("count", 0));
-    // assertTrue(processInstance.isEnded());
-  }
+    // @Deployment
+    public void testMultipleInvocationsInSameTransation() {
+        // ProcessInstance processInstance =
+        // runtimeService.startProcessInstanceByKey("repeating",
+        // CollectionUtil.singletonMap("count", 0));
+        // assertTrue(processInstance.isEnded());
+    }
 
 }

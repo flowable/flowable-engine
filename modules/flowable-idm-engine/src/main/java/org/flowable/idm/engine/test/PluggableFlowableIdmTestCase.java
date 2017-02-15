@@ -36,58 +36,58 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class PluggableFlowableIdmTestCase extends AbstractFlowableIdmTestCase {
 
-  private static Logger pluggabledImTestCaseLogger = LoggerFactory.getLogger(PluggableFlowableIdmTestCase.class);
+    private static Logger pluggabledImTestCaseLogger = LoggerFactory.getLogger(PluggableFlowableIdmTestCase.class);
 
-  protected static IdmEngine cachedIdmEngine;
-  
-  protected void initializeIdmEngine() {
-    if (cachedIdmEngine == null) {
+    protected static IdmEngine cachedIdmEngine;
 
-      pluggabledImTestCaseLogger.info("No cached idm engine found for test. Retrieving the default engine.");
-      IdmEngines.destroy(); // Just to be sure we're not getting any previously cached version
+    protected void initializeIdmEngine() {
+        if (cachedIdmEngine == null) {
 
-      cachedIdmEngine = IdmEngines.getDefaultIdmEngine();
-      if (cachedIdmEngine == null) {
-        throw new FlowableException("no default idm engine available");
-      }
+            pluggabledImTestCaseLogger.info("No cached idm engine found for test. Retrieving the default engine.");
+            IdmEngines.destroy(); // Just to be sure we're not getting any previously cached version
+
+            cachedIdmEngine = IdmEngines.getDefaultIdmEngine();
+            if (cachedIdmEngine == null) {
+                throw new FlowableException("no default idm engine available");
+            }
+        }
+
+        idmEngine = cachedIdmEngine;
+        idmEngineConfiguration = idmEngine.getIdmEngineConfiguration();
     }
-    
-    idmEngine = cachedIdmEngine;
-    idmEngineConfiguration = idmEngine.getIdmEngineConfiguration();
-  }
-  
-  protected Group createGroup(String id, String name, String type) {
-    Group group = idmIdentityService.newGroup(id);
-    group.setName(name);
-    group.setType(type);
-    idmIdentityService.saveGroup(group);
-    return group;
-  }
-  
-  protected void clearAllUsersAndGroups() {
-    
-    // Privileges
-    List<Privilege> privileges = idmIdentityService.createPrivilegeQuery().list();
-    for (Privilege privilege : privileges) {
-      idmIdentityService.deletePrivilege(privilege.getId());
+
+    protected Group createGroup(String id, String name, String type) {
+        Group group = idmIdentityService.newGroup(id);
+        group.setName(name);
+        group.setType(type);
+        idmIdentityService.saveGroup(group);
+        return group;
     }
-    
-    // Groups
-    List<Group> groups = idmIdentityService.createGroupQuery().list();
-    for (Group group : groups) {
-      List<User> members = idmIdentityService.createUserQuery().memberOfGroup(group.getId()).list();
-      for (User member : members) {
-        idmIdentityService.deleteMembership(member.getId(), group.getId());
-      }
-      idmIdentityService.deleteGroup(group.getId());
+
+    protected void clearAllUsersAndGroups() {
+
+        // Privileges
+        List<Privilege> privileges = idmIdentityService.createPrivilegeQuery().list();
+        for (Privilege privilege : privileges) {
+            idmIdentityService.deletePrivilege(privilege.getId());
+        }
+
+        // Groups
+        List<Group> groups = idmIdentityService.createGroupQuery().list();
+        for (Group group : groups) {
+            List<User> members = idmIdentityService.createUserQuery().memberOfGroup(group.getId()).list();
+            for (User member : members) {
+                idmIdentityService.deleteMembership(member.getId(), group.getId());
+            }
+            idmIdentityService.deleteGroup(group.getId());
+        }
+
+        // Users
+        List<User> users = idmIdentityService.createUserQuery().list();
+        for (User user : users) {
+            idmIdentityService.deleteUser(user.getId());
+        }
+
     }
-    
-    // Users
-    List<User> users = idmIdentityService.createUserQuery().list();
-    for (User user : users) {
-      idmIdentityService.deleteUser(user.getId());
-    }
-    
-  }
-  
+
 }

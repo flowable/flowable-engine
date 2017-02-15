@@ -17,32 +17,33 @@ import org.flowable.engine.delegate.event.FlowableErrorEvent;
 
 /**
  * Implementation of an {@link FlowableErrorEvent}.
+ * 
  * @author Frederik Heremans
  */
 public class ActivitiErrorEventImpl extends ActivitiActivityEventImpl implements FlowableErrorEvent {
 
-  protected String errorId;
-	protected String errorCode;
-	
-	public ActivitiErrorEventImpl(FlowableEngineEventType type) {
-	  super(type);
-  }
-	
-	public String getErrorId() {
-    return errorId;
-  }
+    protected String errorId;
+    protected String errorCode;
 
-  public void setErrorId(String errorId) {
-    this.errorId = errorId;
-  }
-	
-	public void setErrorCode(String errorCode) {
-	  this.errorCode = errorCode;
-  }
-	
-	@Override
-	public String getErrorCode() {
-	  return errorCode;
-	}
+    public ActivitiErrorEventImpl(FlowableEngineEventType type) {
+        super(type);
+    }
+
+    public String getErrorId() {
+        return errorId;
+    }
+
+    public void setErrorId(String errorId) {
+        this.errorId = errorId;
+    }
+
+    public void setErrorCode(String errorCode) {
+        this.errorCode = errorCode;
+    }
+
+    @Override
+    public String getErrorCode() {
+        return errorCode;
+    }
 
 }

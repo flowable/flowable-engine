@@ -22,24 +22,24 @@ import org.flowable.engine.delegate.JavaDelegate;
  */
 public class ThrowCustomExceptionDelegate implements JavaDelegate {
 
-  @Override
-  public void execute(DelegateExecution execution) {
-    Object exceptionClassVar = execution.getVariable("exceptionClass");
-    if (exceptionClassVar == null)
-      return;
+    @Override
+    public void execute(DelegateExecution execution) {
+        Object exceptionClassVar = execution.getVariable("exceptionClass");
+        if (exceptionClassVar == null)
+            return;
 
-    String exceptionClassName = exceptionClassVar.toString();
+        String exceptionClassName = exceptionClassVar.toString();
 
-    if (StringUtils.isNotEmpty(exceptionClassName)) {
-      RuntimeException exception = null;
-      try {
-        Class<?> clazz = Class.forName(exceptionClassName);
-        exception = (RuntimeException) clazz.newInstance();
+        if (StringUtils.isNotEmpty(exceptionClassName)) {
+            RuntimeException exception = null;
+            try {
+                Class<?> clazz = Class.forName(exceptionClassName);
+                exception = (RuntimeException) clazz.newInstance();
 
-      } catch (Exception e) {
-        throw new FlowableException("Class not found", e);
-      }
-      throw exception;
+            } catch (Exception e) {
+                throw new FlowableException("Class not found", e);
+            }
+            throw exception;
+        }
     }
-  }
 }

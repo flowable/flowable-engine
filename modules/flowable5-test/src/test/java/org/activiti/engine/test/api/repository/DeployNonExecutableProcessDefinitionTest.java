@@ -20,21 +20,20 @@ import org.flowable.engine.test.Deployment;
  * @author jbarrez
  */
 public class DeployNonExecutableProcessDefinitionTest extends PluggableFlowableTestCase {
-	
-	/*
-	 * Test for https://activiti.atlassian.net/browse/ACT-2071
-	 * 
-	 * In this test, a process definition is deployed together with 
-	 * one that is not executable. The none-executable should not be startable.
-	 */
-	@Deployment
-	public void testDeployNonExecutableProcessDefinition() {
-		try {
-			runtimeService.startProcessInstanceByKey("oneTaskProcessNonExecutable");
-			fail();
-		} catch (FlowableException e) {
-			assertTextPresent("no processes deployed with key 'oneTaskProcessNonExecutable'", e.getMessage());
-		}
-	}
+
+    /*
+     * Test for https://activiti.atlassian.net/browse/ACT-2071
+     * 
+     * In this test, a process definition is deployed together with one that is not executable. The none-executable should not be startable.
+     */
+    @Deployment
+    public void testDeployNonExecutableProcessDefinition() {
+        try {
+            runtimeService.startProcessInstanceByKey("oneTaskProcessNonExecutable");
+            fail();
+        } catch (FlowableException e) {
+            assertTextPresent("no processes deployed with key 'oneTaskProcessNonExecutable'", e.getMessage());
+        }
+    }
 
 }

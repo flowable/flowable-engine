@@ -23,19 +23,19 @@ import org.flowable.idm.engine.impl.interceptor.CommandContext;
  */
 public class DeleteTokenCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  String tokenId;
+    private static final long serialVersionUID = 1L;
+    String tokenId;
 
-  public DeleteTokenCmd(String tokenId) {
-    this.tokenId = tokenId;
-  }
-
-  public Void execute(CommandContext commandContext) {
-    if (tokenId == null) {
-      throw new FlowableIllegalArgumentException("tokenId is null");
+    public DeleteTokenCmd(String tokenId) {
+        this.tokenId = tokenId;
     }
-    commandContext.getTokenEntityManager().delete(tokenId);
 
-    return null;
-  }
+    public Void execute(CommandContext commandContext) {
+        if (tokenId == null) {
+            throw new FlowableIllegalArgumentException("tokenId is null");
+        }
+        commandContext.getTokenEntityManager().delete(tokenId);
+
+        return null;
+    }
 }

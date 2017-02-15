@@ -28,35 +28,35 @@ import bitronix.tm.resource.jdbc.PoolingDataSource;
  */
 public class CloseXADataSourceLifecycleListener implements ProcessEngineLifecycleListener {
 
-  private PoolingDataSource dataSource;
-  private BitronixTransactionManager transactionManager;
+    private PoolingDataSource dataSource;
+    private BitronixTransactionManager transactionManager;
 
-  private static final Logger LOG = LoggerFactory.getLogger(CloseXADataSourceLifecycleListener.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CloseXADataSourceLifecycleListener.class);
 
-  @Override
-  public void onProcessEngineBuilt(ProcessEngine processEngine) {
-    LOG.info("--------------------- Callback for engine start");
-  }
-
-  @Override
-  public void onProcessEngineClosed(ProcessEngine processEngine) {
-    LOG.info("--------------------- Callback for engine end");
-    if (dataSource != null) {
-      LOG.info("--------------------- Closing datasource");
-      dataSource.close();
+    @Override
+    public void onProcessEngineBuilt(ProcessEngine processEngine) {
+        LOG.info("--------------------- Callback for engine start");
     }
 
-    if (transactionManager != null) {
-      transactionManager.shutdown();
+    @Override
+    public void onProcessEngineClosed(ProcessEngine processEngine) {
+        LOG.info("--------------------- Callback for engine end");
+        if (dataSource != null) {
+            LOG.info("--------------------- Closing datasource");
+            dataSource.close();
+        }
+
+        if (transactionManager != null) {
+            transactionManager.shutdown();
+        }
     }
-  }
 
-  public void setDataSource(PoolingDataSource dataSource) {
-    this.dataSource = dataSource;
-  }
+    public void setDataSource(PoolingDataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
-  public void setTransactionManager(BitronixTransactionManager transactionManager) {
-    this.transactionManager = transactionManager;
-  }
+    public void setTransactionManager(BitronixTransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
 
 }

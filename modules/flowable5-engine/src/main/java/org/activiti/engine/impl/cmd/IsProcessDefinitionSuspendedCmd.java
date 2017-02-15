@@ -22,15 +22,15 @@ import org.activiti.engine.impl.interceptor.CommandContext;
  */
 public class IsProcessDefinitionSuspendedCmd implements Command<Boolean>, Serializable {
 
-  private static final long serialVersionUID = 8167762371289445046L;
+    private static final long serialVersionUID = 8167762371289445046L;
 
-  protected String processDefinitionId;
+    protected String processDefinitionId;
 
-  public IsProcessDefinitionSuspendedCmd(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
+    public IsProcessDefinitionSuspendedCmd(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
 
-  public Boolean execute(CommandContext commandContext) {
-    return commandContext.getProcessEngineConfiguration().getDeploymentManager().isProcessDefinitionSuspended(processDefinitionId);
-  }
+    public Boolean execute(CommandContext commandContext) {
+        return commandContext.getProcessEngineConfiguration().getDeploymentManager().isProcessDefinitionSuspended(processDefinitionId);
+    }
 }

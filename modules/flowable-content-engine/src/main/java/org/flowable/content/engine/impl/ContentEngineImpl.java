@@ -25,48 +25,48 @@ import org.slf4j.LoggerFactory;
  */
 public class ContentEngineImpl implements ContentEngine {
 
-  private static Logger log = LoggerFactory.getLogger(ContentEngineImpl.class);
+    private static Logger log = LoggerFactory.getLogger(ContentEngineImpl.class);
 
-  protected String name;
-  protected ContentManagementService managementService;
-  protected ContentService contentService;
-  protected ContentEngineConfiguration engineConfiguration;
+    protected String name;
+    protected ContentManagementService managementService;
+    protected ContentService contentService;
+    protected ContentEngineConfiguration engineConfiguration;
 
-  public ContentEngineImpl(ContentEngineConfiguration engineConfiguration) {
-    this.engineConfiguration = engineConfiguration;
-    this.name = engineConfiguration.getEngineName();
-    this.managementService = engineConfiguration.getContentManagementService();
-    this.contentService = engineConfiguration.getContentService();
+    public ContentEngineImpl(ContentEngineConfiguration engineConfiguration) {
+        this.engineConfiguration = engineConfiguration;
+        this.name = engineConfiguration.getEngineName();
+        this.managementService = engineConfiguration.getContentManagementService();
+        this.contentService = engineConfiguration.getContentService();
 
-    if (name == null) {
-      log.info("default flowable ContentEngine created");
-    } else {
-      log.info("ContentEngine {} created", name);
+        if (name == null) {
+            log.info("default flowable ContentEngine created");
+        } else {
+            log.info("ContentEngine {} created", name);
+        }
+
+        ContentEngines.registerContentEngine(this);
     }
 
-    ContentEngines.registerContentEngine(this);
-  }
+    public void close() {
+        ContentEngines.unregister(this);
+    }
 
-  public void close() {
-    ContentEngines.unregister(this);
-  }
+    // getters and setters
+    // //////////////////////////////////////////////////////
 
-  // getters and setters
-  // //////////////////////////////////////////////////////
+    public String getName() {
+        return name;
+    }
 
-  public String getName() {
-    return name;
-  }
-  
-  public ContentManagementService getContentManagementService() {
-    return managementService;
-  }
+    public ContentManagementService getContentManagementService() {
+        return managementService;
+    }
 
-  public ContentService getContentService() {
-    return contentService;
-  }
+    public ContentService getContentService() {
+        return contentService;
+    }
 
-  public ContentEngineConfiguration getContentEngineConfiguration() {
-    return engineConfiguration;
-  }
+    public ContentEngineConfiguration getContentEngineConfiguration() {
+        return engineConfiguration;
+    }
 }

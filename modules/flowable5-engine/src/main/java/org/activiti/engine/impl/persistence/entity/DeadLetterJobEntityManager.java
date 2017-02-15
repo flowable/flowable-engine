@@ -23,68 +23,67 @@ import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.persistence.AbstractManager;
 import org.flowable.engine.runtime.Job;
 
-
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
 public class DeadLetterJobEntityManager extends AbstractManager {
 
-  public DeadLetterJobEntity findJobById(String jobId) {
-    return (DeadLetterJobEntity) getDbSqlSession().selectOne("selectDeadLetterJob", jobId);
-  }
-  
-  @SuppressWarnings("unchecked")
-  public List<DeadLetterJobEntity> findDeadLetterJobsByDuedate(Date duedate, Page page) {
-    final String query = "selectDeadLetterJobsByDuedate";
-    return getDbSqlSession().selectList(query, duedate, page);
-  }
+    public DeadLetterJobEntity findJobById(String jobId) {
+        return (DeadLetterJobEntity) getDbSqlSession().selectOne("selectDeadLetterJob", jobId);
+    }
 
-  @SuppressWarnings("unchecked")
-  public List<DeadLetterJobEntity> findDeadLetterJobsByExecutionId(String executionId) {
-    return getDbSqlSession().selectList("selectDeadLetterJobsByExecutionId", executionId);
-  }
+    @SuppressWarnings("unchecked")
+    public List<DeadLetterJobEntity> findDeadLetterJobsByDuedate(Date duedate, Page page) {
+        final String query = "selectDeadLetterJobsByDuedate";
+        return getDbSqlSession().selectList(query, duedate, page);
+    }
 
-  @SuppressWarnings("unchecked")
-  public List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery, Page page) {
-    final String query = "selectDeadLetterJobByQueryCriteria";
-    return getDbSqlSession().selectList(query, jobQuery, page);
-  }
+    @SuppressWarnings("unchecked")
+    public List<DeadLetterJobEntity> findDeadLetterJobsByExecutionId(String executionId) {
+        return getDbSqlSession().selectList("selectDeadLetterJobsByExecutionId", executionId);
+    }
 
-  @SuppressWarnings("unchecked")
-  public List<Job> findDeadLetterJobsByTypeAndProcessDefinitionKeyNoTenantId(String jobHandlerType, String processDefinitionKey) {
-  	 Map<String, String> params = new HashMap<String, String>(2);
-     params.put("handlerType", jobHandlerType);
-     params.put("processDefinitionKey", processDefinitionKey);
-     return getDbSqlSession().selectList("selectDeadLetterJobByTypeAndProcessDefinitionKeyNoTenantId", params);
-  }
-  
-  @SuppressWarnings("unchecked")
-  public List<Job> findDeadLetterJobsByTypeAndProcessDefinitionKeyAndTenantId(String jobHandlerType, String processDefinitionKey, String tenantId) {
-  	 Map<String, String> params = new HashMap<String, String>(3);
-     params.put("handlerType", jobHandlerType);
-     params.put("processDefinitionKey", processDefinitionKey);
-     params.put("tenantId", tenantId);
-     return getDbSqlSession().selectList("selectDeadLetterJobByTypeAndProcessDefinitionKeyAndTenantId", params);
-  }
-  
-  @SuppressWarnings("unchecked")
-  public List<Job> findDeadLetterJobsByTypeAndProcessDefinitionId(String jobHandlerType, String processDefinitionId) {
-  	 Map<String, String> params = new HashMap<String, String>(2);
-     params.put("handlerType", jobHandlerType);
-     params.put("processDefinitionId", processDefinitionId);
-     return getDbSqlSession().selectList("selectDeadLetterJobByTypeAndProcessDefinitionId", params);
-  }
+    @SuppressWarnings("unchecked")
+    public List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery, Page page) {
+        final String query = "selectDeadLetterJobByQueryCriteria";
+        return getDbSqlSession().selectList(query, jobQuery, page);
+    }
 
-  public long findDeadLetterJobCountByQueryCriteria(JobQueryImpl jobQuery) {
-    return (Long) getDbSqlSession().selectOne("selectDeadLetterJobCountByQueryCriteria", jobQuery);
-  }
-  
-  public void updateDeadLetterJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-  	HashMap<String, Object> params = new HashMap<String, Object>();
-  	params.put("deploymentId", deploymentId);
-  	params.put("tenantId", newTenantId);
-  	getDbSqlSession().update("updateDeadLetterJobTenantIdForDeployment", params);
-  }
-  
+    @SuppressWarnings("unchecked")
+    public List<Job> findDeadLetterJobsByTypeAndProcessDefinitionKeyNoTenantId(String jobHandlerType, String processDefinitionKey) {
+        Map<String, String> params = new HashMap<String, String>(2);
+        params.put("handlerType", jobHandlerType);
+        params.put("processDefinitionKey", processDefinitionKey);
+        return getDbSqlSession().selectList("selectDeadLetterJobByTypeAndProcessDefinitionKeyNoTenantId", params);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Job> findDeadLetterJobsByTypeAndProcessDefinitionKeyAndTenantId(String jobHandlerType, String processDefinitionKey, String tenantId) {
+        Map<String, String> params = new HashMap<String, String>(3);
+        params.put("handlerType", jobHandlerType);
+        params.put("processDefinitionKey", processDefinitionKey);
+        params.put("tenantId", tenantId);
+        return getDbSqlSession().selectList("selectDeadLetterJobByTypeAndProcessDefinitionKeyAndTenantId", params);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Job> findDeadLetterJobsByTypeAndProcessDefinitionId(String jobHandlerType, String processDefinitionId) {
+        Map<String, String> params = new HashMap<String, String>(2);
+        params.put("handlerType", jobHandlerType);
+        params.put("processDefinitionId", processDefinitionId);
+        return getDbSqlSession().selectList("selectDeadLetterJobByTypeAndProcessDefinitionId", params);
+    }
+
+    public long findDeadLetterJobCountByQueryCriteria(JobQueryImpl jobQuery) {
+        return (Long) getDbSqlSession().selectOne("selectDeadLetterJobCountByQueryCriteria", jobQuery);
+    }
+
+    public void updateDeadLetterJobTenantIdForDeployment(String deploymentId, String newTenantId) {
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("deploymentId", deploymentId);
+        params.put("tenantId", newTenantId);
+        getDbSqlSession().update("updateDeadLetterJobTenantIdForDeployment", params);
+    }
+
 }

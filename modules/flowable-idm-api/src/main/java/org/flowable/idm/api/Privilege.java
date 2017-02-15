@@ -18,9 +18,9 @@ import java.io.Serializable;
  * @author Joram Barrez
  */
 public interface Privilege extends Serializable {
-  
-  String getId();
-  
-  String getName();
-  
+
+    String getId();
+
+    String getName();
+
 }

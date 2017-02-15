@@ -39,81 +39,81 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @RestController
 public class ProcessDefinitionClientResource extends AbstractClientResource {
-  
-  private static final Logger logger = LoggerFactory.getLogger(ModelsClientResource.class);
 
-  @Autowired
-  protected ProcessDefinitionService clientService;
+    private static final Logger logger = LoggerFactory.getLogger(ModelsClientResource.class);
 
-  @Autowired
-  protected ProcessInstanceService processInstanceService;
+    @Autowired
+    protected ProcessDefinitionService clientService;
 
-  @Autowired
-  protected JobService jobService;
+    @Autowired
+    protected ProcessInstanceService processInstanceService;
 
-  @Autowired
-  protected ObjectMapper objectMapper;
+    @Autowired
+    protected JobService jobService;
 
-  /**
-   * GET /rest/authenticate -> check if the user is authenticated, and return its login.
-   */
-  @RequestMapping(value = "/rest/admin/process-definitions/{definitionId}", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getProcessDefinition(@PathVariable String definitionId) throws BadRequestException {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    try {
-      return clientService.getProcessDefinition(serverConfig, definitionId);
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting process definition {}", definitionId, e);
-      throw new BadRequestException(e.getMessage());
-    }
-  }
+    @Autowired
+    protected ObjectMapper objectMapper;
 
-  @RequestMapping(value = "/rest/admin/process-definitions/{definitionId}", method = RequestMethod.PUT, produces = "application/json")
-  public JsonNode updateProcessDefinitionCategory(@PathVariable String definitionId,
-      @RequestBody ObjectNode updateBody) throws BadRequestException {
-
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    if (updateBody.has("category")) {
-      try {
-        String category = null;
-        if (!updateBody.get("category").isNull()) {
-          category = updateBody.get("category").asText();
+    /**
+     * GET /rest/authenticate -> check if the user is authenticated, and return its login.
+     */
+    @RequestMapping(value = "/rest/admin/process-definitions/{definitionId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getProcessDefinition(@PathVariable String definitionId) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            return clientService.getProcessDefinition(serverConfig, definitionId);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting process definition {}", definitionId, e);
+            throw new BadRequestException(e.getMessage());
         }
-        return clientService.updateProcessDefinitionCategory(serverConfig, definitionId, category);
-      } catch (FlowableServiceException e) {
-        logger.error("Error updating process definition category {}", definitionId, e);
-        throw new BadRequestException(e.getMessage());
-      }
-      
-    } else {
-      logger.error("No required category found in request body");
-      throw new BadRequestException("Category is required in body");
     }
-  }
 
-  @RequestMapping(value = "/rest/admin/process-definitions/{definitionId}/process-instances", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getProcessInstances(@PathVariable String definitionId) throws BadRequestException {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    try {
-      ObjectNode bodyNode = objectMapper.createObjectNode();
-      bodyNode.put("processDefinitionId", definitionId);
-      return processInstanceService.listProcesInstancesForProcessDefinition(bodyNode, serverConfig);
-      
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting process instances for process definition {}", definitionId, e);
-      throw new BadRequestException(e.getMessage());
-    }
-  }
+    @RequestMapping(value = "/rest/admin/process-definitions/{definitionId}", method = RequestMethod.PUT, produces = "application/json")
+    public JsonNode updateProcessDefinitionCategory(@PathVariable String definitionId,
+            @RequestBody ObjectNode updateBody) throws BadRequestException {
 
-  @RequestMapping(value = "/rest/admin/process-definitions/{definitionId}/jobs", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getJobs(@PathVariable String definitionId) throws BadRequestException {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    try {
-      return jobService.listJobs(serverConfig, Collections.singletonMap("processDefinitionId", new String[]{definitionId}));
-    
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting jobs for process definition {}", definitionId, e);
-      throw new BadRequestException(e.getMessage());
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        if (updateBody.has("category")) {
+            try {
+                String category = null;
+                if (!updateBody.get("category").isNull()) {
+                    category = updateBody.get("category").asText();
+                }
+                return clientService.updateProcessDefinitionCategory(serverConfig, definitionId, category);
+            } catch (FlowableServiceException e) {
+                logger.error("Error updating process definition category {}", definitionId, e);
+                throw new BadRequestException(e.getMessage());
+            }
+
+        } else {
+            logger.error("No required category found in request body");
+            throw new BadRequestException("Category is required in body");
+        }
     }
-  }
+
+    @RequestMapping(value = "/rest/admin/process-definitions/{definitionId}/process-instances", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getProcessInstances(@PathVariable String definitionId) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            ObjectNode bodyNode = objectMapper.createObjectNode();
+            bodyNode.put("processDefinitionId", definitionId);
+            return processInstanceService.listProcesInstancesForProcessDefinition(bodyNode, serverConfig);
+
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting process instances for process definition {}", definitionId, e);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/rest/admin/process-definitions/{definitionId}/jobs", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getJobs(@PathVariable String definitionId) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            return jobService.listJobs(serverConfig, Collections.singletonMap("processDefinitionId", new String[] { definitionId }));
+
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting jobs for process definition {}", definitionId, e);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
 }

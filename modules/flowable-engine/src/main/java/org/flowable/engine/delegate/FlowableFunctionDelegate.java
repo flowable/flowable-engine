@@ -21,12 +21,12 @@ import java.lang.reflect.Method;
  * @author Tijs Rademakers
  */
 public interface FlowableFunctionDelegate {
-  
-  String prefix();
-  
-  String localName();
-  
-  Method functionMethod();
-  
-  Class<?> functionClass();
+
+    String prefix();
+
+    String localName();
+
+    Method functionMethod();
+
+    Class<?> functionClass();
 }

@@ -26,19 +26,19 @@ import org.flowable.idm.engine.impl.interceptor.CommandContext;
  */
 public class GetGroupsWithPrivilegeCmd implements Command<List<Group>>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String name;
+    protected String name;
 
-  public GetGroupsWithPrivilegeCmd(String name) {
-    if(name == null) {
-      throw new FlowableIllegalArgumentException("name is null");
+    public GetGroupsWithPrivilegeCmd(String name) {
+        if (name == null) {
+            throw new FlowableIllegalArgumentException("name is null");
+        }
+        this.name = name;
     }
-    this.name = name;
-  }
 
-  public List<Group> execute(CommandContext commandContext) {
-    return commandContext.getGroupEntityManager().findGroupsByPrivilegeId(name);
-  }
-  
+    public List<Group> execute(CommandContext commandContext) {
+        return commandContext.getGroupEntityManager().findGroupsByPrivilegeId(name);
+    }
+
 }

@@ -45,68 +45,68 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RequestMapping("/rest/form-models")
 public class FormsResource {
 
-  private static final Logger logger = LoggerFactory.getLogger(FormsResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(FormsResource.class);
 
-  private static final int MIN_FILTER_LENGTH = 2;
-  
-  @Autowired
-  protected ModelRepository modelRepository;
+    private static final int MIN_FILTER_LENGTH = 2;
 
-  @Autowired
-  protected ObjectMapper objectMapper;
+    @Autowired
+    protected ModelRepository modelRepository;
 
-  @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-  public ResultListDataRepresentation getForms(HttpServletRequest request) {
+    @Autowired
+    protected ObjectMapper objectMapper;
 
-    // need to parse the filterText parameter ourselves, due to encoding issues with the default parsing.
-    String filter = null;
-    List<NameValuePair> params = URLEncodedUtils.parse(request.getQueryString(), Charset.forName("UTF-8"));
-    if (params != null) {
-      for (NameValuePair nameValuePair : params) {
-        if ("filter".equalsIgnoreCase(nameValuePair.getName())) {
-          filter = nameValuePair.getValue();
+    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+    public ResultListDataRepresentation getForms(HttpServletRequest request) {
+
+        // need to parse the filterText parameter ourselves, due to encoding issues with the default parsing.
+        String filter = null;
+        List<NameValuePair> params = URLEncodedUtils.parse(request.getQueryString(), Charset.forName("UTF-8"));
+        if (params != null) {
+            for (NameValuePair nameValuePair : params) {
+                if ("filter".equalsIgnoreCase(nameValuePair.getName())) {
+                    filter = nameValuePair.getValue();
+                }
+            }
         }
-      }
+        String validFilter = makeValidFilterText(filter);
+
+        List<Model> models = null;
+        if (validFilter != null) {
+            models = modelRepository.findByModelTypeAndFilter(AbstractModel.MODEL_TYPE_FORM, validFilter, ModelSort.NAME_ASC);
+
+        } else {
+            models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_FORM, ModelSort.NAME_ASC);
+        }
+
+        List<FormRepresentation> reps = new ArrayList<FormRepresentation>();
+
+        for (Model model : models) {
+            reps.add(new FormRepresentation(model));
+        }
+
+        Collections.sort(reps, new NameComparator());
+
+        ResultListDataRepresentation result = new ResultListDataRepresentation(reps);
+        result.setTotal(Long.valueOf(models.size()));
+        return result;
     }
-    String validFilter = makeValidFilterText(filter);
 
-    List<Model> models = null;
-    if (validFilter != null) {
-      models = modelRepository.findByModelTypeAndFilter(AbstractModel.MODEL_TYPE_FORM, validFilter, ModelSort.NAME_ASC);
+    protected String makeValidFilterText(String filterText) {
+        String validFilter = null;
 
-    } else {
-      models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_FORM, ModelSort.NAME_ASC);
+        if (filterText != null) {
+            String trimmed = StringUtils.trim(filterText);
+            if (trimmed.length() >= MIN_FILTER_LENGTH) {
+                validFilter = "%" + trimmed.toLowerCase() + "%";
+            }
+        }
+        return validFilter;
     }
 
-    List<FormRepresentation> reps = new ArrayList<FormRepresentation>();
-
-    for (Model model : models) {
-      reps.add(new FormRepresentation(model));
+    class NameComparator implements Comparator<FormRepresentation> {
+        @Override
+        public int compare(FormRepresentation o1, FormRepresentation o2) {
+            return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
+        }
     }
-
-    Collections.sort(reps, new NameComparator());
-
-    ResultListDataRepresentation result = new ResultListDataRepresentation(reps);
-    result.setTotal(Long.valueOf(models.size()));
-    return result;
-  }
-
-  protected String makeValidFilterText(String filterText) {
-    String validFilter = null;
-
-    if (filterText != null) {
-      String trimmed = StringUtils.trim(filterText);
-      if (trimmed.length() >= MIN_FILTER_LENGTH) {
-        validFilter = "%" + trimmed.toLowerCase() + "%";
-      }
-    }
-    return validFilter;
-  }
-
-  class NameComparator implements Comparator<FormRepresentation> {
-    @Override
-    public int compare(FormRepresentation o1, FormRepresentation o2) {
-      return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
-    }
-  }
 }

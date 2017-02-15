@@ -22,9 +22,9 @@ import org.flowable.engine.impl.interceptor.CommandContext;
  */
 public class ProfilingDbSqlSessionFactory extends DbSqlSessionFactory {
 
-  @Override
-  public Session openSession(AbstractCommandContext commandContext) {
-    CommandContext currentCommandContext = (CommandContext) commandContext;
-    return new ProfilingDbSqlSession(this, currentCommandContext.getEntityCache());
-  }
+    @Override
+    public Session openSession(AbstractCommandContext commandContext) {
+        CommandContext currentCommandContext = (CommandContext) commandContext;
+        return new ProfilingDbSqlSession(this, currentCommandContext.getEntityCache());
+    }
 }

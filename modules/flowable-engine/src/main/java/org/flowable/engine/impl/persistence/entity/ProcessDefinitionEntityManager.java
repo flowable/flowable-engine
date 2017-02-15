@@ -25,26 +25,26 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public interface ProcessDefinitionEntityManager extends EntityManager<ProcessDefinitionEntity> {
 
-  ProcessDefinitionEntity findLatestProcessDefinitionByKey(String processDefinitionKey);
+    ProcessDefinitionEntity findLatestProcessDefinitionByKey(String processDefinitionKey);
 
-  ProcessDefinitionEntity findLatestProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId);
+    ProcessDefinitionEntity findLatestProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId);
 
-  List<ProcessDefinition> findProcessDefinitionsByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery, Page page);
+    List<ProcessDefinition> findProcessDefinitionsByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery, Page page);
 
-  long findProcessDefinitionCountByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery);
+    long findProcessDefinitionCountByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery);
 
-  ProcessDefinitionEntity findProcessDefinitionByDeploymentAndKey(String deploymentId, String processDefinitionKey);
+    ProcessDefinitionEntity findProcessDefinitionByDeploymentAndKey(String deploymentId, String processDefinitionKey);
 
-  ProcessDefinitionEntity findProcessDefinitionByDeploymentAndKeyAndTenantId(String deploymentId, String processDefinitionKey, String tenantId);
+    ProcessDefinitionEntity findProcessDefinitionByDeploymentAndKeyAndTenantId(String deploymentId, String processDefinitionKey, String tenantId);
 
-  ProcessDefinition findProcessDefinitionByKeyAndVersionAndTenantId(String processDefinitionKey, Integer processDefinitionVersion, String tenantId);
+    ProcessDefinition findProcessDefinitionByKeyAndVersionAndTenantId(String processDefinitionKey, Integer processDefinitionVersion, String tenantId);
 
-  List<ProcessDefinition> findProcessDefinitionsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<ProcessDefinition> findProcessDefinitionsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
 
-  long findProcessDefinitionCountByNativeQuery(Map<String, Object> parameterMap);
+    long findProcessDefinitionCountByNativeQuery(Map<String, Object> parameterMap);
 
-  void updateProcessDefinitionTenantIdForDeployment(String deploymentId, String newTenantId);
-  
-  void deleteProcessDefinitionsByDeploymentId(String deploymentId);
+    void updateProcessDefinitionTenantIdForDeployment(String deploymentId, String newTenantId);
+
+    void deleteProcessDefinitionsByDeploymentId(String deploymentId);
 
 }

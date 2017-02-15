@@ -26,54 +26,54 @@ import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
  */
 public class SetFormDefinitionCategoryCmd implements Command<Void> {
 
-  protected String formDefinitionId;
-  protected String category;
+    protected String formDefinitionId;
+    protected String category;
 
-  public SetFormDefinitionCategoryCmd(String formDefinitionId, String category) {
-    this.formDefinitionId = formDefinitionId;
-    this.category = category;
-  }
-
-  public Void execute(CommandContext commandContext) {
-
-    if (formDefinitionId == null) {
-      throw new FlowableIllegalArgumentException("Form definition id is null");
+    public SetFormDefinitionCategoryCmd(String formDefinitionId, String category) {
+        this.formDefinitionId = formDefinitionId;
+        this.category = category;
     }
 
-    FormDefinitionEntity formDefinition = commandContext.getFormDefinitionEntityManager().findById(formDefinitionId);
+    public Void execute(CommandContext commandContext) {
 
-    if (formDefinition == null) {
-      throw new FlowableObjectNotFoundException("No form definition found for id = '" + formDefinitionId + "'");
+        if (formDefinitionId == null) {
+            throw new FlowableIllegalArgumentException("Form definition id is null");
+        }
+
+        FormDefinitionEntity formDefinition = commandContext.getFormDefinitionEntityManager().findById(formDefinitionId);
+
+        if (formDefinition == null) {
+            throw new FlowableObjectNotFoundException("No form definition found for id = '" + formDefinitionId + "'");
+        }
+
+        // Update category
+        formDefinition.setCategory(category);
+
+        // Remove form from cache, it will be refetched later
+        DeploymentCache<FormDefinitionCacheEntry> formDefinitionCache = commandContext.getFormEngineConfiguration().getFormDefinitionCache();
+        if (formDefinitionCache != null) {
+            formDefinitionCache.remove(formDefinitionId);
+        }
+
+        commandContext.getFormDefinitionEntityManager().update(formDefinition);
+
+        return null;
     }
 
-    // Update category
-    formDefinition.setCategory(category);
-
-    // Remove form from cache, it will be refetched later
-    DeploymentCache<FormDefinitionCacheEntry> formDefinitionCache = commandContext.getFormEngineConfiguration().getFormDefinitionCache();
-    if (formDefinitionCache != null) {
-      formDefinitionCache.remove(formDefinitionId);
+    public String getFormDefinitionId() {
+        return formDefinitionId;
     }
-    
-    commandContext.getFormDefinitionEntityManager().update(formDefinition);
 
-    return null;
-  }
+    public void setFormDefinitionId(String formDefinitionId) {
+        this.formDefinitionId = formDefinitionId;
+    }
 
-  public String getFormDefinitionId() {
-    return formDefinitionId;
-  }
+    public String getCategory() {
+        return category;
+    }
 
-  public void setFormDefinitionId(String formDefinitionId) {
-    this.formDefinitionId = formDefinitionId;
-  }
-
-  public String getCategory() {
-    return category;
-  }
-
-  public void setCategory(String category) {
-    this.category = category;
-  }
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
 }
