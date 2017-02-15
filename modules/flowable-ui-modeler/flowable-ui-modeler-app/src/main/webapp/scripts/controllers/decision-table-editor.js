@@ -699,7 +699,7 @@ angular.module('flowableModeler')
         // condition input options
         $scope.popup = {
             selectedExpressionVariableType: '',
-            selectedExpressionLabel: '',
+            selectedExpressionLabel: $scope.model.selectedExpression.label ? $scope.model.selectedExpression.label : '',
             selectedExpressionNewVariableType: $scope.availableVariableTypes[0]
         };
 
