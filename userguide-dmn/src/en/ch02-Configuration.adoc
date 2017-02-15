@@ -5,7 +5,7 @@
 
 === Creating a DMN Engine
 
-_The Flowable DMN engine is structured in a very similar way to the Flowable process engine. As a result parts of the documentation have a resemblance with their process engine counterpart._
+_The Flowable DMN engine is structured in a very similar way to the Flowable process engine. As a result, parts of the documentation are very similar to their process engine counterpart._
 
 The Flowable DMN engine is configured through an XML file called +flowable.dmn.cfg.xml+. Note that this is *not* applicable if you're using <<springintegration,the Spring style of building a DMN engine>>.
 
@@ -40,7 +40,7 @@ This will look for an +flowable.dmn.cfg.xml+ file on the classpath and construct
 
 Note that the configuration XML is in fact a Spring configuration. *This does not mean that Flowable DMN can only be used in a Spring environment!* We are simply leveraging the parsing and dependency injection capabilities of Spring internally for building up the engine.
 
-The DMNEngineConfiguration object can also be created programmatically using the configuration file. It is also possible to use a different bean id (e.g. see line 3).
+The DMNEngineConfiguration object can also be created programmatically using the configuration file. It is also possible to use a different bean id (for example, see line 3).
 
 [source,java,linenums]
 ----
@@ -53,7 +53,7 @@ DmnEngineConfiguration.
 ----
 
 
-It is also possible not to use a configuration file, and create a configuration based on
+It is also possible to not use a configuration file and create a configuration based on
 defaults (see <<configurationClasses,the different supported classes>> for more information).
 
 [source,java,linenums]
@@ -86,7 +86,7 @@ The +flowable.dmn.cfg.xml+ must contain a bean that has the id +$$'dmnEngineConf
 ----
 
 
-This bean is then used to construct the +DmnEngine+. There are multiple classes available that can be used to define the +dmnEngineConfiguration+. These classes represent different environments, and set defaults accordingly. It's a best practice to select the class the matches (the most) your environment, to minimalise the number of properties needed to configure the engine. The following classes are currently available (more will follow in future releases): [[configurationClasses]]
+This bean is then used to construct the +DmnEngine+. There are multiple classes available that can be used to define the +dmnEngineConfiguration+. These classes represent different environments, and set defaults accordingly. It's best practice to select the class that best matches your environment, to minimize the number of properties needed to configure the engine. The following classes are currently available (more will follow in future releases): [[configurationClasses]]
 
 * *org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration*: the process engine is used in a standalone way. Flowable will take care of the transactions. By default, the database will only be checked when the engine boots (and an exception is thrown if there is no Flowable DMN schema or the schema version is incorrect).
 * *org.flowable.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration*: this is a convenience class for unit testing purposes. Flowable DMN will take care of the transactions. An H2 in-memory database is used by default. The database will be created and dropped when the engine boots and shuts down. When using this, probably no additional configuration is needed).

@@ -5,38 +5,38 @@ The following sections cover advanced use cases of Flowable, that go beyond typi
 
 === Async Executor
 
-In Flowable version 5, the Async executor was added in addition to the existing job executor. The Async Executor has proved to be more performant than the old job executor by many users of Flowable and our benchmarks.
+In Flowable v5, the Async executor was added in addition to the existing job executor. The Async Executor has proved to be more performant than the old job executor by many users of Flowable and in our benchmarks.
 
-In Flowable 6 (and later), the async executor is the only one available. For version 6, the async executor was completely refactored for optimal performance and pluggability (while still being compatible with existing API's).
+From Flowable V6, the async executor is the only one available. For V6, the async executor has been completely refactored for optimal performance and pluggability, while still being compatible with existing APIs.
 
 [[async_executor_design]]
 
 ==== Async Executor design
 
-Two types of jobs exist: timers (like those belonging to a boundary event on a user task) and async continuations (belonging to a service task with the _flowable:async="true"_ attribute).
+Two types of jobs exist: timers (such as those belonging to a boundary event on a user task) and async continuations (belonging to a service task with the _flowable:async="true"_ attribute).
 
-*Timers* are the easiest to explain: they are persisted in the ACT_RU_TIMER_JOB table with a certain due date. There is a thread in the async executor that periodically checks if there are new timers that fire (i.e. the due date is 'before' the current time). When that happens, the timer is removed and an async job is created and inserted.
+*Timers* are the easiest to explain: they are persisted in the ACT_RU_TIMER_JOB table with a certain due date. There is a thread in the async executor that periodically checks if there are new timers that should fire (in other words, the due date is 'before' the current time). When that happens, the timer is removed and an async job is created.
 
-An *async job* is inserted in the database during the execution of process instance steps (which means 'during some API call that was made'). If the async executor is active for the current Flowable engine, the async job is actually already _locked_. This means that the job entry is inserted in the ACT_RU_JOB table and will have a _lock owner_ and a _lock expiration time_ set. A transaction listener that fires on a successful commit of the API call triggers the async executor of the same engine to execute the job (so the data is guaranteed to be in the database). To do this, the async executor has a (configurable) thread pool from which a thread will execute the job and continue the process asynchronously. If the Flowable engine does not have the async executor enabled, the async job is inserted in the ACT_RU_JOB table without being locked.
+An *async job* is inserted in the database during the execution of process instance steps (which means, during some API call that was made). If the async executor is active for the current Flowable engine, the async job is actually already _locked_. This means that the job entry is inserted in the ACT_RU_JOB table and will have a _lock owner_ and a _lock expiration time_ set. A transaction listener that fires on a successful commit of the API call triggers the async executor of the same engine to execute the job (so the data is guaranteed to be in the database). To do this, the async executor has a configurable thread pool from which a thread will execute the job and continue the process asynchronously. If the Flowable engine does not have the async executor enabled, the async job is inserted in the ACT_RU_JOB table without being locked.
 
-Similar to the thread that checks for new timers, the async executor has a thread that 'acquires' new async jobs. These are jobs that are present in the table and are not locked. This thread will lock these jobs for the current Flowable engine and pass it to the async executor.
+Similar to the thread that checks for new timers, the async executor has a thread that 'acquires' new async jobs. These are jobs that are present in the table that are not locked. This thread will lock these jobs for the current Flowable engine and pass it to the async executor.
 
-The thread pool executing the jobs uses an in-memory queue to take jobs from. When this queue is full (this is configurable), the job will be unlocked and re-inserted into its table. This way, other async executors can pick it up instead.
+The thread pool executing the jobs uses an in-memory queue from which to take jobs. When this queue is full (this is configurable), the job will be unlocked and re-inserted into its table. This way, other async executors can pick it up instead.
 
-In case an exception happens during job execution, the async job will be transformed to a timer job with a due date. It will be picked up like a regular timer job and become an async job again, to be retried soon. When a job has been retried for a (configurable) number of times and continues to fail, the job is assumed to be 'dead' and moved to the ACT_RU_DEADLETTER_JOB. The 'deadletter' concept is widely used in various other systems. An admin will now need to inspect the exception for the failed job and decide what the best course of action is.
+If an exception happens during job execution, the async job will be transformed to a timer job with a due date. Later, it will be picked up like a regular timer job and become an async job again, to be retried soon. When a job has been retried for a (configurable) number of times and continues to fail, the job is assumed to be 'dead' and moved to the ACT_RU_DEADLETTER_JOB. The 'deadletter' concept is widely used in various other systems. An administrator will now need to inspect the exception for the failed job and decide what the best course of action is.
 
-Process definitions and process instances can be suspended. Suspended jobs related to these definitions or instances are put in the ACT_RU_SUSPENDED_JOB table, to make sure the query to acquire jobs has a few as possible conditions in its where clause.
+Process definitions and process instances can be suspended. Suspended jobs related to these definitions or instances are put in the ACT_RU_SUSPENDED_JOB table, to make sure the query to acquire jobs has as few possible conditions in its where clause.
 
-One thing that is clear from the above, for people familiar with the old implementations of the job/async executor: the main goal is to allow the 'acquire queries' to be as simple as possible. In the past (before version 6), one table was used for all job types/states, which made the 'where' condition large as it catered for all the use cases. This problem is now solved and our benchmarks have proved that this new design delivers better performance and is more scalable.
+One thing that is clear from the above: for people familiar with the old implementations of the job/async executor, the main goal is to allow the 'acquire queries' to be as simple as possible. In the past (before V6), one table was used for all job types/states, which made the 'where' condition large as it catered for all the use cases. This problem is now solved and our benchmarks have proved that this new design delivers better performance and is more scalable.
 
 
 ==== Async executor configuration
 
 The async executor is a highly configurable component. It's always recommended to look into the default settings of the async executor and validate if they match the requirements of your processes.
 
-Alternatively, it's possible to extend the default implementation or implement the _org.flowable.engine.impl.asyncexecutor.AsyncExecutor_ interface with your own implementation.
+Alternatively, it's possible to extend the default implementation or replace the _org.flowable.engine.impl.asyncexecutor.AsyncExecutor_ interface with your own implementation.
 
-The following properties are available on the process engine configuration via setters:
+The following properties are available on the process engine configuration through setters:
 
 .Async executor configuration options
 [options="header"]
@@ -48,14 +48,14 @@ The following properties are available on the process engine configuration via s
 |asyncExecutorMaxPoolSize|10|The maximum number of threads that are created in the thread pool for job execution.
 |asyncExecutorThreadKeepAliveTime|5000|The time (in milliseconds) a thread used for job execution must be kept alive before it is destroyed. Having a setting > 0 takes resources, but in the case of many job executions it avoids creating new threads all the time. If 0, threads will be destroyed after they've been used for job execution.
 |asyncExecutorNumberOfRetries|3|The number of times a job will be retried before it is moved to the 'deadletter' table.
-|asyncExecutorMaxTimerJobsPerAcquisition|1|The number of timer jobs that are acquired during one acquirement query. Default value is 1, as this lowers the potential for optimistic locking exceptions. Larger values can perform better, but the chance of optimistic locking exceptions occurring between different engines becomes larger too.
-|asyncExecutorMaxAsyncJobsDuePerAcquisition|1|The number of async jobs that are acquired during one acquirement query. Default value is 1, as this lowers the potential for optimistic locking exceptions. Larger values can perform better, but the chance of optimistic locking exceptions occurring between different engines becomes larger too.
-|asyncExecutorDefaultTimerJobAcquireWaitTime|10000|The time (in milliseconds) the timer acquisition thread will wait to execute the next acquirement query. This happens when no new timer jobs were found or when less timer jobs have been fetched than set in _asyncExecutorMaxTimerJobsPerAcquisition_.
-|asyncExecutorDefaultAsyncJobAcquireWaitTime|10000|The time (in milliseconds) the async job acquisition thread will wait to execute the next acquirement query. This happens when no new async jobs were found or when less async jobs have been fetched than set in _asyncExecutorMaxAsyncJobsDuePerAcquisition_.
+|asyncExecutorMaxTimerJobsPerAcquisition|1|The number of timer jobs that are acquired in one query. Default value is 1, as this lowers the potential for optimistic locking exceptions. Larger values can perform better, but the chance of optimistic locking exceptions occurring between different engines becomes larger too.
+|asyncExecutorMaxAsyncJobsDuePerAcquisition|1|The number of async jobs that are acquired during one query. Default value is 1, as this lowers the potential for optimistic locking exceptions. Larger values can perform better, but the chance of optimistic locking exceptions occurring between different engines becomes larger too.
+|asyncExecutorDefaultTimerJobAcquireWaitTime|10000|The time (in milliseconds) the timer acquisition thread will wait to execute the next query. This happens when no new timer jobs are found or when less timer jobs have been fetched than set in _asyncExecutorMaxTimerJobsPerAcquisition_.
+|asyncExecutorDefaultAsyncJobAcquireWaitTime|10000|The time (in milliseconds) the async job acquisition thread will wait to execute the next query. This happens when no new async jobs were found or when less async jobs have been fetched than set in _asyncExecutorMaxAsyncJobsDuePerAcquisition_.
 |asyncExecutorDefaultQueueSizeFullWaitTime|0|The time (in milliseconds) the async job (both timer and async continuations) acquisition thread will wait when the internal job queue is full to execute the next query. By default set to 0 (for backwards compatibility). Setting this property to a higher value allows the async executor to hopefully clear its queue a bit.
 |asyncExecutorTimerLockTimeInMillis|5 minutes|The amount of time (in milliseconds) a timer job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
 |asyncExecutorAsyncJobLockTimeInMillis|5 minutes|The amount of time (in milliseconds) an async job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
-|asyncExecutorSecondsToWaitOnShutdown|60|The time (in seconds) that is waited to gracefully shut down the thread pool used for job execution when the a shutdown on the executor (or process engine) is requested.
+|asyncExecutorSecondsToWaitOnShutdown|60|The time (in seconds) that is waited to gracefully shut down the thread pool used for job execution when a shutdown on the executor (or process engine) is requested.
 |asyncExecutorResetExpiredJobsInterval|60 seconds|The amount of time (in milliseconds) that is between two consecutive checks of 'expired jobs'. Expired jobs are jobs that were locked (a lock owner + time was written by some executor, but the job was never completed). During such a check, jobs that are expired are made available again, meaning the lock owner and lock time will be removed. Other executors will now be able to pick it up. A job is deemed expired if the lock time is before the current date.
 |asyncExecutorResetExpiredJobsPageSize|3|The amount of jobs that are fetched at once by the 'reset expired' thread of the async executor.
 |===============
@@ -66,7 +66,7 @@ When reading the <<async_executor_design,async executor design section>>, it bec
 
 Benchmarks have shown that using a message queue is superior, throughput-wise, to the thread pool-backed async executor. However, it does come with an extra architectural component, which of course makes setup, maintenance and monitoring more complex. For many users, the performance of the thread pool-backed async executor is more than sufficient. It is nice to know however, that there is an alternative if the required performance grows.
 
-Currently, the only option that is supported out-of-the-box is JMS and Spring. The reason for supporting Spring before anything else is because Spring has some very nice features that ease a lot of the pain when it comes to threading and dealing with multiple message consumers. However, the integration is so simple, that it can easily be ported to any message queue implementation and/or protocol (Stomp, AMPQ, etc.). Feedback is appreciated for what should be the next implementation.
+Currently, the only option that is supported out-of-the-box is JMS with Spring. The reason for supporting Spring before anything else is because Spring has some very nice features that ease a lot of the pain when it comes to threading and dealing with multiple message consumers. However, the integration is so simple, that it can easily be ported to any message queue implementation or protocol (Stomp, AMPQ, and so on). Feedback is appreciated for what should be the next implementation.
 
 When a new async job is created by the engine, a message is put on a message queue (in a transaction committed transaction listener, so we're sure the job entry is in the database) containing the job identifier. A message consumer then takes this job identifier to fetch the job, and execute the job. The async executor will not create a thread pool anymore. It will insert and query for timers from a separate thread. When a timer fires, it is moved to the async job table, which now means a message is sent to the message queue too. The 'reset expired' thread will also unlock jobs as usual, as message queues can fail too. Instead of 'unlocking' a job, a message will now be resent. The async executor will not poll for async jobs anymore.
 
@@ -92,7 +92,7 @@ To enable the message queue based async executor, in the process engine configur
 * _asyncExecutorMessageQueueMode_ needs to be set to _true_
 * The _org.flowable.spring.executor.jms.MessageBasedJobManager_ must be injected as _JobManager_
 
-Below is a complete example of a Java based configuration, using _ActiveMQ_ as message queue broker.
+Below is a complete example of a Java based configuration, using _ActiveMQ_ as the message queue broker.
 
 Some things to note:
 
@@ -184,11 +184,11 @@ In the code above, the _JobMessageListener_ and _MessageBasedJobManager_ are the
 
 === Hooking into process parsing
 
-A BPMN 2.0 xml needs to be parsed to the Flowable internal model to be executed on the Flowable engine. This parsing happens during a deployment of the process or when a process is not found in memory, and the xml is fetched from the database.
+A BPMN 2.0 XML needs to be parsed to the Flowable internal model to be executed on the Flowable engine. This parsing happens during a deployment of the process or when a process is not found in memory, and the XML is fetched from the database.
 
-For each of these processes, the +BpmnParser+ class creates a new +BpmnParse+ instance. This instance will be used as container for all things that are done during parsing. The parsing on itself is very simple: for each BPMN 2.0 element, there is a matching instance of the +org.flowable.engine.parse.BpmnParseHandler+ available in the engine. As such, the parser has a map which basically maps a BPMN 2.0 element class to an instance of +BpmnParseHandler+. By default, Flowable has +BpmnParseHandler+ instances to handle all supported elements and also uses it to attach execution listeners to steps of the process for creating the history.
+For each of these processes, the +BpmnParser+ class creates a new +BpmnParse+ instance. This instance will be used as container for all things that are done during parsing. The parsing, by itself, is very simple: for each BPMN 2.0 element, there is a matching instance of the +org.flowable.engine.parse.BpmnParseHandler+ available in the engine. As such, the parser has a map that basically maps a BPMN 2.0 element class to an instance of +BpmnParseHandler+. By default, Flowable has +BpmnParseHandler+ instances to handle all supported elements and also uses it to attach execution listeners to steps of the process for creating the history.
 
-It is possible to add custom instances of +org.flowable.engine.parse.BpmnParseHandler+ to the Flowable engine. An often seen use case is for example to add execution listeners to certain steps that fire events to some queue for event processing. The history handling is done in such a way internally in Flowable. To add such custom handlers, the Flowable configuration needs to be tweaked:
+It is possible to add custom instances of +org.flowable.engine.parse.BpmnParseHandler+ to the Flowable engine. An often seen use case, for example, is to add execution listeners to certain steps that fire events to some queue for event processing. The history handling is done in such a way internally in Flowable. To add such custom handlers, the Flowable configuration needs to be tweaked:
 
 [source,xml,linenums]
 ----
@@ -221,7 +221,7 @@ public interface BpmnParseHandler {
 }
 ----
 
-The +getHandledTypes()+ method returns a collection of all the types handled by this parser.  The possible types are a subclass of +BaseElement+, as directed by the generic type of the collection. You can also extend the +AbstractBpmnParseHandler+ class and override the +getHandledType()+ method, which only returns one Class and not a collection. This class contains also some helper methods shared by many of the default parse handlers.  The +BpmnParseHandler+ instance will be called when the parser encounters any of the returned types by this method. In the following example, whenever a process contained in a BPMN 2.0 XML is encountered, it  will execute the logic in the +executeParse+ method (which is a typecasted method that replaces the regular +parse+ method on the +BpmnParseHandler+ interface).
+The +getHandledTypes()+ method returns a collection of all the types handled by this parser.  The possible types are a subclass of +BaseElement+, as directed by the generic type of the collection. You can also extend the +AbstractBpmnParseHandler+ class and override the +getHandledType()+ method, which only returns one Class and not a collection. This class also contains some helper methods shared by many of the default parse handlers.  The +BpmnParseHandler+ instance will be called when the parser encounters any of the types returned by this method. In the following example, whenever a process contained in some BPMN 2.0 XML is encountered, it will execute the logic in the +executeParse+ method (which is a typecast method that replaces the regular +parse+ method on the +BpmnParseHandler+ interface).
 
 [source,java,linenums]
 ----
@@ -238,7 +238,7 @@ public class TestBPMNParseHandler extends AbstractBpmnParseHandler<Process> {
 }
 ----
 
-*Important note:* when writing custom parse handler, do not use any of the internal  classes that are used to parse the BPMN 2.0 constructs. This will cause difficult to find bugs. The safe way to implement a custom handler is to implement the _BpmnParseHandler_ interface or extends the internal abstract class _org.flowable.engine.impl.bpmn.parser.handler.AbstractBpmnParseHandler_.
+*Important note:* when writing custom parse handlers, do not use any of the internal classes that are used to parse the BPMN 2.0 constructs. This will cause difficult to find bugs. The safe way to implement a custom handler is to implement the _BpmnParseHandler_ interface or extend the internal abstract class _org.flowable.engine.impl.bpmn.parser.handler.AbstractBpmnParseHandler_.
 
 It is possible (but less common) to replace the default +BpmnParseHandler+ instances that are responsible for the parsing of the BPMN 2.0 elements to the internal Flowable model. This can be done by following snippet of logic:
 
@@ -251,7 +251,7 @@ It is possible (but less common) to replace the default +BpmnParseHandler+ insta
 </property>
 ----
 
-A simple example could for example be to force all of the service tasks to be asynchronous:
+A simple example could, for example, be to force all of the service tasks to be asynchronous:
 
 [source,java,linenums]
 ----
@@ -273,13 +273,13 @@ public class CustomUserTaskBpmnParseHandler extends ServiceTaskParseHandler {
 [[advanced.uuid.generator]]
 
 
-=== UUID id generator for high concurrency
+=== UUID ID generator for high concurrency
 
-In some (very) high concurrency load cases, the default id generator may cause exceptions due to not being able to fetch new id blocks quickly enough. Every process engine has one id generator. The default id generator reserves a block of ids in the database, such that no other engine will be able to use id's from the same block. During  engine operations, when the default id generator notices that the id block is used up, a new transaction is started to fetch a new block. In (very) limited use cases this can cause problems when there is a real high load. For most use cases the default id generator is more than sufficient. The default +org.flowable.engine.impl.db.DbIdGenerator+ also has a property +idBlockSize+ which can be configured to set the size of the reserved block of ids and to tweak the behavior of the id fetching.
+In some (very) high concurrency load cases, the default ID generator may cause exceptions due to not being able to fetch new ID blocks quickly enough. Every process engine has one ID generator. The default ID generator reserves a block of IDs in the database, such that no other engine will be able to use IDs from the same block. During  engine operations, when the default ID generator notices that the ID block is used up, a new transaction is started to fetch a new block. In (very) limited use cases this can cause problems when there is a real high load. For most use cases the default ID generator is more than sufficient. The default +org.flowable.engine.impl.db.DbIdGenerator+ also has a property +idBlockSize+ which can be configured to set the size of the reserved block of IDs and to tweak the behavior of the ID fetching.
 
-The alternative to the default id generator is the +org.flowable.engine.impl.persistence.StrongUuidGenerator+, which generates a unique link:$$http://en.wikipedia.org/wiki/Universally_unique_identifier$$[UUID] locally and uses that as identifier for all entities. Since the UUID is generated without the need for database access, it copes better with very high concurrency use cases. Do note that performance may differ from the default id generator (both positive and negative) depending on the machine.
+The alternative to the default ID generator is the +org.flowable.engine.impl.persistence.StrongUuidGenerator+, which generates a unique link:$$http://en.wikipedia.org/wiki/Universally_unique_identifier$$[UUID] locally and uses that as an identifier for all entities. Since the UUID is generated without the need for database access, it copes better with very high concurrency use cases. Do note that performance may differ from the default ID generator (both positive and negative) depending on the machine.
 
-The UUID generator can be configured in the Flowable configuration as follows:
+The UUID generator can be set up in the Flowable configuration as follows:
 
 [source,xml,linenums]
 ----
@@ -289,7 +289,7 @@ The UUID generator can be configured in the Flowable configuration as follows:
 ----
 
 
-The use of the UUID id generator depends on the following extra dependency:
+The use of the UUID ID generator has the following extra dependency:
 
 [source,xml,linenums]
 ----
@@ -307,13 +307,13 @@ The use of the UUID id generator depends on the following extra dependency:
 === Multitenancy
 
 
-Multitenancy in general is a concept where the software is capable of serving multiple different organizations. Key is that the data is partitioned and no organization can see the data of other ones. In this context, such an organization (or a department, or a team or ...) is called a _tenant_.
+Multitenancy in general is a concept where the software is capable of serving multiple different organizations. Key is that the data is partitioned and no organization can see the data of other ones. In this context, such an organization (or a department, or a team or whatever, is called a _tenant_.
 
-Note that this is fundamentally different from a multi-instance setup, where a Flowable Process Engine instance is running for each organization separately (and with a different database schema). Although Flowable is lightweight, and running a Process Engine instance doesn't take much resources, it does add complexity and more maintenance. But, for some use cases it might be the right solution.
+Note that this is fundamentally different from a multi-instance setup, where a Flowable Process engine instance is running for each organization separately (and with a different database schema). Although Flowable is lightweight, and running a Process Engine instance doesn't take much resources, it does add complexity and more maintenance. But, for some use cases it might be the right solution.
 
-Multitenancy in Flowable is mainly implemented around partitioning the data. It is important to  note that _Flowable does not enforce multi tenancy rules_. This means it will not verify when querying and using data whether the user doing the operation is belonging to the correct tenant. This should be done in the layer calling the Flowable engine. Flowable does make sure that tenant information can be stored and used when retrieving process data.
+Multitenancy in Flowable is mainly implemented around partitioning the data. It is important to note that _Flowable does not enforce multi tenancy rules_. This means it will not verify when querying and using data whether the user doing the operation belongs to the correct tenant. This should be done in the layer calling the Flowable engine. Flowable does make sure that tenant information can be stored and used when retrieving process data.
 
-When deploying process definition to the Flowable Process Engine it is possible to pass a _tenant identifier_. This is a string (e.g. a UUID, department id, etc.), limited to 256 characters which is uniquely identifies the tenant:
+When deploying process definition to the Flowable Process engine it is possible to pass a _tenant identifier_. This is a string (e.g. a UUID, department id, etc.), limited to 256 characters which uniquely identifies the tenant:
 
 [source,java,linenums]
 ----
@@ -324,7 +324,7 @@ repositoryService.createDeployment()
 ----
 
 
-Passing a tenant id during a deployment has following implications:
+Passing a tenant ID during a deployment has following implications:
 
 * All the process definitions contained in the deployment inherit the tenant identifier from this deployment.
 * All process instances started from those process definitions inherit this tenant identifier from the process definition.
