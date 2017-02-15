@@ -151,7 +151,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
       skipExpression = null;
     }
     return new ServiceTaskDelegateExpressionActivityBehavior(serviceTask.getId(), delegateExpression, 
-        skipExpression, createFieldDeclarations(serviceTask.getFieldExtensions()));
+        skipExpression, createFieldDeclarations(serviceTask.getFieldExtensions()), serviceTask.getMapExceptions());
   }
   
   public ServiceTaskExpressionActivityBehavior createServiceTaskExpressionActivityBehavior(ServiceTask serviceTask) {
@@ -162,7 +162,8 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     } else {
       skipExpression = null;
     }
-    return new ServiceTaskExpressionActivityBehavior(serviceTask.getId(), expression, skipExpression, serviceTask.getResultVariableName());
+    return new ServiceTaskExpressionActivityBehavior(serviceTask.getId(), expression, skipExpression, 
+        serviceTask.getResultVariableName(), serviceTask.getMapExceptions());
   }
   
   public WebServiceActivityBehavior createWebServiceActivityBehavior(ServiceTask serviceTask) {

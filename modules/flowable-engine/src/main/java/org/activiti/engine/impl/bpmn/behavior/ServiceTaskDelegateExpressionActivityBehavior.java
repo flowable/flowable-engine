@@ -14,6 +14,7 @@ package org.activiti.engine.impl.bpmn.behavior;
 
 import java.util.List;
 
+import org.activiti.bpmn.model.MapExceptionEntry;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.DynamicBpmnConstants;
 import org.activiti.engine.delegate.BpmnError;
@@ -48,13 +49,17 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
   protected String serviceTaskId;
   protected Expression expression;
   protected Expression skipExpression;
-  private final List<FieldDeclaration> fieldDeclarations;
+  protected List<FieldDeclaration> fieldDeclarations;
+  protected List<MapExceptionEntry> mapExceptions;
 
-  public ServiceTaskDelegateExpressionActivityBehavior(String serviceTaskId, Expression expression, Expression skipExpression, List<FieldDeclaration> fieldDeclarations) {
+  public ServiceTaskDelegateExpressionActivityBehavior(String serviceTaskId, Expression expression, 
+      Expression skipExpression, List<FieldDeclaration> fieldDeclarations, List<MapExceptionEntry> mapExceptions) {
+    
     this.serviceTaskId = serviceTaskId;
     this.expression = expression;
     this.skipExpression = skipExpression;
     this.fieldDeclarations = fieldDeclarations;
+    this.mapExceptions = mapExceptions;
   }
 
   @Override
@@ -103,6 +108,7 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
       } else {
         leave(execution);
       }
+      
     } catch (Exception exc) {
 
       Throwable cause = exc;
@@ -111,6 +117,10 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
         if (cause instanceof BpmnError) {
           error = (BpmnError) cause;
           break;
+        } else if (cause instanceof RuntimeException) {
+          if (ErrorPropagation.mapException((RuntimeException) cause, execution, mapExceptions)) {
+            return;
+          }
         }
         cause = cause.getCause();
       }
