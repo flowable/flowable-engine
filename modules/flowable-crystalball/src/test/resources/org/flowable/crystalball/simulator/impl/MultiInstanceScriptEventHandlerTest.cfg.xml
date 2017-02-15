@@ -30,6 +30,7 @@
             <entry key="simulationRunFactory" value-ref="&amp;simulationRunFa"/>
           </map>
         </constructor-arg>
+        <constructor-arg name="processEngineConfiguration" ref="processEngineConfiguration" />
       </bean>
     </property>
 

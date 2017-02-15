@@ -1,4 +1,4 @@
-<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="definition_10002" name="Risk Assessment" namespace="http://www.activiti.org/dmn">
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="definition_10002" name="Risk Assessment" namespace="http://www.flowable.org/dmn">
   <decision id="RiskAssessmentUpdated" name="Risk Assessment">
     <decisionTable id="decisionTable_10002" hitPolicy="ANY">
       <input label="Risk Category 1">

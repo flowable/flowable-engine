@@ -1,4 +1,4 @@
-<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="full" name="Full" namespace="http://www.activiti.org/dmn">
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="full" name="Full" namespace="http://www.flowable.org/dmn">
   <decision id="decision1" name="Full Decision">
     <decisionTable id="decisionTable" hitPolicy="FIRST">
       <input>
