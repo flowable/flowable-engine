@@ -114,7 +114,6 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         // scope constructs
         SubProcessJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
         EventSubProcessJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
-        CollapsedSubProcessJsonConverter.fillTypes(convertersToBpmnMap,convertersToJsonMap);
 
         // catch events
         CatchEventJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
@@ -748,17 +747,12 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                     ObjectNode lowerRightNode = (ObjectNode) boundsNode.get(EDITOR_BOUNDS_LOWER_RIGHT);
 
                     //a lane is a childshape of a pool but the bounds of the lane are the correct x,y
-                    if("BPMNDiagram".equals(stencilId)){
-                        graphicInfo.setX(upperLeftNode.get(EDITOR_BOUNDS_X).asDouble());
-                        graphicInfo.setY(upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble());
-                        graphicInfo.setWidth(lowerRightNode.get(EDITOR_BOUNDS_X).asDouble()-graphicInfo.getX());
-                        graphicInfo.setHeight(lowerRightNode.get(EDITOR_BOUNDS_Y).asDouble()-graphicInfo.getY());
-                    }else{
-                        graphicInfo.setX(upperLeftNode.get(EDITOR_BOUNDS_X).asDouble() + parentX);
-                        graphicInfo.setY(upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble() + parentY);
-                        graphicInfo.setWidth(lowerRightNode.get(EDITOR_BOUNDS_X).asDouble() - graphicInfo.getX() + parentX);
-                        graphicInfo.setHeight(lowerRightNode.get(EDITOR_BOUNDS_Y).asDouble() - graphicInfo.getY() + parentY);
-                    }
+                    //we @amaron have a fix for lanes in a pool not correctly formated back to json but its not approved by tijs yet.
+                    //see unmerged pull request... https://github.com/Activiti/Activiti/pull/982
+                    graphicInfo.setX(upperLeftNode.get(EDITOR_BOUNDS_X).asDouble() + parentX);
+                    graphicInfo.setY(upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble() + parentY);
+                    graphicInfo.setWidth(lowerRightNode.get(EDITOR_BOUNDS_X).asDouble() - graphicInfo.getX() + parentX);
+                    graphicInfo.setHeight(lowerRightNode.get(EDITOR_BOUNDS_Y).asDouble() - graphicInfo.getY() + parentY);
 
                     String childShapeId = jsonChildNode.get(EDITOR_SHAPE_ID).asText();
                     bpmnModel.addGraphicInfo(BpmnJsonConverterUtil.getElementId(jsonChildNode), graphicInfo);
@@ -775,7 +769,13 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                         }
                     }
 
-                    readShapeDI(jsonChildNode, graphicInfo.getX(), graphicInfo.getY(), shapeMap, sourceRefMap, bpmnModel);
+                    //The graphic info of the collapsed subprocess is relative to its parent.
+                    //But the children of the collapsed subprocess are relative to the canvas upper corner. (always 0,0)
+                    if(STENCIL_COLLAPSED_SUB_PROCESS.equals(stencilId)){
+                        readShapeDI(jsonChildNode, 0,0, shapeMap, sourceRefMap, bpmnModel);
+                    }else{
+                        readShapeDI(jsonChildNode, graphicInfo.getX(), graphicInfo.getY(), shapeMap, sourceRefMap, bpmnModel);
+                    }
                 }
             }
         }
@@ -788,7 +788,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
                 ObjectNode childNode = (ObjectNode) jsonChildNode;
                 String stencilId = BpmnJsonConverterUtil.getStencilId(childNode);
-                if (STENCIL_SUB_PROCESS.equals(stencilId) || STENCIL_COLLAPSED_SUB_PROCESS.equals(stencilId) || "BPMNDiagram".equals(stencilId)) {
+                if (STENCIL_SUB_PROCESS.equals(stencilId) || STENCIL_COLLAPSED_SUB_PROCESS.equals(stencilId)) {
                     filterAllEdges(childNode, edgeMap, sourceAndTargetMap, shapeMap, sourceRefMap);
 
                 } else if (STENCIL_SEQUENCE_FLOW.equals(stencilId) || STENCIL_ASSOCIATION.equals(stencilId)) {

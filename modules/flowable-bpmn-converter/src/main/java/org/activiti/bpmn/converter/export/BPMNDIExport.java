@@ -40,7 +40,7 @@ public class BPMNDIExport implements BpmnXMLConstants {
     }
 
     //keep a tracker of all subprocesses
-    Map<String,CollapsedSubProcess> collapsedSubProcessMap = new HashMap<String, CollapsedSubProcess>();
+    Map<String,SubProcess> collapsedSubProcessMap = new HashMap<String, SubProcess>();
     Map<String,String> collapsedSubProcessChildren = new HashMap<String, String>();
 
     for(String elementId : model.getLocationMap().keySet()){
@@ -50,15 +50,18 @@ public class BPMNDIExport implements BpmnXMLConstants {
       }else{
         logger.debug("{} - {} ",elementId, flowElement.getClass().getSimpleName());
       }
-      if(flowElement instanceof CollapsedSubProcess){
-        CollapsedSubProcess csp = (CollapsedSubProcess) flowElement;
-
-        for(FlowElement element : csp.getFlowElements()){
-          //the key is the element. the value is the collapsedsubprocess.
-          collapsedSubProcessChildren.put(element.getId(),elementId);
-        }
-
-        collapsedSubProcessMap.put(elementId, csp);
+      if(flowElement instanceof SubProcess){
+		  String flowId = flowElement.getId();
+		  GraphicInfo gi = model.getGraphicInfo(flowId);
+		  Boolean isExpanded = gi.getExpanded();
+		  if(isExpanded != null && isExpanded == false){
+			  SubProcess csp = (SubProcess) flowElement;
+			  for(FlowElement element : csp.getFlowElements()){
+				  //the key is the element. the value is the collapsedsubprocess.
+				  collapsedSubProcessChildren.put(element.getId(),elementId);
+			  }
+			  collapsedSubProcessMap.put(elementId, csp);
+		  }
       }
     }
 
@@ -109,7 +112,7 @@ public class BPMNDIExport implements BpmnXMLConstants {
     // end of the bpmn diagram
     xtw.writeEndElement();
 
-    for(Map.Entry<String, CollapsedSubProcess> entry : collapsedSubProcessMap.entrySet()){
+    for(Map.Entry<String, SubProcess> entry : collapsedSubProcessMap.entrySet()){
 		xtw.writeStartElement(BPMNDI_PREFIX, ELEMENT_DI_DIAGRAM, BPMNDI_NAMESPACE);
 		xtw.writeAttribute(ATTRIBUTE_ID, "BPMNDiagram_" + entry.getKey());
 
@@ -117,18 +120,22 @@ public class BPMNDIExport implements BpmnXMLConstants {
 		xtw.writeAttribute(ATTRIBUTE_DI_BPMNELEMENT, entry.getKey());
 		xtw.writeAttribute(ATTRIBUTE_ID, "BPMNPlane_" + entry.getKey());
 
-		//add the canvas shape
-		createBpmnShape(model,entry.getKey()+"-canvas",xtw);
-
-		CollapsedSubProcess collapsedSubProcess = entry.getValue();
+		//add collapsed panel shapes...
+		SubProcess collapsedSubProcess = entry.getValue();
 		for(FlowElement child : collapsedSubProcess.getFlowElements()){
+			//if there is no graphicinfo we should not create a shape (dataobjects...)
+
 			if(child instanceof SequenceFlow){
 				createBpmnEdge(model,child.getId(),xtw);
 			}else{
+				GraphicInfo graphicInfo = model.getGraphicInfo(child.getId());
+				if(graphicInfo != null){
 				createBpmnShape(model,child.getId(),xtw);
+				}
 			}
 		}
 
+		xtw.writeEndElement();
 		xtw.writeEndElement();
 	}
   }

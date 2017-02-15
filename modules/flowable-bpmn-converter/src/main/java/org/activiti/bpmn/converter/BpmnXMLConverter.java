@@ -558,11 +558,6 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
         }
       }
 
-      //TODO: there is an indicator in the graphic info field?
-      if(subProcess instanceof CollapsedSubProcess){
-      	xtw.writeAttribute("activiti:collapsed","true");
-	  }
-
       if (StringUtils.isNotEmpty(subProcess.getDocumentation())) {
 
         xtw.writeStartElement(ELEMENT_DOCUMENTATION);

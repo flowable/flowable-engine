@@ -40,6 +40,7 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter {
   
     public static void fillJsonTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap) {
       convertersToBpmnMap.put(STENCIL_SUB_PROCESS, SubProcessJsonConverter.class);
+      convertersToBpmnMap.put(STENCIL_COLLAPSED_SUB_PROCESS, SubProcessJsonConverter.class);
     }
   
     public static void fillBpmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
@@ -48,18 +49,31 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter {
     }
   
     protected String getStencilId(BaseElement baseElement) {
-      return STENCIL_SUB_PROCESS;
+        //see http://forum.flowable.org/t/collapsed-subprocess-navigation-in-the-web-based-bpmn-modeler/138/19
+        GraphicInfo graphicInfo = model.getGraphicInfo(baseElement.getId());
+        Boolean isExpanded = graphicInfo.getExpanded();
+        if(isExpanded != null && isExpanded == false){
+            return STENCIL_COLLAPSED_SUB_PROCESS;
+        }else{
+            return STENCIL_SUB_PROCESS;
+        }
     }
 
     protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
       SubProcess subProcess = (SubProcess) baseElement;
-    
-      propertiesNode.put("activitytype", "Sub-Process");
-      propertiesNode.put("subprocesstype", "Embedded");
+
+      propertiesNode.put("activitytype", getStencilId(baseElement));
+      GraphicInfo gi = model.getGraphicInfo(baseElement.getId());
+      Boolean isExpanded = gi.getExpanded();
       ArrayNode subProcessShapesArrayNode = objectMapper.createArrayNode();
       GraphicInfo graphicInfo = model.getGraphicInfo(subProcess.getId());
-      processor.processFlowElements(subProcess, model, subProcessShapesArrayNode,
-              graphicInfo.getX(), graphicInfo.getY());
+
+      if(isExpanded != null && isExpanded == false){
+        processor.processFlowElements(subProcess, model, subProcessShapesArrayNode,0, 0);
+      }else{
+        processor.processFlowElements(subProcess, model, subProcessShapesArrayNode,graphicInfo.getX(), graphicInfo.getY());
+      }
+
       flowElementNode.put("childShapes", subProcessShapesArrayNode);
       
       if (subProcess instanceof Transaction) {
@@ -73,7 +87,6 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter {
       SubProcess subProcess = null;
       if (getPropertyValueAsBoolean("istransaction", elementNode)) {
         subProcess = new Transaction();
-        
       } else {
         subProcess = new SubProcess();
       }
@@ -87,7 +100,13 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter {
         subProcess.setDataObjects(dataObjects);
         subProcess.getFlowElements().addAll(dataObjects);
       }
-      
+
+      //store correct convertion info...
+      if(STENCIL_COLLAPSED_SUB_PROCESS.equals(BpmnJsonConverterUtil.getStencilId(elementNode))){
+          GraphicInfo graphicInfo = model.getGraphicInfo(BpmnJsonConverterUtil.getElementId(elementNode));
+          graphicInfo.setExpanded(false); //default is null!
+      }
+
       return subProcess;
     }
 

@@ -32,9 +32,13 @@ public class BpmnShapeParser implements BpmnXMLConstants {
   	GraphicInfo graphicInfo = new GraphicInfo();
   	
   	String strIsExpanded = xtr.getAttributeValue(null, ATTRIBUTE_DI_IS_EXPANDED);
+
+  	//see: http://forum.flowable.org/t/collapsed-subprocess-navigation-in-the-web-based-bpmn-modeler/138/21?u=ddpardo
     if ("true".equalsIgnoreCase(strIsExpanded)) {
-      graphicInfo.setExpanded(true);
-    }
+      	graphicInfo.setExpanded(true);
+    }else if("false".equalsIgnoreCase(strIsExpanded)){
+    	graphicInfo.setExpanded(false);
+	}
   	
     BpmnXMLUtil.addXMLLocation(graphicInfo, xtr);
 		while (xtr.hasNext()) {

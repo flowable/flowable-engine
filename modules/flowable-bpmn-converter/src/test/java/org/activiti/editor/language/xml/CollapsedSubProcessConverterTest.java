@@ -1,6 +1,5 @@
 package org.activiti.editor.language.xml;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.*;
 import org.junit.Test;
@@ -8,21 +7,22 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 /**
  * Created by Pardo David on 16/01/2017.
  */
-public class CollapsedSubProcessFullConvertionTest extends AbstractConverterTest {
+public class CollapsedSubProcessConverterTest extends AbstractConverterTest {
 	private static final String START_EVENT = "sid-89C70A03-C51B-4185-AB85-B8476E7A4F0C";
 	private static final String SEQUENCEFLOW_TO_COLLAPSEDSUBPROCESS = "sid-B80498C9-A45C-4D58-B4AA-5393A409ACAA";
+	private static final String COLLAPSEDSUBPROCESS = "sid-C20D5023-C2B9-4102-AA17-7F16E49E47C1";
 	private static final String IN_CSB_START_EVENT = "sid-D8198785-4F74-43A8-A4CD-AF383CEEBE04";
 	private static final String IN_CSB_SEQUENCEFLOW_TO_USERTASK = "sid-C633903D-1169-42A4-933D-4D9AAB959792";
 	private static final String IN_CSB_USERTASK = "sid-F64640C9-9585-4927-806B-8B0A03DB2B8B";
 	private static final String IN_CSB_SEQUENCEFLOW_TO_END = "sid-C1EFE310-3B12-42DA-AEE6-5E442C2FEF19";
 	private final static BpmnXMLConverter xmlConverter = new BpmnXMLConverter();
-	private final static ObjectMapper mapper = new ObjectMapper();
 
 	@Test
 	public void convertFromXmlToJava() throws Exception{
@@ -31,8 +31,9 @@ public class CollapsedSubProcessFullConvertionTest extends AbstractConverterTest
 	}
 
 	@Test
-	public void convertBothWays() throws Exception{
+	public void convertFromJavaToXml() throws Exception{
 		BpmnModel bpmnModel = readXMLFile();
+		validateModel(bpmnModel);
 		bpmnModel = exportAndReadXMLFile(bpmnModel);
 		validateModel(bpmnModel);
 	}
@@ -50,9 +51,13 @@ public class CollapsedSubProcessFullConvertionTest extends AbstractConverterTest
 		assertThat(gi.getY(),is(96.0));
 		assertThat(gi.getWidth(),is(30.0));
 		assertThat(gi.getHeight(),is(30.0));
+		assertThat(gi.getExpanded(),is(nullValue()));
 
 		flowLocationGraphicInfo = bpmnModel.getFlowLocationGraphicInfo(SEQUENCEFLOW_TO_COLLAPSEDSUBPROCESS);
 		assertThat(flowLocationGraphicInfo.size(),is(2));
+
+		gi = bpmnModel.getGraphicInfo(COLLAPSEDSUBPROCESS);
+		assertThat(gi.getExpanded(),is(false));
 
 		//intersection points traversed from xml are full points it seems...
 		start = flowLocationGraphicInfo.get(0);
@@ -62,13 +67,6 @@ public class CollapsedSubProcessFullConvertionTest extends AbstractConverterTest
 		end = flowLocationGraphicInfo.get(1);
 		assertThat(end.getX(),is(165.0));
 		assertThat(end.getY(),is(112.0));
-
-		//canvas
-		GraphicInfo graphicInfo = bpmnModel.getGraphicInfo("sid-C20D5023-C2B9-4102-AA17-7F16E49E47C1-canvas");
-		assertThat(graphicInfo.getX(),is(0.0));
-		assertThat(graphicInfo.getY(),is(0.0));
-		assertThat(graphicInfo.getWidth(),is(1200.0));
-		assertThat(graphicInfo.getHeight(),is(1050.0));
 
 		//validate graphic infos
 		FlowElement flowElement = bpmnModel.getFlowElement(IN_CSB_START_EVENT);

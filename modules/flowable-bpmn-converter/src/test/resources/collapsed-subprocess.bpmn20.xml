@@ -4,7 +4,7 @@
     <startEvent id="sid-89C70A03-C51B-4185-AB85-B8476E7A4F0C"></startEvent>
     <sequenceFlow id="sid-B80498C9-A45C-4D58-B4AA-5393A409ACAA" sourceRef="sid-89C70A03-C51B-4185-AB85-B8476E7A4F0C" targetRef="sid-C20D5023-C2B9-4102-AA17-7F16E49E47C1"></sequenceFlow>
     <endEvent id="sid-BF04B244-E974-4BB8-A28A-CAB8D4BC9C27"></endEvent>
-    <subProcess id="sid-C20D5023-C2B9-4102-AA17-7F16E49E47C1" name="advance" activiti:collapsed="true">
+    <subProcess id="sid-C20D5023-C2B9-4102-AA17-7F16E49E47C1" name="advance">
       <startEvent id="sid-D8198785-4F74-43A8-A4CD-AF383CEEBE04"></startEvent>
       <userTask id="sid-F64640C9-9585-4927-806B-8B0A03DB2B8B" name="User task 1"></userTask>
       <endEvent id="sid-4EDFEC94-82D6-48E2-8422-DE0F098CE7A3"></endEvent>
@@ -21,7 +21,7 @@
       <bpmndi:BPMNShape bpmnElement="sid-BF04B244-E974-4BB8-A28A-CAB8D4BC9C27" id="BPMNShape_sid-BF04B244-E974-4BB8-A28A-CAB8D4BC9C27">
         <omgdc:Bounds height="28.0" width="28.0" x="340.0" y="99.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-C20D5023-C2B9-4102-AA17-7F16E49E47C1" id="BPMNShape_sid-C20D5023-C2B9-4102-AA17-7F16E49E47C1">
+      <bpmndi:BPMNShape bpmnElement="sid-C20D5023-C2B9-4102-AA17-7F16E49E47C1" id="BPMNShape_sid-C20D5023-C2B9-4102-AA17-7F16E49E47C1" isExpanded="false">
         <omgdc:Bounds height="80.0" width="100.0" x="165.0" y="73.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="sid-B80498C9-A45C-4D58-B4AA-5393A409ACAA" id="BPMNEdge_sid-B80498C9-A45C-4D58-B4AA-5393A409ACAA">
@@ -36,9 +36,6 @@
   </bpmndi:BPMNDiagram>
   <bpmndi:BPMNDiagram id="BPMNDiagram_sid-C20D5023-C2B9-4102-AA17-7F16E49E47C1">
     <bpmndi:BPMNPlane bpmnElement="sid-C20D5023-C2B9-4102-AA17-7F16E49E47C1" id="BPMNPlane_sid-C20D5023-C2B9-4102-AA17-7F16E49E47C1">
-      <bpmndi:BPMNShape bpmnElement="sid-C20D5023-C2B9-4102-AA17-7F16E49E47C1-canvas" id="BPMNShape_sid-C20D5023-C2B9-4102-AA17-7F16E49E47C1-canvas">
-        <omgdc:Bounds height="1050.0" width="1200.0" x="0.0" y="0.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="sid-D8198785-4F74-43A8-A4CD-AF383CEEBE04" id="BPMNShape_sid-D8198785-4F74-43A8-A4CD-AF383CEEBE04">
         <omgdc:Bounds height="30.0" width="30.0" x="90.0" y="135.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>

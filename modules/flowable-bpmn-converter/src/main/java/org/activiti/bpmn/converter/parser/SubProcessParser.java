@@ -33,8 +33,6 @@ public class SubProcessParser implements BpmnXMLConstants {
 			subProcess = new Transaction();
 		} else if (ATTRIBUTE_VALUE_TRUE.equalsIgnoreCase(xtr.getAttributeValue(null, ATTRIBUTE_TRIGGERED_BY))) {
 			subProcess = new EventSubProcess();
-		} else if (ATTRIBUTE_VALUE_TRUE.equalsIgnoreCase(xtr.getAttributeValue(null, "collapsed"))) {
-			subProcess = new CollapsedSubProcess();
 		} else {
 			subProcess = new SubProcess();
 		}

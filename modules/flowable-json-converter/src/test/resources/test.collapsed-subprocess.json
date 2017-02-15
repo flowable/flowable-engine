@@ -137,26 +137,7 @@
       "stencil": {
         "id": "CollapsedSubProcess"
       },
-      "childShapes": [
-        {
-          "resourceId": "2180001",
-          "properties": {
-            "process_id": "sid-C20D5023-C2B9-4102-AA17-7F16E49E47C1",
-            "name": "New subprocess",
-            "documentation": "",
-            "process_author": "",
-            "process_version": "",
-            "process_namespace": "http://www.activiti.org/processdef",
-            "executionlisteners": "{\"executionListeners\":[]}",
-            "eventlisteners": "{\"eventListeners\":[]}",
-            "signaldefinitions": "[]",
-            "messagedefinitions": "[]",
-            "messages": []
-          },
-          "stencil": {
-            "id": "BPMNDiagram"
-          },
-          "childShapes": [
+      "childShapes":  [
             {
               "resourceId": "sid-D8198785-4F74-43A8-A4CD-AF383CEEBE04",
               "properties": {
@@ -344,22 +325,6 @@
               }
             }
           ],
-          "bounds": {
-            "lowerRight": {
-              "x": 1200,
-              "y": 1050
-            },
-            "upperLeft": {
-              "x": 0,
-              "y": 0
-            }
-          },
-          "stencilset": {
-            "namespace": "http://b3mn.org/stencilset/bpmn2.0#"
-          },
-          "ssextensions": []
-        }
-      ],
       "outgoing": [
         {
           "resourceId": "sid-7833309B-3412-4856-9F41-833113FF7E4E"
