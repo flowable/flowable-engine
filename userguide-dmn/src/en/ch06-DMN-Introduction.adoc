@@ -7,7 +7,7 @@
 
 === What is DMN?
 
-Decision Model and Notation (DMN) is a standard published by the link:$$https://en.wikipedia.org/wiki/Object_Management_Group$$[Object Management Group]. It is a standard approach for describing and modeling repeatable decisions within organizations to ensure that decision models are interchangeable across organizations.
+Decision Model and Notation (DMN) is a standard published by the link:$$http://www.omg.org/spec/DMN/1.1$$[Object Management Group]. It is a standard approach for describing and modeling repeatable decisions within organizations to ensure that decision models are interchangeable across organizations.
 
 [[dmnDefiningDecision]]
 
@@ -18,7 +18,7 @@ The root element of the DMN 1.1 schema is a *definitions* element. Within this e
 
 [source,xml,linenums]
 ----
-<definitions xmlns="http://www.omg.org/spec/DMN/20151130"
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101"
   namespace="http://www.flowable.org/dmn"
   name="DetermineDiscount">
 
@@ -26,7 +26,7 @@ The root element of the DMN 1.1 schema is a *definitions* element. Within this e
 
     <decisionTable id="determineDiscountTable1" hitPolicy="FIRST">
       ..
-    </decisionTable>S
+    </decisionTable>
 
   </decision>
 
@@ -86,12 +86,12 @@ The DMN spec provides a specification for an expression language; (S)-FEEL. Curr
 image::images/decision_tables_6.png[align="center"]
 
 To enter an expression double click on the corresponding cell. 
-In this example the expression ' == "BRONZE" ' is entered. Combined the variable defined in the corresponding input expression (column header) this will result during runtime in the full expression ' customerCat == "BRONZE" '.
+In this example the expression _== "BRONZE"_ is entered. Combined the variable defined in the corresponding input expression (column header) this will result during runtime in the full expression _customerCat == "BRONZE"_.
 
 image::images/decision_tables_7.png[align="center"]
 
 To enter an output expression double click the corresponding cell.
-In this example the expression ' 5 ' is entered. This is actually more like an implicit assignment. The value 5 will be assigned to the variable in the corresponding output entry (column) when all input entries of that rule are evaluated true.
+In this example the expression _5_ is entered. This is actually more like an implicit assignment. The value 5 will be assigned to the variable in the corresponding output entry (column) when all input entries of that rule are evaluated true.
 
 We can then continue completing the decision table by adding more rules (by selecting Add Rule).
 
@@ -119,7 +119,7 @@ The full DMN 1.1 XML of the example above.
 
 [source,xml,linenums]
 ----
-<definitions xmlns="http://www.omg.org/spec/DMN/20151130" id="definition_052249e2-f35d-11e6-9c45-0242ac120005" name="Determine Discount" namespace="http://www.flowable.org/dmn">
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="definition_052249e2-f35d-11e6-9c45-0242ac120005" name="Determine Discount" namespace="http://www.flowable.org/dmn">
   <decision id="DET_DISC_1" name="Determine Discount">
     <decisionTable id="decisionTable_052249e2-f35d-11e6-9c45-0242ac120005" hitPolicy="FIRST">
       <input label="Customer Category">

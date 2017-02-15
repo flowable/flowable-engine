@@ -4,7 +4,7 @@
 
 === DMN Definitions
 
-DMN Definitions with +.dmn.xml+ or +.dmn+ extension can be deployed to the DMN engine.
+DMN Definitions with +.dmn+ extension can be deployed to the DMN engine.
 
 When the DMN engine is plugged into the Process engine the DMN definitions can be packed into a business archive (bar) together with other process related resources. The Process engine deployment service will take care of deploying the DMN resources to the DMN engine.
 

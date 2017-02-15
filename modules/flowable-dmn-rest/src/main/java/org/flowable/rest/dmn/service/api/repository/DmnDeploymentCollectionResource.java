@@ -142,14 +142,14 @@ public class DmnDeploymentCollectionResource {
         try {
             DmnDeploymentBuilder deploymentBuilder = dmnRepositoryService.createDeployment();
             String fileName = file.getOriginalFilename();
-            if (StringUtils.isEmpty(fileName) || !(fileName.endsWith(".dmn") || fileName.endsWith(".xml"))) {
+            if (StringUtils.isEmpty(fileName) || !(fileName.endsWith(".dmn"))) {
                 fileName = file.getName();
             }
 
-            if (fileName.endsWith(".dmn") || fileName.endsWith(".xml")) {
+            if (fileName.endsWith(".dmn")) {
                 deploymentBuilder.addInputStream(fileName, file.getInputStream());
             } else {
-                throw new FlowableIllegalArgumentException("File must be of type .xml or .dmn");
+                throw new FlowableIllegalArgumentException("File must be of type .dmn");
             }
             deploymentBuilder.name(fileName);
 

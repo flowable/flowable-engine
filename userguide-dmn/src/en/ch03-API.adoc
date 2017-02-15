@@ -10,8 +10,6 @@
 The DMN engine API is the most common way of interacting with Flowable DMN. The central starting point is the +DmnEngine+, which can be created in several ways as described in the  <<configuration,configuration section>>. From the DmnEngine, you can obtain the various other services.
 DmnEngine and the services objects are thread safe. So you can keep a reference to 1 of those for a whole server.
 
-image::images/api.services.png[align="center"]
-
 [source,java,linenums]
 ----
 DmnEngine dmnEngine = DmnEngines.getDefaultDmnEngine();
@@ -138,40 +136,6 @@ public class MyDecisionTableTest {
   }
 }
 ----
-
-[[apiDebuggingUnitTest]]
-
-
-=== Debugging unit tests
-
-//TODO
-
-When using the in-memory H2 database for unit tests, the following instructions allow to easily inspect the data in the Flowable DMN database during a debugging session. The screenshots here are taken in Eclipse, but the mechanism should be similar for other IDEs.
-
-Suppose we have put a _breakpoint_ somewhere in our unit test. In Eclipse this is done by double-clicking in the left border next to the code:
-
-image::images/api.test.debug.breakpoint.png[align="center"]
-
-If we now run the unit test in _debug_ mode (right-click in test class, select 'Run as' and then 'JUnit test'), the test execution halts at our breakpoint, where we can now inspect the variables of our test as shown in the right upper panel.
-
-image::images/api.test.debug.view.png[align="center"]
-
-To inspect the Flowable data, open up the _'Display'_ window (if this window isn't there, open Window->Show View->Other and select _Display_.) and type (code completion is available) +org.h2.tools.Server.createWebServer("-web").start()+
-
-image::images/api.test.debug.start.h2.server.png[align="center"]
-
-Select the line you've just typed and right-click on it. Now select 'Display' (or execute the shortcut instead of right-clicking)
-
-image::images/api.test.debug.start.h2.server.2.png[align="center"]
-
-Now open up a browser and go to link:$$http://localhost:8082$$[http://localhost:8082], and fill in the JDBC URL to the in-memory database (by default this is ++jdbc:h2:mem:flowable++), and hit the connect button.
-
-image::images/api.test.debug.h2.login.png[align="center"]
-
-You can now see the Flowable data and use it to understand how and why your unit test is executing your process in a certain way.
-
-image::images/api.test.debug.h2.tables.png[align="center"]
-
 
 
 [[apiProcessEngineInWebApp]]
