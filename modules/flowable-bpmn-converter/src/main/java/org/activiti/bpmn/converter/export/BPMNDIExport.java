@@ -88,7 +88,13 @@ public class BPMNDIExport implements BpmnXMLConstants {
     xtw.writeAttribute(ATTRIBUTE_ID, "BPMNPlane_" + processId);
     
     for (String elementId : model.getLocationMap().keySet()) {
-      
+
+		//if the element is a child of an collapsed subprocess we don't add it info here.
+		if(collapsedSubProcessChildren.get(elementId) != null){
+			logger.debug("{} belongs to collapsed subprocess {}", elementId, collapsedSubProcessChildren.get(elementId));
+			continue;
+		}
+
       if (model.getFlowElement(elementId) != null || model.getArtifact(elementId) != null || 
           model.getPool(elementId) != null || model.getLane(elementId) != null) {
 		  createBpmnShape(model,elementId,xtw);
@@ -130,7 +136,7 @@ public class BPMNDIExport implements BpmnXMLConstants {
 			}else{
 				GraphicInfo graphicInfo = model.getGraphicInfo(child.getId());
 				if(graphicInfo != null){
-				createBpmnShape(model,child.getId(),xtw);
+					createBpmnShape(model,child.getId(),xtw);
 				}
 			}
 		}
