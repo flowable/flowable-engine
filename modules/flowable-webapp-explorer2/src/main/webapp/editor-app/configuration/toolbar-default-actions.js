@@ -21,7 +21,12 @@
 var KISBPM = KISBPM || {};
 KISBPM.TOOLBAR = {
     ACTIONS: {
-
+        validate: function(services){
+            var modal = services.$modal({
+                template: 'editor-app/popups/validate-model.html?version=' + Date.now(),
+                scope: services.$scope
+            });
+        },
         saveModel: function (services) {
 
             var modal = services.$modal({
@@ -429,3 +434,48 @@ activitiModule.controller('SaveModelCtrl',[ '$rootScope', '$scope', '$http', '$r
     };
 
 }]);
+
+activitiModule.controller('ValidateModelCtrl',['$scope', '$http','editorManager',
+    function ($scope, $http, editorManager) {
+        var editor = editorManager.getEditor();
+        var model = editorManager.getModel();
+        $scope.viewActiviti = function(entity){
+            editorManager.navigateTo(entity.activityId);
+            $scope.$hide();
+
+        };
+
+        $scope.errors = [];
+
+        $scope.errorGrid = {
+            data: 'errors',
+            multiSelect: false,
+            columnDefs: [
+                {field:'activityName', displayName: 'Name', width:125},
+                {field:'defaultDescription', displayName: 'Description'},
+                {field: 'warning', displayName: 'Critical', cellTemplate:'editor-app/configuration/properties/errorgrid-critical.html' ,width: 100},
+                {displayName: 'Actions', cellTemplate: 'editor-app/configuration/properties/errorgrid-actions.html', width: 75}
+            ]
+        };
+
+        $scope.status = {
+            loading: true
+        };
+
+
+        $http({
+            url: KISBPM.URL.validateModel(),
+            method: 'POST',
+            cache: false,
+            headers: {
+                "Content-Type":"application/json;charset=utf-8"
+            },
+            data: model
+        }).then(function(response){
+            $scope.status.loading = false;
+            $scope.errors = response.data;
+        },function(response){
+            console.log(response);
+        });
+    }
+]);

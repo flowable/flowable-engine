@@ -489,6 +489,37 @@ li.x-menu-list-item.x-menu-item-active a {
 	content: "X";
 }
 
+.validationGrid {
+	border: 1px solid rgb(212, 212, 212);
+	height: 300px;
+}
+
+.activiti-status {
+	border: 1px solid #3c3c3c;
+	margin: 2px;
+	height: 25px;
+	line-height: 25px;
+}
+
+.activiti-warning {
+	text-align: center;
+	background: yellow;
+	height: 100%;
+}
+
+.activiti-critical {
+	text-align: center;
+	background: #990000;
+	color: white;
+	height: 100%;
+}
+
+.actions {
+	padding-top: 2px;
+	padding-left: 5px;
+}
+
+/**Process navigator */
 #process-treeview-wrapper{
 	height: 200px;
 	background: #f3f3f3;

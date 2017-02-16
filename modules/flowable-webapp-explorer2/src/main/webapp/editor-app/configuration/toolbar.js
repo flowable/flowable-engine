@@ -28,6 +28,12 @@ KISBPM.TOOLBAR_CONFIG = {
             "action" : "KISBPM.TOOLBAR.ACTIONS.saveModel"
         },
         {
+            "type" : "button",
+            "title" : "TOOLBAR.ACTION.VALIDATE",
+            "cssClass" : "glyphicon glyphicon-ok",
+            "action": "KISBPM.TOOLBAR.ACTIONS.validate"
+        },
+        {
             "type" : "separator",
             "title" : "",
             "cssClass" : "toolbar-separator"

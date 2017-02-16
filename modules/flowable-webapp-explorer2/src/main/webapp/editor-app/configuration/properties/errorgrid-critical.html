@@ -1,0 +1,5 @@
+<div class="activiti-status">
+	<!-- we inverse the logic here. A false warning is critical. A true warning is a warning -->
+	<div class="activiti-warning" ng-if="row.entity.warning">Warning</div>
+	<div class="activiti-critical" ng-if="!row.entity.warning">Critical</div>
+</div>
