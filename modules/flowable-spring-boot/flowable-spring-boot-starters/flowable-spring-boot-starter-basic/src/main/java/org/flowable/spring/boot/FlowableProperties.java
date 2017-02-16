@@ -22,7 +22,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Josh Long
  * @author Joram Barrez
  */
-@ConfigurationProperties("spring.flowable")
+@ConfigurationProperties(prefix = "flowable")
 public class FlowableProperties {
 
     private boolean checkProcessDefinitions = true;
