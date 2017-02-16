@@ -9,7 +9,8 @@
     font-style: normal;
 }
 
-.row-no-gutter .col-xs-9 {
+.row-no-gutter .col-xs-9,
+.row-no-gutter .col-xs-12{
 	padding-left: 0px;
 	padding-right: 0px;
 	z-index: 50;
@@ -494,6 +495,14 @@ li.x-menu-list-item.x-menu-item-active a {
 	height: 300px;
 }
 
+.ng-hide-add-active, .ng-hide-remove {
+	display: inherit !important;
+}
+
+.ng-hide:not(.ng-animate) {
+	display: none !important;
+}
+
 .activiti-status {
 	border: 1px solid #3c3c3c;
 	margin: 2px;
@@ -518,6 +527,64 @@ li.x-menu-list-item.x-menu-item-active a {
 	padding-top: 2px;
 	padding-left: 5px;
 }
+
+/** collapse stencils **/
+#paletteSectionFooter {
+	height: 50px;
+	text-align: center;
+	background-color: #e8edf1;
+	border-top: 1px solid #a4acb9;
+	border-right: 1px solid #a4acb9;
+	cursor: pointer;
+	bottom: 0;
+}
+
+#paletteSectionFooter i {
+	line-height: 50px !important;
+}
+
+#paletteSectionOpen {
+	width: 30px;
+	height: 50px;
+	background-color: #e8edf1;
+	text-align: center;
+	bottom: 1px;
+	position: fixed;
+	z-index: 101;
+	border-top: 1px solid #a4acb9;
+	border-right: 1px solid #a4acb9;
+	cursor: pointer;
+	left: 0;
+}
+
+#paletteSectionOpen i {
+	line-height: 50px !important;
+}
+
+.hidden {
+	display: none
+}
+
+#paletteHelpWrapper {
+	float: left;
+	width: 300px;
+	transition: 0.3s width;
+}
+
+.close {
+	width: 0px !important;
+}
+
+#contentCanvasWrapper {
+	padding-left: 300px;
+	transition: 0.3s padding-left;
+}
+
+.collapsedCanvasWrapper {
+	padding-left: 0px !important;
+}
+
+
 
 /**Process navigator */
 #process-treeview-wrapper{
