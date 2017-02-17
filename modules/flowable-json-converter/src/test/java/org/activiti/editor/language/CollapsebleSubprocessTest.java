@@ -1,22 +1,24 @@
 package org.activiti.editor.language;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.activiti.bpmn.model.*;
-import org.activiti.editor.language.json.converter.BpmnJsonConverter;
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.GraphicInfo;
+import org.activiti.bpmn.model.SequenceFlow;
+import org.activiti.bpmn.model.StartEvent;
+import org.activiti.bpmn.model.UserTask;
+import org.junit.Test;
 
 /**
  * Created by Pardo David on 6/01/2017.
  */
-public class CollapsebleSubprocessTest extends AbstractConverterTest{
+public class CollapsebleSubprocessTest extends AbstractConverterTest {
+  
 	private static final String START_EVENT = "sid-89C70A03-C51B-4185-AB85-B8476E7A4F0C";
 	private static final String SEQUENCEFLOW_TO_COLLAPSEDSUBPROCESS = "sid-B80498C9-A45C-4D58-B4AA-5393A409ACAA";
 	private static final String COLLAPSEDSUBPROCESS = "sid-C20D5023-C2B9-4102-AA17-7F16E49E47C1";
@@ -117,8 +119,6 @@ public class CollapsebleSubprocessTest extends AbstractConverterTest{
 		end = flowLocationGraphicInfo.get(1);
 		assertThat(end.getX(),is(435.0));
 		assertThat(end.getY(),is(150.0));
-
-
 	}
 
 	@Override

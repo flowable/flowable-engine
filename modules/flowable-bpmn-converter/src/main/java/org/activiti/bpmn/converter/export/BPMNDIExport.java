@@ -18,9 +18,15 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import com.sun.javafx.collections.MappingChange;
 import org.activiti.bpmn.constants.BpmnXMLConstants;
-import org.activiti.bpmn.model.*;
+import org.activiti.bpmn.model.Artifact;
+import org.activiti.bpmn.model.Association;
+import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.GraphicInfo;
+import org.activiti.bpmn.model.MessageFlow;
+import org.activiti.bpmn.model.SequenceFlow;
+import org.activiti.bpmn.model.SubProcess;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +39,7 @@ public class BPMNDIExport implements BpmnXMLConstants {
     xtw.writeStartElement(BPMNDI_PREFIX, ELEMENT_DI_DIAGRAM, BPMNDI_NAMESPACE);
 
     String processId = null;
-    if(!model.getPools().isEmpty()) {
+    if (!model.getPools().isEmpty()) {
       processId = "Collaboration";
     } else {
       processId = model.getMainProcess().getId();
@@ -43,44 +49,45 @@ public class BPMNDIExport implements BpmnXMLConstants {
     Map<String,SubProcess> collapsedSubProcessMap = new HashMap<String, SubProcess>();
     Map<String,String> collapsedSubProcessChildren = new HashMap<String, String>();
 
-    for(String elementId : model.getLocationMap().keySet()){
+    for (String elementId : model.getLocationMap().keySet()){
       FlowElement flowElement = model.getFlowElement(elementId);
-      if(flowElement == null){
-        logger.debug("{} - {} ",elementId, "Not an element");
-      }else{
-        logger.debug("{} - {} ",elementId, flowElement.getClass().getSimpleName());
-      }
-      if(flowElement instanceof SubProcess){
-		  String flowId = flowElement.getId();
-		  GraphicInfo gi = model.getGraphicInfo(flowId);
-		  Boolean isExpanded = gi.getExpanded();
-		  if(isExpanded != null && isExpanded == false){
-			  SubProcess csp = (SubProcess) flowElement;
-			  for(FlowElement element : csp.getFlowElements()){
-				  //the key is the element. the value is the collapsedsubprocess.
-				  collapsedSubProcessChildren.put(element.getId(),elementId);
-			  }
-			  collapsedSubProcessMap.put(elementId, csp);
-		  }
+      
+      if (flowElement instanceof SubProcess) {
+  		  String flowId = flowElement.getId();
+  		  GraphicInfo gi = model.getGraphicInfo(flowId);
+  		  Boolean isExpanded = gi.getExpanded();
+  		  if (isExpanded != null && isExpanded == false){
+  			  SubProcess subProcess = (SubProcess) flowElement;
+  			  for (FlowElement element : subProcess.getFlowElements()){
+  				  //the key is the element. the value is the collapsed subprocess.
+  				  collapsedSubProcessChildren.put(element.getId(),elementId);
+  			  }
+  			  collapsedSubProcessMap.put(elementId, subProcess);
+  		  }
       }
     }
 
-    for(String elementId : model.getFlowLocationMap().keySet()){
-		FlowElement flowElement = model.getFlowElement(elementId);
-		String belongsTo = null;
-		if(flowElement instanceof SequenceFlow){
-			belongsTo = collapsedSubProcessChildren.get(((SequenceFlow) flowElement).getTargetRef());
-		}else if(flowElement == null){
-			//check if its an artifact
-			Artifact artifact = model.getArtifact(elementId);
-			if(artifact instanceof Association){
-				belongsTo = collapsedSubProcessChildren.get(((Association) artifact).getTargetRef());
-			}
-		}
-      if(belongsTo != null){
-        collapsedSubProcessChildren.put(elementId,belongsTo);
+    for (String elementId : model.getFlowLocationMap().keySet()){
+  		FlowElement flowElement = model.getFlowElement(elementId);
+  		String belongsTo = null;
+  		if (flowElement instanceof SequenceFlow) {
+  		  SequenceFlow sequenceFlow = (SequenceFlow) flowElement;
+  			belongsTo = collapsedSubProcessChildren.get(sequenceFlow.getTargetRef());
+  			
+  		} else if (flowElement == null) {
+  			//check if its an artifact
+  			Artifact artifact = model.getArtifact(elementId);
+  			if (artifact instanceof Association) {
+  			  Association association = (Association) artifact;
+  				belongsTo = collapsedSubProcessChildren.get(association.getTargetRef());
+  			}
+  		}
+  		
+      if (belongsTo != null) {
+        collapsedSubProcessChildren.put(elementId, belongsTo);
       }
     }
+    
     xtw.writeAttribute(ATTRIBUTE_ID, "BPMNDiagram_" + processId);
 
     xtw.writeStartElement(BPMNDI_PREFIX, ELEMENT_DI_PLANE, BPMNDI_NAMESPACE);
@@ -89,30 +96,31 @@ public class BPMNDIExport implements BpmnXMLConstants {
     
     for (String elementId : model.getLocationMap().keySet()) {
 
-		//if the element is a child of an collapsed subprocess we don't add it info here.
-		if(collapsedSubProcessChildren.get(elementId) != null){
-			logger.debug("{} belongs to collapsed subprocess {}", elementId, collapsedSubProcessChildren.get(elementId));
-			continue;
-		}
-
-      if (model.getFlowElement(elementId) != null || model.getArtifact(elementId) != null || 
-          model.getPool(elementId) != null || model.getLane(elementId) != null) {
-		  createBpmnShape(model,elementId,xtw);
+  		//if the element is a child of an collapsed subprocess we don't add its info here.
+  		if (collapsedSubProcessChildren.get(elementId) != null){
+  			logger.debug("{} belongs to collapsed subprocess {}", elementId, collapsedSubProcessChildren.get(elementId));
+  			continue;
+  		}
+  
+  		if (model.getFlowElement(elementId) != null || model.getArtifact(elementId) != null || 
+            model.getPool(elementId) != null || model.getLane(elementId) != null) {
+  		  
+  		  createBpmnShape(model,elementId,xtw);
       }
     }
 
     for (String elementId : model.getFlowLocationMap().keySet()) {
 
-      if(collapsedSubProcessChildren.get(elementId) != null){
+      if (collapsedSubProcessChildren.get(elementId) != null) {
         logger.info("{} belongs to collapsed subprocess {}", elementId, collapsedSubProcessChildren.get(elementId));
         continue;
       }
 
-      if (model.getFlowElement(elementId) != null || model.getArtifact(elementId) != null ||
-          model.getMessageFlow(elementId) != null) {
-		  createBpmnEdge(model,elementId,xtw);
+      if (model.getFlowElement(elementId) != null || model.getArtifact(elementId) != null || model.getMessageFlow(elementId) != null) {
+        createBpmnEdge(model,elementId,xtw);
       }
     }
+    
     // end BPMN DI elements (plance)
     xtw.writeEndElement();
     // end of the bpmn diagram
@@ -128,15 +136,14 @@ public class BPMNDIExport implements BpmnXMLConstants {
 
 		//add collapsed panel shapes...
 		SubProcess collapsedSubProcess = entry.getValue();
-		for(FlowElement child : collapsedSubProcess.getFlowElements()){
-			//if there is no graphicinfo we should not create a shape (dataobjects...)
-
-			if(child instanceof SequenceFlow){
+		for (FlowElement child : collapsedSubProcess.getFlowElements()){
+			
+		  if (child instanceof SequenceFlow){
 				createBpmnEdge(model,child.getId(),xtw);
-			}else{
+			} else {
 				GraphicInfo graphicInfo = model.getGraphicInfo(child.getId());
-				if(graphicInfo != null){
-					createBpmnShape(model,child.getId(),xtw);
+				if (graphicInfo != null) {
+					createBpmnShape(model, child.getId(), xtw);
 				}
 			}
 		}

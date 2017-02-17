@@ -23,7 +23,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Joram Barrez
  * @author Vedran Pavic
  */
-@ConfigurationProperties("spring.activiti")
+@ConfigurationProperties(prefix = "activiti")
 public class ActivitiProperties {
 
   private boolean checkProcessDefinitions = true;

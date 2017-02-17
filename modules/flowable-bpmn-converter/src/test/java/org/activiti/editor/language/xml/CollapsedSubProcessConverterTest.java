@@ -1,20 +1,25 @@
 package org.activiti.editor.language.xml;
 
-import org.activiti.bpmn.converter.BpmnXMLConverter;
-import org.activiti.bpmn.model.*;
-import org.junit.Test;
-
-import java.util.List;
-
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.List;
+
+import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.GraphicInfo;
+import org.activiti.bpmn.model.SequenceFlow;
+import org.activiti.bpmn.model.StartEvent;
+import org.activiti.bpmn.model.UserTask;
+import org.junit.Test;
+
 /**
  * Created by Pardo David on 16/01/2017.
  */
 public class CollapsedSubProcessConverterTest extends AbstractConverterTest {
+  
 	private static final String START_EVENT = "sid-89C70A03-C51B-4185-AB85-B8476E7A4F0C";
 	private static final String SEQUENCEFLOW_TO_COLLAPSEDSUBPROCESS = "sid-B80498C9-A45C-4D58-B4AA-5393A409ACAA";
 	private static final String COLLAPSEDSUBPROCESS = "sid-C20D5023-C2B9-4102-AA17-7F16E49E47C1";
@@ -22,7 +27,6 @@ public class CollapsedSubProcessConverterTest extends AbstractConverterTest {
 	private static final String IN_CSB_SEQUENCEFLOW_TO_USERTASK = "sid-C633903D-1169-42A4-933D-4D9AAB959792";
 	private static final String IN_CSB_USERTASK = "sid-F64640C9-9585-4927-806B-8B0A03DB2B8B";
 	private static final String IN_CSB_SEQUENCEFLOW_TO_END = "sid-C1EFE310-3B12-42DA-AEE6-5E442C2FEF19";
-	private final static BpmnXMLConverter xmlConverter = new BpmnXMLConverter();
 
 	@Test
 	public void convertFromXmlToJava() throws Exception{
@@ -118,8 +122,6 @@ public class CollapsedSubProcessConverterTest extends AbstractConverterTest {
 		end = flowLocationGraphicInfo.get(1);
 		assertThat(end.getX(),is(435.0));
 		assertThat(end.getY(),is(150.0));
-
-
 	}
 
 	@Override

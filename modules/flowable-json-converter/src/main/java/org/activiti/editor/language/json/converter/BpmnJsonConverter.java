@@ -748,9 +748,6 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                     ObjectNode upperLeftNode = (ObjectNode) boundsNode.get(EDITOR_BOUNDS_UPPER_LEFT);
                     ObjectNode lowerRightNode = (ObjectNode) boundsNode.get(EDITOR_BOUNDS_LOWER_RIGHT);
 
-                    //a lane is a childshape of a pool but the bounds of the lane are the correct x,y
-                    //we have a pull-request-fix for lanes in a pool not correctly formated back to json but its not approved by tijs yet.
-                    //see unmerged pull request... https://github.com/Activiti/Activiti/pull/982
                     graphicInfo.setX(upperLeftNode.get(EDITOR_BOUNDS_X).asDouble() + parentX);
                     graphicInfo.setY(upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble() + parentY);
                     graphicInfo.setWidth(lowerRightNode.get(EDITOR_BOUNDS_X).asDouble() - graphicInfo.getX() + parentX);
@@ -773,9 +770,9 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
                     //The graphic info of the collapsed subprocess is relative to its parent.
                     //But the children of the collapsed subprocess are relative to the canvas upper corner. (always 0,0)
-                    if(STENCIL_COLLAPSED_SUB_PROCESS.equals(stencilId)){
+                    if (STENCIL_COLLAPSED_SUB_PROCESS.equals(stencilId)){
                         readShapeDI(jsonChildNode, 0,0, shapeMap, sourceRefMap, bpmnModel);
-                    }else{
+                    } else {
                         readShapeDI(jsonChildNode, graphicInfo.getX(), graphicInfo.getY(), shapeMap, sourceRefMap, bpmnModel);
                     }
                 }

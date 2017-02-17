@@ -49,14 +49,14 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter {
     }
   
     protected String getStencilId(BaseElement baseElement) {
-        //see http://forum.flowable.org/t/collapsed-subprocess-navigation-in-the-web-based-bpmn-modeler/138/19
-        GraphicInfo graphicInfo = model.getGraphicInfo(baseElement.getId());
-        Boolean isExpanded = graphicInfo.getExpanded();
-        if(isExpanded != null && isExpanded == false){
-            return STENCIL_COLLAPSED_SUB_PROCESS;
-        }else{
-            return STENCIL_SUB_PROCESS;
-        }
+      //see http://forum.flowable.org/t/collapsed-subprocess-navigation-in-the-web-based-bpmn-modeler/138/19
+      GraphicInfo graphicInfo = model.getGraphicInfo(baseElement.getId());
+      Boolean isExpanded = graphicInfo.getExpanded();
+      if (isExpanded != null && isExpanded == false){
+        return STENCIL_COLLAPSED_SUB_PROCESS;
+      } else {
+        return STENCIL_SUB_PROCESS;
+      }
     }
 
     protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
@@ -68,10 +68,10 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter {
       ArrayNode subProcessShapesArrayNode = objectMapper.createArrayNode();
       GraphicInfo graphicInfo = model.getGraphicInfo(subProcess.getId());
 
-      if(isExpanded != null && isExpanded == false){
-        processor.processFlowElements(subProcess, model, subProcessShapesArrayNode,0, 0);
-      }else{
-        processor.processFlowElements(subProcess, model, subProcessShapesArrayNode,graphicInfo.getX(), graphicInfo.getY());
+      if (isExpanded != null && isExpanded == false){
+        processor.processFlowElements(subProcess, model, subProcessShapesArrayNode, 0, 0);
+      } else {
+        processor.processFlowElements(subProcess, model, subProcessShapesArrayNode, graphicInfo.getX(), graphicInfo.getY());
       }
 
       flowElementNode.put("childShapes", subProcessShapesArrayNode);
@@ -102,9 +102,9 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter {
       }
 
       //store correct convertion info...
-      if(STENCIL_COLLAPSED_SUB_PROCESS.equals(BpmnJsonConverterUtil.getStencilId(elementNode))){
-          GraphicInfo graphicInfo = model.getGraphicInfo(BpmnJsonConverterUtil.getElementId(elementNode));
-          graphicInfo.setExpanded(false); //default is null!
+      if (STENCIL_COLLAPSED_SUB_PROCESS.equals(BpmnJsonConverterUtil.getStencilId(elementNode))) {
+        GraphicInfo graphicInfo = model.getGraphicInfo(BpmnJsonConverterUtil.getElementId(elementNode));
+        graphicInfo.setExpanded(false); //default is null!
       }
 
       return subProcess;

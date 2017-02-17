@@ -103,7 +103,6 @@ ORYX.Core.StencilSet.Stencil = {
 				this._view = xml.documentElement;
 				
 			} else {
-				console.log("Invalid svg view found: " + xml);
 				throw "ORYX.Core.StencilSet.Stencil(_loadSVGOnSuccess): The response is not a valid SVG document."
 			}
 		} else {

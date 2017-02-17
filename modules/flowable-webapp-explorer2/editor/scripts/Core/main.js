@@ -85,15 +85,6 @@ ORYX.Editor = {
 		// Initialize the eventlistener
 		this._initEventListener();
 
-		// Load particular stencilset
-		// if(ORYX.CONFIG.BACKEND_SWITCH) {
-		// 	var ssUrl = (model.stencilset.namespace||model.stencilset.url).replace("#", "%23");
-		//ORYX.Core.StencilSet.loadStencilSet(ssUrl, this.modelMetaData, this.id);
-		// } else {
-		// 	var ssUrl = model.stencilset.url;
-        	// ORYX.Core.StencilSet.loadStencilSet(ssUrl, this.modelMetaData, this.id);
-		// }
-
 		// CREATES the canvas
 		this._createCanvas(model.stencil ? model.stencil.id : null, model.properties);
 
@@ -755,8 +746,6 @@ ORYX.Editor = {
 		this.selection = [null];
 		this.setSelection([]);
 
-		console.log("Loaded by Serialized");
-
         return shapes;
     },
 	
@@ -773,8 +762,8 @@ ORYX.Editor = {
 		
 		var stencilsets = this.getStencilSets();
 		var extension = this.ss_extensions_def.extensions.find(function(ex){
-				return !!stencilsets[ex["extends"]] && ex.namespace.endsWith("/meta#");
-			});
+			return !!stencilsets[ex["extends"]] && ex.namespace.endsWith("/meta#");
+		});
 			
 		return extension ? extension.namespace || null : null;		
 	},

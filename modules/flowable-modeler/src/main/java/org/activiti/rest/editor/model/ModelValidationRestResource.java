@@ -1,19 +1,19 @@
 package org.activiti.rest.editor.model;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.util.List;
+
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.editor.language.json.converter.BpmnJsonConverter;
 import org.activiti.validation.ProcessValidator;
 import org.activiti.validation.ProcessValidatorFactory;
 import org.activiti.validation.ValidationError;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Endpoint for the activiti modeler to validate the current model.
