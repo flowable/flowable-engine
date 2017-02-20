@@ -343,8 +343,6 @@ public class BpmnDeployer implements Deployer {
                                 dynamicBpmnService.changeLocalizationDescription(locale, flowElementId, documentation, infoNode);
                                 localizationValuesChanged = true;
                             }
-
-                            break;
                         }
                     }
                 }

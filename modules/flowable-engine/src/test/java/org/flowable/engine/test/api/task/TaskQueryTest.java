@@ -2602,6 +2602,11 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertEquals("Mi Tarea", tasks.get(0).getName());
         assertEquals("Mi Tarea Descripción", tasks.get(0).getDescription());
 
+        tasks = taskService.createTaskQuery().processDefinitionId(processInstance.getProcessDefinitionId()).locale("it").list();
+        assertEquals(1, tasks.size());
+        assertEquals("Il mio compito", tasks.get(0).getName());
+        assertEquals("Il mio compito Descrizione", tasks.get(0).getDescription());
+
         ObjectNode infoNode = dynamicBpmnService.getProcessDefinitionInfo(processInstance.getProcessDefinitionId());
 
         dynamicBpmnService.changeLocalizationName("en-GB", "theTask", "My 'en-GB' localized name", infoNode);
@@ -2622,6 +2627,11 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertEquals("Mi Tarea", tasks.get(0).getName());
         assertEquals("Mi Tarea Descripción", tasks.get(0).getDescription());
 
+        tasks = taskService.createTaskQuery().processDefinitionId(processInstance.getProcessDefinitionId()).locale("it").list();
+        assertEquals(1, tasks.size());
+        assertEquals("Il mio compito", tasks.get(0).getName());
+        assertEquals("Il mio compito Descrizione", tasks.get(0).getDescription());
+
         tasks = taskService.createTaskQuery().processDefinitionId(processInstance.getProcessDefinitionId()).locale("en-GB").list();
         assertEquals(1, tasks.size());
         assertEquals("My 'en-GB' localized name", tasks.get(0).getName());
@@ -2637,6 +2647,11 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertEquals("Mi Tarea", tasks.get(0).getName());
         assertEquals("Mi Tarea Descripción", tasks.get(0).getDescription());
 
+        tasks = taskService.createTaskQuery().processDefinitionId(processInstance.getProcessDefinitionId()).locale("it").listPage(0, 10);
+        assertEquals(1, tasks.size());
+        assertEquals("Il mio compito", tasks.get(0).getName());
+        assertEquals("Il mio compito Descrizione", tasks.get(0).getDescription());
+
         tasks = taskService.createTaskQuery().processDefinitionId(processInstance.getProcessDefinitionId()).locale("en-GB").listPage(0, 10);
         assertEquals(1, tasks.size());
         assertEquals("My 'en-GB' localized name", tasks.get(0).getName());
@@ -2649,6 +2664,10 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processDefinitionId(processInstance.getProcessDefinitionId()).locale("es").singleResult();
         assertEquals("Mi Tarea", task.getName());
         assertEquals("Mi Tarea Descripción", task.getDescription());
+
+        task = taskService.createTaskQuery().processDefinitionId(processInstance.getProcessDefinitionId()).locale("it").singleResult();
+        assertEquals("Il mio compito", task.getName());
+        assertEquals("Il mio compito Descrizione", task.getDescription());
 
         task = taskService.createTaskQuery().processDefinitionId(processInstance.getProcessDefinitionId()).locale("en-GB").singleResult();
         assertEquals("My 'en-GB' localized name", task.getName());
