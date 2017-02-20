@@ -12,7 +12,6 @@
  */
 package org.flowable.spring.test.junit4;
 
-import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.api.RuleEngineExecutionResult;
 import org.flowable.dmn.engine.DmnEngine;
