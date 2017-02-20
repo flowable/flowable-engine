@@ -14,7 +14,8 @@ Decision Model and Notation (DMN) is a standard published by the link:$$http://w
 
 === What is a DMN definition
 
-The root element of the DMN 1.1 schema is a *definitions* element. Within this element multiple decision definitions can be defined (although we advise to have only one process definition in each file, since this simplifies maintenance later in the development process). Within each decision one expression can be defined. There are several types of expressions. Within Flowabe, currently, the expression type *decision table* is supported.
+The root element of the DMN 1.1 schema is a *definitions* element. Within this element multiple decision definitions can be defined (although we advise to
+have only one process definition in each file, since this simplifies maintenance later in the development process). Within each decision one expression can be defined. There are several types of expressions. Within Flowable, currently, the expression type *decision table* is supported.
 
 [source,xml,linenums]
 ----
@@ -37,7 +38,7 @@ The root element of the DMN 1.1 schema is a *definitions* element. Within this e
 
 It's possible to create a DMN Definition with a plain text editor. But for this example we'll start by using the decision table editor included in the Flowable modeler.
 
-We'll implement a very simple usecase; determine the discount percentage based on a customer category.
+We'll implement a very simple use case; determine the discount percentage based on a customer category.
 
 Start by opening the decision tables section within the Flowable modeler.
 
@@ -51,7 +52,7 @@ Provide a decision table name and a unique decision table key and select *Create
 
 image::images/decision_tables_3.png[align="center"]
 
-You're now ready to define your decisin table. Let's describe what is presented within the editor.
+You're now ready to define your decision table. Let's describe what is presented within the editor.
 
 ==== Hit Policy
 
