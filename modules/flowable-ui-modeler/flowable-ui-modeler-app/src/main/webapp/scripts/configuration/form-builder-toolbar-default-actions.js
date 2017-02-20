@@ -35,7 +35,11 @@ var FORM_TOOLBAR = {
                     services.$rootScope.formChanges = false;
 
         		    var navigationObject = services.$rootScope.editorHistory.pop();
-        		    services.$location.path('/editor/' + navigationObject.id);
+        		    var additionalParameters = '';
+                	if (navigationObject.subProcessId && navigationObject.subProcessId.length > 0) {
+                		additionalParameters = '?subProcessId=' + navigationObject.subProcessId;
+                	}
+        		    services.$location.url('/editor/' + navigationObject.id + additionalParameters);
         		};
 
         		if (services.$rootScope.formChanges == true) {
@@ -119,7 +123,11 @@ angular.module('flowableModeler')
     	$scope.save(function() {
     	    if ($rootScope.editorHistory.length > 0) {
     	        var navigationObject = $rootScope.editorHistory.pop();
-    	        $location.path('/editor/' + navigationObject.id);
+    	        var additionalParameters = '';
+            	if (navigationObject.subProcessId && navigationObject.subProcessId.length > 0) {
+            		additionalParameters = '?subProcessId=' + navigationObject.subProcessId;
+            	}
+    	        $location.url('/editor/' + navigationObject.id + additionalParameters);
  
             } else {
             	$location.path('/forms');
@@ -192,7 +200,11 @@ angular.module('flowableModeler')
                     $rootScope.ignoreChanges = true;  // Otherwise will get pop up that changes are not saved.
                     if ($rootScope.editorHistory.length > 0) {
                         var navigationObject = $rootScope.editorHistory.pop();
-                        $location.path('/editor/' + navigationObject.id);
+                        var additionalParameters = '';
+		            	if (navigationObject.subProcessId && navigationObject.subProcessId.length > 0) {
+		            		additionalParameters = '?subProcessId=' + navigationObject.subProcessId;
+		            	}
+                        $location.url('/editor/' + navigationObject.id + additionalParameters);
                         
                     } else {
                     	$location.path('/forms');

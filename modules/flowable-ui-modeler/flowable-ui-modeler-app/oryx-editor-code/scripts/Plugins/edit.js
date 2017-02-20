@@ -411,12 +411,15 @@ ORYX.Plugins.Edit = Clazz.extend({
     editDelete: function(){
         var selection = this.facade.getSelection();
         
-        var clipboard = new ORYX.Plugins.Edit.ClipBoard();
-        clipboard.refresh(selection, this.getAllShapesToConsider(selection));
-        
-		var command = new ORYX.Plugins.Edit.DeleteCommand(clipboard , this.facade);
-                                       
-		this.facade.executeCommands([command]);
+        if (selection.length > 0) {
+			//only update the command stack if something was performed...
+	        var clipboard = new ORYX.Plugins.Edit.ClipBoard();
+	        clipboard.refresh(selection, this.getAllShapesToConsider(selection));
+	        
+			var command = new ORYX.Plugins.Edit.DeleteCommand(clipboard , this.facade);
+	                                       
+			this.facade.executeCommands([command]);
+		}
     }
 }); 
 
@@ -478,6 +481,7 @@ ORYX.Plugins.Edit.DeleteCommand = ORYX.Core.Command.extend({
         this.facade.setSelection([]);
         this.facade.getCanvas().update();		
 		this.facade.updateSelection();
+		this.facade.handleEvents({type: ORYX.CONFIG.ACTION_DELETE_COMPLETED});
         
     },
     rollback: function(){

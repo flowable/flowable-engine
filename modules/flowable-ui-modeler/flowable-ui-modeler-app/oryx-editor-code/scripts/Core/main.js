@@ -94,8 +94,6 @@ ORYX.Editor = {
 		//meta data about the model for the signavio warehouse
 		//directory, new, name, description, revision, model (the model data)
 		
-		this.modelMetaData = config;
-		
 		var model = config;
 		
 		this.id = model.modelId;
@@ -116,15 +114,6 @@ ORYX.Editor = {
 		
 		// Initialize the eventlistener
 		this._initEventListener();
-
-		// Load particular stencilset
-		if(ORYX.CONFIG.BACKEND_SWITCH) {
-			var ssUrl = (model.stencilset.namespace||model.stencilset.url).replace("#", "%23");
-        	ORYX.Core.StencilSet.loadStencilSet(ssUrl, this.modelMetaData, this.id);
-		} else {
-			var ssUrl = model.stencilset.url;
-        	ORYX.Core.StencilSet.loadStencilSet(ssUrl, this.modelMetaData, this.id);
-		}
 
 		// CREATES the canvas
 		this._createCanvas(model.stencil ? model.stencil.id : null, model.properties);
@@ -153,6 +142,7 @@ ORYX.Editor = {
             this.getCanvas().update();
 			loadContentFinished = true;
 			initFinished();
+			this.handleEvents({type: ORYX.CONFIG.EVENT_EDITOR_INIT_COMPLETED});
 		}.bind(this), 200);
 	},
 	

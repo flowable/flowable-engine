@@ -68,23 +68,6 @@ ORYX.Core.StencilSet.Stencil = {
 		
 		this._view;
 		this._properties = new Hash();
-
-		// check stencil consistency and set defaults.
-		/*with(this._jsonStencil) {
-			
-			if(!type) throw "Stencil does not provide type.";
-			if((type != "edge") && (type != "node"))
-				throw "Stencil type must be 'edge' or 'node'.";
-			if(!id || id == "") throw "Stencil does not provide valid id.";
-			if(!title || title == "")
-				throw "Stencil does not provide title";
-			if(!description) { description = ""; };
-			if(!groups) { groups = []; }
-			if(!roles) { roles = []; }
-
-			// add id of stencil to its roles
-			roles.push(id);
-		}*/
 		
 		//init all JSON values
 		if(!this._jsonStencil.type || !(this._jsonStencil.type === "edge" || this._jsonStencil.type === "node")) {
@@ -163,7 +146,7 @@ ORYX.Core.StencilSet.Stencil = {
 				this._view = xml.documentElement;
 				
 			} else {
-				throw "ORYX.Core.StencilSet.Stencil(_loadSVGOnSuccess): The response is not a SVG document."
+				throw "ORYX.Core.StencilSet.Stencil(_loadSVGOnSuccess): The response is not a valid SVG document."
 			}
 		} else {
 			new Ajax.Request(

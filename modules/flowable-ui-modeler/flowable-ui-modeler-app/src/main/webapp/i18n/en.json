@@ -542,15 +542,6 @@
         }
     },
 
-    "BPMN-EDITOR": {
-        "PROPERTY": {
-            "FORM-REFERENCE": {
-                "TITLE": "Referenced form",
-                "DESCRIPTION": "Reference to a form."
-            }
-        }
-    },
-
     "ACTION.OK" : "Ok",
     "ACTION.SAVE" : "Save",
     "ACTION.SAVE-AND-CLOSE" : "Save and close editor",
@@ -701,6 +692,7 @@
 
     "PROPERTY.FORMREFERENCE.EMPTY" : "No reference selected",
     "PROPERTY.FORMREFERENCE.TITLE" : "Form reference",
+    "PROPERTY.FORMREFERENCE.DESCRIPTION" : "Reference to a form",
     "PROPERTY.FORMREFERENCE.ERROR.FORM" : "There was an error loading the forms. Try again later",
     "PROPERTY.FORMREFERENCE.FORM.LOADING" : "Loading forms...",
     "PROPERTY.FORMREFERENCE.FORM.EMPTY" : "This folder contains no forms",
@@ -778,6 +770,7 @@
     "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.FIELD" : "Based on field",
 
     "MODEL.SAVE.TITLE" : "Save model",
+    "MODEL.VALIDATE.TITLE" : "Validation results",
     "MODEL.NAME" : "Name",
     "MODEL.KEY" : "Key",
     "MODEL.DESCRIPTION" : "Description",

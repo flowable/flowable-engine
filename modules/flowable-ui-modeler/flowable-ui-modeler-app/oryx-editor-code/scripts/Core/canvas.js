@@ -463,69 +463,68 @@ ORYX.Core.Canvas = ORYX.Core.AbstractShape.extend({
                     
 
         // prepare deserialisation parameter
-        shapes.each(
-            function(shape){
-            	var properties = [];
-                for(field in shape.json.properties){
-                    properties.push({
-                      prefix: 'oryx',
-                      name: field,
-                      value: shape.json.properties[field]
-                    });
-                  }
-                  
-                  // Outgoings
-                  shape.json.outgoing.each(function(out){
+        shapes.each(function(shape){
+        	var properties = [];
+            for(field in shape.json.properties){
+                properties.push({
+                  prefix: 'oryx',
+                  name: field,
+                  value: shape.json.properties[field]
+                });
+              }
+              
+              // Outgoings
+              shape.json.outgoing.each(function(out){
+                properties.push({
+                  prefix: 'raziel',
+                  name: 'outgoing',
+                  value: "#"+out.resourceId
+                });
+              });
+              
+              // Target 
+              // (because of a bug, the first outgoing is taken when there is no target,
+              // can be removed after some time)
+              if(shape.object instanceof ORYX.Core.Edge) {
+                  var target = shape.json.target || shape.json.outgoing[0];
+                  if(target){
                     properties.push({
                       prefix: 'raziel',
-                      name: 'outgoing',
-                      value: "#"+out.resourceId
-                    });
-                  });
-                  
-                  // Target 
-                  // (because of a bug, the first outgoing is taken when there is no target,
-                  // can be removed after some time)
-                  if(shape.object instanceof ORYX.Core.Edge) {
-	                  var target = shape.json.target || shape.json.outgoing[0];
-	                  if(target){
-	                    properties.push({
-	                      prefix: 'raziel',
-	                      name: 'target',
-	                      value: "#"+target.resourceId
-	                    });
-	                  }
-                  }
-                  
-                  // Bounds
-                  if (shape.json.bounds) {
-                      properties.push({
-                          prefix: 'oryx',
-                          name: 'bounds',
-                          value: shape.json.bounds.upperLeft.x + "," + shape.json.bounds.upperLeft.y + "," + shape.json.bounds.lowerRight.x + "," + shape.json.bounds.lowerRight.y
-                      });
-                  }
-                  
-                  //Dockers [{x:40, y:50}, {x:30, y:60}] => "40 50 30 60  #"
-                  if(shape.json.dockers){
-                    properties.push({
-                      prefix: 'oryx',
-                      name: 'dockers',
-                      value: shape.json.dockers.inject("", function(dockersStr, docker){
-                        return dockersStr + docker.x + " " + docker.y + " ";
-                      }) + " #"
+                      name: 'target',
+                      value: "#"+target.resourceId
                     });
                   }
-                  
-                  //Parent
+              }
+              
+              // Bounds
+              if (shape.json.bounds) {
                   properties.push({
-                    prefix: 'raziel',
-                    name: 'parent',
-                    value: shape.json.parent
+                      prefix: 'oryx',
+                      name: 'bounds',
+                      value: shape.json.bounds.upperLeft.x + "," + shape.json.bounds.upperLeft.y + "," + shape.json.bounds.lowerRight.x + "," + shape.json.bounds.lowerRight.y
                   });
-            
-                  shape.__properties = properties;
-	         }.bind(this)
+              }
+              
+              //Dockers [{x:40, y:50}, {x:30, y:60}] => "40 50 30 60  #"
+              if(shape.json.dockers){
+                properties.push({
+                  prefix: 'oryx',
+                  name: 'dockers',
+                  value: shape.json.dockers.inject("", function(dockersStr, docker){
+                    return dockersStr + docker.x + " " + docker.y + " ";
+                  }) + " #"
+                });
+              }
+              
+              //Parent
+              properties.push({
+                prefix: 'raziel',
+                name: 'parent',
+                value: shape.json.parent
+              });
+        
+              shape.__properties = properties;
+         }.bind(this)
         );
   
         // Deserialize the properties from the shapes
