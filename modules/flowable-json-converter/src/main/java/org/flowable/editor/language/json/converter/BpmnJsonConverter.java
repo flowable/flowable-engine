@@ -815,7 +815,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 ObjectNode childNode = (ObjectNode) jsonChildNode;
                 String stencilId = BpmnJsonConverterUtil.getStencilId(childNode);
                 if (STENCIL_SUB_PROCESS.equals(stencilId) || STENCIL_POOL.equals(stencilId) || STENCIL_LANE.equals(stencilId) || 
-                        STENCIL_COLLAPSED_SUB_PROCESS.equals(stencilId)) {
+                        STENCIL_COLLAPSED_SUB_PROCESS.equals(stencilId) || STENCIL_EVENT_SUB_PROCESS.equals(stencilId)) {
                     
                     filterAllEdges(childNode, edgeMap, sourceAndTargetMap, shapeMap, sourceRefMap);
 
