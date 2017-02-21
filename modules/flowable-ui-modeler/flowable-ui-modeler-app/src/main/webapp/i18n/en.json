@@ -199,6 +199,7 @@
           "CREATE-DESCRIPTION": "You need to give a name for the new model and you may want to add a description at the same time.",
           "DUPLICATE-DESCRIPTION": "You can change the name for the new model and you may want to change the description at the same time.",
           "EDIT-DESCRIPTION": "Change any of the model properties below and then press Save to update the model.",
+          "DELETE-DESCRIPTION": "Are you sure you want to delete the process model \"{{name}}\"?",
           "EDIT-TITLE":"Edit model details",
           "DELETE-TITLE": "Delete model",
           "DELETE-LOADING-RELATIONS": "Checking model usage...",
