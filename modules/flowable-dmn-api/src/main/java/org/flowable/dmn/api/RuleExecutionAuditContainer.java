@@ -24,8 +24,8 @@ public class RuleExecutionAuditContainer {
     protected Date startTime;
     protected Date endTime;
 
-    protected List<ExpressionExecution> conditionResults = new ArrayList<ExpressionExecution>();
-    protected List<ExpressionExecution> conclusionResults = new ArrayList<ExpressionExecution>();
+    protected List<ExpressionExecution> conditionResults = new ArrayList<>();
+    protected List<ExpressionExecution> conclusionResults = new ArrayList<>();
 
     public RuleExecutionAuditContainer() {
         this.startTime = new Date();
