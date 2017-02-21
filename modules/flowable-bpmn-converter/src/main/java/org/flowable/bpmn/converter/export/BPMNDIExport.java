@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 public class BPMNDIExport implements BpmnXMLConstants {
     
-    private final static Logger logger = LoggerFactory.getLogger(BPMNDIExport.class);
+    private static final Logger logger = LoggerFactory.getLogger(BPMNDIExport.class);
 
     public static void writeBPMNDI(BpmnModel model, XMLStreamWriter xtw) throws Exception {
         // BPMN DI information

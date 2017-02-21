@@ -16,7 +16,7 @@ Java classes used for custom expression functions present in the business archiv
 ==== DMN Definitions, decisions and decision tables
 
 A DMN definition consists, amongst other things, of decisions. A decision has one expression. The DMN spec describes several types of expressions. Currently in Flowable DMN we support the decision table type of expression. 
-When deploying a DMN definition every decision, which can contain one *decision table*, is inserted seperatly into the ACT_DMN_DECISION table. 
+When deploying a DMN definition every decision, which can contain one *decision table*, is inserted separately into the ACT_DMN_DECISION table.
 
 ==== Deploying programmatically
 
@@ -52,7 +52,7 @@ Instead of making sure that all DMN engines have all the delegation classes on t
 
 === Versioning of DMN decisions
 
-DMN doesn't have a notion of versioning.  That is actually good because the executable DMN defintion file will probably live in a version control system repository (e.g. Subversion, Git or Mercurial) as part of your development project.  Versions of DMN decisions are created during deployment. During deployment, Flowable will assign a version to the +decision+ before it is stored in the Flowable DB.
+DMN doesn't have a notion of versioning.  That is actually good because the executable DMN definition file will probably live in a version control system repository (e.g. Subversion, Git or Mercurial) as part of your development project.  Versions of DMN decisions are created during deployment. During deployment, Flowable will assign a version to the +decision+ before it is stored in the Flowable DB.
 
 For each DMN decision in a DMN definition the following steps are performed to initialize the properties +key+, +version+, +name+ and ++id++:
 

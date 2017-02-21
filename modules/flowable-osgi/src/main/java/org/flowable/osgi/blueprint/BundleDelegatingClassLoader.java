@@ -86,7 +86,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
             urls = AccessController.doPrivileged(new PrivilegedExceptionAction<Enumeration<URL>>() {
 
                 public Enumeration<URL> run() throws IOException {
-                    return (Enumeration<URL>) bundle.getResources(name);
+                    return bundle.getResources(name);
                 }
 
             });

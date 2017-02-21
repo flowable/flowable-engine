@@ -15,7 +15,6 @@ package org.flowable.dmn.converter.child;
 import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.dmn.model.DecisionTable;
-import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnElement;
 import org.flowable.dmn.model.OutputClause;
 

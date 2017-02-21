@@ -72,7 +72,7 @@ public class DefaultBusinessCalendar implements BusinessCalendar {
     }
 
     protected Date addSingleUnitQuantity(Date startDate, String singleUnitQuantity) {
-        int spaceIndex = singleUnitQuantity.indexOf(" ");
+        int spaceIndex = singleUnitQuantity.indexOf(' ');
         if (spaceIndex == -1 || singleUnitQuantity.length() < spaceIndex + 1) {
             throw new FlowableIllegalArgumentException("invalid duedate format: " + singleUnitQuantity);
         }
