@@ -69,7 +69,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(BaseBpmnJsonConverter.class);
 
-    public static final String NAMESPACE = "http://activiti.com/modeler";
+    public static final String NAMESPACE = "http://flowable.org/modeler";
 
     protected ObjectMapper objectMapper = new ObjectMapper();
     protected ActivityProcessor processor;

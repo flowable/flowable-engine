@@ -73,7 +73,7 @@ public class ModelServiceImpl implements ModelService {
 
     private final Logger log = LoggerFactory.getLogger(ModelServiceImpl.class);
 
-    public static final String NAMESPACE = "http://activiti.com/modeler";
+    public static final String NAMESPACE = "http://flowable.org/modeler";
 
     protected static final String PROCESS_NOT_FOUND_MESSAGE_KEY = "PROCESS.ERROR.NOT-FOUND";
 

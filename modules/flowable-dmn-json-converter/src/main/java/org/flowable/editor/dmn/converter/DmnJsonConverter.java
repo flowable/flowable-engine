@@ -39,7 +39,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class DmnJsonConverter {
 
-    public static final String MODEL_NAMESPACE = "http://activiti.com/dmn";
+    public static final String MODEL_NAMESPACE = "http://flowable.org/dmn";
     public static final String URI_JSON = "http://www.ecma-international.org/ecma-404/";
 
     protected ObjectMapper objectMapper = new ObjectMapper();
