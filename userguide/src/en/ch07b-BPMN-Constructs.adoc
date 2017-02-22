@@ -3255,14 +3255,14 @@ public class ThrowsExceptionBehavior implements ActivityBehavior {
 ===== Using a Flowable service from within a JavaDelegate
 
 
-For some use cases, it might be needed to use the Flowable services from within a Java service task (e.g. starting a process instance through the RuntimeService, if the callActivity doesn't suit your needs). The _org.flowable.engine.delegate.DelegateExecution_ allows to easily use these services through the _org.flowable.engine.EngineServices_ interface:
+For some use cases, it might be needed to use the Flowable services from within a Java service task (e.g. starting a process instance through the RuntimeService, if the callActivity doesn't suit your needs).
 
 [source,java,linenums]
 ----
 public class StartProcessInstanceTestDelegate implements JavaDelegate {
 
   public void execute(DelegateExecution execution) throws Exception {
-    RuntimeService runtimeService = execution.getEngineServices().getRuntimeService();
+    RuntimeService runtimeService = Context.getProcessEngineConfiguration().getRuntimeService();
     runtimeService.startProcessInstanceByKey("myProcess");
   }
 
