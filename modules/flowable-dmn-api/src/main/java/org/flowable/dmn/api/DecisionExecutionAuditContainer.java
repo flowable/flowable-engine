@@ -12,12 +12,12 @@
  */
 package org.flowable.dmn.api;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.HitPolicy;
 import org.joda.time.DateTime;
 
@@ -36,12 +36,11 @@ public class DecisionExecutionAuditContainer {
     protected Map<String, Object> inputVariables;
     protected Map<String, String> inputVariableTypes;
     protected Map<String, Object> outputVariables;
-    protected List<RuleExecutionAuditContainer> ruleExecutions = new ArrayList<RuleExecutionAuditContainer>();
+    protected Map<Integer, RuleExecutionAuditContainer> ruleExecutions = new HashMap<>();
     protected Boolean failed = Boolean.FALSE;
     protected String exceptionMessage;
 
     public DecisionExecutionAuditContainer() {
-
     }
 
     public DecisionExecutionAuditContainer(String decisionKey, String decisionName, HitPolicy hitPolicy, Map<String, Object> inputVariables) {
@@ -89,28 +88,28 @@ public class DecisionExecutionAuditContainer {
         outputVariables = result;
     }
 
-    public void addRuleEntry() {
-        ruleExecutions.add(new RuleExecutionAuditContainer());
+    public void addRuleEntry(DecisionRule rule) {
+        ruleExecutions.put(rule.getRuleNumber(), new RuleExecutionAuditContainer(rule.getRuleNumber()));
     }
 
-    public void markRuleEnd(int ruleRowIndex) {
-        ruleExecutions.get(ruleRowIndex).markRuleEnd();
+    public void markRuleEnd(int ruleNumber) {
+        ruleExecutions.get(ruleNumber).markRuleEnd();
     }
 
-    public void addInputEntry(int ruleRowIndex, String inputEntryId, Boolean executionResult) {
-        ruleExecutions.get(ruleRowIndex).addConditionResult(new ExpressionExecution(inputEntryId, executionResult));
+    public void addInputEntry(int ruleNumber, int inputNumber, String inputEntryId, Boolean executionResult) {
+        ruleExecutions.get(ruleNumber).addConditionResult(inputNumber, new ExpressionExecution(inputEntryId, executionResult));
     }
 
-    public void addInputEntry(int ruleRowIndex, String inputEntryId, String exceptionMessage, Boolean executionResult) {
-        ruleExecutions.get(ruleRowIndex).addConditionResult(new ExpressionExecution(inputEntryId, exceptionMessage, executionResult));
+    public void addInputEntry(int ruleNumber, int inputNumber, String inputEntryId, String exceptionMessage, Boolean executionResult) {
+        ruleExecutions.get(ruleNumber).addConditionResult(inputNumber, new ExpressionExecution(inputEntryId, exceptionMessage, executionResult));
     }
 
-    public void addOutputEntry(int ruleRowIndex, String outputEntryId, Object executionResult) {
-        ruleExecutions.get(ruleRowIndex).addConclusionResult(new ExpressionExecution(outputEntryId, executionResult));
+    public void addOutputEntry(int ruleNumber, int outputNumber, String outputEntryId, Object executionResult) {
+        ruleExecutions.get(ruleNumber).addConclusionResult(outputNumber, new ExpressionExecution(outputEntryId, executionResult));
     }
 
-    public void addOutputEntry(int ruleRowIndex, String outputEntryId, String exceptionMessage, Object executionResult) {
-        ruleExecutions.get(ruleRowIndex).addConclusionResult(new ExpressionExecution(outputEntryId, exceptionMessage, executionResult));
+    public void addOutputEntry(int ruleNumber, int outputNumber, String outputEntryId, String exceptionMessage, Object executionResult) {
+        ruleExecutions.get(ruleNumber).addConclusionResult(outputNumber, new ExpressionExecution(outputEntryId, exceptionMessage, executionResult));
     }
 
     public String getDecisionKey() {
@@ -141,7 +140,7 @@ public class DecisionExecutionAuditContainer {
         return outputVariables;
     }
 
-    public List<RuleExecutionAuditContainer> getRuleExecutions() {
+    public Map<Integer, RuleExecutionAuditContainer> getRuleExecutions() {
         return ruleExecutions;
     }
 
@@ -195,7 +194,7 @@ public class DecisionExecutionAuditContainer {
 
     protected Map<String, Object> createDefensiveCopyInputVariables(Map<String, Object> inputVariables) {
 
-        Map<String, Object> defensiveCopyMap = new HashMap<String, Object>();
+        Map<String, Object> defensiveCopyMap = new HashMap<>();
 
         if (inputVariables != null) {
 

@@ -80,6 +80,6 @@ public class CustomConfigRuntimeTest {
         RuleEngineExecutionResult result = ruleService.executeDecisionByKey("decision", processVariablesInput);
 
         Assert.assertEquals(0, result.getResultVariables().size());
-        Assert.assertNotEquals(true, StringUtils.isEmpty(result.getAuditTrail().getRuleExecutions().get(1).getConditionResults().get(0).getException()));
+        Assert.assertNotEquals(true, StringUtils.isEmpty(result.getAuditTrail().getRuleExecutions().get(2).getConditionResults().get(1).getException()));
     }
 }

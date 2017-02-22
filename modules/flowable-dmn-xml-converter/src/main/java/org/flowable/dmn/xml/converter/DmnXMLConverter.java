@@ -72,6 +72,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
 
     static {
         addConverter(new InputClauseXMLConverter());
+        addConverter(new OutputClauseXMLConverter());
         addConverter(new DecisionRuleXMLConverter());
     }
 
@@ -184,6 +185,11 @@ public class DmnXMLConverter implements DmnXMLConstants {
         DmnElement parentElement = null;
         DecisionTable currentDecisionTable = null;
 
+        // reset element counters
+        convertersToDmnMap.get(ELEMENT_RULE).initializeElementCounter();
+        convertersToDmnMap.get(ELEMENT_INPUT_CLAUSE).initializeElementCounter();
+        convertersToDmnMap.get(ELEMENT_OUTPUT_CLAUSE).initializeElementCounter();
+
         try {
             while (xtr.hasNext()) {
                 try {
@@ -220,14 +226,6 @@ public class DmnXMLConverter implements DmnXMLConstants {
 
                     model.getDecisions().get(model.getDecisions().size() - 1).setExpression(currentDecisionTable);
                     parentElement = currentDecisionTable;
-                } else if (ELEMENT_OUTPUT_CLAUSE.equals(xtr.getLocalName())) {
-                    OutputClause outputClause = new OutputClause();
-                    currentDecisionTable.addOutput(outputClause);
-                    outputClause.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
-                    outputClause.setLabel(xtr.getAttributeValue(null, ATTRIBUTE_LABEL));
-                    outputClause.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
-                    outputClause.setTypeRef(xtr.getAttributeValue(null, ATTRIBUTE_TYPE_REF));
-                    parentElement = outputClause;
                 } else if (ELEMENT_DESCRIPTION.equals(xtr.getLocalName())) {
                     parentElement.setDescription(xtr.getElementText());
                 } else if (ELEMENT_EXTENSIONS.equals(xtr.getLocalName())) {

@@ -35,7 +35,7 @@
           <text><![CDATA[< 20]]></text>
         </inputEntry>
         <outputEntry id="outputEntry3_1">
-          <text></text>
+          <text>10</text>
         </outputEntry>
         <outputEntry id="outputEntry3_2">
           <text>'result2'</text>

@@ -12,9 +12,9 @@
  */
 package org.flowable.dmn.api;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Yvo Swillens
@@ -24,19 +24,22 @@ public class RuleExecutionAuditContainer {
     protected Date startTime;
     protected Date endTime;
 
-    protected List<ExpressionExecution> conditionResults = new ArrayList<>();
-    protected List<ExpressionExecution> conclusionResults = new ArrayList<>();
+    protected int ruleNumber;
 
-    public RuleExecutionAuditContainer() {
+    protected Map<Integer, ExpressionExecution> conditionResults = new HashMap<>();
+    protected Map<Integer, ExpressionExecution> conclusionResults = new HashMap<>();
+
+    public RuleExecutionAuditContainer(int ruleNumber) {
+        this.ruleNumber = ruleNumber;
         this.startTime = new Date();
     }
 
-    public void addConditionResult(ExpressionExecution expressionExecution) {
-        conditionResults.add(expressionExecution);
+    public void addConditionResult(int inputNumber, ExpressionExecution expressionExecution) {
+        conditionResults.put(inputNumber, expressionExecution);
     }
 
-    public void addConclusionResult(ExpressionExecution executionResult) {
-        conclusionResults.add(executionResult);
+    public void addConclusionResult(int outputNumber, ExpressionExecution executionResult) {
+        conclusionResults.put(outputNumber, executionResult);
     }
 
     public void markRuleEnd() {
@@ -59,19 +62,20 @@ public class RuleExecutionAuditContainer {
         this.endTime = endTime;
     }
 
-    public List<ExpressionExecution> getConditionResults() {
+    public int getRuleNumber() {
+        return ruleNumber;
+    }
+
+    public void setRuleNumber(int ruleNumber) {
+        this.ruleNumber = ruleNumber;
+    }
+
+    public Map<Integer, ExpressionExecution> getConditionResults() {
         return conditionResults;
     }
 
-    public void setConditionResults(List<ExpressionExecution> conditionResults) {
-        this.conditionResults = conditionResults;
-    }
-
-    public List<ExpressionExecution> getConclusionResults() {
+    public Map<Integer, ExpressionExecution> getConclusionResults() {
         return conclusionResults;
     }
 
-    public void setConclusionResults(List<ExpressionExecution> conclusionResults) {
-        this.conclusionResults = conclusionResults;
-    }
 }

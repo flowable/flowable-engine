@@ -133,7 +133,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         processVariablesInput.put("input1", "blablatest");
         RuleEngineExecutionResult result = ruleService.executeDecisionByKey("decision", processVariablesInput);
         Assert.assertNotNull(result);
-        Assert.assertNotNull(result.getAuditTrail().getRuleExecutions().get(1).getConclusionResults().get(0).getException());
+        Assert.assertNotNull(result.getAuditTrail().getRuleExecutions().get(2).getConclusionResults().get(1).getException());
     }
 
     @Test

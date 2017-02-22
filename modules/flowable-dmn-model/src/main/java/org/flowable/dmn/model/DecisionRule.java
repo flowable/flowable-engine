@@ -20,8 +20,10 @@ import java.util.List;
  */
 public class DecisionRule extends DmnElement {
 
-    protected List<RuleInputClauseContainer> inputEntries = new ArrayList<RuleInputClauseContainer>();
-    protected List<RuleOutputClauseContainer> outputEntries = new ArrayList<RuleOutputClauseContainer>();
+    protected List<RuleInputClauseContainer> inputEntries = new ArrayList<>();
+    protected List<RuleOutputClauseContainer> outputEntries = new ArrayList<>();
+
+    protected int ruleNumber;
 
     public List<RuleInputClauseContainer> getInputEntries() {
         return inputEntries;
@@ -45,5 +47,13 @@ public class DecisionRule extends DmnElement {
 
     public void setOutputEntries(List<RuleOutputClauseContainer> outputEntries) {
         this.outputEntries = outputEntries;
+    }
+
+    public void setRuleNumber(int ruleNumber) {
+        this.ruleNumber = ruleNumber;
+    }
+
+    public int getRuleNumber() {
+        return ruleNumber;
     }
 }
