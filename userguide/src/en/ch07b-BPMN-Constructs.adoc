@@ -43,7 +43,7 @@ Event definitions define the semantics of an event. Without an event definition,
 
 ==== Timer Event Definitions
 
-Timer events are events that are triggered by a defined timer. They can be used as <<bpmnTimerStartEvent,start event>>, <<bpmnIntermediateCatchingEvent,intermediate event>> or <<bpmnTimerBoundaryEvent,boundary event>>. The behavior of the time event depends on the business calendar used. Every timer event has a default business calendar, but the business calendar can also be given aspart of the timer event definition.
+Timer events are events that are triggered by a defined timer. They can be used as <<bpmnTimerStartEvent,start event>>, <<bpmnIntermediateCatchingEvent,intermediate event>> or <<bpmnTimerBoundaryEvent,boundary event>>. The behavior of the time event depends on the business calendar used. Every timer event has a default business calendar, but the business calendar can also be given as part of the timer event definition.
 
 [source,xml,linenums]
 ----
@@ -996,7 +996,7 @@ image::images/bpmn.boundary.error.event.png[align="center"]
 [[bpmnBoundaryErrorEventXml]]
 
 
-===== Xml representation
+===== XML representation
 
 A boundary error event is defined as a typical <<bpmnBoundaryEvent,boundary event>>:
 
