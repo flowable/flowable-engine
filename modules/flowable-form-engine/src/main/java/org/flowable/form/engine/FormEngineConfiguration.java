@@ -301,11 +301,19 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
             if (StringUtils.isNotEmpty(databaseSchema)) {
                 database.setDefaultSchemaName(databaseSchema);
                 database.setLiquibaseSchemaName(databaseSchema);
+                
+            } else if (StringUtils.isNotEmpty(dataSource.getConnection().getSchema())) {
+                database.setDefaultSchemaName(dataSource.getConnection().getSchema());
+                database.setLiquibaseSchemaName(dataSource.getConnection().getSchema());
             }
 
             if (StringUtils.isNotEmpty(databaseCatalog)) {
                 database.setDefaultCatalogName(databaseCatalog);
                 database.setLiquibaseCatalogName(databaseCatalog);
+            
+            } else if (StringUtils.isNotEmpty(dataSource.getConnection().getCatalog())) {
+                database.setDefaultCatalogName(dataSource.getConnection().getCatalog());
+                database.setLiquibaseCatalogName(dataSource.getConnection().getCatalog());
             }
 
             Liquibase liquibase = new Liquibase("org/flowable/form/db/liquibase/flowable-form-db-changelog.xml", new ClassLoaderResourceAccessor(), database);

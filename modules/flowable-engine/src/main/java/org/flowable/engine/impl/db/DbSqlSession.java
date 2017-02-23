@@ -1179,15 +1179,18 @@ public class DbSqlSession implements Session {
                             log.debug("SQL: {}", sqlStatement);
                             jdbcStatement.execute(sqlStatement);
                             jdbcStatement.close();
+                            
                         } catch (Exception e) {
                             if (exception == null) {
                                 exception = e;
                                 exceptionSqlStatement = sqlStatement;
                             }
                             log.error("problem during schema {}, statement {}", operation, sqlStatement, e);
+                            
                         } finally {
                             sqlStatement = null;
                         }
+                        
                     } else {
                         sqlStatement = addSqlStatementPiece(sqlStatement, line);
                     }

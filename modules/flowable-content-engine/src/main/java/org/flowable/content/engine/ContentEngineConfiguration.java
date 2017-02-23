@@ -243,14 +243,14 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration {
             database.setDatabaseChangeLogTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
             database.setDatabaseChangeLogLockTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
 
-            if (StringUtils.isNotEmpty(databaseSchema)) {
-                database.setDefaultSchemaName(databaseSchema);
-                database.setLiquibaseSchemaName(databaseSchema);
+            if (StringUtils.isNotEmpty(dataSource.getConnection().getSchema())) {
+                database.setDefaultSchemaName(dataSource.getConnection().getSchema());
+                database.setLiquibaseSchemaName(dataSource.getConnection().getSchema());
             }
 
-            if (StringUtils.isNotEmpty(databaseCatalog)) {
-                database.setDefaultCatalogName(databaseCatalog);
-                database.setLiquibaseCatalogName(databaseCatalog);
+            if (StringUtils.isNotEmpty(dataSource.getConnection().getCatalog())) {
+                database.setDefaultCatalogName(dataSource.getConnection().getCatalog());
+                database.setLiquibaseCatalogName(dataSource.getConnection().getCatalog());
             }
 
             Liquibase liquibase = new Liquibase("org/flowable/content/db/liquibase/flowable-content-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
