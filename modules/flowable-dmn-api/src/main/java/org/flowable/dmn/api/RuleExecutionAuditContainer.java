@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.api;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +27,10 @@ public class RuleExecutionAuditContainer {
     protected Date endTime;
 
     protected int ruleNumber;
+    protected Boolean valid = Boolean.FALSE;
+
+    @JsonProperty("exception")
+    protected String exceptionMessage;
 
     protected Map<Integer, ExpressionExecution> conditionResults = new HashMap<>();
     protected Map<Integer, ExpressionExecution> conclusionResults = new HashMap<>();
@@ -66,8 +72,20 @@ public class RuleExecutionAuditContainer {
         return ruleNumber;
     }
 
-    public void setRuleNumber(int ruleNumber) {
-        this.ruleNumber = ruleNumber;
+    public Boolean isValid() {
+        return valid;
+    }
+
+    public void setValid() {
+        this.valid = Boolean.TRUE;
+    }
+
+    public String getExceptionMessage() {
+        return exceptionMessage;
+    }
+
+    public void setExceptionMessage(String exceptionMessage) {
+        this.exceptionMessage = exceptionMessage;
     }
 
     public Map<Integer, ExpressionExecution> getConditionResults() {

@@ -39,15 +39,17 @@ public class DecisionExecutionAuditContainer {
     protected Map<Integer, RuleExecutionAuditContainer> ruleExecutions = new HashMap<>();
     protected Boolean failed = Boolean.FALSE;
     protected String exceptionMessage;
+    protected Boolean strictMode;
 
     public DecisionExecutionAuditContainer() {
     }
 
-    public DecisionExecutionAuditContainer(String decisionKey, String decisionName, HitPolicy hitPolicy, Map<String, Object> inputVariables) {
+    public DecisionExecutionAuditContainer(String decisionKey, String decisionName, HitPolicy hitPolicy, Boolean strictMode, Map<String, Object> inputVariables) {
         startTime = new Date();
         this.decisionKey = decisionKey;
         this.decisionName = decisionName;
         this.hitPolicy = hitPolicy.name();
+        this.strictMode = strictMode;
 
         this.inputVariableTypes = getVariablesTypeMap(inputVariables);
 
@@ -94,6 +96,10 @@ public class DecisionExecutionAuditContainer {
 
     public void markRuleEnd(int ruleNumber) {
         ruleExecutions.get(ruleNumber).markRuleEnd();
+    }
+
+    public void markRuleValid(int ruleNumber) {
+        ruleExecutions.get(ruleNumber).setValid();
     }
 
     public void addInputEntry(int ruleNumber, int inputNumber, String inputEntryId, Boolean executionResult) {

@@ -46,40 +46,4 @@ public class StandaloneRuntimeTest {
 
         Assert.assertEquals("result2", result.getResultVariables().get("outputVariable1"));
     }
-
-    @Test
-    @DmnDeploymentAnnotation
-    public void anyHitPolicy() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
-
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("inputVariable1", 2);
-
-        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
-
-        Assert.assertEquals(2, result.getResultVariables().size());
-        Assert.assertEquals(10D, result.getResultVariables().get("outputVariable1"));
-        Assert.assertEquals("result1", result.getResultVariables().get("outputVariable2"));
-        Assert.assertFalse(result.getAuditTrail().isFailed());
-        Assert.assertNull(result.getAuditTrail().getExceptionMessage());
-    }
-
-    @Test
-    @DmnDeploymentAnnotation
-    public void anyHitPolicyViolated() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
-
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("inputVariable1", 2);
-
-        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
-
-        Assert.assertEquals(2, result.getResultVariables().size());
-        Assert.assertEquals(10D, result.getResultVariables().get("outputVariable1"));
-        Assert.assertEquals("result1", result.getResultVariables().get("outputVariable2"));
-        Assert.assertTrue(result.getAuditTrail().isFailed());
-        Assert.assertNotNull(result.getAuditTrail().getExceptionMessage());
-    }
 }
