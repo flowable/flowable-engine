@@ -174,6 +174,14 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
      */
     protected boolean enableSafeDmnXml;
 
+
+    /**
+     * Set this to false if you want to ignore the decision table hit policy validity checks to result in an failed decision table state.
+     *
+     * A result is that intermediate results created up to the point the validation error occurs are returned.
+     */
+    protected boolean strictMode = true;
+
     public static DmnEngineConfiguration createDmnEngineConfigurationFromResourceDefault() {
         return createDmnEngineConfigurationFromResource("flowable.dmn.cfg.xml", "dmnEngineConfiguration");
     }
@@ -913,6 +921,15 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public DmnEngineConfiguration setEnableSafeDmnXml(boolean enableSafeDmnXml) {
         this.enableSafeDmnXml = enableSafeDmnXml;
+        return this;
+    }
+
+    public boolean isStrictMode() {
+        return strictMode;
+    }
+
+    public DmnEngineConfiguration setStrictMode(boolean strictMode) {
+        this.strictMode = strictMode;
         return this;
     }
 
