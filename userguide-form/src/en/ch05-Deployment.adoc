@@ -87,7 +87,7 @@ Should we create a second form definition, as defined below and deploy this to F
 [source,xml,linenums]
 ----
 {
-    "key": "form=2",
+    "key": "form2",
     "name": "My second form",
     "fields": [
         {

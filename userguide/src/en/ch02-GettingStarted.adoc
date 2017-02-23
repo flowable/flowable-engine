@@ -8,7 +8,7 @@ creating process instances of those process definitions, running queries, access
 APIs to do that through examples that you can follow on your own development machine.
 
 Flowable is extremely flexible when it comes to adding it to your application/services/architecture. You can _embed_ the engine in your application or service by including the Flowable library, 
-which is available as a JAR. Since it's a JAR, you can add it easily to any Java environment: Java SE; servlet containers, such as Tomcat or Jetty, Spring; Java EE servers, such as JBoss or Websphere, and so on. 
+which is available as a JAR. Since it's a JAR, you can add it easily to any Java environment: Java SE; servlet containers, such as Tomcat or Jetty, Spring; Java EE servers, such as JBoss or WebSphere, and so on.
 Alternatively, you can use the Flowable REST API to communicate over HTTP. There are also several Flowable Applications (Flowable Modeler, Flowable Admin, Flowable IDM and Flowable Task) that offer out-of-the-box example UIs for working with processes and tasks.
 
 Common to all the ways of setting up Flowable is the core engine, which can be seen as a collection of services that expose APIs to manage and execute business processes. 
