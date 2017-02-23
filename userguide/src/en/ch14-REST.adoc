@@ -3842,7 +3842,7 @@ GET runtime/tasks/{taskId}/identitylinks/groups
 ----
 
 
-Returns only identity links targetting either users or groups. Response body and status-codes are exactly the same as when getting the full list of identity links for a task.
+Returns only identity links targeting either users or groups. Response body and status-codes are exactly the same as when getting the full list of identity links for a task.
 
 
 ==== Get a single identity link on a task

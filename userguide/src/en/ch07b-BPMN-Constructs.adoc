@@ -2264,7 +2264,7 @@ This is exactly the same as using the *potentialOwner* construct as defined <<bp
 <userTask id="theTask" name="my task" flowable:candidateGroups="management, accountancy" />
 ----
 
-This is exactly the same as using a *potentialOwner* construct as defined <<bpmnUserTaskAssignment,above>>. Note that it is not necessaru to use the _group(management)_ declaration, as with the case of the _potential owner_ construct, since the attribute can only be used for groups.
+This is exactly the same as using a *potentialOwner* construct as defined <<bpmnUserTaskAssignment,above>>. Note that it is not necessary to use the _group(management)_ declaration, as with the case of the _potential owner_ construct, since the attribute can only be used for groups.
 
 * _candidateUsers_ and _candidateGroups_ can both be defined on the same user task.
 
@@ -4628,7 +4628,7 @@ These two differences can help you decide whether a boundary event or an embedde
 
 ===== Description
 
-A transaction sub-process is an embedded sub-process thaht can be used to group multiple activities to a transaction. A transaction is a logical unit of work that allows to group a set of individual activities, such that they either succeed or fail collectively.
+A transaction sub-process is an embedded sub-process that can be used to group multiple activities to a transaction. A transaction is a logical unit of work that allows to group a set of individual activities, such that they either succeed or fail collectively.
 
 *Possible outcomes of a transaction:* A transaction can have three different outcomes:
 
@@ -4848,7 +4848,7 @@ Flowable executes processes in a transactional way that can be configured to sui
 
 image::images/async.example.no.async.PNG[align="center"]
 
-We see a segment of a BPMN processe with a user task, a service task and a timer event. Completing the user task and validating the address is part of the same unit of work, so it should succeed or fail atomically. That means that if the service task throws an exception, we want to rollback the current transaction, such that the execution tracks back to the user task and the user task is still present in the database. This is also the default behavior of Flowable. In (1) an application or client thread completes the task. In that same thread, Flowable is now executing the service and advances until it reaches a wait state, in this case, the timer event (2). Then it returns the control to the caller (3), potentially committing the transaction (if it was started by Flowable).
+We see a segment of a BPMN process with a user task, a service task and a timer event. Completing the user task and validating the address is part of the same unit of work, so it should succeed or fail atomically. That means that if the service task throws an exception, we want to rollback the current transaction, such that the execution tracks back to the user task and the user task is still present in the database. This is also the default behavior of Flowable. In (1) an application or client thread completes the task. In that same thread, Flowable is now executing the service and advances until it reaches a wait state, in this case, the timer event (2). Then it returns the control to the caller (3), potentially committing the transaction (if it was started by Flowable).
 
 
 In some cases this is not what we want. Sometimes we need custom control over transaction boundaries in a process, in order to be able to scope logical units of work. This is where asynchronous continuations come into play. Consider the following process (fragment):
