@@ -108,6 +108,15 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         }
         return new ArrayList<RemoteUser>();
     }
+    
+    @Override
+    public List<RemoteUser> findUsersByGroup(String groupId) {
+        JsonNode json = callRemoteIdmService(url + "/api/idm/groups/" + encode(groupId) + "/users", adminUser, adminPassword);
+        if (json != null) {
+            return parseUsersInfo(json);
+        }
+        return new ArrayList<RemoteUser>();
+    }
 
     @Override
     public List<RemoteGroup> findGroupsByNameFilter(String filter) {
