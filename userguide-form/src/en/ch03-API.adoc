@@ -49,7 +49,7 @@ Even though we want to avoid a big exception hierarchy, the following subclasses
 * ++FlowableOptimisticLockingException++: Thrown when an optimistic locking occurs in the data store caused by concurrent access of the same data entry.
 * ++FlowableClassLoadingException++: Thrown when a class requested to load was not found or when an error occurred while loading it.
 * ++FlowableObjectNotFoundException++: Thrown when an object that is requested or action on does not exist.
-* ++FlowableIllegalArgumentException++: An exception indicating that an illegal argument has been supplied in a Flowable DMN API-call, an illegal value was configured in the engine's configuration or an illegal value has been supplied.
+* ++FlowableIllegalArgumentException++: An exception indicating that an illegal argument has been supplied in a Flowable Form API-call, an illegal value was configured in the engine's configuration or an illegal value has been supplied.
 
 [[queryAPI]]
 
@@ -120,7 +120,7 @@ public class MyFormDefinitionTest {
 
 === The Form engine in a web application
 
-The +FormEngine+ is a thread-safe class and can easily be shared among multiple threads. In a web application, this means it is possible to create the DMN engine once when the container boots and shut down the engine when the container goes down.
+The +FormEngine+ is a thread-safe class and can easily be shared among multiple threads. In a web application, this means it is possible to create the Form engine once when the container boots and shut down the engine when the container goes down.
 
 The following code snippet shows how you can write a simple +ServletContextListener+ to initialize and destroy process engines in a plain Servlet environment:
 
