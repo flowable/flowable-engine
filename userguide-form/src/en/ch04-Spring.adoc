@@ -25,20 +25,20 @@ Note that the +formEngineConfiguration+ bean now uses the +org.flowable.form.spr
 
 === Automatic resource deployment
 
-Spring integration also has a special feature for deploying resources.  In the DMN engine configuration, you can specify a set of resources. When the DMN engine is created, all those resources will be scanned and deployed.  There is filtering in place that prevents duplicate deployments.  Only when the resources actually have changed,  will new deployments be deployed to the Flowable DMN DB. This makes sense in a lot of use case, where the Spring container is rebooted often (e.g. testing).
+Spring integration also has a special feature for deploying resources.  In the Form engine configuration, you can specify a set of resources. When the Form engine is created, all those resources will be scanned and deployed.  There is filtering in place that prevents duplicate deployments.  Only when the resources actually have changed,  will new deployments be deployed to the Flowable Form DB. This makes sense in a lot of use case, where the Spring container is rebooted often (e.g. testing).
 
 Here's an example:
 
 [source,xml,linenums]
 ----
-<bean id="dmnEngineConfiguration" class="org.flowable.spring.SpringDmnEngineConfiguration">
+<bean id="formEngineConfiguration" class="org.flowable.spring.SpringFormEngineConfiguration">
   ...
   <property name="deploymentResources"
-    value="classpath*:/org/flowable/spring/test/autodeployment/autodeploy/decision*.dmn" />
+    value="classpath*:/org/flowable/spring/test/autodeployment/autodeploy/*.form" />
 </bean>
 
-<bean id="dmnEngine" class="org.flowable.dmn.spring.DmnEngineFactoryBean">
-  <property name="dmnEngineConfiguration" ref="dmnEngineConfiguration" />
+<bean id="formEngine" class="org.flowable.form.spring.FormEngineFactoryBean">
+  <property name="formEngineConfiguration" ref="formEngineConfiguration" />
 </bean>
 ----
 
@@ -88,7 +88,7 @@ public class SpringJunit4Test {
     public FlowableFormRule flowableSpringRule;
 
     @Test
-    @DmnDeploymentAnnotation
+    @FormDeploymentAnnotation
     public void simpleFormInstanceTest() {
         FormInstance result = formService.getFormInstanceModelById(
             "f7689f79-f1cc-11e6-8549-acde48001122", null);

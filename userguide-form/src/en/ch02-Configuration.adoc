@@ -40,7 +40,7 @@ This will look for an +flowable.form.cfg.xml+ file on the classpath and construc
 
 Note that the configuration XML is in fact a Spring configuration. *This does not mean that Flowable Form can only be used in a Spring environment!* We are simply leveraging the parsing and dependency injection capabilities of Spring internally for building up the engine.
 
-The DMNEngineConfiguration object can also be created programmatically using the configuration file. It is also possible to use a different bean id (e.g. see line 3).
+The FormEngineConfiguration object can also be created programmatically using the configuration file. It is also possible to use a different bean id (e.g. see line 3).
 
 [source,java,linenums]
 ----
@@ -189,7 +189,7 @@ The following properties can be set, regardless of whether you are using the JDB
 === JNDI Datasource Configuration
 
 
-By default, the database configuration for Flowable DMN is contained within the db.properties files in the WEB-INF/classes of each web application. This isn't always ideal because it
+By default, the database configuration for Flowable Form is contained within the db.properties files in the WEB-INF/classes of each web application. This isn't always ideal because it
 requires users to either modify the db.properties in the Flowable source and recompile the war file, or explode the war and modify the db.properties on every deployment.
 
 By using JNDI (Java Naming and Directory Interface) to obtain the database connection, the connection is fully managed by the Servlet Container and the configuration can be managed outside the war deployment. This also allows more control over the connection parameters than what is provided by the db.properties file.
@@ -303,7 +303,7 @@ To upgrade, you have to start with putting the following configuration property 
 </beans>
 ----
 
-*Also, include a suitable database driver for your database to the classpath.* Upgrade the Flowable DMN libraries in your application. Or start up a new version of Flowable Form and point it to a database that contains an older version.  With +databaseSchemaUpdate+ set to +true+, Flowable Form will automatically upgrade the DB schema to the newer version the first time when it notices that libraries and DB schema are out of sync.
+*Also, include a suitable database driver for your database to the classpath.* Upgrade the Flowable Form libraries in your application. Or start up a new version of Flowable Form and point it to a database that contains an older version.  With +databaseSchemaUpdate+ set to +true+, Flowable Form will automatically upgrade the DB schema to the newer version the first time when it notices that libraries and DB schema are out of sync.
 
 
 [[formDefinitionCacheConfiguration]]
