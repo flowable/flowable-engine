@@ -167,7 +167,7 @@ public class ProcessInstanceService {
                 // Delete historic instance
                 URIBuilder builder = clientUtil.createUriBuilder(MessageFormat.format(HISTORIC_PROCESS_INSTANCE_URL, processInstanceId));
                 HttpDelete delete = new HttpDelete(clientUtil.getServerUrl(serverConfig, builder));
-                clientUtil.executeRequestNoResponseBody(delete, serverConfig, HttpStatus.SC_OK);
+                clientUtil.executeRequestNoResponseBody(delete, serverConfig, HttpStatus.SC_NO_CONTENT);
 
             } else if ("terminate".equals(action)) {
                 validAction = true;
