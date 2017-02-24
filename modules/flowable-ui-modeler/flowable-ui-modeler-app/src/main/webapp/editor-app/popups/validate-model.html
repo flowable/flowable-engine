@@ -6,7 +6,7 @@
 			</div>
 			<div class="modal-body">
 				<div>
-					<div class="alert alert-success" role="alert" ng-show="errors.length == 0 && !status.loading">No errors detected.</div>
+					<div class="alert alert-success" role="alert" ng-show="model.errors.length == 0 && !status.loading">No errors detected.</div>
 					<div ng-show="errorGrid && !status.loading" class="validationGrid" ui-grid="errorGrid" ui-grid-selection></div>
 				</div>
 			</div>

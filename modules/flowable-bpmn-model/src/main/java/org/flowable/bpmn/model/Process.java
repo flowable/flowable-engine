@@ -206,9 +206,7 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
     public void addFlowElement(FlowElement element) {
         flowElementList.add(element);
         element.setParentContainer(this);
-        if (StringUtils.isNotEmpty(element.getId())) {
-            flowElementMap.put(element.getId(), element);
-        }
+        addFlowElementToMap(element);
     }
 
     public void addFlowElementToMap(FlowElement element) {

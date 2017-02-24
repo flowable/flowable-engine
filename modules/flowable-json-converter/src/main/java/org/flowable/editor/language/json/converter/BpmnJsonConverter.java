@@ -599,6 +599,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
         Map<String, FlowWithContainer> allFlowMap = new HashMap<String, FlowWithContainer>();
         List<Gateway> gatewayWithOrderList = new ArrayList<Gateway>();
+        
         // post handling of process elements
         for (Process process : bpmnModel.getProcesses()) {
             postProcessElements(process, process.getFlowElements(), edgeMap, bpmnModel, allFlowMap, gatewayWithOrderList);
@@ -664,7 +665,9 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
             Map<String, FlowWithContainer> allFlowMap, List<Gateway> gatewayWithOrderList) {
 
         for (FlowElement flowElement : flowElementList) {
-
+            
+            parentContainer.addFlowElementToMap(flowElement);
+            
             if (flowElement instanceof Event) {
                 Event event = (Event) flowElement;
                 if (CollectionUtils.isNotEmpty(event.getEventDefinitions())) {

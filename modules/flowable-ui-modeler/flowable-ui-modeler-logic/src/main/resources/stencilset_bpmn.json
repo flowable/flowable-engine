@@ -982,7 +982,7 @@
     "groups" : [ "Structural" ],
     "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "asynchronousdefinitionpackage", "exclusivedefinitionpackage", "executionlistenerspackage" ],
     "hiddenPropertyPackages" : [ ],
-    "roles" : [ "Activity", "all" ]
+    "roles" : [ "Activity", "all", "EventSubProcess" ]
   }, {
     "type" : "node",
     "id" : "CallActivity",
