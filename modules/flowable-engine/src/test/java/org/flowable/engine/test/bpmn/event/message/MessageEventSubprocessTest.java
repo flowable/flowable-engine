@@ -256,6 +256,190 @@ public class MessageEventSubprocessTest extends PluggableFlowableTestCase {
         // done!
         assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
     }
+    
+    @Deployment
+    public void testStartingAdditionalTasks() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startingAdditionalTasks");
+        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+
+        Execution execution = runtimeService.createExecutionQuery()
+                .processInstanceId(processInstance.getId())
+                .messageEventSubscriptionName("Start another task")
+                .singleResult();
+        
+        assertNotNull(execution);
+
+        assertEquals(1, taskService.createTaskQuery().count());
+        assertEquals(1, createEventSubscriptionQuery().count());
+
+        // now let's first complete the task in the main flow:
+        Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
+        taskService.complete(task.getId());
+
+        assertEquals(2, createEventSubscriptionQuery().count());
+
+        execution = runtimeService.createExecutionQuery()
+                .processInstanceId(processInstance.getId())
+                .messageEventSubscriptionName("Start another sub task")
+                .singleResult();
+
+        runtimeService.messageEventReceived("Start another sub task", execution.getId());
+        
+        assertEquals(2, taskService.createTaskQuery().count());
+        
+        execution = runtimeService.createExecutionQuery()
+                .processInstanceId(processInstance.getId())
+                .messageEventSubscriptionName("Start another task")
+                .singleResult();
+        
+        runtimeService.messageEventReceived("Start another task", execution.getId());
+        
+        assertEquals(3, taskService.createTaskQuery().count());
+        
+        task = taskService.createTaskQuery().taskDefinitionKey("additionalTask").singleResult();
+        taskService.complete(task.getId());
+
+        assertEquals(2, taskService.createTaskQuery().count());
+        
+        task = taskService.createTaskQuery().taskDefinitionKey("subTask1").singleResult();
+        taskService.complete(task.getId());
+        
+        assertEquals(1, taskService.createTaskQuery().count());
+        
+        task = taskService.createTaskQuery().taskDefinitionKey("additionalSubTask").singleResult();
+        taskService.complete(task.getId());
+        
+        assertEquals(1, taskService.createTaskQuery().count());
+        
+        task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
+        taskService.complete(task.getId());
+
+        // done!
+        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    }
+    
+    @Deployment(resources="org/flowable/engine/test/bpmn/event/message/MessageEventSubprocessTest.testStartingAdditionalTasks.bpmn20.xml")
+    public void testStartingAdditionalTasksNoNestedEventSubProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startingAdditionalTasks");
+        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+
+        Execution execution = runtimeService.createExecutionQuery()
+                .processInstanceId(processInstance.getId())
+                .messageEventSubscriptionName("Start another task")
+                .singleResult();
+        
+        assertNotNull(execution);
+
+        assertEquals(1, taskService.createTaskQuery().count());
+        assertEquals(1, createEventSubscriptionQuery().count());
+
+        // now let's first complete the task in the main flow:
+        Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
+        taskService.complete(task.getId());
+
+        assertEquals(2, createEventSubscriptionQuery().count());
+        assertEquals(1, taskService.createTaskQuery().count());
+        
+        task = taskService.createTaskQuery().taskDefinitionKey("subTask1").singleResult();
+        taskService.complete(task.getId());
+        
+        assertEquals(1, createEventSubscriptionQuery().count());
+        assertEquals(1, taskService.createTaskQuery().count());
+        
+        task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
+        taskService.complete(task.getId());
+
+        // done!
+        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    }
+    
+    @Deployment
+    public void testStartingAdditionalTasksInterrupting() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startingAdditionalTasks");
+        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+
+        Execution execution = runtimeService.createExecutionQuery()
+                .processInstanceId(processInstance.getId())
+                .messageEventSubscriptionName("Start another task")
+                .singleResult();
+        
+        assertNotNull(execution);
+
+        assertEquals(1, taskService.createTaskQuery().count());
+        assertEquals(1, createEventSubscriptionQuery().count());
+
+        // now let's first complete the task in the main flow:
+        Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
+        taskService.complete(task.getId());
+
+        assertEquals(2, createEventSubscriptionQuery().count());
+
+        execution = runtimeService.createExecutionQuery()
+                .processInstanceId(processInstance.getId())
+                .messageEventSubscriptionName("Start another sub task")
+                .singleResult();
+
+        runtimeService.messageEventReceived("Start another sub task", execution.getId());
+        
+        assertEquals(1, taskService.createTaskQuery().count());
+        
+        task = taskService.createTaskQuery().taskDefinitionKey("additionalSubTask").singleResult();
+        taskService.complete(task.getId());
+        
+        assertEquals(1, taskService.createTaskQuery().count());
+        
+        task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
+        taskService.complete(task.getId());
+
+        // done!
+        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    }
+    
+    @Deployment(resources="org/flowable/engine/test/bpmn/event/message/MessageEventSubprocessTest.testStartingAdditionalTasksInterrupting.bpmn20.xml")
+    public void testStartingAdditionalTasksInterruptingWithMainEventSubProcessInterrupt() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startingAdditionalTasks");
+        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+
+        Execution execution = runtimeService.createExecutionQuery()
+                .processInstanceId(processInstance.getId())
+                .messageEventSubscriptionName("Start another task")
+                .singleResult();
+        
+        assertNotNull(execution);
+
+        assertEquals(1, taskService.createTaskQuery().count());
+        assertEquals(1, createEventSubscriptionQuery().count());
+
+        // now let's first complete the task in the main flow:
+        Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
+        taskService.complete(task.getId());
+
+        assertEquals(2, createEventSubscriptionQuery().count());
+
+        execution = runtimeService.createExecutionQuery()
+                .processInstanceId(processInstance.getId())
+                .messageEventSubscriptionName("Start another sub task")
+                .singleResult();
+
+        runtimeService.messageEventReceived("Start another sub task", execution.getId());
+        
+        assertEquals(1, taskService.createTaskQuery().count());
+        
+        execution = runtimeService.createExecutionQuery()
+                .processInstanceId(processInstance.getId())
+                .messageEventSubscriptionName("Start another task")
+                .singleResult();
+        
+        runtimeService.messageEventReceived("Start another task", execution.getId());
+        
+        assertEquals(1, taskService.createTaskQuery().count());
+        
+        task = taskService.createTaskQuery().taskDefinitionKey("additionalTask").singleResult();
+        taskService.complete(task.getId());
+
+        // done!
+        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
         return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor());

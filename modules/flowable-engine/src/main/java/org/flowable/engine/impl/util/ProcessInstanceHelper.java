@@ -22,6 +22,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.Signal;
@@ -200,12 +201,24 @@ public class ProcessInstanceHelper {
     public void startProcessInstance(ExecutionEntity processInstance, CommandContext commandContext, Map<String, Object> variables) {
 
         Process process = ProcessDefinitionUtil.getProcess(processInstance.getProcessDefinitionId());
+        
+        processAvailableEventSubProcesses(processInstance, process, commandContext);
 
+        ExecutionEntity execution = processInstance.getExecutions().get(0); // There will always be one child execution created
+        commandContext.getAgenda().planContinueProcessOperation(execution);
+
+        if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            FlowableEventDispatcher eventDispatcher = Context.getProcessEngineConfiguration().getEventDispatcher();
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(execution, variables, false));
+        }
+    }
+    
+    public void processAvailableEventSubProcesses(ExecutionEntity parentExecution, FlowElementsContainer parentContainer, CommandContext commandContext) {
         // Event sub process handling
         List<MessageEventSubscriptionEntity> messageEventSubscriptions = new LinkedList<>();
         List<SignalEventSubscriptionEntity> signalEventSubscriptions = new LinkedList<>();
 
-        for (FlowElement flowElement : process.getFlowElements()) {
+        for (FlowElement flowElement : parentContainer.getFlowElements()) {
             if (!(flowElement instanceof EventSubProcess)) {
                 continue;
             }
@@ -224,12 +237,12 @@ public class ProcessInstanceHelper {
                 EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
                 if (eventDefinition instanceof MessageEventDefinition) {
                     MessageEventDefinition messageEventDefinition = (MessageEventDefinition) eventDefinition;
-                    BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processInstance.getProcessDefinitionId());
+                    BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentExecution.getProcessDefinitionId());
                     if (bpmnModel.containsMessageId(messageEventDefinition.getMessageRef())) {
                         messageEventDefinition.setMessageRef(bpmnModel.getMessage(messageEventDefinition.getMessageRef()).getName());
                     }
 
-                    ExecutionEntity messageExecution = commandContext.getExecutionEntityManager().createChildExecution(processInstance);
+                    ExecutionEntity messageExecution = commandContext.getExecutionEntityManager().createChildExecution(parentExecution);
                     messageExecution.setCurrentFlowElement(startEvent);
                     messageExecution.setEventScope(true);
 
@@ -238,14 +251,14 @@ public class ProcessInstanceHelper {
 
                 } else if (eventDefinition instanceof SignalEventDefinition) {
                     SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
-                    BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processInstance.getProcessDefinitionId());
+                    BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentExecution.getProcessDefinitionId());
                     Signal signal = null;
                     if (bpmnModel.containsSignalId(signalEventDefinition.getSignalRef())) {
                         signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
                         signalEventDefinition.setSignalRef(signal.getName());
                     }
 
-                    ExecutionEntity signalExecution = commandContext.getExecutionEntityManager().createChildExecution(processInstance);
+                    ExecutionEntity signalExecution = commandContext.getExecutionEntityManager().createChildExecution(parentExecution);
                     signalExecution.setCurrentFlowElement(startEvent);
                     signalExecution.setEventScope(true);
 
@@ -255,7 +268,7 @@ public class ProcessInstanceHelper {
                 } else if (eventDefinition instanceof TimerEventDefinition) {
                     TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
 
-                    ExecutionEntity timerExecution = commandContext.getExecutionEntityManager().createChildExecution(processInstance);
+                    ExecutionEntity timerExecution = commandContext.getExecutionEntityManager().createChildExecution(parentExecution);
                     timerExecution.setCurrentFlowElement(startEvent);
                     timerExecution.setEventScope(true);
 
@@ -271,13 +284,7 @@ public class ProcessInstanceHelper {
             }
         }
 
-        ExecutionEntity execution = processInstance.getExecutions().get(0); // There will always be one child execution created
-        commandContext.getAgenda().planContinueProcessOperation(execution);
-
         if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            FlowableEventDispatcher eventDispatcher = Context.getProcessEngineConfiguration().getEventDispatcher();
-            eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(execution, variables, false));
-
             for (MessageEventSubscriptionEntity messageEventSubscription : messageEventSubscriptions) {
                 commandContext.getProcessEngineConfiguration().getEventDispatcher()
                         .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, messageEventSubscription.getActivityId(),
