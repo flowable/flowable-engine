@@ -11,12 +11,7 @@
             "NOT_FOUND": "The resource you are trying to access does not exist",
             "UNAUTHORIZED": "You should sign in in order to perform the requested operation.",
             "FORBIDDEN": "You are not allowed to perform the requested operation",
-            "INTERNAL_SERVER_ERROR": "Sorry, an unexpected error occured while performing the requested operation.",
-            "UPLOAD-LIMIT-EXCEEDED": "The file you are trying to upload is too large",
-            "UPLOAD-LIMIT-EXCEEDED-TRIAL-USER": "The file you are trying to upload is too large. Upgrade to enterprise to upload files larger than {{quota}}!",
-            "QUOTA-EXCEEDED-RUNTIME-PROCESSES": "As a trial user, you can only have {{quota}} active processes running at the same time.",
-            "QUOTA-EXCEEDED-COMPLETED-PROCESSES": "As a trial user, you can only have {{quota}} completed processes. Delete a completed process in order to start a new one.",
-            "QUOTA-EXCEEDED-TOTAL-CONTENT-SIZE": "As a trial user, you can only store a total of {{quota}} of content. Delete content or complete processes to free up space for new content."
+            "INTERNAL_SERVER_ERROR": "Sorry, an unexpected error occured while performing the requested operation."
         },
         "NAVIGATION": {
             "TASKS": "Tasks",
