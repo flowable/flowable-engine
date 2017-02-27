@@ -284,6 +284,66 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
     }
     
+    @Deployment(resources="org/flowable/engine/test/bpmn/event/timer/TimerEventSubprocessTest.testStartingAdditionalTasks.bpmn20.xml")
+    public void testStartingAdditionalTasksWithNestedEventSubProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startingAdditionalTasks");
+        
+        assertEquals(1, taskService.createTaskQuery().count());
+        Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(job);
+        String firstTimerJobId = job.getId();
+
+        // now let's first complete the task in the main flow:
+        Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
+        taskService.complete(task.getId());
+
+        assertEquals(1, taskService.createTaskQuery().count());
+        List<Job> jobs = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, jobs.size());
+        
+        String secondTimerJobId = null;
+        for (Job timerJob : jobs) {
+            if (!timerJob.getId().equals(firstTimerJobId)) {
+                secondTimerJobId = timerJob.getId();
+            }
+        }
+
+        job = managementService.moveTimerToExecutableJob(secondTimerJobId);
+        managementService.executeJob(job.getId());
+        
+        assertEquals(2, taskService.createTaskQuery().count());
+        
+        task = taskService.createTaskQuery().taskDefinitionKey("subTask1").singleResult();
+        taskService.complete(task.getId());
+        
+        job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(job);
+        assertEquals(1, taskService.createTaskQuery().count());
+        
+        task = taskService.createTaskQuery().taskDefinitionKey("additionalSubTask").singleResult();
+        taskService.complete(task.getId());
+        
+        job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(job);
+        assertEquals(1, taskService.createTaskQuery().count());
+        
+        job = managementService.moveTimerToExecutableJob(job.getId());
+        managementService.executeJob(job.getId());
+        
+        assertEquals(2, taskService.createTaskQuery().count());
+        
+        task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
+        taskService.complete(task.getId());
+        
+        assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        
+        task = taskService.createTaskQuery().taskDefinitionKey("additionalTask").singleResult();
+        taskService.complete(task.getId());
+
+        // done!
+        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    }
+    
     @Deployment
     public void testStartingAdditionalTasksInterrupting() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startingAdditionalTasks");

@@ -177,6 +177,16 @@ public class EndExecutionOperation extends AbstractOperation {
 
                 ExecutionEntity subProcessParentExecution = parentExecution.getParent();
                 if (getNumberOfActiveChildExecutionsForExecution(executionEntityManager, subProcessParentExecution.getId()) == 0) {
+                    if (subProcessParentExecution.getCurrentFlowElement() instanceof SubProcess) {
+                        SubProcess parentSubProcess = (SubProcess) subProcessParentExecution.getCurrentFlowElement();
+                        if (parentSubProcess.getOutgoingFlows().size() > 0) {
+                            ExecutionEntity executionToContinue = handleSubProcessEnd(executionEntityManager, subProcessParentExecution, parentSubProcess);
+                            agenda.planTakeOutgoingSequenceFlowsOperation(executionToContinue, true);
+                            return;
+                        }
+                        
+                    }
+                    
                     agenda.planEndExecutionOperation(subProcessParentExecution);
                 }
 
@@ -242,6 +252,7 @@ public class EndExecutionOperation extends AbstractOperation {
                         for (BoundaryEvent boundaryEvent : subActivity.getBoundaryEvents()) {
                             if (CollectionUtil.isNotEmpty(boundaryEvent.getEventDefinitions()) &&
                                     boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition) {
+                                
                                 hasCompensation = true;
                                 break;
                             }
@@ -380,6 +391,7 @@ public class EndExecutionOperation extends AbstractOperation {
         for (ExecutionEntity childExecution : executions) {
             if (childExecution.isEventScope()) {
                 executionEntityManager.deleteExecutionAndRelatedData(childExecution, null, false);
+                
             } else {
                 allEventScopeExecutions = false;
             }

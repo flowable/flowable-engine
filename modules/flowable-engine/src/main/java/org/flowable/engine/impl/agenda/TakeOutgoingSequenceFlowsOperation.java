@@ -88,8 +88,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
 
     protected void handleFlowNode(FlowNode flowNode) {
         handleActivityEnd(flowNode);
-        if (flowNode.getParentContainer() != null
-                && flowNode.getParentContainer() instanceof AdhocSubProcess) {
+        if (flowNode.getParentContainer() != null && flowNode.getParentContainer() instanceof AdhocSubProcess) {
             handleAdhocSubProcess(flowNode);
         } else {
             leaveFlowNode(flowNode);

@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.event.message;
 
+import java.util.List;
+
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
@@ -347,6 +349,81 @@ public class MessageEventSubprocessTest extends PluggableFlowableTestCase {
         assertEquals(1, taskService.createTaskQuery().count());
         
         task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
+        taskService.complete(task.getId());
+
+        // done!
+        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    }
+    
+    @Deployment(resources="org/flowable/engine/test/bpmn/event/message/MessageEventSubprocessTest.testStartingAdditionalTasks.bpmn20.xml")
+    public void testStartingAdditionalTasksWithNestedEventSubProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startingAdditionalTasks");
+        
+        assertEquals(1, taskService.createTaskQuery().count());
+        assertEquals(1, createEventSubscriptionQuery().count());
+
+        // now let's first complete the task in the main flow:
+        Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
+        taskService.complete(task.getId());
+
+        assertEquals(2, createEventSubscriptionQuery().count());
+        assertEquals(1, taskService.createTaskQuery().count());
+        
+        Execution execution = runtimeService.createExecutionQuery()
+                .processInstanceId(processInstance.getId())
+                .messageEventSubscriptionName("Start another sub task")
+                .singleResult();
+
+        runtimeService.messageEventReceived("Start another sub task", execution.getId());
+        
+        assertEquals(2, createEventSubscriptionQuery().count());
+        assertEquals(2, taskService.createTaskQuery().count());
+        
+        task = taskService.createTaskQuery().taskDefinitionKey("subTask1").singleResult();
+        taskService.complete(task.getId());
+        
+        assertEquals(1, createEventSubscriptionQuery().count());
+        assertEquals(1, taskService.createTaskQuery().count());
+        
+        task = taskService.createTaskQuery().taskDefinitionKey("additionalSubTask").singleResult();
+        taskService.complete(task.getId());
+        
+        assertEquals(1, createEventSubscriptionQuery().count());
+        assertEquals(1, taskService.createTaskQuery().count());
+        
+        execution = runtimeService.createExecutionQuery()
+                .processInstanceId(processInstance.getId())
+                .messageEventSubscriptionName("Start another task")
+                .singleResult();
+        
+        runtimeService.messageEventReceived("Start another task", execution.getId());
+        
+        assertEquals(1, createEventSubscriptionQuery().count());
+        assertEquals(2, taskService.createTaskQuery().count());
+        
+        execution = runtimeService.createExecutionQuery()
+                .processInstanceId(processInstance.getId())
+                .messageEventSubscriptionName("Start another task")
+                .singleResult();
+        
+        runtimeService.messageEventReceived("Start another task", execution.getId());
+        
+        assertEquals(1, createEventSubscriptionQuery().count());
+        assertEquals(3, taskService.createTaskQuery().count());
+        
+        task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
+        taskService.complete(task.getId());
+        
+        assertEquals(0, createEventSubscriptionQuery().count());
+        
+        List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey("additionalTask").list();
+        assertEquals(2, tasks.size());
+        
+        taskService.complete(tasks.get(0).getId());
+        
+        assertEquals(0, createEventSubscriptionQuery().count());
+        
+        task = taskService.createTaskQuery().taskDefinitionKey("additionalTask").singleResult();
         taskService.complete(task.getId());
 
         // done!
