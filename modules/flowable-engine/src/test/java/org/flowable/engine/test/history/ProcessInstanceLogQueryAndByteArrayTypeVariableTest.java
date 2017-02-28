@@ -32,12 +32,12 @@ public class ProcessInstanceLogQueryAndByteArrayTypeVariableTest extends Pluggab
 
     protected String processInstanceId;
 
-    private static String LARGE_STRING_VALUE;
+    private static final String LARGE_STRING_VALUE;
 
     static {
         StringBuilder sb = new StringBuilder("a");
         for (int i = 0; i < 4001; i++) {
-            sb.append("a");
+            sb.append('a');
         }
         LARGE_STRING_VALUE = sb.toString();
     }
@@ -50,7 +50,7 @@ public class ProcessInstanceLogQueryAndByteArrayTypeVariableTest extends Pluggab
         deployTwoTasksTestProcess();
 
         // Start process instance
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         // ByteArrayType Variable
         vars.put("var", LARGE_STRING_VALUE);
         this.processInstanceId = runtimeService.startProcessInstanceByKey("twoTasksProcess", vars).getId();
@@ -76,7 +76,7 @@ public class ProcessInstanceLogQueryAndByteArrayTypeVariableTest extends Pluggab
 
             for (HistoricData event : events) {
                 assertTrue(event instanceof HistoricVariableInstance);
-                assertEquals(((HistoricVariableInstanceEntity) event).getValue(), LARGE_STRING_VALUE);
+                assertEquals(LARGE_STRING_VALUE, ((HistoricVariableInstanceEntity) event).getValue());
             }
         }
     }
@@ -86,7 +86,7 @@ public class ProcessInstanceLogQueryAndByteArrayTypeVariableTest extends Pluggab
 
             HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
                     .processInstanceId(processInstanceId).variableName("var").singleResult();
-            assertEquals(historicVariableInstance.getValue(), LARGE_STRING_VALUE);
+            assertEquals(LARGE_STRING_VALUE, historicVariableInstance.getValue());
 
             ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId)
                     .includeVariableUpdates()
@@ -96,7 +96,7 @@ public class ProcessInstanceLogQueryAndByteArrayTypeVariableTest extends Pluggab
 
             for (HistoricData event : events) {
                 assertTrue(event instanceof HistoricVariableUpdate);
-                assertEquals(((HistoricDetailVariableInstanceUpdateEntity) event).getValue(), LARGE_STRING_VALUE);
+                assertEquals(LARGE_STRING_VALUE, ((HistoricDetailVariableInstanceUpdateEntity) event).getValue());
             }
         }
     }

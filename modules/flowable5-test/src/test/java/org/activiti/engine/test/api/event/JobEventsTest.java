@@ -168,7 +168,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         int timerFiredCount = 0;
         List<FlowableEvent> eventsReceived = listener.getEventsReceived();
         for (FlowableEvent eventReceived : eventsReceived) {
-            if (FlowableEngineEventType.TIMER_FIRED.equals(eventReceived.getType())) {
+            if (FlowableEngineEventType.TIMER_FIRED == eventReceived.getType()) {
                 timerFiredCount++;
             }
         }

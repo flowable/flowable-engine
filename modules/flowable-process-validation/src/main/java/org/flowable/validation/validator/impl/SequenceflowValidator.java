@@ -13,7 +13,6 @@
 package org.flowable.validation.validator.impl;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;

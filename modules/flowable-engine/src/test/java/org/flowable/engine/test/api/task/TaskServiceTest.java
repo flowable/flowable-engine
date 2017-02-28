@@ -691,7 +691,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.getVariable(processInstance.getId(), "b"));
 
         // verify script listener has done its job
-        assertEquals(new Integer(2), runtimeService.getVariable(processInstance.getId(), "sum"));
+        assertEquals(2, runtimeService.getVariable(processInstance.getId(), "sum"));
 
         // Fetch second task
         taskService.createTaskQuery().singleResult();
