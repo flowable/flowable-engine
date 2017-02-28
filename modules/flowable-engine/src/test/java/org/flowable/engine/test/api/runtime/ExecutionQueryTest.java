@@ -26,6 +26,8 @@
 
 package org.flowable.engine.test.api.runtime;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,20 +49,18 @@ import org.flowable.engine.runtime.ExecutionQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * @author Joram Barrez
  * @author Frederik Heremans
  */
 public class ExecutionQueryTest extends PluggableFlowableTestCase {
 
-    private static String CONCURRENT_PROCESS_KEY = "concurrent";
-    private static String SEQUENTIAL_PROCESS_KEY = "oneTaskProcess";
-    private static String CONCURRENT_PROCESS_NAME = "concurrentName";
-    private static String SEQUENTIAL_PROCESS_NAME = "oneTaskProcessName";
-    private static String CONCURRENT_PROCESS_CATEGORY = "org.flowable.enginge.test.api.runtime.concurrent.Category";
-    private static String SEQUENTIAL_PROCESS_CATEGORY = "org.flowable.enginge.test.api.runtime.Category";
+    private static final String CONCURRENT_PROCESS_KEY = "concurrent";
+    private static final String SEQUENTIAL_PROCESS_KEY = "oneTaskProcess";
+    private static final String CONCURRENT_PROCESS_NAME = "concurrentName";
+    private static final String SEQUENTIAL_PROCESS_NAME = "oneTaskProcessName";
+    private static final String CONCURRENT_PROCESS_CATEGORY = "org.flowable.enginge.test.api.runtime.concurrent.Category";
+    private static final String SEQUENTIAL_PROCESS_CATEGORY = "org.flowable.enginge.test.api.runtime.Category";
 
     private List<String> concurrentProcessInstanceIds;
     private List<String> sequentialProcessInstanceIds;
