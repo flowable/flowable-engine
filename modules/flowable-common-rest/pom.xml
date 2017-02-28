@@ -122,7 +122,7 @@
         <!-- Logging, using Log4j as SLF4J implementation -->
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
 
         <!-- Joda time -->

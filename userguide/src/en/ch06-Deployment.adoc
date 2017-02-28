@@ -4,20 +4,19 @@
 
 === Business archives
 
-To deploy processes, they have to be wrapped in a business archive.  A business archive is the unit of deployment to a Flowable Engine. A business archive is equivalent to a zip file.  It can contain  BPMN 2.0 processes, form definitions, DMN rules and any other type of file. In general, a business archive contains a collection of named resources.
+To deploy processes, they have to be wrapped in a business archive (BAR).  A business archive is the unit of deployment to a Flowable engine. A business archive is equivalent to a ZIP file.  It can contain  BPMN 2.0 processes, form definitions, DMN rules and any other type of file. In general, a business archive contains a collection of named resources.
 
-
-When a business archive is deployed, it is scanned for BPMN files with a +.bpmn20.xml+ or +.bpmn+ extension. Each of those will be parsed and may contain multiple process definitions.
-When the DMN engine is activated also +.dmn+ files are parsed and with the form engine activated +.form+ files are handled.
+When a business archive is deployed, it is scanned for BPMN files with a +.bpmn20.xml+ or +.bpmn+ extension. Each of those will be processed and may contain multiple process definitions.
+When the DMN engine is activated,  +.dmn+ files are also parsed, and with the form engine activated, +.form+ files are handled.
 
 [NOTE]
 ====
-Java classes present in the business archive *will not be added to the classpath*. All custom classes used in process definitions in the business archive (for example Java service tasks or event listener implementations) should be present on the Flowable Engine classpath in order to run the processes.
+Java classes present in the business archive *will not be added to the classpath*. All custom classes used in process definitions in the business archive (for example, Java service tasks or event listener implementations) must be made available on the Flowable engine classpath in order to run the processes.
 ====
 
 ==== Deploying programmatically
 
-Deploying a business archive from a zip file can be done like this:
+Deploying a business archive from a ZIP file can be done like this:
 
 [source,java,linenums]
 ----
@@ -39,11 +38,11 @@ Process definitions live in the Flowable database. These process definitions can
 
 ==== Java classes
 
-All custom classes that are used in your process (e.g. JavaDelegates used in Service Tasks or event-listeners, TaskListeners, ...) should be present on the engine's classpath when an instance of the process is started.
+All custom classes that are used in your process (for example, JavaDelegates used in Service Tasks or event-listeners, TaskListeners and so on) should be present on the engine's classpath when an instance of the process is started.
 
-During deployment of a business archive however, those classes don't have to be present on the classpath. This means that your delegation classes don't have to be on the classpath when deploying a new business archive with Ant.
+During deployment of a business archive however, those classes don't have to be present on the classpath. This means that your delegation classes don't have to be on the classpath when deploying a new business archive with Ant, for example.
 
-When you are using the demo setup and you want to add your custom classes, you should add a jar containing your classes to the flowable-task or flowable-rest webapp lib. Don't forget to include the dependencies of your custom classes (if any) as well. Alternatively, you can include your dependencies in the libraries directory of your Tomcat installation, +${tomcat.home}/lib+.
+When you are using the demo setup and you want to add your custom classes, you should add a JAR containing your classes to the flowable-task or flowable-rest webapp lib. Don't forget to include the dependencies of your custom classes (if any) as well. Alternatively, you can include your dependencies in the libraries directory of your Tomcat installation, +${tomcat.home}/lib+.
 
 
 ==== Using Spring beans from a process
@@ -52,23 +51,21 @@ When expressions or scripts use Spring beans, those beans have to be available t
 
 ==== Creating a single app
 
-Instead of making sure that all process engines have all the delegation classes on their classpath and use the right Spring configuration, you may consider including the Flowable rest webapp inside your own webapp so that there is only a single +ProcessEngine+.
-
+Instead of making sure that all process engines have all the delegation classes on their classpath and use the right Spring configuration, you may consider including the Flowable REST webapp inside your own webapp so that there is only a single +ProcessEngine+.
 
 [[versioningOfProcessDefinitions]]
 
 
 === Versioning of process definitions
 
-BPMN doesn't have a notion of versioning.  That is actually good because the executable BPMN process file will probably live in a version control system repository (e.g. Subversion, Git or Mercurial) as part of your development project.  Versions of process definitions are created during deployment. During deployment, Flowable will assign a version to the +ProcessDefinition+ before it is stored in the Flowable DB.
+BPMN doesn't have a notion of versioning.  That is actually good, because the executable BPMN process file will probably live in a version control system repository (such as Subversion, Git or Mercurial) as part of your development project.  However, versions of process definitions are created in the engine as part of deployment. During deployment, Flowable will assign a version to the +ProcessDefinition+ before it is stored in the Flowable DB.
 
-
-For each process definition in a business archive the following steps are performed to initialize the properties +key+, +version+, +name+ and ++id++:
+For each process definition in a business archive, the following steps are performed to initialize the properties +key+, +version+, +name+ and ++id++:
 
 * The process definition +id+ attribute in the XML file is used as the process definition +key+ property.
-* The process definition +name+ attribute in the XML file is used as the process definition +name+ property. If the name attribute is not specified, then id attribute is used as the name.
-* The first time a process with a particular key is deployed, version 1 is assigned.  For all subsequent deployments of process definitions with the same key, the version will be set 1 higher than the maximum currently deployed version. The key property is used to distinguish process definitions.
-* The id property is set to {processDefinitionKey}:{processDefinitionVersion}:{generated-id}, where +generated-id+ is a unique number added to guarantee uniqueness of the process id for the process definition caches in a clustered environment.
+* The process definition +name+ attribute in the XML file is used as the process definition +name+ property. If the name attribute is not specified, then the id attribute is used as the name.
+* The first time a process with a particular key is deployed, version 1 is assigned.  For all subsequent deployments of process definitions with the same key, the version will be set 1 higher than the highest currently deployed version. The key property is used to distinguish process definitions.
+* The id property is set to {processDefinitionKey}:{processDefinitionVersion}:{generated-id}, where +generated-id+ is a unique number added to guarantee uniqueness of the process ID for the process definition caches in a clustered environment.
 
 Take for example the following process
 
@@ -88,8 +85,7 @@ When deploying this process definition, the process definition in the database w
 
 |===============
 
-
-Suppose we now deploy an updated version of the same process (e.g. changing some user tasks), but the ++id++ of the process definition remains the same. The process definition table will now contain the following entries:
+Suppose we now deploy an updated version of the same process (for example, changing some user tasks), but the ++id++ of the process definition remains the same. The process definition table will now contain the following entries:
 
 [options="header"]
 |===============
@@ -122,7 +118,6 @@ The table will look like this:
 |===============
 
 Note how the key for the new process is different from our first process. Even though the name is the same (we should probably have changed that too), Flowable only considers the +id+ attribute when distinguishing processes. The new process is therefore deployed with version 1.
-
 
 [[providingProcessDiagram]]
 
@@ -169,13 +164,13 @@ InputStream imageStream = repositoryService.getResourceAsStream(
 
 === Generating a process diagram
 
-In case no image is provided in the deployment, as described in the <<providingProcessDiagram,previous section>>, the Flowable engine will generate a diagram image if the process definition contains the necessary 'diagram interchange' information.
+If no image is provided in the deployment, as described in the <<providingProcessDiagram,previous section>>, the Flowable engine will generate a process diagram image if the process definition contains the necessary 'diagram interchange' information.
 
 The resource can be retrieved in exactly the same way as when <<providingProcessDiagram, an image is provided>> in the deployment.
 
 image::images/deployment.image.generation.png[align="center"]
 
-If, for some reason, it is not necessary or wanted to generate a diagram during deployment the +isCreateDiagramOnDeploy+ property can be set on the process engine configuration:
+If, for some reason, it's not necessary or desirable to generate a diagram during deployment, the +isCreateDiagramOnDeploy+ property can be set on the process engine configuration:
 
 [source,xml,linenums]
 ----
@@ -184,16 +179,14 @@ If, for some reason, it is not necessary or wanted to generate a diagram during 
 
 No diagram will be generated now.
 
-
 [[deploymentCategory]]
 
 
 === Category
 
-Both deployments and process definitions have user defined categories.  The process definition category is initialized value in attribute in the BPMN file: +<definitions ... targetNamespace="yourCategory" ...+
+Both deployments and process definitions have user-defined categories.  The process definition category is initialized with the value of the targetNamespace attribute in the BPMN XML: +<definitions ... targetNamespace="yourCategory" ...+
 
-
-The deployment category can be specified in the API like this:
+The deployment category can also be specified in the API like this:
 
 [source,java,linenums]
 ----

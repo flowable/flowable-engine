@@ -17,7 +17,6 @@ import java.sql.Connection;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
@@ -261,16 +260,6 @@ public class DbSqlSession implements Session {
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
             database.setDatabaseChangeLogTableName(ContentEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
             database.setDatabaseChangeLogLockTableName(ContentEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
-
-            if (StringUtils.isNotEmpty(sqlSession.getConnection().getSchema())) {
-                database.setDefaultSchemaName(sqlSession.getConnection().getSchema());
-                database.setLiquibaseSchemaName(sqlSession.getConnection().getSchema());
-            }
-
-            if (StringUtils.isNotEmpty(sqlSession.getConnection().getCatalog())) {
-                database.setDefaultCatalogName(sqlSession.getConnection().getCatalog());
-                database.setLiquibaseCatalogName(sqlSession.getConnection().getCatalog());
-            }
 
             Liquibase liquibase = new Liquibase("org/flowable/form/db/liquibase/flowable-form-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
             return liquibase;

@@ -22,6 +22,12 @@ FLOWABLE.TOOLBAR_CONFIG = {
             "action" : "FLOWABLE.TOOLBAR.ACTIONS.saveModel"
         },
         {
+			"type" : "button",
+			"title" : "TOOLBAR.ACTION.VALIDATE",
+			"cssClass" : "glyphicon glyphicon-ok",
+			"action": "FLOWABLE.TOOLBAR.ACTIONS.validate"
+		},
+        {
             "type" : "separator",
             "title" : "",
             "cssClass" : "toolbar-separator"

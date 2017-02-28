@@ -122,6 +122,11 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
         </dependency>
+        <dependency>
+        	<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>compile</scope>
+        </dependency>
 
         <!-- LOGGING -->
         <dependency>

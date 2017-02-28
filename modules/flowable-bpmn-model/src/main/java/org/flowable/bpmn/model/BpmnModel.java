@@ -398,7 +398,7 @@ public class BpmnModel {
     public Message getMessage(String id) {
         Message result = messageMap.get(id);
         if (result == null) {
-            int indexOfNS = id.indexOf(":");
+            int indexOfNS = id.indexOf(':');
             if (indexOfNS > 0) {
                 String idNamespace = id.substring(0, indexOfNS);
                 if (idNamespace.equalsIgnoreCase(this.getTargetNamespace())) {

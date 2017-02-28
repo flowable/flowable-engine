@@ -70,7 +70,7 @@ public class ValuedDataObjectConverterTest extends AbstractConverterTest {
         assertEquals("BooleanTest", dataObj.getName());
         assertEquals("xsd:boolean", dataObj.getItemSubjectRef().getStructureRef());
         assertTrue(dataObj.getValue() instanceof Boolean);
-        assertEquals(new Boolean(true), dataObj.getValue());
+        assertEquals(Boolean.TRUE, dataObj.getValue());
 
         dataObj = objectMap.get("dObj3");
         assertEquals("dObj3", dataObj.getId());
@@ -85,21 +85,21 @@ public class ValuedDataObjectConverterTest extends AbstractConverterTest {
         assertEquals("DoubleTest", dataObj.getName());
         assertEquals("xsd:double", dataObj.getItemSubjectRef().getStructureRef());
         assertTrue(dataObj.getValue() instanceof Double);
-        assertEquals(new Double(123456789), dataObj.getValue());
+        assertEquals(123456789d, dataObj.getValue());
 
         dataObj = objectMap.get("dObj5");
         assertEquals("dObj5", dataObj.getId());
         assertEquals("IntegerTest", dataObj.getName());
         assertEquals("xsd:int", dataObj.getItemSubjectRef().getStructureRef());
         assertTrue(dataObj.getValue() instanceof Integer);
-        assertEquals(new Integer(123), dataObj.getValue());
+        assertEquals(123, dataObj.getValue());
 
         dataObj = objectMap.get("dObj6");
         assertEquals("dObj6", dataObj.getId());
         assertEquals("LongTest", dataObj.getName());
         assertEquals("xsd:long", dataObj.getItemSubjectRef().getStructureRef());
         assertTrue(dataObj.getValue() instanceof Long);
-        assertEquals(new Long(-123456), dataObj.getValue());
+        assertEquals((long) -123456, dataObj.getValue());
         assertEquals(1, dataObj.getExtensionElements().size());
         List<ExtensionElement> testValues = dataObj.getExtensionElements().get("testvalue");
         assertNotNull(testValues);
@@ -148,7 +148,7 @@ public class ValuedDataObjectConverterTest extends AbstractConverterTest {
         assertEquals("BooleanSubTest", dataObj.getName());
         assertEquals("xsd:boolean", dataObj.getItemSubjectRef().getStructureRef());
         assertTrue(dataObj.getValue() instanceof Boolean);
-        assertEquals(new Boolean(false), dataObj.getValue());
+        assertEquals(Boolean.FALSE, dataObj.getValue());
 
         dataObj = objectMap.get("dObj9");
         assertEquals("dObj9", dataObj.getId());
@@ -162,20 +162,20 @@ public class ValuedDataObjectConverterTest extends AbstractConverterTest {
         assertEquals("DoubleSubTest", dataObj.getName());
         assertEquals("xsd:double", dataObj.getItemSubjectRef().getStructureRef());
         assertTrue(dataObj.getValue() instanceof Double);
-        assertEquals(new Double(678912345), dataObj.getValue());
+        assertEquals(678912345d, dataObj.getValue());
 
         dataObj = objectMap.get("dObj11");
         assertEquals("dObj11", dataObj.getId());
         assertEquals("IntegerSubTest", dataObj.getName());
         assertEquals("xsd:int", dataObj.getItemSubjectRef().getStructureRef());
         assertTrue(dataObj.getValue() instanceof Integer);
-        assertEquals(new Integer(45), dataObj.getValue());
+        assertEquals(45, dataObj.getValue());
 
         dataObj = objectMap.get("dObj12");
         assertEquals("dObj12", dataObj.getId());
         assertEquals("LongSubTest", dataObj.getName());
         assertEquals("xsd:long", dataObj.getItemSubjectRef().getStructureRef());
         assertTrue(dataObj.getValue() instanceof Long);
-        assertEquals(new Long(456123), dataObj.getValue());
+        assertEquals(456123L, dataObj.getValue());
     }
 }

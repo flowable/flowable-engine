@@ -1,3 +1,15 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.flowable.editor.language;
 
 import static org.junit.Assert.assertEquals;
@@ -62,7 +74,7 @@ public class ValuedDataObjectConverterTest extends AbstractConverterTest {
                 assertEquals("BooleanTest", dObj.getName());
                 assertEquals("xsd:boolean", dObj.getItemSubjectRef().getStructureRef());
                 assertTrue(dObj.getValue() instanceof Boolean);
-                assertEquals(new Boolean(true), dObj.getValue());
+                assertEquals(Boolean.TRUE, dObj.getValue());
             } else if ("dObj3".equals(dObj.getId())) {
                 assertEquals(DateDataObject.class, dObj.getClass());
                 assertEquals("DateTest", dObj.getName());
@@ -80,19 +92,19 @@ public class ValuedDataObjectConverterTest extends AbstractConverterTest {
                 assertEquals("DoubleTest", dObj.getName());
                 assertEquals("xsd:double", dObj.getItemSubjectRef().getStructureRef());
                 assertTrue(dObj.getValue() instanceof Double);
-                assertEquals(new Double(123456789), dObj.getValue());
+                assertEquals(123456789d, dObj.getValue());
             } else if ("dObj5".equals(dObj.getId())) {
                 assertEquals(IntegerDataObject.class, dObj.getClass());
                 assertEquals("IntegerTest", dObj.getName());
                 assertEquals("xsd:int", dObj.getItemSubjectRef().getStructureRef());
                 assertTrue(dObj.getValue() instanceof Integer);
-                assertEquals(new Integer(123), dObj.getValue());
+                assertEquals(123, dObj.getValue());
             } else if ("dObj6".equals(dObj.getId())) {
                 assertEquals(LongDataObject.class, dObj.getClass());
                 assertEquals("LongTest", dObj.getName());
                 assertEquals("xsd:long", dObj.getItemSubjectRef().getStructureRef());
                 assertTrue(dObj.getValue() instanceof Long);
-                assertEquals(new Long(-123456), dObj.getValue());
+                assertEquals((long) -123456, dObj.getValue());
             }
         }
 
@@ -118,7 +130,7 @@ public class ValuedDataObjectConverterTest extends AbstractConverterTest {
                 assertEquals("SubBooleanTest", dObj.getName());
                 assertEquals("xsd:boolean", dObj.getItemSubjectRef().getStructureRef());
                 assertTrue(dObj.getValue() instanceof Boolean);
-                assertEquals(new Boolean(false), dObj.getValue());
+                assertEquals(Boolean.FALSE, dObj.getValue());
             } else if ("dObj3".equals(dObj.getId())) {
                 assertEquals(DateDataObject.class, dObj.getClass());
                 assertEquals("SubDateTest", dObj.getName());
@@ -134,19 +146,19 @@ public class ValuedDataObjectConverterTest extends AbstractConverterTest {
                 assertEquals("SubDoubleTest", dObj.getName());
                 assertEquals("xsd:double", dObj.getItemSubjectRef().getStructureRef());
                 assertTrue(dObj.getValue() instanceof Double);
-                assertEquals(new Double(678912345), dObj.getValue());
+                assertEquals(678912345d, dObj.getValue());
             } else if ("dObj5".equals(dObj.getId())) {
                 assertEquals(IntegerDataObject.class, dObj.getClass());
                 assertEquals("SubIntegerTest", dObj.getName());
                 assertEquals("xsd:int", dObj.getItemSubjectRef().getStructureRef());
                 assertTrue(dObj.getValue() instanceof Integer);
-                assertEquals(new Integer(45), dObj.getValue());
+                assertEquals(45, dObj.getValue());
             } else if ("dObj6".equals(dObj.getId())) {
                 assertEquals(LongDataObject.class, dObj.getClass());
                 assertEquals("SubLongTest", dObj.getName());
                 assertEquals("xsd:long", dObj.getItemSubjectRef().getStructureRef());
                 assertTrue(dObj.getValue() instanceof Long);
-                assertEquals(new Long(456123), dObj.getValue());
+                assertEquals(456123L, dObj.getValue());
                 assertEquals(1, dObj.getExtensionElements().size());
             }
         }

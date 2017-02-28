@@ -140,6 +140,7 @@ public class SubprocessXMLConverter extends BpmnXMLConverter {
             if (element instanceof SequenceFlow && null != flowLocations.get(elementId)) {
                 // must be an edge
                 mainModel.getFlowLocationMap().put(elementId, flowLocations.get(elementId));
+                
             } else {
                 // do not include data objects because they do not have a corresponding shape in the BPMNDI data
                 if (!(element instanceof DataObject) && null != locations.get(elementId)) {
@@ -147,6 +148,7 @@ public class SubprocessXMLConverter extends BpmnXMLConverter {
                     mainModel.getLocationMap().put(elementId, locations.get(elementId));
                 }
             }
+            
             // also check for any labels
             if (null != labelLocations.get(elementId)) {
                 mainModel.getLabelLocationMap().put(elementId, labelLocations.get(elementId));
@@ -160,12 +162,14 @@ public class SubprocessXMLConverter extends BpmnXMLConverter {
 
     private List<BpmnModel> parseSubModels(FlowElement subElement, Map<String, GraphicInfo> locations,
             Map<String, List<GraphicInfo>> flowLocations, Map<String, GraphicInfo> labelLocations) {
+        
         List<BpmnModel> subModels = new ArrayList<BpmnModel>();
         BpmnModel subModel = new BpmnModel();
         String elementId = null;
 
         // find nested subprocess models
         Collection<FlowElement> subFlowElements = ((SubProcess) subElement).getFlowElements();
+        
         // set main process in submodel to subprocess
         Process newMainProcess = new Process();
         newMainProcess.setId(subElement.getId());

@@ -137,6 +137,7 @@ public class DbSqlSession implements Session {
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.0.0.2"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.0.0.3"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.0.0.4"));
+        FLOWABLE_VERSIONS.add(new FlowableVersion("6.0.0.5"));
 
         /* Current */
         FLOWABLE_VERSIONS.add(new FlowableVersion(ProcessEngine.VERSION));
@@ -1178,15 +1179,18 @@ public class DbSqlSession implements Session {
                             log.debug("SQL: {}", sqlStatement);
                             jdbcStatement.execute(sqlStatement);
                             jdbcStatement.close();
+                            
                         } catch (Exception e) {
                             if (exception == null) {
                                 exception = e;
                                 exceptionSqlStatement = sqlStatement;
                             }
                             log.error("problem during schema {}, statement {}", operation, sqlStatement, e);
+                            
                         } finally {
                             sqlStatement = null;
                         }
+                        
                     } else {
                         sqlStatement = addSqlStatementPiece(sqlStatement, line);
                     }

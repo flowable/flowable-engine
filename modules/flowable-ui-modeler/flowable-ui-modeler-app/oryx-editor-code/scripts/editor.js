@@ -166,156 +166,133 @@ ORYX = Object.extend(ORYX, {
 		init();
 	},
 	
-	_loadPlugins: function() {
-
-		// load plugin configuration file.
-		var source = ORYX.CONFIG.PLUGINS_CONFIG;
-
-		ORYX.Log.debug("Loading plugin configuration from '%0'.", source);
+	_loadPlugins: function(plugins) {
 	
-		new Ajax.Request(source, {
-			asynchronous: false,
-			method: 'get',
-			onSuccess: function(result) {
+		// get plugins.xml content
+		var resultXml = jQuery.parseXML(plugins); //jquery parser
 
-				/*
-				 * This is the method that is being called when the plugin
-				 * configuration was successfully loaded from the server. The
-				 * file has to be processed and the contents need to be
-				 * considered for further plugin requireation.
-				 */
-				
-				ORYX.Log.info("Plugin configuration file loaded.");
-		
-				// get plugins.xml content
-				var resultXml = result.responseXML;
-				
-				// TODO: Describe how properties are handled.
-				// Get the globale Properties
-				var globalProperties = [];
-				var preferences = $A(resultXml.getElementsByTagName("properties"));
-				preferences.each( function(p) {
+		// TODO: Describe how properties are handled.
+		// Get the globale Properties
+		var globalProperties = [];
+		var preferences = $A(resultXml.getElementsByTagName("properties"));
+		preferences.each( function(p) {
 
-					var props = $A(p.childNodes);
-					props.each( function(prop) {
-						var property = new Hash(); 
-						
-						// get all attributes from the node and set to global properties
-						var attributes = $A(prop.attributes)
-						attributes.each(function(attr) {
-							property.set(attr.nodeName, attr.nodeValue);
-						});
-						if(attributes.length > 0) { 
-							globalProperties.push(property) 
-						};				
-					});
+			var props = $A(p.childNodes);
+			props.each( function(prop) {
+				var property = new Hash();
+
+				// get all attributes from the node and set to global properties
+				var attributes = $A(prop.attributes)
+				attributes.each(function(attr) {
+					property.set(attr.nodeName, attr.nodeValue);
+				});
+				if(attributes.length > 0) {
+					globalProperties.push(property)
+				};
+			});
+		});
+
+
+		// TODO Why are we using XML if we don't respect structure anyway?
+		// for each plugin element in the configuration..
+		var plugin = resultXml.getElementsByTagName("plugin");
+		$A(plugin).each( function(node) {
+
+			// get all element's attributes.
+			// TODO: What about: var pluginData = $H(node.attributes) !?
+			var pluginData = new Hash();
+			$A(node.attributes).each( function(attr){
+				pluginData.set(attr.nodeName,attr.nodeValue);
+			});
+
+			// ensure there's a name attribute.
+			if(!pluginData.get('name')) {
+				ORYX.Log.error("A plugin is not providing a name. Ingnoring this plugin.");
+				return;
+			}
+
+			// ensure there's a source attribute.
+			if(!pluginData.get('source')) {
+				ORYX.Log.error("Plugin with name '%0' doesn't provide a source attribute.", pluginData.get('name'));
+				return;
+			}
+
+			// Get all private Properties
+			var propertyNodes = node.getElementsByTagName("property");
+			var properties = [];
+			$A(propertyNodes).each(function(prop) {
+				var property = new Hash();
+
+				// Get all Attributes from the Node
+				var attributes = $A(prop.attributes)
+				attributes.each(function(attr){
+					property.set(attr.nodeName,attr.nodeValue);
 				});
 
-				
-				// TODO Why are we using XML if we don't respect structure anyway?
-				// for each plugin element in the configuration..
-				var plugin = resultXml.getElementsByTagName("plugin");
-				$A(plugin).each( function(node) {
-					
-					// get all element's attributes.
-					// TODO: What about: var pluginData = $H(node.attributes) !?
-					var pluginData = new Hash();
-					$A(node.attributes).each( function(attr){
-						pluginData.set(attr.nodeName, attr.nodeValue);
-					});
-					
-					// ensure there's a name attribute.
-					if (!pluginData.get('name')) {
-						ORYX.Log.error("A plugin is not providing a name. Ingnoring this plugin.");
-						return;
+				if(attributes.length > 0) {
+					properties.push(property)
+				};
+
+			});
+
+			// Set all Global-Properties to the Properties
+			properties = properties.concat(globalProperties);
+
+			// Set Properties to Plugin-Data
+			pluginData.set('properties',properties);
+
+			// Get the RequieredNodes
+			var requireNodes = node.getElementsByTagName("requires");
+			var requires;
+			$A(requireNodes).each(function(req) {
+				var namespace = $A(req.attributes).find(function(attr){ return attr.name == "namespace"})
+				if( namespace && namespace.nodeValue ){
+					if( !requires ){
+						requires = {namespaces:[]}
 					}
 
-					// ensure there's a source attribute.
-					if (!pluginData.get('source')) {
-						ORYX.Log.error("Plugin with name '%0' doesn't provide a source attribute.", pluginData.get('name'));
-						return;
-					}
-					
-					// Get all private Properties
-					var propertyNodes = node.getElementsByTagName("property");
-					var properties = [];
-					$A(propertyNodes).each(function(prop) {
-						var property = new Hash(); 
-						
-						// Get all Attributes from the Node			
-						var attributes = $A(prop.attributes)
-						attributes.each(function(attr){
-							property.set(attr.nodeName, attr.nodeValue);
-						});
+					requires.namespaces.push(namespace.nodeValue)
+				}
+			});
 
-						if (attributes.length > 0) {
-							properties.push(property);
-						}
-					
-					});
-					
-					// Set all Global-Properties to the Properties
-					properties = properties.concat(globalProperties);
-					
-					// Set Properties to Plugin-Data
-					pluginData.set('properties', properties);
-					
-					// Get the RequieredNodes
-					var requireNodes = node.getElementsByTagName("requires");
-					var requires;
-					$A(requireNodes).each(function(req) {			
-						var namespace = $A(req.attributes).find(function(attr){ return attr.name == "namespace"})
-						if( namespace && namespace.nodeValue ){
-							if( !requires ){
-								requires = {namespaces:[]}
-							}
-						
-							requires.namespaces.push(namespace.nodeValue)
-						} 
-					});					
-					
-					// Set Requires to the Plugin-Data, if there is one
-					if( requires ){
-						pluginData.set('requires', requires);
+			// Set Requires to the Plugin-Data, if there is one
+			if( requires ){
+				pluginData.set('requires',requires);
+			}
+
+
+			// Get the RequieredNodes
+			var notUsesInNodes = node.getElementsByTagName("notUsesIn");
+			var notUsesIn;
+			$A(notUsesInNodes).each(function(not) {
+				var namespace = $A(not.attributes).find(function(attr){ return attr.name == "namespace"})
+				if( namespace && namespace.nodeValue ){
+					if( !notUsesIn ){
+						notUsesIn = {namespaces:[]}
 					}
 
+					notUsesIn.namespaces.push(namespace.nodeValue)
+				}
+			});
 
-					// Get the RequieredNodes
-					var notUsesInNodes = node.getElementsByTagName("notUsesIn");
-					var notUsesIn;
-					$A(notUsesInNodes).each(function(not) {			
-						var namespace = $A(not.attributes).find(function(attr){ return attr.name == "namespace"})
-						if( namespace && namespace.nodeValue ){
-							if( !notUsesIn ){
-								notUsesIn = {namespaces:[]}
-							}
-						
-							notUsesIn.namespaces.push(namespace.nodeValue)
-						} 
-					});					
-					
-					// Set Requires to the Plugin-Data, if there is one
-					if( notUsesIn ){
-						pluginData.set('notUsesIn', notUsesIn);
-					}		
-					
-								
-					var url = ORYX.PATH + ORYX.CONFIG.PLUGINS_FOLDER + pluginData.get('source');
-		
-					ORYX.Log.debug("Requireing '%0'", url);
-		
-					// Add the Script-Tag to the Site
-					//Kickstart.require(url);
-		
-					ORYX.Log.info("Plugin '%0' successfully loaded.", pluginData.get('name'));
-		
-					// Add the Plugin-Data to all available Plugins
-					ORYX.availablePlugins.push(pluginData);
-		
-				});
-		
-			},
-			onFailure:this._loadPluginsOnFails
+			// Set Requires to the Plugin-Data, if there is one
+			if( notUsesIn ){
+				pluginData.set('notUsesIn',notUsesIn);
+			}
+
+
+			var url = ORYX.PATH + ORYX.CONFIG.PLUGINS_FOLDER + pluginData.get('source');
+
+			ORYX.Log.debug("Requireing '%0'", url);
+
+			// Add the Script-Tag to the Site
+			//Kickstart.require(url);
+
+			ORYX.Log.info("Plugin '%0' successfully loaded.", pluginData.get('name'));
+
+			// Add the Plugin-Data to all available Plugins
+			ORYX.availablePlugins.push(pluginData);
+
 		});
 
 	},

@@ -26,6 +26,8 @@
 
 package org.flowable.engine.test.api.runtime;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,20 +49,18 @@ import org.flowable.engine.runtime.ExecutionQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * @author Joram Barrez
  * @author Frederik Heremans
  */
 public class ExecutionQueryTest extends PluggableFlowableTestCase {
 
-    private static String CONCURRENT_PROCESS_KEY = "concurrent";
-    private static String SEQUENTIAL_PROCESS_KEY = "oneTaskProcess";
-    private static String CONCURRENT_PROCESS_NAME = "concurrentName";
-    private static String SEQUENTIAL_PROCESS_NAME = "oneTaskProcessName";
-    private static String CONCURRENT_PROCESS_CATEGORY = "org.flowable.enginge.test.api.runtime.concurrent.Category";
-    private static String SEQUENTIAL_PROCESS_CATEGORY = "org.flowable.enginge.test.api.runtime.Category";
+    private static final String CONCURRENT_PROCESS_KEY = "concurrent";
+    private static final String SEQUENTIAL_PROCESS_KEY = "oneTaskProcess";
+    private static final String CONCURRENT_PROCESS_NAME = "concurrentName";
+    private static final String SEQUENTIAL_PROCESS_NAME = "oneTaskProcessName";
+    private static final String CONCURRENT_PROCESS_CATEGORY = "org.flowable.enginge.test.api.runtime.concurrent.Category";
+    private static final String SEQUENTIAL_PROCESS_CATEGORY = "org.flowable.enginge.test.api.runtime.Category";
 
     private List<String> concurrentProcessInstanceIds;
     private List<String> sequentialProcessInstanceIds;
@@ -1464,6 +1464,19 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
             }
         }
 
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).locale("it").list();
+        assertEquals(3, executions.size());
+        for (Execution execution : executions) {
+            if (execution.getParentId() == null) {
+                assertEquals("Nome del processo", execution.getName());
+                assertEquals("Descrizione del processo", execution.getDescription());
+
+            } else if (execution.getParentId().equals(execution.getProcessInstanceId())) {
+                assertEquals("Nome sottoprocesso", execution.getName());
+                assertEquals("Sottoprocesso Descrizione", execution.getDescription());
+            }
+        }
+
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).locale("en-GB").list();
         assertEquals(3, executions.size());
         for (Execution execution : executions) {
@@ -1503,6 +1516,19 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
             }
         }
 
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).locale("it").listPage(0, 10);
+        assertEquals(3, executions.size());
+        for (Execution execution : executions) {
+            if (execution.getParentId() == null) {
+                assertEquals("Nome del processo", execution.getName());
+                assertEquals("Descrizione del processo", execution.getDescription());
+
+            } else if (execution.getParentId().equals(execution.getProcessInstanceId())) {
+                assertEquals("Nome sottoprocesso", execution.getName());
+                assertEquals("Sottoprocesso Descrizione", execution.getDescription());
+            }
+        }
+
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).locale("en-GB").listPage(0, 10);
         assertEquals(3, executions.size());
         for (Execution execution : executions) {
@@ -1528,9 +1554,17 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
         assertEquals("Nombre del proceso", execution.getName());
         assertEquals("Descripción del proceso", execution.getDescription());
 
+        execution = runtimeService.createExecutionQuery().executionId(processInstance.getId()).locale("it").singleResult();
+        assertEquals("Nome del processo", execution.getName());
+        assertEquals("Descrizione del processo", execution.getDescription());
+
         execution = runtimeService.createExecutionQuery().executionId(subProcessId).locale("es").singleResult();
         assertEquals("Nombre Subproceso", execution.getName());
         assertEquals("Subproceso Descripción", execution.getDescription());
+
+        execution = runtimeService.createExecutionQuery().executionId(subProcessId).locale("it").singleResult();
+        assertEquals("Nome sottoprocesso", execution.getName());
+        assertEquals("Sottoprocesso Descrizione", execution.getDescription());
 
         execution = runtimeService.createExecutionQuery().executionId(processInstance.getId()).locale("en-GB").singleResult();
         assertEquals("Process Name 'en-GB'", execution.getName());

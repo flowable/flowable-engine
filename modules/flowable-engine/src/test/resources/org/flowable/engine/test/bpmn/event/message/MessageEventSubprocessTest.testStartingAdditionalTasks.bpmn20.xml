@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+  <message id="startAnotherTask" name="Start another task" />
+  <message id="startAnotherSubTask" name="Start another sub task" />
+  <process id="startingAdditionalTasks" name="Starting additional tasks" isExecutable="true">
+    <startEvent id="startEvent"></startEvent>
+    <userTask id="task1" name="Task 1" flowable:assignee="$INITIATOR">
+      <extensionElements>
+        <modeler:activiti-idm-initiator xmlns:modeler="http://flowable.org/modeler"><![CDATA[true]]></modeler:activiti-idm-initiator>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="sid-3BFE51D9-7356-42F5-A1B9-5F6C12A4A419" sourceRef="startEvent" targetRef="task1"></sequenceFlow>
+    <userTask id="task2" name="Task 2" flowable:assignee="$INITIATOR">
+      <extensionElements>
+        <modeler:activiti-idm-initiator xmlns:modeler="http://flowable.org/modeler"><![CDATA[true]]></modeler:activiti-idm-initiator>
+      </extensionElements>
+    </userTask>
+    <endEvent id="endEvent"></endEvent>
+    <sequenceFlow id="sid-AAFDB0AD-FE6C-46E0-8C95-6FF3F8DA7EBA" sourceRef="task2" targetRef="endEvent"></sequenceFlow>
+    <subProcess id="subProcess1" name="subProcess">
+      <startEvent id="subStartEvent"></startEvent>
+      <userTask id="subTask1" name="Sub task 1" flowable:assignee="$INITIATOR">
+        <extensionElements>
+          <modeler:activiti-idm-initiator xmlns:modeler="http://flowable.org/modeler"><![CDATA[true]]></modeler:activiti-idm-initiator>
+        </extensionElements>
+      </userTask>
+      <endEvent id="subEndEvent"></endEvent>
+      <subProcess id="eventSubProcess" name="subProcess" triggeredByEvent="true">
+        <startEvent id="subEventStartEvent" isInterrupting="false">
+          <messageEventDefinition messageRef="startAnotherSubTask"></messageEventDefinition>
+        </startEvent>
+        <userTask id="additionalSubTask" name="Additional sub task" flowable:assignee="$INITIATOR">
+          <extensionElements>
+            <modeler:activiti-idm-initiator xmlns:modeler="http://flowable.org/modeler"><![CDATA[true]]></modeler:activiti-idm-initiator>
+          </extensionElements>
+        </userTask>
+        <endEvent id="subEventEndEvent"></endEvent>
+        <sequenceFlow id="subEventFlow1" sourceRef="subEventStartEvent" targetRef="additionalSubTask"></sequenceFlow>
+        <sequenceFlow id="subEventFlow2" sourceRef="additionalSubTask" targetRef="subEventEndEvent"></sequenceFlow>
+      </subProcess>
+      <sequenceFlow id="subFlow2" sourceRef="subTask1" targetRef="subEndEvent"></sequenceFlow>
+      <sequenceFlow id="subFlow1" sourceRef="subStartEvent" targetRef="subTask1"></sequenceFlow>
+    </subProcess>
+    <sequenceFlow id="sid-5FF6E4C0-F243-47AD-8A26-162FF45C768E" sourceRef="task1" targetRef="subProcess1"></sequenceFlow>
+    <sequenceFlow id="sid-36154E3B-6CD8-46DA-897A-3E9B5B9D1DEF" sourceRef="subProcess1" targetRef="task2"></sequenceFlow>
+    <subProcess id="eventProcess" name="subProcess" triggeredByEvent="true">
+      <startEvent id="signalStartEvent" isInterrupting="false">
+        <messageEventDefinition messageRef="startAnotherTask"></messageEventDefinition>
+      </startEvent>
+      <userTask id="additionalTask" name="Additional task" flowable:assignee="$INITIATOR">
+        <extensionElements>
+          <modeler:activiti-idm-initiator xmlns:modeler="http://flowable.org/modeler"><![CDATA[true]]></modeler:activiti-idm-initiator>
+        </extensionElements>
+      </userTask>
+      <endEvent id="eventEndEvent"></endEvent>
+      <sequenceFlow id="mainEventFlow1" sourceRef="signalStartEvent" targetRef="additionalTask"></sequenceFlow>
+      <sequenceFlow id="mainEventFlow2" sourceRef="additionalTask" targetRef="eventEndEvent"></sequenceFlow>
+    </subProcess>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_startingAdditionalTasks">
+    <bpmndi:BPMNPlane bpmnElement="startingAdditionalTasks" id="BPMNPlane_startingAdditionalTasks">
+      <bpmndi:BPMNShape bpmnElement="startEvent" id="BPMNShape_startEvent">
+        <omgdc:Bounds height="30.0" width="30.0" x="100.0" y="163.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="task1" id="BPMNShape_task1">
+        <omgdc:Bounds height="80.0" width="100.0" x="195.0" y="138.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="task2" id="BPMNShape_task2">
+        <omgdc:Bounds height="80.0" width="100.0" x="765.0" y="138.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endEvent" id="BPMNShape_endEvent">
+        <omgdc:Bounds height="28.0" width="28.0" x="915.0" y="164.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subProcess1" id="BPMNShape_subProcess1">
+        <omgdc:Bounds height="282.0" width="377.0" x="345.0" y="37.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subStartEvent" id="BPMNShape_subStartEvent">
+        <omgdc:Bounds height="30.0" width="30.0" x="375.0" y="90.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subTask1" id="BPMNShape_subTask1">
+        <omgdc:Bounds height="80.0" width="100.0" x="450.0" y="65.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subEndEvent" id="BPMNShape_subEndEvent">
+        <omgdc:Bounds height="28.0" width="28.0" x="595.0" y="91.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="eventSubProcess" id="BPMNShape_eventSubProcess">
+        <omgdc:Bounds height="117.0" width="303.0" x="375.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subEventStartEvent" id="BPMNShape_subEventStartEvent">
+        <omgdc:Bounds height="30.0" width="30.0" x="405.0" y="223.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="additionalSubTask" id="BPMNShape_additionalSubTask">
+        <omgdc:Bounds height="80.0" width="100.0" x="480.0" y="198.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subEventEndEvent" id="BPMNShape_subEventEndEvent">
+        <omgdc:Bounds height="28.0" width="28.0" x="625.0" y="224.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="eventProcess" id="BPMNShape_eventProcess">
+        <omgdc:Bounds height="157.0" width="484.0" x="105.0" y="390.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="signalStartEvent" id="BPMNShape_signalStartEvent">
+        <omgdc:Bounds height="30.0" width="30.0" x="154.0" y="452.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="additionalTask" id="BPMNShape_additionalTask">
+        <omgdc:Bounds height="80.0" width="100.0" x="229.0" y="427.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="eventEndEvent" id="BPMNShape_eventEndEvent">
+        <omgdc:Bounds height="28.0" width="28.0" x="374.0" y="453.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="mainEventFlow1" id="BPMNEdge_mainEventFlow1">
+        <omgdi:waypoint x="184.0" y="467.0"></omgdi:waypoint>
+        <omgdi:waypoint x="229.0" y="467.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="mainEventFlow2" id="BPMNEdge_mainEventFlow2">
+        <omgdi:waypoint x="329.0" y="467.0"></omgdi:waypoint>
+        <omgdi:waypoint x="374.0" y="467.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-3BFE51D9-7356-42F5-A1B9-5F6C12A4A419" id="BPMNEdge_sid-3BFE51D9-7356-42F5-A1B9-5F6C12A4A419">
+        <omgdi:waypoint x="130.0" y="178.0"></omgdi:waypoint>
+        <omgdi:waypoint x="195.0" y="178.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-5FF6E4C0-F243-47AD-8A26-162FF45C768E" id="BPMNEdge_sid-5FF6E4C0-F243-47AD-8A26-162FF45C768E">
+        <omgdi:waypoint x="295.0" y="178.0"></omgdi:waypoint>
+        <omgdi:waypoint x="345.0" y="178.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="subEventFlow2" id="BPMNEdge_subEventFlow2">
+        <omgdi:waypoint x="580.0" y="238.5"></omgdi:waypoint>
+        <omgdi:waypoint x="625.0" y="238.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="subEventFlow1" id="BPMNEdge_subEventFlow1">
+        <omgdi:waypoint x="435.0" y="238.5"></omgdi:waypoint>
+        <omgdi:waypoint x="480.0" y="238.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-AAFDB0AD-FE6C-46E0-8C95-6FF3F8DA7EBA" id="BPMNEdge_sid-AAFDB0AD-FE6C-46E0-8C95-6FF3F8DA7EBA">
+        <omgdi:waypoint x="865.0" y="178.0"></omgdi:waypoint>
+        <omgdi:waypoint x="915.0" y="178.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="subFlow1" id="BPMNEdge_subFlow1">
+        <omgdi:waypoint x="405.0" y="105.0"></omgdi:waypoint>
+        <omgdi:waypoint x="450.0" y="105.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="subFlow2" id="BPMNEdge_subFlow2">
+        <omgdi:waypoint x="550.0" y="105.0"></omgdi:waypoint>
+        <omgdi:waypoint x="595.0" y="105.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-36154E3B-6CD8-46DA-897A-3E9B5B9D1DEF" id="BPMNEdge_sid-36154E3B-6CD8-46DA-897A-3E9B5B9D1DEF">
+        <omgdi:waypoint x="722.0" y="178.0"></omgdi:waypoint>
+        <omgdi:waypoint x="765.0" y="178.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

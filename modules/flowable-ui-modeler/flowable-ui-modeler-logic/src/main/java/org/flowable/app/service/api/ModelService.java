@@ -64,7 +64,7 @@ public interface ModelService {
 
     ModelHistory createNewModelVersionAndReturnModelHistory(Model modelObject, String comment, User updatedBy);
 
-    void deleteModel(String modelId, boolean cascadeHistory, boolean deleteRuntimeApp);
+    void deleteModel(String modelId);
 
     ReviveModelResultRepresentation reviveProcessModelHistory(ModelHistory modelHistory, User user, String newVersionComment);
 }

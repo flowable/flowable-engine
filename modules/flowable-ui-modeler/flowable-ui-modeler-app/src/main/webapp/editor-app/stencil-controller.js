@@ -14,8 +14,8 @@
 'use strict';
 
 angular.module('flowableModeler')
-    .controller('StencilController', ['$rootScope', '$scope', '$http', '$modal', '$timeout', '$window', 
-                                      function ($rootScope, $scope, $http, $modal, $timeout, $window) {
+    .controller('StencilController', ['$rootScope', '$scope', '$http', '$modal', '$timeout', '$window', 'editorManager',
+                                      function ($rootScope, $scope, $http, $modal, $timeout, $window, editorManager) {
 
         // Property window toggle state
         $scope.propertyWindowState = {'collapsed': false};
@@ -32,8 +32,8 @@ angular.module('flowableModeler')
 
         // Code that is dependent on an initialised Editor is wrapped in a promise for the editor
         $scope.editorFactory.promise.then(function () {
-
-            /* Build stencil item list */
+        
+        	/* Build stencil item list */
 
             // Build simple json representation of stencil set
             var stencilItemGroups = [];
@@ -58,181 +58,176 @@ angular.module('flowableModeler')
             /*
              StencilSet items
              */
-            $http({method: 'GET', url: FLOWABLE.URL.getStencilSet($scope.modelData.stencilSetId)}).success(function (data, status, headers, config) {
+            var data = editorManager.getStencilData();
 
-              var quickMenuDefinition = ['UserTask', 'EndNoneEvent', 'ExclusiveGateway', 
+            var quickMenuDefinition = ['UserTask', 'EndNoneEvent', 'ExclusiveGateway', 
                                          'CatchTimerEvent', 'ThrowNoneEvent', 'TextAnnotation',
                                          'SequenceFlow', 'Association'];
-              var ignoreForPaletteDefinition = ['SequenceFlow', 'MessageFlow', 'Association', 'DataAssociation', 'DataStore', 'SendTask'];
-              var quickMenuItems = [];
+            var ignoreForPaletteDefinition = ['SequenceFlow', 'MessageFlow', 'Association', 'DataAssociation', 'DataStore', 'SendTask'];
+            var quickMenuItems = [];
               
-              var morphRoles = [];
-                for (var i = 0; i < data.rules.morphingRules.length; i++) 
-                {
-                    var role = data.rules.morphingRules[i].role;
-                    var roleItem = {'role': role, 'morphOptions': []};
-                    morphRoles.push(roleItem);
+            var morphRoles = [];
+            for (var i = 0; i < data.rules.morphingRules.length; i++) 
+            {
+                var role = data.rules.morphingRules[i].role;
+                var roleItem = {'role': role, 'morphOptions': []};
+                morphRoles.push(roleItem);
+            }
+          
+            // Check all received items
+            for (var stencilIndex = 0; stencilIndex < data.stencils.length; stencilIndex++) 
+            {
+              // Check if the root group is the 'diagram' group. If so, this item should not be shown.
+                var currentGroupName = data.stencils[stencilIndex].groups[0];
+                if (currentGroupName === 'Diagram' || currentGroupName === 'Form') {
+                    continue;  // go to next item
                 }
-              
-                // Check all received items
-                for (var stencilIndex = 0; stencilIndex < data.stencils.length; stencilIndex++) 
-                {
-                  // Check if the root group is the 'diagram' group. If so, this item should not be shown.
-                    var currentGroupName = data.stencils[stencilIndex].groups[0];
-                    if (currentGroupName === 'Diagram' || currentGroupName === 'Form') {
-                        continue;  // go to next item
-                    }
-                    
-                    var removed = false;
-                    if (data.stencils[stencilIndex].removed) {
-                        removed = true;
-                    }
+                
+                var removed = false;
+                if (data.stencils[stencilIndex].removed) {
+                    removed = true;
+                }
 
-                    var currentGroup = undefined;
-                    if (!removed) {
-                        // Check if this group already exists. If not, we create a new one
+                var currentGroup = undefined;
+                if (!removed) {
+                    // Check if this group already exists. If not, we create a new one
 
-                        if (currentGroupName !== null && currentGroupName !== undefined && currentGroupName.length > 0) {
+                    if (currentGroupName !== null && currentGroupName !== undefined && currentGroupName.length > 0) {
 
-                            currentGroup = findGroup(currentGroupName, stencilItemGroups); // Find group in root groups array
-                            if (currentGroup === null) {
-                                currentGroup = addGroup(currentGroupName, stencilItemGroups);
+                        currentGroup = findGroup(currentGroupName, stencilItemGroups); // Find group in root groups array
+                        if (currentGroup === null) {
+                            currentGroup = addGroup(currentGroupName, stencilItemGroups);
+                        }
+
+                        // Add all child groups (if any)
+                        for (var groupIndex = 1; groupIndex < data.stencils[stencilIndex].groups.length; groupIndex++) {
+                            var childGroupName = data.stencils[stencilIndex].groups[groupIndex];
+                            var childGroup = findGroup(childGroupName, currentGroup.groups);
+                            if (childGroup === null) {
+                                childGroup = addGroup(childGroupName, currentGroup.groups);
                             }
 
-                            // Add all child groups (if any)
-                            for (var groupIndex = 1; groupIndex < data.stencils[stencilIndex].groups.length; groupIndex++) {
-                                var childGroupName = data.stencils[stencilIndex].groups[groupIndex];
-                                var childGroup = findGroup(childGroupName, currentGroup.groups);
-                                if (childGroup === null) {
-                                    childGroup = addGroup(childGroupName, currentGroup.groups);
-                                }
-
-                                // The current group variable holds the parent of the next group (if any),
-                                // and is basically the last element in the array of groups defined in the stencil item
-                                currentGroup = childGroup;
-
-                            }
+                            // The current group variable holds the parent of the next group (if any),
+                            // and is basically the last element in the array of groups defined in the stencil item
+                            currentGroup = childGroup;
 
                         }
-                    }
-                    
-                    // Construct the stencil item
-                    var stencilItem = {'id': data.stencils[stencilIndex].id,
-                        'name': data.stencils[stencilIndex].title,
-                        'description': data.stencils[stencilIndex].description,
-                        'icon': data.stencils[stencilIndex].icon,
-                        'type': data.stencils[stencilIndex].type,
-                        'roles': data.stencils[stencilIndex].roles,
-                        'removed': removed,
-                        'customIcon': false,
-                        'canConnect': false,
-                        'canConnectTo': false,
-                        'canConnectAssociation': false};
-                    
-                    if (data.stencils[stencilIndex].customIconId && data.stencils[stencilIndex].customIconId > 0)
-                    {
-                        stencilItem.customIcon = true;
-                        stencilItem.icon = data.stencils[stencilIndex].customIconId;
-                    }
-                    
-                    if (!removed) {
-                        if (quickMenuDefinition.indexOf(stencilItem.id) >= 0)
-                        {
-                          quickMenuItems[quickMenuDefinition.indexOf(stencilItem.id)] = stencilItem;
-                        }
-                    }
-                    
-                    if (stencilItem.id === 'TextAnnotation' || stencilItem.id === 'BoundaryCompensationEvent') {
-                      stencilItem.canConnectAssociation = true;
-                    }
-                    
-                    for (var i = 0; i < data.stencils[stencilIndex].roles.length; i++)
-                    {
-                      var stencilRole = data.stencils[stencilIndex].roles[i];
-                      if (stencilRole === 'sequence_start')
-                      {
-                        stencilItem.canConnect = true;
-                      }
-                      else if (stencilRole === 'sequence_end')
-                      {
-                        stencilItem.canConnectTo = true;
-                      }
-                      
-                      for (var j = 0; j < morphRoles.length; j++)
-                      {
-                        if (stencilRole === morphRoles[j].role)
-                        {
-                            if (!removed)
-                            {
-                               morphRoles[j].morphOptions.push(stencilItem);
-                          }
-                          stencilItem.morphRole = morphRoles[j].role;
-                          break;
-                        }
-                      }
-                    }
 
-                    if (currentGroup)
-                    {
-                      // Add the stencil item to the correct group
-                      currentGroup.items.push(stencilItem);
-                      if (ignoreForPaletteDefinition.indexOf(stencilItem.id) < 0)
-                      {
-                        currentGroup.paletteItems.push(stencilItem);
-                      }
-
-                    } else
-                    {
-                        // It's a root stencil element
-                        if (!removed) {
-                            stencilItemGroups.push(stencilItem);
-                        }
                     }
                 }
                 
-                for (var i = 0; i < stencilItemGroups.length; i++) 
+                // Construct the stencil item
+                var stencilItem = {'id': data.stencils[stencilIndex].id,
+                    'name': data.stencils[stencilIndex].title,
+                    'description': data.stencils[stencilIndex].description,
+                    'icon': data.stencils[stencilIndex].icon,
+                    'type': data.stencils[stencilIndex].type,
+                    'roles': data.stencils[stencilIndex].roles,
+                    'removed': removed,
+                    'customIcon': false,
+                    'canConnect': false,
+                    'canConnectTo': false,
+                    'canConnectAssociation': false};
+                
+                if (data.stencils[stencilIndex].customIconId && data.stencils[stencilIndex].customIconId > 0)
                 {
-                  if (stencilItemGroups[i].paletteItems && stencilItemGroups[i].paletteItems.length == 0)
+                    stencilItem.customIcon = true;
+                    stencilItem.icon = data.stencils[stencilIndex].customIconId;
+                }
+                
+                if (!removed) {
+                    if (quickMenuDefinition.indexOf(stencilItem.id) >= 0)
+                    {
+                      quickMenuItems[quickMenuDefinition.indexOf(stencilItem.id)] = stencilItem;
+                    }
+                }
+                
+                if (stencilItem.id === 'TextAnnotation' || stencilItem.id === 'BoundaryCompensationEvent') {
+                  stencilItem.canConnectAssociation = true;
+                }
+                
+                for (var i = 0; i < data.stencils[stencilIndex].roles.length; i++)
+                {
+                  var stencilRole = data.stencils[stencilIndex].roles[i];
+                  if (stencilRole === 'sequence_start')
                   {
-                    stencilItemGroups[i].visible = false;
+                    stencilItem.canConnect = true;
+                  }
+                  else if (stencilRole === 'sequence_end')
+                  {
+                    stencilItem.canConnectTo = true;
+                  }
+                  
+                  for (var j = 0; j < morphRoles.length; j++)
+                  {
+                    if (stencilRole === morphRoles[j].role)
+                    {
+                        if (!removed)
+                        {
+                           morphRoles[j].morphOptions.push(stencilItem);
+                      }
+                      stencilItem.morphRole = morphRoles[j].role;
+                      break;
+                    }
                   }
                 }
-                
-                $scope.stencilItemGroups = stencilItemGroups;
 
-                var containmentRules = [];
-                for (var i = 0; i < data.rules.containmentRules.length; i++) 
+                if (currentGroup)
                 {
-                    var rule = data.rules.containmentRules[i];
-                    containmentRules.push(rule);
-                }
-                $scope.containmentRules = containmentRules;
-                
-                // remove quick menu items which are not available anymore due to custom pallette
-                var availableQuickMenuItems = [];
-                for (var i = 0; i < quickMenuItems.length; i++) 
+                  // Add the stencil item to the correct group
+                  currentGroup.items.push(stencilItem);
+                  if (ignoreForPaletteDefinition.indexOf(stencilItem.id) < 0)
+                  {
+                    currentGroup.paletteItems.push(stencilItem);
+                  }
+
+                } else
                 {
-                    if (quickMenuItems[i]) {
-                        availableQuickMenuItems[availableQuickMenuItems.length] = quickMenuItems[i];
+                    // It's a root stencil element
+                    if (!removed) {
+                        stencilItemGroups.push(stencilItem);
                     }
                 }
-                
-                $scope.quickMenuItems = availableQuickMenuItems;
-                $scope.morphRoles = morphRoles;
-            }).
+            }
             
-            error(function (data, status, headers, config) {
-                console.log('Something went wrong when fetching stencil items:' + JSON.stringify(data));
-            });
+            for (var i = 0; i < stencilItemGroups.length; i++) 
+            {
+              if (stencilItemGroups[i].paletteItems && stencilItemGroups[i].paletteItems.length == 0)
+              {
+                stencilItemGroups[i].visible = false;
+              }
+            }
+            
+            $scope.stencilItemGroups = stencilItemGroups;
+
+            var containmentRules = [];
+            for (var i = 0; i < data.rules.containmentRules.length; i++) 
+            {
+                var rule = data.rules.containmentRules[i];
+                containmentRules.push(rule);
+            }
+            $scope.containmentRules = containmentRules;
+            
+            // remove quick menu items which are not available anymore due to custom pallette
+            var availableQuickMenuItems = [];
+            for (var i = 0; i < quickMenuItems.length; i++) 
+            {
+                if (quickMenuItems[i]) {
+                    availableQuickMenuItems[availableQuickMenuItems.length] = quickMenuItems[i];
+                }
+            }
+            
+            $scope.quickMenuItems = availableQuickMenuItems;
+            $scope.morphRoles = morphRoles;
 
             /*
              * Listen to selection change events: show properties
              */
-            $scope.editor.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, function (event) {
+            editorManager.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, function (event) {
                 var shapes = event.elements;
                 var canvasSelected = false;
                 if (shapes && shapes.length == 0) {
-                    shapes = [$scope.editor.getCanvas()];
+                    shapes = [editorManager.getCanvas()];
                     canvasSelected = true;
                 }
                 if (shapes && shapes.length > 0) {
@@ -362,24 +357,24 @@ angular.module('flowableModeler')
                 }
             });
             
-            $scope.editor.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, function (event) {
+            editorManager.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, function (event) {
               
               FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS);
               var shapes = event.elements;
                 
-                if (shapes && shapes.length == 1) {
+              if (shapes && shapes.length == 1) {
 
-                    var selectedShape = shapes.first();
+              	  var selectedShape = shapes.first();
               
-                    var a = $scope.editor.getCanvas().node.getScreenCTM();
+                  var a = editorManager.getCanvas().node.getScreenCTM();
               
-              var absoluteXY = selectedShape.absoluteXY();
-              
-              absoluteXY.x *= a.a;
-              absoluteXY.y *= a.d;
-              
-              var additionalIEZoom = 1;
-              if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
+	              var absoluteXY = selectedShape.absoluteXY();
+	              
+	              absoluteXY.x *= a.a;
+	              absoluteXY.y *= a.d;
+	              
+	              var additionalIEZoom = 1;
+	              if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
                         var ua = navigator.userAgent;
                         if (ua.indexOf('MSIE') >= 0) {
                             //IE 10 and below
@@ -388,89 +383,97 @@ angular.module('flowableModeler')
                                 additionalIEZoom = zoom / 100
                             }
                         }
-                    }
-                    
-              if (additionalIEZoom === 1) {
-                   absoluteXY.y = absoluteXY.y - jQuery("#canvasSection").offset().top + 5;
-                         absoluteXY.x = absoluteXY.x - jQuery("#canvasSection").offset().left;
-              
-              } else {
-                   var canvasOffsetLeft = jQuery("#canvasSection").offset().left;
-                   var canvasScrollLeft = jQuery("#canvasSection").scrollLeft();
-                   var canvasScrollTop = jQuery("#canvasSection").scrollTop();
-                   
-                   var offset = a.e - (canvasOffsetLeft * additionalIEZoom);
-                   var additionaloffset = 0;
-                   if (offset > 10) {
-                       additionaloffset = (offset / additionalIEZoom) - offset;
-                   }
-                   absoluteXY.y = absoluteXY.y - (jQuery("#canvasSection").offset().top * additionalIEZoom) + 5 + ((canvasScrollTop * additionalIEZoom) - canvasScrollTop);
-                         absoluteXY.x = absoluteXY.x - (canvasOffsetLeft * additionalIEZoom) + additionaloffset + ((canvasScrollLeft * additionalIEZoom) - canvasScrollLeft);
-                    }
-              
-              var bounds = new ORYX.Core.Bounds(a.e + absoluteXY.x, a.f + absoluteXY.y, a.e + absoluteXY.x + a.a*selectedShape.bounds.width(), a.f + absoluteXY.y + a.d*selectedShape.bounds.height());
-              var shapeXY = bounds.upperLeft();
-              
-              var stencilItem = $scope.getStencilItemById(selectedShape.getStencil().idWithoutNs());
-              var morphShapes = [];
-              if (stencilItem && stencilItem.morphRole)
-              {
-                  for (var i = 0; i < $scope.morphRoles.length; i++)
-                  {
-                    if ($scope.morphRoles[i].role === stencilItem.morphRole)
-                  {
-                    morphShapes = $scope.morphRoles[i].morphOptions;
                   }
+	                    
+	              if (additionalIEZoom === 1) {
+	                   absoluteXY.y = absoluteXY.y - jQuery("#canvasSection").offset().top + 5;
+	                         absoluteXY.x = absoluteXY.x - jQuery("#canvasSection").offset().left;
+	              
+	              } else {
+	                   var canvasOffsetLeft = jQuery("#canvasSection").offset().left;
+	                   var canvasScrollLeft = jQuery("#canvasSection").scrollLeft();
+	                   var canvasScrollTop = jQuery("#canvasSection").scrollTop();
+	                   
+	                   var offset = a.e - (canvasOffsetLeft * additionalIEZoom);
+	                   var additionaloffset = 0;
+	                   if (offset > 10) {
+	                       additionaloffset = (offset / additionalIEZoom) - offset;
+	                   }
+	                   absoluteXY.y = absoluteXY.y - (jQuery("#canvasSection").offset().top * additionalIEZoom) + 5 + ((canvasScrollTop * additionalIEZoom) - canvasScrollTop);
+	                         absoluteXY.x = absoluteXY.x - (canvasOffsetLeft * additionalIEZoom) + additionaloffset + ((canvasScrollLeft * additionalIEZoom) - canvasScrollLeft);
                   }
-                  }
+	              
+	              var bounds = new ORYX.Core.Bounds(a.e + absoluteXY.x, a.f + absoluteXY.y, a.e + absoluteXY.x + a.a*selectedShape.bounds.width(), a.f + absoluteXY.y + a.d*selectedShape.bounds.height());
+	              var shapeXY = bounds.upperLeft();
+	              
+	              var stencilItem = $scope.getStencilItemById(selectedShape.getStencil().idWithoutNs());
+	              var morphShapes = [];
+	              if (stencilItem && stencilItem.morphRole) {
+	                  for (var i = 0; i < $scope.morphRoles.length; i++) {
+						  if ($scope.morphRoles[i].role === stencilItem.morphRole) {
+	                    	  morphShapes = $scope.morphRoles[i].morphOptions;
+	                      }
+	                  }
+	              }
               
-              var x = shapeXY.x;
-            if (bounds.width() < 48) {
-              x -= 24;
-            }
+              	  var x = shapeXY.x;
+            	  if (bounds.width() < 48) {
+              		  x -= 24;
+            	  }
               
-              if (morphShapes && morphShapes.length > 0)
-              {
-                // In case the element is not wide enough, start the 2 bottom-buttons more to the left
-                // to prevent overflow in the right-menu
+              	  if (morphShapes && morphShapes.length > 0) {
+                	// In case the element is not wide enough, start the 2 bottom-buttons more to the left
+                	// to prevent overflow in the right-menu
                 
-                var morphButton = document.getElementById('morph-button');
-                morphButton.style.display = "block";
-                morphButton.style.left = x + 24 +'px';
-                morphButton.style.top = (shapeXY.y+bounds.height() + 2) + 'px';
-              }
+                	var morphButton = document.getElementById('morph-button');
+                	morphButton.style.display = "block";
+                	morphButton.style.left = x + 24 +'px';
+                	morphButton.style.top = (shapeXY.y+bounds.height() + 2) + 'px';
+              	  }
               
-              var deleteButton = document.getElementById('delete-button');
-              deleteButton.style.display = "block";
-              deleteButton.style.left = x + 'px';
-              deleteButton.style.top = (shapeXY.y+bounds.height() + 2) + 'px';
+              	  var deleteButton = document.getElementById('delete-button');
+              	  deleteButton.style.display = "block";
+              	  deleteButton.style.left = x + 'px';
+              	  deleteButton.style.top = (shapeXY.y+bounds.height() + 2) + 'px';
+              	  
+              	  var editable = selectedShape._stencil._jsonStencil.id.endsWith('CollapsedSubProcess') ;
+				  var editButton = document.getElementById('edit-button');
+				  if (editable) {
+				      editButton.style.display = "block";
+ 					  if (morphShapes && morphShapes.length > 0) {
+						editButton.style.left = x + 24 + 24 + 'px';
+				      } else {
+					 	editButton.style.left = x + 24 +'px';
+					  }
+					  editButton.style.top = (shapeXY.y+bounds.height() + 2) + 'px';
+					  
+				  } else {
+					  editButton.style.display = "none";
+				  }
               
-              if (stencilItem && (stencilItem.canConnect || stencilItem.canConnectAssociation))
-              {
-                var quickButtonCounter = 0;
-                var quickButtonX = shapeXY.x+bounds.width() + 5;
-                var quickButtonY = shapeXY.y;
-                jQuery('.Oryx_button').each(function(i, obj) {
-                  if (obj.id !== 'morph-button' && obj.id != 'delete-button')
-                  {
-                    quickButtonCounter++;
-                    if (quickButtonCounter > 3)
-                    {
-                      quickButtonX = shapeXY.x+bounds.width() + 5;
-                      quickButtonY += 24;
-                      quickButtonCounter = 1;
-                    }
-                    else if (quickButtonCounter > 1)
-                    {
-                      quickButtonX += 24;
-                    }
-                    obj.style.display = "block";
-                    obj.style.left = quickButtonX + 'px';
-                    obj.style.top = quickButtonY + 'px';
+              	  if (stencilItem && (stencilItem.canConnect || stencilItem.canConnectAssociation)) {
+	                var quickButtonCounter = 0;
+	                var quickButtonX = shapeXY.x+bounds.width() + 5;
+	                var quickButtonY = shapeXY.y;
+	                jQuery('.Oryx_button').each(function(i, obj) {
+	                  if (obj.id !== 'morph-button' && obj.id != 'delete-button' && obj.id !== 'edit-button') {
+	                    quickButtonCounter++;
+	                    if (quickButtonCounter > 3) {
+	                      quickButtonX = shapeXY.x+bounds.width() + 5;
+	                      quickButtonY += 24;
+	                      quickButtonCounter = 1;
+	                      
+	                    } else if (quickButtonCounter > 1) {
+	                      quickButtonX += 24;
+	                    }
+	                    
+	                    obj.style.display = "block";
+	                    obj.style.left = quickButtonX + 'px';
+	                    obj.style.top = quickButtonY + 'px';
+	                  }
+	                });
                   }
-                });
-              }
-                }
+               }
             });
             
             if (!$rootScope.stencilInitialized) {
@@ -498,26 +501,27 @@ angular.module('flowableModeler')
               });
               
               FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_SHOW_VALIDATION_POPUP, function (event) {
-                // Method to open validation dialog
+                  // Method to open validation dialog
                   var showValidationDialog = function() {
-                    $rootScope.currentValidationId = event.validationId;
-                    $rootScope.isOnProcessLevel = event.onProcessLevel;
+                      $rootScope.currentValidationId = event.validationId;
+                      $rootScope.isOnProcessLevel = event.onProcessLevel;
 
-                        _internalCreateModal({template: 'editor-app/popups/validation-errors.html?version=' + Date.now()},  $modal, $rootScope);
+                      _internalCreateModal({template: 'editor-app/popups/validation-errors.html?version=' + Date.now()},  $modal, $rootScope);
                   };
 
                   showValidationDialog();
               });
               
               FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_NAVIGATE_TO_PROCESS, function (event) {
-                  var modelMetaData = $rootScope.editor.getModelMetaData();
+                  var modelMetaData = editorManager.getBaseModelData();
                   $rootScope.editorHistory.push({
                         id: modelMetaData.modelId, 
                         name: modelMetaData.name, 
                         type: 'bpmnmodel'
-                    });
-                  $window.location.href = "../editor/#/editor/" + event.processId;
-                });
+                  });
+                  
+              	  $window.location.href = "../editor/#/editor/" + event.processId;
+              });
               
               $rootScope.stencilInitialized = true;
             }
@@ -525,18 +529,15 @@ angular.module('flowableModeler')
             $scope.morphShape = function() {
               $scope.safeApply(function () {
                 
-                var shapes = $rootScope.editor.getSelection();
-                if (shapes && shapes.length == 1)
-                {
+                var shapes = editorManager.getSelection();
+                if (shapes && shapes.length == 1) {
                   $rootScope.currentSelectedShape = shapes.first();
                   var stencilItem = $scope.getStencilItemById($rootScope.currentSelectedShape.getStencil().idWithoutNs());
                   var morphShapes = [];
-                  for (var i = 0; i < $scope.morphRoles.length; i++)
-                  {
-                    if ($scope.morphRoles[i].role === stencilItem.morphRole)
-                  {
-                    morphShapes = $scope.morphRoles[i].morphOptions.slice();
-                  }
+                  for (var i = 0; i < $scope.morphRoles.length; i++) {
+                    if ($scope.morphRoles[i].role === stencilItem.morphRole) {
+                    	morphShapes = $scope.morphRoles[i].morphOptions.slice();
+                    }
                   }
 
                   // Method to open shape select dialog (used later on)
@@ -556,34 +557,30 @@ angular.module('flowableModeler')
             };
             
             $scope.deleteShape = function() {
-              FLOWABLE.TOOLBAR.ACTIONS.deleteItem({'$scope': $scope});
+              FLOWABLE.TOOLBAR.ACTIONS.deleteItem({'$scope': $scope, 'editorManager': editorManager});
             };
             
             $scope.quickAddItem = function(newItemId) {
               $scope.safeApply(function () {
                 
-                var shapes = $rootScope.editor.getSelection();
-                if (shapes && shapes.length == 1)
-                {
+                var shapes = editorManager.getSelection();
+                if (shapes && shapes.length == 1) {
                   $rootScope.currentSelectedShape = shapes.first();
                   
                   var containedStencil = undefined;
-                      var stencilSets = $scope.editor.getStencilSets().values();
-                      for (var i = 0; i < stencilSets.length; i++)
-                      {
-                        var stencilSet = stencilSets[i];
-                      var nodes = stencilSet.nodes();
-                      for (var j = 0; j < nodes.length; j++)
-                          {
-                        if (nodes[j].idWithoutNs() === newItemId)
-                        {
-                          containedStencil = nodes[j];
-                          break;
-                        }
-                          }
-                      }
-                      
-                      if (!containedStencil) return;
+                  var stencilSets = editorManager.getStencilSets().values();
+                  for (var i = 0; i < stencilSets.length; i++) {
+                    var stencilSet = stencilSets[i];
+                  	var nodes = stencilSet.nodes();
+                  	for (var j = 0; j < nodes.length; j++) {
+                    	if (nodes[j].idWithoutNs() === newItemId) {
+                      	    containedStencil = nodes[j];
+                      		break;
+                    	}
+                    }
+                  }
+                  
+                  if (!containedStencil) return;
                   
                   var option = {type: $scope.currentSelectedShape.getStencil().namespace() + newItemId, namespace: $scope.currentSelectedShape.getStencil().namespace()};
                   option['connectedShape'] = $rootScope.currentSelectedShape;
@@ -591,16 +588,25 @@ angular.module('flowableModeler')
                   option['containedStencil'] = containedStencil;
                 
                   var args = { sourceShape: $rootScope.currentSelectedShape, targetStencil: containedStencil };
-                  var targetStencil = $scope.editor.getRules().connectMorph(args);
-                  if (!targetStencil){ return; }// Check if there can be a target shape
+                  var targetStencil = editorManager.getRules().connectMorph(args);
+                  
+                  // Check if there can be a target shape
+                  if (!targetStencil) { 
+                  	return; 
+                  }
+                  
                   option['connectingType'] = targetStencil.id();
 
-                  var command = new FLOWABLE.CreateCommand(option, undefined, undefined, $scope.editor);
+                  var command = new FLOWABLE.CreateCommand(option, undefined, undefined, editorManager.getEditor());
                 
-                  $scope.editor.executeCommands([command]);
+                  editorManager.executeCommands([command]);
                 }
               });
             };
+            
+            $scope.editShape = function(){
+				editorManager.edit($scope.selectedShape.resourceId);
+			};
 
         }); // end of $scope.editorFactory.promise block
 
@@ -652,7 +658,7 @@ angular.module('flowableModeler')
                         this.oldValue = oldValue;
                         this.newValue = newValue;
                         this.shape = shape;
-                        this.facade = $scope.editor;
+                        this.facade = editorManager.getEditor();
                     },
                     execute: function () {
                         this.shape.setProperty(this.key, this.newValue);
@@ -669,8 +675,8 @@ angular.module('flowableModeler')
                 var command = new commandClass();
 
                 // Execute the command
-                $scope.editor.executeCommands([command]);
-                $scope.editor.handleEvents({
+                editorManager.executeCommands([command]);
+                editorManager.handleEvents({
                     type: ORYX.CONFIG.EVENT_PROPWINDOW_PROP_CHANGED,
                     elements: [shape],
                     key: key
@@ -752,16 +758,16 @@ angular.module('flowableModeler')
 
         $scope.dropCallback = function (event, ui) {
           
-            $scope.editor.handleEvents({
+            editorManager.handleEvents({
                 type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
                 highlightId: "shapeRepo.attached"
             });
-            $scope.editor.handleEvents({
+            editorManager.handleEvents({
                 type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
                 highlightId: "shapeRepo.added"
             });
             
-            $scope.editor.handleEvents({
+            editorManager.handleEvents({
                 type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
                 highlightId: "shapeMenu"
             });
@@ -775,71 +781,63 @@ angular.module('flowableModeler')
               var pos = {x: event.pageX, y: event.pageY};
               
               var additionalIEZoom = 1;
-                if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-                    var ua = navigator.userAgent;
-                    if (ua.indexOf('MSIE') >= 0) {
-                        //IE 10 and below
-                        var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100);
-                        if (zoom !== 100) {
-                            additionalIEZoom = zoom / 100;
-                        }
-                    }
+              if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
+                var ua = navigator.userAgent;
+                if (ua.indexOf('MSIE') >= 0) {
+                  //IE 10 and below
+                  var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100);
+                  if (zoom !== 100) {
+                    additionalIEZoom = zoom / 100;
+                  }
                 }
+              }
               
-                var screenCTM = $scope.editor.getCanvas().node.getScreenCTM();
+              var screenCTM = editorManager.getCanvas().node.getScreenCTM();
 
-                // Correcting the UpperLeft-Offset
-                pos.x -= (screenCTM.e / additionalIEZoom);
-                pos.y -= (screenCTM.f / additionalIEZoom);
-                // Correcting the Zoom-Factor
-                pos.x /= screenCTM.a;
-                pos.y /= screenCTM.d;
+              // Correcting the UpperLeft-Offset
+              pos.x -= (screenCTM.e / additionalIEZoom);
+              pos.y -= (screenCTM.f / additionalIEZoom);
+              // Correcting the Zoom-Factor
+              pos.x /= screenCTM.a;
+              pos.y /= screenCTM.d;
                 
-                // Correcting the ScrollOffset
-                pos.x -= document.documentElement.scrollLeft;
-                pos.y -= document.documentElement.scrollTop;
+              // Correcting the ScrollOffset
+              pos.x -= document.documentElement.scrollLeft;
+              pos.y -= document.documentElement.scrollTop;
                 
-                var parentAbs = $scope.dragCurrentParent.absoluteXY();
-                pos.x -= parentAbs.x;
-                pos.y -= parentAbs.y;
+              var parentAbs = $scope.dragCurrentParent.absoluteXY();
+              pos.x -= parentAbs.x;
+              pos.y -= parentAbs.y;
 
-                var containedStencil = undefined;
-                var stencilSets = $scope.editor.getStencilSets().values();
-                for (var i = 0; i < stencilSets.length; i++)
-                {
-                    var stencilSet = stencilSets[i];
-                    var nodes = stencilSet.nodes();
-                    for (var j = 0; j < nodes.length; j++)
-                    {
-                        if (nodes[j].idWithoutNs() === ui.draggable[0].id)
-                        {
-                            containedStencil = nodes[j];
-                            break;
-                        }
-                    }
-
-                    if (!containedStencil)
-                    {
-                        var edges = stencilSet.edges();
-                        for (var j = 0; j < edges.length; j++)
-                        {
-                            if (edges[j].idWithoutNs() === ui.draggable[0].id)
-                            {
-                                containedStencil = edges[j];
-                                break;
-                            }
-                        }
-                    }
+              var containedStencil = undefined;
+              var stencilSets = editorManager.getStencilSets().values();
+              for (var i = 0; i < stencilSets.length; i++) {
+                var stencilSet = stencilSets[i];
+                var nodes = stencilSet.nodes();
+                for (var j = 0; j < nodes.length; j++) {
+                  if (nodes[j].idWithoutNs() === ui.draggable[0].id) {
+                    containedStencil = nodes[j];
+                    break;
+                  }
                 }
 
-                if (!containedStencil) return;
+                if (!containedStencil) {
+                  var edges = stencilSet.edges();
+                  for (var j = 0; j < edges.length; j++) {
+                  if (edges[j].idWithoutNs() === ui.draggable[0].id) {
+                    containedStencil = edges[j];
+                    break;
+                  }
+                }
+              }
+            }
 
-              if ($scope.quickMenu)
-              {
-                var shapes = $scope.editor.getSelection();
-                if (shapes && shapes.length == 1)
-                {
-                  var currentSelectedShape = shapes.first();
+            if (!containedStencil) return;
+
+            if ($scope.quickMenu) {
+              var shapes = editorManager.getSelection();
+              if (shapes && shapes.length == 1) {
+                var currentSelectedShape = shapes.first();
 
                 var option = {};
                 option.type = currentSelectedShape.getStencil().namespace() + ui.draggable[0].id;
@@ -847,129 +845,131 @@ angular.module('flowableModeler')
                 option.connectedShape = currentSelectedShape;
                 option.parent = $scope.dragCurrentParent;
                 option.containedStencil = containedStencil;
-                
+	                
                 // If the ctrl key is not pressed, 
                 // snapp the new shape to the center 
                 // if it is near to the center of the other shape
-                if (!event.ctrlKey){
+                if (!event.ctrlKey) {
                   // Get the center of the shape
                   var cShape = currentSelectedShape.bounds.center();
                   // Snapp +-20 Pixel horizontal to the center 
-                  if (20 > Math.abs(cShape.x - pos.x)){
+                  if (20 > Math.abs(cShape.x - pos.x)) {
                     pos.x = cShape.x;
                   }
                   // Snapp +-20 Pixel vertical to the center 
-                  if (20 > Math.abs(cShape.y - pos.y)){
+                  if (20 > Math.abs(cShape.y - pos.y)) {
                     pos.y = cShape.y;
                   }
                 }
-                
+	                
                 option.position = pos;
-              
+	              
                 if (containedStencil.idWithoutNs() !== 'SequenceFlow' && containedStencil.idWithoutNs() !== 'Association' && 
-                        containedStencil.idWithoutNs() !== 'MessageFlow' && containedStencil.idWithoutNs() !== 'DataAssociation')
-                {
+                        containedStencil.idWithoutNs() !== 'MessageFlow' && containedStencil.idWithoutNs() !== 'DataAssociation') {
+	                        
                   var args = { sourceShape: currentSelectedShape, targetStencil: containedStencil };
-                  var targetStencil = $scope.editor.getRules().connectMorph(args);
-                  if (!targetStencil){ return; }// Check if there can be a target shape
+                  var targetStencil = editorManager.getRules().connectMorph(args);
+                  if (!targetStencil) { // Check if there can be a target shape
+                  	return; 
+                  }
                   option.connectingType = targetStencil.id();
                 }
-  
-                var command = new FLOWABLE.CreateCommand(option, $scope.dropTargetElement, pos, $scope.editor);
-              
-                $scope.editor.executeCommands([command]);
-                }
+	  
+                var command = new FLOWABLE.CreateCommand(option, $scope.dropTargetElement, pos, editorManager.getEditor());
+	              
+                editorManager.executeCommands([command]);
               }
-              else
-              {
-                    var canAttach = false;
-                    if (containedStencil.idWithoutNs() === 'BoundaryErrorEvent' || containedStencil.idWithoutNs() === 'BoundaryTimerEvent' ||
-                        containedStencil.idWithoutNs() === 'BoundarySignalEvent' || containedStencil.idWithoutNs() === 'BoundaryMessageEvent' ||
-                        containedStencil.idWithoutNs() === 'BoundaryCancelEvent' || containedStencil.idWithoutNs() === 'BoundaryCompensationEvent') {
-                        // Modify position, otherwise boundary event will get position related to left corner of the canvas instead of the container
-                        pos = $scope.editor.eventCoordinates( event );
-                        canAttach = true;
-                    }
+	                
+            } else {
+              var canAttach = false;
+              if (containedStencil.idWithoutNs() === 'BoundaryErrorEvent' || containedStencil.idWithoutNs() === 'BoundaryTimerEvent' ||
+                    containedStencil.idWithoutNs() === 'BoundarySignalEvent' || containedStencil.idWithoutNs() === 'BoundaryMessageEvent' ||
+                    containedStencil.idWithoutNs() === 'BoundaryCancelEvent' || containedStencil.idWithoutNs() === 'BoundaryCompensationEvent') {
+                    
+                // Modify position, otherwise boundary event will get position related to left corner of the canvas instead of the container
+                pos = editorManager.eventCoordinates( event );
+                canAttach = true;
+              }
 
-                    var option = {};
-                    option['type'] = $scope.modelData.model.stencilset.namespace + item.id;
-                    option['namespace'] = $scope.modelData.model.stencilset.namespace;
-                    option['position'] = pos;
-                    option['parent'] = $scope.dragCurrentParent;
+              var option = {};
+              option['type'] = $scope.modelData.model.stencilset.namespace + item.id;
+              option['namespace'] = $scope.modelData.model.stencilset.namespace;
+              option['position'] = pos;
+              option['parent'] = $scope.dragCurrentParent;
 
-                    var commandClass = ORYX.Core.Command.extend({
-                        construct: function(option, dockedShape, canAttach, position, facade){
-                            this.option = option;
-                            this.docker = null;
-                            this.dockedShape = dockedShape;
-                            this.dockedShapeParent = dockedShape.parent || facade.getCanvas();
-                            this.position = position;
-                            this.facade = facade;
-                            this.selection = this.facade.getSelection();
-                            this.shape = null;
-                            this.parent = null;
-                            this.canAttach = canAttach;
-                        },
-                        execute: function(){
-                            if (!this.shape) {
-                                this.shape = this.facade.createShape(option);
-                                this.parent = this.shape.parent;
-                            } else if (this.parent) {
-                                this.parent.add(this.shape);
-                            }
-
-                            if (this.canAttach && this.shape.dockers && this.shape.dockers.length) {
-                                this.docker = this.shape.dockers[0];
-
-                                this.dockedShapeParent.add(this.docker.parent);
-
-                                // Set the Docker to the new Shape
-                                this.docker.setDockedShape(undefined);
-                                this.docker.bounds.centerMoveTo(this.position);
-                                if (this.dockedShape !== this.facade.getCanvas()) {
-                                    this.docker.setDockedShape(this.dockedShape);
-                                }
-                                this.facade.setSelection( [this.docker.parent] );
-                            }
-
-                            this.facade.getCanvas().update();
-                            this.facade.updateSelection();
-
-                        },
-                        rollback: function(){
-                            if (this.shape) {
-                                this.facade.setSelection(this.selection.without(this.shape));
-                                this.facade.deleteShape(this.shape);
-                            }
-                            if (this.canAttach && this.docker) {
-                                this.docker.setDockedShape(undefined);
-                            }
-                            this.facade.getCanvas().update();
-                            this.facade.updateSelection();
-
+              var commandClass = ORYX.Core.Command.extend({
+                    construct: function(option, dockedShape, canAttach, position, facade){
+                        this.option = option;
+                        this.docker = null;
+                        this.dockedShape = dockedShape;
+                        this.dockedShapeParent = dockedShape.parent || facade.getCanvas();
+                        this.position = position;
+                        this.facade = facade;
+                        this.selection = this.facade.getSelection();
+                        this.shape = null;
+                        this.parent = null;
+                        this.canAttach = canAttach;
+                    },
+                    execute: function(){
+                        if (!this.shape) {
+                            this.shape = this.facade.createShape(option);
+                            this.parent = this.shape.parent;
+                        } else if (this.parent) {
+                            this.parent.add(this.shape);
                         }
-                    });
 
-                    // Update canvas
-                    var command = new commandClass(option, $scope.dragCurrentParent, canAttach, pos, $scope.editor);
-                    $scope.editor.executeCommands([command]);
+                        if (this.canAttach && this.shape.dockers && this.shape.dockers.length) {
+                            this.docker = this.shape.dockers[0];
 
-                    // Fire event to all who want to know about this
-                    var dropEvent = {
-                        type: FLOWABLE.eventBus.EVENT_TYPE_ITEM_DROPPED,
-                        droppedItem: item,
-                        position: pos
-                    };
-                    FLOWABLE.eventBus.dispatch(dropEvent.type, dropEvent);
-                }
+                            this.dockedShapeParent.add(this.docker.parent);
+
+                            // Set the Docker to the new Shape
+                            this.docker.setDockedShape(undefined);
+                            this.docker.bounds.centerMoveTo(this.position);
+                            if (this.dockedShape !== this.facade.getCanvas()) {
+                                this.docker.setDockedShape(this.dockedShape);
+                            }
+                            this.facade.setSelection( [this.docker.parent] );
+                        }
+
+                        this.facade.getCanvas().update();
+                        this.facade.updateSelection();
+
+                    },
+                    rollback: function(){
+                        if (this.shape) {
+                            this.facade.setSelection(this.selection.without(this.shape));
+                            this.facade.deleteShape(this.shape);
+                        }
+                        if (this.canAttach && this.docker) {
+                            this.docker.setDockedShape(undefined);
+                        }
+                        this.facade.getCanvas().update();
+                        this.facade.updateSelection();
+
+                    }
+              });
+
+              // Update canvas
+              var command = new commandClass(option, $scope.dragCurrentParent, canAttach, pos, editorManager.getEditor());
+              editorManager.executeCommands([command]);
+
+              // Fire event to all who want to know about this
+              var dropEvent = {
+                  type: FLOWABLE.eventBus.EVENT_TYPE_ITEM_DROPPED,
+                  droppedItem: item,
+                  position: pos
+              };
+              FLOWABLE.eventBus.dispatch(dropEvent.type, dropEvent);
             }
+          }
 
-            $scope.dragCurrentParent = undefined;
-            $scope.dragCurrentParentId = undefined;
-            $scope.dragCurrentParentStencil = undefined;
-            $scope.dragCanContain = undefined;
-            $scope.quickMenu = undefined;
-            $scope.dropTargetElement = undefined;
+          $scope.dragCurrentParent = undefined;
+          $scope.dragCurrentParentId = undefined;
+          $scope.dragCurrentParentStencil = undefined;
+          $scope.dragCanContain = undefined;
+          $scope.quickMenu = undefined;
+          $scope.dropTargetElement = undefined;
         };
 
 
@@ -998,7 +998,7 @@ angular.module('flowableModeler')
           
             if ($scope.dragModeOver != false) {
               
-                var coord = $scope.editor.eventCoordinatesXY(event.pageX, event.pageY);
+                var coord = editorManager.eventCoordinatesXY(event.pageX, event.pageY);
                 
                 var additionalIEZoom = 1;
                 if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
@@ -1017,7 +1017,7 @@ angular.module('flowableModeler')
                      coord.y = coord.y / additionalIEZoom;
                 }
                 
-                var aShapes = $scope.editor.getCanvas().getAbstractShapesAtPosition(coord);
+                var aShapes = editorManager.getCanvas().getAbstractShapesAtPosition(coord);
                 
                 if (aShapes.length <= 0) {
                     if (event.helper) {
@@ -1027,12 +1027,11 @@ angular.module('flowableModeler')
                 }
 
                 if (aShapes[0] instanceof ORYX.Core.Canvas) {
-                    $scope.editor.getCanvas().setHightlightStateBasedOnX(coord.x);
+                    editorManager.getCanvas().setHightlightStateBasedOnX(coord.x);
                 }
 
-                if (aShapes.length == 1 && aShapes[0] instanceof ORYX.Core.Canvas)
-                {
-                  var item = $scope.getStencilItemById(event.target.id);
+                if (aShapes.length == 1 && aShapes[0] instanceof ORYX.Core.Canvas) {
+                  	var item = $scope.getStencilItemById(event.target.id);
                     var parentCandidate = aShapes[0];
 
                     if (item.id === 'Lane' || item.id === 'BoundaryErrorEvent' || item.id === 'BoundaryMessageEvent' || 
@@ -1042,7 +1041,7 @@ angular.module('flowableModeler')
                         $scope.dragCanContain = false;
                         
                         // Show Highlight
-                        $scope.editor.handleEvents({
+                        editorManager.handleEvents({
                             type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
                             highlightId: 'shapeRepo.added',
                             elements: [parentCandidate],
@@ -1055,21 +1054,20 @@ angular.module('flowableModeler')
                         $scope.dragCurrentParent = parentCandidate;
                         $scope.dragCurrentParentId = parentCandidate.id;
                         
-                        $scope.editor.handleEvents({
+                        editorManager.handleEvents({
                             type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
                             highlightId: "shapeRepo.added"
                         });
                     }
 
-                    $scope.editor.handleEvents({
+                    editorManager.handleEvents({
                         type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
                         highlightId: "shapeRepo.attached"
                     });
                     
                     return false;
-                }
-                else 
-                {
+                    
+                } else  {
                     var item = $scope.getStencilItemById(event.target.id);
                     
                     var parentCandidate = aShapes.reverse().find(function (candidate) {
@@ -1098,18 +1096,15 @@ angular.module('flowableModeler')
                             if (item.roles.indexOf("IntermediateEventOnActivityBoundary") > -1) {
                                 _canContain = true;
                             }
-                        }
-                        else if (parentCandidate.getStencil().idWithoutNs() === 'Pool')
-                        {
-                          if (item.id === 'Lane')
-                          {
-                            _canContain = true;
-                          }
+                            
+                        } else if (parentCandidate.getStencil().idWithoutNs() === 'Pool') {
+                          	if (item.id === 'Lane') {
+                            	_canContain = true;
+                          	}
                         }
                         
-                        if (_canContain)
-                        {
-                          $scope.editor.handleEvents({
+                        if (_canContain) {
+                            editorManager.handleEvents({
                                 type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
                                 highlightId: "shapeRepo.attached",
                                 elements: [parentCandidate],
@@ -1117,13 +1112,12 @@ angular.module('flowableModeler')
                                 color: ORYX.CONFIG.SELECTION_VALID_COLOR
                             });
 
-                            $scope.editor.handleEvents({
+                            editorManager.handleEvents({
                                 type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
                                 highlightId: "shapeRepo.added"
                             });
-                        }
-                        else
-                        {
+                            
+                        } else {
                             for (var i = 0; i < $scope.containmentRules.length; i++) {
                                 var rule = $scope.containmentRules[i];
                                 if (rule.role === parentItem.id) {
@@ -1139,16 +1133,16 @@ angular.module('flowableModeler')
                                     }
                                 }
                             }
-
+                            
                             // Show Highlight
-                            $scope.editor.handleEvents({
+                            editorManager.handleEvents({
                                 type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
                                 highlightId: 'shapeRepo.added',
                                 elements: [parentCandidate],
                                 color: _canContain ? ORYX.CONFIG.SELECTION_VALID_COLOR : ORYX.CONFIG.SELECTION_INVALID_COLOR
                             });
 
-                            $scope.editor.handleEvents({
+                            editorManager.handleEvents({
                                 type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
                                 highlightId: "shapeRepo.attached"
                             });
@@ -1158,50 +1152,44 @@ angular.module('flowableModeler')
                         $scope.dragCurrentParentId = parentCandidate.id;
                         $scope.dragCurrentParentStencil = parentStencilId;
                         $scope.dragCanContain = _canContain;
-                    }
-                    else 
-                    { 
-                      var canvasCandidate = $scope.editor.getCanvas();
+                        
+                    } else  { 
+                      var canvasCandidate = editorManager.getCanvas();
                       var canConnect = false;
                       
                       var targetStencil = $scope.getStencilItemById(parentCandidate.getStencil().idWithoutNs());
-                  if (targetStencil)
-                  {
-                    var associationConnect = false;
-                    if (stencil.idWithoutNs() === 'Association' && (curCan.getStencil().idWithoutNs() === 'TextAnnotation' || curCan.getStencil().idWithoutNs() === 'BoundaryCompensationEvent'))
-                    {
-                        associationConnect = true;
-                    }
-                            else if (stencil.idWithoutNs() === 'DataAssociation' && curCan.getStencil().idWithoutNs() === 'DataStore')
-                            {
-                                associationConnect = true;
-                            }
-                    
-                    if (targetStencil.canConnectTo || associationConnect)
-                    {
-                      canConnect = true;
-                    }
-                  }
+	                  if (targetStencil) {
+	                    var associationConnect = false;
+	                    if (stencil.idWithoutNs() === 'Association' && (curCan.getStencil().idWithoutNs() === 'TextAnnotation' || curCan.getStencil().idWithoutNs() === 'BoundaryCompensationEvent')) {
+	                        associationConnect = true;
+	                    } else if (stencil.idWithoutNs() === 'DataAssociation' && curCan.getStencil().idWithoutNs() === 'DataStore') {
+                            associationConnect = true;
+                        }
+	                    
+	                    if (targetStencil.canConnectTo || associationConnect) {
+	                      canConnect = true;
+	                    }
+	                  }
                       
                       //Edge
                       $scope.dragCurrentParent = canvasCandidate;
                       $scope.dragCurrentParentId = canvasCandidate.id;
-                        $scope.dragCurrentParentStencil = canvasCandidate.getStencil().id();
-                        $scope.dragCanContain = canConnect;
+                      $scope.dragCurrentParentStencil = canvasCandidate.getStencil().id();
+                      $scope.dragCanContain = canConnect;
                         
                       // Show Highlight
-                        $scope.editor.handleEvents({
+                      editorManager.handleEvents({
                             type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
                             highlightId: 'shapeRepo.added',
                             elements: [canvasCandidate],
                             color: ORYX.CONFIG.SELECTION_VALID_COLOR
-                        });
+                      });
 
-                        $scope.editor.handleEvents({
+                      editorManager.handleEvents({
                             type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
                             highlightId: "shapeRepo.attached"
-                        });
-              }
+                      });
+              		}
                 }
             }
         };
@@ -1209,7 +1197,7 @@ angular.module('flowableModeler')
         $scope.dragCallbackQuickMenu = function (event, ui) {
           
             if ($scope.dragModeOver != false) {
-                var coord = $scope.editor.eventCoordinatesXY(event.pageX, event.pageY);
+                var coord = editorManager.eventCoordinatesXY(event.pageX, event.pageY);
                 
                 var additionalIEZoom = 1;
                 if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
@@ -1228,7 +1216,7 @@ angular.module('flowableModeler')
                      coord.y = coord.y / additionalIEZoom;
                 }
                 
-                var aShapes = $scope.editor.getCanvas().getAbstractShapesAtPosition(coord);
+                var aShapes = editorManager.getCanvas().getAbstractShapesAtPosition(coord);
                
                 if (aShapes.length <= 0) {
                     if (event.helper) {
@@ -1238,47 +1226,40 @@ angular.module('flowableModeler')
                 }
 
                 if (aShapes[0] instanceof ORYX.Core.Canvas) {
-                    $scope.editor.getCanvas().setHightlightStateBasedOnX(coord.x);
+                    editorManager.getCanvas().setHightlightStateBasedOnX(coord.x);
                 }
                 
-            var stencil = undefined;
-              var stencilSets = $scope.editor.getStencilSets().values();
-              for (var i = 0; i < stencilSets.length; i++)
-              {
-                var stencilSet = stencilSets[i];
-              var nodes = stencilSet.nodes();
-              for (var j = 0; j < nodes.length; j++)
-                  {
-                if (nodes[j].idWithoutNs() === event.target.id)
-                {
-                  stencil = nodes[j];
-                  break;
-                }
-                  }
-              
-              if (!stencil)
-              {
-                var edges = stencilSet.edges();
-                  for (var j = 0; j < edges.length; j++)
-                      {
-                    if (edges[j].idWithoutNs() === event.target.id)
-                    {
-                      stencil = edges[j];
-                      break;
+                var stencil = undefined;
+                var stencilSets = editorManager.getStencilSets().values();
+                for (var i = 0; i < stencilSets.length; i++) {
+                	var stencilSet = stencilSets[i];
+              		var nodes = stencilSet.nodes();
+              		for (var j = 0; j < nodes.length; j++) {
+                		if (nodes[j].idWithoutNs() === event.target.id) {
+                  			stencil = nodes[j];
+                  			break;
+                		}
                     }
-                      }
-              }
-              }
+              
+              		if (!stencil) {
+                		var edges = stencilSet.edges();
+                  		for (var j = 0; j < edges.length; j++) {
+                    		if (edges[j].idWithoutNs() === event.target.id) {
+                      			stencil = edges[j];
+                      			break;
+                    		}
+                      	}
+              		}
+              	}
             
                 var candidate = aShapes.last();
                 
                 var isValid = false;
-                if (stencil.type() === "node") 
-                {
-            //check containment rules
-            var canContain = $scope.editor.getRules().canContain({containingShape:candidate, containedStencil:stencil});
+                if (stencil.type() === "node")  {
+            		//check containment rules
+            		var canContain = editorManager.getRules().canContain({containingShape:candidate, containedStencil:stencil});
             
-            var parentCandidate = aShapes.reverse().find(function (candidate) {
+            		var parentCandidate = aShapes.reverse().find(function (candidate) {
                         return (candidate instanceof ORYX.Core.Canvas
                             || candidate instanceof ORYX.Core.Node
                             || candidate instanceof ORYX.Core.Edge);
@@ -1289,68 +1270,61 @@ angular.module('flowableModeler')
                         return false;
                     }
             
-            $scope.dragCurrentParent = parentCandidate;
+            		$scope.dragCurrentParent = parentCandidate;
                     $scope.dragCurrentParentId = parentCandidate.id;
                     $scope.dragCurrentParentStencil = parentCandidate.getStencil().id();
                     $scope.dragCanContain = canContain;
                     $scope.dropTargetElement = parentCandidate;
                     isValid = canContain;
       
-          } else { //Edge
+          		} else { //Edge
           
-            var shapes = $scope.editor.getSelection();
-                if (shapes && shapes.length == 1)
-                {
-                  var currentSelectedShape = shapes.first();
-                  var curCan = candidate;
-                  var canConnect = false;
+            		var shapes = editorManager.getSelection();
+                	if (shapes && shapes.length == 1) {
+                  		var currentSelectedShape = shapes.first();
+                  		var curCan = candidate;
+                  		var canConnect = false;
                   
-                  var targetStencil = $scope.getStencilItemById(curCan.getStencil().idWithoutNs());
-                  if (targetStencil)
-                  {
-                    var associationConnect = false;
-                    if (stencil.idWithoutNs() === 'Association' && (curCan.getStencil().idWithoutNs() === 'TextAnnotation' || curCan.getStencil().idWithoutNs() === 'BoundaryCompensationEvent'))  
-                    {
-                      associationConnect = true;
-                    }
-                    else if (stencil.idWithoutNs() === 'DataAssociation' && curCan.getStencil().idWithoutNs() === 'DataStore')
-                    {
-                        associationConnect = true;
-                    }
+                  		var targetStencil = $scope.getStencilItemById(curCan.getStencil().idWithoutNs());
+                  		if (targetStencil) {
+                    		var associationConnect = false;
+                    		if (stencil.idWithoutNs() === 'Association' && (curCan.getStencil().idWithoutNs() === 'TextAnnotation' || curCan.getStencil().idWithoutNs() === 'BoundaryCompensationEvent')) {
+                      			associationConnect = true;
+                    		} else if (stencil.idWithoutNs() === 'DataAssociation' && curCan.getStencil().idWithoutNs() === 'DataStore') {
+                        		associationConnect = true;
+                    		}
                     
-                    if (targetStencil.canConnectTo || associationConnect)
-                    {
-                    while (!canConnect && curCan && !(curCan instanceof ORYX.Core.Canvas))
-                    {
-                      candidate = curCan;
-                      //check connection rules
-                      canConnect = $scope.editor.getRules().canConnect({
-                                  sourceShape: currentSelectedShape, 
-                                  edgeStencil: stencil, 
-                                  targetShape: curCan
-                                  }); 
-                      curCan = curCan.parent;
-                    }
-                    }
-                  }
-                  var parentCandidate = $scope.editor.getCanvas();
+                    		if (targetStencil.canConnectTo || associationConnect) {
+                    			while (!canConnect && curCan && !(curCan instanceof ORYX.Core.Canvas)) {
+                      				candidate = curCan;
+                      				//check connection rules
+                      				canConnect = editorManager.getRules().canConnect({
+	                                  sourceShape: currentSelectedShape, 
+	                                  edgeStencil: stencil, 
+	                                  targetShape: curCan
+	                                }); 
+                      				curCan = curCan.parent;
+                    			}
+                    		}
+                  		}
+                  		var parentCandidate = editorManager.getCanvas();
                 
-                isValid = canConnect;
-                $scope.dragCurrentParent = parentCandidate;
+                		isValid = canConnect;
+                		$scope.dragCurrentParent = parentCandidate;
                         $scope.dragCurrentParentId = parentCandidate.id;
                         $scope.dragCurrentParentStencil = parentCandidate.getStencil().id();
-                $scope.dragCanContain = canConnect;
-                $scope.dropTargetElement = candidate;
-                }   
+                		$scope.dragCanContain = canConnect;
+                		$scope.dropTargetElement = candidate;
+                	}   
             
-          } 
+          		} 
 
-                $scope.editor.handleEvents({
-          type:   ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW, 
-          highlightId:'shapeMenu',
-          elements: [candidate],
-          color:    isValid ? ORYX.CONFIG.SELECTION_VALID_COLOR : ORYX.CONFIG.SELECTION_INVALID_COLOR
-        });
+                editorManager.handleEvents({
+          			type:   ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW, 
+          			highlightId:'shapeMenu',
+          			elements: [candidate],
+          			color: isValid ? ORYX.CONFIG.SELECTION_VALID_COLOR : ORYX.CONFIG.SELECTION_INVALID_COLOR
+        		});
             }
         };
 

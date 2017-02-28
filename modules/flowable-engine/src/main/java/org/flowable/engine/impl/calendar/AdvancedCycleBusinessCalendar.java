@@ -122,7 +122,7 @@ public class AdvancedCycleBusinessCalendar extends CycleBusinessCalendar {
         int fieldIndex = duedateDescription.indexOf(field + ":");
 
         if (fieldIndex > -1) {
-            int nextWhiteSpace = duedateDescription.indexOf(" ", fieldIndex);
+            int nextWhiteSpace = duedateDescription.indexOf(' ', fieldIndex);
 
             fieldIndex += field.length() + 1;
 
@@ -140,7 +140,7 @@ public class AdvancedCycleBusinessCalendar extends CycleBusinessCalendar {
         int fieldIndex = duedateDescription.indexOf(field + ":");
 
         if (fieldIndex > -1) {
-            int nextWhiteSpace = duedateDescription.indexOf(" ", fieldIndex);
+            int nextWhiteSpace = duedateDescription.indexOf(' ', fieldIndex);
 
             if (nextWhiteSpace > -1) {
                 return duedateDescription.replace(duedateDescription.substring(fieldIndex, nextWhiteSpace), "");

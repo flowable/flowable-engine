@@ -43,7 +43,7 @@ public class MvelExecutionContext {
         }
 
         if (variableId.contains(".")) {
-            String rootVariableId = variableId.substring(0, variableId.indexOf("."));
+            String rootVariableId = variableId.substring(0, variableId.indexOf('.'));
             if (!stackVariables.containsKey(rootVariableId)) {
                 throw new FlowableException("referred id: " + rootVariableId + " is not present on the context");
             }

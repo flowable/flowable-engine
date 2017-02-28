@@ -503,13 +503,11 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
         }
 
         // Draw activities and their sequence-flows
-        for (FlowNode flowNode : bpmnModel.getProcesses().get(0).findFlowElementsOfType(FlowNode.class)) {
-            drawActivity(processDiagramCanvas, bpmnModel, flowNode, highLightedActivities, highLightedFlows, scaleFactor);
-        }
-
         for (Process process : bpmnModel.getProcesses()) {
             for (FlowNode flowNode : process.findFlowElementsOfType(FlowNode.class)) {
-                drawActivity(processDiagramCanvas, bpmnModel, flowNode, highLightedActivities, highLightedFlows, scaleFactor);
+                if (!isPartOfCollapsedSubProcess(flowNode, bpmnModel)) {
+                    drawActivity(processDiagramCanvas, bpmnModel, flowNode, highLightedActivities, highLightedFlows, scaleFactor);
+                }
             }
         }
 
@@ -523,8 +521,16 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
             List<SubProcess> subProcesses = process.findFlowElementsOfType(SubProcess.class, true);
             if (subProcesses != null) {
                 for (SubProcess subProcess : subProcesses) {
-                    for (Artifact subProcessArtifact : subProcess.getArtifacts()) {
-                        drawArtifact(processDiagramCanvas, bpmnModel, subProcessArtifact);
+                    
+                    GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(subProcess.getId());
+                    if (graphicInfo != null && graphicInfo.getExpanded() != null && !graphicInfo.getExpanded()) {
+                        continue;
+                    }
+                    
+                    if (!isPartOfCollapsedSubProcess(subProcess, bpmnModel)) {
+                        for (Artifact subProcessArtifact : subProcess.getArtifacts()) {
+                            drawArtifact(processDiagramCanvas, bpmnModel, subProcessArtifact);
+                        }
                     }
                 }
             }
@@ -690,7 +696,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
         // Nested elements
         if (flowNode instanceof FlowElementsContainer) {
             for (FlowElement nestedFlowElement : ((FlowElementsContainer) flowNode).getFlowElements()) {
-                if (nestedFlowElement instanceof FlowNode) {
+                if (nestedFlowElement instanceof FlowNode && !isPartOfCollapsedSubProcess(nestedFlowElement, bpmnModel)) {
                     drawActivity(processDiagramCanvas, bpmnModel, (FlowNode) nestedFlowElement,
                             highLightedActivities, highLightedFlows, scaleFactor);
                 }
@@ -972,6 +978,20 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
             }
         }
         return flowNodes;
+    }
+    
+    protected boolean isPartOfCollapsedSubProcess(FlowElement flowElement, BpmnModel model) {
+        SubProcess subProcess = flowElement.getSubProcess();
+        if (subProcess != null) {
+            GraphicInfo graphicInfo = model.getGraphicInfo(subProcess.getId());
+            if (graphicInfo != null && graphicInfo.getExpanded() != null && !graphicInfo.getExpanded()) {
+                return true;
+            }
+            
+            return isPartOfCollapsedSubProcess(subProcess, model);
+        }
+        
+        return false;
     }
 
     public Map<Class<? extends BaseElement>, ActivityDrawInstruction> getActivityDrawInstructions() {

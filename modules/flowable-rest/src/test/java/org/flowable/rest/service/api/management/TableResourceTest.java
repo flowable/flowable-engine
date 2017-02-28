@@ -1,5 +1,8 @@
 package org.flowable.rest.service.api.management;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.Map;
 
 import org.apache.http.HttpStatus;
@@ -7,9 +10,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Test for all REST-operations related to the Table collection and a single table resource.
@@ -39,7 +39,7 @@ public class TableResourceTest extends BaseSpringRestTestCase {
             assertNotNull(table.get("count").longValue());
             assertTrue(table.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE, table.get("name").textValue())));
 
-            assertEquals(((Long) tableCounts.get(table.get("name").textValue())).longValue(), table.get("count").longValue());
+            assertEquals(tableCounts.get(table.get("name").textValue()).longValue(), table.get("count").longValue());
         }
     }
 
@@ -58,7 +58,7 @@ public class TableResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
         assertNotNull(responseNode);
         assertEquals(tableNameToGet, responseNode.get("name").textValue());
-        assertEquals(((Long) tableCounts.get(responseNode.get("name").textValue())).longValue(), responseNode.get("count").longValue());
+        assertEquals(tableCounts.get(responseNode.get("name").textValue()).longValue(), responseNode.get("count").longValue());
         assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE, tableNameToGet)));
     }
 

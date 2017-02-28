@@ -243,6 +243,12 @@ public class BpmnDisplayJsonConverter {
 
                 if (element instanceof SubProcess) {
                     SubProcess subProcess = (SubProcess) element;
+                    
+                    // skip collapsed sub processes
+                    if (graphicInfo != null && graphicInfo.getExpanded() != null && !graphicInfo.getExpanded()) {
+                        continue;
+                    }
+                    
                     processElements(subProcess.getFlowElements(), model, elementArray, flowArray, diagramInfo);
                     processArtifacts(subProcess.getArtifacts(), model, elementArray, flowArray, diagramInfo);
                 }

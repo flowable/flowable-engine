@@ -344,7 +344,10 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         List<HistoricIdentityLink> historicIdentityLinksForTask = historyService.getHistoricIdentityLinksForTask(task.getId());
         assertEquals(6, historicIdentityLinksForTask.size());
 
-        int nullCount = 0, kermitCount = 0, fozzieCount = 0, gonzoCount = 0;
+        int nullCount = 0;
+        int kermitCount = 0;
+        int fozzieCount = 0;
+        int gonzoCount = 0;
 
         // The order of history identity links is not guaranteed.
         for (HistoricIdentityLink link : historicIdentityLinksForTask) {

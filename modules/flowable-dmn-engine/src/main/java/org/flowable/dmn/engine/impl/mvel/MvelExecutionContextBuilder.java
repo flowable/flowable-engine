@@ -20,7 +20,6 @@ import java.util.Map;
 import org.flowable.dmn.engine.impl.audit.DecisionExecutionAuditUtil;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionTable;
-import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.OutputClause;
 import org.mvel2.ParserContext;

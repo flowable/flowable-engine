@@ -61,6 +61,7 @@ public class DbSqlSession implements Session {
 
         /* Previous */
         FLOWABLE_IDM_VERSIONS.add(new FlowableIdmVersion("0"));
+        FLOWABLE_IDM_VERSIONS.add(new FlowableIdmVersion("6.0.0.0"));
 
         /* Current */
         FLOWABLE_IDM_VERSIONS.add(new FlowableIdmVersion(IdmEngine.VERSION));
@@ -341,12 +342,6 @@ public class DbSqlSession implements Session {
 
             if (isUpgradeNeeded) {
                 dbVersionProperty.setValue(IdmEngine.VERSION);
-
-                PropertyEntity dbHistoryProperty = selectById(PropertyEntity.class, "schema.history");
-
-                // Set upgrade history
-                String dbHistoryValue = dbHistoryProperty.getValue() + " upgrade(" + dbVersion + "->" + IdmEngine.VERSION + ")";
-                dbHistoryProperty.setValue(dbHistoryValue);
 
                 // Engine upgrade
                 dbSchemaUpgrade("engine", matchingVersionIndex);

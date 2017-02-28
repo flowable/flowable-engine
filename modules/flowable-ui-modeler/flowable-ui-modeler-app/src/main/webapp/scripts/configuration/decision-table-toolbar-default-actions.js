@@ -42,7 +42,11 @@ var DECISION_TABLE_TOOLBAR = {
                 
                 if (services.$rootScope.editorHistory.length > 0) {
                 	var navigationObject = services.$rootScope.editorHistory.pop();
-        			services.$location.path('/editor/' + navigationObject.id);
+                	var additionalParameters = '';
+                	if (navigationObject.subProcessId && navigationObject.subProcessId.length > 0) {
+                		additionalParameters = '?subProcessId=' + navigationObject.subProcessId;
+                	}
+        			services.$location.url('/editor/' + navigationObject.id + additionalParameters);
         		} else {
         			services.$location.path('/decision-tables');
         		}
@@ -123,7 +127,11 @@ angular.module('flowableModeler')
                 $scope.save(function() {
                     if ($rootScope.editorHistory.length > 0) {
 		    	        var navigationObject = $rootScope.editorHistory.pop();
-		    	        $location.path('/editor/' + navigationObject.id);
+		    	        var additionalParameters = '';
+	                	if (navigationObject.subProcessId && navigationObject.subProcessId.length > 0) {
+	                		additionalParameters = '?subProcessId=' + navigationObject.subProcessId;
+	                	}
+		    	        $location.url('/editor/' + navigationObject.id + additionalParameters);
 		 
 		            } else {
 		            	$location.path('/decision-tables');

@@ -26,9 +26,9 @@ import org.flowable.engine.runtime.ProcessInstanceQuery;
  */
 public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestCase {
 
-    private static String PROCESS_DEFINITION_KEY = "oneTaskProcess";
-    private static String PROCESS_DEFINITION_KEY_2 = "oneTaskProcess2";
-    private static String PROCESS_DEFINITION_KEY_3 = "oneTaskProcess3";
+    private static final String PROCESS_DEFINITION_KEY = "oneTaskProcess";
+    private static final String PROCESS_DEFINITION_KEY_2 = "oneTaskProcess2";
+    private static final String PROCESS_DEFINITION_KEY_3 = "oneTaskProcess3";
 
     private List<String> processInstanceIds;
 
@@ -43,10 +43,10 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
                 .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess3.bpmn20.xml")
                 .deploy();
 
-        Map<String, Object> startMap = new HashMap<String, Object>();
+        Map<String, Object> startMap = new HashMap<>();
         startMap.put("test", "test");
         startMap.put("test2", "test2");
-        processInstanceIds = new ArrayList<String>();
+        processInstanceIds = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
             processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, String.valueOf(i), startMap).getId());
         }

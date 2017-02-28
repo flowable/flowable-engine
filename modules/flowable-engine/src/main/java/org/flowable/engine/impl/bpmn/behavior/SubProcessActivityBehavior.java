@@ -25,7 +25,9 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.ProcessInstanceHelper;
 
 /**
  * Implementation of the BPMN 2.0 subprocess (formally known as 'embedded' subprocess): a subprocess defined within another process definition.
@@ -66,8 +68,12 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior {
         if (dataObjectVars != null) {
             executionEntity.setVariablesLocal(dataObjectVars);
         }
+        
+        CommandContext commandContext = Context.getCommandContext();
+        ProcessInstanceHelper processInstanceHelper = commandContext.getProcessEngineConfiguration().getProcessInstanceHelper();
+        processInstanceHelper.processAvailableEventSubProcesses(executionEntity, subProcess, commandContext);
 
-        ExecutionEntity startSubProcessExecution = Context.getCommandContext().getExecutionEntityManager()
+        ExecutionEntity startSubProcessExecution = commandContext.getExecutionEntityManager()
                 .createChildExecution(executionEntity);
         startSubProcessExecution.setCurrentFlowElement(startElement);
         Context.getAgenda().planContinueProcessOperation(startSubProcessExecution);
