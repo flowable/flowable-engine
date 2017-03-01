@@ -17,10 +17,12 @@ import org.flowable.app.security.AjaxAuthenticationSuccessHandler;
 import org.flowable.app.security.AjaxLogoutSuccessHandler;
 import org.flowable.app.security.ClearFlowableCookieLogoutHandler;
 import org.flowable.app.security.CustomDaoAuthenticationProvider;
+import org.flowable.app.security.CustomLdapAuthenticationProvider;
 import org.flowable.app.security.CustomPersistentRememberMeServices;
 import org.flowable.app.security.DefaultPrivileges;
 import org.flowable.app.security.Http401UnauthorizedEntryPoint;
 import org.flowable.app.web.CustomFormLoginConfig;
+import org.flowable.idm.api.IdmIdentityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,7 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
  * Based on http://docs.spring.io/spring-security/site/docs/3.2.x/reference/htmlsingle/#multiple-httpsecurity
  * 
  * @author Joram Barrez
+ * @author Tijs Rademakers
  */
 @Configuration
 @EnableWebSecurity
@@ -57,18 +60,31 @@ public class SecurityConfiguration {
     //
     // GLOBAL CONFIG
     //
+    
+    @Autowired
+    protected IdmIdentityService identityService;
 
     @Autowired
-    private Environment env;
+    protected Environment env;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) {
 
-        // Default auth (database backed)
-        try {
-            auth.authenticationProvider(dbAuthenticationProvider());
-        } catch (Exception e) {
-            logger.error("Could not configure authentication mechanism:", e);
+        if (env.getProperty("ldap.enabled", Boolean.class, false)) {
+            // LDAP auth
+            try {
+                auth.authenticationProvider(ldapAuthenticationProvider());
+            } catch (Exception e) {
+                logger.error("Could not configure ldap authentication mechanism:", e);
+            }
+            
+        } else {
+            // Default auth (database backed)
+            try {
+                auth.authenticationProvider(dbAuthenticationProvider());
+            } catch (Exception e) {
+                logger.error("Could not configure authentication mechanism:", e);
+            }
         }
     }
 
@@ -90,6 +106,13 @@ public class SecurityConfiguration {
         daoAuthenticationProvider.setUserDetailsService(userDetailsService());
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         return daoAuthenticationProvider;
+    }
+    
+    @Bean(name = "ldapAuthenticationProvider")
+    public AuthenticationProvider ldapAuthenticationProvider() {
+        CustomLdapAuthenticationProvider ldapAuthenticationProvider = new CustomLdapAuthenticationProvider(
+                userDetailsService(), identityService);
+        return ldapAuthenticationProvider;
     }
 
     //
@@ -118,29 +141,29 @@ public class SecurityConfiguration {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http
-                    .exceptionHandling()
-                    .authenticationEntryPoint(authenticationEntryPoint)
-                    .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .and()
                     .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                    .and()
+                .and()
                     .rememberMe()
                     .rememberMeServices(rememberMeServices())
                     .key(env.getProperty("security.rememberme.key"))
-                    .and()
+                .and()
                     .logout()
                     .logoutUrl("/app/logout")
                     .logoutSuccessHandler(ajaxLogoutSuccessHandler)
                     .addLogoutHandler(new ClearFlowableCookieLogoutHandler())
                     .permitAll()
-                    .and()
+                .and()
                     .csrf()
                     .disable() // Disabled, cause enabling it will cause sessions
                     .headers()
                     .frameOptions()
                     .sameOrigin()
                     .addHeaderWriter(new XXssProtectionHeaderWriter())
-                    .and()
+                .and()
                     .authorizeRequests()
                     .antMatchers("/*").permitAll()
                     .antMatchers("/app/rest/authenticate").permitAll()
@@ -180,15 +203,15 @@ public class SecurityConfiguration {
         protected void configure(HttpSecurity http) throws Exception {
 
             http
-                    .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                    .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                     .csrf()
                     .disable()
                     .antMatcher("/api" + "/**")
                     .authorizeRequests()
                     .antMatchers("/api" + "/**").authenticated()
-                    .and().httpBasic();
+                .and().httpBasic();
         }
     }
 
