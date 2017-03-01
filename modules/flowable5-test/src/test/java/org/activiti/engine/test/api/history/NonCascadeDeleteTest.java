@@ -7,7 +7,7 @@ import org.flowable.engine.task.Task;
 
 public class NonCascadeDeleteTest extends PluggableFlowableTestCase {
 
-    private static String PROCESS_DEFINITION_KEY = "oneTaskProcess";
+    private static final String PROCESS_DEFINITION_KEY = "oneTaskProcess";
 
     private String deploymentId;
 

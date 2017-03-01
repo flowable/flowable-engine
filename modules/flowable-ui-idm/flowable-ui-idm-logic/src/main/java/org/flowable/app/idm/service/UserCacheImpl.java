@@ -67,7 +67,13 @@ public class UserCacheImpl implements UserCache {
                 .expireAfterAccess(userCacheMaxAge != null ? userCacheMaxAge : (24 * 60 * 60), TimeUnit.SECONDS).recordStats().build(new CacheLoader<String, CachedUser>() {
 
                     public CachedUser load(final String userId) throws Exception {
-                        User userFromDatabase = identityService.createUserQuery().userId(userId).singleResult();
+                        User userFromDatabase = null;
+                        if (!environment.getProperty("ldap.enabled", Boolean.class, false)) {
+                            userFromDatabase = identityService.createUserQuery().userIdIgnoreCase(userId.toLowerCase()).singleResult();
+                        } else {
+                            userFromDatabase = identityService.createUserQuery().userId(userId).singleResult();
+                        }
+                        
                         if (userFromDatabase == null) {
                             throw new UsernameNotFoundException("User " + userId + " was not found in the database");
                         }

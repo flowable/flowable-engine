@@ -77,7 +77,7 @@ public class EmptyProcessTest extends SpringFlowableTestCase {
     public void testObjectAsVariable() throws Exception {
         CamelContext ctx = applicationContext.getBean(CamelContext.class);
         ProducerTemplate tpl = ctx.createProducerTemplate();
-        Object expectedObj = new Long(99);
+        Object expectedObj = 99L;
         Exchange exchange = ctx.getEndpoint("direct:startEmpty").createExchange();
         exchange.getIn().setBody(expectedObj);
         tpl.send("direct:startEmpty", exchange);
@@ -92,7 +92,7 @@ public class EmptyProcessTest extends SpringFlowableTestCase {
     public void testObjectAsStringVariable() throws Exception {
         CamelContext ctx = applicationContext.getBean(CamelContext.class);
         ProducerTemplate tpl = ctx.createProducerTemplate();
-        Object expectedObj = new Long(99);
+        Object expectedObj = 99L;
 
         Exchange exchange = ctx.getEndpoint("direct:startEmptyBodyAsString").createExchange();
         exchange.getIn().setBody(expectedObj);

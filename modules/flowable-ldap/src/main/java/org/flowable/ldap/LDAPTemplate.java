@@ -26,9 +26,9 @@ public class LDAPTemplate {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LDAPTemplate.class);
 
-    protected LDAPConfigurator ldapConfigurator;
+    protected LDAPConfiguration ldapConfigurator;
 
-    public LDAPTemplate(LDAPConfigurator ldapConfigurator) {
+    public LDAPTemplate(LDAPConfiguration ldapConfigurator) {
         this.ldapConfigurator = ldapConfigurator;
     }
 
@@ -44,11 +44,11 @@ public class LDAPTemplate {
         return result;
     }
 
-    public LDAPConfigurator getLdapConfigurator() {
+    public LDAPConfiguration getLdapConfigurator() {
         return ldapConfigurator;
     }
 
-    public void setLdapConfigurator(LDAPConfigurator ldapConfigurator) {
+    public void setLdapConfigurator(LDAPConfiguration ldapConfigurator) {
         this.ldapConfigurator = ldapConfigurator;
     }
 

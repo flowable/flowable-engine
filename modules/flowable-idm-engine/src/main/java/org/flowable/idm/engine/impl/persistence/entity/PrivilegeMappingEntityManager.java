@@ -12,7 +12,10 @@
  */
 package org.flowable.idm.engine.impl.persistence.entity;
 
+import java.util.List;
+
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.idm.api.PrivilegeMapping;
 
 public interface PrivilegeMappingEntityManager extends EntityManager<PrivilegeMappingEntity> {
 
@@ -21,5 +24,7 @@ public interface PrivilegeMappingEntityManager extends EntityManager<PrivilegeMa
     void deleteByPrivilegeIdAndUserId(String privilegeId, String userId);
 
     void deleteByPrivilegeIdAndGroupId(String privilegeId, String groupId);
+    
+    List<PrivilegeMapping> getPrivilegeMappingsByPrivilegeId(String privilegeId);
 
 }

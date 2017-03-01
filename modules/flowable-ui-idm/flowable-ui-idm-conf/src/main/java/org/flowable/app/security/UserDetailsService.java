@@ -22,6 +22,7 @@ import org.flowable.app.idm.service.UserService;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,15 +37,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService, CustomUserDetailService {
 
     @Autowired
-    private UserCache userCache;
+    protected UserCache userCache;
 
     @Autowired
     protected IdmIdentityService identityService;
 
     @Autowired
     protected UserService userService;
+    
+    @Autowired
+    protected Environment environment;
 
-    private long userValidityPeriod;
+    protected long userValidityPeriod;
 
     @Override
     @Transactional
@@ -57,8 +61,13 @@ public class UserDetailsService implements org.springframework.security.core.use
         String actualLogin = login;
         User userFromDatabase = null;
 
-        actualLogin = login.toLowerCase();
-        userFromDatabase = identityService.createUserQuery().userIdIgnoreCase(actualLogin).singleResult();
+        if (!environment.getProperty("ldap.enabled", Boolean.class, false)) {
+            actualLogin = login.toLowerCase();
+            userFromDatabase = identityService.createUserQuery().userIdIgnoreCase(actualLogin).singleResult();
+            
+        } else {
+            userFromDatabase = identityService.createUserQuery().userId(actualLogin).singleResult();
+        }
 
         // Verify user
         if (userFromDatabase == null) {
@@ -77,7 +86,6 @@ public class UserDetailsService implements org.springframework.security.core.use
 
     @Transactional
     public UserDetails loadByUserId(final String userId) {
-
         CachedUser cachedUser = userCache.getUser(userId, true, true, false); // Do not check for validity. This would lead to A LOT of db requests! For login, there is a validity period (see below)
         if (cachedUser == null) {
             throw new UsernameNotFoundException("User " + userId + " was not found in the database");
@@ -96,7 +104,7 @@ public class UserDetailsService implements org.springframework.security.core.use
 
         // The Spring security docs clearly state a new instance must be returned on every invocation
         User user = cachedUser.getUser();
-        String actualUserId = user.getEmail();
+        String actualUserId = user.getId();
 
         return new FlowableAppUser(cachedUser.getUser(), actualUserId, cachedUser.getGrantedAuthorities());
     }

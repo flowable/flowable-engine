@@ -10,17 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.idm.engine.impl.persistence.entity;
+package org.flowable.idm.api;
 
-import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.idm.api.PrivilegeMapping;
+import java.io.Serializable;
 
-public interface PrivilegeMappingEntity extends Entity, PrivilegeMapping {
+/**
+ * @author Tijs Rademakers
+ */
+public interface PrivilegeMapping extends Serializable {
 
-    void setPrivilegeId(String privilegeId);
+    String getPrivilegeId();
 
-    void setUserId(String userId);
-
-    void setGroupId(String groupId);
-
+    String getUserId();
+    
+    String getGroupId();
 }

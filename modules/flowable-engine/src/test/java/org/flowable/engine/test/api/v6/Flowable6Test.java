@@ -114,11 +114,10 @@ public class Flowable6Test extends PluggableFlowableTestCase {
      */
     @org.flowable.engine.test.Deployment
     public void testLongServiceTaskLoop() {
-        int maxCount = 3210; // You can make this as big as you want (as long as
-                             // it still fits within transaction timeouts). Go
-                             // on, try it!
+        int maxCount = 3210; // You can make this as big as you want (as long as it still fits within transaction timeouts).
+                             // Go on, try it!
         Map<String, Object> vars = new HashMap<String, Object>();
-        vars.put("counter", new Integer(0));
+        vars.put("counter", 0);
         vars.put("maxCount", maxCount);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testLongServiceTaskLoop", vars);
         assertNotNull(processInstance);

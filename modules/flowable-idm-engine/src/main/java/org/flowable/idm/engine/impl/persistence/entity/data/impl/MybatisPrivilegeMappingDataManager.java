@@ -13,8 +13,10 @@
 package org.flowable.idm.engine.impl.persistence.entity.data.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.flowable.idm.api.PrivilegeMapping;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntity;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntityImpl;
@@ -56,6 +58,12 @@ public class MybatisPrivilegeMappingDataManager extends AbstractDataManager<Priv
         params.put("privilegeId", privilegeId);
         params.put("groupId", groupId);
         getDbSqlSession().delete("deleteByPrivilegeIdAndGroupId", params);
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<PrivilegeMapping> getPrivilegeMappingsByPrivilegeId(String privilegeId) {
+        return (List<PrivilegeMapping>) getDbSqlSession().selectList("selectPrivilegeMappingsByPrivilegeId", privilegeId); 
     }
 
 }
