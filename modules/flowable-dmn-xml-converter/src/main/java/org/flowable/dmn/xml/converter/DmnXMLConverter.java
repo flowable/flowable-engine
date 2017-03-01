@@ -219,7 +219,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     currentDecisionTable.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
 
                     if (xtr.getAttributeValue(null, ATTRIBUTE_HIT_POLICY) != null) {
-                        currentDecisionTable.setHitPolicy(HitPolicy.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_HIT_POLICY)));
+                        currentDecisionTable.setHitPolicy(HitPolicy.get(xtr.getAttributeValue(null, ATTRIBUTE_HIT_POLICY)));
                     } else {
                         currentDecisionTable.setHitPolicy(HitPolicy.FIRST);
                     }

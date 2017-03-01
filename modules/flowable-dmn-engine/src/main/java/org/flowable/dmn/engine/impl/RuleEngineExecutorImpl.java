@@ -13,6 +13,7 @@
 package org.flowable.dmn.engine.impl;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -238,8 +239,8 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 // check validity
                 evaluateRuleConclusionValidity(resultValue, ruleNumber, ruleClauseContainer.getOutputClause().getOutputNumber(), hitPolicy, executionContext);
 
-                // add result variable
-                executionContext.getResultVariables().put(outputVariableId, executionVariable);
+                // create result
+                composeResult(hitPolicy, outputVariableId, executionVariable, executionContext);
 
                 // add audit entry
                 executionContext.getAuditContainer().addOutputEntry(ruleNumber, ruleClauseContainer.getOutputClause().getOutputNumber(), outputEntryExpression.getId(), executionVariable);
@@ -326,6 +327,27 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
             }
         }
     }
+
+    protected void composeResult(HitPolicy hitPolicy, String outputVariableId, Object executionVariable, MvelExecutionContext executionContext) {
+        if (hitPolicy == HitPolicy.RULE_ORDER) {
+            Object resultVariable = executionContext.getResultVariables().get(outputVariableId);
+            if (resultVariable == null) {
+                resultVariable = new ArrayList<>();
+            }
+            if (resultVariable instanceof List) {
+                ((List) resultVariable).add(executionVariable);
+
+                // add result variable
+                executionContext.getResultVariables().put(outputVariableId, resultVariable);
+            } else {
+                throw new FlowableException("HitPolicy RULE ORDER has wrong output variable type");
+            }
+        } else {
+            // add result variable
+            executionContext.getResultVariables().put(outputVariableId, executionVariable);
+        }
+    }
+
 
     protected String getExceptionMessage(Exception exception) {
         String exceptionMessage = null;

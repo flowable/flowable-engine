@@ -22,6 +22,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -159,6 +160,31 @@ public class HitPolicyTest {
         Assert.assertEquals(2, result.getResultVariables().size());
         Assert.assertEquals("gt 10", result.getResultVariables().get("outputVariable1"));
         Assert.assertEquals("result2", result.getResultVariables().get("outputVariable2"));
+        Assert.assertFalse(result.getAuditTrail().isFailed());
+        Assert.assertNull(result.getAuditTrail().getExceptionMessage());
+    }
+
+    @Test
+    @DmnDeploymentAnnotation
+    public void ruleOrderHitPolicy() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.put("inputVariable1", 13);
+
+        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
+
+        Assert.assertEquals(1, result.getResultVariables().size());
+
+        List ruleResults = (List) result.getResultVariables().get("outputVariable1");
+
+        Assert.assertEquals(2, ruleResults.size());
+
+        Assert.assertEquals("result2", ruleResults.get(0));
+        Assert.assertEquals("result4", ruleResults.get(1));
+
         Assert.assertFalse(result.getAuditTrail().isFailed());
         Assert.assertNull(result.getAuditTrail().getExceptionMessage());
     }

@@ -48,7 +48,7 @@ public class DecisionExecutionAuditContainer {
         startTime = new Date();
         this.decisionKey = decisionKey;
         this.decisionName = decisionName;
-        this.hitPolicy = hitPolicy.name();
+        this.hitPolicy = hitPolicy.getValue();
         this.strictMode = strictMode;
 
         this.inputVariableTypes = getVariablesTypeMap(inputVariables);
