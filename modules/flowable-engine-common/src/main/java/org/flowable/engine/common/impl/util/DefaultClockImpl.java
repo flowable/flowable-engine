@@ -36,7 +36,7 @@ public class DefaultClockImpl implements org.flowable.engine.common.runtime.Cloc
         Calendar time = null;
 
         if (currentTime != null) {
-            time = (null == timeZone ) ? new GregorianCalendar() : new GregorianCalendar(timeZone);
+            time = (timeZone == null) ? new GregorianCalendar() : new GregorianCalendar(timeZone);
             time.setTime(currentTime);
         }
 
@@ -55,13 +55,13 @@ public class DefaultClockImpl implements org.flowable.engine.common.runtime.Cloc
 
     @Override
     public Date getCurrentTime() {
-        return null == CURRENT_TIME ? new Date() : CURRENT_TIME.getTime();
+        return CURRENT_TIME == null ? new Date() : CURRENT_TIME.getTime();
     }
 
     @Override
     public Calendar getCurrentCalendar() {
-        if (null == CURRENT_TIME) {
-            return (null == timeZone) ? new GregorianCalendar() : new GregorianCalendar(timeZone);
+        if (CURRENT_TIME == null) {
+            return (timeZone == null) ? new GregorianCalendar() : new GregorianCalendar(timeZone);
         }
 
         return (Calendar) CURRENT_TIME.clone();
