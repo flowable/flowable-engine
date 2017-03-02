@@ -25,8 +25,26 @@ public class AppDefinitionRepresentation extends AbstractRepresentation {
     private String deploymentId;
     private String deploymentKey;
     private Long tenantId;
+    private String groupsAccess;
+    private String usersAccess;
 
-    public static AppDefinitionRepresentation createDefaultAppDefinitionRepresentation(String id) {
+    public String getGroupsAccess() {
+		return groupsAccess;
+	}
+
+	public void setGroupsAccess(String groupsAccess) {
+		this.groupsAccess = groupsAccess;
+	}
+
+	public String getUsersAccess() {
+		return usersAccess;
+	}
+
+	public void setUsersAccess(String usersAccess) {
+		this.usersAccess = usersAccess;
+	}
+
+	public static AppDefinitionRepresentation createDefaultAppDefinitionRepresentation(String id) {
         AppDefinitionRepresentation appDefinitionRepresentation = new AppDefinitionRepresentation();
         appDefinitionRepresentation.setDefaultAppId(id);
         return appDefinitionRepresentation;

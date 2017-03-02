@@ -49,6 +49,16 @@ angular.module('flowableModeler').controller('SaveAppDefinitionCtrl',
     	description = $rootScope.currentAppDefinition.description;
     }
     
+    var groupsAccess='';
+    //if ($rootScope.currentAppDefinition.groupsAccess) {
+    	groupsAccess=$rootScope.currentAppDefinition.definition.groupsAccess;
+    //}
+    
+    var usersAccess=''; 
+    //if ($rootScope.currentAppDefinition.usersAccess) {
+    	usersAccess=$rootScope.currentAppDefinition.definition.usersAccess;
+    //}
+    
     var saveDialog = { 
         name: $rootScope.currentAppDefinition.name,
         key: $rootScope.currentAppDefinition.key,
