@@ -97,13 +97,13 @@ public class ProcessInstanceHelper {
                 processInstanceName, initialFlowElement, process, variables, transientVariables, startProcessInstance);
     }
 
-    public ProcessInstance createAndStartProcessInstanceByMessage(ProcessDefinition processDefinition, String messageName,
+    public ProcessInstance createAndStartProcessInstanceByMessage(ProcessDefinition processDefinition, String messageName, String businessKey,
             Map<String, Object> variables, Map<String, Object> transientVariables) {
 
         CommandContext commandContext = Context.getCommandContext();
         if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
             return commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().startProcessInstanceByMessage(
-                    messageName, variables, transientVariables, null, processDefinition.getTenantId());
+                    messageName, variables, transientVariables, businessKey, processDefinition.getTenantId());
         }
 
         // Do not start process a process instance if the process definition is suspended
@@ -135,7 +135,7 @@ public class ProcessInstanceHelper {
             throw new FlowableException("No message start event found for process definition " + processDefinition.getId() + " and message name " + messageName);
         }
 
-        return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, null, null, initialFlowElement, process, variables, transientVariables, true);
+        return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, null, initialFlowElement, process, variables, transientVariables, true);
     }
 
     public ProcessInstance createAndStartProcessInstanceWithInitialFlowElement(ProcessDefinition processDefinition,
