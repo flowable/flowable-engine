@@ -61,7 +61,7 @@ public class DefaultProcessValidatorTest {
         List<ValidationError> allErrors = processValidator.validate(bpmnModel);
         Assert.assertEquals(65, allErrors.size());
 
-        String setName = ValidatorSetNames.ACTIVITI_EXECUTABLE_PROCESS; // shortening it a bit
+        String setName = ValidatorSetNames.FLOWABLE_EXECUTABLE_PROCESS; // shortening it a bit
 
         // isExecutable should be true
         List<ValidationError> problems = findErrors(allErrors, setName, Problems.ALL_PROCESS_DEFINITIONS_NOT_EXECUTABLE, 1);
