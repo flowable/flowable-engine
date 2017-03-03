@@ -181,7 +181,7 @@ public class FlowableIdmRule implements TestRule {
     }
 
     protected void configureIdmEngine() {
-        /** meant to be overridden */
+        /* meant to be overridden */
     }
 
     public String getConfigurationResource() {
