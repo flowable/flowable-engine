@@ -19,9 +19,6 @@ package org.flowable.engine.impl.transformer;
  */
 public class LongToInteger extends AbstractTransformer {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Object primTransform(Object anObject) throws Exception {
         return Integer.valueOf(((Long) anObject).toString());

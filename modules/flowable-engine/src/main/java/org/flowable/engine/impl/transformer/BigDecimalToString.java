@@ -24,9 +24,6 @@ public class BigDecimalToString extends AbstractTransformer {
 
     protected DecimalFormat format = new DecimalFormat();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Object primTransform(Object anObject) throws Exception {
         return format.format((BigDecimal) anObject);

@@ -26,9 +26,6 @@ public class DateToString extends AbstractTransformer {
 
     protected Format format = FastDateFormat.getInstance("dd/MM/yyyy");
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Object primTransform(Object anObject) throws Exception {
         return format.format((Date) anObject);
