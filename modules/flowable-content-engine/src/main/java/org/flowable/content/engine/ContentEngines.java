@@ -112,7 +112,7 @@ public abstract class ContentEngines {
     }
 
     /**
-     * Registers the given content engine. No {@link ContentEngineInfo} will be available for this content engine. An engine that is registered will be closed when the {@link ContentEngines#destroy()}
+     * Registers the given content engine. No {@link ContentEngine} will be available for this content engine. An engine that is registered will be closed when the {@link ContentEngines#destroy()}
      * is called.
      */
     public static void registerContentEngine(ContentEngine contentEngine) {
@@ -186,8 +186,8 @@ public abstract class ContentEngines {
     }
 
     /**
-     * Get initialization results. Only info will we available for form engines which were added in the {@link ContentEngines#init()}. No {@link FormEngineInfo} is available for engines which were
-     * registered programmatically.
+     * Get initialization results. Only info will we available for form engines which were added in the {@link ContentEngines#init()}. No
+     * {@link EngineInfo} is available for engines which were registered programmatically.
      */
     public static EngineInfo getContentEngineInfo(String contentEngineName) {
         return contentEngineInfosByName.get(contentEngineName);
@@ -198,7 +198,7 @@ public abstract class ContentEngines {
     }
 
     /**
-     * obtain a content engine by name.
+     * Obtain a content engine by name.
      * 
      * @param contentEngineName
      *            is the name of the content engine or null for the default content engine.
@@ -211,7 +211,7 @@ public abstract class ContentEngines {
     }
 
     /**
-     * retries to initialize a content engine that previously failed.
+     * Retries to initialize a content engine that previously failed.
      */
     public static EngineInfo retry(String resourceUrl) {
         log.debug("retying initializing of resource {}", resourceUrl);
@@ -223,14 +223,14 @@ public abstract class ContentEngines {
     }
 
     /**
-     * provides access to content engine to application clients in a managed server environment.
+     * Provides access to content engine to application clients in a managed server environment.
      */
     public static Map<String, ContentEngine> getContentEngines() {
         return contentEngines;
     }
 
     /**
-     * closes all dmn engines. This method should be called when the server shuts down.
+     * Closes all content engines. This method should be called when the server shuts down.
      */
     public static synchronized void destroy() {
         if (isInitialized()) {

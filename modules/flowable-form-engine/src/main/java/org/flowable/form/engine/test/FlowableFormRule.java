@@ -198,7 +198,7 @@ public class FlowableFormRule implements TestRule {
     }
 
     protected void configureFormEngine() {
-        /** meant to be overridden */
+        /* meant to be overridden */
     }
 
     protected void finished(Description description) {
