@@ -32,9 +32,6 @@ public class Identity extends AbstractTransformer {
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Object primTransform(Object anObject) throws Exception {
         return anObject;
