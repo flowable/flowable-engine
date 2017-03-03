@@ -591,8 +591,23 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                         }
                     }
                 }
+                
+                List<SubProcess> collapsedSubProcess = new ArrayList<>();
+                for (SubProcess subProcess : subShapesMap.values()) {
+                    // determine if its a collapsed subprocess
+                    GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(subProcess.getId());
+                    if (graphicInfo != null && Boolean.FALSE.equals(graphicInfo.getExpanded())){
+                        collapsedSubProcess.add(subProcess);
+                    }
+                }
+                
                 for (String flowId : removeSubFlowsList) {
                     process.removeFlowElement(flowId);
+                    
+                    // check if the sequenceflow to remove is not assigned to a collapsed subprocess.
+                    for (SubProcess subProcess : collapsedSubProcess) {
+                        subProcess.removeFlowElement(flowId);
+                    }
                 }
             }
         }
