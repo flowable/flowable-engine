@@ -1,0 +1,51 @@
+package org.activiti.editor.language;
+
+import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.SubProcess;
+import org.junit.Test;
+
+import java.util.Collection;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
+/**
+ * Verifies if the sequenceflows are correctly stored when a subprocess is inside
+ * and collapseable subprocess.
+ *
+ * Created by Pardo David on 1/03/2017.
+ */
+public class CollapsedSubWithSubSequenceFlowTest extends AbstractConverterTest {
+	private final static String EXPANED_SUBPROCESS_IN_CP = "sid-65F96E4B-9E0D-462D-AFD4-3FFAD5F7F9B6";
+	private final static String COLLAPSED_SUBPROCESS = "sid-44B96119-5A3B-4850-BDAC-2D4A2AECEA0A";
+	@Test
+	public void oneWay() throws Exception{
+		BpmnModel bpmnModel = readJsonFile();
+		validateModel(bpmnModel);
+	}
+
+	@Test
+	public void twoWay() throws Exception{
+		BpmnModel bpmnModel = readJsonFile();
+		bpmnModel = convertToJsonAndBack(bpmnModel);
+		validateModel(bpmnModel);
+	}
+
+	private void validateModel(BpmnModel model){
+		//It appears that the sequenceflows of the expanded subprocess are also stored as a child of the collapsed subprocess...
+		//this lead to duplications when writing back to json...
+		SubProcess collapsedSubprocess = (SubProcess) model.getFlowElement(COLLAPSED_SUBPROCESS);
+		Collection<FlowElement> flowElements = collapsedSubprocess.getFlowElements();
+		assertThat( flowElements.size(),is(5)); //start - sf - sub - sf - end
+
+		SubProcess subProcess = (SubProcess) model.getFlowElement(EXPANED_SUBPROCESS_IN_CP);
+		assertThat(subProcess.getFlowElements().size(),is(5)); //start-sf-task-sf-end
+
+	}
+
+	@Override
+	protected String getResource() {
+		return "test.cswesfs.json";
+	}
+}
