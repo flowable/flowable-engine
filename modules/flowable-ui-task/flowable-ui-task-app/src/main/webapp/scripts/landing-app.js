@@ -53,23 +53,29 @@ flowableApp
         .otherwise({
             redirectTo: FLOWABLE.CONFIG.appDefaultRoute || '/'
         });
-    
+
         // Initialize angular-translate
         $translateProvider.useStaticFilesLoader({
-            prefix: './i18n/',
-            suffix: '.json'
+          prefix: './i18n/',
+          suffix: '.json'
         })
-
-        .registerAvailableLanguageKeys(['en'], {
-            'en_*': 'en',
-            'en-*': 'en'
-        });
-
-
+        /*
+        This can be used to map multiple browser language keys to a
+        angular translate language key.
+        */
+        // .registerAvailableLanguageKeys(['en'], {
+        //     'en-*': 'en'
+        // })
+        .useCookieStorage()
+        .useSanitizeValueStrategy('sanitizeParameters')
+        .uniformLanguageTag('bcp47')
+        .determinePreferredLanguage();
     }])
     .run(['$rootScope', '$timeout', '$translate', '$location', '$http', '$window', '$popover', 'appResourceRoot', 'RuntimeAppDefinitionService',
         function($rootScope, $timeout, $translate, $location, $http, $window, $popover, appResourceRoot, RuntimeAppDefinitionService) {
 
+        // set angular translate fallback language
+        $translate.fallbackLanguage(['en']);
 
         $rootScope.appResourceRoot = appResourceRoot;
 
@@ -154,8 +160,6 @@ flowableApp
      }])
      .run(['$rootScope', '$location', '$window', '$translate', '$modal',
         function($rootScope, $location, $window, $translate, $modal) {
-         
-        $translate.use('en');
          
         /* Auto-height */
 

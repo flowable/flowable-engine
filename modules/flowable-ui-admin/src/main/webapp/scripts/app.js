@@ -17,7 +17,7 @@
 
 /* App Module */
 
-var flowableAdminApp = angular.module('flowableAdminApp', ['ngResource', 'ngRoute', 'ngCookies',
+var flowableAdminApp = angular.module('flowableAdminApp', ['ngResource', 'ngRoute', 'ngCookies', 'ngSanitize',
     'pascalprecht.translate', 'ngGrid', 'ui.select2', 'ui.bootstrap', 'ngFileUpload', 'ui.keypress',
     'ui.grid', 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.autoResize', 'ui.grid.moveColumns', 'ui.grid.cellNav']);
 
@@ -200,11 +200,18 @@ flowableAdminApp
             $translateProvider.useStaticFilesLoader({
                 prefix: './i18n/',
                 suffix: '.json'
-            });
-
-            $translateProvider.registerAvailableLanguageKeys(['en'], {
-                'en_*': 'en'
-            }).determinePreferredLanguage();
+            })
+            /*
+             This can be used to map multiple browser language keys to a
+             angular translate language key.
+             */
+            // .registerAvailableLanguageKeys(['en'], {
+            //     'en-*': 'en'
+            // })
+            .useCookieStorage()
+            .useSanitizeValueStrategy('sanitizeParameters')
+            .uniformLanguageTag('bcp47')
+            .determinePreferredLanguage();
 
         }])
 
@@ -308,10 +315,11 @@ flowableAdminApp
         .run(['$rootScope', '$http', '$timeout', '$location', '$cookies', '$modal', '$translate', '$window',
             function($rootScope, $http, $timeout, $location, $cookies, $modal, $translate, $window) {
 
+                // set angular translate fallback language
+                $translate.fallbackLanguage(['en']);
+
                 $rootScope.serverStatus = {
                 };
-
-                $translate.use('en');
 
         		$rootScope.serversLoaded = false;
 

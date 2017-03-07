@@ -119,13 +119,17 @@ flowableApp
             prefix: './i18n/',
             suffix: '.json'
         })
-
-        .registerAvailableLanguageKeys(['en'], {
-            'en_*': 'en',
-            'en-*': 'en'
-        });
-
-
+        /*
+            This can be used to map multiple browser language keys to a
+            angular translate language key.
+        */
+        // .registerAvailableLanguageKeys(['en'], {
+        //     'en-*': 'en'
+        // })
+        .useCookieStorage()
+        .useSanitizeValueStrategy('sanitizeParameters')
+        .uniformLanguageTag('bcp47')
+        .determinePreferredLanguage();
     }])
     .run(['$rootScope', function($rootScope) {
         $rootScope.$on( "$routeChangeStart", function(event, next, current) {
@@ -137,8 +141,9 @@ flowableApp
     .run(['$rootScope', '$timeout', '$translate', '$location', '$window', 'AuthenticationSharedService',
         function($rootScope, $timeout, $translate, $location, $window, AuthenticationSharedService) {
 
-            $translate.use('en');
-            
+            // set angular translate fallback language
+            $translate.fallbackLanguage(['en']);
+
             // Common model (eg selected tenant id)
             $rootScope.common = {};
 
@@ -221,7 +226,6 @@ flowableApp
     .run(['$rootScope', '$timeout', '$translate', '$location', '$http', '$window', '$popover', 'appResourceRoot',
         function($rootScope, $timeout, $translate, $location, $http, $window, $popover, appResourceRoot) {
 
-
         $rootScope.appResourceRoot = appResourceRoot;
 
         // Alerts
@@ -285,14 +289,7 @@ flowableApp
      }])
      .run(['$rootScope', '$location', '$window', 'AuthenticationSharedService', '$translate', '$modal',
         function($rootScope, $location, $window, AuthenticationSharedService, $translate, $modal) {
-         
-        var proposedLanguage = $translate.proposedLanguage();
-        if (proposedLanguage !== 'de' && proposedLanguage !== 'en' && proposedLanguage !== 'es' && proposedLanguage !== 'fr'
-            && proposedLanguage !== 'it' && proposedLanguage !== 'ja') {
-            
-            $translate.use('en');
-        }
-         
+
         /* Auto-height */
 
         $rootScope.window = {};

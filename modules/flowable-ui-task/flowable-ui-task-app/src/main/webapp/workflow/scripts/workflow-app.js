@@ -101,20 +101,29 @@ flowableApp
 
         // Initialize angular-translate
         $translateProvider.useStaticFilesLoader({
-            prefix: appResourceRoot + 'i18n/',
-            suffix: '.json'
-        });
-
-       $translateProvider.registerAvailableLanguageKeys(['en'], {
-           'en_*': 'en',
-           'en-*': 'en'
-       });
+           prefix: './i18n/',
+           suffix: '.json'
+        })
+        /*
+        This can be used to map multiple browser language keys to a
+        angular translate language key.
+        */
+        // .registerAvailableLanguageKeys(['en'], {
+        //     'en-*': 'en'
+        // })
+        .useCookieStorage()
+        .useSanitizeValueStrategy('sanitizeParameters')
+        .uniformLanguageTag('bcp47')
+        .determinePreferredLanguage();
 
        // turn loading bar spinner off (angular-loading-bar lib)
        cfpLoadingBarProvider.includeSpinner = false;
     }])
     .run(['$rootScope', '$routeParams', '$timeout', '$translate', '$location', '$http', '$window', 'appResourceRoot', 'AppDefinitionService', 'ProcessService',
         function($rootScope, $routeParams, $timeout, $translate, $location, $http, $window, appResourceRoot, AppDefinitionService, ProcessService) {
+
+        // set angular translate fallback language
+        $translate.fallbackLanguage(['en']);
 
         $rootScope.restRootUrl = function() {
             return FLOWABLE.CONFIG.contextRoot;
@@ -124,8 +133,6 @@ flowableApp
         $rootScope.appResourceRoot = appResourceRoot;
         $rootScope.activitiFieldIdPrefix = 'activiti-';
 
-        $translate.use('en');
-        
         $rootScope.window = {};
         var updateWindowSize = function() {
             $rootScope.window.width = $window.innerWidth;
