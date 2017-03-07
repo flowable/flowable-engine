@@ -69,8 +69,7 @@ public class FlowableAppDefinitionService {
             if (deployment.getKey() != null) {
             	
             	AppDefinitionRepresentation app=getAppDefinition(deployment.getKey());
-            	
-            	
+            	    	
                 if (!deploymentMap.containsKey(deployment.getKey())) {
                     deploymentMap.put(deployment.getKey(), deployment);
                 } else if (deploymentMap.get(deployment.getKey()).getDeploymentTime().before(deployment.getDeploymentTime())) {
@@ -83,15 +82,6 @@ public class FlowableAppDefinitionService {
             
             resultList.add(createRepresentation(deployment));
         }
-        
-        
-//        ///sibok666 code
-//        ///getting logged user
-//        User currentUser = SecurityUtils.getCurrentUserObject();
-//        String userId=currentUser.getId();
-//        ///getting the groups by user
-//        List<RemoteGroup> listaGruposXUsuario=remoteIdmService.getUser(userId).getGroups();
-      
         
         ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
         return result;
