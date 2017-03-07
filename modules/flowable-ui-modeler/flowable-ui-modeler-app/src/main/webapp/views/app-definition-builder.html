@@ -65,24 +65,23 @@
                         </div>
                     </div>
                 </div>
-	            <div class="col-xs-8">
-					<div class="form-group">
-						<label for="groupAccessApp">{{'APP.GROUPS-ACCESS' | translate}}</label>
-							<input ng-disabled="model.loading" type="text" class="form-control"
-							               id="groupAccessApp" ng-model="currentAppDefinition.definition.groupsAccess"
-				                         custom-keys enter-pressed="changeGroups($event)" >
-					</div>
+	        <div class="col-xs-8">
+			<div class="form-group">
+				<label for="groupAccessApp">{{'APP.GROUPS-ACCESS' | translate}}</label>
+				<input ng-disabled="model.loading" type="text" class="form-control"
+				       id="groupAccessApp" ng-model="currentAppDefinition.definition.groupsAccess"
+				       custom-keys enter-pressed="changeGroups($event)" />
+			</div>
+		</div>
+		<div class="col-xs-8">
+			<div class="form-group">
+				<label for="userAccessApp">{{'APP.USERS-ACCESS' | translate}}</label>
+				<input ng-disabled="model.loading" type="text" class="form-control"
+			               id="userAccessApp" ng-model="currentAppDefinition.definition.usersAccess"
+			               custom-keys enter-pressed="changeUsers($event)" />
 				</div>
-				<div class="col-xs-8">
-					<div class="form-group">
-						<label for="userAccessApp">{{'APP.USERS-ACCESS' | translate}}</label>
-							<input ng-disabled="model.loading" type="text" class="form-control"
-							               id="userAccessApp" ng-model="currentAppDefinition.definition.usersAccess"
-				                         custom-keys enter-pressed="changeUsers($event)" >
-					</div>
-				</div>                
-            </div> 
-			
+			</div>                
+            	</div> 
             <div class="row">
                 <div class="col-xs-12">
                     <h3>{{'APP.DETAILS.MODELS-TITLE' | translate}}
