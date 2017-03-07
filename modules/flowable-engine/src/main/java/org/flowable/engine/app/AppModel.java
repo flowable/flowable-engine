@@ -23,22 +23,21 @@ public class AppModel {
     protected String groupsAccess;
     
     public String getUsersAccess() {
-		return usersAccess;
-	}
+	return usersAccess;
+    }
 
-	public void setUsersAccess(String usersAccess) {
-		this.usersAccess = usersAccess;
-	}
+    public void setUsersAccess(String usersAccess) {
+	this.usersAccess = usersAccess;
+    }
 
-	public String getGroupsAccess() {
-		return groupsAccess;
-	}
+    public String getGroupsAccess() {
+	return groupsAccess;
+    }
 
-	public void setGroupsAccess(String groupsAccess) {
-		this.groupsAccess = groupsAccess;
-	}
-
-	public String getKey() {
+    public void setGroupsAccess(String groupsAccess) {
+	this.groupsAccess = groupsAccess;
+    }
+    public String getKey() {
         return key;
     }
 
