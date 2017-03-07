@@ -146,9 +146,9 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     validateModel(xif.createXMLStreamReader(in));
                 }
             } catch (UnsupportedEncodingException e) {
-                throw new DmnXMLException("The bpmn 2.0 xml is not UTF8 encoded", e);
+                throw new DmnXMLException("The dmn xml is not properly encoded", e);
             } catch (XMLStreamException e) {
-                throw new DmnXMLException("Error while reading the BPMN 2.0 XML", e);
+                throw new DmnXMLException("Error while reading the dmn xml file", e);
             } catch(Exception e){
                 throw new DmnXMLException(e.getMessage(), e);
             }
@@ -158,9 +158,9 @@ public class DmnXMLConverter implements DmnXMLConstants {
             // XML conversion
             return convertToDmnModel(xif.createXMLStreamReader(in));
         } catch (UnsupportedEncodingException e) {
-            throw new DmnXMLException("The bpmn 2.0 xml is not UTF8 encoded", e);
+            throw new DmnXMLException("The dmn xml is not properly encoded", e);
         } catch (XMLStreamException e) {
-            throw new DmnXMLException("Error while reading the BPMN 2.0 XML", e);
+            throw new DmnXMLException("Error while reading the dmn xml file", e);
         } catch (IOException e) {
             throw new DmnXMLException(e.getMessage(), e);
         }

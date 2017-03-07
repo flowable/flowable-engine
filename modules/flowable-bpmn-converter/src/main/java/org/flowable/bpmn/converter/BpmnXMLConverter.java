@@ -265,7 +265,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                     validateModel(xif.createXMLStreamReader(in));
                 }
             } catch (UnsupportedEncodingException e) {
-                throw new XMLException("The bpmn 2.0 xml is not UTF8 encoded", e);
+                throw new XMLException("The bpmn 2.0 xml is not properly encoded", e);
             } catch(XMLStreamException e){
                 throw new XMLException("Error while reading the BPMN 2.0 XML", e);
             } catch(Exception e){
@@ -277,7 +277,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
             // XML conversion
             return convertToBpmnModel(xif.createXMLStreamReader(in));
         } catch (UnsupportedEncodingException e) {
-            throw new XMLException("The bpmn 2.0 xml is not UTF8 encoded", e);
+            throw new XMLException("The bpmn 2.0 xml is not properly encoded", e);
         } catch (XMLStreamException e) {
             throw new XMLException("Error while reading the BPMN 2.0 XML", e);
         } catch (IOException e) {
