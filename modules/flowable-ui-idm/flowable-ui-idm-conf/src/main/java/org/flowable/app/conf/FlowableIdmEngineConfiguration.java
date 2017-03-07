@@ -88,6 +88,7 @@ public class FlowableIdmEngineConfiguration {
         ldapConfiguration.setUserIdAttribute(environment.getRequiredProperty("ldap.attribute.userid"));
         ldapConfiguration.setUserFirstNameAttribute(environment.getRequiredProperty("ldap.attribute.firstname"));
         ldapConfiguration.setUserLastNameAttribute(environment.getRequiredProperty("ldap.attribute.lastname"));
+        ldapConfiguration.setUserEmailAttribute(environment.getRequiredProperty("ldap.attribute.email"));
                 
         ldapConfiguration.setGroupIdAttribute(environment.getRequiredProperty("ldap.attribute.groupid"));
         ldapConfiguration.setGroupNameAttribute(environment.getRequiredProperty("ldap.attribute.groupname"));
