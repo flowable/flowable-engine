@@ -24,12 +24,15 @@ import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.impl.cmd.GetIdentityLinksForTaskCmd;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.DelegationState;
+import org.flowable.engine.task.IdentityLink;
+import org.flowable.engine.task.IdentityLinkInfo;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.task.TaskQuery;
 import org.flowable.engine.test.Deployment;
@@ -2266,6 +2269,43 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         // use parameters
         assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(Task.class) + " T WHERE T.NAME_ = #{taskName}").parameter("taskName", "gonzoTask")
                 .count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml" })
+    public void testIncludeIdentityLinks() throws Exception {
+        // Start process with a binary variable
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", Collections.singletonMap("binaryVariable", (Object) "It is I, le binary".getBytes()));
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        taskService.setVariableLocal(task.getId(), "binaryTaskVariable", (Object) "It is I, le binary".getBytes());
+
+        taskService.addCandidateGroup(task.getId(), "group1");
+
+        // Query task, including identity links
+        task = taskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
+        assertNotNull(task);
+        assertNotNull(task.getIdentityLinks());
+        assertEquals(1, task.getIdentityLinks().size());
+
+        // Query task, including identity links, process variables, and task variables
+        task = taskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().includeProcessVariables().includeTaskLocalVariables().singleResult();
+        assertNotNull(task);
+        assertNotNull(task.getIdentityLinks());
+        assertEquals(1, task.getIdentityLinks().size());
+        IdentityLinkInfo identityLink = task.getIdentityLinks().get(0);
+        assertEquals(null, identityLink.getProcessInstanceId());
+        assertEquals("candidate", identityLink.getType());
+        assertEquals("group1", identityLink.getGroupId());
+        assertEquals(null, identityLink.getUserId());
+        assertEquals(task.getId(), identityLink.getTaskId());
+
+        assertNotNull(task.getProcessVariables());
+        byte[] bytes = (byte[]) task.getProcessVariables().get("binaryVariable");
+        assertEquals("It is I, le binary", new String(bytes));
+
+        assertNotNull(task.getTaskLocalVariables());
+        bytes = (byte[]) task.getTaskLocalVariables().get("binaryTaskVariable");
+        assertEquals("It is I, le binary", new String(bytes));
     }
 
     /**

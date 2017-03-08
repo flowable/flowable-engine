@@ -31,7 +31,7 @@ public interface TaskDataManager extends DataManager<TaskEntity> {
 
     List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery);
 
-    List<Task> findTasksAndVariablesByQueryCriteria(TaskQueryImpl taskQuery);
+    List<Task> findTasksWithRelatedEntitiesByQueryCriteria(TaskQueryImpl taskQuery);
 
     long findTaskCountByQueryCriteria(TaskQueryImpl taskQuery);
 
