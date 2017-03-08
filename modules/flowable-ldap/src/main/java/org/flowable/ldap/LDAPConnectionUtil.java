@@ -31,11 +31,11 @@ public class LDAPConnectionUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LDAPConnectionUtil.class);
 
-    public static InitialDirContext creatDirectoryContext(LDAPConfigurator ldapConfigurator) {
+    public static InitialDirContext creatDirectoryContext(LDAPConfiguration ldapConfigurator) {
         return createDirectoryContext(ldapConfigurator, ldapConfigurator.getUser(), ldapConfigurator.getPassword());
     }
 
-    public static InitialDirContext createDirectoryContext(LDAPConfigurator ldapConfigurator, String principal, String credentials) {
+    public static InitialDirContext createDirectoryContext(LDAPConfiguration ldapConfigurator, String principal, String credentials) {
         Properties properties = new Properties();
         properties.put(Context.INITIAL_CONTEXT_FACTORY, ldapConfigurator.getInitialContextFactory());
         properties.put(Context.PROVIDER_URL, ldapConfigurator.getServer() + ":" + ldapConfigurator.getPort());

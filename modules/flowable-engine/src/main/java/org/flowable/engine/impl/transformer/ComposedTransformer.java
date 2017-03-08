@@ -23,9 +23,6 @@ public class ComposedTransformer extends AbstractTransformer {
 
     protected List<Transformer> transformers;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Object primTransform(Object anObject) throws Exception {
         Object current = anObject;

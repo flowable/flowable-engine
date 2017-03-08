@@ -21,15 +21,22 @@ import java.util.TimeZone;
  * @author Joram Barrez
  */
 public class DefaultClockImpl implements org.flowable.engine.common.runtime.Clock {
+    private TimeZone timeZone;
+    protected static volatile Calendar CURRENT_TIME;
 
-    private static volatile Calendar CURRENT_TIME;
+    public DefaultClockImpl() {
+    }
+
+    public DefaultClockImpl(TimeZone timeZone) {
+        this.timeZone = timeZone;
+    }
 
     @Override
     public void setCurrentTime(Date currentTime) {
         Calendar time = null;
 
         if (currentTime != null) {
-            time = new GregorianCalendar();
+            time = (timeZone == null) ? new GregorianCalendar() : new GregorianCalendar(timeZone);
             time.setTime(currentTime);
         }
 
@@ -53,7 +60,11 @@ public class DefaultClockImpl implements org.flowable.engine.common.runtime.Cloc
 
     @Override
     public Calendar getCurrentCalendar() {
-        return CURRENT_TIME == null ? new GregorianCalendar() : (Calendar) CURRENT_TIME.clone();
+        if (CURRENT_TIME == null) {
+            return (timeZone == null) ? new GregorianCalendar() : new GregorianCalendar(timeZone);
+        }
+
+        return (Calendar) CURRENT_TIME.clone();
     }
 
     @Override

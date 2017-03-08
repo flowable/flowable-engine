@@ -139,7 +139,7 @@ public class ExchangeUtils {
      * 
      * @param exchange
      *            The Camel Exchange object
-     * @param endPoint
+     * @param endpoint
      *            The endPoint implementation
      * @return The userId of the user to be set as the process initiator
      */

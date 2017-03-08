@@ -142,7 +142,7 @@ public interface IdentityService {
     /**
      * Retrieves the picture for a given user.
      * 
-     * @returns null if the user doesn't have a picture.
+     * @return null if the user doesn't have a picture.
      * @throws ActivitiObjectNotFoundException
      *             if the user doesn't exist. / Picture getUserPicture(String userId);
      * 

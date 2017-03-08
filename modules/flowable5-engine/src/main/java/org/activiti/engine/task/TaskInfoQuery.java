@@ -235,6 +235,7 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * 
      * @deprecated
      */
+    @Deprecated
     T dueDate(Date dueDate);
 
     T taskDueDate(Date dueDate);
@@ -244,6 +245,7 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * 
      * @deprecated
      */
+    @Deprecated
     T dueBefore(Date dueDate);
 
     T taskDueBefore(Date dueDate);
@@ -253,6 +255,7 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * 
      * @deprecated
      */
+    @Deprecated
     T dueAfter(Date dueDate);
 
     T taskDueAfter(Date dueDate);
@@ -262,6 +265,7 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * 
      * @deprecated
      */
+    @Deprecated
     T withoutDueDate();
 
     T withoutTaskDueDate();

@@ -109,7 +109,7 @@ body {
 	top: 2px;
 	line-height: 35px;
     height: 35px;
-    background: url(../images/logo.png) no-repeat 15px center;
+    background: url(../images/flowable-logo.png) no-repeat 15px center;
     width: 180px;
 }
 
@@ -852,7 +852,7 @@ body {
 		only screen and (min-resolution: 192dpi) {
 
     .navbar-header .navbar-brand {
-        background: url(../images/logo-2x.png) no-repeat 20px center;
+        background: url(../images/flowable-logo@2x.png) no-repeat 20px center;
         background-size: 140px 35px;
         background-repeat: no-repeat;
     }

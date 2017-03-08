@@ -55,13 +55,16 @@
     delete from ${prefix}ACT_ID_PRIV_MAPPING where PRIV_ID_ = #{privilegeId} and USER_ID_ = #{userId}
   </delete>
 
-    <delete id="deleteByPrivilegeIdAndGroupId" parameterType="map">
+  <delete id="deleteByPrivilegeIdAndGroupId" parameterType="map">
     delete from ${prefix}ACT_ID_PRIV_MAPPING where PRIV_ID_ = #{privilegeId} and GROUP_ID_ = #{groupId}
   </delete>
 
-
   <select id="selectPrivilegeMapping" parameterType="string" resultMap="privilegeMappingResultMap">
     select * from ${prefix}ACT_ID_PRIV_MAPPING where ID_ = #{id,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectPrivilegeMappingsByPrivilegeId" parameterType="string" resultMap="privilegeMappingResultMap">
+    select * from ${prefix}ACT_ID_PRIV_MAPPING where PRIV_ID_ = #{parameter,jdbcType=VARCHAR}
   </select>
   
 </mapper>

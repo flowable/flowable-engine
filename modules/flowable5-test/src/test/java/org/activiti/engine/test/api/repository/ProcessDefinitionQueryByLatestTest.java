@@ -10,7 +10,7 @@ import org.flowable.engine.repository.ProcessDefinitionQuery;
 
 public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCase {
 
-    private static String XML_FILE_PATH = "org/activiti/engine/test/repository/latest/";
+    private static final String XML_FILE_PATH = "org/activiti/engine/test/repository/latest/";
 
     @Override
     protected void setUp() throws Exception {

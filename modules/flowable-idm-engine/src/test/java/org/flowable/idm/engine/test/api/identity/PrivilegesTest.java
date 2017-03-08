@@ -12,11 +12,13 @@
  */
 package org.flowable.idm.engine.test.api.identity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.Privilege;
+import org.flowable.idm.api.PrivilegeMapping;
 import org.flowable.idm.api.User;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntity;
 import org.flowable.idm.engine.test.PluggableFlowableIdmTestCase;
@@ -154,4 +156,24 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
         assertEquals(1, idmIdentityService.createNativeUserQuery().sql(baseQuerySql).parameter("name", "access admin application").list().size());
     }
 
+    public void testGetPrivilegeMappings() {
+        Privilege modelerPrivilege = idmIdentityService.createPrivilegeQuery().privilegeName("access modeler application").singleResult();
+        List<PrivilegeMapping> privilegeMappings = idmIdentityService.getPrivilegeMappingsByPrivilegeId(modelerPrivilege.getId());
+        assertEquals(3, privilegeMappings.size());
+        List<String> users = new ArrayList<>();
+        List<String> groups = new ArrayList<>();
+        
+        for (PrivilegeMapping privilegeMapping : privilegeMappings) {
+            if (privilegeMapping.getUserId() != null) {
+                users.add(privilegeMapping.getUserId());
+            
+            } else if (privilegeMapping.getGroupId() != null) {
+                groups.add(privilegeMapping.getGroupId());
+            }
+        }
+        
+        assertTrue(users.contains("kermit"));
+        assertTrue(groups.contains("admins"));
+        assertTrue(groups.contains("engineering"));
+    }
 }

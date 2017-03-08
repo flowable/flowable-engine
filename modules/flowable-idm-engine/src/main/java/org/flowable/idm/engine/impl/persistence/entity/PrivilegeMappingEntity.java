@@ -13,18 +13,13 @@
 package org.flowable.idm.engine.impl.persistence.entity;
 
 import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.idm.api.PrivilegeMapping;
 
-public interface PrivilegeMappingEntity extends Entity {
-
-    String getPrivilegeId();
+public interface PrivilegeMappingEntity extends Entity, PrivilegeMapping {
 
     void setPrivilegeId(String privilegeId);
 
-    String getUserId();
-
     void setUserId(String userId);
-
-    String getGroupId();
 
     void setGroupId(String groupId);
 

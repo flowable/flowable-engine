@@ -6,7 +6,7 @@ dn: o=flowable
 objectClass: organization
 objectClass: extensibleObject
 objectClass: top
-o: activiti
+o: flowable
 
 # Users root
 

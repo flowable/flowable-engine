@@ -19,9 +19,6 @@ package org.activiti.engine.impl.transformer;
  */
 public class IntegerToString extends AbstractTransformer {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Object primTransform(Object anObject) throws Exception {
         return ((Integer) anObject).toString();

@@ -19,9 +19,6 @@ import java.util.Map;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.spi.InitialContextFactory;
 
-import org.flowable.engine.cfg.AbstractProcessEngineConfigurator;
-import org.flowable.engine.cfg.ProcessEngineConfigurator;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.ldap.LDAPGroupCache.LDAPGroupCacheListener;
@@ -36,7 +33,7 @@ import org.flowable.ldap.LDAPGroupCache.LDAPGroupCacheListener;
  * 
  * @author Joram Barrez
  */
-public class LDAPConfigurator extends AbstractProcessEngineConfigurator {
+public class LDAPConfiguration {
 
     /* Server connection params */
 
@@ -59,6 +56,8 @@ public class LDAPConfigurator extends AbstractProcessEngineConfigurator {
     protected String queryUserByUserId;
     protected String queryGroupsForUser;
     protected String queryUserByFullNameLike;
+    protected String queryAllUsers;
+    protected String queryAllGroups;
 
     // Attribute names
     protected String userIdAttribute;
@@ -79,25 +78,6 @@ public class LDAPConfigurator extends AbstractProcessEngineConfigurator {
 
     // Cache listener (experimental)
     protected LDAPGroupCacheListener groupCacheListener;
-
-    @Override
-    public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        // Nothing to do
-    }
-
-    @Override
-    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
-
-        LDAPGroupCache ldapGroupCache = null;
-        if (getGroupCacheSize() > 0) {
-            ldapGroupCache = new LDAPGroupCache(getGroupCacheSize(), getGroupCacheExpirationTime(), processEngineConfiguration.getClock());
-            if (groupCacheListener != null) {
-                ldapGroupCache.setLdapCacheListener(groupCacheListener);
-            }
-        }
-
-        processEngineConfiguration.setIdmIdentityService(new LDAPIdentityServiceImpl(processEngineConfiguration, this, ldapGroupCache));
-    }
 
     // Getters and Setters //////////////////////////////////////////////////
 
@@ -273,6 +253,22 @@ public class LDAPConfigurator extends AbstractProcessEngineConfigurator {
      */
     public void setQueryUserByFullNameLike(String queryUserByFullNameLike) {
         this.queryUserByFullNameLike = queryUserByFullNameLike;
+    }
+
+    public String getQueryAllUsers() {
+        return queryAllUsers;
+    }
+
+    public void setQueryAllUsers(String queryAllUsers) {
+        this.queryAllUsers = queryAllUsers;
+    }
+    
+    public String getQueryAllGroups() {
+        return queryAllGroups;
+    }
+
+    public void setQueryAllGroups(String queryAllGroups) {
+        this.queryAllGroups = queryAllGroups;
     }
 
     /**

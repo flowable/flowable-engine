@@ -19,9 +19,6 @@ package org.flowable.engine.impl.webservice;
  */
 public class CxfWebServiceClientFactory implements SyncWebServiceClientFactory {
 
-    /**
-     * {@inheritDoc}
-     */
     public SyncWebServiceClient create(String wsdl) {
         return new CxfWebServiceClient(wsdl);
     }

@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class with overridable methods that are called when doing the calls to the ldap system. You can extend this class and plug it into the {@link LDAPConfigurator} if the default queries are inadequate
+ * Class with overridable methods that are called when doing the calls to the ldap system. You can extend this class and plug it into the {@link LDAPConfiguration} if the default queries are inadequate
  * for your use case.
  * 
  * @author Joram Barrez
@@ -35,7 +35,7 @@ public class LDAPQueryBuilder {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(LDAPQueryBuilder.class);
 
-    public String buildQueryByUserId(LDAPConfigurator ldapConfigurator, String userId) {
+    public String buildQueryByUserId(LDAPConfiguration ldapConfigurator, String userId) {
         String searchExpression = null;
         if (ldapConfigurator.getQueryUserByUserId() != null) {
             searchExpression = MessageFormat.format(ldapConfigurator.getQueryUserByUserId(), userId);
@@ -45,7 +45,7 @@ public class LDAPQueryBuilder {
         return searchExpression;
     }
 
-    public String buildQueryGroupsForUser(final LDAPConfigurator ldapConfigurator, final String userId) {
+    public String buildQueryGroupsForUser(final LDAPConfiguration ldapConfigurator, final String userId) {
         String searchExpression = null;
         if (ldapConfigurator.getQueryGroupsForUser() != null) {
 
@@ -80,7 +80,7 @@ public class LDAPQueryBuilder {
         return searchExpression;
     }
 
-    public String buildQueryByFullNameLike(final LDAPConfigurator ldapConfigurator, String searchText) {
+    public String buildQueryByFullNameLike(final LDAPConfiguration ldapConfigurator, String searchText) {
         String searchExpression = null;
         if (ldapConfigurator.getQueryUserByFullNameLike() != null) {
             searchExpression = MessageFormat.format(ldapConfigurator.getQueryUserByFullNameLike(), ldapConfigurator.getUserFirstNameAttribute(), searchText, ldapConfigurator.getUserLastNameAttribute(),
@@ -91,7 +91,7 @@ public class LDAPQueryBuilder {
         return searchExpression;
     }
 
-    protected SearchControls createSearchControls(LDAPConfigurator ldapConfigurator) {
+    protected SearchControls createSearchControls(LDAPConfiguration ldapConfigurator) {
         SearchControls searchControls = new SearchControls();
         searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
         searchControls.setTimeLimit(ldapConfigurator.getSearchTimeLimit());

@@ -58,9 +58,6 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
         this.dataOutputAssociations.add(dataAssociation);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void execute(ActivityExecution execution) throws Exception {
         MessageInstance message;
 

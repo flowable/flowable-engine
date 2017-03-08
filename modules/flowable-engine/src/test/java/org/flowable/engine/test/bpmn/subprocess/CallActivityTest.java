@@ -34,12 +34,12 @@ import org.flowable.engine.runtime.ProcessInstance;
 
 public class CallActivityTest extends ResourceFlowableTestCase {
 
-    private static String MAIN_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_mainProcess.bpmn.xml";
-    private static String CHILD_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_childProcess.bpmn.xml";
-    private static String MESSAGE_TRIGGERED_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_messageTriggeredProcess.bpmn.xml";
-    private static String INHERIT_VARIABLES_MAIN_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testInheritVariablesCallActivity_mainProcess.bpmn20.xml";
-    private static String INHERIT_VARIABLES_CHILD_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testInheritVariablesCallActivity_childProcess.bpmn20.xml";
-    private static String NOT_INHERIT_VARIABLES_MAIN_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testNotInheritVariablesCallActivity_mainProcess.bpmn20.xml";
+    private static final String MAIN_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_mainProcess.bpmn.xml";
+    private static final String CHILD_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_childProcess.bpmn.xml";
+    private static final String MESSAGE_TRIGGERED_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_messageTriggeredProcess.bpmn.xml";
+    private static final String INHERIT_VARIABLES_MAIN_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testInheritVariablesCallActivity_mainProcess.bpmn20.xml";
+    private static final String INHERIT_VARIABLES_CHILD_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testInheritVariablesCallActivity_childProcess.bpmn20.xml";
+    private static final String NOT_INHERIT_VARIABLES_MAIN_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testNotInheritVariablesCallActivity_mainProcess.bpmn20.xml";
 
     public CallActivityTest() {
         super("org/flowable/standalone/parsing/encoding.flowable.cfg.xml");

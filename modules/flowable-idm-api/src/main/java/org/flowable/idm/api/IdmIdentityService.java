@@ -215,6 +215,11 @@ public interface IdmIdentityService {
      * Delete a privilege for a group.
      */
     void deleteGroupPrivilegeMapping(String privilegeId, String groupId);
+    
+    /**
+     * Get all privilege mappings for a specific privilege
+     */
+    List<PrivilegeMapping> getPrivilegeMappingsByPrivilegeId(String privilegeId);
 
     /**
      * Deletes the privilege with the given id. Note that this also removes all user/group mappings for this privilege.
