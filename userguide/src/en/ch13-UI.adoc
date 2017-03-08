@@ -329,3 +329,32 @@ image::images/flowable_admin_processdefinitiondetails_screen.png[align="center"]
 In the process definition details view, the first page of process instances is shown, together with optional decision table definitions and form definitions that are used in the process definition. For the vacation request process definition, there's one connected decision table and one connected form definition. Clicking on the decision table definition navigates the Flowable Admin application to the DMN engine. You can always navigate back to the Process engine by clicking on the _Parent Deployment ID_ link.
 
 In addition to the deployments and definitions, you can also query on process instances, tasks, jobs and event subscriptions in the Process engine. The views all work in a similar way to what's already been described.
+
+
+=== Internationalization
+
+The Flowable UI apps support internationalization (i18n). The project maintains the English translations. It is however possible to provide your own translation files in order to support other languages.
+
+The link:$$https://github.com/angular-translate/angular-translate[Angular Translate] library tries to load a specific translation file based on the browser's locale located in the _i18n_ folder (present in each UI module). When a matching translation file cannot be loaded the framework will fallback to the English translation.
+
+Mapping multiple browser locale keys to specific translations additional configuration can be provided (located in the Angular app config);
+
+[source,linenums]
+----
+// Initialize angular-translate
+$translateProvider.useStaticFilesLoader({
+    prefix: './i18n/',
+    suffix: '.json'
+})
+/*
+    This can be used to map multiple browser language keys to a
+    angular translate language key.
+*/
+// .registerAvailableLanguageKeys(['en'], {
+//     'en-*': 'en'
+// })
+.useCookieStorage()
+.useSanitizeValueStrategy('sanitizeParameters')
+.uniformLanguageTag('bcp47')
+.determinePreferredLanguage();
+----
