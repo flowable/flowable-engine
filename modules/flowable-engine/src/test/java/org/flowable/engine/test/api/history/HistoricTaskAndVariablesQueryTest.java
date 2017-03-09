@@ -24,6 +24,7 @@ import org.flowable.engine.history.HistoricTaskInstanceQuery;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.IdentityLinkInfo;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
@@ -422,6 +423,59 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             assertEquals(123, variableMap.get("testVar2"));
 
             tasks = historyService.createHistoricTaskInstanceQuery().includeProcessVariables().includeTaskLocalVariables().orderByTaskPriority().asc().listPage(4, 2);
+            assertEquals(0, tasks.size());
+        }
+    }
+
+
+    public void testQueryWithPagingVariablesAndIdentityLinks() {
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().includeProcessVariables().includeTaskLocalVariables().includeIdentityLinks().orderByTaskPriority().desc().listPage(0, 1);
+            assertEquals(1, tasks.size());
+            HistoricTaskInstance task = tasks.get(0);
+            Map<String, Object> variableMap = task.getTaskLocalVariables();
+            assertEquals(2, variableMap.size());
+            assertEquals("someVariable", variableMap.get("testVar"));
+            assertEquals(123, variableMap.get("testVar2"));
+            assertEquals(1, task.getIdentityLinks().size());
+            IdentityLinkInfo identityLink = task.getIdentityLinks().get(0);
+            assertEquals(null, identityLink.getProcessInstanceId());
+            assertEquals("assignee", identityLink.getType());
+            assertEquals(null, identityLink.getGroupId());
+            assertEquals("gonzo", identityLink.getUserId());
+            assertEquals(task.getId(), identityLink.getTaskId());
+
+            tasks = historyService.createHistoricTaskInstanceQuery().includeProcessVariables().includeTaskLocalVariables().includeIdentityLinks().orderByTaskPriority().asc().listPage(1, 2);
+            assertEquals(2, tasks.size());
+            task = tasks.get(1);
+            variableMap = task.getTaskLocalVariables();
+            assertEquals(2, variableMap.size());
+            assertEquals("someVariable", variableMap.get("testVar"));
+            assertEquals(123, variableMap.get("testVar2"));
+            assertEquals(1, task.getIdentityLinks().size());
+            identityLink = task.getIdentityLinks().get(0);
+            assertEquals(null, identityLink.getProcessInstanceId());
+            assertEquals("assignee", identityLink.getType());
+            assertEquals(null, identityLink.getGroupId());
+            assertEquals("gonzo", identityLink.getUserId());
+            assertEquals(task.getId(), identityLink.getTaskId());
+
+            tasks = historyService.createHistoricTaskInstanceQuery().includeProcessVariables().includeTaskLocalVariables().includeIdentityLinks().orderByTaskPriority().asc().listPage(2, 4);
+            assertEquals(1, tasks.size());
+            task = tasks.get(0);
+            variableMap = task.getTaskLocalVariables();
+            assertEquals(2, variableMap.size());
+            assertEquals("someVariable", variableMap.get("testVar"));
+            assertEquals(123, variableMap.get("testVar2"));
+            assertEquals(1, task.getIdentityLinks().size());
+            identityLink = task.getIdentityLinks().get(0);
+            assertEquals(null, identityLink.getProcessInstanceId());
+            assertEquals("assignee", identityLink.getType());
+            assertEquals(null, identityLink.getGroupId());
+            assertEquals("gonzo", identityLink.getUserId());
+            assertEquals(task.getId(), identityLink.getTaskId());
+
+            tasks = historyService.createHistoricTaskInstanceQuery().includeProcessVariables().includeTaskLocalVariables().includeIdentityLinks().orderByTaskPriority().asc().listPage(4, 2);
             assertEquals(0, tasks.size());
         }
     }
