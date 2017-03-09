@@ -139,7 +139,6 @@ flowableModeler
         // .registerAvailableLanguageKeys(['en'], {
         //     'en-*': 'en'
         // })
-        .useCookieStorage()
         .useSanitizeValueStrategy('sanitizeParameters')
         .uniformLanguageTag('bcp47')
         .determinePreferredLanguage();
