@@ -138,44 +138,31 @@ public class DmnXMLConverter implements DmnXMLConstants {
             xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
         }
 
-        InputStreamReader in = null;
-        try {
-            in = new InputStreamReader(inputStreamProvider.getInputStream(), encoding);
-            XMLStreamReader xtr = xif.createXMLStreamReader(in);
-
-            try {
-                if (validateSchema) {
-
-                    if (!enableSafeBpmnXml) {
-                        validateModel(inputStreamProvider);
-                    } else {
-                        validateModel(xtr);
-                    }
-
-                    // The input stream is closed after schema validation
-                    in = new InputStreamReader(inputStreamProvider.getInputStream(), encoding);
-                    xtr = xif.createXMLStreamReader(in);
+        if (validateSchema) {
+            try (InputStreamReader in = new InputStreamReader(inputStreamProvider.getInputStream(), encoding)) {
+                if (!enableSafeBpmnXml) {
+                    validateModel(inputStreamProvider);
+                } else {
+                    validateModel(xif.createXMLStreamReader(in));
                 }
-
-            } catch (Exception e) {
+            } catch (UnsupportedEncodingException e) {
+                throw new DmnXMLException("The dmn xml is not properly encoded", e);
+            } catch (XMLStreamException e) {
+                throw new DmnXMLException("Error while reading the dmn xml file", e);
+            } catch(Exception e){
                 throw new DmnXMLException(e.getMessage(), e);
             }
-
+        }
+        // The input stream is closed after schema validation
+        try (InputStreamReader in = new InputStreamReader(inputStreamProvider.getInputStream(), encoding)) {
             // XML conversion
-            return convertToDmnModel(xtr);
-
+            return convertToDmnModel(xif.createXMLStreamReader(in));
         } catch (UnsupportedEncodingException e) {
-            throw new DmnXMLException("The dmn xml is not UTF8 encoded", e);
+            throw new DmnXMLException("The dmn xml is not properly encoded", e);
         } catch (XMLStreamException e) {
-            throw new DmnXMLException("Error while reading the BPMN 2.0 XML", e);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    LOGGER.debug("Problem closing DMN input stream", e);
-                }
-            }
+            throw new DmnXMLException("Error while reading the dmn xml file", e);
+        } catch (IOException e) {
+            throw new DmnXMLException(e.getMessage(), e);
         }
     }
 
