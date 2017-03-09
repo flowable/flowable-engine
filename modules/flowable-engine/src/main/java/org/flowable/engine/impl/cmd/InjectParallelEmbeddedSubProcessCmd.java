@@ -133,11 +133,11 @@ public class InjectParallelEmbeddedSubProcessCmd extends AbstractDynamicInjectio
 
         } else {
             EndEvent endEvent = new EndEvent();
-            endEvent.setId("end" + UUID.randomUUID().toString());
+            endEvent.setId("end-" + UUID.randomUUID().toString());
             parentContainer.addFlowElement(endEvent);
 
             SequenceFlow endFlow = new SequenceFlow(subProcess.getId(), endEvent.getId());
-            endFlow.setId("flow" + UUID.randomUUID().toString());
+            endFlow.setId("flow-" + UUID.randomUUID().toString());
             parentContainer.addFlowElement(endFlow);
 
         }

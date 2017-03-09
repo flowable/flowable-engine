@@ -120,12 +120,7 @@ public class InjectParallelUserTaskCmd extends AbstractDynamicInjectionCmd imple
             ExecutionEntity processInstance, List<ExecutionEntity> childExecutions) {
         
         TaskEntity taskEntity = commandContext.getTaskEntityManager().findById(taskId);
-        ExecutionEntity executionAtTask = null;
-        for (ExecutionEntity childExecution : childExecutions) {
-            if (taskEntity.getTaskDefinitionKey().equals(childExecution.getActivityId())) {
-                executionAtTask = childExecution;
-            }
-        }
+        ExecutionEntity executionAtTask = taskEntity.getExecution();
 
         ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
         ExecutionEntity execution = executionEntityManager.create();
