@@ -48,6 +48,9 @@ public class ProcessDefinitionEntityImpl extends AbstractEntity implements Proce
     protected boolean isIdentityLinksInitialized;
     protected List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
     protected IOSpecification ioSpecification;
+    protected String derivedFrom;
+    protected String derivedFromRoot;
+
 
     // Backwards compatibility
     protected String engineVersion;
@@ -197,6 +200,22 @@ public class ProcessDefinitionEntityImpl extends AbstractEntity implements Proce
 
     public boolean isSuspended() {
         return suspensionState == SuspensionState.SUSPENDED.getStateCode();
+    }
+
+    public String getDerivedFrom() {
+        return derivedFrom;
+    }
+
+    public void setDerivedFrom(String derivedFrom) {
+        this.derivedFrom = derivedFrom;
+    }
+
+    public String getDerivedFromRoot() {
+        return derivedFromRoot;
+    }
+
+    public void setDerivedFromRoot(String derivedFromRoot) {
+        this.derivedFromRoot = derivedFromRoot;
     }
 
     public String getEngineVersion() {

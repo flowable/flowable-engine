@@ -39,6 +39,8 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
     protected Map<String, ResourceEntity> resources;
     protected Date deploymentTime;
     protected boolean isNew;
+    protected String derivedFrom;
+    protected String derivedFromRoot;
 
     // Backwards compatibility
     protected String engineVersion;
@@ -167,6 +169,22 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
 
     public void setEngineVersion(String engineVersion) {
         this.engineVersion = engineVersion;
+    }
+
+    public String getDerivedFrom() {
+        return derivedFrom;
+    }
+
+    public void setDerivedFrom(String derivedFrom) {
+        this.derivedFrom = derivedFrom;
+    }
+
+    public String getDerivedFromRoot() {
+        return derivedFromRoot;
+    }
+
+    public void setDerivedFromRoot(String derivedFromRoot) {
+        this.derivedFromRoot = derivedFromRoot;
     }
 
     // common methods //////////////////////////////////////////////////////////

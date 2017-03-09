@@ -39,7 +39,11 @@ public interface Deployment {
     String getCategory();
 
     String getKey();
-
+    
+    String getDerivedFrom();
+    
+    String getDerivedFromRoot();
+    
     String getTenantId();
 
     String getEngineVersion();

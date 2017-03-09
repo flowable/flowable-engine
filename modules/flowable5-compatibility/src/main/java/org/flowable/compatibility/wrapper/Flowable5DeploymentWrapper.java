@@ -57,6 +57,16 @@ public class Flowable5DeploymentWrapper implements Deployment {
     public String getTenantId() {
         return activiti5Deployment.getTenantId();
     }
+    
+    @Override
+    public String getDerivedFrom() {
+        return null;
+    }
+    
+    @Override
+    public String getDerivedFromRoot() {
+        return null;
+    }
 
     @Override
     public String getEngineVersion() {

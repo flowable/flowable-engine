@@ -100,6 +100,11 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment> {
      */
     DeploymentQuery deploymentEngineVersion(String engineVersion);
 
+    /**
+     * Only select deployments that are derived from the given deployment.
+    */
+    DeploymentQuery deploymentDerivedFrom(String deploymentId);
+
     /** Only select deployments with the given process definition key. */
     DeploymentQuery processDefinitionKey(String key);
 

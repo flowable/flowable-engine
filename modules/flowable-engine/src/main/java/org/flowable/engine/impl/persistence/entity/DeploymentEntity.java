@@ -50,6 +50,10 @@ public interface DeploymentEntity extends Deployment, Entity {
 
     void setNew(boolean isNew);
 
+    void setDerivedFrom(String derivedFrom);
+
+    void setDerivedFromRoot(String derivedFromRoot);
+
     void setEngineVersion(String engineVersion);
 
 }

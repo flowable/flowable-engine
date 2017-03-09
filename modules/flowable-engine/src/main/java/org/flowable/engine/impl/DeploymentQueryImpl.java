@@ -43,6 +43,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
     protected String tenantIdLike;
     protected boolean withoutTenantId;
     protected String engineVersion;
+    protected String derivedFrom;
     protected String processDefinitionKey;
     protected String processDefinitionKeyLike;
     protected boolean latest;
@@ -153,6 +154,12 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
 
     public DeploymentQueryImpl deploymentEngineVersion(String engineVersion) {
         this.engineVersion = engineVersion;
+        return this;
+    }
+
+    @Override
+    public DeploymentQuery deploymentDerivedFrom(String deploymentId) {
+        this.derivedFrom = deploymentId;
         return this;
     }
 

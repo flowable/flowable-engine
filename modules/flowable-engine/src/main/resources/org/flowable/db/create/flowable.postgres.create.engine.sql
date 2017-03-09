@@ -6,10 +6,10 @@ create table ACT_GE_PROPERTY (
 );
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.0.1.0', 1);
+values ('schema.version', '6.1.0.0', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.0.1.0)', 1);
+values ('schema.history', 'create(6.1.0.0)', 1);
 
 insert into ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);
@@ -31,6 +31,8 @@ create table ACT_RE_DEPLOYMENT (
     KEY_ varchar(255),
     TENANT_ID_ varchar(255) default '',
     DEPLOY_TIME_ timestamp,
+    DERIVED_FROM_ varchar(64),
+    DERIVED_FROM_ROOT_ varchar(64),
     ENGINE_VERSION_ varchar(255),
     primary key (ID_)
 );
@@ -180,6 +182,8 @@ create table ACT_RE_PROCDEF (
     HAS_GRAPHICAL_NOTATION_ boolean,
     SUSPENSION_STATE_ integer,
     TENANT_ID_ varchar(255) default '',
+    DERIVED_FROM_ varchar(64),
+    DERIVED_FROM_ROOT_ varchar(64),
     ENGINE_VERSION_ varchar(255),
     primary key (ID_)
 );

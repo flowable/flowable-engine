@@ -33,6 +33,7 @@ import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.cmd.DeploymentSettings;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.deploy.Deployer;
@@ -81,11 +82,17 @@ public class BpmnDeployer implements Deployer {
         setProcessDefinitionDiagramNames(parsedDeployment);
 
         if (deployment.isNew()) {
-            Map<ProcessDefinitionEntity, ProcessDefinitionEntity> mapOfNewProcessDefinitionToPreviousVersion = getPreviousVersionsOfProcessDefinitions(parsedDeployment);
-            setProcessDefinitionVersionsAndIds(parsedDeployment, mapOfNewProcessDefinitionToPreviousVersion);
-            persistProcessDefinitionsAndAuthorizations(parsedDeployment);
-            updateTimersAndEvents(parsedDeployment, mapOfNewProcessDefinitionToPreviousVersion);
-            dispatchProcessDefinitionEntityInitializedEvent(parsedDeployment);
+            if (!deploymentSettings.containsKey(DeploymentSettings.IS_DERIVED_DEPLOYMENT)) {
+                Map<ProcessDefinitionEntity, ProcessDefinitionEntity> mapOfNewProcessDefinitionToPreviousVersion = getPreviousVersionsOfProcessDefinitions(parsedDeployment);
+                setProcessDefinitionVersionsAndIds(parsedDeployment, mapOfNewProcessDefinitionToPreviousVersion);
+                persistProcessDefinitionsAndAuthorizations(parsedDeployment);
+                updateTimersAndEvents(parsedDeployment, mapOfNewProcessDefinitionToPreviousVersion);
+                dispatchProcessDefinitionEntityInitializedEvent(parsedDeployment);
+            } else {
+                setDerivedProcessDefinitionVersionsAndIds(parsedDeployment, deploymentSettings);
+                persistProcessDefinitionsAndAuthorizations(parsedDeployment);
+                dispatchProcessDefinitionEntityInitializedEvent(parsedDeployment);
+            }
         } else {
             makeProcessDefinitionsConsistentWithPersistedVersions(parsedDeployment);
         }
@@ -183,6 +190,24 @@ public class BpmnDeployer implements Deployer {
 
             if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
                 commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition));
+            }
+        }
+    }
+
+    protected void setDerivedProcessDefinitionVersionsAndIds(ParsedDeployment parsedDeployment, Map<String, Object> deploymentSettings) {
+        for (ProcessDefinitionEntity processDefinition : parsedDeployment.getAllProcessDefinitions()) {
+            processDefinition.setVersion(0);
+            processDefinition.setId(idGenerator.getNextId());
+            processDefinition.setDerivedFrom((String) deploymentSettings.get(DeploymentSettings.DERIVED_PROCESS_DEFINITION_ID));
+            processDefinition.setDerivedFromRoot((String) deploymentSettings.get(DeploymentSettings.DERIVED_PROCESS_DEFINITION_ROOT_ID));
+
+            Process process = parsedDeployment.getProcessModelForProcessDefinition(processDefinition);
+            FlowElement initialElement = process.getInitialFlowElement();
+            if (initialElement instanceof StartEvent) {
+                StartEvent startEvent = (StartEvent) initialElement;
+                if (startEvent.getFormKey() != null) {
+                    processDefinition.setHasStartFormKey(true);
+                }
             }
         }
     }
