@@ -287,10 +287,9 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     @Override
     public List<IdentityLinkEntity> getIdentityLinks() {
         if (!isIdentityLinksInitialized) {
-            if(queryIdentityLinks == null) {
+            if (queryIdentityLinks == null) {
                 taskIdentityLinkEntities = Context.getCommandContext().getIdentityLinkEntityManager().findIdentityLinksByTaskId(id);
-            }
-            else {
+            } else {
                 taskIdentityLinkEntities = queryIdentityLinks;
             }
             isIdentityLinksInitialized = true;
@@ -657,7 +656,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     }
 
     public List<IdentityLinkEntity> getQueryIdentityLinks() {
-        if(queryIdentityLinks == null) {
+        if (queryIdentityLinks == null) {
             queryIdentityLinks = new LinkedList<>();
         }
         return queryIdentityLinks;

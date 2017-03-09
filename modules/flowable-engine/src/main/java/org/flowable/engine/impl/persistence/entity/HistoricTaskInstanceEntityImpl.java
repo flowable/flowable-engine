@@ -285,10 +285,9 @@ public class HistoricTaskInstanceEntityImpl extends HistoricScopeInstanceEntityI
     @Override
     public List<HistoricIdentityLinkEntity> getIdentityLinks() {
         if (!isIdentityLinksInitialized) {
-            if(queryIdentityLinks == null) {
+            if (queryIdentityLinks == null) {
                 identityLinks = Context.getCommandContext().getHistoricIdentityLinkEntityManager().findHistoricIdentityLinksByTaskId(id);
-            }
-            else {
+            } else {
                 identityLinks = queryIdentityLinks;
             }
             isIdentityLinksInitialized = true;
