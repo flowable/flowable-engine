@@ -524,6 +524,11 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     T limitTaskVariables(Integer taskVariablesLimit);
 
     /**
+     * Include identity links in the task query result
+     */
+    T includeIdentityLinks();
+
+    /**
      * Localize task name and description to specified locale.
      */
     T locale(String locale);
