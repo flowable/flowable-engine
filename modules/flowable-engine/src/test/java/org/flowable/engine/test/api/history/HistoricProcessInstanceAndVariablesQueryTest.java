@@ -28,11 +28,11 @@ import org.flowable.engine.task.Task;
  */
 public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestCase {
 
-    private static String PROCESS_DEFINITION_KEY = "oneTaskProcess";
-    private static String PROCESS_DEFINITION_KEY_2 = "oneTaskProcess2";
-    private static String PROCESS_DEFINITION_NAME_2 = "oneTaskProcess2Name";
-    private static String PROCESS_DEFINITION_CATEGORY_2 = "org.flowable.enginge.test.api.runtime.2Category";
-    private static String PROCESS_DEFINITION_KEY_3 = "oneTaskProcess3";
+    private static final String PROCESS_DEFINITION_KEY = "oneTaskProcess";
+    private static final String PROCESS_DEFINITION_KEY_2 = "oneTaskProcess2";
+    private static final String PROCESS_DEFINITION_NAME_2 = "oneTaskProcess2Name";
+    private static final String PROCESS_DEFINITION_CATEGORY_2 = "org.flowable.enginge.test.api.runtime.2Category";
+    private static final String PROCESS_DEFINITION_KEY_3 = "oneTaskProcess3";
 
     private List<String> processInstanceIds;
 

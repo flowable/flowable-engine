@@ -30,6 +30,7 @@ public interface StencilConstants {
     final String STENCIL_EVENT_END_TERMINATE = "EndTerminateEvent";
 
     final String STENCIL_SUB_PROCESS = "SubProcess";
+    final String STENCIL_COLLAPSED_SUB_PROCESS = "CollapsedSubProcess";
     final String STENCIL_EVENT_SUB_PROCESS = "EventSubProcess";
     final String STENCIL_ADHOC_SUB_PROCESS = "AdhocSubProcess";
     final String STENCIL_CALL_ACTIVITY = "CallActivity";

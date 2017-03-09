@@ -73,7 +73,7 @@ public class ModelServiceImpl implements ModelService {
 
     private final Logger log = LoggerFactory.getLogger(ModelServiceImpl.class);
 
-    public static final String NAMESPACE = "http://activiti.com/modeler";
+    public static final String NAMESPACE = "http://flowable.org/modeler";
 
     protected static final String PROCESS_NOT_FOUND_MESSAGE_KEY = "PROCESS.ERROR.NOT-FOUND";
 
@@ -318,7 +318,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public void deleteModel(String modelId, boolean cascadeHistory, boolean deleteRuntimeApp) {
+    public void deleteModel(String modelId) {
 
         Model model = modelRepository.get(modelId);
         if (model == null) {
@@ -328,36 +328,19 @@ public class ModelServiceImpl implements ModelService {
         // Fetch current model history list
         List<ModelHistory> history = modelHistoryRepository.findByModelId(model.getId());
 
-        // if the model is an app definition and the runtime app needs to be deleted, remove it now
-        if (deleteRuntimeApp && model.getModelType() == Model.MODEL_TYPE_APP) {
-            /*
-             * Long appDefinitionId = runtimeAppDefinitionService.getDefinitionIdForModelAndUser(model.getId(), SecurityUtils.getCurrentUserObject()); if (appDefinitionId != null) {
-             * deploymentService.deleteAppDefinition(appDefinitionId); }
-             */
+        // Move model to history and mark removed
+        ModelHistory historyModel = createNewModelhistory(model);
+        historyModel.setRemovalDate(Calendar.getInstance().getTime());
+        persistModelHistory(historyModel);
 
-        } else {
-            // Move model to history and mark removed
-            ModelHistory historyModel = createNewModelhistory(model);
-            historyModel.setRemovalDate(Calendar.getInstance().getTime());
-            persistModelHistory(historyModel);
-        }
-
-        if (cascadeHistory || history.size() == 0) {
-            deleteModelAndChildren(model);
-        } else {
-            // History available and no cascade was requested. Revive latest history entry
-            ModelHistory toRevive = history.remove(0);
-            populateModelBasedOnHistory(model, toRevive);
-            persistModel(model);
-            modelHistoryRepository.delete(toRevive);
-        }
+        deleteModelAndChildren(model);
     }
 
     protected void deleteModelAndChildren(Model model) {
 
         // Models have relations with each other, in all kind of wicked and funny ways.
         // Hence, we remove first all relations, comments, etc. while collecting all models.
-        // Then, once all foreign key problemmakers are removed, we remove the models
+        // Then, once all foreign key problem makers are removed, we remove the models
 
         List<Model> allModels = new ArrayList<Model>();
         internalDeleteModelAndChildren(model, allModels);

@@ -12,6 +12,9 @@
  */
 package org.flowable.ldap;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.InitialDirContext;
@@ -19,14 +22,16 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.NativeGroupQuery;
 import org.flowable.idm.api.NativeUserQuery;
+import org.flowable.idm.api.PrivilegeMapping;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 import org.flowable.idm.engine.impl.IdmIdentityServiceImpl;
+import org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl;
+import org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl;
 import org.flowable.ldap.impl.LDAPGroupQueryImpl;
 import org.flowable.ldap.impl.LDAPUserQueryImpl;
 import org.slf4j.Logger;
@@ -36,14 +41,10 @@ public class LDAPIdentityServiceImpl extends IdmIdentityServiceImpl {
 
     private static Logger logger = LoggerFactory.getLogger(LDAPIdentityServiceImpl.class);
 
-    protected ProcessEngineConfigurationImpl processEngineConfiguration;
-    protected LDAPConfigurator ldapConfigurator;
+    protected LDAPConfiguration ldapConfigurator;
     protected LDAPGroupCache ldapGroupCache;
 
-    public LDAPIdentityServiceImpl(ProcessEngineConfigurationImpl processEngineConfiguration,
-            LDAPConfigurator ldapConfigurator, LDAPGroupCache ldapGroupCache) {
-
-        this.processEngineConfiguration = processEngineConfiguration;
+    public LDAPIdentityServiceImpl(LDAPConfiguration ldapConfigurator, LDAPGroupCache ldapGroupCache) {
         this.ldapConfigurator = ldapConfigurator;
         this.ldapGroupCache = ldapGroupCache;
     }
@@ -61,6 +62,38 @@ public class LDAPIdentityServiceImpl extends IdmIdentityServiceImpl {
     @Override
     public boolean checkPassword(String userId, String password) {
         return executeCheckPassword(userId, password);
+    }
+    
+    @Override
+    public List<Group> getGroupsWithPrivilege(String name) {
+        List<Group> groups = new ArrayList<>();
+        List<PrivilegeMapping> privilegeMappings = getPrivilegeMappingsByPrivilegeId(name);
+        for (PrivilegeMapping privilegeMapping : privilegeMappings) {
+            if (privilegeMapping.getGroupId() != null) {
+                Group group = new GroupEntityImpl();
+                group.setId(privilegeMapping.getGroupId());
+                group.setName(privilegeMapping.getGroupId());
+                groups.add(group);
+            }
+        }
+        
+        return groups;
+    }
+
+    @Override
+    public List<User> getUsersWithPrivilege(String name) {
+        List<User> users = new ArrayList<>();
+        List<PrivilegeMapping> privilegeMappings = getPrivilegeMappingsByPrivilegeId(name);
+        for (PrivilegeMapping privilegeMapping : privilegeMappings) {
+            if (privilegeMapping.getUserId() != null) {
+                User user = new UserEntityImpl();
+                user.setId(privilegeMapping.getUserId());
+                user.setLastName(privilegeMapping.getUserId());
+                users.add(user);
+            }
+        }
+        
+        return users;
     }
 
     @Override

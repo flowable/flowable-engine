@@ -16,7 +16,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
-import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnElement;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.RuleInputClauseContainer;

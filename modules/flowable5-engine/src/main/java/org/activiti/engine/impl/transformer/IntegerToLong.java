@@ -19,9 +19,6 @@ package org.activiti.engine.impl.transformer;
  */
 public class IntegerToLong extends AbstractTransformer {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Object primTransform(Object anObject) throws Exception {
         return Long.valueOf((Integer) anObject);

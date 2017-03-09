@@ -78,6 +78,12 @@ We removed ActivityExecution and replaced it, where used, with the DelegateExecu
 
 All methods from the ActivityExecution class are copied to the DelegateExecution class.
 
+=== EngineServices removed
+
+We removed the getEngineServices method on DelegateExecution, because it had no real benefit and it made the usage of DelegateExecution in the Flowable 6 and the embedded Flowable 5 engine difficult.
+
+Replace all getEngineServices method calls with org.flowable.engine.impl.context.Context.getProcessEngineConfiguration method calls.
+
 === Job, timer, suspended and dead letter jobs
 
 Flowable v5 had only 1 job table and this meant that a fairly complex query had to be executed to get the jobs that needed to be executed from the database.

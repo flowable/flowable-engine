@@ -7,17 +7,17 @@
 
 === What is a form definition?
 
-For the BPMN Engine we adhere to the BPMN specification and for the DMN Engine we use the DMN specification. For start and task forms there's no Oasis specification that can be used. Therefore we have defined a JSON based form definition structure that we use as an output format for the Flowable Form Editor and is used to render start and task forms in the Flowable Task application.
+For the BPMN engine, we adhere to the BPMN specification and for the DMN engine we use the DMN specification. For start and task forms there's no Oasis specification that can be used. Therefore, we have defined a JSON-based form definition structure that we use as an output format for the Flowable Form Editor and is used to render start and task forms in the Flowable Task application.
 
 
 [[formDefining]]
 
 
-=== Defining a form definition
+=== Defining a form
 
-Create a new JSON file using your favourite text or JSON editor and give it a name. Make sure that the file *ends with .form*, since otherwise the Form engine won't pick up this file for deployment.
+Create a new JSON file using your favourite text or JSON editor and give it a name. Make sure that the file *ends with .form*, as otherwise the Form engine won't pick up the file for deployment.
 
-The form definition JSON starts with a _key_, _name_ and _description_. The _key_ property is used by the Form Engine to identify the form definition across the whole Form Engine. The versioning system is also based on the _key_ property being identical for form definitions that have the same origin. The second part is the array of fields that defines the form fields of the form definition. 
+The form definition JSON starts with a _key_, _name_ and _description_. The _key_ property is used by the Form engine to identify the form definition across the whole Form engine. The versioning system is also based on the _key_ property being identical for form definitions that have the same origin. The second part is the array of fields that defines the form fields of the form definition. Optionally, there's a third part that defines the form outcomes.
 
 [source,json,linenums]
 ----
@@ -32,11 +32,21 @@ The form definition JSON starts with a _key_, _name_ and _description_. The _key
             "required": false,
             "placeholder": "empty"
         }
+    ],
+    "outcomes": [
+        {
+            "id": "null",
+            "name": "Accept"
+        },
+        {
+            "id": "null",
+            "name": "Reject"
+        }
     ]
 }
 ----
 
-Each form field has an _id_, _name_ and _type_ property. The _id_ should be unique in the same form definition and is used as the variable name when a form is completed by a user. In this small example, an _input1_ process variable is created with the value of the textfield the user has filled-in.
+Each form field has an _id_, _name_ and _type_ property. The _id_ should be unique within the same form definition and is used as the variable name when a form is completed by a user. In this small example, an _input1_ process variable is created with the value of the text field the user has filled in.  The outcomes are also mapped to a variable based on the form's identifier, in the format of "+form_<form-identifier>_outcome"+.  For the example above, the selected outcome will be set for a variable named "+form_form1_outcome+".  In an expression, you can test if the outcome was 'Accept' using +${form_form1_outcome == "Accept"}+.
 
 The following form field types are supported:
 

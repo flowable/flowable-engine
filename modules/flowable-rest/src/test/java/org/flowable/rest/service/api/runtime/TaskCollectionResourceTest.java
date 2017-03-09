@@ -14,10 +14,13 @@
 package org.flowable.rest.service.api.runtime;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
@@ -29,6 +32,7 @@ import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Assert;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -148,6 +152,8 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             processTask.setPriority(50);
             processTask.setDueDate(processTaskCreate.getTime());
             taskService.saveTask(processTask);
+            runtimeService.setVariable(processInstance.getId(), "variable", "globaltest");
+            taskService.setVariableLocal(processTask.getId(), "localVariable", "localtest");
 
             // Check filter-less to fetch all tasks
             String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION);
@@ -323,6 +329,60 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             // Active filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?active=true";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
+            
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?includeTaskLocalVariables=true";
+            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+            // Check status and size
+            JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
+            closeResponse(response);
+            Assert.assertEquals(2, dataNode.size());
+            
+            Map<String, JsonNode> taskNodeMap = new HashMap<>();
+            for (JsonNode taskNode : dataNode) {
+                taskNodeMap.put(taskNode.get("id").asText(), taskNode);
+            }
+            
+            Assert.assertTrue(taskNodeMap.containsKey(processTask.getId()));
+            JsonNode processTaskNode = taskNodeMap.get(processTask.getId());
+            JsonNode variablesNode = processTaskNode.get("variables");
+            assertEquals(1, variablesNode.size());
+            JsonNode variableNode = variablesNode.get(0);
+            assertEquals("localVariable", variableNode.get("name").asText());
+            assertEquals("local", variableNode.get("scope").asText());
+            assertEquals("localtest", variableNode.get("value").asText());
+            
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?includeTaskLocalVariables=true&includeProcessVariables=true";
+            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+            // Check status and size
+            dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
+            closeResponse(response);
+            Assert.assertEquals(2, dataNode.size());
+            
+            taskNodeMap = new HashMap<>();
+            for (JsonNode taskNode : dataNode) {
+                taskNodeMap.put(taskNode.get("id").asText(), taskNode);
+            }
+            
+            Assert.assertTrue(taskNodeMap.containsKey(processTask.getId()));
+            processTaskNode = taskNodeMap.get(processTask.getId());
+            variablesNode = processTaskNode.get("variables");
+            assertEquals(2, variablesNode.size());
+            Map<String, JsonNode> variableMap = new HashMap<>();
+            for (JsonNode variableResponseNode : variablesNode) {
+                variableMap.put(variableResponseNode.get("name").asText(), variableResponseNode);
+            }
+            
+            variableNode = variableMap.get("localVariable");
+            assertEquals("localVariable", variableNode.get("name").asText());
+            assertEquals("local", variableNode.get("scope").asText());
+            assertEquals("localtest", variableNode.get("value").asText());
+            
+            variableNode = variableMap.get("variable");
+            assertEquals("variable", variableNode.get("name").asText());
+            assertEquals("global", variableNode.get("scope").asText());
+            assertEquals("globaltest", variableNode.get("value").asText());
 
         } finally {
             // Clean adhoc-tasks even if test fails

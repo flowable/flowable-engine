@@ -246,7 +246,7 @@ public class ActivitiRule implements TestRule {
     }
 
     protected void configureProcessEngine() {
-        /** meant to be overridden */
+        /* meant to be overridden */
     }
 
     protected void finished(Description description) {

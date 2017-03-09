@@ -131,11 +131,11 @@ public class JpaTest extends SpringFlowableTestCase {
  * 
  * Resource[] resources = resourcePatternResolver.getResources("classpath://
  */
-/**
- * .bpmn20.xml");
- * 
- * SpringProcessEngineConfiguration engine = new SpringProcessEngineConfiguration(); if (resources != null && resources.length > 0) { engine.setDeploymentResources(resources); }
- * engine.setDataSource(dataSource); engine.setTransactionManager(transactionManager);
+/*
+  .bpmn20.xml");
+
+  SpringProcessEngineConfiguration engine = new SpringProcessEngineConfiguration(); if (resources != null && resources.length > 0) { engine.setDeploymentResources(resources); }
+  engine.setDataSource(dataSource); engine.setTransactionManager(transactionManager);
  */
 /*
  * conf.setDeploymentName(defaultText( activitiProperties.getDeploymentName(), conf.getDeploymentName())); conf.setDatabaseSchema(defaultText( activitiProperties.getDatabaseSchema(),

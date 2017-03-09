@@ -100,7 +100,6 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
         if (bpmnModel.getArtifact(association.getSourceRef()) != null || bpmnModel.getArtifact(association.getTargetRef()) != null) {
 
             // connected to a text annotation so skipping it
-            return;
         }
 
         // ActivityImpl sourceActivity =

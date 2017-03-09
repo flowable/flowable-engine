@@ -41,7 +41,7 @@ angular.module('flowableModeler').controller('FlowableFormReferenceCtrl',
 }]);
 
 angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
-    [ '$rootScope', '$scope', '$http', '$location', function($rootScope, $scope, $http, $location) {
+    [ '$rootScope', '$scope', '$http', '$location', 'editorManager', function($rootScope, $scope, $http, $location, editorManager) {
 	 
 	$scope.state = {'loadingForms' : true, 'formError' : false};
 	
@@ -93,8 +93,8 @@ angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
             
             $scope.updatePropertyInModel($scope.property);
             
-            var modelMetaData = $scope.editor.getModelMetaData();
-            var json = $scope.editor.getJSON();
+            var modelMetaData = editorManager.getBaseModelData();
+            var json = editorManager.getModel();
             json = JSON.stringify(json);
 
             var params = {
@@ -123,20 +123,13 @@ angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
                 url: FLOWABLE.URL.putModel(modelMetaData.modelId)})
 
                 .success(function (data, status, headers, config) {
-                    $scope.editor.handleEvents({
+                    editorManager.handleEvents({
                         type: ORYX.CONFIG.EVENT_SAVED
                     });
 
                     var allSteps = EDITOR.UTIL.collectSortedElementsFromPrecedingElements($scope.selectedShape);
 
-                    $rootScope.editorHistory.push({
-                        id: modelMetaData.modelId, 
-                        name: modelMetaData.name,
-                        key: modelMetaData.key,
-                        stepId: $scope.selectedShape.resourceId,
-                        allSteps: allSteps,
-                        type: 'bpmnmodel'
-                    });
+					$rootScope.addHistoryItem($scope.selectedShape.resourceId);
                     $location.path('form-editor/' + $scope.selectedForm.id);
 
                 })
@@ -151,7 +144,7 @@ angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
     $scope.newForm = function() {
         $scope.popup.state = 'newForm';
         
-        var modelMetaData = $scope.editor.getModelMetaData();
+        var modelMetaData = editorManager.getBaseModelData();
         
         $scope.model = {
             loading: false,
@@ -185,8 +178,8 @@ angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
                	};
                 $scope.updatePropertyInModel($scope.property);
                 
-                var modelMetaData = $scope.editor.getModelMetaData();
-                var json = $scope.editor.getJSON();
+                var modelMetaData = editorManager.getBaseModelData();
+                var json = editorManager.getModel();
                 json = JSON.stringify(json);
 
                 var params = {
@@ -215,7 +208,7 @@ angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
                     url: FLOWABLE.URL.putModel(modelMetaData.modelId)})
 
                     .success(function (data, status, headers, config) {
-                        $scope.editor.handleEvents({
+                        editorManager.handleEvents({
                             type: ORYX.CONFIG.EVENT_SAVED
                         });
                         
@@ -224,14 +217,7 @@ angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
 
                         var allSteps = EDITOR.UTIL.collectSortedElementsFromPrecedingElements($scope.selectedShape);
 
-                        $rootScope.editorHistory.push({
-                            id: modelMetaData.modelId, 
-                            name: modelMetaData.name, 
-                            key: modelMetaData.key, 
-                            type: 'bpmnmodel',
-                            stepId: $scope.selectedShape.resourceId,
-                            allSteps: allSteps,
-                        });
+                        $rootScope.addHistoryItem($scope.selectedShape.resourceId);
                         $location.path('form-editor/' + newFormId);
 
                     })
@@ -252,7 +238,7 @@ angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
     };
 
     $scope.loadForms = function() {
-        var modelMetaData = $scope.editor.getModelMetaData();
+        var modelMetaData = editorManager.getBaseModelData();
         $http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/form-models')
             .success(
                 function(response) {

@@ -70,6 +70,7 @@ public interface JobQuery extends Query<JobQuery, Job> {
      * 
      * @deprecated
      */
+    @Deprecated
     JobQuery duedateLowerThen(Date date);
 
     /**
@@ -77,6 +78,7 @@ public interface JobQuery extends Query<JobQuery, Job> {
      * 
      * @deprecated
      */
+    @Deprecated
     JobQuery duedateLowerThenOrEquals(Date date);
 
     /**
@@ -84,6 +86,7 @@ public interface JobQuery extends Query<JobQuery, Job> {
      * 
      * @deprecated
      */
+    @Deprecated
     JobQuery duedateHigherThen(Date date);
 
     /**
@@ -91,6 +94,7 @@ public interface JobQuery extends Query<JobQuery, Job> {
      * 
      * @deprecated
      */
+    @Deprecated
     JobQuery duedateHigherThenOrEquals(Date date);
 
     /** Only select jobs that failed due to an exception. */

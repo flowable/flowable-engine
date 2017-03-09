@@ -10,6 +10,10 @@
    		<activiti:localization locale="es" name="Nombre del proceso">
     		<activiti:documentation>Descripción del proceso</activiti:documentation>
     	</activiti:localization>
+
+        <activiti:localization locale="it" name="Nome del processo">
+            <activiti:documentation>Descrizione del processo</activiti:documentation>
+        </activiti:localization>
     </extensionElements>
     	
     <startEvent id="theStart" />
@@ -20,6 +24,9 @@
     	<activiti:localization locale="es" name="Nombre Subproceso">
     		<activiti:documentation>Subproceso Descripción</activiti:documentation>
     	</activiti:localization>
+        <activiti:localization locale="it" name="Nome sottoprocesso">
+            <activiti:documentation>Sottoprocesso Descrizione</activiti:documentation>
+        </activiti:localization>
       </extensionElements>
     	
       <startEvent id="subStart" />

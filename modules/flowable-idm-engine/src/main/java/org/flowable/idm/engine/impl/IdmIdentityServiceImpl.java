@@ -22,6 +22,7 @@ import org.flowable.idm.api.NativeTokenQuery;
 import org.flowable.idm.api.NativeUserQuery;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.Privilege;
+import org.flowable.idm.api.PrivilegeMapping;
 import org.flowable.idm.api.PrivilegeQuery;
 import org.flowable.idm.api.Token;
 import org.flowable.idm.api.TokenQuery;
@@ -46,6 +47,7 @@ import org.flowable.idm.engine.impl.cmd.DeleteTokenCmd;
 import org.flowable.idm.engine.impl.cmd.DeleteUserCmd;
 import org.flowable.idm.engine.impl.cmd.DeleteUserInfoCmd;
 import org.flowable.idm.engine.impl.cmd.GetGroupsWithPrivilegeCmd;
+import org.flowable.idm.engine.impl.cmd.GetPrivilegeMappingsByPrivilegeIdCmd;
 import org.flowable.idm.engine.impl.cmd.GetUserInfoCmd;
 import org.flowable.idm.engine.impl.cmd.GetUserInfoKeysCmd;
 import org.flowable.idm.engine.impl.cmd.GetUserPictureCmd;
@@ -183,6 +185,11 @@ public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentitySe
     @Override
     public void deleteGroupPrivilegeMapping(String privilegeId, String groupId) {
         commandExecutor.execute(new DeletePrivilegeMappingCmd(privilegeId, null, groupId));
+    }
+
+    @Override
+    public List<PrivilegeMapping> getPrivilegeMappingsByPrivilegeId(String privilegeId) {
+        return commandExecutor.execute(new GetPrivilegeMappingsByPrivilegeIdCmd(privilegeId));
     }
 
     @Override

@@ -300,7 +300,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
 
             if (StringUtils.isNotEmpty(databaseSchema)) {
                 database.setDefaultSchemaName(databaseSchema);
-                database.setLiquibaseSchemaName(databaseSchema);
+                database.setLiquibaseSchemaName(databaseSchema);   
             }
 
             if (StringUtils.isNotEmpty(databaseCatalog)) {

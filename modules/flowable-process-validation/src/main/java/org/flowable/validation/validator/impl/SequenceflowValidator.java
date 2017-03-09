@@ -44,16 +44,16 @@ public class SequenceflowValidator extends ProcessLevelValidator {
                 addError(errors, Problems.SEQ_FLOW_INVALID_TARGET, process, sequenceFlow, "Invalid target for sequenceflow");
             }
 
-            // Implicit check: sequence flow cannot cross (sub) process
-            // boundaries, hence we check the parent and not the process
+            // Implicit check: sequence flow cannot cross (sub) process boundaries, hence we check the parent and not the process
             // (could be subprocess for example)
             FlowElement source = process.getFlowElement(sourceRef, true);
             FlowElement target = process.getFlowElement(targetRef, true);
-
+            
             // Src and target validation
             if (source == null) {
                 addError(errors, Problems.SEQ_FLOW_INVALID_SRC, process, sequenceFlow, "Invalid source for sequenceflow");
             }
+            
             if (target == null) {
                 addError(errors, Problems.SEQ_FLOW_INVALID_TARGET, process, sequenceFlow, "Invalid target for sequenceflow");
             }
@@ -61,13 +61,15 @@ public class SequenceflowValidator extends ProcessLevelValidator {
             if (source != null && target != null) {
                 FlowElementsContainer sourceContainer = process.getFlowElementsContainer(source.getId());
                 FlowElementsContainer targetContainer = process.getFlowElementsContainer(target.getId());
-
+                
                 if (sourceContainer == null) {
                     addError(errors, Problems.SEQ_FLOW_INVALID_SRC, process, sequenceFlow, "Invalid source for sequenceflow");
                 }
+                
                 if (targetContainer == null) {
                     addError(errors, Problems.SEQ_FLOW_INVALID_TARGET, process, sequenceFlow, "Invalid target for sequenceflow");
                 }
+                
                 if (sourceContainer != null && targetContainer != null && !sourceContainer.equals(targetContainer)) {
                     addError(errors, Problems.SEQ_FLOW_INVALID_TARGET, process, sequenceFlow, "Invalid target for sequenceflow, the target isn't defined in the same scope as the source");
                 }

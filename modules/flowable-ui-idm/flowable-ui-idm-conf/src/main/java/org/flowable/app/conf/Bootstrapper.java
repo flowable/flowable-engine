@@ -45,8 +45,16 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
     public void onApplicationEvent(ContextRefreshedEvent event) {
         if (event.getApplicationContext().getParent() == null) { // Using Spring MVC, there are multiple child contexts. We only care about the root
 
-            // First create the default IDM entities
-            createDefaultAdmin();
+            if (!env.getProperty("ldap.enabled", Boolean.class, false)) {
+                // First create the default IDM entities
+                createDefaultAdmin();
+            
+            } else {
+                if (identityService.createPrivilegeQuery().count() == 0) {
+                    String adminEmail = env.getRequiredProperty("admin.email");
+                    initializeDefaultPrivileges(adminEmail);
+                }
+            }
         }
     }
 

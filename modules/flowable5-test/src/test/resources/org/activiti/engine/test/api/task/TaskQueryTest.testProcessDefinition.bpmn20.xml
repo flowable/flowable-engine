@@ -15,6 +15,9 @@
     	  <activiti:localization locale="es" name="Mi Tarea">
     		<activiti:documentation>Mi Tarea Descripción</activiti:documentation>
     	  </activiti:localization>
+    	  <activiti:localization locale="it" name="Il mio compito">
+			<activiti:documentation>Il mio compito Descrizione</activiti:documentation>
+		  </activiti:localization>
     	</extensionElements>
     </userTask>    
     <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />

@@ -15,7 +15,6 @@ package org.flowable.cdi.impl;
 import org.flowable.cdi.impl.context.ExecutionContextHolder;
 import org.flowable.engine.impl.agenda.AbstractOperation;
 import org.flowable.engine.impl.interceptor.CommandInvoker;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
  * A customized version of the default {@link CommandInvoker} for use with CDI.
@@ -33,7 +32,7 @@ public class CdiCommandInvoker extends CommandInvoker {
         if (runnable instanceof AbstractOperation) {
             AbstractOperation operation = (AbstractOperation) runnable;
             if (operation.getExecution() != null) {
-                ExecutionContextHolder.setExecutionContext((ExecutionEntity) operation.getExecution());
+                ExecutionContextHolder.setExecutionContext(operation.getExecution());
                 executionContextSet = true;
             }
         }

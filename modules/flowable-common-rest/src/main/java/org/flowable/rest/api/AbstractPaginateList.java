@@ -26,18 +26,16 @@ import org.flowable.engine.common.api.query.QueryProperty;
 public abstract class AbstractPaginateList {
 
     /**
-     * Uses the pagination parameters form the request and makes sure to order the result and set all pagination attributes for the response to render
+     * Uses the pagination parameters form the request and makes sure to order the result and set all pagination attributes for the response to render.
      *
      * @param requestParams
      *            The request containing the pagination parameters
+     * @param paginateRequest
      * @param query
      *            The query to get the paged list from
      * @param defaultSort
      *            The default sort column (the rest attribute) that later will be mapped to an internal engine name
-     * @param listName
-     *            The name model attribute name to use for the result list
-     * @param model
-     *            The model to put the list and the pagination attributes in
+     * @param properties
      */
     @SuppressWarnings("rawtypes")
     public DataResponse paginateList(Map<String, String> requestParams, PaginateRequest paginateRequest, Object query, String defaultSort, Map properties) {
@@ -126,7 +124,7 @@ public abstract class AbstractPaginateList {
     }
 
     /**
-     * Uses the pagination parameters from the request and makes sure to order the result and set all pagination attributes for the response to render
+     * Uses the pagination parameters from the request and makes sure to order the result and set all pagination attributes for the response to render.
      *
      * @param requestParams
      *            The request containing the pagination parameters
@@ -134,10 +132,8 @@ public abstract class AbstractPaginateList {
      *            The query to get the paged list from
      * @param defaultSort
      *            The default sort column (the rest attribute) that later will be mapped to an internal engine name
-     * @param listName
-     *            The name model attribute name to use for the result list
-     * @param model
-     *            The model to put the list and the pagination attributes in
+     * @param properties
+     *
      */
     @SuppressWarnings("rawtypes")
     public DataResponse paginateList(Map<String, String> requestParams, Object query, String defaultSort, Map properties) {

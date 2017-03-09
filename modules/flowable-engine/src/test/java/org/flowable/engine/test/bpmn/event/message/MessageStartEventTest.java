@@ -130,6 +130,22 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
 
     }
+    
+    @Deployment
+    public void testBusinessKeySet() {
+        ProcessInstance pi1 = runtimeService.startProcessInstanceByKey("start-by-message-1", "business-key-123");
+        assertEquals("business-key-123", runtimeService.createProcessInstanceQuery()
+                .processInstanceId(pi1.getProcessInstanceId())
+                .singleResult()
+                .getBusinessKey());
+
+        ProcessInstance pi2 = runtimeService.startProcessInstanceByMessage("start-by-message", "business-key-456");
+        // This step fails as the businessKey is null
+        assertEquals("business-key-456", runtimeService.createProcessInstanceQuery()
+                .processInstanceId(pi2.getProcessInstanceId())
+                .singleResult()
+                .getBusinessKey());
+    }
 
     @Deployment
     public void testMessageStartEventAndNoneStartEvent() {

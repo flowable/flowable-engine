@@ -846,7 +846,7 @@ Following settings are possible:
 
 * *enableClassWhiteListing*: When true, all classes will be blacklisted and all classes that want to be used will need to be whitelisted individually. This gives tight control over what is exposed to scripts. By default _false_.
 * *whiteListedClasses*: a Set of Strings corresponding with fully qualified classnames of the classes that are allowed to be used in the script. For example, to expose the _execution_ object in a script, the _org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl_ String needs to be added to this Set. By default _empty_.
-* *maxStackDepth*: Limits the stack depth while calling functions within a script. This can be used to avoid stackoverflow exceptions that occur when recursively calling a method defined in the script. By default _-1_ (disabled).
+* *maxStackDepth*: Limits the stack depth while calling functions within a script. This can be used to avoid stack overflow exceptions that occur when recursively calling a method defined in the script. By default _-1_ (disabled).
 * *maxScriptExecutionTime*: The maximum time a script is allowed to run. By default _-1_ (disabled).
 * *maxMemoryUsed*: The maximum memory, in bytes, that the script is allowed to use. Note that the script engine itself takes a a certain amount of memory that is counted here too. By default _-1_ (disabled).
 * *nrOfInstructionsBeforeStateCheckCallback*: The maximum script execution time and memory usage is implemented using a callback that is called every x instructions of the script. Note that these are not script instructions, but java byte code instructions (which means one script line could be hundreds of byte code instructions). By default 100.

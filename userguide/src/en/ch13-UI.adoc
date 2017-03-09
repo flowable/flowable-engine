@@ -4,12 +4,12 @@
 
 Flowable provides several web applications to demonstrate and leverage the functionality provided by the Flowable project:
 
-* Flowable IDM: an IDentity Management application that provides single sign-on authentication functionality for all the Flowable UI applicatons, and, for users with the IDM administrative privilege, it also provides functionality to manage users, groups and privileges.
+* Flowable IDM: an IDentity Management application that provides single sign-on authentication functionality for all the Flowable UI applications, and, for users with the IDM administrative privilege, it also provides functionality to manage users, groups and privileges.
 * Flowable Modeler: an application that allows users with modeler privileges to model processes, forms, decision tables and application definitions.
 * Flowable Task: a runtime task application that provides functionality to start process instances, edit task forms, complete tasks and query on tasks and process instances.
 * Flowable Admin: an administrative application that allows users with admin privilege to query the BPMN, DMN, form and content engines and provides several options to change process instances, tasks, jobs and so on. The admin application connects to the engines through the REST API that is deployed together with the Flowable Task app and the Flowable REST app.
 
-The Flowable IDM is required for all other apps to enable authenticatation. The WAR files for each app can be deployed to the same servlet container (such as Apache Tomcat), but can also be deployed on different servlet containers. Because the same cookie is used for authentication with each app, the apps need to run on the same domain.
+The Flowable IDM is required for all other apps to enable authentication. The WAR files for each app can be deployed to the same servlet container (such as Apache Tomcat), but can also be deployed on different servlet containers. Because the same cookie is used for authentication with each app, the apps need to run on the same domain.
 
 
 [[uiAppInstallation]]
@@ -87,7 +87,7 @@ The additional configuration options are described in the table below:
 |admin.password|Password of the default administrator user for the Flowable IDM application. Default is test.
 |admin.firstname|Firstname of the default administrator user for the Flowable IDM application. Default is Test.
 |admin.lastname|Lastname of the default administrator user for the Flowable IDM application. Default is Administrator.
-|file.upload.max.size|Maxmimum size of file uploads, such as attachments and model files
+|file.upload.max.size|Maximum size of file uploads, such as attachments and model files
 |contentstorage.fs.rootFolder|Root folder location where content files will be stored, for example, task attachments or form file uploads
 |contentstorage.fs.createRoot|If the root folder doesn't exist, should the Flowable Task application create it?
 |idm.app.url|The URL to the IDM application, used for the login redirect when the cookie isn't set or is invalid, and for the user info and token info REST GET calls.
@@ -97,7 +97,8 @@ The additional configuration options are described in the table below:
 
 |===============
 
-In addition to these properties that are used by multiple Flowable web applications, the Flowable admin application has a few more properties. The full content of the properties file can be viewed on link:$$https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ui-admin/src/main/resources/META-INF/flowable-ui-app/flowable-ui-app.properties$$[Github]. The additional properties are mainly used for defining the initial values for the REST endpoints for the different engines. The Admin application uses the initial values to make a connection to the Flowable engines, but the values can be overriden in the Admin application configuration view and these values are stored in the __ACT\_ADM\_SERVER\_CONFIG__ table. An example of the BPMN Engine REST properties is shown below:
+In addition to these properties that are used by multiple Flowable web applications, the Flowable admin application has a few more properties. The full
+content of the properties file can be viewed on link:$$https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ui-admin/src/main/resources/META-INF/flowable-ui-app/flowable-ui-app.properties$$[Github]. The additional properties are mainly used for defining the initial values for the REST endpoints for the different engines. The Admin application uses the initial values to make a connection to the Flowable engines, but the values can be overridden in the Admin application configuration view and these values are stored in the __ACT\_ADM\_SERVER\_CONFIG__ table. An example of the BPMN Engine REST properties is shown below:
 
 [source,linenums]
 ----
@@ -136,8 +137,40 @@ In this screen users can be added, removed and updated. The groups section can b
 
 image::images/flowable_idm_privilege_screen.png[align="center"]
 
-There's no option to define new privileges yet, but you can add and remove users and groups from the existing four privileges.
+There's no option to define new privileges yet, but you can add and remove users and groups for the existing four privileges.
 
+In addition to the default identity tables, the IDM application can also be configured to use a LDAP server. To connect to a LDAP server, additional properties in the flowable-ui-app.properties file are needed:
+
+[source,linenums]
+----
+#
+# LDAP
+#
+ldap.enabled=true
+ldap.server=ldap://localhost
+ldap.port=10389
+ldap.user=uid=admin, ou=system
+ldap.password=secret
+ldap.basedn=o=flowable
+ldap.query.userbyid=(&(objectClass=inetOrgPerson)(uid={0}))
+ldap.query.userbyname=(&(objectClass=inetOrgPerson)(|({0}=*{1}*)({2}=*{3}*)))
+ldap.query.userall=(objectClass=inetOrgPerson)
+ldap.query.groupsforuser=(&(objectClass=groupOfUniqueNames)(uniqueMember={0}))
+ldap.query.groupall=(objectClass=groupOfUniqueNames)
+ldap.attribute.userid=uid
+ldap.attribute.firstname=cn
+ldap.attribute.lastname=sn
+ldap.attribute.groupid=cn
+ldap.attribute.groupname=cn
+ldap.cache.groupsize=10000
+ldap.cache.groupexpiration=180000
+----
+
+When the ldap.enabled property is set to true, the IDM app will expect the other LDAP properties to have been filled-in. In this example configuration the server configuration + LDAP queries for the Apache Directory Server are provided. For other LDAP servers, like Active Directory, other configuration values are needed.
+
+When LDAP is configured, authentication and group retrieval for a user will be done through the LDAP server. Only privileges will still be retrieved from the Flowable identity tables. So make sure each LDAP user has the correct privileges defined in the IDM application.
+
+If the IDM application is booted with LDAP configuration the bootstrap logic will check if there are already privileges present in the Flowable identity tables. If there are no privileges (only when booting the first time), the 4 default privileges will be created and the admin.email property value (from flowable-ui-app.properties) will be used as the user id to get all 4 privileges. So make sure that the admin.email property value is set to a valid LDAP user, otherwise nobody will be able to login to any of the Flowable UI apps.
 
 [[flowableModelerApp]]
 
@@ -159,8 +192,8 @@ The BPMN editor is divided into 4 parts:
 
 * Palette: the palette of BPMN elements available to design a process model
 * Toolbar: actions to change the model canvas, such as zooming, layout and saving a model
-* Model canvas: the modeling canvas on which to drag and drop BPMN elements and design the proces model
-* Properties panel: the properties for the main proces model if no element is select and otherwise the properties of the selected BPMN element
+* Model canvas: the modeling canvas on which to drag and drop BPMN elements and design the process model
+* Properties panel: the properties for the main process model if no element is select and otherwise the properties of the selected BPMN element
 
 For a User task element there's a _Referenced form_ property in the properties panel. If you select this property, a popup is opened where you can select a form definition from the repository or create a new form. When creating a new form, a similar create dialog to the process model create dialog is presented. After filling in the name and form model key, the form editor is opened.
 
@@ -211,7 +244,7 @@ The full BPMN process model now looks like this:
 
 image::images/flowable_modeler_vacationrequest_screen.png[align="center"]
 
-With the process model completed, we can now create an app definition that combines one or more process models with all their associated models (for example, decision tables and form definitions) into a single artefact. An app definition can be exported as a BAR file (zip format) that can be deployed on the Flowable engine. When creating a vacation request app definition, the app editor will look something like the screen below.
+With the process model completed, we can now create an app definition that combines one or more process models with all their associated models (for example, decision tables and form definitions) into a single artifact. An app definition can be exported as a BAR file (zip format) that can be deployed on the Flowable engine. When creating a vacation request app definition, the app editor will look something like the screen below.
 
 image::images/flowable_modeler_appeditor_screen.png[align="center"]
 
@@ -223,7 +256,8 @@ A process model can be selected by clicking on the model thumbnail. When one or 
 
 image::images/flowable_modeler_appdetails_screen.png[align="center"]
 
-From this view, you can download the app definition in two different formats. The first download button (with the arrow pointing downwards) can be used to download the app definition with the JSON model files for each included model. This makes it easy to share app definitions between different Flowable Modeler applications. The second download button (with the arrow point to upper right) will provide a BAR file of the app definition models, which can be deployed on the Flowable engine. In the BAR file, only the deployable artefacts are included, such as the BPMN 2.0 XML file and the DMN XML file, and not the JSON model files. All files in a BAR file deployed on a Flowable engine are stored in the database, so therefore only the deployable files are included. 
+From this view, you can download the app definition in two different formats. The first download button (with the arrow pointing downwards) can be used to
+download the app definition with the JSON model files for each included model. This makes it easy to share app definitions between different Flowable Modeler applications. The second download button (with the arrow point to upper right) will provide a BAR file of the app definition models, which can be deployed on the Flowable engine. In the BAR file, only the deployable artifacts are included, such as the BPMN 2.0 XML file and the DMN XML file, and not the JSON model files. All files in a BAR file deployed on a Flowable engine are stored in the database, so therefore only the deployable files are included.
 
 From the app definition details view, you can also _Publish_ the app definition directly to the Flowable engine. The Flowable Modeler uses the URL defined in the flowable-ui-app.properties file with the _deployment.api.url_ property key. By default, the deployment URL is configured so the app definition will be deployed on the Flowable Task application when it's running. However, this can be changed to use the Flowable REST application, for example. Make sure the Flowable Task application is running and click on the _Publish_ button. The app definition is now deployed as a BAR file to the Flowable Task application.
 
@@ -252,7 +286,8 @@ When navigating to the task list, you can also see the _Provide vacation informa
 
 image::images/flowable_task_taskdetails_screen.png[align="center"]
 
-Let's fill in the form and complete the task. First, select a start date and end date that have more than 10 days inbetween, so we can validate that a _Manager approval_ task is being generated. After filling in the vacation info form and clicking the _Complete_ button, the Flowable task app navigates directly to the _Manager approval_ task view. When you also complete this task (without a task form), the process instance is completed. 
+Let's fill in the form and complete the task. First, select a start date and end date that have more than 10 days in between, so we can validate that a
+_Manager approval_ task is being generated. After filling in the vacation info form and clicking the _Complete_ button, the Flowable task app navigates directly to the _Manager approval_ task view. When you also complete this task (without a task form), the process instance is completed.
 
 When navigating to the _Processes_ tab and clicking on the _Showing running processes_ section, you can select an option to show completed process instances. The list of completed process instances is now shown and when clicking on the just completed vacation request process you can see the two completed tasks.
 

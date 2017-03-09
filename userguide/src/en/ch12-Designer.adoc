@@ -60,7 +60,7 @@ image::images/designer.project.maven.png[align="center", width="500"]
 
 === Flowable Designer BPMN features
 
-*  Support for start none event, start error event, timer start event, end none event, end error event, sequence flow,  parallel gateway, exclusive gateway, inclusive gateway, event gateway, embedded subprocess, event sub process, call activity, pool, lane,  script task, user task, service task, mail task, manual task, business rule task, receive task, timer boundary event, error boundary event, signal boundary event, timer catching event, signal catching event, signal throwing event, none throwing event and four Flowable specific elements (user, script, mail tasks and start event).
+*  Support for start none event, start error event, timer start event, end none event, end error event, sequence flow,  parallel gateway, exclusive gateway, inclusive gateway, event gateway, embedded sub process, event sub process, call activity, pool, lane,  script task, user task, service task, mail task, manual task, business rule task, receive task, timer boundary event, error boundary event, signal boundary event, timer catching event, signal catching event, signal throwing event, none throwing event and four Flowable specific elements (user, script, mail tasks and start event).
 
 image::images/designer.model.process.png[align="center"]
 

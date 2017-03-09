@@ -11,9 +11,14 @@
     
         <extensionElements>
             <activiti:localization locale="es" name="stringVar 'es' Name">
-            <activiti:documentation>stringVar 'es' Description</activiti:documentation>
+                <activiti:documentation>stringVar 'es' Description</activiti:documentation>
             </activiti:localization>
-        </extensionElements>    
+
+            <activiti:localization locale="it" name="stringVar 'it' Name">
+                <activiti:documentation>stringVar 'it' Description</activiti:documentation>
+            </activiti:localization>
+        </extensionElements>
+
     </dataObject>
   
     <startEvent id="theStart" />
@@ -26,9 +31,13 @@
       
           <extensionElements>
               <activiti:localization locale="es" name="intVar 'es' Name">
-              <activiti:documentation>intVar 'es' Description</activiti:documentation>
+                <activiti:documentation>intVar 'es' Description</activiti:documentation>
               </activiti:localization>
-          </extensionElements>    
+
+              <activiti:localization locale="it" name="intVar 'it' Name">
+                  <activiti:documentation>intVar 'it' Description</activiti:documentation>
+              </activiti:localization>
+          </extensionElements>
       </dataObject>
           
       <startEvent id="subStart" />

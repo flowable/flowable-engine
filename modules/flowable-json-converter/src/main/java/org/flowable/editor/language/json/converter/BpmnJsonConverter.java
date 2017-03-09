@@ -77,7 +77,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
     protected static Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap = new HashMap<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>>();
     protected static Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap = new HashMap<String, Class<? extends BaseBpmnJsonConverter>>();
 
-    public static final String MODELER_NAMESPACE = "http://activiti.com/modeler";
+    public static final String MODELER_NAMESPACE = "http://flowable.org/modeler";
     protected static final DateFormat defaultFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     protected static final DateFormat entFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 
@@ -163,6 +163,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
         DI_RECTANGLES.add(STENCIL_CALL_ACTIVITY);
         DI_RECTANGLES.add(STENCIL_SUB_PROCESS);
+        DI_RECTANGLES.add(STENCIL_COLLAPSED_SUB_PROCESS);
         DI_RECTANGLES.add(STENCIL_EVENT_SUB_PROCESS);
         DI_RECTANGLES.add(STENCIL_ADHOC_SUB_PROCESS);
         DI_RECTANGLES.add(STENCIL_TASK_BUSINESS_RULE);
@@ -590,14 +591,30 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                         }
                     }
                 }
+                
+                List<SubProcess> collapsedSubProcess = new ArrayList<>();
+                for (SubProcess subProcess : subShapesMap.values()) {
+                    // determine if its a collapsed subprocess
+                    GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(subProcess.getId());
+                    if (graphicInfo != null && Boolean.FALSE.equals(graphicInfo.getExpanded())){
+                        collapsedSubProcess.add(subProcess);
+                    }
+                }
+                
                 for (String flowId : removeSubFlowsList) {
                     process.removeFlowElement(flowId);
+                    
+                    // check if the sequenceflow to remove is not assigned to a collapsed subprocess.
+                    for (SubProcess subProcess : collapsedSubProcess) {
+                        subProcess.removeFlowElement(flowId);
+                    }
                 }
             }
         }
 
         Map<String, FlowWithContainer> allFlowMap = new HashMap<String, FlowWithContainer>();
         List<Gateway> gatewayWithOrderList = new ArrayList<Gateway>();
+        
         // post handling of process elements
         for (Process process : bpmnModel.getProcesses()) {
             postProcessElements(process, process.getFlowElements(), edgeMap, bpmnModel, allFlowMap, gatewayWithOrderList);
@@ -663,7 +680,9 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
             Map<String, FlowWithContainer> allFlowMap, List<Gateway> gatewayWithOrderList) {
 
         for (FlowElement flowElement : flowElementList) {
-
+            
+            parentContainer.addFlowElementToMap(flowElement);
+            
             if (flowElement instanceof Event) {
                 Event event = (Event) flowElement;
                 if (CollectionUtils.isNotEmpty(event.getEventDefinitions())) {
@@ -772,10 +791,10 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
                     JsonNode boundsNode = jsonChildNode.get(EDITOR_BOUNDS);
                     ObjectNode upperLeftNode = (ObjectNode) boundsNode.get(EDITOR_BOUNDS_UPPER_LEFT);
+                    ObjectNode lowerRightNode = (ObjectNode) boundsNode.get(EDITOR_BOUNDS_LOWER_RIGHT);
+                    
                     graphicInfo.setX(upperLeftNode.get(EDITOR_BOUNDS_X).asDouble() + parentX);
                     graphicInfo.setY(upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble() + parentY);
-
-                    ObjectNode lowerRightNode = (ObjectNode) boundsNode.get(EDITOR_BOUNDS_LOWER_RIGHT);
                     graphicInfo.setWidth(lowerRightNode.get(EDITOR_BOUNDS_X).asDouble() - graphicInfo.getX() + parentX);
                     graphicInfo.setHeight(lowerRightNode.get(EDITOR_BOUNDS_Y).asDouble() - graphicInfo.getY() + parentY);
 
@@ -794,7 +813,13 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                         }
                     }
 
-                    readShapeDI(jsonChildNode, graphicInfo.getX(), graphicInfo.getY(), shapeMap, sourceRefMap, bpmnModel);
+                    //The graphic info of the collapsed subprocess is relative to its parent.
+                    //But the children of the collapsed subprocess are relative to the canvas upper corner. (always 0,0)
+                    if (STENCIL_COLLAPSED_SUB_PROCESS.equals(stencilId)) {
+                        readShapeDI(jsonChildNode, 0,0, shapeMap, sourceRefMap, bpmnModel);
+                    } else {
+                        readShapeDI(jsonChildNode, graphicInfo.getX(), graphicInfo.getY(), shapeMap, sourceRefMap, bpmnModel);
+                    }
                 }
             }
         }
@@ -807,7 +832,9 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
                 ObjectNode childNode = (ObjectNode) jsonChildNode;
                 String stencilId = BpmnJsonConverterUtil.getStencilId(childNode);
-                if (STENCIL_SUB_PROCESS.equals(stencilId) || STENCIL_POOL.equals(stencilId) || STENCIL_LANE.equals(stencilId)) {
+                if (STENCIL_SUB_PROCESS.equals(stencilId) || STENCIL_POOL.equals(stencilId) || STENCIL_LANE.equals(stencilId) || 
+                        STENCIL_COLLAPSED_SUB_PROCESS.equals(stencilId) || STENCIL_EVENT_SUB_PROCESS.equals(stencilId)) {
+                    
                     filterAllEdges(childNode, edgeMap, sourceAndTargetMap, shapeMap, sourceRefMap);
 
                 } else if (STENCIL_SEQUENCE_FLOW.equals(stencilId) || STENCIL_ASSOCIATION.equals(stencilId)) {

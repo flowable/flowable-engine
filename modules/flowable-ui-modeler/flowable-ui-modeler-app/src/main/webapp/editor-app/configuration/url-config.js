@@ -24,5 +24,9 @@ FLOWABLE.URL = {
 
     putModel: function(modelId) {
         return FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/editor/json';
+    },
+    
+    validateModel: function(){
+		return FLOWABLE.CONFIG.contextRoot + '/app/rest/model/validate';
     }
 };

@@ -168,7 +168,7 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
         LOGGER.debug("Scanning bundle {} for flowable process", bundle.getSymbolicName());
         try {
             List<URL> pathList = new ArrayList<URL>();
-            String flowableHeader = (String) bundle.getHeaders().get(BUNDLE_FLOWABLE_HEADER);
+            String flowableHeader = bundle.getHeaders().get(BUNDLE_FLOWABLE_HEADER);
             if (flowableHeader == null) {
                 flowableHeader = "OSGI-INF/flowable/";
             }
@@ -253,7 +253,7 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
     }
 
     private boolean hasWildcards(String path) {
-        return path.indexOf("*") >= 0;
+        return path.indexOf('*') >= 0;
     }
 
     private String getFilePart(URL url) {

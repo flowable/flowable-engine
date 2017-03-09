@@ -34,6 +34,8 @@ public class BpmnShapeParser implements BpmnXMLConstants {
         String strIsExpanded = xtr.getAttributeValue(null, ATTRIBUTE_DI_IS_EXPANDED);
         if ("true".equalsIgnoreCase(strIsExpanded)) {
             graphicInfo.setExpanded(true);
+        } else if ("false".equalsIgnoreCase(strIsExpanded)) {
+            graphicInfo.setExpanded(false);
         }
 
         BpmnXMLUtil.addXMLLocation(graphicInfo, xtr);

@@ -14,7 +14,8 @@
 'use strict';
 
 angular.module('flowableModeler')
-    .controller('ToolbarController', ['$scope', '$http', '$modal', '$q', '$rootScope', '$translate', '$location', function ($scope, $http, $modal, $q, $rootScope, $translate, $location) {
+    .controller('ToolbarController', ['$scope', '$http', '$modal', '$q', '$rootScope', '$translate', '$location', 'editorManager',
+    		function ($scope, $http, $modal, $q, $rootScope, $translate, $location, editorManager) {
 
     	$scope.editorFactory.promise.then(function () {
 	        var toolbarItems = FLOWABLE.TOOLBAR_CONFIG.items;
@@ -54,7 +55,7 @@ angular.module('flowableModeler')
 
             // Default behaviour
             var buttonClicked = $scope.items[buttonIndex];
-            var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate};
+            var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate, 'editorManager' : editorManager};
             executeFunctionByName(buttonClicked.action, window, services);
 
             // Other events
@@ -68,37 +69,37 @@ angular.module('flowableModeler')
         // Click handler for secondary toolbar buttons
         $scope.toolbarSecondaryButtonClicked = function(buttonIndex) {
             var buttonClicked = $scope.secondaryItems[buttonIndex];
-            var services = { '$scope' : $scope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate, '$location': $location};
+            var services = { '$scope' : $scope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate, '$location': $location, 'editorManager' : editorManager};
             executeFunctionByName(buttonClicked.action, window, services);
         };
         
         /* Key bindings */
-        Mousetrap.bind(['command+z', 'ctrl+z'], function(e) {
-        	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate};
+        Mousetrap.bind('mod+z', function(e) {
+        	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate, 'editorManager' : editorManager};
         	FLOWABLE.TOOLBAR.ACTIONS.undo(services);
             return false;
         });
         
-        Mousetrap.bind(['command+y', 'ctrl+y'], function(e) {
-        	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate};
+        Mousetrap.bind('mod+y', function(e) {
+        	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate, 'editorManager' : editorManager};
         	FLOWABLE.TOOLBAR.ACTIONS.redo(services);
             return false;
         });
         
-        Mousetrap.bind(['command+c', 'ctrl+c'], function(e) {
-        	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate};
+        Mousetrap.bind('mod+c', function(e) {
+        	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate, 'editorManager' : editorManager};
         	FLOWABLE.TOOLBAR.ACTIONS.copy(services);
             return false;
         });
         
-        Mousetrap.bind(['command+v', 'ctrl+v'], function(e) {
-        	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate};
+        Mousetrap.bind('mod+v', function(e) {
+        	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate, 'editorManager' : editorManager};
         	FLOWABLE.TOOLBAR.ACTIONS.paste(services);
             return false;
         });
         
         Mousetrap.bind(['del'], function(e) {
-        	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate};
+        	var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate, 'editorManager' : editorManager};
         	FLOWABLE.TOOLBAR.ACTIONS.deleteItem(services);
             return false;
         });
@@ -107,11 +108,25 @@ angular.module('flowableModeler')
 
         $scope.undoStack = [];
         $scope.redoStack = [];
+        
+        FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_UNDO_REDO_RESET,function($scope){
+			this.undoStack = [];
+			this.redoStack = [];
+			if (this.items) {
+				for(var i = 0; i < this.items.length; i++) {
+					var item = this.items[i];
+					if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.undo' || item.action === "FLOWABLE.TOOLBAR.ACTIONS.redo"){
+						item.enabled = false;
+					}
+				}
+			}
+			
+		},$scope);
 
         $scope.editorFactory.promise.then(function() {
 
             // Catch all command that are executed and store them on the respective stacks
-            $scope.editor.registerOnEvent(ORYX.CONFIG.EVENT_EXECUTE_COMMANDS, function( evt ){
+            editorManager.registerOnEvent(ORYX.CONFIG.EVENT_EXECUTE_COMMANDS, function( evt ){
 
                 // If the event has commands
                 if( !evt.commands ){ return; }
@@ -133,8 +148,8 @@ angular.module('flowableModeler')
         		}
 
                 // Update
-                $scope.editor.getCanvas().update();
-                $scope.editor.updateSelection();
+                editorManager.getCanvas().update();
+                editorManager.updateSelection();
 
             });
 
@@ -142,24 +157,22 @@ angular.module('flowableModeler')
         
         // Handle enable/disable toolbar buttons 
         $scope.editorFactory.promise.then(function() {
-        	$scope.editor.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, function( evt ){
+        	editorManager.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, function( evt ){
         		var elements = evt.elements;
         		
-        		for(var i = 0; i < $scope.items.length; i++) 
-        		{
+        		for(var i = 0; i < $scope.items.length; i++)  {
                     var item = $scope.items[i];
-                    if (item.enabledAction && item.enabledAction === 'element')
-                    {
+                    if (item.enabledAction && item.enabledAction === 'element') {
                     	var minLength = 1;
-                    	if(item.minSelectionCount) {
+                    	if (item.minSelectionCount) {
                     		minLength = item.minSelectionCount;
                     	}
+                    	
                     	if (elements.length >= minLength && !item.enabled) {
                     		$scope.safeApply(function () {
                     			item.enabled = true;
                             });
-                    	}
-                    	else if (elements.length == 0 && item.enabled) {
+                    	} else if (elements.length == 0 && item.enabled) {
                     		$scope.safeApply(function () {
                     			item.enabled = false;
                             });

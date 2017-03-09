@@ -14,17 +14,23 @@ package org.flowable.app.conf;
 
 import javax.sql.DataSource;
 
+import org.flowable.engine.common.impl.util.DefaultClockImpl;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
+import org.flowable.ldap.LDAPConfiguration;
+import org.flowable.ldap.LDAPGroupCache;
+import org.flowable.ldap.LDAPGroupCache.LDAPGroupCacheListener;
+import org.flowable.ldap.LDAPIdentityServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.env.Environment;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
@@ -35,10 +41,16 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class FlowableIdmEngineConfiguration {
 
     @Autowired
-    private DataSource dataSource;
+    protected DataSource dataSource;
 
     @Autowired
-    private PlatformTransactionManager transactionManager;
+    protected PlatformTransactionManager transactionManager;
+    
+    @Autowired(required=false)
+    protected LDAPGroupCacheListener groupCacheListener;
+    
+    @Autowired
+    protected Environment environment;
 
     @Bean(name = "idmEngine")
     public IdmEngine idmEngine() {
@@ -51,8 +63,51 @@ public class FlowableIdmEngineConfiguration {
         idmEngineConfiguration.setDataSource(dataSource);
         idmEngineConfiguration.setDatabaseSchemaUpdate(IdmEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
         idmEngineConfiguration.setTransactionManager(transactionManager);
+        
+        if (environment.getProperty("ldap.enabled", Boolean.class, false)) {
+            initializeLdap(idmEngineConfiguration);
+        }
 
         return idmEngineConfiguration;
+    }
+    
+    protected void initializeLdap(SpringIdmEngineConfiguration idmEngineConfiguration) {
+        LDAPConfiguration ldapConfiguration = new LDAPConfiguration();
+        ldapConfiguration.setServer(environment.getRequiredProperty("ldap.server"));
+        ldapConfiguration.setPort(environment.getRequiredProperty("ldap.port", Integer.class));
+        ldapConfiguration.setUser(environment.getRequiredProperty("ldap.user"));
+        ldapConfiguration.setPassword(environment.getRequiredProperty("ldap.password"));
+        
+        ldapConfiguration.setBaseDn(environment.getRequiredProperty("ldap.basedn"));
+        ldapConfiguration.setQueryUserByUserId(environment.getRequiredProperty("ldap.query.userbyid"));
+        ldapConfiguration.setQueryUserByFullNameLike(environment.getRequiredProperty("ldap.query.userbyname"));
+        ldapConfiguration.setQueryAllUsers(environment.getRequiredProperty("ldap.query.userall"));
+        ldapConfiguration.setQueryGroupsForUser(environment.getRequiredProperty("ldap.query.groupsforuser"));
+        ldapConfiguration.setQueryAllGroups(environment.getRequiredProperty("ldap.query.groupall"));
+                
+        ldapConfiguration.setUserIdAttribute(environment.getRequiredProperty("ldap.attribute.userid"));
+        ldapConfiguration.setUserFirstNameAttribute(environment.getRequiredProperty("ldap.attribute.firstname"));
+        ldapConfiguration.setUserLastNameAttribute(environment.getRequiredProperty("ldap.attribute.lastname"));
+        ldapConfiguration.setUserEmailAttribute(environment.getRequiredProperty("ldap.attribute.email"));
+                
+        ldapConfiguration.setGroupIdAttribute(environment.getRequiredProperty("ldap.attribute.groupid"));
+        ldapConfiguration.setGroupNameAttribute(environment.getRequiredProperty("ldap.attribute.groupname"));
+       
+        ldapConfiguration.setGroupCacheSize(environment.getRequiredProperty("ldap.cache.groupsize", Integer.class));
+        ldapConfiguration.setGroupCacheExpirationTime(environment.getRequiredProperty("ldap.cache.groupexpiration", Long.class));
+        
+        LDAPGroupCache ldapGroupCache = null;
+        if (ldapConfiguration.getGroupCacheSize() > 0) {
+            ldapGroupCache = new LDAPGroupCache(ldapConfiguration.getGroupCacheSize(), 
+                    ldapConfiguration.getGroupCacheExpirationTime(), new DefaultClockImpl());
+            
+            if (groupCacheListener != null) {
+                ldapGroupCache.setLdapCacheListener(groupCacheListener);
+            }
+        }
+        
+        LDAPIdentityServiceImpl ldapIdentityService = new LDAPIdentityServiceImpl(ldapConfiguration, ldapGroupCache);
+        idmEngineConfiguration.setIdmIdentityService(ldapIdentityService);
     }
 
     @Bean(name = "clock")

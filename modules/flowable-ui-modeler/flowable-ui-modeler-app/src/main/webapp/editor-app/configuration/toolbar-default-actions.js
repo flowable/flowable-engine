@@ -25,6 +25,16 @@ FLOWABLE.TOOLBAR = {
                 scope: services.$scope
             }, services.$modal, services.$scope);
         },
+        
+        validate: function(services) {
+        	
+        	_internalCreateModal({
+                backdrop: true,
+                keyboard: true,
+                template: 'editor-app/popups/validate-model.html?version=' + Date.now(),
+                scope: services.$scope
+            }, services.$modal, services.$scope);
+		},
 
         undo: function (services) {
 
@@ -48,14 +58,14 @@ FLOWABLE.TOOLBAR = {
                 }
                 
                 // Update and refresh the canvas
-                services.$scope.editor.handleEvents({
+                services.editorManager.handleEvents({
                     type: ORYX.CONFIG.EVENT_UNDO_ROLLBACK,
                     commands: lastCommands
                 });
                 
                 // Update
-                services.$scope.editor.getCanvas().update();
-                services.$scope.editor.updateSelection();
+                services.editorManager.getCanvas().update();
+                services.editorManager.updateSelection();
             }
             
             var toggleUndo = false;
@@ -109,14 +119,14 @@ FLOWABLE.TOOLBAR = {
                 });
 
                 // Update and refresh the canvas
-                services.$scope.editor.handleEvents({
+                services.editorManager.handleEvents({
                     type: ORYX.CONFIG.EVENT_UNDO_EXECUTE,
                     commands: lastCommands
                 });
 
                 // Update
-                services.$scope.editor.getCanvas().update();
-                services.$scope.editor.updateSelection();
+                services.editorManager.getCanvas().update();
+                services.editorManager.updateSelection();
             }
 
             var toggleUndo = false;
@@ -147,7 +157,7 @@ FLOWABLE.TOOLBAR = {
         },
 
         cut: function (services) {
-            FLOWABLE.TOOLBAR.ACTIONS._getOryxEditPlugin(services.$scope).editCut();
+            FLOWABLE.TOOLBAR.ACTIONS._getOryxEditPlugin(services).editCut();
             for (var i = 0; i < services.$scope.items.length; i++) {
                 var item = services.$scope.items[i];
                 if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.paste') {
@@ -159,7 +169,7 @@ FLOWABLE.TOOLBAR = {
         },
 
         copy: function (services) {
-            FLOWABLE.TOOLBAR.ACTIONS._getOryxEditPlugin(services.$scope).editCopy();
+            FLOWABLE.TOOLBAR.ACTIONS._getOryxEditPlugin(services).editCopy();
             for (var i = 0; i < services.$scope.items.length; i++) {
                 var item = services.$scope.items[i];
                 if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.paste') {
@@ -171,11 +181,11 @@ FLOWABLE.TOOLBAR = {
         },
 
         paste: function (services) {
-            FLOWABLE.TOOLBAR.ACTIONS._getOryxEditPlugin(services.$scope).editPaste();
+            FLOWABLE.TOOLBAR.ACTIONS._getOryxEditPlugin(services).editPaste();
         },
 
         deleteItem: function (services) {
-            FLOWABLE.TOOLBAR.ACTIONS._getOryxEditPlugin(services.$scope).editDelete();
+            FLOWABLE.TOOLBAR.ACTIONS._getOryxEditPlugin(services).editDelete();
         },
 
         addBendPoint: function (services) {
@@ -183,7 +193,7 @@ FLOWABLE.TOOLBAR = {
             // Show the tutorial the first time
             FLOWABLE_EDITOR_TOUR.sequenceFlowBendpoint(services.$scope, services.$translate, services.$q, true);
 
-            var dockerPlugin = FLOWABLE.TOOLBAR.ACTIONS._getOryxDockerPlugin(services.$scope);
+            var dockerPlugin = FLOWABLE.TOOLBAR.ACTIONS._getOryxDockerPlugin(services);
 
             var enableAdd = !dockerPlugin.enabledAdd();
             dockerPlugin.setEnableAdd(enableAdd);
@@ -203,7 +213,7 @@ FLOWABLE.TOOLBAR = {
             // Show the tutorial the first time
             FLOWABLE_EDITOR_TOUR.sequenceFlowBendpoint(services.$scope, services.$translate, services.$q, true);
 
-            var dockerPlugin = FLOWABLE.TOOLBAR.ACTIONS._getOryxDockerPlugin(services.$scope);
+            var dockerPlugin = FLOWABLE.TOOLBAR.ACTIONS._getOryxDockerPlugin(services);
 
             var enableRemove = !dockerPlugin.enabledRemove();
             dockerPlugin.setEnableRemove(enableRemove);
@@ -225,39 +235,41 @@ FLOWABLE.TOOLBAR = {
          * It's important to reuse the same EditPlugin while the same scope is active,
          * as the clipboard is stored for the whole lifetime of the scope.
          */
-        _getOryxEditPlugin: function ($scope) {
+        _getOryxEditPlugin: function (services) {
+        	var $scope = services.$scope;
+			var editorManager = services.editorManager;
             if ($scope.oryxEditPlugin === undefined || $scope.oryxEditPlugin === null) {
-                $scope.oryxEditPlugin = new ORYX.Plugins.Edit($scope.editor);
+                $scope.oryxEditPlugin = new ORYX.Plugins.Edit(editorManager.getEditor());
             }
             return $scope.oryxEditPlugin;
         },
 
         zoomIn: function (services) {
-            FLOWABLE.TOOLBAR.ACTIONS._getOryxViewPlugin(services.$scope).zoom([1.0 + ORYX.CONFIG.ZOOM_OFFSET]);
+            FLOWABLE.TOOLBAR.ACTIONS._getOryxViewPlugin(services).zoom([1.0 + ORYX.CONFIG.ZOOM_OFFSET]);
         },
 
         zoomOut: function (services) {
-            FLOWABLE.TOOLBAR.ACTIONS._getOryxViewPlugin(services.$scope).zoom([1.0 - ORYX.CONFIG.ZOOM_OFFSET]);
+            FLOWABLE.TOOLBAR.ACTIONS._getOryxViewPlugin(services).zoom([1.0 - ORYX.CONFIG.ZOOM_OFFSET]);
         },
         
         zoomActual: function (services) {
-            FLOWABLE.TOOLBAR.ACTIONS._getOryxViewPlugin(services.$scope).setAFixZoomLevel(1);
+            FLOWABLE.TOOLBAR.ACTIONS._getOryxViewPlugin(services).setAFixZoomLevel(1);
         },
         
         zoomFit: function (services) {
-        	FLOWABLE.TOOLBAR.ACTIONS._getOryxViewPlugin(services.$scope).zoomFitToModel();
+        	FLOWABLE.TOOLBAR.ACTIONS._getOryxViewPlugin(services).zoomFitToModel();
         },
         
         alignVertical: function (services) {
-        	FLOWABLE.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services.$scope).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_MIDDLE]);
+        	FLOWABLE.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_MIDDLE]);
         },
         
         alignHorizontal: function (services) {
-        	FLOWABLE.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services.$scope).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_CENTER]);
+        	FLOWABLE.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_CENTER]);
         },
         
         sameSize: function (services) {
-        	FLOWABLE.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services.$scope).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_SIZE]);
+        	FLOWABLE.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_SIZE]);
         },
 
         help: function (services) {
@@ -268,23 +280,29 @@ FLOWABLE.TOOLBAR = {
          * Helper method: fetches the Oryx View plugin from the provided scope,
          * if not on the scope, it is created and put on the scope for further use.
          */
-        _getOryxViewPlugin: function ($scope) {
+        _getOryxViewPlugin: function (services) {
+        	var $scope = services.$scope;
+			var editorManager = services.editorManager;
             if ($scope.oryxViewPlugin === undefined || $scope.oryxViewPlugin === null) {
-                $scope.oryxViewPlugin = new ORYX.Plugins.View($scope.editor);
+                $scope.oryxViewPlugin = new ORYX.Plugins.View(editorManager.getEditor());
             }
             return $scope.oryxViewPlugin;
         },
         
-        _getOryxArrangmentPlugin: function ($scope) {
+        _getOryxArrangmentPlugin: function (services) {
+        	var $scope = services.$scope;
+			var editorManager = services.editorManager;
             if ($scope.oryxArrangmentPlugin === undefined || $scope.oryxArrangmentPlugin === null) {
-                $scope.oryxArrangmentPlugin = new ORYX.Plugins.Arrangement($scope.editor);
+                $scope.oryxArrangmentPlugin = new ORYX.Plugins.Arrangement(editorManager.getEditor());
             }
             return $scope.oryxArrangmentPlugin;
         },
 
-        _getOryxDockerPlugin: function ($scope) {
+        _getOryxDockerPlugin: function (services) {
+        	var $scope = services.$scope;
+			var editorManager = services.editorManager;
             if ($scope.oryxDockerPlugin === undefined || $scope.oryxDockerPlugin === null) {
-                $scope.oryxDockerPlugin = new ORYX.Plugins.AddDocker($scope.editor);
+                $scope.oryxDockerPlugin = new ORYX.Plugins.AddDocker(editorManager.getEditor());
             }
             return $scope.oryxDockerPlugin;
         }
@@ -292,10 +310,14 @@ FLOWABLE.TOOLBAR = {
 };
 
 /** Custom controller for the save dialog */
-angular.module('flowableModeler').controller('SaveModelCtrl', [ '$rootScope', '$scope', '$http', '$route', '$location',
-    function ($rootScope, $scope, $http, $route, $location) {
+angular.module('flowableModeler').controller('SaveModelCtrl', [ '$rootScope', '$scope', '$http', '$route', '$location', 'editorManager',
+    function ($rootScope, $scope, $http, $route, $location, editorManager) {
 
-    var modelMetaData = $scope.editor.getModelMetaData();
+	if (editorManager.getCurrentModelId() != editorManager.getModelId()) {
+		editorManager.edit(editorManager.getModelId());
+	}
+	
+    var modelMetaData = editorManager.getBaseModelData();
 
     var description = '';
     if (modelMetaData.description) {
@@ -311,15 +333,6 @@ angular.module('flowableModeler').controller('SaveModelCtrl', [ '$rootScope', '$
     };
     
     $scope.saveDialog = saveDialog;
-    
-    var json = $scope.editor.getJSON();
-    json = JSON.stringify(json);
-
-    var params = {
-        modeltype: modelMetaData.model.modelType,
-        json_xml: json,
-        name: 'model'
-    };
     
     $scope.status = {
         loading: false
@@ -352,12 +365,11 @@ angular.module('flowableModeler').controller('SaveModelCtrl', [ '$rootScope', '$
         modelMetaData.key = $scope.saveDialog.key;
         modelMetaData.description = $scope.saveDialog.description;
 
-        var json = $scope.editor.getJSON();
-        json = JSON.stringify(json);
+        var json = editorManager.getModel();
 
         var params = {
             modeltype: modelMetaData.model.modelType,
-            json_xml: json,
+            json_xml: JSON.stringify(json),
             name: $scope.saveDialog.name,
             key: $scope.saveDialog.key,
             description: $scope.saveDialog.description,
@@ -389,7 +401,7 @@ angular.module('flowableModeler').controller('SaveModelCtrl', [ '$rootScope', '$
             url: FLOWABLE.URL.putModel(modelMetaData.modelId)})
 
             .success(function (data, status, headers, config) {
-                $scope.editor.handleEvents({
+                editorManager.handleEvents({
                     type: ORYX.CONFIG.EVENT_SAVED
                 });
                 $scope.modelData.name = $scope.saveDialog.name;
@@ -464,3 +476,66 @@ angular.module('flowableModeler').controller('SaveModelCtrl', [ '$rootScope', '$
     };
 
 }]);
+
+angular.module('flowableModeler').controller('ValidateModelCtrl',['$scope', '$http', 'editorManager',
+    function ($scope, $http, editorManager) {
+    
+        var editor = editorManager.getEditor();
+        var model = editorManager.getModel();
+        
+        $scope.status = {
+            loading: true
+        };
+
+        $scope.model = {
+        	errors: []
+        };
+        
+        $scope.errorGrid = {
+            data: $scope.model.errors,
+            headerRowHeight: 28,
+        	enableRowSelection: true,
+        	enableRowHeaderSelection: false,
+        	multiSelect: false,
+        	modifierKeysToMultiSelect: false,
+        	enableHorizontalScrollbar: 0,
+			enableColumnMenus: false,
+			enableSorting: false,
+            columnDefs: [
+                {field: 'activityName', displayName: 'Name', width:125},
+                {field: 'defaultDescription', displayName: 'Description'},
+                {field: 'warning', displayName: 'Critical', cellTemplate:'editor-app/configuration/properties/errorgrid-critical.html', width: 100}
+            ]
+        };
+        
+        $scope.errorGrid.onRegisterApi = function(gridApi) {
+	        //set gridApi on scope
+	        $scope.gridApi = gridApi;
+	        gridApi.selection.on.rowSelectionChanged($scope, function(row) {
+	            if (row.isSelected) {
+	                editorManager.navigateTo(row.entity.activityId);
+            		$scope.$hide();
+	            }
+	        });
+	    };
+
+        $http({
+            url: FLOWABLE.URL.validateModel(),
+            method: 'POST',
+            cache: false,
+            headers: {
+                "Content-Type":"application/json;charset=utf-8"
+            },
+            data: model
+            
+        }).then(function(response){
+        	$scope.status.loading = false;
+            response.data.forEach(function (row) {
+                $scope.model.errors.push(row);
+            });
+            
+        },function(response){
+            console.log(response);
+        });
+    }
+]);

@@ -15,6 +15,8 @@ package org.activiti.engine.test.bpmn.dynamic;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.ArrayList;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
@@ -22,16 +24,14 @@ import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * Created by Pardo David on 7/12/2016.
  */
 public class DynamicCandidateGroupsTest extends PluggableFlowableTestCase implements DynamicBpmnConstants {
 
-    private final String TASK_ONE_SID = "sid-B94D5D22-E93E-4401-ADC5-C5C073E1EEB4";
-    private final String TASK_TWO_SID = "sid-B1C37EBE-A273-4DDE-B909-89302638526A";
-    private final String SCRIPT_TASK_SID = "sid-A403BAE0-E367-449A-90B2-48834FCAA2F9";
+    private static final String TASK_ONE_SID = "sid-B94D5D22-E93E-4401-ADC5-C5C073E1EEB4";
+    private static final String TASK_TWO_SID = "sid-B1C37EBE-A273-4DDE-B909-89302638526A";
+    private static final String SCRIPT_TASK_SID = "sid-A403BAE0-E367-449A-90B2-48834FCAA2F9";
 
     @Deployment(resources = { "org/activiti/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml" })
     public void testIsShouldBePossibleToChangeCandidateGroups() {

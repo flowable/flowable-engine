@@ -191,7 +191,7 @@ public class FlowableContentRule implements TestRule {
     }
 
     protected void configureContentEngine() {
-        /** meant to be overridden */
+        /* meant to be overridden */
     }
 
     protected void finished(Description description) {

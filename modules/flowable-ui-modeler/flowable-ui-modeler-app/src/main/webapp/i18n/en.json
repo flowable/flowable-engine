@@ -199,6 +199,7 @@
           "CREATE-DESCRIPTION": "You need to give a name for the new model and you may want to add a description at the same time.",
           "DUPLICATE-DESCRIPTION": "You can change the name for the new model and you may want to change the description at the same time.",
           "EDIT-DESCRIPTION": "Change any of the model properties below and then press Save to update the model.",
+          "DELETE-DESCRIPTION": "Are you sure you want to delete the process model \"{{name}}\"?",
           "EDIT-TITLE":"Edit model details",
           "DELETE-TITLE": "Delete model",
           "DELETE-LOADING-RELATIONS": "Checking model usage...",
@@ -542,15 +543,6 @@
         }
     },
 
-    "BPMN-EDITOR": {
-        "PROPERTY": {
-            "FORM-REFERENCE": {
-                "TITLE": "Referenced form",
-                "DESCRIPTION": "Reference to a form."
-            }
-        }
-    },
-
     "ACTION.OK" : "Ok",
     "ACTION.SAVE" : "Save",
     "ACTION.SAVE-AND-CLOSE" : "Save and close editor",
@@ -564,6 +556,7 @@
 
     "TOOLBAR.ACTION.CLOSE" : "Close the editor and go back to the overview page",
     "TOOLBAR.ACTION.SAVE" : "Save the model",
+    "TOOLBAR.ACTION.VALIDATE" : "Validate the model",
     "TOOLBAR.ACTION.CUT" : "Cut (select one or more elements in your business process)",
     "TOOLBAR.ACTION.COPY" : "Copy (select one or more elements in your business process)",
     "TOOLBAR.ACTION.PASTE" : "Paste",
@@ -701,6 +694,7 @@
 
     "PROPERTY.FORMREFERENCE.EMPTY" : "No reference selected",
     "PROPERTY.FORMREFERENCE.TITLE" : "Form reference",
+    "PROPERTY.FORMREFERENCE.DESCRIPTION" : "Reference to a form",
     "PROPERTY.FORMREFERENCE.ERROR.FORM" : "There was an error loading the forms. Try again later",
     "PROPERTY.FORMREFERENCE.FORM.LOADING" : "Loading forms...",
     "PROPERTY.FORMREFERENCE.FORM.EMPTY" : "This folder contains no forms",
@@ -778,6 +772,7 @@
     "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.FIELD" : "Based on field",
 
     "MODEL.SAVE.TITLE" : "Save model",
+    "MODEL.VALIDATE.TITLE" : "Validation results",
     "MODEL.NAME" : "Name",
     "MODEL.KEY" : "Key",
     "MODEL.DESCRIPTION" : "Description",

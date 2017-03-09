@@ -64,6 +64,7 @@ public interface TimerJobQuery extends Query<TimerJobQuery, Job> {
      * 
      * @deprecated
      */
+    @Deprecated
     TimerJobQuery duedateLowerThen(Date date);
 
     /**
@@ -71,6 +72,7 @@ public interface TimerJobQuery extends Query<TimerJobQuery, Job> {
      * 
      * @deprecated
      */
+    @Deprecated
     TimerJobQuery duedateLowerThenOrEquals(Date date);
 
     /**
@@ -78,6 +80,7 @@ public interface TimerJobQuery extends Query<TimerJobQuery, Job> {
      * 
      * @deprecated
      */
+    @Deprecated
     TimerJobQuery duedateHigherThen(Date date);
 
     /**
@@ -85,6 +88,7 @@ public interface TimerJobQuery extends Query<TimerJobQuery, Job> {
      * 
      * @deprecated
      */
+    @Deprecated
     TimerJobQuery duedateHigherThenOrEquals(Date date);
 
     /** Only select jobs that failed due to an exception. */

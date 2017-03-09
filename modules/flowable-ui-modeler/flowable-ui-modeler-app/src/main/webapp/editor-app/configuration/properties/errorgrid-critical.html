@@ -1,0 +1,5 @@
+<div class="ui-grid-cell-contents flowable-status">
+	<!-- we inverse the logic here. A false warning is critical. A true warning is a warning -->
+	<div class="flowable-warning" ng-if="row.entity.warning">Warning</div>
+	<div class="flowable-critical" ng-if="!row.entity.warning">Critical</div>
+</div>

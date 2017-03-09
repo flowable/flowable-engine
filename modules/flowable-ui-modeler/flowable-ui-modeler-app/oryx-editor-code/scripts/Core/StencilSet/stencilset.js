@@ -53,50 +53,16 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
      * @param source {URL} A reference to the stencil set specification.
      *
      */
-    construct: function(source, modelMetaData, editorId){
-        arguments.callee.$.construct.apply(this, arguments);
-        
-        if (!source) {
-            throw "ORYX.Core.StencilSet.StencilSet(construct): Parameter 'source' is not defined.";
-        }
-        
-        if (source.endsWith("/")) {
-            source = source.substr(0, source.length - 1);
-        }
+    construct: function(baseUrl, data) {
 		
 		this._extensions = new Hash();
         
-        this._source = source;
-        this._baseUrl = source.substring(0, source.lastIndexOf("/") + 1);
-        
+        this._baseUrl = baseUrl;
         this._jsonObject = {};
         
         this._stencils = new Hash();
 		this._availableStencils = new Hash();
-        
-		if(ORYX.CONFIG.BACKEND_SWITCH) {
-			var stencilType = "bpmn";
-			this._baseUrl = "editor/stencilsets/bpmn2.0/";
-			this._source = "stencilsets/bpmn2.0/bpmn2.0.json";
-			
-			new Ajax.Request(FLOWABLE.CONFIG.contextRoot + "/app/rest/stencil-sets/editor?version=" + Date.now(), {
-	            asynchronous: false,
-	            method: 'get',
-	            onSuccess: this._init.bind(this),
-	            onFailure: this._cancelInit.bind(this)
-	        });
-			
-		} else {
-			new Ajax.Request(source, {
-	            asynchronous: false,
-	            method: 'get',
-	            onSuccess: this._init.bind(this),
-	            onFailure: this._cancelInit.bind(this)
-	        });
-		}
-        
-        if (this.errornous) 
-            throw "Loading stencil set " + source + " failed.";
+       	this._init(data);
     },
     
     /**
@@ -382,7 +348,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
     
     __handleStencilset: function(response){
     
-        this._jsonObject = response.responseJSON;
+        this._jsonObject = response;
         
         // assert it was parsed.
         if (!this._jsonObject) {
