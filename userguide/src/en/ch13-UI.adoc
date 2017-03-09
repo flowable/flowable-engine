@@ -358,3 +358,7 @@ $translateProvider.useStaticFilesLoader({
 .uniformLanguageTag('bcp47')
 .determinePreferredLanguage();
 ----
+
+For example; your browser is configured for English (United States) and provides the language key _en-US_. Without the mapping Angular Translate will try to fetch the corresponding translation file _en-US.json_. (If this is not available it will fallback to 'en' and load the _en.json_ translation file)
+
+By uncommenting the _.registerAvailableLanguageKeys_ block you can map _en-US_ (and all other _en_ language keys) to the _en.json_ language file.
