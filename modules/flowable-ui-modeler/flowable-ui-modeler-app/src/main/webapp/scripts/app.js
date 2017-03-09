@@ -129,18 +129,26 @@ flowableModeler
 
         // Initialize angular-translate
         $translateProvider.useStaticFilesLoader({
-            prefix: appResourceRoot + 'i18n/',
-            suffix: '.json'
-        });
+          prefix: './i18n/',
+          suffix: '.json'
+        })
+        /*
+        This can be used to map multiple browser language keys to a
+        angular translate language key.
+        */
+        // .registerAvailableLanguageKeys(['en'], {
+        //     'en-*': 'en'
+        // })
+        .useSanitizeValueStrategy('sanitizeParameters')
+        .uniformLanguageTag('bcp47')
+        .determinePreferredLanguage();
 
-        $translateProvider.registerAvailableLanguageKeys(['en'], {
-            'en_*': 'en',
-            'en-*': 'en'
-        });
-        
   }])
   .run(['$rootScope', '$timeout', '$modal', '$translate', '$location', '$http', '$window', 'appResourceRoot',
         function($rootScope, $timeout, $modal, $translate, $location, $http, $window, appResourceRoot) {
+
+            // set angular translate fallback language
+            $translate.fallbackLanguage(['en']);
 
             $rootScope.restRootUrl = function() {
                 return FLOWABLE.CONFIG.contextRoot;
@@ -313,8 +321,6 @@ flowableModeler
   ])
   .run(['$rootScope', '$location', '$translate', '$window', '$modal',
         function($rootScope, $location, $translate, $window , $modal) {
-      
-            $translate.use('en');
 
             var fixedUrlPart = '/editor/';
 
