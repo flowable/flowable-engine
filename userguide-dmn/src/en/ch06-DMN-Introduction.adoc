@@ -7,15 +7,15 @@
 
 === What is DMN?
 
-Decision Model and Notation (DMN) is a standard published by the link:$$http://www.omg.org/spec/DMN/1.1$$[Object Management Group]. It is a standard approach for describing and modeling repeatable decisions within organizations to ensure that decision models are interchangeable across organizations.
+Decision Model and Notation (DMN) is a standard published by the link:$$http://www.omg.org/spec/DMN/1.1$$[Object Management Group]. It's a standard approach for describing and modeling repeatable decisions within organizations to ensure that decision models are interchangeable across organizations.
 
 [[dmnDefiningDecision]]
 
 
 === What is a DMN definition
 
-The root element of the DMN 1.1 schema is a *definitions* element. Within this element multiple decision definitions can be defined (although we advise to
-have only one process definition in each file, since this simplifies maintenance later in the development process). Within each decision one expression can be defined. There are several types of expressions. Within Flowable, currently, the expression type *decision table* is supported.
+The root element of the DMN 1.1 schema is a *definitions* element. Within this element multiple decision definitions can be defined (although we advise you to
+have only one process definition in each file, as this simplifies maintenance later in the development process). Within each decision, one expression can be defined. There are several types of expressions. Within Flowable, currently, the expression type *decision table* is supported.
 
 [source,xml,linenums]
 ----
@@ -34,11 +34,11 @@ have only one process definition in each file, since this simplifies maintenance
 </definitions>
 ----
 
-=== Defining a DMN definition
+=== Creating a DMN definition
 
-It's possible to create a DMN Definition with a plain text editor. But for this example we'll start by using the decision table editor included in the Flowable modeler.
+It's possible to create a DMN Definition with a plain text editor, but for this example we'll start by using the decision table editor included in the Flowable modeler.
 
-We'll implement a very simple use case; determine the discount percentage based on a customer category.
+We'll implement a very simple use case: determining the discount percentage based on a customer category.
 
 Start by opening the decision tables section within the Flowable modeler.
 
@@ -64,54 +64,55 @@ When hit policy any is selected all valid rules will executed.
 
 ==== Input and Output expressions
 
-The header of the decision table itself is divided in two sections; blue and green. The blue section are the *input expressions*. The green the *output expressions*.
+The header of the decision table itself is divided in two sections; blue and green. In the blue section are the *input expressions*; the green the *output expressions*.
 
 image::images/decision_tables_4.png[align="center"]
 
-Within an input expression you can define the variable that will be used in the expression of the rule input entries (explained below). It's possible to define multiple input expressions by selecting *Add Input*.
+Within an input expression, you can define the variable that will be used in the expression of the rule input entries (explained below). It's possible to define multiple input expressions by selecting *Add Input*.
 
 image::images/decision_tables_5.png[align="center"]
 
-Within an output expression you can define what variable will be created to form the result of a decision table execution. (The value of the variable will be determined by the output entry expression; explained below). It's possible to define multiple output expressions by selecting *Add Output*.
+Within an output expression, you can define what variable will be created to form the result of a decision table execution (the value of the variable will be determined by the output entry expression; explained below). It's possible to define multiple output expressions by selecting *Add Output*.
+
 
 ==== Rules
 
 Each rule consists of one or more input entries and one or more output entries.
-A input entry is an expression that will be evaluated against the input variable (of that 'column'). When all input entries are evaluated true the rule is considered true an the output entry is evaluated.
+A input entry is an expression that will be evaluated against the input variable (of that 'column'). When all input entries are evaluated to be true the rule is considered true, and the output entry is evaluated.
 
 [NOTE]
 ====
-The DMN spec provides a specification for an expression language; (S)-FEEL. Currently we do not supported this part of the spec. Within Flowable DMN we use link:$$https://github.com/mvel/mvel$$[ MVEL] as the expression language.
+The DMN specification defines an expression language: (S)-FEEL. Currently, we do not supported this part of the specification. Within Flowable DMN, we use link:$$https://github.com/mvel/mvel$$[ MVEL] as the expression language.
 ====
 
 image::images/decision_tables_6.png[align="center"]
 
-To enter an expression double click on the corresponding cell. 
-In this example the expression _== "BRONZE"_ is entered. Combined the variable defined in the corresponding input expression (column header) this will result during runtime in the full expression _customerCat == "BRONZE"_.
+To enter an expression, double-click on the corresponding cell. 
+In this example, the expression _== "BRONZE"_ is entered. Combined with the variable defined in the corresponding input expression (column header), this will result at runtime in the full expression _customerCat == "BRONZE"_.
 
 image::images/decision_tables_7.png[align="center"]
 
-To enter an output expression double click the corresponding cell.
+To enter an output expression, double-click the corresponding cell.
 In this example the expression _5_ is entered. This is actually more like an implicit assignment. The value 5 will be assigned to the variable in the corresponding output entry (column) when all input entries of that rule are evaluated true.
 
 We can then continue completing the decision table by adding more rules (by selecting Add Rule).
 
 image::images/decision_tables_8.png[align="center"]
 
-In our example rule 4 has an empty input entry. Empty input entries will be evaluated by the engine as true. This means that if none of the other rules are valid the outcome of rule 4 will be the output of this decision table. In that case variable *discountPerc* will have value *0*.
+In our example, rule 4 has an empty input entry. Empty input entries will be evaluated by the engine as true. This means that if none of the other rules are valid, the outcome of rule 4 will be the output of this decision table. In this case, variable *discountPerc* will have value *0*.
 
 image::images/decision_tables_9.png[align="center"]
 
-The decision table can then be saved. Provide a unique Decision Table key.
+The decision table can now be saved. Provide a unique Decision Table key.
 
-=== Use in BPMN2.0 process
+=== Use in a BPMN2.0 process
 
 The newly created decision table can be used in a BPMN2.0 process by including a *Decision task* and selecting the *Decision table reference*.
 
 image::images/decision_tables_10.png[align="center"]
 
-In the process above the process has a start form that will provide the *customer category* to the process instance (and thus to the decision table).
-The *Display Discount* user task displays the result of the decision table with an expression form field. Using the expression; ${discountperc}.
+In the process above, the process has a start form that will provide the *customer category* to the process instance (and thus to the decision table).
+The *Display Discount* user task displays the result of the decision table with an expression form field, using the expression; ${discountperc}.
 
 
 === DMN 1.1 XML
@@ -166,4 +167,4 @@ The full DMN 1.1 XML of the example above.
 </definitions>
 ----
 
-* Important to note here is that the decision table key used in Flowable is the decision id in the DMN XML. *
+* Important to note here, is that the decision table key used in Flowable is the decision ID in the DMN XML. *

@@ -198,7 +198,7 @@ public class FlowableDmnRule implements TestRule {
     }
 
     protected void configureDmnEngine() {
-        /** meant to be overridden */
+        /* meant to be overridden */
     }
 
     protected void finished(Description description) {

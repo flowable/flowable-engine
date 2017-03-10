@@ -78,9 +78,9 @@ public class HistoricTaskInstanceEntityManagerImpl extends AbstractEntityManager
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<HistoricTaskInstance> findHistoricTaskInstancesAndVariablesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
+    public List<HistoricTaskInstance> findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
         if (getHistoryManager().isHistoryEnabled()) {
-            return historicTaskInstanceDataManager.findHistoricTaskInstancesAndVariablesByQueryCriteria(historicTaskInstanceQuery);
+            return historicTaskInstanceDataManager.findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(historicTaskInstanceQuery);
         }
         return Collections.EMPTY_LIST;
     }

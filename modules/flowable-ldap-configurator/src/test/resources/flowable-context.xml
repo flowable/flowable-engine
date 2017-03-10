@@ -51,6 +51,7 @@
 		            <property name="userIdAttribute" value="uid" />
 		            <property name="userFirstNameAttribute" value="cn" />
 		            <property name="userLastNameAttribute" value="sn" />
+		            <property name="userEmailAttribute" value="mail" />
 		            
 		            <property name="groupIdAttribute" value="uid" />
 		            <property name="groupNameAttribute" value="cn" />

@@ -63,9 +63,6 @@ public class CxfWebServiceClient implements SyncWebServiceClient {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public Object[] send(String methodName, Object[] arguments, ConcurrentMap<QName, URL> overridenEndpointAddresses) throws Exception {
         try {
             URL newEndpointAddress = null;

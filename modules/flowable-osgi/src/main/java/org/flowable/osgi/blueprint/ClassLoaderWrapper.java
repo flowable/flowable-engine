@@ -33,9 +33,6 @@ public class ClassLoaderWrapper extends ClassLoader {
         this.parents = parents;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     protected synchronized Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
         //
@@ -68,9 +65,6 @@ public class ClassLoaderWrapper extends ClassLoader {
         throw new ClassNotFoundException(name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public URL getResource(String name) {
         //
         // Check parent class loaders
@@ -86,9 +80,6 @@ public class ClassLoaderWrapper extends ClassLoader {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public Enumeration findResources(String name) throws IOException {
         List resources = new ArrayList();

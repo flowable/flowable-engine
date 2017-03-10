@@ -103,6 +103,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected boolean includeTaskLocalVariables;
     protected boolean includeProcessVariables;
     protected Integer taskVariablesLimit;
+    protected boolean includeIdentityLinks;
     protected String userIdForCandidateAndAssignee;
     protected boolean bothCandidateAndAssigned;
     protected String locale;
@@ -1128,6 +1129,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
+    public TaskQuery includeIdentityLinks() {
+        this.includeIdentityLinks = true;
+        return this;
+    }
     public Integer getTaskVariablesLimit() {
         return taskVariablesLimit;
     }
@@ -1283,8 +1288,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         ensureVariablesInitialized();
         checkQueryOk();
         List<Task> tasks = null;
-        if (includeTaskLocalVariables || includeProcessVariables) {
-            tasks = commandContext.getTaskEntityManager().findTasksAndVariablesByQueryCriteria(this);
+        if (includeTaskLocalVariables || includeProcessVariables || includeIdentityLinks) {
+            tasks = commandContext.getTaskEntityManager().findTasksWithRelatedEntitiesByQueryCriteria(this);
         } else {
             tasks = commandContext.getTaskEntityManager().findTasksByQueryCriteria(this);
         }
@@ -1555,6 +1560,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public boolean isIncludeProcessVariables() {
         return includeProcessVariables;
+    }
+
+    public boolean isIncludeIdentityLinks() {
+        return includeIdentityLinks;
     }
 
     public boolean isBothCandidateAndAssigned() {

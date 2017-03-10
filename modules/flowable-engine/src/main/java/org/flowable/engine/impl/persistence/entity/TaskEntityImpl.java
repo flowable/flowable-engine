@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -93,6 +94,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
 
     protected List<VariableInstanceEntity> queryVariables;
+    protected List<IdentityLinkEntity> queryIdentityLinks;
 
     protected boolean forcedUpdate;
 
@@ -285,7 +287,11 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     @Override
     public List<IdentityLinkEntity> getIdentityLinks() {
         if (!isIdentityLinksInitialized) {
-            taskIdentityLinkEntities = Context.getCommandContext().getIdentityLinkEntityManager().findIdentityLinksByTaskId(id);
+            if (queryIdentityLinks == null) {
+                taskIdentityLinkEntities = Context.getCommandContext().getIdentityLinkEntityManager().findIdentityLinksByTaskId(id);
+            } else {
+                taskIdentityLinkEntities = queryIdentityLinks;
+            }
             isIdentityLinksInitialized = true;
         }
 
@@ -647,6 +653,17 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
 
     public void setQueryVariables(List<VariableInstanceEntity> queryVariables) {
         this.queryVariables = queryVariables;
+    }
+
+    public List<IdentityLinkEntity> getQueryIdentityLinks() {
+        if (queryIdentityLinks == null) {
+            queryIdentityLinks = new LinkedList<>();
+        }
+        return queryIdentityLinks;
+    }
+
+    public void setQueryIdentityLinks(List<IdentityLinkEntity> identityLinks) {
+        queryIdentityLinks = identityLinks;
     }
 
     @Override
