@@ -372,9 +372,21 @@ flowableApp
             if (user) {
                if(user.firstName) {
                    return user.firstName + " " + user.lastName;
-               } else {
+               } else if(user.lastName) {
                    return user.lastName;
-               }
+               }else{
+					if(user != undefined && user != null){
+						var _user = user.split(".");
+						if(_user.length > 1){
+							user = _user[0].charAt(0).toUpperCase() + _user[0].slice(1) +" "+ _user[1].charAt(0).toUpperCase() + _user[1].slice(1);
+						}else{
+							user = _user[0].charAt(0).toUpperCase() + _user[0].slice(1);
+						}
+						return user;
+					}else{
+						return "??";
+					}
+			   }
             }
             return '';
         };
