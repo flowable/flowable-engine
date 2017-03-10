@@ -17,7 +17,7 @@
   </bean>
 
   <bean id="debugAgenda" class="org.flowable.engine.impl.agenda.DebugFlowableEngineAgendaFactory">
-    <constructor-arg name="debugger" ref="processDebugger"/>
+    <property name="debugger" ref="processDebugger"/>
   </bean>
 
   <bean id="processDebugger" class="org.flowable.engine.impl.agenda.TestProcessDebugger"/>

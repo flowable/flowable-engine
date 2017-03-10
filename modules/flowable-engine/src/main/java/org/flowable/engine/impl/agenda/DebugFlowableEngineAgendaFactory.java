@@ -15,12 +15,15 @@ package org.flowable.engine.impl.agenda;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.FlowableEngineAgendaFactory;
 import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.runtime.ProcessDebugger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class DebugFlowableEngineAgendaFactory implements FlowableEngineAgendaFactory {
 
+    @Autowired
     protected ProcessDebugger debugger;
 
-    public DebugFlowableEngineAgendaFactory(ProcessDebugger debugger) {
+    public void setDebugger(ProcessDebugger debugger) {
         this.debugger = debugger;
     }
 

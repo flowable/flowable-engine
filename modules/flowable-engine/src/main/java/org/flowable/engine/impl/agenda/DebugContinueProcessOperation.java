@@ -2,9 +2,8 @@ package org.flowable.engine.impl.agenda;
 
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntityManager;
+import org.flowable.engine.impl.persistence.entity.*;
+import org.flowable.engine.runtime.ProcessDebugger;
 
 /**
  * This class extends {@link ContinueProcessOperation} with the possibility to check whether execution is trying to
@@ -14,6 +13,7 @@ import org.flowable.engine.impl.persistence.entity.JobEntityManager;
  */
 public class DebugContinueProcessOperation extends ContinueProcessOperation {
 
+    public static final String HANDLER_TYPE_BREAK_POINT = "breakPoint";
     protected ProcessDebugger debugger;
 
     public DebugContinueProcessOperation(ProcessDebugger debugger, CommandContext commandContext,
@@ -36,26 +36,27 @@ public class DebugContinueProcessOperation extends ContinueProcessOperation {
         }
     }
 
-    private void breakExecution(FlowNode flowNode) {
-        JobEntity brokenExecutionJob = getJobEntityManager().create();
-        brokenExecutionJob.setJobType(JobEntity.JOB_TYPE_MESSAGE);
-        brokenExecutionJob.setRevision(1);
-        brokenExecutionJob.setExecutionId(execution.getId());
-        brokenExecutionJob.setProcessInstanceId(execution.getProcessInstanceId());
-        brokenExecutionJob.setProcessDefinitionId(execution.getProcessDefinitionId());
-        brokenExecutionJob.setExclusive(false);
-        brokenExecutionJob.setJobHandlerType("breakPoint");
+    protected void breakExecution(FlowNode flowNode) {
+        SuspendedJobEntity brokenJob = getSuspendedJobEntityManager().create();
+        brokenJob.setJobType(JobEntity.JOB_TYPE_MESSAGE);
+        brokenJob.setRevision(1);
+        brokenJob.setRetries(0);
+        brokenJob.setExecutionId(execution.getId());
+        brokenJob.setProcessInstanceId(execution.getProcessInstanceId());
+        brokenJob.setProcessDefinitionId(execution.getProcessDefinitionId());
+        brokenJob.setExclusive(false);
+        brokenJob.setJobHandlerType(HANDLER_TYPE_BREAK_POINT);
 
         // Inherit tenant id (if applicable)
         if (execution.getTenantId() != null) {
-            brokenExecutionJob.setTenantId(execution.getTenantId());
+            brokenJob.setTenantId(execution.getTenantId());
         }
 
-        this.commandContext.getJobManager().scheduleAsyncJob(brokenExecutionJob);
+        getSuspendedJobEntityManager().insert(brokenJob);
     }
 
-    private JobEntityManager getJobEntityManager() {
-        return this.commandContext.getJobEntityManager();
+    protected SuspendedJobEntityManager getSuspendedJobEntityManager() {
+        return this.commandContext.getSuspendedJobEntityManager();
     }
 
 }

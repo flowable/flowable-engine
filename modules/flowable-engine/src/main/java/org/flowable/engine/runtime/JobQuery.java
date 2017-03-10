@@ -34,9 +34,7 @@ public interface JobQuery extends Query<JobQuery, Job> {
     /** Only select jobs which exist for the given execution */
     JobQuery executionId(String executionId);
 
-    /**
-     * Only select jobs which have given job handler type
-     */
+    /** Select jobs which have given job handler type */
     JobQuery handlerType(String handlerType);
 
     /** Only select jobs which exist for the given process definition id */

@@ -1,7 +1,10 @@
 package org.flowable.engine.impl.agenda;
 
+import org.flowable.engine.impl.cmd.ActivateSuspendedJobCmd;
+import org.flowable.engine.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.ProcessDebugger;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
@@ -43,8 +46,9 @@ public class DebugProcessOperationTest extends ResourceFlowableTestCase {
     }
 
     private void triggerBreakPoint() {
-        Job job = managementService.createJobQuery().handlerType("breakPoint").singleResult();
+        Job job = managementService.createSuspendedJobQuery().handlerType("breakPoint").singleResult();
         assertNotNull(job);
+        processEngineConfiguration.getCommandExecutor().execute(new ActivateSuspendedJobCmd((SuspendedJobEntity) job));
         managementService.executeJob(job.getId());
     }
 

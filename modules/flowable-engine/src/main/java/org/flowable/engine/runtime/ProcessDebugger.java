@@ -1,11 +1,9 @@
-package org.flowable.engine.impl.agenda;
-
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+package org.flowable.engine.runtime;
 
 /**
  * @author martin.grofcik
  */
-interface ProcessDebugger {
+public interface ProcessDebugger {
 
     /**
      * Indicates that execution is in the breakpoint state
@@ -15,6 +13,6 @@ interface ProcessDebugger {
      * @return true in the case when breakpoint was reached in the execution, false in the case when not
      * @throws RuntimeException in the case when it was not possible to decide
      */
-    boolean isBreakPoint(ExecutionEntity execution);
+    boolean isBreakPoint(Execution execution);
 
 }

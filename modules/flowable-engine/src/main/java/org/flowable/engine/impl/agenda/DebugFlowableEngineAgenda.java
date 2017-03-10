@@ -2,6 +2,7 @@ package org.flowable.engine.impl.agenda;
 
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.runtime.ProcessDebugger;
 
 /**
  * This {@link org.flowable.engine.FlowableEngineAgenda} schedules operations which allow debugging
