@@ -30,11 +30,11 @@
             "CREATE-DECISION-TABLE": "Criar Tabela de Decisão"
         },
         "MESSAGE": {
-          "SELECT-GROUP-HELP": "Use &uparrow; and &downarrow; to select and press Enter to confirm",
-          "PEOPLE-NO-MATCHING-RESULTS": "No matching users were found",
-          "GROUP-NO-MATCHING-RESULTS": "No matching groups were found",
+          "SELECT-GROUP-HELP": "Use &uparrow; e &downarrow; para selecioar e precione Enter paa confirmar",
+          "PEOPLE-NO-MATCHING-RESULTS": "Nenhum usuário correspondente foi encontrado",
+          "GROUP-NO-MATCHING-RESULTS": "Nenhum grupo correspondente foi encontrado",
           "GROUP-SOURCE-TYPE": "Origem do grupo",
-          "GROUP-SOURCE-SEARCH-OPTION": "Group search",
+          "GROUP-SOURCE-SEARCH-OPTION": "Pesquisa de grupo",
           "GROUP-SOURCE-FIELD-OPTION": "Campo de Formulário"
         }
     },
@@ -43,7 +43,7 @@
       "POPUP": {
         "UNSAVED-CHANGES": {
           "TITLE": "Você tem alterações não salvas",
-          "DESCRIPTION": "What do you want to do with your unsaved changes?",
+          "DESCRIPTION": "O que você quer fazer com suas alterações não salvas?",
           "ACTION": {
             "SAVE": "Salvar alterações",
             "DISCARD": "Discartar Alterações",
@@ -54,7 +54,7 @@
     },
 
     "PROCESS-LIST" : {
-        "TITLE" : "Business Process Models",
+        "TITLE" : "Modelos de Processo de Negócio",
         "SEARCH-PLACEHOLDER": "Pesquisar",
         "ACTION" : {
             "CREATE": "Criar Processo",
@@ -62,7 +62,7 @@
         },
 
         "FILTER" : {
-            "PROCESSES": "Process models",
+            "PROCESSES": "Modelos de Processos",
             "PROCESSES-COUNT": "There are {{total}} process models",
             "PROCESSES-ONE": "There is one process model",
             "PROCESSES-EMPTY": "There is no process model created yet. You can design process models, user forms and then bundle them up into a process app. The first step is to create a process model:",
@@ -77,7 +77,7 @@
         },
 
         "SORT": {
-            "MODIFIED-ASC": "Oldest",
+            "MODIFIED-ASC": "Mais antigo",
             "MODIFIED-DESC": "Última modificação",
             "NAME-ASC": "Nome, A-Z",
             "NAME-DESC": "Nome, Z-A"
@@ -103,7 +103,7 @@
         },
 
         "SORT": {
-            "MODIFIED-ASC": "Oldest",
+            "MODIFIED-ASC": "Mais antigo",
             "MODIFIED-DESC": "Last modified",
             "NAME-ASC": "Nome, A-Z",
             "NAME-DESC": "Nome, Z-A"
@@ -130,7 +130,7 @@
         },
 
         "SORT": {
-            "MODIFIED-ASC": "Oldest",
+            "MODIFIED-ASC": "Mais antigo",
             "MODIFIED-DESC": "Last modified",
             "NAME-ASC": "Nome, A-Z",
             "NAME-DESC": "Nome, Z-A"
@@ -160,30 +160,30 @@
         },
 
         "SORT": {
-            "MODIFIED-ASC": "Oldest",
+            "MODIFIED-ASC": "Mais antigo",
             "MODIFIED-DESC": "Last modified",
-            "NAME-ASC": "Name, A-Z",
-            "NAME-DESC": "Name, Z-A"
+            "NAME-ASC": "Nome, A-Z",
+            "NAME-DESC": "Nome, Z-A"
         }
     },
     "PROCESS": {
-      "NAME": "Model name",
-      "KEY": "Model key",
-      "DESCRIPTION": "Description",
+      "NAME": "Nome do modelo",
+      "KEY": "Chave do Modelo",
+      "DESCRIPTION": "Descrição",
       "VERSION-COMMENT": "Version comment",
       "ACTION": {
-            "DETAILS": "Show details",
+            "DETAILS": "Mostrar detalhes",
             "EDIT": "Modify model properties",
             "DUPLICATE": "Duplicate this model",
-            "EXPORT_BPMN20": "Export to BPMN 2.0",
-            "DELETE": "Delete this model",
-            "CREATE-CONFIRM": "Create new model",
-            "DUPLICATE-CONFIRM": "Duplicate the model",
+            "EXPORT_BPMN20": "Exportar para BPMN 2.0",
+            "DELETE": "Excluir este modelo",
+            "CREATE-CONFIRM": "Criar Novo Modelo",
+            "DUPLICATE-CONFIRM": "Duplicar modelo",
             "OPEN-IN-EDITOR": "Visual Editor",
-            "EDIT-CONFIRM": "Save",
-            "DELETE-CONFIRM": "Delete process model",
-            "USE-AS-NEW-VERSION": "Use as new version",
-            "FAVORITE": "Favorite this model"
+            "EDIT-CONFIRM": "Salvar",
+            "DELETE-CONFIRM": "Excluir modelo de processo",
+            "USE-AS-NEW-VERSION": "Usar uma nova versão",
+            "FAVORITE": "Modelo favorito"
 
         },
         "DETAILS": {
@@ -520,7 +520,7 @@
     },
 
     "TOUR": {
-        "WELCOME-TITLE": "Welcome, {{userName}}",
+        "WELCOME-TITLE": "Bemvindo, {{userName}}",
         "WELCOME-CONTENT": "This a short tour of the Flowable editor. The next few steps will guide you through the different sections of the application to get you started. Press the ESC key to stop at any time." ,
         "PALETTE-TITLE": "The Palette",
         "PALETTE-CONTENT": "All the available constructs to create a business process can be found here. They are arranged in logical groups. To open a group simply click on it:",
@@ -678,7 +678,7 @@
     "PROPERTY.OUTPARAMETERS.VALUE" : "{{length}} out-parameters",
     "PROPERTY.OUTPARAMETERS.EMPTY" : "No out-parameters configured",
 
-    "PROPERTY.PARAMETER.SOURCE" : "Source",
+    "PROPERTY.PARAMETER.SOURCE" : "Fonte",
     "PROPERTY.PARAMETER.SOURCE.PLACEHOLDER" : "Enter a source",
     "PROPERTY.PARAMETER.SOURCEEXPRESSION" : "Source expression",
     "PROPERTY.PARAMETER.SOURCEEXPRESSION.PLACEHOLDER" : "Enter a source expression",
@@ -701,15 +701,15 @@
 
     "PROPERTY.TASKLISTENERS.VALUE" : "{{length}} task listeners",
     "PROPERTY.TASKLISTENERS.EMPTY" : "No task listeners configured",
-    "PROPERTY.TASKLISTENERS.EVENT" : "Event",
-    "PROPERTY.TASKLISTENERS.CLASS" : "Class",
+    "PROPERTY.TASKLISTENERS.EVENT" : "Evento",
+    "PROPERTY.TASKLISTENERS.CLASS" : "Classe",
     "PROPERTY.TASKLISTENERS.CLASS.PLACEHOLDER" : "Enter a classname",
-    "PROPERTY.TASKLISTENERS.EXPRESSION" : "Expression",
+    "PROPERTY.TASKLISTENERS.EXPRESSION" : "Expressão",
     "PROPERTY.TASKLISTENERS.EXPRESSION.PLACEHOLDER" : "Enter an expression",
     "PROPERTY.TASKLISTENERS.DELEGATEEXPRESSION" : "Delegate expression",
     "PROPERTY.TASKLISTENERS.DELEGATEEXPRESSION.PLACEHOLDER" : "Enter a delegate expression",
     "PROPERTY.TASKLISTENERS.UNSELECTED" : "No task listener selected",
-    "PROPERTY.TASKLISTENERS.FIELDS.NAME" : "Name",
+    "PROPERTY.TASKLISTENERS.FIELDS.NAME" : "Nome",
     "PROPERTY.TASKLISTENERS.FIELDS.NAME.PLACEHOLDER" : "Enter a name",
     "PROPERTY.TASKLISTENERS.FIELDS.EXPRESSION" : "Expression",
     "PROPERTY.TASKLISTENERS.FIELDS.EXPRESSION.PLACEHOLDER" : "Enter an expression",
@@ -722,9 +722,9 @@
 
     "PROPERTY.EVENTLISTENERS.DISPLAY" : "{{length}} event listeners",
     "PROPERTY.EVENTLISTENERS.EMPTY" : "No event listeners configured",
-    "PROPERTY.EVENTLISTENERS.EVENTS": "Events",
+    "PROPERTY.EVENTLISTENERS.EVENTS": "Eventos",
     "PROPERTY.EVENTLISTENERS.RETHROW": "Rethrow event?",
-    "PROPERTY.EVENTLISTENERS.CLASS" : "Class",
+    "PROPERTY.EVENTLISTENERS.CLASS" : "Classe",
     "PROPERTY.EVENTLISTENERS.CLASS.PLACEHOLDER" : "Enter a classname",
     "PROPERTY.EVENTLISTENERS.DELEGATEEXPRESSION" : "Delegate expression",
     "PROPERTY.EVENTLISTENERS.DELEGATEEXPRESSION.PLACEHOLDER" : "Enter a delegate expression",
@@ -744,13 +744,13 @@
     "PROPERTY.SIGNALDEFINITIONS.SCOPE-GLOBAL": "Global",
     "PROPERTY.SIGNALDEFINITIONS.SCOPE-PROCESSINSTANCE": "Process Instance",
     "PROPERTY.SIGNALDEFINITIONS.ID" : "Id",
-    "PROPERTY.SIGNALDEFINITIONS.NAME" : "Name",
-    "PROPERTY.SIGNALDEFINITIONS.SCOPE" : "Scope",
+    "PROPERTY.SIGNALDEFINITIONS.NAME" : "Nome",
+    "PROPERTY.SIGNALDEFINITIONS.SCOPE" : "Escopo",
 
     "PROPERTY.MESSAGEDEFINITIONS.DISPLAY" : "{{length}} message definitions",
     "PROPERTY.MESSAGEDEFINITIONS.EMPTY" : "No message definitions configured",
     "PROPERTY.MESSAGEDEFINITIONS.ID" : "Id",
-    "PROPERTY.MESSAGEDEFINITIONS.NAME" : "Name",
+    "PROPERTY.MESSAGEDEFINITIONS.NAME" : "Nome",
 
     "PROPERTY.SEQUENCEFLOW.ORDER.EMPTY" : "No sequence flow order determined",
     "PROPERTY.SEQUENCEFLOW.ORDER.NOT.EMPTY" : "Sequence flow order set",
@@ -771,7 +771,7 @@
     "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.STATIC" : "Fixed duration after task creation",
     "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.FIELD" : "Based on field",
 
-    "MODEL.SAVE.TITLE" : "Save model",
+    "MODEL.SAVE.TITLE" : "Salvar modelo",
     "MODEL.VALIDATE.TITLE" : "Validation results",
     "MODEL.NAME" : "Name",
     "MODEL.KEY" : "Key",
