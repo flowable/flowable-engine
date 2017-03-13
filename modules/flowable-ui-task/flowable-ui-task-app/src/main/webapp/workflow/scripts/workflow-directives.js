@@ -293,14 +293,15 @@ angular.module('flowableApp').
                         }
                         newUserPic.userName = user.firstName;
                     } else {
-                        if(user != undefined && user != null){
+                        if (user != undefined && user != null){
 							if (user.length > 1) {
 								newUserPic.text = user.substring(0, 2).toUpperCase();
-							}else if (user.length == 1) {
+							} else if (user.length == 1) {
 								newUserPic.text = user.substring(0, 1).toUpperCase();
 							}
 							newUserPic.userName = user;
-						}else{
+							
+						} else {
 							newUserPic.text ='??';
 							newUserPic.userName = '';
 						}
