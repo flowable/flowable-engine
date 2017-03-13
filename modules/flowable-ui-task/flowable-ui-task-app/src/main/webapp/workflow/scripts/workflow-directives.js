@@ -248,7 +248,7 @@ angular.module('flowableApp').
         directive.replace = true;
         directive.transclude = false;
         directive.template =
-            '<div class="{{userPic.class}}" ng-style="{\'background-image\': userPic.style}" title="{{userPic.userName}}">' +
+            '<div class="{{userPic.class}}" ng-style="{\'background-image\': userPic.style}" title="{{userPic.userName | username}}">' +
                 '<span>{{userPic.text}}</span>'+
             '</div>';
 
@@ -293,8 +293,17 @@ angular.module('flowableApp').
                         }
                         newUserPic.userName = user.firstName;
                     } else {
-                        newUserPic.text = '??';
-                        newUserPic.userName = '';
+                        if(user != undefined && user != null){
+							if (user.length > 1) {
+								newUserPic.text = user.substring(0, 2).toUpperCase();
+							}else if (user.length == 1) {
+								newUserPic.text = user.substring(0, 1).toUpperCase();
+							}
+							newUserPic.userName = user;
+						}else{
+							newUserPic.text ='??';
+							newUserPic.userName = '';
+						}
                     }
                 }
 
