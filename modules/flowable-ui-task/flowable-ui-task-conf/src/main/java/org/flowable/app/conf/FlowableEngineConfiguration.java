@@ -12,8 +12,6 @@
  */
 package org.flowable.app.conf;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
@@ -21,18 +19,14 @@ import org.flowable.content.spring.configurator.SpringContentEngineConfigurator;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator;
-import org.flowable.engine.FormService;
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.ManagementService;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
+import org.flowable.engine.*;
 import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.impl.agenda.DebugFlowableEngineAgendaFactory;
 import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.event.BreakPointJobHandler;
+import org.flowable.engine.impl.jobexecutor.JobHandler;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.spring.configurator.SpringFormEngineConfigurator;
 import org.flowable.spring.ProcessEngineFactoryBean;
@@ -46,6 +40,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Collections;
 
 @Configuration
 @ComponentScan(basePackages = {
@@ -93,6 +91,10 @@ public class FlowableEngineConfiguration {
         processEngineConfiguration.setTransactionManager(transactionManager);
         processEngineConfiguration.setAsyncExecutorActivate(true);
         processEngineConfiguration.setAsyncExecutor(asyncExecutor());
+        processEngineConfiguration.setAgendaFactory(agendaFactory());
+        ArrayList<JobHandler> customJobHandlers = new ArrayList<>();
+        customJobHandlers.add(new BreakPointJobHandler());
+        processEngineConfiguration.setCustomJobHandlers(customJobHandlers);
 
         String emailHost = environment.getProperty("email.host");
         if (StringUtils.isNotEmpty(emailHost)) {
@@ -133,6 +135,11 @@ public class FlowableEngineConfiguration {
         processEngineConfiguration.addConfigurator(springContentEngineConfigurator);
 
         return processEngineConfiguration;
+    }
+
+    @Bean
+    public FlowableEngineAgendaFactory agendaFactory() {
+        return new DebugFlowableEngineAgendaFactory();
     }
 
     @Bean
