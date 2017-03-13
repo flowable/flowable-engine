@@ -1,3 +1,15 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.flowable.app.model.debugger;
 
 import org.flowable.app.model.common.AbstractRepresentation;
@@ -7,16 +19,17 @@ import org.flowable.app.model.common.AbstractRepresentation;
  *
  * @author martin.grofcik
  */
-public final class BreakPointRepresentation extends AbstractRepresentation {
+public final class BreakpointRepresentation extends AbstractRepresentation {
+    
     protected String activityId;
     protected String processDefinitionId;
 
-    public BreakPointRepresentation(String processDefinitionId, String activityId) {
+    public BreakpointRepresentation(String processDefinitionId, String activityId) {
         this.processDefinitionId = processDefinitionId;
         this.activityId = activityId;
     }
 
-    public BreakPointRepresentation() {
+    public BreakpointRepresentation() {
     }
 
     public String getActivityId() {
@@ -40,10 +53,16 @@ public final class BreakPointRepresentation extends AbstractRepresentation {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        BreakPointRepresentation that = (BreakPointRepresentation) o;
+        BreakpointRepresentation that = (BreakpointRepresentation) o;
 
-        if (!getActivityId().equals(that.getActivityId())) return false;
-        if (processDefinitionId == null && that.getProcessDefinitionId() == null) return true;
+        if (!getActivityId().equals(that.getActivityId())) {
+            return false;
+        }
+        
+        if (processDefinitionId == null && that.getProcessDefinitionId() == null) {
+            return true;
+        }
+        
         return getProcessDefinitionId().equals(that.getProcessDefinitionId());
     }
 

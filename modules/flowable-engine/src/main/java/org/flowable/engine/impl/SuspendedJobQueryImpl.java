@@ -35,7 +35,7 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     protected String id;
     protected String processInstanceId;
     protected String executionId;
-    private String handlerType;
+    protected String handlerType;
     protected String processDefinitionId;
     protected boolean retriesLeft;
     protected boolean executable;

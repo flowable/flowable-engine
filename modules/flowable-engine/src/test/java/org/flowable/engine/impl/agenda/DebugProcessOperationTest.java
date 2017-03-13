@@ -1,15 +1,13 @@
 package org.flowable.engine.impl.agenda;
 
-import org.flowable.engine.impl.cmd.ActivateSuspendedJobCmd;
-import org.flowable.engine.impl.persistence.entity.SuspendedJobEntity;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessDebugger;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * This class tests {@link DebugContinueProcessOperation}, {@link ProcessDebugger} and {@link DebugFlowableEngineAgenda}
@@ -35,9 +33,8 @@ public class DebugProcessOperationTest extends ResourceFlowableTestCase {
 
         assertEquals("User task has to be created.", 1, this.taskService.createTaskQuery().count());
         assertProcessActivityId("The execution is still on the user task.", oneTaskProcess, "theTask");
-        this.taskService.complete(
-                this.taskService.createTaskQuery().processInstanceId(oneTaskProcess.getProcessInstanceId()).singleResult().getId()
-        );
+        String taskId = this.taskService.createTaskQuery().processInstanceId(oneTaskProcess.getProcessInstanceId()).singleResult().getId();
+        this.taskService.complete(taskId);
 
         assertProcessActivityId("The execution must stop on the end event.", oneTaskProcess, "theEnd");
         triggerBreakPoint();
@@ -45,14 +42,14 @@ public class DebugProcessOperationTest extends ResourceFlowableTestCase {
         assertThat("No process instance is running.", this.runtimeService.createExecutionQuery().count(), is(0L));
     }
 
-    private void triggerBreakPoint() {
-        Job job = managementService.createSuspendedJobQuery().handlerType("breakPoint").singleResult();
+    protected void triggerBreakPoint() {
+        Job job = managementService.createDeadLetterJobQuery().handlerType("breakpoint").singleResult();
         assertNotNull(job);
-        processEngineConfiguration.getCommandExecutor().execute(new ActivateSuspendedJobCmd((SuspendedJobEntity) job));
-        managementService.executeJob(job.getId());
+        Job deadLetterJob = managementService.moveDeadLetterJobToExecutableJob(job.getId(), 3);
+        managementService.executeJob(deadLetterJob.getId());
     }
 
-    private void assertProcessActivityId(String message, ProcessInstance process, String activityId) {
+    protected void assertProcessActivityId(String message, ProcessInstance process, String activityId) {
         assertThat(message, this.runtimeService.createExecutionQuery().parentId(process.getId()).singleResult().getActivityId(),
                 is(activityId));
     }

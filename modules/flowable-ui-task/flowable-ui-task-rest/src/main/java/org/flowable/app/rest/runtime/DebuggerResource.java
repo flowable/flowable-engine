@@ -12,12 +12,16 @@
  */
 package org.flowable.app.rest.runtime;
 
-import org.flowable.app.model.debugger.BreakPointRepresentation;
+import java.util.Collection;
+
+import org.flowable.app.model.debugger.BreakpointRepresentation;
 import org.flowable.app.service.debugger.DebuggerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Collection;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST controller for managing a debugger requests.
@@ -30,24 +34,24 @@ public class DebuggerResource {
     @Autowired
     protected DebuggerService debuggerService;
 
-    @RequestMapping(value = "/rest/debugger/breakPoints", method = RequestMethod.GET, produces = "application/json")
-    public Collection<BreakPointRepresentation> getBreakPoints() {
-        return debuggerService.getBreakPoints();
+    @RequestMapping(value = "/rest/debugger/breakpoints", method = RequestMethod.GET, produces = "application/json")
+    public Collection<BreakpointRepresentation> getBreakpoints() {
+        return debuggerService.getBreakpoints();
     }
 
-    @RequestMapping(value = "/rest/debugger/breakPoints", method = RequestMethod.POST)
-    public void addBreakPoints(@RequestBody BreakPointRepresentation breakPointRepresentation) {
-        debuggerService.addBreakPoint(breakPointRepresentation);
+    @RequestMapping(value = "/rest/debugger/breakpoints", method = RequestMethod.POST)
+    public void addBreakPoints(@RequestBody BreakpointRepresentation breakpointRepresentation) {
+        debuggerService.addBreakpoint(breakpointRepresentation);
     }
 
-    @RequestMapping(value = "/rest/debugger/breakPoints/{executionId}/continue", method = RequestMethod.PUT)
+    @RequestMapping(value = "/rest/debugger/breakpoints/{executionId}/continue", method = RequestMethod.PUT)
     public void continueExecution(@PathVariable String executionId) {
         debuggerService.continueExecution(executionId);
     }
 
-    @RequestMapping(value = "/rest/debugger/breakPoints", method = RequestMethod.DELETE)
-    public void deleteBreakPoints(@RequestBody BreakPointRepresentation breakPointRepresentation) {
-        debuggerService.removeBreakPoint(breakPointRepresentation);
+    @RequestMapping(value = "/rest/debugger/breakpoints", method = RequestMethod.DELETE)
+    public void deleteBreakPoints(@RequestBody BreakpointRepresentation breakpointRepresentation) {
+        debuggerService.removeBreakpoint(breakpointRepresentation);
     }
 
 }

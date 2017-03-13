@@ -12,10 +12,17 @@
  */
 package org.flowable.app.rest.runtime;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.app.model.debugger.BreakPointRepresentation;
+import org.flowable.app.model.debugger.BreakpointRepresentation;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.debugger.DebuggerService;
 import org.flowable.app.service.editor.mapper.EventInfoMapper;
@@ -166,12 +173,12 @@ public class RuntimeDisplayJsonClientResource {
         Set<String> completedElements = new HashSet<String>(completedActivityInstances);
         completedElements.addAll(completedFlows);
 
-        List<String> breakPoints = new ArrayList<>();
-        for (BreakPointRepresentation breakPoint : debuggerService.getBreakPoints()) {
-            breakPoints.add(breakPoint.getActivityId());
+        List<String> breakpoints = new ArrayList<>();
+        for (BreakpointRepresentation breakpoint : debuggerService.getBreakpoints()) {
+            breakpoints.add(breakpoint.getActivityId());
         }
 
-        ObjectNode displayNode = processProcessElements(pojoModel, completedElements, currentElements, breakPoints, processInstanceId);
+        ObjectNode displayNode = processProcessElements(pojoModel, completedElements, currentElements, breakpoints, processInstanceId);
 
         if (completedActivityInstances != null) {
             ArrayNode completedActivities = displayNode.putArray("completedActivities");
@@ -247,7 +254,7 @@ public class RuntimeDisplayJsonClientResource {
         return displayNode;
     }
 
-    protected ObjectNode processProcessElements(BpmnModel pojoModel, Set<String> completedElements, Set<String> currentElements, Collection<String> breakPoints, String processInstanceId) {
+    protected ObjectNode processProcessElements(BpmnModel pojoModel, Set<String> completedElements, Set<String> currentElements, Collection<String> breakpoints, String processInstanceId) {
         ObjectNode displayNode = objectMapper.createObjectNode();
         GraphicInfo diagramInfo = new GraphicInfo();
 
@@ -304,7 +311,7 @@ public class RuntimeDisplayJsonClientResource {
         }
 
         for (org.flowable.bpmn.model.Process process : pojoModel.getProcesses()) {
-            processElements(process.getFlowElements(), pojoModel, elementArray, flowArray, diagramInfo, completedElements, currentElements, breakPoints, processInstanceId);
+            processElements(process.getFlowElements(), pojoModel, elementArray, flowArray, diagramInfo, completedElements, currentElements, breakpoints, processInstanceId);
             processArtifacts(process.getArtifacts(), pojoModel, elementArray, flowArray, diagramInfo);
         }
 
@@ -319,7 +326,7 @@ public class RuntimeDisplayJsonClientResource {
     }
 
     protected void processElements(Collection<FlowElement> elementList, BpmnModel model, ArrayNode elementArray, ArrayNode flowArray, GraphicInfo diagramInfo, Set<String> completedElements,
-                                   Set<String> currentElements, Collection<String> breakPoints, String processInstanceId) {
+                                   Set<String> currentElements, Collection<String> breakpoints, String processInstanceId) {
 
         for (FlowElement element : elementList) {
 
@@ -327,8 +334,8 @@ public class RuntimeDisplayJsonClientResource {
             if (completedElements != null) {
                 elementNode.put("completed", completedElements.contains(element.getId()));
             }
-            if (!breakPoints.isEmpty()) {
-                elementNode.put("breakPoint", breakPoints.contains(element.getId()));
+            if (!breakpoints.isEmpty()) {
+                elementNode.put("breakpoint", breakpoints.contains(element.getId()));
             }
             Collection<String> brokenExecutions = this.debuggerService.getBrokenExecutions(element.getId(), processInstanceId);
             if (!brokenExecutions.isEmpty()) {
@@ -403,7 +410,7 @@ public class RuntimeDisplayJsonClientResource {
 
                 if (element instanceof SubProcess) {
                     SubProcess subProcess = (SubProcess) element;
-                    processElements(subProcess.getFlowElements(), model, elementArray, flowArray, diagramInfo, completedElements, currentElements, breakPoints, processInstanceId);
+                    processElements(subProcess.getFlowElements(), model, elementArray, flowArray, diagramInfo, completedElements, currentElements, breakpoints, processInstanceId);
                     processArtifacts(subProcess.getArtifacts(), model, elementArray, flowArray, diagramInfo);
                 }
             }

@@ -164,10 +164,20 @@ public class JobQueryTest extends PluggableFlowableTestCase {
     }
 
     public void testQueryByHandlerType() {
-        Job job = managementService.createJobQuery().handlerType("").singleResult();
-        TimerJobQuery query = managementService.createTimerJobQuery().executionId(job.getExecutionId());
-        assertEquals(query.singleResult().getId(), job.getId());
-        verifyQueryResults(query, 1);
+        final JobEntity job = (JobEntity) managementService.createJobQuery().singleResult();
+        job.setJobHandlerType("test");
+        managementService.executeCommand(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+                commandContext.getJobEntityManager().update(job);
+                return null;
+            }
+            
+        });
+        
+        Job handlerTypeJob = managementService.createJobQuery().handlerType("test").singleResult();
+        assertNotNull(handlerTypeJob);
     }
 
     public void testQueryByInvalidJobType() {

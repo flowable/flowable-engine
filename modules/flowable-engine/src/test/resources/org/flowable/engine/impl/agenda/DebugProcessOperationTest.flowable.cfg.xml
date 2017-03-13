@@ -4,14 +4,21 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+  <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+    <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE" />
+    <property name="jdbcDriver" value="org.h2.Driver" />
+    <property name="jdbcUsername" value="sa" />
+    <property name="jdbcPassword" value="" />
+    
     <property name="databaseSchemaUpdate" value="true"/>
+    
+    <property name="asyncExecutorActivate" value="false" />
 
     <property name="agendaFactory" ref="debugAgenda"/>
 
     <property name="customJobHandlers">
       <list>
-        <bean class="org.flowable.engine.impl.event.BreakPointJobHandler"/>
+        <bean class="org.flowable.engine.impl.event.BreakpointJobHandler"/>
       </list>
     </property>
   </bean>

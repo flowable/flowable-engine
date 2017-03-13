@@ -195,10 +195,10 @@ function _addHoverLogic(element, type, defaultColor)
     });
 }
 
-function _breakPointRestCall(actionType, activityId) {
+function _breakpointRestCall(actionType, activityId) {
     $.ajax({
         type: actionType,
-        url: '../app/rest/debugger/breakPoints',
+        url: '../app/rest/debugger/breakpoints',
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify({
             activityId: activityId
@@ -213,41 +213,41 @@ function _breakPointRestCall(actionType, activityId) {
     })
 }
 
-function _drawBreakPoint(element, breakPoints) {
+function _drawBreakpoint(element, breakpoints) {
 
     var circle = paper.circle(element.x + 10, element.y - 10, 7);
 
-    var breakPointFillColor = "white";
-    var breakPointStrokeColor = "gray";
-    var breakPointTipText = "Inactive element";
+    var breakpointFillColor = "white";
+    var breakpointStrokeColor = "gray";
+    var breakpointTipText = "Inactive element";
     if (element.current) {
-        breakPointFillColor = "red";
-        breakPointTipText = "Active execution"
+        breakpointFillColor = "red";
+        breakpointTipText = "Active execution"
     }
 
-    if (element.breakPoint) {
-        breakPointTipText = breakPointTipText + "<br/> Click to remove breakPoint";
-        breakPointStrokeColor = "red";
+    if (element.breakpoint) {
+        breakpointTipText = breakpointTipText + "<br/> Click to remove breakpoint";
+        breakpointStrokeColor = "red";
         circle.click(function () {
-                _breakPointRestCall("DELETE", element.id);
-            }
-        );
+            _breakpointRestCall("DELETE", element.id);
+        });
+        
     } else {
-        breakPointTipText = breakPointTipText + "<br/> Click to add breakPoint";
+        breakpointTipText = breakpointTipText + "<br/> Click to add breakpoint";
         circle.click(function () {
-                _breakPointRestCall("POST", element.id);
+            _breakpointRestCall("POST", element.id);
         });
     }
 
-    circle.attr("stroke", breakPointStrokeColor);
+    circle.attr("stroke", breakpointStrokeColor);
     circle.attr("stroke-width", "3");
-    circle.attr("fill", breakPointFillColor);
+    circle.attr("fill", breakpointFillColor);
 
 
     var circleHtmlNode = jQuery(circle.node);
     circleHtmlNode.qtip({
         content: {
-            text: breakPointTipText,
+            text: breakpointTipText,
             button: false
         },
         position: {
@@ -308,7 +308,7 @@ function _drawContinueExecution(x, y , executionId, activityId) {
     arrow.click(function () {
             $.ajax({
                 type: 'PUT',
-                url: '../app/rest/debugger/breakPoints/' + executionId + '/continue',
+                url: '../app/rest/debugger/breakpoints/' + executionId + '/continue',
                 contentType: 'application/json; charset=utf-8',
                 success: function () {
                     paper.clear();
@@ -404,7 +404,7 @@ function _showProcessDiagram() {
             //try {
             var drawFunction = eval("_draw" + element.type);
             drawFunction(element);
-            _drawBreakPoint(element);
+            _drawBreakpoint(element);
             if (element.brokenExecutions) {
                 for (var j = 0; j < element.brokenExecutions.length; j++) {
                     _drawContinueExecution(element.x +25 + j * 10, element.y - 15, element.brokenExecutions[j], element.id);

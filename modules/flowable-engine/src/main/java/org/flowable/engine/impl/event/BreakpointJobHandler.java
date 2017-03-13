@@ -24,9 +24,9 @@ import org.flowable.engine.impl.persistence.entity.JobEntity;
  *
  * @author martin.grofcik
  */
-public class BreakPointJobHandler implements JobHandler {
+public class BreakpointJobHandler implements JobHandler {
 
-    public static final String JOB_HANDLER_TYPE = "breakPoint";
+    public static final String JOB_HANDLER_TYPE = "breakpoint";
 
     @Override
     public String getType() {

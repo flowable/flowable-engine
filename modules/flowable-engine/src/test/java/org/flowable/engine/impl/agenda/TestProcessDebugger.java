@@ -1,6 +1,5 @@
 package org.flowable.engine.impl.agenda;
 
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessDebugger;
 
@@ -10,7 +9,7 @@ import org.flowable.engine.runtime.ProcessDebugger;
 public class TestProcessDebugger implements ProcessDebugger {
 
     @Override
-    public boolean isBreakPoint(Execution execution) {
+    public boolean isBreakpoint(Execution execution) {
         return true;
     }
 

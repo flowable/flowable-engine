@@ -1,8 +1,23 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.flowable.engine.impl.agenda;
 
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.*;
+import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntity;
+import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntityManager;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.runtime.ProcessDebugger;
 
 /**
@@ -13,7 +28,7 @@ import org.flowable.engine.runtime.ProcessDebugger;
  */
 public class DebugContinueProcessOperation extends ContinueProcessOperation {
 
-    public static final String HANDLER_TYPE_BREAK_POINT = "breakPoint";
+    public static final String HANDLER_TYPE_BREAK_POINT = "breakpoint";
     protected ProcessDebugger debugger;
 
     public DebugContinueProcessOperation(ProcessDebugger debugger, CommandContext commandContext,
@@ -29,7 +44,7 @@ public class DebugContinueProcessOperation extends ContinueProcessOperation {
     }
 
     protected void continueThroughFlowNode(FlowNode flowNode) {
-        if (debugger.isBreakPoint(execution)) {
+        if (debugger.isBreakpoint(execution)) {
             breakExecution(flowNode);
         } else {
             super.continueThroughFlowNode(flowNode);
@@ -37,7 +52,7 @@ public class DebugContinueProcessOperation extends ContinueProcessOperation {
     }
 
     protected void breakExecution(FlowNode flowNode) {
-        SuspendedJobEntity brokenJob = getSuspendedJobEntityManager().create();
+        DeadLetterJobEntity brokenJob = getDeadLetterJobEntityManager().create();
         brokenJob.setJobType(JobEntity.JOB_TYPE_MESSAGE);
         brokenJob.setRevision(1);
         brokenJob.setRetries(0);
@@ -52,11 +67,11 @@ public class DebugContinueProcessOperation extends ContinueProcessOperation {
             brokenJob.setTenantId(execution.getTenantId());
         }
 
-        getSuspendedJobEntityManager().insert(brokenJob);
+        getDeadLetterJobEntityManager().insert(brokenJob);
     }
 
-    protected SuspendedJobEntityManager getSuspendedJobEntityManager() {
-        return this.commandContext.getSuspendedJobEntityManager();
+    protected DeadLetterJobEntityManager getDeadLetterJobEntityManager() {
+        return this.commandContext.getDeadLetterJobEntityManager();
     }
 
 }
