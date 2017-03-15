@@ -112,8 +112,8 @@ public class FlowableProcessDefinitionService {
             if (latest != null && latest) {
                 definitionQuery.latestVersion();
             }
-        }
-        ///sibok666 code
+        }     
+        
         ///getting logged user
         User currentUser = SecurityUtils.getCurrentUserObject();
         String userId=currentUser.getId();
@@ -147,7 +147,7 @@ public class FlowableProcessDefinitionService {
          		}
          	}
         }
-        ///sibok666
+        
         
         ResultListDataRepresentation result = new ResultListDataRepresentation(convertDefinitionList(definitionsFiltered));
         return result;

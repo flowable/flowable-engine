@@ -68,9 +68,6 @@ public class FlowableAppDefinitionService {
         for (Deployment deployment : deployments) {
             if (deployment.getKey() != null) {
             	
-            	AppDefinitionRepresentation app=getAppDefinition(deployment.getKey());
-            	
-            	
                 if (!deploymentMap.containsKey(deployment.getKey())) {
                     deploymentMap.put(deployment.getKey(), deployment);
                 } else if (deploymentMap.get(deployment.getKey()).getDeploymentTime().before(deployment.getDeploymentTime())) {
@@ -80,21 +77,16 @@ public class FlowableAppDefinitionService {
         }
 
         for (Deployment deployment : deploymentMap.values()) {
-            
-            resultList.add(createRepresentation(deployment));
+        	AppDefinitionRepresentation app=createRepresentation(deployment);
+        	if(app!=null){
+        		resultList.add(app);
+        	}
         }
-        
-        
-//        ///sibok666 code
-//        ///getting logged user
-//        User currentUser = SecurityUtils.getCurrentUserObject();
-//        String userId=currentUser.getId();
-//        ///getting the groups by user
-//        List<RemoteGroup> listaGruposXUsuario=remoteIdmService.getUser(userId).getGroups();
+       
+      ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
+
+      return result;
       
-        
-        ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
-        return result;
     }
 
     public AppDefinitionRepresentation getAppDefinition(String deploymentKey) {
@@ -123,6 +115,33 @@ public class FlowableAppDefinitionService {
         resultAppDef.setUsersAccess(appModel.getUsersAccess());
         resultAppDef.setGroupsAccess(appModel.getGroupsAccess());
         
-        return resultAppDef;
+        //getting logged user
+        User currentUser = SecurityUtils.getCurrentUserObject();
+        String userId=currentUser.getId();
+        ///getting the groups by user
+        List<RemoteGroup> listaGruposXUsuario=remoteIdmService.getUser(userId).getGroups();
+        
+        if(resultAppDef.getUsersAccess()!=null){
+        	String arrayUsers[]=resultAppDef.getUsersAccess().split(",");
+        	for(int i=0;i<arrayUsers.length;i++){
+        		if(arrayUsers[i].equals("userId")){
+        			return resultAppDef;
+        		}
+        	}
+        }
+        
+        if(resultAppDef.getGroupsAccess()!=null ){
+        	String arrayGroups[]=resultAppDef.getGroupsAccess().split(",");
+        	for(int i=0;i<arrayGroups.length;i++){
+        		for(RemoteGroup r:listaGruposXUsuario){
+        			if(r.getId().equals(arrayGroups[i])){
+        				return resultAppDef;
+        			}
+        		}
+        	}
+        }	
+        
+        return null;
+       
     }
 }
