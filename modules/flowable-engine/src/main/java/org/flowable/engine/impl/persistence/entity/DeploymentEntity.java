@@ -50,6 +50,4 @@ public interface DeploymentEntity extends Deployment, Entity {
 
     void setNew(boolean isNew);
 
-    void setEngineVersion(String engineVersion);
-
 }

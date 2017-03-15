@@ -42,6 +42,8 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
 
     // Backwards compatibility
     protected String engineVersion;
+    
+
 
     /**
      * Will only be used during actual deployment to pass deployed artifacts (eg process definitions). Will be null otherwise.
