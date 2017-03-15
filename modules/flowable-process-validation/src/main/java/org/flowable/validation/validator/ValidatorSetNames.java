@@ -14,6 +14,6 @@ package org.flowable.validation.validator;
 
 public interface ValidatorSetNames {
 
-    String ACTIVITI_EXECUTABLE_PROCESS = "activiti-executable-process";
+    String FLOWABLE_EXECUTABLE_PROCESS = "flowable-executable-process";
 
 }

@@ -62,6 +62,7 @@ public interface TaskQuery extends TaskInfoQuery<TaskQuery, Task> {
      * 
      * @deprecated Use orderByTaskDueDate() instead
      */
+    @Deprecated
     TaskQuery orderByDueDate();
 
 }

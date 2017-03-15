@@ -261,8 +261,8 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     }
 
     @Override
-    public List<Task> findTasksAndVariablesByQueryCriteria(TaskQueryImpl taskQuery) {
-        return taskDataManager.findTasksAndVariablesByQueryCriteria(taskQuery);
+    public List<Task> findTasksWithRelatedEntitiesByQueryCriteria(TaskQueryImpl taskQuery) {
+        return taskDataManager.findTasksWithRelatedEntitiesByQueryCriteria(taskQuery);
     }
 
     @Override

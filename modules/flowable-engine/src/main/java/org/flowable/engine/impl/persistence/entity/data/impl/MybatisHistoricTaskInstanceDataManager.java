@@ -75,7 +75,7 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<HistoricTaskInstance> findHistoricTaskInstancesAndVariablesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
+    public List<HistoricTaskInstance> findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
         // paging doesn't work for combining task instances and variables
         // due to an outer join, so doing it in-memory
         if (historicTaskInstanceQuery.getFirstResult() < 0 || historicTaskInstanceQuery.getMaxResults() <= 0) {
@@ -93,7 +93,7 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
         }
         historicTaskInstanceQuery.setFirstResult(0);
 
-        List<HistoricTaskInstance> instanceList = getDbSqlSession().selectListWithRawParameterWithoutFilter("selectHistoricTaskInstancesWithVariablesByQueryCriteria", historicTaskInstanceQuery,
+        List<HistoricTaskInstance> instanceList = getDbSqlSession().selectListWithRawParameterWithoutFilter("selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteria", historicTaskInstanceQuery,
                 historicTaskInstanceQuery.getFirstResult(), historicTaskInstanceQuery.getMaxResults());
 
         if (instanceList != null && !instanceList.isEmpty()) {

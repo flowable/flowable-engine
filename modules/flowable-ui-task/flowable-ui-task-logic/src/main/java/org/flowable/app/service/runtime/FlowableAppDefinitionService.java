@@ -68,6 +68,11 @@ public class FlowableAppDefinitionService {
         for (Deployment deployment : deployments) {
             if (deployment.getKey() != null) {
             	
+<<<<<<< HEAD
+=======
+            	AppDefinitionRepresentation app=getAppDefinition(deployment.getKey());
+            	    	
+>>>>>>> branch 'master' of https://github.com/sibok666/flowable-engine
                 if (!deploymentMap.containsKey(deployment.getKey())) {
                     deploymentMap.put(deployment.getKey(), deployment);
                 } else if (deploymentMap.get(deployment.getKey()).getDeploymentTime().before(deployment.getDeploymentTime())) {
@@ -82,11 +87,17 @@ public class FlowableAppDefinitionService {
         		resultList.add(app);
         	}
         }
+<<<<<<< HEAD
        
       ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
 
       return result;
       
+=======
+        
+        ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
+        return result;
+>>>>>>> branch 'master' of https://github.com/sibok666/flowable-engine
     }
 
     public AppDefinitionRepresentation getAppDefinition(String deploymentKey) {

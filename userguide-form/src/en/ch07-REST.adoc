@@ -13,7 +13,7 @@ By default the Flowable engine will connect to an in-memory H2 database. You can
 
 All REST-resources require a valid Flowable-user to be authenticated by default. Basic HTTP access authentication is used, so you should always include a _Authorization: Basic ...==_ HTTP-header when performing requests or include the username and password in the request-url (for example, _http://username:password@localhost:8080/xyz_).
 
-*It's recommended that you use Basic Authentication in combination with HTTPS.*
+*We recommend that you use Basic Authentication in combination with HTTPS.*
 
 ==== Configuration
 
@@ -58,7 +58,7 @@ It's best practice to always set the *Accept* and *Content-Type* (in case of pos
 |+201 - Created+|The operation was successful and the entity has been created and is returned in the response-body (++POST++ request).
 |+204 - No content+|The operation was successful and entity has been deleted and therefore there is no response-body returned (++DELETE++ request).
 |+401 - Unauthorized+|The operation failed. The operation requires an Authentication header to be set. If this was present in the request, the supplied credentials are not valid or the user is not authorized to perform this operation.
-|+403 - Forbidden+|The operation is forbidden and should not be re-attempted. This does not imply an issue with authentication or authorization, it's an operation that is not allowed. Example: deleting a task that is part of a running process is not allowed and will never be allowed, regardless of the user or process/task state.
+|+403 - Forbidden+|The operation is forbidden and should not be re-attempted. This implies an issue with authorization not authentication, it's an operation that is not allowed. Example: deleting a task that is part of a running process is not allowed and will never be allowed, regardless of the user or process/task state.
 |+404 - Not found+|The operation failed. The requested resource was not found.
 |+405 - Method not allowed+|The operation failed. The method is not allowed for this resource. For example, trying to update (PUT) a deployment-resource will result in a +405+ status.
 |+409 - Conflict+|The operation failed. The operation causes an update of a resource that has been updated by another operation, which makes the update no longer valid. Can also indicate a resource that is being created in a collection where a resource with that identifier already exists.
@@ -774,11 +774,11 @@ Returns a read-only view of the engine that is used in this REST-service.
 ----
 
 
-.Get engine info - Response codes
+.Get engine information - Response codes
 [options="header"]
 |===============
 |Response code|Description
-|200|Indicates the form engine info is returned.
+|200|Indicates the form engine information is returned.
 
 |===============
 

@@ -6,8 +6,9 @@
                 <div class="title">
                     <div class="btn-group btn-group-sm pull-right">
                         <div class="btn-group btn-group-sm">
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-								{{'GENERAL.ACTION.SHOW-RESULTS' | translate:filter}}&nbsp;
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                    translate="GENERAL.ACTION.SHOW-RESULTS" translate-value-size="{{'GENERAL.RESULT-SIZES.' + filter.resultSize | translate}}">
+                                &nbsp;
                                 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu">
@@ -19,8 +20,9 @@
                         </button>
                     </div>
                     <div class="btn-group btn-group-sm pull-right">
-                    	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-						     {{'GENERAL.ACTION.SORT-BY' | translate:filter.sort}}&nbsp;
+                    	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                translate="GENERAL.ACTION.SORT-BY" translate-value-sort="{{filter.sort.name | translate}}">
+                            &nbsp;
                             <span class="caret"></span>
                         </button>
                     	<ul class="dropdown-menu">
