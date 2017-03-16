@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +19,7 @@ import org.flowable.engine.common.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link Job}s.
- * 
+ *
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
@@ -33,6 +33,9 @@ public interface SuspendedJobQuery extends Query<SuspendedJobQuery, Job> {
 
     /** Only select jobs which exist for the given execution */
     SuspendedJobQuery executionId(String executionId);
+
+    /** Select jobs which have given job handler type */
+    SuspendedJobQuery handlerType(String handlerType);
 
     /** Only select jobs which exist for the given process definition id */
     SuspendedJobQuery processDefinitionId(String processDefinitionid);

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,10 +18,10 @@ var TASK_HIGHLIGHT_STROKE = 2;
 var CALL_ACTIVITY_STROKE = 2;
 var ENDEVENT_STROKE = 3;
 
-var COMPLETED_COLOR= "#2632aa";
-var TEXT_COLOR= "#373e48";
-var CURRENT_COLOR= "#017501";
-var HOVER_COLOR= "#666666";
+var COMPLETED_COLOR = "#2632aa";
+var TEXT_COLOR = "#373e48";
+var CURRENT_COLOR = "#017501";
+var HOVER_COLOR = "#666666";
 var ACTIVITY_STROKE_COLOR = "#bbbbbb";
 var ACTIVITY_FILL_COLOR = "#f9f9f9";
 var MAIN_STROKE_COLOR = "#585858";
@@ -186,31 +186,98 @@ function _addHoverLogic(element, type, defaultColor)
     });
     _showTip(jQuery(topBodyRect.node), element);
 
-    topBodyRect.mouseover(function() {
-        paper.getById(element.id).attr({"stroke":HOVER_COLOR});
+    topBodyRect.mouseover(function () {
+        paper.getById(element.id).attr({"stroke": HOVER_COLOR});
     });
 
-    topBodyRect.mouseout(function() {
-        paper.getById(element.id).attr({"stroke":strokeColor});
+    topBodyRect.mouseout(function () {
+        paper.getById(element.id).attr({"stroke": strokeColor});
     });
 }
 
-function _zoom(zoomIn)
-{
-    var tmpCanvasWidth, tmpCanvasHeight;
-    if (zoomIn)
-    {
-        tmpCanvasWidth = canvasWidth * (1.0/0.90);
-        tmpCanvasHeight = canvasHeight * (1.0/0.90);
-    }
-    else
-    {
-        tmpCanvasWidth = canvasWidth * (1.0/1.10);
-        tmpCanvasHeight = canvasHeight * (1.0/1.10);
+function _breakpointRestCall(actionType, activityId) {
+    $.ajax({
+        type: actionType,
+        url: '../app/rest/debugger/breakpoints',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify({
+            activityId: activityId
+        }),
+        success: function () {
+            paper.clear();
+            _showProcessDiagram();
+        },
+        error: function () {
+            alert("error");
+        }
+    })
+}
+
+function _drawBreakpoint(element, breakpoints) {
+
+    var circle = paper.circle(element.x + 10, element.y - 10, 7);
+
+    var breakpointFillColor = "white";
+    var breakpointStrokeColor = "gray";
+    var breakpointTipText = "Inactive element";
+    if (element.current) {
+        breakpointFillColor = "red";
+        breakpointTipText = "Active execution"
     }
 
-    if (tmpCanvasWidth != canvasWidth || tmpCanvasHeight != canvasHeight)
-    {
+    if (element.breakpoint) {
+        breakpointTipText = breakpointTipText + "<br/> Click to remove breakpoint";
+        breakpointStrokeColor = "red";
+        circle.click(function () {
+            _breakpointRestCall("DELETE", element.id);
+        });
+        
+    } else {
+        breakpointTipText = breakpointTipText + "<br/> Click to add breakpoint";
+        circle.click(function () {
+            _breakpointRestCall("POST", element.id);
+        });
+    }
+
+    circle.attr("stroke", breakpointStrokeColor);
+    circle.attr("stroke-width", "3");
+    circle.attr("fill", breakpointFillColor);
+
+
+    var circleHtmlNode = jQuery(circle.node);
+    circleHtmlNode.qtip({
+        content: {
+            text: breakpointTipText,
+            button: false
+        },
+        position: {
+            my: 'top left',
+            at: 'bottom center',
+            viewport: jQuery('#bpmnModel')
+        },
+        hide: {
+            fixed: true, delay: 500,
+            event: 'click mouseleave'
+        },
+        style: {
+            classes: 'ui-tooltip-kisbpm-bpmn'
+        }
+    });
+
+}
+
+function _zoom(zoomIn) {
+    var tmpCanvasWidth, tmpCanvasHeight;
+    if (zoomIn) {
+        tmpCanvasWidth = canvasWidth * (1.0 / 0.90);
+        tmpCanvasHeight = canvasHeight * (1.0 / 0.90);
+    }
+    else {
+        tmpCanvasWidth = canvasWidth * (1.0 / 1.10);
+        tmpCanvasHeight = canvasHeight * (1.0 / 1.10);
+    }
+
+    if (tmpCanvasWidth != canvasWidth || tmpCanvasHeight != canvasHeight) {
         canvasWidth = tmpCanvasWidth;
         canvasHeight = tmpCanvasHeight;
         paper.setSize(canvasWidth, canvasHeight);
@@ -220,98 +287,147 @@ function _zoom(zoomIn)
 var modelUrl;
 
 if (modelType == 'runtime') {
-	if (historyModelId) {
-    	modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/history/' + historyModelId + '/model-json';
-	} else {
-    	modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/' + modelId + '/model-json';
-	}
+    if (historyModelId) {
+        modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/history/' + historyModelId + '/model-json';
+    } else {
+        modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/' + modelId + '/model-json';
+    }
 } else if (modelType == 'design') {
-	if (historyModelId) {
-    	modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/history/' + historyModelId + '/model-json';
-	} else {
-    	modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/model-json';
-	}
+    if (historyModelId) {
+        modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/history/' + historyModelId + '/model-json';
+    } else {
+        modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/model-json';
+    }
 } else if (modelType == 'process-definition') {
     modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-definitions/' + processDefinitionId + '/model-json';
 }
 
-var request = jQuery.ajax({
-    type: 'get',
-    url: modelUrl + '?nocaching=' + new Date().getTime()
-});
+function _drawContinueExecution(x, y , executionId, activityId) {
+    var arrow = paper.path("M "+ x +" "+ y + " L "+ (x+8) +" "+ (y+4) +" "+ x +" "+ (y+8) +" z");
 
-request.success(function(data, textStatus, jqXHR) {
-
-    if ((!data.elements || data.elements.length == 0) && (!data.pools || data.pools.length == 0)) return;
-
-    INITIAL_CANVAS_WIDTH = data.diagramWidth;
-    
-    if (modelType == 'design') {
-    	INITIAL_CANVAS_WIDTH += 20;
-    } else {
-        INITIAL_CANVAS_WIDTH += 30;
-    }
-    
-    INITIAL_CANVAS_HEIGHT = data.diagramHeight + 50;
-    canvasWidth = INITIAL_CANVAS_WIDTH;
-    canvasHeight = INITIAL_CANVAS_HEIGHT;
-    viewBoxWidth = INITIAL_CANVAS_WIDTH;
-    viewBoxHeight = INITIAL_CANVAS_HEIGHT;
-    
-    if (modelType == 'design') {
-    	var headerBarHeight = 170;
-    	var offsetY = 0;
-    	if (jQuery(window).height() > (canvasHeight + headerBarHeight))
-    	{
-        	offsetY = (jQuery(window).height() - headerBarHeight - canvasHeight) / 2;
-    	}
-
-    	if (offsetY > 50) {
-        	offsetY = 50;
-    	}
-
-    	jQuery('#bpmnModel').css('marginTop', offsetY);
-    }
-
-    jQuery('#bpmnModel').width(INITIAL_CANVAS_WIDTH);
-    jQuery('#bpmnModel').height(INITIAL_CANVAS_HEIGHT);
-    paper = Raphael(document.getElementById('bpmnModel'), canvasWidth, canvasHeight);
-    paper.setViewBox(0, 0, viewBoxWidth, viewBoxHeight, false);
-    paper.renderfix();
-
-    if (data.pools)
-    {
-        for (var i = 0; i < data.pools.length; i++)
-        {
-            var pool = data.pools[i];
-            _drawPool(pool);
+    arrow.click(function () {
+            $.ajax({
+                type: 'PUT',
+                url: '../app/rest/debugger/breakpoints/' + executionId + '/continue',
+                contentType: 'application/json; charset=utf-8',
+                success: function () {
+                    paper.clear();
+                    _showProcessDiagram();
+                },
+                error: function () {
+                    alert("error");
+                }
+            })
         }
-    }
+    );
+    arrow.attr("stroke", "green");
+    arrow.attr("stroke-width", "3");
+    arrow.attr("fill", "green");
 
-    var modelElements = data.elements;
-    for (var i = 0; i < modelElements.length; i++)
-    {
-        var element = modelElements[i];
-        //try {
-        var drawFunction = eval("_draw" + element.type);
-        drawFunction(element);
-        //} catch(err) {console.log(err);}
-    }
+    var arrowHtmlNode = jQuery(arrow.node);
+    arrowHtmlNode.qtip({
+        content: {
+            text: "Fire execution "+ executionId+", activity " + activityId,
+            button: false
+        },
+        position: {
+            my: 'top left',
+            at: 'bottom center',
+            viewport: jQuery('#bpmnModel')
+        },
+        hide: {
+            fixed: true, delay: 500,
+            event: 'click mouseleave'
+        },
+        style: {
+            classes: 'ui-tooltip-kisbpm-bpmn'
+        }
+    });
 
-    if (data.flows)
-    {
-        for (var i = 0; i < data.flows.length; i++)
-        {
-            var flow = data.flows[i];
-            if (flow.type === 'sequenceFlow') {
-                _drawFlow(flow);
-            } else if (flow.type === 'association') {
-                _drawAssociation(flow);
+}
+
+function _showProcessDiagram() {
+    var request = jQuery.ajax({
+        type: 'get',
+        url: modelUrl + '?nocaching=' + new Date().getTime()
+    });
+
+    request.success(function (data, textStatus, jqXHR) {
+
+        if ((!data.elements || data.elements.length == 0) && (!data.pools || data.pools.length == 0)) return;
+
+        INITIAL_CANVAS_WIDTH = data.diagramWidth;
+
+        if (modelType == 'design') {
+            INITIAL_CANVAS_WIDTH += 20;
+        } else {
+            INITIAL_CANVAS_WIDTH += 30;
+        }
+
+        INITIAL_CANVAS_HEIGHT = data.diagramHeight + 50;
+        canvasWidth = INITIAL_CANVAS_WIDTH;
+        canvasHeight = INITIAL_CANVAS_HEIGHT;
+        viewBoxWidth = INITIAL_CANVAS_WIDTH;
+        viewBoxHeight = INITIAL_CANVAS_HEIGHT;
+
+        if (modelType == 'design') {
+            var headerBarHeight = 170;
+            var offsetY = 0;
+            if (jQuery(window).height() > (canvasHeight + headerBarHeight)) {
+                offsetY = (jQuery(window).height() - headerBarHeight - canvasHeight) / 2;
+            }
+
+            if (offsetY > 50) {
+                offsetY = 50;
+            }
+
+            jQuery('#bpmnModel').css('marginTop', offsetY);
+        }
+
+        jQuery('#bpmnModel').width(INITIAL_CANVAS_WIDTH);
+        jQuery('#bpmnModel').height(INITIAL_CANVAS_HEIGHT);
+        paper = Raphael(document.getElementById('bpmnModel'), canvasWidth, canvasHeight);
+        paper.setViewBox(0, 0, viewBoxWidth, viewBoxHeight, false);
+        paper.renderfix();
+
+        if (data.pools) {
+            for (var i = 0; i < data.pools.length; i++) {
+                var pool = data.pools[i];
+                _drawPool(pool);
             }
         }
-    }
-});
 
-request.error(function(jqXHR, textStatus, errorThrown) {
-    alert("error");
-});
+        var modelElements = data.elements;
+
+        for (var i = 0; i < modelElements.length; i++) {
+            var element = modelElements[i];
+            //try {
+            var drawFunction = eval("_draw" + element.type);
+            drawFunction(element);
+            _drawBreakpoint(element);
+            if (element.brokenExecutions) {
+                for (var j = 0; j < element.brokenExecutions.length; j++) {
+                    _drawContinueExecution(element.x +25 + j * 10, element.y - 15, element.brokenExecutions[j], element.id);
+                }
+            }
+            //} catch(err) {console.log(err);}
+        }
+
+        if (data.flows) {
+            for (var i = 0; i < data.flows.length; i++) {
+                var flow = data.flows[i];
+                if (flow.type === 'sequenceFlow') {
+                    _drawFlow(flow);
+                } else if (flow.type === 'association') {
+                    _drawAssociation(flow);
+                }
+            }
+        }
+    });
+
+    request.error(function (jqXHR, textStatus, errorThrown) {
+        alert("error");
+    });
+}
+
+_showProcessDiagram();

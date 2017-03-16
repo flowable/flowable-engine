@@ -13,6 +13,7 @@
 package org.flowable.engine.task;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -105,6 +106,11 @@ public interface TaskInfo {
      * Returns the process variables if requested in the task query
      */
     Map<String, Object> getProcessVariables();
+
+    /**
+     * Returns the identity links.
+     */
+    List<? extends IdentityLinkInfo> getIdentityLinks();
 
     /**
      * The claim time of this task

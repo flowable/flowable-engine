@@ -61,6 +61,7 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
         persistentState.put("retries", retries);
         persistentState.put("duedate", duedate);
         persistentState.put("exceptionMessage", exceptionMessage);
+        persistentState.put("jobHandlerType", jobHandlerType);
 
         if (exceptionByteArrayRef != null) {
             persistentState.put("exceptionByteArrayId", exceptionByteArrayRef.getId());

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -145,6 +145,43 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
     public void testQueryByInvalidExecutionId() {
         JobQuery query = managementService.createJobQuery().executionId("invalid");
+        verifyQueryResults(query, 0);
+
+        TimerJobQuery timerQuery = managementService.createTimerJobQuery().executionId("invalid");
+        verifyQueryResults(timerQuery, 0);
+
+        try {
+            managementService.createJobQuery().executionId(null).list();
+            fail();
+        } catch (FlowableIllegalArgumentException e) {
+        }
+
+        try {
+            managementService.createTimerJobQuery().executionId(null).list();
+            fail();
+        } catch (FlowableIllegalArgumentException e) {
+        }
+    }
+
+    public void testQueryByHandlerType() {
+        final JobEntity job = (JobEntity) managementService.createJobQuery().singleResult();
+        job.setJobHandlerType("test");
+        managementService.executeCommand(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+                commandContext.getJobEntityManager().update(job);
+                return null;
+            }
+            
+        });
+        
+        Job handlerTypeJob = managementService.createJobQuery().handlerType("test").singleResult();
+        assertNotNull(handlerTypeJob);
+    }
+
+    public void testQueryByInvalidJobType() {
+        JobQuery query = managementService.createJobQuery().handlerType("invalid");
         verifyQueryResults(query, 0);
 
         TimerJobQuery timerQuery = managementService.createTimerJobQuery().executionId("invalid");

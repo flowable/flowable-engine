@@ -106,6 +106,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected boolean includeTaskLocalVariables;
     protected boolean includeProcessVariables;
     protected Integer taskVariablesLimit;
+    protected boolean includeIdentityLinks;
     protected List<HistoricTaskInstanceQueryImpl> orQueryObjects = new ArrayList<HistoricTaskInstanceQueryImpl>();
     protected HistoricTaskInstanceQueryImpl currentOrQueryObject;
     protected boolean inOrStatement;
@@ -134,8 +135,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         ensureVariablesInitialized();
         checkQueryOk();
         List<HistoricTaskInstance> tasks = null;
-        if (includeTaskLocalVariables || includeProcessVariables) {
-            tasks = commandContext.getHistoricTaskInstanceEntityManager().findHistoricTaskInstancesAndVariablesByQueryCriteria(this);
+        if (includeTaskLocalVariables || includeProcessVariables || includeIdentityLinks) {
+            tasks = commandContext.getHistoricTaskInstanceEntityManager().findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(this);
         } else {
             tasks = commandContext.getHistoricTaskInstanceEntityManager().findHistoricTaskInstancesByQueryCriteria(this);
         }
@@ -1089,6 +1090,11 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return this;
     }
 
+    public HistoricTaskInstanceQuery includeIdentityLinks() {
+        this.includeIdentityLinks = true;
+        return this;
+    }
+
     public Integer getTaskVariablesLimit() {
         return taskVariablesLimit;
     }
@@ -1427,6 +1433,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public boolean isIncludeProcessVariables() {
         return includeProcessVariables;
+    }
+
+    public boolean isIncludeIdentityLinks() {
+        return includeIdentityLinks;
     }
 
     public boolean isInOrStatement() {

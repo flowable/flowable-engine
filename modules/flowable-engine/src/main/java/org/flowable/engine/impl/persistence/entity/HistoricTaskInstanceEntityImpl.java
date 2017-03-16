@@ -13,8 +13,10 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +48,9 @@ public class HistoricTaskInstanceEntityImpl extends HistoricScopeInstanceEntityI
     protected String category;
     protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
     protected List<HistoricVariableInstanceEntity> queryVariables;
+    protected List<HistoricIdentityLinkEntity> queryIdentityLinks;
+    protected List<HistoricIdentityLinkEntity> identityLinks = new ArrayList<>();
+    protected boolean isIdentityLinksInitialized;
 
     public HistoricTaskInstanceEntityImpl() {
 
@@ -277,4 +282,28 @@ public class HistoricTaskInstanceEntityImpl extends HistoricScopeInstanceEntityI
         this.queryVariables = queryVariables;
     }
 
+    @Override
+    public List<HistoricIdentityLinkEntity> getIdentityLinks() {
+        if (!isIdentityLinksInitialized) {
+            if (queryIdentityLinks == null) {
+                identityLinks = Context.getCommandContext().getHistoricIdentityLinkEntityManager().findHistoricIdentityLinksByTaskId(id);
+            } else {
+                identityLinks = queryIdentityLinks;
+            }
+            isIdentityLinksInitialized = true;
+        }
+
+        return identityLinks;
+    }
+
+    public List<HistoricIdentityLinkEntity> getQueryIdentityLinks() {
+        if(queryIdentityLinks == null) {
+            queryIdentityLinks = new LinkedList<>();
+        }
+        return queryIdentityLinks;
+    }
+
+    public void setQueryIdentityLinks(List<HistoricIdentityLinkEntity> identityLinks) {
+        queryIdentityLinks = identityLinks;
+    }
 }
