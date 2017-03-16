@@ -19,6 +19,8 @@ public class AppModel {
     protected String description;
     protected String theme;
     protected String icon;
+    protected String usersAccess;
+    protected String groupsAccess;
 
     public String getKey() {
         return key;
@@ -58,5 +60,21 @@ public class AppModel {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public String getUsersAccess() {
+        return usersAccess;
+    }
+
+    public void setUsersAccess(String usersAccess) {
+        this.usersAccess = usersAccess;
+    }
+
+    public String getGroupsAccess() {
+        return groupsAccess;
+    }
+
+    public void setGroupsAccess(String groupsAccess) {
+        this.groupsAccess = groupsAccess;
     }
 }

@@ -12,19 +12,23 @@
  */
 package org.flowable.app.model.runtime;
 
+import java.util.List;
+
 import org.flowable.app.model.common.AbstractRepresentation;
 
 public class AppDefinitionRepresentation extends AbstractRepresentation {
 
-    private String defaultAppId; // Set for default apps (kickstart, tasks, idm, analytics,...)
-    private String name;
-    private String description;
-    private Long modelId;
-    private String theme;
-    private String icon;
-    private String deploymentId;
-    private String deploymentKey;
-    private Long tenantId;
+    protected String defaultAppId;
+    protected String name;
+    protected String description;
+    protected Long modelId;
+    protected String theme;
+    protected String icon;
+    protected String deploymentId;
+    protected String deploymentKey;
+    protected Long tenantId;
+    protected List<String> usersAccess;
+    protected List<String> groupsAccess;
 
     public static AppDefinitionRepresentation createDefaultAppDefinitionRepresentation(String id) {
         AppDefinitionRepresentation appDefinitionRepresentation = new AppDefinitionRepresentation();
@@ -102,5 +106,21 @@ public class AppDefinitionRepresentation extends AbstractRepresentation {
 
     public void setTenantId(Long tenantId) {
         this.tenantId = tenantId;
+    }
+
+    public List<String> getUsersAccess() {
+        return usersAccess;
+    }
+
+    public void setUsersAccess(List<String> usersAccess) {
+        this.usersAccess = usersAccess;
+    }
+
+    public List<String> getGroupsAccess() {
+        return groupsAccess;
+    }
+
+    public void setGroupsAccess(List<String> groupsAccess) {
+        this.groupsAccess = groupsAccess;
     }
 }

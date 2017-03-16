@@ -108,6 +108,8 @@ public class BaseAppDefinitionService {
         appDefinitionNode.put("description", appDefinitionModel.getDescription());
         appDefinitionNode.put("theme", appDefinition.getTheme());
         appDefinitionNode.put("icon", appDefinition.getIcon());
+        appDefinitionNode.put("usersAccess", appDefinition.getUsersAccess());
+        appDefinitionNode.put("groupsAccess", appDefinition.getGroupsAccess());
         return appDefinitionNode.toString();
     }
 
