@@ -112,12 +112,8 @@ public class FlowableProcessDefinitionService {
             if (latest != null && latest) {
                 definitionQuery.latestVersion();
             }
-<<<<<<< HEAD
         }     
         
-=======
-        }
->>>>>>> branch 'master' of https://github.com/sibok666/flowable-engine
         ///getting logged user
         User currentUser = SecurityUtils.getCurrentUserObject();
         String userId=currentUser.getId();
@@ -151,12 +147,6 @@ public class FlowableProcessDefinitionService {
          		}
          	}
         }
-<<<<<<< HEAD
-        
-        
-=======
-       
->>>>>>> branch 'master' of https://github.com/sibok666/flowable-engine
         ResultListDataRepresentation result = new ResultListDataRepresentation(convertDefinitionList(definitionsFiltered));
         return result;
     }

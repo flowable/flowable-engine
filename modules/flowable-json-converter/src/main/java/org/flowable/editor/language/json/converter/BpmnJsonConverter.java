@@ -446,7 +446,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         filterAllEdges(modelNode, edgeMap, sourceAndTargetMap, shapeMap, sourceRefMap);
         readEdgeDI(edgeMap, sourceAndTargetMap, bpmnModel);
 
-        ArrayNode shapesArrayNode = (ArrayNode) modelNode.get(EDITOR_CHILD_SHAPES;
+        ArrayNode shapesArrayNode = (ArrayNode) modelNode.get(EDITOR_CHILD_SHAPES);
 
         if (shapesArrayNode == null || shapesArrayNode.size() == 0)
             return bpmnModel;
