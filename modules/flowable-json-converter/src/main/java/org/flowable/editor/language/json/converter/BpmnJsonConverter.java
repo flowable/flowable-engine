@@ -451,6 +451,30 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         if (shapesArrayNode == null || shapesArrayNode.size() == 0)
             return bpmnModel;
 
+	    ////potential starter Restrict access Code
+				
+		String userStarter=BpmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_POTENTIALSTARTERUSER, modelNode);
+		String groupStarter=BpmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_POTENTIALSTARTERGROUP, modelNode);
+		List<String> usuariosIniciadores=new ArrayList();
+		List<String> gruposIniciadores=new ArrayList();
+		
+		String arregloUsuarios[]=userStarter.split(",");
+		if(arregloUsuarios.length<0){
+			arregloUsuarios[0]=userStarter;
+		}
+		String arregloGrupos[]=groupStarter.split(",");
+		if(arregloGrupos.length<0){
+			arregloGrupos[0]=groupStarter;
+		}
+
+		for(int i=0;i<arregloUsuarios.length;i++){
+			usuariosIniciadores.add(arregloUsuarios[i]);
+		}
+		for(int i=0;i<arregloGrupos.length;i++){
+			gruposIniciadores.add(arregloGrupos[i]);
+		}
+		//End potential starter user code
+		
         boolean nonEmptyPoolFound = false;
         Map<String, Lane> elementInLaneMap = new HashMap<String, Lane>();
         // first create the pool structure
@@ -468,9 +492,12 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 process.setId(pool.getProcessRef());
                 process.setName(pool.getName());
                 process.setExecutable(pool.isExecutable());
-                bpmnModel.addProcess(process);
-
+				process.setCandidateStarterGroups(gruposIniciadores);
+                process.setCandidateStarterUsers(usuariosIniciadores);
+				bpmnModel.addProcess(process);
+				
                 ArrayNode laneArrayNode = (ArrayNode) shapeNode.get(EDITOR_CHILD_SHAPES);
+				
                 for (JsonNode laneNode : laneArrayNode) {
                     // should be a lane, but just check to be certain
                     String laneStencilId = BpmnJsonConverterUtil.getStencilId(laneNode);
@@ -520,6 +547,8 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
         if (!nonEmptyPoolFound) {
             Process process = new Process();
+			process.setCandidateStarterGroups(gruposIniciadores);
+            process.setCandidateStarterUsers(usuariosIniciadores);
             bpmnModel.getProcesses().add(process);
             process.setId(BpmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_ID, modelNode));
             process.setName(BpmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_NAME, modelNode));

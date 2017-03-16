@@ -17,12 +17,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.app.model.common.RemoteGroup;
 import org.flowable.app.model.common.ResultListDataRepresentation;
 import org.flowable.app.model.runtime.AppDefinitionRepresentation;
+import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.exception.NotFoundException;
+import org.flowable.app.service.idm.RemoteIdmService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.app.AppModel;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +50,9 @@ public class FlowableAppDefinitionService {
 
     @Autowired
     protected ObjectMapper objectMapper;
+    
+    @Autowired
+    protected RemoteIdmService remoteIdmService;
 
     protected static final AppDefinitionRepresentation taskAppDefinitionRepresentation = AppDefinitionRepresentation.createDefaultAppDefinitionRepresentation("tasks");
 
@@ -68,11 +76,17 @@ public class FlowableAppDefinitionService {
         }
 
         for (Deployment deployment : deploymentMap.values()) {
-            resultList.add(createRepresentation(deployment));
+        	AppDefinitionRepresentation app=createRepresentation(deployment);
+        	if(app!=null){
+        		resultList.add(app);
+        	}
         }
 
-        ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
-        return result;
+       
+      ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
+
+      return result;
+      
     }
 
     public AppDefinitionRepresentation getAppDefinition(String deploymentKey) {
@@ -98,6 +112,36 @@ public class FlowableAppDefinitionService {
         AppModel appModel = repositoryService.getAppResourceModel(deployment.getId());
         resultAppDef.setTheme(appModel.getTheme());
         resultAppDef.setIcon(appModel.getIcon());
-        return resultAppDef;
+        resultAppDef.setUsersAccess(appModel.getUsersAccess());
+        resultAppDef.setGroupsAccess(appModel.getGroupsAccess());
+        
+        //getting logged user
+        User currentUser = SecurityUtils.getCurrentUserObject();
+        String userId=currentUser.getId();
+        ///getting the groups by user
+        List<RemoteGroup> listaGruposXUsuario=remoteIdmService.getUser(userId).getGroups();
+        
+        if(resultAppDef.getUsersAccess()!=null){
+        	String arrayUsers[]=resultAppDef.getUsersAccess().split(",");
+        	for(int i=0;i<arrayUsers.length;i++){
+        		if(arrayUsers[i].equals("userId")){
+        			return resultAppDef;
+        		}
+        	}
+        }
+        
+        if(resultAppDef.getGroupsAccess()!=null ){
+        	String arrayGroups[]=resultAppDef.getGroupsAccess().split(",");
+        	for(int i=0;i<arrayGroups.length;i++){
+        		for(RemoteGroup r:listaGruposXUsuario){
+        			if(r.getId().equals(arrayGroups[i])){
+        				return resultAppDef;
+        			}
+        		}
+        	}
+        }	
+        
+        return null;
+       
     }
 }

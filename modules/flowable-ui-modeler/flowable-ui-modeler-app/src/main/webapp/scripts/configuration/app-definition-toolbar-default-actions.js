@@ -49,6 +49,12 @@ angular.module('flowableModeler').controller('SaveAppDefinitionCtrl',
     	description = $rootScope.currentAppDefinition.description;
     }
     
+    var groupsAccess='';
+    groupsAccess=$rootScope.currentAppDefinition.definition.groupsAccess;
+    
+    var usersAccess=''; 
+    usersAccess=$rootScope.currentAppDefinition.definition.usersAccess;
+    
     var saveDialog = { 
         name: $rootScope.currentAppDefinition.name,
         key: $rootScope.currentAppDefinition.key,

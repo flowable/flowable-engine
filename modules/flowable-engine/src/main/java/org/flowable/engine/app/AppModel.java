@@ -19,7 +19,24 @@ public class AppModel {
     protected String description;
     protected String theme;
     protected String icon;
+    protected String usersAccess;
+    protected String groupsAccess;
+    
+    public String getUsersAccess() {
+	return usersAccess;
+    }
 
+    public void setUsersAccess(String usersAccess) {
+	this.usersAccess = usersAccess;
+    }
+
+    public String getGroupsAccess() {
+	return groupsAccess;
+    }
+
+    public void setGroupsAccess(String groupsAccess) {
+	this.groupsAccess = groupsAccess;
+    }
     public String getKey() {
         return key;
     }

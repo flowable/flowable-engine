@@ -59,13 +59,13 @@
   <!-- DEPLOYMENT RESULTMAP -->
   
   <resultMap id="deploymentResultMap" type="org.flowable.engine.impl.persistence.entity.DeploymentEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
-    <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
-    <result property="key" column="KEY_" jdbcType="VARCHAR" />
-    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="VARCHAR"/>
+    <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+    <result property="category" column="CATEGORY_" jdbcType="VARCHAR"/>
+    <result property="key" column="KEY_" jdbcType="VARCHAR"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
     <result property="deploymentTime" column="DEPLOY_TIME_" jdbcType="TIMESTAMP"/>
-    <result property="engineVersion" column="ENGINE_VERSION_" jdbcType="VARCHAR" />
+    <result property="engineVersion" column="ENGINE_VERSION_" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!-- DEPLOYMENT SELECT -->
