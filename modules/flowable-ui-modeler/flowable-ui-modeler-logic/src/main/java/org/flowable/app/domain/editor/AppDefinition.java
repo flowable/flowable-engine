@@ -28,6 +28,8 @@ public class AppDefinition {
     protected List<AppModelDefinition> models;
     protected String theme;
     protected String icon;
+    protected String groupsAccess;
+    protected String usersAccess;
 
     public String getTheme() {
         return theme;
@@ -51,5 +53,21 @@ public class AppDefinition {
 
     public void setModels(List<AppModelDefinition> models) {
         this.models = models;
+    }
+
+    public String getGroupsAccess() {
+        return groupsAccess;
+    }
+
+    public void setGroupsAccess(String groupsAccess) {
+        this.groupsAccess = groupsAccess;
+    }
+
+    public String getUsersAccess() {
+        return usersAccess;
+    }
+
+    public void setUsersAccess(String usersAccess) {
+        this.usersAccess = usersAccess;
     }
 }
