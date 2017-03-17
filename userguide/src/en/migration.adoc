@@ -11,9 +11,7 @@
 
 == Introduction
 
-This guide describes the various things that are needed when migrating from Flowable v5.x to Flowable V6. This is a preliminary version of the migration guide, which will be updated as alpha/beta releases of Flowable V6 are being pushed out. As it goes with such releases, many things can still change on the road to a stable version. At that point, the migration guide will be formalized and the regular user guide will be updated to reflect all the features and capabilities in Flowable V6, as was the case for Flowable v5.
-
-*The current Flowable V6 release is for test purposes only! Do not use in production yet.* The main goal of this release is to gather feedback, report issues and to have people test out their process definitions on V6. Of course, as before, all contributions are more than welcomed through our Github page. The Flowable V6 code lives currently link:$$https://github.com/flowable/flowable-engine$$[on the _master_ branch]
+This guide describes the various things that are needed when migrating from Flowable v5.x to Flowable V6.
 
 == Design goals
 
