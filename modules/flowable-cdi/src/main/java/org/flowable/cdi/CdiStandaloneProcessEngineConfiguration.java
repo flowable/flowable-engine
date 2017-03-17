@@ -22,7 +22,7 @@ public class CdiStandaloneProcessEngineConfiguration extends StandaloneProcessEn
 
     @Override
     public void initExpressionManager() {
-        expressionManager = new CdiExpressionManager(this);
+        expressionManager = new CdiExpressionManager();
     }
 
     @Override

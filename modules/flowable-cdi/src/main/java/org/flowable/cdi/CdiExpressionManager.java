@@ -21,7 +21,6 @@ import javax.el.MapELResolver;
 
 import org.flowable.cdi.impl.el.CdiResolver;
 import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.el.VariableScopeElResolver;
 
@@ -39,10 +38,6 @@ import org.flowable.engine.impl.el.VariableScopeElResolver;
  * @author Daniel Meyer
  */
 public class CdiExpressionManager extends ExpressionManager {
-
-    public CdiExpressionManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        super(processEngineConfiguration);
-    }
 
     @Override
     protected ELResolver createElResolver(VariableScope variableScope) {

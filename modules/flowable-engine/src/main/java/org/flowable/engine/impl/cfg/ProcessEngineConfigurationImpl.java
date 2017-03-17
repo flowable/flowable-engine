@@ -847,6 +847,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         configuratorsBeforeInit();
         initProcessDiagramGenerator();
         initHistoryLevel();
+        initFunctionDelegates();
         initExpressionManager();
         initAgendaFactory();
 
@@ -896,7 +897,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initFailedJobCommandFactory();
         initEventDispatcher();
         initProcessValidator();
-        initFunctionDelegates();
         initDatabaseEventLogging();
         initFlowable5CompatibilityHandler();
         configuratorsAfterInit();
@@ -1855,8 +1855,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initExpressionManager() {
         if (expressionManager == null) {
-            expressionManager = new ExpressionManager(beans, this);
+            expressionManager = new ExpressionManager(beans);
         }
+        
+        expressionManager.setFunctionDelegates(flowableFunctionDelegates);
     }
 
     public void initBusinessCalendarManager() {
