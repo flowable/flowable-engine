@@ -24,14 +24,12 @@ import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.cmd.GetIdentityLinksForTaskCmd;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.DelegationState;
-import org.flowable.engine.task.IdentityLink;
 import org.flowable.engine.task.IdentityLinkInfo;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.task.TaskQuery;

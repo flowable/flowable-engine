@@ -127,7 +127,8 @@ public abstract class AbstractEngineConfiguration {
     protected boolean transactionsExternallyManaged;
 
     /**
-     * Flag that can be set to configure or nota relational database is used. This is useful for custom implementations that do not use relational databases at all.
+     * Flag that can be set to configure or not a relational database is used. This is useful for custom implementations that do not use relational databases
+     * at all.
      * 
      * If true (default), the {@link AbstractEngineConfiguration#getDatabaseSchemaUpdate()} value will be used to determine what needs to happen wrt the database schema.
      * 

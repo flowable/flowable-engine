@@ -63,7 +63,7 @@ public class ExecutionEventsTest extends PluggableFlowableTestCase {
         assertEquals(processInstance.getId(), ((org.activiti.engine.runtime.Execution) event.getEntity()).getId());
         listener.clearEventsReceived();
 
-        // Check update event when process-definition is supended (should cascade suspend/activate all process instances)
+        // Check update event when process-definition is suspended (should cascade suspend/activate all process instances)
         repositoryService.suspendProcessDefinitionById(processInstance.getProcessDefinitionId(), true, null);
         repositoryService.activateProcessDefinitionById(processInstance.getProcessDefinitionId(), true, null);
 

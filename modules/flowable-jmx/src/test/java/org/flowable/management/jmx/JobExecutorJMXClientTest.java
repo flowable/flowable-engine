@@ -66,7 +66,7 @@ public class JobExecutorJMXClientTest {
         // assertTrue(processEngineConfig.getJobExecutor().isActive());
         assertTrue((Boolean) mbsc.getAttribute(jobExecutorBeanName, "JobExecutorActivated"));
 
-        // agani disable and check it
+        // again disable and check it
         mbsc.invoke(jobExecutorBeanName, "setJobExecutorActivate", new Boolean[] { false }, new String[] { Boolean.class.getName() });
 
         // check if it has the effect and correctly reported

@@ -92,7 +92,7 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(JobEntity.class);
 
         /*
-         * FK to ByteArray FK to Exeution
+         * FK to ByteArray FK to Execution
          */
         DELETE_ORDER.add(VariableInstanceEntity.class);
 

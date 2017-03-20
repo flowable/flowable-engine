@@ -37,7 +37,7 @@ public class EventListenersConfigurationTest extends ResourceFlowableTestCase {
         // Clear any events received (eg. engine initialisation)
         listener.clearEventsReceived();
 
-        // Dispath a custom event
+        // Dispatch custom event
         FlowableEvent event = new ActivitiEventImpl(FlowableEngineEventType.CUSTOM);
         processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
 

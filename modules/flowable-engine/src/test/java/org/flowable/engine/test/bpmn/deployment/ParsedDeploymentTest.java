@@ -40,14 +40,14 @@ public class ParsedDeploymentTest extends PluggableFlowableTestCase {
 
     private static final String ID1_ID = "id1";
     private static final String ID2_ID = "id2";
-    private static final String IDR_PROCESS_XML = aseembleXmlResourceString(
+    private static final String IDR_PROCESS_XML = assembleXmlResourceString(
             "<process id='" + ID1_ID + "' name='Insurance Damage Report 1' />",
             "<process id='" + ID2_ID + "' name='Insurance Damager Report 2' />");
     private static final String IDR_XML_NAME = "idr." + ResourceNameUtil.BPMN_RESOURCE_SUFFIXES[0];
 
     private static final String EN1_ID = "en1";
     private static final String EN2_ID = "en2";
-    private static final String EN_PROCESS_XML = aseembleXmlResourceString(
+    private static final String EN_PROCESS_XML = assembleXmlResourceString(
             "<process id='" + EN1_ID + "' name='Expense Note 1' />",
             "<process id='" + EN2_ID + "' name='Expense Note 2' />");
     private static final String EN_XML_NAME = "en." + ResourceNameUtil.BPMN_RESOURCE_SUFFIXES[1];
@@ -116,7 +116,7 @@ public class ParsedDeploymentTest extends PluggableFlowableTestCase {
         return result;
     }
 
-    private static String aseembleXmlResourceString(String... definitions) {
+    private static String assembleXmlResourceString(String... definitions) {
         StringBuilder builder = new StringBuilder("<definitions ");
         builder = builder.append(NAMESPACE).append(" ").append(TARGET_NAMESPACE).append(">\n");
 
