@@ -59,8 +59,8 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
     private static final String SEQUENTIAL_PROCESS_KEY = "oneTaskProcess";
     private static final String CONCURRENT_PROCESS_NAME = "concurrentName";
     private static final String SEQUENTIAL_PROCESS_NAME = "oneTaskProcessName";
-    private static final String CONCURRENT_PROCESS_CATEGORY = "org.flowable.enginge.test.api.runtime.concurrent.Category";
-    private static final String SEQUENTIAL_PROCESS_CATEGORY = "org.flowable.enginge.test.api.runtime.Category";
+    private static final String CONCURRENT_PROCESS_CATEGORY = "org.flowable.engine.test.api.runtime.concurrent.Category";
+    private static final String SEQUENTIAL_PROCESS_CATEGORY = "org.flowable.engine.test.api.runtime.Category";
 
     private List<String> concurrentProcessInstanceIds;
     private List<String> sequentialProcessInstanceIds;

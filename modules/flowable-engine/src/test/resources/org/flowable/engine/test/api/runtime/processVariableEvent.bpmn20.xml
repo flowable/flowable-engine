@@ -3,7 +3,7 @@
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:activiti="http://activiti.org/bpmn"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="org.flowable.enginge.test.api.runtime.Category">
+  targetNamespace="org.flowable.engine.test.api.runtime.Category">
 
   <process id="processVariableEvent" name="processVariableEvent">
     
