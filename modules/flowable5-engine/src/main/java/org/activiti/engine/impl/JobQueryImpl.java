@@ -23,7 +23,6 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.runtime.JobQuery;
 import org.flowable.engine.runtime.Job;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Joram Barrez

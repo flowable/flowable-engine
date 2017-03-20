@@ -17,9 +17,6 @@ import java.util.Date;
 
 import org.flowable.engine.task.IdentityLink;
 import org.flowable.engine.task.IdentityLinkInfo;
-import org.flowable.engine.task.IdentityLinkType;
-import org.flowable.idm.api.GroupQuery;
-import org.flowable.idm.api.UserQuery;
 
 /**
  * Historic counterpart of {@link IdentityLink} that represents the current state if any runtime link. Will be preserved when the runtime process instance or task is finished.

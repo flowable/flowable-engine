@@ -29,7 +29,7 @@ import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
  * @author Saeid Mirzaei
  */
 
-// This helper class helps sharing the same code for jobExector test helpers, between Junit3 and junit 4 test support classes
+// This helper class helps sharing the same code for jobExecutor test helpers, between Junit3 and junit 4 test support classes
 public class JobTestHelper {
 
     public static void waitForJobExecutorToProcessAllJobs(ActivitiRule activitiRule, long maxMillisToWait, long intervalMillis) {
@@ -51,7 +51,7 @@ public class JobTestHelper {
 
         try {
             Timer timer = new Timer();
-            InteruptTask task = new InteruptTask(Thread.currentThread());
+            InterruptTask task = new InterruptTask(Thread.currentThread());
             timer.schedule(task, maxMillisToWait);
             boolean areJobsAvailable = true;
             try {
@@ -93,7 +93,7 @@ public class JobTestHelper {
 
         try {
             Timer timer = new Timer();
-            InteruptTask task = new InteruptTask(Thread.currentThread());
+            InterruptTask task = new InterruptTask(Thread.currentThread());
             timer.schedule(task, maxMillisToWait);
             boolean areJobsAvailable = true;
             try {
@@ -135,7 +135,7 @@ public class JobTestHelper {
 
         try {
             Timer timer = new Timer();
-            InteruptTask task = new InteruptTask(Thread.currentThread());
+            InterruptTask task = new InterruptTask(Thread.currentThread());
             timer.schedule(task, maxMillisToWait);
             boolean conditionIsViolated = true;
             try {
@@ -170,7 +170,7 @@ public class JobTestHelper {
 
         try {
             Timer timer = new Timer();
-            InteruptTask task = new InteruptTask(Thread.currentThread());
+            InterruptTask task = new InterruptTask(Thread.currentThread());
             timer.schedule(task, maxMillisToWait);
             try {
                 while (!task.isTimeLimitExceeded()) {
@@ -208,12 +208,12 @@ public class JobTestHelper {
         }
     }
 
-    private static class InteruptTask extends TimerTask {
+    private static class InterruptTask extends TimerTask {
 
         protected boolean timeLimitExceeded;
         protected Thread thread;
 
-        public InteruptTask(Thread thread) {
+        public InterruptTask(Thread thread) {
             this.thread = thread;
         }
 

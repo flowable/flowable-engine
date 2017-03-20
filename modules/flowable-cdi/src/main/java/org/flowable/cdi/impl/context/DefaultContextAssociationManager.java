@@ -168,7 +168,7 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
         }
         ScopedAssociation scopedAssociation = getScopedAssociation();
         if (scopedAssociation.getExecution() == null) {
-            throw new FlowableException("Cannot dissasociate execution, no " + scopedAssociation.getClass().getAnnotations()[0].annotationType().getSimpleName() + " execution associated. ");
+            throw new FlowableException("Cannot disassociate execution, no " + scopedAssociation.getClass().getAnnotations()[0].annotationType().getSimpleName() + " execution associated. ");
         }
         if (log.isTraceEnabled()) {
             log.trace("Disassociating");

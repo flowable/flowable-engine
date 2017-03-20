@@ -171,8 +171,8 @@ public class DefaultJobManager implements JobManager {
         }
 
         JobEntity executableJob = createExecutableJobFromOtherJob(timerJob);
-        boolean insertSuccesful = processEngineConfiguration.getJobEntityManager().insertJobEntity(executableJob);
-        if (insertSuccesful) {
+        boolean insertSuccessful = processEngineConfiguration.getJobEntityManager().insertJobEntity(executableJob);
+        if (insertSuccessful) {
             processEngineConfiguration.getTimerJobEntityManager().delete(timerJob);
             triggerExecutorIfNeeded(executableJob);
             return executableJob;
@@ -183,8 +183,8 @@ public class DefaultJobManager implements JobManager {
     @Override
     public TimerJobEntity moveJobToTimerJob(AbstractJobEntity job) {
         TimerJobEntity timerJob = createTimerJobFromOtherJob(job);
-        boolean insertSuccesful = processEngineConfiguration.getTimerJobEntityManager().insertTimerJobEntity(timerJob);
-        if (insertSuccesful) {
+        boolean insertSuccessful = processEngineConfiguration.getTimerJobEntityManager().insertTimerJobEntity(timerJob);
+        if (insertSuccessful) {
             if (job instanceof JobEntity) {
                 processEngineConfiguration.getJobEntityManager().delete((JobEntity) job);
             } else if (job instanceof SuspendedJobEntity) {
@@ -250,8 +250,8 @@ public class DefaultJobManager implements JobManager {
 
         JobEntity executableJob = createExecutableJobFromOtherJob(deadLetterJobEntity);
         executableJob.setRetries(retries);
-        boolean insertSuccesful = processEngineConfiguration.getJobEntityManager().insertJobEntity(executableJob);
-        if (insertSuccesful) {
+        boolean insertSuccessful = processEngineConfiguration.getJobEntityManager().insertJobEntity(executableJob);
+        if (insertSuccessful) {
             processEngineConfiguration.getDeadLetterJobEntityManager().delete(deadLetterJobEntity);
             triggerExecutorIfNeeded(executableJob);
             return executableJob;

@@ -90,7 +90,7 @@ public class MessageEventsAndNewVersionDeploymentsWithTenantIdTest extends Plugg
     /**
      * Verifying that the event subscriptions do get removed when removing a process instance.
      */
-    public void testBoundaryEventSubscrptionsDeletedOnProcessInstanceDelete() {
+    public void testBoundaryEventSubscriptionsDeletedOnProcessInstanceDelete() {
         String deploymentId1 = deployBoundaryMessageTestProcess();
         runtimeService.startProcessInstanceByKeyAndTenantId("messageTest", TENANT_ID);
         assertEquals("My Task", taskService.createTaskQuery().singleResult().getName());

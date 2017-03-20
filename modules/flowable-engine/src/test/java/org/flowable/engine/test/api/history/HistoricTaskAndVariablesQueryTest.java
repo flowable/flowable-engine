@@ -439,9 +439,9 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             assertEquals(123, variableMap.get("testVar2"));
             assertEquals(1, task.getIdentityLinks().size());
             IdentityLinkInfo identityLink = task.getIdentityLinks().get(0);
-            assertEquals(null, identityLink.getProcessInstanceId());
+            assertNull(identityLink.getProcessInstanceId());
             assertEquals("assignee", identityLink.getType());
-            assertEquals(null, identityLink.getGroupId());
+            assertNull(identityLink.getGroupId());
             assertEquals("gonzo", identityLink.getUserId());
             assertEquals(task.getId(), identityLink.getTaskId());
 
@@ -454,9 +454,9 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             assertEquals(123, variableMap.get("testVar2"));
             assertEquals(1, task.getIdentityLinks().size());
             identityLink = task.getIdentityLinks().get(0);
-            assertEquals(null, identityLink.getProcessInstanceId());
+            assertNull(identityLink.getProcessInstanceId());
             assertEquals("assignee", identityLink.getType());
-            assertEquals(null, identityLink.getGroupId());
+            assertNull(identityLink.getGroupId());
             assertEquals("gonzo", identityLink.getUserId());
             assertEquals(task.getId(), identityLink.getTaskId());
 
@@ -469,9 +469,9 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             assertEquals(123, variableMap.get("testVar2"));
             assertEquals(1, task.getIdentityLinks().size());
             identityLink = task.getIdentityLinks().get(0);
-            assertEquals(null, identityLink.getProcessInstanceId());
+            assertNull(identityLink.getProcessInstanceId());
             assertEquals("assignee", identityLink.getType());
-            assertEquals(null, identityLink.getGroupId());
+            assertNull(identityLink.getGroupId());
             assertEquals("gonzo", identityLink.getUserId());
             assertEquals(task.getId(), identityLink.getTaskId());
 

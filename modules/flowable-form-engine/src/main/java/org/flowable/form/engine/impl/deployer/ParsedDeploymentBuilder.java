@@ -44,7 +44,7 @@ public class ParsedDeploymentBuilder {
     public ParsedDeployment build() {
         List<FormDefinitionEntity> formDefinitions = new ArrayList<FormDefinitionEntity>();
         Map<FormDefinitionEntity, FormDefinitionParse> formDefinitionToParseMap = new LinkedHashMap<FormDefinitionEntity, FormDefinitionParse>();
-        Map<FormDefinitionEntity, ResourceEntity> formDefintionToResourceMap = new LinkedHashMap<FormDefinitionEntity, ResourceEntity>();
+        Map<FormDefinitionEntity, ResourceEntity> formDefinitionToResourceMap = new LinkedHashMap<FormDefinitionEntity, ResourceEntity>();
 
         for (ResourceEntity resource : deployment.getResources().values()) {
             if (isFormResource(resource.getName())) {
@@ -53,12 +53,12 @@ public class ParsedDeploymentBuilder {
                 for (FormDefinitionEntity formDefinition : parse.getFormDefinitions()) {
                     formDefinitions.add(formDefinition);
                     formDefinitionToParseMap.put(formDefinition, parse);
-                    formDefintionToResourceMap.put(formDefinition, resource);
+                    formDefinitionToResourceMap.put(formDefinition, resource);
                 }
             }
         }
 
-        return new ParsedDeployment(deployment, formDefinitions, formDefinitionToParseMap, formDefintionToResourceMap);
+        return new ParsedDeployment(deployment, formDefinitions, formDefinitionToParseMap, formDefinitionToResourceMap);
     }
 
     protected FormDefinitionParse createFormParseFromResource(ResourceEntity resource) {

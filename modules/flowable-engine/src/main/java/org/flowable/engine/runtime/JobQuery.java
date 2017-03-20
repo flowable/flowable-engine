@@ -38,7 +38,7 @@ public interface JobQuery extends Query<JobQuery, Job> {
     JobQuery handlerType(String handlerType);
 
     /** Only select jobs which exist for the given process definition id */
-    JobQuery processDefinitionId(String processDefinitionid);
+    JobQuery processDefinitionId(String processDefinitionId);
 
     /**
      * Only select jobs that are timers. Cannot be used together with {@link #messages()}
