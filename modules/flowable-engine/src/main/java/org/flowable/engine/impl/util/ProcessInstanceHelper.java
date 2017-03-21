@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -153,6 +153,12 @@ public class ProcessInstanceHelper {
         ExecutionEntity processInstance = commandContext.getExecutionEntityManager()
                 .createProcessInstanceExecution(processDefinition, businessKey, processDefinition.getTenantId(), initiatorVariableName);
 
+        // Set processInstance name
+        if (processInstanceName != null) {
+            processInstance.setName(processInstanceName);
+            commandContext.getHistoryManager().recordProcessInstanceNameChange(processInstance.getId(), processInstanceName);
+        }
+
         commandContext.getHistoryManager().recordProcessInstanceStart(processInstance, initialFlowElement);
 
         boolean eventDispatcherEnabled = Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled();
@@ -173,12 +179,6 @@ public class ProcessInstanceHelper {
             for (String varName : transientVariables.keySet()) {
                 processInstance.setTransientVariable(varName, transientVariables.get(varName));
             }
-        }
-
-        // Set processInstance name
-        if (processInstanceName != null) {
-            processInstance.setName(processInstanceName);
-            commandContext.getHistoryManager().recordProcessInstanceNameChange(processInstance.getId(), processInstanceName);
         }
 
         // Fire events
