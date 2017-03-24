@@ -20,6 +20,7 @@ import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.activiti.engine.runtime.Execution;
+import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.test.Deployment;
@@ -72,6 +73,41 @@ public class JavaServiceTaskTest extends PluggableActivitiTestCase {
   }
   
   @Deployment
+  public void testServiceTaskWithSkipExpression() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("input", "test");
+    vars.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
+    vars.put("skip", true);
+    
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("serviceTask", vars);
+    
+    Execution waitExecution = runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).singleResult();
+    assertNotNull(waitExecution);
+    assertEquals("waitState", waitExecution.getActivityId());
+  }
+  
+  @Deployment
+  public void testAsyncServiceTaskWithSkipExpression() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("input", "test");
+    
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("asyncServiceTask", vars);
+    Job job = managementService.createJobQuery().processInstanceId(pi.getProcessInstanceId()).singleResult();
+    assertNotNull(job);
+    
+    vars = new HashMap<String, Object>();
+    vars.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
+    vars.put("skip", true);
+    runtimeService.setVariables(pi.getProcessInstanceId(), vars);
+    
+    managementService.executeJob(job.getId());
+    
+    Execution waitExecution = runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).singleResult();
+    assertNotNull(waitExecution);
+    assertEquals("waitState", waitExecution.getActivityId());
+  }
+  
+  @Deployment
   public void testExpressionFieldInjectionWithSkipExpression() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("name", "kermit");
@@ -85,6 +121,8 @@ public class JavaServiceTaskTest extends PluggableActivitiTestCase {
       .processInstanceId(pi.getId())
       .activityId("waitState")
       .singleResult();
+    
+    assertNotNull(execution);
     
     assertEquals("timrek .rM olleH", runtimeService.getVariable(execution.getId(), "var2"));
     assertEquals("elam :si redneg ruoY", runtimeService.getVariable(execution.getId(), "var1"));
@@ -102,7 +140,11 @@ public class JavaServiceTaskTest extends PluggableActivitiTestCase {
       .activityId("waitState")
       .singleResult();
     
-    assertEquals(null, execution2);
+    assertNotNull(execution2);
+    
+    Map<String, Object> pi2VarMap = runtimeService.getVariables(pi2.getProcessInstanceId());
+    assertFalse(pi2VarMap.containsKey("var1"));
+    assertFalse(pi2VarMap.containsKey("var2"));
   }
   
   @Deployment

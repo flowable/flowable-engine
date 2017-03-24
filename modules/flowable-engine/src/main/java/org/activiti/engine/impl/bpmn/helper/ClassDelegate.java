@@ -104,7 +104,7 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
     if (delegateInstance instanceof ExecutionListener) {
       return (ExecutionListener) delegateInstance; 
     } else if (delegateInstance instanceof JavaDelegate) {
-      return new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance);
+      return new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance, skipExpression);
     } else {
       throw new ActivitiIllegalArgumentException(delegateInstance.getClass().getName()+" doesn't implement "+ExecutionListener.class+" nor "+JavaDelegate.class);
     }
@@ -135,33 +135,29 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
 
   // Activity Behavior
   public void execute(ActivityExecution execution) throws Exception {
-    boolean isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(execution, skipExpression);
-    if (!isSkipExpressionEnabled || 
-            (isSkipExpressionEnabled && !SkipExpressionUtil.shouldSkipFlowElement(execution, skipExpression))) {
-      
-      if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
-        ObjectNode taskElementProperties = Context.getBpmnOverrideElementProperties(serviceTaskId, execution.getProcessDefinitionId());
-        if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME)) {
-          String overrideClassName = taskElementProperties.get(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME).asText();
-          if (StringUtils.isNotEmpty(overrideClassName) && overrideClassName.equals(className) == false) {
-            className = overrideClassName;
-            activityBehaviorInstance = null;
-          }
+    
+    if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
+      ObjectNode taskElementProperties = Context.getBpmnOverrideElementProperties(serviceTaskId, execution.getProcessDefinitionId());
+      if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME)) {
+        String overrideClassName = taskElementProperties.get(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME).asText();
+        if (StringUtils.isNotEmpty(overrideClassName) && overrideClassName.equals(className) == false) {
+          className = overrideClassName;
+          activityBehaviorInstance = null;
         }
       }
-      
-      if (activityBehaviorInstance == null) {
-        activityBehaviorInstance = getActivityBehaviorInstance(execution);
-      }
-      
-      try {
-        activityBehaviorInstance.execute(execution);
-      } catch (BpmnError error) {
-        ErrorPropagation.propagateError(error, execution);
-      } catch (Exception e) {
-        if (!ErrorPropagation.mapException(e, execution, mapExceptions)) {
-            throw e;
-        }
+    }
+    
+    if (activityBehaviorInstance == null) {
+      activityBehaviorInstance = getActivityBehaviorInstance(execution);
+    }
+    
+    try {
+      activityBehaviorInstance.execute(execution);
+    } catch (BpmnError error) {
+      ErrorPropagation.propagateError(error, execution);
+    } catch (Exception e) {
+      if (!ErrorPropagation.mapException(e, execution, mapExceptions)) {
+          throw e;
       }
     }
   }
@@ -213,7 +209,7 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
     if (delegateInstance instanceof ActivityBehavior) {
       return determineBehaviour((ActivityBehavior) delegateInstance, execution);
     } else if (delegateInstance instanceof JavaDelegate) {
-      return determineBehaviour(new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance), execution);
+      return determineBehaviour(new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance, skipExpression), execution);
     } else {
       throw new ActivitiIllegalArgumentException(delegateInstance.getClass().getName()+" doesn't implement "+JavaDelegate.class.getName()+" nor "+ActivityBehavior.class.getName());
     }
