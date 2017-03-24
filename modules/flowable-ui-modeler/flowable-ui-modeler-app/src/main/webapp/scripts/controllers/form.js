@@ -11,8 +11,8 @@
  * limitations under the License.
  */
 angular.module('flowableModeler')
-  .controller('FormCtrl', ['$rootScope', '$scope', '$translate', '$http', '$location', '$routeParams','$modal', '$timeout', '$popover', 
-                              function ($rootScope, $scope, $translate, $http, $location, $routeParams, $modal, $timeout, $popover) {
+  .controller('FormCtrl', ['$rootScope', '$scope', '$translate', '$http', '$location', '$routeParams','$modal', '$timeout', '$popover', '$window', 
+                              function ($rootScope, $scope, $translate, $http, $location, $routeParams, $modal, $timeout, $popover, $window) {
 
     // Main page (needed for visual indicator of current page)
     $rootScope.setMainPageById('forms');
@@ -103,7 +103,8 @@ angular.module('flowableModeler')
 
       modalInstance.$scope.duplicateFormCallback = function(result) {
         $rootScope.editorHistory = [];
-        $location.path("/form-editor/" + result.id);
+        //$location.path("/form-editor/" + result.id);
+        $window.location.href = 'rdsFormBuilder.jsp#?form=' + result.id; 
       };
     };
 
@@ -116,7 +117,8 @@ angular.module('flowableModeler')
     
     $scope.openEditor = function() {
       if ($scope.model.form) {
-    	  $location.path("/form-editor/" + $scope.model.form.id);
+    	  //$location.path("/form-editor/" + $scope.model.form.id);
+        $window.location.href = 'rdsFormBuilder.jsp#?form='+$scope.model.form.id; 
       }
     };
 

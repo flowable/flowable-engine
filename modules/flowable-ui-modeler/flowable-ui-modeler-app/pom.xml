@@ -9,9 +9,17 @@
     </parent>
     <artifactId>flowable-ui-modeler-app</artifactId>
     <packaging>war</packaging>
+    
+    <properties>
+      <system-builder.version>0.5.0-SNAPSHOT</system-builder.version>
+    </properties>
 
     <dependencies>
-
+        <dependency>
+          <groupId>au.com.rds.sb</groupId>
+          <artifactId>schemaform-builder-web-resources</artifactId>
+          <version>${system-builder.version}</version>
+        </dependency>
     	<dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-ui-modeler-conf</artifactId>
@@ -80,8 +88,9 @@
             <artifactId>c3p0</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>11.2.0.3</version>
         </dependency>
 
         <!-- LOGGING -->
