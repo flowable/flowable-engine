@@ -23,7 +23,12 @@ import org.flowable.app.model.editor.FormSaveRepresentation;
 import org.flowable.app.model.editor.ModelKeyRepresentation;
 import org.flowable.app.model.editor.form.FormRepresentation;
 import org.flowable.app.repository.editor.ModelRepository;
+import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.api.ModelService;
+import org.flowable.app.service.exception.BadRequestException;
+import org.flowable.app.service.exception.InternalServerErrorException;
+import org.flowable.form.model.FormModel;
+import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,14 +80,14 @@ public class FlowableFormService {
     return form;
   }
 
-    public List<FormRepresentation> getForms(String[] formIds) {
+  public List<FormRepresentation> getForms(String[] formIds) {
     List<FormRepresentation> formRepresentations = new ArrayList<FormRepresentation>();
 
-        if (formIds == null || formIds.length == 0) {
+    if (formIds == null || formIds.length == 0) {
       throw new BadRequestException("No formIds provided in the request");
     }
 
-        for (String formId : formIds) {
+    for (String formId : formIds) {
       Model model = modelService.getModel(formId);
 
       FormRepresentation form = createFormRepresentation(model);
@@ -92,13 +97,13 @@ public class FlowableFormService {
     return formRepresentations;
   }
 
-    public FormRepresentation saveForm(String formId, FormSaveRepresentation saveRepresentation) {
+  public FormRepresentation saveForm(String formId, FormSaveRepresentation saveRepresentation) {
     User user = SecurityUtils.getCurrentUserObject();
     Model model = modelService.getModel(formId);
 
     String formKey = saveRepresentation.getFormRepresentation().getKey();
     ModelKeyRepresentation modelKeyInfo = modelService.validateModelKey(model, model.getModelType(), formKey);
-        if (modelKeyInfo.isKeyAlreadyExists()) {
+    if (modelKeyInfo.isKeyAlreadyExists()) {
       throw new BadRequestException("Model with provided key already exists " + formKey);
     }
 
@@ -107,9 +112,9 @@ public class FlowableFormService {
     model.setDescription(saveRepresentation.getFormRepresentation().getDescription());
 
     String editorJson = null;
-        try {
+    try {
       editorJson = objectMapper.writeValueAsString(saveRepresentation.getFormRepresentation().getFormDefinition());
-        } catch (Exception e) {
+    } catch (Exception e) {
       logger.error("Error while processing form json", e);
       throw new InternalServerErrorException("Form could not be saved " + formId);
     }
@@ -153,9 +158,9 @@ public class FlowableFormService {
   protected FormRepresentation createFormRepresentation(AbstractModel model)
   {
     FormModel formDefinition = null;
-        try {
+    try {
       formDefinition = objectMapper.readValue(model.getModelEditorJson(), FormModel.class);
-        } catch (Exception e) {
+    } catch (Exception e) {
       logger.error("Error deserializing form", e);
       throw new InternalServerErrorException("Could not deserialize form definition");
     }
