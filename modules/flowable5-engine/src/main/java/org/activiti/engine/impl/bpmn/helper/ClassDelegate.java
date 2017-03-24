@@ -104,7 +104,7 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
         if (delegateInstance instanceof ExecutionListener) {
             return (ExecutionListener) delegateInstance;
         } else if (delegateInstance instanceof JavaDelegate) {
-            return new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance);
+            return new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance, skipExpression);
         } else {
             throw new ActivitiIllegalArgumentException(delegateInstance.getClass().getName() + " doesn't implement " + ExecutionListener.class + " nor " + JavaDelegate.class);
         }
@@ -136,34 +136,29 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
     // Activity Behavior
     public void execute(DelegateExecution execution) {
         ActivityExecution activityExecution = (ActivityExecution) execution;
-        boolean isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(activityExecution, skipExpression);
-        if (!isSkipExpressionEnabled ||
-                (isSkipExpressionEnabled && !SkipExpressionUtil.shouldSkipFlowElement(activityExecution, skipExpression))) {
 
-            if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
-                ObjectNode taskElementProperties = Context.getBpmnOverrideElementProperties(serviceTaskId, execution.getProcessDefinitionId());
-                if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME)) {
-                    String overrideClassName = taskElementProperties.get(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME).asText();
-                    if (StringUtils.isNotEmpty(overrideClassName) && !overrideClassName.equals(className)) {
-                        className = overrideClassName;
-                        activityBehaviorInstance = null;
-                    }
+        if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
+            ObjectNode taskElementProperties = Context.getBpmnOverrideElementProperties(serviceTaskId, execution.getProcessDefinitionId());
+            if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME)) {
+                String overrideClassName = taskElementProperties.get(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME).asText();
+                if (StringUtils.isNotEmpty(overrideClassName) && !overrideClassName.equals(className)) {
+                    className = overrideClassName;
+                    activityBehaviorInstance = null;
                 }
             }
+        }
 
-            if (activityBehaviorInstance == null) {
-                activityBehaviorInstance = getActivityBehaviorInstance(activityExecution);
-            }
+        if (activityBehaviorInstance == null) {
+            activityBehaviorInstance = getActivityBehaviorInstance(activityExecution);
+        }
 
-            try {
-                activityBehaviorInstance.execute(execution);
-            } catch (BpmnError error) {
-                ErrorPropagation.propagateError(error, activityExecution);
-            } catch (RuntimeException e) {
-                if (!ErrorPropagation.mapException(e, activityExecution, mapExceptions))
-                    throw e;
-            }
-
+        try {
+            activityBehaviorInstance.execute(execution);
+        } catch (BpmnError error) {
+            ErrorPropagation.propagateError(error, activityExecution);
+        } catch (RuntimeException e) {
+            if (!ErrorPropagation.mapException(e, activityExecution, mapExceptions))
+                throw e;
         }
     }
 
@@ -214,7 +209,7 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
         if (delegateInstance instanceof ActivityBehavior) {
             return determineBehaviour((ActivityBehavior) delegateInstance, execution);
         } else if (delegateInstance instanceof JavaDelegate) {
-            return determineBehaviour(new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance), execution);
+            return determineBehaviour(new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance, skipExpression), execution);
         } else {
             throw new ActivitiIllegalArgumentException(delegateInstance.getClass().getName() + " doesn't implement " + JavaDelegate.class.getName() + " nor " + ActivityBehavior.class.getName());
         }
