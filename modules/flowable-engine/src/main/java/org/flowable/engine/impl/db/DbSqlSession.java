@@ -119,6 +119,8 @@ public class DbSqlSession implements Session {
         FLOWABLE_VERSIONS.add(new FlowableVersion("5.20.0.2"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("5.21.0.0"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("5.22.0.0"));
+        FLOWABLE_VERSIONS.add(new FlowableVersion("5.23.0.0"));
+        FLOWABLE_VERSIONS.add(new FlowableVersion("5.24.0.0"));
 
         /*
          * Version 5.18.0.1 is the latest v5 version in the list here, although if you would look at the v5 code, you'll see there are a few other releases afterwards.
