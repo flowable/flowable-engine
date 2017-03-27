@@ -1303,9 +1303,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         // Configurators that are explicitly added to the config
         if (configurators != null) {
-            for (ProcessEngineConfigurator configurator : configurators) {
-                allConfigurators.add(configurator);
-            }
+            allConfigurators.addAll(configurators);
         }
 
         // Auto discovery through ServiceLoader

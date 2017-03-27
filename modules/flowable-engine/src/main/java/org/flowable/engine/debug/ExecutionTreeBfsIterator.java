@@ -52,9 +52,7 @@ public class ExecutionTreeBfsIterator implements Iterator<ExecutionTreeNode> {
             }
 
             if (currentNode.getChildren() != null && currentNode.getChildren().size() > 0) {
-                for (ExecutionTreeNode childNode : currentNode.getChildren()) {
-                    nodesToHandle.add(childNode);
-                }
+                nodesToHandle.addAll(currentNode.getChildren());
             }
         }
 
