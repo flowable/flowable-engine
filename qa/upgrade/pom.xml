@@ -6,13 +6,13 @@
   <name>Activiti - Upgrade Fetcher</name>
   <groupId>org.flowable</groupId>
   <artifactId>flowable-upgrade-fetcher</artifactId>
-  <version>5.23.0</version>
+  <version>5.24.0-SNAPSHOT</version>
 
   <parent>
     <groupId>org.flowable</groupId>
     <artifactId>flowable-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>5.23.0</version>
+    <version>5.24.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
