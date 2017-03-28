@@ -439,7 +439,8 @@
             "PEOPLE": "People",
             "GROUP-OF-PEOPLE": "Group of people",
             "UPLOAD": "Upload",
-            "EXPRESSION": "Expression"
+            "EXPRESSION": "Expression",
+            "DECIMAL": "Decimal"
         },
         "TABS": {
             "GENERAL": "General",
