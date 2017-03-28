@@ -1,8 +1,6 @@
 package org.activiti.engine.test.api.history;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
@@ -16,7 +14,6 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
 
     private org.flowable.engine.repository.Deployment oldDeployment;
     private org.flowable.engine.repository.Deployment newDeployment;
-    private List<String> processInstanceIds;
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -24,11 +21,9 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
                 .addClasspathResource(DEPLOYMENT_FILE_PATH)
                 .deploy();
 
-        processInstanceIds = new ArrayList<String>();
-
-        Map<String, Object> startMap = new HashMap<String, Object>();
+        Map<String, Object> startMap = new HashMap<>();
         startMap.put("test", 123);
-        processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, startMap).getId());
+        runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, startMap);
 
         newDeployment = repositoryService.createDeployment()
                 .addClasspathResource(DEPLOYMENT_FILE_PATH)
@@ -36,7 +31,7 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
 
         startMap.clear();
         startMap.put("anothertest", 456);
-        processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, startMap).getId());
+        runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, startMap);
     }
 
     protected void tearDown() throws Exception {

@@ -116,10 +116,8 @@ public class RuntimeVariablesTest extends PluggableFlowableTestCase {
         }
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        Set<String> taskIds = new HashSet<String>();
         for (Task task : tasks) {
             taskService.setVariableLocal(task.getId(), "taskVar", "taskVar");
-            taskIds.add(task.getId());
         }
 
         List<VariableInstance> executionVariableInstances = runtimeService.getVariableInstancesByExecutionIds(executionIds);

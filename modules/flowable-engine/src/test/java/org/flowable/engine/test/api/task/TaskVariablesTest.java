@@ -210,21 +210,19 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/api/runtime/variableScope.bpmn20.xml"
     })
     public void testGetVariablesLocalByTaskIdsForScope() {
-        Map<String, Object> processVars = new HashMap<String, Object>();
+        Map<String, Object> processVars = new HashMap<>();
         processVars.put("processVar", "processVar");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variableScopeProcess", processVars);
 
-        Set<String> executionIds = new HashSet<String>();
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
         for (Execution execution : executions) {
             if (!processInstance.getId().equals(execution.getId())) {
-                executionIds.add(execution.getId());
                 runtimeService.setVariableLocal(execution.getId(), "executionVar", "executionVar");
             }
         }
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        Set<String> taskIds = new HashSet<String>();
+        Set<String> taskIds = new HashSet<>();
         for (Task task : tasks) {
             taskService.setVariableLocal(task.getId(), "taskVar", "taskVar");
             taskIds.add(task.getId());
