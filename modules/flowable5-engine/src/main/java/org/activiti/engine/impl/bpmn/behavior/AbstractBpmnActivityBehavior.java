@@ -54,12 +54,12 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
         String compensationHandlerId = (String) execution.getActivity().getProperty(BpmnParse.PROPERTYNAME_COMPENSATION_HANDLER_ID);
 
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
-        ActivityImpl compensationHandlder = executionEntity.getProcessDefinition().findActivity(compensationHandlerId);
-        PvmScope scopeActivitiy = compensationHandlder.getParent();
-        ExecutionEntity scopeExecution = ScopeUtil.findScopeExecutionForScope(executionEntity, scopeActivitiy);
+        ActivityImpl compensationHandler = executionEntity.getProcessDefinition().findActivity(compensationHandlerId);
+        PvmScope scopeActivity = compensationHandler.getParent();
+        ExecutionEntity scopeExecution = ScopeUtil.findScopeExecutionForScope(executionEntity, scopeActivity);
 
         CompensateEventSubscriptionEntity compensateEventSubscriptionEntity = CompensateEventSubscriptionEntity.createAndInsert(scopeExecution);
-        compensateEventSubscriptionEntity.setActivity(compensationHandlder);
+        compensateEventSubscriptionEntity.setActivity(compensationHandler);
     }
 
     protected boolean hasLoopCharacteristics() {

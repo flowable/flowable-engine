@@ -140,7 +140,7 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
         taskService.addCandidateUser(task.getId(), "kermit");
         taskService.addCandidateGroup(task.getId(), "sales");
 
-        // Three events are received, since the user link on the task also creates an involvment in the process
+        // Three events are received, since the user link on the task also creates an involvement in the process
         assertEquals(6, listener.getEventsReceived().size());
 
         FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);

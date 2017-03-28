@@ -21,15 +21,10 @@ import javax.el.ListELResolver;
 import javax.el.MapELResolver;
 
 import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.el.VariableScopeElResolver;
 
 public class MockExpressionManager extends ExpressionManager {
-
-    public MockExpressionManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        super(processEngineConfiguration);
-    }
 
     @Override
     protected ELResolver createElResolver(VariableScope variableScope) {

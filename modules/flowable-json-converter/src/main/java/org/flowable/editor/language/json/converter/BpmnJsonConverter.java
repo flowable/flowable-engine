@@ -448,8 +448,9 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
         ArrayNode shapesArrayNode = (ArrayNode) modelNode.get(EDITOR_CHILD_SHAPES);
 
-        if (shapesArrayNode == null || shapesArrayNode.size() == 0)
+        if (shapesArrayNode == null || shapesArrayNode.size() == 0) {
             return bpmnModel;
+        }
 
         boolean nonEmptyPoolFound = false;
         Map<String, Lane> elementInLaneMap = new HashMap<String, Lane>();
@@ -548,6 +549,31 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 List<ValuedDataObject> dataObjects = BpmnJsonConverterUtil.convertJsonToDataProperties(processDataPropertiesNode, process);
                 process.setDataObjects(dataObjects);
                 process.getFlowElements().addAll(dataObjects);
+            }
+            
+            String userStarterValue = BpmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_POTENTIALSTARTERUSER, modelNode);
+            String groupStarterValue = BpmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_POTENTIALSTARTERGROUP, modelNode);
+            
+            if (StringUtils.isNotEmpty(userStarterValue)) {
+                List<String> userStarters = new ArrayList<>();
+                String userStartArray[] = userStarterValue.split(",");
+                
+                for (String user : userStartArray) {
+                    userStarters.add(user);
+                }
+                
+                process.setCandidateStarterUsers(userStarters);
+            }
+            
+            if (StringUtils.isNotEmpty(groupStarterValue)) {
+                List<String> groupStarters = new ArrayList<>();
+                String groupStarterArray[] = groupStarterValue.split(",");
+    
+                for (String group : groupStarterArray) {
+                    groupStarters.add(group);
+                }
+                
+                process.setCandidateStarterGroups(groupStarters);
             }
 
             processJsonElements(shapesArrayNode, modelNode, process, shapeMap, formKeyMap, decisionTableKeyMap, bpmnModel);

@@ -60,6 +60,9 @@
 			<if test="executionId != null">
 				and RES.EXECUTION_ID_ = #{executionId}
 			</if>
+			<if test="handlerType != null">
+				and RES.HANDLER_TYPE_ = #{handlerType}
+			</if>
 			<if test="processDefinitionId != null">
 				and RES.PROC_DEF_ID_ = #{processDefinitionId}
 			</if>

@@ -210,9 +210,9 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
                         ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
             }
 
-            HistoricActivityInstanceEntity activitiyInstance = findActivityInstance(parentExecution);
-            if (activitiyInstance != null) {
-                activitiyInstance.setCalledProcessInstanceId(subProcessInstance.getProcessInstanceId());
+            HistoricActivityInstanceEntity activityInstance = findActivityInstance(parentExecution);
+            if (activityInstance != null) {
+                activityInstance.setCalledProcessInstanceId(subProcessInstance.getProcessInstanceId());
             }
 
             // Fix for ACT-1728: start-event not recorded for subprocesses

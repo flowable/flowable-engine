@@ -23,7 +23,6 @@ import javax.el.ListELResolver;
 import javax.el.MapELResolver;
 
 import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.el.JsonNodeELResolver;
 import org.flowable.engine.impl.el.ReadOnlyMapELResolver;
@@ -45,8 +44,8 @@ public class SpringExpressionManager extends ExpressionManager {
      * @param beans
      *            a map of custom beans to expose. If null, all beans in the application-context will be exposed.
      */
-    public SpringExpressionManager(ApplicationContext applicationContext, Map<Object, Object> beans, ProcessEngineConfigurationImpl processEngineConfiguration) {
-        super(beans, processEngineConfiguration);
+    public SpringExpressionManager(ApplicationContext applicationContext, Map<Object, Object> beans) {
+        super(beans);
         this.applicationContext = applicationContext;
     }
 

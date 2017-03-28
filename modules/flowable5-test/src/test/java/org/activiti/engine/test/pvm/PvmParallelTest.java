@@ -30,7 +30,7 @@ import org.activiti.engine.test.pvm.activities.WaitState;
  */
 public class PvmParallelTest extends PvmTestCase {
 
-    public void testSimpleAutmaticConcurrency() {
+    public void testSimpleAutomaticConcurrency() {
         PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
                 .createActivity("start")
                 .initial()

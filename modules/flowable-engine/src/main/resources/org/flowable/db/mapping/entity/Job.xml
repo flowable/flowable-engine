@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
@@ -44,9 +44,9 @@
 	<select id="selectExpiredJobs" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 	  	${limitBefore}
       	select
-      	RES.* ${limitBetween} 
+      	RES.* ${limitBetween}
       	from ${prefix}ACT_RU_JOB RES
-    	where LOCK_EXP_TIME_ is not null and LOCK_EXP_TIME_ &lt; #{parameter, jdbcType=TIMESTAMP} 
+    	where LOCK_EXP_TIME_ is not null and LOCK_EXP_TIME_ &lt; #{parameter, jdbcType=TIMESTAMP}
     	${limitAfter}
   </select>
 
@@ -67,7 +67,7 @@
 		from ${prefix}ACT_RU_JOB J
 		where J.EXECUTION_ID_ = #{parameter}
 	</select>
-	
+
 	<select id="selectJobsByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select *
 		from ${prefix}ACT_RU_JOB J
@@ -101,6 +101,9 @@
 			</if>
 			<if test="executionId != null">
 				and RES.EXECUTION_ID_ = #{executionId}
+			</if>
+			<if test="handlerType != null">
+				and RES.HANDLER_TYPE_ = #{handlerType}
 			</if>
 			<if test="processDefinitionId != null">
 				and RES.PROC_DEF_ID_ = #{processDefinitionId}
@@ -176,7 +179,7 @@
 		)
 	</update>
 
-	<!-- See http://stackoverflow.com/questions/4429319/you-cant-specify-target-table-for-update-in-from-clause 
+	<!-- See http://stackoverflow.com/questions/4429319/you-cant-specify-target-table-for-update-in-from-clause
 		Tested this on MySQL 5.6: does NOT use a temporary table (so good, performance) -->
 	<update id="updateJobTenantIdForDeployment" databaseId="mysql"
 		parameterType="java.util.Map">
@@ -192,7 +195,7 @@
 				inner join ${prefix}ACT_RE_PROCDEF P on J.PROC_DEF_ID_ = P.ID_
 				inner join ${prefix}ACT_RE_DEPLOYMENT D on P.DEPLOYMENT_ID_ = D.ID_
 				where D.ID_ = #{deploymentId, jdbcType=VARCHAR}
-	
+
 			) AS tempTask
 
 		)
@@ -279,7 +282,7 @@
 			#{job.tenantId, jdbcType=VARCHAR})
 		</foreach>
 	</insert>
-	
+
 	<insert id="bulkInsertJob" databaseId="oracle"
 		parameterType="java.util.List">
 		INSERT ALL
@@ -328,7 +331,8 @@
 		<set>
 			REV_ = #{revisionNext, jdbcType=INTEGER},
 			LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP},
-      LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
+      		LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
+      		HANDLER_TYPE_ = #{jobHandlerType, jdbcType=VARCHAR},
 			RETRIES_ = #{retries, jdbcType=INTEGER},
 			EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
 			EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR}
@@ -336,13 +340,13 @@
 		where ID_= #{id, jdbcType=VARCHAR}
 		and REV_ = #{revision, jdbcType=INTEGER}
 	</update>
-	
+
 	<update id="resetExpiredJob" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
     update ${prefix}ACT_RU_JOB
     set LOCK_OWNER_ = null, LOCK_EXP_TIME_ = null
     where ID_ = #{id,jdbcType=VARCHAR}
   </update>
-  
+
 	<select id="selectTimersByExecutionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
 		select *
 		from ${prefix}ACT_RU_JOB

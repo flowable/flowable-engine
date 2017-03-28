@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,6 +35,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     protected String id;
     protected String processInstanceId;
     protected String executionId;
+    protected String handlerType;
     protected String processDefinitionId;
     protected boolean retriesLeft;
     protected boolean executable;
@@ -91,6 +92,14 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
             throw new ActivitiIllegalArgumentException("Provided execution id is null");
         }
         this.executionId = executionId;
+        return this;
+    }
+
+    public JobQueryImpl handlerType(String handlerType) {
+        if (handlerType == null) {
+            throw new ActivitiIllegalArgumentException("Provided handlerType is null");
+        }
+        this.handlerType = handlerType;
         return this;
     }
 
@@ -249,6 +258,10 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
 
     public String getExecutionId() {
         return executionId;
+    }
+
+    public String getHandlerType() {
+        return this.handlerType;
     }
 
     public boolean getRetriesLeft() {

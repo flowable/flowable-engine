@@ -1,5 +1,11 @@
 package org.flowable.rest.api.jpa;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -65,12 +71,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import junit.framework.AssertionFailedError;
 
@@ -336,7 +336,7 @@ public class BaseJPARestTestCase extends AbstractTestCase {
 
         try {
             Timer timer = new Timer();
-            InteruptTask task = new InteruptTask(Thread.currentThread());
+            InterruptTask task = new InterruptTask(Thread.currentThread());
             timer.schedule(task, maxMillisToWait);
             boolean areJobsAvailable = true;
             try {
@@ -363,7 +363,7 @@ public class BaseJPARestTestCase extends AbstractTestCase {
 
         try {
             Timer timer = new Timer();
-            InteruptTask task = new InteruptTask(Thread.currentThread());
+            InterruptTask task = new InterruptTask(Thread.currentThread());
             timer.schedule(task, maxMillisToWait);
             boolean conditionIsViolated = true;
             try {
@@ -390,11 +390,11 @@ public class BaseJPARestTestCase extends AbstractTestCase {
         return !managementService.createJobQuery().list().isEmpty();
     }
 
-    private static class InteruptTask extends TimerTask {
+    private static class InterruptTask extends TimerTask {
         protected boolean timeLimitExceeded;
         protected Thread thread;
 
-        public InteruptTask(Thread thread) {
+        public InterruptTask(Thread thread) {
             this.thread = thread;
         }
 

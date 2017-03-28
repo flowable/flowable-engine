@@ -12,6 +12,8 @@
  */
 package org.flowable.app.conf;
 
+import java.util.ArrayList;
+
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +23,7 @@ import org.flowable.content.spring.configurator.SpringContentEngineConfigurator;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator;
+import org.flowable.engine.FlowableEngineAgendaFactory;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
@@ -30,9 +33,13 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.impl.agenda.DebugFlowableEngineAgendaFactory;
 import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.event.BreakpointJobHandler;
+import org.flowable.engine.impl.jobexecutor.JobHandler;
+import org.flowable.engine.runtime.ProcessDebugger;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.spring.configurator.SpringFormEngineConfigurator;
 import org.flowable.spring.ProcessEngineFactoryBean;
@@ -56,17 +63,20 @@ public class FlowableEngineConfiguration {
 
     private final Logger logger = LoggerFactory.getLogger(FlowableEngineConfiguration.class);
 
-    private static final String PROP_FS_ROOT = "contentstorage.fs.rootFolder";
-    private static final String PROP_FS_CREATE_ROOT = "contentstorage.fs.createRoot";
+    protected static final String PROP_FS_ROOT = "contentstorage.fs.rootFolder";
+    protected static final String PROP_FS_CREATE_ROOT = "contentstorage.fs.createRoot";
 
     @Autowired
-    private DataSource dataSource;
+    protected ProcessDebugger processDebugger;
+    
+    @Autowired
+    protected DataSource dataSource;
 
     @Autowired
-    private PlatformTransactionManager transactionManager;
+    protected PlatformTransactionManager transactionManager;
 
     @Autowired
-    private Environment environment;
+    protected Environment environment;
 
     @Bean(name = "processEngine")
     public ProcessEngineFactoryBean processEngineFactoryBean() {
@@ -93,6 +103,13 @@ public class FlowableEngineConfiguration {
         processEngineConfiguration.setTransactionManager(transactionManager);
         processEngineConfiguration.setAsyncExecutorActivate(true);
         processEngineConfiguration.setAsyncExecutor(asyncExecutor());
+        
+        if (environment.getProperty("debugger.enabled", Boolean.class, false)) {
+            processEngineConfiguration.setAgendaFactory(agendaFactory());
+            ArrayList<JobHandler> customJobHandlers = new ArrayList<>();
+            customJobHandlers.add(new BreakpointJobHandler());
+            processEngineConfiguration.setCustomJobHandlers(customJobHandlers);
+        }
 
         String emailHost = environment.getProperty("email.host");
         if (StringUtils.isNotEmpty(emailHost)) {
@@ -133,6 +150,13 @@ public class FlowableEngineConfiguration {
         processEngineConfiguration.addConfigurator(springContentEngineConfigurator);
 
         return processEngineConfiguration;
+    }
+
+    @Bean
+    public FlowableEngineAgendaFactory agendaFactory() {
+        DebugFlowableEngineAgendaFactory debugAgendaFactory = new DebugFlowableEngineAgendaFactory();
+        debugAgendaFactory.setDebugger(processDebugger);
+        return debugAgendaFactory;
     }
 
     @Bean

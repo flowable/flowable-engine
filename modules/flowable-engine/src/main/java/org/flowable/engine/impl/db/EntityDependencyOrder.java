@@ -96,7 +96,7 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(DeadLetterJobEntityImpl.class);
 
         /*
-         * FK to ByteArray FK to Exeution
+         * FK to ByteArray FK to Execution
          */
         DELETE_ORDER.add(VariableInstanceEntityImpl.class);
 

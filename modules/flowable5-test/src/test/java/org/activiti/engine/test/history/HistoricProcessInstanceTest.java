@@ -170,13 +170,13 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKeyIn(Arrays.asList("undefined1", "undefined2")).count());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKey("businessKey123").count());
 
-        List<String> exludeIds = new ArrayList<String>();
-        exludeIds.add("unexistingProcessDefinition");
+        List<String> excludeIds = new ArrayList<String>();
+        excludeIds.add("unexistingProcessDefinition");
 
-        assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKeyNotIn(exludeIds).count());
+        assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKeyNotIn(excludeIds).count());
 
-        exludeIds.add("oneTaskProcess");
-        assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKeyNotIn(exludeIds).count());
+        excludeIds.add("oneTaskProcess");
+        assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKeyNotIn(excludeIds).count());
 
         // After finishing process
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
@@ -262,13 +262,13 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().processDefinitionKey("oneTaskProcess").processDefinitionId("undefined").endOr().count());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessKey("businessKey123").processDefinitionId("undefined").endOr().count());
 
-        List<String> exludeIds = new ArrayList<String>();
-        exludeIds.add("unexistingProcessDefinition");
+        List<String> excludeIds = new ArrayList<String>();
+        excludeIds.add("unexistingProcessDefinition");
 
-        assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().processDefinitionKeyNotIn(exludeIds).processDefinitionId("undefined").endOr().count());
+        assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().processDefinitionKeyNotIn(excludeIds).processDefinitionId("undefined").endOr().count());
 
-        exludeIds.add("oneTaskProcess");
-        assertEquals(0, historyService.createHistoricProcessInstanceQuery().or().processDefinitionKeyNotIn(exludeIds).processDefinitionId("undefined").endOr().count());
+        excludeIds.add("oneTaskProcess");
+        assertEquals(0, historyService.createHistoricProcessInstanceQuery().or().processDefinitionKeyNotIn(excludeIds).processDefinitionId("undefined").endOr().count());
 
         // After finishing process
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
@@ -485,7 +485,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", vars, tenantId);
         runtimeService.setProcessInstanceName(processInstance.getId(), processInstanceName);
 
-        // Verify name and tenant id (didnt work on mssql and db2) on process instance
+        // Verify name and tenant id (didn't work on mssql and db2) on process instance
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().includeProcessVariables().list();
         assertEquals(1, processInstances.size());
         processInstance = processInstances.get(0);
@@ -498,12 +498,12 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertEquals("Kermit", processInstanceVars.get("name"));
         assertEquals(60, processInstanceVars.get("age"));
 
-        // Verify name and tenant id (didnt work on mssql and db2) on historic process instance
+        // Verify name and tenant id (didn't work on mssql and db2) on historic process instance
         List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().list();
         assertEquals(1, historicProcessInstances.size());
         HistoricProcessInstance historicProcessInstance = historicProcessInstances.get(0);
 
-        // Verify name and tenant id (didnt work on mssql and db2) on process instance
+        // Verify name and tenant id (didn't work on mssql and db2) on process instance
         assertEquals(processInstanceName, historicProcessInstance.getName());
         assertEquals(tenantId, historicProcessInstance.getTenantId());
 

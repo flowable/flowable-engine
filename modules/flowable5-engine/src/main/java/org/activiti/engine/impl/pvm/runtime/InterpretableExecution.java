@@ -43,7 +43,7 @@ public interface InterpretableExecution extends ActivityExecution, ExecutionList
 
     void setActivity(ActivityImpl activity);
 
-    void performOperation(AtomicOperation etomicOperation);
+    void performOperation(AtomicOperation atomicOperation);
 
     boolean isScope();
 

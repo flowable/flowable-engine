@@ -12,10 +12,10 @@
  */
 package org.flowable.engine.impl.calendar;
 
+import java.util.Date;
+
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.runtime.ClockReader;
-
-import java.util.Date;
 
 public class CycleBusinessCalendar extends BusinessCalendarImpl {
 
@@ -44,7 +44,7 @@ public class CycleBusinessCalendar extends BusinessCalendarImpl {
         if (endDate != null) {
             return super.validateDuedate(duedateDescription, maxIterations, endDate, newTimer);
         }
-        // end date could be part of the chron expression
+        // end date could be part of the cron expression
         try {
             if (duedateDescription != null && duedateDescription.startsWith("R")) {
                 return new DurationHelper(duedateDescription, maxIterations, clockReader).isValidDate(newTimer);

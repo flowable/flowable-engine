@@ -35,6 +35,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
     protected String id;
     protected String processInstanceId;
     protected String executionId;
+    protected String handlerType;
     protected String processDefinitionId;
     protected boolean retriesLeft;
     protected boolean executable;
@@ -91,6 +92,14 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
             throw new FlowableIllegalArgumentException("Provided execution id is null");
         }
         this.executionId = executionId;
+        return this;
+    }
+    
+    public TimerJobQueryImpl handlerType(String handlerType) {
+        if (handlerType == null) {
+            throw new FlowableIllegalArgumentException("Provided handlerType is null");
+        }
+        this.handlerType = handlerType;
         return this;
     }
 
@@ -245,6 +254,10 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
 
     public String getExecutionId() {
         return executionId;
+    }
+    
+    public String getHandlerType() {
+        return handlerType;
     }
 
     public boolean getRetriesLeft() {

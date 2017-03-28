@@ -2,8 +2,8 @@
 <definitions id="definitions"
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:activiti="http://activiti.org/bpmn"
-  targetNamespace="org.flowable.enginge.impl.webservice"
-  xmlns:tns="org.flowable.enginge.impl.webservice"
+  targetNamespace="org.flowable.engine.impl.webservice"
+  xmlns:tns="org.flowable.engine.impl.webservice"
   xmlns:counter="http://webservice.flowable.org/">
 
   <import importType="http://schemas.xmlsoap.org/wsdl/"

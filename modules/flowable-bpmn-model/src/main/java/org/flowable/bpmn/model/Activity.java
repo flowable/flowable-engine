@@ -133,8 +133,6 @@ public abstract class Activity extends FlowNode {
         }
 
         boundaryEvents.clear();
-        for (BoundaryEvent event : otherActivity.getBoundaryEvents()) {
-            boundaryEvents.add(event);
-        }
+        boundaryEvents.addAll(otherActivity.getBoundaryEvents());
     }
 }

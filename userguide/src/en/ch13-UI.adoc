@@ -83,10 +83,11 @@ The additional configuration options are described in the table below:
 |email.username|Username for the email server connection
 |email.password|Password for the email server connection
 |flowable.process-definitions.cache.max|Defines the maximum amount of process definitions available in the process definition cache
-|admin.email|Username of the default administrator user for the Flowable IDM application. Default is admin.
+|admin.userid|Username of the default administrator user for the Flowable IDM application. Default is admin.
 |admin.password|Password of the default administrator user for the Flowable IDM application. Default is test.
 |admin.firstname|Firstname of the default administrator user for the Flowable IDM application. Default is Test.
 |admin.lastname|Lastname of the default administrator user for the Flowable IDM application. Default is Administrator.
+|admin.email|Email of the default administrator user for the Flowable IDM application. Default is admin@flowable.org.
 |file.upload.max.size|Maximum size of file uploads, such as attachments and model files
 |contentstorage.fs.rootFolder|Root folder location where content files will be stored, for example, task attachments or form file uploads
 |contentstorage.fs.createRoot|If the root folder doesn't exist, should the Flowable Task application create it?
@@ -122,7 +123,7 @@ The Flowable IDM application is used by all other three Flowable web application
 
 The IDM application boots the IDM engine at startup and will create the identity tables as defined in the IDM engine in the datasource defined in the properties configuration.
 
-When the Flowable IDM application is deployed and started, it will check if there's a user available in the ACT_ID_USER table, and if not it will use the admin.email property to create a new default admin user in this table. It will also add all available privileges in the Flowable project to the newly created admin user:
+When the Flowable IDM application is deployed and started, it will check if there's a user available in the ACT_ID_USER table, and if not it will use the admin.userid property to create a new default admin user in this table. It will also add all available privileges in the Flowable project to the newly created admin user:
 
 * access-idm: provides the privilege to manage users, groups and privileges
 * access-admin: allows the user to login to the Flowable Admin application and manage the Flowable engines
@@ -170,7 +171,7 @@ When the ldap.enabled property is set to true, the IDM app will expect the other
 
 When LDAP is configured, authentication and group retrieval for a user will be done through the LDAP server. Only privileges will still be retrieved from the Flowable identity tables. So make sure each LDAP user has the correct privileges defined in the IDM application.
 
-If the IDM application is booted with LDAP configuration the bootstrap logic will check if there are already privileges present in the Flowable identity tables. If there are no privileges (only when booting the first time), the 4 default privileges will be created and the admin.email property value (from flowable-ui-app.properties) will be used as the user id to get all 4 privileges. So make sure that the admin.email property value is set to a valid LDAP user, otherwise nobody will be able to login to any of the Flowable UI apps.
+If the IDM application is booted with LDAP configuration the bootstrap logic will check if there are already privileges present in the Flowable identity tables. If there are no privileges (only when booting the first time), the 4 default privileges will be created and the admin.userid property value (from flowable-ui-app.properties) will be used as the user id to get all 4 privileges. So make sure that the admin.userid property value is set to a valid LDAP user, otherwise nobody will be able to login to any of the Flowable UI apps.
 
 [[flowableModelerApp]]
 
@@ -329,3 +330,36 @@ image::images/flowable_admin_processdefinitiondetails_screen.png[align="center"]
 In the process definition details view, the first page of process instances is shown, together with optional decision table definitions and form definitions that are used in the process definition. For the vacation request process definition, there's one connected decision table and one connected form definition. Clicking on the decision table definition navigates the Flowable Admin application to the DMN engine. You can always navigate back to the Process engine by clicking on the _Parent Deployment ID_ link.
 
 In addition to the deployments and definitions, you can also query on process instances, tasks, jobs and event subscriptions in the Process engine. The views all work in a similar way to what's already been described.
+
+
+=== Internationalization
+
+The Flowable UI apps support internationalization (i18n). The project maintains the English translations. It is however possible to provide your own translation files in order to support other languages.
+
+The link:$$https://github.com/angular-translate/angular-translate[Angular Translate] library tries to load a specific translation file based on the browser's locale located in the _i18n_ folder (present in each UI module). When a matching translation file cannot be loaded the framework will fallback to the English translation.
+
+Mapping multiple browser locale keys to specific translations additional configuration can be provided (located in the Angular app config);
+
+[source,linenums]
+----
+// Initialize angular-translate
+$translateProvider.useStaticFilesLoader({
+    prefix: './i18n/',
+    suffix: '.json'
+})
+/*
+    This can be used to map multiple browser language keys to a
+    angular translate language key.
+*/
+// .registerAvailableLanguageKeys(['en'], {
+//     'en-*': 'en'
+// })
+.useCookieStorage()
+.useSanitizeValueStrategy('sanitizeParameters')
+.uniformLanguageTag('bcp47')
+.determinePreferredLanguage();
+----
+
+For example; your browser is configured for English (United States) and provides the language key _en-US_. Without the mapping Angular Translate will try to fetch the corresponding translation file _en-US.json_. (If this is not available it will fallback to 'en' and load the _en.json_ translation file)
+
+By uncommenting the _.registerAvailableLanguageKeys_ block you can map _en-US_ (and all other _en_ language keys) to the _en.json_ language file.

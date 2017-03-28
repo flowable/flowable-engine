@@ -52,8 +52,8 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
     private static final String PROCESS_DEFINITION_KEY_2 = "oneTaskProcess2";
     private static final String PROCESS_DEFINITION_NAME = "oneTaskProcessName";
     private static final String PROCESS_DEFINITION_NAME_2 = "oneTaskProcess2Name";
-    private static final String PROCESS_DEFINITION_CATEGORY = "org.activiti.enginge.test.api.runtime.Category";
-    private static final String PROCESS_DEFINITION_CATEGORY_2 = "org.activiti.enginge.test.api.runtime.2Category";
+    private static final String PROCESS_DEFINITION_CATEGORY = "org.activiti.engine.test.api.runtime.Category";
+    private static final String PROCESS_DEFINITION_CATEGORY_2 = "org.activiti.engine.test.api.runtime.2Category";
 
     private org.flowable.engine.repository.Deployment deployment;
     private List<String> processInstanceIds;
