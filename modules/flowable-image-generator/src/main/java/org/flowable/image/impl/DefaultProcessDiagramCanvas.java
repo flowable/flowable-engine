@@ -952,13 +952,13 @@ public class DefaultProcessDiagramCanvas {
 
         if (scaleFactor == 1.0) {
             // plus inside rhombus
-            Stroke orginalStroke = g.getStroke();
+            Stroke originalStroke = g.getStroke();
             g.setStroke(GATEWAY_TYPE_STROKE);
             Line2D.Double line = new Line2D.Double(x + 10, y + height / 2, x + width - 10, y + height / 2); // horizontal
             g.draw(line);
             line = new Line2D.Double(x + width / 2, y + height - 10, x + width / 2, y + 10); // vertical
             g.draw(line);
-            g.setStroke(orginalStroke);
+            g.setStroke(originalStroke);
         }
     }
 
@@ -975,13 +975,13 @@ public class DefaultProcessDiagramCanvas {
 
         if (scaleFactor == 1.0) {
             // X inside rhombus
-            Stroke orginalStroke = g.getStroke();
+            Stroke originalStroke = g.getStroke();
             g.setStroke(GATEWAY_TYPE_STROKE);
             Line2D.Double line = new Line2D.Double(x + quarterWidth + 3, y + quarterHeight + 3, x + 3 * quarterWidth - 3, y + 3 * quarterHeight - 3);
             g.draw(line);
             line = new Line2D.Double(x + quarterWidth + 3, y + 3 * quarterHeight - 3, x + 3 * quarterWidth - 3, y + quarterHeight + 3);
             g.draw(line);
-            g.setStroke(orginalStroke);
+            g.setStroke(originalStroke);
         }
     }
 
@@ -997,11 +997,11 @@ public class DefaultProcessDiagramCanvas {
 
         if (scaleFactor == 1.0) {
             // circle inside rhombus
-            Stroke orginalStroke = g.getStroke();
+            Stroke originalStroke = g.getStroke();
             g.setStroke(GATEWAY_TYPE_STROKE);
             Ellipse2D.Double circle = new Ellipse2D.Double(((width - diameter) / 2) + x, ((height - diameter) / 2) + y, diameter, diameter);
             g.draw(circle);
-            g.setStroke(orginalStroke);
+            g.setStroke(originalStroke);
         }
     }
 
@@ -1048,7 +1048,7 @@ public class DefaultProcessDiagramCanvas {
         int lineX = x + (width - rectangleWidth) / 2;
         int lineY = y + height - rectangleHeight - 3;
 
-        Stroke orginalStroke = g.getStroke();
+        Stroke originalStroke = g.getStroke();
         g.setStroke(MULTI_INSTANCE_STROKE);
 
         if (sequential) {
@@ -1061,7 +1061,7 @@ public class DefaultProcessDiagramCanvas {
             g.draw(new Line2D.Double(lineX + rectangleWidth, lineY, lineX + rectangleWidth, lineY + rectangleHeight));
         }
 
-        g.setStroke(orginalStroke);
+        g.setStroke(originalStroke);
     }
 
     public void drawHighLight(int x, int y, int width, int height) {

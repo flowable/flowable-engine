@@ -28,7 +28,7 @@ public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
     @Override
     public void init() throws Exception {
         ProcessEngineConfigurationImpl configImpl = (ProcessEngineConfigurationImpl) getProcessEngineConfiguration();
-        configImpl.setExpressionManager(new BlueprintExpressionManager(configImpl));
+        configImpl.setExpressionManager(new BlueprintExpressionManager());
 
         List<ResolverFactory> resolverFactories = configImpl.getResolverFactories();
         if (resolverFactories == null) {
@@ -42,10 +42,6 @@ public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
     }
 
     public class BlueprintExpressionManager extends ExpressionManager {
-
-        public BlueprintExpressionManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-            super(processEngineConfiguration);
-        }
 
         @Override
         protected ELResolver createElResolver(VariableScope variableScope) {

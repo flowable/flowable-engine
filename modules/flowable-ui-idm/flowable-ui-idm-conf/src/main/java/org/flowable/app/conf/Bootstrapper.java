@@ -51,8 +51,8 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
             
             } else {
                 if (identityService.createPrivilegeQuery().count() == 0) {
-                    String adminEmail = env.getRequiredProperty("admin.email");
-                    initializeDefaultPrivileges(adminEmail);
+                    String adminUserId = env.getRequiredProperty("admin.userid");
+                    initializeDefaultPrivileges(adminUserId);
                 }
             }
         }
@@ -67,12 +67,13 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     protected User initializeSuperUser() {
+        String adminUserId = env.getRequiredProperty("admin.userid");
         String adminPassword = env.getRequiredProperty("admin.password");
         String adminFirstname = env.getRequiredProperty("admin.firstname");
         String adminLastname = env.getRequiredProperty("admin.lastname");
-        String adminEmail = env.getRequiredProperty("admin.email");
+        String adminEmail = env.getProperty("admin.email");
 
-        User admin = identityService.newUser(adminEmail);
+        User admin = identityService.newUser(adminUserId);
         admin.setFirstName(adminFirstname);
         admin.setLastName(adminLastname);
         admin.setEmail(adminEmail);

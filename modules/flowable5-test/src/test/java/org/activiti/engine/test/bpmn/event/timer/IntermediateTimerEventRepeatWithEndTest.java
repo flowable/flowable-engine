@@ -75,7 +75,7 @@ public class IntermediateTimerEventRepeatWithEndTest extends PluggableFlowableTe
         Task task = tasks.get(0);
         assertEquals("Task A", task.getName());
 
-        // Test Timer Catch Intermediate Events after completing Task B (endDate not reached but it will be executed accrding to the expression)
+        // Test Timer Catch Intermediate Events after completing Task B (endDate not reached but it will be executed according to the expression)
         taskService.complete(task.getId());
 
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 500);

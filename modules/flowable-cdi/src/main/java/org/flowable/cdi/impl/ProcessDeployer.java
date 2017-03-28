@@ -62,7 +62,7 @@ public class ProcessDeployer {
         // deploy the processes
         Deployment deployment = deploymentBuilder.deploy();
         logger.debug("Process deployed");
-        // retreive the processDefinitionId for this process
+        // retrieve the processDefinitionId for this process
         return processEngine.getRepositoryService().createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult().getId();
     }
 

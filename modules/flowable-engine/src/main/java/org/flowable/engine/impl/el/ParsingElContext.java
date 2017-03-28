@@ -12,13 +12,15 @@
  */
 package org.flowable.engine.impl.el;
 
+import java.util.List;
+
 import javax.el.ELContext;
 import javax.el.ELResolver;
 import javax.el.ExpressionFactory;
 import javax.el.FunctionMapper;
 import javax.el.VariableMapper;
 
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.delegate.FlowableFunctionDelegate;
 
 /**
  * Simple implementation of the {@link ELContext} used during parsings.
@@ -32,10 +34,10 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
  */
 public class ParsingElContext extends ELContext {
 
-    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    protected List<FlowableFunctionDelegate> functionDelegates;
 
-    public ParsingElContext(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        this.processEngineConfiguration = processEngineConfiguration;
+    public ParsingElContext(List<FlowableFunctionDelegate> functionDelegates) {
+        this.functionDelegates = functionDelegates;
     }
 
     public ELResolver getELResolver() {
@@ -43,7 +45,7 @@ public class ParsingElContext extends ELContext {
     }
 
     public FunctionMapper getFunctionMapper() {
-        return new FlowableFunctionMapper(processEngineConfiguration);
+        return new FlowableFunctionMapper(functionDelegates);
     }
 
     public VariableMapper getVariableMapper() {

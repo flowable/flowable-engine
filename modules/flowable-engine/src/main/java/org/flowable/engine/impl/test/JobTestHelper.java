@@ -49,7 +49,7 @@ public class JobTestHelper {
 
         try {
             Timer timer = new Timer();
-            InteruptTask task = new InteruptTask(Thread.currentThread());
+            InterruptTask task = new InterruptTask(Thread.currentThread());
             timer.schedule(task, maxMillisToWait);
             boolean areJobsAvailable = true;
             try {
@@ -91,7 +91,7 @@ public class JobTestHelper {
 
         try {
             Timer timer = new Timer();
-            InteruptTask task = new InteruptTask(Thread.currentThread());
+            InterruptTask task = new InterruptTask(Thread.currentThread());
             timer.schedule(task, maxMillisToWait);
             boolean areJobsAvailable = true;
             try {
@@ -131,7 +131,7 @@ public class JobTestHelper {
 
         try {
             Timer timer = new Timer();
-            InteruptTask task = new InteruptTask(Thread.currentThread());
+            InterruptTask task = new InterruptTask(Thread.currentThread());
             timer.schedule(task, maxMillisToWait);
             boolean conditionIsViolated = true;
             try {
@@ -166,7 +166,7 @@ public class JobTestHelper {
 
         try {
             Timer timer = new Timer();
-            InteruptTask task = new InteruptTask(Thread.currentThread());
+            InterruptTask task = new InterruptTask(Thread.currentThread());
             timer.schedule(task, maxMillisToWait);
             try {
                 while (!task.isTimeLimitExceeded()) {
@@ -201,12 +201,12 @@ public class JobTestHelper {
         }
     }
 
-    private static class InteruptTask extends TimerTask {
+    private static class InterruptTask extends TimerTask {
 
         protected boolean timeLimitExceeded;
         protected Thread thread;
 
-        public InteruptTask(Thread thread) {
+        public InterruptTask(Thread thread) {
             this.thread = thread;
         }
 

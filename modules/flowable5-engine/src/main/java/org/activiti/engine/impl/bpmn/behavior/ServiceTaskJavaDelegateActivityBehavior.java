@@ -13,11 +13,13 @@
 
 package org.activiti.engine.impl.bpmn.behavior;
 
+import org.activiti.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.delegate.JavaDelegateInvocation;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
+import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 
@@ -27,18 +29,26 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
 public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavior implements ActivityBehavior, ExecutionListener {
 
     protected JavaDelegate javaDelegate;
+    protected Expression skipExpression;
 
     protected ServiceTaskJavaDelegateActivityBehavior() {
     }
 
-    public ServiceTaskJavaDelegateActivityBehavior(JavaDelegate javaDelegate) {
+    public ServiceTaskJavaDelegateActivityBehavior(JavaDelegate javaDelegate, Expression skipExpression) {
         this.javaDelegate = javaDelegate;
+        this.skipExpression = skipExpression;
     }
 
     public void execute(DelegateExecution execution) {
-        Context.getProcessEngineConfiguration()
-                .getDelegateInterceptor()
-                .handleInvocation(new JavaDelegateInvocation(javaDelegate, execution));
+        boolean isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(execution, skipExpression);
+        if (!isSkipExpressionEnabled ||
+                (isSkipExpressionEnabled && !SkipExpressionUtil.shouldSkipFlowElement(execution, skipExpression))) {
+            
+            Context.getProcessEngineConfiguration()
+                    .getDelegateInterceptor()
+                    .handleInvocation(new JavaDelegateInvocation(javaDelegate, execution));
+        }
+        
         leave((ActivityExecution) execution);
     }
 

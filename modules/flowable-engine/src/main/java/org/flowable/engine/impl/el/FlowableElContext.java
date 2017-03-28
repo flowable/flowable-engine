@@ -12,12 +12,14 @@
  */
 package org.flowable.engine.impl.el;
 
+import java.util.List;
+
 import javax.el.ELContext;
 import javax.el.ELResolver;
 import javax.el.FunctionMapper;
 import javax.el.VariableMapper;
 
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.delegate.FlowableFunctionDelegate;
 
 /**
  * @author Tom Baeyens
@@ -26,11 +28,11 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 public class FlowableElContext extends ELContext {
 
     protected ELResolver elResolver;
-    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    protected List<FlowableFunctionDelegate> functionDelegates;
 
-    public FlowableElContext(ELResolver elResolver, ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public FlowableElContext(ELResolver elResolver, List<FlowableFunctionDelegate> functionDelegates) {
         this.elResolver = elResolver;
-        this.processEngineConfiguration = processEngineConfiguration;
+        this.functionDelegates = functionDelegates;
     }
 
     public ELResolver getELResolver() {
@@ -38,7 +40,7 @@ public class FlowableElContext extends ELContext {
     }
 
     public FunctionMapper getFunctionMapper() {
-        return new FlowableFunctionMapper(processEngineConfiguration);
+        return new FlowableFunctionMapper(functionDelegates);
     }
 
     public VariableMapper getVariableMapper() {

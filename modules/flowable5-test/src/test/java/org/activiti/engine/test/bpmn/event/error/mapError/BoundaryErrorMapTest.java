@@ -68,7 +68,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
 
         try {
             runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
-            fail("exception expected, as there is no matching exceptio map");
+            fail("exception expected, as there is no matching exception map");
         } catch (Exception e) {
             assertFalse(FlagDelegate.isVisited());
         }
@@ -106,7 +106,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         }
     }
 
-    // exception matches by inheritence
+    // exception matches by inheritance
     @Deployment
     public void testClassDelegateSingleInheritedMap() {
         Map<String, Object> vars = new HashMap<String, Object>();

@@ -13,6 +13,8 @@
 
 package org.flowable.engine.impl.cfg;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
@@ -344,8 +346,6 @@ import org.flowable.validation.ProcessValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -610,7 +610,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected int asyncExecutorDefaultAsyncJobAcquireWaitTime = 10 * 1000;
 
     /**
-     * The time (in milliseconds) the async job (both timer and async continuations) acquisition thread will wait when the queueu is full to execute the next query. By default set to 0 (for backwards
+     * The time (in milliseconds) the async job (both timer and async continuations) acquisition thread will wait when the queue is full to execute the next query. By default set to 0 (for backwards
      * compatibility)
      */
     protected int asyncExecutorDefaultQueueSizeFullWaitTime;
@@ -807,7 +807,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected boolean flowable5CompatibilityEnabled; // Default flowable 5 backwards compatibility is disabled!
     protected boolean validateFlowable5EntitiesEnabled = true; // When disabled no checks are performed for existing flowable 5 entities in the db
-    protected boolean redeployFlowable5ProcessDefinitions = false;
+    protected boolean redeployFlowable5ProcessDefinitions;
     protected Flowable5CompatibilityHandlerFactory flowable5CompatibilityHandlerFactory;
     protected Flowable5CompatibilityHandler flowable5CompatibilityHandler;
 
@@ -847,6 +847,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         configuratorsBeforeInit();
         initProcessDiagramGenerator();
         initHistoryLevel();
+        initFunctionDelegates();
         initExpressionManager();
         initAgendaFactory();
 
@@ -896,7 +897,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initFailedJobCommandFactory();
         initEventDispatcher();
         initProcessValidator();
-        initFunctionDelegates();
         initDatabaseEventLogging();
         initFlowable5CompatibilityHandler();
         configuratorsAfterInit();
@@ -1303,9 +1303,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         // Configurators that are explicitly added to the config
         if (configurators != null) {
-            for (ProcessEngineConfigurator configurator : configurators) {
-                allConfigurators.add(configurator);
-            }
+            allConfigurators.addAll(configurators);
         }
 
         // Auto discovery through ServiceLoader
@@ -1855,8 +1853,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initExpressionManager() {
         if (expressionManager == null) {
-            expressionManager = new ExpressionManager(beans, this);
+            expressionManager = new ExpressionManager(beans);
         }
+        
+        expressionManager.setFunctionDelegates(flowableFunctionDelegates);
     }
 
     public void initBusinessCalendarManager() {
@@ -1886,8 +1886,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (eventHandlers == null) {
             eventHandlers = new HashMap<String, EventHandler>();
 
-            SignalEventHandler signalEventHander = new SignalEventHandler();
-            eventHandlers.put(signalEventHander.getEventHandlerType(), signalEventHander);
+            SignalEventHandler signalEventHandler = new SignalEventHandler();
+            eventHandlers.put(signalEventHandler.getEventHandlerType(), signalEventHandler);
 
             CompensationEventHandler compensationEventHandler = new CompensationEventHandler();
             eventHandlers.put(compensationEventHandler.getEventHandlerType(), compensationEventHandler);
@@ -2455,8 +2455,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this.wsOverridenEndpointAddresses;
     }
 
-    public ProcessEngineConfiguration setWsOverridenEndpointAddresses(final ConcurrentMap<QName, URL> wsOverridenEndpointAdress) {
-        this.wsOverridenEndpointAddresses.putAll(wsOverridenEndpointAdress);
+    public ProcessEngineConfiguration setWsOverridenEndpointAddresses(final ConcurrentMap<QName, URL> wsOverridenEndpointAddress) {
+        this.wsOverridenEndpointAddresses.putAll(wsOverridenEndpointAddress);
         return this;
     }
 

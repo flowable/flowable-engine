@@ -427,7 +427,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
 
         List<FlowableEvent> processTerminatedEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_CANCELLED);
-        assertEquals("There should be no FlowaleEventType.PROCESS_TERMINATED event after process complete.", 0, processTerminatedEvents.size());
+        assertEquals("There should be no FlowableEventType.PROCESS_TERMINATED event after process complete.", 0, processTerminatedEvents.size());
     }
 
     @Deployment(resources = "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testProcessTerminate.bpmn")

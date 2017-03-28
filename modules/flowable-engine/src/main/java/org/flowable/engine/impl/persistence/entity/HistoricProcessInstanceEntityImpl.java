@@ -55,6 +55,7 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
         id = processInstance.getId();
         processInstanceId = processInstance.getId();
         businessKey = processInstance.getBusinessKey();
+        name = processInstance.getName();
         processDefinitionId = processInstance.getProcessDefinitionId();
         processDefinitionKey = processInstance.getProcessDefinitionKey();
         processDefinitionName = processInstance.getProcessDefinitionName();

@@ -19,7 +19,6 @@ import java.util.List;
 import javax.el.FunctionMapper;
 
 import org.flowable.engine.delegate.FlowableFunctionDelegate;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 /**
  * A date function mapper that can be used in EL expressions
@@ -28,14 +27,13 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
  */
 public class FlowableFunctionMapper extends FunctionMapper {
 
-    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    protected List<FlowableFunctionDelegate> functionDelegates;
 
-    public FlowableFunctionMapper(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        this.processEngineConfiguration = processEngineConfiguration;
+    public FlowableFunctionMapper(List<FlowableFunctionDelegate> functionDelegates) {
+        this.functionDelegates = functionDelegates;
     }
 
     public Method resolveFunction(String prefix, String localName) {
-        List<FlowableFunctionDelegate> functionDelegates = processEngineConfiguration.getFlowableFunctionDelegates();
         if (functionDelegates != null) {
             for (FlowableFunctionDelegate functionDelegate : functionDelegates) {
                 if (functionDelegate.prefix().equals(prefix) && functionDelegate.localName().equals(localName)) {

@@ -2,7 +2,7 @@
 <definitions id="definitions"
 	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
 	xmlns:activiti="http://activiti.org/bpmn" 
-	targetNamespace="org.flowable.enginge.test.api.mgmt">
+	targetNamespace="org.flowable.engine.test.api.mgmt">
 
 	<process id="timerOnTask">
 
