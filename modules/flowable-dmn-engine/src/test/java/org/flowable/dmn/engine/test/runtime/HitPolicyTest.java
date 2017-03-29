@@ -64,7 +64,7 @@ public class HitPolicyTest {
 
         Assert.assertEquals(0, result.getResultVariables().size());
         Assert.assertTrue(result.getAuditTrail().isFailed());
-        Assert.assertNotNull(result.getAuditTrail().getRuleExecutions().get(3).getConclusionResults().get(1).getException());
+        Assert.assertNotNull(result.getAuditTrail().getRuleExecutions().get(3).getConclusionResults().get(2).getException());
         Assert.assertNotNull(result.getAuditTrail().getExceptionMessage());
     }
 

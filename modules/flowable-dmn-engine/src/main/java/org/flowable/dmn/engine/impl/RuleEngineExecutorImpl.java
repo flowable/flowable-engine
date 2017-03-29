@@ -237,7 +237,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 executionVariable = ExecutionVariableFactory.getExecutionVariable(outputVariableType, resultValue);
 
                 // check validity
-                evaluateRuleConclusionValidity(resultValue, ruleNumber, ruleClauseContainer.getOutputClause().getOutputNumber(), hitPolicy, executionContext);
+                evaluateRuleConclusionValidity(executionVariable, ruleNumber, ruleClauseContainer.getOutputClause().getOutputNumber(), hitPolicy, executionContext);
 
                 // create result
                 composeResult(hitPolicy, outputVariableId, executionVariable, executionContext);
@@ -292,13 +292,13 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         for (Map.Entry<Integer, RuleExecutionAuditContainer> entry : executionContext.getAuditContainer().getRuleExecutions().entrySet()) {
             if (entry.getKey().equals(ruleNumber) == false &&
                 !entry.getValue().getConclusionResults().isEmpty() &&
-                entry.getValue().getConclusionResults().size() > ruleConclusionNumber) {
+                entry.getValue().getConclusionResults().size() >= ruleConclusionNumber) {
 
                 ExpressionExecution expressionExecution = entry.getValue().getConclusionResults().get(ruleConclusionNumber);
 
-                // conclusion value cannot be the same as for other valid rules
+                // conclusion value must be the same as for other valid rules
                 if (expressionExecution != null && expressionExecution.getResult() != null && !expressionExecution.getResult().equals(resultValue)) {
-                    String hitPolicyViolatedMessage = String.format("HitPolicy ANY violated: conclusion %d of rule %d is the same as for rule %d", ruleConclusionNumber, ruleNumber, entry.getKey());
+                    String hitPolicyViolatedMessage = String.format("HitPolicy ANY violated: conclusion %d of rule %d is not the same as for rule %d", ruleConclusionNumber, ruleNumber, entry.getKey());
 
                     logger.warn(hitPolicyViolatedMessage);
 
