@@ -12,7 +12,6 @@
  */
 package org.flowable.engine.test.api.runtime;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +29,6 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
     private static final String PROCESS_DEFINITION_KEY_2 = "oneTaskProcess2";
     private static final String PROCESS_DEFINITION_KEY_3 = "oneTaskProcess3";
 
-    private List<String> processInstanceIds;
-
     /**
      * Setup starts 4 process instances of oneTaskProcess and 1 instance of oneTaskProcess2
      */
@@ -46,18 +43,17 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
         Map<String, Object> startMap = new HashMap<>();
         startMap.put("test", "test");
         startMap.put("test2", "test2");
-        processInstanceIds = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
-            processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, String.valueOf(i), startMap).getId());
+            runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, String.valueOf(i), startMap);
         }
 
         startMap.clear();
         startMap.put("anothertest", 123);
-        processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_2, "1", startMap).getId());
+        runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_2, "1", startMap);
 
         startMap.clear();
         startMap.put("casetest", "MyCaseTest");
-        processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_3, "1", startMap).getId());
+        runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_3, "1", startMap);
     }
 
     protected void tearDown() throws Exception {
