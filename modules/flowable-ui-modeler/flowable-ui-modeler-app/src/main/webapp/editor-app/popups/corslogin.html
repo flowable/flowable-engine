@@ -1,4 +1,3 @@
-
 <div class="modal" ng-controller="LoginController as loginCtrl">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -6,20 +5,18 @@
             <h2>Please login for deployment!</h2>
         </div>
         <div class="modal-body">
-        	<div class="field">
-    			<label for="j_username">Username</label> <input class="text" type="text" ng-model="loginCtrl.loginDetail.name" />
+        	<div class="field form-group">
+    			<label for="j_username">Username</label> <input class="text form-control" type="text" ng-model="loginCtrl.loginDetail.name" />
   			</div>
-  			<div class="field">
-    			<label for="j_password">Password&nbsp;</label> <input class="password" type="password" id="j_password" ng-model="loginCtrl.loginDetail.password" />
+  			<div class="field form-group">
+    			<label for="j_password">Password</label> <input class="password form-control" type="password" id="j_password" ng-model="loginCtrl.loginDetail.password" />
   			</div>
-  			<div class="field" ng-if="loginCtrl.deploying">
-    			<img src="images/bluebar_xp_loading_ani.gif" />
-  			</div>
- 			<span ng-if="loginCtrl.errorMsg">{{loginCtrl.errorMsg}}</span>        
+  			<span ng-if="loginCtrl.deploying" class="glyphicon glyphicon-refresh spinning ng-animate"></span>
+  			<span ng-if="loginCtrl.errorMsg">{{loginCtrl.errorMsg}}</span>	        
         </div>
         <div class="modal-footer">
         	<button class="btn btn-warning" type="button" ng-click="loginCtrl.cancel()">Cancel</button>
-  			<button class="btn btn-primary" type="button" ng-click="loginCtrl.deploy()">Deploy</button>
+  			<button class="btn btn-primary" type="button" ng-click="loginCtrl.deploy()" ng-disabled="loginCtrl.deploying">Deploy</button>
         </div>
     </div>
 </div>
