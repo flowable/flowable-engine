@@ -204,6 +204,7 @@ angular.module('flowableModeler')
                 {'type': 'text', 'title': $translate.instant('FORM-BUILDER.PALLETTE.TEXT'), 'icon': 'images/form-builder/textfield-icon.png', 'width': 1},
                 {'type': 'multi-line-text', 'title': $translate.instant('FORM-BUILDER.PALLETTE.MULTILINE-TEXT'), 'icon': 'images/form-builder/multi-line-textfield-icon.png', 'width': 1},
                 {'type': 'integer', 'title': $translate.instant('FORM-BUILDER.PALLETTE.NUMBER'), 'icon': 'images/form-builder/numberfield-icon.png', 'width': 1},
+                {'type': 'double', 'title': $translate.instant('FORM-BUILDER.PALLETTE.DECIMAL'), 'icon': 'images/form-builder/decimalfield-icon.png', 'width': 1},
                 {'type': 'boolean', 'title': $translate.instant('FORM-BUILDER.PALLETTE.CHECKBOX'), 'icon': 'images/form-builder/booleanfield-icon.png', 'width': 1},
                 {'type': 'date', 'title': $translate.instant('FORM-BUILDER.PALLETTE.DATE'), 'icon': 'images/form-builder/datefield-icon.png', 'width': 1},
                 {'type': 'dropdown', 'title': $translate.instant('FORM-BUILDER.PALLETTE.DROPDOWN'), 'icon': 'images/form-builder/dropdownfield-icon.png', 'width': 1},
