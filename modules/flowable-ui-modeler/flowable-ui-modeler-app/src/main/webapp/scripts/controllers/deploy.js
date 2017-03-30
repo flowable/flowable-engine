@@ -11,8 +11,7 @@ angular.module('flowableModeler')
     
     var deployModelId = $scope.model.process.id
 
-    //var deployUrl = APP_CONFIG.deployUrl ? APP_CONFIG.deployUrl : "http://localhost:8080/runtime/workflow/model/deploy";
-    var deployUrl = "http://localhost:8080/runtime/workflow/deploy";
+    var deployUrl = FLOWABLE.CONFIG.deployUrl ? FLOWABLE.CONFIG.deployUrl : "http://localhost:8080/runtime/workflow/deploy";
     function deploy() {
       if (vm.loginDetail.name && vm.loginDetail.password) {
         vm.deploying = true;
