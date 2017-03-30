@@ -111,7 +111,10 @@ public class InjectParallelUserTaskCmd extends AbstractDynamicInjectionCmd imple
             SequenceFlow endFlow = new SequenceFlow(newUserTask.getId(), endEvent.getId());
             endFlow.setId("flow-" + UUID.randomUUID().toString());
             parentContainer.addFlowElement(endFlow);
-
+        }
+        
+        if (dynamicUserTaskBuilder.getDynamicUserTaskCallback() != null) {
+            dynamicUserTaskBuilder.getDynamicUserTaskCallback().handleCreatedDynamicUserTask(newUserTask, parentContainer, process);
         }
     }
 

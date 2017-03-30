@@ -171,6 +171,7 @@ public class BpmnDeployer implements Deployer {
      */
     protected void setProcessDefinitionVersionsAndIds(ParsedDeployment parsedDeployment,
             Map<ProcessDefinitionEntity, ProcessDefinitionEntity> mapNewToOldProcessDefinitions) {
+        
         CommandContext commandContext = Context.getCommandContext();
 
         for (ProcessDefinitionEntity processDefinition : parsedDeployment.getAllProcessDefinitions()) {
@@ -201,6 +202,8 @@ public class BpmnDeployer implements Deployer {
     }
 
     protected void setDerivedProcessDefinitionVersionsAndIds(ParsedDeployment parsedDeployment, Map<String, Object> deploymentSettings) {
+        CommandContext commandContext = Context.getCommandContext();
+        
         for (ProcessDefinitionEntity processDefinition : parsedDeployment.getAllProcessDefinitions()) {
             processDefinition.setVersion(0);
             processDefinition.setId(idGenerator.getNextId());
@@ -214,6 +217,12 @@ public class BpmnDeployer implements Deployer {
                 if (startEvent.getFormKey() != null) {
                     processDefinition.setHasStartFormKey(true);
                 }
+            }
+            
+            cachingAndArtifactsManager.updateProcessDefinitionCache(parsedDeployment);
+
+            if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+                commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition));
             }
         }
     }

@@ -18,6 +18,7 @@ public class DynamicUserTaskBuilder {
     protected String name;
     protected String assignee;
     protected boolean joinParallelActivitiesOnComplete = true;
+    protected DynamicUserTaskCallback dynamicUserTaskCallback;
 
     public DynamicUserTaskBuilder() {
 
@@ -76,6 +77,19 @@ public class DynamicUserTaskBuilder {
 
     public DynamicUserTaskBuilder joinParallelActivitiesOnComplete(boolean joinParallelActivitiesOnComplete) {
         this.joinParallelActivitiesOnComplete = joinParallelActivitiesOnComplete;
+        return this;
+    }
+    
+    public DynamicUserTaskCallback getDynamicUserTaskCallback() {
+        return dynamicUserTaskCallback;
+    }
+
+    public void setDynamicUserTaskCallback(DynamicUserTaskCallback dynamicUserTaskCallback) {
+        this.dynamicUserTaskCallback = dynamicUserTaskCallback;
+    }
+
+    public DynamicUserTaskBuilder dynamicUserTaskCallback(DynamicUserTaskCallback dynamicUserTaskCallback) {
+        this.dynamicUserTaskCallback = dynamicUserTaskCallback;
         return this;
     }
 
