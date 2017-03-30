@@ -65,6 +65,30 @@ public class CommentEntityManagerImpl extends AbstractEntityManager<CommentEntit
                     FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
         }
     }
+    
+    @Override
+    public CommentEntity update(CommentEntity commentEntity) {
+        checkHistoryEnabled();
+
+        CommentEntity updatedCommentEntity = update(commentEntity, false);
+
+        if (getEventDispatcher().isEnabled()) {
+            // Forced to fetch the process-instance to associate the right
+            // process definition
+            String processDefinitionId = null;
+            String processInstanceId = updatedCommentEntity.getProcessInstanceId();
+            if (updatedCommentEntity.getProcessInstanceId() != null) {
+                ExecutionEntity process = getExecutionEntityManager().findById(updatedCommentEntity.getProcessInstanceId());
+                if (process != null) {
+                    processDefinitionId = process.getProcessDefinitionId();
+                }
+            }
+            getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
+        }
+        
+        return updatedCommentEntity;
+    }
 
     @Override
     public List<Comment> findCommentsByTaskId(String taskId) {

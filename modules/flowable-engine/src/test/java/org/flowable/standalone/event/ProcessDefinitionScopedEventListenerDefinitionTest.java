@@ -56,9 +56,9 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
             assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
         }
 
-        // First event received should be creation of Process-instance
-        assertTrue(testListenerBean.getEventsReceived().get(0) instanceof FlowableEntityEvent);
-        FlowableEntityEvent event = (FlowableEntityEvent) testListenerBean.getEventsReceived().get(0);
+        // Second event received should be creation of Process instance (first is process definition create event)
+        assertTrue(testListenerBean.getEventsReceived().get(1) instanceof FlowableEntityEvent);
+        FlowableEntityEvent event = (FlowableEntityEvent) testListenerBean.getEventsReceived().get(1);
         assertTrue(event.getEntity() instanceof ProcessInstance);
         assertEquals(processInstance.getId(), ((ProcessInstance) event.getEntity()).getId());
 
