@@ -1233,7 +1233,7 @@ flowableModule.
     });
 
 flowableModule.
-directive('doubleNumberInputCheck', function() {
+directive('decimalNumberInputCheck', function() {
 
     return {
         require: 'ngModel',

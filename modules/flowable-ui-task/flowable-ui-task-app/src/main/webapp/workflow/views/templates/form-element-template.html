@@ -18,10 +18,10 @@
         <input id="{{activitiFieldIdPrefix + field.id}}" type="text" name="{{field.id}}" class="form-control" placeholder="{{field.placeholder}}" ng-model="field.value" ng-change="onFieldValueChange(field)" ng-blur="onFieldBlur(field)" ng-focus="onFieldFocus(field)" number-input-check ng-required="field.required">
     </div>
     
-    <div ng-switch-when="double" class="form-group" ng-show="field.isVisible" ng-class="{'has-error': field.required && isEmpty(field)}">
+    <div ng-switch-when="decimal" class="form-group" ng-show="field.isVisible" ng-class="{'has-error': field.required && isEmpty(field)}">
         <label class="control-label">{{field.name}}</label>
         <span class="marker" ng-if="field.required">*</span>
-        <input id="{{activitiFieldIdPrefix + field.id}}" type="text" name="{{field.id}}" class="form-control" placeholder="{{field.placeholder}}" ng-model="field.value" ng-change="onFieldValueChange(field)" ng-blur="onFieldBlur(field)" ng-focus="onFieldFocus(field)" double-number-input-check ng-required="field.required">
+        <input id="{{activitiFieldIdPrefix + field.id}}" type="text" name="{{field.id}}" class="form-control" placeholder="{{field.placeholder}}" ng-model="field.value" ng-change="onFieldValueChange(field)" ng-blur="onFieldBlur(field)" ng-focus="onFieldFocus(field)" decimal-number-input-check ng-required="field.required">
     </div>
 
     <div ng-switch-when="date" class="form-group" ng-show="field.isVisible" ng-class="{'has-error': field.required && isEmpty(field)}">

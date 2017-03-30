@@ -23,7 +23,7 @@ public interface FormFieldTypes {
 
     String INTEGER = "integer";
     
-    String DOUBLE = "double";
+    String DECIMAL = "decimal";
 
     String AMOUNT = "amount";
 
