@@ -50,8 +50,7 @@ public class CommentEntityManagerImpl extends AbstractEntityManager<CommentEntit
 
         Comment comment = (Comment) commentEntity;
         if (getEventDispatcher().isEnabled()) {
-            // Forced to fetch the process-instance to associate the right
-            // process definition
+            // Forced to fetch the process-instance to associate the right process definition
             String processDefinitionId = null;
             String processInstanceId = comment.getProcessInstanceId();
             if (comment.getProcessInstanceId() != null) {

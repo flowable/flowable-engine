@@ -61,7 +61,6 @@ public abstract class AbstractDynamicInjectionCmd {
         newDeploymentEntity.setCategory(deploymentEntity.getCategory());
         newDeploymentEntity.setKey(deploymentEntity.getKey());
         newDeploymentEntity.setTenantId(deploymentEntity.getTenantId());
-        newDeploymentEntity.setEngineVersion(deploymentEntity.getEngineVersion());
 
         newDeploymentEntity.setDerivedFrom(deploymentEntity.getId());
         if (deploymentEntity.getDerivedFromRoot() != null) {
