@@ -20,6 +20,6 @@ import org.activiti.engine.query.NativeQuery;
  * @author Henry Yan(http://www.kafeitu.me)
  */
 public interface NativeHistoricVariableInstanceQuery
-    extends NativeQuery<NativeHistoricVariableInstanceQuery, HistoricVariableInstance> {
+        extends NativeQuery<NativeHistoricVariableInstanceQuery, HistoricVariableInstance> {
 
 }

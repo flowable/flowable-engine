@@ -12,95 +12,115 @@
  */
 package org.flowable.app.model.runtime;
 
+import java.util.List;
+
 import org.flowable.app.model.common.AbstractRepresentation;
 
 public class AppDefinitionRepresentation extends AbstractRepresentation {
 
-  private String defaultAppId; // Set for default apps (kickstart, tasks, idm, analytics,...)
-  private String name;
-  private String description;
-  private Long modelId;
-  private String theme;
-  private String icon;
-  private String deploymentId;
-  private String deploymentKey;
-  private Long tenantId;
+    protected String defaultAppId;
+    protected String name;
+    protected String description;
+    protected Long modelId;
+    protected String theme;
+    protected String icon;
+    protected String deploymentId;
+    protected String deploymentKey;
+    protected Long tenantId;
+    protected List<String> usersAccess;
+    protected List<String> groupsAccess;
 
-  public static AppDefinitionRepresentation createDefaultAppDefinitionRepresentation(String id) {
-    AppDefinitionRepresentation appDefinitionRepresentation = new AppDefinitionRepresentation();
-    appDefinitionRepresentation.setDefaultAppId(id);
-    return appDefinitionRepresentation;
-  }
+    public static AppDefinitionRepresentation createDefaultAppDefinitionRepresentation(String id) {
+        AppDefinitionRepresentation appDefinitionRepresentation = new AppDefinitionRepresentation();
+        appDefinitionRepresentation.setDefaultAppId(id);
+        return appDefinitionRepresentation;
+    }
 
-  public String getDefaultAppId() {
-    return defaultAppId;
-  }
+    public String getDefaultAppId() {
+        return defaultAppId;
+    }
 
-  public void setDefaultAppId(String defaultAppId) {
-    this.defaultAppId = defaultAppId;
-  }
+    public void setDefaultAppId(String defaultAppId) {
+        this.defaultAppId = defaultAppId;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public String getDescription() {
-    return description;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-  public Long getModelId() {
-    return modelId;
-  }
+    public Long getModelId() {
+        return modelId;
+    }
 
-  public void setModelId(Long modelId) {
-    this.modelId = modelId;
-  }
+    public void setModelId(Long modelId) {
+        this.modelId = modelId;
+    }
 
-  public String getTheme() {
-    return theme;
-  }
+    public String getTheme() {
+        return theme;
+    }
 
-  public void setTheme(String theme) {
-    this.theme = theme;
-  }
+    public void setTheme(String theme) {
+        this.theme = theme;
+    }
 
-  public String getIcon() {
-    return icon;
-  }
+    public String getIcon() {
+        return icon;
+    }
 
-  public void setIcon(String icon) {
-    this.icon = icon;
-  }
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
 
-  public String getDeploymentId() {
-    return deploymentId;
-  }
+    public String getDeploymentId() {
+        return deploymentId;
+    }
 
-  public void setDeploymentId(String deploymentId) {
-    this.deploymentId = deploymentId;
-  }
-  
-  public String getDeploymentKey() {
-    return deploymentKey;
-  }
+    public void setDeploymentId(String deploymentId) {
+        this.deploymentId = deploymentId;
+    }
 
-  public void setDeploymentKey(String deploymentKey) {
-    this.deploymentKey = deploymentKey;
-  }
+    public String getDeploymentKey() {
+        return deploymentKey;
+    }
 
-  public Long getTenantId() {
-    return tenantId;
-  }
+    public void setDeploymentKey(String deploymentKey) {
+        this.deploymentKey = deploymentKey;
+    }
 
-  public void setTenantId(Long tenantId) {
-    this.tenantId = tenantId;
-  }
+    public Long getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(Long tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public List<String> getUsersAccess() {
+        return usersAccess;
+    }
+
+    public void setUsersAccess(List<String> usersAccess) {
+        this.usersAccess = usersAccess;
+    }
+
+    public List<String> getGroupsAccess() {
+        return groupsAccess;
+    }
+
+    public void setGroupsAccess(List<String> groupsAccess) {
+        this.groupsAccess = groupsAccess;
+    }
 }

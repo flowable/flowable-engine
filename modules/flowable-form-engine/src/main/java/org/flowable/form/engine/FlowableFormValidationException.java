@@ -22,13 +22,13 @@ import org.flowable.engine.common.api.FlowableException;
  */
 public class FlowableFormValidationException extends FlowableException {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public FlowableFormValidationException(String message) {
-    super(message);
-  }
+    public FlowableFormValidationException(String message) {
+        super(message);
+    }
 
-  public FlowableFormValidationException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public FlowableFormValidationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

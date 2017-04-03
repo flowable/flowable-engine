@@ -20,23 +20,22 @@ import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.runtime.Job;
 
 /**
- * Factory that produces a {@link Runnable} that executes a {@link JobEntity}.
- * Can be used to create special implementations for specific tenants.
+ * Factory that produces a {@link Runnable} that executes a {@link JobEntity}. Can be used to create special implementations for specific tenants.
  * 
  * @author Joram Barrez
  */
 public class TenantAwareExecuteAsyncRunnableFactory implements ExecuteAsyncRunnableFactory {
-  
-  protected TenantInfoHolder tenantInfoHolder;
-  protected String tenantId;
-  
-  public TenantAwareExecuteAsyncRunnableFactory(TenantInfoHolder tenantInfoHolder, String tenantId) {
-    this.tenantInfoHolder = tenantInfoHolder;
-    this.tenantId = tenantId;
-  }
 
-  public Runnable createExecuteAsyncRunnable(Job job, ProcessEngineConfigurationImpl processEngineConfiguration) {
-    return new TenantAwareExecuteAsyncRunnable(job, processEngineConfiguration, tenantInfoHolder, tenantId);
-  }
+    protected TenantInfoHolder tenantInfoHolder;
+    protected String tenantId;
+
+    public TenantAwareExecuteAsyncRunnableFactory(TenantInfoHolder tenantInfoHolder, String tenantId) {
+        this.tenantInfoHolder = tenantInfoHolder;
+        this.tenantId = tenantId;
+    }
+
+    public Runnable createExecuteAsyncRunnable(Job job, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        return new TenantAwareExecuteAsyncRunnable(job, processEngineConfiguration, tenantInfoHolder, tenantId);
+    }
 
 }

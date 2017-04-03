@@ -36,80 +36,81 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
-  
-  private static final Logger logger = LoggerFactory.getLogger(AsyncHistoryJobHandler.class);
-  
-  public static final String JOB_TYPE = "async-history";
-  
-  protected Map<String, List<HistoryJsonTransformer>> historyJsonTransformers = new HashMap<String, List<HistoryJsonTransformer>>();
 
-  public AsyncHistoryJobHandler() {
-    initDefaultTransformers();
-  }
-  
-  @Override
-  public String getType() {
-    return JOB_TYPE;
-  }
-  
-  protected void initDefaultTransformers() {
-    addHistoryJsonTransformer(new ProcessInstanceStartHistoryJsonTransformer());
-    addHistoryJsonTransformer(new ProcessInstanceEndHistoryJsonTransformer());
-    
-    addHistoryJsonTransformer(new ActivityStartHistoryJsonTransformer());
-    addHistoryJsonTransformer(new ActivityEndHistoryJsonTransformer());
-    
-    addHistoryJsonTransformer(new TaskCreatedHistoryJsonTransformer());
-    addHistoryJsonTransformer(new TaskEndedHistoryJsonTransformer());
-    
-    addHistoryJsonTransformer(new TaskPropertyChangedHistoryJsonTransformer());
-    addHistoryJsonTransformer(new TaskAssigneeChangedHistoryJsonTransformer());
-  }
-  
-  public void addHistoryJsonTransformer(HistoryJsonTransformer historyJsonTransformer) {
-    String type = historyJsonTransformer.getType();
-    if (!historyJsonTransformers.containsKey(type)) {
-      historyJsonTransformers.put(type, new ArrayList<HistoryJsonTransformer>());
+    private static final Logger logger = LoggerFactory.getLogger(AsyncHistoryJobHandler.class);
+
+    public static final String JOB_TYPE = "async-history";
+
+    protected Map<String, List<HistoryJsonTransformer>> historyJsonTransformers = new HashMap<String, List<HistoryJsonTransformer>>();
+
+    public AsyncHistoryJobHandler() {
+        initDefaultTransformers();
     }
-    historyJsonTransformers.get(historyJsonTransformer.getType()).add(historyJsonTransformer);
-  }
-  
-  @Override
-  protected void processHistoryJson(CommandContext commandContext, JobEntity job, ArrayNode historicalDataArrayNode) {
-    for (JsonNode element : historicalDataArrayNode) {
-      String type = element.get("type").asText();
-      ObjectNode historicalJsonData = (ObjectNode) element.get("data");
 
-      if (logger.isDebugEnabled()) {
-        logger.debug("Handling async history job (id={}, type={})", job.getId(), type);
-      }
+    @Override
+    public String getType() {
+        return JOB_TYPE;
+    }
 
-      List<HistoryJsonTransformer> transformers = historyJsonTransformers.get(type);
-      if (transformers != null && !transformers.isEmpty()) {
-        for (HistoryJsonTransformer transformer : transformers) {
-          if (transformer.isApplicable(historicalJsonData, commandContext)) {
-            transformer.transformJson(job, historicalJsonData, commandContext);
+    protected void initDefaultTransformers() {
+        addHistoryJsonTransformer(new ProcessInstanceStartHistoryJsonTransformer());
+        addHistoryJsonTransformer(new ProcessInstanceEndHistoryJsonTransformer());
 
-          } else {
-            if (logger.isDebugEnabled()) {
-              logger.debug("Could not handle job (id={}). as it is not applicable. Unacquiring.", job.getId());
-            }
-            throw new AsyncHistoryJobNotApplicableException();
+        addHistoryJsonTransformer(new ActivityStartHistoryJsonTransformer());
+        addHistoryJsonTransformer(new ActivityEndHistoryJsonTransformer());
 
-          }
+        addHistoryJsonTransformer(new TaskCreatedHistoryJsonTransformer());
+        addHistoryJsonTransformer(new TaskEndedHistoryJsonTransformer());
+
+        addHistoryJsonTransformer(new TaskPropertyChangedHistoryJsonTransformer());
+        addHistoryJsonTransformer(new TaskAssigneeChangedHistoryJsonTransformer());
+    }
+
+    public void addHistoryJsonTransformer(HistoryJsonTransformer historyJsonTransformer) {
+        String type = historyJsonTransformer.getType();
+        if (!historyJsonTransformers.containsKey(type)) {
+            historyJsonTransformers.put(type, new ArrayList<HistoryJsonTransformer>());
         }
-      } else {
-        logger.debug("Cannot transform history json: no transformers found for type {}", type);
-      }
+        historyJsonTransformers.get(historyJsonTransformer.getType()).add(historyJsonTransformer);
     }
-  }
 
-  public Map<String, List<HistoryJsonTransformer>> getHistoryJsonTransformers() {
-    return historyJsonTransformers;
-  }
+    @Override
+    protected void processHistoryJson(CommandContext commandContext, JobEntity job, ArrayNode historicalDataArrayNode) {
+        for (JsonNode element : historicalDataArrayNode) {
+            String type = element.get("type").asText();
+            ObjectNode historicalJsonData = (ObjectNode) element.get("data");
 
-  public void setHistoryJsonTransformers(Map<String, List<HistoryJsonTransformer>> historyJsonTransformers) {
-    this.historyJsonTransformers = historyJsonTransformers;
-  }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Handling async history job (id={}, type={})", job.getId(), type);
+            }
+
+            List<HistoryJsonTransformer> transformers = historyJsonTransformers.get(type);
+            if (transformers != null && !transformers.isEmpty()) {
+                for (HistoryJsonTransformer transformer : transformers) {
+                    if (transformer.isApplicable(historicalJsonData, commandContext)) {
+                        transformer.transformJson(job, historicalJsonData, commandContext);
+
+                    } else {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Could not handle job (id={}) for transformer {}. as it is not applicable. Unacquiring.", 
+                                    job.getId(), transformer.getType());
+                        }
+                        throw new AsyncHistoryJobNotApplicableException();
+
+                    }
+                }
+            } else {
+                logger.debug("Cannot transform history json: no transformers found for type {}", type);
+            }
+        }
+    }
+
+    public Map<String, List<HistoryJsonTransformer>> getHistoryJsonTransformers() {
+        return historyJsonTransformers;
+    }
+
+    public void setHistoryJsonTransformers(Map<String, List<HistoryJsonTransformer>> historyJsonTransformers) {
+        this.historyJsonTransformers = historyJsonTransformers;
+    }
 
 }

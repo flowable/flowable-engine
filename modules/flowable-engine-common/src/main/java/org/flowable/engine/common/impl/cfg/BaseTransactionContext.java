@@ -19,9 +19,9 @@ import org.flowable.engine.common.impl.interceptor.AbstractCommandContext;
  */
 public interface BaseTransactionContext<T extends BaseTransactionListener<C>, C extends AbstractCommandContext> {
 
-  void commit();
+    void commit();
 
-  void rollback();
+    void rollback();
 
-  void addTransactionListener(TransactionState transactionState, T transactionListener);
+    void addTransactionListener(TransactionState transactionState, T transactionListener);
 }

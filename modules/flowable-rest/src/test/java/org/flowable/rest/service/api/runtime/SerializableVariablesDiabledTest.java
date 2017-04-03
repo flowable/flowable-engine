@@ -55,149 +55,148 @@ import org.junit.Test;
  * @author Joram Barrez
  */
 public class SerializableVariablesDiabledTest {
-	
-	private RepositoryService repositoryService;
-	private RuntimeService runtimeService;
-	private IdentityService identityService;
-	private TaskService taskService;
-	
-	private String serverUrlPrefix;
-	
-	private String testUserId;
-	private String testGroupId;
 
-	@Before
-	public void setupServer() {
-		if (serverUrlPrefix == null) {
-			TestServer testServer = TestServerUtil.createAndStartServer(ObjectVariableSerializationDisabledApplicationConfiguration.class);
-			serverUrlPrefix = testServer.getServerUrlPrefix();
-			
-			this.repositoryService = testServer.getApplicationContext().getBean(RepositoryService.class);
-			this.runtimeService = testServer.getApplicationContext().getBean(RuntimeService.class);
-			this.identityService = testServer.getApplicationContext().getBean(IdentityService.class);
-			this.taskService = testServer.getApplicationContext().getBean(TaskService.class);
-			
-	    User user = identityService.newUser("kermit");
-	    user.setFirstName("Kermit");
-	    user.setLastName("the Frog");
-	    user.setPassword("kermit");
-	    identityService.saveUser(user);
-	    
-	    Group group = identityService.newGroup("admin");
-	    group.setName("Administrators");
-	    identityService.saveGroup(group);
-	    
-	    identityService.createMembership(user.getId(), group.getId());
-	    
-	    this.testUserId = user.getId();
-	    this.testGroupId = group.getId();
-		}
-	}
-	
-	@After
-	public void removeUsers() {
-		identityService.deleteMembership(testUserId, testGroupId);
-		identityService.deleteGroup(testGroupId);
-		identityService.deleteUser(testUserId);
-		
-		for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
-			repositoryService.deleteDeployment(deployment.getId(), true);
-		}
-	}
-	
-	@Test
-  public void testCreateSingleSerializableProcessVariable() throws Exception {
-  	
-  	repositoryService.createDeployment()
-  		.addClasspathResource("org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml").
-  		deploy();
-  	
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    
-    TestSerializableVariable serializable = new TestSerializableVariable();
-    serializable.setSomeField("some value");
-    
-    // Serialize object to readable stream for representation
-    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-    ObjectOutputStream output = new ObjectOutputStream(buffer);
-    output.writeObject(serializable);
-    output.close();
-    
-    InputStream binaryContent = new ByteArrayInputStream(buffer.toByteArray()); 
-    
-    // Add name, type and scope
-    Map<String, String> additionalFields = new HashMap<String, String>();
-    additionalFields.put("name", "serializableVariable");
-    additionalFields.put("type", "serializable");
-    
-    // Upload a valid BPMN-file using multipart-data
-    HttpPost httpPost = new HttpPost(serverUrlPrefix + 
-        RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId()));
-    httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/x-java-serialized-object", binaryContent, additionalFields));
-    
-    // We have serializeable object disabled, we should get a 415.
-    assertResponseStatus(httpPost, HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
-  }
-	
-	@Test
-  public void testCreateSingleSerializableTaskVariable() throws Exception {
-    repositoryService.createDeployment()
-      .addClasspathResource("org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml")
-      .deploy();
+    private RepositoryService repositoryService;
+    private RuntimeService runtimeService;
+    private IdentityService identityService;
+    private TaskService taskService;
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    private String serverUrlPrefix;
 
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    private String testUserId;
+    private String testGroupId;
 
-    TestSerializableVariable serializable = new TestSerializableVariable();
-    serializable.setSomeField("some value");
+    @Before
+    public void setupServer() {
+        if (serverUrlPrefix == null) {
+            TestServer testServer = TestServerUtil.createAndStartServer(ObjectVariableSerializationDisabledApplicationConfiguration.class);
+            serverUrlPrefix = testServer.getServerUrlPrefix();
 
-    // Serialize object to readable stream for representation
-    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-    ObjectOutputStream output = new ObjectOutputStream(buffer);
-    output.writeObject(serializable);
-    output.close();
+            this.repositoryService = testServer.getApplicationContext().getBean(RepositoryService.class);
+            this.runtimeService = testServer.getApplicationContext().getBean(RuntimeService.class);
+            this.identityService = testServer.getApplicationContext().getBean(IdentityService.class);
+            this.taskService = testServer.getApplicationContext().getBean(TaskService.class);
 
-    InputStream binaryContent = new ByteArrayInputStream(buffer.toByteArray());
+            User user = identityService.newUser("kermit");
+            user.setFirstName("Kermit");
+            user.setLastName("the Frog");
+            user.setPassword("kermit");
+            identityService.saveUser(user);
 
-    // Add name, type and scope
-    Map<String, String> additionalFields = new HashMap<String, String>();
-    additionalFields.put("name", "serializableVariable");
-    additionalFields.put("type", "serializable");
+            Group group = identityService.newGroup("admin");
+            group.setName("Administrators");
+            identityService.saveGroup(group);
 
-    HttpPost httpPost = new HttpPost(serverUrlPrefix +
-            RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
-    httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/x-java-serialized-object", binaryContent, additionalFields));
+            identityService.createMembership(user.getId(), group.getId());
 
-    // We have serializeable object disabled, we should get a 415.
-    assertResponseStatus(httpPost, HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
-  }
-	
-  public void assertResponseStatus(HttpUriRequest request, int expectedStatusCode) {
-	  CloseableHttpResponse response = null;
-    try {
-      
-      CredentialsProvider provider = new BasicCredentialsProvider();
-      UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("kermit", "kermit");
-      provider.setCredentials(AuthScope.ANY, credentials);
-      HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
-      
-      response = (CloseableHttpResponse) client.execute(request);
-      int statusCode = response.getStatusLine().getStatusCode();
-      Assert.assertEquals(expectedStatusCode, statusCode);
-      
-      if (client instanceof CloseableHttpClient) {
-      	((CloseableHttpClient) client).close();
-      }
-      
-      response.close();
-      
-    } catch (ClientProtocolException e) {
-      Assert.fail(e.getMessage());
-    } catch (IOException e) {
-      Assert.fail(e.getMessage());
-    } 
-    
-  }
-  
+            this.testUserId = user.getId();
+            this.testGroupId = group.getId();
+        }
+    }
+
+    @After
+    public void removeUsers() {
+        identityService.deleteMembership(testUserId, testGroupId);
+        identityService.deleteGroup(testGroupId);
+        identityService.deleteUser(testUserId);
+
+        for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+            repositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
+    public void testCreateSingleSerializableProcessVariable() throws Exception {
+
+        repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml").deploy();
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        TestSerializableVariable serializable = new TestSerializableVariable();
+        serializable.setSomeField("some value");
+
+        // Serialize object to readable stream for representation
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        ObjectOutputStream output = new ObjectOutputStream(buffer);
+        output.writeObject(serializable);
+        output.close();
+
+        InputStream binaryContent = new ByteArrayInputStream(buffer.toByteArray());
+
+        // Add name, type and scope
+        Map<String, String> additionalFields = new HashMap<String, String>();
+        additionalFields.put("name", "serializableVariable");
+        additionalFields.put("type", "serializable");
+
+        // Upload a valid BPMN-file using multipart-data
+        HttpPost httpPost = new HttpPost(serverUrlPrefix +
+                RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId()));
+        httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/x-java-serialized-object", binaryContent, additionalFields));
+
+        // We have serializeable object disabled, we should get a 415.
+        assertResponseStatus(httpPost, HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+    }
+
+    @Test
+    public void testCreateSingleSerializableTaskVariable() throws Exception {
+        repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml")
+                .deploy();
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        TestSerializableVariable serializable = new TestSerializableVariable();
+        serializable.setSomeField("some value");
+
+        // Serialize object to readable stream for representation
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        ObjectOutputStream output = new ObjectOutputStream(buffer);
+        output.writeObject(serializable);
+        output.close();
+
+        InputStream binaryContent = new ByteArrayInputStream(buffer.toByteArray());
+
+        // Add name, type and scope
+        Map<String, String> additionalFields = new HashMap<String, String>();
+        additionalFields.put("name", "serializableVariable");
+        additionalFields.put("type", "serializable");
+
+        HttpPost httpPost = new HttpPost(serverUrlPrefix +
+                RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
+        httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/x-java-serialized-object", binaryContent, additionalFields));
+
+        // We have serializeable object disabled, we should get a 415.
+        assertResponseStatus(httpPost, HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+    }
+
+    public void assertResponseStatus(HttpUriRequest request, int expectedStatusCode) {
+        CloseableHttpResponse response = null;
+        try {
+
+            CredentialsProvider provider = new BasicCredentialsProvider();
+            UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("kermit", "kermit");
+            provider.setCredentials(AuthScope.ANY, credentials);
+            HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
+
+            response = (CloseableHttpResponse) client.execute(request);
+            int statusCode = response.getStatusLine().getStatusCode();
+            Assert.assertEquals(expectedStatusCode, statusCode);
+
+            if (client instanceof CloseableHttpClient) {
+                ((CloseableHttpClient) client).close();
+            }
+
+            response.close();
+
+        } catch (ClientProtocolException e) {
+            Assert.fail(e.getMessage());
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        }
+
+    }
+
 }

@@ -16,7 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.flowable.dmn.api.DecisionTable;
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
 import org.flowable.rest.dmn.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.rest.dmn.service.api.DmnRestUrls;
@@ -26,24 +26,24 @@ import org.flowable.rest.dmn.service.api.DmnRestUrls;
  */
 public class DecisionTableResourceDataResourceTest extends BaseSpringDmnRestTestCase {
 
-  @DmnDeploymentAnnotation(resources = { "org/flowable/rest/dmn/service/api/repository/simple.dmn" })
-  public void testGetDecisionTableResource() throws Exception {
+    @DmnDeploymentAnnotation(resources = { "org/flowable/rest/dmn/service/api/repository/simple.dmn" })
+    public void testGetDecisionTableResource() throws Exception {
 
-    DecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery().singleResult();
+        DmnDecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery().singleResult();
 
-    HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE_RESOURCE_CONTENT, decisionTable.getId()));
-    CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE_RESOURCE_CONTENT, decisionTable.getId()));
+        CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
-    // Check "OK" status
-    String content = IOUtils.toString(response.getEntity().getContent());
-    closeResponse(response);
-    assertNotNull(content);
-    assertTrue(content.contains("Full Decision"));
-  }
+        // Check "OK" status
+        String content = IOUtils.toString(response.getEntity().getContent());
+        closeResponse(response);
+        assertNotNull(content);
+        assertTrue(content.contains("Full Decision"));
+    }
 
-  public void testGetDecisionTableResourceForUnexistingDecisionTable() throws Exception {
-    HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE_RESOURCE_CONTENT, "unexisting"));
-    CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
-    closeResponse(response);
-  }
+    public void testGetDecisionTableResourceForUnexistingDecisionTable() throws Exception {
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE_RESOURCE_CONTENT, "unexisting"));
+        CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
+        closeResponse(response);
+    }
 }

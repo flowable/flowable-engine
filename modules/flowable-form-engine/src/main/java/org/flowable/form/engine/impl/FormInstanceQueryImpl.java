@@ -31,228 +31,228 @@ import org.flowable.form.engine.impl.interceptor.CommandExecutor;
  */
 public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, FormInstance> implements FormInstanceQuery, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String id;
-  protected Set<String> ids;
-  protected String formDefinitionId;
-  protected String formDefinitionIdLike;
-  protected String taskId;
-  protected String taskIdLike;
-  protected String processInstanceId;
-  protected String processInstanceIdLike;
-  protected String processDefinitionId;
-  protected String processDefinitionIdLike;
-  protected Date submittedDate;
-  protected Date submittedDateBefore;
-  protected Date submittedDateAfter;
-  protected String submittedBy;
-  protected String submittedByLike;
-  protected String tenantId;
-  protected String tenantIdLike;
-  protected boolean withoutTenantId;
+    private static final long serialVersionUID = 1L;
+    protected String id;
+    protected Set<String> ids;
+    protected String formDefinitionId;
+    protected String formDefinitionIdLike;
+    protected String taskId;
+    protected String taskIdLike;
+    protected String processInstanceId;
+    protected String processInstanceIdLike;
+    protected String processDefinitionId;
+    protected String processDefinitionIdLike;
+    protected Date submittedDate;
+    protected Date submittedDateBefore;
+    protected Date submittedDateAfter;
+    protected String submittedBy;
+    protected String submittedByLike;
+    protected String tenantId;
+    protected String tenantIdLike;
+    protected boolean withoutTenantId;
 
-  public FormInstanceQueryImpl() {
-  }
-
-  public FormInstanceQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
-  public FormInstanceQueryImpl(CommandExecutor commandExecutor) {
-    super(commandExecutor);
-  }
-
-  public FormInstanceQueryImpl id(String id) {
-    this.id = id;
-    return this;
-  }
-  
-  public FormInstanceQueryImpl ids(Set<String> ids) {
-    this.ids = ids;
-    return this;
-  }
-
-  public FormInstanceQueryImpl formDefinitionId(String formDefinitionId) {
-    this.formDefinitionId = formDefinitionId;
-    return this;
-  }
-
-  public FormInstanceQueryImpl formDefinitionIdLike(String formDefinitionIdLike) {
-    this.formDefinitionIdLike = formDefinitionIdLike;
-    return this;
-  }
-  
-  public FormInstanceQueryImpl taskId(String taskId) {
-    this.taskId = taskId;
-    return this;
-  }
-  
-  public FormInstanceQueryImpl taskIdLike(String taskIdLike) {
-    this.taskIdLike = taskIdLike;
-    return this;
-  }
-  
-  public FormInstanceQueryImpl processInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-    return this;
-  }
-
-  public FormInstanceQueryImpl processInstanceIdLike(String processInstanceIdLike) {
-    this.processInstanceIdLike = processInstanceIdLike;
-    return this;
-  }
-  
-  public FormInstanceQueryImpl processDefinitionId(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-    return this;
-  }
-
-  public FormInstanceQueryImpl processDefinitionIdLike(String processDefinitionIdLike) {
-    this.processDefinitionIdLike = processDefinitionIdLike;
-    return this;
-  }
-  
-  public FormInstanceQueryImpl submittedDate(Date submittedDate) {
-    this.submittedDate = submittedDate;
-    return this;
-  }
-  
-  public FormInstanceQueryImpl submittedDateBefore(Date submittedDateBefore) {
-    this.submittedDateBefore = submittedDateBefore;
-    return this;
-  }
-  
-  public FormInstanceQueryImpl submittedDateAfter(Date submittedDateAfter) {
-    this.submittedDateAfter = submittedDateAfter;
-    return this;
-  }
-  
-  public FormInstanceQueryImpl submittedBy(String submittedBy) {
-    this.submittedBy = submittedBy;
-    return this;
-  }
-
-  public FormInstanceQueryImpl submittedByLike(String submittedByLike) {
-    this.submittedByLike = submittedByLike;
-    return this;
-  }
-
-  public FormInstanceQueryImpl deploymentTenantId(String tenantId) {
-    if (tenantId == null) {
-      throw new FlowableIllegalArgumentException("deploymentTenantId is null");
+    public FormInstanceQueryImpl() {
     }
-    this.tenantId = tenantId;
-    return this;
-  }
 
-  public FormInstanceQueryImpl deploymentTenantIdLike(String tenantIdLike) {
-    if (tenantIdLike == null) {
-      throw new FlowableIllegalArgumentException("deploymentTenantIdLike is null");
+    public FormInstanceQueryImpl(CommandContext commandContext) {
+        super(commandContext);
     }
-    this.tenantIdLike = tenantIdLike;
-    return this;
-  }
 
-  public FormInstanceQueryImpl deploymentWithoutTenantId() {
-    this.withoutTenantId = true;
-    return this;
-  }
+    public FormInstanceQueryImpl(CommandExecutor commandExecutor) {
+        super(commandExecutor);
+    }
 
-  // sorting ////////////////////////////////////////////////////////
+    public FormInstanceQueryImpl id(String id) {
+        this.id = id;
+        return this;
+    }
 
-  public FormInstanceQuery orderBySubmittedDate() {
-    return orderBy(FormInstanceQueryProperty.SUBMITTED_DATE);
-  }
+    public FormInstanceQueryImpl ids(Set<String> ids) {
+        this.ids = ids;
+        return this;
+    }
 
-  public FormInstanceQuery orderByTenantId() {
-    return orderBy(FormInstanceQueryProperty.TENANT_ID);
-  }
+    public FormInstanceQueryImpl formDefinitionId(String formDefinitionId) {
+        this.formDefinitionId = formDefinitionId;
+        return this;
+    }
 
-  // results ////////////////////////////////////////////////////////
+    public FormInstanceQueryImpl formDefinitionIdLike(String formDefinitionIdLike) {
+        this.formDefinitionIdLike = formDefinitionIdLike;
+        return this;
+    }
 
-  @Override
-  public long executeCount(CommandContext commandContext) {
-    checkQueryOk();
-    return commandContext.getFormInstanceEntityManager().findFormInstanceCountByQueryCriteria(this);
-  }
+    public FormInstanceQueryImpl taskId(String taskId) {
+        this.taskId = taskId;
+        return this;
+    }
 
-  @Override
-  public List<FormInstance> executeList(CommandContext commandContext, Page page) {
-    checkQueryOk();
-    return commandContext.getFormInstanceEntityManager().findFormInstancesByQueryCriteria(this, page);
-  }
+    public FormInstanceQueryImpl taskIdLike(String taskIdLike) {
+        this.taskIdLike = taskIdLike;
+        return this;
+    }
 
-  // getters ////////////////////////////////////////////////////////
+    public FormInstanceQueryImpl processInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+        return this;
+    }
 
-  public String getId() {
-    return id;
-  }
+    public FormInstanceQueryImpl processInstanceIdLike(String processInstanceIdLike) {
+        this.processInstanceIdLike = processInstanceIdLike;
+        return this;
+    }
 
-  public Set<String> getIds() {
-    return ids;
-  }
+    public FormInstanceQueryImpl processDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+        return this;
+    }
 
-  public String getFormDefinitionId() {
-    return formDefinitionId;
-  }
+    public FormInstanceQueryImpl processDefinitionIdLike(String processDefinitionIdLike) {
+        this.processDefinitionIdLike = processDefinitionIdLike;
+        return this;
+    }
 
-  public String getFormDefinitionIdLike() {
-    return formDefinitionIdLike;
-  }
+    public FormInstanceQueryImpl submittedDate(Date submittedDate) {
+        this.submittedDate = submittedDate;
+        return this;
+    }
 
-  public String getTaskId() {
-    return taskId;
-  }
+    public FormInstanceQueryImpl submittedDateBefore(Date submittedDateBefore) {
+        this.submittedDateBefore = submittedDateBefore;
+        return this;
+    }
 
-  public String getTaskIdLike() {
-    return taskIdLike;
-  }
+    public FormInstanceQueryImpl submittedDateAfter(Date submittedDateAfter) {
+        this.submittedDateAfter = submittedDateAfter;
+        return this;
+    }
 
-  public String getProcessInstanceId() {
-    return processInstanceId;
-  }
+    public FormInstanceQueryImpl submittedBy(String submittedBy) {
+        this.submittedBy = submittedBy;
+        return this;
+    }
 
-  public String getProcessInstanceIdLike() {
-    return processInstanceIdLike;
-  }
+    public FormInstanceQueryImpl submittedByLike(String submittedByLike) {
+        this.submittedByLike = submittedByLike;
+        return this;
+    }
 
-  public String getProcessDefinitionId() {
-    return processDefinitionId;
-  }
+    public FormInstanceQueryImpl deploymentTenantId(String tenantId) {
+        if (tenantId == null) {
+            throw new FlowableIllegalArgumentException("deploymentTenantId is null");
+        }
+        this.tenantId = tenantId;
+        return this;
+    }
 
-  public String getProcessDefinitionIdLike() {
-    return processDefinitionIdLike;
-  }
+    public FormInstanceQueryImpl deploymentTenantIdLike(String tenantIdLike) {
+        if (tenantIdLike == null) {
+            throw new FlowableIllegalArgumentException("deploymentTenantIdLike is null");
+        }
+        this.tenantIdLike = tenantIdLike;
+        return this;
+    }
 
-  public Date getSubmittedDate() {
-    return submittedDate;
-  }
+    public FormInstanceQueryImpl deploymentWithoutTenantId() {
+        this.withoutTenantId = true;
+        return this;
+    }
 
-  public Date getSubmittedDateBefore() {
-    return submittedDateBefore;
-  }
+    // sorting ////////////////////////////////////////////////////////
 
-  public Date getSubmittedDateAfter() {
-    return submittedDateAfter;
-  }
+    public FormInstanceQuery orderBySubmittedDate() {
+        return orderBy(FormInstanceQueryProperty.SUBMITTED_DATE);
+    }
 
-  public String getSubmittedBy() {
-    return submittedBy;
-  }
+    public FormInstanceQuery orderByTenantId() {
+        return orderBy(FormInstanceQueryProperty.TENANT_ID);
+    }
 
-  public String getSubmittedByLike() {
-    return submittedByLike;
-  }
-  
-  public String getTenantId() {
-    return tenantId;
-  }
+    // results ////////////////////////////////////////////////////////
 
-  public String getTenantIdLike() {
-    return tenantIdLike;
-  }
+    @Override
+    public long executeCount(CommandContext commandContext) {
+        checkQueryOk();
+        return commandContext.getFormInstanceEntityManager().findFormInstanceCountByQueryCriteria(this);
+    }
 
-  public boolean isWithoutTenantId() {
-    return withoutTenantId;
-  }
+    @Override
+    public List<FormInstance> executeList(CommandContext commandContext, Page page) {
+        checkQueryOk();
+        return commandContext.getFormInstanceEntityManager().findFormInstancesByQueryCriteria(this, page);
+    }
+
+    // getters ////////////////////////////////////////////////////////
+
+    public String getId() {
+        return id;
+    }
+
+    public Set<String> getIds() {
+        return ids;
+    }
+
+    public String getFormDefinitionId() {
+        return formDefinitionId;
+    }
+
+    public String getFormDefinitionIdLike() {
+        return formDefinitionIdLike;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public String getTaskIdLike() {
+        return taskIdLike;
+    }
+
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public String getProcessInstanceIdLike() {
+        return processInstanceIdLike;
+    }
+
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
+    public String getProcessDefinitionIdLike() {
+        return processDefinitionIdLike;
+    }
+
+    public Date getSubmittedDate() {
+        return submittedDate;
+    }
+
+    public Date getSubmittedDateBefore() {
+        return submittedDateBefore;
+    }
+
+    public Date getSubmittedDateAfter() {
+        return submittedDateAfter;
+    }
+
+    public String getSubmittedBy() {
+        return submittedBy;
+    }
+
+    public String getSubmittedByLike() {
+        return submittedByLike;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public String getTenantIdLike() {
+        return tenantIdLike;
+    }
+
+    public boolean isWithoutTenantId() {
+        return withoutTenantId;
+    }
 }

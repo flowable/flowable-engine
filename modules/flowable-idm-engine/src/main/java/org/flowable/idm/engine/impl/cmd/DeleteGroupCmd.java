@@ -23,20 +23,20 @@ import org.flowable.idm.engine.impl.interceptor.CommandContext;
  */
 public class DeleteGroupCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  String groupId;
+    private static final long serialVersionUID = 1L;
+    String groupId;
 
-  public DeleteGroupCmd(String groupId) {
-    this.groupId = groupId;
-  }
-
-  public Void execute(CommandContext commandContext) {
-    if (groupId == null) {
-      throw new FlowableIllegalArgumentException("groupId is null");
+    public DeleteGroupCmd(String groupId) {
+        this.groupId = groupId;
     }
-    commandContext.getGroupEntityManager().delete(groupId);
 
-    return null;
-  }
+    public Void execute(CommandContext commandContext) {
+        if (groupId == null) {
+            throw new FlowableIllegalArgumentException("groupId is null");
+        }
+        commandContext.getGroupEntityManager().delete(groupId);
+
+        return null;
+    }
 
 }

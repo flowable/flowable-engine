@@ -31,65 +31,65 @@ import org.flowable.engine.impl.db.DbSqlSessionFactory;
  */
 public class ProcessEngineInitializationTest extends PvmTestCase {
 
-  public void testNoTables() {
-    try {
-      ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource("org/activiti/standalone/initialization/notables.flowable.cfg.xml")
-        .buildProcessEngine();
-      fail("expected exception");
-    } catch (Exception e) {
-      // OK
-    }
-  }
-
-  public void testVersionMismatch() {
-    // first create the schema
-    ProcessEngineImpl processEngine = (ProcessEngineImpl) ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/activiti/standalone/initialization/notables.flowable.cfg.xml")
-      .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP)
-      .buildProcessEngine();
-
-    // then update the version to something that is different to the library
-    // version
-    DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) processEngine.getProcessEngineConfiguration().getSessionFactories().get(DbSqlSession.class);
-    SqlSessionFactory sqlSessionFactory = dbSqlSessionFactory.getSqlSessionFactory();
-    SqlSession sqlSession = sqlSessionFactory.openSession();
-    boolean success = false;
-    try {
-      Map<String, Object> parameters = new HashMap<String, Object>();
-      parameters.put("name", "schema.version");
-      parameters.put("value", "25.7");
-      parameters.put("revision", 1);
-      parameters.put("newRevision", 2);
-      sqlSession.update("updateProperty", parameters);
-      success = true;
-    } catch (Exception e) {
-      throw new FlowableException("couldn't update db schema version", e);
-    } finally {
-      if (success) {
-        sqlSession.commit();
-      } else {
-        sqlSession.rollback();
-      }
-      sqlSession.close();
+    public void testNoTables() {
+        try {
+            ProcessEngineConfiguration
+                    .createProcessEngineConfigurationFromResource("org/activiti/standalone/initialization/notables.flowable.cfg.xml")
+                    .buildProcessEngine();
+            fail("expected exception");
+        } catch (Exception e) {
+            // OK
+        }
     }
 
-    try {
-      // now we can see what happens if when a process engine is being
-      // build with a version mismatch between library and db tables
-      ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource("org/activiti/standalone/initialization/notables.flowable.cfg.xml")
-        .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
-        .buildProcessEngine();
-      
-      fail("expected exception");
-    } catch (FlowableWrongDbException e) {
-      assertTextPresent("version mismatch", e.getMessage());
-      assertEquals("25.7", e.getDbVersion());
-      assertEquals(ProcessEngine.VERSION, e.getLibraryVersion());
-    }
+    public void testVersionMismatch() {
+        // first create the schema
+        ProcessEngineImpl processEngine = (ProcessEngineImpl) ProcessEngineConfiguration
+                .createProcessEngineConfigurationFromResource("org/activiti/standalone/initialization/notables.flowable.cfg.xml")
+                .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP)
+                .buildProcessEngine();
 
-    // closing the original process engine to drop the db tables
-    processEngine.close();
-  }
+        // then update the version to something that is different to the library
+        // version
+        DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) processEngine.getProcessEngineConfiguration().getSessionFactories().get(DbSqlSession.class);
+        SqlSessionFactory sqlSessionFactory = dbSqlSessionFactory.getSqlSessionFactory();
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        boolean success = false;
+        try {
+            Map<String, Object> parameters = new HashMap<String, Object>();
+            parameters.put("name", "schema.version");
+            parameters.put("value", "25.7");
+            parameters.put("revision", 1);
+            parameters.put("newRevision", 2);
+            sqlSession.update("updateProperty", parameters);
+            success = true;
+        } catch (Exception e) {
+            throw new FlowableException("couldn't update db schema version", e);
+        } finally {
+            if (success) {
+                sqlSession.commit();
+            } else {
+                sqlSession.rollback();
+            }
+            sqlSession.close();
+        }
+
+        try {
+            // now we can see what happens if when a process engine is being
+            // build with a version mismatch between library and db tables
+            ProcessEngineConfiguration
+                    .createProcessEngineConfigurationFromResource("org/activiti/standalone/initialization/notables.flowable.cfg.xml")
+                    .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
+                    .buildProcessEngine();
+
+            fail("expected exception");
+        } catch (FlowableWrongDbException e) {
+            assertTextPresent("version mismatch", e.getMessage());
+            assertEquals("25.7", e.getDbVersion());
+            assertEquals(ProcessEngine.VERSION, e.getLibraryVersion());
+        }
+
+        // closing the original process engine to drop the db tables
+        processEngine.close();
+    }
 }

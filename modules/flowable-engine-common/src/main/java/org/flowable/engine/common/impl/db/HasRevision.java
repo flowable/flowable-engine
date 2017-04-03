@@ -19,10 +19,10 @@ package org.flowable.engine.common.impl.db;
  */
 public interface HasRevision {
 
-  void setRevision(int revision);
+    void setRevision(int revision);
 
-  int getRevision();
+    int getRevision();
 
-  int getRevisionNext();
+    int getRevisionNext();
 
 }

@@ -15,96 +15,96 @@ package org.flowable.standalone.escapeclause;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
 
 public class ProcessDefinitionQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
-  
-  private String deploymentOneId;
-  private String deploymentTwoId;
 
-  @Override
-  protected void setUp() throws Exception {
-    deploymentOneId = repositoryService
-        .createDeployment()
-        .tenantId("One%")
-        .name("one%")
-        .category("testCategory")
-        .addClasspathResource("org/flowable/engine/test/repository/one%.bpmn20.xml")
-        .deploy()
-        .getId();
+    private String deploymentOneId;
+    private String deploymentTwoId;
 
-      deploymentTwoId = repositoryService
-        .createDeployment()
-        .tenantId("Two_")
-        .name("two_")
-        .addClasspathResource("org/flowable/engine/test/repository/two_.bpmn20.xml")
-        .deploy()
-        .getId();
-    
-    super.setUp();
-  }
-  
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
-    repositoryService.deleteDeployment(deploymentOneId, true);
-    repositoryService.deleteDeployment(deploymentTwoId, true);
-  }
+    @Override
+    protected void setUp() throws Exception {
+        deploymentOneId = repositoryService
+                .createDeployment()
+                .tenantId("One%")
+                .name("one%")
+                .category("testCategory")
+                .addClasspathResource("org/flowable/engine/test/repository/one%.bpmn20.xml")
+                .deploy()
+                .getId();
 
-  public void testQueryByNameLike() {
-    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionNameLike("%\\%%");
-    assertEquals("One%", query.singleResult().getName());
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-    
-    query = repositoryService.createProcessDefinitionQuery().processDefinitionNameLike("%\\_%");
-    assertEquals("Two_", query.singleResult().getName());
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-  }
-  
-  public void testQueryByCategoryLike() {
-    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionCategoryLike("%\\_%");
-    assertEquals("Examples_", query.singleResult().getCategory());
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-  }
-  
-  public void testQueryByKeyLike() {
-    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike("%\\_%");
-    assertEquals("two_", query.singleResult().getKey());
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-  }
-  
-  public void testQueryByResourceNameLike() {
-    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionResourceNameLike("%\\%%");
-    assertEquals("org/flowable/engine/test/repository/one%.bpmn20.xml", query.singleResult().getResourceName());
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-    
-    query = repositoryService.createProcessDefinitionQuery().processDefinitionResourceNameLike("%\\_%");
-    assertEquals("org/flowable/engine/test/repository/two_.bpmn20.xml", query.singleResult().getResourceName());
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-  }
-  
-  public void testQueryByTenantIdLike() {
-    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionTenantIdLike("%\\%%");
-    assertEquals("One%", query.singleResult().getTenantId());
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-    
-    query = repositoryService.createProcessDefinitionQuery().processDefinitionTenantIdLike("%\\_%");
-    assertEquals("Two_", query.singleResult().getTenantId());
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-    
-    query = repositoryService.createProcessDefinitionQuery().latestVersion().processDefinitionTenantIdLike("%\\%%");
-    assertEquals("One%", query.singleResult().getTenantId());
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-    
-    query = repositoryService.createProcessDefinitionQuery().latestVersion().processDefinitionTenantIdLike("%\\_%");
-    assertEquals("Two_", query.singleResult().getTenantId());
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-  }
+        deploymentTwoId = repositoryService
+                .createDeployment()
+                .tenantId("Two_")
+                .name("two_")
+                .addClasspathResource("org/flowable/engine/test/repository/two_.bpmn20.xml")
+                .deploy()
+                .getId();
+
+        super.setUp();
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        repositoryService.deleteDeployment(deploymentOneId, true);
+        repositoryService.deleteDeployment(deploymentTwoId, true);
+    }
+
+    public void testQueryByNameLike() {
+        ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionNameLike("%\\%%");
+        assertEquals("One%", query.singleResult().getName());
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+
+        query = repositoryService.createProcessDefinitionQuery().processDefinitionNameLike("%\\_%");
+        assertEquals("Two_", query.singleResult().getName());
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+    }
+
+    public void testQueryByCategoryLike() {
+        ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionCategoryLike("%\\_%");
+        assertEquals("Examples_", query.singleResult().getCategory());
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+    }
+
+    public void testQueryByKeyLike() {
+        ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike("%\\_%");
+        assertEquals("two_", query.singleResult().getKey());
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+    }
+
+    public void testQueryByResourceNameLike() {
+        ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionResourceNameLike("%\\%%");
+        assertEquals("org/flowable/engine/test/repository/one%.bpmn20.xml", query.singleResult().getResourceName());
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+
+        query = repositoryService.createProcessDefinitionQuery().processDefinitionResourceNameLike("%\\_%");
+        assertEquals("org/flowable/engine/test/repository/two_.bpmn20.xml", query.singleResult().getResourceName());
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+    }
+
+    public void testQueryByTenantIdLike() {
+        ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionTenantIdLike("%\\%%");
+        assertEquals("One%", query.singleResult().getTenantId());
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+
+        query = repositoryService.createProcessDefinitionQuery().processDefinitionTenantIdLike("%\\_%");
+        assertEquals("Two_", query.singleResult().getTenantId());
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+
+        query = repositoryService.createProcessDefinitionQuery().latestVersion().processDefinitionTenantIdLike("%\\%%");
+        assertEquals("One%", query.singleResult().getTenantId());
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+
+        query = repositoryService.createProcessDefinitionQuery().latestVersion().processDefinitionTenantIdLike("%\\_%");
+        assertEquals("Two_", query.singleResult().getTenantId());
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+    }
 }

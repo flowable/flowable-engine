@@ -23,21 +23,21 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
  */
 public class DeleteDeploymentCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String deploymentId;
-  
-  public DeleteDeploymentCmd(String deploymentId) {
-    this.deploymentId = deploymentId;
-  }
+    private static final long serialVersionUID = 1L;
+    protected String deploymentId;
 
-  public Void execute(CommandContext commandContext) {
-    if (deploymentId == null) {
-      throw new FlowableIllegalArgumentException("deploymentId is null");
+    public DeleteDeploymentCmd(String deploymentId) {
+        this.deploymentId = deploymentId;
     }
 
-    // Remove process definitions from cache:
-    commandContext.getDmnEngineConfiguration().getDeploymentManager().removeDeployment(deploymentId);
+    public Void execute(CommandContext commandContext) {
+        if (deploymentId == null) {
+            throw new FlowableIllegalArgumentException("deploymentId is null");
+        }
 
-    return null;
-  }
+        // Remove process definitions from cache:
+        commandContext.getDmnEngineConfiguration().getDeploymentManager().removeDeployment(deploymentId);
+
+        return null;
+    }
 }

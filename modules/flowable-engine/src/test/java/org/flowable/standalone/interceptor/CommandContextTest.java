@@ -23,19 +23,19 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
  */
 public class CommandContextTest extends PluggableFlowableTestCase {
 
-  public void testCommandContextGetCurrentAfterException() {
-    try {
-      processEngineConfiguration.getCommandExecutor().execute(new Command<Object>() {
-        public Object execute(CommandContext commandContext) {
-          throw new IllegalStateException("here i come!");
+    public void testCommandContextGetCurrentAfterException() {
+        try {
+            processEngineConfiguration.getCommandExecutor().execute(new Command<Object>() {
+                public Object execute(CommandContext commandContext) {
+                    throw new IllegalStateException("here i come!");
+                }
+            });
+
+            fail("expected exception");
+        } catch (IllegalStateException e) {
+            // OK
         }
-      });
 
-      fail("expected exception");
-    } catch (IllegalStateException e) {
-      // OK
+        assertNull(Context.getCommandContext());
     }
-
-    assertNull(Context.getCommandContext());
-  }
 }

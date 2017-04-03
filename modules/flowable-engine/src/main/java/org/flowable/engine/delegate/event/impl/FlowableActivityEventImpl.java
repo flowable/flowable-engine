@@ -23,47 +23,47 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
  */
 public class FlowableActivityEventImpl extends FlowableEventImpl implements FlowableActivityEvent {
 
-  protected String activityId;
-  protected String activityName;
-  protected String activityType;
-  protected String behaviorClass;
+    protected String activityId;
+    protected String activityName;
+    protected String activityType;
+    protected String behaviorClass;
 
-  public FlowableActivityEventImpl(FlowableEngineEventType type) {
-    super(type);
-  }
+    public FlowableActivityEventImpl(FlowableEngineEventType type) {
+        super(type);
+    }
 
-  @Override
-  public String getActivityId() {
-    return activityId;
-  }
+    @Override
+    public String getActivityId() {
+        return activityId;
+    }
 
-  public void setActivityId(String activityId) {
-    this.activityId = activityId;
-  }
+    public void setActivityId(String activityId) {
+        this.activityId = activityId;
+    }
 
-  public String getActivityName() {
-    return activityName;
-  }
+    public String getActivityName() {
+        return activityName;
+    }
 
-  public void setActivityName(String activityName) {
-    this.activityName = activityName;
-  }
+    public void setActivityName(String activityName) {
+        this.activityName = activityName;
+    }
 
-  @Override
-  public String getActivityType() {
-    return activityType;
-  }
+    @Override
+    public String getActivityType() {
+        return activityType;
+    }
 
-  public void setActivityType(String activityType) {
-    this.activityType = activityType;
-  }
+    public void setActivityType(String activityType) {
+        this.activityType = activityType;
+    }
 
-  public String getBehaviorClass() {
-    return behaviorClass;
-  }
+    public String getBehaviorClass() {
+        return behaviorClass;
+    }
 
-  public void setBehaviorClass(String behaviorClass) {
-    this.behaviorClass = behaviorClass;
-  }
-  
+    public void setBehaviorClass(String behaviorClass) {
+        this.behaviorClass = behaviorClass;
+    }
+
 }

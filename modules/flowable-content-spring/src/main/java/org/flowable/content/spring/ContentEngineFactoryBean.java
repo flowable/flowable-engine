@@ -29,50 +29,50 @@ import org.springframework.context.ApplicationContextAware;
  */
 public class ContentEngineFactoryBean implements FactoryBean<ContentEngine>, DisposableBean, ApplicationContextAware {
 
-  protected ContentEngineConfiguration contentEngineConfiguration;
+    protected ContentEngineConfiguration contentEngineConfiguration;
 
-  protected ApplicationContext applicationContext;
-  protected ContentEngine contentEngine;
+    protected ApplicationContext applicationContext;
+    protected ContentEngine contentEngine;
 
-  public void destroy() throws Exception {
-    if (contentEngine != null) {
-      contentEngine.close();
+    public void destroy() throws Exception {
+        if (contentEngine != null) {
+            contentEngine.close();
+        }
     }
-  }
 
-  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    this.applicationContext = applicationContext;
-  }
-
-  public ContentEngine getObject() throws Exception {
-    configureExternallyManagedTransactions();
-
-    this.contentEngine = contentEngineConfiguration.buildContentEngine();
-    return this.contentEngine;
-  }
-
-  protected void configureExternallyManagedTransactions() {
-    if (contentEngineConfiguration instanceof SpringContentEngineConfiguration) { // remark: any config can be injected, so we cannot have SpringConfiguration as member
-      SpringContentEngineConfiguration engineConfiguration = (SpringContentEngineConfiguration) contentEngineConfiguration;
-      if (engineConfiguration.getTransactionManager() != null) {
-        contentEngineConfiguration.setTransactionsExternallyManaged(true);
-      }
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
-  }
 
-  public Class<ContentEngine> getObjectType() {
-    return ContentEngine.class;
-  }
+    public ContentEngine getObject() throws Exception {
+        configureExternallyManagedTransactions();
 
-  public boolean isSingleton() {
-    return true;
-  }
+        this.contentEngine = contentEngineConfiguration.buildContentEngine();
+        return this.contentEngine;
+    }
 
-  public ContentEngineConfiguration getContentEngineConfiguration() {
-    return contentEngineConfiguration;
-  }
+    protected void configureExternallyManagedTransactions() {
+        if (contentEngineConfiguration instanceof SpringContentEngineConfiguration) { // remark: any config can be injected, so we cannot have SpringConfiguration as member
+            SpringContentEngineConfiguration engineConfiguration = (SpringContentEngineConfiguration) contentEngineConfiguration;
+            if (engineConfiguration.getTransactionManager() != null) {
+                contentEngineConfiguration.setTransactionsExternallyManaged(true);
+            }
+        }
+    }
 
-  public void setContentEngineConfiguration(ContentEngineConfiguration contentEngineConfiguration) {
-    this.contentEngineConfiguration = contentEngineConfiguration;
-  }
+    public Class<ContentEngine> getObjectType() {
+        return ContentEngine.class;
+    }
+
+    public boolean isSingleton() {
+        return true;
+    }
+
+    public ContentEngineConfiguration getContentEngineConfiguration() {
+        return contentEngineConfiguration;
+    }
+
+    public void setContentEngineConfiguration(ContentEngineConfiguration contentEngineConfiguration) {
+        this.contentEngineConfiguration = contentEngineConfiguration;
+    }
 }

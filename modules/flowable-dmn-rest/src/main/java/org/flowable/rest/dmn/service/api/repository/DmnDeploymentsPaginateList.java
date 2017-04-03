@@ -23,15 +23,15 @@ import java.util.List;
  */
 public class DmnDeploymentsPaginateList extends AbstractPaginateList {
 
-  protected DmnRestResponseFactory restResponseFactory;
+    protected DmnRestResponseFactory restResponseFactory;
 
-  public DmnDeploymentsPaginateList(DmnRestResponseFactory restResponseFactory) {
-    this.restResponseFactory = restResponseFactory;
-  }
+    public DmnDeploymentsPaginateList(DmnRestResponseFactory restResponseFactory) {
+        this.restResponseFactory = restResponseFactory;
+    }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  @Override
-  protected List processList(List list) {
-    return restResponseFactory.createDmnDeploymentResponseList(list);
-  }
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    protected List processList(List list) {
+        return restResponseFactory.createDmnDeploymentResponseList(list);
+    }
 }

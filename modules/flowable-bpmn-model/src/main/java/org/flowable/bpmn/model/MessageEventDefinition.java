@@ -17,34 +17,34 @@ package org.flowable.bpmn.model;
  */
 public class MessageEventDefinition extends EventDefinition {
 
-  protected String messageRef;
-  protected String messageExpression;
+    protected String messageRef;
+    protected String messageExpression;
 
-  public String getMessageRef() {
-    return messageRef;
-  }
+    public String getMessageRef() {
+        return messageRef;
+    }
 
-  public void setMessageRef(String messageRef) {
-    this.messageRef = messageRef;
-  }
+    public void setMessageRef(String messageRef) {
+        this.messageRef = messageRef;
+    }
 
-  public String getMessageExpression() {
-    return messageExpression;
-  }
+    public String getMessageExpression() {
+        return messageExpression;
+    }
 
-  public void setMessageExpression(String messageExpression) {
-    this.messageExpression = messageExpression;
-  }
+    public void setMessageExpression(String messageExpression) {
+        this.messageExpression = messageExpression;
+    }
 
-  public MessageEventDefinition clone() {
-    MessageEventDefinition clone = new MessageEventDefinition();
-    clone.setValues(this);
-    return clone;
-  }
+    public MessageEventDefinition clone() {
+        MessageEventDefinition clone = new MessageEventDefinition();
+        clone.setValues(this);
+        return clone;
+    }
 
-  public void setValues(MessageEventDefinition otherDefinition) {
-    super.setValues(otherDefinition);
-    setMessageRef(otherDefinition.getMessageRef());
-    setMessageExpression(otherDefinition.getMessageExpression());
-  }
+    public void setValues(MessageEventDefinition otherDefinition) {
+        super.setValues(otherDefinition);
+        setMessageRef(otherDefinition.getMessageRef());
+        setMessageExpression(otherDefinition.getMessageExpression());
+    }
 }

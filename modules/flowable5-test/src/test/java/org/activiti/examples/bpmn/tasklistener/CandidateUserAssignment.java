@@ -15,15 +15,14 @@ package org.activiti.examples.bpmn.tasklistener;
 import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
 
-
 /**
  * @author Joram Barrez
  */
 public class CandidateUserAssignment implements TaskListener {
-  
-  public void notify(DelegateTask delegateTask) {
-    delegateTask.addCandidateUser("kermit");
-    delegateTask.addCandidateUser("fozzie");
-  }
+
+    public void notify(DelegateTask delegateTask) {
+        delegateTask.addCandidateUser("kermit");
+        delegateTask.addCandidateUser("fozzie");
+    }
 
 }

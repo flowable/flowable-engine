@@ -33,20 +33,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RestController
 public class ContentItemClientResource extends AbstractClientResource {
 
-  private static final Logger logger = LoggerFactory.getLogger(ContentItemClientResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(ContentItemClientResource.class);
 
-  @Autowired
-  protected ContentItemService clientService;
+    @Autowired
+    protected ContentItemService clientService;
 
-  @RequestMapping(value = "/rest/admin/content-items/{contentItemId}", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getContentItem(@PathVariable String contentItemId) throws BadRequestException {
+    @RequestMapping(value = "/rest/admin/content-items/{contentItemId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getContentItem(@PathVariable String contentItemId) throws BadRequestException {
 
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.CONTENT);
-    try {
-      return clientService.getContentItem(serverConfig, contentItemId);
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting content item {}", contentItemId, e);
-      throw new BadRequestException(e.getMessage());
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.CONTENT);
+        try {
+            return clientService.getContentItem(serverConfig, contentItemId);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting content item {}", contentItemId, e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
 }

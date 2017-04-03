@@ -1,6 +1,5 @@
 package org.flowable.test.spring.boot;
 
-
 import java.util.Map;
 
 import org.flowable.engine.ProcessEngine;
@@ -33,23 +32,22 @@ import org.springframework.web.client.RestTemplate;
  */
 public class EndpointAutoConfigurationTest {
 
-
     @Configuration
-    @Import({EmbeddedServletContainerAutoConfiguration.class,
+    @Import({ EmbeddedServletContainerAutoConfiguration.class,
             DispatcherServletAutoConfiguration.class,
             ServerPropertiesAutoConfiguration.class,
             HttpMessageConvertersAutoConfiguration.class,
-            WebMvcAutoConfiguration.class})
+            WebMvcAutoConfiguration.class })
     public static class EmbeddedContainerConfiguration {
     }
 
     @Configuration
-    @Import({DataSourceAutoConfiguration.class,
+    @Import({ DataSourceAutoConfiguration.class,
             MetricFilterAutoConfiguration.class, EndpointWebMvcAutoConfiguration.class,
             ManagementServerPropertiesAutoConfiguration.class,
             MetricRepositoryAutoConfiguration.class,
-            DataSourceProcessEngineAutoConfiguration.DataSourceProcessEngineConfiguration.class, 
-            EndpointAutoConfiguration.class})
+            DataSourceProcessEngineAutoConfiguration.DataSourceProcessEngineConfiguration.class,
+            EndpointAutoConfiguration.class })
     public static class EndpointConfiguration {
 
         @Bean
@@ -61,24 +59,21 @@ public class EndpointAutoConfigurationTest {
     @Test
     public void mvcEndpoint() throws Throwable {
 
-        AnnotationConfigEmbeddedWebApplicationContext applicationContext = 
-            new AnnotationConfigEmbeddedWebApplicationContext(CallbackEmbeddedContainerCustomizer.class, EmbeddedContainerConfiguration.class, EndpointConfiguration.class);
+        AnnotationConfigEmbeddedWebApplicationContext applicationContext = new AnnotationConfigEmbeddedWebApplicationContext(CallbackEmbeddedContainerCustomizer.class, EmbeddedContainerConfiguration.class, EndpointConfiguration.class);
 
         ProcessEngine processEngine = applicationContext.getBean(ProcessEngine.class);
         org.junit.Assert.assertNotNull("the processEngine should not be null", processEngine);
 
-        ProcessEngineEndpoint processEngineEndpoint =
-                applicationContext.getBean(ProcessEngineEndpoint.class);
+        ProcessEngineEndpoint processEngineEndpoint = applicationContext.getBean(ProcessEngineEndpoint.class);
         org.junit.Assert.assertNotNull("the processEngineEndpoint should not be null", processEngineEndpoint);
 
         RestTemplate restTemplate = applicationContext.getBean(RestTemplate.class);
 
-        ResponseEntity<Map> mapResponseEntity =
-                restTemplate.getForEntity("http://localhost:9091/flowable/", Map.class);
+        ResponseEntity<Map> mapResponseEntity = restTemplate.getForEntity("http://localhost:9091/flowable/", Map.class);
 
         Map map = mapResponseEntity.getBody();
 
-        String[] criticalKeys = {"completedTaskCount", "openTaskCount", "cachedProcessDefinitionCount"};
+        String[] criticalKeys = { "completedTaskCount", "openTaskCount", "cachedProcessDefinitionCount" };
 
         Map<?, ?> invokedResults = processEngineEndpoint.invoke();
         for (String k : criticalKeys) {
@@ -86,12 +81,12 @@ public class EndpointAutoConfigurationTest {
             org.junit.Assert.assertEquals(((Number) map.get(k)).longValue(), ((Number) invokedResults.get(k)).longValue());
         }
     }
-    
+
     @Component
     public static class CallbackEmbeddedContainerCustomizer implements EmbeddedServletContainerCustomizer {
-      @Override
-      public void customize(ConfigurableEmbeddedServletContainer container) {
-        container.setPort(9091);
-      }
+        @Override
+        public void customize(ConfigurableEmbeddedServletContainer container) {
+            container.setPort(9091);
+        }
     }
 }

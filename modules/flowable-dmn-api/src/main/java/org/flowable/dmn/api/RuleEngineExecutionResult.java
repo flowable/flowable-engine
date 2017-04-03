@@ -19,19 +19,19 @@ import java.util.Map;
  */
 public class RuleEngineExecutionResult {
 
-  protected Map<String, Object> resultVariables;
-  protected DecisionExecutionAuditContainer auditTrail;
+    protected Map<String, Object> resultVariables;
+    protected DecisionExecutionAuditContainer auditTrail;
 
-  public RuleEngineExecutionResult(Map<String, Object> resultVariables, DecisionExecutionAuditContainer auditTrail) {
-    this.resultVariables = resultVariables;
-    this.auditTrail = auditTrail;
-  }
+    public RuleEngineExecutionResult(Map<String, Object> resultVariables, DecisionExecutionAuditContainer auditTrail) {
+        this.resultVariables = resultVariables;
+        this.auditTrail = auditTrail;
+    }
 
-  public Map<String, Object> getResultVariables() {
-    return resultVariables;
-  }
+    public Map<String, Object> getResultVariables() {
+        return resultVariables;
+    }
 
-  public DecisionExecutionAuditContainer getAuditTrail() {
-    return auditTrail;
-  }
+    public DecisionExecutionAuditContainer getAuditTrail() {
+        return auditTrail;
+    }
 }

@@ -1,5 +1,11 @@
 package org.flowable.rest.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -65,460 +71,453 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-
 import junit.framework.AssertionFailedError;
 
 public class BaseSpringRestTestCase extends AbstractTestCase {
 
-  private static Logger log = LoggerFactory.getLogger(BaseSpringRestTestCase.class);
-  
-  protected static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
-    "ACT_GE_PROPERTY",
-    "ACT_ID_PROPERTY"
-  );
-  
-  protected static String SERVER_URL_PREFIX;
-  protected static RestUrlBuilder URL_BUILDER;
-  
-  protected static Server server;
-  protected static ApplicationContext appContext;
-  protected ObjectMapper objectMapper = new ObjectMapper();
+    private static Logger log = LoggerFactory.getLogger(BaseSpringRestTestCase.class);
 
-  protected static ProcessEngine processEngine;
+    protected static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
+            "ACT_GE_PROPERTY",
+            "ACT_ID_PROPERTY");
 
-  protected String deploymentId;
-  protected Throwable exception;
+    protected static String SERVER_URL_PREFIX;
+    protected static RestUrlBuilder URL_BUILDER;
 
-  protected static ProcessEngineConfigurationImpl processEngineConfiguration;
-  protected static RepositoryService repositoryService;
-  protected static RuntimeService runtimeService;
-  protected static TaskService taskService;
-  protected static FormService formService;
-  protected static HistoryService historyService;
-  protected static IdentityService identityService;
-  protected static ManagementService managementService;
+    protected static Server server;
+    protected static ApplicationContext appContext;
+    protected ObjectMapper objectMapper = new ObjectMapper();
 
-  protected static CloseableHttpClient client;
-  protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<CloseableHttpResponse>();
+    protected static ProcessEngine processEngine;
 
-  protected ISO8601DateFormat dateFormat = new ISO8601DateFormat();
+    protected String deploymentId;
+    protected Throwable exception;
 
-  static {
-  	
-  	TestServer testServer = TestServerUtil.createAndStartServer(ApplicationConfiguration.class);
-  	server = testServer.getServer();
-  	appContext = testServer.getApplicationContext();
-  	SERVER_URL_PREFIX = testServer.getServerUrlPrefix();
-  	URL_BUILDER = RestUrlBuilder.usingBaseUrl(SERVER_URL_PREFIX);
-    
-    // Lookup services
-    processEngine = appContext.getBean("processEngine", ProcessEngine.class);
-    processEngineConfiguration = appContext.getBean(ProcessEngineConfigurationImpl.class);
-    repositoryService = appContext.getBean(RepositoryService.class);
-    runtimeService = appContext.getBean(RuntimeService.class);
-    taskService = appContext.getBean(TaskService.class);
-    formService = appContext.getBean(FormService.class);
-    historyService = appContext.getBean(HistoryService.class);
-    identityService = appContext.getBean(IdentityService.class);
-    managementService = appContext.getBean(ManagementService.class);
+    protected static ProcessEngineConfigurationImpl processEngineConfiguration;
+    protected static RepositoryService repositoryService;
+    protected static RuntimeService runtimeService;
+    protected static TaskService taskService;
+    protected static FormService formService;
+    protected static HistoryService historyService;
+    protected static IdentityService identityService;
+    protected static ManagementService managementService;
 
-    // Create http client for all tests
-    CredentialsProvider provider = new BasicCredentialsProvider();
-    UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("kermit", "kermit");
-    provider.setCredentials(AuthScope.ANY, credentials);
-    client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
+    protected static CloseableHttpClient client;
+    protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<CloseableHttpResponse>();
 
-    // Clean shutdown
-    Runtime.getRuntime().addShutdownHook(new Thread() {
+    protected ISO8601DateFormat dateFormat = new ISO8601DateFormat();
 
-      @Override
-      public void run() {
+    static {
 
-        if (client != null) {
-          try {
-            client.close();
-          } catch (IOException e) {
-            log.error("Could not close http client", e);
-          }
-        }
+        TestServer testServer = TestServerUtil.createAndStartServer(ApplicationConfiguration.class);
+        server = testServer.getServer();
+        appContext = testServer.getApplicationContext();
+        SERVER_URL_PREFIX = testServer.getServerUrlPrefix();
+        URL_BUILDER = RestUrlBuilder.usingBaseUrl(SERVER_URL_PREFIX);
 
-        if (server != null && server.isRunning()) {
-          try {
-            server.stop();
-          } catch (Exception e) {
-            log.error("Error stopping server", e);
-          }
-        }
-      }
-    });
-  }
+        // Lookup services
+        processEngine = appContext.getBean("processEngine", ProcessEngine.class);
+        processEngineConfiguration = appContext.getBean(ProcessEngineConfigurationImpl.class);
+        repositoryService = appContext.getBean(RepositoryService.class);
+        runtimeService = appContext.getBean(RuntimeService.class);
+        taskService = appContext.getBean(TaskService.class);
+        formService = appContext.getBean(FormService.class);
+        historyService = appContext.getBean(HistoryService.class);
+        identityService = appContext.getBean(IdentityService.class);
+        managementService = appContext.getBean(ManagementService.class);
 
-  @Override
-  public void runBare() throws Throwable {
-    createUsers();
+        // Create http client for all tests
+        CredentialsProvider provider = new BasicCredentialsProvider();
+        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("kermit", "kermit");
+        provider.setCredentials(AuthScope.ANY, credentials);
+        client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
 
-    try {
+        // Clean shutdown
+        Runtime.getRuntime().addShutdownHook(new Thread() {
 
-      deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), getName());
+            @Override
+            public void run() {
 
-      super.runBare();
+                if (client != null) {
+                    try {
+                        client.close();
+                    } catch (IOException e) {
+                        log.error("Could not close http client", e);
+                    }
+                }
 
-    } catch (AssertionFailedError e) {
-      log.error(EMPTY_LINE);
-      log.error("ASSERTION FAILED: {}", e, e);
-      exception = e;
-      throw e;
-
-    } catch (Throwable e) {
-      log.error(EMPTY_LINE);
-      log.error("EXCEPTION: {}", e, e);
-      exception = e;
-      throw e;
-
-    } finally {
-      TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), getName());
-      dropUsers();
-      assertAndEnsureCleanDb();
-      processEngineConfiguration.getClock().reset();
-      closeHttpConnections();
+                if (server != null && server.isRunning()) {
+                    try {
+                        server.stop();
+                    } catch (Exception e) {
+                        log.error("Error stopping server", e);
+                    }
+                }
+            }
+        });
     }
-  }
 
-  protected void createUsers() {
-    User user = identityService.newUser("kermit");
-    user.setFirstName("Kermit");
-    user.setLastName("the Frog");
-    user.setPassword("kermit");
-    identityService.saveUser(user);
+    @Override
+    public void runBare() throws Throwable {
+        createUsers();
 
-    Group group = identityService.newGroup("admin");
-    group.setName("Administrators");
-    identityService.saveGroup(group);
-
-    identityService.createMembership(user.getId(), group.getId());
-  }
-  
-  /**
-   * IMPORTANT: calling method is responsible for calling close() on returned {@link HttpResponse} to free the connection.
-   */
-  public CloseableHttpResponse executeRequest(HttpUriRequest request, int expectedStatusCode) {
-    return internalExecuteRequest(request, expectedStatusCode, true);
-  }
-
-  /**
-   * IMPORTANT: calling method is responsible for calling close() on returned {@link HttpResponse} to free the connection.
-   */
-  public CloseableHttpResponse executeBinaryRequest(HttpUriRequest request, int expectedStatusCode) {
-    return internalExecuteRequest(request, expectedStatusCode, false);
-  }
-
-  protected CloseableHttpResponse internalExecuteRequest(HttpUriRequest request, int expectedStatusCode, boolean addJsonContentType) {
-    CloseableHttpResponse response = null;
-    try {
-      if (addJsonContentType && request.getFirstHeader(HttpHeaders.CONTENT_TYPE) == null) {
-        // Revert to default content-type
-        request.addHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json"));
-      }
-      response = client.execute(request);
-      Assert.assertNotNull(response.getStatusLine());
-      
-      int responseStatusCode = response.getStatusLine().getStatusCode();
-      if (expectedStatusCode != responseStatusCode) {
-        log.info("Wrong status code : {}, but should be {}", responseStatusCode, expectedStatusCode);
-        log.info("Response body: {}", IOUtils.toString(response.getEntity().getContent()));
-      }
-      
-      Assert.assertEquals(expectedStatusCode, responseStatusCode);
-      httpResponses.add(response);
-      return response;
-
-    } catch (ClientProtocolException e) {
-      Assert.fail(e.getMessage());
-    } catch (IOException e) {
-      Assert.fail(e.getMessage());
-    }
-    return null;
-  }
-
-  public void closeResponse(CloseableHttpResponse response) {
-    if (response != null) {
-      try {
-        response.close();
-      } catch (IOException e) {
-        fail("Could not close http connection");
-      }
-    }
-  }
-
-  protected void dropUsers() {
-    IdentityService identityService = processEngine.getIdentityService();
-
-    identityService.deleteUser("kermit");
-    identityService.deleteGroup("admin");
-    identityService.deleteMembership("kermit", "admin");
-  }
-
-  /**
-   * Each test is assumed to clean up all DB content it entered. After a test method executed, this method scans all tables to see if the DB is completely clean. It throws AssertionFailed in case the
-   * DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
-   */
-  protected void assertAndEnsureCleanDb() throws Throwable {
-    log.debug("verifying that db is clean after test");
-    Map<String, Long> tableCounts = managementService.getTableCount();
-    StringBuilder outputMessage = new StringBuilder();
-    for (String tableName : tableCounts.keySet()) {
-      String tableNameWithoutPrefix = tableName.replace(processEngineConfiguration.getDatabaseTablePrefix(), "");
-      if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableNameWithoutPrefix)) {
-        Long count = tableCounts.get(tableName);
-        if (count != 0L) {
-          outputMessage.append("  ").append(tableName).append(": ").append(count.toString()).append(" record(s) ");
-        }
-      }
-    }
-    if (outputMessage.length() > 0) {
-      outputMessage.insert(0, "DB NOT CLEAN: \n");
-      log.error(EMPTY_LINE);
-      log.error(outputMessage.toString());
-
-      log.info("dropping and recreating db");
-
-      CommandExecutor commandExecutor = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutor();
-      commandExecutor.execute(new Command<Object>() {
-        public Object execute(CommandContext commandContext) {
-          DbSqlSession session = commandContext.getDbSqlSession();
-          session.dbSchemaDrop();
-          session.dbSchemaCreate();
-          return null;
-        }
-      });
-
-      if (exception != null) {
-        throw exception;
-      } else {
-        Assert.fail(outputMessage.toString());
-      }
-    } else {
-      log.info("database was clean");
-    }
-  }
-
-  protected void closeHttpConnections() {
-    for (CloseableHttpResponse response : httpResponses) {
-      if (response != null) {
         try {
-          response.close();
+
+            deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), getName());
+
+            super.runBare();
+
+        } catch (AssertionFailedError e) {
+            log.error(EMPTY_LINE);
+            log.error("ASSERTION FAILED: {}", e, e);
+            exception = e;
+            throw e;
+
+        } catch (Throwable e) {
+            log.error(EMPTY_LINE);
+            log.error("EXCEPTION: {}", e, e);
+            exception = e;
+            throw e;
+
+        } finally {
+            TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), getName());
+            dropUsers();
+            assertAndEnsureCleanDb();
+            processEngineConfiguration.getClock().reset();
+            closeHttpConnections();
+        }
+    }
+
+    protected void createUsers() {
+        User user = identityService.newUser("kermit");
+        user.setFirstName("Kermit");
+        user.setLastName("the Frog");
+        user.setPassword("kermit");
+        identityService.saveUser(user);
+
+        Group group = identityService.newGroup("admin");
+        group.setName("Administrators");
+        identityService.saveGroup(group);
+
+        identityService.createMembership(user.getId(), group.getId());
+    }
+
+    /**
+     * IMPORTANT: calling method is responsible for calling close() on returned {@link HttpResponse} to free the connection.
+     */
+    public CloseableHttpResponse executeRequest(HttpUriRequest request, int expectedStatusCode) {
+        return internalExecuteRequest(request, expectedStatusCode, true);
+    }
+
+    /**
+     * IMPORTANT: calling method is responsible for calling close() on returned {@link HttpResponse} to free the connection.
+     */
+    public CloseableHttpResponse executeBinaryRequest(HttpUriRequest request, int expectedStatusCode) {
+        return internalExecuteRequest(request, expectedStatusCode, false);
+    }
+
+    protected CloseableHttpResponse internalExecuteRequest(HttpUriRequest request, int expectedStatusCode, boolean addJsonContentType) {
+        CloseableHttpResponse response = null;
+        try {
+            if (addJsonContentType && request.getFirstHeader(HttpHeaders.CONTENT_TYPE) == null) {
+                // Revert to default content-type
+                request.addHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json"));
+            }
+            response = client.execute(request);
+            Assert.assertNotNull(response.getStatusLine());
+
+            int responseStatusCode = response.getStatusLine().getStatusCode();
+            if (expectedStatusCode != responseStatusCode) {
+                log.info("Wrong status code : {}, but should be {}", responseStatusCode, expectedStatusCode);
+                log.info("Response body: {}", IOUtils.toString(response.getEntity().getContent()));
+            }
+
+            Assert.assertEquals(expectedStatusCode, responseStatusCode);
+            httpResponses.add(response);
+            return response;
+
+        } catch (ClientProtocolException e) {
+            Assert.fail(e.getMessage());
         } catch (IOException e) {
-          log.error("Could not close http connection", e);
+            Assert.fail(e.getMessage());
         }
-      }
+        return null;
     }
-    httpResponses.clear();
-  }
 
-  protected String encode(String string) {
-    if (string != null) {
-      try {
-        return URLEncoder.encode(string, "UTF-8");
-      } catch (UnsupportedEncodingException uee) {
-        throw new IllegalStateException("JVM does not support UTF-8 encoding.", uee);
-      }
-    }
-    return null;
-  }
-
-  public void assertProcessEnded(final String processInstanceId) {
-    ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-
-    if (processInstance != null) {
-      throw new AssertionFailedError("Expected finished process instance '" + processInstanceId + "' but it was still in the db");
-    }
-  }
-
-  public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
-    AsyncExecutor asyncExecutor = processEngineConfiguration.getAsyncExecutor();
-    asyncExecutor.start();
-
-    try {
-      Timer timer = new Timer();
-      InteruptTask task = new InteruptTask(Thread.currentThread());
-      timer.schedule(task, maxMillisToWait);
-      boolean areJobsAvailable = true;
-      try {
-        while (areJobsAvailable && !task.isTimeLimitExceeded()) {
-          Thread.sleep(intervalMillis);
-          areJobsAvailable = areJobsAvailable();
+    public void closeResponse(CloseableHttpResponse response) {
+        if (response != null) {
+            try {
+                response.close();
+            } catch (IOException e) {
+                fail("Could not close http connection");
+            }
         }
-      } catch (InterruptedException e) {
-      } finally {
-        timer.cancel();
-      }
-      if (areJobsAvailable) {
-        throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded");
-      }
-
-    } finally {
-      asyncExecutor.shutdown();
     }
-  }
 
-  public void waitForJobExecutorOnCondition(long maxMillisToWait, long intervalMillis, Callable<Boolean> condition) {
-    AsyncExecutor asyncExecutor = processEngineConfiguration.getAsyncExecutor();
-    asyncExecutor.start();
+    protected void dropUsers() {
+        IdentityService identityService = processEngine.getIdentityService();
 
-    try {
-      Timer timer = new Timer();
-      InteruptTask task = new InteruptTask(Thread.currentThread());
-      timer.schedule(task, maxMillisToWait);
-      boolean conditionIsViolated = true;
-      try {
-        while (conditionIsViolated) {
-          Thread.sleep(intervalMillis);
-          conditionIsViolated = !condition.call();
+        identityService.deleteUser("kermit");
+        identityService.deleteGroup("admin");
+        identityService.deleteMembership("kermit", "admin");
+    }
+
+    /**
+     * Each test is assumed to clean up all DB content it entered. After a test method executed, this method scans all tables to see if the DB is completely clean. It throws AssertionFailed in case
+     * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
+     */
+    protected void assertAndEnsureCleanDb() throws Throwable {
+        log.debug("verifying that db is clean after test");
+        Map<String, Long> tableCounts = managementService.getTableCount();
+        StringBuilder outputMessage = new StringBuilder();
+        for (String tableName : tableCounts.keySet()) {
+            String tableNameWithoutPrefix = tableName.replace(processEngineConfiguration.getDatabaseTablePrefix(), "");
+            if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableNameWithoutPrefix)) {
+                Long count = tableCounts.get(tableName);
+                if (count != 0L) {
+                    outputMessage.append("  ").append(tableName).append(": ").append(count.toString()).append(" record(s) ");
+                }
+            }
         }
-      } catch (InterruptedException e) {
-      } catch (Exception e) {
-        throw new FlowableException("Exception while waiting on condition: " + e.getMessage(), e);
-      } finally {
-        timer.cancel();
-      }
-      if (conditionIsViolated) {
-        throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded");
-      }
+        if (outputMessage.length() > 0) {
+            outputMessage.insert(0, "DB NOT CLEAN: \n");
+            log.error(EMPTY_LINE);
+            log.error(outputMessage.toString());
 
-    } finally {
-      asyncExecutor.shutdown();
-    }
-  }
+            log.info("dropping and recreating db");
 
-  public boolean areJobsAvailable() {
-    return !managementService.createJobQuery().list().isEmpty();
-  }
+            CommandExecutor commandExecutor = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutor();
+            commandExecutor.execute(new Command<Object>() {
+                public Object execute(CommandContext commandContext) {
+                    DbSqlSession session = commandContext.getDbSqlSession();
+                    session.dbSchemaDrop();
+                    session.dbSchemaCreate();
+                    return null;
+                }
+            });
 
-  private static class InteruptTask extends TimerTask {
-    protected boolean timeLimitExceeded;
-    protected Thread thread;
-
-    public InteruptTask(Thread thread) {
-      this.thread = thread;
-    }
-
-    public boolean isTimeLimitExceeded() {
-      return timeLimitExceeded;
+            if (exception != null) {
+                throw exception;
+            } else {
+                Assert.fail(outputMessage.toString());
+            }
+        } else {
+            log.info("database was clean");
+        }
     }
 
-    public void run() {
-      timeLimitExceeded = true;
-      thread.interrupt();
-    }
-  }
-
-  /**
-   * Checks if the returned "data" array (child-node of root-json node returned by invoking a GET on the given url) contains entries with the given ID's.
-   */
-  protected void assertResultsPresentInDataResponse(String url, String... expectedResourceIds) throws JsonProcessingException, IOException {
-    int numberOfResultsExpected = expectedResourceIds.length;
-
-    // Do the actual call
-    CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
-
-    // Check status and size
-    JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
-    closeResponse(response);
-    assertEquals(numberOfResultsExpected, dataNode.size());
-
-    // Check presence of ID's
-    List<String> toBeFound = new ArrayList<String>(Arrays.asList(expectedResourceIds));
-    Iterator<JsonNode> it = dataNode.iterator();
-    while (it.hasNext()) {
-      String id = it.next().get("id").textValue();
-      toBeFound.remove(id);
-    }
-    assertTrue("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
-  }
-  
-  protected void assertEmptyResultsPresentInDataResponse(String url) throws JsonProcessingException, IOException {
-    // Do the actual call
-    CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
-
-    // Check status and size
-    JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
-    closeResponse(response);
-    assertEquals(0, dataNode.size());
-  }
-
-  /**
-   * Checks if the returned "data" array (child-node of root-json node returned by invoking a POST on the given url) contains entries with the given ID's.
-   */
-  protected void assertResultsPresentInPostDataResponse(String url, ObjectNode body, String... expectedResourceIds) throws JsonProcessingException, IOException {
-    assertResultsPresentInPostDataResponseWithStatusCheck(url, body, HttpStatus.SC_OK, expectedResourceIds);
-  }
-
-  protected void assertResultsPresentInPostDataResponseWithStatusCheck(String url, ObjectNode body, int expectedStatusCode, String... expectedResourceIds) throws JsonProcessingException, IOException {
-    int numberOfResultsExpected = 0;
-    if (expectedResourceIds != null) {
-      numberOfResultsExpected = expectedResourceIds.length;
+    protected void closeHttpConnections() {
+        for (CloseableHttpResponse response : httpResponses) {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    log.error("Could not close http connection", e);
+                }
+            }
+        }
+        httpResponses.clear();
     }
 
-    // Do the actual call
-    HttpPost post = new HttpPost(SERVER_URL_PREFIX + url);
-    post.setEntity(new StringEntity(body.toString()));
-    CloseableHttpResponse response = executeRequest(post, expectedStatusCode);
+    protected String encode(String string) {
+        if (string != null) {
+            try {
+                return URLEncoder.encode(string, "UTF-8");
+            } catch (UnsupportedEncodingException uee) {
+                throw new IllegalStateException("JVM does not support UTF-8 encoding.", uee);
+            }
+        }
+        return null;
+    }
 
-    if (expectedStatusCode == HttpStatus.SC_OK) {
-      // Check status and size
-      JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
-      JsonNode dataNode = rootNode.get("data");
-      assertEquals(numberOfResultsExpected, dataNode.size());
+    public void assertProcessEnded(final String processInstanceId) {
+        ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 
-      // Check presence of ID's
-      if (expectedResourceIds != null) {
+        if (processInstance != null) {
+            throw new AssertionFailedError("Expected finished process instance '" + processInstanceId + "' but it was still in the db");
+        }
+    }
+
+    public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
+        AsyncExecutor asyncExecutor = processEngineConfiguration.getAsyncExecutor();
+        asyncExecutor.start();
+
+        try {
+            Timer timer = new Timer();
+            InterruptTask task = new InterruptTask(Thread.currentThread());
+            timer.schedule(task, maxMillisToWait);
+            boolean areJobsAvailable = true;
+            try {
+                while (areJobsAvailable && !task.isTimeLimitExceeded()) {
+                    Thread.sleep(intervalMillis);
+                    areJobsAvailable = areJobsAvailable();
+                }
+            } catch (InterruptedException e) {
+            } finally {
+                timer.cancel();
+            }
+            if (areJobsAvailable) {
+                throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded");
+            }
+
+        } finally {
+            asyncExecutor.shutdown();
+        }
+    }
+
+    public void waitForJobExecutorOnCondition(long maxMillisToWait, long intervalMillis, Callable<Boolean> condition) {
+        AsyncExecutor asyncExecutor = processEngineConfiguration.getAsyncExecutor();
+        asyncExecutor.start();
+
+        try {
+            Timer timer = new Timer();
+            InterruptTask task = new InterruptTask(Thread.currentThread());
+            timer.schedule(task, maxMillisToWait);
+            boolean conditionIsViolated = true;
+            try {
+                while (conditionIsViolated) {
+                    Thread.sleep(intervalMillis);
+                    conditionIsViolated = !condition.call();
+                }
+            } catch (InterruptedException e) {
+            } catch (Exception e) {
+                throw new FlowableException("Exception while waiting on condition: " + e.getMessage(), e);
+            } finally {
+                timer.cancel();
+            }
+            if (conditionIsViolated) {
+                throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded");
+            }
+
+        } finally {
+            asyncExecutor.shutdown();
+        }
+    }
+
+    public boolean areJobsAvailable() {
+        return !managementService.createJobQuery().list().isEmpty();
+    }
+
+    private static class InterruptTask extends TimerTask {
+        protected boolean timeLimitExceeded;
+        protected Thread thread;
+
+        public InterruptTask(Thread thread) {
+            this.thread = thread;
+        }
+
+        public boolean isTimeLimitExceeded() {
+            return timeLimitExceeded;
+        }
+
+        public void run() {
+            timeLimitExceeded = true;
+            thread.interrupt();
+        }
+    }
+
+    /**
+     * Checks if the returned "data" array (child-node of root-json node returned by invoking a GET on the given url) contains entries with the given ID's.
+     */
+    protected void assertResultsPresentInDataResponse(String url, String... expectedResourceIds) throws JsonProcessingException, IOException {
+        int numberOfResultsExpected = expectedResourceIds.length;
+
+        // Do the actual call
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        // Check status and size
+        JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
+        closeResponse(response);
+        assertEquals(numberOfResultsExpected, dataNode.size());
+
+        // Check presence of ID's
         List<String> toBeFound = new ArrayList<String>(Arrays.asList(expectedResourceIds));
         Iterator<JsonNode> it = dataNode.iterator();
         while (it.hasNext()) {
-          String id = it.next().get("id").textValue();
-          toBeFound.remove(id);
+            String id = it.next().get("id").textValue();
+            toBeFound.remove(id);
         }
-        assertTrue("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
-      }
+        assertTrue("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
     }
 
-    closeResponse(response);
-  }
+    protected void assertEmptyResultsPresentInDataResponse(String url) throws JsonProcessingException, IOException {
+        // Do the actual call
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
 
-  /**
-   * Checks if the rest operation returns an error as expected
-   */
-  protected void assertErrorResult(String url, ObjectNode body, int statusCode) throws IOException {
-
-    // Do the actual call
-    HttpPost post = new HttpPost(SERVER_URL_PREFIX + url);
-    post.setEntity(new StringEntity(body.toString()));
-    closeResponse(executeRequest(post, statusCode));
-  }
-
-  /**
-   * Extract a date from the given string. Assertion fails when invalid date has been provided.
-   */
-  protected Date getDateFromISOString(String isoString) {
-    DateTimeFormatter dateFormat = ISODateTimeFormat.dateTime();
-    try {
-      return dateFormat.parseDateTime(isoString).toDate();
-    } catch (IllegalArgumentException iae) {
-      fail("Illegal date provided: " + isoString);
-      return null;
+        // Check status and size
+        JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
+        closeResponse(response);
+        assertEquals(0, dataNode.size());
     }
-  }
 
-  protected String getISODateString(Date time) {
-    return dateFormat.format(time);
-  }
+    /**
+     * Checks if the returned "data" array (child-node of root-json node returned by invoking a POST on the given url) contains entries with the given ID's.
+     */
+    protected void assertResultsPresentInPostDataResponse(String url, ObjectNode body, String... expectedResourceIds) throws JsonProcessingException, IOException {
+        assertResultsPresentInPostDataResponseWithStatusCheck(url, body, HttpStatus.SC_OK, expectedResourceIds);
+    }
 
-  protected String buildUrl(String[] fragments, Object... arguments) {
-    return URL_BUILDER.buildUrl(fragments, arguments);
-  }
+    protected void assertResultsPresentInPostDataResponseWithStatusCheck(String url, ObjectNode body, int expectedStatusCode, String... expectedResourceIds) throws JsonProcessingException, IOException {
+        int numberOfResultsExpected = 0;
+        if (expectedResourceIds != null) {
+            numberOfResultsExpected = expectedResourceIds.length;
+        }
+
+        // Do the actual call
+        HttpPost post = new HttpPost(SERVER_URL_PREFIX + url);
+        post.setEntity(new StringEntity(body.toString()));
+        CloseableHttpResponse response = executeRequest(post, expectedStatusCode);
+
+        if (expectedStatusCode == HttpStatus.SC_OK) {
+            // Check status and size
+            JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+            JsonNode dataNode = rootNode.get("data");
+            assertEquals(numberOfResultsExpected, dataNode.size());
+
+            // Check presence of ID's
+            if (expectedResourceIds != null) {
+                List<String> toBeFound = new ArrayList<String>(Arrays.asList(expectedResourceIds));
+                Iterator<JsonNode> it = dataNode.iterator();
+                while (it.hasNext()) {
+                    String id = it.next().get("id").textValue();
+                    toBeFound.remove(id);
+                }
+                assertTrue("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+            }
+        }
+
+        closeResponse(response);
+    }
+
+    /**
+     * Checks if the rest operation returns an error as expected
+     */
+    protected void assertErrorResult(String url, ObjectNode body, int statusCode) throws IOException {
+
+        // Do the actual call
+        HttpPost post = new HttpPost(SERVER_URL_PREFIX + url);
+        post.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(post, statusCode));
+    }
+
+    /**
+     * Extract a date from the given string. Assertion fails when invalid date has been provided.
+     */
+    protected Date getDateFromISOString(String isoString) {
+        DateTimeFormatter dateFormat = ISODateTimeFormat.dateTime();
+        try {
+            return dateFormat.parseDateTime(isoString).toDate();
+        } catch (IllegalArgumentException iae) {
+            fail("Illegal date provided: " + isoString);
+            return null;
+        }
+    }
+
+    protected String getISODateString(Date time) {
+        return dateFormat.format(time);
+    }
+
+    protected String buildUrl(String[] fragments, Object... arguments) {
+        return URL_BUILDER.buildUrl(fragments, arguments);
+    }
 }

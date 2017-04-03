@@ -22,43 +22,43 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
  * @author Tom Baeyens
  */
 public interface IdentityInfoEntity extends Entity, HasRevision {
-  
-  String TYPE_USERINFO = "userinfo";
 
-  String getType();
+    String TYPE_USERINFO = "userinfo";
 
-  void setType(String type);
+    String getType();
 
-  String getUserId();
+    void setType(String type);
 
-  void setUserId(String userId);
+    String getUserId();
 
-  String getKey();
+    void setUserId(String userId);
 
-  void setKey(String key);
+    String getKey();
 
-  String getValue();
+    void setKey(String key);
 
-  void setValue(String value);
+    String getValue();
 
-  byte[] getPasswordBytes();
+    void setValue(String value);
 
-  void setPasswordBytes(byte[] passwordBytes);
+    byte[] getPasswordBytes();
 
-  String getPassword();
+    void setPasswordBytes(byte[] passwordBytes);
 
-  void setPassword(String password);
+    String getPassword();
 
-  String getName();
+    void setPassword(String password);
 
-  String getUsername();
+    String getName();
 
-  String getParentId();
+    String getUsername();
 
-  void setParentId(String parentId);
+    String getParentId();
 
-  Map<String, String> getDetails();
+    void setParentId(String parentId);
 
-  void setDetails(Map<String, String> details);
-    
+    Map<String, String> getDetails();
+
+    void setDetails(Map<String, String> details);
+
 }

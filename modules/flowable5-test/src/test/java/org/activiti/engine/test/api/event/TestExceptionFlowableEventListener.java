@@ -17,20 +17,20 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 
 public class TestExceptionFlowableEventListener implements FlowableEventListener {
 
-	private boolean failOnException;
-	
-	public TestExceptionFlowableEventListener(boolean failOnException) {
-	  this.failOnException = failOnException;
-  }
+    private boolean failOnException;
 
-	@Override
-  public void onEvent(FlowableEvent event) {
-		throw new RuntimeException("Test exception");
-  }
+    public TestExceptionFlowableEventListener(boolean failOnException) {
+        this.failOnException = failOnException;
+    }
 
-	@Override
-  public boolean isFailOnException() {
-	  return failOnException;
-  }
+    @Override
+    public void onEvent(FlowableEvent event) {
+        throw new RuntimeException("Test exception");
+    }
+
+    @Override
+    public boolean isFailOnException() {
+        return failOnException;
+    }
 
 }

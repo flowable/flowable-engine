@@ -37,73 +37,73 @@ import org.flowable.engine.impl.persistence.entity.data.HistoricDetailDataManage
  */
 public class MybatisHistoricDetailDataManager extends AbstractDataManager<HistoricDetailEntity> implements HistoricDetailDataManager {
 
-  public MybatisHistoricDetailDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    super(processEngineConfiguration);
-  }
+    public MybatisHistoricDetailDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
 
-  @Override
-  public Class<? extends HistoricDetailEntity> getManagedEntityClass() {
-    return HistoricDetailEntityImpl.class;
-  }
-  
-  @Override
-  public HistoricDetailEntity create() {
-    // Superclass is abstract
-    throw new UnsupportedOperationException();
-  }
-  
-  @Override
-  public HistoricDetailAssignmentEntity createHistoricDetailAssignment() {
-    return new HistoricDetailAssignmentEntityImpl();
-  }
-  
-  @Override
-  public HistoricDetailTransitionInstanceEntity createHistoricDetailTransitionInstance() {
-    return new HistoricDetailTransitionInstanceEntityImpl();
-  }
-  
-  @Override
-  public HistoricDetailVariableInstanceUpdateEntity createHistoricDetailVariableInstanceUpdate() {
-    return new HistoricDetailVariableInstanceUpdateEntityImpl();
-  }
-  
-  @Override
-  public HistoricFormPropertyEntity createHistoricFormProperty() {
-    return new HistoricFormPropertyEntityImpl();
-  }
-  
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<HistoricDetailEntity> findHistoricDetailsByProcessInstanceId(String processInstanceId) {
-    return getDbSqlSession().selectList("selectHistoricDetailByProcessInstanceId", processInstanceId);
-  }
-  
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<HistoricDetailEntity> findHistoricDetailsByTaskId(String taskId) {
-    return getDbSqlSession().selectList("selectHistoricDetailByTaskId", taskId);
-  }
-  
-  @Override
-  public long findHistoricDetailCountByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery) {
-    return (Long) getDbSqlSession().selectOne("selectHistoricDetailCountByQueryCriteria", historicVariableUpdateQuery);
-  }
+    @Override
+    public Class<? extends HistoricDetailEntity> getManagedEntityClass() {
+        return HistoricDetailEntityImpl.class;
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<HistoricDetail> findHistoricDetailsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery, Page page) {
-    return getDbSqlSession().selectList("selectHistoricDetailsByQueryCriteria", historicVariableUpdateQuery, page);
-  }
-  
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<HistoricDetail> findHistoricDetailsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return getDbSqlSession().selectListWithRawParameter("selectHistoricDetailByNativeQuery", parameterMap, firstResult, maxResults);
-  }
+    @Override
+    public HistoricDetailEntity create() {
+        // Superclass is abstract
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public long findHistoricDetailCountByNativeQuery(Map<String, Object> parameterMap) {
-    return (Long) getDbSqlSession().selectOne("selectHistoricDetailCountByNativeQuery", parameterMap);
-  }
-  
+    @Override
+    public HistoricDetailAssignmentEntity createHistoricDetailAssignment() {
+        return new HistoricDetailAssignmentEntityImpl();
+    }
+
+    @Override
+    public HistoricDetailTransitionInstanceEntity createHistoricDetailTransitionInstance() {
+        return new HistoricDetailTransitionInstanceEntityImpl();
+    }
+
+    @Override
+    public HistoricDetailVariableInstanceUpdateEntity createHistoricDetailVariableInstanceUpdate() {
+        return new HistoricDetailVariableInstanceUpdateEntityImpl();
+    }
+
+    @Override
+    public HistoricFormPropertyEntity createHistoricFormProperty() {
+        return new HistoricFormPropertyEntityImpl();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<HistoricDetailEntity> findHistoricDetailsByProcessInstanceId(String processInstanceId) {
+        return getDbSqlSession().selectList("selectHistoricDetailByProcessInstanceId", processInstanceId);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<HistoricDetailEntity> findHistoricDetailsByTaskId(String taskId) {
+        return getDbSqlSession().selectList("selectHistoricDetailByTaskId", taskId);
+    }
+
+    @Override
+    public long findHistoricDetailCountByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery) {
+        return (Long) getDbSqlSession().selectOne("selectHistoricDetailCountByQueryCriteria", historicVariableUpdateQuery);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<HistoricDetail> findHistoricDetailsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery, Page page) {
+        return getDbSqlSession().selectList("selectHistoricDetailsByQueryCriteria", historicVariableUpdateQuery, page);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<HistoricDetail> findHistoricDetailsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
+        return getDbSqlSession().selectListWithRawParameter("selectHistoricDetailByNativeQuery", parameterMap, firstResult, maxResults);
+    }
+
+    @Override
+    public long findHistoricDetailCountByNativeQuery(Map<String, Object> parameterMap) {
+        return (Long) getDbSqlSession().selectOne("selectHistoricDetailCountByNativeQuery", parameterMap);
+    }
+
 }

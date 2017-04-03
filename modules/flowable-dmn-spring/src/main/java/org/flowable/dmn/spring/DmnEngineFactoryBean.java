@@ -29,50 +29,50 @@ import org.springframework.context.ApplicationContextAware;
  */
 public class DmnEngineFactoryBean implements FactoryBean<DmnEngine>, DisposableBean, ApplicationContextAware {
 
-  protected DmnEngineConfiguration dmnEngineConfiguration;
+    protected DmnEngineConfiguration dmnEngineConfiguration;
 
-  protected ApplicationContext applicationContext;
-  protected DmnEngine dmnEngine;
+    protected ApplicationContext applicationContext;
+    protected DmnEngine dmnEngine;
 
-  public void destroy() throws Exception {
-    if (dmnEngine != null) {
-      dmnEngine.close();
+    public void destroy() throws Exception {
+        if (dmnEngine != null) {
+            dmnEngine.close();
+        }
     }
-  }
 
-  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    this.applicationContext = applicationContext;
-  }
-
-  public DmnEngine getObject() throws Exception {
-    configureExternallyManagedTransactions();
-
-    this.dmnEngine = dmnEngineConfiguration.buildDmnEngine();
-    return this.dmnEngine;
-  }
-
-  protected void configureExternallyManagedTransactions() {
-    if (dmnEngineConfiguration instanceof SpringDmnEngineConfiguration) { // remark: any config can be injected, so we cannot have SpringConfiguration as member
-      SpringDmnEngineConfiguration engineConfiguration = (SpringDmnEngineConfiguration) dmnEngineConfiguration;
-      if (engineConfiguration.getTransactionManager() != null) {
-        dmnEngineConfiguration.setTransactionsExternallyManaged(true);
-      }
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
-  }
 
-  public Class<DmnEngine> getObjectType() {
-    return DmnEngine.class;
-  }
+    public DmnEngine getObject() throws Exception {
+        configureExternallyManagedTransactions();
 
-  public boolean isSingleton() {
-    return true;
-  }
+        this.dmnEngine = dmnEngineConfiguration.buildDmnEngine();
+        return this.dmnEngine;
+    }
 
-  public DmnEngineConfiguration getDmnEngineConfiguration() {
-    return dmnEngineConfiguration;
-  }
+    protected void configureExternallyManagedTransactions() {
+        if (dmnEngineConfiguration instanceof SpringDmnEngineConfiguration) { // remark: any config can be injected, so we cannot have SpringConfiguration as member
+            SpringDmnEngineConfiguration engineConfiguration = (SpringDmnEngineConfiguration) dmnEngineConfiguration;
+            if (engineConfiguration.getTransactionManager() != null) {
+                dmnEngineConfiguration.setTransactionsExternallyManaged(true);
+            }
+        }
+    }
 
-  public void setDmnEngineConfiguration(DmnEngineConfiguration dmnEngineConfiguration) {
-    this.dmnEngineConfiguration = dmnEngineConfiguration;
-  }
+    public Class<DmnEngine> getObjectType() {
+        return DmnEngine.class;
+    }
+
+    public boolean isSingleton() {
+        return true;
+    }
+
+    public DmnEngineConfiguration getDmnEngineConfiguration() {
+        return dmnEngineConfiguration;
+    }
+
+    public void setDmnEngineConfiguration(DmnEngineConfiguration dmnEngineConfiguration) {
+        this.dmnEngineConfiguration = dmnEngineConfiguration;
+    }
 }

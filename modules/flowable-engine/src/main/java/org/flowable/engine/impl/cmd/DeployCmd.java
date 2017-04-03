@@ -39,137 +39,143 @@ import org.flowable.engine.repository.DeploymentProperties;
  */
 public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected DeploymentBuilderImpl deploymentBuilder;
+    private static final long serialVersionUID = 1L;
+    protected DeploymentBuilderImpl deploymentBuilder;
 
-  public DeployCmd(DeploymentBuilderImpl deploymentBuilder) {
-    this.deploymentBuilder = deploymentBuilder;
-  }
-
-  public Deployment execute(CommandContext commandContext) {
-
-    // Backwards compatibility with v5
-    if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled()
-        && deploymentBuilder.getDeploymentProperties() != null 
-        && deploymentBuilder.getDeploymentProperties().containsKey(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION)
-        && deploymentBuilder.getDeploymentProperties().get(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION).equals(Boolean.TRUE)) {
-      
-        return deployAsFlowable5ProcessDefinition(commandContext);
+    public DeployCmd(DeploymentBuilderImpl deploymentBuilder) {
+        this.deploymentBuilder = deploymentBuilder;
     }
 
-    return executeDeploy(commandContext);
-  }
+    public Deployment execute(CommandContext commandContext) {
 
-  protected Deployment executeDeploy(CommandContext commandContext) {
-    DeploymentEntity deployment = deploymentBuilder.getDeployment();
+        // Backwards compatibility with v5
+        if (deploymentBuilder.getDeploymentProperties() != null
+                && deploymentBuilder.getDeploymentProperties().containsKey(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION)
+                && deploymentBuilder.getDeploymentProperties().get(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION).equals(Boolean.TRUE)) {
 
-    deployment.setDeploymentTime(commandContext.getProcessEngineConfiguration().getClock().getCurrentTime());
+            if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() &&
+                    commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler() != null) {
 
-    if (deploymentBuilder.isDuplicateFilterEnabled()) {
+                return deployAsFlowable5ProcessDefinition(commandContext);
 
-      List<Deployment> existingDeployments = new ArrayList<Deployment>();
-      if (deployment.getTenantId() == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
-        DeploymentEntity existingDeployment = commandContext.getDeploymentEntityManager().findLatestDeploymentByName(deployment.getName());
-        if (existingDeployment != null) {
-          existingDeployments.add(existingDeployment);
+            } else {
+                throw new FlowableException("Can't deploy a v5 deployment with no flowable 5 compatibility enabled or no compatibility handler on the classpath");
+            }
         }
-      } else {
-        List<Deployment> deploymentList = commandContext.getProcessEngineConfiguration().getRepositoryService().createDeploymentQuery().deploymentName(deployment.getName())
-            .deploymentTenantId(deployment.getTenantId()).orderByDeploymentId().desc().list();
 
-        if (!deploymentList.isEmpty()) {
-          existingDeployments.addAll(deploymentList);
+        return executeDeploy(commandContext);
+    }
+
+    protected Deployment executeDeploy(CommandContext commandContext) {
+        DeploymentEntity deployment = deploymentBuilder.getDeployment();
+
+        deployment.setDeploymentTime(commandContext.getProcessEngineConfiguration().getClock().getCurrentTime());
+
+        if (deploymentBuilder.isDuplicateFilterEnabled()) {
+
+            List<Deployment> existingDeployments = new ArrayList<Deployment>();
+            if (deployment.getTenantId() == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
+                DeploymentEntity existingDeployment = commandContext.getDeploymentEntityManager().findLatestDeploymentByName(deployment.getName());
+                if (existingDeployment != null) {
+                    existingDeployments.add(existingDeployment);
+                }
+            } else {
+                List<Deployment> deploymentList = commandContext.getProcessEngineConfiguration().getRepositoryService().createDeploymentQuery().deploymentName(deployment.getName())
+                        .deploymentTenantId(deployment.getTenantId()).orderByDeploymentId().desc().list();
+
+                if (!deploymentList.isEmpty()) {
+                    existingDeployments.addAll(deploymentList);
+                }
+            }
+
+            DeploymentEntity existingDeployment = null;
+            if (!existingDeployments.isEmpty()) {
+                existingDeployment = (DeploymentEntity) existingDeployments.get(0);
+            }
+
+            if ((existingDeployment != null) && !deploymentsDiffer(deployment, existingDeployment)) {
+                return existingDeployment;
+            }
         }
-      }
 
-      DeploymentEntity existingDeployment = null;
-      if (!existingDeployments.isEmpty()) {
-        existingDeployment = (DeploymentEntity) existingDeployments.get(0);
-      }
+        deployment.setNew(true);
 
-      if ((existingDeployment != null) && !deploymentsDiffer(deployment, existingDeployment)) {
-        return existingDeployment;
-      }
-    }
+        // Save the data
+        commandContext.getDeploymentEntityManager().insert(deployment);
 
-    deployment.setNew(true);
-
-    // Save the data
-    commandContext.getDeploymentEntityManager().insert(deployment);
-
-    if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-      commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, deployment));
-    }
-
-    // Deployment settings
-    Map<String, Object> deploymentSettings = new HashMap<String, Object>();
-    deploymentSettings.put(DeploymentSettings.IS_BPMN20_XSD_VALIDATION_ENABLED, deploymentBuilder.isBpmn20XsdValidationEnabled());
-    deploymentSettings.put(DeploymentSettings.IS_PROCESS_VALIDATION_ENABLED, deploymentBuilder.isProcessValidationEnabled());
-
-    // Actually deploy
-    commandContext.getProcessEngineConfiguration().getDeploymentManager().deploy(deployment, deploymentSettings);
-
-    if (deploymentBuilder.getProcessDefinitionsActivationDate() != null) {
-      scheduleProcessDefinitionActivation(commandContext, deployment);
-    }
-
-    if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-      commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, deployment));
-    }
-
-    return deployment;
-  }
-
-  protected Deployment deployAsFlowable5ProcessDefinition(CommandContext commandContext) {
-    Flowable5CompatibilityHandler flowable5CompatibilityHandler = commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler();
-    if (flowable5CompatibilityHandler == null) {
-      throw new FlowableException("Found Flowable 5 process definition, but no compatibility handler on the classpath. " 
-          + "Cannot use the deployment property " + DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION);
-    }
-    return flowable5CompatibilityHandler.deploy(deploymentBuilder);
-  }
-
-  protected boolean deploymentsDiffer(DeploymentEntity deployment, DeploymentEntity saved) {
-
-    if (deployment.getResources() == null || saved.getResources() == null) {
-      return true;
-    }
-
-    Map<String, ResourceEntity> resources = deployment.getResources();
-    Map<String, ResourceEntity> savedResources = saved.getResources();
-
-    for (String resourceName : resources.keySet()) {
-      ResourceEntity savedResource = savedResources.get(resourceName);
-
-      if (savedResource == null)
-        return true;
-
-      if (!savedResource.isGenerated()) {
-        ResourceEntity resource = resources.get(resourceName);
-
-        byte[] bytes = resource.getBytes();
-        byte[] savedBytes = savedResource.getBytes();
-        if (!Arrays.equals(bytes, savedBytes)) {
-          return true;
+        if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, deployment));
         }
-      }
+
+        // Deployment settings
+        Map<String, Object> deploymentSettings = new HashMap<String, Object>();
+        deploymentSettings.put(DeploymentSettings.IS_BPMN20_XSD_VALIDATION_ENABLED, deploymentBuilder.isBpmn20XsdValidationEnabled());
+        deploymentSettings.put(DeploymentSettings.IS_PROCESS_VALIDATION_ENABLED, deploymentBuilder.isProcessValidationEnabled());
+
+        // Actually deploy
+        commandContext.getProcessEngineConfiguration().getDeploymentManager().deploy(deployment, deploymentSettings);
+
+        if (deploymentBuilder.getProcessDefinitionsActivationDate() != null) {
+            scheduleProcessDefinitionActivation(commandContext, deployment);
+        }
+
+        if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, deployment));
+        }
+
+        return deployment;
     }
-    return false;
-  }
 
-  protected void scheduleProcessDefinitionActivation(CommandContext commandContext, DeploymentEntity deployment) {
-    for (ProcessDefinitionEntity processDefinitionEntity : deployment.getDeployedArtifacts(ProcessDefinitionEntity.class)) {
-
-      // If activation date is set, we first suspend all the process
-      // definition
-      SuspendProcessDefinitionCmd suspendProcessDefinitionCmd = new SuspendProcessDefinitionCmd(processDefinitionEntity, false, null, deployment.getTenantId());
-      suspendProcessDefinitionCmd.execute(commandContext);
-
-      // And we schedule an activation at the provided date
-      ActivateProcessDefinitionCmd activateProcessDefinitionCmd = new ActivateProcessDefinitionCmd(processDefinitionEntity, false, deploymentBuilder.getProcessDefinitionsActivationDate(),
-          deployment.getTenantId());
-      activateProcessDefinitionCmd.execute(commandContext);
+    protected Deployment deployAsFlowable5ProcessDefinition(CommandContext commandContext) {
+        Flowable5CompatibilityHandler flowable5CompatibilityHandler = commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler();
+        if (flowable5CompatibilityHandler == null) {
+            throw new FlowableException("Found Flowable 5 process definition, but no compatibility handler on the classpath. "
+                    + "Cannot use the deployment property " + DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION);
+        }
+        return flowable5CompatibilityHandler.deploy(deploymentBuilder);
     }
-  }
-  
+
+    protected boolean deploymentsDiffer(DeploymentEntity deployment, DeploymentEntity saved) {
+
+        if (deployment.getResources() == null || saved.getResources() == null) {
+            return true;
+        }
+
+        Map<String, ResourceEntity> resources = deployment.getResources();
+        Map<String, ResourceEntity> savedResources = saved.getResources();
+
+        for (String resourceName : resources.keySet()) {
+            ResourceEntity savedResource = savedResources.get(resourceName);
+
+            if (savedResource == null)
+                return true;
+
+            if (!savedResource.isGenerated()) {
+                ResourceEntity resource = resources.get(resourceName);
+
+                byte[] bytes = resource.getBytes();
+                byte[] savedBytes = savedResource.getBytes();
+                if (!Arrays.equals(bytes, savedBytes)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    protected void scheduleProcessDefinitionActivation(CommandContext commandContext, DeploymentEntity deployment) {
+        for (ProcessDefinitionEntity processDefinitionEntity : deployment.getDeployedArtifacts(ProcessDefinitionEntity.class)) {
+
+            // If activation date is set, we first suspend all the process
+            // definition
+            SuspendProcessDefinitionCmd suspendProcessDefinitionCmd = new SuspendProcessDefinitionCmd(processDefinitionEntity, false, null, deployment.getTenantId());
+            suspendProcessDefinitionCmd.execute(commandContext);
+
+            // And we schedule an activation at the provided date
+            ActivateProcessDefinitionCmd activateProcessDefinitionCmd = new ActivateProcessDefinitionCmd(processDefinitionEntity, false, deploymentBuilder.getProcessDefinitionsActivationDate(),
+                    deployment.getTenantId());
+            activateProcessDefinitionCmd.execute(commandContext);
+        }
+    }
+
 }

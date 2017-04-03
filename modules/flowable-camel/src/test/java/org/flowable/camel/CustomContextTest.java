@@ -31,64 +31,64 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class CustomContextTest extends SpringFlowableTestCase {
 
-  @Autowired
-  protected CamelContext camelContext;
+    @Autowired
+    protected CamelContext camelContext;
 
-  protected MockEndpoint service1;
+    protected MockEndpoint service1;
 
-  protected MockEndpoint service2;
+    protected MockEndpoint service2;
 
-  public void setUp() throws Exception {
+    public void setUp() throws Exception {
 
-    camelContext.addRoutes(new RouteBuilder() {
+        camelContext.addRoutes(new RouteBuilder() {
 
-      @Override
-      public void configure() throws Exception {
-        from("direct:start").to("activiti:camelProcess");
+            @Override
+            public void configure() throws Exception {
+                from("direct:start").to("flowable:camelProcess");
 
-        from("activiti:camelProcess:serviceTask1").setBody().exchangeProperty("var1").to("mock:service1").setProperty("var2").constant("var2").setBody().properties();
+                from("flowable:camelProcess:serviceTask1").setBody().exchangeProperty("var1").to("mock:service1").setProperty("var2").constant("var2").setBody().properties();
 
-        from("activiti:camelProcess:serviceTask2?copyVariablesToBodyAsMap=true").to("mock:service2");
+                from("flowable:camelProcess:serviceTask2?copyVariablesToBodyAsMap=true").to("mock:service2");
 
-        from("direct:receive").to("activiti:camelProcess:receive");
-      }
-    });
+                from("direct:receive").to("flowable:camelProcess:receive");
+            }
+        });
 
-    service1 = (MockEndpoint) camelContext.getEndpoint("mock:service1");
-    service1.reset();
-    service2 = (MockEndpoint) camelContext.getEndpoint("mock:service2");
-    service2.reset();
-  }
-
-  public void tearDown() throws Exception {
-    List<Route> routes = camelContext.getRoutes();
-    for (Route r : routes) {
-      camelContext.stopRoute(r.getId());
-      camelContext.removeRoute(r.getId());
+        service1 = (MockEndpoint) camelContext.getEndpoint("mock:service1");
+        service1.reset();
+        service2 = (MockEndpoint) camelContext.getEndpoint("mock:service2");
+        service2.reset();
     }
-  }
 
-  @Deployment(resources = { "process/custom.bpmn20.xml" })
-  public void testRunProcess() throws Exception {
-    CamelContext ctx = applicationContext.getBean(CamelContext.class);
-    ProducerTemplate tpl = ctx.createProducerTemplate();
-    service1.expectedBodiesReceived("ala");
+    public void tearDown() throws Exception {
+        List<Route> routes = camelContext.getRoutes();
+        for (Route r : routes) {
+            camelContext.stopRoute(r.getId());
+            camelContext.removeRoute(r.getId());
+        }
+    }
 
-    Exchange exchange = ctx.getEndpoint("direct:start").createExchange();
-    exchange.getIn().setBody(Collections.singletonMap("var1", "ala"));
-    tpl.send("direct:start", exchange);
+    @Deployment(resources = { "process/custom.bpmn20.xml" })
+    public void testRunProcess() throws Exception {
+        CamelContext ctx = applicationContext.getBean(CamelContext.class);
+        ProducerTemplate tpl = ctx.createProducerTemplate();
+        service1.expectedBodiesReceived("ala");
 
-    String instanceId = (String) exchange.getProperty("PROCESS_ID_PROPERTY");
+        Exchange exchange = ctx.getEndpoint("direct:start").createExchange();
+        exchange.getIn().setBody(Collections.singletonMap("var1", "ala"));
+        tpl.send("direct:start", exchange);
 
-    tpl.sendBodyAndProperty("direct:receive", null, FlowableProducer.PROCESS_ID_PROPERTY, instanceId);
+        String instanceId = (String) exchange.getProperty("PROCESS_ID_PROPERTY");
 
-    assertProcessEnded(instanceId);
+        tpl.sendBodyAndProperty("direct:receive", null, FlowableProducer.PROCESS_ID_PROPERTY, instanceId);
 
-    service1.assertIsSatisfied();
+        assertProcessEnded(instanceId);
 
-    @SuppressWarnings("rawtypes")
-    Map m = service2.getExchanges().get(0).getIn().getBody(Map.class);
-    assertEquals("ala", m.get("var1"));
-    assertEquals("var2", m.get("var2"));
-  }
+        service1.assertIsSatisfied();
+
+        @SuppressWarnings("rawtypes")
+        Map m = service2.getExchanges().get(0).getIn().getBody(Map.class);
+        assertEquals("ala", m.get("var1"));
+        assertEquals("var2", m.get("var2"));
+    }
 }

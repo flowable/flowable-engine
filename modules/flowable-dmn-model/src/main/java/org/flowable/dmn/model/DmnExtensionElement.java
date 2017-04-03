@@ -33,30 +33,39 @@ public class DmnExtensionElement extends DmnElement {
     public String getElementText() {
         return elementText;
     }
+
     public void setElementText(String elementText) {
         this.elementText = elementText;
     }
+
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     public String getNamespacePrefix() {
         return namespacePrefix;
     }
+
     public void setNamespacePrefix(String namespacePrefix) {
         this.namespacePrefix = namespacePrefix;
     }
+
     public String getNamespace() {
         return namespace;
     }
+
     public void setNamespace(String namespace) {
         this.namespace = namespace;
     }
+
     public Map<String, List<DmnExtensionElement>> getChildElements() {
         return childElements;
     }
+
     public void addChildElement(DmnExtensionElement childElement) {
         if (childElement != null && childElement.getName() != null && !childElement.getName().trim().isEmpty()) {
             List<DmnExtensionElement> elementList = null;
@@ -67,6 +76,7 @@ public class DmnExtensionElement extends DmnElement {
             this.childElements.get(childElement.getName()).add(childElement);
         }
     }
+
     public void setChildElements(Map<String, List<DmnExtensionElement>> childElements) {
         this.childElements = childElements;
     }

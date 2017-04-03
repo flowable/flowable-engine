@@ -25,17 +25,17 @@ import org.flowable.idm.engine.impl.persistence.entity.GroupEntity;
  * @author Joram Barrez
  */
 public interface GroupDataManager extends DataManager<GroupEntity> {
-  
-  List<Group> findGroupByQueryCriteria(GroupQueryImpl query, Page page);
 
-  long findGroupCountByQueryCriteria(GroupQueryImpl query);
+    List<Group> findGroupByQueryCriteria(GroupQueryImpl query, Page page);
 
-  List<Group> findGroupsByUser(String userId);
-  
-  List<Group> findGroupsByPrivilegeId(String privilegeId);
+    long findGroupCountByQueryCriteria(GroupQueryImpl query);
 
-  List<Group> findGroupsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<Group> findGroupsByUser(String userId);
 
-  long findGroupCountByNativeQuery(Map<String, Object> parameterMap);
-  
+    List<Group> findGroupsByPrivilegeId(String privilegeId);
+
+    List<Group> findGroupsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+
+    long findGroupCountByNativeQuery(Map<String, Object> parameterMap);
+
 }

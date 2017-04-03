@@ -27,26 +27,26 @@ import org.junit.Assert;
  */
 public class JobExecutorExceptionsTest extends PluggableFlowableTestCase {
 
-  @Deployment(resources = { "org/flowable/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml" })
-  public void testQueryByExceptionWithRealJobExecutor() {
-    TimerJobQuery query = managementService.createTimerJobQuery().withException();
-    Assert.assertEquals(0, query.count());
+    @Deployment(resources = { "org/flowable/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml" })
+    public void testQueryByExceptionWithRealJobExecutor() {
+        TimerJobQuery query = managementService.createTimerJobQuery().withException();
+        Assert.assertEquals(0, query.count());
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
 
-    // Timer is set for 4 hours, so move clock 5 hours
-    processEngineConfiguration.getClock().setCurrentTime(new Date(new Date().getTime() + 5 * 60 * 60 * 1000));
+        // Timer is set for 4 hours, so move clock 5 hours
+        processEngineConfiguration.getClock().setCurrentTime(new Date(new Date().getTime() + 5 * 60 * 60 * 1000));
 
-    // The execution is waiting in the first usertask. This contains a
-    // boundary timer event which we will execute manual for testing purposes.
-    JobTestHelper.waitForJobExecutorOnCondition(processEngineConfiguration, 5000L, 100L, new Callable<Boolean>() {
-      public Boolean call() throws Exception {
-        return managementService.createTimerJobQuery().withException().count() == 1;
-      }
-    });
+        // The execution is waiting in the first usertask. This contains a
+        // boundary timer event which we will execute manual for testing purposes.
+        JobTestHelper.waitForJobExecutorOnCondition(processEngineConfiguration, 5000L, 100L, new Callable<Boolean>() {
+            public Boolean call() throws Exception {
+                return managementService.createTimerJobQuery().withException().count() == 1;
+            }
+        });
 
-    query = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).withException();
-    Assert.assertEquals(1, query.count());
-  }
+        query = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).withException();
+        Assert.assertEquals(1, query.count());
+    }
 
 }

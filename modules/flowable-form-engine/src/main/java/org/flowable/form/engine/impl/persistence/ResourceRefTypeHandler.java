@@ -17,35 +17,35 @@ import org.flowable.form.engine.impl.persistence.entity.ResourceRef;
  */
 public class ResourceRefTypeHandler extends TypeReference<ResourceRef> implements TypeHandler<ResourceRef> {
 
-  @Override
-  public void setParameter(PreparedStatement ps, int i, ResourceRef parameter, JdbcType jdbcType) throws SQLException {
-    ps.setString(i, getValueToSet(parameter));
-  }
-
-  private String getValueToSet(ResourceRef parameter) {
-    if (parameter == null) {
-      // Note that this should not happen: ByteArrayRefs should always be initialized.
-      return null;
+    @Override
+    public void setParameter(PreparedStatement ps, int i, ResourceRef parameter, JdbcType jdbcType) throws SQLException {
+        ps.setString(i, getValueToSet(parameter));
     }
-    return parameter.getId();
-  }
 
-  @Override
-  public ResourceRef getResult(ResultSet rs, String columnName) throws SQLException {
-    String id = rs.getString(columnName);
-    return new ResourceRef(id);
-  }
+    private String getValueToSet(ResourceRef parameter) {
+        if (parameter == null) {
+            // Note that this should not happen: ByteArrayRefs should always be initialized.
+            return null;
+        }
+        return parameter.getId();
+    }
 
-  @Override
-  public ResourceRef getResult(ResultSet rs, int columnIndex) throws SQLException {
-    String id = rs.getString(columnIndex);
-    return new ResourceRef(id);
-  }
+    @Override
+    public ResourceRef getResult(ResultSet rs, String columnName) throws SQLException {
+        String id = rs.getString(columnName);
+        return new ResourceRef(id);
+    }
 
-  @Override
-  public ResourceRef getResult(CallableStatement cs, int columnIndex) throws SQLException {
-    String id = cs.getString(columnIndex);
-    return new ResourceRef(id);
-  }
+    @Override
+    public ResourceRef getResult(ResultSet rs, int columnIndex) throws SQLException {
+        String id = rs.getString(columnIndex);
+        return new ResourceRef(id);
+    }
+
+    @Override
+    public ResourceRef getResult(CallableStatement cs, int columnIndex) throws SQLException {
+        String id = cs.getString(columnIndex);
+        return new ResourceRef(id);
+    }
 
 }

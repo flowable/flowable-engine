@@ -18,10 +18,10 @@ import java.io.Serializable;
 import org.flowable.engine.delegate.DelegateExecution;
 
 public class DummyTestBean implements Serializable {
-  
-  private static final long serialVersionUID = 1L;
-  
-  public void test(DelegateExecution execution) {
-    execution.setVariable("executed", true);
-  }
+
+    private static final long serialVersionUID = 1L;
+
+    public void test(DelegateExecution execution) {
+        execution.setVariable("executed", true);
+    }
 }

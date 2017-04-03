@@ -28,41 +28,41 @@ import org.flowable.engine.runtime.Job;
  */
 public class GetJobExceptionStacktraceCmd implements Command<String>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  private String jobId;
-  protected JobType jobType;
+    private static final long serialVersionUID = 1L;
+    private String jobId;
+    protected JobType jobType;
 
-  public GetJobExceptionStacktraceCmd(String jobId, JobType jobType) {
-    this.jobId = jobId;
-    this.jobType = jobType;
-  }
-
-  public String execute(CommandContext commandContext) {
-    if (jobId == null) {
-      throw new FlowableIllegalArgumentException("jobId is null");
+    public GetJobExceptionStacktraceCmd(String jobId, JobType jobType) {
+        this.jobId = jobId;
+        this.jobType = jobType;
     }
 
-    AbstractJobEntity job = null;
-    switch (jobType) {
-    case ASYNC:
-      job = commandContext.getJobEntityManager().findById(jobId);
-      break;
-    case TIMER:
-      job = commandContext.getTimerJobEntityManager().findById(jobId);
-      break;
-    case SUSPENDED:
-      job = commandContext.getSuspendedJobEntityManager().findById(jobId);
-      break;
-    case DEADLETTER:
-      job = commandContext.getDeadLetterJobEntityManager().findById(jobId);
-      break;
-    }
-       
-    if (job == null) {
-      throw new FlowableObjectNotFoundException("No job found with id " + jobId, Job.class);
-    }
+    public String execute(CommandContext commandContext) {
+        if (jobId == null) {
+            throw new FlowableIllegalArgumentException("jobId is null");
+        }
 
-    return job.getExceptionStacktrace();
-  }
+        AbstractJobEntity job = null;
+        switch (jobType) {
+        case ASYNC:
+            job = commandContext.getJobEntityManager().findById(jobId);
+            break;
+        case TIMER:
+            job = commandContext.getTimerJobEntityManager().findById(jobId);
+            break;
+        case SUSPENDED:
+            job = commandContext.getSuspendedJobEntityManager().findById(jobId);
+            break;
+        case DEADLETTER:
+            job = commandContext.getDeadLetterJobEntityManager().findById(jobId);
+            break;
+        }
+
+        if (job == null) {
+            throw new FlowableObjectNotFoundException("No job found with id " + jobId, Job.class);
+        }
+
+        return job.getExceptionStacktrace();
+    }
 
 }

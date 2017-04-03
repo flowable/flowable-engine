@@ -25,39 +25,39 @@ import org.flowable.dmn.engine.impl.persistence.entity.ResourceEntityManager;
  * @author Joram Barrez
  */
 public abstract class AbstractManager {
-  
-  protected DmnEngineConfiguration dmnEngineConfiguration;
-  
-  public AbstractManager(DmnEngineConfiguration dmnEngineConfiguration) {
-    this.dmnEngineConfiguration = dmnEngineConfiguration;
-  }
-  
-  // Command scoped 
-  
-  protected CommandContext getCommandContext() {
-    return Context.getCommandContext();
-  }
 
-  protected <T> T getSession(Class<T> sessionClass) {
-    return getCommandContext().getSession(sessionClass);
-  }
-  
-  // Engine scoped
-  
-  protected DmnEngineConfiguration getDmnEngineConfiguration() {
-    return dmnEngineConfiguration;
-  }
+    protected DmnEngineConfiguration dmnEngineConfiguration;
 
-  protected DmnDeploymentEntityManager getDeploymentEntityManager() {
-    return getDmnEngineConfiguration().getDeploymentEntityManager();
-  }
-  
-  protected DecisionTableEntityManager getDecisionTableEntityManager() {
-    return getDmnEngineConfiguration().getDecisionTableEntityManager();
-  }
+    public AbstractManager(DmnEngineConfiguration dmnEngineConfiguration) {
+        this.dmnEngineConfiguration = dmnEngineConfiguration;
+    }
 
-  protected ResourceEntityManager getResourceEntityManager() {
-    return getDmnEngineConfiguration().getResourceEntityManager();
-  }
+    // Command scoped
+
+    protected CommandContext getCommandContext() {
+        return Context.getCommandContext();
+    }
+
+    protected <T> T getSession(Class<T> sessionClass) {
+        return getCommandContext().getSession(sessionClass);
+    }
+
+    // Engine scoped
+
+    protected DmnEngineConfiguration getDmnEngineConfiguration() {
+        return dmnEngineConfiguration;
+    }
+
+    protected DmnDeploymentEntityManager getDeploymentEntityManager() {
+        return getDmnEngineConfiguration().getDeploymentEntityManager();
+    }
+
+    protected DecisionTableEntityManager getDecisionTableEntityManager() {
+        return getDmnEngineConfiguration().getDecisionTableEntityManager();
+    }
+
+    protected ResourceEntityManager getResourceEntityManager() {
+        return getDmnEngineConfiguration().getResourceEntityManager();
+    }
 
 }

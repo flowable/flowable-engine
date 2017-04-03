@@ -17,10 +17,10 @@ import org.flowable.engine.impl.interceptor.CommandContext;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class AbstractNeedsHistoricActivityHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
-  
-  @Override
-  public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
-    return historicActivityInstanceExistsForData(historicalData, commandContext);
-  }
+
+    @Override
+    public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
+        return historicActivityInstanceExistsForData(historicalData, commandContext);
+    }
 
 }

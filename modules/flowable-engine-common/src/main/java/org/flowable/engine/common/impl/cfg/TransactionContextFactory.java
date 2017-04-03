@@ -19,6 +19,6 @@ import org.flowable.engine.common.impl.interceptor.AbstractCommandContext;
  */
 public interface TransactionContextFactory<T extends BaseTransactionListener<C>, C extends AbstractCommandContext> {
 
-  BaseTransactionContext<T, C> openTransactionContext(C commandContext);
+    BaseTransactionContext<T, C> openTransactionContext(C commandContext);
 
 }

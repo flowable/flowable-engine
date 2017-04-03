@@ -37,40 +37,40 @@ import org.junit.Test;
 
 public class JobExecutorJMXClientTest {
 
-  @Test
-  public void testJobExecutorJMXClient() throws InterruptedException, IOException, MalformedObjectNameException, AttributeNotFoundException, InstanceNotFoundException, MBeanException,
-      ReflectionException {
-    String hostName = Utils.getHostName();
-    JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://" + hostName + ":10111/jndi/rmi://" + hostName + ":1099/jmxrmi/flowable");
+    @Test
+    public void testJobExecutorJMXClient() throws InterruptedException, IOException, MalformedObjectNameException, AttributeNotFoundException, InstanceNotFoundException, MBeanException,
+            ReflectionException {
+        String hostName = Utils.getHostName();
+        JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://" + hostName + ":10111/jndi/rmi://" + hostName + ":1099/jmxrmi/flowable");
 
-    ProcessEngineConfiguration processEngineConfig = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("flowable.cfg.xml");
-    processEngineConfig.buildProcessEngine();
+        ProcessEngineConfiguration processEngineConfig = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("flowable.cfg.xml");
+        processEngineConfig.buildProcessEngine();
 
-    // wait for jmx server to come up
-    Thread.sleep(500);
-    JMXConnector jmxc = JMXConnectorFactory.connect(url, null);
+        // wait for jmx server to come up
+        Thread.sleep(500);
+        JMXConnector jmxc = JMXConnectorFactory.connect(url, null);
 
-    MBeanServerConnection mbsc = jmxc.getMBeanServerConnection();
-    ObjectName jobExecutorBeanName = new ObjectName("org.flowable.jmx.Mbeans:type=JobExecutor");
+        MBeanServerConnection mbsc = jmxc.getMBeanServerConnection();
+        ObjectName jobExecutorBeanName = new ObjectName("org.flowable.jmx.Mbeans:type=JobExecutor");
 
-    processEngineConfig.getAsyncExecutor().shutdown();
+        processEngineConfig.getAsyncExecutor().shutdown();
 
-    // first check that job executor is not activated and correctly reported
-    // as being inactive
-    assertFalse(processEngineConfig.isAsyncExecutorActivate());
-    assertFalse((Boolean) mbsc.getAttribute(jobExecutorBeanName, "JobExecutorActivated"));
-    // now activate it remotely
-    mbsc.invoke(jobExecutorBeanName, "setJobExecutorActivate", new Boolean[] { true }, new String[] { Boolean.class.getName() });
+        // first check that job executor is not activated and correctly reported
+        // as being inactive
+        assertFalse(processEngineConfig.isAsyncExecutorActivate());
+        assertFalse((Boolean) mbsc.getAttribute(jobExecutorBeanName, "JobExecutorActivated"));
+        // now activate it remotely
+        mbsc.invoke(jobExecutorBeanName, "setJobExecutorActivate", new Boolean[] { true }, new String[] { Boolean.class.getName() });
 
-    // check if it has the effect and correctly reported
-    // assertTrue(processEngineConfig.getJobExecutor().isActive());
-    assertTrue((Boolean) mbsc.getAttribute(jobExecutorBeanName, "JobExecutorActivated"));
+        // check if it has the effect and correctly reported
+        // assertTrue(processEngineConfig.getJobExecutor().isActive());
+        assertTrue((Boolean) mbsc.getAttribute(jobExecutorBeanName, "JobExecutorActivated"));
 
-    // agani disable and check it
-    mbsc.invoke(jobExecutorBeanName, "setJobExecutorActivate", new Boolean[] { false }, new String[] { Boolean.class.getName() });
+        // again disable and check it
+        mbsc.invoke(jobExecutorBeanName, "setJobExecutorActivate", new Boolean[] { false }, new String[] { Boolean.class.getName() });
 
-    // check if it has the effect and correctly reported
-    assertFalse(processEngineConfig.isAsyncExecutorActivate());
-    assertFalse((Boolean) mbsc.getAttribute(jobExecutorBeanName, "JobExecutorActivated"));
-  }
+        // check if it has the effect and correctly reported
+        assertFalse(processEngineConfig.isAsyncExecutorActivate());
+        assertFalse((Boolean) mbsc.getAttribute(jobExecutorBeanName, "JobExecutorActivated"));
+    }
 }

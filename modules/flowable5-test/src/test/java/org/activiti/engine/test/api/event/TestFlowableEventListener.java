@@ -20,28 +20,28 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 
 public class TestFlowableEventListener implements FlowableEventListener {
 
-	private List<FlowableEvent> eventsReceived;
-	
-	public TestFlowableEventListener() {
-		eventsReceived = new ArrayList<FlowableEvent>();
-  }
-	
-	public List<FlowableEvent> getEventsReceived() {
-	  return eventsReceived;
-  }
-	
-	public void clearEventsReceived() {
-		eventsReceived.clear();
-	}
-	
-	@Override
-	public void onEvent(FlowableEvent event) {
-		eventsReceived.add(event);
-	}
+    private List<FlowableEvent> eventsReceived;
 
-	@Override
-	public boolean isFailOnException() {
-		return false;
-	}
+    public TestFlowableEventListener() {
+        eventsReceived = new ArrayList<FlowableEvent>();
+    }
+
+    public List<FlowableEvent> getEventsReceived() {
+        return eventsReceived;
+    }
+
+    public void clearEventsReceived() {
+        eventsReceived.clear();
+    }
+
+    @Override
+    public void onEvent(FlowableEvent event) {
+        eventsReceived.add(event);
+    }
+
+    @Override
+    public boolean isFailOnException() {
+        return false;
+    }
 
 }

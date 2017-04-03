@@ -34,200 +34,194 @@ import org.springframework.test.context.ContextConfiguration;
  */
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class CamelVariableTransferTest extends SpringFlowableTestCase {
-  @Autowired
-  protected CamelContext camelContext;
-  
-  @Autowired
-  protected TaskService taskService;
+    @Autowired
+    protected CamelContext camelContext;
 
-  protected MockEndpoint service1;
-  
-  public void setUp() throws Exception {
-    camelContext.addRoutes(new RouteBuilder() {
+    @Autowired
+    protected TaskService taskService;
 
-      @Override
-      public void configure() throws Exception {
-        from("direct:startAllProperties")
-          .setProperty("property1", simple("sampleValueForProperty1"))
-          .setProperty("property2", simple("sampleValueForProperty2"))
-          .setProperty("property3", simple("sampleValueForProperty3"))
-          .transform(simple("sampleBody"))
-          .to("log:testVariables?showProperties=true")
-          .to("activiti:testPropertiesProcess?copyVariablesFromProperties=true");
+    protected MockEndpoint service1;
 
-        from("direct:startNoProperties")
-        .setProperty("property1", simple("sampleValueForProperty1"))
-        .setProperty("property2", simple("sampleValueForProperty2"))
-        .setProperty("property3", simple("sampleValueForProperty3"))
-        .transform(simple("sampleBody"))
-        .to("log:testVariables?showProperties=true")
-        .to("activiti:testPropertiesProcess?copyVariablesFromProperties=false");
+    public void setUp() throws Exception {
+        camelContext.addRoutes(new RouteBuilder() {
 
-        from("direct:startFilteredProperties")
-        .setProperty("property1", simple("sampleValueForProperty1"))
-        .setProperty("property2", simple("sampleValueForProperty2"))
-        .setProperty("property3", simple("sampleValueForProperty3"))
-        .to("log:testVariables?showProperties=true")
-        .to("activiti:testPropertiesProcess?copyVariablesFromProperties=(property1|property2)"); 
-        
-        from("direct:startAllHeaders")
-        .setHeader("property1", simple("sampleValueForProperty1"))
-        .setHeader("property2", simple("sampleValueForProperty2"))
-        .setHeader("property3", simple("sampleValueForProperty3"))
-        .to("log:testVariables?showProperties=true");
+            @Override
+            public void configure() throws Exception {
+                from("direct:startAllProperties")
+                        .setProperty("property1", simple("sampleValueForProperty1"))
+                        .setProperty("property2", simple("sampleValueForProperty2"))
+                        .setProperty("property3", simple("sampleValueForProperty3"))
+                        .transform(simple("sampleBody"))
+                        .to("log:testVariables?showProperties=true")
+                        .to("flowable:testPropertiesProcess?copyVariablesFromProperties=true");
 
-        from("direct:startNoHeaders")
-        .setHeader("property1", simple("sampleValueForProperty1"))
-        .setHeader("property2", simple("sampleValueForProperty2"))
-        .setHeader("property3", simple("sampleValueForProperty3"))
-        .to("log:testVariables?showProperties=true")
-        .to("activiti:testPropertiesProcess?copyVariablesFromHeader=false");   
-        
-        from("direct:startFilteredHeaders")
-        .setHeader("property1", simple("sampleValueForProperty1"))
-        .setHeader("property2", simple("sampleValueForProperty2"))
-        .setHeader("property3", simple("sampleValueForProperty3"))
-        .to("log:testVariables?showProperties=true")
-        .to("activiti:testPropertiesProcess?copyVariablesFromHeader=(property1|property2)");   
-      }
-    });   
-  }
-  
-  public void tearDown() throws Exception {
-    List<Route> routes = camelContext.getRoutes();
-    for (Route r: routes) {
-      camelContext.stopRoute(r.getId());
-      camelContext.removeRoute(r.getId());
+                from("direct:startNoProperties")
+                        .setProperty("property1", simple("sampleValueForProperty1"))
+                        .setProperty("property2", simple("sampleValueForProperty2"))
+                        .setProperty("property3", simple("sampleValueForProperty3"))
+                        .transform(simple("sampleBody"))
+                        .to("log:testVariables?showProperties=true")
+                        .to("flowable:testPropertiesProcess?copyVariablesFromProperties=false");
+
+                from("direct:startFilteredProperties")
+                        .setProperty("property1", simple("sampleValueForProperty1"))
+                        .setProperty("property2", simple("sampleValueForProperty2"))
+                        .setProperty("property3", simple("sampleValueForProperty3"))
+                        .to("log:testVariables?showProperties=true")
+                        .to("flowable:testPropertiesProcess?copyVariablesFromProperties=(property1|property2)");
+
+                from("direct:startAllHeaders")
+                        .setHeader("property1", simple("sampleValueForProperty1"))
+                        .setHeader("property2", simple("sampleValueForProperty2"))
+                        .setHeader("property3", simple("sampleValueForProperty3"))
+                        .to("log:testVariables?showProperties=true");
+
+                from("direct:startNoHeaders")
+                        .setHeader("property1", simple("sampleValueForProperty1"))
+                        .setHeader("property2", simple("sampleValueForProperty2"))
+                        .setHeader("property3", simple("sampleValueForProperty3"))
+                        .to("log:testVariables?showProperties=true")
+                        .to("flowable:testPropertiesProcess?copyVariablesFromHeader=false");
+
+                from("direct:startFilteredHeaders")
+                        .setHeader("property1", simple("sampleValueForProperty1"))
+                        .setHeader("property2", simple("sampleValueForProperty2"))
+                        .setHeader("property3", simple("sampleValueForProperty3"))
+                        .to("log:testVariables?showProperties=true")
+                        .to("flowable:testPropertiesProcess?copyVariablesFromHeader=(property1|property2)");
+            }
+        });
     }
-  }
-  
-  
-// check that at least all properties are passed from camel to activiti when copyVariablesFromProperties=true is simply true
-  @Deployment
-  public void testCamelPropertiesAll() throws Exception {
-    ProducerTemplate tpl = camelContext.createProducerTemplate();
-    Exchange exchange = camelContext.getEndpoint("direct:startAllProperties").createExchange();
-    tpl.send("direct:startAllProperties", exchange);
-    
-    assertNotNull(taskService);
-    assertNotNull(runtimeService);
-    assertEquals(1, taskService.createTaskQuery().count());
-    Task task = taskService.createTaskQuery().singleResult();
-    assertNotNull(task);
-    Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
-    assertEquals("sampleValueForProperty1", variables.get("property1"));
-    assertEquals("sampleValueForProperty2", variables.get("property2"));
-    assertEquals("sampleValueForProperty3", variables.get("property3"));
-  }
-  
-  
-//check that body will be copied into variables even if copyVariablesFromProperties=true 
- @Deployment(resources = {"org/activiti/camel/variables/CamelVariableTransferTest.testCamelPropertiesAll.bpmn20.xml"})
- public void testCamelPropertiesAndBody() throws Exception {
-   ProducerTemplate tpl = camelContext.createProducerTemplate();
-   Exchange exchange = camelContext.getEndpoint("direct:startAllProperties").createExchange();
 
+    public void tearDown() throws Exception {
+        List<Route> routes = camelContext.getRoutes();
+        for (Route r : routes) {
+            camelContext.stopRoute(r.getId());
+            camelContext.removeRoute(r.getId());
+        }
+    }
 
-   tpl.send("direct:startAllProperties", exchange);
-   
-   assertNotNull(taskService);
-   assertNotNull(runtimeService);
-   assertEquals(1, taskService.createTaskQuery().count());
-   Task task = taskService.createTaskQuery().singleResult();
-   assertNotNull(task);
-   Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
-   assertEquals("sampleValueForProperty1", variables.get("property1"));
-   assertEquals("sampleValueForProperty2", variables.get("property2"));
-   assertEquals("sampleValueForProperty3", variables.get("property3"));
-   assertEquals("sampleBody", variables.get("camelBody"));
- }
-  
-  @Deployment(resources = {"org/activiti/camel/variables/CamelVariableTransferTest.testCamelPropertiesAll.bpmn20.xml"})
-  public void testCamelPropertiesFiltered() throws Exception {
-    ProducerTemplate tpl = camelContext.createProducerTemplate();
-    Exchange exchange = camelContext.getEndpoint("direct:startFilteredProperties").createExchange();
-    tpl.send("direct:startFilteredProperties", exchange);
-    
-    assertNotNull(taskService);
-    assertNotNull(runtimeService);
-    assertEquals(1, taskService.createTaskQuery().count());
-    Task task = taskService.createTaskQuery().singleResult();
-    assertNotNull(task);
-    Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
-    assertEquals("sampleValueForProperty1", variables.get("property1"));
-    assertEquals("sampleValueForProperty2", variables.get("property2"));
-    assertNull(variables.get("property3"));
-  }
+    // check that at least all properties are passed from camel to activiti when copyVariablesFromProperties=true is simply true
+    @Deployment
+    public void testCamelPropertiesAll() throws Exception {
+        ProducerTemplate tpl = camelContext.createProducerTemplate();
+        Exchange exchange = camelContext.getEndpoint("direct:startAllProperties").createExchange();
+        tpl.send("direct:startAllProperties", exchange);
 
-  @Deployment(resources = {"org/activiti/camel/variables/CamelVariableTransferTest.testCamelPropertiesAll.bpmn20.xml"})
-  public void testCamelPropertiesNone() throws Exception {
-    ProducerTemplate tpl = camelContext.createProducerTemplate();
-    Exchange exchange = camelContext.getEndpoint("direct:startNoProperties").createExchange();
-    tpl.send("direct:startNoProperties", exchange);
-    
-    assertNotNull(taskService);
-    assertNotNull(runtimeService);
-    assertEquals(1, taskService.createTaskQuery().count());
-    Task task = taskService.createTaskQuery().singleResult();
-    assertNotNull(task);
-    Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
-    assertNull(variables.get("property1"));
-    assertNull(variables.get("property2"));
-    assertNull(variables.get("property3"));
-  }
-  
-  @Deployment(resources = {"org/activiti/camel/variables/CamelVariableTransferTest.testCamelPropertiesAll.bpmn20.xml"})
-  public void testCamelHeadersAll() throws Exception {
-    ProducerTemplate tpl = camelContext.createProducerTemplate();
-    Exchange exchange = camelContext.getEndpoint("direct:startAllProperties").createExchange();
-    tpl.send("direct:startAllProperties", exchange);
-    
-    assertNotNull(taskService);
-    assertNotNull(runtimeService);
-    assertEquals(1, taskService.createTaskQuery().count());
-    Task task = taskService.createTaskQuery().singleResult();
-    assertNotNull(task);
-    Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
-    assertEquals("sampleValueForProperty1", variables.get("property1"));
-    assertEquals("sampleValueForProperty2", variables.get("property2"));
-    assertEquals("sampleValueForProperty3", variables.get("property3"));
-  }
+        assertNotNull(taskService);
+        assertNotNull(runtimeService);
+        assertEquals(1, taskService.createTaskQuery().count());
+        Task task = taskService.createTaskQuery().singleResult();
+        assertNotNull(task);
+        Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
+        assertEquals("sampleValueForProperty1", variables.get("property1"));
+        assertEquals("sampleValueForProperty2", variables.get("property2"));
+        assertEquals("sampleValueForProperty3", variables.get("property3"));
+    }
 
-  @Deployment(resources = {"org/activiti/camel/variables/CamelVariableTransferTest.testCamelPropertiesAll.bpmn20.xml"})
-  public void testCamelHeadersFiltered() throws Exception {
-    ProducerTemplate tpl = camelContext.createProducerTemplate();
-    Exchange exchange = camelContext.getEndpoint("direct:startFilteredHeaders").createExchange();
-    tpl.send("direct:startFilteredHeaders", exchange);
-    
-    assertNotNull(taskService);
-    assertNotNull(runtimeService);
-    assertEquals(1, taskService.createTaskQuery().count());
-    Task task = taskService.createTaskQuery().singleResult();
-    assertNotNull(task);
-    Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
-    assertEquals("sampleValueForProperty1", variables.get("property1"));
-    assertEquals("sampleValueForProperty2", variables.get("property2"));
-    assertNull(variables.get("property3"));
-  }
+    // check that body will be copied into variables even if copyVariablesFromProperties=true
+    @Deployment(resources = { "org/activiti/camel/variables/CamelVariableTransferTest.testCamelPropertiesAll.bpmn20.xml" })
+    public void testCamelPropertiesAndBody() throws Exception {
+        ProducerTemplate tpl = camelContext.createProducerTemplate();
+        Exchange exchange = camelContext.getEndpoint("direct:startAllProperties").createExchange();
 
-  @Deployment(resources = {"org/activiti/camel/variables/CamelVariableTransferTest.testCamelPropertiesAll.bpmn20.xml"})
-  public void testCamelHeadersNone() throws Exception {
-    ProducerTemplate tpl = camelContext.createProducerTemplate();
-    Exchange exchange = camelContext.getEndpoint("direct:startNoHeaders").createExchange();
-    tpl.send("direct:startNoHeaders", exchange);
-    
-    assertNotNull(taskService);
-    assertNotNull(runtimeService);
-    assertEquals(1, taskService.createTaskQuery().count());
-    Task task = taskService.createTaskQuery().singleResult();
-    assertNotNull(task);
-    Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
-    assertNull(variables.get("property1"));
-    assertNull(variables.get("property2"));
-    assertNull(variables.get("property3"));
-  }
+        tpl.send("direct:startAllProperties", exchange);
 
+        assertNotNull(taskService);
+        assertNotNull(runtimeService);
+        assertEquals(1, taskService.createTaskQuery().count());
+        Task task = taskService.createTaskQuery().singleResult();
+        assertNotNull(task);
+        Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
+        assertEquals("sampleValueForProperty1", variables.get("property1"));
+        assertEquals("sampleValueForProperty2", variables.get("property2"));
+        assertEquals("sampleValueForProperty3", variables.get("property3"));
+        assertEquals("sampleBody", variables.get("camelBody"));
+    }
 
-  
+    @Deployment(resources = { "org/activiti/camel/variables/CamelVariableTransferTest.testCamelPropertiesAll.bpmn20.xml" })
+    public void testCamelPropertiesFiltered() throws Exception {
+        ProducerTemplate tpl = camelContext.createProducerTemplate();
+        Exchange exchange = camelContext.getEndpoint("direct:startFilteredProperties").createExchange();
+        tpl.send("direct:startFilteredProperties", exchange);
+
+        assertNotNull(taskService);
+        assertNotNull(runtimeService);
+        assertEquals(1, taskService.createTaskQuery().count());
+        Task task = taskService.createTaskQuery().singleResult();
+        assertNotNull(task);
+        Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
+        assertEquals("sampleValueForProperty1", variables.get("property1"));
+        assertEquals("sampleValueForProperty2", variables.get("property2"));
+        assertNull(variables.get("property3"));
+    }
+
+    @Deployment(resources = { "org/activiti/camel/variables/CamelVariableTransferTest.testCamelPropertiesAll.bpmn20.xml" })
+    public void testCamelPropertiesNone() throws Exception {
+        ProducerTemplate tpl = camelContext.createProducerTemplate();
+        Exchange exchange = camelContext.getEndpoint("direct:startNoProperties").createExchange();
+        tpl.send("direct:startNoProperties", exchange);
+
+        assertNotNull(taskService);
+        assertNotNull(runtimeService);
+        assertEquals(1, taskService.createTaskQuery().count());
+        Task task = taskService.createTaskQuery().singleResult();
+        assertNotNull(task);
+        Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
+        assertNull(variables.get("property1"));
+        assertNull(variables.get("property2"));
+        assertNull(variables.get("property3"));
+    }
+
+    @Deployment(resources = { "org/activiti/camel/variables/CamelVariableTransferTest.testCamelPropertiesAll.bpmn20.xml" })
+    public void testCamelHeadersAll() throws Exception {
+        ProducerTemplate tpl = camelContext.createProducerTemplate();
+        Exchange exchange = camelContext.getEndpoint("direct:startAllProperties").createExchange();
+        tpl.send("direct:startAllProperties", exchange);
+
+        assertNotNull(taskService);
+        assertNotNull(runtimeService);
+        assertEquals(1, taskService.createTaskQuery().count());
+        Task task = taskService.createTaskQuery().singleResult();
+        assertNotNull(task);
+        Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
+        assertEquals("sampleValueForProperty1", variables.get("property1"));
+        assertEquals("sampleValueForProperty2", variables.get("property2"));
+        assertEquals("sampleValueForProperty3", variables.get("property3"));
+    }
+
+    @Deployment(resources = { "org/activiti/camel/variables/CamelVariableTransferTest.testCamelPropertiesAll.bpmn20.xml" })
+    public void testCamelHeadersFiltered() throws Exception {
+        ProducerTemplate tpl = camelContext.createProducerTemplate();
+        Exchange exchange = camelContext.getEndpoint("direct:startFilteredHeaders").createExchange();
+        tpl.send("direct:startFilteredHeaders", exchange);
+
+        assertNotNull(taskService);
+        assertNotNull(runtimeService);
+        assertEquals(1, taskService.createTaskQuery().count());
+        Task task = taskService.createTaskQuery().singleResult();
+        assertNotNull(task);
+        Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
+        assertEquals("sampleValueForProperty1", variables.get("property1"));
+        assertEquals("sampleValueForProperty2", variables.get("property2"));
+        assertNull(variables.get("property3"));
+    }
+
+    @Deployment(resources = { "org/activiti/camel/variables/CamelVariableTransferTest.testCamelPropertiesAll.bpmn20.xml" })
+    public void testCamelHeadersNone() throws Exception {
+        ProducerTemplate tpl = camelContext.createProducerTemplate();
+        Exchange exchange = camelContext.getEndpoint("direct:startNoHeaders").createExchange();
+        tpl.send("direct:startNoHeaders", exchange);
+
+        assertNotNull(taskService);
+        assertNotNull(runtimeService);
+        assertEquals(1, taskService.createTaskQuery().count());
+        Task task = taskService.createTaskQuery().singleResult();
+        assertNotNull(task);
+        Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
+        assertNull(variables.get("property1"));
+        assertNull(variables.get("property2"));
+        assertNull(variables.get("property3"));
+    }
 
 }

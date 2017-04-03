@@ -27,111 +27,111 @@ import org.flowable.idm.api.Picture;
  */
 public class UserEntityImpl extends AbstractEntity implements UserEntity, Serializable, HasRevision {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String firstName;
-  protected String lastName;
-  protected String email;
-  protected String password;
+    protected String firstName;
+    protected String lastName;
+    protected String email;
+    protected String password;
 
-  protected ByteArrayRef pictureByteArrayRef;
+    protected ByteArrayRef pictureByteArrayRef;
 
-  public UserEntityImpl() {
-  }
-
-  @Override
-  public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
-    persistentState.put("firstName", firstName);
-    persistentState.put("lastName", lastName);
-    persistentState.put("email", email);
-    persistentState.put("password", password);
-    
-    if (pictureByteArrayRef != null) {
-      persistentState.put("pictureByteArrayId", pictureByteArrayRef.getId());
+    public UserEntityImpl() {
     }
-    
-    return persistentState;
-  }
 
-  @Override
-  public Picture getPicture() {
-    if (pictureByteArrayRef != null && pictureByteArrayRef.getId() != null) {
-      return new Picture(pictureByteArrayRef.getBytes(), pictureByteArrayRef.getName());
+    @Override
+    public Object getPersistentState() {
+        Map<String, Object> persistentState = new HashMap<String, Object>();
+        persistentState.put("firstName", firstName);
+        persistentState.put("lastName", lastName);
+        persistentState.put("email", email);
+        persistentState.put("password", password);
+
+        if (pictureByteArrayRef != null) {
+            persistentState.put("pictureByteArrayId", pictureByteArrayRef.getId());
+        }
+
+        return persistentState;
     }
-    return null;
-  }
 
-  @Override
-  public void setPicture(Picture picture) {
-    if(picture != null) {
-      savePicture(picture);
-    } else {
-      deletePicture();
-    }      
-  }
-
-  protected void savePicture(Picture picture) {
-    if (pictureByteArrayRef == null) {
-      pictureByteArrayRef = new ByteArrayRef();
+    @Override
+    public Picture getPicture() {
+        if (pictureByteArrayRef != null && pictureByteArrayRef.getId() != null) {
+            return new Picture(pictureByteArrayRef.getBytes(), pictureByteArrayRef.getName());
+        }
+        return null;
     }
-    pictureByteArrayRef.setValue(picture.getMimeType(), picture.getBytes());
-  }
-  
-  protected void deletePicture() {
-    if (pictureByteArrayRef != null) {
-      pictureByteArrayRef.delete();
+
+    @Override
+    public void setPicture(Picture picture) {
+        if (picture != null) {
+            savePicture(picture);
+        } else {
+            deletePicture();
+        }
     }
-  }
-  
-  @Override
-  public String getFirstName() {
-    return firstName;
-  }
 
-  @Override
-  public void setFirstName(String firstName) {
-    this.firstName = firstName;
-  }
+    protected void savePicture(Picture picture) {
+        if (pictureByteArrayRef == null) {
+            pictureByteArrayRef = new ByteArrayRef();
+        }
+        pictureByteArrayRef.setValue(picture.getMimeType(), picture.getBytes());
+    }
 
-  @Override
-  public String getLastName() {
-    return lastName;
-  }
+    protected void deletePicture() {
+        if (pictureByteArrayRef != null) {
+            pictureByteArrayRef.delete();
+        }
+    }
 
-  @Override
-  public void setLastName(String lastName) {
-    this.lastName = lastName;
-  }
+    @Override
+    public String getFirstName() {
+        return firstName;
+    }
 
-  @Override
-  public String getEmail() {
-    return email;
-  }
+    @Override
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-  @Override
-  public void setEmail(String email) {
-    this.email = email;
-  }
+    @Override
+    public String getLastName() {
+        return lastName;
+    }
 
-  @Override
-  public String getPassword() {
-    return password;
-  }
+    @Override
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-  @Override
-  public void setPassword(String password) {
-    this.password = password;
-  }
+    @Override
+    public String getEmail() {
+        return email;
+    }
 
-  @Override
-  public boolean isPictureSet() {
-    return pictureByteArrayRef != null && pictureByteArrayRef.getId() != null;
-  }
+    @Override
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-  @Override
-  public ByteArrayRef getPictureByteArrayRef() {
-    return pictureByteArrayRef;
-  }
-  
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
+    public boolean isPictureSet() {
+        return pictureByteArrayRef != null && pictureByteArrayRef.getId() != null;
+    }
+
+    @Override
+    public ByteArrayRef getPictureByteArrayRef() {
+        return pictureByteArrayRef;
+    }
+
 }

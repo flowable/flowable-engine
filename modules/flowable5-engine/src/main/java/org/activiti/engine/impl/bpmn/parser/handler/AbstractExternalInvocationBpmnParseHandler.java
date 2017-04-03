@@ -24,40 +24,38 @@ import org.flowable.engine.impl.bpmn.data.TransformationDataOutputAssociation;
 import org.flowable.engine.impl.bpmn.webservice.MessageImplicitDataInputAssociation;
 import org.flowable.engine.impl.bpmn.webservice.MessageImplicitDataOutputAssociation;
 
-
 /**
  * @author Joram Barrez
  */
 public abstract class AbstractExternalInvocationBpmnParseHandler<T extends FlowNode> extends AbstractActivityBpmnParseHandler<T> {
-  
-  public AbstractDataAssociation createDataInputAssociation(BpmnParse bpmnParse, DataAssociation dataAssociationElement) {
-    if (dataAssociationElement.getAssignments().isEmpty()) {
-      return new MessageImplicitDataInputAssociation(dataAssociationElement.getSourceRef(), dataAssociationElement.getTargetRef());
-    } else {
-      SimpleDataInputAssociation dataAssociation = new SimpleDataInputAssociation(
-          dataAssociationElement.getSourceRef(), dataAssociationElement.getTargetRef());
 
-      for (org.flowable.bpmn.model.Assignment assigmentElement : dataAssociationElement.getAssignments()) {
-        if (StringUtils.isNotEmpty(assigmentElement.getFrom()) && StringUtils.isNotEmpty(assigmentElement.getTo())) {
-          Expression from = bpmnParse.getExpressionManager().createExpression(assigmentElement.getFrom());
-          Expression to = bpmnParse.getExpressionManager().createExpression(assigmentElement.getTo());
-          Assignment assignment = new Assignment(from, to);
-          dataAssociation.addAssignment(assignment);
+    public AbstractDataAssociation createDataInputAssociation(BpmnParse bpmnParse, DataAssociation dataAssociationElement) {
+        if (dataAssociationElement.getAssignments().isEmpty()) {
+            return new MessageImplicitDataInputAssociation(dataAssociationElement.getSourceRef(), dataAssociationElement.getTargetRef());
+        } else {
+            SimpleDataInputAssociation dataAssociation = new SimpleDataInputAssociation(
+                    dataAssociationElement.getSourceRef(), dataAssociationElement.getTargetRef());
+
+            for (org.flowable.bpmn.model.Assignment assignmentElement : dataAssociationElement.getAssignments()) {
+                if (StringUtils.isNotEmpty(assignmentElement.getFrom()) && StringUtils.isNotEmpty(assignmentElement.getTo())) {
+                    Expression from = bpmnParse.getExpressionManager().createExpression(assignmentElement.getFrom());
+                    Expression to = bpmnParse.getExpressionManager().createExpression(assignmentElement.getTo());
+                    Assignment assignment = new Assignment(from, to);
+                    dataAssociation.addAssignment(assignment);
+                }
+            }
+            return dataAssociation;
         }
-      }
-      return dataAssociation;
     }
-  }
-  
-  public AbstractDataAssociation createDataOutputAssociation(BpmnParse bpmnParse, DataAssociation dataAssociationElement) {
-    if (StringUtils.isNotEmpty(dataAssociationElement.getSourceRef())) {
-      return new MessageImplicitDataOutputAssociation(dataAssociationElement.getTargetRef(), dataAssociationElement.getSourceRef());
-    } else {
-      Expression transformation = bpmnParse.getExpressionManager().createExpression(dataAssociationElement.getTransformation());
-      AbstractDataAssociation dataOutputAssociation = new TransformationDataOutputAssociation(null, dataAssociationElement.getTargetRef(), transformation);
-      return dataOutputAssociation;
-    }
-  }
 
+    public AbstractDataAssociation createDataOutputAssociation(BpmnParse bpmnParse, DataAssociation dataAssociationElement) {
+        if (StringUtils.isNotEmpty(dataAssociationElement.getSourceRef())) {
+            return new MessageImplicitDataOutputAssociation(dataAssociationElement.getTargetRef(), dataAssociationElement.getSourceRef());
+        } else {
+            Expression transformation = bpmnParse.getExpressionManager().createExpression(dataAssociationElement.getTransformation());
+            AbstractDataAssociation dataOutputAssociation = new TransformationDataOutputAssociation(null, dataAssociationElement.getTargetRef(), transformation);
+            return dataOutputAssociation;
+        }
+    }
 
 }

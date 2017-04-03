@@ -26,64 +26,64 @@ import org.flowable.engine.test.Deployment;
  */
 public class UuidGeneratorTest extends ResourceFlowableTestCase {
 
-  public UuidGeneratorTest() throws Exception {
-    super("org/flowable/standalone/idgenerator/uuidgenerator.test.flowable.cfg.xml");
-  }
+    public UuidGeneratorTest() throws Exception {
+        super("org/flowable/standalone/idgenerator/uuidgenerator.test.flowable.cfg.xml");
+    }
 
-  @Deployment
-  public void testUuidGeneratorUsage() {
+    @Deployment
+    public void testUuidGeneratorUsage() {
 
-    ExecutorService executorService = Executors.newFixedThreadPool(10);
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-    // Start processes
-    for (int i = 0; i < 50; i++) {
-      executorService.execute(new Runnable() {
-        public void run() {
-          try {
-            runtimeService.startProcessInstanceByKey("simpleProcess");
-          } catch (Exception e) {
+        // Start processes
+        for (int i = 0; i < 50; i++) {
+            executorService.execute(new Runnable() {
+                public void run() {
+                    try {
+                        runtimeService.startProcessInstanceByKey("simpleProcess");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        fail();
+                    }
+                }
+            });
+        }
+
+        // Complete tasks
+        executorService.execute(new Runnable() {
+
+            public void run() {
+                boolean tasksFound = true;
+                while (tasksFound) {
+
+                    List<Task> tasks = taskService.createTaskQuery().list();
+                    for (Task task : tasks) {
+                        taskService.complete(task.getId());
+                    }
+
+                    tasksFound = taskService.createTaskQuery().count() > 0;
+
+                    if (!tasksFound) {
+                        try {
+                            Thread.sleep(1500L); // just to be sure
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        tasksFound = taskService.createTaskQuery().count() > 0;
+                    }
+                }
+            }
+        });
+
+        try {
+            executorService.shutdown();
+            executorService.awaitTermination(1, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
             e.printStackTrace();
             fail();
-          }
         }
-      });
+
+        assertEquals(50, historyService.createHistoricProcessInstanceQuery().count());
     }
-
-    // Complete tasks
-    executorService.execute(new Runnable() {
-
-      public void run() {
-        boolean tasksFound = true;
-        while (tasksFound) {
-
-          List<Task> tasks = taskService.createTaskQuery().list();
-          for (Task task : tasks) {
-            taskService.complete(task.getId());
-          }
-
-          tasksFound = taskService.createTaskQuery().count() > 0;
-
-          if (!tasksFound) {
-            try {
-              Thread.sleep(1500L); // just to be sure
-            } catch (InterruptedException e) {
-              e.printStackTrace();
-            }
-            tasksFound = taskService.createTaskQuery().count() > 0;
-          }
-        }
-      }
-    });
-
-    try {
-      executorService.shutdown();
-      executorService.awaitTermination(1, TimeUnit.MINUTES);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-      fail();
-    }
-
-    assertEquals(50, historyService.createHistoricProcessInstanceQuery().count());
-  }
 
 }

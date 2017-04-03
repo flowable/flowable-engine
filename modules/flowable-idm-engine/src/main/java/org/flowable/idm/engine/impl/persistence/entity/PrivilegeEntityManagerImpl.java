@@ -28,41 +28,41 @@ import org.flowable.idm.engine.impl.persistence.entity.data.PrivilegeDataManager
  */
 public class PrivilegeEntityManagerImpl extends AbstractEntityManager<PrivilegeEntity> implements PrivilegeEntityManager {
 
-  protected PrivilegeDataManager privilegeDataManager;
-  
-  public PrivilegeEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, PrivilegeDataManager privilegeDataManager) {
-    super(idmEngineConfiguration);
-    this.privilegeDataManager = privilegeDataManager;
-  }
+    protected PrivilegeDataManager privilegeDataManager;
 
-  @Override
-  protected DataManager<PrivilegeEntity> getDataManager() {
-    return privilegeDataManager;
-  }
-  
-  @Override
-  public PrivilegeQuery createNewPrivilegeQuery() {
-    return new PrivilegeQueryImpl(getCommandExecutor());
-  }
+    public PrivilegeEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, PrivilegeDataManager privilegeDataManager) {
+        super(idmEngineConfiguration);
+        this.privilegeDataManager = privilegeDataManager;
+    }
 
-  @Override
-  public List<Privilege> findPrivilegeByQueryCriteria(PrivilegeQueryImpl query, Page page) {
-    return privilegeDataManager.findPrivilegeByQueryCriteria(query, page);
-  }
+    @Override
+    protected DataManager<PrivilegeEntity> getDataManager() {
+        return privilegeDataManager;
+    }
 
-  @Override
-  public long findPrivilegeCountByQueryCriteria(PrivilegeQueryImpl query) {
-    return privilegeDataManager.findPrivilegeCountByQueryCriteria(query);
-  }
+    @Override
+    public PrivilegeQuery createNewPrivilegeQuery() {
+        return new PrivilegeQueryImpl(getCommandExecutor());
+    }
 
-  @Override
-  public List<Privilege> findPrivilegeByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return privilegeDataManager.findPrivilegeByNativeQuery(parameterMap, firstResult, maxResults);
-  }
+    @Override
+    public List<Privilege> findPrivilegeByQueryCriteria(PrivilegeQueryImpl query, Page page) {
+        return privilegeDataManager.findPrivilegeByQueryCriteria(query, page);
+    }
 
-  @Override
-  public long findPrivilegeCountByNativeQuery(Map<String, Object> parameterMap) {
-    return privilegeDataManager.findPrivilegeCountByNativeQuery(parameterMap);
-  }
+    @Override
+    public long findPrivilegeCountByQueryCriteria(PrivilegeQueryImpl query) {
+        return privilegeDataManager.findPrivilegeCountByQueryCriteria(query);
+    }
+
+    @Override
+    public List<Privilege> findPrivilegeByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
+        return privilegeDataManager.findPrivilegeByNativeQuery(parameterMap, firstResult, maxResults);
+    }
+
+    @Override
+    public long findPrivilegeCountByNativeQuery(Map<String, Object> parameterMap) {
+        return privilegeDataManager.findPrivilegeCountByNativeQuery(parameterMap);
+    }
 
 }

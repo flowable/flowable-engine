@@ -26,59 +26,59 @@ import org.flowable.idm.engine.impl.interceptor.CommandContext;
  */
 public class Context {
 
-  protected static ThreadLocal<Stack<CommandContext>> commandContextThreadLocal = new ThreadLocal<Stack<CommandContext>>();
-  protected static ThreadLocal<Stack<IdmEngineConfiguration>> idmEngineConfigurationStackThreadLocal = new ThreadLocal<Stack<IdmEngineConfiguration>>();
-  
-  public static CommandContext getCommandContext() {
-    Stack<CommandContext> stack = getStack(commandContextThreadLocal);
-    if (stack.isEmpty()) {
-      return null;
+    protected static ThreadLocal<Stack<CommandContext>> commandContextThreadLocal = new ThreadLocal<Stack<CommandContext>>();
+    protected static ThreadLocal<Stack<IdmEngineConfiguration>> idmEngineConfigurationStackThreadLocal = new ThreadLocal<Stack<IdmEngineConfiguration>>();
+
+    public static CommandContext getCommandContext() {
+        Stack<CommandContext> stack = getStack(commandContextThreadLocal);
+        if (stack.isEmpty()) {
+            return null;
+        }
+        return stack.peek();
     }
-    return stack.peek();
-  }
 
-  public static void setCommandContext(CommandContext commandContext) {
-    getStack(commandContextThreadLocal).push(commandContext);
-  }
-
-  public static void removeCommandContext() {
-    getStack(commandContextThreadLocal).pop();
-  }
-
-  public static IdmEngineConfiguration getIdmEngineConfiguration() {
-    Stack<IdmEngineConfiguration> stack = getStack(idmEngineConfigurationStackThreadLocal);
-    if (stack.isEmpty()) {
-      return null;
+    public static void setCommandContext(CommandContext commandContext) {
+        getStack(commandContextThreadLocal).push(commandContext);
     }
-    return stack.peek();
-  }
 
-  public static void setIdmEngineConfiguration(IdmEngineConfiguration idmEngineConfiguration) {
-    getStack(idmEngineConfigurationStackThreadLocal).push(idmEngineConfiguration);
-  }
-
-  public static void removeIdmEngineConfiguration() {
-    getStack(idmEngineConfigurationStackThreadLocal).pop();
-  }
-  
-  public static TransactionContext getTransactionContext() {
-    return (TransactionContext) TransactionContextHolder.getTransactionContext();
-  }
-  
-  public static void setTransactionContext(TransactionContext transactionContext) {
-    TransactionContextHolder.setTransactionContext(transactionContext);
-  }
-  
-  public static void removeTransactionContext() {
-    TransactionContextHolder.removeTransactionContext();
-  }
-  
-  protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {
-    Stack<T> stack = threadLocal.get();
-    if (stack == null) {
-      stack = new Stack<T>();
-      threadLocal.set(stack);
+    public static void removeCommandContext() {
+        getStack(commandContextThreadLocal).pop();
     }
-    return stack;
-  }
+
+    public static IdmEngineConfiguration getIdmEngineConfiguration() {
+        Stack<IdmEngineConfiguration> stack = getStack(idmEngineConfigurationStackThreadLocal);
+        if (stack.isEmpty()) {
+            return null;
+        }
+        return stack.peek();
+    }
+
+    public static void setIdmEngineConfiguration(IdmEngineConfiguration idmEngineConfiguration) {
+        getStack(idmEngineConfigurationStackThreadLocal).push(idmEngineConfiguration);
+    }
+
+    public static void removeIdmEngineConfiguration() {
+        getStack(idmEngineConfigurationStackThreadLocal).pop();
+    }
+
+    public static TransactionContext getTransactionContext() {
+        return (TransactionContext) TransactionContextHolder.getTransactionContext();
+    }
+
+    public static void setTransactionContext(TransactionContext transactionContext) {
+        TransactionContextHolder.setTransactionContext(transactionContext);
+    }
+
+    public static void removeTransactionContext() {
+        TransactionContextHolder.removeTransactionContext();
+    }
+
+    protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {
+        Stack<T> stack = threadLocal.get();
+        if (stack == null) {
+            stack = new Stack<T>();
+            threadLocal.set(stack);
+        }
+        return stack;
+    }
 }

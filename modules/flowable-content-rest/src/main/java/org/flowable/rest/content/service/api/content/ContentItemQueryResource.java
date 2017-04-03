@@ -17,6 +17,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.swagger.annotations.Authorization;
 import org.flowable.rest.api.DataResponse;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,18 +35,18 @@ import io.swagger.annotations.ApiResponses;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Content item" }, description = "Query content items")
+@Api(tags = { "Content item" }, description = "Query content items", authorizations = { @Authorization(value = "basicAuth") })
 public class ContentItemQueryResource extends ContentItemBaseResource {
 
-  @ApiOperation(value = "Query for content items", tags = {"Content item"},
-          notes ="All supported JSON parameter fields allowed are exactly the same as the parameters found for getting a collection of content items, but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long.")
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message =  "Indicates request was successful and the content items are returned."),
-          @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format. The status-message contains additional information.")
-  })
-  @RequestMapping(value = "/query/content-items", method = RequestMethod.POST, produces = "application/json")
-  public DataResponse getQueryResult(@RequestBody ContentItemQueryRequest request, @ApiParam(hidden = true)@RequestParam Map<String, String> requestParams, HttpServletRequest httpRequest) {
+    @ApiOperation(value = "Query for content items", tags = {
+            "Content item" }, notes = "All supported JSON parameter fields allowed are exactly the same as the parameters found for getting a collection of content items, but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates request was successful and the content items are returned."),
+            @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format. The status-message contains additional information.")
+    })
+    @RequestMapping(value = "/query/content-items", method = RequestMethod.POST, produces = "application/json")
+    public DataResponse getQueryResult(@RequestBody ContentItemQueryRequest request, @ApiParam(hidden = true) @RequestParam Map<String, String> requestParams, HttpServletRequest httpRequest) {
 
-    return getContentItemsFromQueryRequest(request, requestParams);
-  }
+        return getContentItemsFromQueryRequest(request, requestParams);
+    }
 }

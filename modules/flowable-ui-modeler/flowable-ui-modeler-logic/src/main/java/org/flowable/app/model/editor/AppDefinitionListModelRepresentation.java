@@ -15,30 +15,28 @@ package org.flowable.app.model.editor;
 import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.domain.editor.AppDefinition;
 
-
-
 /**
  * Representation of app definitions to be used in the model overview.
  * 
  * @author Tijs Rademakers
  */
 public class AppDefinitionListModelRepresentation extends ModelRepresentation {
-	
-	protected AppDefinition appDefinition;
-	
-	public AppDefinitionListModelRepresentation(AbstractModel model) {
-	    initialize(model);	
-	}
-	
-	public AppDefinitionListModelRepresentation() {
-	    
-	}
 
-	public AppDefinition getAppDefinition() {
-		return appDefinition;
-	}
+    protected AppDefinition appDefinition;
 
-	public void setAppDefinition(AppDefinition appDefinition) {
-		this.appDefinition = appDefinition;
-	}
+    public AppDefinitionListModelRepresentation(AbstractModel model) {
+        initialize(model);
+    }
+
+    public AppDefinitionListModelRepresentation() {
+
+    }
+
+    public AppDefinition getAppDefinition() {
+        return appDefinition;
+    }
+
+    public void setAppDefinition(AppDefinition appDefinition) {
+        this.appDefinition = appDefinition;
+    }
 }

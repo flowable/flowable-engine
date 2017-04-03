@@ -26,18 +26,18 @@ import org.flowable.idm.engine.impl.interceptor.CommandContext;
  */
 public class GetUsersWithPrivilegeCmd implements Command<List<User>>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String name;
+    protected String name;
 
-  public GetUsersWithPrivilegeCmd(String name) {
-    if(name == null) {
-      throw new FlowableIllegalArgumentException("name is null");
+    public GetUsersWithPrivilegeCmd(String name) {
+        if (name == null) {
+            throw new FlowableIllegalArgumentException("name is null");
+        }
+        this.name = name;
     }
-    this.name = name;
-  }
 
-  public List<User> execute(CommandContext commandContext) {
-    return commandContext.getUserEntityManager().findUsersByPrivilegeId(name);
-  }
+    public List<User> execute(CommandContext commandContext) {
+        return commandContext.getUserEntityManager().findUsersByPrivilegeId(name);
+    }
 }

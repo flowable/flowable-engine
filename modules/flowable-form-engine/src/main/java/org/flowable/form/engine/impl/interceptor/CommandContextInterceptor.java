@@ -23,72 +23,72 @@ import org.slf4j.LoggerFactory;
  * @author Tijs Rademakers
  */
 public class CommandContextInterceptor extends AbstractCommandInterceptor {
-  private static final Logger log = LoggerFactory.getLogger(CommandContextInterceptor.class);
+    private static final Logger log = LoggerFactory.getLogger(CommandContextInterceptor.class);
 
-  protected CommandContextFactory commandContextFactory;
-  protected FormEngineConfiguration formEngineConfiguration;
+    protected CommandContextFactory commandContextFactory;
+    protected FormEngineConfiguration formEngineConfiguration;
 
-  public CommandContextInterceptor() {
-  }
-
-  public CommandContextInterceptor(CommandContextFactory commandContextFactory, FormEngineConfiguration formEngineConfiguration) {
-    this.commandContextFactory = commandContextFactory;
-    this.formEngineConfiguration = formEngineConfiguration;
-  }
-
-  public <T> T execute(CommandConfig config, Command<T> command) {
-    CommandContext context = Context.getCommandContext();
-
-    boolean contextReused = false;
-    // We need to check the exception, because the transaction can be in a
-    // rollback state, and some other command is being fired to compensate (eg. decrementing job retries)
-    if (!config.isContextReusePossible() || context == null || context.getException() != null) {
-      context = commandContextFactory.createCommandContext(command);
-    } else {
-      log.debug("Valid context found. Reusing it for the current command '{}'", command.getClass().getCanonicalName());
-      contextReused = true;
+    public CommandContextInterceptor() {
     }
 
-    try {
-      // Push on stack
-      Context.setCommandContext(context);
-      Context.setFormEngineConfiguration(formEngineConfiguration);
+    public CommandContextInterceptor(CommandContextFactory commandContextFactory, FormEngineConfiguration formEngineConfiguration) {
+        this.commandContextFactory = commandContextFactory;
+        this.formEngineConfiguration = formEngineConfiguration;
+    }
 
-      return next.execute(config, command);
+    public <T> T execute(CommandConfig config, Command<T> command) {
+        CommandContext context = Context.getCommandContext();
 
-    } catch (Exception e) {
-
-      context.exception(e);
-      
-    } finally {
-      try {
-        if (!contextReused) {
-          context.close();
+        boolean contextReused = false;
+        // We need to check the exception, because the transaction can be in a
+        // rollback state, and some other command is being fired to compensate (eg. decrementing job retries)
+        if (!config.isContextReusePossible() || context == null || context.getException() != null) {
+            context = commandContextFactory.createCommandContext(command);
+        } else {
+            log.debug("Valid context found. Reusing it for the current command '{}'", command.getClass().getCanonicalName());
+            contextReused = true;
         }
-      } finally {
-        
-        // Pop from stack
-        Context.removeCommandContext();
-        Context.removeFormEngineConfiguration();
-      }
+
+        try {
+            // Push on stack
+            Context.setCommandContext(context);
+            Context.setFormEngineConfiguration(formEngineConfiguration);
+
+            return next.execute(config, command);
+
+        } catch (Exception e) {
+
+            context.exception(e);
+
+        } finally {
+            try {
+                if (!contextReused) {
+                    context.close();
+                }
+            } finally {
+
+                // Pop from stack
+                Context.removeCommandContext();
+                Context.removeFormEngineConfiguration();
+            }
+        }
+
+        return null;
     }
 
-    return null;
-  }
+    public CommandContextFactory getCommandContextFactory() {
+        return commandContextFactory;
+    }
 
-  public CommandContextFactory getCommandContextFactory() {
-    return commandContextFactory;
-  }
+    public void setCommandContextFactory(CommandContextFactory commandContextFactory) {
+        this.commandContextFactory = commandContextFactory;
+    }
 
-  public void setCommandContextFactory(CommandContextFactory commandContextFactory) {
-    this.commandContextFactory = commandContextFactory;
-  }
+    public FormEngineConfiguration getFormEngineConfiguration() {
+        return formEngineConfiguration;
+    }
 
-  public FormEngineConfiguration getFormEngineConfiguration() {
-    return formEngineConfiguration;
-  }
-
-  public void setFormEngineConfiguration(FormEngineConfiguration formEngineConfiguration) {
-    this.formEngineConfiguration = formEngineConfiguration;
-  }
+    public void setFormEngineConfiguration(FormEngineConfiguration formEngineConfiguration) {
+        this.formEngineConfiguration = formEngineConfiguration;
+    }
 }

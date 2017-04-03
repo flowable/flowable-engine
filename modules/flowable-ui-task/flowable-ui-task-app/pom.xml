@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-ui-task</artifactId>
-        <version>6.0.0-SNAPSHOT</version>
+        <version>6.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>flowable-ui-task-app</artifactId>
     <packaging>war</packaging>
@@ -122,6 +122,11 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
         </dependency>
+        <dependency>
+        	<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>compile</scope>
+        </dependency>
 
         <!-- LOGGING -->
         <dependency>
@@ -235,10 +240,6 @@
         </dependency>
 
         <!-- EMAIL -->
-        <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-        </dependency>
         <dependency>
         	<groupId>javax.mail</groupId>
         	<artifactId>mail</artifactId>

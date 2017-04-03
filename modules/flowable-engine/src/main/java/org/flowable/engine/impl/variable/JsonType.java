@@ -18,55 +18,53 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
-
 /**
  * @author Tijs Rademakers
  */
 public class JsonType implements VariableType {
-  
-  private static final Logger logger = LoggerFactory.getLogger(JsonType.class);
-  
-  protected final int maxLength;
-  protected ObjectMapper objectMapper;
 
-  public JsonType(int maxLength, ObjectMapper objectMapper) {
-    this.maxLength = maxLength;
-    this.objectMapper = objectMapper;
-  }
+    private static final Logger logger = LoggerFactory.getLogger(JsonType.class);
 
-  public String getTypeName() {
-    return "json";
-  }
+    protected final int maxLength;
+    protected ObjectMapper objectMapper;
 
-  public boolean isCachable() {
-    return true;
-  }
-
-  public Object getValue(ValueFields valueFields) {
-    JsonNode jsonValue = null;
-    if (valueFields.getTextValue() != null && valueFields.getTextValue().length() > 0) {
-      try {
-        jsonValue = objectMapper.readTree(valueFields.getTextValue());
-      } catch (Exception e) {
-          logger.error("Error reading json variable {}", valueFields.getName(), e);
-      }
+    public JsonType(int maxLength, ObjectMapper objectMapper) {
+        this.maxLength = maxLength;
+        this.objectMapper = objectMapper;
     }
-    return jsonValue;
-  }
 
-  public void setValue(Object value, ValueFields valueFields) {
-    valueFields.setTextValue(value != null ? value.toString() : null);
-  }
+    public String getTypeName() {
+        return "json";
+    }
 
-  public boolean isAbleToStore(Object value) {
-    if (value == null) {
-      return true;
+    public boolean isCachable() {
+        return true;
     }
-    if (JsonNode.class.isAssignableFrom(value.getClass())) {
-      JsonNode jsonValue = (JsonNode) value;
-      return jsonValue.toString().length() <= maxLength;
+
+    public Object getValue(ValueFields valueFields) {
+        JsonNode jsonValue = null;
+        if (valueFields.getTextValue() != null && valueFields.getTextValue().length() > 0) {
+            try {
+                jsonValue = objectMapper.readTree(valueFields.getTextValue());
+            } catch (Exception e) {
+                logger.error("Error reading json variable {}", valueFields.getName(), e);
+            }
+        }
+        return jsonValue;
     }
-    return false;
-  }
+
+    public void setValue(Object value, ValueFields valueFields) {
+        valueFields.setTextValue(value != null ? value.toString() : null);
+    }
+
+    public boolean isAbleToStore(Object value) {
+        if (value == null) {
+            return true;
+        }
+        if (JsonNode.class.isAssignableFrom(value.getClass())) {
+            JsonNode jsonValue = (JsonNode) value;
+            return jsonValue.toString().length() <= maxLength;
+        }
+        return false;
+    }
 }

@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.history.HistoricIdentityLink;
 import org.flowable.rest.service.api.RestResponseFactory;
@@ -35,28 +36,28 @@ import java.util.List;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History" }, description = "Manage History")
+@Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricProcessInstanceIdentityLinkCollectionResource {
 
-  @Autowired
-  protected RestResponseFactory restResponseFactory;
+    @Autowired
+    protected RestResponseFactory restResponseFactory;
 
-  @Autowired
-  protected HistoryService historyService;
+    @Autowired
+    protected HistoryService historyService;
 
-  @ApiOperation(value = "Get the identity links of a historic process instance", tags = { "History" }, notes = "")
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates request was successful and the identity links are returned", response = HistoricIdentityLinkResponse.class, responseContainer="List"),
-          @ApiResponse(code = 404, message = "Indicates the process instance could not be found..") })
-  @RequestMapping(value = "/history/historic-process-instances/{processInstanceId}/identitylinks", method = RequestMethod.GET, produces = "application/json")
-  public List<HistoricIdentityLinkResponse> getProcessIdentityLinks(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
+    @ApiOperation(value = "Get the identity links of a historic process instance", tags = { "History" }, notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates request was successful and the identity links are returned", response = HistoricIdentityLinkResponse.class, responseContainer = "List"),
+            @ApiResponse(code = 404, message = "Indicates the process instance could not be found..") })
+    @RequestMapping(value = "/history/historic-process-instances/{processInstanceId}/identitylinks", method = RequestMethod.GET, produces = "application/json")
+    public List<HistoricIdentityLinkResponse> getProcessIdentityLinks(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
 
-    List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForProcessInstance(processInstanceId);
+        List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForProcessInstance(processInstanceId);
 
-    if (identityLinks != null) {
-      return restResponseFactory.createHistoricIdentityLinkResponseList(identityLinks);
+        if (identityLinks != null) {
+            return restResponseFactory.createHistoricIdentityLinkResponseList(identityLinks);
+        }
+
+        return new ArrayList<HistoricIdentityLinkResponse>();
     }
-
-    return new ArrayList<HistoricIdentityLinkResponse>();
-  }
 }

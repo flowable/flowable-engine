@@ -21,15 +21,15 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
  * @author Joram Barrez
  */
 public class InactiveExecutionsByProcInstMatcher extends CachedEntityMatcherAdapter<ExecutionEntity> {
-  
-  @Override
-  public boolean isRetained(ExecutionEntity executionEntity, Object parameter) {
-    Map<String, Object> paramMap = (Map<String, Object>) parameter;
-    String processInstanceId = (String) paramMap.get("processInstanceId");
-    
-    return executionEntity.getProcessInstanceId() != null 
-        && executionEntity.getProcessInstanceId().equals(processInstanceId) 
-        && !executionEntity.isActive();
-  }
-  
+
+    @Override
+    public boolean isRetained(ExecutionEntity executionEntity, Object parameter) {
+        Map<String, Object> paramMap = (Map<String, Object>) parameter;
+        String processInstanceId = (String) paramMap.get("processInstanceId");
+
+        return executionEntity.getProcessInstanceId() != null
+                && executionEntity.getProcessInstanceId().equals(processInstanceId)
+                && !executionEntity.isActive();
+    }
+
 }

@@ -109,7 +109,7 @@ body {
 	top: 2px;
 	line-height: 35px;
     height: 35px;
-    background: url(../images/logo.png) no-repeat 15px center;
+    background: url(../images/flowable-logo.png) no-repeat 15px center;
     width: 180px;
 }
 
@@ -254,7 +254,7 @@ body {
 	text-decoration: none;
 	margin: 0;
 	padding: 8px 15px;
-	line-height: 36px;
+	line-height: 39px;
 	color: #7b8a8a;
 	background-color: #f5f7f7;
 	cursor: pointer;
@@ -655,7 +655,7 @@ body {
 	list-style: square inside;
 }
 
-/* Activiti Icon font */
+/* Flowable Icon font */
 
 @font-face {
      font-family: 'svgfont_1regular';
@@ -852,7 +852,7 @@ body {
 		only screen and (min-resolution: 192dpi) {
 
     .navbar-header .navbar-brand {
-        background: url(../images/logo-2x.png) no-repeat 20px center;
+        background: url(../images/flowable-logo@2x.png) no-repeat 20px center;
         background-size: 140px 35px;
         background-repeat: no-repeat;
     }

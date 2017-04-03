@@ -33,29 +33,29 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 @RestController
 public class ProcessEngineInfoClientResource extends AbstractClientResource {
-  
-  private static final Logger logger = LoggerFactory.getLogger(ProcessEngineInfoClientResource.class);
 
-  @Autowired
-  protected ProcessEngineInfoService clientService;
+    private static final Logger logger = LoggerFactory.getLogger(ProcessEngineInfoClientResource.class);
 
-  @Autowired
-  protected Environment env;
+    @Autowired
+    protected ProcessEngineInfoService clientService;
 
-  @RequestMapping(value = "/rest/admin/engine-info/{endpointTypeCode}", method = RequestMethod.GET)
-  public JsonNode getEngineInfo(@PathVariable Integer endpointTypeCode) throws BadRequestException {
-    EndpointType endpointType = EndpointType.valueOf(endpointTypeCode);
+    @Autowired
+    protected Environment env;
 
-    if (endpointType == null) {
-      throw new BadRequestException("No valid endpoint type code provided: " + endpointTypeCode);
+    @RequestMapping(value = "/rest/admin/engine-info/{endpointTypeCode}", method = RequestMethod.GET)
+    public JsonNode getEngineInfo(@PathVariable Integer endpointTypeCode) throws BadRequestException {
+        EndpointType endpointType = EndpointType.valueOf(endpointTypeCode);
+
+        if (endpointType == null) {
+            throw new BadRequestException("No valid endpoint type code provided: " + endpointTypeCode);
+        }
+
+        try {
+            return clientService.getEngineInfo(retrieveServerConfig(endpointType));
+
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting engine info {}", endpointType, e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-
-    try {
-      return clientService.getEngineInfo(retrieveServerConfig(endpointType));
-      
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting engine info {}", endpointType, e);
-      throw new BadRequestException(e.getMessage());
-    }
-  }
 }

@@ -19,10 +19,10 @@ import org.flowable.validation.validator.ValidatorSetFactory;
  */
 public class ProcessValidatorFactory {
 
-  public ProcessValidator createDefaultProcessValidator() {
-    ProcessValidatorImpl processValidator = new ProcessValidatorImpl();
-    processValidator.addValidatorSet(new ValidatorSetFactory().createFlowableExecutableProcessValidatorSet());
-    return processValidator;
-  }
+    public ProcessValidator createDefaultProcessValidator() {
+        ProcessValidatorImpl processValidator = new ProcessValidatorImpl();
+        processValidator.addValidatorSet(new ValidatorSetFactory().createFlowableExecutableProcessValidatorSet());
+        return processValidator;
+    }
 
 }

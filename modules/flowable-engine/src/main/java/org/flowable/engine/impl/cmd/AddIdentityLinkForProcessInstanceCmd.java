@@ -24,68 +24,67 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.engine.impl.util.Flowable5Util;
 
-
 /**
  * @author Marcus Klimstra
  * @author Joram Barrez
  */
 public class AddIdentityLinkForProcessInstanceCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String processInstanceId;
+    protected String processInstanceId;
 
-  protected String userId;
+    protected String userId;
 
-  protected String groupId;
+    protected String groupId;
 
-  protected String type;
+    protected String type;
 
-  public AddIdentityLinkForProcessInstanceCmd(String processInstanceId, String userId, String groupId, String type) {
-    validateParams(processInstanceId, userId, groupId, type);
-    this.processInstanceId = processInstanceId;
-    this.userId = userId;
-    this.groupId = groupId;
-    this.type = type;
-  }
-
-  protected void validateParams(String processInstanceId, String userId, String groupId, String type) {
-
-    if (processInstanceId == null) {
-      throw new FlowableIllegalArgumentException("processInstanceId is null");
+    public AddIdentityLinkForProcessInstanceCmd(String processInstanceId, String userId, String groupId, String type) {
+        validateParams(processInstanceId, userId, groupId, type);
+        this.processInstanceId = processInstanceId;
+        this.userId = userId;
+        this.groupId = groupId;
+        this.type = type;
     }
 
-    if (type == null) {
-      throw new FlowableIllegalArgumentException("type is required when adding a new process instance identity link");
+    protected void validateParams(String processInstanceId, String userId, String groupId, String type) {
+
+        if (processInstanceId == null) {
+            throw new FlowableIllegalArgumentException("processInstanceId is null");
+        }
+
+        if (type == null) {
+            throw new FlowableIllegalArgumentException("type is required when adding a new process instance identity link");
+        }
+
+        if (userId == null && groupId == null) {
+            throw new FlowableIllegalArgumentException("userId and groupId cannot both be null");
+        }
+
     }
 
-    if (userId == null && groupId == null) {
-      throw new FlowableIllegalArgumentException("userId and groupId cannot both be null");
+    public Void execute(CommandContext commandContext) {
+
+        ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
+        ExecutionEntity processInstance = executionEntityManager.findById(processInstanceId);
+
+        if (processInstance == null) {
+            throw new FlowableObjectNotFoundException("Cannot find process instance with id " + processInstanceId, ExecutionEntity.class);
+        }
+
+        if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processInstance.getProcessDefinitionId())) {
+            Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+            compatibilityHandler.addIdentityLinkForProcessInstance(processInstanceId, userId, groupId, type);
+            return null;
+        }
+
+        IdentityLinkEntityManager identityLinkEntityManager = commandContext.getIdentityLinkEntityManager();
+        identityLinkEntityManager.addIdentityLink(processInstance, userId, groupId, type);
+        commandContext.getHistoryManager().createProcessInstanceIdentityLinkComment(processInstanceId, userId, groupId, type, true);
+
+        return null;
+
     }
-
-  }
-
-  public Void execute(CommandContext commandContext) {
-
-    ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
-    ExecutionEntity processInstance = executionEntityManager.findById(processInstanceId);
-
-    if (processInstance == null) {
-      throw new FlowableObjectNotFoundException("Cannot find process instance with id " + processInstanceId, ExecutionEntity.class);
-    }
-    
-    if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processInstance.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      compatibilityHandler.addIdentityLinkForProcessInstance(processInstanceId, userId, groupId, type);
-      return null;
-    }
-
-    IdentityLinkEntityManager identityLinkEntityManager = commandContext.getIdentityLinkEntityManager();
-    identityLinkEntityManager.addIdentityLink(processInstance, userId, groupId, type);
-    commandContext.getHistoryManager().createProcessInstanceIdentityLinkComment(processInstanceId, userId, groupId, type, true);
-
-    return null;
-
-  }
 
 }

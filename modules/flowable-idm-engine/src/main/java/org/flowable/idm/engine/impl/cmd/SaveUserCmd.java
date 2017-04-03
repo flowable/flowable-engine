@@ -26,27 +26,27 @@ import org.flowable.idm.engine.impl.persistence.entity.UserEntity;
  */
 public class SaveUserCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected User user;
+    private static final long serialVersionUID = 1L;
+    protected User user;
 
-  public SaveUserCmd(User user) {
-    this.user = user;
-  }
-
-  public Void execute(CommandContext commandContext) {
-    if (user == null) {
-      throw new FlowableIllegalArgumentException("user is null");
-    }
-    if (commandContext.getUserEntityManager().isNewUser(user)) {
-      if (user instanceof UserEntity) {
-        commandContext.getUserEntityManager().insert((UserEntity) user,true);
-      } else {
-        commandContext.getDbSqlSession().insert((Entity) user);
-      }
-    } else {
-      commandContext.getUserEntityManager().updateUser(user);
+    public SaveUserCmd(User user) {
+        this.user = user;
     }
 
-    return null;
-  }
+    public Void execute(CommandContext commandContext) {
+        if (user == null) {
+            throw new FlowableIllegalArgumentException("user is null");
+        }
+        if (commandContext.getUserEntityManager().isNewUser(user)) {
+            if (user instanceof UserEntity) {
+                commandContext.getUserEntityManager().insert((UserEntity) user, true);
+            } else {
+                commandContext.getDbSqlSession().insert((Entity) user);
+            }
+        } else {
+            commandContext.getUserEntityManager().updateUser(user);
+        }
+
+        return null;
+    }
 }

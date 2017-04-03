@@ -12,50 +12,50 @@
  */
 package org.flowable.engine.impl.calendar;
 
+import java.util.Date;
+
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.runtime.ClockReader;
 
-import java.util.Date;
-
 public class CycleBusinessCalendar extends BusinessCalendarImpl {
 
-  public static String NAME = "cycle";
+    public static String NAME = "cycle";
 
-  public CycleBusinessCalendar(ClockReader clockReader) {
-    super(clockReader);
-  }
-
-  public Date resolveDuedate(String duedateDescription, int maxIterations) {
-    try {
-      if (duedateDescription != null && duedateDescription.startsWith("R")) {
-        return new DurationHelper(duedateDescription, maxIterations, clockReader).getDateAfter();
-      } else {
-        CronExpression ce = new CronExpression(duedateDescription, clockReader);
-        return ce.getTimeAfter(clockReader.getCurrentTime());
-      }
-
-    } catch (Exception e) {
-      throw new FlowableException("Failed to parse cron expression: " + duedateDescription, e);
+    public CycleBusinessCalendar(ClockReader clockReader) {
+        super(clockReader);
     }
 
-  }
+    public Date resolveDuedate(String duedateDescription, int maxIterations) {
+        try {
+            if (duedateDescription != null && duedateDescription.startsWith("R")) {
+                return new DurationHelper(duedateDescription, maxIterations, clockReader).getDateAfter();
+            } else {
+                CronExpression ce = new CronExpression(duedateDescription, clockReader);
+                return ce.getTimeAfter(clockReader.getCurrentTime());
+            }
 
-  public Boolean validateDuedate(String duedateDescription, int maxIterations, Date endDate, Date newTimer) {
-    if (endDate != null) {
-      return super.validateDuedate(duedateDescription, maxIterations, endDate, newTimer);
-    }
-    // end date could be part of the chron expression
-    try {
-      if (duedateDescription != null && duedateDescription.startsWith("R")) {
-        return new DurationHelper(duedateDescription, maxIterations, clockReader).isValidDate(newTimer);
-      } else {
-        return true;
-      }
+        } catch (Exception e) {
+            throw new FlowableException("Failed to parse cron expression: " + duedateDescription, e);
+        }
 
-    } catch (Exception e) {
-      throw new FlowableException("Failed to parse cron expression: " + duedateDescription, e);
     }
 
-  }
+    public Boolean validateDuedate(String duedateDescription, int maxIterations, Date endDate, Date newTimer) {
+        if (endDate != null) {
+            return super.validateDuedate(duedateDescription, maxIterations, endDate, newTimer);
+        }
+        // end date could be part of the cron expression
+        try {
+            if (duedateDescription != null && duedateDescription.startsWith("R")) {
+                return new DurationHelper(duedateDescription, maxIterations, clockReader).isValidDate(newTimer);
+            } else {
+                return true;
+            }
+
+        } catch (Exception e) {
+            throw new FlowableException("Failed to parse cron expression: " + duedateDescription, e);
+        }
+
+    }
 
 }

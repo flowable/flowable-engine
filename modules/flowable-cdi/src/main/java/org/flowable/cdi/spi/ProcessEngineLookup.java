@@ -37,22 +37,22 @@ import org.flowable.engine.ProcessEngine;
  */
 public interface ProcessEngineLookup {
 
-  /**
-   * determines the ordering in which implementations are invoked. Implementations with a high ordering are invoked first.
-   */
-  int getPrecedence();
+    /**
+     * Determines the ordering in which implementations are invoked. Implementations with a high ordering are invoked first.
+     */
+    int getPrecedence();
 
-  /**
-   * This method will only be called once by the {@link FlowableExtension}, at startup
-   * 
-   * @return a {@link ProcessEngine}
-   * 
-   */
-  ProcessEngine getProcessEngine();
+    /**
+     * This method will only be called once by the {@link FlowableExtension}, at startup
+     * 
+     * @return a {@link ProcessEngine}
+     * 
+     */
+    ProcessEngine getProcessEngine();
 
-  /**
-   * * This method will only be called once by the {@link FlowableExtension}, at shutdown
-   */
-  void ungetProcessEngine();
+    /**
+     * This method will only be called once by the {@link FlowableExtension}, at shutdown
+     */
+    void ungetProcessEngine();
 
 }

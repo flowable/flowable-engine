@@ -20,16 +20,16 @@ import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
  */
 public class CdiStandaloneProcessEngineConfiguration extends StandaloneProcessEngineConfiguration {
 
-  @Override
-  public void initExpressionManager() {
-    expressionManager = new CdiExpressionManager();
-  }
-  
-  @Override
-  public void initCommandInvoker() {
-    if (commandInvoker == null) {
-      commandInvoker = new CdiCommandInvoker();
+    @Override
+    public void initExpressionManager() {
+        expressionManager = new CdiExpressionManager();
     }
-  }
+
+    @Override
+    public void initCommandInvoker() {
+        if (commandInvoker == null) {
+            commandInvoker = new CdiCommandInvoker();
+        }
+    }
 
 }

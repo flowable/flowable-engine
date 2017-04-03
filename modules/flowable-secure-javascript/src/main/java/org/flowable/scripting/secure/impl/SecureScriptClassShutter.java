@@ -18,16 +18,14 @@ import java.util.Set;
 import org.mozilla.javascript.ClassShutter;
 
 /**
- * A {@link ClassShutter} that uses a {@link Set} of Strings denoting fully qualified classnames
- * that are white listed for usage in scripts.
+ * A {@link ClassShutter} that uses a {@link Set} of Strings denoting fully qualified classnames that are white listed for usage in scripts.
  * 
  * @author Joram Barrez
  */
 public class SecureScriptClassShutter implements ClassShutter {
 
     /**
-     * A collection of whitelisted classnames.
-     * For each Java class used in a script, this collection will be checked.
+     * A collection of whitelisted classnames. For each Java class used in a script, this collection will be checked.
      */
     protected Set<String> whiteListedClasses = new HashSet<String>();
 
@@ -39,10 +37,10 @@ public class SecureScriptClassShutter implements ClassShutter {
     public void addWhiteListedClass(String fqcn) {
         whiteListedClasses.add(fqcn);
     }
-    
+
     public void removeWhiteListedClass(String fqcn) {
-      whiteListedClasses.remove(fqcn);
-  }
+        whiteListedClasses.remove(fqcn);
+    }
 
     public Set<String> getWhiteListedClasses() {
         return whiteListedClasses;

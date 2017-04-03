@@ -21,6 +21,6 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
  */
 public interface SingleCachedEntityMatcher<EntityImpl extends Entity> {
 
-  boolean isRetained(EntityImpl entity, Object param);
+    boolean isRetained(EntityImpl entity, Object param);
 
 }

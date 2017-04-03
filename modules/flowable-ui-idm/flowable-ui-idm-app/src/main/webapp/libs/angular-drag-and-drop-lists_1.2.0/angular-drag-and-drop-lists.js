@@ -95,11 +95,11 @@ angular.module('dndLists', [])
 
         // <FLOWABLE>
         // This code was originally placed after element.addClass.
-        // This timeout is invoked after the 'dragend' event in IE9 (at leats on slooow virtual box)
+        // This timeout is invoked after the 'dragend' event in IE9 (at least on slooow virtual box)
         // and since this class is used to hide elements it seems like the element is gone,
         // therefor make sure the dragging still is happening when adding this class
         $timeout(function() {
-          // Activiti This code
+          // Flowable This code
           if (dndDragTypeWorkaround.isDragging) {
             element.addClass("dndDraggingSource");
           }
@@ -398,7 +398,7 @@ angular.module('dndLists', [])
       }
 
         /**
-         * Activiti-patched version of isMouseInFirstHalf that uses page and bounding client rect
+         * Flowable-patched version of isMouseInFirstHalf that uses page and bounding client rect
          * instead of the offsetX and layerX properties to determine which half of target the mouse pointer is hovering
          * this is more natural since th method now actually works like above, but it also adds some mild
          * flickering when sorting inside the list, why its still not in use.

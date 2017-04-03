@@ -35,41 +35,41 @@ import org.flowable.idm.engine.impl.interceptor.CommandContext;
  */
 public class IdmManagementServiceImpl extends ServiceImpl implements IdmManagementService {
 
-  public Map<String, Long> getTableCount() {
-    return commandExecutor.execute(new GetTableCountCmd());
-  }
+    public Map<String, Long> getTableCount() {
+        return commandExecutor.execute(new GetTableCountCmd());
+    }
 
-  public String getTableName(Class<?> entityClass) {
-    return commandExecutor.execute(new GetTableNameCmd(entityClass));
-  }
+    public String getTableName(Class<?> entityClass) {
+        return commandExecutor.execute(new GetTableNameCmd(entityClass));
+    }
 
-  public TableMetaData getTableMetaData(String tableName) {
-    return commandExecutor.execute(new GetTableMetaDataCmd(tableName));
-  }
-  
-  public TablePageQuery createTablePageQuery() {
-    return new TablePageQueryImpl(commandExecutor);
-  }
+    public TableMetaData getTableMetaData(String tableName) {
+        return commandExecutor.execute(new GetTableMetaDataCmd(tableName));
+    }
 
-  public Map<String, String> getProperties() {
-    return commandExecutor.execute(new GetPropertiesCmd());
-  }
+    public TablePageQuery createTablePageQuery() {
+        return new TablePageQueryImpl(commandExecutor);
+    }
 
-  public String databaseSchemaUpgrade(final Connection connection, final String catalog, final String schema) {
-    CommandConfig config = commandExecutor.getDefaultConfig().transactionNotSupported();
-    return commandExecutor.execute(config, new Command<String>() {
-      public String execute(CommandContext commandContext) {
-        DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) commandContext.getSessionFactories().get(DbSqlSession.class);
-        DbSqlSession dbSqlSession = new DbSqlSession(dbSqlSessionFactory, connection, catalog, schema);
-        commandContext.getSessions().put(DbSqlSession.class, dbSqlSession);
-        return dbSqlSession.dbSchemaUpdate();
-      }
-    });
-  }
+    public Map<String, String> getProperties() {
+        return commandExecutor.execute(new GetPropertiesCmd());
+    }
 
-  public <MapperType, ResultType> ResultType executeCustomSql(CustomSqlExecution<MapperType, ResultType> customSqlExecution) {
-    Class<MapperType> mapperClass = customSqlExecution.getMapperClass();
-    return commandExecutor.execute(new ExecuteCustomSqlCmd<MapperType, ResultType>(mapperClass, customSqlExecution));
-  }
+    public String databaseSchemaUpgrade(final Connection connection, final String catalog, final String schema) {
+        CommandConfig config = commandExecutor.getDefaultConfig().transactionNotSupported();
+        return commandExecutor.execute(config, new Command<String>() {
+            public String execute(CommandContext commandContext) {
+                DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) commandContext.getSessionFactories().get(DbSqlSession.class);
+                DbSqlSession dbSqlSession = new DbSqlSession(dbSqlSessionFactory, connection, catalog, schema);
+                commandContext.getSessions().put(DbSqlSession.class, dbSqlSession);
+                return dbSqlSession.dbSchemaUpdate();
+            }
+        });
+    }
+
+    public <MapperType, ResultType> ResultType executeCustomSql(CustomSqlExecution<MapperType, ResultType> customSqlExecution) {
+        Class<MapperType> mapperClass = customSqlExecution.getMapperClass();
+        return commandExecutor.execute(new ExecuteCustomSqlCmd<MapperType, ResultType>(mapperClass, customSqlExecution));
+    }
 
 }

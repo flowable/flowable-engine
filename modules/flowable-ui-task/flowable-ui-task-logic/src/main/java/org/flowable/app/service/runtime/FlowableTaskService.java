@@ -44,79 +44,79 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class FlowableTaskService extends FlowableAbstractTaskService {
 
-  private static final Logger logger = LoggerFactory.getLogger(FlowableTaskService.class);
+    private static final Logger logger = LoggerFactory.getLogger(FlowableTaskService.class);
 
-  public TaskRepresentation getTask(String taskId, HttpServletResponse response) {
-    User currentUser = SecurityUtils.getCurrentUserObject();
-    HistoricTaskInstance task = permissionService.validateReadPermissionOnTask(currentUser, taskId);
+    public TaskRepresentation getTask(String taskId, HttpServletResponse response) {
+        User currentUser = SecurityUtils.getCurrentUserObject();
+        HistoricTaskInstance task = permissionService.validateReadPermissionOnTask(currentUser, taskId);
 
-    ProcessDefinition processDefinition = null;
-    if (StringUtils.isNotEmpty(task.getProcessDefinitionId())) {
-      try {
-        processDefinition = repositoryService.getProcessDefinition(task.getProcessDefinitionId());
-      } catch (FlowableException e) {
-        logger.error("Error getting process definition {}", task.getProcessDefinitionId(), e);
-      }
-    }
-
-    TaskRepresentation rep = new TaskRepresentation(task, processDefinition);
-    fillPermissionInformation(rep, task, currentUser);
-
-    // Populate the people
-    populateAssignee(task, rep);
-    rep.setInvolvedPeople(getInvolvedUsers(taskId));
-
-    return rep;
-  }
-
-  protected void populateAssignee(TaskInfo task, TaskRepresentation rep) {
-    if (task.getAssignee() != null) {
-      CachedUser cachedUser = userCache.getUser(task.getAssignee());
-      if (cachedUser != null && cachedUser.getUser() != null) {
-        rep.setAssignee(new UserRepresentation(cachedUser.getUser()));
-      }
-    }
-  }
-
-  protected List<UserRepresentation> getInvolvedUsers(String taskId) {
-    List<HistoricIdentityLink> idLinks = historyService.getHistoricIdentityLinksForTask(taskId);
-    List<UserRepresentation> result = new ArrayList<UserRepresentation>(idLinks.size());
-
-    for (HistoricIdentityLink link : idLinks) {
-      // Only include users and non-assignee links
-      if (link.getUserId() != null && !IdentityLinkType.ASSIGNEE.equals(link.getType())) {
-        CachedUser cachedUser = userCache.getUser(link.getUserId());
-        if (cachedUser != null && cachedUser.getUser() != null) {
-          result.add(new UserRepresentation(cachedUser.getUser()));
+        ProcessDefinition processDefinition = null;
+        if (StringUtils.isNotEmpty(task.getProcessDefinitionId())) {
+            try {
+                processDefinition = repositoryService.getProcessDefinition(task.getProcessDefinitionId());
+            } catch (FlowableException e) {
+                logger.error("Error getting process definition {}", task.getProcessDefinitionId(), e);
+            }
         }
-      }
-    }
-    return result;
-  }
 
-  public TaskRepresentation updateTask(String taskId, TaskUpdateRepresentation updated) {
-    Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        TaskRepresentation rep = new TaskRepresentation(task, processDefinition);
+        fillPermissionInformation(rep, task, currentUser);
 
-    if (task == null) {
-      throw new NotFoundException("Task with id: " + taskId + " does not exist");
-    }
+        // Populate the people
+        populateAssignee(task, rep);
+        rep.setInvolvedPeople(getInvolvedUsers(taskId));
 
-    permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), task.getId());
-
-    if (updated.isNameSet()) {
-      task.setName(updated.getName());
+        return rep;
     }
 
-    if (updated.isDescriptionSet()) {
-      task.setDescription(updated.getDescription());
+    protected void populateAssignee(TaskInfo task, TaskRepresentation rep) {
+        if (task.getAssignee() != null) {
+            CachedUser cachedUser = userCache.getUser(task.getAssignee());
+            if (cachedUser != null && cachedUser.getUser() != null) {
+                rep.setAssignee(new UserRepresentation(cachedUser.getUser()));
+            }
+        }
     }
 
-    if (updated.isDueDateSet()) {
-      task.setDueDate(updated.getDueDate());
+    protected List<UserRepresentation> getInvolvedUsers(String taskId) {
+        List<HistoricIdentityLink> idLinks = historyService.getHistoricIdentityLinksForTask(taskId);
+        List<UserRepresentation> result = new ArrayList<UserRepresentation>(idLinks.size());
+
+        for (HistoricIdentityLink link : idLinks) {
+            // Only include users and non-assignee links
+            if (link.getUserId() != null && !IdentityLinkType.ASSIGNEE.equals(link.getType())) {
+                CachedUser cachedUser = userCache.getUser(link.getUserId());
+                if (cachedUser != null && cachedUser.getUser() != null) {
+                    result.add(new UserRepresentation(cachedUser.getUser()));
+                }
+            }
+        }
+        return result;
     }
 
-    taskService.saveTask(task);
+    public TaskRepresentation updateTask(String taskId, TaskUpdateRepresentation updated) {
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 
-    return new TaskRepresentation(task);
-  }
+        if (task == null) {
+            throw new NotFoundException("Task with id: " + taskId + " does not exist");
+        }
+
+        permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), task.getId());
+
+        if (updated.isNameSet()) {
+            task.setName(updated.getName());
+        }
+
+        if (updated.isDescriptionSet()) {
+            task.setDescription(updated.getDescription());
+        }
+
+        if (updated.isDueDateSet()) {
+            task.setDueDate(updated.getDueDate());
+        }
+
+        taskService.saveTask(task);
+
+        return new TaskRepresentation(task);
+    }
 }

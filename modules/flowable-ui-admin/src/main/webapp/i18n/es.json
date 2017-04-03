@@ -1,0 +1,1030 @@
+{
+    "GENERAL": {
+        "YES": "Si",
+        "NO": "No",
+        "ACTION": {
+            "LOGOUT": "Salir",
+            "DISMISS-ALERT": "Click para descartar este mensaje",
+            "RETURN-TO-LIST": "Regresar a la lista",
+            "SHOW-RESULTS": "Mostrar {{'GENERAL.RESULT-SIZES.' + resultSize.toString() | translate}} resultados",
+            "REFRESH-LIST": "Actualizar lista",
+            "SORT-BY": "Ordenar por {{name | translate}}",
+            "CLEAR-FILTERS": "Limpiar filtros",
+            "CANCEL-AND-CLOSE": "Cancelar y Cerrar",
+            "CANCEL": "Cancelar",
+            "NEXT": "Siguiente",
+            "PREVIOUS": "Anterior",
+            "CLOSE": "Cerrar",
+            "SHOWLICENSE": "Informacion de licencia"
+        },
+        "TITLE": {
+            "MAIN": "Administrador de actividades",
+            "ACTIONS": "Acciones",
+            "FILTERS": "Filtros"
+        },
+        "MENU": {
+            "PROCESS-ENGINE": "Motor de procesos",
+            "FORM-ENGINE": "Motor de formularios",
+            "CONTENT-ENGINE": "Motor de contenido",
+            "DMN-ENGINE": "Motor DMN",
+            "DEPLOYMENTS": "Despliegues",
+            "DEFINITIONS": "Definiciones",
+            "INSTANCES": "Instancias",
+            "TASKS": "Tareas",
+            "JOBS": "Trabajos",
+            "EVENT-SUBSCRIPTIONS": "Subscripciones a eventos",
+            "CONFIGURATION": "Configuracion",
+            "CONFIGURATION-ENGINE": "Motor",
+            "DECISION-TABLES": "Tablas de decision",
+            "CONTENT-ITEMS": "Contenidos"
+        },
+        "RESULT-SIZES": {
+            "10": "10",
+            "25": "25",
+            "50": "50",
+            "100": "100",
+            "100000000": "todo"
+        }
+    },
+    "PROCESS-DEFINITION": {
+        "ID": "Identificador:",
+        "NAME": "nombre:",
+        "VERSION": "Version:",
+        "DESCRIPTION": "Descripcion:",
+        "KEY": "Llave:",
+        "CATEGORY": "Categoria:",
+        "SUSPENDED": "Suspendido:",
+        "DEPLOYMENT": "Despliegue:",
+        "TENANT": "Tenant:",
+        "START-FORM-DEFINED": "Formulario inicial definido:",
+        "GRAPHICAL-NOTATION-DEFINED": "Notacion grafica definida:",
+        "PROCESS-INSTANCES-SIZE": "La definicion tiene {{total}} instancias de proceso corriendo",
+        "PROCESS-INSTANCES-SHOWING": ", mostrando {{size}} iniciados mas recientemente",
+        "PROCESS-INSTANCES-EMPTY": "La definicion no tiene instancias de proceso corriendo",
+        "JOBS-SIZE": "La definicion tiene {{total}} trabajos corriendo",
+        "JOBS-EMPTY": "La definicion no tiene trabajos corriendo",
+        "DECISION-TABLES-SIZE": "La definicion {{total}} tablas de decision.",
+        "DECISION-TABLES-EMPTY": "La definicion no tiene tablas de decision.",
+        "FORM-DEFINITIONS-SIZE": "La definicion tiene {{total}} definiciones de formulario.",
+        "FORM-DEFINITIONS-EMPTY": "La definicion no tiene definiciones de formulario.",
+        "TITLE": {
+            "PROCESS-INSTANCES": "Instancias de proceso",
+            "JOBS": "Trabajos",
+            "DECISION-TABLES": "Tablas de decision",
+            "FORMS": "Definiciones de formulario"
+        },
+        "ACTION": {
+            "EDIT-CATEGORY": "Editar categoria",
+            "SHOW-ALL-JOBS": "Mostrar todos los trabajos",
+            "SHOW-ALL-PROCESSES": "Mostrar todos los procesos",
+            "SHOW-DIAGRAM": "Mostrar diagrama de proceso"
+        },
+        "POPUP": {
+            "EDIT-CATEGORY": {
+                "TITLE": "Editar catgoria para una definicion",
+                "MESSAGE": "La categoria inicial de la definicion es poblada desde el atributo targetNameSpace en el BPMN 2.0 XML, pero puede ser modificada despues del despliegue.",
+                "CATEGORY": "Categoria",
+                "CATEGORY-PLACEHOLDER": "Introduce una categoria",
+                "CONFIRM": "Actualizar categoria"
+            },
+            "SHOW-PROCESS-MODEL": {
+                "TITLE": "Diagrama de proceso"
+            }
+        }
+    },
+    "PROCESS-DEFINITIONS": {
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} definiciones similares.",
+        "LIST-MESSAGE-EMPTY": "No hay definiciones de proceso similares.",
+        "FILTER": {
+            "NAME": "Nombre (sensible a mayusculas y minusculas )",
+            "KEY": "Key (sensible a mayusculas y minusculas)",
+            "DEPLOYMENT-ID": "Identificador de despliegue",
+            "TENANT-ID": "Tenant ID",
+            "LATEST": "Ultima version",
+            "LATEST-HELP": "Mostrar solo las ultimas versiones"
+        },
+        "TITLE": {
+            "MAIN": "Definiciones de procesos"
+        },
+        "SORT": {
+            "ID": "Identificador",
+            "NAME": "Nombre",
+            "VERSION": "Version"
+        },
+        "HEADER": {
+            "ID": "Identificador",
+            "NAME": "Nombre",
+            "VERSION": "Version",
+            "KEY": "Key",
+            "TENANT": "Tenant"
+        },
+        "ACTIONS": {
+            "UPLOAD-FROM-MODELER": "Subir desde el Editor de Flowable"
+        },
+        "POPUP": {
+            "UPLOAD-FROM-MODELER": {
+                "NAME": "Usuario",
+                "PASSWORD": "Password",
+                "ERROR": "No se pudo contactar al Editor",
+                "UNAUTHORIZED": "Datos invalidos",
+                "UPLOAD-DESCRIPTION": "El modelo de proceso sera buscado y desplegado al cluster actualmente activo de Flowable. Selecciona un nombre apropiado para el paquete de despliegue."
+            }
+        }
+    },
+    "PROCESS-INSTANCE": {
+        "ID": "Identificador:",
+        "NAME": "Nombre:",
+        "DESCRIPTION": "Descripcion:",
+        "BUSINESS-KEY": "Business key:",
+        "TENANT-ID": "Tenant:",
+        "STATUS": "Estatus:",
+        "STATUS-ACTIVE": "Activo",
+        "STATUS-COMPLETED": "Completado",
+        "ACTIVITY-ID-STARTED": "Identificador de inicio de actividad:",
+        "ACTIVITY-ID-ENDED": "Finalizado en actividad:",
+        "DELETE-REASON": "Razon de eliminado:",
+        "STARTED-BY": "Iniciado por:",
+        "END-TIME": "Hora de finalizacion:",
+        "DURATION": "Duracion:",
+        "SUPER-PROCESS-INSTANCE-ID": "Identificador de proceso padre:",
+        "TASKS-SIZE": "Esta instancia de proceso tiene {{total}} tareas.",
+        "TASKS-EMPTY": "Esta instancia de proceso no tiene tareas.",
+        "VARIABLES-SIZE": "Esta instancia de proceso tiene {{total}} variables.",
+        "VARIABLES-EMPTY": "Esta instancia de proceso no tiene variables.",
+        "JOBS-SIZE": "Esta instancia de proceso tiene {{total}} trabajos.",
+        "JOBS-EMPTY": "Esta instancia de proceso no tiene trabajos.",
+        "SUBPROCESSES-SIZE": "Esta instancia de proceso tiene {{total}} subprocesos.",
+        "SUBPROCESSES-EMPTY": "Esta instancia de proceso no tiene subprocesos.",
+        "DECISION-TABLES-SIZE": "Esta instancia de proceso tiene {{total}} tablas de decision.",
+        "DECISION-TABLES-EMPTY": "Esta instancia de proceso no tiene tablas de decision.",
+        "FORM-INSTANCES-SIZE": "Esta instancia de proceso tiene {{total}} instancias de formulario.",
+        "FORM-INSTANCES-EMPTY": "Esta instancia de proceso no tiene instancias de formulario.",
+        "TITLE": {
+            "TASKS": "Tareas",
+            "VARIABLES": "Variables",
+            "JOBS": "Trabajos",
+            "SUBPROCESSES": "Subprocesos",
+            "DECISION-TABLES": "Tablas de Decision",
+            "FORM-INSTANCES": "Instacias de Formularios"
+        },
+        "ACTION": {
+            "DELETE": "Eliminar instacia de proceso",
+            "TERMINATE": "Terminar instancia de proceso",
+            "SHOW-ALL-TASKS": "Mostrar todas las tareas",
+            "SHOW-ALL-JOBS": "Mostrar todos los trabajos",
+            "SHOW-ALL-SUBPROCESSES": "Mostrar todos los subprocesos",
+            "SHOW-DIAGRAM": "Mostrar diagrama de proceso",
+            "TITLE-VARIABLES": "Acciones en la variable selecionada",
+            "DELETE-VARIABLE": "Borra variable",
+            "UPDATE-VALUE": "Actualizar variable",
+            "ADD-VARIABLE": "Agregar variable"
+        },
+        "POPUP": {
+            "DELETE": {
+                "TITLE": "Eliminar instacia de proceso",
+                "MESSAGE-DELETE": "Estas seguro que deseas borrar la instancia de proceso",
+                "MESSAGE-TERMINATE": "Estas seguro que deseas terminar la instancia de proceso",
+                "DELETE-REASON": "Razon de eliminado",
+                "DELETE-REASON-HELP": "Introduce una razon de eliminado opcional",
+                "CONFIRM-DELETE": "Eliminar instancia de proceso",
+                "CONFIRM-TERMINATE": "Terminar instancia de proceso"
+            },
+            "SHOW-PROCESS-MODEL": {
+                "TITLE": "Diagrama de proceso"
+            },
+            "CREATE-VARIABLE": {
+                "TITLE": "Crear variable",
+                "NAME": "Nombre de variable",
+                "TYPE": "Tipo de variable de actividad",
+                "VALUE": "Valor de variable",
+                "CREATE": "Crear"
+            },
+            "UPDATE-VARIABLE": {
+                "TITLE": "Actualizar variable '{{name}}'",
+                "NAME": "Nombre variable",
+                "VALUE": "Valor",
+                "CHECKED": "true",
+                "UNCHECKED": "false",
+                "DATE-HELP": "ISO-8601 format (example : 2016-01-28T23:00:00Z)",
+                "ACTION-UPDATE": "Actualizar"
+            },
+            "DELETE-VARIABLE": {
+                "TITLE": "Borrar variable '{{name}}",
+                "MESSAGE": "Estas seguro que deseas eliminar esta variable?",
+                "DELETE": "Borrar"
+            }
+        }
+    },
+    "PROCESS-INSTANCES": {
+        "TITLE": "Instancias de proceso",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} instancias de proceso similares.",
+        "LIST-MESSAGE-EMPTY": "No hay instancias de proceso similares.",
+        "FILTER": {
+            "NAME": "Nombre",
+            "PROCESS-DEFINITION": "Definicion de proceso",
+            "ALL-PROCESS-DEFINITIONS": "Todas las definiciones de proceo",
+            "BUSINESS-KEY": "Business key",
+            "SUPER-PROCESS-INSTANCE-ID": "Identificador de instancia de proceso padre",
+            "STARTED-BEFORE": "Iniciado antes",
+            "STARTED-AFTER": "Iniciado despues",
+            "ENDED-BEFORE": "Terminado antes",
+            "ENDED-AFTER": "Terminado despues",
+            "VARIABLE": "Variable",
+            "VARIABLE-NAME": "Nombre de variable",
+            "VARIABLE-VALUE": "Valor de variable",
+            "VARIABLE-BOOLEAN-VALUE": "Boolean value: {{value}}",
+            "TENANT-ID": "Tenant identifier"
+        },
+        "SORT": {
+            "ID": "ID",
+            "START-TIME": "Hora de inicio"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Nombre",
+            "BUSINESS-KEY": "Business key",
+            "PROCESS-DEFINITION": "Definicion de proceso",
+            "CREATE-TIME": "Creado",
+            "END-TIME": "Finalizado",
+            "STATUS":"Estatus"
+        }
+    },
+    "TASK": {
+        "ID": "Identificador:",
+        "NAME": "Nombre:",
+        "STATUS": "Estatus:",
+        "STATUS-COMPLETED": "Completado",
+        "STATUS-ACTIVE": "Activo",
+        "DESCRIPTION": "Descripcion:",
+        "TASK-DEFINITION-KEY": "Definicion key:",
+        "FORM-KEY": "Formulario key:",
+        "PRIORITY": "Prioridad:",
+        "DELEGATION-STATE": "Delegation state:",
+        "CATEGORY": "Categoria:",
+        "TENANT-ID": "Tenant:",
+        "PARENT": "Tarea padre:",
+        "ASSIGNEE": "Assignado:",
+        "OWNER": "Propietario:",
+        "START-DATE": "Fecha de inicio:",
+        "DUE-DATE": "Fecha de vencimiento:",
+        "END-DATE": "Fecha de finalizacion:",
+        "DELETE-REASON": "Razon de eliminado:",
+        "PROCESS-INSTANCE": "Instancia de proceso",
+        "PROCESS-DEFINITION": "Definicion de proceso",
+        "EXECUTION-ID": "Identificador de Ejecucion:",
+        "SUBTASKS-MESSAGE": "Esta tarea tiene {{total}} subtareas, mostrando {{size}}.",
+        "SUBTASKS-MESSAGE-EMPTY": "Esta tarea no tiene subtareas.",
+        "VARIABLES-MESSAGE": "Esta tarea tiene {{size}} variables.",
+        "VARIABLES-MESSAGE-EMPTY": "Esta tarea no tiene variables.",
+        "IDENTITY-LINKS-MESSAGE": "Esta tarea tiene {{size}} identity links.",
+        "IDENTITY-LINKS-MESSAGE-EMPTY": "Esta tarea no tiene identity links.",
+        "ACTION": {
+            "EDIT": "Editar tarea",
+            "ASSIGN-CLAIM": "Asignar/Reclamar tarea",
+            "DELEGATE": "Delegar tarea",
+            "RESOLVE": "Resolver tarea",
+            "COMPLETE": "Completar tarea",
+            "DELETE": "Eliminar tarea",
+            "SHOW-ALL-SUBTASKS": "Mostrar todas las subtareas",
+            "SHOW-SUBMITTED-FORM": "Mostrar instancia de formulario"
+        },
+        "TITLE": {
+            "SUBTASKS": "Sub tareas",
+            "IDENTITY-LINKS": "Identity links",
+            "VARIABLES": "Variables"
+        },
+        "POPUP": {
+            "ASSIGN": {
+                "TITLE": "Asignar tareas",
+                "MESSAGE": "Estas seguro que deseas asignar la tarea",
+                "NEW-ASSIGNEE": "Nueva asignacion",
+                "NEW-ASSIGNEE-HELP": "Deja el campo asignado en blanco si deseas que la tarea no se asignada a nadie.",
+                "CONFIRM": "Asignar tarea"
+            },
+            "COMPLETE": {
+                "TITLE": "Completar tarea",
+                "MESSAGE": "Estas seguro que deseas completar la tarea",
+                "CONFIRM": "Completar tarea"
+            },
+            "DELEGATE": {
+                "TITLE": "Delegar tarea",
+                "MESSAGE": "Estas seguro que deseas delegar la tarea",
+                "CONFIRM": "Delegar tarea",
+                "DELEGATE-TO": "Usuario a quien delega"
+            },
+            "RESOLVE": {
+                "TITLE": "Resolver tarea",
+                "MESSAGE": "Estas seguro que deseas resolver la tarea",
+                "CONFIRM": "Resolver tarea"
+            },
+            "DELETE": {
+                "TITLE": "Eliminar tarea",
+                "MESSAGE": "Estas seguro que deseas borrar la tarea",
+                "CONFIRM": "Eliminar tarea"
+            },
+            "EDIT": {
+                "TITLE": "Editar tarea",
+                "CONFIRM": "Actualizar tarea",
+                "NAME": "Nombre",
+                "DESCRIPTION": "Descripcion",
+                "PRIORITY": "Prioridad",
+                "CATEGORY": "Categoria",
+                "ASSIGNEE": "Assignado",
+                "OWNER": "Propietario",
+                "DUE-DATE": "Fecha de vencimiento"
+            }
+        }
+    },
+    "TASKS": {
+        "TITLE": "Tareas",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} tareas similares.",
+        "LIST-MESSAGE-EMPTY": "No hay tareas similares.",
+        "FILTER": {
+            "NAME": "Nombre (Sensible a mayusculas y minusculas)",
+            "ASSIGNEE": "Assignado (Sensible a mayusculas y minusculas)",
+            "STATUS":"Estatus",
+            "STATUS-ANY": "Cualquier estatus",
+            "STATUS-ACTIVE": "Tareas activas",
+            "STATUS-COMPLETE": "Tareas completadas",
+            "PROCESS-INSTANCE-ID": "Identificador de instancia de proceso",
+            "TENANT-ID": "Tenant identifier",
+            "OWNER": "Propietario (sensible a mayusculas y minusculas)",
+            "PARENT-TASK-ID": "Parent Identificador de tarea",
+            "CREATED-BEFORE": "Creado antes",
+            "CREATED-AFTER": "Creado despues",
+            "ENDED-BEFORE": "Finalizado antes",
+            "ENDED-AFTER": "Finalizado despues",
+            "DUE-BEFORE": "Vencido antes",
+            "DUE-AFTER": "Vencido despues",
+            "TASK-VARIABLE": "Variable local de tarea",
+            "PROCESS-VARIABLE": "Variable de proceso",
+            "VARIABLE-NAME": "Nombre de variable",
+            "VARIABLE-VALUE": "Valor de variable",
+            "VARIABLE-BOOLEAN-VALUE": "Boolean value: {{value}}"
+        },
+        "SORT": {
+            "NAME": "Nombre",
+            "DUE-DATE": "Fecha de vencimiento",
+            "START-TIME": "Hora de inicio",
+            "END-TIME": "Hora de finalizacion",
+            "PRIORITY": "Prioridad"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Nombre",
+            "ASSIGNEE": "Assignado",
+            "OWNER": "Propietario",
+            "CREATE-TIME": "Creado",
+            "END-TIME": "Finalizado",
+            "PRIORITY": "Prioridad"
+        }
+    },
+    "DEPLOYMENTS": {
+        "TITLE": "Despliegues",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} despliegues similares.",
+        "LIST-MESSAGE-EMPTY": "No hay despliegues similares.",
+        "FILTER": {
+            "NAME": "Nombre (Sensible a mayusculas y minusculas)",
+            "TENANTID": "Tenant identifier (Sensible a mayusculas y minusculas)"
+        },
+        "SORT": {
+            "ID": "Identificador",
+            "NAME": "Nombre"
+        },
+        "HEADER": {
+            "ID": "Identificador",
+            "NAME": "Nombre",
+            "DEPLOY-TIME": "Hora de despliegue",
+            "CATEGORY": "Categoria",
+            "TENANT": "Tenant"
+        },
+        "ACTION": {
+            "UPLOAD": "Subir proceso o paquete",
+            "DELETE": "Borrar despliegue"
+        },
+        "POPUP": {
+            "UPLOAD": {
+                "DESCRIPTION": "Selecciona un archivo de proceso .bpmn, .bpmn20.xml para desplegar o sube un paquete de procesos en un archivo .zip o .bar.",
+                "DROPZONE": "O arrastra un archivo aqui",
+                "NO-DROP": "Arrastrar archivos no esta permitido por su navegador",
+                "CANCEL-UPLOAD": "Cancelar carga",
+                "ERROR": "No se pudo subir este archivo"
+            },
+            "DELETE": {
+            	"CONFIRM-MESSAGE": "Borrar despliegue '{{name}}'?"
+            	}
+        }
+    },
+    "DEPLOYMENT": {
+        "ID": "Identificador:",
+        "NAME": "Nombre:",
+        "TIME": "Hora de despliegue:",
+        "CATEGORY": "Categoria:",
+        "TENANTID": "Tenant identifier:",
+        "DEFINITIONS-MESSAGE": "Este despliegue tiene {{total}} definiciones de proceso, mostrando {{size}}.",
+        "DEFINITIONS-MESSAGE-EMPTY": "Este despliegue no tiene definiciones de proceso.",
+        "TITLE": {
+            "DEFINITIONS": "Definiciones de proceso",
+            "RESOURCES": "Recursos"
+        },
+        "ACTION": {
+            "SHOW-ALL-DEFINITIONS": "Mostrar todas las definiciones"
+        }
+    },
+    "JOB": {
+        "TITLE": {
+            "MAIN": "Trabajo {{id}}",
+            "EXCEPTION": "Excepcion"
+        },
+        "ACTIONS": {
+            "EXECUTE": "Ejecutar trabajo",
+            "DELETE": "Eliminar trabajo"
+        },
+        "POPUP": {
+            "DELETE-JOB": {
+                "TITLE": "Eliminar trabajo '{{id}}'",
+                "MESSAGE": "Estas seguro que deseas borrar el trabajo {{id}}?",
+                "CONFIRM": "Eliminar trabajo"
+            }
+        },
+        "ID": "Identificador:",
+        "EXECUTION-ID": "Identificador de ejecucion:",
+        "PROCESS-INSTANCE": "Instancia de proceso:",
+        "PROCESS-DEFINITION": "Definicion de proceso:",
+        "DUEDATE": "Fecha de vencimiento:",
+        "RETRIES-LEFT": "Intentos restantes:",
+        "TENANT-ID": "Tenant:"
+    },
+    "JOBS": {
+        "TITLE": "Trabajos",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} trabajos similares.",
+        "LIST-MESSAGE-EMPTY": "No hay trabajos similares.",
+        "FILTER": {
+            "PROCESS-DEFINITION": "Definicion de proceso",
+            "ALL-PROCESS-DEFINITIONS": "Todas las definiciones de proceo",
+            "PROCESS-INSTANCE-ID": "Identificador de instancia de proceso",
+            "TENANT-ID": "Tenant identifier",
+            "DUE-BEFORE": "Vencido antes",
+            "DUE-AFTER": "Vencido despues",
+            "EXCEPTION": "Excepcion",
+            "EXCEPTION-HELP": "Solo0 mostrar trabajos con excepciones"
+        },
+        "SORT": {
+            "ID": "Identificador de trabajo",
+            "DUE-DATE": "Fecha de vencimiento",
+            "PROCESS-INSTANCE-ID": "Identificador de instancia de proceso"
+        },
+        "HEADER": {
+            "ID": "Identificador",
+            "DUE-DATE": "Fecha de vencimiento",
+            "PROCESS-DEFINITION": "Definicion de proceso",
+            "RETRIES": "Intentos",
+            "EXCEPTION": "Excepcion"
+        }
+    },
+    "EVENT-SUBSCRIPTION": {
+        "TITLE": {
+            "MAIN": "Suscripcion a evento {{id}}"
+        },
+        "ACTIONS": {
+            "TRIGGER": "Evento disparador"
+        },
+        "ID": "Identificador:",
+        "ACTIVITY-ID": "Identificador de actividad:",
+        "EXECUTION-ID": "Identificador de ejecucion:",
+        "PROCESS-INSTANCE": "Instancia de proceso:",
+        "PROCESS-DEFINITION": "Definicion de proceso:",
+        "CREATE-DATE": "Creado:",
+        "EVENT-TYPE": "Tipo de evento:",
+        "EVENT-NAME": "Nombre de evento:",
+        "TENANT-ID": "Tenant:"
+    },
+    "EVENT-SUBSCRIPTIONS": {
+    	"TITLE": "Suscripciones aventos",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} suscripciones a eventos similares.",
+        "LIST-MESSAGE-EMPTY": "No hay suscripciones a eventos similares.",
+    	"FILTER": {
+            "PROCESS-DEFINITION": "Definicion de proceso",
+            "ALL-PROCESS-DEFINITIONS": "Todas las definiciones de proceo",
+            "PROCESS-INSTANCE-ID": "Identificador de instancia de proceso",
+            "TENANT-ID": "Tenant identifier",
+            "CREATED-BEFORE": "Creado antes",
+            "CREATED-AFTER": "Creado despues"
+        },
+        "SORT": {
+            "ID": "Identificador de suscripcion a evento",
+            "CREATE-DATE": "Creado",
+            "PROCESS-INSTANCE-ID": "Identificador de instancia de proceso"
+        },
+    	"HEADER": {
+            "ID": "Identificador",
+            "CREATE-DATE": "Creado",
+            "PROCESS-DEFINITION": "Definicion de proceso",
+            "EVENT-TYPE": "Tipo de evento",
+            "EVENT-NAME": "Nombre de evento"
+        }
+    },
+    "LOGIN": {
+        "TITLE": "Iniciar sesion",
+        "USERNAME": "Usuario",
+        "USERNAME-PLACEHOLDER": "Introduce tu usuario",
+        "PASSWORD": "Password",
+        "PASSWORD-PLACEHOLDER": "Introduce tu password",
+        "ACTION": {
+            "CONFIRM": "Iniciar sesion"
+        }
+    },
+    "USER": {
+        "POPUP": {
+            "CHANGE-PASSWORD": {
+                "TITLE": "Cambiar password para '{{login}}'",
+                "OLD-PASSWORD": "Viejo password",
+                "NEW-PASSWORD": "Nuevo password",
+                "CONFIRM": "Cambiar password"
+            },
+            "DELETE": {
+                "TITLE": "Borrar usuario {{login}}",
+                "MESSAGE": "Estas seguro que deseas borrar el usuario '{{login}}'?",
+                "CONFIRM": "Borrar usuario"
+            },
+            "EDIT": {
+                "TITLE": "Editar usuario {{login}}",
+                "LOGIN": "Inicio de sesion",
+                "EMAIL": "Email",
+                "FIRSTNAME": "Nombre",
+                "LASTNAME": "Apellido",
+                "CONFIRM": "Actualizar usuario"
+            },
+            "NEW": {
+                "TITLE": "Crear nuevo usuario",
+                "LOGIN": "Inicio de sesion",
+                "EMAIL": "Email",
+                "FIRSTNAME": "Nombre",
+                "LASTNAME": "Apellido",
+                "PASSWORD": "Password",
+                "ADMIN": "Tiene derecho de administrador",
+                "CONFIRM": "Crear usuario"
+            }
+        }
+    },
+    "USERS": {
+        "TITLE": "Usuarios",
+        "ACTION": {
+            "EDIT": "Editar usuario",
+            "NEW": "Crear nuevo usuario",
+            "DELETE": "Borrar usuario",
+            "CHANGE-PASSWORD": "Cambiar password"
+        },
+        "HEADER": {
+            "LOGIN": "Inicio de sesion",
+            "FIRSTNAME": "Nombre",
+            "LASTNAME": "Apellido",
+            "EMAIL": "Email",
+            "CLUSTER_USER": "Cluster usuario"
+        }
+    },
+    "LICENSE": {
+        "POPUP": {
+            "TITLE": "License information",
+            "HOLDER": "Holder",
+            "SUBJECT": "Subject",
+            "PRODUCTKEY": "Product type",
+            "GOODAFTERDATE": "License valid after",
+            "GOODBEFOREDATE": "License valid until",
+            "NUMBER_OF_PROCESSES": "Number of active processes",
+            "NUMBER_OF_ADMINS": "Number of administrator users",
+            "MULTI_TENANT": "Multi tenant",
+            "DEFAULT_TENANT": "Default tenant"
+        }
+    },
+    "CLUSTER": {
+        "NAME": "Nombre:",
+        "USER": "User:",
+        "MASTER-MANDATORY": "Master configuration mandatory:",
+        "METRICS-SEND-INTERVAL": "Metric send interval:",
+        "ENDPOINT-HELP": "The endpoint configuration (each cluster has only one) needs to point to a Flowable REST installation. This endpoint will then be used to retrieve and manage the data used in the other sections (for example deployments, process definitions, and so on) of this application.",
+        "ENDPOINT-NAME": "Nombre:",
+        "ENDPOINT-DESCRIPTION": "Description:",
+        "ENDPOINT-ADDRESS": "Server address:",
+        "ENDPOINT-PORT": "Server port:",
+        "ENDPOINT-CONTEXT-ROOT": "Context root:",
+        "ENDPOINT-REST-ROOT": "REST root:",
+        "ENDPOINT-USERNAME": "Username:",
+        "PROCESS-ENGINE-HELP": "This section allows you to define a 'master configuration' for the cluster. All instances in the cluster will use this configuration when they boot up (if the cluster config jar is on the classpath or if the corresponding properties are set). If not set, the instances will use their local configuration files.",
+        "NO-MASTER-DEFINED": "No master configuration defined",
+        "ACTION": {
+            "SHOW-PASSWORD": "Show password",
+            "EDIT-CLUSTER-CONFIG": "Edit cluster configuration",
+            "CREATE-CLUSTER-CONFIG": "Create new cluster",
+            "DELETE-CLUSTER-CONFIG": "Delete cluster configuration",
+            "GENERATE-JAR": "Generate cluster config jar",
+            "EDIT-ENDPOINT": "Edit REST endpoint",
+            "CHECK-ENDPOINT": "Check REST endpoint",
+            "SELECT-MASTER": "Select master configuration",
+            "ADD-CONFIGURATION": "Add master configuration",
+            "EDIT-CONFIGURATION": "Edit master configuration",
+            "DELETE-CONFIGURATION": "Delete master configuration"
+        },
+        "TITLE": {
+            "PROCESS-ENDPOINT": "Process API Endpoint configuration",
+            "DMN-ENDPOINT": "DMN API Endpoint configuration",
+            "FORM-ENDPOINT": "Form API Endpoint configuration",
+            "CONTENT-ENDPOINT": "Content API Endpoint configuration"
+        },
+        "POPUP": {
+            "EDIT-ENDPOINT": {
+                "ENDPOINT-NAME": "Nombre",
+                "ENDPOINT-DESCRIPTION": "Description",
+                "ENDPOINT-ADDRESS": "Server address",
+                "ENDPOINT-PORT": "Server port",
+                "ENDPOINT-CONTEXT-ROOT": "Context root",
+                "ENDPOINT-REST-ROOT": "REST root",
+                "ENDPOINT-USERNAME": "Username",
+                "ENDPOINT-PASSWORD": "Password",
+                "ENDPOINT-PASSWORD-HELP": "Leave blank to keep current password",
+                "ENDPOINT-URL-PREVIEW": "URL preview",
+                "ACTION-CONFIRM": "Save endpoint configuration",
+                "ERROR-401": "Error: invalid credentials",
+                "ERROR-403": "Error: invalid credentials or URL",
+                "ERROR-404": "Error: URL not found",
+                "ERROR-500": "Error: server error. Check server logs."
+            }
+        }
+    },
+    "APP-DEPLOYMENTS": {
+        "TITLE": "App desplegadas",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de{{total}} app deseplegadas similares.",
+        "LIST-MESSAGE-EMPTY": "No hay app desplegadas similares.",
+        "FILTER": {
+            "NAME": "Nombre",
+            "TENANTID": "Tenant identifier",
+            "LATEST": "Ultima version",
+            "LATEST-HELP": "Mostrar solo ultimas versiones"
+        },
+        "SORT": {
+            "ID": "Identificador",
+            "NAME": "Nombre"
+        },
+        "HEADER": {
+            "ID": "Identificador",
+            "APP-DEFINITION-ID": "Identificador de App",
+            "DEPLOYMENT-ID": "Identificador de Despliegue de Proceso",
+            "DMN-DEPLOYMENT-ID": "Identificador de despliegue de DMN",
+            "NAME": "Nombre",
+            "DEPLOY-TIME": "Hora de despliegue",
+            "DEPLOYED-BY": "Dsplegado por",
+            "TENANT": "Tenant ID"
+        },
+        "ACTION": {
+            "UPLOAD": "Subir y publicar una App"
+        },
+        "POPUP": {
+            "UPLOAD": {
+                "DESCRIPTION": "Selecciona una dfeinicion de app .zip para desplegar.",
+                "WARNING": "Solo es posible subir un proceso a una instancia de Flowable UI.",
+                "DROPZONE": "O arrastra un archivo aqui",
+                "NO-DROP": "Arrastrar archivos no soportado por el navegador",
+                "CANCEL-UPLOAD": "Cancelar carga",
+                "ERROR": "No se puede subir este archivo"
+            }
+        }
+    },
+    "VARIABLES": {
+        "HEADER": {
+            "NAME": "Nombre",
+            "TYPE": "Tipo",
+            "VALUE": "Valor"
+        }
+    },
+    "IDENTITY-LINKS": {
+        "HEADER": {
+            "GROUP-ID": "Identificador de Grupo",
+            "TYPE": "Tipo",
+            "USER-ID": "Identificador de usuario"
+        }
+    },
+    "ALERT": {
+        "GENERAL": {
+            "HTTP-ERROR": "No pudimos obtener datos del servidor",
+            "AUTHENTICATION-ERROR": "Introdujiste datos de acceso invalidos"
+        },
+        "ENGINE": {
+            "ENDPOINT-UPDATED": "Endpoint '{{name}}' updated.",
+            "ENDPOINT-INVALID": "Endpoint configuration for '{{name}}' is invalid.",
+            "ENDPOINT-VALID": "Endpoint valid, Engine at endpoint: {{name}} - {{version}}"
+        },
+        "JOB": {
+            "DELETED": "Trabajo '{{id}}' borrado correctamente.",
+            "EXECUTED": "Trabajo '{{id}}' ejecutado correctamente."
+        },
+        "EVENT-SUBSCRIPTION": {
+        	"TRIGGERED": "Event subscription '{{id}}' disparado correctamente."
+        },
+        "PROCESS-INSTANCE": {
+            "DELETED": "Process instance '{{id}}' borrado correctamente.",
+            "TERMINATED": "Process instance '{{id}}' terminado correctamente."
+        },
+        "TASK": {
+            "DELETED": "Tarea '{{id}}' borrado correctamente.",
+            "COMPLETED": "Tarea '{{id}}' completado correctamente.",
+            "DELEGATED": "Tarea '{{id}}' delegado al usuario {{user}}.",
+            "RESOLVED": "Tarea '{{id}}' resuelto correctamente.",
+            "ASSIGNED": "Tarea '{{id}}' ha sido asignado al usuario {{user}}.",
+            "UNASSIGNED": "Tarea '{{id}}' ha sido desasignado.",
+            "UPDATED": "Tarea '{{id}}' actualizado correctamente."
+        },
+        "USER": {
+            "DELETED": "Usuario '{{login}}' borrado correctamente.",
+            "UPDATED": "Usuario '{{login}}' actualizado correctamente.",
+            "CREATED": "Usuario '{{login}}' creado.",
+            "PASSWORD-CHANGED": "Password para '{{login}}' se cambiado correctamente."
+        },
+        "PROCESS-DEFINITION": {
+            "CATEGORY-UPDATED": "Categoria de la definicion de proceso actualizada"
+        },
+        "DEPLOYMENT": {
+        	"DELETED-DEPLOYMENT": "Borrar despliegue '{{name}}'",
+        	"DELETE-ERROR": "No se puede borrar el despliegue. {{exception || ''}}",
+        	"DEPLOYMENT-SUCCESS": "Despliegu exitoso"
+        },
+        "APP-DEPLOYMENT": {
+        	"DELETED-APP": "App eliminada '{{appDefinition.name}}'",
+        	"DELETE-ERROR": "No se pudo eliminar la App. {{message || ''}}"
+        }
+    },
+    "DECISION-TABLE-DEPLOYMENTS": {
+        "TITLE": "Despliegues de Tablas de Decisiones",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de{{total}} matching deployments.",
+        "LIST-MESSAGE-EMPTY": "No hay despliegues similares",
+        "FILTER": {
+            "NAME": "Nombre (case sensitive)",
+            "TENANTID": "Tenant identifier (Sensible a mayusculas y minusculas)"
+        },
+        "SORT": {
+            "ID": "Identificador",
+            "NAME": "Nombre"
+        },
+        "HEADER": {
+            "ID": "Identificador",
+            "NAME": "Nombre",
+            "DEPLOY-TIME": "Hora de despliegue",
+            "CATEGORY": "Categoria",
+            "TENANT": "Tenant"
+        },
+        "ACTION": {
+            "DELETE": "Eliminar despliegue"
+        }
+    },
+    "DECISION-TABLE-DEPLOYMENT": {
+        "ID": "Identificador:",
+        "NAME": "Nombre:",
+        "TIME": "Hora de despliegue:",
+        "CATEGORY": "Categoria:",
+        "TENANTID": "Tenant identifier:",
+        "DECISION-TABLES-MESSAGE": "Este despliegue tiene {{total}} tablas de decision, mostrando {{size}}.",
+        "DECISION-TABLES-MESSAGE-EMPTY": "Este despliegue no tiene tablas de decision.",
+        "PARENT-DEPLOYMENT-ID": "Identificador de despliegue padre",
+        "TITLE": {
+            "DECISION-TABLES": "Tablas de Decision",
+            "RESOURCES": "Recursos"
+        },
+        "ACTION": {
+            "SHOW-ALL-DEFINITIONS": "Mostrar todas las tablas de decision"
+        }
+    },
+    "DECISION-TABLES": {
+        "TITLE": "Tablas de decision",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} tablas de decision similares.",
+        "LIST-MESSAGE-EMPTY": "No hay tablas de decision similares.",
+        "FILTER": {
+            "NAME": "Nombre",
+            "KEY": "Key",
+            "TENANTID": "Tenant identifier"
+        },
+        "SORT": {
+            "ID": "Identificador",
+            "NAME": "Nombre"
+        },
+        "HEADER": {
+            "ID": "Identificador",
+            "NAME": "Nombre",
+            "VERSION": "Version",
+            "KEY": "Key",
+            "DEPLOY-TIME": "Hora de despliegue",
+            "TENANT-ID": "Tenant ID"
+        }
+    },
+    "DECISION-TABLE": {
+        "ID": "Identificador:",
+        "NAME": "Nombre:",
+        "VERSION": "Version:",
+        "KEY": "Key:",
+        "DEPLOYMENT-ID": "Identificador de despliegue:",
+        "PARENT-DEPLOYMENT-ID": "Identificador de despliegue padre",
+        "RESOURCE-NAME": "Nombre del recurso:",
+        "DESCRIPTION": "Descripcion:",
+        "TENANT": "Tenant:",
+        "TITLE": {
+            "DECISION-AUDITS": "Auditorias de decision"
+        },
+        "DECISION-AUDITS-MESSAGE": "Esta tabla de decision tiene {{total}} auditorias, mostrando {{size}}.",
+        "DECISION-AUDITS-MESSAGE-EMPTY": "Esta tabla de decision no tiene auditorias",
+        "ACTION": {
+            "EDIT-CATEGORY": "Editar categoria",
+            "SHOW-ALL-JOBS": "Mostrar todos los trabajos",
+            "SHOW-ALL-PROCESSES": "Mostrar todos los procesos",
+            "SHOW-DIAGRAM": "Mostrar diagramas de procesos",
+            "SHOW-DECISION-TABLE": "Mostrar tablas de decision"
+        },
+        "POPUP": {
+            "TITLE": "Tablka de decision: ",
+            "KEY": "Key: ",
+            "HIT-POLICY": "Politica de aciertos: ",
+            "HIT-POLICIES": {
+                "FIRST": "Primero (Single pass)",
+                "ANY": "Cualquiera (Single pass)"
+            }
+        }
+    },
+    "FORM-DEFINITIONS": {
+    	"TITLE": "Definicion de formularios",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de{{total}} formularios similares.",
+        "LIST-MESSAGE-EMPTY": "No hay formularios similares.",
+        "HEADER": {
+            "ID": "Identificador",
+            "NAME": "Nombre",
+            "DEPLOYMENTID": "Identificador de despliegue",
+            "TENANTID": "Tenant ID",
+            "KEY": "Key",
+            "VERSION": "Version"
+        },
+        "FILTER": {
+            "NAME": "Nombre",
+            "APPID": "Identificador de despliegue de App",
+            "TENANTID": "Tenant identifier"
+        },
+        "SORT": {
+            "ID": "Identificador",
+            "NAME": "Nombre"
+        }
+    },
+    "FORM-DEFINITION": {
+        "ID": "Identificador:",
+        "NAME": "Nombre:",
+        "PARENT-DEPLOYMENT-ID": "Identificador de despliegue padre",
+        "DEPLOYMENT-ID": "Identificador de despliegue",
+        "DESCRIPTION": "Descripcion:",
+        "TENANT": "Tenant:",
+        "MESSAGE-EMPTY": "(None)",
+        "TITLE": {
+            "FORM-INSTANCES": "Instancias de formulario"
+        },
+        "FORM-INSTANCES-MESSAGE": "Esta definicion tiene {{total}} instancias de formulario, mostrando {{size}}.",
+        "FORM-INSTANCES-MESSAGE-EMPTY": "Esta definicion no tiene instacias de formulario",
+        "ACTION": {
+            "EDIT-CATEGORY": "Editar categoria",
+            "SHOW-ALL-JOBS": "Mostrar todos los trabajos",
+            "SHOW-ALL-PROCESSES": "Mostrar todos los procesos",
+            "SHOW-DIAGRAM": "Mostrar diagrama de proceso",
+            "SHOW-FORM": "Mostrar formulario"
+        },
+        "POPUP": {
+            "TITLE": "Formulario: "
+        },
+        "FIELD-PREVIEW" : {
+        	"DISPLAY-REF": "Valor a mostrar",
+        	"SELECT-FIELD": "(No hay campo seleccionado)",
+        	"FIELD-VALUE": "Mostrar valor del campo \"{{name}}\"",
+        	"UNKNOWN-TYPE": "Tipo de campo desconocido {{type}}",
+        	"TEXT-VALUE": "Texto",
+        	"MULTI-TEXT-VALUE": "Texto multi-linea",
+        	"NUMBER-VALUE": "123",
+        	"DATE-VALUE": "Fecha",
+        	"DROPDOWN-VALUE": "Selecciona ...",
+        	"UPLOAD-VALUE": "Sube o importa contenido...",
+        	"RADIOS-OPTION1": "Opcion 1",
+        	"SELECT-PERSON": "Selecciona una persona",
+        	"SELECT-GROUP": "Selecciona un grupo"
+        	}
+    },
+    "FORM-DEPLOYMENTS": {
+        "TITLE": "Form Deployments",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de{{total}} despliegues de formulario similares.",
+        "LIST-MESSAGE-EMPTY": "No hay despliegues de formularios similares.",
+        "FILTER": {
+            "NAME": "Nombre (sensible a mayusculas y minusculas)",
+            "TENANTID": "Tenant identifier (case sensitive)"
+        },
+        "SORT": {
+            "ID": "Identificador",
+            "NAME": "Nombre"
+        },
+        "HEADER": {
+            "ID": "Identificador",
+            "NAME": "Nombre",
+            "DEPLOY-TIME": "Hora de despliegue",
+            "CATEGORY": "Categoria",
+            "TENANT": "Tenant"
+        },
+        "ACTION": {
+            "DELETE": "Delete deployment"
+        }
+    },
+    "FORM-DEPLOYMENT": {
+        "ID": "Identificador:",
+        "NAME": "Nombre:",
+        "TIME": "Hora de despliegue:",
+        "CATEGORY": "Categoria:",
+        "TENANTID": "Tenant identifier:",
+        "PARENT-DEPLOYMENT-ID": "Identificador de despliegue padre",
+        "DEFINITIONS-MESSAGE": "Este despliegue tiene {{total}} definiciones de formulario, mostrando {{size}}.",
+        "DEFINITIONS-MESSAGE-EMPTY": "Este despliegue no tiene definiciones de formulario.",
+        "TITLE": {
+            "FORM-DEFINITIONS": "Definiciones de formulario",
+            "RESOURCES": "Recursos"
+        },
+        "ACTION": {
+            "SHOW-ALL-DEFINITIONS": "Mostrar todas las definiciones de formulario"
+        }
+    },
+    "FORM-INSTANCES": {
+        "TITLE": "Instancias de formulario",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de{{total}} instancias de formulario similares.",
+        "LIST-MESSAGE-EMPTY": "No hay instancias de formulario similares.",
+        "HEADER": {
+            "ID": "ID",
+            "PROCESS-INSTANCE-ID": "Identificador de instancia de proceso",
+            "TASK-ID": "Identificador de tarea",
+            "SUBMITTED-ON": "Fecha de envio",
+            "SUBMITTED-BY": "Enviado por",
+            "TENANT-ID": "Tenant ID"
+        },
+        "FILTER": {
+            "NAME": "Nombre",
+            "TENANTID": "Tenant identifier"
+        },
+        "SORT": {
+            "SUBMITTED-DATE": "Fecha de envio"
+        }
+    },
+    "FORM-INSTANCE": {
+        "HEADER": {
+            "ID": "ID",
+            "TASK-ID": "Identificador de tarea",
+            "PROCESS-ID": "Identificador de instancia de proceso",
+            "SUBMITTED": "Fecha de envio",
+            "SUBMITTED-BY": "Enviado por",
+            "FORM-DEFINITION-ID": "Identificador de definicion de forma"
+        },
+        "FORM-FIELD-VALUES-MESSAGE": "Esta instancia tiene {{total}} valores de campo de formulario, mostrando {{size}}",
+        "FORM-FIELD-VALUES-MESSAGE-EMPTY": "Esta instancia no tiene valores de campo de formulario",
+        "ACTION": {
+            "SHOW-FORM-INSTANCE": "Mostrar instancia de formulario"
+        },
+        "TITLE": {
+            "FORM-FIELD-VALUES": "Valor de campo de formulario"
+        },
+        "FORM-FIELD-VALUES": {
+            "ID": "Identificador de campo de formulario",
+            "NAME": "Nombre de campo de formulario",
+            "TYPE": "Tipo de campo de formulario",
+            "VALUE": "Valor de campo de formulario"
+        }
+    },
+    "CONTENT-ITEMS": {
+        "TITLE": "Articulos de contenido",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de{{total}} articulos de contenido similares.",
+        "LIST-MESSAGE-EMPTY": "No hay articulos de contenido.",
+        "HEADER": {
+            "ID": "Identificador",
+            "NAME": "Nombre",
+            "PROCESS-INSTANCE-ID": "Identificador de instancia de proceso",
+            "TASK-ID": "Identificador de tarea",
+            "LAST-MODIFIED-ON": "Fecha de ultima actualizacion",
+            "LAST-MODIFIED-BY": "Ultima vez modificado por",
+            "TENANT-ID": "Tenant ID"
+        },
+        "FILTER": {
+            "NAME": "Nombre",
+            "TENANTID": "Tenant identifier"
+        },
+        "SORT": {
+            "CREATED": "Fecha de creacion"
+        }
+    },
+    "CONTENT-ITEM": {
+        "HEADER": {
+            "ID": "Identificador",
+            "TASK-ID": "Identificador de tarea",
+            "PROCESS-INSTANCE-ID": "Identificador de instancia de proceso",
+            "CREATED-ON": "Fecha de creacion",
+            "CREATED-BY": "Creado por",
+            "LAST-MODIFIED-ON": "Fecha de ultima actualizacion",
+            "LAST-MODIFIED-BY": "Ultima vez modificado por",
+            "CONTENT-STORE-ID": "Identificador de alamacenamiento de contenido"
+        },
+        "ACTION": {
+            "SHOW-CONTENT-ITEM": "Mostrar contenido del articulo"
+        }
+    }
+}

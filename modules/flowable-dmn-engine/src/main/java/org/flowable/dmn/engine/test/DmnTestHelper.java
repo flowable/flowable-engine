@@ -85,11 +85,8 @@ public abstract class DmnTestHelper {
     }
 
     /**
-     * get a resource location by convention based on a class (type) and a
-     * relative resource name. The return value will be the full classpath
-     * location of the type, plus a suffix built from the name parameter:
-     * <code>DmnDeployer.DMN_RESOURCE_SUFFIXES</code>. The first resource
-     * matching a suffix will be returned.
+     * get a resource location by convention based on a class (type) and a relative resource name. The return value will be the full classpath location of the type, plus a suffix built from the name
+     * parameter: <code>DmnDeployer.DMN_RESOURCE_SUFFIXES</code>. The first resource matching a suffix will be returned.
      */
     public static String getDmnDecisionResource(Class<?> type, String name) {
         for (String suffix : ParsedDeploymentBuilder.DMN_RESOURCE_SUFFIXES) {
@@ -126,10 +123,8 @@ public abstract class DmnTestHelper {
     }
 
     /**
-     * Each test is assumed to clean up all DB content it entered. After a test
-     * method executed, this method scans all tables to see if the DB is
-     * completely clean. It throws AssertionFailed in case the DB is not clean.
-     * If the DB is not clean, it is cleaned by performing a create a drop.
+     * Each test is assumed to clean up all DB content it entered. After a test method executed, this method scans all tables to see if the DB is completely clean. It throws AssertionFailed in case
+     * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
      */
     public static void assertAndEnsureCleanDb(DmnEngine dmnEngine) {
         log.debug("verifying that db is clean after test");

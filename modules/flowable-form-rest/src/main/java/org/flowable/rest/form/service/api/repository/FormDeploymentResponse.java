@@ -24,78 +24,78 @@ import java.util.Date;
  */
 public class FormDeploymentResponse {
 
-  protected String id;
-  protected String name;
-  @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
-  protected Date deploymentTime;
-  protected String category;
-  protected String url;
-  protected String parentDeploymentId;
-  protected String tenantId;
+    protected String id;
+    protected String name;
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
+    protected Date deploymentTime;
+    protected String category;
+    protected String url;
+    protected String parentDeploymentId;
+    protected String tenantId;
 
-  public FormDeploymentResponse(FormDeployment deployment, String url) {
-    setId(deployment.getId());
-    setName(deployment.getName());
-    setDeploymentTime(deployment.getDeploymentTime());
-    setCategory(deployment.getCategory());
-    setTenantId(deployment.getTenantId());
-    setParentDeploymentId(deployment.getParentDeploymentId());
-    setUrl(url);
-  }
+    public FormDeploymentResponse(FormDeployment deployment, String url) {
+        setId(deployment.getId());
+        setName(deployment.getName());
+        setDeploymentTime(deployment.getDeploymentTime());
+        setCategory(deployment.getCategory());
+        setTenantId(deployment.getTenantId());
+        setParentDeploymentId(deployment.getParentDeploymentId());
+        setUrl(url);
+    }
 
-  public String getId() {
-    return id;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public void setId(String id) {
-    this.id = id;
-  }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public Date getDeploymentTime() {
-    return deploymentTime;
-  }
+    public Date getDeploymentTime() {
+        return deploymentTime;
+    }
 
-  public void setDeploymentTime(Date deploymentTime) {
-    this.deploymentTime = deploymentTime;
-  }
+    public void setDeploymentTime(Date deploymentTime) {
+        this.deploymentTime = deploymentTime;
+    }
 
-  public String getCategory() {
-    return category;
-  }
+    public String getCategory() {
+        return category;
+    }
 
-  public void setCategory(String category) {
-    this.category = category;
-  }
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
-  public String getUrl() {
-    return url;
-  }
+    public String getUrl() {
+        return url;
+    }
 
-  public void setUrl(String url) {
-    this.url = url;
-  }
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-  public String getParentDeploymentId() {
-    return parentDeploymentId;
-  }
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
+    }
 
-  public void setParentDeploymentId(String parentDeploymentId) {
-    this.parentDeploymentId = parentDeploymentId;
-  }
+    public void setParentDeploymentId(String parentDeploymentId) {
+        this.parentDeploymentId = parentDeploymentId;
+    }
 
-  public String getTenantId() {
-    return tenantId;
-  }
+    public String getTenantId() {
+        return tenantId;
+    }
 
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
 }

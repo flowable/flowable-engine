@@ -21,24 +21,24 @@ import com.fasterxml.jackson.databind.util.ISO8601Utils;
 
 public class AsyncHistoryDateUtil {
 
-  protected static TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
+    protected static TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
 
-  public static String formatDate(Date date) {
-    if (date != null) {
-      return ISO8601Utils.format(date, true, utcTimeZone);
-    }
-    return null;
-  }
-
-  public static Date parseDate(String s) {
-    if (s != null) {
-      try {
-        return ISO8601Utils.parse(s, new ParsePosition(0));
-      } catch (ParseException e) {
+    public static String formatDate(Date date) {
+        if (date != null) {
+            return ISO8601Utils.format(date, true, utcTimeZone);
+        }
         return null;
-      }
     }
-    return null;
-  }
+
+    public static Date parseDate(String s) {
+        if (s != null) {
+            try {
+                return ISO8601Utils.parse(s, new ParsePosition(0));
+            } catch (ParseException e) {
+                return null;
+            }
+        }
+        return null;
+    }
 
 }

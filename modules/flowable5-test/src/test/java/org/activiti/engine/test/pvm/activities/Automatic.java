@@ -20,20 +20,19 @@ import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 
-
 /**
  * @author Tom Baeyens
  */
 public class Automatic implements ActivityBehavior {
 
-  public void execute(DelegateExecution execution) {
-    ActivityExecution activityExecution = (ActivityExecution) execution;
-    List<PvmTransition> outgoingTransitions = activityExecution.getActivity().getOutgoingTransitions();
-    if (outgoingTransitions.isEmpty()) {
-      activityExecution.end();
-    } else {
-      activityExecution.take(outgoingTransitions.get(0));
+    public void execute(DelegateExecution execution) {
+        ActivityExecution activityExecution = (ActivityExecution) execution;
+        List<PvmTransition> outgoingTransitions = activityExecution.getActivity().getOutgoingTransitions();
+        if (outgoingTransitions.isEmpty()) {
+            activityExecution.end();
+        } else {
+            activityExecution.take(outgoingTransitions.get(0));
+        }
     }
-  }
 
 }

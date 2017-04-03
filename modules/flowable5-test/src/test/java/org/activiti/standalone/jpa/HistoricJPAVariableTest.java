@@ -26,137 +26,136 @@ import org.flowable.engine.test.Deployment;
  */
 public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
 
-  protected static ProcessEngine cachedProcessEngine;
+    protected static ProcessEngine cachedProcessEngine;
 
-  private static EntityManagerFactory entityManagerFactory;
+    private static EntityManagerFactory entityManagerFactory;
 
-  private static FieldAccessJPAEntity simpleEntityFieldAccess;
-  private static boolean entitiesInitialized;
+    private static FieldAccessJPAEntity simpleEntityFieldAccess;
+    private static boolean entitiesInitialized;
 
-  protected String processInstanceId;
+    protected String processInstanceId;
 
-  @Override
-  protected void initializeProcessEngine() {
-    if (cachedProcessEngine==null) {
-      ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource("org/activiti/standalone/jpa/flowable.cfg.xml");
-      
-      cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
-      
-      org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) 
-          ((ProcessEngineConfigurationImpl) cachedProcessEngine.getProcessEngineConfiguration()).getFlowable5CompatibilityHandler().getRawProcessConfiguration();
+    @Override
+    protected void initializeProcessEngine() {
+        if (cachedProcessEngine == null) {
+            ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
+                    .createProcessEngineConfigurationFromResource("org/activiti/standalone/jpa/flowable.cfg.xml");
 
-      EntityManagerSessionFactory entityManagerSessionFactory = (EntityManagerSessionFactory) activiti5ProcessEngineConfig
-        .getSessionFactories()
-        .get(EntityManagerSession.class);
-      
-      entityManagerFactory = entityManagerSessionFactory.getEntityManagerFactory();
-    }
-    processEngine = cachedProcessEngine;
-  }
+            cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
 
-  public void setupJPAEntities() {
-    if (!entitiesInitialized) {
-      EntityManager manager = entityManagerFactory.createEntityManager();
-      manager.getTransaction().begin();
+            org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) ((ProcessEngineConfigurationImpl) cachedProcessEngine
+                    .getProcessEngineConfiguration()).getFlowable5CompatibilityHandler().getRawProcessConfiguration();
 
-      // Simple test data
-      simpleEntityFieldAccess = new FieldAccessJPAEntity();
-      simpleEntityFieldAccess.setId(1L);
-      simpleEntityFieldAccess.setValue("value1");
-      manager.persist(simpleEntityFieldAccess);
+            EntityManagerSessionFactory entityManagerSessionFactory = (EntityManagerSessionFactory) activiti5ProcessEngineConfig
+                    .getSessionFactories()
+                    .get(EntityManagerSession.class);
 
-      manager.flush();
-      manager.getTransaction().commit();
-      manager.close();
-      entitiesInitialized = true;
-    }
-  }
-
-  @Deployment
-  public void testGetJPAEntityAsHistoricVariable() {
-    setupJPAEntities();
-    // -----------------------------------------------------------------------------
-    // Simple test, Start process with JPA entities as variables
-    // -----------------------------------------------------------------------------
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("simpleEntityFieldAccess", simpleEntityFieldAccess);
-
-    // Start the process with the JPA-entities as variables. They will be stored
-    // in the DB.
-    this.processInstanceId = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables).getId();
-
-    for (Task task : taskService.createTaskQuery().includeTaskLocalVariables().list()) {
-      taskService.complete(task.getId());
+            entityManagerFactory = entityManagerSessionFactory.getEntityManagerFactory();
+        }
+        processEngine = cachedProcessEngine;
     }
 
-    // Get JPAEntity Variable by HistoricVariableInstanceQuery
-    HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).variableName("simpleEntityFieldAccess")
-        .singleResult();
+    public void setupJPAEntities() {
+        if (!entitiesInitialized) {
+            EntityManager manager = entityManagerFactory.createEntityManager();
+            manager.getTransaction().begin();
 
-    Object value = historicVariableInstance.getValue();
-    assertTrue(value instanceof FieldAccessJPAEntity);
-    assertEquals(((FieldAccessJPAEntity) value).getValue(), simpleEntityFieldAccess.getValue());
-  }
+            // Simple test data
+            simpleEntityFieldAccess = new FieldAccessJPAEntity();
+            simpleEntityFieldAccess.setId(1L);
+            simpleEntityFieldAccess.setValue("value1");
+            manager.persist(simpleEntityFieldAccess);
 
-  @Deployment
-  public void testGetJPAEntityAsHistoricLog() {
-    setupJPAEntities();
-    // -----------------------------------------------------------------------------
-    // Simple test, Start process with JPA entities as variables
-    // -----------------------------------------------------------------------------
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("simpleEntityFieldAccess", simpleEntityFieldAccess);
-
-    // Start the process with the JPA-entities as variables. They will be stored
-    // in the DB.
-    this.processInstanceId = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables).getId();
-
-    // Finish tasks
-    for (Task task : taskService.createTaskQuery().includeTaskLocalVariables().list()) {
-      taskService.complete(task.getId());
+            manager.flush();
+            manager.getTransaction().commit();
+            manager.close();
+            entitiesInitialized = true;
+        }
     }
 
-    // Get JPAEntity Variable by ProcessInstanceHistoryLogQuery
-    ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeVariables().singleResult();
-    List<HistoricData> events = log.getHistoricData();
+    @Deployment
+    public void testGetJPAEntityAsHistoricVariable() {
+        setupJPAEntities();
+        // -----------------------------------------------------------------------------
+        // Simple test, Start process with JPA entities as variables
+        // -----------------------------------------------------------------------------
+        Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put("simpleEntityFieldAccess", simpleEntityFieldAccess);
 
-    for (HistoricData event : events) {
-      Object value = ((HistoricVariableInstanceEntity) event).getValue();
-      assertTrue(value instanceof FieldAccessJPAEntity);
-      assertEquals(((FieldAccessJPAEntity) value).getValue(), simpleEntityFieldAccess.getValue());
-    }
-  }
-  
-  @Deployment
-  (resources={"org/activiti/standalone/jpa/HistoricJPAVariableTest.testGetJPAEntityAsHistoricLog.bpmn20.xml"})
-  public void testGetJPAUpdateEntityAsHistoricLog() {
-    setupJPAEntities();
-    // -----------------------------------------------------------------------------
-    // Simple test, Start process with JPA entities as variables
-    // -----------------------------------------------------------------------------
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("simpleEntityFieldAccess", simpleEntityFieldAccess);
+        // Start the process with the JPA-entities as variables. They will be stored
+        // in the DB.
+        this.processInstanceId = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables).getId();
 
-    // Start the process with the JPA-entities as variables. They will be stored in the DB.
-    this.processInstanceId = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables).getId();
-    
-    // Finish tasks
-    for (Task task : taskService.createTaskQuery().includeProcessVariables().list()) {
-      taskService.setVariable(task.getId(), "simpleEntityFieldAccess", simpleEntityFieldAccess);
-      taskService.complete(task.getId());
+        for (Task task : taskService.createTaskQuery().includeTaskLocalVariables().list()) {
+            taskService.complete(task.getId());
+        }
+
+        // Get JPAEntity Variable by HistoricVariableInstanceQuery
+        HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).variableName("simpleEntityFieldAccess")
+                .singleResult();
+
+        Object value = historicVariableInstance.getValue();
+        assertTrue(value instanceof FieldAccessJPAEntity);
+        assertEquals(((FieldAccessJPAEntity) value).getValue(), simpleEntityFieldAccess.getValue());
     }
 
-    // Get JPAEntity Variable by ProcessInstanceHistoryLogQuery
-    ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId)
-        .includeVariableUpdates()
-        .singleResult();
-    List<HistoricData> events = log.getHistoricData();
+    @Deployment
+    public void testGetJPAEntityAsHistoricLog() {
+        setupJPAEntities();
+        // -----------------------------------------------------------------------------
+        // Simple test, Start process with JPA entities as variables
+        // -----------------------------------------------------------------------------
+        Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put("simpleEntityFieldAccess", simpleEntityFieldAccess);
 
-    for (HistoricData event : events) {
-      Object value = ((HistoricDetailVariableInstanceUpdateEntity) event).getValue();
-      assertTrue(value instanceof FieldAccessJPAEntity);
-      assertEquals(((FieldAccessJPAEntity)value).getValue(), simpleEntityFieldAccess.getValue());
+        // Start the process with the JPA-entities as variables. They will be stored
+        // in the DB.
+        this.processInstanceId = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables).getId();
+
+        // Finish tasks
+        for (Task task : taskService.createTaskQuery().includeTaskLocalVariables().list()) {
+            taskService.complete(task.getId());
+        }
+
+        // Get JPAEntity Variable by ProcessInstanceHistoryLogQuery
+        ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeVariables().singleResult();
+        List<HistoricData> events = log.getHistoricData();
+
+        for (HistoricData event : events) {
+            Object value = ((HistoricVariableInstanceEntity) event).getValue();
+            assertTrue(value instanceof FieldAccessJPAEntity);
+            assertEquals(((FieldAccessJPAEntity) value).getValue(), simpleEntityFieldAccess.getValue());
+        }
     }
-  }
+
+    @Deployment(resources = { "org/activiti/standalone/jpa/HistoricJPAVariableTest.testGetJPAEntityAsHistoricLog.bpmn20.xml" })
+    public void testGetJPAUpdateEntityAsHistoricLog() {
+        setupJPAEntities();
+        // -----------------------------------------------------------------------------
+        // Simple test, Start process with JPA entities as variables
+        // -----------------------------------------------------------------------------
+        Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put("simpleEntityFieldAccess", simpleEntityFieldAccess);
+
+        // Start the process with the JPA-entities as variables. They will be stored in the DB.
+        this.processInstanceId = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables).getId();
+
+        // Finish tasks
+        for (Task task : taskService.createTaskQuery().includeProcessVariables().list()) {
+            taskService.setVariable(task.getId(), "simpleEntityFieldAccess", simpleEntityFieldAccess);
+            taskService.complete(task.getId());
+        }
+
+        // Get JPAEntity Variable by ProcessInstanceHistoryLogQuery
+        ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId)
+                .includeVariableUpdates()
+                .singleResult();
+        List<HistoricData> events = log.getHistoricData();
+
+        for (HistoricData event : events) {
+            Object value = ((HistoricDetailVariableInstanceUpdateEntity) event).getValue();
+            assertTrue(value instanceof FieldAccessJPAEntity);
+            assertEquals(((FieldAccessJPAEntity) value).getValue(), simpleEntityFieldAccess.getValue());
+        }
+    }
 }

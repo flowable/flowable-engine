@@ -29,48 +29,48 @@ import org.flowable.engine.impl.util.TaskHelper;
  */
 public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String taskId;
-  protected Map<String, String> properties;
-  protected boolean completeTask;
+    protected String taskId;
+    protected Map<String, String> properties;
+    protected boolean completeTask;
 
-  public SubmitTaskFormCmd(String taskId, Map<String, String> properties, boolean completeTask) {
-    super(taskId);
-    this.taskId = taskId;
-    this.properties = properties;
-    this.completeTask = completeTask;
-  }
+    public SubmitTaskFormCmd(String taskId, Map<String, String> properties, boolean completeTask) {
+        super(taskId);
+        this.taskId = taskId;
+        this.properties = properties;
+        this.completeTask = completeTask;
+    }
 
-  protected Void execute(CommandContext commandContext, TaskEntity task) {
-    
-    // Backwards compatibility
-    if (task.getProcessDefinitionId() != null) {
-      if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-        compatibilityHandler.submitTaskFormData(taskId, properties, completeTask);
+    protected Void execute(CommandContext commandContext, TaskEntity task) {
+
+        // Backwards compatibility
+        if (task.getProcessDefinitionId() != null) {
+            if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
+                Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+                compatibilityHandler.submitTaskFormData(taskId, properties, completeTask);
+                return null;
+            }
+        }
+
+        commandContext.getHistoryManager().recordFormPropertiesSubmitted(task.getExecution(), properties, taskId);
+
+        TaskFormHandler taskFormHandler = FormHandlerUtil.getTaskFormHandlder(task);
+
+        if (taskFormHandler != null) {
+            taskFormHandler.submitFormProperties(properties, task.getExecution());
+
+            if (completeTask) {
+                TaskHelper.completeTask(task, null, null, false, commandContext);
+            }
+        }
+
         return null;
-      }
     }
-    
-    commandContext.getHistoryManager().recordFormPropertiesSubmitted(task.getExecution(), properties, taskId);
-    
-    TaskFormHandler taskFormHandler = FormHandlerUtil.getTaskFormHandlder(task);
 
-    if (taskFormHandler != null) {
-      taskFormHandler.submitFormProperties(properties, task.getExecution());
-
-      if (completeTask) {
-        TaskHelper.completeTask(task, null, null, false, commandContext);
-      }
+    @Override
+    protected String getSuspendedTaskException() {
+        return "Cannot submit a form to a suspended task";
     }
-    
-    return null;
-  }
-
-  @Override
-  protected String getSuspendedTaskException() {
-    return "Cannot submit a form to a suspended task";
-  }
 
 }

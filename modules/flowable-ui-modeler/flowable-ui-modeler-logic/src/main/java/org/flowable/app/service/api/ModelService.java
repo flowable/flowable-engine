@@ -27,44 +27,44 @@ import org.flowable.idm.api.User;
 
 public interface ModelService {
 
-  Model getModel(String modelId);
-  
-  ModelRepresentation getModelRepresentation(String modelId);
+    Model getModel(String modelId);
 
-  List<AbstractModel> getModelsByModelType(Integer modelType);
-  
-  ModelKeyRepresentation validateModelKey(Model model, Integer modelType, String key);
-  
-  ModelHistory getModelHistory(String modelId, String modelHistoryId);
+    ModelRepresentation getModelRepresentation(String modelId);
 
-  Long getModelCountForUser(User user, int modelTypeApp);
-  
-  BpmnModel getBpmnModel(AbstractModel model);
+    List<AbstractModel> getModelsByModelType(Integer modelType);
 
-  byte[] getBpmnXML(BpmnModel bpmnMode);
-  
-  byte[] getBpmnXML(AbstractModel model);
-  
-  BpmnModel getBpmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap);
+    ModelKeyRepresentation validateModelKey(Model model, Integer modelType, String key);
 
-  Model createModel(ModelRepresentation model, String editorJson, User createdBy);
-  
-  Model createModel(Model newModel, User createdBy);
+    ModelHistory getModelHistory(String modelId, String modelHistoryId);
 
-  Model saveModel(Model modelObject);
-  
-  Model saveModel(Model modelObject, String editorJson, byte[] imageBytes, boolean newVersion, String newVersionComment, User updatedBy);
+    Long getModelCountForUser(User user, int modelTypeApp);
 
-  Model saveModel(String modelId, String name, String key, String description, String editorJson, 
-      boolean newVersion, String newVersionComment, User updatedBy);
-  
-  ModelRepresentation importNewVersion(String modelId, String fileName, InputStream modelStream);
+    BpmnModel getBpmnModel(AbstractModel model);
 
-  Model createNewModelVersion(Model modelObject, String comment, User updatedBy);
-  
-  ModelHistory createNewModelVersionAndReturnModelHistory(Model modelObject, String comment, User updatedBy);
+    byte[] getBpmnXML(BpmnModel bpmnMode);
 
-  void deleteModel(String modelId, boolean cascadeHistory, boolean deleteRuntimeApp);
+    byte[] getBpmnXML(AbstractModel model);
 
-  ReviveModelResultRepresentation reviveProcessModelHistory(ModelHistory modelHistory, User user, String newVersionComment);
+    BpmnModel getBpmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap);
+
+    Model createModel(ModelRepresentation model, String editorJson, User createdBy);
+
+    Model createModel(Model newModel, User createdBy);
+
+    Model saveModel(Model modelObject);
+
+    Model saveModel(Model modelObject, String editorJson, byte[] imageBytes, boolean newVersion, String newVersionComment, User updatedBy);
+
+    Model saveModel(String modelId, String name, String key, String description, String editorJson,
+            boolean newVersion, String newVersionComment, User updatedBy);
+
+    ModelRepresentation importNewVersion(String modelId, String fileName, InputStream modelStream);
+
+    Model createNewModelVersion(Model modelObject, String comment, User updatedBy);
+
+    ModelHistory createNewModelVersionAndReturnModelHistory(Model modelObject, String comment, User updatedBy);
+
+    void deleteModel(String modelId);
+
+    ReviveModelResultRepresentation reviveProcessModelHistory(ModelHistory modelHistory, User user, String newVersionComment);
 }

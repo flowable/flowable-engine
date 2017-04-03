@@ -1,4 +1,4 @@
-alter table ACT_RU_TASK add column IS_COUNT_ENABLED_ smallint check(IS_MI_ROOT_ in (1,0));
+alter table ACT_RU_TASK add column IS_COUNT_ENABLED_ smallint check(IS_COUNT_ENABLED_ in (1,0));
 alter table ACT_RU_TASK add column VAR_COUNT_ integer;
 alter table ACT_RU_TASK add column ID_LINK_COUNT_ integer;
 

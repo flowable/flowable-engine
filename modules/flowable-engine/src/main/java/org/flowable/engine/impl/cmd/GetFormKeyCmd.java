@@ -29,56 +29,54 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public class GetFormKeyCmd implements Command<String> {
 
-  protected String taskDefinitionKey;
-  protected String processDefinitionId;
+    protected String taskDefinitionKey;
+    protected String processDefinitionId;
 
-  /**
-   * Retrieves a start form key.
-   */
-  public GetFormKeyCmd(String processDefinitionId) {
-    setProcessDefinitionId(processDefinitionId);
-  }
+    /**
+     * Retrieves a start form key.
+     */
+    public GetFormKeyCmd(String processDefinitionId) {
+        setProcessDefinitionId(processDefinitionId);
+    }
 
-  /**
-   * Retrieves a task form key.
-   */
-  public GetFormKeyCmd(String processDefinitionId, String taskDefinitionKey) {
-    setProcessDefinitionId(processDefinitionId);
-    if (taskDefinitionKey == null || taskDefinitionKey.length() < 1) {
-      throw new FlowableIllegalArgumentException("The task definition key is mandatory, but '" + taskDefinitionKey + "' has been provided.");
+    /**
+     * Retrieves a task form key.
+     */
+    public GetFormKeyCmd(String processDefinitionId, String taskDefinitionKey) {
+        setProcessDefinitionId(processDefinitionId);
+        if (taskDefinitionKey == null || taskDefinitionKey.length() < 1) {
+            throw new FlowableIllegalArgumentException("The task definition key is mandatory, but '" + taskDefinitionKey + "' has been provided.");
+        }
+        this.taskDefinitionKey = taskDefinitionKey;
     }
-    this.taskDefinitionKey = taskDefinitionKey;
-  }
 
-  protected void setProcessDefinitionId(String processDefinitionId) {
-    if (processDefinitionId == null || processDefinitionId.length() < 1) {
-      throw new FlowableIllegalArgumentException("The process definition id is mandatory, but '" + processDefinitionId + "' has been provided.");
+    protected void setProcessDefinitionId(String processDefinitionId) {
+        if (processDefinitionId == null || processDefinitionId.length() < 1) {
+            throw new FlowableIllegalArgumentException("The process definition id is mandatory, but '" + processDefinitionId + "' has been provided.");
+        }
+        this.processDefinitionId = processDefinitionId;
     }
-    this.processDefinitionId = processDefinitionId;
-  }
 
-  public String execute(CommandContext commandContext) {
-    ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
-    
-    if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 
-        commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().isVersion5Tag(processDefinition.getEngineVersion())) {
-      
-      return Flowable5Util.getFlowable5CompatibilityHandler().getFormKey(processDefinitionId, taskDefinitionKey); 
+    public String execute(CommandContext commandContext) {
+        ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
+
+        if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
+            return Flowable5Util.getFlowable5CompatibilityHandler().getFormKey(processDefinitionId, taskDefinitionKey);
+        }
+
+        DefaultFormHandler formHandler;
+        if (taskDefinitionKey == null) {
+            // TODO: Maybe add getFormKey() to FormHandler interface to avoid the following cast
+            formHandler = (DefaultFormHandler) FormHandlerUtil.getStartFormHandler(commandContext, processDefinition);
+        } else {
+            // TODO: Maybe add getFormKey() to FormHandler interface to avoid the following cast
+            formHandler = (DefaultFormHandler) FormHandlerUtil.getTaskFormHandlder(processDefinitionId, taskDefinitionKey);
+        }
+        String formKey = null;
+        if (formHandler.getFormKey() != null) {
+            formKey = formHandler.getFormKey().getExpressionText();
+        }
+        return formKey;
     }
-    
-    DefaultFormHandler formHandler;
-    if (taskDefinitionKey == null) {
-      // TODO: Maybe add getFormKey() to FormHandler interface to avoid the following cast
-      formHandler = (DefaultFormHandler) FormHandlerUtil.getStartFormHandler(commandContext, processDefinition); 
-    } else {
-      // TODO: Maybe add getFormKey() to FormHandler interface to avoid the following cast
-      formHandler = (DefaultFormHandler) FormHandlerUtil.getTaskFormHandlder(processDefinitionId, taskDefinitionKey); 
-    }
-    String formKey = null;
-    if (formHandler.getFormKey() != null) {
-      formKey = formHandler.getFormKey().getExpressionText();
-    }
-    return formKey;
-  }
 
 }

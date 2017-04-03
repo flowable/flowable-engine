@@ -28,65 +28,64 @@ import org.flowable.engine.impl.persistence.entity.TaskEntity;
  */
 public class VariableScopeResolver implements Resolver {
 
-  protected ProcessEngineConfigurationImpl processEngineConfiguration;
-  protected VariableScope variableScope;
-  
-  protected String variableScopeKey = "execution";
-  
-  protected static final String processEngineConfigurationKey = "processEngineConfiguration";
-  protected static final String runtimeServiceKey = "runtimeService";
-  protected static final String taskServiceKey = "taskService";
-  protected static final String repositoryServiceKey = "repositoryService";
-  protected static final String managementServiceKey = "managementService";
-  protected static final String historyServiceKey = "historyService";
-  protected static final String formServiceKey = "formService";
-  protected static final String identityServiceKey = "identityServiceKey";
-  
-  protected static final List<String> KEYS = Arrays.asList( 
-      processEngineConfigurationKey, runtimeServiceKey, taskServiceKey, 
-      repositoryServiceKey, managementServiceKey, historyServiceKey, formServiceKey, identityServiceKey);
-  
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    protected VariableScope variableScope;
 
-  public VariableScopeResolver(ProcessEngineConfigurationImpl processEngineConfiguration, VariableScope variableScope) {
-    
-    this.processEngineConfiguration = processEngineConfiguration;
-    
-    if (variableScope == null) {
-      throw new FlowableIllegalArgumentException("variableScope cannot be null");
-    }
-    if (variableScope instanceof ExecutionEntity) {
-      variableScopeKey = "execution";
-    } else if (variableScope instanceof TaskEntity) {
-      variableScopeKey = "task";
-    } else {
-      throw new FlowableException("unsupported variable scope type: " + variableScope.getClass().getName());
-    }
-    this.variableScope = variableScope;
-  }
+    protected String variableScopeKey = "execution";
 
-  public boolean containsKey(Object key) {
-    return variableScopeKey.equals(key) || KEYS.contains(key)|| variableScope.hasVariable((String) key);
-  }
+    protected static final String processEngineConfigurationKey = "processEngineConfiguration";
+    protected static final String runtimeServiceKey = "runtimeService";
+    protected static final String taskServiceKey = "taskService";
+    protected static final String repositoryServiceKey = "repositoryService";
+    protected static final String managementServiceKey = "managementService";
+    protected static final String historyServiceKey = "historyService";
+    protected static final String formServiceKey = "formService";
+    protected static final String identityServiceKey = "identityServiceKey";
 
-  public Object get(Object key) {
-    if (variableScopeKey.equals(key)) {
-      return variableScope;
-    } else if (processEngineConfigurationKey.equals(key)) {
-      return processEngineConfiguration;
-    } else if (runtimeServiceKey.equals(key)) {
-      return processEngineConfiguration.getRuntimeService();
-    } else if (taskServiceKey.equals(key)) {
-      return processEngineConfiguration.getTaskService();
-    } else if (repositoryServiceKey.equals(key)) {
-      return processEngineConfiguration.getRepositoryService();
-    } else if (managementServiceKey.equals(key)) {
-      return processEngineConfiguration.getManagementService();
-    } else if (formServiceKey.equals(key)) {
-      return processEngineConfiguration.getFormService();
-    } else if (identityServiceKey.equals(key)) {
-      return processEngineConfiguration.getIdentityService();
+    protected static final List<String> KEYS = Arrays.asList(
+            processEngineConfigurationKey, runtimeServiceKey, taskServiceKey,
+            repositoryServiceKey, managementServiceKey, historyServiceKey, formServiceKey, identityServiceKey);
+
+    public VariableScopeResolver(ProcessEngineConfigurationImpl processEngineConfiguration, VariableScope variableScope) {
+
+        this.processEngineConfiguration = processEngineConfiguration;
+
+        if (variableScope == null) {
+            throw new FlowableIllegalArgumentException("variableScope cannot be null");
+        }
+        if (variableScope instanceof ExecutionEntity) {
+            variableScopeKey = "execution";
+        } else if (variableScope instanceof TaskEntity) {
+            variableScopeKey = "task";
+        } else {
+            throw new FlowableException("unsupported variable scope type: " + variableScope.getClass().getName());
+        }
+        this.variableScope = variableScope;
     }
 
-    return variableScope.getVariable((String) key);
-  }
+    public boolean containsKey(Object key) {
+        return variableScopeKey.equals(key) || KEYS.contains(key) || variableScope.hasVariable((String) key);
+    }
+
+    public Object get(Object key) {
+        if (variableScopeKey.equals(key)) {
+            return variableScope;
+        } else if (processEngineConfigurationKey.equals(key)) {
+            return processEngineConfiguration;
+        } else if (runtimeServiceKey.equals(key)) {
+            return processEngineConfiguration.getRuntimeService();
+        } else if (taskServiceKey.equals(key)) {
+            return processEngineConfiguration.getTaskService();
+        } else if (repositoryServiceKey.equals(key)) {
+            return processEngineConfiguration.getRepositoryService();
+        } else if (managementServiceKey.equals(key)) {
+            return processEngineConfiguration.getManagementService();
+        } else if (formServiceKey.equals(key)) {
+            return processEngineConfiguration.getFormService();
+        } else if (identityServiceKey.equals(key)) {
+            return processEngineConfiguration.getIdentityService();
+        }
+
+        return variableScope.getVariable((String) key);
+    }
 }

@@ -25,28 +25,28 @@ import org.flowable.engine.test.Deployment;
  */
 public class WatchDogAgendaTest extends ResourceFlowableTestCase {
 
-  public WatchDogAgendaTest() {
-    super("org/flowable/examples/runtime/WatchDogAgendaTest.flowable.cfg.xml");
-  }
-
-  @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
-  public void testWatchDogWithOneTaskProcess() {
-    this.runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    Task task = this.taskService.createTaskQuery().singleResult();
-    this.taskService.complete(task.getId());
-    assertThat(this.runtimeService.createProcessInstanceQuery().count(), is(0L));
-  }
-
-  @Deployment(resources = "org/flowable/examples/runtime/WatchDogAgendaTest-endlessloop.bpmn20.xml")
-  public void testWatchDogWithEndLessLoop() {
-    try {
-      this.runtimeService.startProcessInstanceByKey("endlessloop");
-      fail("ActivitiException with 'WatchDog limit exceeded.' message expected.");
-    } catch (FlowableException e) {
-      if (!"WatchDog limit exceeded.".equals(e.getMessage())) {
-        fail("Unexpected exception " + e);
-      }
+    public WatchDogAgendaTest() {
+        super("org/flowable/examples/runtime/WatchDogAgendaTest.flowable.cfg.xml");
     }
-  }
+
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    public void testWatchDogWithOneTaskProcess() {
+        this.runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        Task task = this.taskService.createTaskQuery().singleResult();
+        this.taskService.complete(task.getId());
+        assertThat(this.runtimeService.createProcessInstanceQuery().count(), is(0L));
+    }
+
+    @Deployment(resources = "org/flowable/examples/runtime/WatchDogAgendaTest-endlessloop.bpmn20.xml")
+    public void testWatchDogWithEndLessLoop() {
+        try {
+            this.runtimeService.startProcessInstanceByKey("endlessloop");
+            fail("ActivitiException with 'WatchDog limit exceeded.' message expected.");
+        } catch (FlowableException e) {
+            if (!"WatchDog limit exceeded.".equals(e.getMessage())) {
+                fail("Unexpected exception " + e);
+            }
+        }
+    }
 
 }

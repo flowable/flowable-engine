@@ -38,47 +38,47 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
-  
-  public static final String REST_ENDPOINTS_PREFIX = "/app/rest";
-	
-	@Bean
-	public FlowableCookieFilter flowableCookieFilter() {
-	  FlowableCookieFilter filter = new FlowableCookieFilter();
-	  filter.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_MODELER));
-	  return filter;
-	}
-	
-	@Configuration
-	@Order(10)
-  public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    protected FlowableCookieFilter flowableCookieFilter;
+    public static final String REST_ENDPOINTS_PREFIX = "/app/rest";
 
-    @Autowired
-    protected AjaxLogoutSuccessHandler ajaxLogoutSuccessHandler;
-    
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-      http
-        .sessionManagement()
-           .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
-          .addFilterBefore(flowableCookieFilter, UsernamePasswordAuthenticationFilter.class)
-          .logout()
-              .logoutUrl("/app/logout")
-              .logoutSuccessHandler(ajaxLogoutSuccessHandler)
-              .addLogoutHandler(new ClearFlowableCookieLogoutHandler())
-              .and()
-          .csrf()
-              .disable() // Disabled, cause enabling it will cause sessions
-          .headers()
-              .frameOptions()
-              	.sameOrigin()
-              	.addHeaderWriter(new XXssProtectionHeaderWriter())
-              	.and()
-          .authorizeRequests()
-            .antMatchers(REST_ENDPOINTS_PREFIX + "/**").hasAuthority(DefaultPrivileges.ACCESS_MODELER);
+    @Bean
+    public FlowableCookieFilter flowableCookieFilter() {
+        FlowableCookieFilter filter = new FlowableCookieFilter();
+        filter.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_MODELER));
+        return filter;
     }
-	}
+
+    @Configuration
+    @Order(10)
+    public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
+
+        @Autowired
+        protected FlowableCookieFilter flowableCookieFilter;
+
+        @Autowired
+        protected AjaxLogoutSuccessHandler ajaxLogoutSuccessHandler;
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http
+                    .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
+                    .addFilterBefore(flowableCookieFilter, UsernamePasswordAuthenticationFilter.class)
+                    .logout()
+                    .logoutUrl("/app/logout")
+                    .logoutSuccessHandler(ajaxLogoutSuccessHandler)
+                    .addLogoutHandler(new ClearFlowableCookieLogoutHandler())
+                    .and()
+                    .csrf()
+                    .disable() // Disabled, cause enabling it will cause sessions
+                    .headers()
+                    .frameOptions()
+                    .sameOrigin()
+                    .addHeaderWriter(new XXssProtectionHeaderWriter())
+                    .and()
+                    .authorizeRequests()
+                    .antMatchers(REST_ENDPOINTS_PREFIX + "/**").hasAuthority(DefaultPrivileges.ACCESS_MODELER);
+        }
+    }
 }

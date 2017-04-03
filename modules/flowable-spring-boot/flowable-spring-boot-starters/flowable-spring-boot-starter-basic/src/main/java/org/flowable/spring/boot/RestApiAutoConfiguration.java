@@ -30,28 +30,28 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @AutoConfigureAfter(SecurityAutoConfiguration.class)
-@ConditionalOnClass(name = {"org.flowable.rest.service.api.RestUrls", "org.springframework.web.servlet.DispatcherServlet"})
+@ConditionalOnClass(name = { "org.flowable.rest.service.api.RestUrls", "org.springframework.web.servlet.DispatcherServlet" })
 public class RestApiAutoConfiguration {
 
-  @Bean
-  public RestResponseFactory restResponseFactory() {
-    RestResponseFactory restResponseFactory = new RestResponseFactory();
-    return restResponseFactory;
-  }
+    @Bean
+    public RestResponseFactory restResponseFactory() {
+        RestResponseFactory restResponseFactory = new RestResponseFactory();
+        return restResponseFactory;
+    }
 
-  @Bean
-  public ContentTypeResolver contentTypeResolver() {
-    ContentTypeResolver resolver = new DefaultContentTypeResolver();
-    return resolver;
-  }
-  
-  @Configuration
-  @ComponentScan({"org.flowable.rest.exception", "org.flowable.rest.service.api"}) 
-  public static class ComponentScanRestResourcesConfiguration {
-  	
-  	// The component scan cannot be on the root configuration, it would trigger
-  	// always even if the condition is evaluating to false.
-  	// Hence, this 'dummy' configuration
-  	
-  }
+    @Bean
+    public ContentTypeResolver contentTypeResolver() {
+        ContentTypeResolver resolver = new DefaultContentTypeResolver();
+        return resolver;
+    }
+
+    @Configuration
+    @ComponentScan({ "org.flowable.rest.exception", "org.flowable.rest.service.api" })
+    public static class ComponentScanRestResourcesConfiguration {
+
+        // The component scan cannot be on the root configuration, it would trigger
+        // always even if the condition is evaluating to false.
+        // Hence, this 'dummy' configuration
+
+    }
 }

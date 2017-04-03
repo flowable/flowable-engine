@@ -32,76 +32,76 @@ import org.flowable.engine.runtime.Job;
  */
 public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
 
-  public void testJobCommandsWithMessage() {
-    ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (ProcessEngineConfigurationImpl) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
-    CommandExecutor commandExecutor = activiti5ProcessEngineConfig.getCommandExecutor();
-    
-    String jobId = commandExecutor.execute(new Command<String>() {
+    public void testJobCommandsWithMessage() {
+        ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (ProcessEngineConfigurationImpl) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
+        CommandExecutor commandExecutor = activiti5ProcessEngineConfig.getCommandExecutor();
 
-      public String execute(CommandContext commandContext) {
-        JobEntity message = createTweetMessage("i'm coding a test");
-        commandContext.getJobEntityManager().send(message);
-        return message.getId();
-      }
-    });
+        String jobId = commandExecutor.execute(new Command<String>() {
 
-    Job job  = managementService.createJobQuery().singleResult();
-    assertNotNull(job);
-    assertEquals(jobId, job.getId());
-    
-    assertEquals(0, tweetHandler.getMessages().size());
+            public String execute(CommandContext commandContext) {
+                JobEntity message = createTweetMessage("i'm coding a test");
+                commandContext.getJobEntityManager().send(message);
+                return message.getId();
+            }
+        });
 
-    activiti5ProcessEngineConfig.getManagementService().executeJob(job.getId());
+        Job job = managementService.createJobQuery().singleResult();
+        assertNotNull(job);
+        assertEquals(jobId, job.getId());
 
-    assertEquals("i'm coding a test", tweetHandler.getMessages().get(0));
-    assertEquals(1, tweetHandler.getMessages().size());
-  }
+        assertEquals(0, tweetHandler.getMessages().size());
 
-  static final long SOME_TIME = 928374923546L;
-  static final long SECOND = 1000;
+        activiti5ProcessEngineConfig.getManagementService().executeJob(job.getId());
 
-  public void testJobCommandsWithTimer() {
-    ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (ProcessEngineConfigurationImpl) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
-    
-    // clock gets automatically reset in LogTestCase.runTest
-    Clock clock = processEngineConfiguration.getClock();
-    clock.setCurrentTime(new Date(SOME_TIME));
-    processEngineConfiguration.setClock(clock);
+        assertEquals("i'm coding a test", tweetHandler.getMessages().get(0));
+        assertEquals(1, tweetHandler.getMessages().size());
+    }
 
-    AsyncExecutor asyncExecutor = processEngineConfiguration.getAsyncExecutor();
-    CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
-    
-    String jobId = commandExecutor.execute(new Command<String>() {
+    static final long SOME_TIME = 928374923546L;
+    static final long SECOND = 1000;
 
-      public String execute(CommandContext commandContext) {
-        TimerJobEntity timer = createTweetTimer("i'm coding a test", new Date(SOME_TIME + (10 * SECOND)));
-        commandContext.getJobEntityManager().schedule(timer);
-        return timer.getId();
-      }
-    });
+    public void testJobCommandsWithTimer() {
+        ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (ProcessEngineConfigurationImpl) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
 
-    AcquiredTimerJobEntities acquiredJobs = processEngineConfiguration.getCommandExecutor().execute(new AcquireTimerJobsCmd(asyncExecutor));
-    assertEquals(0, acquiredJobs.size());
+        // clock gets automatically reset in LogTestCase.runTest
+        Clock clock = processEngineConfiguration.getClock();
+        clock.setCurrentTime(new Date(SOME_TIME));
+        processEngineConfiguration.setClock(clock);
 
-    clock.setCurrentTime(new Date(SOME_TIME + (20 * SECOND)));
-    processEngineConfiguration.setClock(clock);
+        AsyncExecutor asyncExecutor = processEngineConfiguration.getAsyncExecutor();
+        CommandExecutor commandExecutor = (CommandExecutor) processEngineConfiguration.getFlowable5CompatibilityHandler().getRawCommandExecutor();
 
-    acquiredJobs = processEngineConfiguration.getCommandExecutor().execute(new AcquireTimerJobsCmd(asyncExecutor));
-    assertEquals(1, acquiredJobs.size());
+        String jobId = commandExecutor.execute(new Command<String>() {
 
-    Job job = acquiredJobs.getJobs().iterator().next();
+            public String execute(CommandContext commandContext) {
+                TimerJobEntity timer = createTweetTimer("i'm coding a test", new Date(SOME_TIME + (10 * SECOND)));
+                commandContext.getJobEntityManager().schedule(timer);
+                return timer.getId();
+            }
+        });
 
-    assertEquals(jobId, job.getId());
+        AcquiredTimerJobEntities acquiredJobs = processEngineConfiguration.getCommandExecutor().execute(new AcquireTimerJobsCmd(asyncExecutor));
+        assertEquals(0, acquiredJobs.size());
 
-    assertEquals(0, tweetHandler.getMessages().size());
+        clock.setCurrentTime(new Date(SOME_TIME + (20 * SECOND)));
+        processEngineConfiguration.setClock(clock);
 
-    managementService.moveTimerToExecutableJob(jobId);
-    JobEntity jobEntity = (JobEntity) activiti5ProcessEngineConfig.getManagementService().createJobQuery().singleResult();
-    activiti5ProcessEngineConfig.getCommandExecutor().execute(new ExecuteAsyncJobCmd(jobEntity));
+        acquiredJobs = processEngineConfiguration.getCommandExecutor().execute(new AcquireTimerJobsCmd(asyncExecutor));
+        assertEquals(1, acquiredJobs.size());
 
-    assertEquals("i'm coding a test", tweetHandler.getMessages().get(0));
-    assertEquals(1, tweetHandler.getMessages().size());
-    
-    processEngineConfiguration.resetClock();
-  }
+        Job job = acquiredJobs.getJobs().iterator().next();
+
+        assertEquals(jobId, job.getId());
+
+        assertEquals(0, tweetHandler.getMessages().size());
+
+        managementService.moveTimerToExecutableJob(jobId);
+        JobEntity jobEntity = (JobEntity) activiti5ProcessEngineConfig.getManagementService().createJobQuery().singleResult();
+        activiti5ProcessEngineConfig.getCommandExecutor().execute(new ExecuteAsyncJobCmd(jobEntity));
+
+        assertEquals("i'm coding a test", tweetHandler.getMessages().get(0));
+        assertEquals(1, tweetHandler.getMessages().size());
+
+        processEngineConfiguration.resetClock();
+    }
 }

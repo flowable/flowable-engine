@@ -22,25 +22,25 @@ import org.activiti.engine.impl.interceptor.CommandContext;
  * @author Joram Barrez
  */
 public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
-  
-  private static final long serialVersionUID = 1L;
-  protected String processInstanceId;
-  protected String deleteReason;
 
-  public DeleteProcessInstanceCmd(String processInstanceId, String deleteReason) {
-    this.processInstanceId = processInstanceId;
-    this.deleteReason = deleteReason;
-  }
+    private static final long serialVersionUID = 1L;
+    protected String processInstanceId;
+    protected String deleteReason;
 
-  public Void execute(CommandContext commandContext) { 
-    if (processInstanceId == null) {
-      throw new ActivitiIllegalArgumentException("processInstanceId is null");
+    public DeleteProcessInstanceCmd(String processInstanceId, String deleteReason) {
+        this.processInstanceId = processInstanceId;
+        this.deleteReason = deleteReason;
     }
 
-    commandContext
-      .getExecutionEntityManager()
-      .deleteProcessInstance(processInstanceId, deleteReason);
-    return null;
-  }
+    public Void execute(CommandContext commandContext) {
+        if (processInstanceId == null) {
+            throw new ActivitiIllegalArgumentException("processInstanceId is null");
+        }
+
+        commandContext
+                .getExecutionEntityManager()
+                .deleteProcessInstance(processInstanceId, deleteReason);
+        return null;
+    }
 
 }

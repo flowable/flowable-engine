@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.apache.commons.io.IOUtils;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -40,58 +41,58 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Form Definitions" }, description = "Manage Form Definitions")
-public class FormDefinitionResourceDataResource  {
+@Api(tags = { "Form Definitions" }, description = "Manage Form Definitions", authorizations = { @Authorization(value = "basicAuth") })
+public class FormDefinitionResourceDataResource {
 
-  @Autowired
-  protected FormRepositoryService formRepositoryService;
+    @Autowired
+    protected FormRepositoryService formRepositoryService;
 
-  @Autowired
-  protected ContentTypeResolver contentTypeResolver;
+    @Autowired
+    protected ContentTypeResolver contentTypeResolver;
 
-  @ApiOperation(value = "List of form definitions", tags = {"Form Definitions"})
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Indicates both form definition and resource have been found and the resource data has been returned."),
-      @ApiResponse(code = 404, message = "Indicates the requested form definition was not found or there is no resource with the given id present in the process definition. The status-description contains additional information.")
-  })
-  @RequestMapping(value = "/form-repository/form-definitions/{formDefinitionId}/resourcedata", method = RequestMethod.GET, produces = "application/json")
-  @ResponseBody
-  public byte[] getDecisionTableResource(@ApiParam(name = "formDefinitionId") @PathVariable String formDefinitionId, HttpServletResponse response) {
-    FormDefinition formDefinition = formRepositoryService.getFormDefinition(formDefinitionId);
+    @ApiOperation(value = "List of form definitions", tags = { "Form Definitions" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates both form definition and resource have been found and the resource data has been returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested form definition was not found or there is no resource with the given id present in the process definition. The status-description contains additional information.")
+    })
+    @RequestMapping(value = "/form-repository/form-definitions/{formDefinitionId}/resourcedata", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public byte[] getDecisionTableResource(@ApiParam(name = "formDefinitionId") @PathVariable String formDefinitionId, HttpServletResponse response) {
+        FormDefinition formDefinition = formRepositoryService.getFormDefinition(formDefinitionId);
 
-    if (formDefinition == null) {
-      throw new FlowableObjectNotFoundException("Could not find a form definition with id '" + formDefinitionId);
+        if (formDefinition == null) {
+            throw new FlowableObjectNotFoundException("Could not find a form definition with id '" + formDefinitionId);
+        }
+        if (formDefinition.getDeploymentId() == null) {
+            throw new FlowableException("No deployment id available");
+        }
+        if (formDefinition.getResourceName() == null) {
+            throw new FlowableException("No resource name available");
+        }
+
+        // Check if deployment exists
+        FormDeployment deployment = formRepositoryService.createDeploymentQuery().deploymentId(formDefinition.getDeploymentId()).singleResult();
+        if (deployment == null) {
+            throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + formDefinition.getDeploymentId());
+        }
+
+        List<String> resourceList = formRepositoryService.getDeploymentResourceNames(formDefinition.getDeploymentId());
+
+        if (resourceList.contains(formDefinition.getResourceName())) {
+            final InputStream resourceStream = formRepositoryService.getResourceAsStream(
+                    formDefinition.getDeploymentId(), formDefinition.getResourceName());
+
+            String contentType = contentTypeResolver.resolveContentType(formDefinition.getResourceName());
+            response.setContentType(contentType);
+            try {
+                return IOUtils.toByteArray(resourceStream);
+            } catch (Exception e) {
+                throw new FlowableException("Error converting resource stream", e);
+            }
+        } else {
+            // Resource not found in deployment
+            throw new FlowableObjectNotFoundException("Could not find a resource with id '" +
+                    formDefinition.getResourceName() + "' in deployment '" + formDefinition.getDeploymentId());
+        }
     }
-    if (formDefinition.getDeploymentId() == null) {
-      throw new FlowableException("No deployment id available");
-    }
-    if (formDefinition.getResourceName() == null) {
-      throw new FlowableException("No resource name available");
-    }
-
-    // Check if deployment exists
-    FormDeployment deployment = formRepositoryService.createDeploymentQuery().deploymentId(formDefinition.getDeploymentId()).singleResult();
-    if (deployment == null) {
-      throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + formDefinition.getDeploymentId());
-    }
-
-    List<String> resourceList = formRepositoryService.getDeploymentResourceNames(formDefinition.getDeploymentId());
-
-    if (resourceList.contains(formDefinition.getResourceName())) {
-      final InputStream resourceStream = formRepositoryService.getResourceAsStream(
-          formDefinition.getDeploymentId(), formDefinition.getResourceName());
-
-      String contentType = contentTypeResolver.resolveContentType(formDefinition.getResourceName());
-      response.setContentType(contentType);
-      try {
-        return IOUtils.toByteArray(resourceStream);
-      } catch (Exception e) {
-        throw new FlowableException("Error converting resource stream", e);
-      }
-    } else {
-      // Resource not found in deployment
-      throw new FlowableObjectNotFoundException("Could not find a resource with id '" + 
-          formDefinition.getResourceName() + "' in deployment '" + formDefinition.getDeploymentId());
-    }
-  }
 }

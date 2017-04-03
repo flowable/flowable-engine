@@ -22,12 +22,12 @@ import org.flowable.idm.engine.impl.persistence.entity.IdentityInfoEntity;
  */
 public interface IdentityInfoDataManager extends DataManager<IdentityInfoEntity> {
 
-  List<IdentityInfoEntity> findIdentityInfoDetails(String identityInfoId);
-  
-  List<IdentityInfoEntity> findIdentityInfoByUserId(String userId);
-  
-  IdentityInfoEntity findUserInfoByUserIdAndKey(String userId, String key);
+    List<IdentityInfoEntity> findIdentityInfoDetails(String identityInfoId);
 
-  List<String> findUserInfoKeysByUserIdAndType(String userId, String type);
-  
+    List<IdentityInfoEntity> findIdentityInfoByUserId(String userId);
+
+    IdentityInfoEntity findUserInfoByUserIdAndKey(String userId, String key);
+
+    List<String> findUserInfoKeysByUserIdAndType(String userId, String type);
+
 }

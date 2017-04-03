@@ -20,38 +20,37 @@ import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
-
 /**
  * @author Joram Barrez
  */
 public class ConnectionPoolTest extends PvmTestCase {
-  
-  public void testMyBatisConnectionPoolProperlyConfigured() {
-    ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/activiti/engine/test/db/connection-pool.flowable.cfg.xml");
-    
-    config.buildProcessEngine();
-    
-    // Expected values
-    int maxActive = 25;
-    int maxIdle = 10;
-    int maxCheckoutTime = 30000;
-    int maxWaitTime = 25000;
-    
-    assertEquals(maxActive, config.getJdbcMaxActiveConnections());
-    assertEquals(maxIdle, config.getJdbcMaxIdleConnections());
-    assertEquals(maxCheckoutTime, config.getJdbcMaxCheckoutTime());
-    assertEquals(maxWaitTime, config.getJdbcMaxWaitTime());
-    
-    // Verify that these properties are correctly set in the MyBatis datasource
-    DataSource datasource = config.getDbSqlSessionFactory().getSqlSessionFactory().getConfiguration().getEnvironment().getDataSource();
-    assertTrue(datasource instanceof PooledDataSource);
-    
-    PooledDataSource pooledDataSource = (PooledDataSource) datasource;
-    assertEquals(maxActive, pooledDataSource.getPoolMaximumActiveConnections());
-    assertEquals(maxIdle, pooledDataSource.getPoolMaximumIdleConnections());
-    assertEquals(maxCheckoutTime, pooledDataSource.getPoolMaximumCheckoutTime());
-    assertEquals(maxWaitTime, pooledDataSource.getPoolTimeToWait());
-  }
+
+    public void testMyBatisConnectionPoolProperlyConfigured() {
+        ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
+                .createProcessEngineConfigurationFromResource("org/activiti/engine/test/db/connection-pool.flowable.cfg.xml");
+
+        config.buildProcessEngine();
+
+        // Expected values
+        int maxActive = 25;
+        int maxIdle = 10;
+        int maxCheckoutTime = 30000;
+        int maxWaitTime = 25000;
+
+        assertEquals(maxActive, config.getJdbcMaxActiveConnections());
+        assertEquals(maxIdle, config.getJdbcMaxIdleConnections());
+        assertEquals(maxCheckoutTime, config.getJdbcMaxCheckoutTime());
+        assertEquals(maxWaitTime, config.getJdbcMaxWaitTime());
+
+        // Verify that these properties are correctly set in the MyBatis datasource
+        DataSource datasource = config.getDbSqlSessionFactory().getSqlSessionFactory().getConfiguration().getEnvironment().getDataSource();
+        assertTrue(datasource instanceof PooledDataSource);
+
+        PooledDataSource pooledDataSource = (PooledDataSource) datasource;
+        assertEquals(maxActive, pooledDataSource.getPoolMaximumActiveConnections());
+        assertEquals(maxIdle, pooledDataSource.getPoolMaximumIdleConnections());
+        assertEquals(maxCheckoutTime, pooledDataSource.getPoolMaximumCheckoutTime());
+        assertEquals(maxWaitTime, pooledDataSource.getPoolTimeToWait());
+    }
 
 }

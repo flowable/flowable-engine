@@ -22,89 +22,89 @@ import org.flowable.app.model.common.AbstractRepresentation;
  */
 public class DecisionTableRepresentation extends AbstractRepresentation {
 
-  protected String id;
-  protected String name;
-  protected String key;
-  protected String description;
-  protected Integer version;
-  protected String lastUpdatedBy;
-  protected Date lastUpdated;
-  protected DecisionTableDefinitionRepresentation decisionTableDefinition;
+    protected String id;
+    protected String name;
+    protected String key;
+    protected String description;
+    protected Integer version;
+    protected String lastUpdatedBy;
+    protected Date lastUpdated;
+    protected DecisionTableDefinitionRepresentation decisionTableDefinition;
 
-  public DecisionTableRepresentation(AbstractModel model) {
-    this.id = model.getId();
-    this.name = model.getName();
-    this.key = model.getKey();
-    this.description = model.getDescription();
-    this.version = model.getVersion();
-    this.lastUpdated = model.getLastUpdated();
-    this.lastUpdatedBy = model.getLastUpdatedBy();
-  }
+    public DecisionTableRepresentation(AbstractModel model) {
+        this.id = model.getId();
+        this.name = model.getName();
+        this.key = model.getKey();
+        this.description = model.getDescription();
+        this.version = model.getVersion();
+        this.lastUpdated = model.getLastUpdated();
+        this.lastUpdatedBy = model.getLastUpdatedBy();
+    }
 
-  public DecisionTableRepresentation() {
-  }
+    public DecisionTableRepresentation() {
+    }
 
-  public String getId() {
-    return id;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public void setId(String id) {
-    this.id = id;
-  }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
-  
-  public String getKey() {
-    return key;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public void setKey(String key) {
-    this.key = key;
-  }
+    public String getKey() {
+        return key;
+    }
 
-  public String getDescription() {
-    return description;
-  }
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public Integer getVersion() {
-    return version;
-  }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-  public void setVersion(Integer version) {
-    this.version = version;
-  }
+    public Integer getVersion() {
+        return version;
+    }
 
-  public String getLastUpdatedBy() {
-    return lastUpdatedBy;
-  }
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
 
-  public void setLastUpdatedBy(String lastUpdatedBy) {
-    this.lastUpdatedBy = lastUpdatedBy;
-  }
+    public String getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
 
-  public Date getLastUpdated() {
-    return lastUpdated;
-  }
+    public void setLastUpdatedBy(String lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
 
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
-  }
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
 
-  public DecisionTableDefinitionRepresentation getDecisionTableDefinition() {
-    return decisionTableDefinition;
-  }
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
 
-  public void setDecisionTableDefinition(DecisionTableDefinitionRepresentation decisionTableDefinition) {
-    this.decisionTableDefinition = decisionTableDefinition;
-  }
+    public DecisionTableDefinitionRepresentation getDecisionTableDefinition() {
+        return decisionTableDefinition;
+    }
+
+    public void setDecisionTableDefinition(DecisionTableDefinitionRepresentation decisionTableDefinition) {
+        this.decisionTableDefinition = decisionTableDefinition;
+    }
 }

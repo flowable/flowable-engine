@@ -28,38 +28,34 @@ import java.util.Map;
  */
 public class ProcessInstanceCreateTransformer extends Flowable2SimulationEventFunction {
 
-  public static final String PROCESS_INSTANCE_ID = "processInstanceId";
-  private final String processDefinitionIdKey;
-  private final String businessKey;
-  private final String variablesKey;
+    public static final String PROCESS_INSTANCE_ID = "processInstanceId";
+    private final String processDefinitionIdKey;
+    private final String businessKey;
+    private final String variablesKey;
 
-  public ProcessInstanceCreateTransformer(String simulationEventType, String processDefinitionIdKey, String businessKey, String variablesKey) {
-    super(simulationEventType);
-    this.processDefinitionIdKey = processDefinitionIdKey;
-    this.businessKey = businessKey;
-    this.variablesKey = variablesKey;
-  }
-
-  @Override
-  public SimulationEvent apply(FlowableEvent event) {
-    if (FlowableEngineEventType.ENTITY_INITIALIZED == event.getType() && (event instanceof FlowableEntityEvent) && ((FlowableEntityEvent) event).getEntity() instanceof ProcessInstance
-        && ((ExecutionEntity) ((FlowableEntityEvent) event).getEntity()).isProcessInstanceType()) {
-
-      ProcessInstance processInstance = (ProcessInstance) ((FlowableEntityEvent) event).getEntity();
-      ExecutionEntity executionEntity = (ExecutionEntity) ((FlowableEntityEvent) event).getEntity();
-
-      Map<String, Object> simEventProperties = new HashMap<String, Object>();
-      simEventProperties.put(processDefinitionIdKey, processInstance.getProcessDefinitionId());
-      simEventProperties.put(businessKey, processInstance.getBusinessKey());
-      simEventProperties.put(variablesKey, executionEntity.getVariables());
-      simEventProperties.put(PROCESS_INSTANCE_ID, executionEntity.getProcessInstanceId());
-
-      return new SimulationEvent.Builder(simulationEventType).
-              simulationTime(Context.getProcessEngineConfiguration().getClock().getCurrentTime().getTime()).
-              properties(simEventProperties).
-              priority(2).
-              build();
+    public ProcessInstanceCreateTransformer(String simulationEventType, String processDefinitionIdKey, String businessKey, String variablesKey) {
+        super(simulationEventType);
+        this.processDefinitionIdKey = processDefinitionIdKey;
+        this.businessKey = businessKey;
+        this.variablesKey = variablesKey;
     }
-    return null;
-  }
+
+    @Override
+    public SimulationEvent apply(FlowableEvent event) {
+        if (FlowableEngineEventType.ENTITY_INITIALIZED == event.getType() && (event instanceof FlowableEntityEvent) && ((FlowableEntityEvent) event).getEntity() instanceof ProcessInstance
+                && ((ExecutionEntity) ((FlowableEntityEvent) event).getEntity()).isProcessInstanceType()) {
+
+            ProcessInstance processInstance = (ProcessInstance) ((FlowableEntityEvent) event).getEntity();
+            ExecutionEntity executionEntity = (ExecutionEntity) ((FlowableEntityEvent) event).getEntity();
+
+            Map<String, Object> simEventProperties = new HashMap<String, Object>();
+            simEventProperties.put(processDefinitionIdKey, processInstance.getProcessDefinitionId());
+            simEventProperties.put(businessKey, processInstance.getBusinessKey());
+            simEventProperties.put(variablesKey, executionEntity.getVariables());
+            simEventProperties.put(PROCESS_INSTANCE_ID, executionEntity.getProcessInstanceId());
+
+            return new SimulationEvent.Builder(simulationEventType).simulationTime(Context.getProcessEngineConfiguration().getClock().getCurrentTime().getTime()).properties(simEventProperties).priority(2).build();
+        }
+        return null;
+    }
 }

@@ -24,18 +24,18 @@ import org.flowable.idm.engine.impl.interceptor.CommandContext;
  */
 public class GetTableMetaDataCmd implements Command<TableMetaData>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String tableName;
+    private static final long serialVersionUID = 1L;
+    protected String tableName;
 
-  public GetTableMetaDataCmd(String tableName) {
-    this.tableName = tableName;
-  }
-
-  public TableMetaData execute(CommandContext commandContext) {
-    if (tableName == null) {
-      throw new FlowableIllegalArgumentException("tableName is null");
+    public GetTableMetaDataCmd(String tableName) {
+        this.tableName = tableName;
     }
-    return commandContext.getTableDataManager().getTableMetaData(tableName);
-  }
+
+    public TableMetaData execute(CommandContext commandContext) {
+        if (tableName == null) {
+            throw new FlowableIllegalArgumentException("tableName is null");
+        }
+        return commandContext.getTableDataManager().getTableMetaData(tableName);
+    }
 
 }

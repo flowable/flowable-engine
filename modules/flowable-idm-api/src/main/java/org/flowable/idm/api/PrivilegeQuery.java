@@ -23,20 +23,20 @@ import org.flowable.engine.common.api.query.Query;
  * @author Joram Barrez
  */
 public interface PrivilegeQuery extends Query<PrivilegeQuery, Privilege> {
-  
-  /** Only select {@link Privilege}s with the given id/ */
-  PrivilegeQuery privilegeId(String id);
-  
-  /** Only select {@link Privilege}s with the given name */
-  PrivilegeQuery privilegeName(String name);
-  
-  /** Only select {@link Privilege}s with the given user id. */
-  PrivilegeQuery userId(String userId);
-  
-  /** Only select {@link Privilege}s with the given group id. */
-  PrivilegeQuery groupId(String groupId);
-  
-  /** Only select {@link Privilege}s with the given group ids. */
-  PrivilegeQuery groupIds(List<String> groupIds);
+
+    /** Only select {@link Privilege}s with the given id/ */
+    PrivilegeQuery privilegeId(String id);
+
+    /** Only select {@link Privilege}s with the given name */
+    PrivilegeQuery privilegeName(String name);
+
+    /** Only select {@link Privilege}s with the given user id. */
+    PrivilegeQuery userId(String userId);
+
+    /** Only select {@link Privilege}s with the given group id. */
+    PrivilegeQuery groupId(String groupId);
+
+    /** Only select {@link Privilege}s with the given group ids. */
+    PrivilegeQuery groupIds(List<String> groupIds);
 
 }

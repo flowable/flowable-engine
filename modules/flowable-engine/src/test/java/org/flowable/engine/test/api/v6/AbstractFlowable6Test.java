@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Parent class for internal Activiti tests.
+ * Parent class for internal Flowable tests.
  * 
  * Boots up a process engine and caches it.
  * 
@@ -34,97 +34,97 @@ import org.slf4j.LoggerFactory;
  * @author Joram Barrez
  */
 public class AbstractFlowable6Test {
-  
-  private static final Logger logger = LoggerFactory.getLogger(AbstractFlowable6Test.class);
 
-  public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000";
+    private static final Logger logger = LoggerFactory.getLogger(AbstractFlowable6Test.class);
 
-  @Rule
-  public FlowableRule activitiRule = new FlowableRule();
+    public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000";
 
-  protected static ProcessEngine cachedProcessEngine;
-  protected ProcessEngineConfigurationImpl processEngineConfiguration;
-  protected RepositoryService repositoryService;
-  protected RuntimeService runtimeService;
-  protected TaskService taskService;
-  protected FormService formService;
-  protected HistoryService historyService;
-  protected ManagementService managementService;
+    @Rule
+    public FlowableRule activitiRule = new FlowableRule();
 
-  @Before
-  public void initProcessEngine() {
-    if (cachedProcessEngine == null) {
-      cachedProcessEngine = activitiRule.getProcessEngine();
+    protected static ProcessEngine cachedProcessEngine;
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    protected RepositoryService repositoryService;
+    protected RuntimeService runtimeService;
+    protected TaskService taskService;
+    protected FormService formService;
+    protected HistoryService historyService;
+    protected ManagementService managementService;
 
-      // Boot up H2 webapp
-      if (cachedProcessEngine instanceof ProcessEngineImpl) {
-        if (((ProcessEngineImpl) cachedProcessEngine).getProcessEngineConfiguration().getJdbcUrl().equals(H2_TEST_JDBC_URL)) {
-          initializeH2WebApp(cachedProcessEngine);
+    @Before
+    public void initProcessEngine() {
+        if (cachedProcessEngine == null) {
+            cachedProcessEngine = activitiRule.getProcessEngine();
+
+            // Boot up H2 webapp
+            if (cachedProcessEngine instanceof ProcessEngineImpl) {
+                if (((ProcessEngineImpl) cachedProcessEngine).getProcessEngineConfiguration().getJdbcUrl().equals(H2_TEST_JDBC_URL)) {
+                    initializeH2WebApp(cachedProcessEngine);
+                }
+            }
         }
-      }
+
+        this.processEngineConfiguration = (ProcessEngineConfigurationImpl) cachedProcessEngine.getProcessEngineConfiguration();
+        this.repositoryService = cachedProcessEngine.getRepositoryService();
+        this.runtimeService = cachedProcessEngine.getRuntimeService();
+        this.taskService = cachedProcessEngine.getTaskService();
+        this.formService = cachedProcessEngine.getFormService();
+        this.historyService = cachedProcessEngine.getHistoryService();
+        this.managementService = cachedProcessEngine.getManagementService();
     }
 
-    this.processEngineConfiguration = (ProcessEngineConfigurationImpl) cachedProcessEngine.getProcessEngineConfiguration();
-    this.repositoryService = cachedProcessEngine.getRepositoryService();
-    this.runtimeService = cachedProcessEngine.getRuntimeService();
-    this.taskService = cachedProcessEngine.getTaskService();
-    this.formService = cachedProcessEngine.getFormService();
-    this.historyService = cachedProcessEngine.getHistoryService();
-    this.managementService = cachedProcessEngine.getManagementService();
-  }
-
-  @After
-  public void resetClock() {
-    activitiRule.getProcessEngine().getProcessEngineConfiguration().getClock().reset();
-  }
-
-  @After
-  public void logCommandInvokerDebugInfo() {
-
-    ProcessExecutionLoggerConfigurator loggerConfigurator = null;
-    List<ProcessEngineConfigurator> configurators = ((ProcessEngineImpl) cachedProcessEngine).getProcessEngineConfiguration().getConfigurators();
-    if (configurators != null && configurators.size() > 0) {
-      for (ProcessEngineConfigurator configurator : configurators) {
-        if (configurator instanceof ProcessExecutionLoggerConfigurator) {
-          loggerConfigurator = (ProcessExecutionLoggerConfigurator) configurator;
-          break;
-        }
-      }
-
-      if (loggerConfigurator != null) {
-        loggerConfigurator.getProcessExecutionLogger().logDebugInfo(true);
-      }
+    @After
+    public void resetClock() {
+        activitiRule.getProcessEngine().getProcessEngineConfiguration().getClock().reset();
     }
-  }
 
-  protected void initializeH2WebApp(ProcessEngine processEngine) {
-    try {
-      final Server server = Server.createWebServer("-web");
+    @After
+    public void logCommandInvokerDebugInfo() {
 
-      // Shutdown hook
-      final ProcessEngineConfiguration processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
-      final ProcessEngineLifecycleListener originalLifecycleListener = processEngineConfiguration.getProcessEngineLifecycleListener();
-      processEngineConfiguration.setProcessEngineLifecycleListener(new ProcessEngineLifecycleListener() {
+        ProcessExecutionLoggerConfigurator loggerConfigurator = null;
+        List<ProcessEngineConfigurator> configurators = ((ProcessEngineImpl) cachedProcessEngine).getProcessEngineConfiguration().getConfigurators();
+        if (configurators != null && configurators.size() > 0) {
+            for (ProcessEngineConfigurator configurator : configurators) {
+                if (configurator instanceof ProcessExecutionLoggerConfigurator) {
+                    loggerConfigurator = (ProcessExecutionLoggerConfigurator) configurator;
+                    break;
+                }
+            }
 
-        @Override
-        public void onProcessEngineClosed(ProcessEngine processEngine) {
-          server.stop();
-          originalLifecycleListener.onProcessEngineClosed(processEngine);
+            if (loggerConfigurator != null) {
+                loggerConfigurator.getProcessExecutionLogger().logDebugInfo(true);
+            }
         }
-
-        @Override
-        public void onProcessEngineBuilt(ProcessEngine processEngine) {
-          originalLifecycleListener.onProcessEngineBuilt(processEngine);
-        }
-
-      });
-
-      // Actually start the web server
-      server.start();
-
-    } catch (SQLException e) {
-      logger.warn("Could not start H2 webapp", e);
     }
-  }
+
+    protected void initializeH2WebApp(ProcessEngine processEngine) {
+        try {
+            final Server server = Server.createWebServer("-web");
+
+            // Shutdown hook
+            final ProcessEngineConfiguration processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
+            final ProcessEngineLifecycleListener originalLifecycleListener = processEngineConfiguration.getProcessEngineLifecycleListener();
+            processEngineConfiguration.setProcessEngineLifecycleListener(new ProcessEngineLifecycleListener() {
+
+                @Override
+                public void onProcessEngineClosed(ProcessEngine processEngine) {
+                    server.stop();
+                    originalLifecycleListener.onProcessEngineClosed(processEngine);
+                }
+
+                @Override
+                public void onProcessEngineBuilt(ProcessEngine processEngine) {
+                    originalLifecycleListener.onProcessEngineBuilt(processEngine);
+                }
+
+            });
+
+            // Actually start the web server
+            server.start();
+
+        } catch (SQLException e) {
+            logger.warn("Could not start H2 webapp", e);
+        }
+    }
 
 }

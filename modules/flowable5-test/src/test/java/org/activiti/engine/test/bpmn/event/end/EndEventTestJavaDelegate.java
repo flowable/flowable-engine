@@ -19,16 +19,16 @@ import org.flowable.engine.delegate.JavaDelegate;
  * @author Joram Barrez
  */
 public class EndEventTestJavaDelegate implements JavaDelegate {
-  
-  public static int timesCalled;
-  
-  public void execute(DelegateExecution execution) {
-    timesCalled++;
-    try {
-      Thread.sleep(3000L);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
+
+    public static int timesCalled;
+
+    public void execute(DelegateExecution execution) {
+        timesCalled++;
+        try {
+            Thread.sleep(3000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
-  }
 
 }

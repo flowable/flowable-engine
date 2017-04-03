@@ -41,60 +41,59 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RequestMapping("/rest/admin/deployments")
 public class DeploymentsClientResource extends AbstractClientResource {
 
-  private static final Logger logger = LoggerFactory.getLogger(DeploymentsClientResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeploymentsClientResource.class);
 
-  @Autowired
-  protected DeploymentService clientService;
+    @Autowired
+    protected DeploymentService clientService;
 
-  /**
-   * GET /rest/admin/deployments -> get a list of deployments.
-   */
-  @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-  public JsonNode listDeployments(HttpServletRequest request) {
-    logger.debug("REST request to get a list of deployments");
+    /**
+     * GET /rest/admin/deployments -> get a list of deployments.
+     */
+    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+    public JsonNode listDeployments(HttpServletRequest request) {
+        logger.debug("REST request to get a list of deployments");
 
-    JsonNode resultNode = null;
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-    Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
-
-    try {
-      resultNode = clientService.listDeployments(serverConfig, parameterMap);
-
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting deployments", e);
-      throw new BadRequestException(e.getMessage());
-    }
-
-    return resultNode;
-  }
-
-  /**
-   * POST /rest/admin/deployments: upload a deployment
-   */
-  @RequestMapping(method = RequestMethod.POST, produces = "application/json")
-  public JsonNode handleFileUpload(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
-    if (!file.isEmpty()) {
-      try {
+        JsonNode resultNode = null;
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
-        String fileName = file.getOriginalFilename();
-        if (fileName != null && (fileName.endsWith(".bpmn") || fileName.endsWith(".bpmn20.xml") || fileName.endsWith(".zip") || fileName.endsWith(".bar"))) {
+        Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
 
-          return clientService.uploadDeployment(serverConfig, fileName, file.getInputStream());
+        try {
+            resultNode = clientService.listDeployments(serverConfig, parameterMap);
 
-        } else {
-          logger.error("Invalid filename {}", fileName);
-          throw new BadRequestException("Invalid file name");
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting deployments", e);
+            throw new BadRequestException(e.getMessage());
         }
 
-      } catch (IOException e) {
-        logger.error("Error deploying file", e);
-        throw new InternalServerErrorException("Could not deploy file: " + e.getMessage());
-      }
-
-    } else {
-      logger.error("No file found in POST request");
-      throw new BadRequestException("No file found in POST body");
+        return resultNode;
     }
-  }
+
+    /**
+     * POST /rest/admin/deployments: upload a deployment
+     */
+    @RequestMapping(method = RequestMethod.POST, produces = "application/json")
+    public JsonNode handleFileUpload(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+        if (!file.isEmpty()) {
+            try {
+                ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+                String fileName = file.getOriginalFilename();
+                if (fileName != null && (fileName.endsWith(".bpmn") || fileName.endsWith(".bpmn20.xml") || fileName.endsWith(".zip") || fileName.endsWith(".bar"))) {
+                    return clientService.uploadDeployment(serverConfig, fileName, file.getInputStream());
+
+                } else {
+                    logger.error("Invalid filename {}", fileName);
+                    throw new BadRequestException("Invalid file name");
+                }
+
+            } catch (Exception e) {
+                logger.error("Error deploying file", e);
+                throw new BadRequestException("Could not deploy file: " + e.getMessage());
+            }
+
+        } else {
+            logger.error("No file found in POST request");
+            throw new BadRequestException("No file found in POST body");
+        }
+    }
 
 }

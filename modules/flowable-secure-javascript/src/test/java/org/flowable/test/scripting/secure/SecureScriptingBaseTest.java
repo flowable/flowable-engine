@@ -31,61 +31,61 @@ import org.junit.Before;
  */
 public abstract class SecureScriptingBaseTest {
 
-  protected ProcessEngine processEngine;
-  protected RuntimeService runtimeService;
-  protected RepositoryService repositoryService;
-  protected TaskService taskService;
+    protected ProcessEngine processEngine;
+    protected RuntimeService runtimeService;
+    protected RepositoryService repositoryService;
+    protected TaskService taskService;
 
-  @Before
-  public void initProcessEngine() {
+    @Before
+    public void initProcessEngine() {
 
-    SecureJavascriptConfigurator configurator = new SecureJavascriptConfigurator()
-        .setWhiteListedClasses(new HashSet<String>(Collections.singletonList("java.util.ArrayList")))
-        .setMaxStackDepth(10).setMaxScriptExecutionTime(3000L)
-        .setMaxMemoryUsed(3145728L);
+        SecureJavascriptConfigurator configurator = new SecureJavascriptConfigurator()
+                .setWhiteListedClasses(new HashSet<String>(Collections.singletonList("java.util.ArrayList")))
+                .setMaxStackDepth(10).setMaxScriptExecutionTime(3000L)
+                .setMaxMemoryUsed(3145728L);
 
-    this.processEngine = new StandaloneInMemProcessEngineConfiguration()
-        .addConfigurator(configurator)
-        .setDatabaseSchemaUpdate("create-drop")
-        .buildProcessEngine();
+        this.processEngine = new StandaloneInMemProcessEngineConfiguration()
+                .addConfigurator(configurator)
+                .setDatabaseSchemaUpdate("create-drop")
+                .buildProcessEngine();
 
-    this.runtimeService = processEngine.getRuntimeService();
-    this.repositoryService = processEngine.getRepositoryService();
-    this.taskService = processEngine.getTaskService();
-  }
-
-  @After
-  public void shutdownProcessEngine() {
-
-    for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
-      repositoryService.deleteDeployment(deployment.getId(), true);
+        this.runtimeService = processEngine.getRuntimeService();
+        this.repositoryService = processEngine.getRepositoryService();
+        this.taskService = processEngine.getTaskService();
     }
 
-    this.taskService = null;
-    this.repositoryService = null;
-    this.runtimeService = null;
+    @After
+    public void shutdownProcessEngine() {
 
-    this.processEngine.close();
-    this.processEngine = null;
-  }
+        for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+            repositoryService.deleteDeployment(deployment.getId(), true);
+        }
 
-  protected void deployProcessDefinition(String classpathResource) {
-    repositoryService.createDeployment().addClasspathResource(classpathResource).deploy();
-  }
+        this.taskService = null;
+        this.repositoryService = null;
+        this.runtimeService = null;
 
-  protected void enableSysoutsInScript() {
-    addWhiteListedClass("java.lang.System");
-    addWhiteListedClass("java.io.PrintStream");
-  }
+        this.processEngine.close();
+        this.processEngine = null;
+    }
 
-  protected void addWhiteListedClass(String whiteListedClass) {
-    SecureScriptClassShutter secureScriptClassShutter = SecureJavascriptConfigurator.getSecureScriptClassShutter();
-    secureScriptClassShutter.addWhiteListedClass(whiteListedClass);
-  }
-  
-  protected void removeWhiteListedClass(String whiteListedClass) {
-    SecureScriptClassShutter secureScriptClassShutter = SecureJavascriptConfigurator.getSecureScriptClassShutter();
-    secureScriptClassShutter.removeWhiteListedClass(whiteListedClass);
-  }
+    protected void deployProcessDefinition(String classpathResource) {
+        repositoryService.createDeployment().addClasspathResource(classpathResource).deploy();
+    }
+
+    protected void enableSysoutsInScript() {
+        addWhiteListedClass("java.lang.System");
+        addWhiteListedClass("java.io.PrintStream");
+    }
+
+    protected void addWhiteListedClass(String whiteListedClass) {
+        SecureScriptClassShutter secureScriptClassShutter = SecureJavascriptConfigurator.getSecureScriptClassShutter();
+        secureScriptClassShutter.addWhiteListedClass(whiteListedClass);
+    }
+
+    protected void removeWhiteListedClass(String whiteListedClass) {
+        SecureScriptClassShutter secureScriptClassShutter = SecureJavascriptConfigurator.getSecureScriptClassShutter();
+        secureScriptClassShutter.removeWhiteListedClass(whiteListedClass);
+    }
 
 }

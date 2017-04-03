@@ -20,12 +20,12 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
  */
 public interface MembershipEntity extends Entity {
 
-  String getUserId();
+    String getUserId();
 
-  void setUserId(String userId);
+    void setUserId(String userId);
 
-  String getGroupId();
+    String getGroupId();
 
-  void setGroupId(String groupId);
+    void setGroupId(String groupId);
 
 }

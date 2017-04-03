@@ -22,10 +22,10 @@ import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
  */
 public interface ResourceDataManager extends DataManager<ResourceEntity> {
 
-  void deleteResourcesByDeploymentId(String deploymentId);
+    void deleteResourcesByDeploymentId(String deploymentId);
 
-  ResourceEntity findResourceByDeploymentIdAndResourceName(String deploymentId, String resourceName);
+    ResourceEntity findResourceByDeploymentIdAndResourceName(String deploymentId, String resourceName);
 
-  List<ResourceEntity> findResourcesByDeploymentId(String deploymentId);
-  
+    List<ResourceEntity> findResourcesByDeploymentId(String deploymentId);
+
 }

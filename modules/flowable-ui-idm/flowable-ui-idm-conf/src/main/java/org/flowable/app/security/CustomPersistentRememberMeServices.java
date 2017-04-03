@@ -64,174 +64,174 @@ import org.springframework.util.ReflectionUtils;
 @Service
 public class CustomPersistentRememberMeServices extends AbstractRememberMeServices implements CustomRememberMeService {
 
-  private final Logger log = LoggerFactory.getLogger(CustomPersistentRememberMeServices.class);
+    private final Logger log = LoggerFactory.getLogger(CustomPersistentRememberMeServices.class);
 
-  @Autowired
-  private PersistentTokenService persistentTokenService;
+    @Autowired
+    private PersistentTokenService persistentTokenService;
 
-  @Autowired
-  private CustomUserDetailService customUserDetailService;
+    @Autowired
+    private CustomUserDetailService customUserDetailService;
 
-  @Autowired
-  private IdmIdentityService identityService;
+    @Autowired
+    private IdmIdentityService identityService;
 
-  private final int tokenMaxAgeInSeconds;
-  private final long tokenMaxAgeInMilliseconds;
-  private final long tokenRefreshDurationInMilliseconds;
+    private final int tokenMaxAgeInSeconds;
+    private final long tokenMaxAgeInMilliseconds;
+    private final long tokenRefreshDurationInMilliseconds;
 
-  @Autowired
-  public CustomPersistentRememberMeServices(Environment env, org.springframework.security.core.userdetails.UserDetailsService userDetailsService) {
-    super(env.getProperty("security.rememberme.key"), userDetailsService);
+    @Autowired
+    public CustomPersistentRememberMeServices(Environment env, org.springframework.security.core.userdetails.UserDetailsService userDetailsService) {
+        super(env.getProperty("security.rememberme.key"), userDetailsService);
 
-    setAlwaysRemember(true);
+        setAlwaysRemember(true);
 
-    Integer tokenMaxAgeSeconds = env.getProperty("security.cookie.max-age", Integer.class);
-    if (tokenMaxAgeSeconds != null) {
-      log.info("Cookie max-age set to {} seconds", tokenMaxAgeSeconds);
-    } else {
-      tokenMaxAgeSeconds = 2678400; // Default: 31 days
+        Integer tokenMaxAgeSeconds = env.getProperty("security.cookie.max-age", Integer.class);
+        if (tokenMaxAgeSeconds != null) {
+            log.info("Cookie max-age set to {} seconds", tokenMaxAgeSeconds);
+        } else {
+            tokenMaxAgeSeconds = 2678400; // Default: 31 days
+        }
+        tokenMaxAgeInSeconds = tokenMaxAgeSeconds;
+        tokenMaxAgeInMilliseconds = tokenMaxAgeSeconds.longValue() * 1000L;
+
+        Integer tokenRefreshSeconds = env.getProperty("security.cookie.refresh-age", Integer.class);
+        if (tokenRefreshSeconds != null) {
+            log.info("Cookie refresh age set to {} seconds", tokenRefreshSeconds);
+        } else {
+            tokenRefreshSeconds = 86400; // Default : 1 day
+        }
+        tokenRefreshDurationInMilliseconds = tokenRefreshSeconds.longValue() * 1000L;
+
+        setCookieName(CookieConstants.COOKIE_NAME);
     }
-    tokenMaxAgeInSeconds = tokenMaxAgeSeconds;
-    tokenMaxAgeInMilliseconds = tokenMaxAgeSeconds.longValue() * 1000L;
 
-    Integer tokenRefreshSeconds = env.getProperty("security.cookie.refresh-age", Integer.class);
-    if (tokenRefreshSeconds != null) {
-      log.info("Cookie refresh age set to {} seconds", tokenRefreshSeconds);
-    } else {
-      tokenRefreshSeconds = 86400; // Default : 1 day
-    }
-    tokenRefreshDurationInMilliseconds = tokenRefreshSeconds.longValue() * 1000L;
+    @Override
+    protected void onLoginSuccess(HttpServletRequest request, HttpServletResponse response, Authentication successfulAuthentication) {
+        String userEmail = successfulAuthentication.getName();
 
-    setCookieName(CookieConstants.COOKIE_NAME);
-  }
+        log.debug("Creating new persistent login for user {}", userEmail);
+        FlowableAppUser appUser = (FlowableAppUser) successfulAuthentication.getPrincipal();
 
-  @Override
-  protected void onLoginSuccess(HttpServletRequest request, HttpServletResponse response, Authentication successfulAuthentication) {
-    String userEmail = successfulAuthentication.getName();
-
-    log.debug("Creating new persistent login for user {}", userEmail);
-    FlowableAppUser appUser = (FlowableAppUser) successfulAuthentication.getPrincipal();
-
-    Token token = createAndInsertPersistentToken(appUser.getUserObject(), request.getRemoteAddr(), request.getHeader("User-Agent"));
-    addCookie(token, request, response);
-  }
-
-  @Override
-  @Transactional
-  protected UserDetails processAutoLoginCookie(String[] cookieTokens, HttpServletRequest request, HttpServletResponse response) {
-
-    Token token = getPersistentToken(cookieTokens);
-
-    // Refresh token if refresh period has been passed
-    if (new Date().getTime() - token.getTokenDate().getTime() > tokenRefreshDurationInMilliseconds) {
-
-      // log.info("Refreshing persistent login token for user '{}', series '{}'", token.getUserId(), token.getSeries());
-      try {
-
-        // Refreshing: creating a new token to be used for subsequent calls
-
-        token = persistentTokenService.createToken(identityService.createUserQuery().userId(token.getUserId()).singleResult(), 
-            request.getRemoteAddr(), request.getHeader("User-Agent"));
+        Token token = createAndInsertPersistentToken(appUser.getUserObject(), request.getRemoteAddr(), request.getHeader("User-Agent"));
         addCookie(token, request, response);
-
-      } catch (DataAccessException e) {
-        log.error("Failed to update token: ", e);
-        throw new RememberMeAuthenticationException("Autologin failed due to data access problem: " + e.getMessage());
-      }
-
     }
 
-    return customUserDetailService.loadByUserId(token.getUserId());
-  }
+    @Override
+    @Transactional
+    protected UserDetails processAutoLoginCookie(String[] cookieTokens, HttpServletRequest request, HttpServletResponse response) {
 
-  /**
-   * When logout occurs, only invalidate the current token, and not all user sessions.
-   * <p/>
-   * The standard Spring Security implementations are too basic: they invalidate all tokens for the current user, so when he logs out from one browser, all his other sessions are destroyed.
-   */
-  @Override
-  @Transactional
-  public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-    String rememberMeCookie = extractRememberMeCookie(request);
-    if (rememberMeCookie != null && rememberMeCookie.length() != 0) {
-      try {
-        String[] cookieTokens = decodeCookie(rememberMeCookie);
         Token token = getPersistentToken(cookieTokens);
-        persistentTokenService.delete(token);
-      } catch (InvalidCookieException ice) {
-        log.info("Invalid cookie, no persistent token could be deleted");
-      } catch (RememberMeAuthenticationException rmae) {
-        log.debug("No persistent token found, so no token could be deleted");
-      }
-    }
-    super.logout(request, response, authentication);
-  }
 
-  /**
-   * Validate the token and return it.
-   */
-  private Token getPersistentToken(String[] cookieTokens) {
-    if (cookieTokens.length != 2) {
-      throw new InvalidCookieException("Cookie token did not contain " + 2 + " tokens, but contained '" + Arrays.asList(cookieTokens) + "'");
-    }
+        // Refresh token if refresh period has been passed
+        if (new Date().getTime() - token.getTokenDate().getTime() > tokenRefreshDurationInMilliseconds) {
 
-    final String presentedSeries = cookieTokens[0];
-    final String presentedToken = cookieTokens[1];
+            // log.info("Refreshing persistent login token for user '{}', series '{}'", token.getUserId(), token.getSeries());
+            try {
 
-    Token token = persistentTokenService.getPersistentToken(presentedSeries);
+                // Refreshing: creating a new token to be used for subsequent calls
 
-    if (token == null) {
-      // No series match, so we can't authenticate using this cookie
-      throw new RememberMeAuthenticationException("No persistent token found for series id: " + presentedSeries);
+                token = persistentTokenService.createToken(identityService.createUserQuery().userId(token.getUserId()).singleResult(),
+                        request.getRemoteAddr(), request.getHeader("User-Agent"));
+                addCookie(token, request, response);
+
+            } catch (DataAccessException e) {
+                log.error("Failed to update token: ", e);
+                throw new RememberMeAuthenticationException("Autologin failed due to data access problem: " + e.getMessage());
+            }
+
+        }
+
+        return customUserDetailService.loadByUserId(token.getUserId());
     }
 
-    // We have a match for this user/series combination
-    if (!presentedToken.equals(token.getTokenValue())) {
-
-      // This could be caused by the opportunity window where the token just has been refreshed, but
-      // has not been put into the token cache yet. Invalidate the token and refetch and it the new token value from the db is now returned.
-
-      token = persistentTokenService.getPersistentToken(presentedSeries, true); // Note the 'true' here, which invalidates the cache before fetching
-      if (!presentedToken.equals(token.getTokenValue())) {
-
-        // Token doesn't match series value. Delete this session and throw an exception.
-        persistentTokenService.delete(token);
-        throw new CookieTheftException("Invalid remember-me token (Series/token) mismatch. Implies previous cookie theft attack.");
-
-      }
+    /**
+     * When logout occurs, only invalidate the current token, and not all user sessions.
+     * <p/>
+     * The standard Spring Security implementations are too basic: they invalidate all tokens for the current user, so when he logs out from one browser, all his other sessions are destroyed.
+     */
+    @Override
+    @Transactional
+    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        String rememberMeCookie = extractRememberMeCookie(request);
+        if (rememberMeCookie != null && rememberMeCookie.length() != 0) {
+            try {
+                String[] cookieTokens = decodeCookie(rememberMeCookie);
+                Token token = getPersistentToken(cookieTokens);
+                persistentTokenService.delete(token);
+            } catch (InvalidCookieException ice) {
+                log.info("Invalid cookie, no persistent token could be deleted");
+            } catch (RememberMeAuthenticationException rmae) {
+                log.debug("No persistent token found, so no token could be deleted");
+            }
+        }
+        super.logout(request, response, authentication);
     }
 
-    if (new Date().getTime() - token.getTokenDate().getTime() > tokenMaxAgeInMilliseconds) {
-      throw new RememberMeAuthenticationException("Remember-me login has expired");
+    /**
+     * Validate the token and return it.
+     */
+    private Token getPersistentToken(String[] cookieTokens) {
+        if (cookieTokens.length != 2) {
+            throw new InvalidCookieException("Cookie token did not contain " + 2 + " tokens, but contained '" + Arrays.asList(cookieTokens) + "'");
+        }
+
+        final String presentedSeries = cookieTokens[0];
+        final String presentedToken = cookieTokens[1];
+
+        Token token = persistentTokenService.getPersistentToken(presentedSeries);
+
+        if (token == null) {
+            // No series match, so we can't authenticate using this cookie
+            throw new RememberMeAuthenticationException("No persistent token found for series id: " + presentedSeries);
+        }
+
+        // We have a match for this user/series combination
+        if (!presentedToken.equals(token.getTokenValue())) {
+
+            // This could be caused by the opportunity window where the token just has been refreshed, but
+            // has not been put into the token cache yet. Invalidate the token and refetch and it the new token value from the db is now returned.
+
+            token = persistentTokenService.getPersistentToken(presentedSeries, true); // Note the 'true' here, which invalidates the cache before fetching
+            if (!presentedToken.equals(token.getTokenValue())) {
+
+                // Token doesn't match series value. Delete this session and throw an exception.
+                persistentTokenService.delete(token);
+                throw new CookieTheftException("Invalid remember-me token (Series/token) mismatch. Implies previous cookie theft attack.");
+
+            }
+        }
+
+        if (new Date().getTime() - token.getTokenDate().getTime() > tokenMaxAgeInMilliseconds) {
+            throw new RememberMeAuthenticationException("Remember-me login has expired");
+        }
+        return token;
     }
-    return token;
-  }
 
-  private void addCookie(Token token, HttpServletRequest request, HttpServletResponse response) {
-    setCookie(new String[] { token.getId(), token.getTokenValue() }, tokenMaxAgeInSeconds, request, response);
-  }
-
-  @Override
-  protected void setCookie(String[] tokens, int maxAge, HttpServletRequest request, HttpServletResponse response) {
-    String cookieValue = encodeCookie(tokens);
-    Cookie cookie = new Cookie(getCookieName(), cookieValue);
-    cookie.setMaxAge(maxAge);
-    cookie.setPath("/");
-
-    cookie.setSecure(request.isSecure());
-
-    Method setHttpOnlyMethod = ReflectionUtils.findMethod(Cookie.class, "setHttpOnly", boolean.class);
-    if (setHttpOnlyMethod != null) {
-      ReflectionUtils.invokeMethod(setHttpOnlyMethod, cookie, Boolean.TRUE);
-    } else if (logger.isDebugEnabled()) {
-      logger.debug("Note: Cookie will not be marked as HttpOnly because you are not using Servlet 3.0 (Cookie#setHttpOnly(boolean) was not found).");
+    private void addCookie(Token token, HttpServletRequest request, HttpServletResponse response) {
+        setCookie(new String[] { token.getId(), token.getTokenValue() }, tokenMaxAgeInSeconds, request, response);
     }
 
-    response.addCookie(cookie);
-  }
+    @Override
+    protected void setCookie(String[] tokens, int maxAge, HttpServletRequest request, HttpServletResponse response) {
+        String cookieValue = encodeCookie(tokens);
+        Cookie cookie = new Cookie(getCookieName(), cookieValue);
+        cookie.setMaxAge(maxAge);
+        cookie.setPath("/");
 
-  @Override
-  public Token createAndInsertPersistentToken(User user, String remoteAddress, String userAgent) {
-    return persistentTokenService.createToken(user, remoteAddress, userAgent);
-  }
+        cookie.setSecure(request.isSecure());
+
+        Method setHttpOnlyMethod = ReflectionUtils.findMethod(Cookie.class, "setHttpOnly", boolean.class);
+        if (setHttpOnlyMethod != null) {
+            ReflectionUtils.invokeMethod(setHttpOnlyMethod, cookie, Boolean.TRUE);
+        } else if (logger.isDebugEnabled()) {
+            logger.debug("Note: Cookie will not be marked as HttpOnly because you are not using Servlet 3.0 (Cookie#setHttpOnly(boolean) was not found).");
+        }
+
+        response.addCookie(cookie);
+    }
+
+    @Override
+    public Token createAndInsertPersistentToken(User user, String remoteAddress, String userAgent) {
+        return persistentTokenService.createToken(user, remoteAddress, userAgent);
+    }
 }

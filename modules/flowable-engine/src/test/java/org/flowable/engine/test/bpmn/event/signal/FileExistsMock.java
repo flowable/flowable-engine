@@ -14,27 +14,27 @@ package org.flowable.engine.test.bpmn.event.signal;
 
 public class FileExistsMock {
 
-	private boolean exists;
-	
-	private static FileExistsMock instance;
+    private boolean exists;
 
-	public static synchronized FileExistsMock getInstance() {
-		if (instance == null) {
-			instance = new FileExistsMock();
-		}
-		return instance;
-	}
-	
-	public boolean fileExists(){
-		return this.exists;
-	}
-	
-	public void touchFile(){
-		this.exists = true;
-	}
-	
-	public void removeFile(){
-		this.exists = false;
-	}
+    private static FileExistsMock instance;
+
+    public static synchronized FileExistsMock getInstance() {
+        if (instance == null) {
+            instance = new FileExistsMock();
+        }
+        return instance;
+    }
+
+    public boolean fileExists() {
+        return this.exists;
+    }
+
+    public void touchFile() {
+        this.exists = true;
+    }
+
+    public void removeFile() {
+        this.exists = false;
+    }
 
 }

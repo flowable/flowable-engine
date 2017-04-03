@@ -25,25 +25,25 @@ import org.flowable.engine.delegate.Expression;
  */
 public class SimpleDataInputAssociation extends AbstractDataAssociation {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected List<Assignment> assignments = new ArrayList<Assignment>();
+    protected List<Assignment> assignments = new ArrayList<Assignment>();
 
-  public SimpleDataInputAssociation(Expression sourceExpression, String target) {
-    super(sourceExpression, target);
-  }
-
-  public SimpleDataInputAssociation(String source, String target) {
-    super(source, target);
-  }
-
-  public void addAssignment(Assignment assignment) {
-    this.assignments.add(assignment);
-  }
-
-  public void evaluate(DelegateExecution execution) {
-    for (Assignment assignment : this.assignments) {
-      assignment.evaluate(execution);
+    public SimpleDataInputAssociation(Expression sourceExpression, String target) {
+        super(sourceExpression, target);
     }
-  }
+
+    public SimpleDataInputAssociation(String source, String target) {
+        super(source, target);
+    }
+
+    public void addAssignment(Assignment assignment) {
+        this.assignments.add(assignment);
+    }
+
+    public void evaluate(DelegateExecution execution) {
+        for (Assignment assignment : this.assignments) {
+            assignment.evaluate(execution);
+        }
+    }
 }

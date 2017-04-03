@@ -23,10 +23,10 @@ import org.flowable.engine.delegate.DelegateExecution;
  */
 public class MyCustomPropertiesResolver implements CustomPropertiesResolver {
 
-  @Override
-  public Map<String, Object> getCustomPropertiesMap(DelegateExecution execution) {
-    Map<String, Object> myMap = new HashMap<>();
-    myMap.put("customProp1", execution.getCurrentActivityId());
-    return myMap;
-  }
+    @Override
+    public Map<String, Object> getCustomPropertiesMap(DelegateExecution execution) {
+        Map<String, Object> myMap = new HashMap<>();
+        myMap.put("customProp1", execution.getCurrentActivityId());
+        return myMap;
+    }
 }

@@ -33,86 +33,86 @@ import org.flowable.engine.impl.persistence.entity.TaskEntity;
  */
 public class TriggerTimerEventJobHandler implements JobHandler {
 
-  public static final String TYPE = "trigger-timer";
+    public static final String TYPE = "trigger-timer";
 
-  public String getType() {
-    return TYPE;
-  }
-
-  public void execute(JobEntity job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
-
-    commandContext.getAgenda().planTriggerExecutionOperation(execution);
-
-    if (commandContext.getEventDispatcher().isEnabled()) {
-      commandContext.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_FIRED, job));
+    public String getType() {
+        return TYPE;
     }
-    
-    if (execution.getCurrentFlowElement() instanceof BoundaryEvent) {
-      List<String> processedElements = new ArrayList<String>();
-      dispatchExecutionTimeOut(job, execution, processedElements, commandContext);
-    }
-  }
-  
-  protected void dispatchExecutionTimeOut(JobEntity timerEntity, ExecutionEntity execution, List<String> processedElements, CommandContext commandContext) {
-    FlowElement currentElement = execution.getCurrentFlowElement();
-    if (currentElement instanceof BoundaryEvent) {
-      BoundaryEvent boundaryEvent = (BoundaryEvent) execution.getCurrentFlowElement();
-      if (boundaryEvent.isCancelActivity() && boundaryEvent.getAttachedToRef() != null) {
 
-        if (!processedElements.contains(boundaryEvent.getId())) {
-          processedElements.add(boundaryEvent.getId());
-          ExecutionEntity parentExecution = execution.getParent();
-          dispatchExecutionTimeOut(timerEntity, parentExecution, processedElements, commandContext);
+    public void execute(JobEntity job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
+
+        commandContext.getAgenda().planTriggerExecutionOperation(execution);
+
+        if (commandContext.getEventDispatcher().isEnabled()) {
+            commandContext.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_FIRED, job));
         }
-      }
-    
-    } else {
-      
-      // flow nodes
-      if (execution.getCurrentFlowElement() instanceof FlowNode) {
-        processedElements.add(execution.getCurrentActivityId());
-        dispatchActivityTimeOut(timerEntity, (FlowNode) execution.getCurrentFlowElement(), execution, commandContext);
-        
-        if (execution.getCurrentFlowElement() instanceof UserTask && !execution.isMultiInstanceRoot()) {
-          List<TaskEntity> tasks = execution.getTasks();
-          if (tasks.size() > 0) {
-            tasks.get(0).setCanceled(true);
-          }
+
+        if (execution.getCurrentFlowElement() instanceof BoundaryEvent) {
+            List<String> processedElements = new ArrayList<String>();
+            dispatchExecutionTimeOut(job, execution, processedElements, commandContext);
         }
-      }
-      
-      // subprocesses
-      if (execution.getCurrentFlowElement() instanceof SubProcess) {
-        for (ExecutionEntity subExecution : execution.getExecutions()) {
-          if (!processedElements.contains(subExecution.getCurrentActivityId())) {
-            dispatchExecutionTimeOut(timerEntity, subExecution, processedElements, commandContext);
-          }
-        }
-        
-      // call activities  
-      } else if (execution.getCurrentFlowElement() instanceof CallActivity) {
-        ExecutionEntity subProcessInstance = commandContext.getExecutionEntityManager().findSubProcessInstanceBySuperExecutionId(execution.getId());
-        if (subProcessInstance != null) {
-          List<? extends ExecutionEntity> childExecutions = subProcessInstance.getExecutions();
-          for (ExecutionEntity subExecution : childExecutions) {
-            if (!processedElements.contains(subExecution.getCurrentActivityId())) {
-              dispatchExecutionTimeOut(timerEntity, subExecution, processedElements, commandContext);
+    }
+
+    protected void dispatchExecutionTimeOut(JobEntity timerEntity, ExecutionEntity execution, List<String> processedElements, CommandContext commandContext) {
+        FlowElement currentElement = execution.getCurrentFlowElement();
+        if (currentElement instanceof BoundaryEvent) {
+            BoundaryEvent boundaryEvent = (BoundaryEvent) execution.getCurrentFlowElement();
+            if (boundaryEvent.isCancelActivity() && boundaryEvent.getAttachedToRef() != null) {
+
+                if (!processedElements.contains(boundaryEvent.getId())) {
+                    processedElements.add(boundaryEvent.getId());
+                    ExecutionEntity parentExecution = execution.getParent();
+                    dispatchExecutionTimeOut(timerEntity, parentExecution, processedElements, commandContext);
+                }
             }
-          }
-        }
-      }
-    }
-  }
 
-  protected void dispatchActivityTimeOut(JobEntity timerEntity, FlowNode flowNode, ExecutionEntity execution, CommandContext commandContext) {
-    commandContext.getEventDispatcher().dispatchEvent(
-        FlowableEventBuilder.createActivityCancelledEvent(flowNode.getId(), flowNode.getName(), execution.getId(), 
-            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), parseActivityType(flowNode), timerEntity));
-  }
-  
-  protected String parseActivityType(FlowNode flowNode) {
-    String elementType = flowNode.getClass().getSimpleName();
-    elementType = elementType.substring(0, 1).toLowerCase() + elementType.substring(1);
-    return elementType;
-  }
+        } else {
+
+            // flow nodes
+            if (execution.getCurrentFlowElement() instanceof FlowNode) {
+                processedElements.add(execution.getCurrentActivityId());
+                dispatchActivityTimeOut(timerEntity, (FlowNode) execution.getCurrentFlowElement(), execution, commandContext);
+
+                if (execution.getCurrentFlowElement() instanceof UserTask && !execution.isMultiInstanceRoot()) {
+                    List<TaskEntity> tasks = execution.getTasks();
+                    if (tasks.size() > 0) {
+                        tasks.get(0).setCanceled(true);
+                    }
+                }
+            }
+
+            // subprocesses
+            if (execution.getCurrentFlowElement() instanceof SubProcess) {
+                for (ExecutionEntity subExecution : execution.getExecutions()) {
+                    if (!processedElements.contains(subExecution.getCurrentActivityId())) {
+                        dispatchExecutionTimeOut(timerEntity, subExecution, processedElements, commandContext);
+                    }
+                }
+
+                // call activities
+            } else if (execution.getCurrentFlowElement() instanceof CallActivity) {
+                ExecutionEntity subProcessInstance = commandContext.getExecutionEntityManager().findSubProcessInstanceBySuperExecutionId(execution.getId());
+                if (subProcessInstance != null) {
+                    List<? extends ExecutionEntity> childExecutions = subProcessInstance.getExecutions();
+                    for (ExecutionEntity subExecution : childExecutions) {
+                        if (!processedElements.contains(subExecution.getCurrentActivityId())) {
+                            dispatchExecutionTimeOut(timerEntity, subExecution, processedElements, commandContext);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected void dispatchActivityTimeOut(JobEntity timerEntity, FlowNode flowNode, ExecutionEntity execution, CommandContext commandContext) {
+        commandContext.getEventDispatcher().dispatchEvent(
+                FlowableEventBuilder.createActivityCancelledEvent(flowNode.getId(), flowNode.getName(), execution.getId(),
+                        execution.getProcessInstanceId(), execution.getProcessDefinitionId(), parseActivityType(flowNode), timerEntity));
+    }
+
+    protected String parseActivityType(FlowNode flowNode) {
+        String elementType = flowNode.getClass().getSimpleName();
+        elementType = elementType.substring(0, 1).toLowerCase() + elementType.substring(1);
+        return elementType;
+    }
 }

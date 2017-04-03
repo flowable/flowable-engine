@@ -98,7 +98,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
             server.start();
         }
     }
-    
+
     @Deployment
     public void testWebServiceInvocationWithEndpointAddressConfigured() throws Exception {
 

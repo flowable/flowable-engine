@@ -34,39 +34,39 @@ import org.junit.Test;
  */
 public class FlowableRuleJunit4Test {
 
-  @Rule
-  public FlowableRule activitiRule = new FlowableRule();
+    @Rule
+    public FlowableRule activitiRule = new FlowableRule();
 
-  @Test
-  @Deployment
-  public void ruleUsageExample() {
-    RuntimeService runtimeService = activitiRule.getRuntimeService();
-    runtimeService.startProcessInstanceByKey("ruleUsage");
+    @Test
+    @Deployment
+    public void ruleUsageExample() {
+        RuntimeService runtimeService = activitiRule.getRuntimeService();
+        runtimeService.startProcessInstanceByKey("ruleUsage");
 
-    TaskService taskService = activitiRule.getTaskService();
-    Task task = taskService.createTaskQuery().singleResult();
-    assertEquals("My Task", task.getName());
+        TaskService taskService = activitiRule.getTaskService();
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("My Task", task.getName());
 
-    taskService.complete(task.getId());
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-  }
+        taskService.complete(task.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+    }
 
-  // this is to show how JobTestHelper could be used to wait for jobs to be all processed
-  @Test
-  @Deployment(resources = { "org/flowable/engine/test/bpmn/async/AsyncTaskTest.testAsyncTask.bpmn20.xml" })
-  public void testWaitForJobs() {
-    RuntimeService runtimeService = activitiRule.getRuntimeService();
-    ManagementService managementService = activitiRule.getManagementService();
+    // this is to show how JobTestHelper could be used to wait for jobs to be all processed
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/async/AsyncTaskTest.testAsyncTask.bpmn20.xml" })
+    public void testWaitForJobs() {
+        RuntimeService runtimeService = activitiRule.getRuntimeService();
+        ManagementService managementService = activitiRule.getManagementService();
 
-    // start process
-    runtimeService.startProcessInstanceByKey("asyncTask");
+        // start process
+        runtimeService.startProcessInstanceByKey("asyncTask");
 
-    // now there should be one job in the database:
-    assertEquals(1, managementService.createJobQuery().count());
+        // now there should be one job in the database:
+        assertEquals(1, managementService.createJobQuery().count());
 
-    JobTestHelper.waitForJobExecutorToProcessAllJobs(activitiRule, 5000L, 500L);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(activitiRule, 5000L, 500L);
 
-    // the job is done
-    assertEquals(0, managementService.createJobQuery().count());
-  }
+        // the job is done
+        assertEquals(0, managementService.createJobQuery().count());
+    }
 }

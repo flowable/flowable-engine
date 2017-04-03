@@ -44,125 +44,125 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 @Transactional
 public class PersistentTokenServiceImpl implements PersistentTokenService {
 
-  private static final Logger logger = LoggerFactory.getLogger(PersistentTokenServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(PersistentTokenServiceImpl.class);
 
-  private static final int DEFAULT_SERIES_LENGTH = 16;
+    private static final int DEFAULT_SERIES_LENGTH = 16;
 
-  private static final int DEFAULT_TOKEN_LENGTH = 16;
+    private static final int DEFAULT_TOKEN_LENGTH = 16;
 
-  private SecureRandom random;
+    private SecureRandom random;
 
-  @Autowired
-  private Environment environment;
+    @Autowired
+    private Environment environment;
 
-  @Autowired
-  private IdmIdentityService idmIdentityService;
+    @Autowired
+    private IdmIdentityService idmIdentityService;
 
-  // Caching the persistent tokens to avoid hitting the database too often (eg when doing multiple requests at the same time)
-  // (This happens a lot, when the page consists of multiple requests)
-  private LoadingCache<String, Token> tokenCache;
+    // Caching the persistent tokens to avoid hitting the database too often (eg when doing multiple requests at the same time)
+    // (This happens a lot, when the page consists of multiple requests)
+    private LoadingCache<String, Token> tokenCache;
 
-  public PersistentTokenServiceImpl() {
-    random = new SecureRandom();
-  }
-
-  @PostConstruct
-  protected void initTokenCache() {
-    Long maxSize = environment.getProperty("cache.login-users.max.size", Long.class);
-    Long maxAge = environment.getProperty("cache.login-users.max.age", Long.class);
-    tokenCache = CacheBuilder.newBuilder().maximumSize(maxSize != null ? maxSize : 2048).expireAfterWrite(maxAge != null ? maxAge : 30, TimeUnit.SECONDS).recordStats()
-        .build(new CacheLoader<String, Token>() {
-
-          public Token load(final String tokenId) throws Exception {
-            Token token = idmIdentityService.createTokenQuery().tokenId(tokenId).singleResult();
-            if (token != null) {
-              return token;
-            } else {
-              throw new PersistentTokenNotFoundException();
-            }
-          }
-
-        });
-  }
-
-  @Override
-  public Token saveAndFlush(Token token) {
-    idmIdentityService.saveToken(token);
-    return token;
-  }
-
-  @Override
-  public void delete(Token token) {
-    tokenCache.invalidate(token);
-    idmIdentityService.deleteToken(token.getId());
-  }
-
-  @Override
-  public Token getPersistentToken(String tokenId) {
-    return getPersistentToken(tokenId, false);
-  }
-
-  @Override
-  public Token getPersistentToken(String tokenId, boolean invalidateCacheEntry) {
-
-    if (invalidateCacheEntry) {
-      tokenCache.invalidate(tokenId);
+    public PersistentTokenServiceImpl() {
+        random = new SecureRandom();
     }
 
-    try {
-      return tokenCache.get(tokenId);
-    } catch (ExecutionException e) {
-      return null;
-    } catch (UncheckedExecutionException e) {
-      return null;
+    @PostConstruct
+    protected void initTokenCache() {
+        Long maxSize = environment.getProperty("cache.login-users.max.size", Long.class);
+        Long maxAge = environment.getProperty("cache.login-users.max.age", Long.class);
+        tokenCache = CacheBuilder.newBuilder().maximumSize(maxSize != null ? maxSize : 2048).expireAfterWrite(maxAge != null ? maxAge : 30, TimeUnit.SECONDS).recordStats()
+                .build(new CacheLoader<String, Token>() {
+
+                    public Token load(final String tokenId) throws Exception {
+                        Token token = idmIdentityService.createTokenQuery().tokenId(tokenId).singleResult();
+                        if (token != null) {
+                            return token;
+                        } else {
+                            throw new PersistentTokenNotFoundException();
+                        }
+                    }
+
+                });
     }
-  }
 
-  private String generateSeriesData() {
-    return generateRandomWithoutSlash(DEFAULT_SERIES_LENGTH);
-  }
-
-  private String generateTokenData() {
-    return generateRandomWithoutSlash(DEFAULT_TOKEN_LENGTH);
-  }
-  
-  private String generateRandomWithoutSlash(int size) {
-    String data = generateRandom(size);
-    while (data.contains("/")) {
-      data = generateRandom(size);
+    @Override
+    public Token saveAndFlush(Token token) {
+        idmIdentityService.saveToken(token);
+        return token;
     }
-    return data;
-  }
-  
-  private String generateRandom(int size) {
-    byte[] s = new byte[size];
-    random.nextBytes(s);
-    return new String(Base64.encode(s));
-  }
 
-  @Override
-  public Token createToken(User user, String remoteAddress, String userAgent) {
-
-    Token token = idmIdentityService.newToken(generateSeriesData());
-    token.setTokenValue(generateTokenData());
-    token.setTokenDate(new Date());
-    token.setIpAddress(remoteAddress);
-    token.setUserAgent(userAgent);
-    token.setUserId(user.getId());
-    
-    try {
-      saveAndFlush(token);
-      return token;
-    } catch (DataAccessException e) {
-      logger.error("Failed to save persistent token ", e);
-      return token;
+    @Override
+    public void delete(Token token) {
+        tokenCache.invalidate(token);
+        idmIdentityService.deleteToken(token.getId());
     }
-  }
 
-  // Just helper exception class for handling null values
-  private static class PersistentTokenNotFoundException extends RuntimeException {
+    @Override
+    public Token getPersistentToken(String tokenId) {
+        return getPersistentToken(tokenId, false);
+    }
 
-    private static final long serialVersionUID = 1L;
-  }
+    @Override
+    public Token getPersistentToken(String tokenId, boolean invalidateCacheEntry) {
+
+        if (invalidateCacheEntry) {
+            tokenCache.invalidate(tokenId);
+        }
+
+        try {
+            return tokenCache.get(tokenId);
+        } catch (ExecutionException e) {
+            return null;
+        } catch (UncheckedExecutionException e) {
+            return null;
+        }
+    }
+
+    private String generateSeriesData() {
+        return generateRandomWithoutSlash(DEFAULT_SERIES_LENGTH);
+    }
+
+    private String generateTokenData() {
+        return generateRandomWithoutSlash(DEFAULT_TOKEN_LENGTH);
+    }
+
+    private String generateRandomWithoutSlash(int size) {
+        String data = generateRandom(size);
+        while (data.contains("/")) {
+            data = generateRandom(size);
+        }
+        return data;
+    }
+
+    private String generateRandom(int size) {
+        byte[] s = new byte[size];
+        random.nextBytes(s);
+        return new String(Base64.encode(s));
+    }
+
+    @Override
+    public Token createToken(User user, String remoteAddress, String userAgent) {
+
+        Token token = idmIdentityService.newToken(generateSeriesData());
+        token.setTokenValue(generateTokenData());
+        token.setTokenDate(new Date());
+        token.setIpAddress(remoteAddress);
+        token.setUserAgent(userAgent);
+        token.setUserId(user.getId());
+
+        try {
+            saveAndFlush(token);
+            return token;
+        } catch (DataAccessException e) {
+            logger.error("Failed to save persistent token ", e);
+            return token;
+        }
+    }
+
+    // Just helper exception class for handling null values
+    private static class PersistentTokenNotFoundException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
+    }
 
 }

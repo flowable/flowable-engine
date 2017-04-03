@@ -33,290 +33,290 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
-  private static Logger log = LoggerFactory.getLogger(DefaultAsyncJobExecutor.class);
-  
-  protected Thread timerJobAcquisitionThread;
-  protected Thread asyncJobAcquisitionThread;
-  protected Thread resetExpiredJobThread;
+    private static Logger log = LoggerFactory.getLogger(DefaultAsyncJobExecutor.class);
 
-  /**
-   * The minimal number of threads that are kept alive in the threadpool for job execution
-   */
-  protected int corePoolSize = 2;
+    protected Thread timerJobAcquisitionThread;
+    protected Thread asyncJobAcquisitionThread;
+    protected Thread resetExpiredJobThread;
 
-  /**
-   * The maximum number of threads that are kept alive in the threadpool for job execution
-   */
-  protected int maxPoolSize = 10;
+    /**
+     * The minimal number of threads that are kept alive in the threadpool for job execution
+     */
+    protected int corePoolSize = 2;
 
-  /**
-   * The time (in milliseconds) a thread used for job execution must be kept alive before it is destroyed. Default setting is 0. Having a non-default setting of 0 takes resources, but in the case of
-   * many job executions it avoids creating new threads all the time.
-   */
-  protected long keepAliveTime = 5000L;
+    /**
+     * The maximum number of threads that are kept alive in the threadpool for job execution
+     */
+    protected int maxPoolSize = 10;
 
-  /** The size of the queue on which jobs to be executed are placed */
-  protected int queueSize = 100;
-  
-  /** Whether to unlock jobs that are owned by this executor (have the same lockOwner) at startup */
-  protected boolean unlockOwnedJobs;
+    /**
+     * The time (in milliseconds) a thread used for job execution must be kept alive before it is destroyed. Default setting is 0. Having a non-default setting of 0 takes resources, but in the case of
+     * many job executions it avoids creating new threads all the time.
+     */
+    protected long keepAliveTime = 5000L;
 
-  /** The queue used for job execution work */
-  protected BlockingQueue<Runnable> threadPoolQueue;
+    /** The size of the queue on which jobs to be executed are placed */
+    protected int queueSize = 100;
 
-  /** The executor service used for job execution */
-  protected ExecutorService executorService;
+    /** Whether to unlock jobs that are owned by this executor (have the same lockOwner) at startup */
+    protected boolean unlockOwnedJobs;
 
-  /**
-   * The time (in seconds) that is waited to gracefully shut down the threadpool used for job execution
-   */
-  protected long secondsToWaitOnShutdown = 60L;
+    /** The queue used for job execution work */
+    protected BlockingQueue<Runnable> threadPoolQueue;
 
-  protected boolean executeAsyncJob(final Job job, Runnable runnable) {
-    try {
-      executorService.execute(runnable);
-      return true;
-    } catch (RejectedExecutionException e) {
-      
-      // When a RejectedExecutionException is caught, this means that the queue for holding the jobs 
-      // that are to be executed is full and can't store more.
-      // The job is now 'unlocked', meaning that the lock owner/time is set to null,
-      // so other executors can pick the job up (or this async executor, the next time the 
-      // acquire query is executed.
-      
-      // This can happen while already in a command context (for example in a transaction listener
-      // after the async executor has been hinted that a new async job is created)
-      // or not (when executed in the acquire thread runnable)
-      
-      CommandContext commandContext = Context.getCommandContext();
-      if (commandContext != null) {
-        commandContext.getJobManager().unacquire(job);
-        
-      } else {
-        processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
-          public Void execute(CommandContext commandContext) {
-            commandContext.getJobManager().unacquire(job);
-            return null;
-          }
-        });
-      }
-      
-      // Job queue full, returning true so (if wanted) the acquiring can be throttled
-      return false;
-    }
-  }
-  
-  @Override
-  protected void startAdditionalComponents() {
-    if (!isMessageQueueMode) {
-      initAsyncJobExecutionThreadPool();
-      startJobAcquisitionThread();
-    }
-    
-    startTimerAcquisitionThread();
-    startResetExpiredJobsThread();
-  }
-  
-  @Override
-  protected void shutdownAdditionalComponents() {
-    stopResetExpiredJobsThread();
-    stopTimerAcquisitionThread();
-    stopJobAcquisitionThread();
-    stopExecutingAsyncJobs();
-  }
-  
-  protected void initAsyncJobExecutionThreadPool() {
-    if (threadPoolQueue == null) {
-      log.info("Creating thread pool queue of size {}", queueSize);
-      threadPoolQueue = new ArrayBlockingQueue<Runnable>(queueSize);
-    }
+    /** The executor service used for job execution */
+    protected ExecutorService executorService;
 
-    if (executorService == null) {
-      log.info("Creating executor service with corePoolSize {}, maxPoolSize {} and keepAliveTime {}", corePoolSize, maxPoolSize, keepAliveTime);
+    /**
+     * The time (in seconds) that is waited to gracefully shut down the threadpool used for job execution
+     */
+    protected long secondsToWaitOnShutdown = 60L;
 
-      BasicThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("flowable-async-job-executor-thread-%d").build();
-      executorService = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, threadPoolQueue, threadFactory);
-    }
-    
-    if (unlockOwnedJobs) {
-      unlockOwnedJobs();
-    }
-  }
+    protected boolean executeAsyncJob(final Job job, Runnable runnable) {
+        try {
+            executorService.execute(runnable);
+            return true;
+        } catch (RejectedExecutionException e) {
 
-  protected void stopExecutingAsyncJobs() {
-    if (executorService != null) {
-      
-      // Ask the thread pool to finish and exit
-      executorService.shutdown();
-  
-      // Waits for 1 minute to finish all currently executing jobs
-      try {
-        if (!executorService.awaitTermination(secondsToWaitOnShutdown, TimeUnit.SECONDS)) {
-            log.warn("Timeout during shutdown of async job executor. The current running jobs could not end within {} seconds after shutdown operation.", secondsToWaitOnShutdown);
+            // When a RejectedExecutionException is caught, this means that the queue for holding the jobs
+            // that are to be executed is full and can't store more.
+            // The job is now 'unlocked', meaning that the lock owner/time is set to null,
+            // so other executors can pick the job up (or this async executor, the next time the
+            // acquire query is executed.
+
+            // This can happen while already in a command context (for example in a transaction listener
+            // after the async executor has been hinted that a new async job is created)
+            // or not (when executed in the acquire thread runnable)
+
+            CommandContext commandContext = Context.getCommandContext();
+            if (commandContext != null) {
+                commandContext.getJobManager().unacquire(job);
+
+            } else {
+                processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+                    public Void execute(CommandContext commandContext) {
+                        commandContext.getJobManager().unacquire(job);
+                        return null;
+                    }
+                });
+            }
+
+            // Job queue full, returning true so (if wanted) the acquiring can be throttled
+            return false;
         }
-      } catch (InterruptedException e) {
-        log.warn("Interrupted while shutting down the async job executor. ", e);
-      }
-  
-      executorService = null;
     }
-  }
 
-  /** Starts the acquisition thread */
-  protected void startJobAcquisitionThread() {
-    if (asyncJobAcquisitionThread == null) {
-      asyncJobAcquisitionThread = new Thread(asyncJobsDueRunnable);
+    @Override
+    protected void startAdditionalComponents() {
+        if (!isMessageQueueMode) {
+            initAsyncJobExecutionThreadPool();
+            startJobAcquisitionThread();
+        }
+
+        startTimerAcquisitionThread();
+        startResetExpiredJobsThread();
     }
-    asyncJobAcquisitionThread.start();
-  }
 
-  protected void startTimerAcquisitionThread() {
-    if (timerJobAcquisitionThread == null) {
-      timerJobAcquisitionThread = new Thread(timerJobRunnable);
+    @Override
+    protected void shutdownAdditionalComponents() {
+        stopResetExpiredJobsThread();
+        stopTimerAcquisitionThread();
+        stopJobAcquisitionThread();
+        stopExecutingAsyncJobs();
     }
-    timerJobAcquisitionThread.start();
-  }
 
-  /** Stops the acquisition thread */
-  protected void stopJobAcquisitionThread() {
-    if (asyncJobAcquisitionThread != null) {
-      try {
-        asyncJobAcquisitionThread.join();
-      } catch (InterruptedException e) {
-        log.warn("Interrupted while waiting for the async job acquisition thread to terminate", e);
-      }
-      asyncJobAcquisitionThread = null;
+    protected void initAsyncJobExecutionThreadPool() {
+        if (threadPoolQueue == null) {
+            log.info("Creating thread pool queue of size {}", queueSize);
+            threadPoolQueue = new ArrayBlockingQueue<Runnable>(queueSize);
+        }
+
+        if (executorService == null) {
+            log.info("Creating executor service with corePoolSize {}, maxPoolSize {} and keepAliveTime {}", corePoolSize, maxPoolSize, keepAliveTime);
+
+            BasicThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("flowable-async-job-executor-thread-%d").build();
+            executorService = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, threadPoolQueue, threadFactory);
+        }
+
+        if (unlockOwnedJobs) {
+            unlockOwnedJobs();
+        }
     }
-  }
 
-  protected void stopTimerAcquisitionThread() {
-    if (timerJobAcquisitionThread != null) {
-      try {
-        timerJobAcquisitionThread.join();
-      } catch (InterruptedException e) {
-        log.warn("Interrupted while waiting for the timer job acquisition thread to terminate", e);
-      }
-      timerJobAcquisitionThread = null;
+    protected void stopExecutingAsyncJobs() {
+        if (executorService != null) {
+
+            // Ask the thread pool to finish and exit
+            executorService.shutdown();
+
+            // Waits for 1 minute to finish all currently executing jobs
+            try {
+                if (!executorService.awaitTermination(secondsToWaitOnShutdown, TimeUnit.SECONDS)) {
+                    log.warn("Timeout during shutdown of async job executor. The current running jobs could not end within {} seconds after shutdown operation.", secondsToWaitOnShutdown);
+                }
+            } catch (InterruptedException e) {
+                log.warn("Interrupted while shutting down the async job executor. ", e);
+            }
+
+            executorService = null;
+        }
     }
-  }
-  
-  /** Starts the reset expired jobs thread */
-  protected void startResetExpiredJobsThread() {
-    if (resetExpiredJobThread == null) {
-      resetExpiredJobThread = new Thread(resetExpiredJobsRunnable);
+
+    /** Starts the acquisition thread */
+    protected void startJobAcquisitionThread() {
+        if (asyncJobAcquisitionThread == null) {
+            asyncJobAcquisitionThread = new Thread(asyncJobsDueRunnable);
+        }
+        asyncJobAcquisitionThread.start();
     }
-    resetExpiredJobThread.start();
-  }
-  
-  /** Stops the reset expired jobs thread */
-  protected void stopResetExpiredJobsThread() {
-    if (resetExpiredJobThread != null) {
-      try {
-        resetExpiredJobThread.join();
-      } catch (InterruptedException e) {
-        log.warn("Interrupted while waiting for the reset expired jobs thread to terminate", e);
-      }
-  
-      resetExpiredJobThread = null;
+
+    protected void startTimerAcquisitionThread() {
+        if (timerJobAcquisitionThread == null) {
+            timerJobAcquisitionThread = new Thread(timerJobRunnable);
+        }
+        timerJobAcquisitionThread.start();
     }
-  }
-  
-  public Thread getTimerJobAcquisitionThread() {
-    return timerJobAcquisitionThread;
-  }
 
-  public void setTimerJobAcquisitionThread(Thread timerJobAcquisitionThread) {
-    this.timerJobAcquisitionThread = timerJobAcquisitionThread;
-  }
-
-  public Thread getAsyncJobAcquisitionThread() {
-    return asyncJobAcquisitionThread;
-  }
-
-  public void setAsyncJobAcquisitionThread(Thread asyncJobAcquisitionThread) {
-    this.asyncJobAcquisitionThread = asyncJobAcquisitionThread;
-  }
-
-  public Thread getResetExpiredJobThread() {
-    return resetExpiredJobThread;
-  }
-
-  public void setResetExpiredJobThread(Thread resetExpiredJobThread) {
-    this.resetExpiredJobThread = resetExpiredJobThread;
-  }
-  
-  public int getQueueSize() {
-    return queueSize;
-  }
-  
-  @Override
-  public int getRemainingCapacity() {
-    if (threadPoolQueue != null) {
-      return threadPoolQueue.remainingCapacity();
-    } else {
-      // return plenty of remaining capacity if there's no thread pool queue
-      return 99;
+    /** Stops the acquisition thread */
+    protected void stopJobAcquisitionThread() {
+        if (asyncJobAcquisitionThread != null) {
+            try {
+                asyncJobAcquisitionThread.join();
+            } catch (InterruptedException e) {
+                log.warn("Interrupted while waiting for the async job acquisition thread to terminate", e);
+            }
+            asyncJobAcquisitionThread = null;
+        }
     }
-  }
 
-  public void setQueueSize(int queueSize) {
-    this.queueSize = queueSize;
-  }
+    protected void stopTimerAcquisitionThread() {
+        if (timerJobAcquisitionThread != null) {
+            try {
+                timerJobAcquisitionThread.join();
+            } catch (InterruptedException e) {
+                log.warn("Interrupted while waiting for the timer job acquisition thread to terminate", e);
+            }
+            timerJobAcquisitionThread = null;
+        }
+    }
 
-  public int getCorePoolSize() {
-    return corePoolSize;
-  }
+    /** Starts the reset expired jobs thread */
+    protected void startResetExpiredJobsThread() {
+        if (resetExpiredJobThread == null) {
+            resetExpiredJobThread = new Thread(resetExpiredJobsRunnable);
+        }
+        resetExpiredJobThread.start();
+    }
 
-  public void setCorePoolSize(int corePoolSize) {
-    this.corePoolSize = corePoolSize;
-  }
+    /** Stops the reset expired jobs thread */
+    protected void stopResetExpiredJobsThread() {
+        if (resetExpiredJobThread != null) {
+            try {
+                resetExpiredJobThread.join();
+            } catch (InterruptedException e) {
+                log.warn("Interrupted while waiting for the reset expired jobs thread to terminate", e);
+            }
 
-  public int getMaxPoolSize() {
-    return maxPoolSize;
-  }
+            resetExpiredJobThread = null;
+        }
+    }
 
-  public void setMaxPoolSize(int maxPoolSize) {
-    this.maxPoolSize = maxPoolSize;
-  }
+    public Thread getTimerJobAcquisitionThread() {
+        return timerJobAcquisitionThread;
+    }
 
-  public long getKeepAliveTime() {
-    return keepAliveTime;
-  }
+    public void setTimerJobAcquisitionThread(Thread timerJobAcquisitionThread) {
+        this.timerJobAcquisitionThread = timerJobAcquisitionThread;
+    }
 
-  public void setKeepAliveTime(long keepAliveTime) {
-    this.keepAliveTime = keepAliveTime;
-  }
+    public Thread getAsyncJobAcquisitionThread() {
+        return asyncJobAcquisitionThread;
+    }
 
-  public long getSecondsToWaitOnShutdown() {
-    return secondsToWaitOnShutdown;
-  }
+    public void setAsyncJobAcquisitionThread(Thread asyncJobAcquisitionThread) {
+        this.asyncJobAcquisitionThread = asyncJobAcquisitionThread;
+    }
 
-  public void setSecondsToWaitOnShutdown(long secondsToWaitOnShutdown) {
-    this.secondsToWaitOnShutdown = secondsToWaitOnShutdown;
-  }
-  
-  public boolean isUnlockOwnedJobs() {
-    return unlockOwnedJobs;
-  }
-   
-  public void setUnlockOwnedJobs(boolean unlockOwnedJobs) {
-    this.unlockOwnedJobs = unlockOwnedJobs;
-  }
+    public Thread getResetExpiredJobThread() {
+        return resetExpiredJobThread;
+    }
 
-  public BlockingQueue<Runnable> getThreadPoolQueue() {
-    return threadPoolQueue;
-  }
+    public void setResetExpiredJobThread(Thread resetExpiredJobThread) {
+        this.resetExpiredJobThread = resetExpiredJobThread;
+    }
 
-  public void setThreadPoolQueue(BlockingQueue<Runnable> threadPoolQueue) {
-    this.threadPoolQueue = threadPoolQueue;
-  }
+    public int getQueueSize() {
+        return queueSize;
+    }
 
-  public ExecutorService getExecutorService() {
-    return executorService;
-  }
+    @Override
+    public int getRemainingCapacity() {
+        if (threadPoolQueue != null) {
+            return threadPoolQueue.remainingCapacity();
+        } else {
+            // return plenty of remaining capacity if there's no thread pool queue
+            return 99;
+        }
+    }
 
-  public void setExecutorService(ExecutorService executorService) {
-    this.executorService = executorService;
-  }
+    public void setQueueSize(int queueSize) {
+        this.queueSize = queueSize;
+    }
+
+    public int getCorePoolSize() {
+        return corePoolSize;
+    }
+
+    public void setCorePoolSize(int corePoolSize) {
+        this.corePoolSize = corePoolSize;
+    }
+
+    public int getMaxPoolSize() {
+        return maxPoolSize;
+    }
+
+    public void setMaxPoolSize(int maxPoolSize) {
+        this.maxPoolSize = maxPoolSize;
+    }
+
+    public long getKeepAliveTime() {
+        return keepAliveTime;
+    }
+
+    public void setKeepAliveTime(long keepAliveTime) {
+        this.keepAliveTime = keepAliveTime;
+    }
+
+    public long getSecondsToWaitOnShutdown() {
+        return secondsToWaitOnShutdown;
+    }
+
+    public void setSecondsToWaitOnShutdown(long secondsToWaitOnShutdown) {
+        this.secondsToWaitOnShutdown = secondsToWaitOnShutdown;
+    }
+
+    public boolean isUnlockOwnedJobs() {
+        return unlockOwnedJobs;
+    }
+
+    public void setUnlockOwnedJobs(boolean unlockOwnedJobs) {
+        this.unlockOwnedJobs = unlockOwnedJobs;
+    }
+
+    public BlockingQueue<Runnable> getThreadPoolQueue() {
+        return threadPoolQueue;
+    }
+
+    public void setThreadPoolQueue(BlockingQueue<Runnable> threadPoolQueue) {
+        this.threadPoolQueue = threadPoolQueue;
+    }
+
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
+
+    public void setExecutorService(ExecutorService executorService) {
+        this.executorService = executorService;
+    }
 
 }

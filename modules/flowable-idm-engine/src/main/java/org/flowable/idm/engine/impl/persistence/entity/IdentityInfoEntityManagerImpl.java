@@ -28,115 +28,115 @@ import org.flowable.idm.engine.impl.persistence.entity.data.IdentityInfoDataMana
  * @author Joram Barrez
  */
 public class IdentityInfoEntityManagerImpl extends AbstractEntityManager<IdentityInfoEntity> implements IdentityInfoEntityManager {
-  
-  protected IdentityInfoDataManager identityInfoDataManager;
-  
-  public IdentityInfoEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, IdentityInfoDataManager identityInfoDataManager) {
-    super(idmEngineConfiguration);
-    this.identityInfoDataManager = identityInfoDataManager;
-  }
 
-  @Override
-  protected DataManager<IdentityInfoEntity> getDataManager() {
-    return identityInfoDataManager;
-  }
-  
-  @Override
-  public void deleteUserInfoByUserIdAndKey(String userId, String key) {
-    IdentityInfoEntity identityInfoEntity = findUserInfoByUserIdAndKey(userId, key);
-    if (identityInfoEntity != null) {
-      delete(identityInfoEntity);
-    }
-  }
+    protected IdentityInfoDataManager identityInfoDataManager;
 
-  @Override
-  public void updateUserInfo(String userId, String userPassword, String type, String key, String value, String accountPassword, Map<String, String> accountDetails) {
-    byte[] storedPassword = null;
-    if (accountPassword != null) {
-      storedPassword = encryptPassword(accountPassword, userPassword);
+    public IdentityInfoEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, IdentityInfoDataManager identityInfoDataManager) {
+        super(idmEngineConfiguration);
+        this.identityInfoDataManager = identityInfoDataManager;
     }
 
-    IdentityInfoEntity identityInfoEntity = findUserInfoByUserIdAndKey(userId, key);
-    if (identityInfoEntity != null) {
-      // update
-      identityInfoEntity.setValue(value);
-      identityInfoEntity.setPasswordBytes(storedPassword);
-      identityInfoDataManager.update(identityInfoEntity);
+    @Override
+    protected DataManager<IdentityInfoEntity> getDataManager() {
+        return identityInfoDataManager;
+    }
 
-      if (accountDetails == null) {
-        accountDetails = new HashMap<String, String>();
-      }
-
-      Set<String> newKeys = new HashSet<String>(accountDetails.keySet());
-      List<IdentityInfoEntity> identityInfoDetails = identityInfoDataManager.findIdentityInfoDetails(identityInfoEntity.getId());
-      for (IdentityInfoEntity identityInfoDetail : identityInfoDetails) {
-        String detailKey = identityInfoDetail.getKey();
-        newKeys.remove(detailKey);
-        String newDetailValue = accountDetails.get(detailKey);
-        if (newDetailValue == null) {
-          delete(identityInfoDetail);
-        } else {
-          // update detail
-          identityInfoDetail.setValue(newDetailValue);
+    @Override
+    public void deleteUserInfoByUserIdAndKey(String userId, String key) {
+        IdentityInfoEntity identityInfoEntity = findUserInfoByUserIdAndKey(userId, key);
+        if (identityInfoEntity != null) {
+            delete(identityInfoEntity);
         }
-      }
-      insertAccountDetails(identityInfoEntity, accountDetails, newKeys);
-
-    } else {
-      // insert
-      identityInfoEntity = identityInfoDataManager.create(); 
-      identityInfoEntity.setUserId(userId);
-      identityInfoEntity.setType(type);
-      identityInfoEntity.setKey(key);
-      identityInfoEntity.setValue(value);
-      identityInfoEntity.setPasswordBytes(storedPassword);
-      insert(identityInfoEntity, false);
-      if (accountDetails != null) {
-        insertAccountDetails(identityInfoEntity, accountDetails, accountDetails.keySet());
-      }
     }
-  }
 
-  protected void insertAccountDetails(IdentityInfoEntity identityInfoEntity, Map<String, String> accountDetails, Set<String> keys) {
-    for (String newKey : keys) {
-      // insert detail
-      IdentityInfoEntity identityInfoDetail = identityInfoDataManager.create();
-      identityInfoDetail.setParentId(identityInfoEntity.getId());
-      identityInfoDetail.setKey(newKey);
-      identityInfoDetail.setValue(accountDetails.get(newKey));
-      insert(identityInfoDetail, false);
+    @Override
+    public void updateUserInfo(String userId, String userPassword, String type, String key, String value, String accountPassword, Map<String, String> accountDetails) {
+        byte[] storedPassword = null;
+        if (accountPassword != null) {
+            storedPassword = encryptPassword(accountPassword, userPassword);
+        }
+
+        IdentityInfoEntity identityInfoEntity = findUserInfoByUserIdAndKey(userId, key);
+        if (identityInfoEntity != null) {
+            // update
+            identityInfoEntity.setValue(value);
+            identityInfoEntity.setPasswordBytes(storedPassword);
+            identityInfoDataManager.update(identityInfoEntity);
+
+            if (accountDetails == null) {
+                accountDetails = new HashMap<String, String>();
+            }
+
+            Set<String> newKeys = new HashSet<String>(accountDetails.keySet());
+            List<IdentityInfoEntity> identityInfoDetails = identityInfoDataManager.findIdentityInfoDetails(identityInfoEntity.getId());
+            for (IdentityInfoEntity identityInfoDetail : identityInfoDetails) {
+                String detailKey = identityInfoDetail.getKey();
+                newKeys.remove(detailKey);
+                String newDetailValue = accountDetails.get(detailKey);
+                if (newDetailValue == null) {
+                    delete(identityInfoDetail);
+                } else {
+                    // update detail
+                    identityInfoDetail.setValue(newDetailValue);
+                }
+            }
+            insertAccountDetails(identityInfoEntity, accountDetails, newKeys);
+
+        } else {
+            // insert
+            identityInfoEntity = identityInfoDataManager.create();
+            identityInfoEntity.setUserId(userId);
+            identityInfoEntity.setType(type);
+            identityInfoEntity.setKey(key);
+            identityInfoEntity.setValue(value);
+            identityInfoEntity.setPasswordBytes(storedPassword);
+            insert(identityInfoEntity, false);
+            if (accountDetails != null) {
+                insertAccountDetails(identityInfoEntity, accountDetails, accountDetails.keySet());
+            }
+        }
     }
-  }
 
-  protected byte[] encryptPassword(String accountPassword, String userPassword) {
-    return accountPassword.getBytes();
-  }
+    protected void insertAccountDetails(IdentityInfoEntity identityInfoEntity, Map<String, String> accountDetails, Set<String> keys) {
+        for (String newKey : keys) {
+            // insert detail
+            IdentityInfoEntity identityInfoDetail = identityInfoDataManager.create();
+            identityInfoDetail.setParentId(identityInfoEntity.getId());
+            identityInfoDetail.setKey(newKey);
+            identityInfoDetail.setValue(accountDetails.get(newKey));
+            insert(identityInfoDetail, false);
+        }
+    }
 
-  protected String decryptPassword(byte[] storedPassword, String userPassword) {
-    return new String(storedPassword);
-  }
+    protected byte[] encryptPassword(String accountPassword, String userPassword) {
+        return accountPassword.getBytes();
+    }
 
-  @Override
-  public IdentityInfoEntity findUserInfoByUserIdAndKey(String userId, String key) {
-    return identityInfoDataManager.findUserInfoByUserIdAndKey(userId, key);
-  }
-  
-  @Override
-  public List<IdentityInfoEntity> findIdentityInfoByUserId(String userId) {
-    return identityInfoDataManager.findIdentityInfoByUserId(userId);
-  }
+    protected String decryptPassword(byte[] storedPassword, String userPassword) {
+        return new String(storedPassword);
+    }
 
-  @Override
-  public List<String> findUserInfoKeysByUserIdAndType(String userId, String type) {
-    return identityInfoDataManager.findUserInfoKeysByUserIdAndType(userId, type);
-  }
+    @Override
+    public IdentityInfoEntity findUserInfoByUserIdAndKey(String userId, String key) {
+        return identityInfoDataManager.findUserInfoByUserIdAndKey(userId, key);
+    }
 
-  public IdentityInfoDataManager getIdentityInfoDataManager() {
-    return identityInfoDataManager;
-  }
+    @Override
+    public List<IdentityInfoEntity> findIdentityInfoByUserId(String userId) {
+        return identityInfoDataManager.findIdentityInfoByUserId(userId);
+    }
 
-  public void setIdentityInfoDataManager(IdentityInfoDataManager identityInfoDataManager) {
-    this.identityInfoDataManager = identityInfoDataManager;
-  }
-  
+    @Override
+    public List<String> findUserInfoKeysByUserIdAndType(String userId, String type) {
+        return identityInfoDataManager.findUserInfoKeysByUserIdAndType(userId, type);
+    }
+
+    public IdentityInfoDataManager getIdentityInfoDataManager() {
+        return identityInfoDataManager;
+    }
+
+    public void setIdentityInfoDataManager(IdentityInfoDataManager identityInfoDataManager) {
+        this.identityInfoDataManager = identityInfoDataManager;
+    }
+
 }

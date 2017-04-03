@@ -44,9 +44,9 @@ import org.junit.runners.model.Statement;
  * </pre>
  * 
  * <p>
- * The DmnEngine and the services will be made available to the test class through the getters of the FlowableContentRule. The dmnEngine will be initialized by default with the flowable.dmn.cfg.xml resource
- * on the classpath. To specify a different configuration file, pass the resource location in {@link #FlowableContentRule(String) the appropriate constructor}. Process engines will be cached statically.
- * Right before the first time the setUp is called for a given configuration resource, the process engine will be constructed.
+ * The DmnEngine and the services will be made available to the test class through the getters of the FlowableContentRule. The dmnEngine will be initialized by default with the flowable.dmn.cfg.xml
+ * resource on the classpath. To specify a different configuration file, pass the resource location in {@link #FlowableContentRule(String) the appropriate constructor}. Process engines will be cached
+ * statically. Right before the first time the setUp is called for a given configuration resource, the process engine will be constructed.
  * </p>
  * 
  * <p>
@@ -55,174 +55,174 @@ import org.junit.runners.model.Statement;
  * </p>
  * 
  * <p>
- * The FlowableRule also lets you {@link FlowableContentRule#setCurrentTime(Date) set the current time used by the process engine}. This can be handy to control the exact time that is used by the engine
- * in order to verify e.g. e.g. due dates of timers. Or start, end and duration times in the history service. In the tearDown, the internal clock will automatically be reset to use the current system
- * time rather then the time that was set during a test method.
+ * The FlowableRule also lets you {@link FlowableContentRule#setCurrentTime(Date) set the current time used by the process engine}. This can be handy to control the exact time that is used by the
+ * engine in order to verify e.g. e.g. due dates of timers. Or start, end and duration times in the history service. In the tearDown, the internal clock will automatically be reset to use the current
+ * system time rather then the time that was set during a test method.
  * </p>
  * 
  * @author Tijs Rademakers
  */
 public class FlowableContentRule implements TestRule {
 
-  protected String configurationResource = "flowable.content.cfg.xml";
-  protected String deploymentId;
+    protected String configurationResource = "flowable.content.cfg.xml";
+    protected String deploymentId;
 
-  protected ContentEngineConfiguration contentEngineConfiguration;
-  protected ContentEngine contentEngine;
-  protected ContentService contentService;
+    protected ContentEngineConfiguration contentEngineConfiguration;
+    protected ContentEngine contentEngine;
+    protected ContentService contentService;
 
-  public FlowableContentRule() {
-  }
+    public FlowableContentRule() {
+    }
 
-  public FlowableContentRule(String configurationResource) {
-    this.configurationResource = configurationResource;
-  }
+    public FlowableContentRule(String configurationResource) {
+        this.configurationResource = configurationResource;
+    }
 
-  public FlowableContentRule(ContentEngine contentEngine) {
-    setContentEngine(contentEngine);
-  }
+    public FlowableContentRule(ContentEngine contentEngine) {
+        setContentEngine(contentEngine);
+    }
 
-  /**
-   * Implementation based on {@link TestWatcher}.
-   */
-  @Override
-  public Statement apply(final Statement base, final Description description) {
-    return new Statement() {
-      @Override
-      public void evaluate() throws Throwable {
-        List<Throwable> errors = new ArrayList<Throwable>();
+    /**
+     * Implementation based on {@link TestWatcher}.
+     */
+    @Override
+    public Statement apply(final Statement base, final Description description) {
+        return new Statement() {
+            @Override
+            public void evaluate() throws Throwable {
+                List<Throwable> errors = new ArrayList<Throwable>();
 
-        startingQuietly(description, errors);
+                startingQuietly(description, errors);
+                try {
+                    base.evaluate();
+                    succeededQuietly(description, errors);
+                } catch (AssumptionViolatedException e) {
+                    errors.add(e);
+                    skippedQuietly(e, description, errors);
+                } catch (Throwable t) {
+                    errors.add(t);
+                    failedQuietly(t, description, errors);
+                } finally {
+                    finishedQuietly(description, errors);
+                }
+
+                MultipleFailureException.assertEmpty(errors);
+            }
+        };
+    }
+
+    private void succeededQuietly(Description description, List<Throwable> errors) {
         try {
-          base.evaluate();
-          succeededQuietly(description, errors);
-        } catch (AssumptionViolatedException e) {
-          errors.add(e);
-          skippedQuietly(e, description, errors);
+            succeeded(description);
         } catch (Throwable t) {
-          errors.add(t);
-          failedQuietly(t, description, errors);
-        } finally {
-          finishedQuietly(description, errors);
+            errors.add(t);
+        }
+    }
+
+    private void failedQuietly(Throwable t, Description description, List<Throwable> errors) {
+        try {
+            failed(t, description);
+        } catch (Throwable t1) {
+            errors.add(t1);
+        }
+    }
+
+    private void skippedQuietly(AssumptionViolatedException e, Description description, List<Throwable> errors) {
+        try {
+            skipped(e, description);
+        } catch (Throwable t) {
+            errors.add(t);
+        }
+    }
+
+    private void startingQuietly(Description description, List<Throwable> errors) {
+        try {
+            starting(description);
+        } catch (Throwable t) {
+            errors.add(t);
+        }
+    }
+
+    private void finishedQuietly(Description description, List<Throwable> errors) {
+        try {
+            finished(description);
+        } catch (Throwable t) {
+            errors.add(t);
+        }
+    }
+
+    /**
+     * Invoked when a test succeeds
+     */
+    protected void succeeded(Description description) {
+    }
+
+    /**
+     * Invoked when a test fails
+     */
+    protected void failed(Throwable e, Description description) {
+    }
+
+    /**
+     * Invoked when a test is skipped due to a failed assumption.
+     */
+    protected void skipped(AssumptionViolatedException e, Description description) {
+    }
+
+    protected void starting(Description description) {
+        if (contentEngine == null) {
+            initializeContentEngine();
         }
 
-        MultipleFailureException.assertEmpty(errors);
-      }
-    };
-  }
+        if (contentEngineConfiguration == null) {
+            initializeServices();
+        }
 
-  private void succeededQuietly(Description description, List<Throwable> errors) {
-    try {
-      succeeded(description);
-    } catch (Throwable t) {
-      errors.add(t);
-    }
-  }
-
-  private void failedQuietly(Throwable t, Description description, List<Throwable> errors) {
-    try {
-      failed(t, description);
-    } catch (Throwable t1) {
-      errors.add(t1);
-    }
-  }
-
-  private void skippedQuietly(AssumptionViolatedException e, Description description, List<Throwable> errors) {
-    try {
-      skipped(e, description);
-    } catch (Throwable t) {
-      errors.add(t);
-    }
-  }
-
-  private void startingQuietly(Description description, List<Throwable> errors) {
-    try {
-      starting(description);
-    } catch (Throwable t) {
-      errors.add(t);
-    }
-  }
-
-  private void finishedQuietly(Description description, List<Throwable> errors) {
-    try {
-      finished(description);
-    } catch (Throwable t) {
-      errors.add(t);
-    }
-  }
-
-  /**
-   * Invoked when a test succeeds
-   */
-  protected void succeeded(Description description) {
-  }
-
-  /**
-   * Invoked when a test fails
-   */
-  protected void failed(Throwable e, Description description) {
-  }
-
-  /**
-   * Invoked when a test is skipped due to a failed assumption.
-   */
-  protected void skipped(AssumptionViolatedException e, Description description) {
-  }
-
-  protected void starting(Description description) {
-    if (contentEngine == null) {
-      initializeContentEngine();
+        configureContentEngine();
     }
 
-    if (contentEngineConfiguration == null) {
-      initializeServices();
+    protected void initializeContentEngine() {
+        contentEngine = ContentTestHelper.getContentEngine(configurationResource);
     }
 
-    configureContentEngine();
-  }
+    protected void initializeServices() {
+        contentEngineConfiguration = contentEngine.getContentEngineConfiguration();
+        contentService = contentEngine.getContentService();
+    }
 
-  protected void initializeContentEngine() {
-    contentEngine = ContentTestHelper.getContentEngine(configurationResource);
-  }
+    protected void configureContentEngine() {
+        /* meant to be overridden */
+    }
 
-  protected void initializeServices() {
-    contentEngineConfiguration = contentEngine.getContentEngineConfiguration();
-    contentService = contentEngine.getContentService();
-  }
+    protected void finished(Description description) {
+    }
 
-  protected void configureContentEngine() {
-    /** meant to be overridden */
-  }
+    public String getConfigurationResource() {
+        return configurationResource;
+    }
 
-  protected void finished(Description description) {
-  }
+    public void setConfigurationResource(String configurationResource) {
+        this.configurationResource = configurationResource;
+    }
 
-  public String getConfigurationResource() {
-    return configurationResource;
-  }
+    public ContentEngine getContentEngine() {
+        return contentEngine;
+    }
 
-  public void setConfigurationResource(String configurationResource) {
-    this.configurationResource = configurationResource;
-  }
+    public void setContentEngine(ContentEngine contentEngine) {
+        this.contentEngine = contentEngine;
+        initializeServices();
+    }
 
-  public ContentEngine getContentEngine() {
-    return contentEngine;
-  }
+    public ContentService getContentService() {
+        return contentService;
+    }
 
-  public void setContentEngine(ContentEngine contentEngine) {
-    this.contentEngine = contentEngine;
-    initializeServices();
-  }
+    public void setContentService(ContentService contentService) {
+        this.contentService = contentService;
+    }
 
-  public ContentService getContentService() {
-    return contentService;
-  }
-
-  public void setContentService(ContentService contentService) {
-    this.contentService = contentService;
-  }
-
-  public void setContentEngineConfiguration(ContentEngineConfiguration contentEngineConfiguration) {
-    this.contentEngineConfiguration = contentEngineConfiguration;
-  }
+    public void setContentEngineConfiguration(ContentEngineConfiguration contentEngineConfiguration) {
+        this.contentEngineConfiguration = contentEngineConfiguration;
+    }
 }

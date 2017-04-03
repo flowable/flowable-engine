@@ -17,16 +17,15 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.JavaDelegate;
 
-
 /**
  * @author Joram Barrez
  */
 public class ToUpperCaseFieldInjected implements JavaDelegate {
-  
-  private Expression text;
-  
-  public void execute(DelegateExecution execution) {
-    execution.setVariable("var", ((String)text.getValue(execution)).toUpperCase());
-  }
-  
+
+    private Expression text;
+
+    public void execute(DelegateExecution execution) {
+        execution.setVariable("var", ((String) text.getValue(execution)).toUpperCase());
+    }
+
 }

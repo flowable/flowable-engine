@@ -17,12 +17,7 @@ package org.flowable.dmn.model;
  */
 public enum BuiltinAggregator {
 
-    COLLECT,
-    SUM,
-    FIRST,
-    MIN,
-    MAX,
-    ANY;
+    COLLECT, SUM, FIRST, MIN, MAX, ANY;
 
     public String value() {
         return name();

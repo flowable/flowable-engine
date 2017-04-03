@@ -23,29 +23,29 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
  */
 public class DeleteContentItemsCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected String processInstanceId;
-  protected String taskId;
+    private static final long serialVersionUID = 1L;
 
-  public DeleteContentItemsCmd(String processInstanceId, String taskId) {
-    this.processInstanceId = processInstanceId;
-    this.taskId = taskId;
-  }
-  
-  public Void execute(CommandContext commandContext) {
-    if (processInstanceId == null && taskId == null) {
-      throw new FlowableIllegalArgumentException("taskId and processInstanceId are null");
+    protected String processInstanceId;
+    protected String taskId;
+
+    public DeleteContentItemsCmd(String processInstanceId, String taskId) {
+        this.processInstanceId = processInstanceId;
+        this.taskId = taskId;
     }
-    
-    if (processInstanceId != null) {
-      commandContext.getContentItemEntityManager().deleteContentItemsByProcessInstanceId(processInstanceId);
-    
-    } else {
-      commandContext.getContentItemEntityManager().deleteContentItemsByTaskId(taskId);
+
+    public Void execute(CommandContext commandContext) {
+        if (processInstanceId == null && taskId == null) {
+            throw new FlowableIllegalArgumentException("taskId and processInstanceId are null");
+        }
+
+        if (processInstanceId != null) {
+            commandContext.getContentItemEntityManager().deleteContentItemsByProcessInstanceId(processInstanceId);
+
+        } else {
+            commandContext.getContentItemEntityManager().deleteContentItemsByTaskId(taskId);
+        }
+
+        return null;
     }
-    
-    return null;
-  }
 
 }

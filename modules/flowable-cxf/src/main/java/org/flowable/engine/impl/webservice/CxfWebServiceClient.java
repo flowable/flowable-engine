@@ -36,12 +36,12 @@ import org.slf4j.LoggerFactory;
  */
 public class CxfWebServiceClient implements SyncWebServiceClient {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CxfWebServiceClient.class);
-    
-  protected Client client;
+    private static final Logger LOGGER = LoggerFactory.getLogger(CxfWebServiceClient.class);
 
-  public CxfWebServiceClient(String wsdl) {
-    JaxWsDynamicClientFactory dcf = JaxWsDynamicClientFactory.newInstance();
+    protected Client client;
+
+    public CxfWebServiceClient(String wsdl) {
+        JaxWsDynamicClientFactory dcf = JaxWsDynamicClientFactory.newInstance();
         Enumeration<URL> xjcBindingUrls;
         try {
             xjcBindingUrls = Thread.currentThread().getContextClassLoader()
@@ -61,30 +61,27 @@ public class CxfWebServiceClient implements SyncWebServiceClient {
         } catch (IOException e) {
             throw new FlowableException("An error occurs creating a web-service client for WSDL '" + wsdl + "'.", e);
         }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public Object[] send(String methodName, Object[] arguments, ConcurrentMap<QName,URL> overridenEndpointAddresses) throws Exception {
-    try {
-      URL newEndpointAddress = null;
-      if (overridenEndpointAddresses != null) {
-        newEndpointAddress = overridenEndpointAddresses
-               .get(this.client.getEndpoint().getEndpointInfo().getName());
-      }
-      
-      if (newEndpointAddress != null) {
-          this.client.getRequestContext().put(Message.ENDPOINT_ADDRESS, newEndpointAddress.toExternalForm());
-      }
-      return client.invoke(methodName, arguments);
-    } catch (Fault e) {
-       LOGGER.debug("Technical error calling WS", e);
-       throw new FlowableException(e.getMessage(), e);
-    } catch (Exception e) {
-       // Other exceptions should be associated to business fault defined in the service WSDL
-       LOGGER.debug("Business error calling WS", e);
-       throw new BpmnError(e.getClass().getName(), e.getMessage());
     }
-  }
+
+    public Object[] send(String methodName, Object[] arguments, ConcurrentMap<QName, URL> overridenEndpointAddresses) throws Exception {
+        try {
+            URL newEndpointAddress = null;
+            if (overridenEndpointAddresses != null) {
+                newEndpointAddress = overridenEndpointAddresses
+                        .get(this.client.getEndpoint().getEndpointInfo().getName());
+            }
+
+            if (newEndpointAddress != null) {
+                this.client.getRequestContext().put(Message.ENDPOINT_ADDRESS, newEndpointAddress.toExternalForm());
+            }
+            return client.invoke(methodName, arguments);
+        } catch (Fault e) {
+            LOGGER.debug("Technical error calling WS", e);
+            throw new FlowableException(e.getMessage(), e);
+        } catch (Exception e) {
+            // Other exceptions should be associated to business fault defined in the service WSDL
+            LOGGER.debug("Business error calling WS", e);
+            throw new BpmnError(e.getClass().getName(), e.getMessage());
+        }
+    }
 }

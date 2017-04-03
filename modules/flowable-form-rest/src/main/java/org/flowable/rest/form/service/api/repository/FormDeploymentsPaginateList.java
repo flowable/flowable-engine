@@ -22,15 +22,15 @@ import java.util.List;
  */
 public class FormDeploymentsPaginateList extends AbstractPaginateList {
 
-  protected FormRestResponseFactory formRestResponseFactory;
+    protected FormRestResponseFactory formRestResponseFactory;
 
-  public FormDeploymentsPaginateList(FormRestResponseFactory formRestResponseFactory) {
-    this.formRestResponseFactory = formRestResponseFactory;
-  }
+    public FormDeploymentsPaginateList(FormRestResponseFactory formRestResponseFactory) {
+        this.formRestResponseFactory = formRestResponseFactory;
+    }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  @Override
-  protected List processList(List list) {
-    return formRestResponseFactory.createFormDeploymentResponseList(list);
-  }
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    protected List processList(List list) {
+        return formRestResponseFactory.createFormDeploymentResponseList(list);
+    }
 }

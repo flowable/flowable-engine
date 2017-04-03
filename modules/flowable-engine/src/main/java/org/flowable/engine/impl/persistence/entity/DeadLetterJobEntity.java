@@ -19,5 +19,5 @@ package org.flowable.engine.impl.persistence.entity;
  * @author Joram Barrez
  */
 public interface DeadLetterJobEntity extends AbstractJobEntity {
-  
+
 }

@@ -23,26 +23,26 @@ import org.flowable.idm.engine.impl.interceptor.CommandContext;
  */
 public class DeleteMembershipCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  String userId;
-  String groupId;
+    private static final long serialVersionUID = 1L;
+    String userId;
+    String groupId;
 
-  public DeleteMembershipCmd(String userId, String groupId) {
-    this.userId = userId;
-    this.groupId = groupId;
-  }
-
-  public Void execute(CommandContext commandContext) {
-    if (userId == null) {
-      throw new FlowableIllegalArgumentException("userId is null");
-    }
-    if (groupId == null) {
-      throw new FlowableIllegalArgumentException("groupId is null");
+    public DeleteMembershipCmd(String userId, String groupId) {
+        this.userId = userId;
+        this.groupId = groupId;
     }
 
-    commandContext.getMembershipEntityManager().deleteMembership(userId, groupId);
+    public Void execute(CommandContext commandContext) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("userId is null");
+        }
+        if (groupId == null) {
+            throw new FlowableIllegalArgumentException("groupId is null");
+        }
 
-    return null;
-  }
+        commandContext.getMembershipEntityManager().deleteMembership(userId, groupId);
+
+        return null;
+    }
 
 }

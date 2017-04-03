@@ -55,13 +55,13 @@ public class FlowableProfiler implements ProcessEngineConfigurator {
     public int getPriority() {
         return 0;
     }
-    
+
     public void reset() {
-      if (currentProfileSession != null) {
-        stopCurrentProfileSession();
-      }
-      this.currentProfileSession = null;
-      this.profileSessions.clear();
+        if (currentProfileSession != null) {
+            stopCurrentProfileSession();
+        }
+        this.currentProfileSession = null;
+        this.profileSessions.clear();
     }
 
     public void startProfileSession(String name) {

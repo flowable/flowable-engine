@@ -24,9 +24,9 @@ import org.flowable.engine.common.runtime.ClockReader;
  */
 public class AdvancedSchedulerResolverWithoutTimeZone implements AdvancedSchedulerResolver {
 
-  @Override
-  public Date resolve(String duedateDescription, ClockReader clockReader, TimeZone timeZone) {
-    return new CycleBusinessCalendar(clockReader).resolveDuedate(duedateDescription);
-  }
+    @Override
+    public Date resolve(String duedateDescription, ClockReader clockReader, TimeZone timeZone) {
+        return new CycleBusinessCalendar(clockReader).resolveDuedate(duedateDescription);
+    }
 
 }

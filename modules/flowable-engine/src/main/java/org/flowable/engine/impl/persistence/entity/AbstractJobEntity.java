@@ -24,62 +24,62 @@ import org.flowable.engine.runtime.Job;
  */
 public interface AbstractJobEntity extends Job, Entity, HasRevision {
 
-  void setExecution(ExecutionEntity execution);
+    void setExecution(ExecutionEntity execution);
 
-  void setDuedate(Date duedate);
+    void setDuedate(Date duedate);
 
-  void setExecutionId(String executionId);
+    void setExecutionId(String executionId);
 
-  void setRetries(int retries);
+    void setRetries(int retries);
 
-  void setProcessInstanceId(String processInstanceId);
+    void setProcessInstanceId(String processInstanceId);
 
-  boolean isExclusive();
+    boolean isExclusive();
 
-  void setExclusive(boolean isExclusive);
+    void setExclusive(boolean isExclusive);
 
-  void setProcessDefinitionId(String processDefinitionId);
+    void setProcessDefinitionId(String processDefinitionId);
 
-  String getJobHandlerType();
+    String getJobHandlerType();
 
-  void setJobHandlerType(String jobHandlerType);
+    void setJobHandlerType(String jobHandlerType);
 
-  String getJobHandlerConfiguration();
+    String getJobHandlerConfiguration();
 
-  void setJobHandlerConfiguration(String jobHandlerConfiguration);
+    void setJobHandlerConfiguration(String jobHandlerConfiguration);
   
-  String getAdvancedJobHandlerConfiguration();
+    String getAdvancedJobHandlerConfiguration();
 
-  void setAdvancedJobHandlerConfiguration(String jobHandlerConfiguration);
+    void setAdvancedJobHandlerConfiguration(String jobHandlerConfiguration);
   
-  void setAdvancedJobHandlerConfigurationBytes(byte[] bytes);
+    void setAdvancedJobHandlerConfigurationBytes(byte[] bytes);
   
-  ByteArrayRef getAdvancedJobHandlerConfigurationByteArrayRef();
+    ByteArrayRef getAdvancedJobHandlerConfigurationByteArrayRef();
 
-  String getJobType();
+    String getJobType();
 
-  void setJobType(String jobType);
-  
-  String getRepeat();
+    void setJobType(String jobType);
 
-  void setRepeat(String repeat);
+    String getRepeat();
 
-  Date getEndDate();
+    void setRepeat(String repeat);
 
-  void setEndDate(Date endDate);
+    Date getEndDate();
 
-  int getMaxIterations();
+    void setEndDate(Date endDate);
 
-  void setMaxIterations(int maxIterations);
-  
-  String getExceptionStacktrace();
+    int getMaxIterations();
 
-  void setExceptionStacktrace(String exception);
+    void setMaxIterations(int maxIterations);
 
-  void setExceptionMessage(String exceptionMessage);
+    String getExceptionStacktrace();
 
-  ByteArrayRef getExceptionByteArrayRef();
+    void setExceptionStacktrace(String exception);
 
-  void setTenantId(String tenantId);
+    void setExceptionMessage(String exceptionMessage);
+
+    ByteArrayRef getExceptionByteArrayRef();
+
+    void setTenantId(String tenantId);
 
 }

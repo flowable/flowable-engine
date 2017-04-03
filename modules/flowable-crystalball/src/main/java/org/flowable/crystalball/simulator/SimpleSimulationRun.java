@@ -26,87 +26,87 @@ import java.util.Map;
  */
 public class SimpleSimulationRun extends AbstractSimulationRun {
 
-  protected EventCalendar eventCalendar;
+    protected EventCalendar eventCalendar;
 
-  /** simulation start date */
-  protected Date simulationStartDate = new Date(0);
-  protected Date dueDate;
+    /** simulation start date */
+    protected Date simulationStartDate = new Date(0);
+    protected Date dueDate;
 
-  protected SimpleSimulationRun(Builder builder) {
-    super(builder.eventHandlers);
-    this.eventCalendar = builder.getEventCalendar();
-    this.processEngine = builder.getProcessEngine();
-    // init internal event handler map.
-    eventHandlerMap.put(SimulationConstants.TYPE_END_SIMULATION, new NoopEventHandler());
-  }
-
-  @Override
-  public void close() {
-    // remove simulation from simulation context
-    SimulationRunContext.getEventCalendar().clear();
-    SimulationRunContext.removeEventCalendar();
-    SimulationRunContext.getProcessEngine().close();
-    SimulationRunContext.removeProcessEngine();
-  }
-
-  @Override
-  protected void initSimulationRunContext(VariableScope execution) {// init new process engine
-    try {
-      // add context in which simulation run is executed
-      SimulationRunContext.setEventCalendar(eventCalendar);
-      SimulationRunContext.setProcessEngine(processEngine);
-      SimulationRunContext.setExecution(execution);
-
-      // run simulation
-      // init context and task calendar and simulation time is set to current
-      SimulationRunContext.getClock().setCurrentTime(simulationStartDate);
-
-      if (dueDate != null)
-        SimulationRunContext.getEventCalendar().addEvent(new SimulationEvent.Builder(SimulationConstants.TYPE_END_SIMULATION).simulationTime(dueDate.getTime()).build());
-    } catch (Exception e) {
-      throw new FlowableException("Unable to initialize simulation run", e);
-    }
-  }
-
-  @Override
-  protected boolean simulationEnd(SimulationEvent event) {
-    if (event != null && event.getType().equals(SimulationConstants.TYPE_BREAK_SIMULATION))
-      return true;
-    if (dueDate != null)
-      return event == null || (SimulationRunContext.getClock().getCurrentTime().after(dueDate));
-    return event == null;
-  }
-
-  public static class Builder {
-    private Map<String, SimulationEventHandler> eventHandlers = Collections.emptyMap();
-    private ProcessEngineImpl processEngine;
-    private EventCalendar eventCalendar;
-
-    public ProcessEngineImpl getProcessEngine() {
-      return processEngine;
+    protected SimpleSimulationRun(Builder builder) {
+        super(builder.eventHandlers);
+        this.eventCalendar = builder.getEventCalendar();
+        this.processEngine = builder.getProcessEngine();
+        // init internal event handler map.
+        eventHandlerMap.put(SimulationConstants.TYPE_END_SIMULATION, new NoopEventHandler());
     }
 
-    public Builder processEngine(ProcessEngineImpl processEngine) {
-      this.processEngine = processEngine;
-      return this;
+    @Override
+    public void close() {
+        // remove simulation from simulation context
+        SimulationRunContext.getEventCalendar().clear();
+        SimulationRunContext.removeEventCalendar();
+        SimulationRunContext.getProcessEngine().close();
+        SimulationRunContext.removeProcessEngine();
     }
 
-    public EventCalendar getEventCalendar() {
-      return eventCalendar;
+    @Override
+    protected void initSimulationRunContext(VariableScope execution) {// init new process engine
+        try {
+            // add context in which simulation run is executed
+            SimulationRunContext.setEventCalendar(eventCalendar);
+            SimulationRunContext.setProcessEngine(processEngine);
+            SimulationRunContext.setExecution(execution);
+
+            // run simulation
+            // init context and task calendar and simulation time is set to current
+            SimulationRunContext.getClock().setCurrentTime(simulationStartDate);
+
+            if (dueDate != null)
+                SimulationRunContext.getEventCalendar().addEvent(new SimulationEvent.Builder(SimulationConstants.TYPE_END_SIMULATION).simulationTime(dueDate.getTime()).build());
+        } catch (Exception e) {
+            throw new FlowableException("Unable to initialize simulation run", e);
+        }
     }
 
-    public Builder eventCalendar(EventCalendar eventCalendar) {
-      this.eventCalendar = eventCalendar;
-      return this;
+    @Override
+    protected boolean simulationEnd(SimulationEvent event) {
+        if (event != null && event.getType().equals(SimulationConstants.TYPE_BREAK_SIMULATION))
+            return true;
+        if (dueDate != null)
+            return event == null || (SimulationRunContext.getClock().getCurrentTime().after(dueDate));
+        return event == null;
     }
 
-    public Builder eventHandlers(Map<String, SimulationEventHandler> eventHandlersMap) {
-      this.eventHandlers = eventHandlersMap;
-      return this;
-    }
+    public static class Builder {
+        private Map<String, SimulationEventHandler> eventHandlers = Collections.emptyMap();
+        private ProcessEngineImpl processEngine;
+        private EventCalendar eventCalendar;
 
-    public SimpleSimulationRun build() {
-      return new SimpleSimulationRun(this);
+        public ProcessEngineImpl getProcessEngine() {
+            return processEngine;
+        }
+
+        public Builder processEngine(ProcessEngineImpl processEngine) {
+            this.processEngine = processEngine;
+            return this;
+        }
+
+        public EventCalendar getEventCalendar() {
+            return eventCalendar;
+        }
+
+        public Builder eventCalendar(EventCalendar eventCalendar) {
+            this.eventCalendar = eventCalendar;
+            return this;
+        }
+
+        public Builder eventHandlers(Map<String, SimulationEventHandler> eventHandlersMap) {
+            this.eventHandlers = eventHandlersMap;
+            return this;
+        }
+
+        public SimpleSimulationRun build() {
+            return new SimpleSimulationRun(this);
+        }
     }
-  }
 }

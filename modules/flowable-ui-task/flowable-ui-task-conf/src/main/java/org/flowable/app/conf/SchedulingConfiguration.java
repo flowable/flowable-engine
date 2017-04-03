@@ -34,11 +34,11 @@ public class SchedulingConfiguration implements SchedulingConfigurer {
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         taskRegistrar.setScheduler(taskExecutor());
     }
-    
-    @Bean(destroyMethod="shutdownNow")
+
+    @Bean(destroyMethod = "shutdownNow")
     public Executor taskExecutor() {
-    	ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(5);
-    	return scheduledExecutorService;
+        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(5);
+        return scheduledExecutorService;
     }
 
 }

@@ -29,339 +29,339 @@ import org.flowable.engine.test.Deployment;
 
 public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
 
-  @Deployment
-  public void testOneTaskProcess() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    
-    List<Execution> executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-    assertEquals(2, executionList.size());
-    
-    Execution rootProcessInstance = null;
-    Execution childExecution = null;
-    
-    for (Execution execution : executionList) {
-      if (execution.getId().equals(execution.getProcessInstanceId())) {
-        rootProcessInstance = execution;
-        
-        assertNull(execution.getActivityId());
-      
-      } else {
-        childExecution = execution;
+    @Deployment
+    public void testOneTaskProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        assertFalse(execution.getId().equals(execution.getProcessInstanceId()));
-        assertEquals("theTask", execution.getActivityId());
-      }
-    }
-    
-    assertNotNull(rootProcessInstance);
-    assertNotNull(childExecution);
+        List<Execution> executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, executionList.size());
 
-    Task task = taskService.createTaskQuery().singleResult();
-    assertEquals(childExecution.getId(), task.getExecutionId());
+        Execution rootProcessInstance = null;
+        Execution childExecution = null;
 
-    taskService.complete(task.getId());
-    
-    if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-      List<HistoricActivityInstance> historicActivities = historyService.createHistoricActivityInstanceQuery()
-          .processInstanceId(processInstance.getId())
-          .list();
-      assertEquals(3, historicActivities.size());
-      
-      List<String> activityIds = new ArrayList<String>();
-      activityIds.add("theStart");
-      activityIds.add("theTask");
-      activityIds.add("theEnd");
-      
-      for (HistoricActivityInstance historicActivityInstance : historicActivities) {
-        activityIds.remove(historicActivityInstance.getActivityId());
-        assertEquals(childExecution.getId(), historicActivityInstance.getExecutionId());
-      }
-      
-      assertEquals(0, activityIds.size());
-    }
-  }
-  
-  @Deployment
-  public void testOneNestedTaskProcess() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneNestedTaskProcess");
-    
-    List<Execution> executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-    assertEquals(2, executionList.size());
-    
-    Execution rootProcessInstance = null;
-    Execution childExecution = null;
-    
-    for (Execution execution : executionList) {
-      if (execution.getId().equals(execution.getProcessInstanceId())) {
-        rootProcessInstance = execution;
-        
-        assertNull(execution.getActivityId());
-      
-      } else {
-        childExecution = execution;
+        for (Execution execution : executionList) {
+            if (execution.getId().equals(execution.getProcessInstanceId())) {
+                rootProcessInstance = execution;
 
-        assertFalse(execution.getId().equals(execution.getProcessInstanceId()));
-        assertEquals("theTask1", execution.getActivityId());
-      }
-    }
-    
-    assertNotNull(rootProcessInstance);
-    assertNotNull(childExecution);
+                assertNull(execution.getActivityId());
 
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertEquals(childExecution.getId(), task.getExecutionId());
+            } else {
+                childExecution = execution;
 
-    taskService.complete(task.getId());
-    
-    executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-    assertEquals(3, executionList.size());
-    
-    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertEquals("subTask", task.getTaskDefinitionKey());
-    Execution subTaskExecution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
-    assertEquals("subTask", subTaskExecution.getActivityId());
-    
-    Execution subProcessExecution = runtimeService.createExecutionQuery().executionId(subTaskExecution.getParentId()).singleResult();
-    assertEquals("subProcess", subProcessExecution.getActivityId());
-    assertEquals(rootProcessInstance.getId(), subProcessExecution.getParentId());
-    
-    taskService.complete(task.getId());
-    
-    executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-    assertEquals(2, executionList.size());
-    
-    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertFalse(childExecution.getId().equals(task.getExecutionId()));
-    
-    Execution finalTaskExecution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
-    assertEquals("theTask2", finalTaskExecution.getActivityId());
-    
-    assertEquals(rootProcessInstance.getId(), finalTaskExecution.getParentId());
-    
-    taskService.complete(task.getId());
-    
-    assertProcessEnded(processInstance.getId());
-    
-    if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-      List<HistoricActivityInstance> historicActivities = historyService.createHistoricActivityInstanceQuery()
-          .processInstanceId(processInstance.getId())
-          .list();
-      assertEquals(8, historicActivities.size());
-      
-      List<String> activityIds = new ArrayList<String>();
-      activityIds.add("theStart");
-      activityIds.add("theTask1");
-      activityIds.add("subProcess");
-      activityIds.add("subStart");
-      activityIds.add("subTask");
-      activityIds.add("subEnd");
-      activityIds.add("theTask2");
-      activityIds.add("theEnd");
-      
-      for (HistoricActivityInstance historicActivityInstance : historicActivities) {
-        String activityId = historicActivityInstance.getActivityId();
-        activityIds.remove(activityId);
-        
-        if ("theStart".equalsIgnoreCase(activityId) ||
-          "theTask1".equalsIgnoreCase(activityId)) {
-          
-          assertEquals(childExecution.getId(), historicActivityInstance.getExecutionId());
-          
-        } else if ("theTask2".equalsIgnoreCase(activityId) ||
-              "theEnd".equalsIgnoreCase(activityId)) {
-              
-          assertEquals(finalTaskExecution.getId(), historicActivityInstance.getExecutionId());
-        
-        } else if ("subStart".equalsIgnoreCase(activityId) ||
-            "subTask".equalsIgnoreCase(activityId) ||
-            "subEnd".equalsIgnoreCase(activityId)) {
-          
-          assertEquals(subTaskExecution.getId(), historicActivityInstance.getExecutionId());
-        
-        } else if ("subProcess".equalsIgnoreCase(activityId)) {
-          assertEquals(subProcessExecution.getId(), historicActivityInstance.getExecutionId());
+                assertFalse(execution.getId().equals(execution.getProcessInstanceId()));
+                assertEquals("theTask", execution.getActivityId());
+            }
         }
-      }
-      
-      assertEquals(0, activityIds.size());
-    }
-  }
-  
-  @Deployment
-  public void testSubProcessWithTimer() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessWithTimer");
-    
-    List<Execution> executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-    assertEquals(2, executionList.size());
-    
-    Execution rootProcessInstance = null;
-    Execution childExecution = null;
-    
-    for (Execution execution : executionList) {
-      if (execution.getId().equals(execution.getProcessInstanceId())) {
-        rootProcessInstance = execution;
-        
-        assertNull(execution.getActivityId());
-      
-      } else {
-        childExecution = execution;
 
-        assertFalse(execution.getId().equals(execution.getProcessInstanceId()));
-        assertEquals("theTask1", execution.getActivityId());
-      }
-    }
-    
-    assertNotNull(rootProcessInstance);
-    assertNotNull(childExecution);
+        assertNotNull(rootProcessInstance);
+        assertNotNull(childExecution);
 
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertEquals(childExecution.getId(), task.getExecutionId());
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals(childExecution.getId(), task.getExecutionId());
 
-    taskService.complete(task.getId());
-    
-    executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-    assertEquals(4, executionList.size());
-    
-    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertEquals("subTask", task.getTaskDefinitionKey());
-    Execution subTaskExecution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
-    assertEquals("subTask", subTaskExecution.getActivityId());
-    
-    Execution subProcessExecution = runtimeService.createExecutionQuery().executionId(subTaskExecution.getParentId()).singleResult();
-    assertEquals("subProcess", subProcessExecution.getActivityId());
-    assertEquals(rootProcessInstance.getId(), subProcessExecution.getParentId());
-    
-    taskService.complete(task.getId());
-    
-    executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-    assertEquals(2, executionList.size());
-    
-    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertFalse(childExecution.getId().equals(task.getExecutionId()));
-    
-    Execution finalTaskExecution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
-    assertEquals("theTask2", finalTaskExecution.getActivityId());
-    
-    assertEquals(rootProcessInstance.getId(), finalTaskExecution.getParentId());
-    
-    taskService.complete(task.getId());
-    
-    assertProcessEnded(processInstance.getId());
-    
-    if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-      List<HistoricActivityInstance> historicActivities = historyService.createHistoricActivityInstanceQuery()
-          .processInstanceId(processInstance.getId())
-          .list();
-      assertEquals(8, historicActivities.size());
-      
-      List<String> activityIds = new ArrayList<String>();
-      activityIds.add("theStart");
-      activityIds.add("theTask1");
-      activityIds.add("subProcess");
-      activityIds.add("subStart");
-      activityIds.add("subTask");
-      activityIds.add("subEnd");
-      activityIds.add("theTask2");
-      activityIds.add("theEnd");
-      
-      for (HistoricActivityInstance historicActivityInstance : historicActivities) {
-        String activityId = historicActivityInstance.getActivityId();
-        activityIds.remove(activityId);
-        
-        if ("theStart".equalsIgnoreCase(activityId) ||
-          "theTask1".equalsIgnoreCase(activityId)) {
-          
-          assertEquals(childExecution.getId(), historicActivityInstance.getExecutionId());
-          
-        } else if ("theTask2".equalsIgnoreCase(activityId) ||
-              "theEnd".equalsIgnoreCase(activityId)) {
-              
-          assertEquals(finalTaskExecution.getId(), historicActivityInstance.getExecutionId());
-        
-        } else if ("subStart".equalsIgnoreCase(activityId) ||
-            "subTask".equalsIgnoreCase(activityId) ||
-            "subEnd".equalsIgnoreCase(activityId)) {
-          
-          assertEquals(subTaskExecution.getId(), historicActivityInstance.getExecutionId());
-        
-        } else if ("subProcess".equalsIgnoreCase(activityId)) {
-          assertEquals(subProcessExecution.getId(), historicActivityInstance.getExecutionId());
+        taskService.complete(task.getId());
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            List<HistoricActivityInstance> historicActivities = historyService.createHistoricActivityInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+            assertEquals(3, historicActivities.size());
+
+            List<String> activityIds = new ArrayList<String>();
+            activityIds.add("theStart");
+            activityIds.add("theTask");
+            activityIds.add("theEnd");
+
+            for (HistoricActivityInstance historicActivityInstance : historicActivities) {
+                activityIds.remove(historicActivityInstance.getActivityId());
+                assertEquals(childExecution.getId(), historicActivityInstance.getExecutionId());
+            }
+
+            assertEquals(0, activityIds.size());
         }
-      }
-      
-      assertEquals(0, activityIds.size());
-    }
-  }
-  
-  @Deployment
-  public void testSubProcessEvents() {
-    SubProcessEventListener listener = new SubProcessEventListener();
-    processEngineConfiguration.getEventDispatcher().addEventListener(listener);
-    
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessEvents");
-    
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    taskService.complete(task.getId());
-    
-    Execution subProcessExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("subProcess").singleResult();
-    
-    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    taskService.complete(task.getId());
-    
-    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    taskService.complete(task.getId());
-    
-    assertProcessEnded(processInstance.getId());
-    
-    // Verify Events
-    List<FlowableEvent> events = listener.getEventsReceived();
-    assertEquals(2, events.size());
-    
-    FlowableActivityEvent event = (FlowableActivityEvent) events.get(0);
-    assertEquals("subProcess", event.getActivityType());
-    assertEquals(subProcessExecution.getId(), event.getExecutionId());
-    
-    event = (FlowableActivityEvent) events.get(1);
-    assertEquals("subProcess", event.getActivityType());
-    assertEquals(subProcessExecution.getId(), event.getExecutionId());
-    
-    processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
-  }
-  
-  public class SubProcessEventListener implements FlowableEventListener {
- 
-    private List<FlowableEvent> eventsReceived;
-
-    public SubProcessEventListener() {
-      eventsReceived = new ArrayList<FlowableEvent>();
     }
 
-    public List<FlowableEvent> getEventsReceived() {
-      return eventsReceived;
-    }
+    @Deployment
+    public void testOneNestedTaskProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneNestedTaskProcess");
 
-    public void clearEventsReceived() {
-      eventsReceived.clear();
-    }
+        List<Execution> executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, executionList.size());
 
-    @Override
-    public void onEvent(FlowableEvent activitiEvent) {
-      if (activitiEvent instanceof FlowableActivityEvent) {
-        FlowableActivityEvent event = (FlowableActivityEvent) activitiEvent;
-        if ("subProcess".equals(event.getActivityType())) {
-          eventsReceived.add(event);
+        Execution rootProcessInstance = null;
+        Execution childExecution = null;
+
+        for (Execution execution : executionList) {
+            if (execution.getId().equals(execution.getProcessInstanceId())) {
+                rootProcessInstance = execution;
+
+                assertNull(execution.getActivityId());
+
+            } else {
+                childExecution = execution;
+
+                assertFalse(execution.getId().equals(execution.getProcessInstanceId()));
+                assertEquals("theTask1", execution.getActivityId());
+            }
         }
-      } else if (activitiEvent instanceof FlowableActivityCancelledEvent) {
-        FlowableActivityCancelledEvent event = (FlowableActivityCancelledEvent) activitiEvent;
-        if ("subProcess".equals(event.getActivityType())) {
-          eventsReceived.add(event);
+
+        assertNotNull(rootProcessInstance);
+        assertNotNull(childExecution);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals(childExecution.getId(), task.getExecutionId());
+
+        taskService.complete(task.getId());
+
+        executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(3, executionList.size());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subTask", task.getTaskDefinitionKey());
+        Execution subTaskExecution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
+        assertEquals("subTask", subTaskExecution.getActivityId());
+
+        Execution subProcessExecution = runtimeService.createExecutionQuery().executionId(subTaskExecution.getParentId()).singleResult();
+        assertEquals("subProcess", subProcessExecution.getActivityId());
+        assertEquals(rootProcessInstance.getId(), subProcessExecution.getParentId());
+
+        taskService.complete(task.getId());
+
+        executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, executionList.size());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertFalse(childExecution.getId().equals(task.getExecutionId()));
+
+        Execution finalTaskExecution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
+        assertEquals("theTask2", finalTaskExecution.getActivityId());
+
+        assertEquals(rootProcessInstance.getId(), finalTaskExecution.getParentId());
+
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            List<HistoricActivityInstance> historicActivities = historyService.createHistoricActivityInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+            assertEquals(8, historicActivities.size());
+
+            List<String> activityIds = new ArrayList<String>();
+            activityIds.add("theStart");
+            activityIds.add("theTask1");
+            activityIds.add("subProcess");
+            activityIds.add("subStart");
+            activityIds.add("subTask");
+            activityIds.add("subEnd");
+            activityIds.add("theTask2");
+            activityIds.add("theEnd");
+
+            for (HistoricActivityInstance historicActivityInstance : historicActivities) {
+                String activityId = historicActivityInstance.getActivityId();
+                activityIds.remove(activityId);
+
+                if ("theStart".equalsIgnoreCase(activityId) ||
+                        "theTask1".equalsIgnoreCase(activityId)) {
+
+                    assertEquals(childExecution.getId(), historicActivityInstance.getExecutionId());
+
+                } else if ("theTask2".equalsIgnoreCase(activityId) ||
+                        "theEnd".equalsIgnoreCase(activityId)) {
+
+                    assertEquals(finalTaskExecution.getId(), historicActivityInstance.getExecutionId());
+
+                } else if ("subStart".equalsIgnoreCase(activityId) ||
+                        "subTask".equalsIgnoreCase(activityId) ||
+                        "subEnd".equalsIgnoreCase(activityId)) {
+
+                    assertEquals(subTaskExecution.getId(), historicActivityInstance.getExecutionId());
+
+                } else if ("subProcess".equalsIgnoreCase(activityId)) {
+                    assertEquals(subProcessExecution.getId(), historicActivityInstance.getExecutionId());
+                }
+            }
+
+            assertEquals(0, activityIds.size());
         }
-      }
     }
 
-    @Override
-    public boolean isFailOnException() {
-      return true;
+    @Deployment
+    public void testSubProcessWithTimer() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessWithTimer");
+
+        List<Execution> executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, executionList.size());
+
+        Execution rootProcessInstance = null;
+        Execution childExecution = null;
+
+        for (Execution execution : executionList) {
+            if (execution.getId().equals(execution.getProcessInstanceId())) {
+                rootProcessInstance = execution;
+
+                assertNull(execution.getActivityId());
+
+            } else {
+                childExecution = execution;
+
+                assertFalse(execution.getId().equals(execution.getProcessInstanceId()));
+                assertEquals("theTask1", execution.getActivityId());
+            }
+        }
+
+        assertNotNull(rootProcessInstance);
+        assertNotNull(childExecution);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals(childExecution.getId(), task.getExecutionId());
+
+        taskService.complete(task.getId());
+
+        executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(4, executionList.size());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subTask", task.getTaskDefinitionKey());
+        Execution subTaskExecution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
+        assertEquals("subTask", subTaskExecution.getActivityId());
+
+        Execution subProcessExecution = runtimeService.createExecutionQuery().executionId(subTaskExecution.getParentId()).singleResult();
+        assertEquals("subProcess", subProcessExecution.getActivityId());
+        assertEquals(rootProcessInstance.getId(), subProcessExecution.getParentId());
+
+        taskService.complete(task.getId());
+
+        executionList = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, executionList.size());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertFalse(childExecution.getId().equals(task.getExecutionId()));
+
+        Execution finalTaskExecution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
+        assertEquals("theTask2", finalTaskExecution.getActivityId());
+
+        assertEquals(rootProcessInstance.getId(), finalTaskExecution.getParentId());
+
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            List<HistoricActivityInstance> historicActivities = historyService.createHistoricActivityInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .list();
+            assertEquals(8, historicActivities.size());
+
+            List<String> activityIds = new ArrayList<String>();
+            activityIds.add("theStart");
+            activityIds.add("theTask1");
+            activityIds.add("subProcess");
+            activityIds.add("subStart");
+            activityIds.add("subTask");
+            activityIds.add("subEnd");
+            activityIds.add("theTask2");
+            activityIds.add("theEnd");
+
+            for (HistoricActivityInstance historicActivityInstance : historicActivities) {
+                String activityId = historicActivityInstance.getActivityId();
+                activityIds.remove(activityId);
+
+                if ("theStart".equalsIgnoreCase(activityId) ||
+                        "theTask1".equalsIgnoreCase(activityId)) {
+
+                    assertEquals(childExecution.getId(), historicActivityInstance.getExecutionId());
+
+                } else if ("theTask2".equalsIgnoreCase(activityId) ||
+                        "theEnd".equalsIgnoreCase(activityId)) {
+
+                    assertEquals(finalTaskExecution.getId(), historicActivityInstance.getExecutionId());
+
+                } else if ("subStart".equalsIgnoreCase(activityId) ||
+                        "subTask".equalsIgnoreCase(activityId) ||
+                        "subEnd".equalsIgnoreCase(activityId)) {
+
+                    assertEquals(subTaskExecution.getId(), historicActivityInstance.getExecutionId());
+
+                } else if ("subProcess".equalsIgnoreCase(activityId)) {
+                    assertEquals(subProcessExecution.getId(), historicActivityInstance.getExecutionId());
+                }
+            }
+
+            assertEquals(0, activityIds.size());
+        }
     }
-  }
+
+    @Deployment
+    public void testSubProcessEvents() {
+        SubProcessEventListener listener = new SubProcessEventListener();
+        processEngineConfiguration.getEventDispatcher().addEventListener(listener);
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessEvents");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        Execution subProcessExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("subProcess").singleResult();
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+
+        // Verify Events
+        List<FlowableEvent> events = listener.getEventsReceived();
+        assertEquals(2, events.size());
+
+        FlowableActivityEvent event = (FlowableActivityEvent) events.get(0);
+        assertEquals("subProcess", event.getActivityType());
+        assertEquals(subProcessExecution.getId(), event.getExecutionId());
+
+        event = (FlowableActivityEvent) events.get(1);
+        assertEquals("subProcess", event.getActivityType());
+        assertEquals(subProcessExecution.getId(), event.getExecutionId());
+
+        processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
+    }
+
+    public class SubProcessEventListener implements FlowableEventListener {
+
+        private List<FlowableEvent> eventsReceived;
+
+        public SubProcessEventListener() {
+            eventsReceived = new ArrayList<FlowableEvent>();
+        }
+
+        public List<FlowableEvent> getEventsReceived() {
+            return eventsReceived;
+        }
+
+        public void clearEventsReceived() {
+            eventsReceived.clear();
+        }
+
+        @Override
+        public void onEvent(FlowableEvent activitiEvent) {
+            if (activitiEvent instanceof FlowableActivityEvent) {
+                FlowableActivityEvent event = (FlowableActivityEvent) activitiEvent;
+                if ("subProcess".equals(event.getActivityType())) {
+                    eventsReceived.add(event);
+                }
+            } else if (activitiEvent instanceof FlowableActivityCancelledEvent) {
+                FlowableActivityCancelledEvent event = (FlowableActivityCancelledEvent) activitiEvent;
+                if ("subProcess".equals(event.getActivityType())) {
+                    eventsReceived.add(event);
+                }
+            }
+        }
+
+        @Override
+        public boolean isFailOnException() {
+            return true;
+        }
+    }
 }

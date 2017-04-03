@@ -31,128 +31,128 @@ import org.slf4j.LoggerFactory;
  */
 public class FormDefinitionDeployer implements Deployer {
 
-  private static final Logger log = LoggerFactory.getLogger(FormDefinitionDeployer.class);
+    private static final Logger log = LoggerFactory.getLogger(FormDefinitionDeployer.class);
 
-  protected IdGenerator idGenerator;
-  protected ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory;
-  protected FormDefinitionDeploymentHelper formDeploymentHelper;
-  protected CachingAndArtifactsManager cachingAndArtifactsManager;
+    protected IdGenerator idGenerator;
+    protected ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory;
+    protected FormDefinitionDeploymentHelper formDeploymentHelper;
+    protected CachingAndArtifactsManager cachingAndArtifactsManager;
 
-  public void deploy(FormDeploymentEntity deployment) {
-    log.debug("Processing deployment {}", deployment.getName());
+    public void deploy(FormDeploymentEntity deployment) {
+        log.debug("Processing deployment {}", deployment.getName());
 
-    // The ParsedDeployment represents the deployment, the forms, and the form
-    // resource, parse, and model associated with each form.
-    ParsedDeployment parsedDeployment = parsedDeploymentBuilderFactory.getBuilderForDeployment(deployment).build();
+        // The ParsedDeployment represents the deployment, the forms, and the form
+        // resource, parse, and model associated with each form.
+        ParsedDeployment parsedDeployment = parsedDeploymentBuilderFactory.getBuilderForDeployment(deployment).build();
 
-    formDeploymentHelper.verifyFormsDoNotShareKeys(parsedDeployment.getAllFormDefinitions());
+        formDeploymentHelper.verifyFormsDoNotShareKeys(parsedDeployment.getAllFormDefinitions());
 
-    formDeploymentHelper.copyDeploymentValuesToForms(parsedDeployment.getDeployment(), parsedDeployment.getAllFormDefinitions());
-    formDeploymentHelper.setResourceNamesOnFormDefinitions(parsedDeployment);
+        formDeploymentHelper.copyDeploymentValuesToForms(parsedDeployment.getDeployment(), parsedDeployment.getAllFormDefinitions());
+        formDeploymentHelper.setResourceNamesOnFormDefinitions(parsedDeployment);
 
-    if (deployment.isNew()) {
-      Map<FormDefinitionEntity, FormDefinitionEntity> mapOfNewFormToPreviousVersion = getPreviousVersionsOfFormDefinitions(parsedDeployment);
-      setFormDefinitionVersionsAndIds(parsedDeployment, mapOfNewFormToPreviousVersion);
-      persistFormDefinitions(parsedDeployment);
-    } else {
-      makeFormDefinitionsConsistentWithPersistedVersions(parsedDeployment);
+        if (deployment.isNew()) {
+            Map<FormDefinitionEntity, FormDefinitionEntity> mapOfNewFormToPreviousVersion = getPreviousVersionsOfFormDefinitions(parsedDeployment);
+            setFormDefinitionVersionsAndIds(parsedDeployment, mapOfNewFormToPreviousVersion);
+            persistFormDefinitions(parsedDeployment);
+        } else {
+            makeFormDefinitionsConsistentWithPersistedVersions(parsedDeployment);
+        }
+
+        cachingAndArtifactsManager.updateCachingAndArtifacts(parsedDeployment);
     }
 
-    cachingAndArtifactsManager.updateCachingAndArtifacts(parsedDeployment);
-  }
+    /**
+     * Constructs a map from new FormEntities to the previous version by key and tenant. If no previous version exists, no map entry is created.
+     */
+    protected Map<FormDefinitionEntity, FormDefinitionEntity> getPreviousVersionsOfFormDefinitions(ParsedDeployment parsedDeployment) {
 
-  /**
-   * Constructs a map from new FormEntities to the previous version by key and tenant. If no previous version exists, no map entry is created.
-   */
-  protected Map<FormDefinitionEntity, FormDefinitionEntity> getPreviousVersionsOfFormDefinitions(ParsedDeployment parsedDeployment) {
+        Map<FormDefinitionEntity, FormDefinitionEntity> result = new LinkedHashMap<FormDefinitionEntity, FormDefinitionEntity>();
 
-    Map<FormDefinitionEntity, FormDefinitionEntity> result = new LinkedHashMap<FormDefinitionEntity, FormDefinitionEntity>();
+        for (FormDefinitionEntity newDefinition : parsedDeployment.getAllFormDefinitions()) {
+            FormDefinitionEntity existingFormDefinition = formDeploymentHelper.getMostRecentVersionOfForm(newDefinition);
 
-    for (FormDefinitionEntity newDefinition : parsedDeployment.getAllFormDefinitions()) {
-      FormDefinitionEntity existingFormDefinition = formDeploymentHelper.getMostRecentVersionOfForm(newDefinition);
+            if (existingFormDefinition != null) {
+                result.put(newDefinition, existingFormDefinition);
+            }
+        }
 
-      if (existingFormDefinition != null) {
-        result.put(newDefinition, existingFormDefinition);
-      }
+        return result;
     }
 
-    return result;
-  }
+    /**
+     * Sets the version on each form entity, and the identifier. If the map contains an older version for a form, then the version is set to that older entity's version plus one; otherwise it is set
+     * to 1.
+     */
+    protected void setFormDefinitionVersionsAndIds(ParsedDeployment parsedDeployment, Map<FormDefinitionEntity, FormDefinitionEntity> mapNewToOldForms) {
 
-  /**
-   * Sets the version on each form entity, and the identifier. If the map contains an older version for a form, then the version is set to that older entity's version plus one; otherwise it is set to
-   * 1.
-   */
-  protected void setFormDefinitionVersionsAndIds(ParsedDeployment parsedDeployment, Map<FormDefinitionEntity, FormDefinitionEntity> mapNewToOldForms) {
+        for (FormDefinitionEntity formDefinition : parsedDeployment.getAllFormDefinitions()) {
+            int version = 1;
 
-    for (FormDefinitionEntity formDefinition : parsedDeployment.getAllFormDefinitions()) {
-      int version = 1;
+            FormDefinitionEntity latest = mapNewToOldForms.get(formDefinition);
+            if (latest != null) {
+                version = latest.getVersion() + 1;
+            }
 
-      FormDefinitionEntity latest = mapNewToOldForms.get(formDefinition);
-      if (latest != null) {
-        version = latest.getVersion() + 1;
-      }
-
-      formDefinition.setVersion(version);
-      formDefinition.setId(idGenerator.getNextId());
+            formDefinition.setVersion(version);
+            formDefinition.setId(idGenerator.getNextId());
+        }
     }
-  }
 
-  /**
-   * Saves each decision table. It is assumed that the deployment is new, the definitions have never been saved before, and that they have all their values properly set up.
-   */
-  protected void persistFormDefinitions(ParsedDeployment parsedDeployment) {
-    CommandContext commandContext = Context.getCommandContext();
-    FormDefinitionEntityManager formDefinitionEntityManager = commandContext.getFormDefinitionEntityManager();
+    /**
+     * Saves each decision table. It is assumed that the deployment is new, the definitions have never been saved before, and that they have all their values properly set up.
+     */
+    protected void persistFormDefinitions(ParsedDeployment parsedDeployment) {
+        CommandContext commandContext = Context.getCommandContext();
+        FormDefinitionEntityManager formDefinitionEntityManager = commandContext.getFormDefinitionEntityManager();
 
-    for (FormDefinitionEntity formDefinition : parsedDeployment.getAllFormDefinitions()) {
-      formDefinitionEntityManager.insert(formDefinition);
+        for (FormDefinitionEntity formDefinition : parsedDeployment.getAllFormDefinitions()) {
+            formDefinitionEntityManager.insert(formDefinition);
+        }
     }
-  }
 
-  /**
-   * Loads the persisted version of each form and set values on the in-memory version to be consistent.
-   */
-  protected void makeFormDefinitionsConsistentWithPersistedVersions(ParsedDeployment parsedDeployment) {
-    for (FormDefinitionEntity formDefinition : parsedDeployment.getAllFormDefinitions()) {
-      FormDefinitionEntity persistedFormDefinition = formDeploymentHelper.getPersistedInstanceOfFormDefinition(formDefinition);
+    /**
+     * Loads the persisted version of each form and set values on the in-memory version to be consistent.
+     */
+    protected void makeFormDefinitionsConsistentWithPersistedVersions(ParsedDeployment parsedDeployment) {
+        for (FormDefinitionEntity formDefinition : parsedDeployment.getAllFormDefinitions()) {
+            FormDefinitionEntity persistedFormDefinition = formDeploymentHelper.getPersistedInstanceOfFormDefinition(formDefinition);
 
-      if (persistedFormDefinition != null) {
-        formDefinition.setId(persistedFormDefinition.getId());
-        formDefinition.setVersion(persistedFormDefinition.getVersion());
-      }
+            if (persistedFormDefinition != null) {
+                formDefinition.setId(persistedFormDefinition.getId());
+                formDefinition.setVersion(persistedFormDefinition.getVersion());
+            }
+        }
     }
-  }
 
-  public IdGenerator getIdGenerator() {
-    return idGenerator;
-  }
+    public IdGenerator getIdGenerator() {
+        return idGenerator;
+    }
 
-  public void setIdGenerator(IdGenerator idGenerator) {
-    this.idGenerator = idGenerator;
-  }
+    public void setIdGenerator(IdGenerator idGenerator) {
+        this.idGenerator = idGenerator;
+    }
 
-  public ParsedDeploymentBuilderFactory getExParsedDeploymentBuilderFactory() {
-    return parsedDeploymentBuilderFactory;
-  }
+    public ParsedDeploymentBuilderFactory getExParsedDeploymentBuilderFactory() {
+        return parsedDeploymentBuilderFactory;
+    }
 
-  public void setParsedDeploymentBuilderFactory(ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory) {
-    this.parsedDeploymentBuilderFactory = parsedDeploymentBuilderFactory;
-  }
+    public void setParsedDeploymentBuilderFactory(ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory) {
+        this.parsedDeploymentBuilderFactory = parsedDeploymentBuilderFactory;
+    }
 
-  public FormDefinitionDeploymentHelper getFormDeploymentHelper() {
-    return formDeploymentHelper;
-  }
+    public FormDefinitionDeploymentHelper getFormDeploymentHelper() {
+        return formDeploymentHelper;
+    }
 
-  public void setFormDeploymentHelper(FormDefinitionDeploymentHelper formDeploymentHelper) {
-    this.formDeploymentHelper = formDeploymentHelper;
-  }
+    public void setFormDeploymentHelper(FormDefinitionDeploymentHelper formDeploymentHelper) {
+        this.formDeploymentHelper = formDeploymentHelper;
+    }
 
-  public CachingAndArtifactsManager getCachingAndArtifcatsManager() {
-    return cachingAndArtifactsManager;
-  }
+    public CachingAndArtifactsManager getCachingAndArtifcatsManager() {
+        return cachingAndArtifactsManager;
+    }
 
-  public void setCachingAndArtifactsManager(CachingAndArtifactsManager manager) {
-    this.cachingAndArtifactsManager = manager;
-  }
+    public void setCachingAndArtifactsManager(CachingAndArtifactsManager manager) {
+        this.cachingAndArtifactsManager = manager;
+    }
 }

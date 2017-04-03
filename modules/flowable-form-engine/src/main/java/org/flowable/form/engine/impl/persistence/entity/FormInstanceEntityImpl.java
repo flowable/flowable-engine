@@ -26,115 +26,115 @@ import org.flowable.form.engine.FormEngineConfiguration;
  */
 public class FormInstanceEntityImpl extends AbstractEntityNoRevision implements FormInstanceEntity, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String formDefinitionId;
-  protected String taskId;
-  protected String processInstanceId;
-  protected String processDefinitionId;
-  protected Date submittedDate;
-  protected String submittedBy;
-  protected String formValuesId;
-  protected ResourceRef resourceRef;
-  protected String tenantId = FormEngineConfiguration.NO_TENANT_ID;
-  
-  public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
-    if (resourceRef != null && resourceRef.getId() != null) {
-      persistentState.put("formValuesId", resourceRef.getId());
+    protected String formDefinitionId;
+    protected String taskId;
+    protected String processInstanceId;
+    protected String processDefinitionId;
+    protected Date submittedDate;
+    protected String submittedBy;
+    protected String formValuesId;
+    protected ResourceRef resourceRef;
+    protected String tenantId = FormEngineConfiguration.NO_TENANT_ID;
+
+    public Object getPersistentState() {
+        Map<String, Object> persistentState = new HashMap<String, Object>();
+        if (resourceRef != null && resourceRef.getId() != null) {
+            persistentState.put("formValuesId", resourceRef.getId());
+        }
+        return persistentState;
     }
-    return persistentState;
-  }
 
-  // getters and setters
-  // //////////////////////////////////////////////////////
+    // getters and setters
+    // //////////////////////////////////////////////////////
 
-  public String getFormDefinitionId() {
-    return formDefinitionId;
-  }
-
-  public void setFormDefinitionId(String formDefinitionId) {
-    this.formDefinitionId = formDefinitionId;
-  }
-  
-  public String getTaskId() {
-    return taskId;
-  }
-
-  public void setTaskId(String taskId) {
-    this.taskId = taskId;
-  }
-
-  public String getProcessInstanceId() {
-    return processInstanceId;
-  }
-
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
-
-  public String getProcessDefinitionId() {
-    return processDefinitionId;
-  }
-
-  public void setProcessDefinitionId(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
-
-  public Date getSubmittedDate() {
-    return submittedDate;
-  }
-
-  public void setSubmittedDate(Date submittedDate) {
-    this.submittedDate = submittedDate;
-  }
-
-  public String getSubmittedBy() {
-    return submittedBy;
-  }
-
-  public void setSubmittedBy(String submittedBy) {
-    this.submittedBy = submittedBy;
-  }
-
-  public String getFormValuesId() {
-    return formValuesId;
-  }
-
-  public void setFormValuesId(String formValuesId) {
-    this.formValuesId = formValuesId;
-  }
-
-  public String getTenantId() {
-    return tenantId;
-  }
-
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
-  
-  public byte[] getFormValueBytes() {
-    ensureResourceRefInitialized();
-    return resourceRef.getBytes();
-  }
-
-  public void setFormValueBytes(byte[] bytes) {
-    ensureResourceRefInitialized();
-    resourceRef.setValue("form-" + formDefinitionId, bytes);
-  }
-
-  public ResourceRef getResourceRef() {
-    return resourceRef;
-  }
-  
-  protected void ensureResourceRefInitialized() {
-    if (resourceRef == null) {
-      resourceRef = new ResourceRef();
+    public String getFormDefinitionId() {
+        return formDefinitionId;
     }
-  }
-  
-  public String toString() {
-    return "SubmittedFormEntity[" + id + "]";
-  }
+
+    public void setFormDefinitionId(String formDefinitionId) {
+        this.formDefinitionId = formDefinitionId;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
+
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
+
+    public Date getSubmittedDate() {
+        return submittedDate;
+    }
+
+    public void setSubmittedDate(Date submittedDate) {
+        this.submittedDate = submittedDate;
+    }
+
+    public String getSubmittedBy() {
+        return submittedBy;
+    }
+
+    public void setSubmittedBy(String submittedBy) {
+        this.submittedBy = submittedBy;
+    }
+
+    public String getFormValuesId() {
+        return formValuesId;
+    }
+
+    public void setFormValuesId(String formValuesId) {
+        this.formValuesId = formValuesId;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public byte[] getFormValueBytes() {
+        ensureResourceRefInitialized();
+        return resourceRef.getBytes();
+    }
+
+    public void setFormValueBytes(byte[] bytes) {
+        ensureResourceRefInitialized();
+        resourceRef.setValue("form-" + formDefinitionId, bytes);
+    }
+
+    public ResourceRef getResourceRef() {
+        return resourceRef;
+    }
+
+    protected void ensureResourceRefInitialized() {
+        if (resourceRef == null) {
+            resourceRef = new ResourceRef();
+        }
+    }
+
+    public String toString() {
+        return "SubmittedFormEntity[" + id + "]";
+    }
 
 }

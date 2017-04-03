@@ -19,8 +19,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Custom path matcher that ignores all unknown http-methods, which do not exist in {@link HttpMethod}
- * enum.
+ * Custom path matcher that ignores all unknown http-methods, which do not exist in {@link HttpMethod} enum.
  * 
  * Wraps a {@link AntPathRequestMatcher}
  * 
@@ -32,8 +31,7 @@ public class CustomAntPathMatcher implements RequestMatcher {
     protected boolean httpMethodUsed;
 
     /**
-     * Creates a matcher with the specific pattern which will match all HTTP
-     * methods in a case insensitive manner.
+     * Creates a matcher with the specific pattern which will match all HTTP methods in a case insensitive manner.
      *
      * @param pattern
      *            the ant pattern to use for matching
@@ -43,28 +41,24 @@ public class CustomAntPathMatcher implements RequestMatcher {
     }
 
     /**
-     * Creates a matcher with the supplied pattern and HTTP method in a case
-     * insensitive manner.
+     * Creates a matcher with the supplied pattern and HTTP method in a case insensitive manner.
      *
      * @param pattern
      *            the ant pattern to use for matching
      * @param httpMethod
-     *            the HTTP method. The {@code matches} method will return false
-     *            if the incoming request doesn't have the same method.
+     *            the HTTP method. The {@code matches} method will return false if the incoming request doesn't have the same method.
      */
     public CustomAntPathMatcher(String pattern, String httpMethod) {
-        this(pattern,httpMethod,false);
+        this(pattern, httpMethod, false);
     }
 
     /**
-     * Creates a matcher with the supplied pattern which will match the
-     * specified Http method
+     * Creates a matcher with the supplied pattern which will match the specified Http method
      *
      * @param pattern
      *            the ant pattern to use for matching
      * @param httpMethod
-     *            the HTTP method. The {@code matches} method will return false
-     *            if the incoming request doesn't doesn't have the same method.
+     *            the HTTP method. The {@code matches} method will return false if the incoming request doesn't doesn't have the same method.
      * @param caseSensitive
      *            true if the matcher should consider case, else false
      */
@@ -72,14 +66,14 @@ public class CustomAntPathMatcher implements RequestMatcher {
         httpMethodUsed = httpMethod != null;
         wrapped = new AntPathRequestMatcher(pattern, httpMethod, caseSensitive);
     }
-    
+
     @Override
     public boolean matches(HttpServletRequest request) {
-        if(httpMethodUsed) {
+        if (httpMethodUsed) {
             // Check if the method actually exists
             try {
                 HttpMethod.valueOf(request.getMethod());
-            } catch(IllegalArgumentException iae) {
+            } catch (IllegalArgumentException iae) {
                 // Since it's not possible to register matchers for an unknown method, we know the path/method will
                 // never match. Return false to prevent an exception in the wrapped matcher
                 return false;

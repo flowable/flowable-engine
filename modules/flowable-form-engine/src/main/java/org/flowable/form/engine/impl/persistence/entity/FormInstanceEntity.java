@@ -23,22 +23,22 @@ import org.flowable.form.api.FormInstance;
  */
 public interface FormInstanceEntity extends FormInstance, Entity {
 
-  void setFormDefinitionId(String formDefinitionId);
+    void setFormDefinitionId(String formDefinitionId);
 
-  void setTaskId(String taskId);
+    void setTaskId(String taskId);
 
-  void setProcessInstanceId(String processInstanceId);
+    void setProcessInstanceId(String processInstanceId);
 
-  void setProcessDefinitionId(String processDefinitionId);
+    void setProcessDefinitionId(String processDefinitionId);
 
-  void setSubmittedDate(Date submittedDate);
+    void setSubmittedDate(Date submittedDate);
 
-  void setSubmittedBy(String submittedBy);
-  
-  void setFormValuesId(String formValuesId);
+    void setSubmittedBy(String submittedBy);
 
-  void setTenantId(String tenantId);
-  
-  void setFormValueBytes(byte[] formValueBytes);
-  
+    void setFormValuesId(String formValuesId);
+
+    void setTenantId(String tenantId);
+
+    void setFormValueBytes(byte[] formValueBytes);
+
 }

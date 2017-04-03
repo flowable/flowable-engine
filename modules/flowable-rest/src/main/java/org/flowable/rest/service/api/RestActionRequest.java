@@ -22,14 +22,14 @@ import io.swagger.annotations.ApiModelProperty;
  */
 public class RestActionRequest {
 
-  private String action;
+    private String action;
 
-  @ApiModelProperty(value = "Action to perform")
-  public void setAction(String action) {
-    this.action = action;
-  }
+    @ApiModelProperty(value = "Action to perform")
+    public void setAction(String action) {
+        this.action = action;
+    }
 
-  public String getAction() {
-    return action;
-  }
+    public String getAction() {
+        return action;
+    }
 }

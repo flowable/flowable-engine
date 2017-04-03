@@ -26,52 +26,52 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class ScriptCondition implements Condition {
 
-  private static final long serialVersionUID = 1L;
-  
-  private final String expression;
-  private final String language;
+    private static final long serialVersionUID = 1L;
 
-  public ScriptCondition(String expression, String language) {
-    this.expression = expression;
-    this.language = language;
-  }
+    private final String expression;
+    private final String language;
 
-  public boolean evaluate(String sequenceFlowId, DelegateExecution execution) {
-    String conditionExpression = null;
-    if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
-      ObjectNode elementProperties = Context.getBpmnOverrideElementProperties(sequenceFlowId, execution.getProcessDefinitionId());
-      conditionExpression = getActiveValue(expression, DynamicBpmnConstants.SEQUENCE_FLOW_CONDITION, elementProperties);
-    } else {
-      conditionExpression = expression;
+    public ScriptCondition(String expression, String language) {
+        this.expression = expression;
+        this.language = language;
     }
-    
-    ScriptingEngines scriptingEngines = Context
-      .getProcessEngineConfiguration()
-      .getScriptingEngines();
-    
-    Object result = scriptingEngines.evaluate(conditionExpression, language, execution);
-    if (result == null) {
-      throw new ActivitiException("condition script returns null: " + expression);
-    }
-    if (!(result instanceof Boolean)) {
-      throw new ActivitiException("condition script returns non-Boolean: " + result + " (" + result.getClass().getName() + ")");
-    }
-    return (Boolean) result;
-  }
-  
-  protected String getActiveValue(String originalValue, String propertyName, ObjectNode elementProperties) {
-    String activeValue = originalValue;
-    if (elementProperties != null) {
-      JsonNode overrideValueNode = elementProperties.get(propertyName);
-      if (overrideValueNode != null) {
-        if (overrideValueNode.isNull()) {
-          activeValue = null;
+
+    public boolean evaluate(String sequenceFlowId, DelegateExecution execution) {
+        String conditionExpression = null;
+        if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
+            ObjectNode elementProperties = Context.getBpmnOverrideElementProperties(sequenceFlowId, execution.getProcessDefinitionId());
+            conditionExpression = getActiveValue(expression, DynamicBpmnConstants.SEQUENCE_FLOW_CONDITION, elementProperties);
         } else {
-          activeValue = overrideValueNode.asText();
+            conditionExpression = expression;
         }
-      }
+
+        ScriptingEngines scriptingEngines = Context
+                .getProcessEngineConfiguration()
+                .getScriptingEngines();
+
+        Object result = scriptingEngines.evaluate(conditionExpression, language, execution);
+        if (result == null) {
+            throw new ActivitiException("condition script returns null: " + expression);
+        }
+        if (!(result instanceof Boolean)) {
+            throw new ActivitiException("condition script returns non-Boolean: " + result + " (" + result.getClass().getName() + ")");
+        }
+        return (Boolean) result;
     }
-    return activeValue;
-  }
+
+    protected String getActiveValue(String originalValue, String propertyName, ObjectNode elementProperties) {
+        String activeValue = originalValue;
+        if (elementProperties != null) {
+            JsonNode overrideValueNode = elementProperties.get(propertyName);
+            if (overrideValueNode != null) {
+                if (overrideValueNode.isNull()) {
+                    activeValue = null;
+                } else {
+                    activeValue = overrideValueNode.asText();
+                }
+            }
+        }
+        return activeValue;
+    }
 
 }

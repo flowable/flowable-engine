@@ -15,27 +15,26 @@ package org.activiti.standalone.parsing;
 import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 
-
 /**
  * @author Frederik Heremans
  * @author Joram Barrez
  */
 public class CustomDefaultBpmnParseHandlerTest extends ResourceFlowableTestCase {
-  
-  public CustomDefaultBpmnParseHandlerTest() {
-    super("org/activiti/standalone/parsing/custom.default.parse.handler.flowable.cfg.xml");
-  }
 
-  @Deployment
-  public void testCustomDefaultUserTaskParsing() throws Exception {
-    // The task which is created after process instance start should be async
-    runtimeService.startProcessInstanceByKey("customDefaultBpmnParseHandler");
-    
-    assertEquals(0, taskService.createTaskQuery().count());
-    assertEquals(1, managementService.createJobQuery().count());
-    
-    managementService.executeJob(managementService.createJobQuery().singleResult().getId());
-    assertEquals(1, taskService.createTaskQuery().count());
-  }
-  
+    public CustomDefaultBpmnParseHandlerTest() {
+        super("org/activiti/standalone/parsing/custom.default.parse.handler.flowable.cfg.xml");
+    }
+
+    @Deployment
+    public void testCustomDefaultUserTaskParsing() throws Exception {
+        // The task which is created after process instance start should be async
+        runtimeService.startProcessInstanceByKey("customDefaultBpmnParseHandler");
+
+        assertEquals(0, taskService.createTaskQuery().count());
+        assertEquals(1, managementService.createJobQuery().count());
+
+        managementService.executeJob(managementService.createJobQuery().singleResult().getId());
+        assertEquals(1, taskService.createTaskQuery().count());
+    }
+
 }

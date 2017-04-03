@@ -15,12 +15,12 @@ package org.flowable.engine.delegate;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 
 public interface BusinessRuleTaskDelegate extends ActivityBehavior {
-  
-  void addRuleVariableInputIdExpression(Expression inputId);
-  
-  void addRuleIdExpression(Expression inputId);
-  
-  void setExclude(boolean exclude);
-  
-  void setResultVariable(String resultVariableName);
+
+    void addRuleVariableInputIdExpression(Expression inputId);
+
+    void addRuleIdExpression(Expression inputId);
+
+    void setExclude(boolean exclude);
+
+    void setResultVariable(String resultVariableName);
 }

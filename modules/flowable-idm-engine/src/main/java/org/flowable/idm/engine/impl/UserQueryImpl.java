@@ -28,192 +28,244 @@ import org.flowable.idm.engine.impl.interceptor.CommandExecutor;
  */
 public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements UserQuery {
 
-  private static final long serialVersionUID = 1L;
-  protected String id;
-  protected List<String> ids;
-  protected String firstName;
-  protected String firstNameLike;
-  protected String lastName;
-  protected String lastNameLike;
-  protected String fullNameLike;
-  protected String email;
-  protected String emailLike;
-  protected String groupId;
-  protected List<String> groupIds;
+    private static final long serialVersionUID = 1L;
+    protected String id;
+    protected List<String> ids;
+    protected String idIgnoreCase;
+    protected String firstName;
+    protected String firstNameLike;
+    protected String firstNameLikeIgnoreCase;
+    protected String lastName;
+    protected String lastNameLike;
+    protected String lastNameLikeIgnoreCase;
+    protected String fullNameLike;
+    protected String fullNameLikeIgnoreCase;
+    protected String email;
+    protected String emailLike;
+    protected String groupId;
+    protected List<String> groupIds;
 
-  public UserQueryImpl() {
-  }
-
-  public UserQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
-  public UserQueryImpl(CommandExecutor commandExecutor) {
-    super(commandExecutor);
-  }
-
-  public UserQuery userId(String id) {
-    if (id == null) {
-      throw new FlowableIllegalArgumentException("Provided id is null");
+    public UserQueryImpl() {
     }
-    this.id = id;
-    return this;
-  }
-  
-  public UserQuery userIds(List<String> ids) {
-    if (ids == null) {
-      throw new FlowableIllegalArgumentException("Provided ids is null");
+
+    public UserQueryImpl(CommandContext commandContext) {
+        super(commandContext);
     }
-    this.ids = ids;
-    return this;
-  }
 
-  public UserQuery userFirstName(String firstName) {
-    if (firstName == null) {
-      throw new FlowableIllegalArgumentException("Provided firstName is null");
+    public UserQueryImpl(CommandExecutor commandExecutor) {
+        super(commandExecutor);
     }
-    this.firstName = firstName;
-    return this;
-  }
 
-  public UserQuery userFirstNameLike(String firstNameLike) {
-    if (firstNameLike == null) {
-      throw new FlowableIllegalArgumentException("Provided firstNameLike is null");
+    public UserQuery userId(String id) {
+        if (id == null) {
+            throw new FlowableIllegalArgumentException("Provided id is null");
+        }
+        this.id = id;
+        return this;
     }
-    this.firstNameLike = firstNameLike;
-    return this;
-  }
 
-  public UserQuery userLastName(String lastName) {
-    if (lastName == null) {
-      throw new FlowableIllegalArgumentException("Provided lastName is null");
+    public UserQuery userIds(List<String> ids) {
+        if (ids == null) {
+            throw new FlowableIllegalArgumentException("Provided ids is null");
+        }
+        this.ids = ids;
+        return this;
     }
-    this.lastName = lastName;
-    return this;
-  }
 
-  public UserQuery userLastNameLike(String lastNameLike) {
-    if (lastNameLike == null) {
-      throw new FlowableIllegalArgumentException("Provided lastNameLike is null");
+    public UserQuery userIdIgnoreCase(String id) {
+        if (id == null) {
+            throw new FlowableIllegalArgumentException("Provided id is null");
+        }
+        this.idIgnoreCase = id.toLowerCase();
+        return this;
     }
-    this.lastNameLike = lastNameLike;
-    return this;
-  }
 
-  public UserQuery userFullNameLike(String fullNameLike) {
-    if (fullNameLike == null) {
-      throw new FlowableIllegalArgumentException("Provided full name is null");
+    public UserQuery userFirstName(String firstName) {
+        if (firstName == null) {
+            throw new FlowableIllegalArgumentException("Provided first name is null");
+        }
+        this.firstName = firstName;
+        return this;
     }
-    this.fullNameLike = fullNameLike;
-    return this;
-  }
 
-  public UserQuery userEmail(String email) {
-    if (email == null) {
-      throw new FlowableIllegalArgumentException("Provided email is null");
+    public UserQuery userFirstNameLike(String firstNameLike) {
+        if (firstNameLike == null) {
+            throw new FlowableIllegalArgumentException("Provided first name is null");
+        }
+        this.firstNameLike = firstNameLike;
+        return this;
     }
-    this.email = email;
-    return this;
-  }
 
-  public UserQuery userEmailLike(String emailLike) {
-    if (emailLike == null) {
-      throw new FlowableIllegalArgumentException("Provided emailLike is null");
+    public UserQuery userFirstNameLikeIgnoreCase(String firstNameLikeIgnoreCase) {
+        if (firstNameLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("Provided first name is null");
+        }
+        this.firstNameLikeIgnoreCase = firstNameLikeIgnoreCase.toLowerCase();
+        return this;
     }
-    this.emailLike = emailLike;
-    return this;
-  }
 
-  public UserQuery memberOfGroup(String groupId) {
-    if (groupId == null) {
-      throw new FlowableIllegalArgumentException("Provided groupId is null");
+    public UserQuery userLastName(String lastName) {
+        if (lastName == null) {
+            throw new FlowableIllegalArgumentException("Provided last name is null");
+        }
+        this.lastName = lastName;
+        return this;
     }
-    this.groupId = groupId;
-    return this;
-  }
-  
-  public UserQuery memberOfGroups(List<String> groupIds) {
-    if (groupIds == null) {
-      throw new FlowableIllegalArgumentException("Provided groupIds is null");
+
+    public UserQuery userLastNameLike(String lastNameLike) {
+        if (lastNameLike == null) {
+            throw new FlowableIllegalArgumentException("Provided last name is null");
+        }
+        this.lastNameLike = lastNameLike;
+        return this;
     }
-    this.groupIds = groupIds;
-    return this;
-  }
 
-  // sorting //////////////////////////////////////////////////////////
+    public UserQuery userLastNameLikeIgnoreCase(String lastNameLikeIgnoreCase) {
+        if (lastNameLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("Provided last name is null");
+        }
+        this.lastNameLikeIgnoreCase = lastNameLikeIgnoreCase.toLowerCase();
+        return this;
+    }
 
-  public UserQuery orderByUserId() {
-    return orderBy(UserQueryProperty.USER_ID);
-  }
+    public UserQuery userFullNameLike(String fullNameLike) {
+        if (fullNameLike == null) {
+            throw new FlowableIllegalArgumentException("Provided full name is null");
+        }
+        this.fullNameLike = fullNameLike;
+        return this;
+    }
 
-  public UserQuery orderByUserEmail() {
-    return orderBy(UserQueryProperty.EMAIL);
-  }
+    public UserQuery userFullNameLikeIgnoreCase(String fullNameLikeIgnoreCase) {
+        if (fullNameLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("Provided full name is null");
+        }
+        this.fullNameLikeIgnoreCase = fullNameLikeIgnoreCase.toLowerCase();
+        return this;
+    }
 
-  public UserQuery orderByUserFirstName() {
-    return orderBy(UserQueryProperty.FIRST_NAME);
-  }
+    public UserQuery userEmail(String email) {
+        if (email == null) {
+            throw new FlowableIllegalArgumentException("Provided email is null");
+        }
+        this.email = email;
+        return this;
+    }
 
-  public UserQuery orderByUserLastName() {
-    return orderBy(UserQueryProperty.LAST_NAME);
-  }
+    public UserQuery userEmailLike(String emailLike) {
+        if (emailLike == null) {
+            throw new FlowableIllegalArgumentException("Provided emailLike is null");
+        }
+        this.emailLike = emailLike;
+        return this;
+    }
 
-  // results //////////////////////////////////////////////////////////
+    public UserQuery memberOfGroup(String groupId) {
+        if (groupId == null) {
+            throw new FlowableIllegalArgumentException("Provided groupId is null");
+        }
+        this.groupId = groupId;
+        return this;
+    }
 
-  public long executeCount(CommandContext commandContext) {
-    checkQueryOk();
-    return commandContext.getUserEntityManager().findUserCountByQueryCriteria(this);
-  }
+    public UserQuery memberOfGroups(List<String> groupIds) {
+        if (groupIds == null) {
+            throw new FlowableIllegalArgumentException("Provided groupIds is null");
+        }
+        this.groupIds = groupIds;
+        return this;
+    }
 
-  public List<User> executeList(CommandContext commandContext, Page page) {
-    checkQueryOk();
-    return commandContext.getUserEntityManager().findUserByQueryCriteria(this, page);
-  }
+    // sorting //////////////////////////////////////////////////////////
 
-  // getters //////////////////////////////////////////////////////////
+    public UserQuery orderByUserId() {
+        return orderBy(UserQueryProperty.USER_ID);
+    }
 
-  public String getId() {
-    return id;
-  }
+    public UserQuery orderByUserEmail() {
+        return orderBy(UserQueryProperty.EMAIL);
+    }
 
-  public List<String> getIds() {
-    return ids;
-  }
+    public UserQuery orderByUserFirstName() {
+        return orderBy(UserQueryProperty.FIRST_NAME);
+    }
 
-  public String getFirstName() {
-    return firstName;
-  }
+    public UserQuery orderByUserLastName() {
+        return orderBy(UserQueryProperty.LAST_NAME);
+    }
 
-  public String getFirstNameLike() {
-    return firstNameLike;
-  }
+    // results //////////////////////////////////////////////////////////
 
-  public String getLastName() {
-    return lastName;
-  }
+    public long executeCount(CommandContext commandContext) {
+        checkQueryOk();
+        return commandContext.getUserEntityManager().findUserCountByQueryCriteria(this);
+    }
 
-  public String getLastNameLike() {
-    return lastNameLike;
-  }
+    public List<User> executeList(CommandContext commandContext, Page page) {
+        checkQueryOk();
+        return commandContext.getUserEntityManager().findUserByQueryCriteria(this, page);
+    }
 
-  public String getEmail() {
-    return email;
-  }
+    // getters //////////////////////////////////////////////////////////
 
-  public String getEmailLike() {
-    return emailLike;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public String getGroupId() {
-    return groupId;
-  }
-  
-  public List<String> getGroupIds() {
-    return groupIds;
-  }
+    public List<String> getIds() {
+        return ids;
+    }
 
-  public String getFullNameLike() {
-    return fullNameLike;
-  }
-  
+    public String getIdIgnoreCase() {
+        return idIgnoreCase;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getFirstNameLike() {
+        return firstNameLike;
+    }
+
+    public String getFirstNameLikeIgnoreCase() {
+        return firstNameLikeIgnoreCase;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getLastNameLike() {
+        return lastNameLike;
+    }
+
+    public String getLastNameLikeIgnoreCase() {
+        return lastNameLikeIgnoreCase;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getEmailLike() {
+        return emailLike;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public List<String> getGroupIds() {
+        return groupIds;
+    }
+
+    public String getFullNameLike() {
+        return fullNameLike;
+    }
+
+    public String getFullNameLikeIgnoreCase() {
+        return fullNameLikeIgnoreCase;
+    }
+
 }

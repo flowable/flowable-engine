@@ -33,21 +33,32 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 @RestController
 public class FormDefinitionClientResource extends AbstractClientResource {
-  
-  private static final Logger logger = LoggerFactory.getLogger(FormDefinitionClientResource.class);
 
-  @Autowired
-  protected FormDefinitionService clientService;
+    private static final Logger logger = LoggerFactory.getLogger(FormDefinitionClientResource.class);
 
-  @RequestMapping(value = "/rest/admin/form-definitions/{formDefinitionId}", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getFormDefinition(@PathVariable String formDefinitionId) throws BadRequestException {
+    @Autowired
+    protected FormDefinitionService clientService;
 
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
-    try {
-      return clientService.getForm(serverConfig, formDefinitionId);
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting form definition {}", formDefinitionId, e);
-      throw new BadRequestException(e.getMessage());
+    @RequestMapping(value = "/rest/admin/form-definitions/{formDefinitionId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getFormDefinition(@PathVariable String formDefinitionId) throws BadRequestException {
+
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+        try {
+            return clientService.getForm(serverConfig, formDefinitionId);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting form definition {}", formDefinitionId, e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
+
+    @RequestMapping(value = "/rest/admin/process-definition-start-form-definition/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getProcessDefinitionStartForm(@PathVariable String processDefinitionId) throws BadRequestException {
+
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+        try {
+            return clientService.getProcessDefinitionStartForm(serverConfig, processDefinitionId);
+        } catch (FlowableServiceException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
 }

@@ -33,63 +33,63 @@ import org.springframework.core.io.Resource;
  */
 public class AbstractAutoDeploymentStrategyTest {
 
-  @Mock
-  protected DmnRepositoryService repositoryServiceMock;
+    @Mock
+    protected DmnRepositoryService repositoryServiceMock;
 
-  @Mock
-  protected DmnDeploymentBuilder deploymentBuilderMock;
+    @Mock
+    protected DmnDeploymentBuilder deploymentBuilderMock;
 
-  @Mock
-  protected ContextResource resourceMock1;
+    @Mock
+    protected ContextResource resourceMock1;
 
-  @Mock
-  protected ByteArrayResource resourceMock2;
+    @Mock
+    protected ByteArrayResource resourceMock2;
 
-  @Mock
-  protected Resource resourceMock3;
+    @Mock
+    protected Resource resourceMock3;
 
-  @Mock
-  protected File fileMock1;
+    @Mock
+    protected File fileMock1;
 
-  @Mock
-  protected File fileMock2;
-  
-  @Mock
-  protected File fileMock3;
+    @Mock
+    protected File fileMock2;
 
-  @Mock
-  private InputStream inputStreamMock;
+    @Mock
+    protected File fileMock3;
 
-  @Mock
-  private DmnDeployment deploymentMock;
+    @Mock
+    private InputStream inputStreamMock;
 
-  protected final String deploymentNameHint = "nameHint";
+    @Mock
+    private DmnDeployment deploymentMock;
 
-  protected final String resourceName1 = "resourceName1.form";
-  protected final String resourceName2 = "resourceName2.form";
-  protected final String resourceName3 = "resourceName2.test";
+    protected final String deploymentNameHint = "nameHint";
 
-  @Before
-  public void before() throws Exception {
+    protected final String resourceName1 = "resourceName1.form";
+    protected final String resourceName2 = "resourceName2.form";
+    protected final String resourceName3 = "resourceName2.test";
 
-    when(resourceMock1.getPathWithinContext()).thenReturn(resourceName1);
-    when(resourceMock1.getFile()).thenReturn(fileMock1);
+    @Before
+    public void before() throws Exception {
 
-    when(resourceMock2.getDescription()).thenReturn(resourceName2);
-    when(resourceMock2.getFile()).thenReturn(fileMock2);
-    
-    when(resourceMock3.getFile()).thenReturn(fileMock3);
-    when(fileMock3.getAbsolutePath()).thenReturn(resourceName3);
+        when(resourceMock1.getPathWithinContext()).thenReturn(resourceName1);
+        when(resourceMock1.getFile()).thenReturn(fileMock1);
 
-    when(resourceMock1.getInputStream()).thenReturn(inputStreamMock);
-    when(resourceMock2.getInputStream()).thenReturn(inputStreamMock);
-    when(resourceMock3.getInputStream()).thenReturn(inputStreamMock);
+        when(resourceMock2.getDescription()).thenReturn(resourceName2);
+        when(resourceMock2.getFile()).thenReturn(fileMock2);
 
-    when(repositoryServiceMock.createDeployment()).thenReturn(deploymentBuilderMock);
-    when(deploymentBuilderMock.enableDuplicateFiltering()).thenReturn(deploymentBuilderMock);
-    when(deploymentBuilderMock.name(isA(String.class))).thenReturn(deploymentBuilderMock);
+        when(resourceMock3.getFile()).thenReturn(fileMock3);
+        when(fileMock3.getAbsolutePath()).thenReturn(resourceName3);
 
-    when(deploymentBuilderMock.deploy()).thenReturn(deploymentMock);
-  }
+        when(resourceMock1.getInputStream()).thenReturn(inputStreamMock);
+        when(resourceMock2.getInputStream()).thenReturn(inputStreamMock);
+        when(resourceMock3.getInputStream()).thenReturn(inputStreamMock);
+
+        when(repositoryServiceMock.createDeployment()).thenReturn(deploymentBuilderMock);
+        when(deploymentBuilderMock.enableDuplicateFiltering()).thenReturn(deploymentBuilderMock);
+        when(deploymentBuilderMock.name(isA(String.class))).thenReturn(deploymentBuilderMock);
+
+        when(deploymentBuilderMock.deploy()).thenReturn(deploymentMock);
+    }
 
 }

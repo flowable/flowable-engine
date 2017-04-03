@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-
 /**
  * Activity implementation of the BPMN 2.0 script task.
  * 
@@ -36,66 +35,66 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Falko Menge
  */
 public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
-  
-  private static final long serialVersionUID = 1L;
-  
-  private static final Logger LOGGER = LoggerFactory.getLogger(ScriptTaskActivityBehavior.class);
-  
-  protected String scriptTaskId;
-  protected String script;
-  protected String language;
-  protected String resultVariable;
-  protected boolean storeScriptVariables; // https://activiti.atlassian.net/browse/ACT-1626
 
-  public ScriptTaskActivityBehavior(String script, String language, String resultVariable) {
-    this.script = script;
-    this.language = language;
-    this.resultVariable = resultVariable;
-  }
-  
-  public ScriptTaskActivityBehavior(String scriptTaskId, String script, String language, String resultVariable, boolean storeScriptVariables) {
-    this(script, language, resultVariable);
-    this.scriptTaskId = scriptTaskId;
-    this.storeScriptVariables = storeScriptVariables;
-  }
-  
-  public void execute(DelegateExecution execution) {
-    ActivityExecution activityExecution = (ActivityExecution) execution;
-    ScriptingEngines scriptingEngines = Context.getProcessEngineConfiguration().getScriptingEngines();
-    
-    if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
-      ObjectNode taskElementProperties = Context.getBpmnOverrideElementProperties(scriptTaskId, execution.getProcessDefinitionId());
-      if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT)) {
-        String overrideScript = taskElementProperties.get(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT).asText();
-        if (StringUtils.isNotEmpty(overrideScript) && !overrideScript.equals(script)) {
-          script = overrideScript;
+    private static final long serialVersionUID = 1L;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptTaskActivityBehavior.class);
+
+    protected String scriptTaskId;
+    protected String script;
+    protected String language;
+    protected String resultVariable;
+    protected boolean storeScriptVariables; // https://activiti.atlassian.net/browse/ACT-1626
+
+    public ScriptTaskActivityBehavior(String script, String language, String resultVariable) {
+        this.script = script;
+        this.language = language;
+        this.resultVariable = resultVariable;
+    }
+
+    public ScriptTaskActivityBehavior(String scriptTaskId, String script, String language, String resultVariable, boolean storeScriptVariables) {
+        this(script, language, resultVariable);
+        this.scriptTaskId = scriptTaskId;
+        this.storeScriptVariables = storeScriptVariables;
+    }
+
+    public void execute(DelegateExecution execution) {
+        ActivityExecution activityExecution = (ActivityExecution) execution;
+        ScriptingEngines scriptingEngines = Context.getProcessEngineConfiguration().getScriptingEngines();
+
+        if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
+            ObjectNode taskElementProperties = Context.getBpmnOverrideElementProperties(scriptTaskId, execution.getProcessDefinitionId());
+            if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT)) {
+                String overrideScript = taskElementProperties.get(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT).asText();
+                if (StringUtils.isNotEmpty(overrideScript) && !overrideScript.equals(script)) {
+                    script = overrideScript;
+                }
+            }
         }
-      }
+
+        boolean noErrors = true;
+        try {
+            Object result = scriptingEngines.evaluate(script, language, execution, storeScriptVariables);
+
+            if (resultVariable != null) {
+                execution.setVariable(resultVariable, result);
+            }
+
+        } catch (ActivitiException e) {
+
+            LOGGER.warn("Exception while executing {} : {}", activityExecution.getActivity().getId(), e.getMessage());
+
+            noErrors = false;
+            Throwable rootCause = ExceptionUtils.getRootCause(e);
+            if (rootCause instanceof BpmnError) {
+                ErrorPropagation.propagateError((BpmnError) rootCause, activityExecution);
+            } else {
+                throw e;
+            }
+        }
+        if (noErrors) {
+            leave(activityExecution);
+        }
     }
 
-    boolean noErrors = true;
-    try {
-      Object result = scriptingEngines.evaluate(script, language, execution, storeScriptVariables);
-      
-      if (resultVariable != null) {
-        execution.setVariable(resultVariable, result);
-      }
-
-    } catch (ActivitiException e) {
-
-        LOGGER.warn("Exception while executing {} : {}", activityExecution.getActivity().getId(), e.getMessage());
-      
-      noErrors = false;
-      Throwable rootCause = ExceptionUtils.getRootCause(e);
-      if (rootCause instanceof BpmnError) {
-        ErrorPropagation.propagateError((BpmnError) rootCause, activityExecution);
-      } else {
-        throw e;
-      }
-    }
-    if (noErrors) {
-      leave(activityExecution);
-    }
-  }
-  
 }

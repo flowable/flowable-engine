@@ -20,20 +20,20 @@ import org.flowable.idm.engine.IdmEngineConfiguration;
  */
 public class CommandContextFactory {
 
-  protected IdmEngineConfiguration idmEngineConfiguration;
+    protected IdmEngineConfiguration idmEngineConfiguration;
 
-  public CommandContext createCommandContext(Command<?> cmd) {
-    return new CommandContext(cmd, idmEngineConfiguration);
-  }
+    public CommandContext createCommandContext(Command<?> cmd) {
+        return new CommandContext(cmd, idmEngineConfiguration);
+    }
 
-  // getters and setters
-  // //////////////////////////////////////////////////////
+    // getters and setters
+    // //////////////////////////////////////////////////////
 
-  public IdmEngineConfiguration getIdmEngineConfiguration() {
-    return idmEngineConfiguration;
-  }
+    public IdmEngineConfiguration getIdmEngineConfiguration() {
+        return idmEngineConfiguration;
+    }
 
-  public void setIdmEngineConfiguration(IdmEngineConfiguration idmEngineConfiguration) {
-    this.idmEngineConfiguration = idmEngineConfiguration;
-  }
+    public void setIdmEngineConfiguration(IdmEngineConfiguration idmEngineConfiguration) {
+        this.idmEngineConfiguration = idmEngineConfiguration;
+    }
 }

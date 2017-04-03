@@ -19,13 +19,13 @@ import org.flowable.compatibility.testdata.Flowable5TestDataGenerator;
 
 public class StartProcessInstanceTestDataGenerator implements Flowable5TestDataGenerator {
 
-  @Override
-  public void generateTestData(ProcessEngine processEngine) {
-    RepositoryService repositoryService = processEngine.getRepositoryService();
-    repositoryService.createDeployment().addClasspathResource("oneTaskProcess.bpmn20.xml").deploy();
-    
-    RuntimeService runtimeService = processEngine.getRuntimeService();
-    runtimeService.startProcessInstanceByKey("oneTaskProcess", "activitiv5-one-task-process");
-  }
+    @Override
+    public void generateTestData(ProcessEngine processEngine) {
+        RepositoryService repositoryService = processEngine.getRepositoryService();
+        repositoryService.createDeployment().addClasspathResource("oneTaskProcess.bpmn20.xml").deploy();
+
+        RuntimeService runtimeService = processEngine.getRuntimeService();
+        runtimeService.startProcessInstanceByKey("oneTaskProcess", "activitiv5-one-task-process");
+    }
 
 }

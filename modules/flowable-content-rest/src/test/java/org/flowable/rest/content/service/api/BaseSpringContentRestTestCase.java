@@ -69,286 +69,286 @@ import junit.framework.AssertionFailedError;
 
 public abstract class BaseSpringContentRestTestCase extends AbstractContentTestCase {
 
-  private static Logger log = LoggerFactory.getLogger(BaseSpringContentRestTestCase.class);
+    private static Logger log = LoggerFactory.getLogger(BaseSpringContentRestTestCase.class);
 
-  protected static String SERVER_URL_PREFIX;
-  protected static ContentRestUrlBuilder URL_BUILDER;
+    protected static String SERVER_URL_PREFIX;
+    protected static ContentRestUrlBuilder URL_BUILDER;
 
-  protected static Server server;
-  protected static ApplicationContext appContext;
-  protected ObjectMapper objectMapper = new ObjectMapper();
+    protected static Server server;
+    protected static ApplicationContext appContext;
+    protected ObjectMapper objectMapper = new ObjectMapper();
 
-  protected static ContentEngine contentEngine;
+    protected static ContentEngine contentEngine;
 
-  protected Throwable exception;
+    protected Throwable exception;
 
-  protected static ContentEngineConfiguration contentEngineConfiguration;
-  protected static ContentService contentService;
+    protected static ContentEngineConfiguration contentEngineConfiguration;
+    protected static ContentService contentService;
 
-  protected static CloseableHttpClient client;
-  protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<CloseableHttpResponse>();
-  
-  protected ISO8601DateFormat ISO_DATE_FORMAT = new ISO8601DateFormat();
+    protected static CloseableHttpClient client;
+    protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<CloseableHttpResponse>();
 
-  static {
+    protected ISO8601DateFormat ISO_DATE_FORMAT = new ISO8601DateFormat();
 
-    TestServer testServer = TestServerUtil.createAndStartServer(ApplicationConfiguration.class);
-    server = testServer.getServer();
-    appContext = testServer.getApplicationContext();
-    SERVER_URL_PREFIX = testServer.getServerUrlPrefix();
-    URL_BUILDER = ContentRestUrlBuilder.usingBaseUrl(SERVER_URL_PREFIX);
+    static {
 
-    // Lookup services
-    contentEngine = appContext.getBean(ContentEngine.class);
-    contentEngineConfiguration = contentEngine.getContentEngineConfiguration();
-    contentService = contentEngine.getContentService();
+        TestServer testServer = TestServerUtil.createAndStartServer(ApplicationConfiguration.class);
+        server = testServer.getServer();
+        appContext = testServer.getApplicationContext();
+        SERVER_URL_PREFIX = testServer.getServerUrlPrefix();
+        URL_BUILDER = ContentRestUrlBuilder.usingBaseUrl(SERVER_URL_PREFIX);
 
-    // Create http client for all tests
-    CredentialsProvider provider = new BasicCredentialsProvider();
-    UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("kermit", "kermit");
-    provider.setCredentials(AuthScope.ANY, credentials);
-    client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
+        // Lookup services
+        contentEngine = appContext.getBean(ContentEngine.class);
+        contentEngineConfiguration = contentEngine.getContentEngineConfiguration();
+        contentService = contentEngine.getContentService();
 
-    // Clean shutdown
-    Runtime.getRuntime().addShutdownHook(new Thread() {
+        // Create http client for all tests
+        CredentialsProvider provider = new BasicCredentialsProvider();
+        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("kermit", "kermit");
+        provider.setCredentials(AuthScope.ANY, credentials);
+        client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
 
-      @Override
-      public void run() {
+        // Clean shutdown
+        Runtime.getRuntime().addShutdownHook(new Thread() {
 
-        if (client != null) {
-          try {
-            client.close();
-          } catch (IOException e) {
-            log.error("Could not close http client", e);
-          }
-        }
+            @Override
+            public void run() {
 
-        if (server != null && server.isRunning()) {
-          try {
-            server.stop();
-          } catch (Exception e) {
-            log.error("Error stopping server", e);
-          }
-        }
-      }
-    });
-  }
+                if (client != null) {
+                    try {
+                        client.close();
+                    } catch (IOException e) {
+                        log.error("Could not close http client", e);
+                    }
+                }
 
-  @Override
-  public void runBare() throws Throwable {
-    try {
-      super.runBare();
-      
-    } catch (AssertionFailedError e) {
-      log.error(EMPTY_LINE);
-      log.error("ASSERTION FAILED: {}", e, e);
-      exception = e;
-      throw e;
-
-    } catch (Throwable e) {
-      log.error(EMPTY_LINE);
-      log.error("EXCEPTION: {}", e, e);
-      exception = e;
-      throw e;
-
-    } finally {
-      ContentTestHelper.assertAndEnsureCleanDb(contentEngine);
-      contentEngineConfiguration.getClock().reset();
-      closeHttpConnections();
+                if (server != null && server.isRunning()) {
+                    try {
+                        server.stop();
+                    } catch (Exception e) {
+                        log.error("Error stopping server", e);
+                    }
+                }
+            }
+        });
     }
-  }
 
-  /**
-   * IMPORTANT: calling method is responsible for calling close() on returned {@link HttpResponse} to free the connection.
-   */
-  public CloseableHttpResponse executeRequest(HttpUriRequest request, int expectedStatusCode) {
-    return internalExecuteRequest(request, expectedStatusCode, true);
-  }
-
-  /**
-   * IMPORTANT: calling method is responsible for calling close() on returned {@link HttpResponse} to free the connection.
-   */
-  public CloseableHttpResponse executeBinaryRequest(HttpUriRequest request, int expectedStatusCode) {
-    return internalExecuteRequest(request, expectedStatusCode, false);
-  }
-
-  protected CloseableHttpResponse internalExecuteRequest(HttpUriRequest request, int expectedStatusCode, boolean addJsonContentType) {
-    CloseableHttpResponse response = null;
-    try {
-      if (addJsonContentType && request.getFirstHeader(HttpHeaders.CONTENT_TYPE) == null) {
-        // Revert to default content-type
-        request.addHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json"));
-      }
-      response = client.execute(request);
-      Assert.assertNotNull(response.getStatusLine());
-
-      int responseStatusCode = response.getStatusLine().getStatusCode();
-      if (expectedStatusCode != responseStatusCode) {
-        log.info("Wrong status code : {}, but should be {}", responseStatusCode, expectedStatusCode);
-        log.info("Response body: {}", IOUtils.toString(response.getEntity().getContent()));
-      }
-
-      Assert.assertEquals(expectedStatusCode, responseStatusCode);
-      httpResponses.add(response);
-      return response;
-
-    } catch (ClientProtocolException e) {
-      Assert.fail(e.getMessage());
-    } catch (IOException e) {
-      Assert.fail(e.getMessage());
-    }
-    return null;
-  }
-
-  public void closeResponse(CloseableHttpResponse response) {
-    if (response != null) {
-      try {
-        response.close();
-      } catch (IOException e) {
-        fail("Could not close http connection");
-      }
-    }
-  }
-
-  protected void closeHttpConnections() {
-    for (CloseableHttpResponse response : httpResponses) {
-      if (response != null) {
+    @Override
+    public void runBare() throws Throwable {
         try {
-          response.close();
-        } catch (IOException e) {
-          log.error("Could not close http connection", e);
+            super.runBare();
+
+        } catch (AssertionFailedError e) {
+            log.error(EMPTY_LINE);
+            log.error("ASSERTION FAILED: {}", e, e);
+            exception = e;
+            throw e;
+
+        } catch (Throwable e) {
+            log.error(EMPTY_LINE);
+            log.error("EXCEPTION: {}", e, e);
+            exception = e;
+            throw e;
+
+        } finally {
+            ContentTestHelper.assertAndEnsureCleanDb(contentEngine);
+            contentEngineConfiguration.getClock().reset();
+            closeHttpConnections();
         }
-      }
-    }
-    httpResponses.clear();
-  }
-
-  protected String encode(String string) {
-    if (string != null) {
-      try {
-        return URLEncoder.encode(string, "UTF-8");
-      } catch (UnsupportedEncodingException uee) {
-        throw new IllegalStateException("JVM does not support UTF-8 encoding.", uee);
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Checks if the returned "data" array (child-node of root-json node returned by invoking a GET on the given url) contains entries with the given ID's.
-   */
-  protected void assertResultsPresentInDataResponse(String url, String... expectedResourceIds) throws JsonProcessingException, IOException {
-    int numberOfResultsExpected = expectedResourceIds.length;
-
-    // Do the actual call
-    CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
-
-    // Check status and size
-    JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
-    closeResponse(response);
-    assertEquals(numberOfResultsExpected, dataNode.size());
-
-    // Check presence of ID's
-    List<String> toBeFound = new ArrayList<String>(Arrays.asList(expectedResourceIds));
-    Iterator<JsonNode> it = dataNode.iterator();
-    while (it.hasNext()) {
-      String id = it.next().get("id").textValue();
-      toBeFound.remove(id);
-    }
-    assertTrue("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
-  }
-  
-  protected void assertResultsPresentInPostDataResponse(String url, ObjectNode body, String... expectedResourceIds) throws JsonProcessingException, IOException {
-    assertResultsPresentInPostDataResponseWithStatusCheck(url, body, HttpStatus.SC_OK, expectedResourceIds);
-  }
-
-  protected void assertResultsPresentInPostDataResponseWithStatusCheck(String url, ObjectNode body, int expectedStatusCode, String... expectedResourceIds) throws JsonProcessingException, IOException {
-    int numberOfResultsExpected = 0;
-    if (expectedResourceIds != null) {
-      numberOfResultsExpected = expectedResourceIds.length;
     }
 
-    // Do the actual call
-    HttpPost post = new HttpPost(SERVER_URL_PREFIX + url);
-    post.setEntity(new StringEntity(body.toString()));
-    CloseableHttpResponse response = executeRequest(post, expectedStatusCode);
+    /**
+     * IMPORTANT: calling method is responsible for calling close() on returned {@link HttpResponse} to free the connection.
+     */
+    public CloseableHttpResponse executeRequest(HttpUriRequest request, int expectedStatusCode) {
+        return internalExecuteRequest(request, expectedStatusCode, true);
+    }
 
-    if (expectedStatusCode == HttpStatus.SC_OK) {
-      // Check status and size
-      JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
-      JsonNode dataNode = rootNode.get("data");
-      assertEquals(numberOfResultsExpected, dataNode.size());
+    /**
+     * IMPORTANT: calling method is responsible for calling close() on returned {@link HttpResponse} to free the connection.
+     */
+    public CloseableHttpResponse executeBinaryRequest(HttpUriRequest request, int expectedStatusCode) {
+        return internalExecuteRequest(request, expectedStatusCode, false);
+    }
 
-      // Check presence of ID's
-      if (expectedResourceIds != null) {
+    protected CloseableHttpResponse internalExecuteRequest(HttpUriRequest request, int expectedStatusCode, boolean addJsonContentType) {
+        CloseableHttpResponse response = null;
+        try {
+            if (addJsonContentType && request.getFirstHeader(HttpHeaders.CONTENT_TYPE) == null) {
+                // Revert to default content-type
+                request.addHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json"));
+            }
+            response = client.execute(request);
+            Assert.assertNotNull(response.getStatusLine());
+
+            int responseStatusCode = response.getStatusLine().getStatusCode();
+            if (expectedStatusCode != responseStatusCode) {
+                log.info("Wrong status code : {}, but should be {}", responseStatusCode, expectedStatusCode);
+                log.info("Response body: {}", IOUtils.toString(response.getEntity().getContent()));
+            }
+
+            Assert.assertEquals(expectedStatusCode, responseStatusCode);
+            httpResponses.add(response);
+            return response;
+
+        } catch (ClientProtocolException e) {
+            Assert.fail(e.getMessage());
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        }
+        return null;
+    }
+
+    public void closeResponse(CloseableHttpResponse response) {
+        if (response != null) {
+            try {
+                response.close();
+            } catch (IOException e) {
+                fail("Could not close http connection");
+            }
+        }
+    }
+
+    protected void closeHttpConnections() {
+        for (CloseableHttpResponse response : httpResponses) {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    log.error("Could not close http connection", e);
+                }
+            }
+        }
+        httpResponses.clear();
+    }
+
+    protected String encode(String string) {
+        if (string != null) {
+            try {
+                return URLEncoder.encode(string, "UTF-8");
+            } catch (UnsupportedEncodingException uee) {
+                throw new IllegalStateException("JVM does not support UTF-8 encoding.", uee);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Checks if the returned "data" array (child-node of root-json node returned by invoking a GET on the given url) contains entries with the given ID's.
+     */
+    protected void assertResultsPresentInDataResponse(String url, String... expectedResourceIds) throws JsonProcessingException, IOException {
+        int numberOfResultsExpected = expectedResourceIds.length;
+
+        // Do the actual call
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        // Check status and size
+        JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
+        closeResponse(response);
+        assertEquals(numberOfResultsExpected, dataNode.size());
+
+        // Check presence of ID's
         List<String> toBeFound = new ArrayList<String>(Arrays.asList(expectedResourceIds));
         Iterator<JsonNode> it = dataNode.iterator();
         while (it.hasNext()) {
-          String id = it.next().get("id").textValue();
-          toBeFound.remove(id);
+            String id = it.next().get("id").textValue();
+            toBeFound.remove(id);
         }
-        assertTrue("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
-      }
+        assertTrue("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
     }
 
-    closeResponse(response);
-  }
-  
-  protected void assertEmptyResultsPresentInDataResponse(String url) throws JsonProcessingException, IOException {
-    // Do the actual call
-    CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
-
-    // Check status and size
-    JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
-    closeResponse(response);
-    assertEquals(0, dataNode.size());
-  }
-  
-  /**
-   * Extract a date from the given string. Assertion fails when invalid date has been provided.
-   */
-  protected Date getDateFromISOString(String isoString) {
-    DateTimeFormatter dateFormat = ISODateTimeFormat.dateTime();
-    try {
-      return dateFormat.parseDateTime(isoString).toDate();
-    } catch (IllegalArgumentException iae) {
-      fail("Illegal date provided: " + isoString);
-      return null;
+    protected void assertResultsPresentInPostDataResponse(String url, ObjectNode body, String... expectedResourceIds) throws JsonProcessingException, IOException {
+        assertResultsPresentInPostDataResponseWithStatusCheck(url, body, HttpStatus.SC_OK, expectedResourceIds);
     }
-  }
-  
-  protected String getISODateString(Date time) {
-    return ISO_DATE_FORMAT.format(time);
-  }
-  
-  protected String createContentItem(String name, String mimeType, String taskId, String processInstanceId,
-      String tenantId, String createdBy, String lastModifiedBy) {
-    
-    ContentItem contentItem = fillAndCreateContentItem(name, mimeType, taskId, processInstanceId, tenantId, createdBy, lastModifiedBy);
-    contentService.saveContentItem(contentItem);
-    return contentItem.getId();
-  }
-  
-  protected String createContentItem(String name, String mimeType, String taskId, String processInstanceId,
-      String tenantId, String createdBy, String lastModifiedBy, InputStream fileStream) {
-    
-    ContentItem contentItem = fillAndCreateContentItem(name, mimeType, taskId, processInstanceId, tenantId, createdBy, lastModifiedBy);
-    contentService.saveContentItem(contentItem, fileStream);
-    return contentItem.getId();
-  }
-  
-  protected ContentItem fillAndCreateContentItem(String name, String mimeType, String taskId, String processInstanceId,
-      String tenantId, String createdBy, String lastModifiedBy) {
-    
-    ContentItem contentItem = contentService.newContentItem();
-    contentItem.setName(name);
-    contentItem.setMimeType(mimeType);
-    contentItem.setTaskId(taskId);
-    contentItem.setProcessInstanceId(processInstanceId);
-    contentItem.setTenantId(tenantId);
-    contentItem.setCreatedBy(createdBy);
-    contentItem.setLastModifiedBy(lastModifiedBy);
-    
-    return contentItem;
-  }
+
+    protected void assertResultsPresentInPostDataResponseWithStatusCheck(String url, ObjectNode body, int expectedStatusCode, String... expectedResourceIds) throws JsonProcessingException, IOException {
+        int numberOfResultsExpected = 0;
+        if (expectedResourceIds != null) {
+            numberOfResultsExpected = expectedResourceIds.length;
+        }
+
+        // Do the actual call
+        HttpPost post = new HttpPost(SERVER_URL_PREFIX + url);
+        post.setEntity(new StringEntity(body.toString()));
+        CloseableHttpResponse response = executeRequest(post, expectedStatusCode);
+
+        if (expectedStatusCode == HttpStatus.SC_OK) {
+            // Check status and size
+            JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+            JsonNode dataNode = rootNode.get("data");
+            assertEquals(numberOfResultsExpected, dataNode.size());
+
+            // Check presence of ID's
+            if (expectedResourceIds != null) {
+                List<String> toBeFound = new ArrayList<String>(Arrays.asList(expectedResourceIds));
+                Iterator<JsonNode> it = dataNode.iterator();
+                while (it.hasNext()) {
+                    String id = it.next().get("id").textValue();
+                    toBeFound.remove(id);
+                }
+                assertTrue("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+            }
+        }
+
+        closeResponse(response);
+    }
+
+    protected void assertEmptyResultsPresentInDataResponse(String url) throws JsonProcessingException, IOException {
+        // Do the actual call
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        // Check status and size
+        JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
+        closeResponse(response);
+        assertEquals(0, dataNode.size());
+    }
+
+    /**
+     * Extract a date from the given string. Assertion fails when invalid date has been provided.
+     */
+    protected Date getDateFromISOString(String isoString) {
+        DateTimeFormatter dateFormat = ISODateTimeFormat.dateTime();
+        try {
+            return dateFormat.parseDateTime(isoString).toDate();
+        } catch (IllegalArgumentException iae) {
+            fail("Illegal date provided: " + isoString);
+            return null;
+        }
+    }
+
+    protected String getISODateString(Date time) {
+        return ISO_DATE_FORMAT.format(time);
+    }
+
+    protected String createContentItem(String name, String mimeType, String taskId, String processInstanceId,
+            String tenantId, String createdBy, String lastModifiedBy) {
+
+        ContentItem contentItem = fillAndCreateContentItem(name, mimeType, taskId, processInstanceId, tenantId, createdBy, lastModifiedBy);
+        contentService.saveContentItem(contentItem);
+        return contentItem.getId();
+    }
+
+    protected String createContentItem(String name, String mimeType, String taskId, String processInstanceId,
+            String tenantId, String createdBy, String lastModifiedBy, InputStream fileStream) {
+
+        ContentItem contentItem = fillAndCreateContentItem(name, mimeType, taskId, processInstanceId, tenantId, createdBy, lastModifiedBy);
+        contentService.saveContentItem(contentItem, fileStream);
+        return contentItem.getId();
+    }
+
+    protected ContentItem fillAndCreateContentItem(String name, String mimeType, String taskId, String processInstanceId,
+            String tenantId, String createdBy, String lastModifiedBy) {
+
+        ContentItem contentItem = contentService.newContentItem();
+        contentItem.setName(name);
+        contentItem.setMimeType(mimeType);
+        contentItem.setTaskId(taskId);
+        contentItem.setProcessInstanceId(processInstanceId);
+        contentItem.setTenantId(tenantId);
+        contentItem.setCreatedBy(createdBy);
+        contentItem.setLastModifiedBy(lastModifiedBy);
+
+        return contentItem;
+    }
 }

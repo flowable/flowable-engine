@@ -42,7 +42,6 @@ import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
-import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,168 +59,164 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Transactional
 public class FlowableModelQueryService {
 
-  private static final Logger logger = LoggerFactory.getLogger(FlowableModelQueryService.class);
+    private static final Logger logger = LoggerFactory.getLogger(FlowableModelQueryService.class);
 
-  protected static final String FILTER_SHARED_WITH_ME = "sharedWithMe";
-  protected static final String FILTER_SHARED_WITH_OTHERS = "sharedWithOthers";
-  protected static final String FILTER_FAVORITE = "favorite";
+    protected static final String FILTER_SHARED_WITH_ME = "sharedWithMe";
+    protected static final String FILTER_SHARED_WITH_OTHERS = "sharedWithOthers";
+    protected static final String FILTER_FAVORITE = "favorite";
 
-  protected static final int MIN_FILTER_LENGTH = 1;
+    protected static final int MIN_FILTER_LENGTH = 1;
 
-  @Autowired
-  protected ModelRepository modelRepository;
+    @Autowired
+    protected ModelRepository modelRepository;
 
-  @Autowired
-  protected ModelService modelService;
+    @Autowired
+    protected ModelService modelService;
 
-  @Autowired
-  protected ObjectMapper objectMapper;
+    @Autowired
+    protected ObjectMapper objectMapper;
 
-  protected BpmnXMLConverter bpmnXmlConverter = new BpmnXMLConverter();
-  protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
+    protected BpmnXMLConverter bpmnXmlConverter = new BpmnXMLConverter();
+    protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
 
-  public ResultListDataRepresentation getModels(String filter, String sort, Integer modelType, HttpServletRequest request) {
+    public ResultListDataRepresentation getModels(String filter, String sort, Integer modelType, HttpServletRequest request) {
 
-    // need to parse the filterText parameter ourselves, due to encoding issues with the default parsing.
-    String filterText = null;
-    List<NameValuePair> params = URLEncodedUtils.parse(request.getQueryString(), Charset.forName("UTF-8"));
-    if (params != null) {
-      for (NameValuePair nameValuePair : params) {
-        if ("filterText".equalsIgnoreCase(nameValuePair.getName())) {
-          filterText = nameValuePair.getValue();
-        }
-      }
-    }
-
-    List<ModelRepresentation> resultList = new ArrayList<ModelRepresentation>();
-    List<Model> models = null;
-
-    String validFilter = makeValidFilterText(filterText);
-
-    User user = SecurityUtils.getCurrentUserObject();
-
-    if (validFilter != null) {
-      models = modelRepository.findByModelTypeAndCreatedBy(user.getId(), modelType, validFilter, sort);
-
-    } else {
-      models = modelRepository.findByModelTypeAndCreatedBy(user.getId(), modelType, sort);
-    }
-
-    if (CollectionUtils.isNotEmpty(models)) {
-      List<String> addedModelIds = new ArrayList<String>();
-      for (Model model : models) {
-        if (!addedModelIds.contains(model.getId())) {
-          addedModelIds.add(model.getId());
-          ModelRepresentation representation = createModelRepresentation(model);
-          resultList.add(representation);
-        }
-      }
-    }
-
-    ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
-    return result;
-  }
-
-  public ResultListDataRepresentation getModelsToIncludeInAppDefinition() {
-
-    List<ModelRepresentation> resultList = new ArrayList<ModelRepresentation>();
-
-    User user = SecurityUtils.getCurrentUserObject();
-
-    List<String> addedModelIds = new ArrayList<String>();
-    List<Model> models = modelRepository.findByModelTypeAndCreatedBy(user.getId(), 0, ModelSort.MODIFIED_DESC);
-
-    if (CollectionUtils.isNotEmpty(models)) {
-      for (Model model : models) {
-        if (!addedModelIds.contains(model.getId())) {
-          addedModelIds.add(model.getId());
-          ModelRepresentation representation = createModelRepresentation(model);
-          resultList.add(representation);
-        }
-      }
-    }
-
-    ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
-    return result;
-  }
-
-  public ModelRepresentation importProcessModel(HttpServletRequest request, MultipartFile file) {
-
-    String fileName = file.getOriginalFilename();
-    if (fileName != null && (fileName.endsWith(".bpmn") || fileName.endsWith(".bpmn20.xml"))) {
-      try {
-        XMLInputFactory xif = XmlUtil.createSafeXmlInputFactory();
-        InputStreamReader xmlIn = new InputStreamReader(file.getInputStream(), "UTF-8");
-        XMLStreamReader xtr = xif.createXMLStreamReader(xmlIn);
-        BpmnModel bpmnModel = bpmnXmlConverter.convertToBpmnModel(xtr);
-        if (CollectionUtils.isEmpty(bpmnModel.getProcesses())) {
-          throw new BadRequestException("No process found in definition " + fileName);
+        // need to parse the filterText parameter ourselves, due to encoding issues with the default parsing.
+        String filterText = null;
+        List<NameValuePair> params = URLEncodedUtils.parse(request.getQueryString(), Charset.forName("UTF-8"));
+        if (params != null) {
+            for (NameValuePair nameValuePair : params) {
+                if ("filterText".equalsIgnoreCase(nameValuePair.getName())) {
+                    filterText = nameValuePair.getValue();
+                }
+            }
         }
 
-        if (bpmnModel.getLocationMap().size() == 0) {
-          BpmnAutoLayout bpmnLayout = new BpmnAutoLayout(bpmnModel);
-          bpmnLayout.execute();
+        List<ModelRepresentation> resultList = new ArrayList<ModelRepresentation>();
+        List<Model> models = null;
+
+        String validFilter = makeValidFilterText(filterText);
+
+        if (validFilter != null) {
+            models = modelRepository.findByModelTypeAndFilter(modelType, validFilter, sort);
+
+        } else {
+            models = modelRepository.findByModelType(modelType, sort);
         }
 
-        ObjectNode modelNode = bpmnJsonConverter.convertToJson(bpmnModel);
-
-        org.flowable.bpmn.model.Process process = bpmnModel.getMainProcess();
-        String name = process.getId();
-        if (StringUtils.isNotEmpty(process.getName())) {
-          name = process.getName();
+        if (CollectionUtils.isNotEmpty(models)) {
+            List<String> addedModelIds = new ArrayList<String>();
+            for (Model model : models) {
+                if (!addedModelIds.contains(model.getId())) {
+                    addedModelIds.add(model.getId());
+                    ModelRepresentation representation = createModelRepresentation(model);
+                    resultList.add(representation);
+                }
+            }
         }
-        String description = process.getDocumentation();
 
-        ModelRepresentation model = new ModelRepresentation();
-        model.setKey(process.getId());
-        model.setName(name);
-        model.setDescription(description);
-        model.setModelType(AbstractModel.MODEL_TYPE_BPMN);
-        Model newModel = modelService.createModel(model, modelNode.toString(), SecurityUtils.getCurrentUserObject());
-        return new ModelRepresentation(newModel);
-
-      } catch (BadRequestException e) {
-        throw e;
-
-      } catch (Exception e) {
-        logger.error("Import failed for {}", fileName, e);
-        throw new BadRequestException("Import failed for " + fileName + ", error message " + e.getMessage());
-      }
-    } else {
-      throw new BadRequestException("Invalid file name, only .bpmn and .bpmn20.xml files are supported not " + fileName);
+        ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
+        return result;
     }
-  }
 
-  protected ModelRepresentation createModelRepresentation(AbstractModel model) {
-    ModelRepresentation representation = null;
-    if (model.getModelType() != null && model.getModelType() == 3) {
-      representation = new AppDefinitionListModelRepresentation(model);
+    public ResultListDataRepresentation getModelsToIncludeInAppDefinition() {
 
-      AppDefinition appDefinition = null;
-      try {
-        appDefinition = objectMapper.readValue(model.getModelEditorJson(), AppDefinition.class);
-      } catch (Exception e) {
-        logger.error("Error deserializing app {}", model.getId(), e);
-        throw new InternalServerErrorException("Could not deserialize app definition");
-      }
-      ((AppDefinitionListModelRepresentation) representation).setAppDefinition(appDefinition);
+        List<ModelRepresentation> resultList = new ArrayList<ModelRepresentation>();
 
-    } else {
-      representation = new ModelRepresentation(model);
+        List<String> addedModelIds = new ArrayList<String>();
+        List<Model> models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_BPMN, ModelSort.MODIFIED_DESC);
+
+        if (CollectionUtils.isNotEmpty(models)) {
+            for (Model model : models) {
+                if (!addedModelIds.contains(model.getId())) {
+                    addedModelIds.add(model.getId());
+                    ModelRepresentation representation = createModelRepresentation(model);
+                    resultList.add(representation);
+                }
+            }
+        }
+
+        ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
+        return result;
     }
-    return representation;
-  }
 
-  protected String makeValidFilterText(String filterText) {
-    String validFilter = null;
+    public ModelRepresentation importProcessModel(HttpServletRequest request, MultipartFile file) {
 
-    if (filterText != null) {
-      String trimmed = StringUtils.trim(filterText);
-      if (trimmed.length() >= MIN_FILTER_LENGTH) {
-        validFilter = "%" + trimmed.toLowerCase() + "%";
-      }
+        String fileName = file.getOriginalFilename();
+        if (fileName != null && (fileName.endsWith(".bpmn") || fileName.endsWith(".bpmn20.xml"))) {
+            try {
+                XMLInputFactory xif = XmlUtil.createSafeXmlInputFactory();
+                InputStreamReader xmlIn = new InputStreamReader(file.getInputStream(), "UTF-8");
+                XMLStreamReader xtr = xif.createXMLStreamReader(xmlIn);
+                BpmnModel bpmnModel = bpmnXmlConverter.convertToBpmnModel(xtr);
+                if (CollectionUtils.isEmpty(bpmnModel.getProcesses())) {
+                    throw new BadRequestException("No process found in definition " + fileName);
+                }
+
+                if (bpmnModel.getLocationMap().size() == 0) {
+                    BpmnAutoLayout bpmnLayout = new BpmnAutoLayout(bpmnModel);
+                    bpmnLayout.execute();
+                }
+
+                ObjectNode modelNode = bpmnJsonConverter.convertToJson(bpmnModel);
+
+                org.flowable.bpmn.model.Process process = bpmnModel.getMainProcess();
+                String name = process.getId();
+                if (StringUtils.isNotEmpty(process.getName())) {
+                    name = process.getName();
+                }
+                String description = process.getDocumentation();
+
+                ModelRepresentation model = new ModelRepresentation();
+                model.setKey(process.getId());
+                model.setName(name);
+                model.setDescription(description);
+                model.setModelType(AbstractModel.MODEL_TYPE_BPMN);
+                Model newModel = modelService.createModel(model, modelNode.toString(), SecurityUtils.getCurrentUserObject());
+                return new ModelRepresentation(newModel);
+
+            } catch (BadRequestException e) {
+                throw e;
+
+            } catch (Exception e) {
+                logger.error("Import failed for {}", fileName, e);
+                throw new BadRequestException("Import failed for " + fileName + ", error message " + e.getMessage());
+            }
+        } else {
+            throw new BadRequestException("Invalid file name, only .bpmn and .bpmn20.xml files are supported not " + fileName);
+        }
     }
-    return validFilter;
-  }
+
+    protected ModelRepresentation createModelRepresentation(AbstractModel model) {
+        ModelRepresentation representation = null;
+        if (model.getModelType() != null && model.getModelType() == 3) {
+            representation = new AppDefinitionListModelRepresentation(model);
+
+            AppDefinition appDefinition = null;
+            try {
+                appDefinition = objectMapper.readValue(model.getModelEditorJson(), AppDefinition.class);
+            } catch (Exception e) {
+                logger.error("Error deserializing app {}", model.getId(), e);
+                throw new InternalServerErrorException("Could not deserialize app definition");
+            }
+            ((AppDefinitionListModelRepresentation) representation).setAppDefinition(appDefinition);
+
+        } else {
+            representation = new ModelRepresentation(model);
+        }
+        return representation;
+    }
+
+    protected String makeValidFilterText(String filterText) {
+        String validFilter = null;
+
+        if (filterText != null) {
+            String trimmed = StringUtils.trim(filterText);
+            if (trimmed.length() >= MIN_FILTER_LENGTH) {
+                validFilter = "%" + trimmed.toLowerCase() + "%";
+            }
+        }
+        return validFilter;
+    }
 
 }

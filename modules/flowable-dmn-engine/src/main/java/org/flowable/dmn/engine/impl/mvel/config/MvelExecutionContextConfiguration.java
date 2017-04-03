@@ -25,7 +25,7 @@ public class MvelExecutionContextConfiguration {
     protected Map<String, Object> contextConfigurationVariables = new HashMap<String, Object>();
 
     public Map<String, Method> getParserConfiguration() {
-        return  parserConfiguration;
+        return parserConfiguration;
     }
 
     public Map<String, Object> getContextConfigurationVariables() {
@@ -33,7 +33,7 @@ public class MvelExecutionContextConfiguration {
     }
 
     public void addParserConfiguration(String methodPlaceHolder, Method targetMethod) {
-        this. parserConfiguration.put(methodPlaceHolder, targetMethod);
+        this.parserConfiguration.put(methodPlaceHolder, targetMethod);
     }
 
     public void setParserConfiguration(Map<String, Method> parserConfiguration) {

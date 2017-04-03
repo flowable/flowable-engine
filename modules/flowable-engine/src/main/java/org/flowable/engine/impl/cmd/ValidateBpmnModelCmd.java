@@ -26,20 +26,20 @@ import org.flowable.validation.ValidationError;
  */
 public class ValidateBpmnModelCmd implements Command<List<ValidationError>> {
 
-  protected BpmnModel bpmnModel;
+    protected BpmnModel bpmnModel;
 
-  public ValidateBpmnModelCmd(BpmnModel bpmnModel) {
-    this.bpmnModel = bpmnModel;
-  }
-
-  @Override
-  public List<ValidationError> execute(CommandContext commandContext) {
-    ProcessValidator processValidator = commandContext.getProcessEngineConfiguration().getProcessValidator();
-    if (processValidator == null) {
-      throw new FlowableException("No process validator defined");
+    public ValidateBpmnModelCmd(BpmnModel bpmnModel) {
+        this.bpmnModel = bpmnModel;
     }
 
-    return processValidator.validate(bpmnModel);
-  }
+    @Override
+    public List<ValidationError> execute(CommandContext commandContext) {
+        ProcessValidator processValidator = commandContext.getProcessEngineConfiguration().getProcessValidator();
+        if (processValidator == null) {
+            throw new FlowableException("No process validator defined");
+        }
+
+        return processValidator.validate(bpmnModel);
+    }
 
 }

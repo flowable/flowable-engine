@@ -29,8 +29,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
- * Installs a Spring Security adapter for the Flowable
- * {@link org.flowable.engine.IdentityService}.
+ * Installs a Spring Security adapter for the Flowable {@link org.flowable.engine.IdentityService}.
  *
  * @author Josh Long
  */
@@ -38,44 +37,44 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 @AutoConfigureBefore(org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class)
 public class SecurityAutoConfiguration {
 
-  @Configuration
-  @ConditionalOnClass( UserDetailsService.class)
-  public static class UserDetailsServiceConfiguration
-          extends GlobalAuthenticationConfigurerAdapter {
+    @Configuration
+    @ConditionalOnClass(UserDetailsService.class)
+    public static class UserDetailsServiceConfiguration
+            extends GlobalAuthenticationConfigurerAdapter {
 
-    @Override
-    public void init(AuthenticationManagerBuilder auth) throws Exception {
-      auth.userDetailsService( userDetailsService());
+        @Override
+        public void init(AuthenticationManagerBuilder auth) throws Exception {
+            auth.userDetailsService(userDetailsService());
+        }
+
+        @Bean
+        public UserDetailsService userDetailsService() {
+            return new IdentityServiceUserDetailsService(this.identityService);
+        }
+
+        @Autowired
+        private IdentityService identityService;
     }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-      return new IdentityServiceUserDetailsService(this.identityService);
-    }
+    @Configuration
+    @ConditionalOnClass(name = { "org.flowable.rest.service.api.RestUrls", "org.springframework.web.servlet.DispatcherServlet" })
+    @EnableWebSecurity
+    public static class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private IdentityService identityService;
-  }
-  
-  @Configuration
-  @ConditionalOnClass(name = {"org.flowable.rest.service.api.RestUrls", "org.springframework.web.servlet.DispatcherServlet"})
-  @EnableWebSecurity
-  public static class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+        @Bean
+        public AuthenticationProvider authenticationProvider() {
+            return new BasicAuthenticationProvider();
+        }
 
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-      return new BasicAuthenticationProvider();
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http
+                    .authenticationProvider(authenticationProvider())
+                    .csrf().disable()
+                    .authorizeRequests()
+                    .anyRequest().authenticated()
+                    .and()
+                    .httpBasic();
+        }
     }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-      http
-        .authenticationProvider(authenticationProvider())
-        .csrf().disable()
-        .authorizeRequests()
-          .anyRequest().authenticated()
-          .and()
-        .httpBasic();
-    }
-  }
 }

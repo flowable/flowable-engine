@@ -25,20 +25,20 @@ import org.flowable.idm.engine.impl.TokenQueryImpl;
  * @author Tijs Rademakers
  */
 public interface TokenEntityManager extends EntityManager<TokenEntity> {
-  
-  Token createNewToken(String tokenId);
-  
-  void updateToken(Token updatedToken);
-  
-  boolean isNewToken(Token token);
-  
-  List<Token> findTokenByQueryCriteria(TokenQueryImpl query, Page page);
 
-  long findTokenCountByQueryCriteria(TokenQueryImpl query);
+    Token createNewToken(String tokenId);
 
-  TokenQuery createNewTokenQuery();
+    void updateToken(Token updatedToken);
 
-  List<Token> findTokensByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    boolean isNewToken(Token token);
 
-  long findTokenCountByNativeQuery(Map<String, Object> parameterMap);
+    List<Token> findTokenByQueryCriteria(TokenQueryImpl query, Page page);
+
+    long findTokenCountByQueryCriteria(TokenQueryImpl query);
+
+    TokenQuery createNewTokenQuery();
+
+    List<Token> findTokensByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+
+    long findTokenCountByNativeQuery(Map<String, Object> parameterMap);
 }

@@ -26,37 +26,37 @@ import org.flowable.engine.task.Comment;
  */
 public interface ProcessInstanceHistoryLogQuery {
 
-  /**
-   * The {@link ProcessInstanceHistoryLog} will contain the {@link HistoricTaskInstance} instances.
-   */
-  ProcessInstanceHistoryLogQuery includeTasks();
+    /**
+     * The {@link ProcessInstanceHistoryLog} will contain the {@link HistoricTaskInstance} instances.
+     */
+    ProcessInstanceHistoryLogQuery includeTasks();
 
-  /**
-   * The {@link ProcessInstanceHistoryLog} will contain the {@link HistoricActivityInstance} instances.
-   */
-  ProcessInstanceHistoryLogQuery includeActivities();
+    /**
+     * The {@link ProcessInstanceHistoryLog} will contain the {@link HistoricActivityInstance} instances.
+     */
+    ProcessInstanceHistoryLogQuery includeActivities();
 
-  /**
-   * The {@link ProcessInstanceHistoryLog} will contain the {@link HistoricVariableInstance} instances.
-   */
-  ProcessInstanceHistoryLogQuery includeVariables();
+    /**
+     * The {@link ProcessInstanceHistoryLog} will contain the {@link HistoricVariableInstance} instances.
+     */
+    ProcessInstanceHistoryLogQuery includeVariables();
 
-  /**
-   * The {@link ProcessInstanceHistoryLog} will contain the {@link Comment} instances.
-   */
-  ProcessInstanceHistoryLogQuery includeComments();
+    /**
+     * The {@link ProcessInstanceHistoryLog} will contain the {@link Comment} instances.
+     */
+    ProcessInstanceHistoryLogQuery includeComments();
 
-  /**
-   * The {@link ProcessInstanceHistoryLog} will contain the {@link HistoricVariableUpdate} instances.
-   */
-  ProcessInstanceHistoryLogQuery includeVariableUpdates();
+    /**
+     * The {@link ProcessInstanceHistoryLog} will contain the {@link HistoricVariableUpdate} instances.
+     */
+    ProcessInstanceHistoryLogQuery includeVariableUpdates();
 
-  /**
-   * The {@link ProcessInstanceHistoryLog} will contain the {@link HistoricFormProperty} instances.
-   */
-  ProcessInstanceHistoryLogQuery includeFormProperties();
+    /**
+     * The {@link ProcessInstanceHistoryLog} will contain the {@link HistoricFormProperty} instances.
+     */
+    ProcessInstanceHistoryLogQuery includeFormProperties();
 
-  /** Executes the query. */
-  ProcessInstanceHistoryLog singleResult();
+    /** Executes the query. */
+    ProcessInstanceHistoryLog singleResult();
 
 }

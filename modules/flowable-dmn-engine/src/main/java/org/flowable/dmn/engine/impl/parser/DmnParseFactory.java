@@ -12,7 +12,6 @@
  */
 package org.flowable.dmn.engine.impl.parser;
 
-
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez

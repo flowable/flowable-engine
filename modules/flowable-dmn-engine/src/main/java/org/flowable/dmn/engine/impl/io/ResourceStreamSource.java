@@ -18,27 +18,26 @@ import java.io.InputStream;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.io.StreamSource;
 
-
 /**
  * @author Joram Barrez
  */
 public class ResourceStreamSource implements StreamSource {
 
-  String resource;
-  
-  public ResourceStreamSource(String resource) {
-    this.resource = resource;
-  }
+    String resource;
 
-  public InputStream getInputStream() {
-    InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource);
-    if (inputStream == null) {
-      throw new FlowableException("resource '"+resource+"' doesn't exist");
+    public ResourceStreamSource(String resource) {
+        this.resource = resource;
     }
-    return new BufferedInputStream(inputStream);
-  }
 
-  public String toString() {
-    return "Resource["+resource+"]";
-  }
+    public InputStream getInputStream() {
+        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource);
+        if (inputStream == null) {
+            throw new FlowableException("resource '" + resource + "' doesn't exist");
+        }
+        return new BufferedInputStream(inputStream);
+    }
+
+    public String toString() {
+        return "Resource[" + resource + "]";
+    }
 }

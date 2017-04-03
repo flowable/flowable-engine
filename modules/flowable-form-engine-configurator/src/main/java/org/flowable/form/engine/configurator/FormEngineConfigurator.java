@@ -33,78 +33,78 @@ import org.flowable.form.engine.impl.cfg.StandaloneFormEngineConfiguration;
  * @author Joram Barrez
  */
 public class FormEngineConfigurator extends AbstractProcessEngineConfigurator {
-  
-  protected FormEngineConfiguration formEngineConfiguration;
-  
-  @Override
-  public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    
-    // Custom deployers need to be added before the process engine boots
-    List<Deployer> deployers = null;
-    if (processEngineConfiguration.getCustomPostDeployers() != null) {
-      deployers = processEngineConfiguration.getCustomPostDeployers();
-    } else {
-      deployers = new ArrayList<Deployer>();
-    }
-    deployers.add(new FormDeployer());
-    processEngineConfiguration.setCustomPostDeployers(deployers);
-    
-  }
-  
-  @Override
-  public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    if (formEngineConfiguration == null) {
-      formEngineConfiguration = new StandaloneFormEngineConfiguration();
-    
-      if (processEngineConfiguration.getDataSource() != null) {
-        DataSource originalDatasource = processEngineConfiguration.getDataSource();
-        if (processEngineConfiguration.isTransactionsExternallyManaged()) {
-          formEngineConfiguration.setDataSource(originalDatasource);
+
+    protected FormEngineConfiguration formEngineConfiguration;
+
+    @Override
+    public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
+
+        // Custom deployers need to be added before the process engine boots
+        List<Deployer> deployers = null;
+        if (processEngineConfiguration.getCustomPostDeployers() != null) {
+            deployers = processEngineConfiguration.getCustomPostDeployers();
         } else {
-          formEngineConfiguration.setDataSource(new TransactionContextAwareDataSource(originalDatasource));
+            deployers = new ArrayList<Deployer>();
         }
-        
-      } else {
-        throw new FlowableException("A datasource is required for initializing the Form engine ");
-      }
-      
-      formEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
-      formEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
-      formEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
-      formEngineConfiguration.setDatabaseTablePrefix(processEngineConfiguration.getDatabaseTablePrefix());
-      formEngineConfiguration.setDatabaseWildcardEscapeCharacter(processEngineConfiguration.getDatabaseWildcardEscapeCharacter());
-      
-      if (processEngineConfiguration.isTransactionsExternallyManaged()) {
-        formEngineConfiguration.setTransactionsExternallyManaged(true);
-       } else {
-        formEngineConfiguration.setTransactionFactory(
-             new TransactionContextAwareTransactionFactory<org.flowable.form.engine.impl.cfg.TransactionContext>(
-                   org.flowable.form.engine.impl.cfg.TransactionContext.class));
-       }
-      
+        deployers.add(new FormDeployer());
+        processEngineConfiguration.setCustomPostDeployers(deployers);
+
     }
-    
-    FormEngine formEngine = initFormEngine();
-    processEngineConfiguration.setFormEngineInitialized(true);
-    processEngineConfiguration.setFormEngineRepositoryService(formEngine.getFormRepositoryService());
-    processEngineConfiguration.setFormEngineFormService(formEngine.getFormService());
-  }
 
-  protected synchronized FormEngine initFormEngine() {
-    if (formEngineConfiguration == null) {
-      throw new FlowableException("FormEngineConfiguration is required");
+    @Override
+    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        if (formEngineConfiguration == null) {
+            formEngineConfiguration = new StandaloneFormEngineConfiguration();
+
+            if (processEngineConfiguration.getDataSource() != null) {
+                DataSource originalDatasource = processEngineConfiguration.getDataSource();
+                if (processEngineConfiguration.isTransactionsExternallyManaged()) {
+                    formEngineConfiguration.setDataSource(originalDatasource);
+                } else {
+                    formEngineConfiguration.setDataSource(new TransactionContextAwareDataSource(originalDatasource));
+                }
+
+            } else {
+                throw new FlowableException("A datasource is required for initializing the Form engine ");
+            }
+
+            formEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
+            formEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
+            formEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
+            formEngineConfiguration.setDatabaseTablePrefix(processEngineConfiguration.getDatabaseTablePrefix());
+            formEngineConfiguration.setDatabaseWildcardEscapeCharacter(processEngineConfiguration.getDatabaseWildcardEscapeCharacter());
+
+            if (processEngineConfiguration.isTransactionsExternallyManaged()) {
+                formEngineConfiguration.setTransactionsExternallyManaged(true);
+            } else {
+                formEngineConfiguration.setTransactionFactory(
+                        new TransactionContextAwareTransactionFactory<org.flowable.form.engine.impl.cfg.TransactionContext>(
+                                org.flowable.form.engine.impl.cfg.TransactionContext.class));
+            }
+
+        }
+
+        FormEngine formEngine = initFormEngine();
+        processEngineConfiguration.setFormEngineInitialized(true);
+        processEngineConfiguration.setFormEngineRepositoryService(formEngine.getFormRepositoryService());
+        processEngineConfiguration.setFormEngineFormService(formEngine.getFormService());
     }
-    
-    return formEngineConfiguration.buildFormEngine();
-  }
 
-  public FormEngineConfiguration getFormEngineConfiguration() {
-    return formEngineConfiguration;
-  }
+    protected synchronized FormEngine initFormEngine() {
+        if (formEngineConfiguration == null) {
+            throw new FlowableException("FormEngineConfiguration is required");
+        }
 
-  public FormEngineConfigurator setFormEngineConfiguration(FormEngineConfiguration formEngineConfiguration) {
-    this.formEngineConfiguration = formEngineConfiguration;
-    return this;
-  }
+        return formEngineConfiguration.buildFormEngine();
+    }
+
+    public FormEngineConfiguration getFormEngineConfiguration() {
+        return formEngineConfiguration;
+    }
+
+    public FormEngineConfigurator setFormEngineConfiguration(FormEngineConfiguration formEngineConfiguration) {
+        this.formEngineConfiguration = formEngineConfiguration;
+        return this;
+    }
 
 }

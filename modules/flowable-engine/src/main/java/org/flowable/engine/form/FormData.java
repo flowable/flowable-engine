@@ -22,19 +22,19 @@ import java.util.List;
  */
 public interface FormData {
 
-  /**
-   * User defined reference to a form. In the Explorer app, it is assumed that the form key specifies a resource in the deployment which is the template for the form. But users are free to use this
-   * property differently.
-   */
-  String getFormKey();
+    /**
+     * User defined reference to a form. In the Explorer app, it is assumed that the form key specifies a resource in the deployment which is the template for the form. But users are free to use this
+     * property differently.
+     */
+    String getFormKey();
 
-  /**
-   * The deployment id of the process definition to which this form is related
-   * */
-  String getDeploymentId();
+    /**
+     * The deployment id of the process definition to which this form is related
+     */
+    String getDeploymentId();
 
-  /**
-   * Properties containing the dynamic information that needs to be displayed in the form.
-   */
-  List<FormProperty> getFormProperties();
+    /**
+     * Properties containing the dynamic information that needs to be displayed in the form.
+     */
+    List<FormProperty> getFormProperties();
 }

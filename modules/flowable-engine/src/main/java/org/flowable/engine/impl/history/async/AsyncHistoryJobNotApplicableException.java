@@ -16,15 +16,15 @@ import org.flowable.engine.common.api.FlowableException;
 
 public class AsyncHistoryJobNotApplicableException extends FlowableException {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public AsyncHistoryJobNotApplicableException() {
-    this(null);
-  }
-  
-  public AsyncHistoryJobNotApplicableException(String message) {
-    super(message);
-    this.isLogged = false;
-  }
+    public AsyncHistoryJobNotApplicableException() {
+        this(null);
+    }
+
+    public AsyncHistoryJobNotApplicableException(String message) {
+        super(message);
+        this.isLogged = false;
+    }
 
 }

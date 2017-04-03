@@ -17,10 +17,12 @@ import org.flowable.app.security.AjaxAuthenticationSuccessHandler;
 import org.flowable.app.security.AjaxLogoutSuccessHandler;
 import org.flowable.app.security.ClearFlowableCookieLogoutHandler;
 import org.flowable.app.security.CustomDaoAuthenticationProvider;
+import org.flowable.app.security.CustomLdapAuthenticationProvider;
 import org.flowable.app.security.CustomPersistentRememberMeServices;
 import org.flowable.app.security.DefaultPrivileges;
 import org.flowable.app.security.Http401UnauthorizedEntryPoint;
 import org.flowable.app.web.CustomFormLoginConfig;
+import org.flowable.idm.api.IdmIdentityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,150 +48,171 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
  * Based on http://docs.spring.io/spring-security/site/docs/3.2.x/reference/htmlsingle/#multiple-httpsecurity
  * 
  * @author Joram Barrez
+ * @author Tijs Rademakers
  */
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true)
 public class SecurityConfiguration {
-	
-	private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
-	
-  //
-	// GLOBAL CONFIG
-	//
 
-	@Autowired
-	private Environment env;
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
 
-	@Autowired
-	public void configureGlobal(AuthenticationManagerBuilder auth) {
+    //
+    // GLOBAL CONFIG
+    //
+    
+    @Autowired
+    protected IdmIdentityService identityService;
 
-		// Default auth (database backed)
-		try {
-			auth.authenticationProvider(dbAuthenticationProvider());
-		} catch (Exception e) {
-			logger.error("Could not configure authentication mechanism:", e);
-		}
-	}
+    @Autowired
+    protected Environment env;
 
-	@Bean
-	public UserDetailsService userDetailsService() {
-		org.flowable.app.security.UserDetailsService userDetailsService = new org.flowable.app.security.UserDetailsService();
-		userDetailsService.setUserValidityPeriod(env.getProperty("cache.users.recheck.period", Long.class, 30000L));
-		return userDetailsService;
-	}
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) {
 
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return NoOpPasswordEncoder.getInstance();
-	}
-	
-	@Bean(name = "dbAuthenticationProvider")
-	public AuthenticationProvider dbAuthenticationProvider() {
-		CustomDaoAuthenticationProvider daoAuthenticationProvider = new CustomDaoAuthenticationProvider();
-		daoAuthenticationProvider.setUserDetailsService(userDetailsService());
-		daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
-		return daoAuthenticationProvider;
-	}
-	
-	//
-	// REGULAR WEBAP CONFIG
-	//
-	
-	@Configuration
-	@Order(10) // API config first (has Order(1))
+        if (env.getProperty("ldap.enabled", Boolean.class, false)) {
+            // LDAP auth
+            try {
+                auth.authenticationProvider(ldapAuthenticationProvider());
+            } catch (Exception e) {
+                logger.error("Could not configure ldap authentication mechanism:", e);
+            }
+            
+        } else {
+            // Default auth (database backed)
+            try {
+                auth.authenticationProvider(dbAuthenticationProvider());
+            } catch (Exception e) {
+                logger.error("Could not configure authentication mechanism:", e);
+            }
+        }
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        org.flowable.app.security.UserDetailsService userDetailsService = new org.flowable.app.security.UserDetailsService();
+        userDetailsService.setUserValidityPeriod(env.getProperty("cache.users.recheck.period", Long.class, 30000L));
+        return userDetailsService;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
+    }
+
+    @Bean(name = "dbAuthenticationProvider")
+    public AuthenticationProvider dbAuthenticationProvider() {
+        CustomDaoAuthenticationProvider daoAuthenticationProvider = new CustomDaoAuthenticationProvider();
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService());
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        return daoAuthenticationProvider;
+    }
+    
+    @Bean(name = "ldapAuthenticationProvider")
+    public AuthenticationProvider ldapAuthenticationProvider() {
+        CustomLdapAuthenticationProvider ldapAuthenticationProvider = new CustomLdapAuthenticationProvider(
+                userDetailsService(), identityService);
+        return ldapAuthenticationProvider;
+    }
+
+    //
+    // REGULAR WEBAP CONFIG
+    //
+
+    @Configuration
+    @Order(10) // API config first (has Order(1))
     public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
-	    @Autowired
-	    private Environment env;
+        @Autowired
+        private Environment env;
 
-	    @Autowired
-	    private AjaxAuthenticationSuccessHandler ajaxAuthenticationSuccessHandler;
+        @Autowired
+        private AjaxAuthenticationSuccessHandler ajaxAuthenticationSuccessHandler;
 
-	    @Autowired
-	    private AjaxAuthenticationFailureHandler ajaxAuthenticationFailureHandler;
+        @Autowired
+        private AjaxAuthenticationFailureHandler ajaxAuthenticationFailureHandler;
 
-	    @Autowired
-	    private AjaxLogoutSuccessHandler ajaxLogoutSuccessHandler;
-	    
-	    @Autowired
-	    private Http401UnauthorizedEntryPoint authenticationEntryPoint;
-	    
-	    @Override
-	    protected void configure(HttpSecurity http) throws Exception {
-	        http
-	            .exceptionHandling()
-	                .authenticationEntryPoint(authenticationEntryPoint) 
-	                .and()
-	            .sessionManagement()
-	                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-	                .and()
-	            .rememberMe()
-	                .rememberMeServices(rememberMeServices())
-	                .key(env.getProperty("security.rememberme.key"))
-	                .and()
-	            .logout()
-	                .logoutUrl("/app/logout")
-	                .logoutSuccessHandler(ajaxLogoutSuccessHandler)
-	                .addLogoutHandler(new ClearFlowableCookieLogoutHandler())
-	                .permitAll()
-	                .and()
-	            .csrf()
-	                .disable() // Disabled, cause enabling it will cause sessions
-	            .headers()
-	                .frameOptions()
-	                	.sameOrigin()
-	                	.addHeaderWriter(new XXssProtectionHeaderWriter())
-	                .and()
-	            .authorizeRequests()
-	                .antMatchers("/*").permitAll()
-	                .antMatchers("/app/rest/authenticate").permitAll()
-	                .antMatchers("/app/**").hasAuthority(DefaultPrivileges.ACCESS_IDM);
+        @Autowired
+        private AjaxLogoutSuccessHandler ajaxLogoutSuccessHandler;
 
-	        // Custom login form configurer to allow for non-standard HTTP-methods (eg. LOCK)
-	        CustomFormLoginConfig<HttpSecurity> loginConfig = new CustomFormLoginConfig<HttpSecurity>();
-	        loginConfig.loginProcessingUrl("/app/authentication")
-	            .successHandler(ajaxAuthenticationSuccessHandler)
-	            .failureHandler(ajaxAuthenticationFailureHandler)
-	            .usernameParameter("j_username")
-	            .passwordParameter("j_password")
-	            .permitAll();
-	        
-	        http.apply(loginConfig);
-	    }
+        @Autowired
+        private Http401UnauthorizedEntryPoint authenticationEntryPoint;
 
-	    @Bean
-	    public RememberMeServices rememberMeServices() {
-	      return new CustomPersistentRememberMeServices(env, userDetailsService());
-	    }
-	    
-	    @Bean
-	    public RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
-	        return new RememberMeAuthenticationProvider(env.getProperty("security.rememberme.key"));
-	    }
-	}
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http
+                .exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .and()
+                    .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                    .rememberMe()
+                    .rememberMeServices(rememberMeServices())
+                    .key(env.getProperty("security.rememberme.key"))
+                .and()
+                    .logout()
+                    .logoutUrl("/app/logout")
+                    .logoutSuccessHandler(ajaxLogoutSuccessHandler)
+                    .addLogoutHandler(new ClearFlowableCookieLogoutHandler())
+                    .permitAll()
+                .and()
+                    .csrf()
+                    .disable() // Disabled, cause enabling it will cause sessions
+                    .headers()
+                    .frameOptions()
+                    .sameOrigin()
+                    .addHeaderWriter(new XXssProtectionHeaderWriter())
+                .and()
+                    .authorizeRequests()
+                    .antMatchers("/*").permitAll()
+                    .antMatchers("/app/rest/authenticate").permitAll()
+                    .antMatchers("/app/**").hasAuthority(DefaultPrivileges.ACCESS_IDM);
 
-	//
-	// BASIC AUTH
-	//
+            // Custom login form configurer to allow for non-standard HTTP-methods (eg. LOCK)
+            CustomFormLoginConfig<HttpSecurity> loginConfig = new CustomFormLoginConfig<HttpSecurity>();
+            loginConfig.loginProcessingUrl("/app/authentication")
+                    .successHandler(ajaxAuthenticationSuccessHandler)
+                    .failureHandler(ajaxAuthenticationFailureHandler)
+                    .usernameParameter("j_username")
+                    .passwordParameter("j_password")
+                    .permitAll();
 
-	@Configuration
-	@Order(1)
-	public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+            http.apply(loginConfig);
+        }
 
-		protected void configure(HttpSecurity http) throws Exception {
+        @Bean
+        public RememberMeServices rememberMeServices() {
+            return new CustomPersistentRememberMeServices(env, userDetailsService());
+        }
 
-			http
-				.sessionManagement()
-					.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-					.and()
-				.csrf()
-					.disable()
-				.antMatcher("/api" + "/**")
-				.authorizeRequests()
-					.antMatchers("/api" + "/**").authenticated()
-					.and().httpBasic();
-		}
-	}
+        @Bean
+        public RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
+            return new RememberMeAuthenticationProvider(env.getProperty("security.rememberme.key"));
+        }
+    }
+
+    //
+    // BASIC AUTH
+    //
+
+    @Configuration
+    @Order(1)
+    public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+
+        protected void configure(HttpSecurity http) throws Exception {
+
+            http
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                    .csrf()
+                    .disable()
+                    .antMatcher("/api" + "/**")
+                    .authorizeRequests()
+                    .antMatchers("/api" + "/**").authenticated()
+                .and().httpBasic();
+        }
+    }
 
 }

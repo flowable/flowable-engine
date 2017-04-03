@@ -17,7 +17,7 @@ package org.flowable.dmn.engine.impl.cfg;
  */
 public class StandaloneInMemDmnEngineConfiguration extends StandaloneDmnEngineConfiguration {
 
-  public StandaloneInMemDmnEngineConfiguration() {
-    setJdbcUrl("jdbc:h2:mem:flowable");
-  }
+    public StandaloneInMemDmnEngineConfiguration() {
+        setJdbcUrl("jdbc:h2:mem:flowable");
+    }
 }

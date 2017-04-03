@@ -33,10 +33,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
-@ComponentScan(
-    value = {"org.flowable.app.rest.idm", "org.flowable.app.rest.exception"},
-    excludeFilters = @ComponentScan.Filter(type=FilterType.ASSIGNABLE_TYPE, value=RemoteAccountResource.class)
-)
+@ComponentScan(value = { "org.flowable.app.rest.idm", "org.flowable.app.rest.exception" }, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = RemoteAccountResource.class))
 @EnableAsync
 public class AppDispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
@@ -44,7 +41,7 @@ public class AppDispatcherServletConfiguration extends WebMvcConfigurationSuppor
 
     @Autowired
     private ObjectMapper objectMapper;
-    
+
     @Bean
     public SessionLocaleResolver localeResolver() {
         return new SessionLocaleResolver();
@@ -64,15 +61,15 @@ public class AppDispatcherServletConfiguration extends WebMvcConfigurationSuppor
         RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();
         requestMappingHandlerMapping.setUseSuffixPatternMatch(false);
         requestMappingHandlerMapping.setRemoveSemicolonContent(false);
-        Object[] interceptors = {localeChangeInterceptor()};
+        Object[] interceptors = { localeChangeInterceptor() };
         requestMappingHandlerMapping.setInterceptors(interceptors);
         return requestMappingHandlerMapping;
     }
-    
+
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         addDefaultHttpMessageConverters(converters);
-        for (HttpMessageConverter<?> converter: converters) {
+        for (HttpMessageConverter<?> converter : converters) {
             if (converter instanceof MappingJackson2HttpMessageConverter) {
                 MappingJackson2HttpMessageConverter jackson2HttpMessageConverter = (MappingJackson2HttpMessageConverter) converter;
                 jackson2HttpMessageConverter.setObjectMapper(objectMapper);

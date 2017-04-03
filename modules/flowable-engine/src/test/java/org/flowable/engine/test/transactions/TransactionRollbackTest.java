@@ -24,41 +24,41 @@ import org.flowable.engine.test.Deployment;
  */
 public class TransactionRollbackTest extends PluggableFlowableTestCase {
 
-  public static class Buzzz implements ActivityBehavior {
-    
-    private static final long serialVersionUID = 1L;
+    public static class Buzzz implements ActivityBehavior {
 
-    public void execute(DelegateExecution execution) {
-      throw new FlowableException("Buzzz");
-    }
-  }
+        private static final long serialVersionUID = 1L;
 
-  @Deployment
-  public void testRollback() {
-    try {
-      runtimeService.startProcessInstanceByKey("RollbackProcess");
-
-      fail("Starting the process instance should throw an exception");
-
-    } catch (Exception e) {
-      assertEquals("Buzzz", e.getMessage());
+        public void execute(DelegateExecution execution) {
+            throw new FlowableException("Buzzz");
+        }
     }
 
-    assertEquals(0, runtimeService.createExecutionQuery().count());
-  }
+    @Deployment
+    public void testRollback() {
+        try {
+            runtimeService.startProcessInstanceByKey("RollbackProcess");
 
-  @Deployment(resources = { "org/flowable/engine/test/transactions/trivial.bpmn20.xml", "org/flowable/engine/test/transactions/rollbackAfterSubProcess.bpmn20.xml" })
-  public void testRollbackAfterSubProcess() {
-    try {
-      runtimeService.startProcessInstanceByKey("RollbackAfterSubProcess");
+            fail("Starting the process instance should throw an exception");
 
-      fail("Starting the process instance should throw an exception");
+        } catch (Exception e) {
+            assertEquals("Buzzz", e.getMessage());
+        }
 
-    } catch (Exception e) {
-      assertEquals("Buzzz", e.getMessage());
+        assertEquals(0, runtimeService.createExecutionQuery().count());
     }
 
-    assertEquals(0, runtimeService.createExecutionQuery().count());
+    @Deployment(resources = { "org/flowable/engine/test/transactions/trivial.bpmn20.xml", "org/flowable/engine/test/transactions/rollbackAfterSubProcess.bpmn20.xml" })
+    public void testRollbackAfterSubProcess() {
+        try {
+            runtimeService.startProcessInstanceByKey("RollbackAfterSubProcess");
 
-  }
+            fail("Starting the process instance should throw an exception");
+
+        } catch (Exception e) {
+            assertEquals("Buzzz", e.getMessage());
+        }
+
+        assertEquals(0, runtimeService.createExecutionQuery().count());
+
+    }
 }

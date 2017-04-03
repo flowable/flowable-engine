@@ -22,18 +22,18 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
  */
 public class FlowableActivityCancelledEventImpl extends FlowableActivityEventImpl implements FlowableActivityCancelledEvent {
 
-  protected Object cause;
+    protected Object cause;
 
-  public FlowableActivityCancelledEventImpl() {
-    super(FlowableEngineEventType.ACTIVITY_CANCELLED);
-  }
+    public FlowableActivityCancelledEventImpl() {
+        super(FlowableEngineEventType.ACTIVITY_CANCELLED);
+    }
 
-  public void setCause(Object cause) {
-    this.cause = cause;
-  }
+    public void setCause(Object cause) {
+        this.cause = cause;
+    }
 
-  public Object getCause() {
-    return cause;
-  }
+    public Object getCause() {
+        return cause;
+    }
 
 }

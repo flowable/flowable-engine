@@ -20,14 +20,12 @@ import java.util.List;
  */
 public class DmnDefinition extends NamedElement {
 
-    public static final String DMN_1_1 = "http://www.omg.org/spec/DMN/20151130";
+    public static final String DMN_1_1 = "http://www.omg.org/spec/DMN/20151101";
     protected String expressionLanguage;
     protected String typeLanguage;
     protected String namespace;
     protected List<ItemDefinition> itemDefinitions = new ArrayList<ItemDefinition>();
-    protected List<Decision> drgElements = new ArrayList<Decision>();
-    
-    protected DecisionTable currentDecisionTable;
+    protected List<Decision> decisions = new ArrayList<Decision>();
 
     public String getExpressionLanguage() {
         return expressionLanguage;
@@ -61,28 +59,20 @@ public class DmnDefinition extends NamedElement {
         this.itemDefinitions.add(itemDefinition);
     }
 
-    public List<Decision> getDrgElements() {
-        return drgElements;
+    public List<Decision> getDecisions() {
+        return decisions;
     }
 
-    public void addDrgElement(Decision decision) {
-        this.drgElements.add(decision);
+    public void addDecision(Decision decision) {
+        this.decisions.add(decision);
     }
-    
-    public Decision getDrgElementById(String id) {
-        for (Decision decision : drgElements) {
+
+    public Decision getDecisionById(String id) {
+        for (Decision decision : decisions) {
             if (id.equals(decision.getId())) {
                 return decision;
             }
         }
         return null;
-    }
-
-    public DecisionTable getCurrentDecisionTable() {
-        return currentDecisionTable;
-    }
-
-    public void setCurrentDecisionTable(DecisionTable currentDecisionTable) {
-        this.currentDecisionTable = currentDecisionTable;
     }
 }

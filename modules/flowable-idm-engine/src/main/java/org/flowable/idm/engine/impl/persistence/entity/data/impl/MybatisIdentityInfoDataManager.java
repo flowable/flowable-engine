@@ -26,47 +26,47 @@ import org.flowable.idm.engine.impl.persistence.entity.data.IdentityInfoDataMana
  * @author Joram Barrez
  */
 public class MybatisIdentityInfoDataManager extends AbstractDataManager<IdentityInfoEntity> implements IdentityInfoDataManager {
-  
-  public MybatisIdentityInfoDataManager(IdmEngineConfiguration idmEngineConfiguration) {
-    super(idmEngineConfiguration);
-  }
 
-  @Override
-  public Class<? extends IdentityInfoEntity> getManagedEntityClass() {
-    return IdentityInfoEntityImpl.class;
-  }
-  
-  @Override
-  public IdentityInfoEntity create() {
-    return new IdentityInfoEntityImpl();
-  }
-  
-  @Override
-  public List<IdentityInfoEntity> findIdentityInfoDetails(String identityInfoId) {
-    return getDbSqlSession().getSqlSession().selectList("selectIdentityInfoDetails", identityInfoId);
-  }
-  
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<IdentityInfoEntity> findIdentityInfoByUserId(String userId) {
-    return getDbSqlSession().selectList("selectIdentityInfoByUserId", userId);
-  }
-  
-  @Override
-  public IdentityInfoEntity findUserInfoByUserIdAndKey(String userId, String key) {
-    Map<String, String> parameters = new HashMap<String, String>();
-    parameters.put("userId", userId);
-    parameters.put("key", key);
-    return (IdentityInfoEntity) getDbSqlSession().selectOne("selectIdentityInfoByUserIdAndKey", parameters);
-  }
+    public MybatisIdentityInfoDataManager(IdmEngineConfiguration idmEngineConfiguration) {
+        super(idmEngineConfiguration);
+    }
 
-  @Override
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public List<String> findUserInfoKeysByUserIdAndType(String userId, String type) {
-    Map<String, String> parameters = new HashMap<String, String>();
-    parameters.put("userId", userId);
-    parameters.put("type", type);
-    return (List) getDbSqlSession().getSqlSession().selectList("selectIdentityInfoKeysByUserIdAndType", parameters);
-  }
-  
+    @Override
+    public Class<? extends IdentityInfoEntity> getManagedEntityClass() {
+        return IdentityInfoEntityImpl.class;
+    }
+
+    @Override
+    public IdentityInfoEntity create() {
+        return new IdentityInfoEntityImpl();
+    }
+
+    @Override
+    public List<IdentityInfoEntity> findIdentityInfoDetails(String identityInfoId) {
+        return getDbSqlSession().getSqlSession().selectList("selectIdentityInfoDetails", identityInfoId);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<IdentityInfoEntity> findIdentityInfoByUserId(String userId) {
+        return getDbSqlSession().selectList("selectIdentityInfoByUserId", userId);
+    }
+
+    @Override
+    public IdentityInfoEntity findUserInfoByUserIdAndKey(String userId, String key) {
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("userId", userId);
+        parameters.put("key", key);
+        return (IdentityInfoEntity) getDbSqlSession().selectOne("selectIdentityInfoByUserIdAndKey", parameters);
+    }
+
+    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public List<String> findUserInfoKeysByUserIdAndType(String userId, String type) {
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("userId", userId);
+        parameters.put("type", type);
+        return (List) getDbSqlSession().getSqlSession().selectList("selectIdentityInfoKeysByUserIdAndType", parameters);
+    }
+
 }

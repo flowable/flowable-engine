@@ -21,25 +21,25 @@ import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
  */
 public class ErrorEndEventActivityBehavior extends FlowNodeActivityBehavior {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String errorCode;
+    protected String errorCode;
 
-  public ErrorEndEventActivityBehavior(String errorCode) {
-    this.errorCode = errorCode;
-  }
+    public ErrorEndEventActivityBehavior(String errorCode) {
+        this.errorCode = errorCode;
+    }
 
-  @Override
-  public void execute(DelegateExecution execution) {
-    ErrorPropagation.propagateError(errorCode, execution);
-  }
+    @Override
+    public void execute(DelegateExecution execution) {
+        ErrorPropagation.propagateError(errorCode, execution);
+    }
 
-  public String getErrorCode() {
-    return errorCode;
-  }
+    public String getErrorCode() {
+        return errorCode;
+    }
 
-  public void setErrorCode(String errorCode) {
-    this.errorCode = errorCode;
-  }
+    public void setErrorCode(String errorCode) {
+        this.errorCode = errorCode;
+    }
 
 }

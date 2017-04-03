@@ -32,47 +32,47 @@ import org.flowable.form.engine.FormExpression;
  */
 public class JuelExpression implements FormExpression {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected String expressionText;
-  protected ValueExpression valueExpression;
-  protected ExpressionManager expressionManager;
+    private static final long serialVersionUID = 1L;
 
-  public JuelExpression(ValueExpression valueExpression, String expressionText, ExpressionManager expressionManager) {
-    this.valueExpression = valueExpression;
-    this.expressionText = expressionText;
-    this.expressionManager = expressionManager;
-  }
+    protected String expressionText;
+    protected ValueExpression valueExpression;
+    protected ExpressionManager expressionManager;
 
-  public Object getValue(Map<String, Object> variables) {
-    ELContext elContext = expressionManager.createElContext(variables);
-    try {
-      return valueExpression.getValue(elContext);
-      
-    } catch (PropertyNotFoundException pnfe) {
-      throw new FlowableException("Unknown property used in expression: " + expressionText, pnfe);
-    } catch (MethodNotFoundException mnfe) {
-      throw new FlowableException("Unknown method used in expression: " + expressionText, mnfe);
-    } catch (ELException ele) {
-      throw new FlowableException("Error while evaluating expression: " + expressionText, ele);
-    } catch (Exception e) {
-      throw new FlowableException("Error while evaluating expression: " + expressionText, e);
+    public JuelExpression(ValueExpression valueExpression, String expressionText, ExpressionManager expressionManager) {
+        this.valueExpression = valueExpression;
+        this.expressionText = expressionText;
+        this.expressionManager = expressionManager;
     }
-  }
 
-  public void setValue(Object value, Map<String, Object> variables) {
-    // set value is not implemented
-  }
+    public Object getValue(Map<String, Object> variables) {
+        ELContext elContext = expressionManager.createElContext(variables);
+        try {
+            return valueExpression.getValue(elContext);
 
-  @Override
-  public String toString() {
-    if (valueExpression != null) {
-      return valueExpression.getExpressionString();
+        } catch (PropertyNotFoundException pnfe) {
+            throw new FlowableException("Unknown property used in expression: " + expressionText, pnfe);
+        } catch (MethodNotFoundException mnfe) {
+            throw new FlowableException("Unknown method used in expression: " + expressionText, mnfe);
+        } catch (ELException ele) {
+            throw new FlowableException("Error while evaluating expression: " + expressionText, ele);
+        } catch (Exception e) {
+            throw new FlowableException("Error while evaluating expression: " + expressionText, e);
+        }
     }
-    return super.toString();
-  }
 
-  public String getExpressionText() {
-    return expressionText;
-  }
+    public void setValue(Object value, Map<String, Object> variables) {
+        // set value is not implemented
+    }
+
+    @Override
+    public String toString() {
+        if (valueExpression != null) {
+            return valueExpression.getExpressionString();
+        }
+        return super.toString();
+    }
+
+    public String getExpressionText() {
+        return expressionText;
+    }
 }

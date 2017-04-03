@@ -21,49 +21,60 @@ import java.util.TimeZone;
  * @author Joram Barrez
  */
 public class DefaultClockImpl implements org.flowable.engine.common.runtime.Clock {
+    private TimeZone timeZone;
+    protected static volatile Calendar CURRENT_TIME;
 
-  private static volatile Calendar CURRENT_TIME;
-
-  @Override
-  public void setCurrentTime(Date currentTime) {
-    Calendar time = null;
-
-    if (currentTime != null) {
-      time = new GregorianCalendar();
-      time.setTime(currentTime);
+    public DefaultClockImpl() {
     }
 
-    setCurrentCalendar(time);
-  }
+    public DefaultClockImpl(TimeZone timeZone) {
+        this.timeZone = timeZone;
+    }
 
-  @Override
-  public void setCurrentCalendar(Calendar currentTime) {
-    CURRENT_TIME = currentTime;
-  }
+    @Override
+    public void setCurrentTime(Date currentTime) {
+        Calendar time = null;
 
-  @Override
-  public void reset() {
-    CURRENT_TIME = null;
-  }
+        if (currentTime != null) {
+            time = (timeZone == null) ? new GregorianCalendar() : new GregorianCalendar(timeZone);
+            time.setTime(currentTime);
+        }
 
-  @Override
-  public Date getCurrentTime() {
-    return CURRENT_TIME == null ? new Date() : CURRENT_TIME.getTime();
-  }
+        setCurrentCalendar(time);
+    }
 
-  @Override
-  public Calendar getCurrentCalendar() {
-    return CURRENT_TIME == null ? new GregorianCalendar() : (Calendar) CURRENT_TIME.clone();
-  }
+    @Override
+    public void setCurrentCalendar(Calendar currentTime) {
+        CURRENT_TIME = currentTime;
+    }
 
-  @Override
-  public Calendar getCurrentCalendar(TimeZone timeZone) {
-    return TimeZoneUtil.convertToTimeZone(getCurrentCalendar(), timeZone);
-  }
+    @Override
+    public void reset() {
+        CURRENT_TIME = null;
+    }
 
-  @Override
-  public TimeZone getCurrentTimeZone() {
-    return getCurrentCalendar().getTimeZone();
-  }
+    @Override
+    public Date getCurrentTime() {
+        return CURRENT_TIME == null ? new Date() : CURRENT_TIME.getTime();
+    }
+
+    @Override
+    public Calendar getCurrentCalendar() {
+        if (CURRENT_TIME == null) {
+            return (timeZone == null) ? new GregorianCalendar() : new GregorianCalendar(timeZone);
+        }
+
+        return (Calendar) CURRENT_TIME.clone();
+    }
+
+    @Override
+    public Calendar getCurrentCalendar(TimeZone timeZone) {
+        return TimeZoneUtil.convertToTimeZone(getCurrentCalendar(), timeZone);
+    }
+
+    @Override
+    public TimeZone getCurrentTimeZone() {
+        return getCurrentCalendar().getTimeZone();
+    }
 
 }

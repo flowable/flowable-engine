@@ -37,30 +37,30 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RequestMapping("/rest/admin/decision-table-deployments")
 public class DecisionTableDeploymentsClientResource extends AbstractClientResource {
 
-  private static final Logger logger = LoggerFactory.getLogger(DecisionTableDeploymentsClientResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(DecisionTableDeploymentsClientResource.class);
 
-  @Autowired
-  protected DecisionTableDeploymentService clientService;
+    @Autowired
+    protected DecisionTableDeploymentService clientService;
 
-  /**
-   * GET /rest/admin/decision-table-deployments -> get a list of deployments.
-   */
-  @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-  public JsonNode listDeployments(HttpServletRequest request) {
-    logger.debug("REST request to get a list of decision table deployments");
+    /**
+     * GET /rest/admin/decision-table-deployments -> get a list of deployments.
+     */
+    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+    public JsonNode listDeployments(HttpServletRequest request) {
+        logger.debug("REST request to get a list of decision table deployments");
 
-    JsonNode resultNode = null;
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
-    Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
+        JsonNode resultNode = null;
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
+        Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
 
-    try {
-      resultNode = clientService.listDeployments(serverConfig, parameterMap);
+        try {
+            resultNode = clientService.listDeployments(serverConfig, parameterMap);
 
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting deployments", e);
-      throw new BadRequestException(e.getMessage());
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting deployments", e);
+            throw new BadRequestException(e.getMessage());
+        }
+
+        return resultNode;
     }
-
-    return resultNode;
-  }
 }

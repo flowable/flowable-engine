@@ -18,76 +18,76 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
 public class DeadLetterJobEntity extends AbstractJobEntity {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private static Logger log = LoggerFactory.getLogger(DeadLetterJobEntity.class);
-  
-  public DeadLetterJobEntity() {}
+    private static Logger log = LoggerFactory.getLogger(DeadLetterJobEntity.class);
 
-  public DeadLetterJobEntity(AbstractJobEntity te) {
-    this.id = te.getId();
-    this.jobType = te.getJobType();
-    this.revision = te.getRevision();
-    this.jobHandlerConfiguration = te.getJobHandlerConfiguration();
-    this.jobHandlerType = te.getJobHandlerType();
-    this.isExclusive = te.isExclusive();
-    this.duedate = te.getDuedate();
-    this.repeat = te.getRepeat();
-    this.retries = te.getRetries();
-    this.endDate = te.getEndDate();
-    this.executionId = te.getExecutionId();
-    this.processInstanceId = te.getProcessInstanceId();
-    this.processDefinitionId = te.getProcessDefinitionId();
-    this.exceptionMessage = te.getExceptionMessage();
-    setExceptionStacktrace(te.getExceptionStacktrace());
-
-    // Inherit tenant
-    this.tenantId = te.getTenantId();
-  }
-  
-  public void insert() {
-    Context.getCommandContext()
-      .getDbSqlSession()
-      .insert(this);
-    
-    // add link to execution
-    if (executionId != null) {
-      ExecutionEntity execution = Context.getCommandContext()
-        .getExecutionEntityManager()
-        .findExecutionById(executionId);
-      
-      // Inherit tenant if (if applicable)
-      if (execution.getTenantId() != null) {
-        setTenantId(execution.getTenantId());
-      }
+    public DeadLetterJobEntity() {
     }
-    
-    if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-      Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, this));
-      Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, this));
-    }
-  }
-  
-  public void delete() {
-    Context.getCommandContext()
-      .getDbSqlSession()
-      .delete(this);
 
-    // Also delete the job's exception byte array
-    exceptionByteArrayRef.delete();
+    public DeadLetterJobEntity(AbstractJobEntity te) {
+        this.id = te.getId();
+        this.jobType = te.getJobType();
+        this.revision = te.getRevision();
+        this.jobHandlerConfiguration = te.getJobHandlerConfiguration();
+        this.jobHandlerType = te.getJobHandlerType();
+        this.isExclusive = te.isExclusive();
+        this.duedate = te.getDuedate();
+        this.repeat = te.getRepeat();
+        this.retries = te.getRetries();
+        this.endDate = te.getEndDate();
+        this.executionId = te.getExecutionId();
+        this.processInstanceId = te.getProcessInstanceId();
+        this.processDefinitionId = te.getProcessDefinitionId();
+        this.exceptionMessage = te.getExceptionMessage();
+        setExceptionStacktrace(te.getExceptionStacktrace());
 
-    if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-      Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        // Inherit tenant
+        this.tenantId = te.getTenantId();
     }
-  }
+
+    public void insert() {
+        Context.getCommandContext()
+                .getDbSqlSession()
+                .insert(this);
+
+        // add link to execution
+        if (executionId != null) {
+            ExecutionEntity execution = Context.getCommandContext()
+                    .getExecutionEntityManager()
+                    .findExecutionById(executionId);
+
+            // Inherit tenant if (if applicable)
+            if (execution.getTenantId() != null) {
+                setTenantId(execution.getTenantId());
+            }
+        }
+
+        if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, this));
+            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, this));
+        }
+    }
+
+    public void delete() {
+        Context.getCommandContext()
+                .getDbSqlSession()
+                .delete(this);
+
+        // Also delete the job's exception byte array
+        exceptionByteArrayRef.delete();
+
+        if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        }
+    }
 }

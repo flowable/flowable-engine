@@ -24,44 +24,49 @@ import org.flowable.engine.common.api.query.Query;
  */
 public interface GroupQuery extends Query<GroupQuery, Group> {
 
-  /** Only select {@link Group}s with the given id. */
-  GroupQuery groupId(String groupId);
-  
-  /** Only select {@link Group}s with the given ids. */
-  GroupQuery groupIds(List<String> groupIds);
+    /** Only select {@link Group}s with the given id. */
+    GroupQuery groupId(String groupId);
 
-  /** Only select {@link Group}s with the given name. */
-  GroupQuery groupName(String groupName);
+    /** Only select {@link Group}s with the given ids. */
+    GroupQuery groupIds(List<String> groupIds);
 
-  /**
-   * Only select {@link Group}s where the name matches the given parameter. The syntax to use is that of SQL, eg. %test%.
-   */
-  GroupQuery groupNameLike(String groupNameLike);
+    /** Only select {@link Group}s with the given name. */
+    GroupQuery groupName(String groupName);
 
-  /** Only select {@link Group}s which have the given type. */
-  GroupQuery groupType(String groupType);
+    /**
+     * Only select {@link Group}s where the name matches the given parameter. The syntax to use is that of SQL, eg. %test%.
+     */
+    GroupQuery groupNameLike(String groupNameLike);
 
-  /** Only selects {@link Group}s where the given user is a member of. */
-  GroupQuery groupMember(String groupMemberUserId);
-  
-  /** Only selects {@link Group}s where the given users are a member of. */
-  GroupQuery groupMembers(List<String> groupMemberUserIds);
+    /**
+     * Only select {@link Group}s where the name matches the given parameter (ignoring case). The syntax to use is that of SQL, eg. %test%.
+     */
+    GroupQuery groupNameLikeIgnoreCase(String groupNameLikeIgnoreCase);
 
-  // sorting ////////////////////////////////////////////////////////
+    /** Only select {@link Group}s which have the given type. */
+    GroupQuery groupType(String groupType);
 
-  /**
-   * Order by group id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  GroupQuery orderByGroupId();
+    /** Only selects {@link Group}s where the given user is a member of. */
+    GroupQuery groupMember(String groupMemberUserId);
 
-  /**
-   * Order by group name (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  GroupQuery orderByGroupName();
+    /** Only selects {@link Group}s where the given users are a member of. */
+    GroupQuery groupMembers(List<String> groupMemberUserIds);
 
-  /**
-   * Order by group type (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  GroupQuery orderByGroupType();
+    // sorting ////////////////////////////////////////////////////////
+
+    /**
+     * Order by group id (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    GroupQuery orderByGroupId();
+
+    /**
+     * Order by group name (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    GroupQuery orderByGroupName();
+
+    /**
+     * Order by group type (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    GroupQuery orderByGroupType();
 
 }

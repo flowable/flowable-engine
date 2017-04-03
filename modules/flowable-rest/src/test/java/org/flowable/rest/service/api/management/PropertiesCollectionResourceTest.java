@@ -18,26 +18,26 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class PropertiesCollectionResourceTest extends BaseSpringRestTestCase {
 
-  /**
-   * Test getting the engine properties.
-   */
-  public void testGetProperties() throws Exception {
-    CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROPERTIES_COLLECTION)), HttpStatus.SC_OK);
+    /**
+     * Test getting the engine properties.
+     */
+    public void testGetProperties() throws Exception {
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROPERTIES_COLLECTION)), HttpStatus.SC_OK);
 
-    Map<String, String> properties = managementService.getProperties();
+        Map<String, String> properties = managementService.getProperties();
 
-    JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-    closeResponse(response);
-    assertNotNull(responseNode);
-    assertEquals(properties.size(), responseNode.size());
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertNotNull(responseNode);
+        assertEquals(properties.size(), responseNode.size());
 
-    Iterator<Map.Entry<String, JsonNode>> nodes = responseNode.fields();
-    Map.Entry<String, JsonNode> node = null;
-    while (nodes.hasNext()) {
-      node = nodes.next();
-      String propValue = properties.get(node.getKey());
-      assertNotNull(propValue);
-      assertEquals(propValue, node.getValue().textValue());
+        Iterator<Map.Entry<String, JsonNode>> nodes = responseNode.fields();
+        Map.Entry<String, JsonNode> node = null;
+        while (nodes.hasNext()) {
+            node = nodes.next();
+            String propValue = properties.get(node.getKey());
+            assertNotNull(propValue);
+            assertEquals(propValue, node.getValue().textValue());
+        }
     }
-  }
 }

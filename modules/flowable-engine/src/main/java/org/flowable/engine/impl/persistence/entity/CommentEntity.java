@@ -13,8 +13,6 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
-import java.util.Date;
-
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
@@ -24,30 +22,18 @@ import org.flowable.engine.task.Event;
  * @author Joram Barrez
  */
 public interface CommentEntity extends Comment, Event, Entity {
-  
-  String TYPE_EVENT = "event";
-  String TYPE_COMMENT = "comment";
 
-  byte[] getFullMessageBytes();
+    String TYPE_EVENT = "event";
+    String TYPE_COMMENT = "comment";
 
-  void setFullMessageBytes(byte[] fullMessageBytes);
+    byte[] getFullMessageBytes();
 
-  void setMessage(String[] messageParts);
+    void setFullMessageBytes(byte[] fullMessageBytes);
 
-  void setUserId(String userId);
+    void setMessage(String[] messageParts);
 
-  void setTaskId(String taskId);
+    void setMessage(String message);
 
-  void setMessage(String message);
+    void setAction(String action);
 
-  void setTime(Date time);
-
-  void setProcessInstanceId(String processInstanceId);
-
-  void setType(String type);
-
-  void setFullMessage(String fullMessage);
-
-  void setAction(String action);
-    
 }

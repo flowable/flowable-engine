@@ -26,150 +26,148 @@ import org.flowable.bpmn.model.FlowElement;
  */
 public interface DelegateExecution extends VariableScope {
 
-  /**
-   * Unique id of this path of execution that can be used as a handle to provide external signals back into the engine after wait states.
-   */
-  String getId();
+    /**
+     * Unique id of this path of execution that can be used as a handle to provide external signals back into the engine after wait states.
+     */
+    String getId();
 
-  /** Reference to the overall process instance */
-  String getProcessInstanceId();
-  
-  /**
-   * The 'root' process instance. When using call activity for example, the processInstance
-   * set will not always be the root. This method returns the topmost process instance.
-   */
-  String getRootProcessInstanceId();
+    /** Reference to the overall process instance */
+    String getProcessInstanceId();
 
-  /**
-   * Will contain the event name in case this execution is passed in for an {@link ExecutionListener}.
-   */
-  String getEventName();
-  
-  /**
-   * Sets the current event (typically when execution an {@link ExecutionListener}). 
-   */
-  void setEventName(String eventName);
+    /**
+     * The 'root' process instance. When using call activity for example, the processInstance set will not always be the root. This method returns the topmost process instance.
+     */
+    String getRootProcessInstanceId();
 
-  /**
-   * The business key for the process instance this execution is associated with.
-   */
-  String getProcessInstanceBusinessKey();
+    /**
+     * Will contain the event name in case this execution is passed in for an {@link ExecutionListener}.
+     */
+    String getEventName();
 
-  /**
-   * The process definition key for the process instance this execution is associated with.
-   */
-  String getProcessDefinitionId();
+    /**
+     * Sets the current event (typically when execution an {@link ExecutionListener}).
+     */
+    void setEventName(String eventName);
 
-  /**
-   * Gets the id of the parent of this execution. If null, the execution represents a process-instance.
-   */
-  String getParentId();
+    /**
+     * The business key for the process instance this execution is associated with.
+     */
+    String getProcessInstanceBusinessKey();
 
-  /**
-   * Gets the id of the calling execution. If not null, the execution is part of a subprocess.
-   */
-  String getSuperExecutionId();
+    /**
+     * The process definition key for the process instance this execution is associated with.
+     */
+    String getProcessDefinitionId();
 
-  /**
-   * Gets the id of the current activity.
-   */
-  String getCurrentActivityId();
+    /**
+     * Gets the id of the parent of this execution. If null, the execution represents a process-instance.
+     */
+    String getParentId();
 
-  /**
-   * Returns the tenant id, if any is set before on the process definition or process instance.
-   */
-  String getTenantId();
-  
-  /**
-   * The BPMN element where the execution currently is at. 
-   */
-  FlowElement getCurrentFlowElement();
+    /**
+     * Gets the id of the calling execution. If not null, the execution is part of a subprocess.
+     */
+    String getSuperExecutionId();
 
-  /**
-   * Change the current BPMN element the execution is at. 
-   */
-  void setCurrentFlowElement(FlowElement flowElement);
-  
-  /**
-   * Returns the {@link FlowableListener} instance matching an {@link ExecutionListener}
-   * if currently an execution listener is being execution. 
-   * Returns null otherwise.
-   */
-  FlowableListener getCurrentFlowableListener();
+    /**
+     * Gets the id of the current activity.
+     */
+    String getCurrentActivityId();
 
-  /**
-   * Called when an {@link ExecutionListener} is being executed. 
-   */
-  void setCurrentFlowableListener(FlowableListener currentListener);
+    /**
+     * Returns the tenant id, if any is set before on the process definition or process instance.
+     */
+    String getTenantId();
 
-  /* Execution management */
+    /**
+     * The BPMN element where the execution currently is at.
+     */
+    FlowElement getCurrentFlowElement();
 
-  /**
-   * returns the parent of this execution, or null if there no parent.
-   */
-  DelegateExecution getParent();
+    /**
+     * Change the current BPMN element the execution is at.
+     */
+    void setCurrentFlowElement(FlowElement flowElement);
 
-  /**
-   * returns the list of execution of which this execution the parent of.
-   */
-  List<? extends DelegateExecution> getExecutions();
+    /**
+     * Returns the {@link FlowableListener} instance matching an {@link ExecutionListener} if currently an execution listener is being execution. Returns null otherwise.
+     */
+    FlowableListener getCurrentFlowableListener();
 
-  /* State management */
+    /**
+     * Called when an {@link ExecutionListener} is being executed.
+     */
+    void setCurrentFlowableListener(FlowableListener currentListener);
 
-  /**
-   * makes this execution active or inactive.
-   */
-  void setActive(boolean isActive);
+    /* Execution management */
 
-  /**
-   * returns whether this execution is currently active.
-   */
-  boolean isActive();
+    /**
+     * returns the parent of this execution, or null if there no parent.
+     */
+    DelegateExecution getParent();
 
-  /**
-   * returns whether this execution has ended or not.
-   */
-  boolean isEnded();
+    /**
+     * returns the list of execution of which this execution the parent of.
+     */
+    List<? extends DelegateExecution> getExecutions();
 
-  /**
-   * changes the concurrent indicator on this execution.
-   */
-  void setConcurrent(boolean isConcurrent);
+    /* State management */
 
-  /**
-   * returns whether this execution is concurrent or not.
-   */
-  boolean isConcurrent();
+    /**
+     * makes this execution active or inactive.
+     */
+    void setActive(boolean isActive);
 
-  /**
-   * returns whether this execution is a process instance or not.
-   */
-  boolean isProcessInstanceType();
+    /**
+     * returns whether this execution is currently active.
+     */
+    boolean isActive();
 
-  /**
-   * Inactivates this execution. This is useful for example in a join: the execution still exists, but it is not longer active.
-   */
-  void inactivate();
+    /**
+     * returns whether this execution has ended or not.
+     */
+    boolean isEnded();
 
-  /**
-   * Returns whether this execution is a scope.
-   */
-  boolean isScope();
+    /**
+     * changes the concurrent indicator on this execution.
+     */
+    void setConcurrent(boolean isConcurrent);
 
-  /**
-   * Changes whether this execution is a scope or not.
-   */
-  void setScope(boolean isScope);
-  
-  /**
-   * Returns whether this execution is the root of a multi instance execution.
-   */
-  boolean isMultiInstanceRoot();
-  
-  /**
-   * Changes whether this execution is a multi instance root or not.
-   * @param isMultiInstanceRoot
-   */
-  void setMultiInstanceRoot(boolean isMultiInstanceRoot);
+    /**
+     * returns whether this execution is concurrent or not.
+     */
+    boolean isConcurrent();
+
+    /**
+     * returns whether this execution is a process instance or not.
+     */
+    boolean isProcessInstanceType();
+
+    /**
+     * Inactivates this execution. This is useful for example in a join: the execution still exists, but it is not longer active.
+     */
+    void inactivate();
+
+    /**
+     * Returns whether this execution is a scope.
+     */
+    boolean isScope();
+
+    /**
+     * Changes whether this execution is a scope or not.
+     */
+    void setScope(boolean isScope);
+
+    /**
+     * Returns whether this execution is the root of a multi instance execution.
+     */
+    boolean isMultiInstanceRoot();
+
+    /**
+     * Changes whether this execution is a multi instance root or not.
+     * 
+     * @param isMultiInstanceRoot
+     */
+    void setMultiInstanceRoot(boolean isMultiInstanceRoot);
 
 }

@@ -26,74 +26,78 @@ import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntit
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTransformer {
-  
-  protected String getStringFromJson(ObjectNode objectNode, String fieldName) {
-    if (objectNode.has(fieldName)) {
-      return objectNode.get(fieldName).asText();
+
+    protected String getStringFromJson(ObjectNode objectNode, String fieldName) {
+        if (objectNode.has(fieldName)) {
+            return objectNode.get(fieldName).asText();
+        }
+        return null;
     }
-    return null;
-  }
-  
-  protected Date getDateFromJson(ObjectNode objectNode, String fieldName) {
-    String s = getStringFromJson(objectNode, fieldName);
-    return AsyncHistoryDateUtil.parseDate(s);
-  }
-  
-  protected Integer getIntegerFromJson(ObjectNode objectNode, String fieldName) {
-    String s = getStringFromJson(objectNode, fieldName);
-    if (StringUtils.isNotEmpty(s)) {
-      return Integer.valueOf(s);
+
+    protected Date getDateFromJson(ObjectNode objectNode, String fieldName) {
+        String s = getStringFromJson(objectNode, fieldName);
+        return AsyncHistoryDateUtil.parseDate(s);
     }
-    return 0;
-  }
-  
-  protected void dispatchEvent(CommandContext commandContext, FlowableEvent event) {;
-    FlowableEventDispatcher eventDispatcher =  commandContext.getProcessEngineConfiguration().getEventDispatcher();
-    if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-      eventDispatcher.dispatchEvent(event);
+
+    protected Integer getIntegerFromJson(ObjectNode objectNode, String fieldName) {
+        String s = getStringFromJson(objectNode, fieldName);
+        if (StringUtils.isNotEmpty(s)) {
+            return Integer.valueOf(s);
+        }
+        return 0;
     }
-  }
-  
-  public boolean historicActivityInstanceExistsForData(ObjectNode historicalData, CommandContext commandContext) {
-    String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
-    if (StringUtils.isNotEmpty(executionId)) {
-      String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
-      if (StringUtils.isNotEmpty(activityId)) {
-        HistoricActivityInstanceEntity historicActivityInstanceEntity = findUnfinishedHistoricActivityInstance(commandContext, executionId, activityId);
-        return historicActivityInstanceEntity != null;
-      }
+
+    protected void dispatchEvent(CommandContext commandContext, FlowableEvent event) {
+        ;
+        FlowableEventDispatcher eventDispatcher = commandContext.getProcessEngineConfiguration().getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(event);
+        }
     }
-    return false;
-  }
-  
-  protected HistoricActivityInstanceEntity findUnfinishedHistoricActivityInstance(CommandContext commandContext, String executionId, String activityId) {
-    if (executionId == null || activityId == null) {
-      return null;
+
+    public boolean historicActivityInstanceExistsForData(ObjectNode historicalData, CommandContext commandContext) {
+        String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
+        if (StringUtils.isNotEmpty(executionId)) {
+            String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
+            
+            if (StringUtils.isNotEmpty(activityId)) {
+                HistoricActivityInstanceEntity historicActivityInstanceEntity = findUnfinishedHistoricActivityInstance(commandContext, executionId, activityId);
+                return historicActivityInstanceEntity != null;
+            }
+        }
+        return false;
     }
-    
-    HistoricActivityInstanceEntity historicActivityInstanceEntity = getUnfinishedHistoricActivityInstanceFromCache(commandContext, executionId, activityId);
-    if (historicActivityInstanceEntity == null) {
-      List<HistoricActivityInstanceEntity> historicActivityInstances = commandContext.getHistoricActivityInstanceEntityManager()
-        .findUnfinishedHistoricActivityInstancesByExecutionAndActivityId(executionId, activityId);
-      if (!historicActivityInstances.isEmpty()) {
-        historicActivityInstanceEntity = historicActivityInstances.get(0);
-      }
+
+    protected HistoricActivityInstanceEntity findUnfinishedHistoricActivityInstance(CommandContext commandContext, String executionId, String activityId) {
+        if (executionId == null || activityId == null) {
+            return null;
+        }
+
+        HistoricActivityInstanceEntity historicActivityInstanceEntity = getUnfinishedHistoricActivityInstanceFromCache(commandContext, executionId, activityId);
+        if (historicActivityInstanceEntity == null) {
+            List<HistoricActivityInstanceEntity> historicActivityInstances = commandContext.getHistoricActivityInstanceEntityManager()
+                            .findUnfinishedHistoricActivityInstancesByExecutionAndActivityId(executionId, activityId);
+            if (!historicActivityInstances.isEmpty()) {
+                historicActivityInstanceEntity = historicActivityInstances.get(0);
+            }
+        }
+        return historicActivityInstanceEntity;
     }
-    return historicActivityInstanceEntity;
-  }
-  
-  protected HistoricActivityInstanceEntity getUnfinishedHistoricActivityInstanceFromCache(CommandContext commandContext, 
-      String executionId, String activityId) {
-    List<HistoricActivityInstanceEntity> cachedHistoricActivityInstances = commandContext.getEntityCache().findInCache(HistoricActivityInstanceEntity.class);
-    for (HistoricActivityInstanceEntity cachedHistoricActivityInstance : cachedHistoricActivityInstances) {
-      if (activityId != null 
-          && activityId.equals(cachedHistoricActivityInstance.getActivityId()) 
-          && cachedHistoricActivityInstance.getEndTime() == null
-          && executionId.equals(cachedHistoricActivityInstance.getExecutionId())) {
-        return cachedHistoricActivityInstance;
-      }
+
+    protected HistoricActivityInstanceEntity getUnfinishedHistoricActivityInstanceFromCache(CommandContext commandContext,
+                    String executionId, String activityId) {
+        
+        List<HistoricActivityInstanceEntity> cachedHistoricActivityInstances = commandContext.getEntityCache().findInCache(HistoricActivityInstanceEntity.class);
+        for (HistoricActivityInstanceEntity cachedHistoricActivityInstance : cachedHistoricActivityInstances) {
+            if (activityId != null
+                            && activityId.equals(cachedHistoricActivityInstance.getActivityId())
+                            && cachedHistoricActivityInstance.getEndTime() == null
+                            && executionId.equals(cachedHistoricActivityInstance.getExecutionId())) {
+                
+                return cachedHistoricActivityInstance;
+            }
+        }
+        return null;
     }
-    return null;
-  }
-  
+
 }

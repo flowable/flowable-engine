@@ -24,30 +24,30 @@ import org.flowable.engine.impl.context.Context;
  * @author Joram Barrez
  */
 public class DelegateExpressionUtil {
-  
-  public static Object resolveDelegateExpression(Expression expression, VariableScope variableScope) {
-    return resolveDelegateExpression(expression, variableScope, null);
-  }
-  
-  public static Object resolveDelegateExpression(Expression expression, 
-      VariableScope variableScope, List<FieldDeclaration> fieldDeclarations) {
-    
-    // Note: we can't cache the result of the expression, because the
-    // execution can change: eg. delegateExpression='${mySpringBeanFactory.randomSpringBean()}'
-    Object delegate = expression.getValue(variableScope);
-    
-    if (fieldDeclarations != null && fieldDeclarations.size() > 0) {
-      
-      DelegateExpressionFieldInjectionMode injectionMode = Context.getProcessEngineConfiguration().getDelegateExpressionFieldInjectionMode();
-      if (injectionMode == DelegateExpressionFieldInjectionMode.COMPATIBILITY) {
-        ClassDelegate.applyFieldDeclaration(fieldDeclarations, delegate, true);
-      } else if (injectionMode == DelegateExpressionFieldInjectionMode.MIXED) {
-        ClassDelegate.applyFieldDeclaration(fieldDeclarations, delegate, false);
-      }
-      
+
+    public static Object resolveDelegateExpression(Expression expression, VariableScope variableScope) {
+        return resolveDelegateExpression(expression, variableScope, null);
     }
-    
-    return delegate;
-  }
+
+    public static Object resolveDelegateExpression(Expression expression,
+            VariableScope variableScope, List<FieldDeclaration> fieldDeclarations) {
+
+        // Note: we can't cache the result of the expression, because the
+        // execution can change: eg. delegateExpression='${mySpringBeanFactory.randomSpringBean()}'
+        Object delegate = expression.getValue(variableScope);
+
+        if (fieldDeclarations != null && fieldDeclarations.size() > 0) {
+
+            DelegateExpressionFieldInjectionMode injectionMode = Context.getProcessEngineConfiguration().getDelegateExpressionFieldInjectionMode();
+            if (injectionMode == DelegateExpressionFieldInjectionMode.COMPATIBILITY) {
+                ClassDelegate.applyFieldDeclaration(fieldDeclarations, delegate, true);
+            } else if (injectionMode == DelegateExpressionFieldInjectionMode.MIXED) {
+                ClassDelegate.applyFieldDeclaration(fieldDeclarations, delegate, false);
+            }
+
+        }
+
+        return delegate;
+    }
 
 }

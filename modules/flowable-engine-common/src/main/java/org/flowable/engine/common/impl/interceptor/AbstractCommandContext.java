@@ -28,237 +28,236 @@ import org.slf4j.LoggerFactory;
  */
 public class AbstractCommandContext {
 
-  private static Logger log = LoggerFactory.getLogger(AbstractCommandContext.class);
+    private static Logger log = LoggerFactory.getLogger(AbstractCommandContext.class);
 
-  protected BaseCommand<?, ? extends AbstractCommandContext> command;
-  protected Map<Class<?>, SessionFactory> sessionFactories;
-  protected Map<Class<?>, Session> sessions = new HashMap<Class<?>, Session>();
-  protected Throwable exception;
-  protected List<BaseCommandContextCloseListener<AbstractCommandContext>> closeListeners;
-  protected Map<String, Object> attributes; // General-purpose storing of anything during the lifetime of a command context
-  protected boolean reused;
+    protected BaseCommand<?, ? extends AbstractCommandContext> command;
+    protected Map<Class<?>, SessionFactory> sessionFactories;
+    protected Map<Class<?>, Session> sessions = new HashMap<Class<?>, Session>();
+    protected Throwable exception;
+    protected List<BaseCommandContextCloseListener<AbstractCommandContext>> closeListeners;
+    protected Map<String, Object> attributes; // General-purpose storing of anything during the lifetime of a command context
+    protected boolean reused;
 
-  public AbstractCommandContext(BaseCommand<?, ? extends AbstractCommandContext> command) {
-    this.command = command;
-  }
+    public AbstractCommandContext(BaseCommand<?, ? extends AbstractCommandContext> command) {
+        this.command = command;
+    }
 
-  public void close() {
-    
-    // The intention of this method is that all resources are closed properly, even if exceptions occur
-    // in close or flush methods of the sessions or the transaction context.
+    public void close() {
 
-    try {
-      try {
+        // The intention of this method is that all resources are closed properly, even if exceptions occur
+        // in close or flush methods of the sessions or the transaction context.
+
         try {
-          executeCloseListenersClosing();
-          if (exception == null) {
-            flushSessions();
-          }
-        } catch (Throwable exception) {
-          exception(exception);
-          
-        } finally {
-          
-          try {
-            if (exception == null) {
-              executeCloseListenersAfterSessionFlushed();
+            try {
+                try {
+                    executeCloseListenersClosing();
+                    if (exception == null) {
+                        flushSessions();
+                    }
+                } catch (Throwable exception) {
+                    exception(exception);
+
+                } finally {
+
+                    try {
+                        if (exception == null) {
+                            executeCloseListenersAfterSessionFlushed();
+                        }
+                    } catch (Throwable exception) {
+                        exception(exception);
+                    }
+
+                    if (exception != null) {
+                        logException();
+                        executeCloseListenersCloseFailure();
+                    } else {
+                        executeCloseListenersClosed();
+                    }
+
+                }
+            } catch (Throwable exception) {
+                // Catch exceptions during rollback
+                exception(exception);
+            } finally {
+                // Sessions need to be closed, regardless of exceptions/commit/rollback
+                closeSessions();
             }
-          } catch (Throwable exception) {
+        } catch (Throwable exception) {
+            // Catch exceptions during session closing
             exception(exception);
-          }
-          
-          if (exception != null) {
-            logException();
-            executeCloseListenersCloseFailure();
-          } else {
-            executeCloseListenersClosed();
-          }
-          
         }
-      } catch (Throwable exception) {
-        // Catch exceptions during rollback
-        exception(exception);
-      } finally {
-        // Sessions need to be closed, regardless of exceptions/commit/rollback
-        closeSessions();
-      }
-    } catch (Throwable exception) {
-      // Catch exceptions during session closing
-      exception(exception);
-    }
-    
-    if (exception != null) {
-      rethrowExceptionIfNeeded();
-    }
-  }
 
-  protected void logException() {
-    if (exception instanceof FlowableException && !((FlowableException)exception).isLogged()) {
-      return;
-    }
-    
-    if (exception instanceof FlowableOptimisticLockingException) {
-      // reduce log level, as normally we're not interested in logging this exception
-      log.debug("Optimistic locking exception : {}", exception.getMessage(), exception);
-    } else {
-      log.error("Error while closing command context", exception);
-    }
-  }
-
-  protected void rethrowExceptionIfNeeded() throws Error {
-    if (exception instanceof Error) {
-      throw (Error) exception;
-    } else if (exception instanceof RuntimeException) {
-      throw (RuntimeException) exception;
-    } else {
-      throw new FlowableException("exception while executing command " + command, exception);
-    }
-  }
-
-  public void addCloseListener(BaseCommandContextCloseListener<AbstractCommandContext> commandContextCloseListener) {
-    if (closeListeners == null) {
-      closeListeners = new ArrayList<BaseCommandContextCloseListener<AbstractCommandContext>>(1);
-    }
-    closeListeners.add(commandContextCloseListener);
-  }
-
-  public List<BaseCommandContextCloseListener<AbstractCommandContext>> getCloseListeners() {
-    return closeListeners;
-  }
-  
-  protected void executeCloseListenersClosing() {
-    if (closeListeners != null) {
-      try {
-        for (BaseCommandContextCloseListener<AbstractCommandContext> listener : closeListeners) {
-          listener.closing(this);
+        if (exception != null) {
+            rethrowExceptionIfNeeded();
         }
-      } catch (Throwable exception) {
-        exception(exception);
-      }
     }
-  }
-  
-  protected void executeCloseListenersAfterSessionFlushed() {
-    if (closeListeners != null) {
-      try {
-        for (BaseCommandContextCloseListener<AbstractCommandContext> listener : closeListeners) {
-          listener.afterSessionsFlush(this);
+
+    protected void logException() {
+        if (exception instanceof FlowableException && !((FlowableException) exception).isLogged()) {
+            return;
         }
-      } catch (Throwable exception) {
-        exception(exception);
-      }
-    }
-  }
-  
-  protected void executeCloseListenersClosed() {
-    if (closeListeners != null) {
-      try {
-        for (BaseCommandContextCloseListener<AbstractCommandContext> listener : closeListeners) {
-          listener.closed(this);
+        
+        if (exception instanceof FlowableOptimisticLockingException) {
+            // reduce log level, as normally we're not interested in logging this exception
+            log.debug("Optimistic locking exception : {}", exception.getMessage(), exception);
+        } else {
+            log.error("Error while closing command context", exception);
         }
-      } catch (Throwable exception) {
-        exception(exception);
-      }
     }
-  }
-  
-  protected void executeCloseListenersCloseFailure() {
-    if (closeListeners != null) {
-      try {
-        for (BaseCommandContextCloseListener<AbstractCommandContext> listener : closeListeners) {
-          listener.closeFailure(this);
+
+    protected void rethrowExceptionIfNeeded() throws Error {
+        if (exception instanceof Error) {
+            throw (Error) exception;
+        } else if (exception instanceof RuntimeException) {
+            throw (RuntimeException) exception;
+        } else {
+            throw new FlowableException("exception while executing command " + command, exception);
         }
-      } catch (Throwable exception) {
-        exception(exception);
-      }
-    }
-  }
-
-  protected void flushSessions() {
-    for (Session session : sessions.values()) {
-      session.flush();
-    }
-  }
-
-  protected void closeSessions() {
-    for (Session session : sessions.values()) {
-      try {
-        session.close();
-      } catch (Throwable exception) {
-        exception(exception);
-      }
-    }
-  }
-
-  /**
-   * Stores the provided exception on this {@link AbstractCommandContext} instance.
-   * That exception will be rethrown at the end of closing the {@link AbstractCommandContext} instance. 
-   * 
-   * If there is already an exception being stored, a 'masked exception' message will be logged.
-   */
-  public void exception(Throwable exception) {
-    if (this.exception == null) {
-      this.exception = exception;
-
-    } else {
-      log.error("masked exception in command context. for root cause, see below as it will be rethrown later.", exception);
-    }
-  }
-
-  public void addAttribute(String key, Object value) {
-    if (attributes == null) {
-      attributes = new HashMap<String, Object>(1);
-    }
-    attributes.put(key, value);
-  }
-
-  public Object getAttribute(String key) {
-    if (attributes != null) {
-      return attributes.get(key);
-    }
-    return null;
-  }
-
-  @SuppressWarnings({ "unchecked" })
-  public <T> T getSession(Class<T> sessionClass) {
-    Session session = sessions.get(sessionClass);
-    if (session == null) {
-      SessionFactory sessionFactory = sessionFactories.get(sessionClass);
-      if (sessionFactory == null) {
-        throw new FlowableException("no session factory configured for " + sessionClass.getName());
-      }
-      session = sessionFactory.openSession(this);
-      sessions.put(sessionClass, session);
     }
 
-    return (T) session;
-  }
+    public void addCloseListener(BaseCommandContextCloseListener<AbstractCommandContext> commandContextCloseListener) {
+        if (closeListeners == null) {
+            closeListeners = new ArrayList<BaseCommandContextCloseListener<AbstractCommandContext>>(1);
+        }
+        closeListeners.add(commandContextCloseListener);
+    }
 
-  public Map<Class<?>, SessionFactory> getSessionFactories() {
-    return sessionFactories;
-  }
+    public List<BaseCommandContextCloseListener<AbstractCommandContext>> getCloseListeners() {
+        return closeListeners;
+    }
 
-  // getters and setters
-  // //////////////////////////////////////////////////////
+    protected void executeCloseListenersClosing() {
+        if (closeListeners != null) {
+            try {
+                for (BaseCommandContextCloseListener<AbstractCommandContext> listener : closeListeners) {
+                    listener.closing(this);
+                }
+            } catch (Throwable exception) {
+                exception(exception);
+            }
+        }
+    }
 
-  public BaseCommand<?, ? extends AbstractCommandContext> getCommand() {
-    return command;
-  }
+    protected void executeCloseListenersAfterSessionFlushed() {
+        if (closeListeners != null) {
+            try {
+                for (BaseCommandContextCloseListener<AbstractCommandContext> listener : closeListeners) {
+                    listener.afterSessionsFlush(this);
+                }
+            } catch (Throwable exception) {
+                exception(exception);
+            }
+        }
+    }
 
-  public Map<Class<?>, Session> getSessions() {
-    return sessions;
-  }
+    protected void executeCloseListenersClosed() {
+        if (closeListeners != null) {
+            try {
+                for (BaseCommandContextCloseListener<AbstractCommandContext> listener : closeListeners) {
+                    listener.closed(this);
+                }
+            } catch (Throwable exception) {
+                exception(exception);
+            }
+        }
+    }
 
-  public Throwable getException() {
-    return exception;
-  }
+    protected void executeCloseListenersCloseFailure() {
+        if (closeListeners != null) {
+            try {
+                for (BaseCommandContextCloseListener<AbstractCommandContext> listener : closeListeners) {
+                    listener.closeFailure(this);
+                }
+            } catch (Throwable exception) {
+                exception(exception);
+            }
+        }
+    }
 
-  public boolean isReused() {
-    return reused;
-  }
+    protected void flushSessions() {
+        for (Session session : sessions.values()) {
+            session.flush();
+        }
+    }
 
-  public void setReused(boolean reused) {
-    this.reused = reused;
-  }
-  
+    protected void closeSessions() {
+        for (Session session : sessions.values()) {
+            try {
+                session.close();
+            } catch (Throwable exception) {
+                exception(exception);
+            }
+        }
+    }
+
+    /**
+     * Stores the provided exception on this {@link AbstractCommandContext} instance. That exception will be rethrown at the end of closing the {@link AbstractCommandContext} instance.
+     * 
+     * If there is already an exception being stored, a 'masked exception' message will be logged.
+     */
+    public void exception(Throwable exception) {
+        if (this.exception == null) {
+            this.exception = exception;
+
+        } else {
+            log.error("masked exception in command context. for root cause, see below as it will be rethrown later.", exception);
+        }
+    }
+
+    public void addAttribute(String key, Object value) {
+        if (attributes == null) {
+            attributes = new HashMap<String, Object>(1);
+        }
+        attributes.put(key, value);
+    }
+
+    public Object getAttribute(String key) {
+        if (attributes != null) {
+            return attributes.get(key);
+        }
+        return null;
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    public <T> T getSession(Class<T> sessionClass) {
+        Session session = sessions.get(sessionClass);
+        if (session == null) {
+            SessionFactory sessionFactory = sessionFactories.get(sessionClass);
+            if (sessionFactory == null) {
+                throw new FlowableException("no session factory configured for " + sessionClass.getName());
+            }
+            session = sessionFactory.openSession(this);
+            sessions.put(sessionClass, session);
+        }
+
+        return (T) session;
+    }
+
+    public Map<Class<?>, SessionFactory> getSessionFactories() {
+        return sessionFactories;
+    }
+
+    // getters and setters
+    // //////////////////////////////////////////////////////
+
+    public BaseCommand<?, ? extends AbstractCommandContext> getCommand() {
+        return command;
+    }
+
+    public Map<Class<?>, Session> getSessions() {
+        return sessions;
+    }
+
+    public Throwable getException() {
+        return exception;
+    }
+
+    public boolean isReused() {
+        return reused;
+    }
+
+    public void setReused(boolean reused) {
+        this.reused = reused;
+    }
+
 }

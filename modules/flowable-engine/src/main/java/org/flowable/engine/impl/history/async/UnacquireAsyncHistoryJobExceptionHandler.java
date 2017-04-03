@@ -20,25 +20,25 @@ import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.runtime.Job;
 
 public class UnacquireAsyncHistoryJobExceptionHandler implements AsyncRunnableExecutionExceptionHandler {
-  
-  @Override
-  public boolean handleException(final ProcessEngineConfigurationImpl processEngineConfiguration, final Job job, final Throwable exception) {
-    if (job != null
-        && AsyncHistoryJobHandler.JOB_TYPE.equals(job.getJobHandlerType())
-        && exception instanceof AsyncHistoryJobNotApplicableException) {
-      return processEngineConfiguration.getCommandExecutor().execute(new Command<Boolean>() {
-        public Boolean execute(CommandContext commandContext) {
-          CommandConfig commandConfig = processEngineConfiguration.getCommandExecutor().getDefaultConfig().transactionRequiresNew();
-          return processEngineConfiguration.getCommandExecutor().execute(commandConfig, new Command<Boolean>() {
-            public Boolean execute(CommandContext commandContext2) {
-              commandContext2.getJobManager().unacquire(job);
-              return true;
-            }
-          });
+
+    @Override
+    public boolean handleException(final ProcessEngineConfigurationImpl processEngineConfiguration, final Job job, final Throwable exception) {
+        if (job != null && AsyncHistoryJobHandler.JOB_TYPE.equals(job.getJobHandlerType()) 
+                        && exception instanceof AsyncHistoryJobNotApplicableException) {
+            
+            return processEngineConfiguration.getCommandExecutor().execute(new Command<Boolean>() {
+                public Boolean execute(CommandContext commandContext) {
+                    CommandConfig commandConfig = processEngineConfiguration.getCommandExecutor().getDefaultConfig().transactionRequiresNew();
+                    return processEngineConfiguration.getCommandExecutor().execute(commandConfig, new Command<Boolean>() {
+                        public Boolean execute(CommandContext commandContext2) {
+                            commandContext2.getJobManager().unacquire(job);
+                            return true;
+                        }
+                    });
+                }
+            });
         }
-      });
+        return false;
     }
-    return false;
-  }
-  
+
 }

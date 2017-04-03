@@ -18,20 +18,20 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.validation.validator.ValidatorSet;
 
 /**
- * Validates a process definition against the rules of the Activiti engine to be executable
+ * Validates a process definition against the rules of the Flowable engine to be executable
  * 
  * @author jbarrez
  */
 public interface ProcessValidator {
 
-  /**
-   * Validates the provided {@link BpmnModel} and returns a list of all {@link ValidationError} occurrences found.
-   */
-  List<ValidationError> validate(BpmnModel bpmnModel);
+    /**
+     * Validates the provided {@link BpmnModel} and returns a list of all {@link ValidationError} occurrences found.
+     */
+    List<ValidationError> validate(BpmnModel bpmnModel);
 
-  /**
-   * Returns the {@link ValidatorSet} instances for this process validator. Useful if some validation rules need to be disabled.
-   */
-  List<ValidatorSet> getValidatorSets();
+    /**
+     * Returns the {@link ValidatorSet} instances for this process validator. Useful if some validation rules need to be disabled.
+     */
+    List<ValidatorSet> getValidatorSets();
 
 }

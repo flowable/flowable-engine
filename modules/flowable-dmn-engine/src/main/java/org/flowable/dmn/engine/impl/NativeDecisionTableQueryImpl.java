@@ -15,31 +15,31 @@ package org.flowable.dmn.engine.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.dmn.api.DecisionTable;
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.NativeDecisionTableQuery;
 import org.flowable.dmn.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.engine.impl.interceptor.CommandExecutor;
 
-public class NativeDecisionTableQueryImpl extends AbstractNativeQuery<NativeDecisionTableQuery, DecisionTable> implements NativeDecisionTableQuery {
+public class NativeDecisionTableQueryImpl extends AbstractNativeQuery<NativeDecisionTableQuery, DmnDecisionTable> implements NativeDecisionTableQuery {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public NativeDecisionTableQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
+    public NativeDecisionTableQueryImpl(CommandContext commandContext) {
+        super(commandContext);
+    }
 
-  public NativeDecisionTableQueryImpl(CommandExecutor commandExecutor) {
-    super(commandExecutor);
-  }
+    public NativeDecisionTableQueryImpl(CommandExecutor commandExecutor) {
+        super(commandExecutor);
+    }
 
-  // results ////////////////////////////////////////////////////////////////
+    // results ////////////////////////////////////////////////////////////////
 
-  public List<DecisionTable> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return commandContext.getDecisionTableEntityManager().findDecisionTablesByNativeQuery(parameterMap, firstResult, maxResults);
-  }
+    public List<DmnDecisionTable> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
+        return commandContext.getDecisionTableEntityManager().findDecisionTablesByNativeQuery(parameterMap, firstResult, maxResults);
+    }
 
-  public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-    return commandContext.getDecisionTableEntityManager().findDecisionTableCountByNativeQuery(parameterMap);
-  }
+    public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
+        return commandContext.getDecisionTableEntityManager().findDecisionTableCountByNativeQuery(parameterMap);
+    }
 
 }

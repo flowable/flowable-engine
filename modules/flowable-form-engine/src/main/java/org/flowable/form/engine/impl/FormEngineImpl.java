@@ -26,54 +26,54 @@ import org.slf4j.LoggerFactory;
  */
 public class FormEngineImpl implements FormEngine {
 
-  private static Logger log = LoggerFactory.getLogger(FormEngineImpl.class);
+    private static Logger log = LoggerFactory.getLogger(FormEngineImpl.class);
 
-  protected String name;
-  protected FormManagementService managementService;
-  protected FormRepositoryService repositoryService;
-  protected FormService formService;
-  protected FormEngineConfiguration engineConfiguration;
+    protected String name;
+    protected FormManagementService managementService;
+    protected FormRepositoryService repositoryService;
+    protected FormService formService;
+    protected FormEngineConfiguration engineConfiguration;
 
-  public FormEngineImpl(FormEngineConfiguration engineConfiguration) {
-    this.engineConfiguration = engineConfiguration;
-    this.name = engineConfiguration.getEngineName();
-    this.managementService = engineConfiguration.getFormManagementService();
-    this.repositoryService = engineConfiguration.getFormRepositoryService();
-    this.formService = engineConfiguration.getFormService();
+    public FormEngineImpl(FormEngineConfiguration engineConfiguration) {
+        this.engineConfiguration = engineConfiguration;
+        this.name = engineConfiguration.getEngineName();
+        this.managementService = engineConfiguration.getFormManagementService();
+        this.repositoryService = engineConfiguration.getFormRepositoryService();
+        this.formService = engineConfiguration.getFormService();
 
-    if (name == null) {
-      log.info("default flowable FormEngine created");
-    } else {
-      log.info("FormEngine {} created", name);
+        if (name == null) {
+            log.info("default flowable FormEngine created");
+        } else {
+            log.info("FormEngine {} created", name);
+        }
+
+        FormEngines.registerFormEngine(this);
     }
 
-    FormEngines.registerFormEngine(this);
-  }
+    public void close() {
+        FormEngines.unregister(this);
+    }
 
-  public void close() {
-    FormEngines.unregister(this);
-  }
+    // getters and setters
+    // //////////////////////////////////////////////////////
 
-  // getters and setters
-  // //////////////////////////////////////////////////////
+    public String getName() {
+        return name;
+    }
 
-  public String getName() {
-    return name;
-  }
-  
-  public FormManagementService getFormManagementService() {
-    return managementService;
-  }
+    public FormManagementService getFormManagementService() {
+        return managementService;
+    }
 
-  public FormRepositoryService getFormRepositoryService() {
-    return repositoryService;
-  }
+    public FormRepositoryService getFormRepositoryService() {
+        return repositoryService;
+    }
 
-  public FormService getFormService() {
-    return formService;
-  }
+    public FormService getFormService() {
+        return formService;
+    }
 
-  public FormEngineConfiguration getFormEngineConfiguration() {
-    return engineConfiguration;
-  }
+    public FormEngineConfiguration getFormEngineConfiguration() {
+        return engineConfiguration;
+    }
 }

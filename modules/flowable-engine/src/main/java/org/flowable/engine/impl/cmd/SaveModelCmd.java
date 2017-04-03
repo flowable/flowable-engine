@@ -24,23 +24,23 @@ import org.flowable.engine.impl.persistence.entity.ModelEntity;
  */
 public class SaveModelCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected ModelEntity model;
+    private static final long serialVersionUID = 1L;
+    protected ModelEntity model;
 
-  public SaveModelCmd(ModelEntity model) {
-    this.model = model;
-  }
+    public SaveModelCmd(ModelEntity model) {
+        this.model = model;
+    }
 
-  public Void execute(CommandContext commandContext) {
-    if (model == null) {
-      throw new FlowableIllegalArgumentException("model is null");
+    public Void execute(CommandContext commandContext) {
+        if (model == null) {
+            throw new FlowableIllegalArgumentException("model is null");
+        }
+        if (model.getId() == null) {
+            commandContext.getModelEntityManager().insert(model);
+        } else {
+            commandContext.getModelEntityManager().updateModel(model);
+        }
+        return null;
     }
-    if (model.getId() == null) {
-      commandContext.getModelEntityManager().insert(model);
-    } else {
-      commandContext.getModelEntityManager().updateModel(model);
-    }
-    return null;
-  }
 
 }

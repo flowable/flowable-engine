@@ -24,17 +24,17 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
  */
 public class UrlStreamSource implements StreamSource {
 
-  URL url;
+    URL url;
 
-  public UrlStreamSource(URL url) {
-    this.url = url;
-  }
-
-  public InputStream getInputStream() {
-    try {
-      return new BufferedInputStream(url.openStream());
-    } catch (IOException e) {
-      throw new FlowableIllegalArgumentException("couldn't open url '" + url + "'", e);
+    public UrlStreamSource(URL url) {
+        this.url = url;
     }
-  }
+
+    public InputStream getInputStream() {
+        try {
+            return new BufferedInputStream(url.openStream());
+        } catch (IOException e) {
+            throw new FlowableIllegalArgumentException("couldn't open url '" + url + "'", e);
+        }
+    }
 }

@@ -25,19 +25,19 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
  */
 public class GetBpmnModelCmd implements Command<BpmnModel>, Serializable {
 
-  private static final long serialVersionUID = 8167762371289445046L;
+    private static final long serialVersionUID = 8167762371289445046L;
 
-  protected String processDefinitionId;
+    protected String processDefinitionId;
 
-  public GetBpmnModelCmd(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
-
-  public BpmnModel execute(CommandContext commandContext) {
-    if (processDefinitionId == null) {
-      throw new FlowableIllegalArgumentException("processDefinitionId is null");
+    public GetBpmnModelCmd(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
     }
 
-    return ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
-  }
+    public BpmnModel execute(CommandContext commandContext) {
+        if (processDefinitionId == null) {
+            throw new FlowableIllegalArgumentException("processDefinitionId is null");
+        }
+
+        return ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
+    }
 }

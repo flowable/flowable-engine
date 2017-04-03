@@ -31,42 +31,42 @@ import org.flowable.engine.runtime.Execution;
  */
 public class FindActiveActivityIdsCmd implements Command<List<String>>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String executionId;
+    private static final long serialVersionUID = 1L;
+    protected String executionId;
 
-  public FindActiveActivityIdsCmd(String executionId) {
-    this.executionId = executionId;
-  }
-
-  public List<String> execute(CommandContext commandContext) {
-    if (executionId == null) {
-      throw new FlowableIllegalArgumentException("executionId is null");
+    public FindActiveActivityIdsCmd(String executionId) {
+        this.executionId = executionId;
     }
 
-    ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
-    ExecutionEntity execution = executionEntityManager.findById(executionId);
+    public List<String> execute(CommandContext commandContext) {
+        if (executionId == null) {
+            throw new FlowableIllegalArgumentException("executionId is null");
+        }
 
-    if (execution == null) {
-      throw new FlowableObjectNotFoundException("execution " + executionId + " doesn't exist", Execution.class);
+        ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
+        ExecutionEntity execution = executionEntityManager.findById(executionId);
+
+        if (execution == null) {
+            throw new FlowableObjectNotFoundException("execution " + executionId + " doesn't exist", Execution.class);
+        }
+
+        return findActiveActivityIds(execution);
     }
 
-    return findActiveActivityIds(execution);
-  }
-  
-  public List<String> findActiveActivityIds(ExecutionEntity executionEntity) {
-    List<String> activeActivityIds = new ArrayList<String>();
-    collectActiveActivityIds(executionEntity, activeActivityIds);
-    return activeActivityIds;
-  }
+    public List<String> findActiveActivityIds(ExecutionEntity executionEntity) {
+        List<String> activeActivityIds = new ArrayList<String>();
+        collectActiveActivityIds(executionEntity, activeActivityIds);
+        return activeActivityIds;
+    }
 
-  protected void collectActiveActivityIds(ExecutionEntity executionEntity, List<String> activeActivityIds) {
-    if (executionEntity.isActive() && executionEntity.getActivityId() != null) {
-      activeActivityIds.add(executionEntity.getActivityId());
+    protected void collectActiveActivityIds(ExecutionEntity executionEntity, List<String> activeActivityIds) {
+        if (executionEntity.isActive() && executionEntity.getActivityId() != null) {
+            activeActivityIds.add(executionEntity.getActivityId());
+        }
+
+        for (ExecutionEntity childExecution : executionEntity.getExecutions()) {
+            collectActiveActivityIds(childExecution, activeActivityIds);
+        }
     }
-    
-    for (ExecutionEntity childExecution : executionEntity.getExecutions()) {
-      collectActiveActivityIds(childExecution, activeActivityIds);
-    }
-  }
-  
+
 }

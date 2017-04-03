@@ -28,19 +28,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ModelRelationResource {
 
-  @Autowired
-  protected ModelService modelService;
-  
-  @Autowired
-  protected ModelRelationService modelRelationService;
+    @Autowired
+    protected ModelService modelService;
 
-  @RequestMapping(value = "/rest/models/{modelId}/parent-relations", method = RequestMethod.GET, produces = "application/json")
-  public List<ModelInformation> getModelRelations(@PathVariable String modelId) {
-    Model model = modelService.getModel(modelId);
-    if (model == null) {
-      throw new NotFoundException();
+    @Autowired
+    protected ModelRelationService modelRelationService;
+
+    @RequestMapping(value = "/rest/models/{modelId}/parent-relations", method = RequestMethod.GET, produces = "application/json")
+    public List<ModelInformation> getModelRelations(@PathVariable String modelId) {
+        Model model = modelService.getModel(modelId);
+        if (model == null) {
+            throw new NotFoundException();
+        }
+        return modelRelationService.findParentModels(modelId);
     }
-    return modelRelationService.findParentModels(modelId);
-  }
 
 }

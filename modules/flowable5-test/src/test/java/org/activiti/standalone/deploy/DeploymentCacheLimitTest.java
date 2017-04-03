@@ -24,40 +24,39 @@ import org.flowable.engine.repository.DeploymentProperties;
  * @author Joram Barrez
  */
 public class DeploymentCacheLimitTest extends ResourceFlowableTestCase {
-  
-  public DeploymentCacheLimitTest() {
-    super("org/activiti/standalone/deploy/deployment.cache.limit.test.flowable.cfg.xml");
-  }
 
-  public void testDeploymentCacheLimit() {
-    int processDefinitionCacheLimit = 3; // This is set in the configuration above
-    
-    org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) 
-        processEngineConfiguration.getFlowable5CompatibilityHandler().getRawProcessConfiguration();
-    
-    DefaultDeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache = (DefaultDeploymentCache<ProcessDefinitionCacheEntry>) 
-        activiti5ProcessEngineConfig.getProcessDefinitionCache();
-    assertEquals(0, processDefinitionCache.size());
-    
-    String processDefinitionTemplate = DeploymentCacheTestUtil.readTemplateFile(
-            "/org/activiti/standalone/deploy/deploymentCacheTest.bpmn20.xml");
-    for (int i = 1; i <= 5; i++) {
-      repositoryService.createDeployment()
-              .addString("Process " + i + ".bpmn20.xml", MessageFormat.format(processDefinitionTemplate, i))
-              .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
-              .deploy();
-      
-      if (i < processDefinitionCacheLimit) {
-        assertEquals(i, processDefinitionCache.size());
-      } else {
-        assertEquals(processDefinitionCacheLimit, processDefinitionCache.size());
-      }
+    public DeploymentCacheLimitTest() {
+        super("org/activiti/standalone/deploy/deployment.cache.limit.test.flowable.cfg.xml");
     }
-    
-    // Cleanup
-    for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
-      repositoryService.deleteDeployment(deployment.getId(), true);
+
+    public void testDeploymentCacheLimit() {
+        int processDefinitionCacheLimit = 3; // This is set in the configuration above
+
+        org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) processEngineConfiguration.getFlowable5CompatibilityHandler()
+                .getRawProcessConfiguration();
+
+        DefaultDeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache = (DefaultDeploymentCache<ProcessDefinitionCacheEntry>) activiti5ProcessEngineConfig.getProcessDefinitionCache();
+        assertEquals(0, processDefinitionCache.size());
+
+        String processDefinitionTemplate = DeploymentCacheTestUtil.readTemplateFile(
+                "/org/activiti/standalone/deploy/deploymentCacheTest.bpmn20.xml");
+        for (int i = 1; i <= 5; i++) {
+            repositoryService.createDeployment()
+                    .addString("Process " + i + ".bpmn20.xml", MessageFormat.format(processDefinitionTemplate, i))
+                    .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
+                    .deploy();
+
+            if (i < processDefinitionCacheLimit) {
+                assertEquals(i, processDefinitionCache.size());
+            } else {
+                assertEquals(processDefinitionCacheLimit, processDefinitionCache.size());
+            }
+        }
+
+        // Cleanup
+        for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+            repositoryService.deleteDeployment(deployment.getId(), true);
+        }
     }
-  }
-  
+
 }

@@ -22,37 +22,37 @@ import org.flowable.editor.language.json.converter.util.CollectionUtils;
 
 public class UserTaskInfoMapper extends AbstractInfoMapper {
 
-	protected void mapProperties(Object element) {
-		UserTask userTask = (UserTask) element;
-		createPropertyNode("Assignee", userTask.getAssignee());
-		createPropertyNode("Candidate users", userTask.getCandidateUsers());
-		createPropertyNode("Candidate groups", userTask.getCandidateGroups());
-		createPropertyNode("Due date", userTask.getDueDate());
-		createPropertyNode("Form key", userTask.getFormKey());
-		createPropertyNode("Priority", userTask.getPriority());
-		if (CollectionUtils.isNotEmpty(userTask.getFormProperties())) {
-		    List<String> formPropertyValues = new ArrayList<String>();
-		    for (FormProperty formProperty : userTask.getFormProperties()) {
-		        StringBuilder propertyBuilder = new StringBuilder();
-		        if (StringUtils.isNotEmpty(formProperty.getName())) {
-		            propertyBuilder.append(formProperty.getName());
-		        } else {
-		            propertyBuilder.append(formProperty.getId());
-		        }
-		        if (StringUtils.isNotEmpty(formProperty.getType())) {
-		            propertyBuilder.append(" - ");
-		            propertyBuilder.append(formProperty.getType());
-		        }
-		        if (formProperty.isRequired()) {
-		            propertyBuilder.append(" (required)");
-		        } else {
-		            propertyBuilder.append(" (not required)");
-		        }
+    protected void mapProperties(Object element) {
+        UserTask userTask = (UserTask) element;
+        createPropertyNode("Assignee", userTask.getAssignee());
+        createPropertyNode("Candidate users", userTask.getCandidateUsers());
+        createPropertyNode("Candidate groups", userTask.getCandidateGroups());
+        createPropertyNode("Due date", userTask.getDueDate());
+        createPropertyNode("Form key", userTask.getFormKey());
+        createPropertyNode("Priority", userTask.getPriority());
+        if (CollectionUtils.isNotEmpty(userTask.getFormProperties())) {
+            List<String> formPropertyValues = new ArrayList<String>();
+            for (FormProperty formProperty : userTask.getFormProperties()) {
+                StringBuilder propertyBuilder = new StringBuilder();
+                if (StringUtils.isNotEmpty(formProperty.getName())) {
+                    propertyBuilder.append(formProperty.getName());
+                } else {
+                    propertyBuilder.append(formProperty.getId());
+                }
+                if (StringUtils.isNotEmpty(formProperty.getType())) {
+                    propertyBuilder.append(" - ");
+                    propertyBuilder.append(formProperty.getType());
+                }
+                if (formProperty.isRequired()) {
+                    propertyBuilder.append(" (required)");
+                } else {
+                    propertyBuilder.append(" (not required)");
+                }
                 formPropertyValues.add(propertyBuilder.toString());
             }
-		    createPropertyNode("Form properties", formPropertyValues);
-		}
-		createListenerPropertyNodes("Task listeners", userTask.getTaskListeners());
-		createListenerPropertyNodes("Execution listeners", userTask.getExecutionListeners());
-	}
+            createPropertyNode("Form properties", formPropertyValues);
+        }
+        createListenerPropertyNodes("Task listeners", userTask.getTaskListeners());
+        createListenerPropertyNodes("Execution listeners", userTask.getExecutionListeners());
+    }
 }

@@ -32,97 +32,97 @@ import org.slf4j.LoggerFactory;
  */
 public class FlowableEventSupport {
 
-  private static final Logger LOG = LoggerFactory.getLogger(FlowableEventSupport.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FlowableEventSupport.class);
 
-  protected List<FlowableEventListener> eventListeners;
-  protected Map<FlowableEventType, List<FlowableEventListener>> typedListeners;
+    protected List<FlowableEventListener> eventListeners;
+    protected Map<FlowableEventType, List<FlowableEventListener>> typedListeners;
 
-  public FlowableEventSupport() {
-    eventListeners = new CopyOnWriteArrayList<FlowableEventListener>();
-    typedListeners = new HashMap<FlowableEventType, List<FlowableEventListener>>();
-  }
-
-  public synchronized void addEventListener(FlowableEventListener listenerToAdd) {
-    if (listenerToAdd == null) {
-      throw new FlowableIllegalArgumentException("Listener cannot be null.");
-    }
-    if (!eventListeners.contains(listenerToAdd)) {
-      eventListeners.add(listenerToAdd);
-    }
-  }
-
-  public synchronized void addEventListener(FlowableEventListener listenerToAdd, FlowableEventType... types) {
-    if (listenerToAdd == null) {
-      throw new FlowableIllegalArgumentException("Listener cannot be null.");
+    public FlowableEventSupport() {
+        eventListeners = new CopyOnWriteArrayList<FlowableEventListener>();
+        typedListeners = new HashMap<FlowableEventType, List<FlowableEventListener>>();
     }
 
-    if (types == null || types.length == 0) {
-      addEventListener(listenerToAdd);
-
-    } else {
-      for (FlowableEventType type : types) {
-        addTypedEventListener(listenerToAdd, type);
-      }
-    }
-  }
-
-  public void removeEventListener(FlowableEventListener listenerToRemove) {
-    eventListeners.remove(listenerToRemove);
-
-    for (List<FlowableEventListener> listeners : typedListeners.values()) {
-      listeners.remove(listenerToRemove);
-    }
-  }
-
-  public void dispatchEvent(FlowableEvent event) {
-    if (event == null) {
-      throw new FlowableIllegalArgumentException("Event cannot be null.");
+    public synchronized void addEventListener(FlowableEventListener listenerToAdd) {
+        if (listenerToAdd == null) {
+            throw new FlowableIllegalArgumentException("Listener cannot be null.");
+        }
+        if (!eventListeners.contains(listenerToAdd)) {
+            eventListeners.add(listenerToAdd);
+        }
     }
 
-    if (event.getType() == null) {
-      throw new FlowableIllegalArgumentException("Event type cannot be null.");
+    public synchronized void addEventListener(FlowableEventListener listenerToAdd, FlowableEventType... types) {
+        if (listenerToAdd == null) {
+            throw new FlowableIllegalArgumentException("Listener cannot be null.");
+        }
+
+        if (types == null || types.length == 0) {
+            addEventListener(listenerToAdd);
+
+        } else {
+            for (FlowableEventType type : types) {
+                addTypedEventListener(listenerToAdd, type);
+            }
+        }
     }
 
-    // Call global listeners
-    if (!eventListeners.isEmpty()) {
-      for (FlowableEventListener listener : eventListeners) {
-        dispatchEvent(event, listener);
-      }
+    public void removeEventListener(FlowableEventListener listenerToRemove) {
+        eventListeners.remove(listenerToRemove);
+
+        for (List<FlowableEventListener> listeners : typedListeners.values()) {
+            listeners.remove(listenerToRemove);
+        }
     }
 
-    // Call typed listeners, if any
-    List<FlowableEventListener> typed = typedListeners.get(event.getType());
-    if (typed != null && !typed.isEmpty()) {
-      for (FlowableEventListener listener : typed) {
-        dispatchEvent(event, listener);
-      }
-    }
-  }
+    public void dispatchEvent(FlowableEvent event) {
+        if (event == null) {
+            throw new FlowableIllegalArgumentException("Event cannot be null.");
+        }
 
-  protected void dispatchEvent(FlowableEvent event, FlowableEventListener listener) {
-    try {
-      listener.onEvent(event);
-    } catch (Throwable t) {
-      if (listener.isFailOnException()) {
-        throw new FlowableException("Exception while executing event-listener", t);
-      } else {
-        // Ignore the exception and continue notifying remaining listeners. The listener
-        // explicitly states that the exception should not bubble up
-        LOG.warn("Exception while executing event-listener, which was ignored", t);
-      }
-    }
-  }
+        if (event.getType() == null) {
+            throw new FlowableIllegalArgumentException("Event type cannot be null.");
+        }
 
-  protected synchronized void addTypedEventListener(FlowableEventListener listener, FlowableEventType type) {
-    List<FlowableEventListener> listeners = typedListeners.get(type);
-    if (listeners == null) {
-      // Add an empty list of listeners for this type
-      listeners = new CopyOnWriteArrayList<FlowableEventListener>();
-      typedListeners.put(type, listeners);
+        // Call global listeners
+        if (!eventListeners.isEmpty()) {
+            for (FlowableEventListener listener : eventListeners) {
+                dispatchEvent(event, listener);
+            }
+        }
+
+        // Call typed listeners, if any
+        List<FlowableEventListener> typed = typedListeners.get(event.getType());
+        if (typed != null && !typed.isEmpty()) {
+            for (FlowableEventListener listener : typed) {
+                dispatchEvent(event, listener);
+            }
+        }
     }
 
-    if (!listeners.contains(listener)) {
-      listeners.add(listener);
+    protected void dispatchEvent(FlowableEvent event, FlowableEventListener listener) {
+        try {
+            listener.onEvent(event);
+        } catch (Throwable t) {
+            if (listener.isFailOnException()) {
+                throw new FlowableException("Exception while executing event-listener", t);
+            } else {
+                // Ignore the exception and continue notifying remaining listeners. The listener
+                // explicitly states that the exception should not bubble up
+                LOG.warn("Exception while executing event-listener, which was ignored", t);
+            }
+        }
     }
-  }
+
+    protected synchronized void addTypedEventListener(FlowableEventListener listener, FlowableEventType type) {
+        List<FlowableEventListener> listeners = typedListeners.get(type);
+        if (listeners == null) {
+            // Add an empty list of listeners for this type
+            listeners = new CopyOnWriteArrayList<FlowableEventListener>();
+            typedListeners.put(type, listeners);
+        }
+
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
+    }
 }

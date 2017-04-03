@@ -21,23 +21,23 @@ import org.flowable.engine.runtime.Job;
 
 public class UnacquireOwnedJobsCmd implements Command<Void> {
 
-  private final String lockOwner;
-  private final String tenantId;
-  
-  public UnacquireOwnedJobsCmd(String lockOwner, String tenantId) {
-    this.lockOwner = lockOwner;
-    this.tenantId = tenantId;
-  }
+    private final String lockOwner;
+    private final String tenantId;
 
-  @Override
-  public Void execute(CommandContext commandContext) {
-    JobQueryImpl jobQuery = new JobQueryImpl(commandContext);
-    jobQuery.lockOwner(lockOwner);
-    jobQuery.jobTenantId(tenantId);
-    List<Job> jobs = commandContext.getJobEntityManager().findJobsByQueryCriteria(jobQuery, null);
-    for (Job job : jobs) {
-      commandContext.getJobManager().unacquire(job);
+    public UnacquireOwnedJobsCmd(String lockOwner, String tenantId) {
+        this.lockOwner = lockOwner;
+        this.tenantId = tenantId;
     }
-    return null;
-  }
+
+    @Override
+    public Void execute(CommandContext commandContext) {
+        JobQueryImpl jobQuery = new JobQueryImpl(commandContext);
+        jobQuery.lockOwner(lockOwner);
+        jobQuery.jobTenantId(tenantId);
+        List<Job> jobs = commandContext.getJobEntityManager().findJobsByQueryCriteria(jobQuery, null);
+        for (Job job : jobs) {
+            commandContext.getJobManager().unacquire(job);
+        }
+        return null;
+    }
 }

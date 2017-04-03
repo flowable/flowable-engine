@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
 
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.flowable.engine.impl.persistence.entity.DeadLetterJobEntityImpl">
 
@@ -35,7 +35,7 @@
         from ${prefix}ACT_RU_DEADLETTER_JOB J
         where J.EXECUTION_ID_ = #{parameter}
     </select>
-    
+
     <select id="selectDeadLetterJobsByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select *
         from ${prefix}ACT_RU_DEADLETTER_JOB J
@@ -43,14 +43,14 @@
     </select>
 
     <!-- TIMER INSERT -->
-  
+
   	<insert id="insertDeadLetterJob" parameterType="org.flowable.engine.impl.persistence.entity.DeadLetterJobEntityImpl">
     insert into ${prefix}ACT_RU_DEADLETTER_JOB (
-            ID_, 
+            ID_,
             REV_,
             TYPE_,
             EXCLUSIVE_,
-            EXECUTION_ID_, 
+            EXECUTION_ID_,
             PROCESS_INSTANCE_ID_,
             PROC_DEF_ID_,
             EXCEPTION_STACK_ID_,
@@ -80,12 +80,12 @@
   	</insert>
 
   	<insert id="bulkInsertDeadLetterJob" parameterType="java.util.List">
-    INSERT INTO ${prefix}ACT_RU_DEADLETTER_JOB (
+        INSERT INTO ${prefix}ACT_RU_DEADLETTER_JOB (
             ID_,
             REV_,
             TYPE_,
             EXCLUSIVE_,
-            EXECUTION_ID_, 
+            EXECUTION_ID_,
             PROCESS_INSTANCE_ID_,
             PROC_DEF_ID_,
             EXCEPTION_STACK_ID_,
@@ -114,44 +114,44 @@
 	         #{job.tenantId, jdbcType=VARCHAR})
 	    </foreach>
   	</insert>
-  	
-  <insert id="bulkInsertDeadLetterJob" databaseId="oracle" parameterType="java.util.List">
-    INSERT ALL
-    <foreach collection="list" item="job" index="index">
-      INTO ${prefix}ACT_RU_DEADLETTER_JOB (
-      ID_,
-      REV_,
-      TYPE_,
-      EXCLUSIVE_,
-      EXECUTION_ID_, 
-      PROCESS_INSTANCE_ID_,
-      PROC_DEF_ID_,
-      EXCEPTION_STACK_ID_,
-      EXCEPTION_MSG_,
-      DUEDATE_,
-      REPEAT_,
-      HANDLER_TYPE_,
-      HANDLER_CFG_,
-      ADV_HANDLER_CFG_ID_,
-      TENANT_ID_) VALUES 
-      (#{job.id, jdbcType=VARCHAR},
-       #{job.revision, jdbcType=INTEGER},
-       #{job.jobType, jdbcType=VARCHAR},
-       #{job.exclusive, jdbcType=BOOLEAN},
-       #{job.executionId, jdbcType=VARCHAR},
-       #{job.processInstanceId, jdbcType=VARCHAR},
-       #{job.processDefinitionId, jdbcType=VARCHAR},
-       #{job.exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
-       #{job.exceptionMessage, jdbcType=VARCHAR},
-       #{job.duedate, jdbcType=TIMESTAMP},
-       #{job.repeat, jdbcType=VARCHAR},
-       #{job.jobHandlerType, jdbcType=VARCHAR},
-       #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
-       #{job.advancedJobHandlerConfigurationByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
-       #{job.tenantId, jdbcType=VARCHAR})
-    </foreach>
-    SELECT * FROM dual
-  </insert>
+
+  	<insert id="bulkInsertDeadLetterJob" databaseId="oracle" parameterType="java.util.List">
+    	INSERT ALL
+    	<foreach collection="list" item="job" index="index">
+      		INTO ${prefix}ACT_RU_DEADLETTER_JOB (
+      		ID_,
+      		REV_,
+      		TYPE_,
+      		EXCLUSIVE_,
+      		EXECUTION_ID_,
+      		PROCESS_INSTANCE_ID_,
+      		PROC_DEF_ID_,
+      		EXCEPTION_STACK_ID_,
+      		EXCEPTION_MSG_,
+      		DUEDATE_,
+      		REPEAT_,
+      		HANDLER_TYPE_,
+      		HANDLER_CFG_,
+      		ADV_HANDLER_CFG_ID_,
+      		TENANT_ID_) VALUES 
+      		(#{job.id, jdbcType=VARCHAR},
+       		#{job.revision, jdbcType=INTEGER},
+       		#{job.jobType, jdbcType=VARCHAR},
+       		#{job.exclusive, jdbcType=BOOLEAN},
+       		#{job.executionId, jdbcType=VARCHAR},
+       		#{job.processInstanceId, jdbcType=VARCHAR},
+       		#{job.processDefinitionId, jdbcType=VARCHAR},
+       		#{job.exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
+       		#{job.exceptionMessage, jdbcType=VARCHAR},
+       		#{job.duedate, jdbcType=TIMESTAMP},
+       		#{job.repeat, jdbcType=VARCHAR},
+       		#{job.jobHandlerType, jdbcType=VARCHAR},
+       		#{job.jobHandlerConfiguration, jdbcType=VARCHAR},
+       		#{job.advancedJobHandlerConfigurationByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
+       		#{job.tenantId, jdbcType=VARCHAR})
+    	</foreach>
+    	SELECT * FROM dual
+  	</insert>
 
     <select id="selectDeadLetterJobByQueryCriteria" parameterType="org.flowable.engine.impl.JobQueryImpl" resultMap="jobResultMap">
         ${limitBefore}
@@ -177,6 +177,9 @@
             </if>
             <if test="executionId != null">
                 and RES.EXECUTION_ID_ = #{executionId}
+            </if>
+            <if test="handlerType != null">
+                and RES.HANDLER_TYPE_ = #{handlerType}
             </if>
             <if test="processDefinitionId != null">
                 and RES.PROC_DEF_ID_ = #{processDefinitionId}

@@ -34,41 +34,41 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
  */
 public class DmnRestUrlBuilder {
 
-  protected String baseUrl = "";
+    protected String baseUrl = "";
 
-  protected DmnRestUrlBuilder() {
-  }
-
-  protected DmnRestUrlBuilder(String baseUrl) {
-    this.baseUrl = baseUrl;
-  }
-
-  public String getBaseUrl() {
-    return baseUrl;
-  }
-
-  public String buildUrl(String[] fragments, Object... arguments) {
-    return new StringBuilder(baseUrl).append("/").append(MessageFormat.format(StringUtils.join(fragments, '/'), arguments)).toString();
-  }
-
-  /** Uses baseUrl as the base URL */
-  public static DmnRestUrlBuilder usingBaseUrl(String baseUrl) {
-    if (baseUrl == null) {
-      throw new FlowableIllegalArgumentException("baseUrl can not be null");
+    protected DmnRestUrlBuilder() {
     }
-    if (baseUrl.endsWith("/")) {
-      baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+
+    protected DmnRestUrlBuilder(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
-    return new DmnRestUrlBuilder(baseUrl);
-  }
 
-  /** Extracts the base URL from the request */
-  public static DmnRestUrlBuilder fromRequest(HttpServletRequest request) {
-    return usingBaseUrl(ServletUriComponentsBuilder.fromServletMapping(request).build().toUriString());
-  }
+    public String getBaseUrl() {
+        return baseUrl;
+    }
 
-  /** Extracts the base URL from current request */
-  public static DmnRestUrlBuilder fromCurrentRequest() {
-    return usingBaseUrl(ServletUriComponentsBuilder.fromCurrentServletMapping().build().toUriString());
-  }
+    public String buildUrl(String[] fragments, Object... arguments) {
+        return new StringBuilder(baseUrl).append("/").append(MessageFormat.format(StringUtils.join(fragments, '/'), arguments)).toString();
+    }
+
+    /** Uses baseUrl as the base URL */
+    public static DmnRestUrlBuilder usingBaseUrl(String baseUrl) {
+        if (baseUrl == null) {
+            throw new FlowableIllegalArgumentException("baseUrl can not be null");
+        }
+        if (baseUrl.endsWith("/")) {
+            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+        }
+        return new DmnRestUrlBuilder(baseUrl);
+    }
+
+    /** Extracts the base URL from the request */
+    public static DmnRestUrlBuilder fromRequest(HttpServletRequest request) {
+        return usingBaseUrl(ServletUriComponentsBuilder.fromServletMapping(request).build().toUriString());
+    }
+
+    /** Extracts the base URL from current request */
+    public static DmnRestUrlBuilder fromCurrentRequest() {
+        return usingBaseUrl(ServletUriComponentsBuilder.fromCurrentServletMapping().build().toUriString());
+    }
 }

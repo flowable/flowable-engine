@@ -18,30 +18,29 @@ import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 
-
 /**
  * @author Joram Barrez
  */
 public class ThrowsExceptionBehavior implements ActivityBehavior {
 
-  public void execute(DelegateExecution execution) {
-    ActivityExecution activityExecution = (ActivityExecution) execution;
-    String var = (String) execution.getVariable("var");
+    public void execute(DelegateExecution execution) {
+        ActivityExecution activityExecution = (ActivityExecution) execution;
+        String var = (String) execution.getVariable("var");
 
-    PvmTransition transition;
-    try {
-      executeLogic(var);
-      transition = activityExecution.getActivity().findOutgoingTransition("no-exception");
-    } catch (Exception e) {
-      transition = activityExecution.getActivity().findOutgoingTransition("exception");
+        PvmTransition transition;
+        try {
+            executeLogic(var);
+            transition = activityExecution.getActivity().findOutgoingTransition("no-exception");
+        } catch (Exception e) {
+            transition = activityExecution.getActivity().findOutgoingTransition("exception");
+        }
+        activityExecution.take(transition);
     }
-    activityExecution.take(transition);
-  }
-  
-  protected void executeLogic(String value) {
-    if (value.equals("throw-exception")) {
-      throw new RuntimeException();
+
+    protected void executeLogic(String value) {
+        if (value.equals("throw-exception")) {
+            throw new RuntimeException();
+        }
     }
-  }
-  
+
 }

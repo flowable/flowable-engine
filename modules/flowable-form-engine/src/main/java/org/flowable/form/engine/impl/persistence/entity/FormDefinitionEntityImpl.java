@@ -25,101 +25,101 @@ import org.flowable.form.engine.FormEngineConfiguration;
  */
 public class FormDefinitionEntityImpl extends AbstractEntityNoRevision implements FormDefinitionEntity, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String name;
-  protected String description;
-  protected String key;
-  protected int version;
-  protected String category;
-  protected String deploymentId;
-  protected String parentDeploymentId;
-  protected String resourceName;
-  protected String tenantId = FormEngineConfiguration.NO_TENANT_ID;
-  
-  public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
-    persistentState.put("category", this.category);
-    return persistentState;
-  }
+    protected String name;
+    protected String description;
+    protected String key;
+    protected int version;
+    protected String category;
+    protected String deploymentId;
+    protected String parentDeploymentId;
+    protected String resourceName;
+    protected String tenantId = FormEngineConfiguration.NO_TENANT_ID;
 
-  // getters and setters
-  // //////////////////////////////////////////////////////
+    public Object getPersistentState() {
+        Map<String, Object> persistentState = new HashMap<String, Object>();
+        persistentState.put("category", this.category);
+        return persistentState;
+    }
 
-  public String getKey() {
-    return key;
-  }
+    // getters and setters
+    // //////////////////////////////////////////////////////
 
-  public void setKey(String key) {
-    this.key = key;
-  }
+    public String getKey() {
+        return key;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public String getDescription() {
-    return description;
-  }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-  public String getDeploymentId() {
-    return deploymentId;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public void setDeploymentId(String deploymentId) {
-    this.deploymentId = deploymentId;
-  }
+    public String getDeploymentId() {
+        return deploymentId;
+    }
 
-  public String getParentDeploymentId() {
-    return parentDeploymentId;
-  }
+    public void setDeploymentId(String deploymentId) {
+        this.deploymentId = deploymentId;
+    }
 
-  public void setParentDeploymentId(String parentDeploymentId) {
-    this.parentDeploymentId = parentDeploymentId;
-  }
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
+    }
 
-  public int getVersion() {
-    return version;
-  }
+    public void setParentDeploymentId(String parentDeploymentId) {
+        this.parentDeploymentId = parentDeploymentId;
+    }
 
-  public void setVersion(int version) {
-    this.version = version;
-  }
+    public int getVersion() {
+        return version;
+    }
 
-  public String getResourceName() {
-    return resourceName;
-  }
+    public void setVersion(int version) {
+        this.version = version;
+    }
 
-  public void setResourceName(String resourceName) {
-    this.resourceName = resourceName;
-  }
+    public String getResourceName() {
+        return resourceName;
+    }
 
-  public String getTenantId() {
-    return tenantId;
-  }
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
+    }
 
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
+    public String getTenantId() {
+        return tenantId;
+    }
 
-  public String getCategory() {
-    return category;
-  }
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
 
-  public void setCategory(String category) {
-    this.category = category;
-  }
-  
-  public String toString() {
-    return "FormEntity[" + id + "]";
-  }
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String toString() {
+        return "FormEntity[" + id + "]";
+    }
 
 }

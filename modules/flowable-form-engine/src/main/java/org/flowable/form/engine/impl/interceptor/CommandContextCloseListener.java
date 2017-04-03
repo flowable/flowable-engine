@@ -9,8 +9,8 @@ import org.flowable.engine.common.impl.interceptor.BaseCommandContextCloseListen
  */
 public interface CommandContextCloseListener extends BaseCommandContextCloseListener<CommandContext> {
 
-  void closing(CommandContext commandContext);
+    void closing(CommandContext commandContext);
 
-  void closed(CommandContext commandContext);
+    void closed(CommandContext commandContext);
 
 }

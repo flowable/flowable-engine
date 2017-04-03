@@ -25,112 +25,112 @@ import org.flowable.engine.runtime.Job;
  */
 public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
 
-  protected TweetExceptionHandler tweetExceptionHandler = new TweetExceptionHandler();
+    protected TweetExceptionHandler tweetExceptionHandler = new TweetExceptionHandler();
 
-  private CommandExecutor commandExecutor;
+    private CommandExecutor commandExecutor;
 
-  public void setUp() throws Exception {
-    processEngineConfiguration.getJobHandlers().put(tweetExceptionHandler.getType(), tweetExceptionHandler);
-    this.commandExecutor = processEngineConfiguration.getCommandExecutor();
-  }
-
-  public void tearDown() throws Exception {
-    processEngineConfiguration.getJobHandlers().remove(tweetExceptionHandler.getType());
-  }
-
-  public void testJobCommandsWith2Exceptions() {
-    commandExecutor.execute(new Command<String>() {
-
-      public String execute(CommandContext commandContext) {
-        JobEntity message = createTweetExceptionMessage();
-        commandContext.getJobManager().scheduleAsyncJob(message);
-        return message.getId();
-      }
-    });
-
-    Job job = managementService.createJobQuery().singleResult();
-    assertEquals(3, job.getRetries());
-
-    try {
-      managementService.executeJob(job.getId());
-      fail("exception expected");
-    } catch (Exception e) {
-      // exception expected;
+    public void setUp() throws Exception {
+        processEngineConfiguration.getJobHandlers().put(tweetExceptionHandler.getType(), tweetExceptionHandler);
+        this.commandExecutor = processEngineConfiguration.getCommandExecutor();
     }
 
-    job = managementService.createTimerJobQuery().singleResult();
-    assertEquals(2, job.getRetries());
-
-    try {
-      managementService.moveTimerToExecutableJob(job.getId());
-      managementService.executeJob(job.getId());
-      fail("exception expected");
-    } catch (Exception e) {
-      // exception expected;
+    public void tearDown() throws Exception {
+        processEngineConfiguration.getJobHandlers().remove(tweetExceptionHandler.getType());
     }
 
-    job = managementService.createTimerJobQuery().singleResult();
-    assertEquals(1, job.getRetries());
+    public void testJobCommandsWith2Exceptions() {
+        commandExecutor.execute(new Command<String>() {
 
-    managementService.moveTimerToExecutableJob(job.getId());
-    managementService.executeJob(job.getId());
-  }
+            public String execute(CommandContext commandContext) {
+                JobEntity message = createTweetExceptionMessage();
+                commandContext.getJobManager().scheduleAsyncJob(message);
+                return message.getId();
+            }
+        });
 
-  public void testJobCommandsWith3Exceptions() {
-    tweetExceptionHandler.setExceptionsRemaining(3);
+        Job job = managementService.createJobQuery().singleResult();
+        assertEquals(3, job.getRetries());
 
-    commandExecutor.execute(new Command<String>() {
+        try {
+            managementService.executeJob(job.getId());
+            fail("exception expected");
+        } catch (Exception e) {
+            // exception expected;
+        }
 
-      public String execute(CommandContext commandContext) {
-        JobEntity message = createTweetExceptionMessage();
-        commandContext.getJobManager().scheduleAsyncJob(message);
-        return message.getId();
-      }
-    });
+        job = managementService.createTimerJobQuery().singleResult();
+        assertEquals(2, job.getRetries());
 
-    Job job = managementService.createJobQuery().singleResult();
-    assertEquals(3, job.getRetries());
+        try {
+            managementService.moveTimerToExecutableJob(job.getId());
+            managementService.executeJob(job.getId());
+            fail("exception expected");
+        } catch (Exception e) {
+            // exception expected;
+        }
 
-    try {
-      managementService.executeJob(job.getId());
-      fail("exception expected");
-    } catch (Exception e) {
-      // exception expected;
+        job = managementService.createTimerJobQuery().singleResult();
+        assertEquals(1, job.getRetries());
+
+        managementService.moveTimerToExecutableJob(job.getId());
+        managementService.executeJob(job.getId());
     }
 
-    job = managementService.createTimerJobQuery().singleResult();
-    assertEquals(2, job.getRetries());
+    public void testJobCommandsWith3Exceptions() {
+        tweetExceptionHandler.setExceptionsRemaining(3);
 
-    try {
-      managementService.moveTimerToExecutableJob(job.getId());
-      managementService.executeJob(job.getId());
-      fail("exception expected");
-    } catch (Exception e) {
-      // exception expected;
+        commandExecutor.execute(new Command<String>() {
+
+            public String execute(CommandContext commandContext) {
+                JobEntity message = createTweetExceptionMessage();
+                commandContext.getJobManager().scheduleAsyncJob(message);
+                return message.getId();
+            }
+        });
+
+        Job job = managementService.createJobQuery().singleResult();
+        assertEquals(3, job.getRetries());
+
+        try {
+            managementService.executeJob(job.getId());
+            fail("exception expected");
+        } catch (Exception e) {
+            // exception expected;
+        }
+
+        job = managementService.createTimerJobQuery().singleResult();
+        assertEquals(2, job.getRetries());
+
+        try {
+            managementService.moveTimerToExecutableJob(job.getId());
+            managementService.executeJob(job.getId());
+            fail("exception expected");
+        } catch (Exception e) {
+            // exception expected;
+        }
+
+        job = managementService.createTimerJobQuery().singleResult();
+        assertEquals(1, job.getRetries());
+
+        try {
+            managementService.moveTimerToExecutableJob(job.getId());
+            managementService.executeJob(job.getId());
+            fail("exception expected");
+        } catch (Exception e) {
+            // exception expected;
+        }
+
+        job = managementService.createDeadLetterJobQuery().singleResult();
+        assertNotNull(job);
+
+        managementService.deleteDeadLetterJob(job.getId());
     }
 
-    job = managementService.createTimerJobQuery().singleResult();
-    assertEquals(1, job.getRetries());
-
-    try {
-      managementService.moveTimerToExecutableJob(job.getId());
-      managementService.executeJob(job.getId());
-      fail("exception expected");
-    } catch (Exception e) {
-      // exception expected;
+    protected JobEntity createTweetExceptionMessage() {
+        JobEntity message = new JobEntityImpl();
+        message.setJobType(JobEntity.JOB_TYPE_MESSAGE);
+        message.setRetries(3);
+        message.setJobHandlerType("tweet-exception");
+        return message;
     }
-
-    job = managementService.createDeadLetterJobQuery().singleResult();
-    assertNotNull(job);
-
-    managementService.deleteDeadLetterJob(job.getId());
-  }
-
-  protected JobEntity createTweetExceptionMessage() {
-    JobEntity message = new JobEntityImpl();
-    message.setJobType(JobEntity.JOB_TYPE_MESSAGE);
-    message.setRetries(3);
-    message.setJobHandlerType("tweet-exception");
-    return message;
-  }
 }

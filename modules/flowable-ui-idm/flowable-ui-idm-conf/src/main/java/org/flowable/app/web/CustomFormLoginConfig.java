@@ -21,14 +21,14 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 /**
  * Custom implementation of {@link FormLoginConfigurer}, to have control over the auth filter instance.
  */
-public final class CustomFormLoginConfig<H extends HttpSecurityBuilder<H>> extends AbstractAuthenticationFilterConfigurer<H,CustomFormLoginConfig<H>,CustomUsernamePasswordAuthenticationFilter> {
+public final class CustomFormLoginConfig<H extends HttpSecurityBuilder<H>> extends AbstractAuthenticationFilterConfigurer<H, CustomFormLoginConfig<H>, CustomUsernamePasswordAuthenticationFilter> {
 
     public CustomFormLoginConfig() {
         super(new CustomUsernamePasswordAuthenticationFilter(), null);
         getAuthenticationFilter().setPasswordParameter("username");
         getAuthenticationFilter().setPasswordParameter("password");
     }
-    
+
     public CustomFormLoginConfig<H> usernameParameter(String usernameParameter) {
         getAuthenticationFilter().setUsernameParameter(usernameParameter);
         return this;
@@ -45,7 +45,9 @@ public final class CustomFormLoginConfig<H extends HttpSecurityBuilder<H>> exten
         initDefaultLoginFilter(http);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer#createLoginProcessingUrlMatcher(java.lang.String)
      */
     @Override
@@ -56,11 +58,12 @@ public final class CustomFormLoginConfig<H extends HttpSecurityBuilder<H>> exten
     /**
      * If available, initializes the {@link DefaultLoginPageGeneratingFilter} shared object.
      *
-     * @param http the {@link HttpSecurityBuilder} to use
+     * @param http
+     *            the {@link HttpSecurityBuilder} to use
      */
     private void initDefaultLoginFilter(H http) {
         DefaultLoginPageGeneratingFilter loginPageGeneratingFilter = http.getSharedObject(DefaultLoginPageGeneratingFilter.class);
-        if(loginPageGeneratingFilter != null && !isCustomLoginPage()) {
+        if (loginPageGeneratingFilter != null && !isCustomLoginPage()) {
             loginPageGeneratingFilter.setFormLoginEnabled(true);
             loginPageGeneratingFilter.setUsernameParameter(getAuthenticationFilter().getUsernameParameter());
             loginPageGeneratingFilter.setPasswordParameter(getAuthenticationFilter().getPasswordParameter());
@@ -70,4 +73,3 @@ public final class CustomFormLoginConfig<H extends HttpSecurityBuilder<H>> exten
         }
     }
 }
-

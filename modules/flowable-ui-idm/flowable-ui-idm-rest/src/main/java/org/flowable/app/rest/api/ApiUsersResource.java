@@ -31,39 +31,39 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ApiUsersResource {
-  
-  @Autowired
-  protected UserService userService;
-  
-  @RequestMapping(value = "/idm/users/{userId}", method = RequestMethod.GET, produces = {"application/json"})
-  public UserRepresentation getUserInformation(@PathVariable String userId) {
-    UserInformation userInformation = userService.getUserInformation(userId);
-    if (userInformation != null) {
-      UserRepresentation userRepresentation = new UserRepresentation(userInformation.getUser());
-      if (userInformation.getGroups() != null) {
-        for (Group group : userInformation.getGroups()) {
-          userRepresentation.getGroups().add(new GroupRepresentation(group));
+
+    @Autowired
+    protected UserService userService;
+
+    @RequestMapping(value = "/idm/users/{userId}", method = RequestMethod.GET, produces = { "application/json" })
+    public UserRepresentation getUserInformation(@PathVariable String userId) {
+        UserInformation userInformation = userService.getUserInformation(userId);
+        if (userInformation != null) {
+            UserRepresentation userRepresentation = new UserRepresentation(userInformation.getUser());
+            if (userInformation.getGroups() != null) {
+                for (Group group : userInformation.getGroups()) {
+                    userRepresentation.getGroups().add(new GroupRepresentation(group));
+                }
+            }
+            if (userInformation.getPrivileges() != null) {
+                for (String privilege : userInformation.getPrivileges()) {
+                    userRepresentation.getPrivileges().add(privilege);
+                }
+            }
+            return userRepresentation;
+        } else {
+            throw new NotFoundException();
         }
-      }
-      if (userInformation.getPrivileges() != null) {
-        for (String privilege : userInformation.getPrivileges()) {
-          userRepresentation.getPrivileges().add(privilege);
+    }
+
+    @RequestMapping(value = "/idm/users", method = RequestMethod.GET, produces = { "application/json" })
+    public List<UserRepresentation> findUsersByFilter(@RequestParam("filter") String filter) {
+        List<User> users = userService.getUsers(filter, null, null);
+        List<UserRepresentation> result = new ArrayList<UserRepresentation>();
+        for (User user : users) {
+            result.add(new UserRepresentation(user));
         }
-      }
-      return userRepresentation;
-    } else {
-      throw new NotFoundException();
+        return result;
     }
-  }
-  
-  @RequestMapping(value = "/idm/users", method = RequestMethod.GET, produces = {"application/json"})
-  public List<UserRepresentation> findUsersByFilter(@RequestParam("filter") String filter) {
-    List<User> users = userService.getUsers(filter, null, null);
-    List<UserRepresentation> result = new ArrayList<UserRepresentation>();
-    for (User user : users) {
-      result.add(new UserRepresentation(user));
-    }
-    return result;
-  }
 
 }

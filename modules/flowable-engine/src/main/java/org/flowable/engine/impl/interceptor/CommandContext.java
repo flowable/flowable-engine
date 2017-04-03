@@ -67,200 +67,200 @@ import org.slf4j.LoggerFactory;
  */
 public class CommandContext extends AbstractCommandContext {
 
-  private static Logger log = LoggerFactory.getLogger(CommandContext.class);
+    private static Logger log = LoggerFactory.getLogger(CommandContext.class);
 
-  protected ProcessEngineConfigurationImpl processEngineConfiguration;
-  protected FailedJobCommandFactory failedJobCommandFactory;
-  
-  protected FlowableEngineAgenda agenda;
-  protected Map<String, ExecutionEntity> involvedExecutions = new HashMap<String, ExecutionEntity>(1); // The executions involved with the command
-  protected LinkedList<Object> resultStack = new LinkedList<Object>(); // needs to be a stack, as JavaDelegates can do api calls again
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    protected FailedJobCommandFactory failedJobCommandFactory;
 
-  public CommandContext(Command<?> command, ProcessEngineConfigurationImpl processEngineConfiguration) {
-    super(command);
-    this.processEngineConfiguration = processEngineConfiguration;
-    this.failedJobCommandFactory = processEngineConfiguration.getFailedJobCommandFactory();
-    this.sessionFactories = processEngineConfiguration.getSessionFactories();
-    this.agenda = processEngineConfiguration.getAgendaFactory().createAgenda(this);
-  }
+    protected FlowableEngineAgenda agenda;
+    protected Map<String, ExecutionEntity> involvedExecutions = new HashMap<String, ExecutionEntity>(1); // The executions involved with the command
+    protected LinkedList<Object> resultStack = new LinkedList<Object>(); // needs to be a stack, as JavaDelegates can do api calls again
 
-  protected void logException() {
-    if (exception instanceof JobNotFoundException || exception instanceof FlowableTaskAlreadyClaimedException) {
-      // reduce log level, because this may have been caused because of job deletion due to cancelActiviti="true"
-      log.info("Error while closing command context", exception);
-    } else {
-      super.logException();
+    public CommandContext(Command<?> command, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(command);
+        this.processEngineConfiguration = processEngineConfiguration;
+        this.failedJobCommandFactory = processEngineConfiguration.getFailedJobCommandFactory();
+        this.sessionFactories = processEngineConfiguration.getSessionFactories();
+        this.agenda = processEngineConfiguration.getAgendaFactory().createAgenda(this);
     }
-  }
-  
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public void addCloseListener(CommandContextCloseListener commandContextCloseListener) {
-    if (closeListeners == null) {
-      closeListeners = new ArrayList<BaseCommandContextCloseListener<AbstractCommandContext>>(1);
+
+    protected void logException() {
+        if (exception instanceof JobNotFoundException || exception instanceof FlowableTaskAlreadyClaimedException) {
+            // reduce log level, because this may have been caused because of job deletion due to cancelActiviti="true"
+            log.info("Error while closing command context", exception);
+        } else {
+            super.logException();
+        }
     }
-    closeListeners.add((BaseCommandContextCloseListener) commandContextCloseListener);
-  }
 
-  public DbSqlSession getDbSqlSession() {
-    return getSession(DbSqlSession.class);
-  }
-
-  public EntityCache getEntityCache() {
-    return getSession(EntityCache.class);
-  }
-
-  public DeploymentEntityManager getDeploymentEntityManager() {
-    return processEngineConfiguration.getDeploymentEntityManager();
-  }
-
-  public ResourceEntityManager getResourceEntityManager() {
-    return processEngineConfiguration.getResourceEntityManager();
-  }
-
-  public ByteArrayEntityManager getByteArrayEntityManager() {
-    return processEngineConfiguration.getByteArrayEntityManager();
-  }
-
-  public ProcessDefinitionEntityManager getProcessDefinitionEntityManager() {
-    return processEngineConfiguration.getProcessDefinitionEntityManager();
-  }
-
-  public ModelEntityManager getModelEntityManager() {
-    return processEngineConfiguration.getModelEntityManager();
-  }
-  
-  public ProcessDefinitionInfoEntityManager getProcessDefinitionInfoEntityManager() {
-    return processEngineConfiguration.getProcessDefinitionInfoEntityManager();
-  }
-
-  public ExecutionEntityManager getExecutionEntityManager() {
-    return processEngineConfiguration.getExecutionEntityManager();
-  }
-
-  public TaskEntityManager getTaskEntityManager() {
-    return processEngineConfiguration.getTaskEntityManager();
-  }
-
-  public IdentityLinkEntityManager getIdentityLinkEntityManager() {
-    return processEngineConfiguration.getIdentityLinkEntityManager();
-  }
-
-  public VariableInstanceEntityManager getVariableInstanceEntityManager() {
-    return processEngineConfiguration.getVariableInstanceEntityManager();
-  }
-
-  public HistoricProcessInstanceEntityManager getHistoricProcessInstanceEntityManager() {
-    return processEngineConfiguration.getHistoricProcessInstanceEntityManager();
-  }
-
-  public HistoricDetailEntityManager getHistoricDetailEntityManager() {
-    return processEngineConfiguration.getHistoricDetailEntityManager();
-  }
-
-  public HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {
-    return processEngineConfiguration.getHistoricVariableInstanceEntityManager();
-  }
-
-  public HistoricActivityInstanceEntityManager getHistoricActivityInstanceEntityManager() {
-    return processEngineConfiguration.getHistoricActivityInstanceEntityManager();
-  }
-
-  public HistoricTaskInstanceEntityManager getHistoricTaskInstanceEntityManager() {
-    return processEngineConfiguration.getHistoricTaskInstanceEntityManager();
-  }
-
-  public HistoricIdentityLinkEntityManager getHistoricIdentityLinkEntityManager() {
-    return processEngineConfiguration.getHistoricIdentityLinkEntityManager();
-  }
-
-  public EventLogEntryEntityManager getEventLogEntryEntityManager() {
-    return processEngineConfiguration.getEventLogEntryEntityManager();
-  }
-
-  public JobEntityManager getJobEntityManager() {
-    return processEngineConfiguration.getJobEntityManager();
-  }
-  
-  public TimerJobEntityManager getTimerJobEntityManager() {
-    return processEngineConfiguration.getTimerJobEntityManager();
-  }
-  
-  public SuspendedJobEntityManager getSuspendedJobEntityManager() {
-    return processEngineConfiguration.getSuspendedJobEntityManager();
-  }
-  
-  public DeadLetterJobEntityManager getDeadLetterJobEntityManager() {
-    return processEngineConfiguration.getDeadLetterJobEntityManager();
-  }
-
-  public AttachmentEntityManager getAttachmentEntityManager() {
-    return processEngineConfiguration.getAttachmentEntityManager();
-  }
-
-  public TableDataManager getTableDataManager() {
-    return processEngineConfiguration.getTableDataManager();
-  }
-
-  public CommentEntityManager getCommentEntityManager() {
-    return processEngineConfiguration.getCommentEntityManager();
-  }
-
-  public PropertyEntityManager getPropertyEntityManager() {
-    return processEngineConfiguration.getPropertyEntityManager();
-  }
-
-  public EventSubscriptionEntityManager getEventSubscriptionEntityManager() {
-    return processEngineConfiguration.getEventSubscriptionEntityManager();
-  }
-
-  public HistoryManager getHistoryManager() {
-    return processEngineConfiguration.getHistoryManager();
-  }
-  
-  public JobManager getJobManager() {
-    return processEngineConfiguration.getJobManager();
-  }
-
-  // Involved executions ////////////////////////////////////////////////////////
-
-  public void addInvolvedExecution(ExecutionEntity executionEntity) {
-    if (executionEntity.getId() != null) {
-      involvedExecutions.put(executionEntity.getId(), executionEntity);
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void addCloseListener(CommandContextCloseListener commandContextCloseListener) {
+        if (closeListeners == null) {
+            closeListeners = new ArrayList<BaseCommandContextCloseListener<AbstractCommandContext>>(1);
+        }
+        closeListeners.add((BaseCommandContextCloseListener) commandContextCloseListener);
     }
-  }
 
-  public boolean hasInvolvedExecutions() {
-    return involvedExecutions.size() > 0;
-  }
+    public DbSqlSession getDbSqlSession() {
+        return getSession(DbSqlSession.class);
+    }
 
-  public Collection<ExecutionEntity> getInvolvedExecutions() {
-    return involvedExecutions.values();
-  }
+    public EntityCache getEntityCache() {
+        return getSession(EntityCache.class);
+    }
 
-  // getters and setters
-  // //////////////////////////////////////////////////////
+    public DeploymentEntityManager getDeploymentEntityManager() {
+        return processEngineConfiguration.getDeploymentEntityManager();
+    }
 
-  public FailedJobCommandFactory getFailedJobCommandFactory() {
-    return failedJobCommandFactory;
-  }
+    public ResourceEntityManager getResourceEntityManager() {
+        return processEngineConfiguration.getResourceEntityManager();
+    }
 
-  public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
-    return processEngineConfiguration;
-  }
+    public ByteArrayEntityManager getByteArrayEntityManager() {
+        return processEngineConfiguration.getByteArrayEntityManager();
+    }
 
-  public FlowableEventDispatcher getEventDispatcher() {
-    return processEngineConfiguration.getEventDispatcher();
-  }
+    public ProcessDefinitionEntityManager getProcessDefinitionEntityManager() {
+        return processEngineConfiguration.getProcessDefinitionEntityManager();
+    }
 
-  public FlowableEngineAgenda getAgenda() {
-    return agenda;
-  }
+    public ModelEntityManager getModelEntityManager() {
+        return processEngineConfiguration.getModelEntityManager();
+    }
 
-  public Object getResult() {
-    return resultStack.pollLast();
-  }
+    public ProcessDefinitionInfoEntityManager getProcessDefinitionInfoEntityManager() {
+        return processEngineConfiguration.getProcessDefinitionInfoEntityManager();
+    }
 
-  public void setResult(Object result) {
-    resultStack.add(result);
-  }
+    public ExecutionEntityManager getExecutionEntityManager() {
+        return processEngineConfiguration.getExecutionEntityManager();
+    }
+
+    public TaskEntityManager getTaskEntityManager() {
+        return processEngineConfiguration.getTaskEntityManager();
+    }
+
+    public IdentityLinkEntityManager getIdentityLinkEntityManager() {
+        return processEngineConfiguration.getIdentityLinkEntityManager();
+    }
+
+    public VariableInstanceEntityManager getVariableInstanceEntityManager() {
+        return processEngineConfiguration.getVariableInstanceEntityManager();
+    }
+
+    public HistoricProcessInstanceEntityManager getHistoricProcessInstanceEntityManager() {
+        return processEngineConfiguration.getHistoricProcessInstanceEntityManager();
+    }
+
+    public HistoricDetailEntityManager getHistoricDetailEntityManager() {
+        return processEngineConfiguration.getHistoricDetailEntityManager();
+    }
+
+    public HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {
+        return processEngineConfiguration.getHistoricVariableInstanceEntityManager();
+    }
+
+    public HistoricActivityInstanceEntityManager getHistoricActivityInstanceEntityManager() {
+        return processEngineConfiguration.getHistoricActivityInstanceEntityManager();
+    }
+
+    public HistoricTaskInstanceEntityManager getHistoricTaskInstanceEntityManager() {
+        return processEngineConfiguration.getHistoricTaskInstanceEntityManager();
+    }
+
+    public HistoricIdentityLinkEntityManager getHistoricIdentityLinkEntityManager() {
+        return processEngineConfiguration.getHistoricIdentityLinkEntityManager();
+    }
+
+    public EventLogEntryEntityManager getEventLogEntryEntityManager() {
+        return processEngineConfiguration.getEventLogEntryEntityManager();
+    }
+
+    public JobEntityManager getJobEntityManager() {
+        return processEngineConfiguration.getJobEntityManager();
+    }
+
+    public TimerJobEntityManager getTimerJobEntityManager() {
+        return processEngineConfiguration.getTimerJobEntityManager();
+    }
+
+    public SuspendedJobEntityManager getSuspendedJobEntityManager() {
+        return processEngineConfiguration.getSuspendedJobEntityManager();
+    }
+
+    public DeadLetterJobEntityManager getDeadLetterJobEntityManager() {
+        return processEngineConfiguration.getDeadLetterJobEntityManager();
+    }
+
+    public AttachmentEntityManager getAttachmentEntityManager() {
+        return processEngineConfiguration.getAttachmentEntityManager();
+    }
+
+    public TableDataManager getTableDataManager() {
+        return processEngineConfiguration.getTableDataManager();
+    }
+
+    public CommentEntityManager getCommentEntityManager() {
+        return processEngineConfiguration.getCommentEntityManager();
+    }
+
+    public PropertyEntityManager getPropertyEntityManager() {
+        return processEngineConfiguration.getPropertyEntityManager();
+    }
+
+    public EventSubscriptionEntityManager getEventSubscriptionEntityManager() {
+        return processEngineConfiguration.getEventSubscriptionEntityManager();
+    }
+
+    public HistoryManager getHistoryManager() {
+        return processEngineConfiguration.getHistoryManager();
+    }
+
+    public JobManager getJobManager() {
+        return processEngineConfiguration.getJobManager();
+    }
+
+    // Involved executions ////////////////////////////////////////////////////////
+
+    public void addInvolvedExecution(ExecutionEntity executionEntity) {
+        if (executionEntity.getId() != null) {
+            involvedExecutions.put(executionEntity.getId(), executionEntity);
+        }
+    }
+
+    public boolean hasInvolvedExecutions() {
+        return involvedExecutions.size() > 0;
+    }
+
+    public Collection<ExecutionEntity> getInvolvedExecutions() {
+        return involvedExecutions.values();
+    }
+
+    // getters and setters
+    // //////////////////////////////////////////////////////
+
+    public FailedJobCommandFactory getFailedJobCommandFactory() {
+        return failedJobCommandFactory;
+    }
+
+    public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
+        return processEngineConfiguration;
+    }
+
+    public FlowableEventDispatcher getEventDispatcher() {
+        return processEngineConfiguration.getEventDispatcher();
+    }
+
+    public FlowableEngineAgenda getAgenda() {
+        return agenda;
+    }
+
+    public Object getResult() {
+        return resultStack.pollLast();
+    }
+
+    public void setResult(Object result) {
+        resultStack.add(result);
+    }
 }

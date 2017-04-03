@@ -26,21 +26,21 @@ import org.flowable.engine.impl.persistence.entity.TaskEntity;
  * @author Joram Barrez
  */
 public interface HistoricTaskInstanceDataManager extends DataManager<HistoricTaskInstanceEntity> {
-  
-  HistoricTaskInstanceEntity create(TaskEntity task, ExecutionEntity execution);
-  
-  List<HistoricTaskInstanceEntity> findHistoricTasksByParentTaskId(String parentTaskId);
 
-  List<HistoricTaskInstanceEntity> findHistoricTaskInstanceByProcessInstanceId(String processInstanceId);
-  
-  long findHistoricTaskInstanceCountByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
+    HistoricTaskInstanceEntity create(TaskEntity task, ExecutionEntity execution);
 
-  List<HistoricTaskInstance> findHistoricTaskInstancesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
+    List<HistoricTaskInstanceEntity> findHistoricTasksByParentTaskId(String parentTaskId);
 
-  List<HistoricTaskInstance> findHistoricTaskInstancesAndVariablesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
-  
-  List<HistoricTaskInstance> findHistoricTaskInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<HistoricTaskInstanceEntity> findHistoricTaskInstanceByProcessInstanceId(String processInstanceId);
 
-  long findHistoricTaskInstanceCountByNativeQuery(Map<String, Object> parameterMap);
-  
+    long findHistoricTaskInstanceCountByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
+
+    List<HistoricTaskInstance> findHistoricTaskInstancesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
+
+    List<HistoricTaskInstance> findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
+
+    List<HistoricTaskInstance> findHistoricTaskInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+
+    long findHistoricTaskInstanceCountByNativeQuery(Map<String, Object> parameterMap);
+
 }

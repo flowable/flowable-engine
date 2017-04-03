@@ -25,39 +25,39 @@ import org.flowable.engine.impl.persistence.entity.JobEntity;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ProcessInstanceEndHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
-  
-  public static final String TYPE = "process-instance-end";
 
-  @Override
-  public String getType() {
-    return TYPE;
-  }
+    public static final String TYPE = "process-instance-end";
 
-  @Override
-  public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
-    String id = getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID);
-    HistoricProcessInstanceEntityManager historicProcessInstanceEntityManager = commandContext.getHistoricProcessInstanceEntityManager();
-    return historicProcessInstanceEntityManager.findById(id) != null;
-  }
-
-  @Override
-  public void transformJson(JobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-    HistoricProcessInstanceEntityManager historicProcessInstanceEntityManager = commandContext.getHistoricProcessInstanceEntityManager();
-
-    String processInstanceId = getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID);
-    HistoricProcessInstanceEntity historicProcessInstance = historicProcessInstanceEntityManager.findById(processInstanceId);
-    historicProcessInstance.setEndActivityId(getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID));
-    
-    Date endTime = getDateFromJson(historicalData, HistoryJsonConstants.END_TIME);
-    historicProcessInstance.setEndTime(endTime);
-    historicProcessInstance.setDeleteReason(getStringFromJson(historicalData, HistoryJsonConstants.DELETE_REASON));
-
-    Date startTime = historicProcessInstance.getStartTime();
-    if (startTime != null && endTime != null) {
-      historicProcessInstance.setDurationInMillis(endTime.getTime() - startTime.getTime());
+    @Override
+    public String getType() {
+        return TYPE;
     }
 
-    dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
-  }
+    @Override
+    public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
+        String id = getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID);
+        HistoricProcessInstanceEntityManager historicProcessInstanceEntityManager = commandContext.getHistoricProcessInstanceEntityManager();
+        return historicProcessInstanceEntityManager.findById(id) != null;
+    }
+
+    @Override
+    public void transformJson(JobEntity job, ObjectNode historicalData, CommandContext commandContext) {
+        HistoricProcessInstanceEntityManager historicProcessInstanceEntityManager = commandContext.getHistoricProcessInstanceEntityManager();
+
+        String processInstanceId = getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID);
+        HistoricProcessInstanceEntity historicProcessInstance = historicProcessInstanceEntityManager.findById(processInstanceId);
+        historicProcessInstance.setEndActivityId(getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID));
+
+        Date endTime = getDateFromJson(historicalData, HistoryJsonConstants.END_TIME);
+        historicProcessInstance.setEndTime(endTime);
+        historicProcessInstance.setDeleteReason(getStringFromJson(historicalData, HistoryJsonConstants.DELETE_REASON));
+
+        Date startTime = historicProcessInstance.getStartTime();
+        if (startTime != null && endTime != null) {
+            historicProcessInstance.setDurationInMillis(endTime.getTime() - startTime.getTime());
+        }
+
+        dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
+    }
 
 }

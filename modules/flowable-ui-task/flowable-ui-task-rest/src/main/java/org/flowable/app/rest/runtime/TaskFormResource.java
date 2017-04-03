@@ -33,23 +33,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/rest/task-forms")
 public class TaskFormResource {
-  
-  @Autowired
-  protected FlowableTaskFormService taskFormService;
 
-  @RequestMapping(value = "/{taskId}", method = RequestMethod.GET, produces = "application/json")
-  public FormModel getTaskForm(@PathVariable String taskId) {
-    return taskFormService.getTaskForm(taskId);
-  }
+    @Autowired
+    protected FlowableTaskFormService taskFormService;
 
-  @ResponseStatus(value = HttpStatus.OK)
-  @RequestMapping(value = "/{taskId}", method = RequestMethod.POST, produces = "application/json")
-  public void completeTaskForm(@PathVariable String taskId, @RequestBody CompleteFormRepresentation completeTaskFormRepresentation) {
-    taskFormService.completeTaskForm(taskId, completeTaskFormRepresentation);
-  }
+    @RequestMapping(value = "/{taskId}", method = RequestMethod.GET, produces = "application/json")
+    public FormModel getTaskForm(@PathVariable String taskId) {
+        return taskFormService.getTaskForm(taskId);
+    }
 
-  @RequestMapping(value = "/{taskId}/variables", method = RequestMethod.GET, produces = "application/json")
-  public List<ProcessInstanceVariableRepresentation> getProcessInstanceVariables(@PathVariable String taskId) {
-    return taskFormService.getProcessInstanceVariables(taskId);
-  }
+    @ResponseStatus(value = HttpStatus.OK)
+    @RequestMapping(value = "/{taskId}", method = RequestMethod.POST, produces = "application/json")
+    public void completeTaskForm(@PathVariable String taskId, @RequestBody CompleteFormRepresentation completeTaskFormRepresentation) {
+        taskFormService.completeTaskForm(taskId, completeTaskFormRepresentation);
+    }
+
+    @RequestMapping(value = "/{taskId}/variables", method = RequestMethod.GET, produces = "application/json")
+    public List<ProcessInstanceVariableRepresentation> getProcessInstanceVariables(@PathVariable String taskId) {
+        return taskFormService.getProcessInstanceVariables(taskId);
+    }
 }

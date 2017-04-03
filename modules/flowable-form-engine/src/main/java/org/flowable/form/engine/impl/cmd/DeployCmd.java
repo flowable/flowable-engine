@@ -33,88 +33,88 @@ import org.flowable.form.engine.impl.repository.FormDeploymentBuilderImpl;
  */
 public class DeployCmd<T> implements Command<FormDeployment>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected FormDeploymentBuilderImpl deploymentBuilder;
+    private static final long serialVersionUID = 1L;
+    protected FormDeploymentBuilderImpl deploymentBuilder;
 
-  public DeployCmd(FormDeploymentBuilderImpl deploymentBuilder) {
-    this.deploymentBuilder = deploymentBuilder;
-  }
-
-  public FormDeployment execute(CommandContext commandContext) {
-
-    FormDeploymentEntity deployment = deploymentBuilder.getDeployment();
-
-    deployment.setDeploymentTime(commandContext.getFormEngineConfiguration().getClock().getCurrentTime());
-
-    if (deploymentBuilder.isDuplicateFilterEnabled()) {
-
-      List<FormDeployment> existingDeployments = new ArrayList<FormDeployment>();
-      if (deployment.getTenantId() == null || FormEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
-        FormDeploymentEntity existingDeployment = commandContext.getDeploymentEntityManager().findLatestDeploymentByName(deployment.getName());
-        if (existingDeployment != null) {
-          existingDeployments.add(existingDeployment);
-        }
-      } else {
-        List<FormDeployment> deploymentList = commandContext.getFormEngineConfiguration().getFormRepositoryService().createDeploymentQuery().deploymentName(deployment.getName())
-            .deploymentTenantId(deployment.getTenantId()).orderByDeploymentId().desc().list();
-
-        if (!deploymentList.isEmpty()) {
-          existingDeployments.addAll(deploymentList);
-        }
-      }
-
-      FormDeploymentEntity existingDeployment = null;
-      if (!existingDeployments.isEmpty()) {
-        existingDeployment = (FormDeploymentEntity) existingDeployments.get(0);
-        
-        Map<String, ResourceEntity> resourceMap = new HashMap<String, ResourceEntity>();
-        List<ResourceEntity> resourceList = commandContext.getResourceEntityManager().findResourcesByDeploymentId(existingDeployment.getId());
-        for (ResourceEntity resourceEntity : resourceList) {
-          resourceMap.put(resourceEntity.getName(), resourceEntity);
-        }
-        existingDeployment.setResources(resourceMap);
-      }
-
-      if ((existingDeployment != null) && !deploymentsDiffer(deployment, existingDeployment)) {
-        return existingDeployment;
-      }
+    public DeployCmd(FormDeploymentBuilderImpl deploymentBuilder) {
+        this.deploymentBuilder = deploymentBuilder;
     }
 
-    deployment.setNew(true);
+    public FormDeployment execute(CommandContext commandContext) {
 
-    // Save the data
-    commandContext.getDeploymentEntityManager().insert(deployment);
+        FormDeploymentEntity deployment = deploymentBuilder.getDeployment();
 
-    // Actually deploy
-    commandContext.getFormEngineConfiguration().getDeploymentManager().deploy(deployment);
+        deployment.setDeploymentTime(commandContext.getFormEngineConfiguration().getClock().getCurrentTime());
 
-    return deployment;
-  }
+        if (deploymentBuilder.isDuplicateFilterEnabled()) {
 
-  protected boolean deploymentsDiffer(FormDeploymentEntity deployment, FormDeploymentEntity saved) {
+            List<FormDeployment> existingDeployments = new ArrayList<FormDeployment>();
+            if (deployment.getTenantId() == null || FormEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
+                FormDeploymentEntity existingDeployment = commandContext.getDeploymentEntityManager().findLatestDeploymentByName(deployment.getName());
+                if (existingDeployment != null) {
+                    existingDeployments.add(existingDeployment);
+                }
+            } else {
+                List<FormDeployment> deploymentList = commandContext.getFormEngineConfiguration().getFormRepositoryService().createDeploymentQuery().deploymentName(deployment.getName())
+                        .deploymentTenantId(deployment.getTenantId()).orderByDeploymentId().desc().list();
 
-    if (deployment.getResources() == null || saved.getResources() == null) {
-      return true;
+                if (!deploymentList.isEmpty()) {
+                    existingDeployments.addAll(deploymentList);
+                }
+            }
+
+            FormDeploymentEntity existingDeployment = null;
+            if (!existingDeployments.isEmpty()) {
+                existingDeployment = (FormDeploymentEntity) existingDeployments.get(0);
+
+                Map<String, ResourceEntity> resourceMap = new HashMap<String, ResourceEntity>();
+                List<ResourceEntity> resourceList = commandContext.getResourceEntityManager().findResourcesByDeploymentId(existingDeployment.getId());
+                for (ResourceEntity resourceEntity : resourceList) {
+                    resourceMap.put(resourceEntity.getName(), resourceEntity);
+                }
+                existingDeployment.setResources(resourceMap);
+            }
+
+            if ((existingDeployment != null) && !deploymentsDiffer(deployment, existingDeployment)) {
+                return existingDeployment;
+            }
+        }
+
+        deployment.setNew(true);
+
+        // Save the data
+        commandContext.getDeploymentEntityManager().insert(deployment);
+
+        // Actually deploy
+        commandContext.getFormEngineConfiguration().getDeploymentManager().deploy(deployment);
+
+        return deployment;
     }
 
-    Map<String, ResourceEntity> resources = deployment.getResources();
-    Map<String, ResourceEntity> savedResources = saved.getResources();
+    protected boolean deploymentsDiffer(FormDeploymentEntity deployment, FormDeploymentEntity saved) {
 
-    for (String resourceName : resources.keySet()) {
-      ResourceEntity savedResource = savedResources.get(resourceName);
+        if (deployment.getResources() == null || saved.getResources() == null) {
+            return true;
+        }
 
-      if (savedResource == null) {
-        return true;
-      }
+        Map<String, ResourceEntity> resources = deployment.getResources();
+        Map<String, ResourceEntity> savedResources = saved.getResources();
 
-      ResourceEntity resource = resources.get(resourceName);
+        for (String resourceName : resources.keySet()) {
+            ResourceEntity savedResource = savedResources.get(resourceName);
 
-      byte[] bytes = resource.getBytes();
-      byte[] savedBytes = savedResource.getBytes();
-      if (!Arrays.equals(bytes, savedBytes)) {
-        return true;
-      }
+            if (savedResource == null) {
+                return true;
+            }
+
+            ResourceEntity resource = resources.get(resourceName);
+
+            byte[] bytes = resource.getBytes();
+            byte[] savedBytes = savedResource.getBytes();
+            if (!Arrays.equals(bytes, savedBytes)) {
+                return true;
+            }
+        }
+        return false;
     }
-    return false;
-  }
 }

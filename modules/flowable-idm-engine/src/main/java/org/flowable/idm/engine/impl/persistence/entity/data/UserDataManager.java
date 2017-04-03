@@ -26,15 +26,14 @@ import org.flowable.idm.engine.impl.persistence.entity.UserEntity;
  */
 public interface UserDataManager extends DataManager<UserEntity> {
 
-  List<User> findUserByQueryCriteria(UserQueryImpl query, Page page);
+    List<User> findUserByQueryCriteria(UserQueryImpl query, Page page);
 
-  long findUserCountByQueryCriteria(UserQueryImpl query);
- 
-  List<User> findUsersByPrivilegeId(String privilegeId);
-  
-  List<User> findUsersByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    long findUserCountByQueryCriteria(UserQueryImpl query);
 
-  long findUserCountByNativeQuery(Map<String, Object> parameterMap);
+    List<User> findUsersByPrivilegeId(String privilegeId);
 
-  
+    List<User> findUsersByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+
+    long findUserCountByNativeQuery(Map<String, Object> parameterMap);
+
 }

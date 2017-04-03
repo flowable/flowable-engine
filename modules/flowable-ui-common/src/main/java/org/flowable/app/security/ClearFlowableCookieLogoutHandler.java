@@ -21,11 +21,11 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 public class ClearFlowableCookieLogoutHandler implements LogoutHandler {
 
-  public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-    Cookie cookie = new Cookie(CookieConstants.COOKIE_NAME, null);
-    cookie.setPath("/");
-    cookie.setMaxAge(0);
-    response.addCookie(cookie);
-  }
+    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        Cookie cookie = new Cookie(CookieConstants.COOKIE_NAME, null);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+    }
 
 }

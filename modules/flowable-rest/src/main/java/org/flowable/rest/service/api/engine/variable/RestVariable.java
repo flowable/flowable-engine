@@ -25,43 +25,43 @@ import org.flowable.rest.variable.EngineRestVariable;
  */
 public class RestVariable extends EngineRestVariable {
 
-  public enum RestVariableScope {
-    LOCAL, GLOBAL
-  }
-
-  private RestVariableScope variableScope;
-
-  @JsonIgnore
-  public RestVariableScope getVariableScope() {
-    return variableScope;
-  }
-
-  public void setVariableScope(RestVariableScope variableScope) {
-    this.variableScope = variableScope;
-  }
-
-  public String getScope() {
-    String scope = null;
-    if (variableScope != null) {
-      scope = variableScope.name().toLowerCase();
+    public enum RestVariableScope {
+        LOCAL, GLOBAL
     }
-    return scope;
-  }
 
-  public void setScope(String scope) {
-    setVariableScope(getScopeFromString(scope));
-  }
+    private RestVariableScope variableScope;
 
-  public static RestVariableScope getScopeFromString(String scope) {
-    if (scope != null) {
-      for (RestVariableScope s : RestVariableScope.values()) {
-        if (s.name().equalsIgnoreCase(scope)) {
-          return s;
+    @JsonIgnore
+    public RestVariableScope getVariableScope() {
+        return variableScope;
+    }
+
+    public void setVariableScope(RestVariableScope variableScope) {
+        this.variableScope = variableScope;
+    }
+
+    public String getScope() {
+        String scope = null;
+        if (variableScope != null) {
+            scope = variableScope.name().toLowerCase();
         }
-      }
-      throw new FlowableIllegalArgumentException("Invalid variable scope: '" + scope + "'");
-    } else {
-      return null;
+        return scope;
     }
-  }
+
+    public void setScope(String scope) {
+        setVariableScope(getScopeFromString(scope));
+    }
+
+    public static RestVariableScope getScopeFromString(String scope) {
+        if (scope != null) {
+            for (RestVariableScope s : RestVariableScope.values()) {
+                if (s.name().equalsIgnoreCase(scope)) {
+                    return s;
+                }
+            }
+            throw new FlowableIllegalArgumentException("Invalid variable scope: '" + scope + "'");
+        } else {
+            return null;
+        }
+    }
 }

@@ -24,7 +24,7 @@ angular.module('flowableModeler')
 
 	  $scope.model = {
         filters: [
-            {id: 'myReusableForms', labelKey: 'MY-REUSABLE-FORMS'}
+            {id: 'forms', labelKey: 'FORMS'}
 		],
 
 		sorts: [

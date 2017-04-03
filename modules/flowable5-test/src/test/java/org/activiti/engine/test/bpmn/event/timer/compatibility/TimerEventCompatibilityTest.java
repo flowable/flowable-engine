@@ -19,10 +19,10 @@ import org.flowable.engine.common.runtime.Clock;
 
 public abstract class TimerEventCompatibilityTest extends PluggableFlowableTestCase {
 
-  protected void moveByMinutes(int minutes) throws Exception {
-    Clock clock = processEngineConfiguration.getClock();
-    Date newDate = new Date(clock.getCurrentTime().getTime() + ((minutes * 60 * 1000)));
-    clock.setCurrentTime(newDate);
-    processEngineConfiguration.setClock(clock);
-  }
+    protected void moveByMinutes(int minutes) throws Exception {
+        Clock clock = processEngineConfiguration.getClock();
+        Date newDate = new Date(clock.getCurrentTime().getTime() + ((minutes * 60 * 1000)));
+        clock.setCurrentTime(newDate);
+        processEngineConfiguration.setClock(clock);
+    }
 }

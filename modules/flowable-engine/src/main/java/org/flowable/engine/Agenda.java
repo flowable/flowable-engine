@@ -22,7 +22,8 @@ public interface Agenda {
      * Get next operation from agenda and remove operation from the queue.
      *
      * @return next operation from the queue
-     * @throws {@link org.flowable.engine.common.api.FlowableException} in the case when agenda is empty
+     * @throws {@link
+     *             org.flowable.engine.common.api.FlowableException} in the case when agenda is empty
      */
     Runnable getNextOperation();
 
@@ -30,14 +31,16 @@ public interface Agenda {
      * Get next operation from agenda and keep operation on the top of the agenda
      *
      * @return the first operation from the agenda
-     * @throws {@link org.flowable.engine.common.api.FlowableException} in the case when agenda is empty
+     * @throws {@link
+     *             org.flowable.engine.common.api.FlowableException} in the case when agenda is empty
      */
     Runnable peekOperation();
 
     /**
      * Plan operation for execution
      *
-     * @param operation operation to run
+     * @param operation
+     *            operation to run
      */
     void planOperation(Runnable operation);
 }

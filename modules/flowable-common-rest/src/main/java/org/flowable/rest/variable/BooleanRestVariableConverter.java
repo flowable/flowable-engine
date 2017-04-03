@@ -20,37 +20,37 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
  */
 public class BooleanRestVariableConverter implements RestVariableConverter {
 
-  @Override
-  public String getRestTypeName() {
-    return "boolean";
-  }
-
-  @Override
-  public Class<?> getVariableType() {
-    return Boolean.class;
-  }
-
-  @Override
-  public Object getVariableValue(EngineRestVariable result) {
-    if (result.getValue() != null) {
-      if (!(result.getValue() instanceof Boolean)) {
-        throw new FlowableIllegalArgumentException("Converter can only convert booleans");
-      }
-      return result.getValue();
+    @Override
+    public String getRestTypeName() {
+        return "boolean";
     }
-    return null;
-  }
 
-  @Override
-  public void convertVariableValue(Object variableValue, EngineRestVariable result) {
-    if (variableValue != null) {
-      if (!(variableValue instanceof Boolean)) {
-        throw new FlowableIllegalArgumentException("Converter can only convert booleans");
-      }
-      result.setValue(variableValue);
-    } else {
-      result.setValue(null);
+    @Override
+    public Class<?> getVariableType() {
+        return Boolean.class;
     }
-  }
+
+    @Override
+    public Object getVariableValue(EngineRestVariable result) {
+        if (result.getValue() != null) {
+            if (!(result.getValue() instanceof Boolean)) {
+                throw new FlowableIllegalArgumentException("Converter can only convert booleans");
+            }
+            return result.getValue();
+        }
+        return null;
+    }
+
+    @Override
+    public void convertVariableValue(Object variableValue, EngineRestVariable result) {
+        if (variableValue != null) {
+            if (!(variableValue instanceof Boolean)) {
+                throw new FlowableIllegalArgumentException("Converter can only convert booleans");
+            }
+            result.setValue(variableValue);
+        } else {
+            result.setValue(null);
+        }
+    }
 
 }

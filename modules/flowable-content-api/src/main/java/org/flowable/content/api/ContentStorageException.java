@@ -19,17 +19,17 @@ import org.flowable.engine.common.api.FlowableException;
  */
 public class ContentStorageException extends FlowableException {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public ContentStorageException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-    super(message, cause);
-  }
+    public ContentStorageException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause);
+    }
 
-  public ContentStorageException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public ContentStorageException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-  public ContentStorageException(String message) {
-    super(message);
-  }
+    public ContentStorageException(String message) {
+        super(message);
+    }
 }

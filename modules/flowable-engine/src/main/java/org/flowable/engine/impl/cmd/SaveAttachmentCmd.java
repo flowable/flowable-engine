@@ -30,38 +30,38 @@ import org.flowable.engine.task.Attachment;
  */
 public class SaveAttachmentCmd implements Command<Object>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected Attachment attachment;
+    private static final long serialVersionUID = 1L;
+    protected Attachment attachment;
 
-  public SaveAttachmentCmd(Attachment attachment) {
-    this.attachment = attachment;
-  }
+    public SaveAttachmentCmd(Attachment attachment) {
+        this.attachment = attachment;
+    }
 
-  public Object execute(CommandContext commandContext) {
-    AttachmentEntity updateAttachment = commandContext.getAttachmentEntityManager().findById(attachment.getId());
+    public Object execute(CommandContext commandContext) {
+        AttachmentEntity updateAttachment = commandContext.getAttachmentEntityManager().findById(attachment.getId());
 
-    String processInstanceId = updateAttachment.getProcessInstanceId();
-    String processDefinitionId = null;
-    if (updateAttachment.getProcessInstanceId() != null) {
-      ExecutionEntity process = commandContext.getExecutionEntityManager().findById(processInstanceId);
-      if (process != null) {
-        processDefinitionId = process.getProcessDefinitionId();
-        if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, process.getProcessDefinitionId())) {
-          Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-          compatibilityHandler.saveAttachment(attachment);
-          return null;
+        String processInstanceId = updateAttachment.getProcessInstanceId();
+        String processDefinitionId = null;
+        if (updateAttachment.getProcessInstanceId() != null) {
+            ExecutionEntity process = commandContext.getExecutionEntityManager().findById(processInstanceId);
+            if (process != null) {
+                processDefinitionId = process.getProcessDefinitionId();
+                if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, process.getProcessDefinitionId())) {
+                    Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+                    compatibilityHandler.saveAttachment(attachment);
+                    return null;
+                }
+            }
         }
-      }
-    }
-    
-    updateAttachment.setName(attachment.getName());
-    updateAttachment.setDescription(attachment.getDescription());
 
-    if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-      commandContext.getProcessEngineConfiguration().getEventDispatcher()
-          .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, attachment, processInstanceId, processInstanceId, processDefinitionId));
-    }
+        updateAttachment.setName(attachment.getName());
+        updateAttachment.setDescription(attachment.getDescription());
 
-    return null;
-  }
+        if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            commandContext.getProcessEngineConfiguration().getEventDispatcher()
+                    .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, attachment, processInstanceId, processInstanceId, processDefinitionId));
+        }
+
+        return null;
+    }
 }

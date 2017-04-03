@@ -21,16 +21,16 @@ import org.flowable.engine.impl.identity.Authentication;
 
 public class EngineAuthenticationCookieFilterCallback implements FlowableCookieFilterCallback {
 
-  @Override
-  public void onValidTokenFound(HttpServletRequest request, HttpServletResponse response, RemoteToken token) {
-    if (token != null && token.getUserId() != null) {
-      Authentication.setAuthenticatedUserId(token.getUserId());
+    @Override
+    public void onValidTokenFound(HttpServletRequest request, HttpServletResponse response, RemoteToken token) {
+        if (token != null && token.getUserId() != null) {
+            Authentication.setAuthenticatedUserId(token.getUserId());
+        }
     }
-  }
 
-  @Override
-  public void onFilterCleanup(HttpServletRequest request, HttpServletResponse response) {
-    Authentication.setAuthenticatedUserId(null);
-  }
+    @Override
+    public void onFilterCleanup(HttpServletRequest request, HttpServletResponse response) {
+        Authentication.setAuthenticatedUserId(null);
+    }
 
 }

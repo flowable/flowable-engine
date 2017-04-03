@@ -31,25 +31,25 @@ import org.junit.Rule;
  */
 public class AbstractFlowableFormTest {
 
-  public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowableform;DB_CLOSE_DELAY=1000";
+    public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowableform;DB_CLOSE_DELAY=1000";
 
-  @Rule
-  public FlowableFormRule flowableRule = new FlowableFormRule();
+    @Rule
+    public FlowableFormRule flowableRule = new FlowableFormRule();
 
-  protected static FormEngine cachedFormEngine;
-  protected FormEngineConfiguration formEngineConfiguration;
-  protected FormRepositoryService repositoryService;
-  protected FormService formService;
+    protected static FormEngine cachedFormEngine;
+    protected FormEngineConfiguration formEngineConfiguration;
+    protected FormRepositoryService repositoryService;
+    protected FormService formService;
 
-  @Before
-  public void initFormEngine() {
-    if (cachedFormEngine == null) {
-      cachedFormEngine = flowableRule.getFormEngine();
+    @Before
+    public void initFormEngine() {
+        if (cachedFormEngine == null) {
+            cachedFormEngine = flowableRule.getFormEngine();
+        }
+
+        this.formEngineConfiguration = cachedFormEngine.getFormEngineConfiguration();
+        this.repositoryService = cachedFormEngine.getFormRepositoryService();
+        this.formService = cachedFormEngine.getFormService();
     }
-
-    this.formEngineConfiguration = cachedFormEngine.getFormEngineConfiguration();
-    this.repositoryService = cachedFormEngine.getFormRepositoryService();
-    this.formService = cachedFormEngine.getFormService();
-  }
 
 }

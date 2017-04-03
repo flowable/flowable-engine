@@ -12,6 +12,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 @EnableAsync
 public class FormDispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
-  protected final Logger log = LoggerFactory.getLogger(FormDispatcherServletConfiguration.class);
+    protected final Logger log = LoggerFactory.getLogger(FormDispatcherServletConfiguration.class);
 
 }

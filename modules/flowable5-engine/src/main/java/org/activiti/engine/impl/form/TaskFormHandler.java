@@ -17,13 +17,12 @@ import org.activiti.engine.form.TaskFormData;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.delegate.Expression;
 
-
 /**
  * @author Tom Baeyens
  */
 public interface TaskFormHandler extends FormHandler {
 
-  TaskFormData createTaskForm(TaskEntity task);
-  
-  Expression getFormKey();
+    TaskFormData createTaskForm(TaskEntity task);
+
+    Expression getFormKey();
 }

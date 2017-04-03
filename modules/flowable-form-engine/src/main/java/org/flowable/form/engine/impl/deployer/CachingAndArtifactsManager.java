@@ -25,27 +25,25 @@ import org.flowable.form.model.FormModel;
  * Updates caches and artifacts for a deployment and its forms
  */
 public class CachingAndArtifactsManager {
-  
-  protected FormJsonConverter formJsonConverter = new FormJsonConverter();
-  
-  /**
-   * Ensures that the decision table is cached in the appropriate places, including the
-   * deployment's collection of deployed artifacts and the deployment manager's cache.
-   */
-  public void updateCachingAndArtifacts(ParsedDeployment parsedDeployment) {
-    final FormEngineConfiguration formEngineConfiguration = Context.getFormEngineConfiguration();
-    DeploymentCache<FormDefinitionCacheEntry> formDefinitionCache = formEngineConfiguration.getDeploymentManager().getFormCache();
-    FormDeploymentEntity deployment = parsedDeployment.getDeployment();
 
-    for (FormDefinitionEntity formDefinition : parsedDeployment.getAllFormDefinitions()) {
-      FormModel formModel = parsedDeployment.getFormModelForFormDefinition(formDefinition);
-      formModel.setId(formDefinition.getId());
-      FormDefinitionCacheEntry cacheEntry = new FormDefinitionCacheEntry(formDefinition, formJsonConverter.convertToJson(formModel));
-      formDefinitionCache.add(formDefinition.getId(), cacheEntry);
-    
-      // Add to deployment for further usage
-      deployment.addDeployedArtifact(formDefinition);
+    protected FormJsonConverter formJsonConverter = new FormJsonConverter();
+
+    /**
+     * Ensures that the decision table is cached in the appropriate places, including the deployment's collection of deployed artifacts and the deployment manager's cache.
+     */
+    public void updateCachingAndArtifacts(ParsedDeployment parsedDeployment) {
+        final FormEngineConfiguration formEngineConfiguration = Context.getFormEngineConfiguration();
+        DeploymentCache<FormDefinitionCacheEntry> formDefinitionCache = formEngineConfiguration.getDeploymentManager().getFormCache();
+        FormDeploymentEntity deployment = parsedDeployment.getDeployment();
+
+        for (FormDefinitionEntity formDefinition : parsedDeployment.getAllFormDefinitions()) {
+            FormModel formModel = parsedDeployment.getFormModelForFormDefinition(formDefinition);
+            formModel.setId(formDefinition.getId());
+            FormDefinitionCacheEntry cacheEntry = new FormDefinitionCacheEntry(formDefinition, formJsonConverter.convertToJson(formModel));
+            formDefinitionCache.add(formDefinition.getId(), cacheEntry);
+
+            // Add to deployment for further usage
+            deployment.addDeployedArtifact(formDefinition);
+        }
     }
-  }
 }
-

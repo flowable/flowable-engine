@@ -29,19 +29,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AppDefinitionsResource {
 
-  private final Logger logger = LoggerFactory.getLogger(AppDefinitionsResource.class);
+    private final Logger logger = LoggerFactory.getLogger(AppDefinitionsResource.class);
 
-  @Autowired
-  protected FlowableAppDefinitionService appDefinitionService;
+    @Autowired
+    protected FlowableAppDefinitionService appDefinitionService;
 
-  @RequestMapping(value = "/rest/runtime/app-definitions", method = RequestMethod.GET)
-  public ResultListDataRepresentation getAppDefinitions() {
-    return appDefinitionService.getAppDefinitions();
-  }
+    @RequestMapping(value = "/rest/runtime/app-definitions", method = RequestMethod.GET)
+    public ResultListDataRepresentation getAppDefinitions() {
+        return appDefinitionService.getAppDefinitions();
+    }
 
-  @RequestMapping(value = "/rest/runtime/app-definitions/{deploymentKey}", method = RequestMethod.GET)
-  public AppDefinitionRepresentation getAppDefinition(@PathVariable("deploymentKey") String deploymentKey) {
-    return appDefinitionService.getAppDefinition(deploymentKey);
-  }
+    @RequestMapping(value = "/rest/runtime/app-definitions/{deploymentKey}", method = RequestMethod.GET)
+    public AppDefinitionRepresentation getAppDefinition(@PathVariable("deploymentKey") String deploymentKey) {
+        return appDefinitionService.getAppDefinition(deploymentKey);
+    }
 
 }

@@ -12,31 +12,34 @@
  */
 package org.flowable.form.model;
 
-
 /**
  * @author Tijs Rademakers
  */
 public class Option {
-	
-	protected String id;
-	protected String name;
-	
-	public Option(String name) {
-	    this.name = name;
-	}
-	
-	public Option() {}
-	
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
+
+    protected String id;
+    protected String name;
+
+    public Option(String name) {
+        this.name = name;
+    }
+
+    public Option() {
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

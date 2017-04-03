@@ -18,16 +18,16 @@ BPMN is a widely accepted and supported standard notation for representing proce
 
 [NOTE]
 ====
-This introduction is written under the assumption you are using the link:$$http://eclipse.org/$$[Eclipse IDE] to create and edit files. Very little of this is specific to Eclipse, however. You can use any other tool you prefer to create XML files containing BPMN 2.0.
+This introduction is written with the assumption you are using the link:$$http://eclipse.org/$$[Eclipse IDE] to create and edit files. Very little of this is specific to Eclipse, however, you can use any other tool you prefer to create XML files containing BPMN 2.0.
 
 ====
 
-Create a new XML file (__right-click on any project and select New->Other->XML-XML File__) and give it a name. Make sure that the file *ends with .bpmn20.xml or .bpmn*, since otherwise the engine won't pick up this file for deployment.
+Create a new XML file (__right-click on any project and select New->Other->XML-XML File__) and give it a name. Make sure that the file *ends with .bpmn20.xml or .bpmn*, otherwise the engine won't pick it up for deployment.
 
 image::images/new.bpmn.procdef.png[align="center"]
 
 
-The root element of the BPMN 2.0 schema is the +definitions+ element. Within this element, multiple process definitions can be defined (although we advise to have only one process definition in each file, since this simplifies maintenance later in the development process). An empty process definition looks as listed below. Note that the minimal +definitions+ element only needs the +xmlns+ and +targetNamespace+ declaration. The +targetNamespace+ can be anything, and is useful for categorizing process definitions.
+The root element of the BPMN 2.0 schema is the +definitions+ element. Within this element, multiple process definitions can be given (although our advice is to have only one process definition in each file, as this simplifies maintenance later in the development process). An empty process definition looks like the one shown below. Note that the minimal +definitions+ element only needs the +xmlns+ and +targetNamespace+ declaration. The +targetNamespace+ can be anything and is useful for categorizing process definitions.
 
 [source,xml,linenums]
 ----
@@ -43,7 +43,7 @@ The root element of the BPMN 2.0 schema is the +definitions+ element. Within thi
 </definitions>
 ----
 
-Optionally you can also add the online schema location of the BPMN 2.0 XML schema, as an alternative to the XML catalog configuration in Eclipse.
+Optionally, you can also add the online schema location of the BPMN 2.0 XML schema, as an alternative to the XML catalog configuration in Eclipse.
 
 [source,xml,linenums]
 ----
@@ -62,7 +62,7 @@ The +process+ element has two attributes:
 ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProcess");
 ----
 
-* Important to note here is that this is not the same as calling the  +startProcessInstanceById+ method. This method expects the String id  that was generated at deploy time by the Flowable engine, and can be retrieved by calling the +processDefinition.getId()+ method. The format of the generated id is *'key:version'*, and the length is *constrained to 64 characters*. If you get an +FlowableException+ stating that the generated id is too long, limit the text in the _key_ field of the process.
+* Important to note here is that this is not the same as calling the +startProcessInstanceById+ method, which expects the String ID that was generated at deploy time by the Flowable engine (the ID can be retrieved by calling the +processDefinition.getId()+ method). The format of the generated ID is *'key:version'*, and the length is *constrained to 64 characters*. If you get a +FlowableException+ stating that the generated ID is too long, limit the text in the _key_ field of the process.
 * *name*: this attribute is *optional* and maps to the _name_ property of a +ProcessDefinition+. The engine itself doesn't use this property, so it can be used for displaying a more human-friendly name in a user interface, for example.
 
 
@@ -71,7 +71,7 @@ ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myPr
 
 === Getting started: 10 minute tutorial
 
-In this section we will cover a (very simple) business process that we will use to introduce some basic Flowable concepts and the Flowable API.
+In this section we will cover a very simple business process that we will use to introduce some basic Flowable concepts and the Flowable API.
 
 
 [[bpmn10MinuteTutorialPrerequisites]]
@@ -87,7 +87,7 @@ This tutorial assumes that you have the <<demo.setup.one.minute.version,Flowable
 
 ==== Goal
 
-The goal of this tutorial is to learn about Flowable and some basic BPMN 2.0 concepts. The end result will be a simple Java SE program that deploys a process definition, and interacts with this process through the Flowable engine API. We'll also touch some of the tooling around Flowable. Of course, what you'll learn in this tutorial can also be used when building your own web applications around your business processes.
+The goal of this tutorial is to learn about Flowable and some basic BPMN 2.0 concepts. The end result will be a simple Java SE program that deploys a process definition, and then interacts with this process through the Flowable engine API. We'll also touch on some of the tooling around Flowable. Of course, what you'll learn in this tutorial can also be used when building your own web applications around your business processes.
 
 
 [[bpmnFirstExampleUseCase]]
@@ -95,7 +95,7 @@ The goal of this tutorial is to learn about Flowable and some basic BPMN 2.0 con
 
 ==== Use case
 
-The use case is straightforward: we have a company, let's call it BPMCorp. In BPMCorp, a financial report needs to be written every month for the company shareholders. This is the responsibility of the accountancy department. When the report is finished, one of the members of the upper management needs to approve the document before it is sent to all the shareholders.
+The use case is straightforward: we have a company, let's call it BPMCorp. In BPMCorp, a financial report needs to be written every month for the company shareholders. This is the responsibility of the accountancy department. When the report is finished, one of the members of the upper management needs to approve the document before it's sent to all the shareholders.
 
 
 [[bpmnFirstExampleDiagram]]
@@ -103,7 +103,7 @@ The use case is straightforward: we have a company, let's call it BPMCorp. In BP
 
 ==== Process diagram
 
-The business process as described above can be graphically visualized using the   <<flowableDesigner,Flowable Designer>>. However, for this tutorial we'll type the XML ourselves, as we learn the most this way at this point. The graphical BPMN 2.0 notation of our process looks like this:
+The business process as described above can be defined graphically using the <<flowableDesigner,Flowable Designer>>. However, for this tutorial, we'll type the XML ourselves, as we'll learn the most this way at this stage. The graphical BPMN 2.0 notation of our process looks like this:
 
 image::images/financial.report.example.diagram.png[align="center"]
 
@@ -115,12 +115,12 @@ What we see is a <<bpmnNoneStartEvent,none Start Event>> (circle on the left), f
 
 ==== XML representation
 
-The XML version of this business process (__FinancialReportProcess.bpmn20.xml__) looks as shown below. It's easy to recognize the main elements of our process (click on the links for going to the detailed section of that BPMN 2.0 construct):
+The XML version of this business process (__FinancialReportProcess.bpmn20.xml__) looks like that shown below. It's easy to recognize the main elements of our process (click on the link to go to the detailed section of that BPMN 2.0 construct):
 
-* The <<bpmnNoneStartEvent,(none) start event>> tells us what the _entry point_ to the process is.
+* The <<bpmnNoneStartEvent,(none) start event>> tells us what the _entry point_ is to the process.
 * The <<bpmnUserTask,User Tasks>> declarations are the representation of the human tasks of our process. Note that the first task is assigned to the _accountancy_ group, while the second task is assigned to the _management_ group. See <<bpmnUserTaskAssignment,the section on user task assignment>> for more information on how users and groups can be assigned to user tasks.
 * The process ends when the <<bpmnNoneEndEvent,none end event>> is reached.
-* The elements are connected with each other through <<bpmnSequenceFlow,sequence flows>>. These sequence flows have a +source+ and +target+, defining the _direction_ of the sequence flow.
+* The elements are connected to each other by <<bpmnSequenceFlow,sequence flows>>. These sequence flows have a +source+ and +target+, defining the _direction_ of the sequence flow.
 
 [source,xml,linenums]
 ----
@@ -129,47 +129,45 @@ The XML version of this business process (__FinancialReportProcess.bpmn20.xml__)
   xmlns:flowable="http://flowable.org/bpmn"
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL">
 
-	<process id="financialReport" name="Monthly financial report reminder process">
+    <process id="financialReport" name="Monthly financial report reminder process">
 
-	  <startEvent id="theStart" />
+      <startEvent id="theStart" />
 
-	  <sequenceFlow id="flow1" sourceRef="theStart" targetRef="writeReportTask" />
+      <sequenceFlow id="flow1" sourceRef="theStart" targetRef="writeReportTask" />
 
-	  <userTask id="writeReportTask" name="Write monthly financial report" >
-	    <documentation>
-	      Write monthly financial report for publication to shareholders.
-	    </documentation>
-	    <potentialOwner>
-	      <resourceAssignmentExpression>
-	        <formalExpression>accountancy</formalExpression>
-	      </resourceAssignmentExpression>
-	    </potentialOwner>
-	  </userTask>
+      <userTask id="writeReportTask" name="Write monthly financial report" >
+        <documentation>
+          Write monthly financial report for publication to shareholders.
+        </documentation>
+        <potentialOwner>
+          <resourceAssignmentExpression>
+            <formalExpression>accountancy</formalExpression>
+          </resourceAssignmentExpression>
+        </potentialOwner>
+      </userTask>
 
-	  <sequenceFlow id="flow2" sourceRef="writeReportTask" targetRef="verifyReportTask" />
+      <sequenceFlow id="flow2" sourceRef="writeReportTask" targetRef="verifyReportTask" />
 
-	  <userTask id="verifyReportTask" name="Verify monthly financial report" >
-	    <documentation>
-	      Verify monthly financial report composed by the accountancy department.
-	      This financial report is going to be sent to all the company shareholders.
-	    </documentation>
-	    <potentialOwner>
-	      <resourceAssignmentExpression>
-	        <formalExpression>management</formalExpression>
-	      </resourceAssignmentExpression>
-	    </potentialOwner>
-	  </userTask>
+      <userTask id="verifyReportTask" name="Verify monthly financial report" >
+        <documentation>
+          Verify monthly financial report composed by the accountancy department.
+          This financial report is going to be sent to all the company shareholders.
+        </documentation>
+        <potentialOwner>
+          <resourceAssignmentExpression>
+            <formalExpression>management</formalExpression>
+          </resourceAssignmentExpression>
+        </potentialOwner>
+      </userTask>
 
-	  <sequenceFlow id="flow3" sourceRef="verifyReportTask" targetRef="theEnd" />
+      <sequenceFlow id="flow3" sourceRef="verifyReportTask" targetRef="theEnd" />
 
-	  <endEvent id="theEnd" />
+      <endEvent id="theEnd" />
 
-	</process>
+    </process>
 
 </definitions>
 ----
-
-
 
 
 [[bpmnFirstExamplStartProcess]]
@@ -177,12 +175,12 @@ The XML version of this business process (__FinancialReportProcess.bpmn20.xml__)
 
 ==== Starting a process instance
 
-We have now created the *process definition* of our business process. From such a process definition, we can create *process instances*. In this case, one process instance would match with the creation and verification of a single financial report for a particular month. All the process instances share the same process definition.
+We have now created the *process definition* for our business process. From such a process definition, we can create *process instances*. In this scenario, one process instance corresponds to the creation and verification of a single financial report for a particular month. All the process instances for any month share the same process definition.
 
-To be able to create process instances from a given process definition, we must first *deploy* this process definition. Deploying a process definition means two things:
+To be able to create process instances from a given process definition, we must first *deploy* the process definition. Deploying a process definition means two things:
 
-* The process definition will be stored in the persistent datastore that is configured for your Flowable engine. So by deploying our business process, we make sure that the engine will find the process definition after an engine reboot.
-* The BPMN 2.0 process file will be parsed to an in-memory object model that can be manipulated through the Flowable API.
+* The process definition will be stored in the persistent datastore that is configured for your Flowable engine. So by deploying our business process, we make sure that the engine will find the process definition after an engine restart.
+* The BPMN 2.0 process XML will be parsed to an in-memory object model that can be manipulated through the Flowable API.
 
 More information on deployment can be found <<chDeployment,in the dedicated section on deployment>>.
 
@@ -195,20 +193,20 @@ Deployment deployment = repositoryService.createDeployment()
   .deploy();
 ----
 
-Now we can start a new process instance using  the +id+ we defined in the process definition (see process element in the XML file). Note that this +id+ in Flowable terminology is called the *key*.
+Now we can start a new process instance using the +id+ we defined in the process definition (see process element in the XML). Note that this +id+ in Flowable terminology is called the *key*.
 
 [source,java,linenums]
 ----
 ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("financialReport");
 ----
 
-This will create a process instance that will first go through the start event. After the start event, it follows all the outgoing sequence flows (only one in this case) and the first task ('write monthly financial report') is reached. The Flowable engine will now store a task in the persistent database. At this point, the user or group assignments attached to the task are resolved and also stored in the database. It's important to note that the Flowable engine will continue process execution steps until it reaches a _wait state_, such as the user task. At such a wait state, the current state of the process instance is stored in the database. It remains in that state until a user decides to complete their task. At that point, the engine will continue until it reaches a new wait state or the end of the process. When the engine reboots or crashes in the meantime, the state of the process is safe and well in the database.
+This will create a process instance that will first go through the start event. After the start event, it follows all the outgoing sequence flows (only one in this case) and the first task ('write monthly financial report') is reached. The Flowable engine will now store a task in the persistent database. At this point, the user or group assignments attached to the task are resolved and also stored in the database. It's important to note that the Flowable engine will continue process execution steps until it reaches a _wait state_, such as a user task. At such a wait state, the current state of the process instance is stored in the database. It remains in that state until a user decides to complete their task. At that point, the engine will continue until it reaches a new wait state or the end of the process. If the engine reboots or crashes in the meantime, the state of the process is safe and secure in the database.
 
-After the task is created, the +startProcessInstanceByKey+ method will return since the user task activity is a _wait state_. In this case, the task is assigned to a group, which means that every member of the group is a *candidate* to perform the task.
+After the task is created, the +startProcessInstanceByKey+ method will return because the user task activity is a _wait state_. In our scenario, the task is assigned to a group, which means that every member of the group is a *candidate* to perform the task.
 
-We can now throw this all together and create a simple Java program. Create a new Eclipse project and add the Flowable JARs and dependencies to its classpath  (these can be found in the _libs_ folder of the Flowable distribution). Before we can call the Flowable services, we must first construct a +ProcessEngine+ that gives us access to the services. Here we use the _'standalone'_ configuration, which constructs a +ProcessEngine+ that uses the database also used in the demo setup.
+We can now throw this all together and create a simple Java program. Create a new Eclipse project and add the Flowable JARs and dependencies to its classpath (these can be found in the _libs_ folder of the Flowable distribution). Before we can call the Flowable services, we must first construct a +ProcessEngine+ that gives us access to the services. Here we use the _'standalone'_ configuration, which constructs a +ProcessEngine+ that uses the database also used in the demo setup.
 
-You can download the process definition XML link:$$images/FinancialReportProcess.bpmn20.xml$$[here]. This file contains the XML as shown above, but also contains the necessary BPMN  <<generatingProcessDiagram,diagram interchange information>> to visualize the process in the Flowable tools.
+You can download the process definition XML link:$$images/FinancialReportProcess.bpmn20.xml$$[here]. This file contains the XML shown above, but also contains the necessary BPMN  <<generatingProcessDiagram,diagram interchange information>> to visualize the process in the Flowable tools.
 
 [source,java,linenums]
 ----
@@ -247,7 +245,7 @@ We can now retrieve this task through the +TaskService+ by adding the following 
 List<Task> tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
 ----
 
-Note that the user we pass to this operation needs to be a member of  the _accountancy_ group, since that was declared in the process definition:
+Note that the user we pass to this operation needs to be a member of the _accountancy_ group, as that was declared in the process definition:
 
 [source,xml,linenums]
 ----
@@ -266,11 +264,12 @@ TaskService taskService = processEngine.getTaskService();
 List<Task> tasks = taskService.createTaskQuery().taskCandidateGroup("accountancy").list();
 ----
 
-Since we've configured our +ProcessEngine+ to use the same database as the demo setup is using, we can now log into the link:$$http://localhost:8080/flowable-app/$$[Flowable app]. Login as admin and create 2 new users _kermit_ and _fozzie_, giving kermit admin capabilities.  Then create 2 new organization groups named _accountancy_ and _management_,  and add fozzie to the new accountancy group. Now login with fozzie, and we will find  that we can start our business process after selecting the _Processes_ page in the _Task App_ and clicking on the _'Start a process'_ link and selecting the _'Monthly financial report'_ process.
+As we've configured our +ProcessEngine+ to use the same database that the demo setup is using, we can now log into the link:$$http://localhost:8080/flowable-idm/$$[Flowable IDM]. Login as admin/test and create 2 new users _kermit_ and _fozzie_, and give both of them the _Access the workflow application_ privilege. Then create 2 new organization groups named _accountancy_ and _management_, and add fozzie to the new accountancy group and add kermit to the management group. 
+Now login with fozzie to the link:$$http://localhost:8080/flowable-task/$$[Flowable task] application, and we will find that we can start our business process by selecting the Task App, then its _Processes_ page and selecting the _'Monthly financial report'_ process.
 
 image::images/bpmn.financial.report.example.start.process.png[align="center"]
 
-As explained, the process will execute up to the first user task. Since we're logged in as kermit, we can see that there is a new candidate task available for him after we've started a process instance. Select the _Task App_ to view this new task.  Note that even if the process was started by someone else, the task would still be visible as a candidate task to everyone in the accountancy group.
+As explained, the process will execute until reaching the first user task. As we're logged in as fozzie, we can see that there is a new candidate task available for him after we've started a process instance. Select the _Tasks_ page to view this new task.  Note that even if the process was started by someone else, the task would still be visible as a candidate task to everyone in the accountancy group.
 
 
 image::images/bpmn.financial.report.example.task.assigned.png[align="center"]
@@ -280,21 +279,21 @@ image::images/bpmn.financial.report.example.task.assigned.png[align="center"]
 
 ==== Claiming the task
 
-An accountant now needs to *claim the task*. By claiming the task, the specific user will become the *assignee* of the task and the task will disappear from every task list of the other members of the accountancy group. Claiming a task is programmatically done as follows:
+An accountant now needs to *claim the task*. By claiming the task, that specific user will become the *assignee* of the task, and the task will disappear from every task list of the other members of the accountancy group. Claiming a task is programmatically done as follows:
 
 [source,java,linenums]
 ----
 taskService.claim(task.getId(), "fozzie");
 ----
 
-The task is now in the *personal task list of the one that claimed the task*.
+The task is now in the *personal task list of the user that claimed the task*.
 
 [source,java,linenums]
 ----
 List<Task> tasks = taskService.createTaskQuery().taskAssignee("fozzie").list();
 ----
 
-In the Flowable UI App, clicking the _claim_ button will call the same operation. The task will now move to the personal task list of the logged on user. You also see that the assignee of the task changed to the current logged in user.
+In the Flowable Task app, clicking the _claim_ button will call the same operation. The task will now move to the personal task list of the logged on user. You'll also see that the assignee of the task changed to the current logged in user.
 
 image::images/bpmn.financial.report.example.claim.task.png[align="center"]
 
@@ -312,9 +311,9 @@ The accountant can now start working on the financial report. Once the report is
 taskService.complete(task.getId());
 ----
 
-For the Flowable engine, this is an external signal that the process instance execution must be continued. The task itself is removed from the runtime data. The single outgoing transition out of the task is followed, moving the execution to the second task (__'verification of the report'__).  The same mechanism as described for the first task will now be used to assign the second task, with the small difference that the task will be assigned to the __management__ group.
+For the Flowable engine, this is an external signal that the process instance execution can now continue. The task itself is removed from the runtime data. The single outgoing transition from the task is followed, moving the execution to the second task (__'verification of the report'__).  The same mechanism as described for the first task will now be used to assign the second task, with the small difference that the task will be assigned to the __management__ group.
 
-In the demo setup, completing the task is done by clicking the _complete_ button in the task list. Since Fozzie isn't an accountant, we need to log out of the Flowable app and login in as _kermit_ (who is a manager). The second task is now visible in the unassigned task lists.
+In the demo setup, completing the task is done by clicking the _complete_ button in the task list. Since Fozzie isn't an accountant, we need to log out of the Flowable Task app and login in as _kermit_ (who is a manager). The second task is now visible in the unassigned task lists.
 
 
 [[bpmnFirstExampleEndingProcess]]
@@ -324,11 +323,7 @@ In the demo setup, completing the task is done by clicking the _complete_ button
 
 The verification task can be retrieved and claimed in exactly the same way as before. Completing this second task will move process execution to the end event, which finishes the process instance. The process instance and all related runtime execution data are removed from the datastore.
 
-When you log into Flowable app you can verify this, since no records will be found in the table where the process executions are stored.
-
-image::images/bpmn.financial.report.example.process.ended.png[align="center"]
-
-Programmatically, you can also verify that the process is ended using the +historyService+
+Programmatically, you can also verify that the process has ended, using the +historyService+
 
 [source,java,linenums]
 ----
@@ -343,7 +338,7 @@ System.out.println("Process instance end time: " + historicProcessInstance.getEn
 
 ==== Code overview
 
-Combine all the snippets from previous sections, and you should have something like this (this code takes in account that you probably will have started a few process instances through the Flowable app UI. As such, it always retrieves a list of tasks instead of one task, so it always works):
+Combine all the snippets from previous sections, and you should have something like the following.  The code takes into account that you probably will have started a few process instances through the Flowable app UI. It retrieves a list of tasks instead of one task, so it always works:
 
 [source,java,linenums]
 ----
@@ -422,7 +417,7 @@ public class TenMinuteTutorial {
 It's easy to see that this business process is too simple to be usable in reality. However, as you are going through the BPMN 2.0 constructs available in Flowable, you will be able to enhance the business process by:
 
 
-* defining *gateways* that act as decisions. This way, a manager could reject the financial report which would recreate the task for the accountant.
-* declaring and using *variables*, such that we can store or reference the report so that it can be visualized in the form.
-* defining a *service task* at the end of the process that will send the report to every shareholder.
+* defining *gateways* so a manager can decide to reject the financial report and recreate the task for the accountant, following a different path than when accepting the report.
+* declaring and using *variables* to store or reference the report so that it can be visualized in the form.
+* defining a *service task* at the end of the process to send the report to every shareholder.
 * etc.

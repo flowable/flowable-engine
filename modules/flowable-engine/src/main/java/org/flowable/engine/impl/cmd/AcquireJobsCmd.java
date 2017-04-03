@@ -28,38 +28,38 @@ import org.flowable.engine.impl.persistence.entity.JobEntity;
  */
 public class AcquireJobsCmd implements Command<AcquiredJobEntities> {
 
-  private final AsyncExecutor asyncExecutor;
-  private final int remainingCapacity;
+    private final AsyncExecutor asyncExecutor;
+    private final int remainingCapacity;
 
-  public AcquireJobsCmd(AsyncExecutor asyncExecutor) {
-    this(asyncExecutor, Integer.MAX_VALUE);
-  }
-  
-  public AcquireJobsCmd(AsyncExecutor asyncExecutor, int remainingCapacity) {
-    this.asyncExecutor = asyncExecutor;
-    this.remainingCapacity = remainingCapacity;
-  }
-
-  public AcquiredJobEntities execute(CommandContext commandContext) {
-    int maxResults = Math.min(remainingCapacity, asyncExecutor.getMaxAsyncJobsDuePerAcquisition());
-    
-    List<JobEntity> jobs = commandContext.getJobEntityManager()
-        .findJobsToExecute(new Page(0, maxResults));
-    AcquiredJobEntities acquiredJobs = new AcquiredJobEntities();
-
-    for (JobEntity job : jobs) {
-      lockJob(commandContext, job, asyncExecutor.getAsyncJobLockTimeInMillis());
-      acquiredJobs.addJob(job);
+    public AcquireJobsCmd(AsyncExecutor asyncExecutor) {
+        this(asyncExecutor, Integer.MAX_VALUE);
     }
 
-    return acquiredJobs;
-  }
+    public AcquireJobsCmd(AsyncExecutor asyncExecutor, int remainingCapacity) {
+        this.asyncExecutor = asyncExecutor;
+        this.remainingCapacity = remainingCapacity;
+    }
 
-  protected void lockJob(CommandContext commandContext, JobEntity job, int lockTimeInMillis) {
-    GregorianCalendar gregorianCalendar = new GregorianCalendar();
-    gregorianCalendar.setTime(commandContext.getProcessEngineConfiguration().getClock().getCurrentTime());
-    gregorianCalendar.add(Calendar.MILLISECOND, lockTimeInMillis);
-    job.setLockOwner(asyncExecutor.getLockOwner());
-    job.setLockExpirationTime(gregorianCalendar.getTime());
-  }
+    public AcquiredJobEntities execute(CommandContext commandContext) {
+        int maxResults = Math.min(remainingCapacity, asyncExecutor.getMaxAsyncJobsDuePerAcquisition());
+
+        List<JobEntity> jobs = commandContext.getJobEntityManager()
+                .findJobsToExecute(new Page(0, maxResults));
+        AcquiredJobEntities acquiredJobs = new AcquiredJobEntities();
+
+        for (JobEntity job : jobs) {
+            lockJob(commandContext, job, asyncExecutor.getAsyncJobLockTimeInMillis());
+            acquiredJobs.addJob(job);
+        }
+
+        return acquiredJobs;
+    }
+
+    protected void lockJob(CommandContext commandContext, JobEntity job, int lockTimeInMillis) {
+        GregorianCalendar gregorianCalendar = new GregorianCalendar();
+        gregorianCalendar.setTime(commandContext.getProcessEngineConfiguration().getClock().getCurrentTime());
+        gregorianCalendar.add(Calendar.MILLISECOND, lockTimeInMillis);
+        job.setLockOwner(asyncExecutor.getLockOwner());
+        job.setLockExpirationTime(gregorianCalendar.getTime());
+    }
 }

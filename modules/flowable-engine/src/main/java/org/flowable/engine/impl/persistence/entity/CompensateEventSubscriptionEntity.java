@@ -13,13 +13,12 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
-
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
 public interface CompensateEventSubscriptionEntity extends EventSubscriptionEntity {
-  
-  String EVENT_TYPE = "compensate";
+
+    String EVENT_TYPE = "compensate";
 
 }

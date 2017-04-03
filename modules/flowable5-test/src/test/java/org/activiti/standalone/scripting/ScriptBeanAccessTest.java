@@ -17,20 +17,19 @@ import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
-
 /**
  * @author Tom Baeyens
  */
 public class ScriptBeanAccessTest extends ResourceFlowableTestCase {
 
-  public ScriptBeanAccessTest() {
-    super("org/activiti/standalone/scripting/flowable.cfg.xml");
-  }
+    public ScriptBeanAccessTest() {
+        super("org/activiti/standalone/scripting/flowable.cfg.xml");
+    }
 
-  @Deployment
-  public void testConfigurationBeanAccess() {
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("ScriptBeanAccess");
-    assertEquals("myValue", runtimeService.getVariable(pi.getId(), "myVariable"));
-  }
+    @Deployment
+    public void testConfigurationBeanAccess() {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("ScriptBeanAccess");
+        assertEquals("myValue", runtimeService.getVariable(pi.getId(), "myVariable"));
+    }
 
 }

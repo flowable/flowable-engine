@@ -20,6 +20,6 @@ import org.flowable.engine.impl.db.DbSqlSession;
  */
 public interface DbUpgradeStep {
 
-  void execute(DbSqlSession dbSqlSession) throws Exception;
+    void execute(DbSqlSession dbSqlSession) throws Exception;
 
 }

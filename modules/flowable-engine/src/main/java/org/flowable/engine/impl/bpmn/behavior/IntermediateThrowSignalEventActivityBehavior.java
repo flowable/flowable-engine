@@ -34,60 +34,60 @@ import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity
  */
 public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnActivityBehavior {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected final SignalEventDefinition signalEventDefinition;
-  protected String signalEventName;
-  protected String signalExpression;
-  protected boolean processInstanceScope;
+    protected final SignalEventDefinition signalEventDefinition;
+    protected String signalEventName;
+    protected String signalExpression;
+    protected boolean processInstanceScope;
 
-  public IntermediateThrowSignalEventActivityBehavior(ThrowEvent throwEvent, SignalEventDefinition signalEventDefinition, Signal signal) {
-    if (signal != null) {
-      signalEventName = signal.getName();
-      if (Signal.SCOPE_PROCESS_INSTANCE.equals(signal.getScope())) {
-        this.processInstanceScope = true;
-      }
-    } else if (StringUtils.isNotEmpty(signalEventDefinition.getSignalRef())) {
-      signalEventName = signalEventDefinition.getSignalRef();
-    } else {
-      signalExpression = signalEventDefinition.getSignalExpression();
-    }
-    
-    this.signalEventDefinition = signalEventDefinition;
-  }
+    public IntermediateThrowSignalEventActivityBehavior(ThrowEvent throwEvent, SignalEventDefinition signalEventDefinition, Signal signal) {
+        if (signal != null) {
+            signalEventName = signal.getName();
+            if (Signal.SCOPE_PROCESS_INSTANCE.equals(signal.getScope())) {
+                this.processInstanceScope = true;
+            }
+        } else if (StringUtils.isNotEmpty(signalEventDefinition.getSignalRef())) {
+            signalEventName = signalEventDefinition.getSignalRef();
+        } else {
+            signalExpression = signalEventDefinition.getSignalExpression();
+        }
 
-  public void execute(DelegateExecution execution) {
-
-    CommandContext commandContext = Context.getCommandContext();
-    
-    String eventSubscriptionName = null;
-    if (signalEventName != null) {
-      eventSubscriptionName = signalEventName;
-    } else {
-      Expression expressionObject = commandContext.getProcessEngineConfiguration().getExpressionManager().createExpression(signalExpression);
-      eventSubscriptionName = expressionObject.getValue(execution).toString();
+        this.signalEventDefinition = signalEventDefinition;
     }
 
-    EventSubscriptionEntityManager eventSubscriptionEntityManager = commandContext.getEventSubscriptionEntityManager();
-    List<SignalEventSubscriptionEntity> subscriptionEntities = null;
-    if (processInstanceScope) {
-      subscriptionEntities = eventSubscriptionEntityManager
-          .findSignalEventSubscriptionsByProcessInstanceAndEventName(execution.getProcessInstanceId(), eventSubscriptionName);
-    } else {
-      subscriptionEntities = eventSubscriptionEntityManager
-          .findSignalEventSubscriptionsByEventName(eventSubscriptionName, execution.getTenantId());
-    }
+    public void execute(DelegateExecution execution) {
 
-    for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : subscriptionEntities) {
-      Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventSubscriptionName, 
-              null, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(), 
-              signalEventSubscriptionEntity.getProcessDefinitionId()));
-      
-      eventSubscriptionEntityManager.eventReceived(signalEventSubscriptionEntity, null, signalEventDefinition.isAsync());
-    }
+        CommandContext commandContext = Context.getCommandContext();
 
-    commandContext.getAgenda().planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) execution, true);
-  }
+        String eventSubscriptionName = null;
+        if (signalEventName != null) {
+            eventSubscriptionName = signalEventName;
+        } else {
+            Expression expressionObject = commandContext.getProcessEngineConfiguration().getExpressionManager().createExpression(signalExpression);
+            eventSubscriptionName = expressionObject.getValue(execution).toString();
+        }
+
+        EventSubscriptionEntityManager eventSubscriptionEntityManager = commandContext.getEventSubscriptionEntityManager();
+        List<SignalEventSubscriptionEntity> subscriptionEntities = null;
+        if (processInstanceScope) {
+            subscriptionEntities = eventSubscriptionEntityManager
+                    .findSignalEventSubscriptionsByProcessInstanceAndEventName(execution.getProcessInstanceId(), eventSubscriptionName);
+        } else {
+            subscriptionEntities = eventSubscriptionEntityManager
+                    .findSignalEventSubscriptionsByEventName(eventSubscriptionName, execution.getTenantId());
+        }
+
+        for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : subscriptionEntities) {
+            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventSubscriptionName,
+                            null, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(),
+                            signalEventSubscriptionEntity.getProcessDefinitionId()));
+
+            eventSubscriptionEntityManager.eventReceived(signalEventSubscriptionEntity, null, signalEventDefinition.isAsync());
+        }
+
+        commandContext.getAgenda().planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) execution, true);
+    }
 
 }

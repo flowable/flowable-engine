@@ -19,23 +19,23 @@ import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 
 public class ParsedDeploymentBuilderFactory {
 
-  protected BpmnParser bpmnParser;
+    protected BpmnParser bpmnParser;
 
-  public BpmnParser getBpmnParser() {
-    return bpmnParser;
-  }
+    public BpmnParser getBpmnParser() {
+        return bpmnParser;
+    }
 
-  public void setBpmnParser(BpmnParser bpmnParser) {
-    this.bpmnParser = bpmnParser;
-  }
+    public void setBpmnParser(BpmnParser bpmnParser) {
+        this.bpmnParser = bpmnParser;
+    }
 
-  public ParsedDeploymentBuilder getBuilderForDeployment(DeploymentEntity deployment) {
-    return getBuilderForDeploymentAndSettings(deployment, null);
-  }
+    public ParsedDeploymentBuilder getBuilderForDeployment(DeploymentEntity deployment) {
+        return getBuilderForDeploymentAndSettings(deployment, null);
+    }
 
-  public ParsedDeploymentBuilder getBuilderForDeploymentAndSettings(DeploymentEntity deployment,
-      Map<String, Object> deploymentSettings) {
-    return new ParsedDeploymentBuilder(deployment, bpmnParser, deploymentSettings);
-  }
-  
+    public ParsedDeploymentBuilder getBuilderForDeploymentAndSettings(DeploymentEntity deployment,
+            Map<String, Object> deploymentSettings) {
+        return new ParsedDeploymentBuilder(deployment, bpmnParser, deploymentSettings);
+    }
+
 }

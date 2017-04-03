@@ -44,155 +44,151 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Tijs Rademakers
  */
 public interface Flowable5CompatibilityHandler {
-  
-  String V5_ENGINE_TAG = "v5";
 
-  boolean isVersion5Tag(String tag);
-  
-  ProcessDefinition getProcessDefinition(String processDefinitionId);
-  
-  ProcessDefinition getProcessDefinitionByKey(String processDefinitionKey);
-  
-  org.flowable.bpmn.model.Process getProcessDefinitionProcessObject(String processDefinitionId);
-  
-  BpmnModel getProcessDefinitionBpmnModel(String processDefinitionId);
-  
-  ObjectNode getProcessDefinitionInfo(String processDefinitionId);
-  
-  ProcessDefinitionCacheEntry resolveProcessDefinition(ProcessDefinition processDefinition);
-  
-  boolean isProcessDefinitionSuspended(String processDefinitionId);
-  
-  void addCandidateStarter(String processDefinitionId, String userId, String groupId);
-  
-  void deleteCandidateStarter(String processDefinitionId, String userId, String groupId);
-  
-  void suspendProcessDefinition(String processDefinitionId, String processDefinitionKey, boolean suspendProcessInstances, Date suspensionDate, String tenantId);
+    ProcessDefinition getProcessDefinition(String processDefinitionId);
 
-  void activateProcessDefinition(String processDefinitionId, String processDefinitionKey, boolean activateProcessInstances, Date activationDate, String tenantId);
-  
-  void setProcessDefinitionCategory(String processDefinitionId, String category);
-  
-  Deployment deploy(DeploymentBuilderImpl deploymentBuilder);
-  
-  void setDeploymentCategory(String deploymentId, String category);
-  
-  void changeDeploymentTenantId(String deploymentId, String newTenantId);
-  
-  void deleteDeployment(String deploymentId, boolean cascade);
-  
-  ProcessInstance startProcessInstance(String processDefinitionKey, String processDefinitionId, Map<String, Object> variables, Map<String, Object> transientVariables,
-          String businessKey, String tenantId, String processInstanceName);
-  
-  ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> variables, Map<String, Object> transientVariables, String businessKey, String tenantId);
-  
-  Object getExecutionVariable(String executionId, String variableName, boolean isLocal);
-  
-  VariableInstance getExecutionVariableInstance(String executionId, String variableName, boolean isLocal);
-  
-  Map<String, Object> getExecutionVariables(String executionId, Collection<String> variableNames, boolean isLocal);
-  
-  Map<String, VariableInstance> getExecutionVariableInstances(String executionId, Collection<String> variableNames, boolean isLocal);
-  
-  void setExecutionVariables(String executionId, Map<String, ? extends Object> variables, boolean isLocal);
-  
-  void removeExecutionVariables(String executionId, Collection<String> variableNames, boolean isLocal);
-  
-  void updateBusinessKey(String processInstanceId, String businessKey);
-  
-  void suspendProcessInstance(String processInstanceId);
-  
-  void activateProcessInstance(String processInstanceId);
-  
-  void addIdentityLinkForProcessInstance(String processInstanceId, String userId, String groupId, String identityLinkType);
-  
-  void deleteIdentityLinkForProcessInstance(String processInstanceId, String userId, String groupId, String identityLinkType);
-  
-  void deleteProcessInstance(String processInstanceId, String deleteReason);
-  
-  void deleteHistoricProcessInstance(String processInstanceId);
-  
-  void completeTask(TaskEntity taskEntity, Map<String, Object> variables, boolean localScope);
-  
-  void completeTask(TaskEntity taskEntity, Map<String, Object> variables, Map<String, Object> transientVariables);
-  
-  void claimTask(String taskId, String userId);
-  
-  void setTaskVariables(String taskId, Map<String, ? extends Object> variables, boolean isLocal);
-  
-  void removeTaskVariables(String taskId, Collection<String> variableNames, boolean isLocal);
-  
-  void setTaskDueDate(String taskId, Date dueDate);
-  
-  void setTaskPriority(String taskId, int priority);
-  
-  void deleteTask(String taskId, String deleteReason, boolean cascade);
-  
-  void deleteHistoricTask(String taskId);
-  
-  StartFormData getStartFormData(String processDefinitionId);
-  
-  String getFormKey(String processDefinitionId, String taskDefinitionKey);
-  
-  Object getRenderedStartForm(String processDefinitionId, String formEngineName);
-  
-  ProcessInstance submitStartFormData(String processDefinitionId, String businessKey, Map<String, String> properties);
-  
-  void submitTaskFormData(String taskId, Map<String, String> properties, boolean completeTask);
-  
-  void saveTask(TaskEntity task);
-  
-  void addIdentityLink(String taskId, String identityId, int identityIdType, String identityType);
-  
-  void deleteIdentityLink(String taskId, String userId, String groupId, String identityLinkType);
-  
-  Comment addComment(String taskId, String processInstanceId, String type, String message);
-  
-  void deleteComment(String commentId, String taskId, String processInstanceId);
-  
-  Attachment createAttachment(String attachmentType, String taskId, String processInstanceId, String attachmentName, String attachmentDescription, InputStream content, String url);
-  
-  void saveAttachment(Attachment attachment);
-  
-  void deleteAttachment(String attachmentId);
-  
-  void trigger(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables);
-  
-  void messageEventReceived(String messageName, String executionId, Map<String, Object> processVariables, boolean async);
-  
-  void signalEventReceived(String signalName, String executionId, Map<String, Object> processVariables, boolean async, String tenantId);
-  
-  void signalEventReceived(SignalEventSubscriptionEntity signalEventSubscriptionEntity, Object payload, boolean async);
+    ProcessDefinition getProcessDefinitionByKey(String processDefinitionKey);
 
-  void executeJob(Job job);
-  
-  void executeJobWithLockAndRetry(Job job);
-  
-  void handleFailedJob(Job job, Throwable exception);
-  
-  void deleteJob(String jobId);
-  
-  void leaveExecution(DelegateExecution execution);
-  
-  void propagateError(BpmnError bpmnError, DelegateExecution execution);
-  
-  boolean mapException(Exception camelException, DelegateExecution execution, List<MapExceptionEntry> mapExceptions);
-  
-  Map<String, Object> getVariables(ProcessInstance processInstance);
-  
-  Object getScriptingEngineValue(String payloadExpressionValue, String languageValue, DelegateExecution execution);
-  
-  void throwErrorEvent(FlowableEvent event);
-  
-  void setClock(Clock clock);
-  
-  void resetClock();
-  
-  Object getRawProcessEngine();
-  
-  Object getRawProcessConfiguration();
-  
-  Object getRawCommandExecutor();
-  
-  Object getCamelContextObject(String camelContextValue);
+    org.flowable.bpmn.model.Process getProcessDefinitionProcessObject(String processDefinitionId);
+
+    BpmnModel getProcessDefinitionBpmnModel(String processDefinitionId);
+
+    ObjectNode getProcessDefinitionInfo(String processDefinitionId);
+
+    ProcessDefinitionCacheEntry resolveProcessDefinition(ProcessDefinition processDefinition);
+
+    boolean isProcessDefinitionSuspended(String processDefinitionId);
+
+    void addCandidateStarter(String processDefinitionId, String userId, String groupId);
+
+    void deleteCandidateStarter(String processDefinitionId, String userId, String groupId);
+
+    void suspendProcessDefinition(String processDefinitionId, String processDefinitionKey, boolean suspendProcessInstances, Date suspensionDate, String tenantId);
+
+    void activateProcessDefinition(String processDefinitionId, String processDefinitionKey, boolean activateProcessInstances, Date activationDate, String tenantId);
+
+    void setProcessDefinitionCategory(String processDefinitionId, String category);
+
+    Deployment deploy(DeploymentBuilderImpl deploymentBuilder);
+
+    void setDeploymentCategory(String deploymentId, String category);
+
+    void changeDeploymentTenantId(String deploymentId, String newTenantId);
+
+    void deleteDeployment(String deploymentId, boolean cascade);
+
+    ProcessInstance startProcessInstance(String processDefinitionKey, String processDefinitionId, Map<String, Object> variables, Map<String, Object> transientVariables,
+            String businessKey, String tenantId, String processInstanceName);
+
+    ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> variables, Map<String, Object> transientVariables, String businessKey, String tenantId);
+
+    Object getExecutionVariable(String executionId, String variableName, boolean isLocal);
+
+    VariableInstance getExecutionVariableInstance(String executionId, String variableName, boolean isLocal);
+
+    Map<String, Object> getExecutionVariables(String executionId, Collection<String> variableNames, boolean isLocal);
+
+    Map<String, VariableInstance> getExecutionVariableInstances(String executionId, Collection<String> variableNames, boolean isLocal);
+
+    void setExecutionVariables(String executionId, Map<String, ? extends Object> variables, boolean isLocal);
+
+    void removeExecutionVariables(String executionId, Collection<String> variableNames, boolean isLocal);
+
+    void updateBusinessKey(String processInstanceId, String businessKey);
+
+    void suspendProcessInstance(String processInstanceId);
+
+    void activateProcessInstance(String processInstanceId);
+
+    void addIdentityLinkForProcessInstance(String processInstanceId, String userId, String groupId, String identityLinkType);
+
+    void deleteIdentityLinkForProcessInstance(String processInstanceId, String userId, String groupId, String identityLinkType);
+
+    void deleteProcessInstance(String processInstanceId, String deleteReason);
+
+    void deleteHistoricProcessInstance(String processInstanceId);
+
+    void completeTask(TaskEntity taskEntity, Map<String, Object> variables, boolean localScope);
+
+    void completeTask(TaskEntity taskEntity, Map<String, Object> variables, Map<String, Object> transientVariables);
+
+    void claimTask(String taskId, String userId);
+
+    void setTaskVariables(String taskId, Map<String, ? extends Object> variables, boolean isLocal);
+
+    void removeTaskVariables(String taskId, Collection<String> variableNames, boolean isLocal);
+
+    void setTaskDueDate(String taskId, Date dueDate);
+
+    void setTaskPriority(String taskId, int priority);
+
+    void deleteTask(String taskId, String deleteReason, boolean cascade);
+
+    void deleteHistoricTask(String taskId);
+
+    StartFormData getStartFormData(String processDefinitionId);
+
+    String getFormKey(String processDefinitionId, String taskDefinitionKey);
+
+    Object getRenderedStartForm(String processDefinitionId, String formEngineName);
+
+    ProcessInstance submitStartFormData(String processDefinitionId, String businessKey, Map<String, String> properties);
+
+    void submitTaskFormData(String taskId, Map<String, String> properties, boolean completeTask);
+
+    void saveTask(TaskEntity task);
+
+    void addIdentityLink(String taskId, String identityId, int identityIdType, String identityType);
+
+    void deleteIdentityLink(String taskId, String userId, String groupId, String identityLinkType);
+
+    Comment addComment(String taskId, String processInstanceId, String type, String message);
+
+    void deleteComment(String commentId, String taskId, String processInstanceId);
+
+    Attachment createAttachment(String attachmentType, String taskId, String processInstanceId, String attachmentName, String attachmentDescription, InputStream content, String url);
+
+    void saveAttachment(Attachment attachment);
+
+    void deleteAttachment(String attachmentId);
+
+    void trigger(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables);
+
+    void messageEventReceived(String messageName, String executionId, Map<String, Object> processVariables, boolean async);
+
+    void signalEventReceived(String signalName, String executionId, Map<String, Object> processVariables, boolean async, String tenantId);
+
+    void signalEventReceived(SignalEventSubscriptionEntity signalEventSubscriptionEntity, Object payload, boolean async);
+
+    void executeJob(Job job);
+
+    void executeJobWithLockAndRetry(Job job);
+
+    void handleFailedJob(Job job, Throwable exception);
+
+    void deleteJob(String jobId);
+
+    void leaveExecution(DelegateExecution execution);
+
+    void propagateError(BpmnError bpmnError, DelegateExecution execution);
+
+    boolean mapException(Exception camelException, DelegateExecution execution, List<MapExceptionEntry> mapExceptions);
+
+    Map<String, Object> getVariables(ProcessInstance processInstance);
+
+    Object getScriptingEngineValue(String payloadExpressionValue, String languageValue, DelegateExecution execution);
+
+    void throwErrorEvent(FlowableEvent event);
+
+    void setClock(Clock clock);
+
+    void resetClock();
+
+    Object getRawProcessEngine();
+
+    Object getRawProcessConfiguration();
+
+    Object getRawCommandExecutor();
+
+    Object getCamelContextObject(String camelContextValue);
 }

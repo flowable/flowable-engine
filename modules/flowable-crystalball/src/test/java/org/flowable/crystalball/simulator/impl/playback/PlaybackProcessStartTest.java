@@ -30,87 +30,72 @@ import static org.apache.commons.lang3.StringUtils.startsWith;
  * @author martin.grofcik
  */
 public class PlaybackProcessStartTest extends AbstractPlaybackTest {
-  public static final String SIMPLEST_PROCESS = "theSimplestProcess";
-  public static final String BUSINESS_KEY = "testBusinessKey";
-  public static final String TEST_VALUE = "TestValue";
-  public static final String TEST_VARIABLE = "testVariable";
+    public static final String SIMPLEST_PROCESS = "theSimplestProcess";
+    public static final String BUSINESS_KEY = "testBusinessKey";
+    public static final String TEST_VALUE = "TestValue";
+    public static final String TEST_VARIABLE = "testVariable";
 
-  @CheckStatus(methodName = "demoCheckStatus")
-  @Deployment
-  public void testDemo() {
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put(TEST_VARIABLE, TEST_VALUE);
-    processEngine.getRuntimeService().startProcessInstanceByKey(SIMPLEST_PROCESS, BUSINESS_KEY, variables);
-  }
+    @CheckStatus(methodName = "demoCheckStatus")
+    @Deployment
+    public void testDemo() {
+        Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put(TEST_VARIABLE, TEST_VALUE);
+        processEngine.getRuntimeService().startProcessInstanceByKey(SIMPLEST_PROCESS, BUSINESS_KEY, variables);
+    }
 
-  
-  public void demoCheckStatus() {
-    final HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().
-      finished().
-      includeProcessVariables().
-      singleResult();
-    assertNotNull(historicProcessInstance);
-    RepositoryService repositoryService = processEngine.getRepositoryService();
-    final ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().
-      processDefinitionId(historicProcessInstance.getProcessDefinitionId()).
-      singleResult();
-    assertEquals(SIMPLEST_PROCESS, processDefinition.getKey());
+    public void demoCheckStatus() {
+        final HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().finished().includeProcessVariables().singleResult();
+        assertNotNull(historicProcessInstance);
+        RepositoryService repositoryService = processEngine.getRepositoryService();
+        final ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(historicProcessInstance.getProcessDefinitionId()).singleResult();
+        assertEquals(SIMPLEST_PROCESS, processDefinition.getKey());
 
-    assertEquals(1, historicProcessInstance.getProcessVariables().size());
-    assertEquals(TEST_VALUE, historicProcessInstance.getProcessVariables().get(TEST_VARIABLE));
-    assertEquals(BUSINESS_KEY, historicProcessInstance.getBusinessKey());
-  }
+        assertEquals(1, historicProcessInstance.getProcessVariables().size());
+        assertEquals(TEST_VALUE, historicProcessInstance.getProcessVariables().get(TEST_VARIABLE));
+        assertEquals(BUSINESS_KEY, historicProcessInstance.getBusinessKey());
+    }
 
-  @CheckStatus(methodName = "messageProcessStartCheckStatus")
-  @Deployment
-  public void testMessageProcessStart() {
+    @CheckStatus(methodName = "messageProcessStartCheckStatus")
+    @Deployment
+    public void testMessageProcessStart() {
 
-    runtimeService.startProcessInstanceByMessage("startProcessMessage");
-  }
+        runtimeService.startProcessInstanceByMessage("startProcessMessage");
+    }
 
-  
-  public void messageProcessStartCheckStatus() {
-    final HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().
-      finished().
-      singleResult();
-    assertNotNull(historicProcessInstance);
-    assertTrue(startsWith(historicProcessInstance.getProcessDefinitionId(), "messageStartEventProcess"));
-  }
+    public void messageProcessStartCheckStatus() {
+        final HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().finished().singleResult();
+        assertNotNull(historicProcessInstance);
+        assertTrue(startsWith(historicProcessInstance.getProcessDefinitionId(), "messageStartEventProcess"));
+    }
 
-  @Deployment
-  @CheckStatus(methodName = "checkStatus")
-  public void testSignals() throws Exception {
-    runtimeService.startProcessInstanceByKey("catchSignal");
-    EventRecorderTestUtils.increaseTime(this.processEngineConfiguration.getClock());
-    runtimeService.startProcessInstanceByKey("throwSignal");
-  }
+    @Deployment
+    @CheckStatus(methodName = "checkStatus")
+    public void testSignals() throws Exception {
+        runtimeService.startProcessInstanceByKey("catchSignal");
+        EventRecorderTestUtils.increaseTime(this.processEngineConfiguration.getClock());
+        runtimeService.startProcessInstanceByKey("throwSignal");
+    }
 
-  
-  public void checkStatus() {
-    final List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().
-                                                            finished().
-                                                            list();
-    assertNotNull(historicProcessInstances);
-    assertEquals(2, historicProcessInstances.size());
-  }
+    public void checkStatus() {
+        final List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().finished().list();
+        assertNotNull(historicProcessInstances);
+        assertEquals(2, historicProcessInstances.size());
+    }
 
-  @Deployment
-  @CheckStatus(methodName = "userTaskCheckStatus")
-  public void testUserTask() throws Exception {
-    runtimeService.startProcessInstanceByKey("oneTaskProcess", "oneTaskProcessBusinessKey");
-    Task task = taskService.createTaskQuery().taskDefinitionKey("userTask").singleResult();
-    EventRecorderTestUtils.increaseTime(processEngineConfiguration.getClock());
-    taskService.complete(task.getId());
-  }
+    @Deployment
+    @CheckStatus(methodName = "userTaskCheckStatus")
+    public void testUserTask() throws Exception {
+        runtimeService.startProcessInstanceByKey("oneTaskProcess", "oneTaskProcessBusinessKey");
+        Task task = taskService.createTaskQuery().taskDefinitionKey("userTask").singleResult();
+        EventRecorderTestUtils.increaseTime(processEngineConfiguration.getClock());
+        taskService.complete(task.getId());
+    }
 
-  
-  public void userTaskCheckStatus() {
-    final HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().
-      finished().
-      singleResult();
-    assertNotNull(historicProcessInstance);
-    assertEquals("oneTaskProcessBusinessKey", historicProcessInstance.getBusinessKey());
-    HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskDefinitionKey("userTask").singleResult();
-    assertEquals("user1", historicTaskInstance.getAssignee());
-  }
+    public void userTaskCheckStatus() {
+        final HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().finished().singleResult();
+        assertNotNull(historicProcessInstance);
+        assertEquals("oneTaskProcessBusinessKey", historicProcessInstance.getBusinessKey());
+        HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskDefinitionKey("userTask").singleResult();
+        assertEquals("user1", historicTaskInstance.getAssignee());
+    }
 }

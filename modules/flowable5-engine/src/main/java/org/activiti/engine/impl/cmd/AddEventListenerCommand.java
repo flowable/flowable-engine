@@ -24,35 +24,35 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
  * @author Frederik Heremans
  */
 public class AddEventListenerCommand implements Command<Void> {
-	
-	protected FlowableEventListener listener;
-	protected FlowableEngineEventType[] types;
-	
-	public AddEventListenerCommand(FlowableEventListener listener, FlowableEngineEventType[] types) {
-	  this.listener = listener;
-	  this.types = types;
-  }
 
-	public AddEventListenerCommand(FlowableEventListener listener) {
-	  super();
-	  this.listener = listener;
-  }
+    protected FlowableEventListener listener;
+    protected FlowableEngineEventType[] types;
 
-	@Override
-  public Void execute(CommandContext commandContext) {
-		if(listener == null) {
-			throw new ActivitiIllegalArgumentException("listener is null.");
-		}
-		
-		if(types != null) {
-			commandContext.getProcessEngineConfiguration()
-				.getEventDispatcher().addEventListener(listener, types);
-		} else {
-			commandContext.getProcessEngineConfiguration()
-				.getEventDispatcher().addEventListener(listener);
-		}
-		
-	  return null;
-  }
-	
+    public AddEventListenerCommand(FlowableEventListener listener, FlowableEngineEventType[] types) {
+        this.listener = listener;
+        this.types = types;
+    }
+
+    public AddEventListenerCommand(FlowableEventListener listener) {
+        super();
+        this.listener = listener;
+    }
+
+    @Override
+    public Void execute(CommandContext commandContext) {
+        if (listener == null) {
+            throw new ActivitiIllegalArgumentException("listener is null.");
+        }
+
+        if (types != null) {
+            commandContext.getProcessEngineConfiguration()
+                    .getEventDispatcher().addEventListener(listener, types);
+        } else {
+            commandContext.getProcessEngineConfiguration()
+                    .getEventDispatcher().addEventListener(listener);
+        }
+
+        return null;
+    }
+
 }

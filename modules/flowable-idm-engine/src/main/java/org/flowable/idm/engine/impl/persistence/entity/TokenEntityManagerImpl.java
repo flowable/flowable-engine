@@ -29,50 +29,50 @@ import org.flowable.idm.engine.impl.persistence.entity.data.TokenDataManager;
  */
 public class TokenEntityManagerImpl extends AbstractEntityManager<TokenEntity> implements TokenEntityManager {
 
-  protected TokenDataManager tokenDataManager;
-  
-  public TokenEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, TokenDataManager tokenDataManager) {
-    super(idmEngineConfiguration);
-    this.tokenDataManager = tokenDataManager;
-  }
-  
-  @Override
-  protected DataManager<TokenEntity> getDataManager() {
-    return tokenDataManager;
-  }
-  
-  public Token createNewToken(String tokenId) {
-    TokenEntity tokenEntity = create();
-    tokenEntity.setId(tokenId);
-    tokenEntity.setRevision(0); // needed as tokens can be transient
-    return tokenEntity;
-  }
-  
-  public void updateToken(Token updatedToken) {
-    super.update((TokenEntity) updatedToken);
-  }
-  
-  public boolean isNewToken(Token token) {
-    return ((TokenEntity) token).getRevision() == 0;
-  }
-  
-  public List<Token> findTokenByQueryCriteria(TokenQueryImpl query, Page page) {
-    return tokenDataManager.findTokenByQueryCriteria(query, page);
-  }
+    protected TokenDataManager tokenDataManager;
 
-  public long findTokenCountByQueryCriteria(TokenQueryImpl query) {
-    return tokenDataManager.findTokenCountByQueryCriteria(query);
-  }
+    public TokenEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, TokenDataManager tokenDataManager) {
+        super(idmEngineConfiguration);
+        this.tokenDataManager = tokenDataManager;
+    }
 
-  public TokenQuery createNewTokenQuery() {
-    return new TokenQueryImpl(getCommandExecutor());
-  }
+    @Override
+    protected DataManager<TokenEntity> getDataManager() {
+        return tokenDataManager;
+    }
 
-  public List<Token> findTokensByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return tokenDataManager.findTokensByNativeQuery(parameterMap, firstResult, maxResults);
-  }
+    public Token createNewToken(String tokenId) {
+        TokenEntity tokenEntity = create();
+        tokenEntity.setId(tokenId);
+        tokenEntity.setRevision(0); // needed as tokens can be transient
+        return tokenEntity;
+    }
 
-  public long findTokenCountByNativeQuery(Map<String, Object> parameterMap) {
-    return tokenDataManager.findTokenCountByNativeQuery(parameterMap);
-  }
+    public void updateToken(Token updatedToken) {
+        super.update((TokenEntity) updatedToken);
+    }
+
+    public boolean isNewToken(Token token) {
+        return ((TokenEntity) token).getRevision() == 0;
+    }
+
+    public List<Token> findTokenByQueryCriteria(TokenQueryImpl query, Page page) {
+        return tokenDataManager.findTokenByQueryCriteria(query, page);
+    }
+
+    public long findTokenCountByQueryCriteria(TokenQueryImpl query) {
+        return tokenDataManager.findTokenCountByQueryCriteria(query);
+    }
+
+    public TokenQuery createNewTokenQuery() {
+        return new TokenQueryImpl(getCommandExecutor());
+    }
+
+    public List<Token> findTokensByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
+        return tokenDataManager.findTokensByNativeQuery(parameterMap, firstResult, maxResults);
+    }
+
+    public long findTokenCountByNativeQuery(Map<String, Object> parameterMap) {
+        return tokenDataManager.findTokenCountByNativeQuery(parameterMap);
+    }
 }

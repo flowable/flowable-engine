@@ -24,32 +24,32 @@ import org.slf4j.LoggerFactory;
  */
 public class LDAPTemplate {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(LDAPTemplate.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LDAPTemplate.class);
 
-  protected LDAPConfigurator ldapConfigurator;
+    protected LDAPConfiguration ldapConfigurator;
 
-  public LDAPTemplate(LDAPConfigurator ldapConfigurator) {
-    this.ldapConfigurator = ldapConfigurator;
-  }
-
-  public <T> T execute(LDAPCallBack<T> ldapCallBack) {
-    InitialDirContext initialDirContext = null;
-    try {
-      initialDirContext = LDAPConnectionUtil.creatDirectoryContext(ldapConfigurator);
-    } catch (Exception e) {
-        LOGGER.info("Could not create LDAP connection : {}", e.getMessage(), e);
+    public LDAPTemplate(LDAPConfiguration ldapConfigurator) {
+        this.ldapConfigurator = ldapConfigurator;
     }
-    T result = ldapCallBack.executeInContext(initialDirContext);
-    LDAPConnectionUtil.closeDirectoryContext(initialDirContext);
-    return result;
-  }
 
-  public LDAPConfigurator getLdapConfigurator() {
-    return ldapConfigurator;
-  }
+    public <T> T execute(LDAPCallBack<T> ldapCallBack) {
+        InitialDirContext initialDirContext = null;
+        try {
+            initialDirContext = LDAPConnectionUtil.creatDirectoryContext(ldapConfigurator);
+        } catch (Exception e) {
+            LOGGER.info("Could not create LDAP connection : {}", e.getMessage(), e);
+        }
+        T result = ldapCallBack.executeInContext(initialDirContext);
+        LDAPConnectionUtil.closeDirectoryContext(initialDirContext);
+        return result;
+    }
 
-  public void setLdapConfigurator(LDAPConfigurator ldapConfigurator) {
-    this.ldapConfigurator = ldapConfigurator;
-  }
+    public LDAPConfiguration getLdapConfigurator() {
+        return ldapConfigurator;
+    }
+
+    public void setLdapConfigurator(LDAPConfiguration ldapConfigurator) {
+        this.ldapConfigurator = ldapConfigurator;
+    }
 
 }

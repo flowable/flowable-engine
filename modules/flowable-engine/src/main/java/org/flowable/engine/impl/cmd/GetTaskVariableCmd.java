@@ -28,39 +28,39 @@ import org.flowable.engine.task.Task;
  */
 public class GetTaskVariableCmd implements Command<Object>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String taskId;
-  protected String variableName;
-  protected boolean isLocal;
+    private static final long serialVersionUID = 1L;
+    protected String taskId;
+    protected String variableName;
+    protected boolean isLocal;
 
-  public GetTaskVariableCmd(String taskId, String variableName, boolean isLocal) {
-    this.taskId = taskId;
-    this.variableName = variableName;
-    this.isLocal = isLocal;
-  }
-
-  public Object execute(CommandContext commandContext) {
-    if (taskId == null) {
-      throw new FlowableIllegalArgumentException("taskId is null");
-    }
-    if (variableName == null) {
-      throw new FlowableIllegalArgumentException("variableName is null");
+    public GetTaskVariableCmd(String taskId, String variableName, boolean isLocal) {
+        this.taskId = taskId;
+        this.variableName = variableName;
+        this.isLocal = isLocal;
     }
 
-    TaskEntity task = commandContext.getTaskEntityManager().findById(taskId);
+    public Object execute(CommandContext commandContext) {
+        if (taskId == null) {
+            throw new FlowableIllegalArgumentException("taskId is null");
+        }
+        if (variableName == null) {
+            throw new FlowableIllegalArgumentException("variableName is null");
+        }
 
-    if (task == null) {
-      throw new FlowableObjectNotFoundException("task " + taskId + " doesn't exist", Task.class);
+        TaskEntity task = commandContext.getTaskEntityManager().findById(taskId);
+
+        if (task == null) {
+            throw new FlowableObjectNotFoundException("task " + taskId + " doesn't exist", Task.class);
+        }
+
+        Object value;
+
+        if (isLocal) {
+            value = task.getVariableLocal(variableName, false);
+        } else {
+            value = task.getVariable(variableName, false);
+        }
+
+        return value;
     }
-
-    Object value;
-
-    if (isLocal) {
-      value = task.getVariableLocal(variableName, false);
-    } else {
-      value = task.getVariable(variableName, false);
-    }
-
-    return value;
-  }
 }

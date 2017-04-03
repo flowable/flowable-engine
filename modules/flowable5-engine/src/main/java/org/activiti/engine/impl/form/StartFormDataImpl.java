@@ -16,23 +16,22 @@ package org.activiti.engine.impl.form;
 import org.flowable.engine.form.StartFormData;
 import org.flowable.engine.repository.ProcessDefinition;
 
-
 /**
  * @author Tom Baeyens
  */
 public class StartFormDataImpl extends FormDataImpl implements StartFormData {
-  
-  private static final long serialVersionUID = 1L;
-  
-  protected ProcessDefinition processDefinition;
 
-  // getters and setters //////////////////////////////////////////////////////
-  
-  public ProcessDefinition getProcessDefinition() {
-    return processDefinition;
-  }
+    private static final long serialVersionUID = 1L;
 
-  public void setProcessDefinition(ProcessDefinition processDefinition) {
-    this.processDefinition = processDefinition;
-  }
+    protected ProcessDefinition processDefinition;
+
+    // getters and setters //////////////////////////////////////////////////////
+
+    public ProcessDefinition getProcessDefinition() {
+        return processDefinition;
+    }
+
+    public void setProcessDefinition(ProcessDefinition processDefinition) {
+        this.processDefinition = processDefinition;
+    }
 }

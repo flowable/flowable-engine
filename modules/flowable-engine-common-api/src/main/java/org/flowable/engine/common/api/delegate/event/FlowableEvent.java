@@ -12,7 +12,6 @@
  */
 package org.flowable.engine.common.api.delegate.event;
 
-
 /**
  * Describes an event that occurred in the Flowable Engine which is dispatched to external listeners, if any.
  * 
@@ -21,9 +20,9 @@ package org.flowable.engine.common.api.delegate.event;
  */
 public interface FlowableEvent {
 
-  /**
-   * @return type of event.
-   */
-  FlowableEventType getType();
+    /**
+     * @return type of event.
+     */
+    FlowableEventType getType();
 
 }

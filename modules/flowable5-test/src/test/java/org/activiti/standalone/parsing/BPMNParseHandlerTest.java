@@ -15,21 +15,20 @@ package org.activiti.standalone.parsing;
 import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 
-
 /**
  * @author Frederik Heremans
  * @author Joram Barrez
  */
 public class BPMNParseHandlerTest extends ResourceFlowableTestCase {
-  
-  public BPMNParseHandlerTest() {
-    super("org/activiti/standalone/parsing/bpmn.parse.listener.flowable.cfg.xml");
-  }
 
-  @Deployment
-  public void testAlterProcessDefinitionKeyWhenDeploying() throws Exception {
-    // Check if process-definition has different key
-    assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").count());
-    assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess-modified").count());
-  }
+    public BPMNParseHandlerTest() {
+        super("org/activiti/standalone/parsing/bpmn.parse.listener.flowable.cfg.xml");
+    }
+
+    @Deployment
+    public void testAlterProcessDefinitionKeyWhenDeploying() throws Exception {
+        // Check if process-definition has different key
+        assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").count());
+        assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess-modified").count());
+    }
 }

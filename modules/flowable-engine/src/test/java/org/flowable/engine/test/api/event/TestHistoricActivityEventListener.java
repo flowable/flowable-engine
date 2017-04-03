@@ -24,32 +24,32 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
  */
 public class TestHistoricActivityEventListener implements FlowableEventListener {
 
-	private List<FlowableEvent> eventsReceived;
-	
-	public TestHistoricActivityEventListener() {
-		eventsReceived = new ArrayList<FlowableEvent>();
-  }
-	
-	public List<FlowableEvent> getEventsReceived() {
-	  return eventsReceived;
-  }
-	
-	public void clearEventsReceived() {
-		eventsReceived.clear();
-	}
-	
-	@Override
-	public void onEvent(FlowableEvent event) {
-		if (event.getType().equals(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED)
-				|| event.getType().equals(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED)
-				|| event.getType().equals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED)
-			  || event.getType().equals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED)) {
-					eventsReceived.add(event);
-				}
-	}
-	
-	@Override
-	public boolean isFailOnException() {
-		return false;
-	}
+    private List<FlowableEvent> eventsReceived;
+
+    public TestHistoricActivityEventListener() {
+        eventsReceived = new ArrayList<FlowableEvent>();
+    }
+
+    public List<FlowableEvent> getEventsReceived() {
+        return eventsReceived;
+    }
+
+    public void clearEventsReceived() {
+        eventsReceived.clear();
+    }
+
+    @Override
+    public void onEvent(FlowableEvent event) {
+        if (event.getType().equals(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED)
+                || event.getType().equals(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED)
+                || event.getType().equals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED)
+                || event.getType().equals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED)) {
+            eventsReceived.add(event);
+        }
+    }
+
+    @Override
+    public boolean isFailOnException() {
+        return false;
+    }
 }

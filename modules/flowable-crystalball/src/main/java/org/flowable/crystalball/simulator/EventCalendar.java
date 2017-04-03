@@ -20,15 +20,15 @@ import java.util.List;
  * @author martin.grofcik
  */
 public interface EventCalendar {
-  boolean isEmpty();
+    boolean isEmpty();
 
-  SimulationEvent peekFirstEvent();
+    SimulationEvent peekFirstEvent();
 
-  SimulationEvent removeFirstEvent();
+    SimulationEvent removeFirstEvent();
 
-  void addEvent(SimulationEvent event);
+    void addEvent(SimulationEvent event);
 
-  List<SimulationEvent> getEvents();
+    List<SimulationEvent> getEvents();
 
-  void clear();
+    void clear();
 }

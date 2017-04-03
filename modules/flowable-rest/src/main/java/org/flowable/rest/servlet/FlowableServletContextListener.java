@@ -26,23 +26,23 @@ import javax.servlet.ServletContextListener;
  */
 public class FlowableServletContextListener implements ServletContextListener {
 
-  protected static final Logger LOGGER = LoggerFactory.getLogger(FlowableServletContextListener.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(FlowableServletContextListener.class);
 
-  public void contextInitialized(ServletContextEvent event) {
-    LOGGER.info("Booting Flowable Process Engine");
-    ProcessEngine processEngine = null;
-    try {
-      processEngine = ProcessEngines.getDefaultProcessEngine();
-    } catch (Exception e) {
-      LOGGER.error("Error starting the Flowable REST API", e);
+    public void contextInitialized(ServletContextEvent event) {
+        LOGGER.info("Booting Flowable Process Engine");
+        ProcessEngine processEngine = null;
+        try {
+            processEngine = ProcessEngines.getDefaultProcessEngine();
+        } catch (Exception e) {
+            LOGGER.error("Error starting the Flowable REST API", e);
+        }
+        if (processEngine == null) {
+            LOGGER.error("Could not start the Flowable REST API");
+        }
     }
-    if (processEngine == null) {
-      LOGGER.error("Could not start the Flowable REST API");
-    }
-  }
 
-  public void contextDestroyed(ServletContextEvent event) {
-    LOGGER.info("Destroying Flowable Process Engine");
-    ProcessEngines.destroy();
-  }
+    public void contextDestroyed(ServletContextEvent event) {
+        LOGGER.info("Destroying Flowable Process Engine");
+        ProcessEngines.destroy();
+    }
 }

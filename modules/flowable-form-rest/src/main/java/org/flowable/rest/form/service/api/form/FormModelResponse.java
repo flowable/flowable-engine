@@ -19,26 +19,26 @@ import org.flowable.form.model.FormModel;
  */
 public class FormModelResponse extends FormModel {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected String url;
+    private static final long serialVersionUID = 1L;
 
-  public FormModelResponse(FormModel formModel) {
-    setId(formModel.getId());
-    setName(formModel.getName());
-    setDescription(formModel.getDescription());
-    setKey(formModel.getKey());
-    setVersion(formModel.getVersion());
-    setFields(formModel.getFields());
-    setOutcomes(formModel.getOutcomes());
-    setOutcomeVariableName(formModel.getOutcomeVariableName());
-  }
+    protected String url;
 
-  public String getUrl() {
-    return url;
-  }
+    public FormModelResponse(FormModel formModel) {
+        setId(formModel.getId());
+        setName(formModel.getName());
+        setDescription(formModel.getDescription());
+        setKey(formModel.getKey());
+        setVersion(formModel.getVersion());
+        setFields(formModel.getFields());
+        setOutcomes(formModel.getOutcomes());
+        setOutcomeVariableName(formModel.getOutcomeVariableName());
+    }
 
-  public void setUrl(String url) {
-    this.url = url;
-  }
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 }

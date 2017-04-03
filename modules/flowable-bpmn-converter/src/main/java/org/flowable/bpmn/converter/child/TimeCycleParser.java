@@ -25,19 +25,19 @@ import org.flowable.bpmn.model.TimerEventDefinition;
  */
 public class TimeCycleParser extends BaseChildElementParser {
 
-  public String getElementName() {
-    return ATTRIBUTE_TIMER_CYCLE;
-  }
-
-  public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-    if (!(parentElement instanceof TimerEventDefinition))
-      return;
-
-    TimerEventDefinition eventDefinition = (TimerEventDefinition) parentElement;
-
-    if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_END_DATE, xtr))) {
-      eventDefinition.setEndDate(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_END_DATE, xtr));
+    public String getElementName() {
+        return ATTRIBUTE_TIMER_CYCLE;
     }
-    eventDefinition.setTimeCycle(xtr.getElementText());
-  }
+
+    public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
+        if (!(parentElement instanceof TimerEventDefinition))
+            return;
+
+        TimerEventDefinition eventDefinition = (TimerEventDefinition) parentElement;
+
+        if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_END_DATE, xtr))) {
+            eventDefinition.setEndDate(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_END_DATE, xtr));
+        }
+        eventDefinition.setTimeCycle(xtr.getElementText());
+    }
 }

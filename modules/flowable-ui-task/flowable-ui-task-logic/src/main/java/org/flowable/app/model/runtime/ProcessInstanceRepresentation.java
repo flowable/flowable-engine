@@ -46,7 +46,7 @@ public class ProcessInstanceRepresentation extends AbstractRepresentation {
     protected String processDefinitionDeploymentId;
     protected boolean graphicalNotationDefined;
     protected boolean startFormDefined;
-    
+
     protected List<RestVariable> variables = new ArrayList<RestVariable>();
 
     public ProcessInstanceRepresentation(ProcessInstance processInstance, ProcessDefinition processDefinition, boolean graphicalNotation, User startedBy) {
@@ -68,7 +68,7 @@ public class ProcessInstanceRepresentation extends AbstractRepresentation {
         this(processInstance, graphicalNotation, startedBy);
         mapProcessDefinition(processDefinition);
     }
-    
+
     public ProcessInstanceRepresentation(HistoricProcessInstance processInstance, boolean graphicalNotation, User startedBy) {
         this.id = processInstance.getId();
         this.name = processInstance.getName();
@@ -91,7 +91,9 @@ public class ProcessInstanceRepresentation extends AbstractRepresentation {
             this.processDefinitionDeploymentId = processDefinition.getDeploymentId();
         }
     }
-    public ProcessInstanceRepresentation() {}
+
+    public ProcessInstanceRepresentation() {
+    }
 
     public String getId() {
         return id;
@@ -108,15 +110,15 @@ public class ProcessInstanceRepresentation extends AbstractRepresentation {
     public UserRepresentation getStartedBy() {
         return startedBy;
     }
-    
+
     public void setStartedBy(UserRepresentation startedBy) {
-      this.startedBy = startedBy;
-  }
-    
+        this.startedBy = startedBy;
+    }
+
     public String getBusinessKey() {
         return businessKey;
     }
-    
+
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
     }
@@ -136,23 +138,23 @@ public class ProcessInstanceRepresentation extends AbstractRepresentation {
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
-    
+
     public Date getStarted() {
         return started;
     }
-    
+
     public void setStarted(Date started) {
         this.started = started;
     }
-    
+
     public Date getEnded() {
         return ended;
     }
-    
+
     public void setEnded(Date ended) {
         this.ended = ended;
     }
-    
+
     public void setName(String name) {
         this.name = name;
     }
@@ -204,23 +206,23 @@ public class ProcessInstanceRepresentation extends AbstractRepresentation {
     public void setProcessDefinitionDeploymentId(String processDefinitionDeploymentId) {
         this.processDefinitionDeploymentId = processDefinitionDeploymentId;
     }
-    
+
     public List<RestVariable> getVariables() {
         return variables;
     }
-  
+
     public void setVariables(List<RestVariable> variables) {
         this.variables = variables;
     }
-  
+
     public void addVariable(RestVariable variable) {
         variables.add(variable);
     }
-    
+
     public boolean isGraphicalNotationDefined() {
         return graphicalNotationDefined;
     }
-    
+
     public void setGraphicalNotationDefined(boolean graphicalNotationDefined) {
         this.graphicalNotationDefined = graphicalNotationDefined;
     }

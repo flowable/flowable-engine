@@ -47,27 +47,27 @@ public class ErrorInfo {
     public void setMessage(String message) {
         this.message = message;
     }
-    
+
     public void setMessageKey(String messageKey) {
         this.messageKey = messageKey;
     }
-    
+
     @JsonInclude(Include.NON_NULL)
     public String getMessageKey() {
         return messageKey;
     }
-    
+
     @JsonInclude(Include.NON_EMPTY)
     public Map<String, Object> getCustomData() {
         return customData;
     }
-    
+
     public void setCustomData(Map<String, Object> params) {
         this.customData = params;
     }
-    
+
     public void addParameter(String name, Object value) {
-        if(customData == null) {
+        if (customData == null) {
             customData = new HashMap<String, Object>();
         }
         customData.put(name, value);

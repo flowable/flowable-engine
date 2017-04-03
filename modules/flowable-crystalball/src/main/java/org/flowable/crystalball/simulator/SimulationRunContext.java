@@ -29,121 +29,121 @@ import org.flowable.engine.delegate.VariableScope;
  */
 public abstract class SimulationRunContext {
 
-  //
-  // Process engine on which simulation will be executed
-  //
-  protected static ThreadLocal<Stack<ProcessEngine>> processEngineThreadLocal = new ThreadLocal<Stack<ProcessEngine>>();
+    //
+    // Process engine on which simulation will be executed
+    //
+    protected static ThreadLocal<Stack<ProcessEngine>> processEngineThreadLocal = new ThreadLocal<Stack<ProcessEngine>>();
 
-  //
-  // Simulation objects
-  //
-  protected static ThreadLocal<Stack<EventCalendar>> eventCalendarThreadLocal = new ThreadLocal<Stack<EventCalendar>>();
+    //
+    // Simulation objects
+    //
+    protected static ThreadLocal<Stack<EventCalendar>> eventCalendarThreadLocal = new ThreadLocal<Stack<EventCalendar>>();
 
-  //
-  // Simulation run Id
-  //
-  protected static ThreadLocal<Stack<String>> simulationRunIdThreadLocal = new ThreadLocal<Stack<String>>();
+    //
+    // Simulation run Id
+    //
+    protected static ThreadLocal<Stack<String>> simulationRunIdThreadLocal = new ThreadLocal<Stack<String>>();
 
-  //
-  // Variable scope used for getting/setting variables to the simulationManager
-  //
-  protected static ThreadLocal<Stack<VariableScope>> executionThreadLocal = new ThreadLocal<Stack<VariableScope>>();
+    //
+    // Variable scope used for getting/setting variables to the simulationManager
+    //
+    protected static ThreadLocal<Stack<VariableScope>> executionThreadLocal = new ThreadLocal<Stack<VariableScope>>();
 
-  public static RuntimeService getRuntimeService() {
-    Stack<ProcessEngine> stack = getStack(processEngineThreadLocal);
-    if (stack.isEmpty()) {
-      return null;
+    public static RuntimeService getRuntimeService() {
+        Stack<ProcessEngine> stack = getStack(processEngineThreadLocal);
+        if (stack.isEmpty()) {
+            return null;
+        }
+        return stack.peek().getRuntimeService();
     }
-    return stack.peek().getRuntimeService();
-  }
 
-  public static void setProcessEngine(ProcessEngine processEngine) {
-    getStack(processEngineThreadLocal).push(processEngine);
-  }
-
-  public static ProcessEngine getProcessEngine() {
-    return getStack(processEngineThreadLocal).peek();
-  }
-
-  public static void removeProcessEngine() {
-    getStack(processEngineThreadLocal).pop();
-  }
-
-  public static TaskService getTaskService() {
-    Stack<ProcessEngine> stack = getStack(processEngineThreadLocal);
-    if (stack.isEmpty()) {
-      return null;
+    public static void setProcessEngine(ProcessEngine processEngine) {
+        getStack(processEngineThreadLocal).push(processEngine);
     }
-    return stack.peek().getTaskService();
-  }
 
-  public static EventCalendar getEventCalendar() {
-    Stack<EventCalendar> stack = getStack(eventCalendarThreadLocal);
-    if (stack.isEmpty()) {
-      return null;
+    public static ProcessEngine getProcessEngine() {
+        return getStack(processEngineThreadLocal).peek();
     }
-    return stack.peek();
-  }
 
-  public static void setEventCalendar(EventCalendar eventCalendar) {
-    getStack(eventCalendarThreadLocal).push(eventCalendar);
-  }
-
-  public static String getSimulationRunId() {
-    Stack<String> stack = getStack(simulationRunIdThreadLocal);
-    if (stack.isEmpty()) {
-      return null;
+    public static void removeProcessEngine() {
+        getStack(processEngineThreadLocal).pop();
     }
-    return stack.peek();
-  }
 
-  public static void setSimulationRunId(String simulationRunId) {
-    getStack(simulationRunIdThreadLocal).push(simulationRunId);
-  }
-
-  public static void removeEventCalendar() {
-    getStack(eventCalendarThreadLocal).pop();
-  }
-
-  public static HistoryService getHistoryService() {
-    Stack<ProcessEngine> stack = getStack(processEngineThreadLocal);
-    if (stack.isEmpty()) {
-      return null;
+    public static TaskService getTaskService() {
+        Stack<ProcessEngine> stack = getStack(processEngineThreadLocal);
+        if (stack.isEmpty()) {
+            return null;
+        }
+        return stack.peek().getTaskService();
     }
-    return stack.peek().getHistoryService();
-  }
 
-  public static RepositoryService getRepositoryService() {
-    Stack<ProcessEngine> stack = getStack(processEngineThreadLocal);
-    if (stack.isEmpty()) {
-      return null;
+    public static EventCalendar getEventCalendar() {
+        Stack<EventCalendar> stack = getStack(eventCalendarThreadLocal);
+        if (stack.isEmpty()) {
+            return null;
+        }
+        return stack.peek();
     }
-    return stack.peek().getRepositoryService();
-  }
 
-  public static VariableScope getExecution() {
-    Stack<VariableScope> stack = getStack(executionThreadLocal);
-    if (stack.isEmpty()) {
-      return null;
+    public static void setEventCalendar(EventCalendar eventCalendar) {
+        getStack(eventCalendarThreadLocal).push(eventCalendar);
     }
-    return stack.peek();
-  }
 
-  public static void setExecution(VariableScope execution) {
-    getStack(executionThreadLocal).push(execution);
-  }
-
-  public static Clock getClock() {
-    return getProcessEngine().getProcessEngineConfiguration().getClock();
-  }
-
-  protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {
-    Stack<T> stack = threadLocal.get();
-    if (stack == null) {
-      stack = new Stack<T>();
-      threadLocal.set(stack);
+    public static String getSimulationRunId() {
+        Stack<String> stack = getStack(simulationRunIdThreadLocal);
+        if (stack.isEmpty()) {
+            return null;
+        }
+        return stack.peek();
     }
-    return stack;
-  }
+
+    public static void setSimulationRunId(String simulationRunId) {
+        getStack(simulationRunIdThreadLocal).push(simulationRunId);
+    }
+
+    public static void removeEventCalendar() {
+        getStack(eventCalendarThreadLocal).pop();
+    }
+
+    public static HistoryService getHistoryService() {
+        Stack<ProcessEngine> stack = getStack(processEngineThreadLocal);
+        if (stack.isEmpty()) {
+            return null;
+        }
+        return stack.peek().getHistoryService();
+    }
+
+    public static RepositoryService getRepositoryService() {
+        Stack<ProcessEngine> stack = getStack(processEngineThreadLocal);
+        if (stack.isEmpty()) {
+            return null;
+        }
+        return stack.peek().getRepositoryService();
+    }
+
+    public static VariableScope getExecution() {
+        Stack<VariableScope> stack = getStack(executionThreadLocal);
+        if (stack.isEmpty()) {
+            return null;
+        }
+        return stack.peek();
+    }
+
+    public static void setExecution(VariableScope execution) {
+        getStack(executionThreadLocal).push(execution);
+    }
+
+    public static Clock getClock() {
+        return getProcessEngine().getProcessEngineConfiguration().getClock();
+    }
+
+    protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {
+        Stack<T> stack = threadLocal.get();
+        if (stack == null) {
+            stack = new Stack<T>();
+            threadLocal.set(stack);
+        }
+        return stack;
+    }
 
 }

@@ -24,26 +24,26 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
  * @author Frederik Heremans
  */
 public class DispatchEventCommand implements Command<Void> {
-	
-	protected FlowableEvent event;
-	
-	public DispatchEventCommand(FlowableEvent event) {
-	  this.event = event;
-  }
 
-	@Override
-  public Void execute(CommandContext commandContext) {
-		if(event == null) {
-			throw new ActivitiIllegalArgumentException("event is null");
-		}
-		
-		if(commandContext.getEventDispatcher().isEnabled()) {
-			commandContext.getEventDispatcher().dispatchEvent(event);
-		} else {
-			throw new ActivitiException("Message dispatcher is disabled, cannot dispatch event");
-		}
-		
-	  return null;
-  }
-	
+    protected FlowableEvent event;
+
+    public DispatchEventCommand(FlowableEvent event) {
+        this.event = event;
+    }
+
+    @Override
+    public Void execute(CommandContext commandContext) {
+        if (event == null) {
+            throw new ActivitiIllegalArgumentException("event is null");
+        }
+
+        if (commandContext.getEventDispatcher().isEnabled()) {
+            commandContext.getEventDispatcher().dispatchEvent(event);
+        } else {
+            throw new ActivitiException("Message dispatcher is disabled, cannot dispatch event");
+        }
+
+        return null;
+    }
+
 }

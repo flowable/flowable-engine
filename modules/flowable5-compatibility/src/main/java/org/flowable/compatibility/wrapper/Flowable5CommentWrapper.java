@@ -15,6 +15,7 @@ package org.flowable.compatibility.wrapper;
 
 import java.util.Date;
 
+import org.activiti.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.task.Comment;
 
 /**
@@ -24,48 +25,78 @@ import org.flowable.engine.task.Comment;
  */
 public class Flowable5CommentWrapper implements Comment {
 
-  private org.activiti.engine.task.Comment activit5Comment;
-  
-  public Flowable5CommentWrapper(org.activiti.engine.task.Comment activit5Comment) {
-    this.activit5Comment = activit5Comment;
-  }
+    private org.activiti.engine.task.Comment activit5Comment;
 
-  @Override
-  public String getId() {
-    return activit5Comment.getId();
-  }
+    public Flowable5CommentWrapper(org.activiti.engine.task.Comment activit5Comment) {
+        this.activit5Comment = activit5Comment;
+    }
 
-  @Override
-  public String getUserId() {
-    return activit5Comment.getUserId();
-  }
+    @Override
+    public String getId() {
+        return activit5Comment.getId();
+    }
 
-  @Override
-  public Date getTime() {
-    return activit5Comment.getTime();
-  }
+    @Override
+    public String getUserId() {
+        return activit5Comment.getUserId();
+    }
 
-  @Override
-  public String getTaskId() {
-    return activit5Comment.getTaskId();
-  }
+    @Override
+    public Date getTime() {
+        return activit5Comment.getTime();
+    }
 
-  @Override
-  public String getProcessInstanceId() {
-    return activit5Comment.getProcessInstanceId();
-  }
+    @Override
+    public String getTaskId() {
+        return activit5Comment.getTaskId();
+    }
 
-  @Override
-  public String getType() {
-    return activit5Comment.getType();
-  }
+    @Override
+    public String getProcessInstanceId() {
+        return activit5Comment.getProcessInstanceId();
+    }
 
-  @Override
-  public String getFullMessage() {
-    return activit5Comment.getFullMessage();
-  }
-  
-  public org.activiti.engine.task.Comment getRawObject() {
-    return activit5Comment;
-  }
+    @Override
+    public String getType() {
+        return activit5Comment.getType();
+    }
+
+    @Override
+    public String getFullMessage() {
+        return activit5Comment.getFullMessage();
+    }
+
+    public org.activiti.engine.task.Comment getRawObject() {
+        return activit5Comment;
+    }
+
+    @Override
+    public void setUserId(String userId) {
+        ((CommentEntity) activit5Comment).setUserId(userId);
+    }
+
+    @Override
+    public void setTime(Date time) {
+        ((CommentEntity) activit5Comment).setTime(time);
+    }
+
+    @Override
+    public void setTaskId(String taskId) {
+        ((CommentEntity) activit5Comment).setTaskId(taskId);
+    }
+
+    @Override
+    public void setProcessInstanceId(String processInstanceId) {
+        ((CommentEntity) activit5Comment).setProcessInstanceId(processInstanceId);
+    }
+
+    @Override
+    public void setType(String type) {
+        ((CommentEntity) activit5Comment).setType(type);
+    }
+
+    @Override
+    public void setFullMessage(String fullMessage) {
+        ((CommentEntity) activit5Comment).setFullMessage(fullMessage);
+    }
 }

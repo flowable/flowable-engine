@@ -16,48 +16,48 @@ import org.flowable.engine.history.HistoricActivityInstanceQuery;
 
 public class HistoricActivityInstanceEscapeClauseTest extends AbstractEscapeClauseTestCase {
 
-  private String deploymentOneId;
-  
-  private String deploymentTwoId;
-  
-  @Override
-  protected void setUp() throws Exception {
-    deploymentOneId = repositoryService
-      .createDeployment()
-      .tenantId("One%")
-      .addClasspathResource("org/flowable/engine/test/history/HistoricActivityInstanceTest.testHistoricActivityInstanceQuery.bpmn20.xml")
-      .deploy()
-      .getId();
+    private String deploymentOneId;
 
-    deploymentTwoId = repositoryService
-      .createDeployment()
-      .tenantId("Two_")
-      .addClasspathResource("org/flowable/engine/test/history/HistoricActivityInstanceTest.testHistoricActivityInstanceQuery.bpmn20.xml")
-      .deploy()
-      .getId();
-    
-    super.setUp();
-  }
+    private String deploymentTwoId;
 
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
-    repositoryService.deleteDeployment(deploymentOneId, true);
-    repositoryService.deleteDeployment(deploymentTwoId, true);
-  }
-  
-  public void testQueryByTenantIdLike() {
-    runtimeService.startProcessInstanceByKeyAndTenantId("noopProcess", "One%");
-    runtimeService.startProcessInstanceByKeyAndTenantId("noopProcess", "Two_");
+    @Override
+    protected void setUp() throws Exception {
+        deploymentOneId = repositoryService
+                .createDeployment()
+                .tenantId("One%")
+                .addClasspathResource("org/flowable/engine/test/history/HistoricActivityInstanceTest.testHistoricActivityInstanceQuery.bpmn20.xml")
+                .deploy()
+                .getId();
 
-    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery().activityId("noop").activityTenantIdLike("%\\%%");
-    assertEquals("One%", query.singleResult().getTenantId());
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-    
-    query = historyService.createHistoricActivityInstanceQuery().activityId("noop").activityTenantIdLike("%\\_%");
-    assertEquals("Two_", query.singleResult().getTenantId());
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-  }
+        deploymentTwoId = repositoryService
+                .createDeployment()
+                .tenantId("Two_")
+                .addClasspathResource("org/flowable/engine/test/history/HistoricActivityInstanceTest.testHistoricActivityInstanceQuery.bpmn20.xml")
+                .deploy()
+                .getId();
+
+        super.setUp();
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        repositoryService.deleteDeployment(deploymentOneId, true);
+        repositoryService.deleteDeployment(deploymentTwoId, true);
+    }
+
+    public void testQueryByTenantIdLike() {
+        runtimeService.startProcessInstanceByKeyAndTenantId("noopProcess", "One%");
+        runtimeService.startProcessInstanceByKeyAndTenantId("noopProcess", "Two_");
+
+        HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery().activityId("noop").activityTenantIdLike("%\\%%");
+        assertEquals("One%", query.singleResult().getTenantId());
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+
+        query = historyService.createHistoricActivityInstanceQuery().activityId("noop").activityTenantIdLike("%\\_%");
+        assertEquals("Two_", query.singleResult().getTenantId());
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+    }
 }

@@ -25,26 +25,26 @@ import org.flowable.engine.common.api.query.QueryProperty;
  */
 public class ContentItemQueryProperty implements QueryProperty {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private static final Map<String, ContentItemQueryProperty> properties = new HashMap<String, ContentItemQueryProperty>();
+    private static final Map<String, ContentItemQueryProperty> properties = new HashMap<String, ContentItemQueryProperty>();
 
-  public static final ContentItemQueryProperty CREATED_DATE = new ContentItemQueryProperty("RES.CREATED_");
-  public static final ContentItemQueryProperty TENANT_ID = new ContentItemQueryProperty("RES.TENANT_ID_");
+    public static final ContentItemQueryProperty CREATED_DATE = new ContentItemQueryProperty("RES.CREATED_");
+    public static final ContentItemQueryProperty TENANT_ID = new ContentItemQueryProperty("RES.TENANT_ID_");
 
-  private String name;
+    private String name;
 
-  public ContentItemQueryProperty(String name) {
-    this.name = name;
-    properties.put(name, this);
-  }
+    public ContentItemQueryProperty(String name) {
+        this.name = name;
+        properties.put(name, this);
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public static ContentItemQueryProperty findByName(String propertyName) {
-    return properties.get(propertyName);
-  }
+    public static ContentItemQueryProperty findByName(String propertyName) {
+        return properties.get(propertyName);
+    }
 
 }

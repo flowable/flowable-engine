@@ -21,42 +21,42 @@ import org.flowable.engine.impl.persistence.entity.JobEntity;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TaskAssigneeChangedHistoryJsonTransformer extends TaskPropertyChangedHistoryJsonTransformer {
-  
-  public static final String TYPE = "task-assignee-changed";
-  
-  @Override
-  public String getType() {
-    return TYPE;
-  }
-  
-  @Override
-  public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
-    String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
-    if (StringUtils.isNotEmpty(executionId)) {
-      return super.isApplicable(historicalData, commandContext) 
-          && historicActivityInstanceExistsForData(historicalData, commandContext);
-      
-    } else {
-      return super.isApplicable(historicalData, commandContext);
-    }
-  }
 
-  @Override
-  public void transformJson(JobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-    
-    super.transformJson(job, historicalData, commandContext);
-    
-    String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
-    if (StringUtils.isNotEmpty(executionId)) {
-      String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
-      if (StringUtils.isNotEmpty(activityId)) {
-        HistoricActivityInstanceEntity historicActivityInstanceEntity = findUnfinishedHistoricActivityInstance(commandContext, executionId, activityId);
-        if (historicActivityInstanceEntity != null) {
-          String assignee = getStringFromJson(historicalData, HistoryJsonConstants.ASSIGNEE);
-          historicActivityInstanceEntity.setAssignee(assignee);
-        }
-      }
+    public static final String TYPE = "task-assignee-changed";
+
+    @Override
+    public String getType() {
+        return TYPE;
     }
-  }
+
+    @Override
+    public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
+        String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
+        if (StringUtils.isNotEmpty(executionId)) {
+            return super.isApplicable(historicalData, commandContext)
+                            && historicActivityInstanceExistsForData(historicalData, commandContext);
+
+        } else {
+            return super.isApplicable(historicalData, commandContext);
+        }
+    }
+
+    @Override
+    public void transformJson(JobEntity job, ObjectNode historicalData, CommandContext commandContext) {
+
+        super.transformJson(job, historicalData, commandContext);
+
+        String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
+        if (StringUtils.isNotEmpty(executionId)) {
+            String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
+            if (StringUtils.isNotEmpty(activityId)) {
+                HistoricActivityInstanceEntity historicActivityInstanceEntity = findUnfinishedHistoricActivityInstance(commandContext, executionId, activityId);
+                if (historicActivityInstanceEntity != null) {
+                    String assignee = getStringFromJson(historicalData, HistoryJsonConstants.ASSIGNEE);
+                    historicActivityInstanceEntity.setAssignee(assignee);
+                }
+            }
+        }
+    }
 
 }

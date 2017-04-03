@@ -35,114 +35,114 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 @EnableTransactionManagement
 public class DatabaseConfiguration {
 
-  private final Logger log = LoggerFactory.getLogger(DatabaseConfiguration.class);
-  
-  @Autowired
-  protected Environment env;
-  
-  @Autowired
-  protected ResourceLoader resourceLoader;
+    private final Logger log = LoggerFactory.getLogger(DatabaseConfiguration.class);
 
-  @Bean
-  public DataSource dataSource() {
-    log.info("Configuring Datasource");
+    @Autowired
+    protected Environment env;
 
-    String dataSourceJndiName = env.getProperty("datasource.jndi.name");
-    if (StringUtils.isNotEmpty(dataSourceJndiName)) {
+    @Autowired
+    protected ResourceLoader resourceLoader;
 
-      log.info("Using jndi datasource '{}'", dataSourceJndiName);
-      JndiDataSourceLookup dsLookup = new JndiDataSourceLookup();
-      dsLookup.setResourceRef(env.getProperty("datasource.jndi.resourceRef", Boolean.class, Boolean.TRUE));
-      DataSource dataSource = dsLookup.getDataSource(dataSourceJndiName);
-      return dataSource;
+    @Bean
+    public DataSource dataSource() {
+        log.info("Configuring Datasource");
 
-    } else {
+        String dataSourceJndiName = env.getProperty("datasource.jndi.name");
+        if (StringUtils.isNotEmpty(dataSourceJndiName)) {
 
-      String dataSourceDriver = env.getProperty("datasource.driver", "org.h2.Driver");
-      String dataSourceUrl = env.getProperty("datasource.url", "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1");
+            log.info("Using jndi datasource '{}'", dataSourceJndiName);
+            JndiDataSourceLookup dsLookup = new JndiDataSourceLookup();
+            dsLookup.setResourceRef(env.getProperty("datasource.jndi.resourceRef", Boolean.class, Boolean.TRUE));
+            DataSource dataSource = dsLookup.getDataSource(dataSourceJndiName);
+            return dataSource;
 
-      String dataSourceUsername = env.getProperty("datasource.username", "sa");
-      String dataSourcePassword = env.getProperty("datasource.password", "");
+        } else {
 
-      Integer minPoolSize = env.getProperty("datasource.min-pool-size", Integer.class);
-      if (minPoolSize == null) {
-        minPoolSize = 10;
-      }
+            String dataSourceDriver = env.getProperty("datasource.driver", "org.h2.Driver");
+            String dataSourceUrl = env.getProperty("datasource.url", "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=-1");
 
-      Integer maxPoolSize = env.getProperty("datasource.max-pool-size", Integer.class);
-      if (maxPoolSize == null) {
-        maxPoolSize = 100;
-      }
+            String dataSourceUsername = env.getProperty("datasource.username", "sa");
+            String dataSourcePassword = env.getProperty("datasource.password", "");
 
-      Integer acquireIncrement = env.getProperty("datasource.acquire-increment", Integer.class);
-      if (acquireIncrement == null) {
-        acquireIncrement = 5;
-      }
+            Integer minPoolSize = env.getProperty("datasource.min-pool-size", Integer.class);
+            if (minPoolSize == null) {
+                minPoolSize = 10;
+            }
 
-      String preferredTestQuery = env.getProperty("datasource.preferred-test-query");
+            Integer maxPoolSize = env.getProperty("datasource.max-pool-size", Integer.class);
+            if (maxPoolSize == null) {
+                maxPoolSize = 100;
+            }
 
-      Boolean testConnectionOnCheckin = env.getProperty("datasource.test-connection-on-checkin", Boolean.class);
-      if (testConnectionOnCheckin == null) {
-        testConnectionOnCheckin = true;
-      }
+            Integer acquireIncrement = env.getProperty("datasource.acquire-increment", Integer.class);
+            if (acquireIncrement == null) {
+                acquireIncrement = 5;
+            }
 
-      Boolean testConnectionOnCheckOut = env.getProperty("datasource.test-connection-on-checkout", Boolean.class);
-      if (testConnectionOnCheckOut == null) {
-        testConnectionOnCheckOut = true;
-      }
+            String preferredTestQuery = env.getProperty("datasource.preferred-test-query");
 
-      Integer maxIdleTime = env.getProperty("datasource.max-idle-time", Integer.class);
-      if (maxIdleTime == null) {
-        maxIdleTime = 1800;
-      }
+            Boolean testConnectionOnCheckin = env.getProperty("datasource.test-connection-on-checkin", Boolean.class);
+            if (testConnectionOnCheckin == null) {
+                testConnectionOnCheckin = true;
+            }
 
-      Integer maxIdleTimeExcessConnections = env.getProperty("datasource.max-idle-time-excess-connections", Integer.class);
-      if (maxIdleTimeExcessConnections == null) {
-        maxIdleTimeExcessConnections = 1800;
-      }
+            Boolean testConnectionOnCheckOut = env.getProperty("datasource.test-connection-on-checkout", Boolean.class);
+            if (testConnectionOnCheckOut == null) {
+                testConnectionOnCheckOut = true;
+            }
 
-      if (log.isInfoEnabled()) {
-        log.info("Configuring Datasource with following properties (omitted password for security)");
-        log.info("datasource driver : {}", dataSourceDriver);
-        log.info("datasource url : {}", dataSourceUrl);
-        log.info("datasource user name : {}", dataSourceUsername);
-        log.info("Min pool size | Max pool size | acquire increment : {} | {} | {}", minPoolSize, maxPoolSize, acquireIncrement);
-      }
+            Integer maxIdleTime = env.getProperty("datasource.max-idle-time", Integer.class);
+            if (maxIdleTime == null) {
+                maxIdleTime = 1800;
+            }
 
-      ComboPooledDataSource ds = new ComboPooledDataSource();
-      try {
-        ds.setDriverClass(dataSourceDriver);
-      } catch (PropertyVetoException e) {
-        log.error("Could not set Jdbc Driver class", e);
-        return null;
-      }
+            Integer maxIdleTimeExcessConnections = env.getProperty("datasource.max-idle-time-excess-connections", Integer.class);
+            if (maxIdleTimeExcessConnections == null) {
+                maxIdleTimeExcessConnections = 1800;
+            }
 
-      // Connection settings
-      ds.setJdbcUrl(dataSourceUrl);
-      ds.setUser(dataSourceUsername);
-      ds.setPassword(dataSourcePassword);
+            if (log.isInfoEnabled()) {
+                log.info("Configuring Datasource with following properties (omitted password for security)");
+                log.info("datasource driver : {}", dataSourceDriver);
+                log.info("datasource url : {}", dataSourceUrl);
+                log.info("datasource user name : {}", dataSourceUsername);
+                log.info("Min pool size | Max pool size | acquire increment : {} | {} | {}", minPoolSize, maxPoolSize, acquireIncrement);
+            }
 
-      // Pool config: see http://www.mchange.com/projects/c3p0/#configuration
-      ds.setMinPoolSize(minPoolSize);
-      ds.setMaxPoolSize(maxPoolSize);
-      ds.setAcquireIncrement(acquireIncrement);
-      if (preferredTestQuery != null) {
-        ds.setPreferredTestQuery(preferredTestQuery);
-      }
-      ds.setTestConnectionOnCheckin(testConnectionOnCheckin);
-      ds.setTestConnectionOnCheckout(testConnectionOnCheckOut);
-      ds.setMaxIdleTimeExcessConnections(maxIdleTimeExcessConnections);
-      ds.setMaxIdleTime(maxIdleTime);
+            ComboPooledDataSource ds = new ComboPooledDataSource();
+            try {
+                ds.setDriverClass(dataSourceDriver);
+            } catch (PropertyVetoException e) {
+                log.error("Could not set Jdbc Driver class", e);
+                return null;
+            }
 
-      return ds;
+            // Connection settings
+            ds.setJdbcUrl(dataSourceUrl);
+            ds.setUser(dataSourceUsername);
+            ds.setPassword(dataSourcePassword);
+
+            // Pool config: see http://www.mchange.com/projects/c3p0/#configuration
+            ds.setMinPoolSize(minPoolSize);
+            ds.setMaxPoolSize(maxPoolSize);
+            ds.setAcquireIncrement(acquireIncrement);
+            if (preferredTestQuery != null) {
+                ds.setPreferredTestQuery(preferredTestQuery);
+            }
+            ds.setTestConnectionOnCheckin(testConnectionOnCheckin);
+            ds.setTestConnectionOnCheckout(testConnectionOnCheckOut);
+            ds.setMaxIdleTimeExcessConnections(maxIdleTimeExcessConnections);
+            ds.setMaxIdleTime(maxIdleTime);
+
+            return ds;
+        }
     }
-  }
-  
-  @Bean
-  public PlatformTransactionManager annotationDrivenTransactionManager() {
-    DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
-    dataSourceTransactionManager.setDataSource(dataSource());
-    return dataSourceTransactionManager;
-  }
+
+    @Bean
+    public PlatformTransactionManager annotationDrivenTransactionManager() {
+        DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
+        dataSourceTransactionManager.setDataSource(dataSource());
+        return dataSourceTransactionManager;
+    }
 
 }

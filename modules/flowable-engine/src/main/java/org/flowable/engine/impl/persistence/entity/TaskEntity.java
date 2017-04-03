@@ -31,47 +31,47 @@ import org.flowable.engine.task.Task;
  */
 public interface TaskEntity extends VariableScope, Task, DelegateTask, Entity, HasRevision {
 
-  ExecutionEntity getExecution();
-  
-  void setExecutionId(String executionId);
-  
-  void setExecution(ExecutionEntity execution);
+    ExecutionEntity getExecution();
 
-  List<IdentityLinkEntity> getIdentityLinks();
+    void setExecutionId(String executionId);
 
-  void setExecutionVariables(Map<String, Object> parameters);
+    void setExecution(ExecutionEntity execution);
 
-  void setCreateTime(Date createTime);
+    List<IdentityLinkEntity> getIdentityLinks();
 
-  void setProcessDefinitionId(String processDefinitionId);
+    void setExecutionVariables(Map<String, Object> parameters);
 
-  void setEventName(String eventName);
-  
-  void setCurrentFlowableListener(FlowableListener currentListener);
-  
-  ExecutionEntity getProcessInstance();
+    void setCreateTime(Date createTime);
 
-  void setProcessInstanceId(String processInstanceId);
+    void setProcessDefinitionId(String processDefinitionId);
 
-  int getSuspensionState();
+    void setEventName(String eventName);
 
-  void setSuspensionState(int suspensionState);
-  
-  void setTaskDefinitionKey(String taskDefinitionKey);
-  
-  Map<String, VariableInstanceEntity> getVariableInstanceEntities();
+    void setCurrentFlowableListener(FlowableListener currentListener);
 
-  void forceUpdate();
-  
-  boolean isDeleted();
-  
-  void setDeleted(boolean isDeleted);
-  
-  boolean isCanceled();
+    ExecutionEntity getProcessInstance();
 
-  void setCanceled(boolean isCanceled);
+    void setProcessInstanceId(String processInstanceId);
 
-  Date getClaimTime();
+    int getSuspensionState();
 
-  void setClaimTime(Date claimTime);
+    void setSuspensionState(int suspensionState);
+
+    void setTaskDefinitionKey(String taskDefinitionKey);
+
+    Map<String, VariableInstanceEntity> getVariableInstanceEntities();
+
+    void forceUpdate();
+
+    boolean isDeleted();
+
+    void setDeleted(boolean isDeleted);
+
+    boolean isCanceled();
+
+    void setCanceled(boolean isCanceled);
+
+    Date getClaimTime();
+
+    void setClaimTime(Date claimTime);
 }

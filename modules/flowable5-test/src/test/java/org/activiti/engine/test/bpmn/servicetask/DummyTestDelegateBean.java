@@ -19,10 +19,10 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
 public class DummyTestDelegateBean implements JavaDelegate, Serializable {
-  
-  private static final long serialVersionUID = 1L;
-  
-  public void execute(DelegateExecution execution) {
-    execution.setVariable("executed", true);
-  }
+
+    private static final long serialVersionUID = 1L;
+
+    public void execute(DelegateExecution execution) {
+        execution.setVariable("executed", true);
+    }
 }

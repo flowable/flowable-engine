@@ -25,21 +25,21 @@ import org.flowable.idm.engine.impl.persistence.entity.data.PropertyDataManager;
  */
 public class PropertyEntityManagerImpl extends AbstractEntityManager<PropertyEntity> implements PropertyEntityManager {
 
-  protected PropertyDataManager propertyDataManager;
-  
-  public PropertyEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, PropertyDataManager propertyDataManager) {
-    super(idmEngineConfiguration);
-    this.propertyDataManager = propertyDataManager;
-  }
-  
-  @Override
-  protected DataManager<PropertyEntity> getDataManager() {
-    return propertyDataManager;
-  }
-  
-  @Override
-  public List<PropertyEntity> findAll() {
-    return propertyDataManager.findAll();
-  }
-  
+    protected PropertyDataManager propertyDataManager;
+
+    public PropertyEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, PropertyDataManager propertyDataManager) {
+        super(idmEngineConfiguration);
+        this.propertyDataManager = propertyDataManager;
+    }
+
+    @Override
+    protected DataManager<PropertyEntity> getDataManager() {
+        return propertyDataManager;
+    }
+
+    @Override
+    public List<PropertyEntity> findAll() {
+        return propertyDataManager.findAll();
+    }
+
 }

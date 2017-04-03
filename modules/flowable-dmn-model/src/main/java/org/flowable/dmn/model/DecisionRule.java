@@ -30,7 +30,7 @@ public class DecisionRule extends DmnElement {
     public void addInputEntry(RuleInputClauseContainer inputEntry) {
         this.inputEntries.add(inputEntry);
     }
-    
+
     public void setInputEntries(List<RuleInputClauseContainer> inputEntries) {
         this.inputEntries = inputEntries;
     }
@@ -42,7 +42,7 @@ public class DecisionRule extends DmnElement {
     public void addOutputEntry(RuleOutputClauseContainer outputEntry) {
         this.outputEntries.add(outputEntry);
     }
-    
+
     public void setOutputEntries(List<RuleOutputClauseContainer> outputEntries) {
         this.outputEntries = outputEntries;
     }

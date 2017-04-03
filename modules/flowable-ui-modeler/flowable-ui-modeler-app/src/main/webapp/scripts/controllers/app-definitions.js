@@ -20,7 +20,7 @@ angular.module('flowableModeler')
 
 	  $scope.model = {
         filters: [
-            {id: 'myApps', labelKey: 'MY-APPS'}
+            {id: 'apps', labelKey: 'APPS'}
 		],
 
 		sorts: [

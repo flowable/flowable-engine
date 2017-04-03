@@ -25,26 +25,26 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:org/flowable/spring/test/taskListener/TaskListenerDelegateExpressionTest-context.xml")
 public class TransactionDependentTaskListenerSpringTest extends SpringFlowableTestCase {
 
-  @Autowired
-  MyTransactionDependentTaskListener listener;
+    @Autowired
+    MyTransactionDependentTaskListener listener;
 
-  @Deployment
-  public void testCustomPropertiesMapDelegateExpression() {
-    runtimeService.startProcessInstanceByKey("transactionDependentTaskListenerProcess");
+    @Deployment
+    public void testCustomPropertiesMapDelegateExpression() {
+        runtimeService.startProcessInstanceByKey("transactionDependentTaskListenerProcess");
 
-    // Completing first task will trigger the first closed listener (expression custom properties resolver)
-    Task task = taskService.createTaskQuery().singleResult();
-    taskService.complete(task.getId());
+        // Completing first task will trigger the first closed listener (expression custom properties resolver)
+        Task task = taskService.createTaskQuery().singleResult();
+        taskService.complete(task.getId());
 
-    assertEquals("task3", listener.getCurrentTasks().get(0).getTaskId());
-    assertEquals("task3", listener.getCurrentTasks().get(0).getCustomPropertiesMap().get("customProp1"));
+        assertEquals("task3", listener.getCurrentTasks().get(0).getTaskId());
+        assertEquals("task3", listener.getCurrentTasks().get(0).getCustomPropertiesMap().get("customProp1"));
 
-    // Completing second task will trigger the second closed listener (delegate expression custom properties resolver)
-    task = taskService.createTaskQuery().singleResult();
-    taskService.complete(task.getId());
+        // Completing second task will trigger the second closed listener (delegate expression custom properties resolver)
+        task = taskService.createTaskQuery().singleResult();
+        taskService.complete(task.getId());
 
-    assertEquals("task4", listener.getCurrentTasks().get(1).getTaskId());
-    assertEquals("task4", listener.getCurrentTasks().get(1).getCustomPropertiesMap().get("customProp1"));
-  }
+        assertEquals("task4", listener.getCurrentTasks().get(1).getTaskId());
+        assertEquals("task4", listener.getCurrentTasks().get(1).getCustomPropertiesMap().get("customProp1"));
+    }
 
 }

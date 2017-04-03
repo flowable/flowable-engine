@@ -22,12 +22,12 @@ import org.flowable.engine.event.EventLogEntry;
  */
 public interface EventLogEntryEntityManager extends EntityManager<EventLogEntryEntity> {
 
-  List<EventLogEntry> findAllEventLogEntries();
+    List<EventLogEntry> findAllEventLogEntries();
 
-  List<EventLogEntry> findEventLogEntries(long startLogNr, long pageSize);
+    List<EventLogEntry> findEventLogEntries(long startLogNr, long pageSize);
 
-  List<EventLogEntry> findEventLogEntriesByProcessInstanceId(String processInstanceId);
+    List<EventLogEntry> findEventLogEntriesByProcessInstanceId(String processInstanceId);
 
-  void deleteEventLogEntry(long logNr);
+    void deleteEventLogEntry(long logNr);
 
 }

@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -46,91 +47,91 @@ import java.io.ObjectOutputStream;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History" }, description = "Manage History")
+@Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricTaskInstanceVariableDataResource {
 
-  @Autowired
-  protected RestResponseFactory restResponseFactory;
+    @Autowired
+    protected RestResponseFactory restResponseFactory;
 
-  @Autowired
-  protected HistoryService historyService;
+    @Autowired
+    protected HistoryService historyService;
 
-  @RequestMapping(value = "/history/historic-task-instances/{taskId}/variables/{variableName}/data", method = RequestMethod.GET)
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates the task instance was found and the requested variable data is returned."),
-          @ApiResponse(code = 404, message = "Indicates the requested task instance was not found or the process instance doesn’t have a variable with the given name or the variable doesn’t have a binary stream available. Status message provides additional information.")})
-  @ApiOperation(value = "Get the binary data for a historic task instance variable", tags = {"History"}, nickname = "getHistoricTaskInstanceVariableData",
-          notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
-  @ResponseBody
-  public byte[] getVariableData(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName, @RequestParam(value = "scope", required = false) String scope,
-      HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = "/history/historic-task-instances/{taskId}/variables/{variableName}/data", method = RequestMethod.GET)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the task instance was found and the requested variable data is returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested task instance was not found or the process instance doesn’t have a variable with the given name or the variable doesn’t have a binary stream available. Status message provides additional information.") })
+    @ApiOperation(value = "Get the binary data for a historic task instance variable", tags = {
+            "History" }, nickname = "getHistoricTaskInstanceVariableData", notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
+    @ResponseBody
+    public byte[] getVariableData(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName, @RequestParam(value = "scope", required = false) String scope,
+            HttpServletRequest request, HttpServletResponse response) {
 
-    try {
-      byte[] result = null;
-      RestVariable variable = getVariableFromRequest(true, taskId, variableName, scope, request);
-      if (RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variable.getType())) {
-        result = (byte[]) variable.getValue();
-        response.setContentType("application/octet-stream");
+        try {
+            byte[] result = null;
+            RestVariable variable = getVariableFromRequest(true, taskId, variableName, scope, request);
+            if (RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variable.getType())) {
+                result = (byte[]) variable.getValue();
+                response.setContentType("application/octet-stream");
 
-      } else if (RestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variable.getType())) {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        ObjectOutputStream outputStream = new ObjectOutputStream(buffer);
-        outputStream.writeObject(variable.getValue());
-        outputStream.close();
-        result = buffer.toByteArray();
-        response.setContentType("application/x-java-serialized-object");
+            } else if (RestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variable.getType())) {
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                ObjectOutputStream outputStream = new ObjectOutputStream(buffer);
+                outputStream.writeObject(variable.getValue());
+                outputStream.close();
+                result = buffer.toByteArray();
+                response.setContentType("application/x-java-serialized-object");
 
-      } else {
-        throw new FlowableObjectNotFoundException("The variable does not have a binary data stream.", null);
-      }
-      return result;
+            } else {
+                throw new FlowableObjectNotFoundException("The variable does not have a binary data stream.", null);
+            }
+            return result;
 
-    } catch (IOException ioe) {
-      // Re-throw IOException
-      throw new FlowableException("Unexpected exception getting variable data", ioe);
-    }
-  }
-
-  public RestVariable getVariableFromRequest(boolean includeBinary, String taskId, String variableName, String scope, HttpServletRequest request) {
-    RestVariableScope variableScope = RestVariable.getScopeFromString(scope);
-    HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery().taskId(taskId);
-
-    if (variableScope != null) {
-      if (variableScope == RestVariableScope.GLOBAL) {
-        taskQuery.includeProcessVariables();
-      } else {
-        taskQuery.includeTaskLocalVariables();
-      }
-    } else {
-      taskQuery.includeTaskLocalVariables().includeProcessVariables();
+        } catch (IOException ioe) {
+            // Re-throw IOException
+            throw new FlowableException("Unexpected exception getting variable data", ioe);
+        }
     }
 
-    HistoricTaskInstance taskObject = taskQuery.singleResult();
+    public RestVariable getVariableFromRequest(boolean includeBinary, String taskId, String variableName, String scope, HttpServletRequest request) {
+        RestVariableScope variableScope = RestVariable.getScopeFromString(scope);
+        HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery().taskId(taskId);
 
-    if (taskObject == null) {
-      throw new FlowableObjectNotFoundException("Historic task instance '" + taskId + "' couldn't be found.", HistoricTaskInstanceEntity.class);
-    }
+        if (variableScope != null) {
+            if (variableScope == RestVariableScope.GLOBAL) {
+                taskQuery.includeProcessVariables();
+            } else {
+                taskQuery.includeTaskLocalVariables();
+            }
+        } else {
+            taskQuery.includeTaskLocalVariables().includeProcessVariables();
+        }
 
-    Object value = null;
-    if (variableScope != null) {
-      if (variableScope == RestVariableScope.GLOBAL) {
-        value = taskObject.getProcessVariables().get(variableName);
-      } else {
-        value = taskObject.getTaskLocalVariables().get(variableName);
-      }
-    } else {
-      // look for local task variables first
-      if (taskObject.getTaskLocalVariables().containsKey(variableName)) {
-        value = taskObject.getTaskLocalVariables().get(variableName);
-      } else {
-        value = taskObject.getProcessVariables().get(variableName);
-      }
-    }
+        HistoricTaskInstance taskObject = taskQuery.singleResult();
 
-    if (value == null) {
-      throw new FlowableObjectNotFoundException("Historic task instance '" + taskId + "' variable value for " + variableName + " couldn't be found.", VariableInstanceEntity.class);
-    } else {
-      return restResponseFactory.createRestVariable(variableName, value, null, taskId, RestResponseFactory.VARIABLE_HISTORY_TASK, includeBinary);
+        if (taskObject == null) {
+            throw new FlowableObjectNotFoundException("Historic task instance '" + taskId + "' couldn't be found.", HistoricTaskInstanceEntity.class);
+        }
+
+        Object value = null;
+        if (variableScope != null) {
+            if (variableScope == RestVariableScope.GLOBAL) {
+                value = taskObject.getProcessVariables().get(variableName);
+            } else {
+                value = taskObject.getTaskLocalVariables().get(variableName);
+            }
+        } else {
+            // look for local task variables first
+            if (taskObject.getTaskLocalVariables().containsKey(variableName)) {
+                value = taskObject.getTaskLocalVariables().get(variableName);
+            } else {
+                value = taskObject.getProcessVariables().get(variableName);
+            }
+        }
+
+        if (value == null) {
+            throw new FlowableObjectNotFoundException("Historic task instance '" + taskId + "' variable value for " + variableName + " couldn't be found.", VariableInstanceEntity.class);
+        } else {
+            return restResponseFactory.createRestVariable(variableName, value, null, taskId, RestResponseFactory.VARIABLE_HISTORY_TASK, includeBinary);
+        }
     }
-  }
 }

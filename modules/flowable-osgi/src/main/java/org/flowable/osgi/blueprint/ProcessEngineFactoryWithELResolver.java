@@ -22,47 +22,48 @@ import org.flowable.osgi.OsgiScriptingEngines;
 
 public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
 
-  private BlueprintELResolver blueprintELResolver;
-  private BlueprintContextELResolver blueprintContextELResolver;
+    private BlueprintELResolver blueprintELResolver;
+    private BlueprintContextELResolver blueprintContextELResolver;
 
-  @Override
-  public void init() throws Exception {
-    ProcessEngineConfigurationImpl configImpl = (ProcessEngineConfigurationImpl) getProcessEngineConfiguration();
-    configImpl.setExpressionManager(new BlueprintExpressionManager());
-
-    List<ResolverFactory> resolverFactories = configImpl.getResolverFactories();
-    if (resolverFactories == null) {
-      resolverFactories = new ArrayList<ResolverFactory>();
-      resolverFactories.add(new VariableScopeResolverFactory());
-      resolverFactories.add(new BeansResolverFactory());
-    }
-
-    configImpl.setScriptingEngines(new OsgiScriptingEngines(new ScriptBindingsFactory(configImpl, resolverFactories)));
-    super.init();
-  }
-
-  public class BlueprintExpressionManager extends ExpressionManager {
     @Override
-    protected ELResolver createElResolver(VariableScope variableScope) {
-      CompositeELResolver compositeElResolver = new CompositeELResolver();
-      compositeElResolver.add(new VariableScopeElResolver(variableScope));
-      if (blueprintContextELResolver != null) {
-        compositeElResolver.add(blueprintContextELResolver);
-      }
-      compositeElResolver.add(blueprintELResolver);
-      compositeElResolver.add(new BeanELResolver());
-      compositeElResolver.add(new ArrayELResolver());
-      compositeElResolver.add(new ListELResolver());
-      compositeElResolver.add(new MapELResolver());
-      return compositeElResolver;
+    public void init() throws Exception {
+        ProcessEngineConfigurationImpl configImpl = (ProcessEngineConfigurationImpl) getProcessEngineConfiguration();
+        configImpl.setExpressionManager(new BlueprintExpressionManager());
+
+        List<ResolverFactory> resolverFactories = configImpl.getResolverFactories();
+        if (resolverFactories == null) {
+            resolverFactories = new ArrayList<ResolverFactory>();
+            resolverFactories.add(new VariableScopeResolverFactory());
+            resolverFactories.add(new BeansResolverFactory());
+        }
+
+        configImpl.setScriptingEngines(new OsgiScriptingEngines(new ScriptBindingsFactory(configImpl, resolverFactories)));
+        super.init();
     }
-  }
 
-  public void setBlueprintELResolver(BlueprintELResolver blueprintELResolver) {
-    this.blueprintELResolver = blueprintELResolver;
-  }
+    public class BlueprintExpressionManager extends ExpressionManager {
 
-  public void setBlueprintContextELResolver(BlueprintContextELResolver blueprintContextELResolver) {
-    this.blueprintContextELResolver = blueprintContextELResolver;
-  }
+        @Override
+        protected ELResolver createElResolver(VariableScope variableScope) {
+            CompositeELResolver compositeElResolver = new CompositeELResolver();
+            compositeElResolver.add(new VariableScopeElResolver(variableScope));
+            if (blueprintContextELResolver != null) {
+                compositeElResolver.add(blueprintContextELResolver);
+            }
+            compositeElResolver.add(blueprintELResolver);
+            compositeElResolver.add(new BeanELResolver());
+            compositeElResolver.add(new ArrayELResolver());
+            compositeElResolver.add(new ListELResolver());
+            compositeElResolver.add(new MapELResolver());
+            return compositeElResolver;
+        }
+    }
+
+    public void setBlueprintELResolver(BlueprintELResolver blueprintELResolver) {
+        this.blueprintELResolver = blueprintELResolver;
+    }
+
+    public void setBlueprintContextELResolver(BlueprintContextELResolver blueprintContextELResolver) {
+        this.blueprintContextELResolver = blueprintContextELResolver;
+    }
 }

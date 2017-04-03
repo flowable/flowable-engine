@@ -24,10 +24,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class RestVariableBuilder {
-    
+
     public static final String BYTE_ARRAY_VARIABLE_TYPE = "binary";
     public static final String SERIALIZABLE_VARIABLE_TYPE = "serializable";
-    
+
     @Autowired
     protected List<RestVariableConverter> converters;
 
@@ -50,7 +50,7 @@ public class RestVariableBuilder {
             if (converter != null) {
                 converter.convertVariableValue(value, restVar);
                 restVar.setType(converter.getRestTypeName());
-                
+
             } else {
                 // Revert to default conversion, which is the
                 // serializable/byte-array form

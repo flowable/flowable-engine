@@ -24,11 +24,11 @@ import org.flowable.engine.impl.persistence.entity.TaskEntity;
  */
 public class TaskCreatedEventHandler extends AbstractTaskEventHandler {
 
-  @Override
-  public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
-    TaskEntity task = (TaskEntity) ((FlowableEntityEvent) event).getEntity();
-    Map<String, Object> data = handleCommonTaskFields(task);
-    return createEventLogEntry(task.getProcessDefinitionId(), task.getProcessInstanceId(), task.getExecutionId(), task.getId(), data);
-  }
+    @Override
+    public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
+        TaskEntity task = (TaskEntity) ((FlowableEntityEvent) event).getEntity();
+        Map<String, Object> data = handleCommonTaskFields(task);
+        return createEventLogEntry(task.getProcessDefinitionId(), task.getProcessInstanceId(), task.getExecutionId(), task.getId(), data);
+    }
 
 }

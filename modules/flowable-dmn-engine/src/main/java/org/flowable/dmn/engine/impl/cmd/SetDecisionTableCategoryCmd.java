@@ -24,54 +24,54 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
  */
 public class SetDecisionTableCategoryCmd implements Command<Void> {
 
-  protected String decisionTableId;
-  protected String category;
+    protected String decisionTableId;
+    protected String category;
 
-  public SetDecisionTableCategoryCmd(String decisionTableId, String category) {
-    this.decisionTableId = decisionTableId;
-    this.category = category;
-  }
-
-  public Void execute(org.flowable.dmn.engine.impl.interceptor.CommandContext commandContext) {
-
-    if (decisionTableId == null) {
-      throw new FlowableIllegalArgumentException("Decision table id is null");
+    public SetDecisionTableCategoryCmd(String decisionTableId, String category) {
+        this.decisionTableId = decisionTableId;
+        this.category = category;
     }
 
-    DecisionTableEntity decisionTable = commandContext.getDecisionTableEntityManager().findById(decisionTableId);
+    public Void execute(org.flowable.dmn.engine.impl.interceptor.CommandContext commandContext) {
 
-    if (decisionTable == null) {
-      throw new FlowableObjectNotFoundException("No decision table found for id = '" + decisionTableId + "'");
+        if (decisionTableId == null) {
+            throw new FlowableIllegalArgumentException("Decision table id is null");
+        }
+
+        DecisionTableEntity decisionTable = commandContext.getDecisionTableEntityManager().findById(decisionTableId);
+
+        if (decisionTable == null) {
+            throw new FlowableObjectNotFoundException("No decision table found for id = '" + decisionTableId + "'");
+        }
+
+        // Update category
+        decisionTable.setCategory(category);
+
+        // Remove process definition from cache, it will be refetched later
+        DeploymentCache<DecisionTableCacheEntry> decisionTableCache = commandContext.getDmnEngineConfiguration().getDecisionCache();
+        if (decisionTableCache != null) {
+            decisionTableCache.remove(decisionTableId);
+        }
+
+        commandContext.getDecisionTableEntityManager().update(decisionTable);
+
+        return null;
     }
 
-    // Update category
-    decisionTable.setCategory(category);
-
-    // Remove process definition from cache, it will be refetched later
-    DeploymentCache<DecisionTableCacheEntry> decisionTableCache = commandContext.getDmnEngineConfiguration().getDecisionCache();
-    if (decisionTableCache != null) {
-      decisionTableCache.remove(decisionTableId);
+    public String getDecisionTableId() {
+        return decisionTableId;
     }
-    
-    commandContext.getDecisionTableEntityManager().update(decisionTable);
 
-    return null;
-  }
+    public void setDecisionTableId(String decisionTableId) {
+        this.decisionTableId = decisionTableId;
+    }
 
-  public String getDecisionTableId() {
-    return decisionTableId;
-  }
+    public String getCategory() {
+        return category;
+    }
 
-  public void setDecisionTableId(String decisionTableId) {
-    this.decisionTableId = decisionTableId;
-  }
-
-  public String getCategory() {
-    return category;
-  }
-
-  public void setCategory(String category) {
-    this.category = category;
-  }
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
 }

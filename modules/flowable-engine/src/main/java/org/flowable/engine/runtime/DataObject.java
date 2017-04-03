@@ -17,34 +17,34 @@ package org.flowable.engine.runtime;
  * Represents a modeled DataObject.
  */
 public interface DataObject {
-  
-  /**
-   * Name of the DataObject.
-   */
-  String getName();
-  
-  /**
-   * Localized Name of the DataObject.
-   */
-  String getLocalizedName();
-  
-  /**
-   * Description of the DataObject.
-   */
-  String getDescription();
 
-  /**
-   * Value of the DataObject.
-   */
-  Object getValue();
+    /**
+     * Name of the DataObject.
+     */
+    String getName();
 
-  /**
-   * Type of the DataObject.
-   */
-  String getType();  
-  
-  /**
-   * The id of the flow element in the process defining this data object.
-   */
-  String getDataObjectDefinitionKey();
+    /**
+     * Localized Name of the DataObject.
+     */
+    String getLocalizedName();
+
+    /**
+     * Description of the DataObject.
+     */
+    String getDescription();
+
+    /**
+     * Value of the DataObject.
+     */
+    Object getValue();
+
+    /**
+     * Type of the DataObject.
+     */
+    String getType();
+
+    /**
+     * The id of the flow element in the process defining this data object.
+     */
+    String getDataObjectDefinitionKey();
 }

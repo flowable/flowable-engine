@@ -20,7 +20,7 @@ import org.flowable.engine.delegate.DelegateExecution;
  */
 public class Printer {
 
-  public void printMessage(DelegateExecution execution) {
-    execution.setVariable("myVar", "Hello from Printer!");
-  }
+    public void printMessage(DelegateExecution execution) {
+        execution.setVariable("myVar", "Hello from Printer!");
+    }
 }

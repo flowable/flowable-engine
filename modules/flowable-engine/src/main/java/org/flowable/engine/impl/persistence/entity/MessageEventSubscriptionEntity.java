@@ -17,7 +17,7 @@ package org.flowable.engine.impl.persistence.entity;
  * @author Tijs Rademakers
  */
 public interface MessageEventSubscriptionEntity extends EventSubscriptionEntity {
-  
-  String EVENT_TYPE = "message";
+
+    String EVENT_TYPE = "message";
 
 }

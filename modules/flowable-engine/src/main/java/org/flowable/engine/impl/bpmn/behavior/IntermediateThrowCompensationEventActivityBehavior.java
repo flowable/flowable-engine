@@ -37,65 +37,65 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
  */
 public class IntermediateThrowCompensationEventActivityBehavior extends FlowNodeActivityBehavior {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected final CompensateEventDefinition compensateEventDefinition;
+    private static final long serialVersionUID = 1L;
 
-  public IntermediateThrowCompensationEventActivityBehavior(CompensateEventDefinition compensateEventDefinition) {
-    this.compensateEventDefinition = compensateEventDefinition;
-  }
+    protected final CompensateEventDefinition compensateEventDefinition;
 
-  @Override
-  public void execute(DelegateExecution execution) {
-    ThrowEvent throwEvent = (ThrowEvent) execution.getCurrentFlowElement();
-    
-    /*
-     * From the BPMN 2.0 spec:
-     * 
-     * The Activity to be compensated MAY be supplied.
-     *  
-     * If an Activity is not supplied, then the compensation is broadcast to all completed Activities in 
-     * the current Sub- Process (if present), or the entire Process instance (if at the global level). This “throws” the compensation.
-     */
-    final String activityRef = compensateEventDefinition.getActivityRef();
-    
-    CommandContext commandContext = Context.getCommandContext();
-    EventSubscriptionEntityManager eventSubscriptionEntityManager = commandContext.getEventSubscriptionEntityManager();
-    
-    List<CompensateEventSubscriptionEntity> eventSubscriptions = new ArrayList<CompensateEventSubscriptionEntity>();
-    if (StringUtils.isNotEmpty(activityRef)) {
-      
-      // If an activity ref is provided, only that activity is compensated
-      eventSubscriptions.addAll(eventSubscriptionEntityManager
-          .findCompensateEventSubscriptionsByProcessInstanceIdAndActivityId(execution.getProcessInstanceId(), activityRef));
-      
-    } else {
-      
-      // If no activity ref is provided, it is broadcast to the current sub process / process instance
-      Process process = ProcessDefinitionUtil.getProcess(execution.getProcessDefinitionId());
-      
-      FlowElementsContainer flowElementsContainer = null;
-      if (throwEvent.getSubProcess() == null) {
-        flowElementsContainer = process;
-      } else {
-        flowElementsContainer = throwEvent.getSubProcess();
-      }
-      
-      for (FlowElement flowElement : flowElementsContainer.getFlowElements()) {
-        if (flowElement instanceof Activity) {
-          eventSubscriptions.addAll(eventSubscriptionEntityManager
-              .findCompensateEventSubscriptionsByProcessInstanceIdAndActivityId(execution.getProcessInstanceId(), flowElement.getId()));
+    public IntermediateThrowCompensationEventActivityBehavior(CompensateEventDefinition compensateEventDefinition) {
+        this.compensateEventDefinition = compensateEventDefinition;
+    }
+
+    @Override
+    public void execute(DelegateExecution execution) {
+        ThrowEvent throwEvent = (ThrowEvent) execution.getCurrentFlowElement();
+
+        /*
+         * From the BPMN 2.0 spec:
+         * 
+         * The Activity to be compensated MAY be supplied.
+         * 
+         * If an Activity is not supplied, then the compensation is broadcast to all completed Activities in the current Sub- Process (if present), or the entire Process instance (if at the global
+         * level). This “throws” the compensation.
+         */
+        final String activityRef = compensateEventDefinition.getActivityRef();
+
+        CommandContext commandContext = Context.getCommandContext();
+        EventSubscriptionEntityManager eventSubscriptionEntityManager = commandContext.getEventSubscriptionEntityManager();
+
+        List<CompensateEventSubscriptionEntity> eventSubscriptions = new ArrayList<CompensateEventSubscriptionEntity>();
+        if (StringUtils.isNotEmpty(activityRef)) {
+
+            // If an activity ref is provided, only that activity is compensated
+            eventSubscriptions.addAll(eventSubscriptionEntityManager
+                    .findCompensateEventSubscriptionsByProcessInstanceIdAndActivityId(execution.getProcessInstanceId(), activityRef));
+
+        } else {
+
+            // If no activity ref is provided, it is broadcast to the current sub process / process instance
+            Process process = ProcessDefinitionUtil.getProcess(execution.getProcessDefinitionId());
+
+            FlowElementsContainer flowElementsContainer = null;
+            if (throwEvent.getSubProcess() == null) {
+                flowElementsContainer = process;
+            } else {
+                flowElementsContainer = throwEvent.getSubProcess();
+            }
+
+            for (FlowElement flowElement : flowElementsContainer.getFlowElements()) {
+                if (flowElement instanceof Activity) {
+                    eventSubscriptions.addAll(eventSubscriptionEntityManager
+                            .findCompensateEventSubscriptionsByProcessInstanceIdAndActivityId(execution.getProcessInstanceId(), flowElement.getId()));
+                }
+            }
+
         }
-      }
-      
+
+        if (eventSubscriptions.isEmpty()) {
+            leave(execution);
+        } else {
+            // TODO: implement async (waitForCompletion=false in bpmn)
+            ScopeUtil.throwCompensationEvent(eventSubscriptions, execution, false);
+            leave(execution);
+        }
     }
-    
-    if (eventSubscriptions.isEmpty()) {
-      leave(execution);
-    } else {
-      // TODO: implement async (waitForCompletion=false in bpmn)
-      ScopeUtil.throwCompensationEvent(eventSubscriptions, execution, false);
-      leave(execution);
-    }
-  }
 }

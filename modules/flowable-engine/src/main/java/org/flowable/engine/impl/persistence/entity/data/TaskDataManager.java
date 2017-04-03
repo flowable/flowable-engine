@@ -24,25 +24,25 @@ import org.flowable.engine.task.Task;
  * @author Joram Barrez
  */
 public interface TaskDataManager extends DataManager<TaskEntity> {
-  
-  List<TaskEntity> findTasksByExecutionId(final String executionId);
 
-  List<TaskEntity> findTasksByProcessInstanceId(String processInstanceId);
+    List<TaskEntity> findTasksByExecutionId(final String executionId);
 
-  List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery);
-  
-  List<Task> findTasksAndVariablesByQueryCriteria(TaskQueryImpl taskQuery);
+    List<TaskEntity> findTasksByProcessInstanceId(String processInstanceId);
 
-  long findTaskCountByQueryCriteria(TaskQueryImpl taskQuery);
+    List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery);
 
-  List<Task> findTasksByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<Task> findTasksWithRelatedEntitiesByQueryCriteria(TaskQueryImpl taskQuery);
 
-  long findTaskCountByNativeQuery(Map<String, Object> parameterMap);
+    long findTaskCountByQueryCriteria(TaskQueryImpl taskQuery);
 
-  List<Task> findTasksByParentTaskId(String parentTaskId);
-  
-  void updateTaskTenantIdForDeployment(String deploymentId, String newTenantId);
+    List<Task> findTasksByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
 
-  void updateAllTaskRelatedEntityCountFlags(boolean newValue);
-  
+    long findTaskCountByNativeQuery(Map<String, Object> parameterMap);
+
+    List<Task> findTasksByParentTaskId(String parentTaskId);
+
+    void updateTaskTenantIdForDeployment(String deploymentId, String newTenantId);
+
+    void updateAllTaskRelatedEntityCountFlags(boolean newValue);
+
 }

@@ -16,6 +16,6 @@ import org.flowable.engine.impl.interceptor.Command;
 
 public interface FailedJobCommandFactory {
 
-  public Command<Object> getCommand(String jobId, Throwable exception);
+    public Command<Object> getCommand(String jobId, Throwable exception);
 
 }

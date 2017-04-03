@@ -23,21 +23,21 @@ import org.flowable.engine.impl.HistoricProcessInstanceQueryImpl;
  * @author Joram Barrez
  */
 public interface HistoricProcessInstanceEntityManager extends EntityManager<HistoricProcessInstanceEntity> {
+
+    HistoricProcessInstanceEntity create();
   
-  HistoricProcessInstanceEntity create();
-  
-  HistoricProcessInstanceEntity create(ExecutionEntity processInstanceExecutionEntity);
+    HistoricProcessInstanceEntity create(ExecutionEntity processInstanceExecutionEntity);
 
-  long findHistoricProcessInstanceCountByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery);
+    long findHistoricProcessInstanceCountByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery);
 
-  List<HistoricProcessInstance> findHistoricProcessInstancesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery);
+    List<HistoricProcessInstance> findHistoricProcessInstancesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery);
 
-  List<HistoricProcessInstance> findHistoricProcessInstancesAndVariablesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery);
+    List<HistoricProcessInstance> findHistoricProcessInstancesAndVariablesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery);
 
-  List<HistoricProcessInstance> findHistoricProcessInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<HistoricProcessInstance> findHistoricProcessInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
 
-  long findHistoricProcessInstanceCountByNativeQuery(Map<String, Object> parameterMap);
-  
-  void deleteHistoricProcessInstanceByProcessDefinitionId(String processDefinitionId);
+    long findHistoricProcessInstanceCountByNativeQuery(Map<String, Object> parameterMap);
+
+    void deleteHistoricProcessInstanceByProcessDefinitionId(String processDefinitionId);
 
 }

@@ -12,19 +12,84 @@
  */
 package org.flowable.dmn.api;
 
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+
 import java.util.Map;
 
 /**
+ * Service for executing DMN decisions (decision tables)
+ *
  * @author Tijs Rademakers
  * @author Yvo Swillens
  */
 public interface DmnRuleService {
 
-  RuleEngineExecutionResult executeDecisionByKey(String decisionKey, Map<String, Object> processVariables);
+    /**
+     * Execute a decision identified by it's key.
+     *
+     * @param decisionKey
+     *            the decision key, cannot be null
+     * @param inputVariables
+     *            map with input variables
+     * @return the {@link RuleEngineExecutionResult} for this execution
+     * @throws FlowableObjectNotFoundException
+     *             when the decision with given key does not exist.
+     * @throws FlowableException
+     *             when an error occurs while executing the decision.
+     */
+    RuleEngineExecutionResult executeDecisionByKey(String decisionKey, Map<String, Object> inputVariables);
 
-  RuleEngineExecutionResult executeDecisionByKeyAndTenantId(String decisionKey, Map<String, Object> processVariables, String tenantId);
+    /**
+     * Execute a decision identified by it's key and tenant id.
+     *
+     * @param decisionKey
+     *            the decision key, cannot be null
+     * @param inputVariables
+     *            map with input variables
+     * @param tenantId
+     *            the tenant id
+     * @return the {@link RuleEngineExecutionResult} for this execution
+     * @throws FlowableObjectNotFoundException
+     *             when the decision with given key and tenant id does not exist.
+     * @throws FlowableException
+     *             when an error occurs while executing the decision.
+     */
+    RuleEngineExecutionResult executeDecisionByKeyAndTenantId(String decisionKey, Map<String, Object> inputVariables, String tenantId);
 
-  RuleEngineExecutionResult executeDecisionByKeyAndParentDeploymentId(String decisionKey, String parentDeploymentId, Map<String, Object> variables);
+    /**
+     * Execute a decision identified by it's key and parent deployment id.
+     *
+     * @param decisionKey
+     *            the decision key, cannot be null
+     * @param parentDeploymentId
+     *            the parent deployment id
+     * @param inputVariables
+     *            map with input variables
+     * @return the {@link RuleEngineExecutionResult} for this execution
+     * @throws FlowableObjectNotFoundException
+     *             when the decision with given key and parent deployment id does not exist.
+     * @throws FlowableException
+     *             when an error occurs while executing the decision.
+     */
+    RuleEngineExecutionResult executeDecisionByKeyAndParentDeploymentId(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables);
 
-  RuleEngineExecutionResult executeDecisionByKeyParentDeploymentIdAndTenantId(String decisionKey, String parentDeploymentId, Map<String, Object> variables, String tenantId);
+    /**
+     * Execute a decision identified by it's key and parent deployment id.
+     *
+     * @param decisionKey
+     *            the decision key, cannot be null
+     * @param parentDeploymentId
+     *            the parent deployment id
+     * @param inputVariables
+     *            map with input variables
+     * @param tenantId
+     *            the tenant id
+     * @return the {@link RuleEngineExecutionResult} for this execution
+     * @throws FlowableObjectNotFoundException
+     *             when the decision with given key and parent deployment id and tenant id does not exist.
+     * @throws FlowableException
+     *             when an error occurs while executing the decision.
+     */
+    RuleEngineExecutionResult executeDecisionByKeyParentDeploymentIdAndTenantId(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables, String tenantId);
 }

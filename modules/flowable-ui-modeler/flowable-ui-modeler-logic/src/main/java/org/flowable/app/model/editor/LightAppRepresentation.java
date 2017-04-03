@@ -14,7 +14,6 @@ package org.flowable.app.model.editor;
 
 import org.flowable.app.model.common.AbstractRepresentation;
 
-
 public class LightAppRepresentation extends AbstractRepresentation {
 
     private Long id;

@@ -16,7 +16,7 @@ package org.flowable.app.idm.constant;
  * @author Joram Barrez
  */
 public interface GroupIds {
-  
-  String ROLE_ADMIN = "ROLE_ADMIN";
+
+    String ROLE_ADMIN = "ROLE_ADMIN";
 
 }

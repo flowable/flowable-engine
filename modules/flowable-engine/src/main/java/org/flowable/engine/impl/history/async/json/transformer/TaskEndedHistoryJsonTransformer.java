@@ -22,26 +22,26 @@ import org.flowable.engine.impl.persistence.entity.JobEntity;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TaskEndedHistoryJsonTransformer extends AbstractNeedsTaskHistoryJsonTransformer {
-  
-  public static final String TYPE = "task-ended";
 
-  @Override
-  public String getType() {
-    return TYPE;
-  }
+    public static final String TYPE = "task-ended";
 
-  @Override
-  public void transformJson(JobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-    String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
-    HistoricTaskInstanceEntity historicTaskInstance = commandContext.getHistoricTaskInstanceEntityManager().findById(taskId);
-    Date endTime = getDateFromJson(historicalData, HistoryJsonConstants.END_TIME);
-    historicTaskInstance.setEndTime(endTime);
-    historicTaskInstance.setDeleteReason(getStringFromJson(historicalData, HistoryJsonConstants.DELETE_REASON));
-    
-    Date startTime = historicTaskInstance.getStartTime();
-    if (startTime != null && endTime != null) {
-      historicTaskInstance.setDurationInMillis(endTime.getTime() - startTime.getTime());
+    @Override
+    public String getType() {
+        return TYPE;
     }
-  }
+
+    @Override
+    public void transformJson(JobEntity job, ObjectNode historicalData, CommandContext commandContext) {
+        String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
+        HistoricTaskInstanceEntity historicTaskInstance = commandContext.getHistoricTaskInstanceEntityManager().findById(taskId);
+        Date endTime = getDateFromJson(historicalData, HistoryJsonConstants.END_TIME);
+        historicTaskInstance.setEndTime(endTime);
+        historicTaskInstance.setDeleteReason(getStringFromJson(historicalData, HistoryJsonConstants.DELETE_REASON));
+
+        Date startTime = historicTaskInstance.getStartTime();
+        if (startTime != null && endTime != null) {
+            historicTaskInstance.setDurationInMillis(endTime.getTime() - startTime.getTime());
+        }
+    }
 
 }

@@ -15,9 +15,9 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**
@@ -25,31 +25,22 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public class IsFlowable5ProcessDefinitionCmd implements Command<Boolean>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String processDefinitionId;
+    private static final long serialVersionUID = 1L;
+    protected String processDefinitionId;
 
-  public IsFlowable5ProcessDefinitionCmd(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
-
-  public Boolean execute(CommandContext commandContext) {
-    if (!commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled()) {
-      return false;
+    public IsFlowable5ProcessDefinitionCmd(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
     }
-    
-    ProcessDefinition processDefinition = commandContext.getProcessEngineConfiguration()
-        .getDeploymentManager()
-        .findDeployedProcessDefinitionById(processDefinitionId);
-    
-    if (processDefinition.getEngineVersion() != null) {
-      if (commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().isVersion5Tag(processDefinition.getEngineVersion())) {
-        if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled()) {
-          return true;
+
+    public Boolean execute(CommandContext commandContext) {
+        ProcessDefinition processDefinition = commandContext.getProcessEngineConfiguration()
+                .getDeploymentManager()
+                .findDeployedProcessDefinitionById(processDefinitionId);
+
+        if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
+            return true;
         }
-      } else {
-        throw new FlowableException("Invalid 'engine' for process definition " + processDefinition.getId() + " : " + processDefinition.getEngineVersion());
-      }
+
+        return false;
     }
-    return false;
-  }
 }

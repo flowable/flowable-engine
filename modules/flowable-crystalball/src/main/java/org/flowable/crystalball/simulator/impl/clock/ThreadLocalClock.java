@@ -24,56 +24,56 @@ import java.util.TimeZone;
  * This class provides thread local clock implementation. Each thread can run its own simulation engine and can behave according to its internal thread local clock
  */
 public class ThreadLocalClock implements Clock {
-  private static volatile ThreadLocal<Clock> THREAD_CLOCK = new ThreadLocal<Clock>();
-  protected FactoryBean<Clock> clockFactory;
+    private static volatile ThreadLocal<Clock> THREAD_CLOCK = new ThreadLocal<Clock>();
+    protected FactoryBean<Clock> clockFactory;
 
-  public ThreadLocalClock(FactoryBean<Clock> clockFactory) {
-    this.clockFactory = clockFactory;
-  }
-
-  @Override
-  public void setCurrentTime(Date currentTime) {
-    get().setCurrentTime(currentTime);
-  }
-
-  private Clock get() {
-    if (THREAD_CLOCK.get() == null) {
-      try {
-        THREAD_CLOCK.set(clockFactory.getObject());
-      } catch (Exception e) {
-        throw new FlowableException("Unable to get simulation clock", e);
-      }
+    public ThreadLocalClock(FactoryBean<Clock> clockFactory) {
+        this.clockFactory = clockFactory;
     }
-    return THREAD_CLOCK.get();
-  }
 
-  @Override
-  public void setCurrentCalendar(Calendar currentTime) {
-    get().setCurrentCalendar(currentTime);
-  }
+    @Override
+    public void setCurrentTime(Date currentTime) {
+        get().setCurrentTime(currentTime);
+    }
 
-  @Override
-  public void reset() {
-    get().reset();
-  }
+    private Clock get() {
+        if (THREAD_CLOCK.get() == null) {
+            try {
+                THREAD_CLOCK.set(clockFactory.getObject());
+            } catch (Exception e) {
+                throw new FlowableException("Unable to get simulation clock", e);
+            }
+        }
+        return THREAD_CLOCK.get();
+    }
 
-  @Override
-  public Date getCurrentTime() {
-    return get().getCurrentTime();
-  }
+    @Override
+    public void setCurrentCalendar(Calendar currentTime) {
+        get().setCurrentCalendar(currentTime);
+    }
 
-  @Override
-  public Calendar getCurrentCalendar() {
-    return get().getCurrentCalendar();
-  }
+    @Override
+    public void reset() {
+        get().reset();
+    }
 
-  @Override
-  public Calendar getCurrentCalendar(TimeZone timeZone) {
-    return get().getCurrentCalendar(timeZone);
-  }
+    @Override
+    public Date getCurrentTime() {
+        return get().getCurrentTime();
+    }
 
-  @Override
-  public TimeZone getCurrentTimeZone() {
-    return get().getCurrentTimeZone();
-  }
+    @Override
+    public Calendar getCurrentCalendar() {
+        return get().getCurrentCalendar();
+    }
+
+    @Override
+    public Calendar getCurrentCalendar(TimeZone timeZone) {
+        return get().getCurrentCalendar(timeZone);
+    }
+
+    @Override
+    public TimeZone getCurrentTimeZone() {
+        return get().getCurrentTimeZone();
+    }
 }

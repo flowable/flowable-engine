@@ -19,8 +19,8 @@ package org.flowable.engine.common.api.delegate.event;
  */
 public interface FlowableEntityEvent extends FlowableEvent {
 
-  /**
-   * @return the entity that is targeted by this event.
-   */
-  Object getEntity();
+    /**
+     * @return the entity that is targeted by this event.
+     */
+    Object getEntity();
 }

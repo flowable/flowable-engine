@@ -24,80 +24,80 @@ import org.flowable.app.model.common.AbstractRepresentation;
  */
 public class AppDefinitionRepresentation extends AbstractRepresentation {
 
-  private String id;
-  private String name;
-  private String key;
-  private String description;
-  private Integer version;
-  private Date created;
-  private AppDefinition definition;
+    private String id;
+    private String name;
+    private String key;
+    private String description;
+    private Integer version;
+    private Date created;
+    private AppDefinition definition;
 
-  public AppDefinitionRepresentation() {
-    // Empty constructor for Jackson
-  }
+    public AppDefinitionRepresentation() {
+        // Empty constructor for Jackson
+    }
 
-  public AppDefinitionRepresentation(AbstractModel model) {
-    this.id = model.getId();
-    this.name = model.getName();
-    this.key = model.getKey();
-    this.description = model.getDescription();
-    this.version = model.getVersion();
-    this.created = model.getCreated();
-  }
+    public AppDefinitionRepresentation(AbstractModel model) {
+        this.id = model.getId();
+        this.name = model.getName();
+        this.key = model.getKey();
+        this.description = model.getDescription();
+        this.version = model.getVersion();
+        this.created = model.getCreated();
+    }
 
-  public String getId() {
-    return id;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public void setId(String id) {
-    this.id = id;
-  }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public String getKey() {
-    return key;
-  }
+    public String getKey() {
+        return key;
+    }
 
-  public void setKey(String key) {
-    this.key = key;
-  }
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-  public String getDescription() {
-    return description;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-  public Integer getVersion() {
-    return version;
-  }
+    public Integer getVersion() {
+        return version;
+    }
 
-  public void setVersion(Integer version) {
-    this.version = version;
-  }
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
 
-  public Date getCreated() {
-    return created;
-  }
+    public Date getCreated() {
+        return created;
+    }
 
-  public void setCreated(Date created) {
-    this.created = created;
-  }
+    public void setCreated(Date created) {
+        this.created = created;
+    }
 
-  public AppDefinition getDefinition() {
-    return definition;
-  }
+    public AppDefinition getDefinition() {
+        return definition;
+    }
 
-  public void setDefinition(AppDefinition definition) {
-    this.definition = definition;
-  }
+    public void setDefinition(AppDefinition definition) {
+        this.definition = definition;
+    }
 }

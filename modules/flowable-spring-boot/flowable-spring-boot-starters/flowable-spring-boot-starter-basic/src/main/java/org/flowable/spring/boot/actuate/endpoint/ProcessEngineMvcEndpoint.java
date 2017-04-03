@@ -48,31 +48,30 @@ public class ProcessEngineMvcEndpoint extends EndpointMvcAdapter {
     }
 
     /**
-     * Look up the process definition by key. For example,
-     * this is <A href="http://localhost:8080/activiti/processes/fulfillmentProcess">process-diagram for</A>
-     * a process definition named {@code fulfillmentProcess}.
+     * Look up the process definition by key. For example, this is <A href="http://localhost:8080/activiti/processes/fulfillmentProcess">process-diagram for</A> a process definition named
+     * {@code fulfillmentProcess}.
      */
     @RequestMapping(value = "/processes/{processDefinitionKey:.*}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
     @ResponseBody
     public ResponseEntity processDefinitionDiagram(@PathVariable String processDefinitionKey) {
-      ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-              .processDefinitionKey(processDefinitionKey)
-              .latestVersion()
-              .singleResult();
-      if (processDefinition == null) {
-          return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-      }
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey(processDefinitionKey)
+                .latestVersion()
+                .singleResult();
+        if (processDefinition == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
 
-      ProcessDiagramGenerator processDiagramGenerator = new DefaultProcessDiagramGenerator();
-      BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
+        ProcessDiagramGenerator processDiagramGenerator = new DefaultProcessDiagramGenerator();
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
 
-      if (bpmnModel.getLocationMap().size() == 0) {
-          BpmnAutoLayout autoLayout = new BpmnAutoLayout(bpmnModel);
-          autoLayout.execute();
-      }
+        if (bpmnModel.getLocationMap().size() == 0) {
+            BpmnAutoLayout autoLayout = new BpmnAutoLayout(bpmnModel);
+            autoLayout.execute();
+        }
 
-      InputStream is = processDiagramGenerator.generateJpgDiagram(bpmnModel);
-      return ResponseEntity.ok(new InputStreamResource(is));
-  }
+        InputStream is = processDiagramGenerator.generateJpgDiagram(bpmnModel);
+        return ResponseEntity.ok(new InputStreamResource(is));
+    }
 
 }

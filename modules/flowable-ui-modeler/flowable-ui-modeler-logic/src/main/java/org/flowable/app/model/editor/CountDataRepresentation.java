@@ -12,15 +12,12 @@
  */
 package org.flowable.app.model.editor;
 
-
-
-
 /**
  * @author Tijs Rademakers
  */
 public class CountDataRepresentation {
-	
-	protected Long count;
+
+    protected Long count;
 
     public Long getCount() {
         return count;

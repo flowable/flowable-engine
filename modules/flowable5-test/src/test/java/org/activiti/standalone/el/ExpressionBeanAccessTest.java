@@ -18,29 +18,28 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
-
 /**
  * @author Frederik Heremans
  */
 public class ExpressionBeanAccessTest extends ResourceFlowableTestCase {
 
-  public ExpressionBeanAccessTest() {
-    super("org/activiti/standalone/el/flowable.cfg.xml");
-  }
-  
-  @Deployment
-  public void testConfigurationBeanAccess() {
-    // Exposed bean returns 'I'm exposed' when to-string is called in first service-task
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("expressionBeanAccess");
-    assertEquals("I'm exposed", runtimeService.getVariable(pi.getId(), "exposedBeanResult"));
-    
-    // After signaling, an expression tries to use a bean that is present in the configuration but
-    // is not added to the beans-list
-    try {
-      runtimeService.trigger(pi.getId());
-      fail("Exception expected");
-    } catch(FlowableException ae) {
-      assertNotNull(ae.getCause());
+    public ExpressionBeanAccessTest() {
+        super("org/activiti/standalone/el/flowable.cfg.xml");
     }
-  }
+
+    @Deployment
+    public void testConfigurationBeanAccess() {
+        // Exposed bean returns 'I'm exposed' when to-string is called in first service-task
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("expressionBeanAccess");
+        assertEquals("I'm exposed", runtimeService.getVariable(pi.getId(), "exposedBeanResult"));
+
+        // After signaling, an expression tries to use a bean that is present in the configuration but
+        // is not added to the beans-list
+        try {
+            runtimeService.trigger(pi.getId());
+            fail("Exception expected");
+        } catch (FlowableException ae) {
+            assertNotNull(ae.getCause());
+        }
+    }
 }

@@ -12,7 +12,7 @@
   </insert>
 
   <insert id="bulkInsertDeployment" parameterType="java.util.List">
-    insert into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_)
+    insert into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, ENGINE_VERSION_)
     values
       <foreach collection="list" item="deployment" index="index" separator=",">
         (#{deployment.id, jdbcType=VARCHAR},
@@ -20,20 +20,22 @@
          #{deployment.category, jdbcType=VARCHAR},
          #{deployment.key, jdbcType=VARCHAR},
          #{deployment.tenantId, jdbcType=VARCHAR},
-         #{deployment.deploymentTime, jdbcType=TIMESTAMP})
+         #{deployment.deploymentTime, jdbcType=TIMESTAMP},
+         #{deployment.engineVersion, jdbcType=VARCHAR})
       </foreach>
   </insert>
 
   <insert id="bulkInsertDeployment" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL 
       <foreach collection="list" item="deployment" index="index">
-        into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_) VALUES 
+        into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, ENGINE_VERSION_) VALUES 
           (#{deployment.id, jdbcType=VARCHAR},
            #{deployment.name, jdbcType=VARCHAR},
            #{deployment.category, jdbcType=VARCHAR},
            #{deployment.key, jdbcType=VARCHAR},
            #{deployment.tenantId, jdbcType=VARCHAR},
-           #{deployment.deploymentTime, jdbcType=TIMESTAMP})
+           #{deployment.deploymentTime, jdbcType=TIMESTAMP},
+           #{deployment.engineVersion, jdbcType=VARCHAR})
       </foreach>
     SELECT * FROM dual
   </insert>
@@ -90,6 +92,13 @@
       <if test="deploymentId != null">
         RES.ID_ = #{deploymentId}
       </if>
+      <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
+        and RES.ID_ IN
+        <foreach item="deploymentId" index="index" collection="deploymentIds" 
+                 open="(" separator="," close=")">
+          #{deploymentId}
+        </foreach>
+      </if>
       <if test="name != null">
         and RES.NAME_ = #{name}
       </if>
@@ -119,6 +128,9 @@
       </if>
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+      </if>
+      <if test="engineVersion != null">
+        and RES.ENGINE_VERSION_ = #{engineVersion}
       </if>
       <if test="processDefinitionKey != null">
         and PROCDEF.KEY_ = #{processDefinitionKey}

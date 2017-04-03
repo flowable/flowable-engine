@@ -19,11 +19,11 @@ import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntity;
  * @author Joram Barrez
  */
 public class HistoricIdentityLinksByProcInstMatcher extends CachedEntityMatcherAdapter<HistoricIdentityLinkEntity> {
- 
-  @Override
-  public boolean isRetained(HistoricIdentityLinkEntity historicIdentityLinkEntity, Object parameter) {
-    return historicIdentityLinkEntity.getProcessInstanceId() != null 
-        && historicIdentityLinkEntity.getProcessInstanceId().equals((String) parameter);
-  }
-  
+
+    @Override
+    public boolean isRetained(HistoricIdentityLinkEntity historicIdentityLinkEntity, Object parameter) {
+        return historicIdentityLinkEntity.getProcessInstanceId() != null
+                && historicIdentityLinkEntity.getProcessInstanceId().equals((String) parameter);
+    }
+
 }

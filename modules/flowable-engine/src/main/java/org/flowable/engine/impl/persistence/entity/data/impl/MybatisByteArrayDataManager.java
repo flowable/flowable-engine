@@ -24,30 +24,30 @@ import org.flowable.engine.impl.persistence.entity.data.ByteArrayDataManager;
  * @author Joram Barrez
  */
 public class MybatisByteArrayDataManager extends AbstractDataManager<ByteArrayEntity> implements ByteArrayDataManager {
-  
-  public MybatisByteArrayDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    super(processEngineConfiguration);
-  }
 
-  @Override
-  public ByteArrayEntity create() {
-    return new ByteArrayEntityImpl();
-  }
+    public MybatisByteArrayDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
 
-  @Override
-  public Class<? extends ByteArrayEntity> getManagedEntityClass() {
-    return ByteArrayEntityImpl.class;
-  }
-  
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<ByteArrayEntity> findAll() {
-    return getDbSqlSession().selectList("selectByteArrays");
-  }
-  
-  @Override
-  public void deleteByteArrayNoRevisionCheck(String byteArrayEntityId) {
-    getDbSqlSession().delete("deleteByteArrayNoRevisionCheck", byteArrayEntityId, ByteArrayEntityImpl.class);
-  }
-  
+    @Override
+    public ByteArrayEntity create() {
+        return new ByteArrayEntityImpl();
+    }
+
+    @Override
+    public Class<? extends ByteArrayEntity> getManagedEntityClass() {
+        return ByteArrayEntityImpl.class;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<ByteArrayEntity> findAll() {
+        return getDbSqlSession().selectList("selectByteArrays");
+    }
+
+    @Override
+    public void deleteByteArrayNoRevisionCheck(String byteArrayEntityId) {
+        getDbSqlSession().delete("deleteByteArrayNoRevisionCheck", byteArrayEntityId, ByteArrayEntityImpl.class);
+    }
+
 }

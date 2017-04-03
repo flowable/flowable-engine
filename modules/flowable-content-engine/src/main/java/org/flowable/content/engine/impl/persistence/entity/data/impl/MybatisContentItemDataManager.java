@@ -27,40 +27,40 @@ import org.flowable.engine.common.impl.Page;
  * @author Tijs Rademakers
  */
 public class MybatisContentItemDataManager extends AbstractDataManager<ContentItemEntity> implements ContentItemDataManager {
-  
-  public MybatisContentItemDataManager(ContentEngineConfiguration contentEngineConfiguration) {
-    super(contentEngineConfiguration);
-  }
 
-  @Override
-  public Class<? extends ContentItemEntity> getManagedEntityClass() {
-    return ContentItemEntityImpl.class;
-  }
-  
-  @Override
-  public ContentItemEntity create() {
-    return new ContentItemEntityImpl();
-  }
-  
-  @Override
-  public long findContentItemCountByQueryCriteria(ContentItemQueryImpl contentItemQuery) {
-    return (Long) getDbSqlSession().selectOne("selectContentItemCountByQueryCriteria", contentItemQuery);
-  }
+    public MybatisContentItemDataManager(ContentEngineConfiguration contentEngineConfiguration) {
+        super(contentEngineConfiguration);
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl contentItemQuery, Page page) {
-    final String query = "selectContentItemsByQueryCriteria";
-    return getDbSqlSession().selectList(query, contentItemQuery, page);
-  }
-  
-  @Override
-  public void deleteContentItemsByTaskId(String taskId) {
-    getDbSqlSession().delete("deleteContentItemsByTaskId", taskId);
-  }
+    @Override
+    public Class<? extends ContentItemEntity> getManagedEntityClass() {
+        return ContentItemEntityImpl.class;
+    }
 
-  @Override
-  public void deleteContentItemsByProcessInstanceId(String processInstanceId) {
-    getDbSqlSession().delete("deleteContentItemsByProcessInstanceId", processInstanceId);
-  }
+    @Override
+    public ContentItemEntity create() {
+        return new ContentItemEntityImpl();
+    }
+
+    @Override
+    public long findContentItemCountByQueryCriteria(ContentItemQueryImpl contentItemQuery) {
+        return (Long) getDbSqlSession().selectOne("selectContentItemCountByQueryCriteria", contentItemQuery);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl contentItemQuery, Page page) {
+        final String query = "selectContentItemsByQueryCriteria";
+        return getDbSqlSession().selectList(query, contentItemQuery, page);
+    }
+
+    @Override
+    public void deleteContentItemsByTaskId(String taskId) {
+        getDbSqlSession().delete("deleteContentItemsByTaskId", taskId);
+    }
+
+    @Override
+    public void deleteContentItemsByProcessInstanceId(String processInstanceId) {
+        getDbSqlSession().delete("deleteContentItemsByProcessInstanceId", processInstanceId);
+    }
 }

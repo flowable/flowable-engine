@@ -12,10 +12,14 @@
  */
 package org.flowable.engine.impl.el;
 
+import java.util.List;
+
 import javax.el.ELContext;
 import javax.el.ELResolver;
 import javax.el.FunctionMapper;
 import javax.el.VariableMapper;
+
+import org.flowable.engine.delegate.FlowableFunctionDelegate;
 
 /**
  * @author Tom Baeyens
@@ -23,21 +27,23 @@ import javax.el.VariableMapper;
  */
 public class FlowableElContext extends ELContext {
 
-  protected ELResolver elResolver;
+    protected ELResolver elResolver;
+    protected List<FlowableFunctionDelegate> functionDelegates;
 
-  public FlowableElContext(ELResolver elResolver) {
-    this.elResolver = elResolver;
-  }
+    public FlowableElContext(ELResolver elResolver, List<FlowableFunctionDelegate> functionDelegates) {
+        this.elResolver = elResolver;
+        this.functionDelegates = functionDelegates;
+    }
 
-  public ELResolver getELResolver() {
-    return elResolver;
-  }
+    public ELResolver getELResolver() {
+        return elResolver;
+    }
 
-  public FunctionMapper getFunctionMapper() {
-    return new FlowableFunctionMapper();
-  }
+    public FunctionMapper getFunctionMapper() {
+        return new FlowableFunctionMapper(functionDelegates);
+    }
 
-  public VariableMapper getVariableMapper() {
-    return null;
-  }
+    public VariableMapper getVariableMapper() {
+        return null;
+    }
 }

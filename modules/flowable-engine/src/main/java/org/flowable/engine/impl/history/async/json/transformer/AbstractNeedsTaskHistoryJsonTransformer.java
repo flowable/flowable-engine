@@ -18,11 +18,11 @@ import org.flowable.engine.impl.interceptor.CommandContext;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class AbstractNeedsTaskHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
-  
-  @Override
-  public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
-    String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
-    return commandContext.getHistoricTaskInstanceEntityManager().findById(taskId) != null;
-  }
+
+    @Override
+    public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
+        String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
+        return commandContext.getHistoricTaskInstanceEntityManager().findById(taskId) != null;
+    }
 
 }

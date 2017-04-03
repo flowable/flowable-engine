@@ -34,97 +34,97 @@ import org.flowable.rest.form.service.api.repository.FormDeploymentResponse;
  */
 public class FormRestResponseFactory {
 
-  public FormModelResponse createFormModelResponse(FormModel formModel) {
-    return createFormModelResponse(formModel, createUrlBuilder());
-  }
-
-  public FormModelResponse createFormModelResponse(FormModel formModel, FormRestUrlBuilder urlBuilder) {
-    FormModelResponse response = new FormModelResponse(formModel);
-    response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_RUNTIME_TASK_FORM));
-
-    return response;
-  }
-
-  public List<FormInstanceResponse> createFormInstanceResponse(List<FormInstance> formInstances) {
-    FormRestUrlBuilder urlBuilder = new FormRestUrlBuilder();
-    List<FormInstanceResponse> responseList = new ArrayList<>();
-    for (FormInstance formInstance : formInstances) {
-      responseList.add(createFormInstanceResponse(formInstance, urlBuilder));
+    public FormModelResponse createFormModelResponse(FormModel formModel) {
+        return createFormModelResponse(formModel, createUrlBuilder());
     }
 
-    return responseList;
-  }
+    public FormModelResponse createFormModelResponse(FormModel formModel, FormRestUrlBuilder urlBuilder) {
+        FormModelResponse response = new FormModelResponse(formModel);
+        response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_RUNTIME_TASK_FORM));
 
-  public FormInstanceResponse createFormInstanceResponse(FormInstance formInstance) {
-    return createFormInstanceResponse(formInstance, createUrlBuilder());
-  }
-
-  public FormInstanceResponse createFormInstanceResponse(FormInstance formInstance, FormRestUrlBuilder urlBuilder) {
-    FormInstanceResponse response = new FormInstanceResponse(formInstance);
-    response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_FORM_INSTANCE_QUERY));
-
-    return response;
-  }
-
-  public List<FormInstanceModelResponse> createFormInstanceModelResponse(List<FormInstanceModel> formInstanceModels) {
-    FormRestUrlBuilder urlBuilder = new FormRestUrlBuilder();
-    List<FormInstanceModelResponse> responseList = new ArrayList<>();
-    for (FormInstanceModel formInstanceModel : formInstanceModels) {
-      responseList.add(createFormInstanceModelResponse(formInstanceModel, urlBuilder));
+        return response;
     }
 
-    return responseList;
-  }
+    public List<FormInstanceResponse> createFormInstanceResponse(List<FormInstance> formInstances) {
+        FormRestUrlBuilder urlBuilder = new FormRestUrlBuilder();
+        List<FormInstanceResponse> responseList = new ArrayList<>();
+        for (FormInstance formInstance : formInstances) {
+            responseList.add(createFormInstanceResponse(formInstance, urlBuilder));
+        }
 
-  public FormInstanceModelResponse createFormInstanceModelResponse(FormInstanceModel formInstanceModel) {
-    return createFormInstanceModelResponse(formInstanceModel, createUrlBuilder());
-  }
-
-  public FormInstanceModelResponse createFormInstanceModelResponse(FormInstanceModel formInstanceModel, FormRestUrlBuilder urlBuilder) {
-    FormInstanceModelResponse response = new FormInstanceModelResponse(formInstanceModel);
-    response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_COMPLETED_TASK_FORM));
-
-    return response;
-  }
-
-  public FormDefinitionResponse createFormDefinitionResponse(FormDefinition formDefinition) {
-    return createFormDefinitionResponse(formDefinition, createUrlBuilder());
-  }
-
-  public FormDefinitionResponse createFormDefinitionResponse(FormDefinition formDefinition, FormRestUrlBuilder urlBuilder) {
-    FormDefinitionResponse response = new FormDefinitionResponse(formDefinition);
-    response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_FORM, formDefinition.getId()));
-
-    return response;
-  }
-
-  public List<FormDefinitionResponse> createFormResponseList(List<FormDefinition> formDefinitions) {
-    FormRestUrlBuilder urlBuilder = createUrlBuilder();
-    List<FormDefinitionResponse> responseList = new ArrayList<>();
-    for (FormDefinition formDefinition : formDefinitions) {
-      responseList.add(createFormDefinitionResponse(formDefinition, urlBuilder));
+        return responseList;
     }
-    return responseList;
-  }
 
-  public List<FormDeploymentResponse> createFormDeploymentResponseList(List<FormDeployment> deployments) {
-    FormRestUrlBuilder urlBuilder = createUrlBuilder();
-    List<FormDeploymentResponse> responseList = new ArrayList<>();
-    for (FormDeployment instance : deployments) {
-      responseList.add(createFormDeploymentResponse(instance, urlBuilder));
+    public FormInstanceResponse createFormInstanceResponse(FormInstance formInstance) {
+        return createFormInstanceResponse(formInstance, createUrlBuilder());
     }
-    return responseList;
-  }
 
-  public FormDeploymentResponse createFormDeploymentResponse(FormDeployment deployment) {
-    return createFormDeploymentResponse(deployment, createUrlBuilder());
-  }
+    public FormInstanceResponse createFormInstanceResponse(FormInstance formInstance, FormRestUrlBuilder urlBuilder) {
+        FormInstanceResponse response = new FormInstanceResponse(formInstance);
+        response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_FORM_INSTANCE_QUERY));
 
-  public FormDeploymentResponse createFormDeploymentResponse(FormDeployment deployment, FormRestUrlBuilder urlBuilder) {
-    return new FormDeploymentResponse(deployment, urlBuilder.buildUrl(FormRestUrls.URL_DEPLOYMENT, deployment.getId()));
-  }
+        return response;
+    }
 
-  protected FormRestUrlBuilder createUrlBuilder() {
-    return FormRestUrlBuilder.fromCurrentRequest();
-  }
+    public List<FormInstanceModelResponse> createFormInstanceModelResponse(List<FormInstanceModel> formInstanceModels) {
+        FormRestUrlBuilder urlBuilder = new FormRestUrlBuilder();
+        List<FormInstanceModelResponse> responseList = new ArrayList<>();
+        for (FormInstanceModel formInstanceModel : formInstanceModels) {
+            responseList.add(createFormInstanceModelResponse(formInstanceModel, urlBuilder));
+        }
+
+        return responseList;
+    }
+
+    public FormInstanceModelResponse createFormInstanceModelResponse(FormInstanceModel formInstanceModel) {
+        return createFormInstanceModelResponse(formInstanceModel, createUrlBuilder());
+    }
+
+    public FormInstanceModelResponse createFormInstanceModelResponse(FormInstanceModel formInstanceModel, FormRestUrlBuilder urlBuilder) {
+        FormInstanceModelResponse response = new FormInstanceModelResponse(formInstanceModel);
+        response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_COMPLETED_TASK_FORM));
+
+        return response;
+    }
+
+    public FormDefinitionResponse createFormDefinitionResponse(FormDefinition formDefinition) {
+        return createFormDefinitionResponse(formDefinition, createUrlBuilder());
+    }
+
+    public FormDefinitionResponse createFormDefinitionResponse(FormDefinition formDefinition, FormRestUrlBuilder urlBuilder) {
+        FormDefinitionResponse response = new FormDefinitionResponse(formDefinition);
+        response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_FORM, formDefinition.getId()));
+
+        return response;
+    }
+
+    public List<FormDefinitionResponse> createFormResponseList(List<FormDefinition> formDefinitions) {
+        FormRestUrlBuilder urlBuilder = createUrlBuilder();
+        List<FormDefinitionResponse> responseList = new ArrayList<>();
+        for (FormDefinition formDefinition : formDefinitions) {
+            responseList.add(createFormDefinitionResponse(formDefinition, urlBuilder));
+        }
+        return responseList;
+    }
+
+    public List<FormDeploymentResponse> createFormDeploymentResponseList(List<FormDeployment> deployments) {
+        FormRestUrlBuilder urlBuilder = createUrlBuilder();
+        List<FormDeploymentResponse> responseList = new ArrayList<>();
+        for (FormDeployment instance : deployments) {
+            responseList.add(createFormDeploymentResponse(instance, urlBuilder));
+        }
+        return responseList;
+    }
+
+    public FormDeploymentResponse createFormDeploymentResponse(FormDeployment deployment) {
+        return createFormDeploymentResponse(deployment, createUrlBuilder());
+    }
+
+    public FormDeploymentResponse createFormDeploymentResponse(FormDeployment deployment, FormRestUrlBuilder urlBuilder) {
+        return new FormDeploymentResponse(deployment, urlBuilder.buildUrl(FormRestUrls.URL_DEPLOYMENT, deployment.getId()));
+    }
+
+    protected FormRestUrlBuilder createUrlBuilder() {
+        return FormRestUrlBuilder.fromCurrentRequest();
+    }
 }

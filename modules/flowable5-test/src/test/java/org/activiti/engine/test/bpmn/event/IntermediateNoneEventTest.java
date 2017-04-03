@@ -19,22 +19,21 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
 public class IntermediateNoneEventTest extends PluggableFlowableTestCase {
-  
-  private static boolean listenerExcecuted;
-  
-  public static class MyExecutionListener implements ExecutionListener {
-    public void notify(DelegateExecution execution) {
-      listenerExcecuted = true;
-    }    
-  }
 
-  @Deployment
-  public void testIntermediateNoneTimerEvent() throws Exception {    
-    assertFalse(listenerExcecuted);    
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("intermediateNoneEventExample");
-    assertProcessEnded(pi.getProcessInstanceId());
-    assertTrue(listenerExcecuted);    
-  }
+    private static boolean listenerExecuted;
 
+    public static class MyExecutionListener implements ExecutionListener {
+        public void notify(DelegateExecution execution) {
+            listenerExecuted = true;
+        }
+    }
+
+    @Deployment
+    public void testIntermediateNoneTimerEvent() throws Exception {
+        assertFalse(listenerExecuted);
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("intermediateNoneEventExample");
+        assertProcessEnded(pi.getProcessInstanceId());
+        assertTrue(listenerExecuted);
+    }
 
 }

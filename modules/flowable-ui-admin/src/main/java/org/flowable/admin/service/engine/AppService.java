@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * Service for invoking Activiti REST services.
+ * Service for invoking Flowable REST services.
  */
 @Service
 public class AppService {
@@ -55,7 +55,7 @@ public class AppService {
     protected FlowableClientService clientUtil;
 
     public JsonNode listAppDefinitions(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
-        URIBuilder builder =  clientUtil.createUriBuilder(APP_LIST_URL);
+        URIBuilder builder = clientUtil.createUriBuilder(APP_LIST_URL);
         addParametersToBuilder(builder, parameterMap);
 
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
@@ -68,7 +68,7 @@ public class AppService {
     }
 
     public void getAppDefinitionByDeployment(ServerConfig serverConfig, HttpServletResponse httpResponse, Map<String, String[]> parameterMap) {
-        URIBuilder builder =  clientUtil.createUriBuilder(APP_BY_DEPLOYMENT_URL);
+        URIBuilder builder = clientUtil.createUriBuilder(APP_BY_DEPLOYMENT_URL);
         addParametersToBuilder(builder, parameterMap);
 
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
@@ -81,21 +81,21 @@ public class AppService {
     }
 
     public JsonNode getProcessDefinitionsForDeploymentId(ServerConfig serverConfig, String deploymentId) {
-        URIBuilder builder =  clientUtil.createUriBuilder(PROCESS_DEFINITIONS_URL);
+        URIBuilder builder = clientUtil.createUriBuilder(PROCESS_DEFINITIONS_URL);
         builder.addParameter("deploymentId", deploymentId);
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
         return clientUtil.executeRequest(get, serverConfig);
     }
 
     public JsonNode getDecisionDefinitionsForDeploymentId(ServerConfig serverConfig, String dmnDeploymentId) {
-        URIBuilder builder =  clientUtil.createUriBuilder(DECISION_TABLES_URL);
+        URIBuilder builder = clientUtil.createUriBuilder(DECISION_TABLES_URL);
         builder.addParameter("deploymentId", dmnDeploymentId);
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
         return clientUtil.executeRequest(get, serverConfig);
     }
 
     public JsonNode getFormsForAppDeploymentId(ServerConfig serverConfig, String appDeploymentId) {
-        URIBuilder builder =  clientUtil.createUriBuilder(FORMS_URL);
+        URIBuilder builder = clientUtil.createUriBuilder(FORMS_URL);
         builder.addParameter("appDeploymentId", appDeploymentId);
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
         return clientUtil.executeRequest(get, serverConfig);
@@ -105,15 +105,14 @@ public class AppService {
         uploadAppDefinition(httpResponse, serverConfig, name, IOUtils.toByteArray(inputStream));
     }
 
-
     public JsonNode exportApp(ServerConfig serverConfig, String deploymentId, HttpServletResponse httpResponse) throws IOException {
-        URIBuilder builder =  clientUtil.createUriBuilder(MessageFormat.format(EXPORT_DEPLOYED_APP_URL, deploymentId));
+        URIBuilder builder = clientUtil.createUriBuilder(MessageFormat.format(EXPORT_DEPLOYED_APP_URL, deploymentId));
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
         return clientUtil.executeDownloadRequest(get, httpResponse, serverConfig);
     }
 
     public JsonNode redeployApp(HttpServletResponse httpResponse, ServerConfig serverConfig, ServerConfig targetServerConfig, String deploymentId) throws IOException {
-        URIBuilder builder =  clientUtil.createUriBuilder(MessageFormat.format(EXPORT_DEPLOYED_APP_URL, deploymentId));
+        URIBuilder builder = clientUtil.createUriBuilder(MessageFormat.format(EXPORT_DEPLOYED_APP_URL, deploymentId));
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
         AttachmentResponseInfo attachmentResponseInfo = clientUtil.executeDownloadRequest(get, serverConfig, 200, 404);
         if (attachmentResponseInfo.isSuccess()) {
@@ -126,7 +125,7 @@ public class AppService {
     }
 
     public JsonNode redeployReplaceApp(HttpServletResponse httpResponse, ServerConfig serverConfig, ServerConfig targetServerConfig, String deploymentId, String appId) throws IOException {
-        URIBuilder builder =  clientUtil.createUriBuilder(MessageFormat.format(EXPORT_DEPLOYED_APP_URL, deploymentId));
+        URIBuilder builder = clientUtil.createUriBuilder(MessageFormat.format(EXPORT_DEPLOYED_APP_URL, deploymentId));
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
         AttachmentResponseInfo attachmentResponseInfo = clientUtil.executeDownloadRequest(get, serverConfig, 200, 404);
         if (attachmentResponseInfo.isSuccess()) {
@@ -147,7 +146,7 @@ public class AppService {
     }
 
     protected void uploadNewAppDefinitionVersion(HttpServletResponse httpResponse, ServerConfig serverConfig, String name, byte[] bytes, String appId) throws IOException {
-        URIBuilder builder =  clientUtil.createUriBuilder(MessageFormat.format(APP_IMPORT_AND_PUBLISH_AS_NEW_VERSION_URL, appId));
+        URIBuilder builder = clientUtil.createUriBuilder(MessageFormat.format(APP_IMPORT_AND_PUBLISH_AS_NEW_VERSION_URL, appId));
         HttpPost post = new HttpPost(clientUtil.getServerUrl(serverConfig, builder));
         HttpEntity reqEntity = MultipartEntityBuilder.create()
                 .addBinaryBody("file", bytes, ContentType.APPLICATION_OCTET_STREAM, name).build();

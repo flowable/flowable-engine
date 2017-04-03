@@ -14,51 +14,57 @@ package org.flowable.compatibility.wrapper;
 
 import java.util.Date;
 
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.Deployment;
 
 /**
  * @author Joram Barrez
  */
 public class Flowable5DeploymentWrapper implements Deployment {
-  
-  protected org.activiti.engine.repository.Deployment activiti5Deployment;
-  
-  public Flowable5DeploymentWrapper(org.activiti.engine.repository.Deployment activiti5Deployment) {
-    this.activiti5Deployment = activiti5Deployment;
-  }
 
-  @Override
-  public String getId() {
-    return activiti5Deployment.getId();
-  }
+    protected org.activiti.engine.repository.Deployment activiti5Deployment;
 
-  @Override
-  public String getName() {
-    return activiti5Deployment.getName();
-  }
+    public Flowable5DeploymentWrapper(org.activiti.engine.repository.Deployment activiti5Deployment) {
+        this.activiti5Deployment = activiti5Deployment;
+    }
 
-  @Override
-  public Date getDeploymentTime() {
-    return activiti5Deployment.getDeploymentTime();
-  }
+    @Override
+    public String getId() {
+        return activiti5Deployment.getId();
+    }
 
-  @Override
-  public String getCategory() {
-    return activiti5Deployment.getCategory();
-  }
-  
-  @Override
-  public String getKey() {
-    return null;
-  }
+    @Override
+    public String getName() {
+        return activiti5Deployment.getName();
+    }
 
-  @Override
-  public String getTenantId() {
-    return activiti5Deployment.getTenantId();
-  }
-  
-  public org.activiti.engine.repository.Deployment getRawObject() {
-    return activiti5Deployment;
-  }
-  
+    @Override
+    public Date getDeploymentTime() {
+        return activiti5Deployment.getDeploymentTime();
+    }
+
+    @Override
+    public String getCategory() {
+        return activiti5Deployment.getCategory();
+    }
+
+    @Override
+    public String getKey() {
+        return null;
+    }
+
+    @Override
+    public String getTenantId() {
+        return activiti5Deployment.getTenantId();
+    }
+
+    @Override
+    public String getEngineVersion() {
+        return Flowable5Util.V5_ENGINE_TAG;
+    }
+
+    public org.activiti.engine.repository.Deployment getRawObject() {
+        return activiti5Deployment;
+    }
+
 }

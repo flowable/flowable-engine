@@ -36,251 +36,251 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class ExecutionResourceTest extends BaseSpringRestTestCase {
 
-  /**
-   * Test getting a single execution.
-   */
-  @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
-  public void testGetExecution() throws Exception {
-    Execution processInstanceExecution = runtimeService.startProcessInstanceByKey("processOne");
-    
-    Execution subProcessExecution = runtimeService.createExecutionQuery().activityId("subProcess").singleResult();
-    assertNotNull(subProcessExecution);
-    
-    Execution childExecution = runtimeService.createExecutionQuery().activityId("processTask").singleResult();
-    assertNotNull(childExecution);
+    /**
+     * Test getting a single execution.
+     */
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
+    public void testGetExecution() throws Exception {
+        Execution processInstanceExecution = runtimeService.startProcessInstanceByKey("processOne");
 
-    CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, processInstanceExecution.getId())), HttpStatus.SC_OK);
+        Execution subProcessExecution = runtimeService.createExecutionQuery().activityId("subProcess").singleResult();
+        assertNotNull(subProcessExecution);
 
-    // Check resulting parent execution
-    JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-    closeResponse(response);
-    assertNotNull(responseNode);
-    assertEquals(processInstanceExecution.getId(), responseNode.get("id").textValue());
-    assertTrue(responseNode.get("activityId").isNull());
-    assertFalse(responseNode.get("suspended").booleanValue());
-    assertTrue(responseNode.get("parentUrl").isNull());
-    assertFalse(responseNode.get("suspended").booleanValue());
+        Execution childExecution = runtimeService.createExecutionQuery().activityId("processTask").singleResult();
+        assertNotNull(childExecution);
 
-    assertTrue(responseNode.get("url").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, processInstanceExecution.getId())));
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, processInstanceExecution.getId())), HttpStatus.SC_OK);
 
-    assertTrue(responseNode.get("processInstanceUrl").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE, processInstanceExecution.getId())));
+        // Check resulting parent execution
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertNotNull(responseNode);
+        assertEquals(processInstanceExecution.getId(), responseNode.get("id").textValue());
+        assertTrue(responseNode.get("activityId").isNull());
+        assertFalse(responseNode.get("suspended").booleanValue());
+        assertTrue(responseNode.get("parentUrl").isNull());
+        assertFalse(responseNode.get("suspended").booleanValue());
 
-    // Check resulting child execution
-    response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, childExecution.getId())), HttpStatus.SC_OK);
+        assertTrue(responseNode.get("url").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, processInstanceExecution.getId())));
 
-    responseNode = objectMapper.readTree(response.getEntity().getContent());
-    closeResponse(response);
-    assertNotNull(responseNode);
-    assertEquals(childExecution.getId(), responseNode.get("id").textValue());
-    assertEquals("processTask", responseNode.get("activityId").textValue());
-    assertFalse(responseNode.get("suspended").booleanValue());
-    assertFalse(responseNode.get("suspended").booleanValue());
+        assertTrue(responseNode.get("processInstanceUrl").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE, processInstanceExecution.getId())));
 
-    assertTrue(responseNode.get("url").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, childExecution.getId())));
+        // Check resulting child execution
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, childExecution.getId())), HttpStatus.SC_OK);
 
-    assertTrue(responseNode.get("parentUrl").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, subProcessExecution.getId())));
+        responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertNotNull(responseNode);
+        assertEquals(childExecution.getId(), responseNode.get("id").textValue());
+        assertEquals("processTask", responseNode.get("activityId").textValue());
+        assertFalse(responseNode.get("suspended").booleanValue());
+        assertFalse(responseNode.get("suspended").booleanValue());
 
-    assertTrue(responseNode.get("processInstanceUrl").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE, processInstanceExecution.getId())));
-  }
+        assertTrue(responseNode.get("url").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, childExecution.getId())));
 
-  /**
-   * Test getting an unexisting execution.
-   */
-  public void testGetUnexistingExecution() throws Exception {
-    CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, "unexisting")), HttpStatus.SC_NOT_FOUND);
-    closeResponse(response);
-  }
+        assertTrue(responseNode.get("parentUrl").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, subProcessExecution.getId())));
 
-  /**
-   * Test signalling a single execution, without signal name.
-   */
-  @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-signal.bpmn20.xml" })
-  public void testSignalExecution() throws Exception {
-    runtimeService.startProcessInstanceByKey("processOne");
-    
-    Execution signalExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
-    assertNotNull(signalExecution);
-    assertEquals("waitState", signalExecution.getActivityId());
+        assertTrue(responseNode.get("processInstanceUrl").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE, processInstanceExecution.getId())));
+    }
 
-    ObjectNode requestNode = objectMapper.createObjectNode();
-    requestNode.put("action", "signal");
+    /**
+     * Test getting an unexisting execution.
+     */
+    public void testGetUnexistingExecution() throws Exception {
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, "unexisting")), HttpStatus.SC_NOT_FOUND);
+        closeResponse(response);
+    }
 
-    // Signalling one causes process to move on to second signal and
-    // execution is not finished yet
-    HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, signalExecution.getId()));
-    httpPut.setEntity(new StringEntity(requestNode.toString()));
-    CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
-    JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-    closeResponse(response);
-    assertEquals("anotherWaitState", responseNode.get("activityId").textValue());
-    assertEquals("anotherWaitState", runtimeService.createExecutionQuery().executionId(signalExecution.getId()).singleResult().getActivityId());
+    /**
+     * Test signalling a single execution, without signal name.
+     */
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-signal.bpmn20.xml" })
+    public void testSignalExecution() throws Exception {
+        runtimeService.startProcessInstanceByKey("processOne");
 
-    // Signalling again causes process to end
-    response = executeRequest(httpPut, HttpStatus.SC_NO_CONTENT);
-    closeResponse(response);
+        Execution signalExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
+        assertNotNull(signalExecution);
+        assertEquals("waitState", signalExecution.getActivityId());
 
-    // Check if process is actually ended
-    assertNull(runtimeService.createExecutionQuery().executionId(signalExecution.getId()).singleResult());
-  }
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("action", "signal");
 
-  /**
-   * Test signalling a single execution, without signal name.
-   */
-  @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-signal-event.bpmn20.xml" })
-  public void testSignalEventExecution() throws Exception {
-    Execution signalExecution = runtimeService.startProcessInstanceByKey("processOne");
-    assertNotNull(signalExecution);
+        // Signalling one causes process to move on to second signal and
+        // execution is not finished yet
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, signalExecution.getId()));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertEquals("anotherWaitState", responseNode.get("activityId").textValue());
+        assertEquals("anotherWaitState", runtimeService.createExecutionQuery().executionId(signalExecution.getId()).singleResult().getActivityId());
 
-    ObjectNode requestNode = objectMapper.createObjectNode();
-    requestNode.put("action", "signalEventReceived");
-    requestNode.put("signalName", "unexisting");
+        // Signalling again causes process to end
+        response = executeRequest(httpPut, HttpStatus.SC_NO_CONTENT);
+        closeResponse(response);
 
-    Execution waitingExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
-    assertNotNull(waitingExecution);
+        // Check if process is actually ended
+        assertNull(runtimeService.createExecutionQuery().executionId(signalExecution.getId()).singleResult());
+    }
 
-    HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, waitingExecution.getId()));
-    httpPut.setEntity(new StringEntity(requestNode.toString()));
-    CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_INTERNAL_SERVER_ERROR);
-    closeResponse(response);
+    /**
+     * Test signalling a single execution, without signal name.
+     */
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-signal-event.bpmn20.xml" })
+    public void testSignalEventExecution() throws Exception {
+        Execution signalExecution = runtimeService.startProcessInstanceByKey("processOne");
+        assertNotNull(signalExecution);
 
-    requestNode.put("signalName", "alert");
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("action", "signalEventReceived");
+        requestNode.put("signalName", "unexisting");
 
-    // Sending signal event causes the execution to end (scope-execution for
-    // the catching event)
-    httpPut.setEntity(new StringEntity(requestNode.toString()));
-    response = executeRequest(httpPut, HttpStatus.SC_OK);
-    closeResponse(response);
+        Execution waitingExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
+        assertNotNull(waitingExecution);
 
-    // Check if process is moved on to the other wait-state
-    waitingExecution = runtimeService.createExecutionQuery().activityId("anotherWaitState").singleResult();
-    assertNotNull(waitingExecution);
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, waitingExecution.getId()));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        closeResponse(response);
 
-  }
+        requestNode.put("signalName", "alert");
 
-  /**
-   * Test signalling a single execution, with signal event.
-   */
-  @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-signal-event.bpmn20.xml" })
-  public void testSignalEventExecutionWithvariables() throws Exception {
-    Execution signalExecution = runtimeService.startProcessInstanceByKey("processOne");
-    assertNotNull(signalExecution);
+        // Sending signal event causes the execution to end (scope-execution for
+        // the catching event)
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPut, HttpStatus.SC_OK);
+        closeResponse(response);
 
-    ArrayNode variables = objectMapper.createArrayNode();
-    ObjectNode requestNode = objectMapper.createObjectNode();
-    requestNode.put("action", "signalEventReceived");
-    requestNode.put("signalName", "alert");
-    requestNode.set("variables", variables);
+        // Check if process is moved on to the other wait-state
+        waitingExecution = runtimeService.createExecutionQuery().activityId("anotherWaitState").singleResult();
+        assertNotNull(waitingExecution);
 
-    ObjectNode varNode = objectMapper.createObjectNode();
-    variables.add(varNode);
-    varNode.put("name", "myVar");
-    varNode.put("value", "Variable set when signal event is received");
+    }
 
-    Execution waitingExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
-    assertNotNull(waitingExecution);
+    /**
+     * Test signalling a single execution, with signal event.
+     */
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-signal-event.bpmn20.xml" })
+    public void testSignalEventExecutionWithvariables() throws Exception {
+        Execution signalExecution = runtimeService.startProcessInstanceByKey("processOne");
+        assertNotNull(signalExecution);
 
-    // Sending signal event causes the execution to end (scope-execution for
-    // the catching event)
-    HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, waitingExecution.getId()));
-    httpPut.setEntity(new StringEntity(requestNode.toString()));
-    CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
-    closeResponse(response);
+        ArrayNode variables = objectMapper.createArrayNode();
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("action", "signalEventReceived");
+        requestNode.put("signalName", "alert");
+        requestNode.set("variables", variables);
 
-    // Check if process is moved on to the other wait-state
-    waitingExecution = runtimeService.createExecutionQuery().activityId("anotherWaitState").singleResult();
-    assertNotNull(waitingExecution);
+        ObjectNode varNode = objectMapper.createObjectNode();
+        variables.add(varNode);
+        varNode.put("name", "myVar");
+        varNode.put("value", "Variable set when signal event is received");
 
-    Map<String, Object> vars = runtimeService.getVariables(waitingExecution.getId());
-    assertEquals(1, vars.size());
+        Execution waitingExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
+        assertNotNull(waitingExecution);
 
-    assertEquals("Variable set when signal event is received", vars.get("myVar"));
-  }
+        // Sending signal event causes the execution to end (scope-execution for
+        // the catching event)
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, waitingExecution.getId()));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+        closeResponse(response);
 
-  /**
-   * Test signalling a single execution, without signal event and variables.
-   */
-  @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-message-event.bpmn20.xml" })
-  public void testMessageEventExecution() throws Exception {
-    Execution execution = runtimeService.startProcessInstanceByKey("processOne");
-    assertNotNull(execution);
+        // Check if process is moved on to the other wait-state
+        waitingExecution = runtimeService.createExecutionQuery().activityId("anotherWaitState").singleResult();
+        assertNotNull(waitingExecution);
 
-    ObjectNode requestNode = objectMapper.createObjectNode();
-    requestNode.put("action", "messageEventReceived");
-    requestNode.put("messageName", "unexisting");
-    Execution waitingExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
-    assertNotNull(waitingExecution);
+        Map<String, Object> vars = runtimeService.getVariables(waitingExecution.getId());
+        assertEquals(1, vars.size());
 
-    HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, waitingExecution.getId()));
-    httpPut.setEntity(new StringEntity(requestNode.toString()));
-    CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_INTERNAL_SERVER_ERROR);
-    closeResponse(response);
+        assertEquals("Variable set when signal event is received", vars.get("myVar"));
+    }
 
-    requestNode.put("messageName", "paymentMessage");
+    /**
+     * Test signalling a single execution, without signal event and variables.
+     */
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-message-event.bpmn20.xml" })
+    public void testMessageEventExecution() throws Exception {
+        Execution execution = runtimeService.startProcessInstanceByKey("processOne");
+        assertNotNull(execution);
 
-    // Sending signal event causes the execution to end (scope-execution for
-    // the catching event)
-    httpPut.setEntity(new StringEntity(requestNode.toString()));
-    response = executeRequest(httpPut, HttpStatus.SC_OK);
-    closeResponse(response);
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("action", "messageEventReceived");
+        requestNode.put("messageName", "unexisting");
+        Execution waitingExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
+        assertNotNull(waitingExecution);
 
-    // Check if process is moved on to the other wait-state
-    waitingExecution = runtimeService.createExecutionQuery().activityId("anotherWaitState").singleResult();
-    assertNotNull(waitingExecution);
-  }
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, waitingExecution.getId()));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        closeResponse(response);
 
-  /**
-   * Test messaging a single execution with variables.
-   */
-  @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-message-event.bpmn20.xml" })
-  public void testMessageEventExecutionWithvariables() throws Exception {
-    Execution signalExecution = runtimeService.startProcessInstanceByKey("processOne");
-    assertNotNull(signalExecution);
+        requestNode.put("messageName", "paymentMessage");
 
-    ArrayNode variables = objectMapper.createArrayNode();
-    ObjectNode requestNode = objectMapper.createObjectNode();
-    requestNode.put("action", "messageEventReceived");
-    requestNode.put("messageName", "paymentMessage");
-    requestNode.set("variables", variables);
+        // Sending signal event causes the execution to end (scope-execution for
+        // the catching event)
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPut, HttpStatus.SC_OK);
+        closeResponse(response);
 
-    ObjectNode varNode = objectMapper.createObjectNode();
-    variables.add(varNode);
-    varNode.put("name", "myVar");
-    varNode.put("value", "Variable set when signal event is received");
+        // Check if process is moved on to the other wait-state
+        waitingExecution = runtimeService.createExecutionQuery().activityId("anotherWaitState").singleResult();
+        assertNotNull(waitingExecution);
+    }
 
-    Execution waitingExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
-    assertNotNull(waitingExecution);
+    /**
+     * Test messaging a single execution with variables.
+     */
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-message-event.bpmn20.xml" })
+    public void testMessageEventExecutionWithvariables() throws Exception {
+        Execution signalExecution = runtimeService.startProcessInstanceByKey("processOne");
+        assertNotNull(signalExecution);
 
-    // Sending signal event causes the execution to end (scope-execution for
-    // the catching event)
-    HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, waitingExecution.getId()));
-    httpPut.setEntity(new StringEntity(requestNode.toString()));
-    CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
-    closeResponse(response);
+        ArrayNode variables = objectMapper.createArrayNode();
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("action", "messageEventReceived");
+        requestNode.put("messageName", "paymentMessage");
+        requestNode.set("variables", variables);
 
-    // Check if process is moved on to the other wait-state
-    waitingExecution = runtimeService.createExecutionQuery().activityId("anotherWaitState").singleResult();
-    assertNotNull(waitingExecution);
+        ObjectNode varNode = objectMapper.createObjectNode();
+        variables.add(varNode);
+        varNode.put("name", "myVar");
+        varNode.put("value", "Variable set when signal event is received");
 
-    Map<String, Object> vars = runtimeService.getVariables(waitingExecution.getId());
-    assertEquals(1, vars.size());
+        Execution waitingExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
+        assertNotNull(waitingExecution);
 
-    assertEquals("Variable set when signal event is received", vars.get("myVar"));
-  }
+        // Sending signal event causes the execution to end (scope-execution for
+        // the catching event)
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, waitingExecution.getId()));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+        closeResponse(response);
 
-  /**
-   * Test executing an illegal action on an execution.
-   */
-  @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
-  public void testIllegalExecutionAction() throws Exception {
-    Execution execution = runtimeService.startProcessInstanceByKey("processOne");
-    assertNotNull(execution);
+        // Check if process is moved on to the other wait-state
+        waitingExecution = runtimeService.createExecutionQuery().activityId("anotherWaitState").singleResult();
+        assertNotNull(waitingExecution);
 
-    ObjectNode requestNode = objectMapper.createObjectNode();
-    requestNode.put("action", "badaction");
+        Map<String, Object> vars = runtimeService.getVariables(waitingExecution.getId());
+        assertEquals(1, vars.size());
 
-    HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, execution.getId()));
-    httpPut.setEntity(new StringEntity(requestNode.toString()));
-    CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST);
-    closeResponse(response);
-  }
+        assertEquals("Variable set when signal event is received", vars.get("myVar"));
+    }
+
+    /**
+     * Test executing an illegal action on an execution.
+     */
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
+    public void testIllegalExecutionAction() throws Exception {
+        Execution execution = runtimeService.startProcessInstanceByKey("processOne");
+        assertNotNull(execution);
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("action", "badaction");
+
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, execution.getId()));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST);
+        closeResponse(response);
+    }
 }

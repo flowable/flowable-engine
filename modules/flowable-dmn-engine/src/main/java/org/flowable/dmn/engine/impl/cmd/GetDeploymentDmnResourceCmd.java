@@ -28,22 +28,22 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
  */
 public class GetDeploymentDmnResourceCmd implements Command<InputStream>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String decisionTableId;
+    private static final long serialVersionUID = 1L;
+    protected String decisionTableId;
 
-  public GetDeploymentDmnResourceCmd(String decisionTableId) {
-    if (decisionTableId == null || decisionTableId.length() < 1) {
-      throw new FlowableIllegalArgumentException("The decision table id is mandatory, but '" + decisionTableId + "' has been provided.");
+    public GetDeploymentDmnResourceCmd(String decisionTableId) {
+        if (decisionTableId == null || decisionTableId.length() < 1) {
+            throw new FlowableIllegalArgumentException("The decision table id is mandatory, but '" + decisionTableId + "' has been provided.");
+        }
+        this.decisionTableId = decisionTableId;
     }
-    this.decisionTableId = decisionTableId;
-  }
 
-  public InputStream execute(CommandContext commandContext) {
-    DecisionTableEntity decisionTable = commandContext.getDmnEngineConfiguration().getDeploymentManager().findDeployedDecisionById(decisionTableId);
-    String deploymentId = decisionTable.getDeploymentId();
-    String resourceName = decisionTable.getResourceName();
-    InputStream processModelStream = new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
-    return processModelStream;
-  }
+    public InputStream execute(CommandContext commandContext) {
+        DecisionTableEntity decisionTable = commandContext.getDmnEngineConfiguration().getDeploymentManager().findDeployedDecisionById(decisionTableId);
+        String deploymentId = decisionTable.getDeploymentId();
+        String resourceName = decisionTable.getResourceName();
+        InputStream processModelStream = new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
+        return processModelStream;
+    }
 
 }

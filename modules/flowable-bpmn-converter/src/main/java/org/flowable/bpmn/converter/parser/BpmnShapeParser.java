@@ -26,34 +26,36 @@ import org.flowable.bpmn.model.GraphicInfo;
  */
 public class BpmnShapeParser implements BpmnXMLConstants {
 
-  public void parse(XMLStreamReader xtr, BpmnModel model) throws Exception {
+    public void parse(XMLStreamReader xtr, BpmnModel model) throws Exception {
 
-    String id = xtr.getAttributeValue(null, ATTRIBUTE_DI_BPMNELEMENT);
-    GraphicInfo graphicInfo = new GraphicInfo();
+        String id = xtr.getAttributeValue(null, ATTRIBUTE_DI_BPMNELEMENT);
+        GraphicInfo graphicInfo = new GraphicInfo();
 
-    String strIsExpanded = xtr.getAttributeValue(null, ATTRIBUTE_DI_IS_EXPANDED);
-    if ("true".equalsIgnoreCase(strIsExpanded)) {
-      graphicInfo.setExpanded(true);
+        String strIsExpanded = xtr.getAttributeValue(null, ATTRIBUTE_DI_IS_EXPANDED);
+        if ("true".equalsIgnoreCase(strIsExpanded)) {
+            graphicInfo.setExpanded(true);
+        } else if ("false".equalsIgnoreCase(strIsExpanded)) {
+            graphicInfo.setExpanded(false);
+        }
+
+        BpmnXMLUtil.addXMLLocation(graphicInfo, xtr);
+        while (xtr.hasNext()) {
+            xtr.next();
+            if (xtr.isStartElement() && ELEMENT_DI_BOUNDS.equalsIgnoreCase(xtr.getLocalName())) {
+                graphicInfo.setX(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_X)));
+                graphicInfo.setY(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_Y)));
+                graphicInfo.setWidth(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_WIDTH)));
+                graphicInfo.setHeight(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_HEIGHT)));
+
+                model.addGraphicInfo(id, graphicInfo);
+                break;
+            } else if (xtr.isEndElement() && ELEMENT_DI_SHAPE.equalsIgnoreCase(xtr.getLocalName())) {
+                break;
+            }
+        }
     }
 
-    BpmnXMLUtil.addXMLLocation(graphicInfo, xtr);
-    while (xtr.hasNext()) {
-      xtr.next();
-      if (xtr.isStartElement() && ELEMENT_DI_BOUNDS.equalsIgnoreCase(xtr.getLocalName())) {
-        graphicInfo.setX(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_X)));
-        graphicInfo.setY(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_Y)));
-        graphicInfo.setWidth(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_WIDTH)));
-        graphicInfo.setHeight(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_HEIGHT)));
-
-        model.addGraphicInfo(id, graphicInfo);
-        break;
-      } else if (xtr.isEndElement() && ELEMENT_DI_SHAPE.equalsIgnoreCase(xtr.getLocalName())) {
-        break;
-      }
+    public BaseElement parseElement() {
+        return null;
     }
-  }
-
-  public BaseElement parseElement() {
-    return null;
-  }
 }

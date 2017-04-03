@@ -29,7 +29,7 @@ public class AjaxAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication)
+            Authentication authentication)
             throws IOException, ServletException {
 
         response.setStatus(HttpServletResponse.SC_OK);

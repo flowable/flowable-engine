@@ -26,32 +26,32 @@ import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.Histor
  * @author Joram Barrez
  */
 public class MybatisHistoricIdentityLinkDataManager extends AbstractDataManager<HistoricIdentityLinkEntity> implements HistoricIdentityLinkDataManager {
-  
-  protected CachedEntityMatcher<HistoricIdentityLinkEntity> historicIdentityLinksByProcInstMatcher = new HistoricIdentityLinksByProcInstMatcher();
 
-  public MybatisHistoricIdentityLinkDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    super(processEngineConfiguration);
-  }
+    protected CachedEntityMatcher<HistoricIdentityLinkEntity> historicIdentityLinksByProcInstMatcher = new HistoricIdentityLinksByProcInstMatcher();
 
-  @Override
-  public Class<? extends HistoricIdentityLinkEntity> getManagedEntityClass() {
-    return HistoricIdentityLinkEntityImpl.class;
-  }
-  
-  @Override
-  public HistoricIdentityLinkEntity create() {
-    return new HistoricIdentityLinkEntityImpl();
-  }
-  
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByTaskId(String taskId) {
-    return getDbSqlSession().selectList("selectHistoricIdentityLinksByTask", taskId);
-  }
+    public MybatisHistoricIdentityLinkDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
 
-  @Override
-  public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByProcessInstanceId(final String processInstanceId) {
-    return getList("selectHistoricIdentityLinksByProcessInstance", processInstanceId, historicIdentityLinksByProcInstMatcher, true);
-  }
-  
+    @Override
+    public Class<? extends HistoricIdentityLinkEntity> getManagedEntityClass() {
+        return HistoricIdentityLinkEntityImpl.class;
+    }
+
+    @Override
+    public HistoricIdentityLinkEntity create() {
+        return new HistoricIdentityLinkEntityImpl();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByTaskId(String taskId) {
+        return getDbSqlSession().selectList("selectHistoricIdentityLinksByTask", taskId);
+    }
+
+    @Override
+    public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByProcessInstanceId(final String processInstanceId) {
+        return getList("selectHistoricIdentityLinksByProcessInstance", processInstanceId, historicIdentityLinksByProcInstMatcher, true);
+    }
+
 }

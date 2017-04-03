@@ -41,67 +41,67 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @RestController
 public class HistoricTaskQueryResource {
 
-  @Autowired
-  protected HistoryService historyService;
+    @Autowired
+    protected HistoryService historyService;
 
-  @Autowired
-  protected UserCache userCache;
+    @Autowired
+    protected UserCache userCache;
 
-  @Autowired
-  protected PermissionService permissionService;
+    @Autowired
+    protected PermissionService permissionService;
 
-  @RequestMapping(value = "/rest/query/history/tasks", method = RequestMethod.POST, produces = "application/json")
-  public ResultListDataRepresentation listTasks(@RequestBody ObjectNode requestNode) {
-    if (requestNode == null) {
-      throw new BadRequestException("No request found");
-    }
-
-    HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery();
-
-    User currentUser = SecurityUtils.getCurrentUserObject();
-
-    JsonNode processInstanceIdNode = requestNode.get("processInstanceId");
-    if (processInstanceIdNode != null && !processInstanceIdNode.isNull()) {
-      String processInstanceId = processInstanceIdNode.asText();
-      if (permissionService.hasReadPermissionOnProcessInstance(currentUser, processInstanceId)) {
-        taskQuery.processInstanceId(processInstanceId);
-      } else {
-        throw new NotPermittedException();
-      }
-    }
-
-    JsonNode finishedNode = requestNode.get("finished");
-    if (finishedNode != null && !finishedNode.isNull()) {
-      boolean isFinished = finishedNode.asBoolean();
-      if (isFinished) {
-        taskQuery.finished();
-      } else {
-        taskQuery.unfinished();
-      }
-    }
-
-    List<HistoricTaskInstance> tasks = taskQuery.list();
-
-    // get all users to have the user object available in the task on the client side
-    ResultListDataRepresentation result = new ResultListDataRepresentation(convertTaskInfoList(tasks));
-    return result;
-  }
-
-  protected List<TaskRepresentation> convertTaskInfoList(List<HistoricTaskInstance> tasks) {
-    List<TaskRepresentation> result = new ArrayList<TaskRepresentation>();
-    if (CollectionUtils.isNotEmpty(tasks)) {
-      TaskRepresentation representation = null;
-      for (HistoricTaskInstance task : tasks) {
-        representation = new TaskRepresentation(task);
-
-        CachedUser cachedUser = userCache.getUser(task.getAssignee());
-        if (cachedUser != null && cachedUser.getUser() != null) {
-          representation.setAssignee(new UserRepresentation(cachedUser.getUser()));
+    @RequestMapping(value = "/rest/query/history/tasks", method = RequestMethod.POST, produces = "application/json")
+    public ResultListDataRepresentation listTasks(@RequestBody ObjectNode requestNode) {
+        if (requestNode == null) {
+            throw new BadRequestException("No request found");
         }
 
-        result.add(representation);
-      }
+        HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery();
+
+        User currentUser = SecurityUtils.getCurrentUserObject();
+
+        JsonNode processInstanceIdNode = requestNode.get("processInstanceId");
+        if (processInstanceIdNode != null && !processInstanceIdNode.isNull()) {
+            String processInstanceId = processInstanceIdNode.asText();
+            if (permissionService.hasReadPermissionOnProcessInstance(currentUser, processInstanceId)) {
+                taskQuery.processInstanceId(processInstanceId);
+            } else {
+                throw new NotPermittedException();
+            }
+        }
+
+        JsonNode finishedNode = requestNode.get("finished");
+        if (finishedNode != null && !finishedNode.isNull()) {
+            boolean isFinished = finishedNode.asBoolean();
+            if (isFinished) {
+                taskQuery.finished();
+            } else {
+                taskQuery.unfinished();
+            }
+        }
+
+        List<HistoricTaskInstance> tasks = taskQuery.list();
+
+        // get all users to have the user object available in the task on the client side
+        ResultListDataRepresentation result = new ResultListDataRepresentation(convertTaskInfoList(tasks));
+        return result;
     }
-    return result;
-  }
+
+    protected List<TaskRepresentation> convertTaskInfoList(List<HistoricTaskInstance> tasks) {
+        List<TaskRepresentation> result = new ArrayList<TaskRepresentation>();
+        if (CollectionUtils.isNotEmpty(tasks)) {
+            TaskRepresentation representation = null;
+            for (HistoricTaskInstance task : tasks) {
+                representation = new TaskRepresentation(task);
+
+                CachedUser cachedUser = userCache.getUser(task.getAssignee());
+                if (cachedUser != null && cachedUser.getUser() != null) {
+                    representation.setAssignee(new UserRepresentation(cachedUser.getUser()));
+                }
+
+                result.add(representation);
+            }
+        }
+        return result;
+    }
 }

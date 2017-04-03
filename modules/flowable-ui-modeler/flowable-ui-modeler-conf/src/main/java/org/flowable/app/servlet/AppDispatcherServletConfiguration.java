@@ -34,7 +34,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
-@ComponentScan(value = {"org.flowable.app.rest"})
+@ComponentScan(value = { "org.flowable.app.rest" })
 @EnableAsync
 public class AppDispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
@@ -42,7 +42,7 @@ public class AppDispatcherServletConfiguration extends WebMvcConfigurationSuppor
 
     @Autowired
     private ObjectMapper objectMapper;
-    
+
     @Autowired
     private Environment environment;
 
@@ -72,15 +72,15 @@ public class AppDispatcherServletConfiguration extends WebMvcConfigurationSuppor
         RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();
         requestMappingHandlerMapping.setUseSuffixPatternMatch(false);
         requestMappingHandlerMapping.setRemoveSemicolonContent(false);
-        Object[] interceptors = {localeChangeInterceptor()};
+        Object[] interceptors = { localeChangeInterceptor() };
         requestMappingHandlerMapping.setInterceptors(interceptors);
         return requestMappingHandlerMapping;
     }
-    
+
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         addDefaultHttpMessageConverters(converters);
-        for (HttpMessageConverter<?> converter: converters) {
+        for (HttpMessageConverter<?> converter : converters) {
             if (converter instanceof MappingJackson2HttpMessageConverter) {
                 MappingJackson2HttpMessageConverter jackson2HttpMessageConverter = (MappingJackson2HttpMessageConverter) converter;
                 jackson2HttpMessageConverter.setObjectMapper(objectMapper);

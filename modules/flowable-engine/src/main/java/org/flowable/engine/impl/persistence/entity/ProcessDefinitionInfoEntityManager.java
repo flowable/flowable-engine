@@ -19,20 +19,20 @@ import org.flowable.engine.common.impl.persistence.entity.EntityManager;
  */
 public interface ProcessDefinitionInfoEntityManager extends EntityManager<ProcessDefinitionInfoEntity> {
 
-  void insertProcessDefinitionInfo(ProcessDefinitionInfoEntity processDefinitionInfo);
+    void insertProcessDefinitionInfo(ProcessDefinitionInfoEntity processDefinitionInfo);
 
-  void updateProcessDefinitionInfo(ProcessDefinitionInfoEntity updatedProcessDefinitionInfo);
+    void updateProcessDefinitionInfo(ProcessDefinitionInfoEntity updatedProcessDefinitionInfo);
 
-  void deleteProcessDefinitionInfo(String processDefinitionId);
-  
-  void updateInfoJson(String id, byte[] json);
-  
-  void deleteInfoJson(ProcessDefinitionInfoEntity processDefinitionInfo);
+    void deleteProcessDefinitionInfo(String processDefinitionId);
 
-  ProcessDefinitionInfoEntity findById(String id);
-  
-  ProcessDefinitionInfoEntity findProcessDefinitionInfoByProcessDefinitionId(String processDefinitionId);
-  
-  byte[] findInfoJsonById(String infoJsonId);
+    void updateInfoJson(String id, byte[] json);
+
+    void deleteInfoJson(ProcessDefinitionInfoEntity processDefinitionInfo);
+
+    ProcessDefinitionInfoEntity findById(String id);
+
+    ProcessDefinitionInfoEntity findProcessDefinitionInfoByProcessDefinitionId(String processDefinitionId);
+
+    byte[] findInfoJsonById(String infoJsonId);
 
 }

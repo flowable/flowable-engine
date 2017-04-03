@@ -20,7 +20,7 @@ import org.flowable.engine.impl.bpmn.parser.BpmnParser;
  */
 public class DefaultBpmnParseFactory implements BpmnParseFactory {
 
-  public BpmnParse createBpmnParse(BpmnParser bpmnParser) {
-    return new BpmnParse(bpmnParser);
-  }
+    public BpmnParse createBpmnParse(BpmnParser bpmnParser) {
+        return new BpmnParse(bpmnParser);
+    }
 }

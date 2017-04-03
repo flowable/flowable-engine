@@ -29,32 +29,32 @@ import org.flowable.engine.impl.delegate.invocation.TaskListenerInvocation;
  */
 public class DelegateExpressionTaskListener implements TaskListener {
 
-  protected Expression expression;
-  private final List<FieldDeclaration> fieldDeclarations;
+    protected Expression expression;
+    private final List<FieldDeclaration> fieldDeclarations;
 
-  public DelegateExpressionTaskListener(Expression expression, List<FieldDeclaration> fieldDeclarations) {
-    this.expression = expression;
-    this.fieldDeclarations = fieldDeclarations;
-  }
-
-  public void notify(DelegateTask delegateTask) {
-    Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, delegateTask, fieldDeclarations);
-    if (delegate instanceof TaskListener) {
-      try {
-        Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new TaskListenerInvocation((TaskListener) delegate, delegateTask));
-      } catch (Exception e) {
-        throw new FlowableException("Exception while invoking TaskListener: " + e.getMessage(), e);
-      }
-    } else {
-      throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + TaskListener.class);
+    public DelegateExpressionTaskListener(Expression expression, List<FieldDeclaration> fieldDeclarations) {
+        this.expression = expression;
+        this.fieldDeclarations = fieldDeclarations;
     }
-  }
 
-  /**
-   * returns the expression text for this task listener. Comes in handy if you want to check which listeners you already have.
-   */
-  public String getExpressionText() {
-    return expression.getExpressionText();
-  }
+    public void notify(DelegateTask delegateTask) {
+        Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, delegateTask, fieldDeclarations);
+        if (delegate instanceof TaskListener) {
+            try {
+                Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new TaskListenerInvocation((TaskListener) delegate, delegateTask));
+            } catch (Exception e) {
+                throw new FlowableException("Exception while invoking TaskListener: " + e.getMessage(), e);
+            }
+        } else {
+            throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + TaskListener.class);
+        }
+    }
+
+    /**
+     * returns the expression text for this task listener. Comes in handy if you want to check which listeners you already have.
+     */
+    public String getExpressionText() {
+        return expression.getExpressionText();
+    }
 
 }

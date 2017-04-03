@@ -22,24 +22,24 @@ import org.flowable.idm.engine.impl.interceptor.CommandExecutor;
 
 public class NativeTokenQueryImpl extends AbstractNativeQuery<NativeTokenQuery, Token> implements NativeTokenQuery {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public NativeTokenQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
+    public NativeTokenQueryImpl(CommandContext commandContext) {
+        super(commandContext);
+    }
 
-  public NativeTokenQueryImpl(CommandExecutor commandExecutor) {
-    super(commandExecutor);
-  }
+    public NativeTokenQueryImpl(CommandExecutor commandExecutor) {
+        super(commandExecutor);
+    }
 
-  // results ////////////////////////////////////////////////////////////////
+    // results ////////////////////////////////////////////////////////////////
 
-  public List<Token> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return commandContext.getTokenEntityManager().findTokensByNativeQuery(parameterMap, firstResult, maxResults);
-  }
+    public List<Token> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
+        return commandContext.getTokenEntityManager().findTokensByNativeQuery(parameterMap, firstResult, maxResults);
+    }
 
-  public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-    return commandContext.getTokenEntityManager().findTokenCountByNativeQuery(parameterMap);
-  }
+    public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
+        return commandContext.getTokenEntityManager().findTokenCountByNativeQuery(parameterMap);
+    }
 
 }

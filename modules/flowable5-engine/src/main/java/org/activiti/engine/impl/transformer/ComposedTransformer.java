@@ -21,17 +21,14 @@ import java.util.List;
  */
 public class ComposedTransformer extends AbstractTransformer {
 
-  protected List<Transformer> transformers;
-  
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected Object primTransform(Object anObject) throws Exception {
-    Object current = anObject;
-    for (Transformer transformer : this.transformers) {
-      current = transformer.transform(current);
+    protected List<Transformer> transformers;
+
+    @Override
+    protected Object primTransform(Object anObject) throws Exception {
+        Object current = anObject;
+        for (Transformer transformer : this.transformers) {
+            current = transformer.transform(current);
+        }
+        return current;
     }
-    return current;
-  }
 }

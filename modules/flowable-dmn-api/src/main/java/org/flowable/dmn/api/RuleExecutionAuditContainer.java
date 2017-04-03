@@ -21,57 +21,57 @@ import java.util.List;
  */
 public class RuleExecutionAuditContainer {
 
-  protected Date startTime;
-  protected Date endTime;
+    protected Date startTime;
+    protected Date endTime;
 
-  protected List<ExpressionExecution> conditionResults = new ArrayList<ExpressionExecution>();
-  protected List<ExpressionExecution> conclusionResults = new ArrayList<ExpressionExecution>();
+    protected List<ExpressionExecution> conditionResults = new ArrayList<ExpressionExecution>();
+    protected List<ExpressionExecution> conclusionResults = new ArrayList<ExpressionExecution>();
 
-  public RuleExecutionAuditContainer() {
-    this.startTime = new Date();
-  }
+    public RuleExecutionAuditContainer() {
+        this.startTime = new Date();
+    }
 
-  public void addConditionResult(ExpressionExecution expressionExecution) {
-    conditionResults.add(expressionExecution);
-  }
+    public void addConditionResult(ExpressionExecution expressionExecution) {
+        conditionResults.add(expressionExecution);
+    }
 
-  public void addConclusionResult(ExpressionExecution executionResult) {
-    conclusionResults.add(executionResult);
-  }
+    public void addConclusionResult(ExpressionExecution executionResult) {
+        conclusionResults.add(executionResult);
+    }
 
-  public void markRuleEnd() {
-    endTime = new Date();
-  }
+    public void markRuleEnd() {
+        endTime = new Date();
+    }
 
-  public Date getStartTime() {
-    return startTime;
-  }
+    public Date getStartTime() {
+        return startTime;
+    }
 
-  public void setStartTime(Date startTime) {
-    this.startTime = startTime;
-  }
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
 
-  public Date getEndTime() {
-    return endTime;
-  }
+    public Date getEndTime() {
+        return endTime;
+    }
 
-  public void setEndTime(Date endTime) {
-    this.endTime = endTime;
-  }
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
 
-  public List<ExpressionExecution> getConditionResults() {
-    return conditionResults;
-  }
+    public List<ExpressionExecution> getConditionResults() {
+        return conditionResults;
+    }
 
-  public void setConditionResults(List<ExpressionExecution> conditionResults) {
-    this.conditionResults = conditionResults;
-  }
+    public void setConditionResults(List<ExpressionExecution> conditionResults) {
+        this.conditionResults = conditionResults;
+    }
 
-  public List<ExpressionExecution> getConclusionResults() {
-    return conclusionResults;
-  }
+    public List<ExpressionExecution> getConclusionResults() {
+        return conclusionResults;
+    }
 
-  public void setConclusionResults(List<ExpressionExecution> conclusionResults) {
-    this.conclusionResults = conclusionResults;
-  }
+    public void setConclusionResults(List<ExpressionExecution> conclusionResults) {
+        this.conclusionResults = conclusionResults;
+    }
 }

@@ -29,81 +29,81 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public class ProcessDefinitionPersistenceTest extends PluggableFlowableTestCase {
 
-  public void testProcessDefinitionPersistence() {
-    String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/db/processOne.bpmn20.xml")
-        .addClasspathResource("org/flowable/engine/test/db/processTwo.bpmn20.xml").deploy().getId();
+    public void testProcessDefinitionPersistence() {
+        String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/db/processOne.bpmn20.xml")
+                .addClasspathResource("org/flowable/engine/test/db/processTwo.bpmn20.xml").deploy().getId();
 
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+        List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
 
-    assertEquals(2, processDefinitions.size());
+        assertEquals(2, processDefinitions.size());
 
-    repositoryService.deleteDeployment(deploymentId);
-  }
+        repositoryService.deleteDeployment(deploymentId);
+    }
 
-  public void testProcessDefinitionIntrospection() {
-    String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/db/processOne.bpmn20.xml").deploy().getId();
+    public void testProcessDefinitionIntrospection() {
+        String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/db/processOne.bpmn20.xml").deploy().getId();
 
-    String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
-    ProcessDefinition processDefinition = ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(procDefId);
+        String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+        ProcessDefinition processDefinition = ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(procDefId);
 
-    assertEquals(procDefId, processDefinition.getId());
-    assertEquals("Process One", processDefinition.getName());
-    
-    Process process = repositoryService.getBpmnModel(processDefinition.getId()).getMainProcess();
-    StartEvent startElement = (StartEvent) process.getFlowElement("start");
-    assertNotNull(startElement);
-    assertEquals("start", startElement.getId());
-    assertEquals("S t a r t", startElement.getName());
-    assertEquals("the start event", startElement.getDocumentation());
-    List<SequenceFlow> outgoingFlows = startElement.getOutgoingFlows();
-    assertEquals(1, outgoingFlows.size());
-    assertEquals("${a == b}", outgoingFlows.get(0).getConditionExpression());
+        assertEquals(procDefId, processDefinition.getId());
+        assertEquals("Process One", processDefinition.getName());
 
-    EndEvent endElement = (EndEvent) process.getFlowElement("end");
-    assertNotNull(endElement);
-    assertEquals("end", endElement.getId());
+        Process process = repositoryService.getBpmnModel(processDefinition.getId()).getMainProcess();
+        StartEvent startElement = (StartEvent) process.getFlowElement("start");
+        assertNotNull(startElement);
+        assertEquals("start", startElement.getId());
+        assertEquals("S t a r t", startElement.getName());
+        assertEquals("the start event", startElement.getDocumentation());
+        List<SequenceFlow> outgoingFlows = startElement.getOutgoingFlows();
+        assertEquals(1, outgoingFlows.size());
+        assertEquals("${a == b}", outgoingFlows.get(0).getConditionExpression());
 
-    assertEquals("flow1", outgoingFlows.get(0).getId());
-    assertEquals("Flow One", outgoingFlows.get(0).getName());
-    assertEquals("The only transitions in the process", outgoingFlows.get(0).getDocumentation());
-    assertSame(startElement, outgoingFlows.get(0).getSourceFlowElement());
-    assertSame(endElement, outgoingFlows.get(0).getTargetFlowElement());
+        EndEvent endElement = (EndEvent) process.getFlowElement("end");
+        assertNotNull(endElement);
+        assertEquals("end", endElement.getId());
 
-    repositoryService.deleteDeployment(deploymentId);
-  }
+        assertEquals("flow1", outgoingFlows.get(0).getId());
+        assertEquals("Flow One", outgoingFlows.get(0).getName());
+        assertEquals("The only transitions in the process", outgoingFlows.get(0).getDocumentation());
+        assertSame(startElement, outgoingFlows.get(0).getSourceFlowElement());
+        assertSame(endElement, outgoingFlows.get(0).getTargetFlowElement());
 
-  public void testProcessDefinitionQuery() {
-    String deployment1Id = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/db/processOne.bpmn20.xml")
-        .addClasspathResource("org/flowable/engine/test/db/processTwo.bpmn20.xml").deploy().getId();
+        repositoryService.deleteDeployment(deploymentId);
+    }
 
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionName().asc().orderByProcessDefinitionVersion().asc().list();
+    public void testProcessDefinitionQuery() {
+        String deployment1Id = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/db/processOne.bpmn20.xml")
+                .addClasspathResource("org/flowable/engine/test/db/processTwo.bpmn20.xml").deploy().getId();
 
-    assertEquals(2, processDefinitions.size());
+        List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionName().asc().orderByProcessDefinitionVersion().asc().list();
 
-    String deployment2Id = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/db/processOne.bpmn20.xml")
-        .addClasspathResource("org/flowable/engine/test/db/processTwo.bpmn20.xml").deploy().getId();
+        assertEquals(2, processDefinitions.size());
 
-    assertEquals(4, repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionName().asc().count());
-    assertEquals(2, repositoryService.createProcessDefinitionQuery().latestVersion().orderByProcessDefinitionName().asc().count());
+        String deployment2Id = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/db/processOne.bpmn20.xml")
+                .addClasspathResource("org/flowable/engine/test/db/processTwo.bpmn20.xml").deploy().getId();
 
-    repositoryService.deleteDeployment(deployment1Id);
-    repositoryService.deleteDeployment(deployment2Id);
-  }
+        assertEquals(4, repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionName().asc().count());
+        assertEquals(2, repositoryService.createProcessDefinitionQuery().latestVersion().orderByProcessDefinitionName().asc().count());
 
-  public void testProcessDefinitionGraphicalNotationFlag() {
-    String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/db/process-with-di.bpmn20.xml")
-        .addClasspathResource("org/flowable/engine/test/db/process-without-di.bpmn20.xml").deploy().getId();
+        repositoryService.deleteDeployment(deployment1Id);
+        repositoryService.deleteDeployment(deployment2Id);
+    }
 
-    assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
+    public void testProcessDefinitionGraphicalNotationFlag() {
+        String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/db/process-with-di.bpmn20.xml")
+                .addClasspathResource("org/flowable/engine/test/db/process-without-di.bpmn20.xml").deploy().getId();
 
-    ProcessDefinition processWithDi = repositoryService.createProcessDefinitionQuery().processDefinitionKey("processWithDi").singleResult();
-    assertTrue(processWithDi.hasGraphicalNotation());
+        assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
 
-    ProcessDefinition processWithoutDi = repositoryService.createProcessDefinitionQuery().processDefinitionKey("processWithoutDi").singleResult();
-    assertFalse(processWithoutDi.hasGraphicalNotation());
+        ProcessDefinition processWithDi = repositoryService.createProcessDefinitionQuery().processDefinitionKey("processWithDi").singleResult();
+        assertTrue(processWithDi.hasGraphicalNotation());
 
-    repositoryService.deleteDeployment(deploymentId);
+        ProcessDefinition processWithoutDi = repositoryService.createProcessDefinitionQuery().processDefinitionKey("processWithoutDi").singleResult();
+        assertFalse(processWithoutDi.hasGraphicalNotation());
 
-  }
+        repositoryService.deleteDeployment(deploymentId);
+
+    }
 
 }

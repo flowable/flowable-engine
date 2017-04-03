@@ -19,85 +19,85 @@ import java.util.Date;
  */
 public class AppModelDefinition {
 
-  protected String id;
-  protected String name;
-  protected Integer version;
-  protected Integer modelType;
-  protected String description;
-  protected Long stencilSetId;
-  protected String createdBy;
-  protected String lastUpdatedBy;
-  protected Date lastUpdated;
+    protected String id;
+    protected String name;
+    protected Integer version;
+    protected Integer modelType;
+    protected String description;
+    protected Long stencilSetId;
+    protected String createdBy;
+    protected String lastUpdatedBy;
+    protected Date lastUpdated;
 
-  public String getId() {
-    return id;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public void setId(String id) {
-    this.id = id;
-  }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public Integer getVersion() {
-    return version;
-  }
+    public Integer getVersion() {
+        return version;
+    }
 
-  public void setVersion(Integer version) {
-    this.version = version;
-  }
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
 
-  public Integer getModelType() {
-    return modelType;
-  }
+    public Integer getModelType() {
+        return modelType;
+    }
 
-  public void setModelType(Integer modelType) {
-    this.modelType = modelType;
-  }
+    public void setModelType(Integer modelType) {
+        this.modelType = modelType;
+    }
 
-  public String getDescription() {
-    return description;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-  public Long getStencilSetId() {
-    return stencilSetId;
-  }
+    public Long getStencilSetId() {
+        return stencilSetId;
+    }
 
-  public void setStencilSetId(Long stencilSetId) {
-    this.stencilSetId = stencilSetId;
-  }
+    public void setStencilSetId(Long stencilSetId) {
+        this.stencilSetId = stencilSetId;
+    }
 
-  public String getCreatedBy() {
-    return createdBy;
-  }
+    public String getCreatedBy() {
+        return createdBy;
+    }
 
-  public void setCreatedBy(String createdBy) {
-    this.createdBy = createdBy;
-  }
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 
-  public String getLastUpdatedBy() {
-    return lastUpdatedBy;
-  }
+    public String getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
 
-  public void setLastUpdatedBy(String lastUpdatedBy) {
-    this.lastUpdatedBy = lastUpdatedBy;
-  }
+    public void setLastUpdatedBy(String lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
 
-  public Date getLastUpdated() {
-    return lastUpdated;
-  }
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
 
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
-  }
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
 }

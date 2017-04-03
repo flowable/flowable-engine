@@ -12,11 +12,9 @@
  */
 package org.flowable.app.model.common;
 
-
 /**
  * @author Tijs Rademakers
  */
 public class AbstractRepresentation {
-	
-	
+
 }

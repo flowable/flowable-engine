@@ -12,7 +12,6 @@
  */
 package org.flowable.form.api;
 
-
 /**
  * An object structure representing a form
  * 
@@ -23,38 +22,38 @@ package org.flowable.form.api;
  */
 public interface FormDefinition {
 
-  /** unique identifier */
-  String getId();
+    /** unique identifier */
+    String getId();
 
-  /**
-   * category name of the form
-   */
-  String getCategory();
+    /**
+     * category name of the form
+     */
+    String getCategory();
 
-  /** label used for display purposes */
-  String getName();
+    /** label used for display purposes */
+    String getName();
 
-  /** unique name for all versions this form */
-  String getKey();
+    /** unique name for all versions this form */
+    String getKey();
 
-  /** description of this form **/
-  String getDescription();
+    /** description of this form **/
+    String getDescription();
 
-  /** version of this form */
-  int getVersion();
+    /** version of this form */
+    int getVersion();
 
-  /**
-   * name of {@link FormRepositoryService#getResourceAsStream(String, String) the resource} of this process definition.
-   */
-  String getResourceName();
+    /**
+     * name of {@link FormRepositoryService#getResourceAsStream(String, String) the resource} of this process definition.
+     */
+    String getResourceName();
 
-  /** The deployment in which this form is contained. */
-  String getDeploymentId();
-  
-  /** The parent deployment id in which this form is contained. */
-  String getParentDeploymentId();
+    /** The deployment in which this form is contained. */
+    String getDeploymentId();
 
-  /** The tenant identifier of this form */
-  String getTenantId();
+    /** The parent deployment id in which this form is contained. */
+    String getParentDeploymentId();
+
+    /** The tenant identifier of this form */
+    String getTenantId();
 
 }

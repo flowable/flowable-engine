@@ -23,18 +23,18 @@ import org.flowable.idm.api.event.FlowableIdmEventType;
  */
 public class FlowableIdmEntityEventImpl extends FlowableIdmEventImpl implements FlowableEntityEvent {
 
-  protected Object entity;
+    protected Object entity;
 
-  public FlowableIdmEntityEventImpl(Object entity, FlowableIdmEventType type) {
-    super(type);
-    if (entity == null) {
-      throw new FlowableIllegalArgumentException("Entity cannot be null.");
+    public FlowableIdmEntityEventImpl(Object entity, FlowableIdmEventType type) {
+        super(type);
+        if (entity == null) {
+            throw new FlowableIllegalArgumentException("Entity cannot be null.");
+        }
+        this.entity = entity;
     }
-    this.entity = entity;
-  }
 
-  @Override
-  public Object getEntity() {
-    return entity;
-  }
+    @Override
+    public Object getEntity() {
+        return entity;
+    }
 }

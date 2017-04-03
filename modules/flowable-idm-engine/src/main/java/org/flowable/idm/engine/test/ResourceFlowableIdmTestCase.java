@@ -23,41 +23,41 @@ import org.slf4j.LoggerFactory;
  * @author Joram Barrez
  */
 public abstract class ResourceFlowableIdmTestCase extends AbstractFlowableIdmTestCase {
-  
-  private static final Logger logger = LoggerFactory.getLogger(ResourceFlowableIdmTestCase.class);
 
-  protected String idmConfigurationResource;
-  protected String idmEngineName;
+    private static final Logger logger = LoggerFactory.getLogger(ResourceFlowableIdmTestCase.class);
 
-  public ResourceFlowableIdmTestCase(String idmConfigurationResource) {
-    this(idmConfigurationResource, null);
-  }
-  
-  public ResourceFlowableIdmTestCase(String idmConfigurationResource, String idmEngineName) {
-    this.idmConfigurationResource = idmConfigurationResource;
-    this.idmEngineName = idmEngineName;
-  }
+    protected String idmConfigurationResource;
+    protected String idmEngineName;
 
-  @Override
-  protected void closeDownIdmEngine() {
-    super.closeDownIdmEngine();
-    IdmEngines.unregister(idmEngine);
-    idmEngine = null;
-  }
-
-  @Override
-  protected void initializeIdmEngine() {
-    IdmEngineConfiguration config = IdmEngineConfiguration.createIdmEngineConfigurationFromResource(idmConfigurationResource);
-    if (idmEngineName != null) {
-      logger.info("Initializing idm engine with name '{}'", idmEngineName);
-      config.setEngineName(idmEngineName);
+    public ResourceFlowableIdmTestCase(String idmConfigurationResource) {
+        this(idmConfigurationResource, null);
     }
-    additionalConfiguration(config);
-    idmEngine = config.buildIdmEngine();
-  }
-  
-  protected void additionalConfiguration(IdmEngineConfiguration idmEngineConfiguration) {
-    
-  }
+
+    public ResourceFlowableIdmTestCase(String idmConfigurationResource, String idmEngineName) {
+        this.idmConfigurationResource = idmConfigurationResource;
+        this.idmEngineName = idmEngineName;
+    }
+
+    @Override
+    protected void closeDownIdmEngine() {
+        super.closeDownIdmEngine();
+        IdmEngines.unregister(idmEngine);
+        idmEngine = null;
+    }
+
+    @Override
+    protected void initializeIdmEngine() {
+        IdmEngineConfiguration config = IdmEngineConfiguration.createIdmEngineConfigurationFromResource(idmConfigurationResource);
+        if (idmEngineName != null) {
+            logger.info("Initializing idm engine with name '{}'", idmEngineName);
+            config.setEngineName(idmEngineName);
+        }
+        additionalConfiguration(config);
+        idmEngine = config.buildIdmEngine();
+    }
+
+    protected void additionalConfiguration(IdmEngineConfiguration idmEngineConfiguration) {
+
+    }
 
 }

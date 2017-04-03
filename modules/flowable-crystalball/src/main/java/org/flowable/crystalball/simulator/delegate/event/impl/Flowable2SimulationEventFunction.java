@@ -22,9 +22,9 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
  * @author martin.grofcik
  */
 public abstract class Flowable2SimulationEventFunction implements Function<FlowableEvent, SimulationEvent> {
-  protected final String simulationEventType;
+    protected final String simulationEventType;
 
-  public Flowable2SimulationEventFunction(String simulationEventType) {
-    this.simulationEventType = simulationEventType;
-  }
+    public Flowable2SimulationEventFunction(String simulationEventType) {
+        this.simulationEventType = simulationEventType;
+    }
 }

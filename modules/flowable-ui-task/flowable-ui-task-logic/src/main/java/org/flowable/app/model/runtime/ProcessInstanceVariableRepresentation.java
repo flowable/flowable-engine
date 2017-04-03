@@ -22,36 +22,36 @@ public class ProcessInstanceVariableRepresentation {
     private String id;
     private String type;
     private Object value;
-    
+
     public ProcessInstanceVariableRepresentation() {
     }
-    
+
     public ProcessInstanceVariableRepresentation(String id, String type, Object value) {
         this.id = id;
         this.type = type;
         this.value = value;
     }
-    
+
     public String getId() {
         return id;
     }
-    
+
     public void setType(String type) {
         this.type = type;
     }
-    
+
     public String getType() {
         return type;
     }
-    
+
     public void setId(String id) {
         this.id = id;
     }
-    
+
     public Object getValue() {
         return value;
     }
-    
+
     public void setValue(Object value) {
         this.value = value;
     }

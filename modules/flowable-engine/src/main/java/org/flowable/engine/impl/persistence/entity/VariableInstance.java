@@ -19,30 +19,30 @@ import org.flowable.engine.impl.variable.ValueFields;
 /**
  * @author Tijs Rademakers
  * 
- * Generic variable class that can be reused for V6 and V5 engine
+ *         Generic variable class that can be reused for V6 and V5 engine
  */
 public interface VariableInstance extends ValueFields, Entity, HasRevision {
-  
-  void setName(String name);
 
-  void setProcessInstanceId(String processInstanceId);
+    void setName(String name);
 
-  void setExecutionId(String executionId);
+    void setProcessInstanceId(String processInstanceId);
 
-  Object getValue();
+    void setExecutionId(String executionId);
 
-  void setValue(Object value);
+    Object getValue();
 
-  String getTypeName();
+    void setValue(Object value);
 
-  void setTypeName(String typeName);
+    String getTypeName();
 
-  String getProcessInstanceId();
+    void setTypeName(String typeName);
 
-  String getTaskId();
+    String getProcessInstanceId();
 
-  void setTaskId(String taskId);
+    String getTaskId();
 
-  String getExecutionId();
+    void setTaskId(String taskId);
+
+    String getExecutionId();
 
 }

@@ -131,6 +131,7 @@ create table ACT_HI_IDENTITYLINK (
     TYPE_ varchar(255),
     USER_ID_ varchar(255),
     TASK_ID_ varchar(64),
+    CREATE_TIME_ timestamp,
     PROC_INST_ID_ varchar(64),
     primary key (ID_)
 );

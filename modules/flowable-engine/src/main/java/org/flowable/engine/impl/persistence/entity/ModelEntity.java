@@ -25,16 +25,16 @@ import org.flowable.engine.repository.Model;
  */
 public interface ModelEntity extends Model, HasRevision, Entity {
 
-  void setCreateTime(Date createTime);
+    void setCreateTime(Date createTime);
 
-  void setLastUpdateTime(Date lastUpdateTime);
+    void setLastUpdateTime(Date lastUpdateTime);
 
-  String getEditorSourceValueId();
+    String getEditorSourceValueId();
 
-  void setEditorSourceValueId(String editorSourceValueId);
+    void setEditorSourceValueId(String editorSourceValueId);
 
-  String getEditorSourceExtraValueId();
+    String getEditorSourceExtraValueId();
 
-  void setEditorSourceExtraValueId(String editorSourceExtraValueId);
+    void setEditorSourceExtraValueId(String editorSourceExtraValueId);
 
 }

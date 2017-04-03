@@ -28,22 +28,22 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public class GetDeploymentProcessModelCmd implements Command<InputStream>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String processDefinitionId;
+    private static final long serialVersionUID = 1L;
+    protected String processDefinitionId;
 
-  public GetDeploymentProcessModelCmd(String processDefinitionId) {
-    if (processDefinitionId == null || processDefinitionId.length() < 1) {
-      throw new FlowableIllegalArgumentException("The process definition id is mandatory, but '" + processDefinitionId + "' has been provided.");
+    public GetDeploymentProcessModelCmd(String processDefinitionId) {
+        if (processDefinitionId == null || processDefinitionId.length() < 1) {
+            throw new FlowableIllegalArgumentException("The process definition id is mandatory, but '" + processDefinitionId + "' has been provided.");
+        }
+        this.processDefinitionId = processDefinitionId;
     }
-    this.processDefinitionId = processDefinitionId;
-  }
 
-  public InputStream execute(CommandContext commandContext) {
-    ProcessDefinition processDefinition = commandContext.getProcessEngineConfiguration().getDeploymentManager().findDeployedProcessDefinitionById(processDefinitionId);
-    String deploymentId = processDefinition.getDeploymentId();
-    String resourceName = processDefinition.getResourceName();
-    InputStream processModelStream = new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
-    return processModelStream;
-  }
+    public InputStream execute(CommandContext commandContext) {
+        ProcessDefinition processDefinition = commandContext.getProcessEngineConfiguration().getDeploymentManager().findDeployedProcessDefinitionById(processDefinitionId);
+        String deploymentId = processDefinition.getDeploymentId();
+        String resourceName = processDefinition.getResourceName();
+        InputStream processModelStream = new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
+        return processModelStream;
+    }
 
 }

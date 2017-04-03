@@ -30,74 +30,74 @@ import org.slf4j.LoggerFactory;
 
 public class ParsedDeploymentBuilder {
 
-  private static final Logger log = LoggerFactory.getLogger(ParsedDeploymentBuilder.class);
-  
-  public static final String[] DMN_RESOURCE_SUFFIXES = new String[] { "dmn" };
+    private static final Logger log = LoggerFactory.getLogger(ParsedDeploymentBuilder.class);
 
-  protected DmnDeploymentEntity deployment;
-  protected DmnParseFactory dmnParseFactory;
-  protected Map<String, Object> deploymentSettings;
+    public static final String[] DMN_RESOURCE_SUFFIXES = new String[] { "dmn" };
 
-  public ParsedDeploymentBuilder(DmnDeploymentEntity deployment, DmnParseFactory dmnParseFactory, Map<String, Object> deploymentSettings) {
-    this.deployment = deployment;
-    this.dmnParseFactory = dmnParseFactory;
-    this.deploymentSettings = deploymentSettings;
-  }
+    protected DmnDeploymentEntity deployment;
+    protected DmnParseFactory dmnParseFactory;
+    protected Map<String, Object> deploymentSettings;
 
-  public ParsedDeployment build() {
-    List<DecisionTableEntity> decisionTables = new ArrayList<DecisionTableEntity>();
-    Map<DecisionTableEntity, DmnParse> decisionTablesToDmnParseMap = new LinkedHashMap<DecisionTableEntity, DmnParse>();
-    Map<DecisionTableEntity, ResourceEntity> decisionTablesToResourceMap = new LinkedHashMap<DecisionTableEntity, ResourceEntity>();
+    public ParsedDeploymentBuilder(DmnDeploymentEntity deployment, DmnParseFactory dmnParseFactory, Map<String, Object> deploymentSettings) {
+        this.deployment = deployment;
+        this.dmnParseFactory = dmnParseFactory;
+        this.deploymentSettings = deploymentSettings;
+    }
 
-    for (ResourceEntity resource : deployment.getResources().values()) {
-      if (isDmnResource(resource.getName())) {
-        log.debug("Processing DMN resource {}", resource.getName());
-        DmnParse parse = createDmnParseFromResource(resource);
-        for (DecisionTableEntity decisionTable : parse.getDecisionTables()) {
-          decisionTables.add(decisionTable);
-          decisionTablesToDmnParseMap.put(decisionTable, parse);
-          decisionTablesToResourceMap.put(decisionTable, resource);
+    public ParsedDeployment build() {
+        List<DecisionTableEntity> decisionTables = new ArrayList<DecisionTableEntity>();
+        Map<DecisionTableEntity, DmnParse> decisionTablesToDmnParseMap = new LinkedHashMap<DecisionTableEntity, DmnParse>();
+        Map<DecisionTableEntity, ResourceEntity> decisionTablesToResourceMap = new LinkedHashMap<DecisionTableEntity, ResourceEntity>();
+
+        for (ResourceEntity resource : deployment.getResources().values()) {
+            if (isDmnResource(resource.getName())) {
+                log.debug("Processing DMN resource {}", resource.getName());
+                DmnParse parse = createDmnParseFromResource(resource);
+                for (DecisionTableEntity decisionTable : parse.getDecisionTables()) {
+                    decisionTables.add(decisionTable);
+                    decisionTablesToDmnParseMap.put(decisionTable, parse);
+                    decisionTablesToResourceMap.put(decisionTable, resource);
+                }
+            }
         }
-      }
+
+        return new ParsedDeployment(deployment, decisionTables, decisionTablesToDmnParseMap, decisionTablesToResourceMap);
     }
 
-    return new ParsedDeployment(deployment, decisionTables, decisionTablesToDmnParseMap, decisionTablesToResourceMap);
-  }
+    protected DmnParse createDmnParseFromResource(ResourceEntity resource) {
+        String resourceName = resource.getName();
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(resource.getBytes());
 
-  protected DmnParse createDmnParseFromResource(ResourceEntity resource) {
-    String resourceName = resource.getName();
-    ByteArrayInputStream inputStream = new ByteArrayInputStream(resource.getBytes());
+        DmnParse dmnParse = dmnParseFactory.createParse()
+                .sourceInputStream(inputStream)
+                .setSourceSystemId(resourceName)
+                .deployment(deployment)
+                .name(resourceName);
 
-    DmnParse dmnParse = dmnParseFactory.createParse()
-        .sourceInputStream(inputStream)
-        .setSourceSystemId(resourceName)
-        .deployment(deployment)
-        .name(resourceName);
+        if (deploymentSettings != null) {
 
-    if (deploymentSettings != null) {
+            // Schema validation if needed
+            if (deploymentSettings.containsKey(DeploymentSettings.IS_DMN_XSD_VALIDATION_ENABLED)) {
+                dmnParse.setValidateSchema((Boolean) deploymentSettings.get(DeploymentSettings.IS_DMN_XSD_VALIDATION_ENABLED));
+            }
 
-      // Schema validation if needed
-      if (deploymentSettings.containsKey(DeploymentSettings.IS_DMN_XSD_VALIDATION_ENABLED)) {
-        dmnParse.setValidateSchema((Boolean) deploymentSettings.get(DeploymentSettings.IS_DMN_XSD_VALIDATION_ENABLED));
-      }
+        } else {
+            // On redeploy, we assume it is validated at the first deploy
+            dmnParse.setValidateSchema(false);
+        }
 
-    } else {
-      // On redeploy, we assume it is validated at the first deploy
-      dmnParse.setValidateSchema(false);
-    }
-    
-    dmnParse.execute(Context.getDmnEngineConfiguration());
-    return dmnParse;
-  }
-
-  protected boolean isDmnResource(String resourceName) {
-    for (String suffix : DMN_RESOURCE_SUFFIXES) {
-      if (resourceName.endsWith(suffix)) {
-        return true;
-      }
+        dmnParse.execute(Context.getDmnEngineConfiguration());
+        return dmnParse;
     }
 
-    return false;
-  }
+    protected boolean isDmnResource(String resourceName) {
+        for (String suffix : DMN_RESOURCE_SUFFIXES) {
+            if (resourceName.endsWith(suffix)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 }

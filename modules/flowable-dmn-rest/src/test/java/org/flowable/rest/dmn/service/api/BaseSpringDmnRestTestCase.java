@@ -64,227 +64,227 @@ import junit.framework.AssertionFailedError;
 
 public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
 
-  private static Logger log = LoggerFactory.getLogger(BaseSpringDmnRestTestCase.class);
+    private static Logger log = LoggerFactory.getLogger(BaseSpringDmnRestTestCase.class);
 
-  protected static String SERVER_URL_PREFIX;
-  protected static DmnRestUrlBuilder URL_BUILDER;
+    protected static String SERVER_URL_PREFIX;
+    protected static DmnRestUrlBuilder URL_BUILDER;
 
-  protected static Server server;
-  protected static ApplicationContext appContext;
-  protected ObjectMapper objectMapper = new ObjectMapper();
+    protected static Server server;
+    protected static ApplicationContext appContext;
+    protected ObjectMapper objectMapper = new ObjectMapper();
 
-  protected static DmnEngine dmnEngine;
+    protected static DmnEngine dmnEngine;
 
-  protected String deploymentId;
-  protected Throwable exception;
+    protected String deploymentId;
+    protected Throwable exception;
 
-  protected static DmnEngineConfiguration dmnEngineConfiguration;
-  protected static DmnRepositoryService dmnRepositoryService;
-  protected static DmnRuleService dmnRuleService;
+    protected static DmnEngineConfiguration dmnEngineConfiguration;
+    protected static DmnRepositoryService dmnRepositoryService;
+    protected static DmnRuleService dmnRuleService;
 
-  protected static CloseableHttpClient client;
-  protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<CloseableHttpResponse>();
+    protected static CloseableHttpClient client;
+    protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<CloseableHttpResponse>();
 
-  static {
+    static {
 
-    TestServer testServer = TestServerUtil.createAndStartServer(ApplicationConfiguration.class);
-    server = testServer.getServer();
-    appContext = testServer.getApplicationContext();
-    SERVER_URL_PREFIX = testServer.getServerUrlPrefix();
-    URL_BUILDER = DmnRestUrlBuilder.usingBaseUrl(SERVER_URL_PREFIX);
+        TestServer testServer = TestServerUtil.createAndStartServer(ApplicationConfiguration.class);
+        server = testServer.getServer();
+        appContext = testServer.getApplicationContext();
+        SERVER_URL_PREFIX = testServer.getServerUrlPrefix();
+        URL_BUILDER = DmnRestUrlBuilder.usingBaseUrl(SERVER_URL_PREFIX);
 
-    // Lookup services
-    dmnEngine = DmnEngines.getDefaultDmnEngine();
-    dmnEngineConfiguration = appContext.getBean(DmnEngineConfiguration.class);
-    dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
-    dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
+        // Lookup services
+        dmnEngine = DmnEngines.getDefaultDmnEngine();
+        dmnEngineConfiguration = appContext.getBean(DmnEngineConfiguration.class);
+        dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
+        dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
 
-    // Create http client for all tests
-    CredentialsProvider provider = new BasicCredentialsProvider();
-    UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("kermit", "kermit");
-    provider.setCredentials(AuthScope.ANY, credentials);
-    client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
+        // Create http client for all tests
+        CredentialsProvider provider = new BasicCredentialsProvider();
+        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("kermit", "kermit");
+        provider.setCredentials(AuthScope.ANY, credentials);
+        client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
 
-    // Clean shutdown
-    Runtime.getRuntime().addShutdownHook(new Thread() {
+        // Clean shutdown
+        Runtime.getRuntime().addShutdownHook(new Thread() {
 
-      @Override
-      public void run() {
+            @Override
+            public void run() {
 
-        if (client != null) {
-          try {
-            client.close();
-          } catch (IOException e) {
-            log.error("Could not close http client", e);
-          }
-        }
+                if (client != null) {
+                    try {
+                        client.close();
+                    } catch (IOException e) {
+                        log.error("Could not close http client", e);
+                    }
+                }
 
-        if (server != null && server.isRunning()) {
-          try {
-            server.stop();
-          } catch (Exception e) {
-            log.error("Error stopping server", e);
-          }
-        }
-      }
-    });
-  }
-
-  @Override
-  public void runBare() throws Throwable {
-    try {
-      deploymentId = DmnTestHelper.annotationDeploymentSetUp(dmnEngine, getClass(), getName());
-
-      super.runBare();
-    } catch (AssertionFailedError e) {
-      log.error(EMPTY_LINE);
-      log.error("ASSERTION FAILED: {}", e, e);
-      exception = e;
-      throw e;
-
-    } catch (Throwable e) {
-      log.error(EMPTY_LINE);
-      log.error("EXCEPTION: {}", e, e);
-      exception = e;
-      throw e;
-
-    } finally {
-      DmnTestHelper.annotationDeploymentTearDown(dmnEngine, deploymentId, getClass(), getName());
-      DmnTestHelper.assertAndEnsureCleanDb(dmnEngine);
-      dmnEngineConfiguration.getClock().reset();
-      closeHttpConnections();
+                if (server != null && server.isRunning()) {
+                    try {
+                        server.stop();
+                    } catch (Exception e) {
+                        log.error("Error stopping server", e);
+                    }
+                }
+            }
+        });
     }
-  }
 
-  /**
-   * IMPORTANT: calling method is responsible for calling close() on returned {@link HttpResponse} to free the connection.
-   */
-  public CloseableHttpResponse executeRequest(HttpUriRequest request, int expectedStatusCode) {
-    return internalExecuteRequest(request, expectedStatusCode, true);
-  }
-
-  /**
-   * IMPORTANT: calling method is responsible for calling close() on returned {@link HttpResponse} to free the connection.
-   */
-  public CloseableHttpResponse executeBinaryRequest(HttpUriRequest request, int expectedStatusCode) {
-    return internalExecuteRequest(request, expectedStatusCode, false);
-  }
-
-  protected CloseableHttpResponse internalExecuteRequest(HttpUriRequest request, int expectedStatusCode, boolean addJsonContentType) {
-    CloseableHttpResponse response = null;
-    try {
-      if (addJsonContentType && request.getFirstHeader(HttpHeaders.CONTENT_TYPE) == null) {
-        // Revert to default content-type
-        request.addHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json"));
-      }
-      response = client.execute(request);
-      Assert.assertNotNull(response.getStatusLine());
-
-      int responseStatusCode = response.getStatusLine().getStatusCode();
-      if (expectedStatusCode != responseStatusCode) {
-        log.info("Wrong status code : {}, but should be {}", responseStatusCode, expectedStatusCode);
-        log.info("Response body: {}", IOUtils.toString(response.getEntity().getContent()));
-      }
-
-      Assert.assertEquals(expectedStatusCode, responseStatusCode);
-      httpResponses.add(response);
-      return response;
-
-    } catch (ClientProtocolException e) {
-      Assert.fail(e.getMessage());
-    } catch (IOException e) {
-      Assert.fail(e.getMessage());
-    }
-    return null;
-  }
-
-  public void closeResponse(CloseableHttpResponse response) {
-    if (response != null) {
-      try {
-        response.close();
-      } catch (IOException e) {
-        fail("Could not close http connection");
-      }
-    }
-  }
-
-  protected void closeHttpConnections() {
-    for (CloseableHttpResponse response : httpResponses) {
-      if (response != null) {
+    @Override
+    public void runBare() throws Throwable {
         try {
-          response.close();
-        } catch (IOException e) {
-          log.error("Could not close http connection", e);
+            deploymentId = DmnTestHelper.annotationDeploymentSetUp(dmnEngine, getClass(), getName());
+
+            super.runBare();
+        } catch (AssertionFailedError e) {
+            log.error(EMPTY_LINE);
+            log.error("ASSERTION FAILED: {}", e, e);
+            exception = e;
+            throw e;
+
+        } catch (Throwable e) {
+            log.error(EMPTY_LINE);
+            log.error("EXCEPTION: {}", e, e);
+            exception = e;
+            throw e;
+
+        } finally {
+            DmnTestHelper.annotationDeploymentTearDown(dmnEngine, deploymentId, getClass(), getName());
+            DmnTestHelper.assertAndEnsureCleanDb(dmnEngine);
+            dmnEngineConfiguration.getClock().reset();
+            closeHttpConnections();
         }
-      }
-    }
-    httpResponses.clear();
-  }
-
-  protected String encode(String string) {
-    if (string != null) {
-      try {
-        return URLEncoder.encode(string, "UTF-8");
-      } catch (UnsupportedEncodingException uee) {
-        throw new IllegalStateException("JVM does not support UTF-8 encoding.", uee);
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Checks if the returned "data" array (child-node of root-json node returned by invoking a GET on the given url) contains entries with the given ID's.
-   */
-  protected void assertResultsPresentInDataResponse(String url, String... expectedResourceIds) throws JsonProcessingException, IOException {
-    int numberOfResultsExpected = expectedResourceIds.length;
-
-    // Do the actual call
-    CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
-
-    // Check status and size
-    JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
-    closeResponse(response);
-    assertEquals(numberOfResultsExpected, dataNode.size());
-
-    // Check presence of ID's
-    List<String> toBeFound = new ArrayList<String>(Arrays.asList(expectedResourceIds));
-    Iterator<JsonNode> it = dataNode.iterator();
-    while (it.hasNext()) {
-      String id = it.next().get("id").textValue();
-      toBeFound.remove(id);
-    }
-    assertTrue("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
-  }
-
-  protected void assertResultsPresentInPostDataResponseWithStatusCheck(String url, ObjectNode body, int expectedStatusCode, String... expectedResourceIds) throws JsonProcessingException, IOException {
-    int numberOfResultsExpected = 0;
-    if (expectedResourceIds != null) {
-      numberOfResultsExpected = expectedResourceIds.length;
     }
 
-    // Do the actual call
-    HttpPost post = new HttpPost(SERVER_URL_PREFIX + url);
-    post.setEntity(new StringEntity(body.toString()));
-    CloseableHttpResponse response = executeRequest(post, expectedStatusCode);
+    /**
+     * IMPORTANT: calling method is responsible for calling close() on returned {@link HttpResponse} to free the connection.
+     */
+    public CloseableHttpResponse executeRequest(HttpUriRequest request, int expectedStatusCode) {
+        return internalExecuteRequest(request, expectedStatusCode, true);
+    }
 
-    if (expectedStatusCode == HttpStatus.SC_OK) {
-      // Check status and size
-      JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
-      JsonNode dataNode = rootNode.get("data");
-      assertEquals(numberOfResultsExpected, dataNode.size());
+    /**
+     * IMPORTANT: calling method is responsible for calling close() on returned {@link HttpResponse} to free the connection.
+     */
+    public CloseableHttpResponse executeBinaryRequest(HttpUriRequest request, int expectedStatusCode) {
+        return internalExecuteRequest(request, expectedStatusCode, false);
+    }
 
-      // Check presence of ID's
-      if (expectedResourceIds != null) {
+    protected CloseableHttpResponse internalExecuteRequest(HttpUriRequest request, int expectedStatusCode, boolean addJsonContentType) {
+        CloseableHttpResponse response = null;
+        try {
+            if (addJsonContentType && request.getFirstHeader(HttpHeaders.CONTENT_TYPE) == null) {
+                // Revert to default content-type
+                request.addHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json"));
+            }
+            response = client.execute(request);
+            Assert.assertNotNull(response.getStatusLine());
+
+            int responseStatusCode = response.getStatusLine().getStatusCode();
+            if (expectedStatusCode != responseStatusCode) {
+                log.info("Wrong status code : {}, but should be {}", responseStatusCode, expectedStatusCode);
+                log.info("Response body: {}", IOUtils.toString(response.getEntity().getContent()));
+            }
+
+            Assert.assertEquals(expectedStatusCode, responseStatusCode);
+            httpResponses.add(response);
+            return response;
+
+        } catch (ClientProtocolException e) {
+            Assert.fail(e.getMessage());
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        }
+        return null;
+    }
+
+    public void closeResponse(CloseableHttpResponse response) {
+        if (response != null) {
+            try {
+                response.close();
+            } catch (IOException e) {
+                fail("Could not close http connection");
+            }
+        }
+    }
+
+    protected void closeHttpConnections() {
+        for (CloseableHttpResponse response : httpResponses) {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    log.error("Could not close http connection", e);
+                }
+            }
+        }
+        httpResponses.clear();
+    }
+
+    protected String encode(String string) {
+        if (string != null) {
+            try {
+                return URLEncoder.encode(string, "UTF-8");
+            } catch (UnsupportedEncodingException uee) {
+                throw new IllegalStateException("JVM does not support UTF-8 encoding.", uee);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Checks if the returned "data" array (child-node of root-json node returned by invoking a GET on the given url) contains entries with the given ID's.
+     */
+    protected void assertResultsPresentInDataResponse(String url, String... expectedResourceIds) throws JsonProcessingException, IOException {
+        int numberOfResultsExpected = expectedResourceIds.length;
+
+        // Do the actual call
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        // Check status and size
+        JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
+        closeResponse(response);
+        assertEquals(numberOfResultsExpected, dataNode.size());
+
+        // Check presence of ID's
         List<String> toBeFound = new ArrayList<String>(Arrays.asList(expectedResourceIds));
         Iterator<JsonNode> it = dataNode.iterator();
         while (it.hasNext()) {
-          String id = it.next().get("id").textValue();
-          toBeFound.remove(id);
+            String id = it.next().get("id").textValue();
+            toBeFound.remove(id);
         }
-        assertTrue("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
-      }
+        assertTrue("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
     }
 
-    closeResponse(response);
-  }
+    protected void assertResultsPresentInPostDataResponseWithStatusCheck(String url, ObjectNode body, int expectedStatusCode, String... expectedResourceIds) throws JsonProcessingException, IOException {
+        int numberOfResultsExpected = 0;
+        if (expectedResourceIds != null) {
+            numberOfResultsExpected = expectedResourceIds.length;
+        }
+
+        // Do the actual call
+        HttpPost post = new HttpPost(SERVER_URL_PREFIX + url);
+        post.setEntity(new StringEntity(body.toString()));
+        CloseableHttpResponse response = executeRequest(post, expectedStatusCode);
+
+        if (expectedStatusCode == HttpStatus.SC_OK) {
+            // Check status and size
+            JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+            JsonNode dataNode = rootNode.get("data");
+            assertEquals(numberOfResultsExpected, dataNode.size());
+
+            // Check presence of ID's
+            if (expectedResourceIds != null) {
+                List<String> toBeFound = new ArrayList<String>(Arrays.asList(expectedResourceIds));
+                Iterator<JsonNode> it = dataNode.iterator();
+                while (it.hasNext()) {
+                    String id = it.next().get("id").textValue();
+                    toBeFound.remove(id);
+                }
+                assertTrue("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+            }
+        }
+
+        closeResponse(response);
+    }
 }

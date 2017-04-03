@@ -31,27 +31,27 @@ import org.flowable.validation.validator.ProcessLevelValidator;
  */
 public class EventSubprocessValidator extends ProcessLevelValidator {
 
-  @Override
-  protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
-    List<EventSubProcess> eventSubprocesses = process.findFlowElementsOfType(EventSubProcess.class);
-    for (EventSubProcess eventSubprocess : eventSubprocesses) {
+    @Override
+    protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
+        List<EventSubProcess> eventSubprocesses = process.findFlowElementsOfType(EventSubProcess.class);
+        for (EventSubProcess eventSubprocess : eventSubprocesses) {
 
-      List<StartEvent> startEvents = process.findFlowElementsInSubProcessOfType(eventSubprocess, StartEvent.class);
-      for (StartEvent startEvent : startEvents) {
-        if (startEvent.getEventDefinitions() != null && !startEvent.getEventDefinitions().isEmpty()) {
-          EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
-          if (!(eventDefinition instanceof org.flowable.bpmn.model.ErrorEventDefinition) && 
-              !(eventDefinition instanceof MessageEventDefinition) && 
-              !(eventDefinition instanceof SignalEventDefinition) &&
-              !(eventDefinition instanceof TimerEventDefinition)) {
-            
-            addError(errors, Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION, process, eventSubprocess, 
-                "start event of event subprocess must be of type 'error', 'timer', 'message' or 'signal'");
-          }
+            List<StartEvent> startEvents = process.findFlowElementsInSubProcessOfType(eventSubprocess, StartEvent.class);
+            for (StartEvent startEvent : startEvents) {
+                if (startEvent.getEventDefinitions() != null && !startEvent.getEventDefinitions().isEmpty()) {
+                    EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
+                    if (!(eventDefinition instanceof org.flowable.bpmn.model.ErrorEventDefinition) &&
+                            !(eventDefinition instanceof MessageEventDefinition) &&
+                            !(eventDefinition instanceof SignalEventDefinition) &&
+                            !(eventDefinition instanceof TimerEventDefinition)) {
+
+                        addError(errors, Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION, process, eventSubprocess,
+                                "start event of event subprocess must be of type 'error', 'timer', 'message' or 'signal'");
+                    }
+                }
+            }
+
         }
-      }
-
     }
-  }
 
 }

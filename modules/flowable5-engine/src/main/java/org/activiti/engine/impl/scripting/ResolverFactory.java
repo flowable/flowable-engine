@@ -15,12 +15,10 @@ package org.activiti.engine.impl.scripting;
 
 import org.flowable.engine.delegate.VariableScope;
 
-
-
 /**
  * @author Tom Baeyens
  */
 public interface ResolverFactory {
 
-  Resolver createResolver(VariableScope variableScope);
+    Resolver createResolver(VariableScope variableScope);
 }

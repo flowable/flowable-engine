@@ -26,106 +26,106 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  */
 public class ContentItemRepresentation extends AbstractRepresentation {
 
-  protected String id;
-  protected String name;
-  protected boolean contentAvailable;
-  protected String contentStoreId;
-  protected String contentStoreName;
-  protected String mimeType;
-  protected String simpleType;
-  protected Date created;
-  protected String createdBy;
+    protected String id;
+    protected String name;
+    protected boolean contentAvailable;
+    protected String contentStoreId;
+    protected String contentStoreName;
+    protected String mimeType;
+    protected String simpleType;
+    protected Date created;
+    protected String createdBy;
 
-  public ContentItemRepresentation() {
-  }
-
-  public ContentItemRepresentation(ContentItem content, SimpleContentTypeMapper mapper) {
-    this.id = content.getId();
-    this.name = content.getName();
-    this.contentStoreId = content.getContentStoreId();
-    this.contentStoreName = content.getContentStoreName();
-    this.created = content.getCreated();
-    this.createdBy = content.getCreatedBy();
-    this.contentAvailable = content.isContentAvailable();
-    this.mimeType = content.getMimeType();
-
-    if (mapper != null) {
-      this.simpleType = mapper.getSimpleType(content);
+    public ContentItemRepresentation() {
     }
-  }
 
-  public String getId() {
-    return id;
-  }
+    public ContentItemRepresentation(ContentItem content, SimpleContentTypeMapper mapper) {
+        this.id = content.getId();
+        this.name = content.getName();
+        this.contentStoreId = content.getContentStoreId();
+        this.contentStoreName = content.getContentStoreName();
+        this.created = content.getCreated();
+        this.createdBy = content.getCreatedBy();
+        this.contentAvailable = content.isContentAvailable();
+        this.mimeType = content.getMimeType();
 
-  public void setId(String id) {
-    this.id = id;
-  }
+        if (mapper != null) {
+            this.simpleType = mapper.getSimpleType(content);
+        }
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public Date getCreated() {
-    return created;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setCreated(Date created) {
-    this.created = created;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public String getCreatedBy() {
-    return createdBy;
-  }
+    public Date getCreated() {
+        return created;
+    }
 
-  public void setCreatedBy(String createdBy) {
-    this.createdBy = createdBy;
-  }
+    public void setCreated(Date created) {
+        this.created = created;
+    }
 
-  public boolean isContentAvailable() {
-    return contentAvailable;
-  }
+    public String getCreatedBy() {
+        return createdBy;
+    }
 
-  public void setContentAvailable(boolean contentAvailable) {
-    this.contentAvailable = contentAvailable;
-  }
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 
-  @JsonInclude(Include.NON_NULL)
-  public String getContentStoreId() {
-    return contentStoreId;
-  }
+    public boolean isContentAvailable() {
+        return contentAvailable;
+    }
 
-  public void setContentStoreId(String contentStoreId) {
-    this.contentStoreId = contentStoreId;
-  }
+    public void setContentAvailable(boolean contentAvailable) {
+        this.contentAvailable = contentAvailable;
+    }
 
-  @JsonInclude(Include.NON_NULL)
-  public String getContentStoreName() {
-    return contentStoreName;
-  }
+    @JsonInclude(Include.NON_NULL)
+    public String getContentStoreId() {
+        return contentStoreId;
+    }
 
-  public void setContentStoreName(String contentStoreName) {
-    this.contentStoreName = contentStoreName;
-  }
+    public void setContentStoreId(String contentStoreId) {
+        this.contentStoreId = contentStoreId;
+    }
 
-  public String getMimeType() {
-    return mimeType;
-  }
+    @JsonInclude(Include.NON_NULL)
+    public String getContentStoreName() {
+        return contentStoreName;
+    }
 
-  public void setMimeType(String mimeType) {
-    this.mimeType = mimeType;
-  }
+    public void setContentStoreName(String contentStoreName) {
+        this.contentStoreName = contentStoreName;
+    }
 
-  @JsonInclude(Include.NON_NULL)
-  public String getSimpleType() {
-    return simpleType;
-  }
+    public String getMimeType() {
+        return mimeType;
+    }
 
-  public void setSimpleType(String simpleType) {
-    this.simpleType = simpleType;
-  }
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
+    @JsonInclude(Include.NON_NULL)
+    public String getSimpleType() {
+        return simpleType;
+    }
+
+    public void setSimpleType(String simpleType) {
+        this.simpleType = simpleType;
+    }
 }

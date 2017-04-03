@@ -20,30 +20,29 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.TimerJobQuery;
 import org.flowable.engine.test.Deployment;
 
-
 public class ExclusiveTimerEventTest extends PluggableFlowableTestCase {
 
-  @Deployment
-  public void testCatchingTimerEvent() throws Exception {
-    Clock clock = processEngineConfiguration.getClock();
-    // Set the clock fixed
-    Date startTime = new Date();
-    clock.setCurrentTime(startTime);
-    processEngineConfiguration.setClock(clock);
+    @Deployment
+    public void testCatchingTimerEvent() throws Exception {
+        Clock clock = processEngineConfiguration.getClock();
+        // Set the clock fixed
+        Date startTime = new Date();
+        clock.setCurrentTime(startTime);
+        processEngineConfiguration.setClock(clock);
 
-    // After process start, there should be 3 timers created
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("exclusiveTimers");
-    TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
-    assertEquals(3, jobQuery.count());
+        // After process start, there should be 3 timers created
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("exclusiveTimers");
+        TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
+        assertEquals(3, jobQuery.count());
 
-    // After setting the clock to time '50minutes and 5 seconds', the timers should fire
-    clock.setCurrentTime(new Date(startTime.getTime() + ((50 * 60 * 1000) + 5000)));
-    processEngineConfiguration.setClock(clock);
-    waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5000L, 200L);
+        // After setting the clock to time '50minutes and 5 seconds', the timers should fire
+        clock.setCurrentTime(new Date(startTime.getTime() + ((50 * 60 * 1000) + 5000)));
+        processEngineConfiguration.setClock(clock);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5000L, 200L);
 
-    assertEquals(0, jobQuery.count());
-    assertProcessEnded(pi.getProcessInstanceId());
-    
-    processEngineConfiguration.resetClock();
-  }
+        assertEquals(0, jobQuery.count());
+        assertProcessEnded(pi.getProcessInstanceId());
+
+        processEngineConfiguration.resetClock();
+    }
 }

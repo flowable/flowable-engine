@@ -25,48 +25,48 @@ import org.flowable.engine.impl.util.TaskHelper;
  */
 public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
 
-  private static final long serialVersionUID = 1L;
-  protected Map<String, Object> variables;
-  protected Map<String, Object> transientVariables;
-  protected boolean localScope;
+    private static final long serialVersionUID = 1L;
+    protected Map<String, Object> variables;
+    protected Map<String, Object> transientVariables;
+    protected boolean localScope;
 
-  public CompleteTaskCmd(String taskId, Map<String, Object> variables) {
-    super(taskId);
-    this.variables = variables;
-  }
-
-  public CompleteTaskCmd(String taskId, Map<String, Object> variables, boolean localScope) {
-    this(taskId, variables);
-    this.localScope = localScope;
-  }
-  
-  public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
-    this(taskId, variables);
-    this.transientVariables = transientVariables;
-  }
-
-  protected Void execute(CommandContext commandContext, TaskEntity task) {
-    // Backwards compatibility
-    if (task.getProcessDefinitionId() != null) {
-      if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-        
-        if (transientVariables == null) {
-          compatibilityHandler.completeTask(task, variables, localScope);
-        } else {
-          compatibilityHandler.completeTask(task, variables, transientVariables);
-        }
-        return null;
-      }
+    public CompleteTaskCmd(String taskId, Map<String, Object> variables) {
+        super(taskId);
+        this.variables = variables;
     }
-    
-    TaskHelper.completeTask(task, variables, transientVariables, localScope, commandContext);
-    return null;
-  }
 
-  @Override
-  protected String getSuspendedTaskException() {
-    return "Cannot complete a suspended task";
-  }
+    public CompleteTaskCmd(String taskId, Map<String, Object> variables, boolean localScope) {
+        this(taskId, variables);
+        this.localScope = localScope;
+    }
+
+    public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
+        this(taskId, variables);
+        this.transientVariables = transientVariables;
+    }
+
+    protected Void execute(CommandContext commandContext, TaskEntity task) {
+        // Backwards compatibility
+        if (task.getProcessDefinitionId() != null) {
+            if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
+                Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+
+                if (transientVariables == null) {
+                    compatibilityHandler.completeTask(task, variables, localScope);
+                } else {
+                    compatibilityHandler.completeTask(task, variables, transientVariables);
+                }
+                return null;
+            }
+        }
+
+        TaskHelper.completeTask(task, variables, transientVariables, localScope, commandContext);
+        return null;
+    }
+
+    @Override
+    protected String getSuspendedTaskException() {
+        return "Cannot complete a suspended task";
+    }
 
 }

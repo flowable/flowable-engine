@@ -11,6 +11,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 public class ProcessDispatcherServletConfiguration extends BaseDispatcherServletConfiguration {
 
-  protected final Logger log = LoggerFactory.getLogger(ProcessDispatcherServletConfiguration.class);
+    protected final Logger log = LoggerFactory.getLogger(ProcessDispatcherServletConfiguration.class);
 
 }

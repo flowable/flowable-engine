@@ -18,63 +18,63 @@ import org.flowable.app.model.common.AbstractRepresentation;
 import org.flowable.idm.api.Token;
 
 public class TokenRepresentation extends AbstractRepresentation {
-  
-  protected String id;
-  protected String value;
-  protected Date date; 
-  protected String userId;
-  protected String data;
-  
-  public TokenRepresentation() {
-    
-  }
-  
-  public TokenRepresentation(Token token) {
-    setId(token.getId());
-    setValue(token.getTokenValue());
-    setDate(token.getTokenDate());
-    setUserId(token.getUserId());
-    setData(token.getTokenData());
-  }
 
-  public String getId() {
-    return id;
-  }
+    protected String id;
+    protected String value;
+    protected Date date;
+    protected String userId;
+    protected String data;
 
-  public void setId(String id) {
-    this.id = id;
-  }
+    public TokenRepresentation() {
 
-  public String getValue() {
-    return value;
-  }
+    }
 
-  public void setValue(String value) {
-    this.value = value;
-  }
+    public TokenRepresentation(Token token) {
+        setId(token.getId());
+        setValue(token.getTokenValue());
+        setDate(token.getTokenDate());
+        setUserId(token.getUserId());
+        setData(token.getTokenData());
+    }
 
-  public Date getDate() {
-    return date;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public void setDate(Date date) {
-    this.date = date;
-  }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public String getUserId() {
-    return userId;
-  }
+    public String getValue() {
+        return value;
+    }
 
-  public void setUserId(String userId) {
-    this.userId = userId;
-  }
+    public void setValue(String value) {
+        this.value = value;
+    }
 
-  public String getData() {
-    return data;
-  }
+    public Date getDate() {
+        return date;
+    }
 
-  public void setData(String data) {
-    this.data = data;
-  }
-  
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
 }

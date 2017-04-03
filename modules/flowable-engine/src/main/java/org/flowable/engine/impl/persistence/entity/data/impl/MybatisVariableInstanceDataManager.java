@@ -30,80 +30,80 @@ import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.Variab
  * @author Joram Barrez
  */
 public class MybatisVariableInstanceDataManager extends AbstractDataManager<VariableInstanceEntity> implements VariableInstanceDataManager {
-  
-  protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceEntity = new VariableByExecutionIdMatcher();
 
-  public MybatisVariableInstanceDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    super(processEngineConfiguration);
-  }
+    protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceEntity = new VariableByExecutionIdMatcher();
 
-  @Override
-  public Class<? extends VariableInstanceEntity> getManagedEntityClass() {
-    return VariableInstanceEntityImpl.class;
-  }
-  
-  @Override
-  public VariableInstanceEntity create() {
-    VariableInstanceEntityImpl variableInstanceEntity = new VariableInstanceEntityImpl();
-    variableInstanceEntity.setRevision(0); // For backwards compatibility, variables / HistoricVariableUpdate assumes revision 0 for the first time
-    return variableInstanceEntity;
-  }
-  
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<VariableInstanceEntity> findVariableInstancesByTaskId(String taskId) {
-    return getDbSqlSession().selectList("selectVariablesByTaskId", taskId);
-  }
-  
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<VariableInstanceEntity> findVariableInstancesByTaskIds(Set<String> taskIds) {
-    return getDbSqlSession().selectList("selectVariablesByTaskIds", taskIds);
-  }
-  
-  @Override
-  public List<VariableInstanceEntity> findVariableInstancesByExecutionId(final String executionId) {
-    return getList("selectVariablesByExecutionId", executionId, variableInstanceEntity, true);
-  }
-  
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<VariableInstanceEntity> findVariableInstancesByExecutionIds(Set<String> executionIds) {
-    return getDbSqlSession().selectList("selectVariablesByExecutionIds", executionIds);
-  }
+    public MybatisVariableInstanceDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
 
-  @Override
-  public VariableInstanceEntity findVariableInstanceByExecutionAndName(String executionId, String variableName) {
-    Map<String, String> params = new HashMap<String, String>(2);
-    params.put("executionId", executionId);
-    params.put("name", variableName);
-    return (VariableInstanceEntity) getDbSqlSession().selectOne("selectVariableInstanceByExecutionAndName", params);
-  }
+    @Override
+    public Class<? extends VariableInstanceEntity> getManagedEntityClass() {
+        return VariableInstanceEntityImpl.class;
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<VariableInstanceEntity> findVariableInstancesByExecutionAndNames(String executionId, Collection<String> names) {
-    Map<String, Object> params = new HashMap<String, Object>(2);
-    params.put("executionId", executionId);
-    params.put("names", names);
-    return getDbSqlSession().selectList("selectVariableInstancesByExecutionAndNames", params);
-  }
+    @Override
+    public VariableInstanceEntity create() {
+        VariableInstanceEntityImpl variableInstanceEntity = new VariableInstanceEntityImpl();
+        variableInstanceEntity.setRevision(0); // For backwards compatibility, variables / HistoricVariableUpdate assumes revision 0 for the first time
+        return variableInstanceEntity;
+    }
 
-  @Override
-  public VariableInstanceEntity findVariableInstanceByTaskAndName(String taskId, String variableName) {
-    Map<String, String> params = new HashMap<String, String>(2);
-    params.put("taskId", taskId);
-    params.put("name", variableName);
-    return (VariableInstanceEntity) getDbSqlSession().selectOne("selectVariableInstanceByTaskAndName", params);
-  }
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<VariableInstanceEntity> findVariableInstancesByTaskId(String taskId) {
+        return getDbSqlSession().selectList("selectVariablesByTaskId", taskId);
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<VariableInstanceEntity> findVariableInstancesByTaskAndNames(String taskId, Collection<String> names) {
-    Map<String, Object> params = new HashMap<String, Object>(2);
-    params.put("taskId", taskId);
-    params.put("names", names);
-    return getDbSqlSession().selectList("selectVariableInstancesByTaskAndNames", params);
-  }
-  
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<VariableInstanceEntity> findVariableInstancesByTaskIds(Set<String> taskIds) {
+        return getDbSqlSession().selectList("selectVariablesByTaskIds", taskIds);
+    }
+
+    @Override
+    public List<VariableInstanceEntity> findVariableInstancesByExecutionId(final String executionId) {
+        return getList("selectVariablesByExecutionId", executionId, variableInstanceEntity, true);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<VariableInstanceEntity> findVariableInstancesByExecutionIds(Set<String> executionIds) {
+        return getDbSqlSession().selectList("selectVariablesByExecutionIds", executionIds);
+    }
+
+    @Override
+    public VariableInstanceEntity findVariableInstanceByExecutionAndName(String executionId, String variableName) {
+        Map<String, String> params = new HashMap<String, String>(2);
+        params.put("executionId", executionId);
+        params.put("name", variableName);
+        return (VariableInstanceEntity) getDbSqlSession().selectOne("selectVariableInstanceByExecutionAndName", params);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<VariableInstanceEntity> findVariableInstancesByExecutionAndNames(String executionId, Collection<String> names) {
+        Map<String, Object> params = new HashMap<String, Object>(2);
+        params.put("executionId", executionId);
+        params.put("names", names);
+        return getDbSqlSession().selectList("selectVariableInstancesByExecutionAndNames", params);
+    }
+
+    @Override
+    public VariableInstanceEntity findVariableInstanceByTaskAndName(String taskId, String variableName) {
+        Map<String, String> params = new HashMap<String, String>(2);
+        params.put("taskId", taskId);
+        params.put("name", variableName);
+        return (VariableInstanceEntity) getDbSqlSession().selectOne("selectVariableInstanceByTaskAndName", params);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<VariableInstanceEntity> findVariableInstancesByTaskAndNames(String taskId, Collection<String> names) {
+        Map<String, Object> params = new HashMap<String, Object>(2);
+        params.put("taskId", taskId);
+        params.put("names", names);
+        return getDbSqlSession().selectList("selectVariableInstancesByTaskAndNames", params);
+    }
+
 }

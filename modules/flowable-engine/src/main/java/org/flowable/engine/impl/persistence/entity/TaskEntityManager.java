@@ -21,34 +21,34 @@ import org.flowable.engine.task.Task;
 
 public interface TaskEntityManager extends EntityManager<TaskEntity> {
 
-  void insert(TaskEntity taskEntity, ExecutionEntity execution);
-  
-  void changeTaskAssignee(TaskEntity taskEntity, String assignee);
-  
-  void changeTaskOwner(TaskEntity taskEntity, String owner);
+    void insert(TaskEntity taskEntity, ExecutionEntity execution);
 
-  List<TaskEntity> findTasksByExecutionId(String executionId);
+    void changeTaskAssignee(TaskEntity taskEntity, String assignee);
 
-  List<TaskEntity> findTasksByProcessInstanceId(String processInstanceId);
+    void changeTaskOwner(TaskEntity taskEntity, String owner);
 
-  List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery);
+    List<TaskEntity> findTasksByExecutionId(String executionId);
 
-  List<Task> findTasksAndVariablesByQueryCriteria(TaskQueryImpl taskQuery);
+    List<TaskEntity> findTasksByProcessInstanceId(String processInstanceId);
 
-  long findTaskCountByQueryCriteria(TaskQueryImpl taskQuery);
+    List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery);
 
-  List<Task> findTasksByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<Task> findTasksWithRelatedEntitiesByQueryCriteria(TaskQueryImpl taskQuery);
 
-  long findTaskCountByNativeQuery(Map<String, Object> parameterMap);
+    long findTaskCountByQueryCriteria(TaskQueryImpl taskQuery);
 
-  List<Task> findTasksByParentTaskId(String parentTaskId);
+    List<Task> findTasksByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
 
-  void updateTaskTenantIdForDeployment(String deploymentId, String newTenantId);
+    long findTaskCountByNativeQuery(Map<String, Object> parameterMap);
 
-  void deleteTask(String taskId, String deleteReason, boolean cascade);
-  
-  void deleteTasksByProcessInstanceId(String processInstanceId, String deleteReason, boolean cascade);
+    List<Task> findTasksByParentTaskId(String parentTaskId);
 
-  void deleteTask(TaskEntity task, String deleteReason, boolean cascade, boolean cancel);
+    void updateTaskTenantIdForDeployment(String deploymentId, String newTenantId);
+
+    void deleteTask(String taskId, String deleteReason, boolean cascade);
+
+    void deleteTasksByProcessInstanceId(String processInstanceId, String deleteReason, boolean cascade);
+
+    void deleteTask(TaskEntity task, String deleteReason, boolean cascade, boolean cancel);
 
 }

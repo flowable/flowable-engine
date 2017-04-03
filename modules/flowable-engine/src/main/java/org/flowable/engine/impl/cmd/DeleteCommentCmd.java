@@ -31,76 +31,76 @@ import org.flowable.engine.task.Task;
  */
 public class DeleteCommentCmd implements Command<Void>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String taskId;
-  protected String processInstanceId;
-  protected String commentId;
+    private static final long serialVersionUID = 1L;
+    protected String taskId;
+    protected String processInstanceId;
+    protected String commentId;
 
-  public DeleteCommentCmd(String taskId, String processInstanceId, String commentId) {
-    this.taskId = taskId;
-    this.processInstanceId = processInstanceId;
-    this.commentId = commentId;
-  }
-
-  public Void execute(CommandContext commandContext) {
-    CommentEntityManager commentManager = commandContext.getCommentEntityManager();
-
-    if (commentId != null) {
-      // Delete for an individual comment
-      Comment comment = commentManager.findComment(commentId);
-      if (comment == null) {
-        throw new FlowableObjectNotFoundException("Comment with id '" + commentId + "' doesn't exists.", Comment.class);
-      }
-      
-      if (comment.getProcessInstanceId() != null) {
-        ExecutionEntity execution = (ExecutionEntity) commandContext.getExecutionEntityManager().findById(comment.getProcessInstanceId());
-        if (execution != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-          Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-          compatibilityHandler.deleteComment(commentId, taskId, processInstanceId);
-          return null;
-        }
-      
-      } else if (comment.getTaskId() != null) {
-        Task task = commandContext.getTaskEntityManager().findById(comment.getTaskId());
-        if (task != null && task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-          Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-          compatibilityHandler.deleteComment(commentId, taskId, processInstanceId);
-          return null;
-        }
-      }
-      
-      commentManager.delete((CommentEntity) comment);
-
-    } else {
-      // Delete all comments on a task of process
-      ArrayList<Comment> comments = new ArrayList<Comment>();
-      if (processInstanceId != null) {
-        
-        ExecutionEntity execution = (ExecutionEntity) commandContext.getExecutionEntityManager().findById(processInstanceId);
-        if (execution != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-          Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-          compatibilityHandler.deleteComment(commentId, taskId, processInstanceId);
-          return null;
-        }
-        
-        comments.addAll(commentManager.findCommentsByProcessInstanceId(processInstanceId));
-      }
-      if (taskId != null) {
-        
-        Task task = commandContext.getTaskEntityManager().findById(taskId);
-        if (task != null && task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-          Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-          compatibilityHandler.deleteComment(commentId, taskId, processInstanceId);
-          return null;
-        }
-        
-        comments.addAll(commentManager.findCommentsByTaskId(taskId));
-      }
-
-      for (Comment comment : comments) {
-        commentManager.delete((CommentEntity) comment);
-      }
+    public DeleteCommentCmd(String taskId, String processInstanceId, String commentId) {
+        this.taskId = taskId;
+        this.processInstanceId = processInstanceId;
+        this.commentId = commentId;
     }
-    return null;
-  }
+
+    public Void execute(CommandContext commandContext) {
+        CommentEntityManager commentManager = commandContext.getCommentEntityManager();
+
+        if (commentId != null) {
+            // Delete for an individual comment
+            Comment comment = commentManager.findComment(commentId);
+            if (comment == null) {
+                throw new FlowableObjectNotFoundException("Comment with id '" + commentId + "' doesn't exists.", Comment.class);
+            }
+
+            if (comment.getProcessInstanceId() != null) {
+                ExecutionEntity execution = (ExecutionEntity) commandContext.getExecutionEntityManager().findById(comment.getProcessInstanceId());
+                if (execution != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
+                    Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+                    compatibilityHandler.deleteComment(commentId, taskId, processInstanceId);
+                    return null;
+                }
+
+            } else if (comment.getTaskId() != null) {
+                Task task = commandContext.getTaskEntityManager().findById(comment.getTaskId());
+                if (task != null && task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
+                    Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+                    compatibilityHandler.deleteComment(commentId, taskId, processInstanceId);
+                    return null;
+                }
+            }
+
+            commentManager.delete((CommentEntity) comment);
+
+        } else {
+            // Delete all comments on a task of process
+            ArrayList<Comment> comments = new ArrayList<Comment>();
+            if (processInstanceId != null) {
+
+                ExecutionEntity execution = (ExecutionEntity) commandContext.getExecutionEntityManager().findById(processInstanceId);
+                if (execution != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
+                    Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+                    compatibilityHandler.deleteComment(commentId, taskId, processInstanceId);
+                    return null;
+                }
+
+                comments.addAll(commentManager.findCommentsByProcessInstanceId(processInstanceId));
+            }
+            if (taskId != null) {
+
+                Task task = commandContext.getTaskEntityManager().findById(taskId);
+                if (task != null && task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
+                    Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+                    compatibilityHandler.deleteComment(commentId, taskId, processInstanceId);
+                    return null;
+                }
+
+                comments.addAll(commentManager.findCommentsByTaskId(taskId));
+            }
+
+            for (Comment comment : comments) {
+                commentManager.delete((CommentEntity) comment);
+            }
+        }
+        return null;
+    }
 }

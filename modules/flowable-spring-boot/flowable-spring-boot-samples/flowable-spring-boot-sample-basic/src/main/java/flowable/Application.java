@@ -14,7 +14,7 @@ import java.util.Collections;
 @SpringBootApplication
 public class Application {
 
-    //  establish that it's detected the processes and that we can deploy one.
+    // establish that it's detected the processes and that we can deploy one.
     @Bean
     CommandLineRunner basics(final RuntimeService runtimeService) {
         return new CommandLineRunner() {

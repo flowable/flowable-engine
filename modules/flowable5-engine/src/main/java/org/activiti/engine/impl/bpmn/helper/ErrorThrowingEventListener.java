@@ -20,47 +20,46 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
 
 /**
- * An {@link FlowableEventListener} that throws a error event when an event is
- * dispatched to it.
+ * An {@link FlowableEventListener} that throws a error event when an event is dispatched to it.
  * 
  * @author Frederik Heremans
  * 
  */
 public class ErrorThrowingEventListener extends BaseDelegateEventListener {
-	
-	protected String errorCode;
 
-	@Override
-	public void onEvent(FlowableEvent event) {
-		if (isValidEvent(event) && event instanceof FlowableEngineEvent) {
-		  FlowableEngineEvent engineEvent = (FlowableEngineEvent) event;
-			ExecutionEntity execution = null;
-			
-			if (Context.isExecutionContextActive()) {
-				execution = Context.getExecutionContext().getExecution();
-			} else if (engineEvent.getExecutionId() != null){
-				// Get the execution based on the event's execution ID instead
-				execution = Context.getCommandContext().getExecutionEntityManager().findExecutionById(engineEvent.getExecutionId());
-			}
-			
-			if(execution == null) {
-				throw new ActivitiException("No execution context active and event is not related to an execution. No compensation event can be thrown.");
-			}
-			
-			try {
-				ErrorPropagation.propagateError(errorCode, execution);
-			} catch (Exception e) {
-				throw new ActivitiException("Error while propagating error-event", e);
-			}    
-		}
-	}
+    protected String errorCode;
 
-	public void setErrorCode(String errorCode) {
-	  this.errorCode = errorCode;
-  }
+    @Override
+    public void onEvent(FlowableEvent event) {
+        if (isValidEvent(event) && event instanceof FlowableEngineEvent) {
+            FlowableEngineEvent engineEvent = (FlowableEngineEvent) event;
+            ExecutionEntity execution = null;
 
-	@Override
-	public boolean isFailOnException() {
-		return true;
-	}
+            if (Context.isExecutionContextActive()) {
+                execution = Context.getExecutionContext().getExecution();
+            } else if (engineEvent.getExecutionId() != null) {
+                // Get the execution based on the event's execution ID instead
+                execution = Context.getCommandContext().getExecutionEntityManager().findExecutionById(engineEvent.getExecutionId());
+            }
+
+            if (execution == null) {
+                throw new ActivitiException("No execution context active and event is not related to an execution. No compensation event can be thrown.");
+            }
+
+            try {
+                ErrorPropagation.propagateError(errorCode, execution);
+            } catch (Exception e) {
+                throw new ActivitiException("Error while propagating error-event", e);
+            }
+        }
+    }
+
+    public void setErrorCode(String errorCode) {
+        this.errorCode = errorCode;
+    }
+
+    @Override
+    public boolean isFailOnException() {
+        return true;
+    }
 }

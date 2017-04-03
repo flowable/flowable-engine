@@ -20,9 +20,9 @@ import org.flowable.engine.impl.interceptor.CommandInterceptor;
  */
 public class StandaloneProcessEngineConfiguration extends ProcessEngineConfigurationImpl {
 
-  @Override
-  public CommandInterceptor createTransactionInterceptor() {
-    return null;
-  }
+    @Override
+    public CommandInterceptor createTransactionInterceptor() {
+        return null;
+    }
 
 }

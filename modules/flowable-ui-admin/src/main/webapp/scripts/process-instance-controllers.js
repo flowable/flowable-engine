@@ -138,7 +138,8 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
 
                 $scope.tabData.tabs.push({id: 'decisionTables', name: 'PROCESS-INSTANCE.TITLE.DECISION-TABLES'});
                 $scope.tabData.tabs.push({id: 'forms', name: 'PROCESS-INSTANCE.TITLE.FORM-INSTANCES'});
-                $scope.loadDecisionTables();
+                //TODO: implement when decision task runtime data is stored
+                // $scope.loadDecisionTables();
                 $scope.loadFormInstances();
             }).error(function (data, status, headers, config) {
                 if (data && data.message) {

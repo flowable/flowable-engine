@@ -19,6 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormService;
@@ -34,63 +35,59 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Form Instance Models" }, description = "Manage Form Instance Models")
+@Api(tags = { "Form Instance Models" }, description = "Manage Form Instance Models", authorizations = { @Authorization(value = "basicAuth") })
 public class FormInstanceModelResource {
 
-  @Autowired
-  protected FormService formService;
+    @Autowired
+    protected FormService formService;
 
-  @Autowired
-  protected FormRestResponseFactory formRestResponseFactory;
+    @Autowired
+    protected FormRestResponseFactory formRestResponseFactory;
 
-  @ApiOperation(value = "Get a form instance model", tags = {"Form Instance Models"},  nickname = "getFormInstanceModel")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Indicates the form instance was found and the model is returned."),
-      @ApiResponse(code = 404, message = "Indicates the form instance was not found.")
-  })
-  @RequestMapping(value = "/form/form-instance-model", method = RequestMethod.POST, produces = "application/json")
-  public FormInstanceModelResponse getFormInstanceModel(@ApiParam(name = "formInstanceModelRequest") @RequestBody FormRequest formRequest, HttpServletRequest request) {
+    @ApiOperation(value = "Get a form instance model", tags = { "Form Instance Models" }, nickname = "getFormInstanceModel")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the form instance was found and the model is returned."),
+            @ApiResponse(code = 404, message = "Indicates the form instance was not found.")
+    })
+    @RequestMapping(value = "/form/form-instance-model", method = RequestMethod.POST, produces = "application/json")
+    public FormInstanceModelResponse getFormInstanceModel(@ApiParam(name = "formInstanceModelRequest") @RequestBody FormRequest formRequest, HttpServletRequest request) {
 
-    FormInstanceModel formInstanceModel;
+        FormInstanceModel formInstanceModel;
 
-    if (formRequest.getFormInstanceId() != null) {
-      formInstanceModel = formService.getFormInstanceModelById(
-          formRequest.getFormInstanceId(),
-          null
-      );
-    } else if (formRequest.getParentDeploymentId() != null) {
-      formInstanceModel = formService.getFormInstanceModelByKeyAndParentDeploymentId(
-          formRequest.getParentDeploymentId(),
-          formRequest.getFormDefinitionKey(),
-          formRequest.getTaskId(),
-          formRequest.getProcessInstanceId(),
-          formRequest.getVariables(),
-          formRequest.getTenantId()
-      );
-    } else if (formRequest.getFormDefinitionKey() != null) {
-      formInstanceModel = formService.getFormInstanceModelByKey(
-          formRequest.getFormDefinitionKey(),
-          formRequest.getTaskId(),
-          formRequest.getProcessInstanceId(),
-          formRequest.getVariables(),
-          formRequest.getTenantId()
-      );
-    } else if (formRequest.getFormDefinitionId() != null) {
-      formInstanceModel = formService.getFormInstanceModelById(
-          formRequest.getFormDefinitionId(),
-          formRequest.getTaskId(),
-          formRequest.getProcessInstanceId(),
-          formRequest.getVariables(),
-          formRequest.getTenantId()
-      );
-    } else {
-      throw new FlowableIllegalArgumentException("Either parent deployment key, form definition key or form definition id must be provided in the request");
+        if (formRequest.getFormInstanceId() != null) {
+            formInstanceModel = formService.getFormInstanceModelById(
+                    formRequest.getFormInstanceId(),
+                    null);
+        } else if (formRequest.getParentDeploymentId() != null) {
+            formInstanceModel = formService.getFormInstanceModelByKeyAndParentDeploymentId(
+                    formRequest.getParentDeploymentId(),
+                    formRequest.getFormDefinitionKey(),
+                    formRequest.getTaskId(),
+                    formRequest.getProcessInstanceId(),
+                    formRequest.getVariables(),
+                    formRequest.getTenantId());
+        } else if (formRequest.getFormDefinitionKey() != null) {
+            formInstanceModel = formService.getFormInstanceModelByKey(
+                    formRequest.getFormDefinitionKey(),
+                    formRequest.getTaskId(),
+                    formRequest.getProcessInstanceId(),
+                    formRequest.getVariables(),
+                    formRequest.getTenantId());
+        } else if (formRequest.getFormDefinitionId() != null) {
+            formInstanceModel = formService.getFormInstanceModelById(
+                    formRequest.getFormDefinitionId(),
+                    formRequest.getTaskId(),
+                    formRequest.getProcessInstanceId(),
+                    formRequest.getVariables(),
+                    formRequest.getTenantId());
+        } else {
+            throw new FlowableIllegalArgumentException("Either parent deployment key, form definition key or form definition id must be provided in the request");
+        }
+
+        if (formInstanceModel == null) {
+            throw new FlowableObjectNotFoundException("Could not find a form instance");
+        }
+
+        return formRestResponseFactory.createFormInstanceModelResponse(formInstanceModel);
     }
-
-    if (formInstanceModel == null) {
-      throw new FlowableObjectNotFoundException("Could not find a form instance");
-    }
-
-    return formRestResponseFactory.createFormInstanceModelResponse(formInstanceModel);
-  }
 }

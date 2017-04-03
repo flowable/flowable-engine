@@ -21,15 +21,15 @@ import org.flowable.engine.impl.bpmn.parser.BpmnParse;
  */
 public class EventSubProcessParseHandler extends AbstractActivityBpmnParseHandler<EventSubProcess> {
 
-  protected Class<? extends BaseElement> getHandledType() {
-    return EventSubProcess.class;
-  }
+    protected Class<? extends BaseElement> getHandledType() {
+        return EventSubProcess.class;
+    }
 
-  @Override
-  protected void executeParse(BpmnParse bpmnParse, EventSubProcess eventSubProcess) {
-    eventSubProcess.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubprocessActivityBehavior(eventSubProcess));
-    bpmnParse.processFlowElements(eventSubProcess.getFlowElements());
-    processArtifacts(bpmnParse, eventSubProcess.getArtifacts());
-  }
+    @Override
+    protected void executeParse(BpmnParse bpmnParse, EventSubProcess eventSubProcess) {
+        eventSubProcess.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubprocessActivityBehavior(eventSubProcess));
+        bpmnParse.processFlowElements(eventSubProcess.getFlowElements());
+        processArtifacts(bpmnParse, eventSubProcess.getArtifacts());
+    }
 
 }

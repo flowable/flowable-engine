@@ -18,7 +18,7 @@ package org.flowable.engine.impl.scripting;
  */
 public interface Resolver {
 
-  boolean containsKey(Object key);
+    boolean containsKey(Object key);
 
-  Object get(Object key);
+    Object get(Object key);
 }

@@ -24,32 +24,32 @@ import org.flowable.engine.repository.Deployment;
  */
 public class DeploymentCacheLimitTest extends ResourceFlowableTestCase {
 
-  public DeploymentCacheLimitTest() {
-    super("org/flowable/standalone/deploy/deployment.cache.limit.test.flowable.cfg.xml");
-  }
-
-  public void testDeploymentCacheLimit() {
-    int processDefinitionCacheLimit = 3; // This is set in the configuration
-                                         // above
-
-    DefaultDeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache = (DefaultDeploymentCache<ProcessDefinitionCacheEntry>) processEngineConfiguration.getProcessDefinitionCache();
-    assertEquals(0, processDefinitionCache.size());
-
-    String processDefinitionTemplate = DeploymentCacheTestUtil.readTemplateFile("/org/flowable/standalone/deploy/deploymentCacheTest.bpmn20.xml");
-    for (int i = 1; i <= 5; i++) {
-      repositoryService.createDeployment().addString("Process " + i + ".bpmn20.xml", MessageFormat.format(processDefinitionTemplate, i)).deploy();
-
-      if (i < processDefinitionCacheLimit) {
-        assertEquals(i, processDefinitionCache.size());
-      } else {
-        assertEquals(processDefinitionCacheLimit, processDefinitionCache.size());
-      }
+    public DeploymentCacheLimitTest() {
+        super("org/flowable/standalone/deploy/deployment.cache.limit.test.flowable.cfg.xml");
     }
 
-    // Cleanup
-    for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
-      repositoryService.deleteDeployment(deployment.getId(), true);
+    public void testDeploymentCacheLimit() {
+        int processDefinitionCacheLimit = 3; // This is set in the configuration
+                                             // above
+
+        DefaultDeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache = (DefaultDeploymentCache<ProcessDefinitionCacheEntry>) processEngineConfiguration.getProcessDefinitionCache();
+        assertEquals(0, processDefinitionCache.size());
+
+        String processDefinitionTemplate = DeploymentCacheTestUtil.readTemplateFile("/org/flowable/standalone/deploy/deploymentCacheTest.bpmn20.xml");
+        for (int i = 1; i <= 5; i++) {
+            repositoryService.createDeployment().addString("Process " + i + ".bpmn20.xml", MessageFormat.format(processDefinitionTemplate, i)).deploy();
+
+            if (i < processDefinitionCacheLimit) {
+                assertEquals(i, processDefinitionCache.size());
+            } else {
+                assertEquals(processDefinitionCacheLimit, processDefinitionCache.size());
+            }
+        }
+
+        // Cleanup
+        for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+            repositoryService.deleteDeployment(deployment.getId(), true);
+        }
     }
-  }
 
 }

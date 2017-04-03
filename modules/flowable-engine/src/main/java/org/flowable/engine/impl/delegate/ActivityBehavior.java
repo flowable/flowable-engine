@@ -22,5 +22,5 @@ import org.flowable.engine.delegate.DelegateExecution;
  */
 public interface ActivityBehavior extends Serializable {
 
-  void execute(DelegateExecution execution);
+    void execute(DelegateExecution execution);
 }

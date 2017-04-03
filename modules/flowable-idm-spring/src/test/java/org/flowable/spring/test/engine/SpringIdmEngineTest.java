@@ -17,10 +17,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration("classpath:org/flowable/spring/test/engine/springIdmEngine-context.xml")
 public class SpringIdmEngineTest {
 
-  @Test
-  public void testGetEngineFromCache() {
-    assertNotNull(IdmEngines.getDefaultIdmEngine());
-    assertNotNull(IdmEngines.getIdmEngine("default"));
-  }
+    @Test
+    public void testGetEngineFromCache() {
+        assertNotNull(IdmEngines.getDefaultIdmEngine());
+        assertNotNull(IdmEngines.getIdmEngine("default"));
+    }
 
 }

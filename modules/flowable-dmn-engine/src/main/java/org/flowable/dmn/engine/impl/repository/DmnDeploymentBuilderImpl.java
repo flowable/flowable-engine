@@ -34,139 +34,139 @@ import org.flowable.engine.common.api.FlowableException;
  */
 public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected static final String DEFAULT_ENCODING = "UTF-8";
+    private static final long serialVersionUID = 1L;
+    protected static final String DEFAULT_ENCODING = "UTF-8";
 
-  protected transient DmnRepositoryServiceImpl repositoryService;
-  protected transient ResourceEntityManager resourceEntityManager;
+    protected transient DmnRepositoryServiceImpl repositoryService;
+    protected transient ResourceEntityManager resourceEntityManager;
 
-  protected DmnDeploymentEntity deployment;
-  protected boolean isDmn20XsdValidationEnabled = true;
-  protected boolean isDuplicateFilterEnabled;
+    protected DmnDeploymentEntity deployment;
+    protected boolean isDmn20XsdValidationEnabled = true;
+    protected boolean isDuplicateFilterEnabled;
 
-  public DmnDeploymentBuilderImpl() {
-    DmnEngineConfiguration dmnEngineConfiguration = Context.getDmnEngineConfiguration();
-    this.repositoryService = (DmnRepositoryServiceImpl) dmnEngineConfiguration.getDmnRepositoryService();
-    this.deployment = dmnEngineConfiguration.getDeploymentEntityManager().create();
-    this.resourceEntityManager = dmnEngineConfiguration.getResourceEntityManager();
-  }
-
-  public DmnDeploymentBuilder addInputStream(String resourceName, InputStream inputStream) {
-    if (inputStream == null) {
-      throw new FlowableException("inputStream for resource '" + resourceName + "' is null");
+    public DmnDeploymentBuilderImpl() {
+        DmnEngineConfiguration dmnEngineConfiguration = Context.getDmnEngineConfiguration();
+        this.repositoryService = (DmnRepositoryServiceImpl) dmnEngineConfiguration.getDmnRepositoryService();
+        this.deployment = dmnEngineConfiguration.getDeploymentEntityManager().create();
+        this.resourceEntityManager = dmnEngineConfiguration.getResourceEntityManager();
     }
 
-    byte[] bytes = null;
-    try {
-      bytes = IOUtils.toByteArray(inputStream);
-    } catch (Exception e) {
-      throw new FlowableException("could not get byte array from resource '" + resourceName + "'");
+    public DmnDeploymentBuilder addInputStream(String resourceName, InputStream inputStream) {
+        if (inputStream == null) {
+            throw new FlowableException("inputStream for resource '" + resourceName + "' is null");
+        }
+
+        byte[] bytes = null;
+        try {
+            bytes = IOUtils.toByteArray(inputStream);
+        } catch (Exception e) {
+            throw new FlowableException("could not get byte array from resource '" + resourceName + "'");
+        }
+
+        if (bytes == null) {
+            throw new FlowableException("byte array for resource '" + resourceName + "' is null");
+        }
+
+        ResourceEntity resource = resourceEntityManager.create();
+        resource.setName(resourceName);
+        resource.setBytes(bytes);
+        deployment.addResource(resource);
+        return this;
     }
 
-    if (bytes == null) {
-      throw new FlowableException("byte array for resource '" + resourceName + "' is null");
+    public DmnDeploymentBuilder addClasspathResource(String resource) {
+        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource);
+        if (inputStream == null) {
+            throw new FlowableException("resource '" + resource + "' not found");
+        }
+        return addInputStream(resource, inputStream);
     }
 
-    ResourceEntity resource = resourceEntityManager.create();
-    resource.setName(resourceName);
-    resource.setBytes(bytes);
-    deployment.addResource(resource);
-    return this;
-  }
+    public DmnDeploymentBuilder addString(String resourceName, String text) {
+        if (text == null) {
+            throw new FlowableException("text is null");
+        }
 
-  public DmnDeploymentBuilder addClasspathResource(String resource) {
-    InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource);
-    if (inputStream == null) {
-      throw new FlowableException("resource '" + resource + "' not found");
-    }
-    return addInputStream(resource, inputStream);
-  }
-
-  public DmnDeploymentBuilder addString(String resourceName, String text) {
-    if (text == null) {
-      throw new FlowableException("text is null");
+        ResourceEntity resource = resourceEntityManager.create();
+        resource.setName(resourceName);
+        try {
+            resource.setBytes(text.getBytes(DEFAULT_ENCODING));
+        } catch (UnsupportedEncodingException e) {
+            throw new FlowableException("Unable to get process bytes.", e);
+        }
+        deployment.addResource(resource);
+        return this;
     }
 
-    ResourceEntity resource = resourceEntityManager.create();
-    resource.setName(resourceName);
-    try {
-      resource.setBytes(text.getBytes(DEFAULT_ENCODING));
-    } catch (UnsupportedEncodingException e) {
-      throw new FlowableException("Unable to get process bytes.", e);
-    }
-    deployment.addResource(resource);
-    return this;
-  }
+    public DmnDeploymentBuilder addDmnBytes(String resourceName, byte[] dmnBytes) {
+        if (dmnBytes == null) {
+            throw new FlowableException("dmn bytes is null");
+        }
 
-  public DmnDeploymentBuilder addDmnBytes(String resourceName, byte[] dmnBytes) {
-    if (dmnBytes == null) {
-      throw new FlowableException("dmn bytes is null");
+        ResourceEntity resource = resourceEntityManager.create();
+        resource.setName(resourceName);
+        resource.setBytes(dmnBytes);
+        deployment.addResource(resource);
+        return this;
     }
 
-    ResourceEntity resource = resourceEntityManager.create();
-    resource.setName(resourceName);
-    resource.setBytes(dmnBytes);
-    deployment.addResource(resource);
-    return this;
-  }
-
-  public DmnDeploymentBuilder addDmnModel(String resourceName, DmnDefinition dmnDefinition) {
-    DmnXMLConverter dmnXMLConverter = new DmnXMLConverter();
-    try {
-      String dmn20Xml = new String(dmnXMLConverter.convertToXML(dmnDefinition), "UTF-8");
-      addString(resourceName, dmn20Xml);
-    } catch (UnsupportedEncodingException e) {
-      throw new FlowableException("Error while transforming DMN model to xml: not UTF-8 encoded", e);
+    public DmnDeploymentBuilder addDmnModel(String resourceName, DmnDefinition dmnDefinition) {
+        DmnXMLConverter dmnXMLConverter = new DmnXMLConverter();
+        try {
+            String dmn20Xml = new String(dmnXMLConverter.convertToXML(dmnDefinition), "UTF-8");
+            addString(resourceName, dmn20Xml);
+        } catch (UnsupportedEncodingException e) {
+            throw new FlowableException("Error while transforming DMN model to xml: not UTF-8 encoded", e);
+        }
+        return this;
     }
-    return this;
-  }
 
-  public DmnDeploymentBuilder name(String name) {
-    deployment.setName(name);
-    return this;
-  }
+    public DmnDeploymentBuilder name(String name) {
+        deployment.setName(name);
+        return this;
+    }
 
-  public DmnDeploymentBuilder category(String category) {
-    deployment.setCategory(category);
-    return this;
-  }
+    public DmnDeploymentBuilder category(String category) {
+        deployment.setCategory(category);
+        return this;
+    }
 
-  public DmnDeploymentBuilder disableSchemaValidation() {
-    this.isDmn20XsdValidationEnabled = false;
-    return this;
-  }
+    public DmnDeploymentBuilder disableSchemaValidation() {
+        this.isDmn20XsdValidationEnabled = false;
+        return this;
+    }
 
-  public DmnDeploymentBuilder tenantId(String tenantId) {
-    deployment.setTenantId(tenantId);
-    return this;
-  }
-  
-  public DmnDeploymentBuilder parentDeploymentId(String parentDeploymentId) {
-    deployment.setParentDeploymentId(parentDeploymentId);
-    return this;
-  }
-  
-  public DmnDeploymentBuilder enableDuplicateFiltering() {
-    isDuplicateFilterEnabled = true;
-    return this;
-  }
+    public DmnDeploymentBuilder tenantId(String tenantId) {
+        deployment.setTenantId(tenantId);
+        return this;
+    }
 
-  public DmnDeployment deploy() {
-    return repositoryService.deploy(this);
-  }
+    public DmnDeploymentBuilder parentDeploymentId(String parentDeploymentId) {
+        deployment.setParentDeploymentId(parentDeploymentId);
+        return this;
+    }
 
-  // getters and setters
-  // //////////////////////////////////////////////////////
+    public DmnDeploymentBuilder enableDuplicateFiltering() {
+        isDuplicateFilterEnabled = true;
+        return this;
+    }
 
-  public DmnDeploymentEntity getDeployment() {
-    return deployment;
-  }
+    public DmnDeployment deploy() {
+        return repositoryService.deploy(this);
+    }
 
-  public boolean isDmnXsdValidationEnabled() {
-    return isDmn20XsdValidationEnabled;
-  }
+    // getters and setters
+    // //////////////////////////////////////////////////////
 
-  public boolean isDuplicateFilterEnabled() {
-    return isDuplicateFilterEnabled;
-  }
+    public DmnDeploymentEntity getDeployment() {
+        return deployment;
+    }
+
+    public boolean isDmnXsdValidationEnabled() {
+        return isDmn20XsdValidationEnabled;
+    }
+
+    public boolean isDuplicateFilterEnabled() {
+        return isDuplicateFilterEnabled;
+    }
 }

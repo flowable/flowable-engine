@@ -18,15 +18,15 @@ import org.flowable.app.model.common.UserRepresentation;
  * @author Joram Barrez
  */
 public class CreateUserRepresentation extends UserRepresentation {
-  
-  protected String password;
 
-  public String getPassword() {
-    return password;
-  }
+    protected String password;
 
-  public void setPassword(String password) {
-    this.password = password;
-  }
-  
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
 }

@@ -21,56 +21,55 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.test.Deployment;
 
 /**
- * @author Saeid Mirzaei
- * Test case for ACT-4066
+ * @author Saeid Mirzaei Test case for ACT-4066
  */
 
 public class StartTimerEventRepeatWithoutN extends PluggableFlowableTestCase {
 
-	protected long counter;
-	protected StartEventListener startEventListener;
-	
-	class StartEventListener implements FlowableEventListener {
+    protected long counter;
+    protected StartEventListener startEventListener;
 
-		@Override
-		public void onEvent(FlowableEvent event) {
-			if (event.getType().equals(FlowableEngineEventType.TIMER_FIRED)) {
-				counter++;
-			}
-		}
+    class StartEventListener implements FlowableEventListener {
 
-		@Override
-		public boolean isFailOnException() {
-			return false;
-		}
-		
-	}
+        @Override
+        public void onEvent(FlowableEvent event) {
+            if (event.getType().equals(FlowableEngineEventType.TIMER_FIRED)) {
+                counter++;
+            }
+        }
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		
-		startEventListener = new StartEventListener();
-		processEngineConfiguration.getEventDispatcher().addEventListener(startEventListener);
-	}
-	
-	@Override
-  protected void tearDown() throws Exception {
-	  processEngineConfiguration.getEventDispatcher().removeEventListener(startEventListener);
-    super.tearDown();
-  }
+        @Override
+        public boolean isFailOnException() {
+            return false;
+        }
 
-  @Deployment
-	public void testStartTimerEventRepeatWithoutN() {
-		counter = 0;
-		
-		try {
-			waitForJobExecutorToProcessAllJobs(5500, 500);
-			fail("job is finished sooner than expected");
-		} catch (FlowableException e) {
-			assertTrue(e.getMessage().startsWith("time limit"));
-			assertTrue(counter >= 2);
-		}
-	}
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        startEventListener = new StartEventListener();
+        processEngineConfiguration.getEventDispatcher().addEventListener(startEventListener);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        processEngineConfiguration.getEventDispatcher().removeEventListener(startEventListener);
+        super.tearDown();
+    }
+
+    @Deployment
+    public void testStartTimerEventRepeatWithoutN() {
+        counter = 0;
+
+        try {
+            waitForJobExecutorToProcessAllJobs(5500, 500);
+            fail("job is finished sooner than expected");
+        } catch (FlowableException e) {
+            assertTrue(e.getMessage().startsWith("time limit"));
+            assertTrue(counter >= 2);
+        }
+    }
 
 }

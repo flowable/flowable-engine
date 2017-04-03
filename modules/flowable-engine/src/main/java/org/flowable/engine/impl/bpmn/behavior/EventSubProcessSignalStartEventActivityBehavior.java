@@ -41,83 +41,83 @@ import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity
  */
 public class EventSubProcessSignalStartEventActivityBehavior extends AbstractBpmnActivityBehavior {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected SignalEventDefinition signalEventDefinition;
-  protected Signal signal;
-  
-  public EventSubProcessSignalStartEventActivityBehavior(SignalEventDefinition signalEventDefinition, Signal signal) {
-    this.signalEventDefinition = signalEventDefinition;
-    this.signal = signal;
-  }
+    private static final long serialVersionUID = 1L;
 
-  public void execute(DelegateExecution execution) {
-    StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
-    EventSubProcess eventSubProcess = (EventSubProcess) startEvent.getSubProcess();
+    protected SignalEventDefinition signalEventDefinition;
+    protected Signal signal;
 
-    execution.setScope(true);
-
-    // initialize the template-defined data objects as variables
-    Map<String, Object> dataObjectVars = processDataObjects(eventSubProcess.getDataObjects());
-    if (dataObjectVars != null) {
-      execution.setVariablesLocal(dataObjectVars);
+    public EventSubProcessSignalStartEventActivityBehavior(SignalEventDefinition signalEventDefinition, Signal signal) {
+        this.signalEventDefinition = signalEventDefinition;
+        this.signal = signal;
     }
-  }
-  
-  @Override
-  public void trigger(DelegateExecution execution, String triggerName, Object triggerData) {
-    CommandContext commandContext = Context.getCommandContext();
-    ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
-    ExecutionEntity executionEntity = (ExecutionEntity) execution;
-    
-    String eventName = null;
-    if (signal != null) {
-      eventName = signal.getName();
-    } else {
-      eventName = signalEventDefinition.getSignalRef();
-    }
-    
-    StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
-    if (startEvent.isInterrupting()) {  
-      List<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByParentExecutionId(executionEntity.getParentId());
-      for (ExecutionEntity childExecution : childExecutions) {
-        if (!childExecution.getId().equals(executionEntity.getId())) {
-          executionEntityManager.deleteExecutionAndRelatedData(childExecution, 
-              DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")", false);
+
+    public void execute(DelegateExecution execution) {
+        StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
+        EventSubProcess eventSubProcess = (EventSubProcess) startEvent.getSubProcess();
+
+        execution.setScope(true);
+
+        // initialize the template-defined data objects as variables
+        Map<String, Object> dataObjectVars = processDataObjects(eventSubProcess.getDataObjects());
+        if (dataObjectVars != null) {
+            execution.setVariablesLocal(dataObjectVars);
         }
-      }
-      
-      EventSubscriptionEntityManager eventSubscriptionEntityManager = Context.getCommandContext().getEventSubscriptionEntityManager();
-      List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
-      
-      for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
-        if (eventSubscription instanceof SignalEventSubscriptionEntity && eventSubscription.getEventName().equals(eventName)) {
+    }
 
-          eventSubscriptionEntityManager.delete(eventSubscription);
+    @Override
+    public void trigger(DelegateExecution execution, String triggerName, Object triggerData) {
+        CommandContext commandContext = Context.getCommandContext();
+        ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+
+        String eventName = null;
+        if (signal != null) {
+            eventName = signal.getName();
+        } else {
+            eventName = signalEventDefinition.getSignalRef();
         }
-      }
+
+        StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
+        if (startEvent.isInterrupting()) {
+            List<ExecutionEntity> childExecutions = executionEntityManager.collectChildren(executionEntity.getParent());
+            for (int i = childExecutions.size() - 1; i >= 0; i--) {
+                ExecutionEntity childExecutionEntity = childExecutions.get(i);
+                if (!childExecutionEntity.isEnded() && !childExecutionEntity.getId().equals(executionEntity.getId())) {
+                    executionEntityManager.deleteExecutionAndRelatedData(childExecutionEntity,
+                            DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")", false);
+                }
+            }
+
+            EventSubscriptionEntityManager eventSubscriptionEntityManager = Context.getCommandContext().getEventSubscriptionEntityManager();
+            List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
+
+            for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
+                if (eventSubscription instanceof SignalEventSubscriptionEntity && eventSubscription.getEventName().equals(eventName)) {
+
+                    eventSubscriptionEntityManager.delete(eventSubscription);
+                }
+            }
+        }
+
+        ExecutionEntity newSubProcessExecution = executionEntityManager.createChildExecution(executionEntity.getParent());
+        newSubProcessExecution.setCurrentFlowElement((SubProcess) executionEntity.getCurrentFlowElement().getParentContainer());
+        newSubProcessExecution.setEventScope(false);
+        newSubProcessExecution.setScope(true);
+
+        ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(newSubProcessExecution);
+        outgoingFlowExecution.setCurrentFlowElement(startEvent);
+
+        leave(outgoingFlowExecution);
     }
 
-    
-    ExecutionEntity newSubProcessExecution = executionEntityManager.createChildExecution(executionEntity.getParent());
-    newSubProcessExecution.setCurrentFlowElement((SubProcess) executionEntity.getCurrentFlowElement().getParentContainer());
-    newSubProcessExecution.setEventScope(false);
-    newSubProcessExecution.setScope(true);
-    
-    ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(newSubProcessExecution);
-    outgoingFlowExecution.setCurrentFlowElement(startEvent);
-    
-    leave(outgoingFlowExecution);
-  }
-
-  protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
-    Map<String, Object> variablesMap = new HashMap<String, Object>();
-    // convert data objects to process variables
-    if (dataObjects != null) {
-      for (ValuedDataObject dataObject : dataObjects) {
-        variablesMap.put(dataObject.getName(), dataObject.getValue());
-      }
+    protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
+        Map<String, Object> variablesMap = new HashMap<String, Object>();
+        // convert data objects to process variables
+        if (dataObjects != null) {
+            for (ValuedDataObject dataObject : dataObjects) {
+                variablesMap.put(dataObject.getName(), dataObject.getValue());
+            }
+        }
+        return variablesMap;
     }
-    return variablesMap;
-  }
 }

@@ -16,31 +16,31 @@ import org.flowable.app.model.common.AbstractRepresentation;
 
 public class AppDefinitionSaveRepresentation extends AbstractRepresentation {
 
-  protected AppDefinitionRepresentation appDefinition;
-  protected boolean publish;
-  protected Boolean force;
+    protected AppDefinitionRepresentation appDefinition;
+    protected boolean publish;
+    protected Boolean force;
 
-  public AppDefinitionRepresentation getAppDefinition() {
-    return appDefinition;
-  }
+    public AppDefinitionRepresentation getAppDefinition() {
+        return appDefinition;
+    }
 
-  public void setAppDefinition(AppDefinitionRepresentation appDefinition) {
-    this.appDefinition = appDefinition;
-  }
+    public void setAppDefinition(AppDefinitionRepresentation appDefinition) {
+        this.appDefinition = appDefinition;
+    }
 
-  public boolean isPublish() {
-    return publish;
-  }
+    public boolean isPublish() {
+        return publish;
+    }
 
-  public void setPublish(boolean publish) {
-    this.publish = publish;
-  }
+    public void setPublish(boolean publish) {
+        this.publish = publish;
+    }
 
-  public Boolean getForce() {
-    return force;
-  }
+    public Boolean getForce() {
+        return force;
+    }
 
-  public void setForce(Boolean force) {
-    this.force = force;
-  }
+    public void setForce(Boolean force) {
+        this.force = force;
+    }
 }

@@ -15,8 +15,8 @@ package org.flowable.engine.impl.interceptor;
 import org.flowable.engine.impl.delegate.invocation.DelegateInvocation;
 
 /**
- * Interceptor responsible for handling calls to 'user code'. User code represents external Java code (e.g. services and listeners) invoked by the process engine. The following is a list of classes that
- * represent user code:
+ * Interceptor responsible for handling calls to 'user code'. User code represents external Java code (e.g. services and listeners) invoked by the process engine. The following is a list of classes
+ * that represent user code:
  * <ul>
  * <li>{@link org.flowable.engine.delegate.JavaDelegate}</li>
  * <li>{@link org.flowable.engine.delegate.ExecutionListener}</li>
@@ -30,6 +30,6 @@ import org.flowable.engine.impl.delegate.invocation.DelegateInvocation;
  */
 public interface DelegateInterceptor {
 
-  public void handleInvocation(DelegateInvocation invocation);
+    public void handleInvocation(DelegateInvocation invocation);
 
 }

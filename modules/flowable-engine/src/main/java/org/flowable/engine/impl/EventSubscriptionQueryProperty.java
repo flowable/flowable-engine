@@ -20,27 +20,27 @@ import org.flowable.engine.common.api.query.QueryProperty;
  */
 public class EventSubscriptionQueryProperty implements QueryProperty {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  // properties used in event subscription queries:
+    // properties used in event subscription queries:
 
-  public static final EventSubscriptionQueryProperty ID = new EventSubscriptionQueryProperty("RES.ID_");
-  public static final EventSubscriptionQueryProperty EXECUTION_ID = new EventSubscriptionQueryProperty("RES.EXECUTION_ID_");
-  public static final EventSubscriptionQueryProperty PROCESS_INSTANCE_ID = new EventSubscriptionQueryProperty("RES.PROC_INST_ID_");
-  public static final EventSubscriptionQueryProperty PROCESS_DEFINITION_ID = new EventSubscriptionQueryProperty("RES.PROC_DEF_ID_");
-  public static final EventSubscriptionQueryProperty CREATED = new EventSubscriptionQueryProperty("RES.CREATED_");
-  public static final EventSubscriptionQueryProperty TENANT_ID = new EventSubscriptionQueryProperty("RES.TENANT_ID_");
+    public static final EventSubscriptionQueryProperty ID = new EventSubscriptionQueryProperty("RES.ID_");
+    public static final EventSubscriptionQueryProperty EXECUTION_ID = new EventSubscriptionQueryProperty("RES.EXECUTION_ID_");
+    public static final EventSubscriptionQueryProperty PROCESS_INSTANCE_ID = new EventSubscriptionQueryProperty("RES.PROC_INST_ID_");
+    public static final EventSubscriptionQueryProperty PROCESS_DEFINITION_ID = new EventSubscriptionQueryProperty("RES.PROC_DEF_ID_");
+    public static final EventSubscriptionQueryProperty CREATED = new EventSubscriptionQueryProperty("RES.CREATED_");
+    public static final EventSubscriptionQueryProperty TENANT_ID = new EventSubscriptionQueryProperty("RES.TENANT_ID_");
 
-  // ///////////////////////////////////////////////
+    // ///////////////////////////////////////////////
 
-  private final String propertyName;
+    private final String propertyName;
 
-  public EventSubscriptionQueryProperty(String propertyName) {
-    this.propertyName = propertyName;
-  }
+    public EventSubscriptionQueryProperty(String propertyName) {
+        this.propertyName = propertyName;
+    }
 
-  public String getName() {
-    return propertyName;
-  }
+    public String getName() {
+        return propertyName;
+    }
 
 }

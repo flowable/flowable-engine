@@ -19,8 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Joram Barrez
  */
 public class AbstractIdmService {
-  
-  @Autowired
-  protected IdmIdentityService identityService;
-  
+
+    @Autowired
+    protected IdmIdentityService identityService;
+
 }

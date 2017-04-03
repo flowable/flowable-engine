@@ -23,21 +23,21 @@ import org.flowable.engine.impl.interceptor.CommandContext;
  */
 public class GetModelEditorSourceCmd implements Command<byte[]>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String modelId;
+    private static final long serialVersionUID = 1L;
+    protected String modelId;
 
-  public GetModelEditorSourceCmd(String modelId) {
-    this.modelId = modelId;
-  }
-
-  public byte[] execute(CommandContext commandContext) {
-    if (modelId == null) {
-      throw new FlowableIllegalArgumentException("modelId is null");
+    public GetModelEditorSourceCmd(String modelId) {
+        this.modelId = modelId;
     }
 
-    byte[] bytes = commandContext.getModelEntityManager().findEditorSourceByModelId(modelId);
+    public byte[] execute(CommandContext commandContext) {
+        if (modelId == null) {
+            throw new FlowableIllegalArgumentException("modelId is null");
+        }
 
-    return bytes;
-  }
+        byte[] bytes = commandContext.getModelEntityManager().findEditorSourceByModelId(modelId);
+
+        return bytes;
+    }
 
 }

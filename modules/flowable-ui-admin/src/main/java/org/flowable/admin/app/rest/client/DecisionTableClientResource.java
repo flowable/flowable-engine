@@ -33,33 +33,33 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RestController
 public class DecisionTableClientResource extends AbstractClientResource {
 
-  private static final Logger logger = LoggerFactory.getLogger(DecisionTableClientResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(DecisionTableClientResource.class);
 
-  @Autowired
-  protected DecisionTableService clientService;
+    @Autowired
+    protected DecisionTableService clientService;
 
-  @RequestMapping(value = "/rest/admin/decision-tables/{decisionTableId}", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getDecisionTable(@PathVariable String decisionTableId) throws BadRequestException {
+    @RequestMapping(value = "/rest/admin/decision-tables/{decisionTableId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getDecisionTable(@PathVariable String decisionTableId) throws BadRequestException {
 
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
-    try {
-      return clientService.getDecisionTable(serverConfig, decisionTableId);
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting decision table {}", decisionTableId, e);
-      throw new BadRequestException(e.getMessage());
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
+        try {
+            return clientService.getDecisionTable(serverConfig, decisionTableId);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting decision table {}", decisionTableId, e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
 
-  @RequestMapping(value = "/rest/admin/decision-tables/{decisionTableId}/editorJson", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getEditorJsonForDecisionTable(@PathVariable String decisionTableId) throws BadRequestException {
+    @RequestMapping(value = "/rest/admin/decision-tables/{decisionTableId}/editorJson", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getEditorJsonForDecisionTable(@PathVariable String decisionTableId) throws BadRequestException {
 
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
-    try {
-      return clientService.getEditorJsonForDecisionTable(serverConfig, decisionTableId);
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting editor json for decision table {}", decisionTableId, e);
-      throw new BadRequestException(e.getMessage());
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
+        try {
+            return clientService.getEditorJsonForDecisionTable(serverConfig, decisionTableId);
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting editor json for decision table {}", decisionTableId, e);
+            throw new BadRequestException(e.getMessage());
+        }
     }
-  }
 
 }

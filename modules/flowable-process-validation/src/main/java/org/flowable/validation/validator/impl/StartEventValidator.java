@@ -31,50 +31,50 @@ import org.flowable.validation.validator.ProcessLevelValidator;
  */
 public class StartEventValidator extends ProcessLevelValidator {
 
-  @Override
-  protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
-    List<StartEvent> startEvents = process.findFlowElementsOfType(StartEvent.class, false);
-    validateEventDefinitionTypes(startEvents, process, errors);
-    validateMultipleStartEvents(startEvents, process, errors);
-  }
+    @Override
+    protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
+        List<StartEvent> startEvents = process.findFlowElementsOfType(StartEvent.class, false);
+        validateEventDefinitionTypes(startEvents, process, errors);
+        validateMultipleStartEvents(startEvents, process, errors);
+    }
 
-  protected void validateEventDefinitionTypes(List<StartEvent> startEvents, Process process, List<ValidationError> errors) {
-    for (StartEvent startEvent : startEvents) {
-      if (startEvent.getEventDefinitions() != null && !startEvent.getEventDefinitions().isEmpty()) {
-        EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
-        if (!(eventDefinition instanceof MessageEventDefinition) && 
-            !(eventDefinition instanceof TimerEventDefinition) && 
-            !(eventDefinition instanceof SignalEventDefinition)) {
-            addError(errors, Problems.START_EVENT_INVALID_EVENT_DEFINITION,
-                process, startEvent,
-                "Unsupported event definition on start event");
-          }
+    protected void validateEventDefinitionTypes(List<StartEvent> startEvents, Process process, List<ValidationError> errors) {
+        for (StartEvent startEvent : startEvents) {
+            if (startEvent.getEventDefinitions() != null && !startEvent.getEventDefinitions().isEmpty()) {
+                EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
+                if (!(eventDefinition instanceof MessageEventDefinition) &&
+                        !(eventDefinition instanceof TimerEventDefinition) &&
+                        !(eventDefinition instanceof SignalEventDefinition)) {
+                    addError(errors, Problems.START_EVENT_INVALID_EVENT_DEFINITION,
+                            process, startEvent,
+                            "Unsupported event definition on start event");
+                }
+            }
+
         }
-      
     }
-  }
-  
-  protected void validateMultipleStartEvents(List<StartEvent> startEvents, Process process, List<ValidationError> errors) {
-    
-    // Multiple none events are not supported
-    List<StartEvent> noneStartEvents = new ArrayList<StartEvent>();
-    for (StartEvent startEvent : startEvents) {
-      if (startEvent.getEventDefinitions() == null || startEvent.getEventDefinitions().isEmpty()) {
-        noneStartEvents.add(startEvent);
-      }
+
+    protected void validateMultipleStartEvents(List<StartEvent> startEvents, Process process, List<ValidationError> errors) {
+
+        // Multiple none events are not supported
+        List<StartEvent> noneStartEvents = new ArrayList<StartEvent>();
+        for (StartEvent startEvent : startEvents) {
+            if (startEvent.getEventDefinitions() == null || startEvent.getEventDefinitions().isEmpty()) {
+                noneStartEvents.add(startEvent);
+            }
+        }
+
+        if (noneStartEvents.size() > 1) {
+            for (StartEvent startEvent : noneStartEvents) {
+                addError(
+                        errors,
+                        Problems.START_EVENT_MULTIPLE_FOUND,
+                        process,
+                        startEvent,
+                        "Multiple none start events are not supported");
+            }
+        }
+
     }
-    
-    if (noneStartEvents.size() > 1) {
-      for (StartEvent startEvent : noneStartEvents) {
-        addError(
-            errors,
-            Problems.START_EVENT_MULTIPLE_FOUND,
-            process,
-            startEvent,
-            "Multiple none start events are not supported");
-      }
-    }
-    
-  }
 
 }

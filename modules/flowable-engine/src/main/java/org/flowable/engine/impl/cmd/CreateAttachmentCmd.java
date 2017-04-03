@@ -40,111 +40,111 @@ import org.flowable.engine.task.Task;
 // Not Serializable
 public class CreateAttachmentCmd implements Command<Attachment> {
 
-  protected String attachmentType;
-  protected String taskId;
-  protected String processInstanceId;
-  protected String attachmentName;
-  protected String attachmentDescription;
-  protected InputStream content;
-  protected String url;
+    protected String attachmentType;
+    protected String taskId;
+    protected String processInstanceId;
+    protected String attachmentName;
+    protected String attachmentDescription;
+    protected InputStream content;
+    protected String url;
 
-  public CreateAttachmentCmd(String attachmentType, String taskId, String processInstanceId, String attachmentName, String attachmentDescription, InputStream content, String url) {
-    this.attachmentType = attachmentType;
-    this.taskId = taskId;
-    this.processInstanceId = processInstanceId;
-    this.attachmentName = attachmentName;
-    this.attachmentDescription = attachmentDescription;
-    this.content = content;
-    this.url = url;
-  }
-
-  public Attachment execute(CommandContext commandContext) {
-
-    if (taskId != null) {
-      TaskEntity task = verifyTaskParameters(commandContext);
-      if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-        return compatibilityHandler.createAttachment(attachmentType, taskId, processInstanceId, attachmentName, attachmentDescription, content, url);
-      }
-    }
-    
-    if (processInstanceId != null) {
-      ExecutionEntity execution = verifyExecutionParameters(commandContext);
-      if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-        return compatibilityHandler.createAttachment(attachmentType, taskId, processInstanceId, attachmentName, attachmentDescription, content, url);
-      }
+    public CreateAttachmentCmd(String attachmentType, String taskId, String processInstanceId, String attachmentName, String attachmentDescription, InputStream content, String url) {
+        this.attachmentType = attachmentType;
+        this.taskId = taskId;
+        this.processInstanceId = processInstanceId;
+        this.attachmentName = attachmentName;
+        this.attachmentDescription = attachmentDescription;
+        this.content = content;
+        this.url = url;
     }
 
-    AttachmentEntity attachment = commandContext.getAttachmentEntityManager().create();
-    attachment.setName(attachmentName);
-    attachment.setProcessInstanceId(processInstanceId);
-    attachment.setTaskId(taskId);
-    attachment.setDescription(attachmentDescription);
-    attachment.setType(attachmentType);
-    attachment.setUrl(url);
-    attachment.setUserId(Authentication.getAuthenticatedUserId());
-    attachment.setTime(commandContext.getProcessEngineConfiguration().getClock().getCurrentTime());
+    public Attachment execute(CommandContext commandContext) {
 
-    commandContext.getAttachmentEntityManager().insert(attachment, false);
-
-    if (content != null) {
-      byte[] bytes = IoUtil.readInputStream(content, attachmentName);
-      ByteArrayEntity byteArray = commandContext.getByteArrayEntityManager().create();
-      byteArray.setBytes(bytes);
-      commandContext.getByteArrayEntityManager().insert(byteArray);
-      attachment.setContentId(byteArray.getId());
-      attachment.setContent(byteArray);
-    }
-
-    commandContext.getHistoryManager().createAttachmentComment(taskId, processInstanceId, attachmentName, true);
-
-    if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-      // Forced to fetch the process-instance to associate the right
-      // process definition
-      String processDefinitionId = null;
-      if (attachment.getProcessInstanceId() != null) {
-        ExecutionEntity process = commandContext.getExecutionEntityManager().findById(processInstanceId);
-        if (process != null) {
-          processDefinitionId = process.getProcessDefinitionId();
+        if (taskId != null) {
+            TaskEntity task = verifyTaskParameters(commandContext);
+            if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
+                Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+                return compatibilityHandler.createAttachment(attachmentType, taskId, processInstanceId, attachmentName, attachmentDescription, content, url);
+            }
         }
-      }
 
-      commandContext.getProcessEngineConfiguration().getEventDispatcher()
-          .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, attachment, processInstanceId, processInstanceId, processDefinitionId));
-      commandContext.getProcessEngineConfiguration().getEventDispatcher()
-          .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, attachment, processInstanceId, processInstanceId, processDefinitionId));
+        if (processInstanceId != null) {
+            ExecutionEntity execution = verifyExecutionParameters(commandContext);
+            if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
+                Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+                return compatibilityHandler.createAttachment(attachmentType, taskId, processInstanceId, attachmentName, attachmentDescription, content, url);
+            }
+        }
+
+        AttachmentEntity attachment = commandContext.getAttachmentEntityManager().create();
+        attachment.setName(attachmentName);
+        attachment.setProcessInstanceId(processInstanceId);
+        attachment.setTaskId(taskId);
+        attachment.setDescription(attachmentDescription);
+        attachment.setType(attachmentType);
+        attachment.setUrl(url);
+        attachment.setUserId(Authentication.getAuthenticatedUserId());
+        attachment.setTime(commandContext.getProcessEngineConfiguration().getClock().getCurrentTime());
+
+        commandContext.getAttachmentEntityManager().insert(attachment, false);
+
+        if (content != null) {
+            byte[] bytes = IoUtil.readInputStream(content, attachmentName);
+            ByteArrayEntity byteArray = commandContext.getByteArrayEntityManager().create();
+            byteArray.setBytes(bytes);
+            commandContext.getByteArrayEntityManager().insert(byteArray);
+            attachment.setContentId(byteArray.getId());
+            attachment.setContent(byteArray);
+        }
+
+        commandContext.getHistoryManager().createAttachmentComment(taskId, processInstanceId, attachmentName, true);
+
+        if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            // Forced to fetch the process-instance to associate the right
+            // process definition
+            String processDefinitionId = null;
+            if (attachment.getProcessInstanceId() != null) {
+                ExecutionEntity process = commandContext.getExecutionEntityManager().findById(processInstanceId);
+                if (process != null) {
+                    processDefinitionId = process.getProcessDefinitionId();
+                }
+            }
+
+            commandContext.getProcessEngineConfiguration().getEventDispatcher()
+                    .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, attachment, processInstanceId, processInstanceId, processDefinitionId));
+            commandContext.getProcessEngineConfiguration().getEventDispatcher()
+                    .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, attachment, processInstanceId, processInstanceId, processDefinitionId));
+        }
+
+        return attachment;
     }
 
-    return attachment;
-  }
+    protected TaskEntity verifyTaskParameters(CommandContext commandContext) {
+        TaskEntity task = commandContext.getTaskEntityManager().findById(taskId);
 
-  protected TaskEntity verifyTaskParameters(CommandContext commandContext) {
-    TaskEntity task = commandContext.getTaskEntityManager().findById(taskId);
+        if (task == null) {
+            throw new FlowableObjectNotFoundException("Cannot find task with id " + taskId, Task.class);
+        }
 
-    if (task == null) {
-      throw new FlowableObjectNotFoundException("Cannot find task with id " + taskId, Task.class);
+        if (task.isSuspended()) {
+            throw new FlowableException("It is not allowed to add an attachment to a suspended task");
+        }
+
+        return task;
     }
 
-    if (task.isSuspended()) {
-      throw new FlowableException("It is not allowed to add an attachment to a suspended task");
-    }
-    
-    return task;
-  }
+    protected ExecutionEntity verifyExecutionParameters(CommandContext commandContext) {
+        ExecutionEntity execution = commandContext.getExecutionEntityManager().findById(processInstanceId);
 
-  protected ExecutionEntity verifyExecutionParameters(CommandContext commandContext) {
-    ExecutionEntity execution = commandContext.getExecutionEntityManager().findById(processInstanceId);
+        if (execution == null) {
+            throw new FlowableObjectNotFoundException("Process instance " + processInstanceId + " doesn't exist", ProcessInstance.class);
+        }
 
-    if (execution == null) {
-      throw new FlowableObjectNotFoundException("Process instance " + processInstanceId + " doesn't exist", ProcessInstance.class);
-    }
+        if (execution.isSuspended()) {
+            throw new FlowableException("It is not allowed to add an attachment to a suspended process instance");
+        }
 
-    if (execution.isSuspended()) {
-      throw new FlowableException("It is not allowed to add an attachment to a suspended process instance");
+        return execution;
     }
-    
-    return execution;
-  }
 
 }

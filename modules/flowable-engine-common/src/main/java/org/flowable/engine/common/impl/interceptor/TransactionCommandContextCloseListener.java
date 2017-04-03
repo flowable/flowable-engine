@@ -19,31 +19,31 @@ import org.flowable.engine.common.impl.cfg.BaseTransactionContext;
  * @author Joram Barrez
  */
 public class TransactionCommandContextCloseListener implements BaseCommandContextCloseListener<AbstractCommandContext> {
-  
-  protected BaseTransactionContext transactionContext;
-  
-  public TransactionCommandContextCloseListener(BaseTransactionContext transactionContext) {
-    this.transactionContext = transactionContext;
-  }
 
-  @Override
-  public void closing(AbstractCommandContext commandContext) {
-    
-  }
+    protected BaseTransactionContext transactionContext;
 
-  @Override
-  public void afterSessionsFlush(AbstractCommandContext commandContext) {
-    transactionContext.commit();
-  }
+    public TransactionCommandContextCloseListener(BaseTransactionContext transactionContext) {
+        this.transactionContext = transactionContext;
+    }
 
-  @Override
-  public void closed(AbstractCommandContext commandContext) {
-    
-  }
+    @Override
+    public void closing(AbstractCommandContext commandContext) {
 
-  @Override
-  public void closeFailure(AbstractCommandContext commandContext) {
-    transactionContext.rollback();
-  }
+    }
+
+    @Override
+    public void afterSessionsFlush(AbstractCommandContext commandContext) {
+        transactionContext.commit();
+    }
+
+    @Override
+    public void closed(AbstractCommandContext commandContext) {
+
+    }
+
+    @Override
+    public void closeFailure(AbstractCommandContext commandContext) {
+        transactionContext.rollback();
+    }
 
 }

@@ -20,5 +20,5 @@ package org.flowable.engine.common.api.delegate.event;
  */
 public interface FlowableEventType {
 
-  String name();
+    String name();
 }

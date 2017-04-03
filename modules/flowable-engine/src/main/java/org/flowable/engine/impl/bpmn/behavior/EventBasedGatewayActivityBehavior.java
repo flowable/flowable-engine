@@ -18,7 +18,7 @@ package org.flowable.engine.impl.bpmn.behavior;
  * @author Joram Barrez
  */
 public class EventBasedGatewayActivityBehavior extends FlowNodeActivityBehavior {
-  
-  private static final long serialVersionUID = 1L;
+
+    private static final long serialVersionUID = 1L;
 
 }

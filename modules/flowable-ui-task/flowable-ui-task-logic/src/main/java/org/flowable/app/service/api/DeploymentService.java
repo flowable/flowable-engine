@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface DeploymentService {
 
-  @Transactional
-  void deleteAppDefinition(Long appDefinitionId);
+    @Transactional
+    void deleteAppDefinition(Long appDefinitionId);
 
 }

@@ -18,11 +18,11 @@ import org.flowable.engine.impl.persistence.entity.JobEntity;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public interface HistoryJsonTransformer {
-  
-  String getType();
-  
-  boolean isApplicable(ObjectNode historicalData, CommandContext commandContext);
-  
-  void transformJson(JobEntity job, ObjectNode historicalData, CommandContext commandContext);
+
+    String getType();
+
+    boolean isApplicable(ObjectNode historicalData, CommandContext commandContext);
+
+    void transformJson(JobEntity job, ObjectNode historicalData, CommandContext commandContext);
 
 }

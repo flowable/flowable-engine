@@ -22,18 +22,18 @@ import org.springframework.beans.factory.FactoryBean;
  * @author martin.grofcik
  */
 public class DefaultClockFactory implements FactoryBean<Clock> {
-  @Override
-  public Clock getObject() throws RuntimeException {
-    return new DefaultClockImpl();
-  }
+    @Override
+    public Clock getObject() throws RuntimeException {
+        return new DefaultClockImpl();
+    }
 
-  @Override
-  public Class<?> getObjectType() {
-    return DefaultClockImpl.class;
-  }
+    @Override
+    public Class<?> getObjectType() {
+        return DefaultClockImpl.class;
+    }
 
-  @Override
-  public boolean isSingleton() {
-    return false;
-  }
+    @Override
+    public boolean isSingleton() {
+        return false;
+    }
 }

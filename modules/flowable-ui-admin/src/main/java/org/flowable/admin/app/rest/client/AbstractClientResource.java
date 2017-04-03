@@ -27,34 +27,34 @@ import org.springframework.core.env.Environment;
 
 public abstract class AbstractClientResource {
 
-  private static final String SERVER_ID = "serverId";
+    private static final String SERVER_ID = "serverId";
 
-  @Autowired
-  protected ServerConfigRepository configRepository;
+    @Autowired
+    protected ServerConfigRepository configRepository;
 
-  @Autowired
-  protected Environment env;
+    @Autowired
+    protected Environment env;
 
-  protected ServerConfig retrieveServerConfig(EndpointType endpointType) {
-    List<ServerConfig> serverConfigs = configRepository.getByEndpointType(endpointType);
+    protected ServerConfig retrieveServerConfig(EndpointType endpointType) {
+        List<ServerConfig> serverConfigs = configRepository.getByEndpointType(endpointType);
 
-    if (serverConfigs == null) {
-      throw new BadRequestException("No server config found");
+        if (serverConfigs == null) {
+            throw new BadRequestException("No server config found");
+        }
+
+        if (serverConfigs.size() > 1) {
+            throw new BadRequestException("Only one server config per endpoint type allowed");
+        }
+
+        return serverConfigs.get(0);
     }
 
-    if (serverConfigs.size() > 1) {
-      throw new BadRequestException("Only one server config per endpoint type allowed");
+    protected Map<String, String[]> getRequestParametersWithoutServerId(HttpServletRequest request) {
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        Map<String, String[]> resultMap = new HashMap<String, String[]>();
+        resultMap.putAll(parameterMap);
+        resultMap.remove(SERVER_ID);
+        return resultMap;
     }
-
-    return serverConfigs.get(0);
-  }
-
-  protected Map<String, String[]> getRequestParametersWithoutServerId(HttpServletRequest request) {
-    Map<String, String[]> parameterMap = request.getParameterMap();
-    Map<String, String[]> resultMap = new HashMap<String, String[]>();
-    resultMap.putAll(parameterMap);
-    resultMap.remove(SERVER_ID);
-    return resultMap;
-  }
 
 }

@@ -25,25 +25,25 @@ import org.flowable.engine.impl.interceptor.CommandContext;
  */
 public class DispatchEventCommand implements Command<Void> {
 
-  protected FlowableEvent event;
+    protected FlowableEvent event;
 
-  public DispatchEventCommand(FlowableEvent event) {
-    this.event = event;
-  }
-
-  @Override
-  public Void execute(CommandContext commandContext) {
-    if (event == null) {
-      throw new FlowableIllegalArgumentException("event is null");
+    public DispatchEventCommand(FlowableEvent event) {
+        this.event = event;
     }
 
-    if (commandContext.getEventDispatcher().isEnabled()) {
-      commandContext.getEventDispatcher().dispatchEvent(event);
-    } else {
-      throw new FlowableException("Message dispatcher is disabled, cannot dispatch event");
-    }
+    @Override
+    public Void execute(CommandContext commandContext) {
+        if (event == null) {
+            throw new FlowableIllegalArgumentException("event is null");
+        }
 
-    return null;
-  }
+        if (commandContext.getEventDispatcher().isEnabled()) {
+            commandContext.getEventDispatcher().dispatchEvent(event);
+        } else {
+            throw new FlowableException("Message dispatcher is disabled, cannot dispatch event");
+        }
+
+        return null;
+    }
 
 }

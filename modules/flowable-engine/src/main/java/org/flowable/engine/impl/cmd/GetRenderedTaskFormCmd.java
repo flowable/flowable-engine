@@ -33,40 +33,40 @@ import org.flowable.engine.task.Task;
  */
 public class GetRenderedTaskFormCmd implements Command<Object>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String taskId;
-  protected String formEngineName;
+    private static final long serialVersionUID = 1L;
+    protected String taskId;
+    protected String formEngineName;
 
-  public GetRenderedTaskFormCmd(String taskId, String formEngineName) {
-    this.taskId = taskId;
-    this.formEngineName = formEngineName;
-  }
+    public GetRenderedTaskFormCmd(String taskId, String formEngineName) {
+        this.taskId = taskId;
+        this.formEngineName = formEngineName;
+    }
 
-  public Object execute(CommandContext commandContext) {
-    
-    if (taskId == null) {
-      throw new FlowableIllegalArgumentException("Task id should not be null");
+    public Object execute(CommandContext commandContext) {
+
+        if (taskId == null) {
+            throw new FlowableIllegalArgumentException("Task id should not be null");
+        }
+
+        TaskEntity task = commandContext.getTaskEntityManager().findById(taskId);
+        if (task == null) {
+            throw new FlowableObjectNotFoundException("Task '" + taskId + "' not found", Task.class);
+        }
+
+        TaskFormHandler taskFormHandler = FormHandlerUtil.getTaskFormHandlder(task);
+        if (taskFormHandler != null) {
+
+            FormEngine formEngine = commandContext.getProcessEngineConfiguration().getFormEngines().get(formEngineName);
+
+            if (formEngine == null) {
+                throw new FlowableException("No formEngine '" + formEngineName + "' defined process engine configuration");
+            }
+
+            TaskFormData taskForm = taskFormHandler.createTaskForm(task);
+
+            return formEngine.renderTaskForm(taskForm);
+        }
+
+        return null;
     }
-    
-    TaskEntity task = commandContext.getTaskEntityManager().findById(taskId);
-    if (task == null) {
-      throw new FlowableObjectNotFoundException("Task '" + taskId + "' not found", Task.class);
-    }
-    
-    TaskFormHandler taskFormHandler = FormHandlerUtil.getTaskFormHandlder(task);
-    if (taskFormHandler != null) {
-    
-      FormEngine formEngine = commandContext.getProcessEngineConfiguration().getFormEngines().get(formEngineName);
-  
-      if (formEngine == null) {
-        throw new FlowableException("No formEngine '" + formEngineName + "' defined process engine configuration");
-      }
-  
-      TaskFormData taskForm = taskFormHandler.createTaskForm(task);
-  
-      return formEngine.renderTaskForm(taskForm);
-    }
-    
-    return null;
-  }
 }

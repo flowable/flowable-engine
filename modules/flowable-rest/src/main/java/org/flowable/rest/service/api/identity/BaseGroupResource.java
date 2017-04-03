@@ -25,18 +25,18 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class BaseGroupResource {
 
-  @Autowired
-  protected RestResponseFactory restResponseFactory;
+    @Autowired
+    protected RestResponseFactory restResponseFactory;
 
-  @Autowired
-  protected IdentityService identityService;
+    @Autowired
+    protected IdentityService identityService;
 
-  protected Group getGroupFromRequest(String groupId) {
-    Group group = identityService.createGroupQuery().groupId(groupId).singleResult();
+    protected Group getGroupFromRequest(String groupId) {
+        Group group = identityService.createGroupQuery().groupId(groupId).singleResult();
 
-    if (group == null) {
-      throw new FlowableObjectNotFoundException("Could not find a group with id '" + groupId + "'.", User.class);
+        if (group == null) {
+            throw new FlowableObjectNotFoundException("Could not find a group with id '" + groupId + "'.", User.class);
+        }
+        return group;
     }
-    return group;
-  }
 }

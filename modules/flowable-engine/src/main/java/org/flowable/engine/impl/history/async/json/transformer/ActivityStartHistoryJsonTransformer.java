@@ -23,37 +23,36 @@ import org.flowable.engine.impl.persistence.entity.JobEntity;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ActivityStartHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
-  
-  public static final String TYPE = "activity-start";
 
-  @Override
-  public String getType() {
-    return TYPE;
-  }
+    public static final String TYPE = "activity-start";
 
-  @Override
-  public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
-    return true;
-  }
+    @Override
+    public String getType() {
+        return TYPE;
+    }
 
-  @Override
-  public void transformJson(JobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-    HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager =
-        commandContext.getProcessEngineConfiguration().getHistoricActivityInstanceEntityManager();
-    HistoricActivityInstanceEntity historicActivityInstanceEntity = historicActivityInstanceEntityManager.create();
-    historicActivityInstanceEntity.setId(commandContext.getProcessEngineConfiguration().getIdGenerator().getNextId());
-    historicActivityInstanceEntity.setProcessDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_ID));
-    historicActivityInstanceEntity.setProcessInstanceId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID));
-    historicActivityInstanceEntity.setExecutionId(getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID));
-    historicActivityInstanceEntity.setActivityId(getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID));
-    historicActivityInstanceEntity.setActivityName(getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_NAME));
-    historicActivityInstanceEntity.setActivityType(getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_TYPE));
-    historicActivityInstanceEntity.setStartTime(getDateFromJson(historicalData, HistoryJsonConstants.START_TIME));
-    historicActivityInstanceEntity.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
-    
-    historicActivityInstanceEntityManager.insert(historicActivityInstanceEntity);
-    dispatchEvent(commandContext, 
-        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstanceEntity));
-  }
+    @Override
+    public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
+        return true;
+    }
+
+    @Override
+    public void transformJson(JobEntity job, ObjectNode historicalData, CommandContext commandContext) {
+        HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = commandContext.getProcessEngineConfiguration().getHistoricActivityInstanceEntityManager();
+        HistoricActivityInstanceEntity historicActivityInstanceEntity = historicActivityInstanceEntityManager.create();
+        historicActivityInstanceEntity.setId(commandContext.getProcessEngineConfiguration().getIdGenerator().getNextId());
+        historicActivityInstanceEntity.setProcessDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_ID));
+        historicActivityInstanceEntity.setProcessInstanceId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID));
+        historicActivityInstanceEntity.setExecutionId(getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID));
+        historicActivityInstanceEntity.setActivityId(getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID));
+        historicActivityInstanceEntity.setActivityName(getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_NAME));
+        historicActivityInstanceEntity.setActivityType(getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_TYPE));
+        historicActivityInstanceEntity.setStartTime(getDateFromJson(historicalData, HistoryJsonConstants.START_TIME));
+        historicActivityInstanceEntity.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
+
+        historicActivityInstanceEntityManager.insert(historicActivityInstanceEntity);
+        dispatchEvent(commandContext,
+                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstanceEntity));
+    }
 
 }

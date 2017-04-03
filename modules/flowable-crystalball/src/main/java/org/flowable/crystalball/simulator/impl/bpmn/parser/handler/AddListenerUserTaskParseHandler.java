@@ -26,24 +26,23 @@ import org.flowable.engine.impl.bpmn.parser.handler.UserTaskParseHandler;
  */
 public class AddListenerUserTaskParseHandler extends UserTaskParseHandler {
 
-  private final String eventName;
-  private final TaskListener taskListener;
+    private final String eventName;
+    private final TaskListener taskListener;
 
-  public AddListenerUserTaskParseHandler(String eventName, TaskListener taskListener) {
-    this.eventName = eventName;
-    this.taskListener = taskListener;
-  }
+    public AddListenerUserTaskParseHandler(String eventName, TaskListener taskListener) {
+        this.eventName = eventName;
+        this.taskListener = taskListener;
+    }
 
-  protected void executeParse(BpmnParse bpmnParse, UserTask userTask) {
-    super.executeParse(bpmnParse, userTask);
-    
-    FlowableListener listener = new FlowableListener();
-    listener.setEvent(eventName);
-    listener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_INSTANCE);
-    listener.setInstance(taskListener);
-    userTask.getTaskListeners().add(listener);
-    
+    protected void executeParse(BpmnParse bpmnParse, UserTask userTask) {
+        super.executeParse(bpmnParse, userTask);
 
-  }
-  
+        FlowableListener listener = new FlowableListener();
+        listener.setEvent(eventName);
+        listener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_INSTANCE);
+        listener.setInstance(taskListener);
+        userTask.getTaskListeners().add(listener);
+
+    }
+
 }

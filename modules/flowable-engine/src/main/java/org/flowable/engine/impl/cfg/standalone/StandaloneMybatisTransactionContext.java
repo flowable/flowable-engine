@@ -37,103 +37,102 @@ import org.slf4j.LoggerFactory;
  */
 public class StandaloneMybatisTransactionContext implements TransactionContext {
 
-  private static Logger log = LoggerFactory.getLogger(StandaloneMybatisTransactionContext.class);
+    private static Logger log = LoggerFactory.getLogger(StandaloneMybatisTransactionContext.class);
 
-  protected CommandContext commandContext;
-  protected DbSqlSession dbSqlSession;
-  protected Map<TransactionState, List<TransactionListener>> stateTransactionListeners;
+    protected CommandContext commandContext;
+    protected DbSqlSession dbSqlSession;
+    protected Map<TransactionState, List<TransactionListener>> stateTransactionListeners;
 
-  public StandaloneMybatisTransactionContext(AbstractCommandContext commandContext) {
-    this.commandContext = (CommandContext) commandContext;
-    this.dbSqlSession = this.commandContext.getDbSqlSession();
-  }
-
-  public void addTransactionListener(TransactionState transactionState, TransactionListener transactionListener) {
-    if (stateTransactionListeners == null) {
-      stateTransactionListeners = new HashMap<TransactionState, List<TransactionListener>>();
+    public StandaloneMybatisTransactionContext(AbstractCommandContext commandContext) {
+        this.commandContext = (CommandContext) commandContext;
+        this.dbSqlSession = this.commandContext.getDbSqlSession();
     }
-    List<TransactionListener> transactionListeners = stateTransactionListeners.get(transactionState);
-    if (transactionListeners == null) {
-      transactionListeners = new ArrayList<TransactionListener>();
-      stateTransactionListeners.put(transactionState, transactionListeners);
-    }
-    transactionListeners.add(transactionListener);
-  }
 
- public void commit() {
-    
-    log.debug("firing event committing...");
-    fireTransactionEvent(TransactionState.COMMITTING, false);
-    
-    log.debug("committing the ibatis sql session...");
-    dbSqlSession.commit();
-    log.debug("firing event committed...");
-    fireTransactionEvent(TransactionState.COMMITTED, true);
-    
-  }
-
-  /**
-   * Fires the event for the provided {@link TransactionState}.
-   * 
-   * @param transactionState The {@link TransactionState} for which the listeners will be called.
-   * @param executeInNewContext If true, the listeners will be called in a new command context.
-   *                            This is needed for example when firing the {@link TransactionState#COMMITTED}
-   *                            event: the transaction is already committed and executing logic in the same
-   *                            context could lead to strange behaviour (for example doing a {@link SqlSession#update(String)}
-   *                            would actually roll back the update (as the MyBatis context is already committed
-   *                            and the internal flags have not been correctly set).
-   */
-  protected void fireTransactionEvent(TransactionState transactionState, boolean executeInNewContext) {
-    if (stateTransactionListeners==null) {
-      return;
-    }
-    final List<TransactionListener> transactionListeners = stateTransactionListeners.get(transactionState);
-    if (transactionListeners==null) {
-      return;
-    }
-    
-    if (executeInNewContext) {
-      CommandExecutor commandExecutor = commandContext.getProcessEngineConfiguration().getCommandExecutor(); 
-      CommandConfig commandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW); 
-      commandExecutor.execute(commandConfig, new Command<Void>() {
-        public Void execute(CommandContext commandContext) {
-          executeTransactionListeners(transactionListeners, commandContext);
-          return null;
+    public void addTransactionListener(TransactionState transactionState, TransactionListener transactionListener) {
+        if (stateTransactionListeners == null) {
+            stateTransactionListeners = new HashMap<TransactionState, List<TransactionListener>>();
         }
-      });
-    } else {
-      executeTransactionListeners(transactionListeners, commandContext);
+        List<TransactionListener> transactionListeners = stateTransactionListeners.get(transactionState);
+        if (transactionListeners == null) {
+            transactionListeners = new ArrayList<TransactionListener>();
+            stateTransactionListeners.put(transactionState, transactionListeners);
+        }
+        transactionListeners.add(transactionListener);
     }
-    
-  }
-  
-  protected void executeTransactionListeners(List<TransactionListener> transactionListeners, CommandContext commandContext) {
-    for (TransactionListener transactionListener : transactionListeners) {
-      transactionListener.execute(commandContext);
+
+    public void commit() {
+
+        log.debug("firing event committing...");
+        fireTransactionEvent(TransactionState.COMMITTING, false);
+
+        log.debug("committing the ibatis sql session...");
+        dbSqlSession.commit();
+        log.debug("firing event committed...");
+        fireTransactionEvent(TransactionState.COMMITTED, true);
+
     }
-  }
 
-  public void rollback() {
-    try {
-      try {
-        log.debug("firing event rolling back...");
-        fireTransactionEvent(TransactionState.ROLLINGBACK, false);
+    /**
+     * Fires the event for the provided {@link TransactionState}.
+     * 
+     * @param transactionState
+     *            The {@link TransactionState} for which the listeners will be called.
+     * @param executeInNewContext
+     *            If true, the listeners will be called in a new command context. This is needed for example when firing the {@link TransactionState#COMMITTED} event: the transaction is already
+     *            committed and executing logic in the same context could lead to strange behaviour (for example doing a {@link SqlSession#update(String)} would actually roll back the update (as the
+     *            MyBatis context is already committed and the internal flags have not been correctly set).
+     */
+    protected void fireTransactionEvent(TransactionState transactionState, boolean executeInNewContext) {
+        if (stateTransactionListeners == null) {
+            return;
+        }
+        final List<TransactionListener> transactionListeners = stateTransactionListeners.get(transactionState);
+        if (transactionListeners == null) {
+            return;
+        }
 
-      } catch (Throwable exception) {
-        log.info("Exception during transaction: {}", exception.getMessage());
-        commandContext.exception(exception);
-      } finally {
-        log.debug("rolling back ibatis sql session...");
-        dbSqlSession.rollback();
-      }
+        if (executeInNewContext) {
+            CommandExecutor commandExecutor = commandContext.getProcessEngineConfiguration().getCommandExecutor();
+            CommandConfig commandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
+            commandExecutor.execute(commandConfig, new Command<Void>() {
+                public Void execute(CommandContext commandContext) {
+                    executeTransactionListeners(transactionListeners, commandContext);
+                    return null;
+                }
+            });
+        } else {
+            executeTransactionListeners(transactionListeners, commandContext);
+        }
 
-    } catch (Throwable exception) {
-      log.info("Exception during transaction: {}", exception.getMessage());
-      commandContext.exception(exception);
-
-    } finally {
-      log.debug("firing event rolled back...");
-      fireTransactionEvent(TransactionState.ROLLED_BACK, true);
     }
-  }
+
+    protected void executeTransactionListeners(List<TransactionListener> transactionListeners, CommandContext commandContext) {
+        for (TransactionListener transactionListener : transactionListeners) {
+            transactionListener.execute(commandContext);
+        }
+    }
+
+    public void rollback() {
+        try {
+            try {
+                log.debug("firing event rolling back...");
+                fireTransactionEvent(TransactionState.ROLLINGBACK, false);
+
+            } catch (Throwable exception) {
+                log.info("Exception during transaction: {}", exception.getMessage());
+                commandContext.exception(exception);
+            } finally {
+                log.debug("rolling back ibatis sql session...");
+                dbSqlSession.rollback();
+            }
+
+        } catch (Throwable exception) {
+            log.info("Exception during transaction: {}", exception.getMessage());
+            commandContext.exception(exception);
+
+        } finally {
+            log.debug("firing event rolled back...");
+            fireTransactionEvent(TransactionState.ROLLED_BACK, true);
+        }
+    }
 }

@@ -26,136 +26,136 @@ import org.junit.Test;
  */
 public class SecureScriptingTest extends SecureScriptingBaseTest {
 
-  @Test
-  public void testClassWhiteListing() {
-    deployProcessDefinition("test-secure-script-class-white-listing.bpmn20.xml");
+    @Test
+    public void testClassWhiteListing() {
+        deployProcessDefinition("test-secure-script-class-white-listing.bpmn20.xml");
 
-    try {
-      runtimeService.startProcessInstanceByKey("secureScripting");
-      Assert.fail(); // Expecting exception
-    } catch (Exception e) {
-      e.printStackTrace();
-      Assert.assertTrue(e.getMessage().contains("Cannot call property getRuntime in object"));
+        try {
+            runtimeService.startProcessInstanceByKey("secureScripting");
+            Assert.fail(); // Expecting exception
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.assertTrue(e.getMessage().contains("Cannot call property getRuntime in object"));
+        }
     }
-  }
 
-  @Test
-  public void testInfiniteLoop() {
-    deployProcessDefinition("test-secure-script-infinite-loop.bpmn20.xml");
+    @Test
+    public void testInfiniteLoop() {
+        deployProcessDefinition("test-secure-script-infinite-loop.bpmn20.xml");
 
-    enableSysoutsInScript();
-    addWhiteListedClass("java.lang.Thread"); // For the thread.sleep
+        enableSysoutsInScript();
+        addWhiteListedClass("java.lang.Thread"); // For the thread.sleep
 
-    try {
-      runtimeService.startProcessInstanceByKey("secureScripting");
-      Assert.fail(); // Expecting exception
-    } catch (Throwable t) {
-      t.printStackTrace();
-      Assert.assertTrue(t.getMessage().contains("Maximum variableScope time of 3000 ms exceeded"));
+        try {
+            runtimeService.startProcessInstanceByKey("secureScripting");
+            Assert.fail(); // Expecting exception
+        } catch (Throwable t) {
+            t.printStackTrace();
+            Assert.assertTrue(t.getMessage().contains("Maximum variableScope time of 3000 ms exceeded"));
+        }
     }
-  }
 
-  @Test
-  public void testMaximumStackDepth() {
-    deployProcessDefinition("test-secure-script-max-stack-depth.bpmn20.xml");
+    @Test
+    public void testMaximumStackDepth() {
+        deployProcessDefinition("test-secure-script-max-stack-depth.bpmn20.xml");
 
-    try {
-      runtimeService.startProcessInstanceByKey("secureScripting");
-      Assert.fail(); // Expecting exception
-    } catch (Throwable t) {
-      t.printStackTrace();
-      Assert.assertTrue(t.getMessage().contains("Exceeded maximum stack depth"));
+        try {
+            runtimeService.startProcessInstanceByKey("secureScripting");
+            Assert.fail(); // Expecting exception
+        } catch (Throwable t) {
+            t.printStackTrace();
+            Assert.assertTrue(t.getMessage().contains("Exceeded maximum stack depth"));
+        }
     }
-  }
 
-  @Test
-  public void testMaxMemoryUsage() {
-    deployProcessDefinition("test-secure-script-max-memory-usage.bpmn20.xml");
+    @Test
+    public void testMaxMemoryUsage() {
+        deployProcessDefinition("test-secure-script-max-memory-usage.bpmn20.xml");
 
-    try {
-      runtimeService.startProcessInstanceByKey("secureScripting");
-      Assert.fail(); // Expecting exception
-    } catch (Throwable t) {
-      t.printStackTrace();
-      Assert.assertTrue(t.getMessage().contains("Memory limit of 3145728 bytes reached"));
+        try {
+            runtimeService.startProcessInstanceByKey("secureScripting");
+            Assert.fail(); // Expecting exception
+        } catch (Throwable t) {
+            t.printStackTrace();
+            Assert.assertTrue(t.getMessage().contains("Memory limit of 3145728 bytes reached"));
+        }
     }
-  }
 
-  @Test
-  public void testUseExecutionAndVariables() {
-    deployProcessDefinition("test-secure-script-use-variableScope-and-vars.bpmn20.xml");
+    @Test
+    public void testUseExecutionAndVariables() {
+        deployProcessDefinition("test-secure-script-use-variableScope-and-vars.bpmn20.xml");
 
-    addWhiteListedClass("java.lang.Integer");
-    addWhiteListedClass("org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl");
+        addWhiteListedClass("java.lang.Integer");
+        addWhiteListedClass("org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl");
 
-    Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("a", 123);
-    vars.put("b", 456);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("useExecutionAndVars", vars);
+        Map<String, Object> vars = new HashMap<String, Object>();
+        vars.put("a", 123);
+        vars.put("b", 456);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("useExecutionAndVars", vars);
 
-    Object c = runtimeService.getVariable(processInstance.getId(), "c");
-    Assert.assertTrue(c instanceof Number);
-    Number cNumber = (Number) c;
-    Assert.assertEquals(579, cNumber.intValue());
-    
-    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-    Assert.assertEquals(1, tasks.size());
-  }
+        Object c = runtimeService.getVariable(processInstance.getId(), "c");
+        Assert.assertTrue(c instanceof Number);
+        Number cNumber = (Number) c;
+        Assert.assertEquals(579, cNumber.intValue());
 
-  @Test
-  public void testExecutionListener() {
-    deployProcessDefinition("test-secure-script-execution-listener.bpmn20.xml");
-    try {
-      runtimeService.startProcessInstanceByKey("secureScripting");
-      Assert.fail(); // Expecting exception
-    } catch (Exception e) {
-      e.printStackTrace();
-      Assert.assertTrue(e.getMessage().contains("Cannot call property getRuntime in object"));
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        Assert.assertEquals(1, tasks.size());
     }
-    Assert.assertEquals(0, taskService.createTaskQuery().count());
-  }
-  
-  @Test
-  public void testExecutionListener2() {
-    deployProcessDefinition("test-secure-script-execution-listener2.bpmn20.xml");
-    
-    removeWhiteListedClass("org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl");
-    try {
-      runtimeService.startProcessInstanceByKey("secureScripting");
-      Assert.fail(); // Expecting exception
-    } catch (Exception e) {
-      
+
+    @Test
+    public void testExecutionListener() {
+        deployProcessDefinition("test-secure-script-execution-listener.bpmn20.xml");
+        try {
+            runtimeService.startProcessInstanceByKey("secureScripting");
+            Assert.fail(); // Expecting exception
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.assertTrue(e.getMessage().contains("Cannot call property getRuntime in object"));
+        }
+        Assert.assertEquals(0, taskService.createTaskQuery().count());
     }
-    
-    try {
-      addWhiteListedClass("org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl");
-      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("secureScripting");
-      Assert.assertEquals("testValue", runtimeService.getVariable(processInstance.getId(), "test"));
-    } catch(Exception e) {
-      Assert.fail();
-    } finally {
-      removeWhiteListedClass("org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl");
+
+    @Test
+    public void testExecutionListener2() {
+        deployProcessDefinition("test-secure-script-execution-listener2.bpmn20.xml");
+
+        removeWhiteListedClass("org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl");
+        try {
+            runtimeService.startProcessInstanceByKey("secureScripting");
+            Assert.fail(); // Expecting exception
+        } catch (Exception e) {
+
+        }
+
+        try {
+            addWhiteListedClass("org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl");
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("secureScripting");
+            Assert.assertEquals("testValue", runtimeService.getVariable(processInstance.getId(), "test"));
+        } catch (Exception e) {
+            Assert.fail();
+        } finally {
+            removeWhiteListedClass("org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl");
+        }
     }
-  }
-  
-  @Test
-  public void testTaskListener() {
-    deployProcessDefinition("test-secure-script-task-listener.bpmn20.xml");
-    runtimeService.startProcessInstanceByKey("secureScripting");
-    
-    Task task = taskService.createTaskQuery().singleResult();
-    Assert.assertNotNull(task);
-    
-    // Completing the task should fail cause the script is not secure
-    try {
-      taskService.complete(task.getId());
-      Assert.fail(); // Expecting exception
-    } catch (Exception e) {
-      e.printStackTrace();
+
+    @Test
+    public void testTaskListener() {
+        deployProcessDefinition("test-secure-script-task-listener.bpmn20.xml");
+        runtimeService.startProcessInstanceByKey("secureScripting");
+
+        Task task = taskService.createTaskQuery().singleResult();
+        Assert.assertNotNull(task);
+
+        // Completing the task should fail cause the script is not secure
+        try {
+            taskService.complete(task.getId());
+            Assert.fail(); // Expecting exception
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        task = taskService.createTaskQuery().singleResult();
+        Assert.assertNotNull(task);
     }
-    
-    task = taskService.createTaskQuery().singleResult();
-    Assert.assertNotNull(task);
-  }
 
 }

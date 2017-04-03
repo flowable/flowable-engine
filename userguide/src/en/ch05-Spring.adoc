@@ -6,7 +6,7 @@ While you can definitely use Flowable without Spring, we've provided some very n
 
 === ProcessEngineFactoryBean
 
-The +ProcessEngine+ can be configured as a regular Spring bean. The starting point of the integration is the class +org.flowable.spring.ProcessEngineFactoryBean+. That bean takes a process engine configuration and creates the process engine.  This means that the creation and configuration of properties for Spring is the same as documented in the <<configuration,configuration section>>. For Spring integration the configuration and engine beans will look like this:
+The +ProcessEngine+ can be configured as a regular Spring bean. The starting point of the integration is the class +org.flowable.spring.ProcessEngineFactoryBean+. That bean takes a process engine configuration and creates the process engine.  This means that the creation and configuration of properties for Spring is the same as documented in the <<configuration,configuration section>>. For Spring integration, the configuration and engine beans will look like this:
 
 [source,xml,linenums]
 ----
@@ -25,12 +25,12 @@ Note that the +processEngineConfiguration+ bean now uses the +org.flowable.sprin
 
 === Transactions
 
-We'll explain the +SpringTransactionIntegrationTest+ found in the Spring examples of the distribution step by step.   Below is the Spring configuration file that we use in this example  (you can find it in SpringTransactionIntegrationTest-context.xml). The section shown below  contains the dataSource, transactionManager, processEngine and the Flowable Engine services.
+We'll explain the +SpringTransactionIntegrationTest+ found in the Spring examples of the distribution step by step.  Below is the Spring configuration file that we use in this example (you can find it in SpringTransactionIntegrationTest-context.xml). The section shown below contains the dataSource, transactionManager, processEngine and the Flowable engine services.
 
 
-When passing the DataSource to the +SpringProcessEngineConfiguration+ (using property "dataSource"), Flowable uses a +org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy+ internally, which wraps the passed DataSource. This is done to make sure the SQL connections retrieved from the DataSource and the Spring transactions play well together. This implies that it's no longer needed to proxy the dataSource yourself in Spring configuration, although it's still allowed to pass a +TransactionAwareDataSourceProxy+ into the +SpringProcessEngineConfiguration+. In this case no additional wrapping will occur.
+When passing the DataSource to the +SpringProcessEngineConfiguration+ (using property "dataSource"), Flowable uses a +org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy+ internally, which wraps the passed DataSource. This is done to make sure the SQL connections retrieved from the DataSource and the Spring transactions play well together. This implies that it's no longer necessary to proxy the dataSource yourself in Spring configuration, although it's still possible to pass a +TransactionAwareDataSourceProxy+ into the +SpringProcessEngineConfiguration+. In this case, no additional wrapping will occur.
 
-*Make sure when declaring a +TransactionAwareDataSourceProxy+ in Spring configuration yourself, that you don't use it for resources that are already aware of Spring-transactions (e.g. DataSourceTransactionManager and JPATransactionManager need the un-proxied dataSource).*
+*Make sure when declaring a +TransactionAwareDataSourceProxy+ in Spring configuration yourself that you don't use it for resources that are already aware of Spring transactions (e.g. DataSourceTransactionManager and JPATransactionManager need the un-proxied dataSource).*
 
 [source,xml,linenums]
 ----
@@ -38,9 +38,12 @@ When passing the DataSource to the +SpringProcessEngineConfiguration+ (using pro
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd
-                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
-                           http://www.springframework.org/schema/tx      http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                             http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context 
+                             http://www.springframework.org/schema/context/spring-context-2.5.xsd
+                           http://www.springframework.org/schema/tx
+                             http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 
   <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
     <property name="driverClass" value="org.h2.Driver" />
@@ -91,7 +94,7 @@ The remainder of that Spring configuration file contains the beans and configura
 </beans>
 ----
 
-First the application context is created with any of the Spring ways to do that. In this  example you could use a classpath XML resource to configure our Spring application context:
+First, the application context is created using any of the ways supported by Spring. In this example, you could use a classpath XML resource to configure our Spring application context:
 
 [source,java,linenums]
 ----
@@ -99,15 +102,16 @@ ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationC
 	"org/flowable/examples/spring/SpringTransactionIntegrationTest-context.xml");
 ----
 
-or since it is a test:
+or, as it's a test:
 
 [source,java,linenums]
 ----
-@ContextConfiguration("classpath:org/flowable/spring/test/transaction/SpringTransactionIntegrationTest-context.xml")
+@ContextConfiguration(
+  "classpath:org/flowable/spring/test/transaction/SpringTransactionIntegrationTest-context.xml")
 ----
 
 
-Then we can get the service beans and invoke methods on them.  The ProcessEngineFactoryBean will have  added an extra interceptor to the services that applies Propagation.REQUIRED transaction semantics on  the Flowable service methods.  So, for example, we can use the repositoryService to deploy a process like this:
+Then we can get the service beans and invoke methods on them.  The ProcessEngineFactoryBean will have added an extra interceptor to the services that applies Propagation.REQUIRED transaction semantics on the Flowable service methods.  So, for example, we can use the repositoryService to deploy a process like this:
 
 [source,java,linenums]
 ----
@@ -121,7 +125,7 @@ String deploymentId = repositoryService
 
 ----
 
-The other way around also works.  In this case, the Spring transaction will  be around the userBean.hello() method and the Flowable service method invocation will join that  same transaction.
+The other way around also works.  In this case, the Spring transaction will be around the userBean.hello() method and the Flowable service method invocation will join that same transaction.
 
 [source,java,linenums]
 ----
@@ -129,7 +133,7 @@ UserBean userBean = (UserBean) applicationContext.getBean("userBean");
 userBean.hello();
 ----
 
-The UserBean looks like this.  Remember from above in the Spring bean configuration we injected the  repositoryService into the userBean.
+The UserBean looks like this.  Remember, from above in the Spring bean configuration, we injected the repositoryService into the userBean.
 
 [source,java,linenums]
 ----
@@ -157,7 +161,7 @@ public class UserBean {
 
 === Expressions
 
-When using the ProcessEngineFactoryBean, by default, all <<apiExpressions,expressions>> in the BPMN processes will also 'see' all the Spring beans. It's possible to limit the beans you want to expose in expressions or even exposing no beans at all using a map that you can configure.  The example below exposes a single bean (printer), available to use under the key "printer".  *To have NO beans exposed at all, just pass an empty list as 'beans' property on the SpringProcessEngineConfiguration. When no 'beans' property is set, all Spring beans in the context will be available.*
+When using the ProcessEngineFactoryBean, all <<apiExpressions,expressions>> in the BPMN processes will also 'see' all the Spring beans, by default. It's possible to limit the beans (even none) you want to expose in expressions using a map that you can configure.  The example below exposes a single bean (printer), available to use under the key "printer".  *To have NO beans exposed at all, just pass an empty list as 'beans' property on the SpringProcessEngineConfiguration. When no 'beans' property is set, all Spring beans in the context will be available.*
 
 [source,xml,linenums]
 ----
@@ -220,10 +224,9 @@ And the Spring bean configuration (also shown above) looks like this:
 ----
 
 
-
 === Automatic resource deployment
 
-Spring integration also has a special feature for deploying resources.  In the process engine configuration, you can specify a set of resources. When the process engine is created, all those resources will be scanned and deployed.  There is filtering in place that prevents duplicate deployments.  Only when the resources actually have changed,  will new deployments be deployed to the Flowable DB. This makes sense in a lot of use case, where the Spring container is rebooted often (e.g. testing).
+Spring integration also has a special feature for deploying resources.  In the process engine configuration, you can specify a set of resources. When the process engine is created, all those resources will be scanned and deployed.  There is filtering in place that prevents duplicate deployments.  Only when the resources have actually changed will new deployments be deployed to the Flowable DB. This makes sense in a lot of use cases, where the Spring container is rebooted frequently (for example, testing).
 
 Here's an example:
 
@@ -240,14 +243,13 @@ Here's an example:
 </bean>
 ----
 
-By default, the configuration above will group all of the resources matching the filtering into a single deployment to the Flowable engine. The duplicate filtering to prevent re-deployment of unchanged  resources applies to the whole deployment. In some cases, this may not be what you want. For instance, if you deploy a set of process resources this way and only a single
- process definition in those resources has changed, the deployment as a whole will be considered new and all of the process definitions in that deployment will be re-deployed, resulting in new  versions of each of the process definitions, even though only one was actually changed.
+By default, the configuration above will group all of the resources matching the filter into a single deployment to the Flowable engine. The duplicate filtering to prevent re-deployment of unchanged resources applies to the whole deployment. In some cases, this may not be what you want. For instance, if you deploy a set of process resources this way and only a single process definition in those resources has changed, the deployment as a whole will be considered new and all of the process definitions in that deployment will be re-deployed, resulting in new  versions of each of the process definitions, even though only one was actually changed.
 
-To be able to customize the way deployments are determined, you can specify an additional property in the +SpringProcessEngineConfiguration+, +deploymentMode+. This  property defines the way deployments will be determined from the set of resources that match the filter. There are 3 values that are supported by default for this property:
+To be able to customize the way deployments are determined, you can specify an additional property in the +SpringProcessEngineConfiguration+, +deploymentMode+. This property defines the way deployments will be determined from the set of resources that match the filter. There are 3 values that are supported by default for this property:
 
 * ++default++: Group all resources into a single deployment and apply duplicate filtering to that deployment. This is the default value and it will be used if you don't specify a value.
-* ++single-resource++: Create a separate deployment for each individual resource and apply duplicate filtering to that deployment. This is the  value you would use to have each process definition be deployed separately and only create a new process definition version if it has changed.
-* ++resource-parent-folder++: Create a separate deployment for resources that share the same parent folder and apply duplicate filtering to that  deployment. This value can be used to create separate deployments for most resources, but still be able to group some by placing them in a shared folder. Here's an example of how to specify the +single-resource+ configuration for ++deploymentMode++:
+* ++single-resource++: Create a separate deployment for each individual resource and apply duplicate filtering to that deployment. This is the value you would use to have each process definition be deployed separately and only create a new process definition version if it has changed.
+* ++resource-parent-folder++: Create a separate deployment for resources that share the same parent folder and apply duplicate filtering to that deployment. This value can be used to create separate deployments for most resources, but still be able to group some by placing them in a shared folder. Here's an example of how to specify the +single-resource+ configuration for ++deploymentMode++:
 
 
 [source,xml,linenums]
@@ -260,7 +262,7 @@ To be able to customize the way deployments are determined, you can specify an a
 </bean>
 ----
 
-In addition to using the values listed above for +deploymentMode+, you may require customized behavior towards determining deployments. If so,  you can create a subclass of +SpringProcessEngineConfiguration+ and override the +getAutoDeploymentStrategy(String deploymentMode)+ method.  This method determines which deployment strategy is used for a certain value of the +deploymentMode+ configuration.
+In addition to using the values listed above for +deploymentMode+, you may require customized behavior towards determining deployments. If so, you can create a subclass of +SpringProcessEngineConfiguration+ and override the +getAutoDeploymentStrategy(String deploymentMode)+ method.  This method determines which deployment strategy is used for a certain value of the +deploymentMode+ configuration.
 
 
 [[springUnitTest]]
@@ -300,7 +302,7 @@ public class MyBusinessProcessTest {
 }
 ----
 
-Note that for this to work, you need to define a _org.flowable.engine.test.Flowable_ bean in the Spring configuration (which is injected by auto-wiring in the example above).
+Note that for this to work, you need to define an _org.flowable.engine.test.Flowable_ bean in the Spring configuration (which is injected by auto-wiring in the example above).
 
 [source,xml,linenums]
 ----
@@ -314,7 +316,7 @@ Note that for this to work, you need to define a _org.flowable.engine.test.Flowa
 
 === JPA with Hibernate 4.2.x
 
-When using Hibernate 4.2.x JPA in service task or listener logic in the Flowable Engine an additional dependency to Spring ORM is needed. This is not needed for Hibernate 4.1.x or lower. The following dependency should be added:
+When using Hibernate 4.2.x JPA in service task or listener logic in the Flowable engine, an additional dependency to Spring ORM is needed. This is not needed for Hibernate 4.1.x or earlier. The following dependency should be added:
 
 [source,xml,linenums]
 ----
@@ -335,7 +337,7 @@ Spring Boot is an application framework which, according to link:$$http://projec
 
 For more information on Spring Boot, see link:$$http://projects.spring.io/spring-boot/$$[http://projects.spring.io/spring-boot/]
 
-The Spring Boot - Flowable integration is currently experimental. It has been developer together with Spring committers, but it is still early days. We welcome all to try it out and provide feedback. 
+The Spring Boot - Flowable integration has been developed together with Spring committers. 
 
 ==== Compatibility
 
@@ -349,9 +351,9 @@ Spring Boot is all about convention over configuration. To get started, simply a
 [source,xml,linenums]
 ----
 <dependency>
-	<groupId>org.flowable</groupId>
-	<artifactId>flowable-spring-boot-starter-basic</artifactId>
-	<version>${flowable.version}</version>
+    <groupId>org.flowable</groupId>
+    <artifactId>flowable-spring-boot-starter-basic</artifactId>
+    <version>${flowable.version}</version>
 </dependency>
 ----
 
@@ -376,7 +378,7 @@ public class MyApplication {
 }
 ----
 
-Flowable needs a database to store its data. If you would run the code above, it would give you an informative exception message that you need to add a database driver dependency to the classpath. For now, add the H2 database dependency:
+Flowable needs a database to store its data. If you run the code above, it will give you an informative exception message that you need to add a database driver dependency to the classpath. For now, add the H2 database dependency:
 
 [source,xml,linenums]
 ----
@@ -412,14 +414,14 @@ o.s.j.e.a.AnnotationMBeanExporter        : Registering beans for JMX exposure on
 MyApplication                            : Started MyApplication in 2.019 seconds (JVM running for 2.294)
 ----
 
-So by just adding the dependency to the classpath and using the _@EnableAutoConfiguration_ annotation a lot has happened behind the scenes:
+So, by just adding the dependency to the classpath and using the _@EnableAutoConfiguration_ annotation a lot has happened behind the scenes:
 
-* An in-memory datasource is created automatically (since the H2 driver is on the classpath) and passed to the Flowable process engine configuration
+* An in-memory datasource is created automatically (because the H2 driver is on the classpath) and passed to the Flowable process engine configuration
 * A Flowable ProcessEngine bean is created and exposed
 * All the Flowable services are exposed as Spring beans
 * The Spring Job Executor is created
 
-Also, any BPMN 2.0 process definition in the _processes_ folder would be automatically deployed. Create a folder _processes_ and add a dummy process definition (named _one-task-process.bpmn20.xml_) to this folder. 
+Also, any BPMN 2.0 process definitions in the _processes_ folder will be automatically deployed. Create a folder _processes_ and add a dummy process definition (named _one-task-process.bpmn20.xml_) to this folder. 
 
 [source,xml,linenums]
 ----
@@ -440,7 +442,7 @@ Also, any BPMN 2.0 process definition in the _processes_ folder would be automat
 </definitions>
 ----
 
-Also add following code lines to test if the deployment actually worked. The _CommandLineRunner_ is a special kind of Spring bean that is executed when the application boots:
+Also, add following code lines to test if the deployment actually worked. The _CommandLineRunner_ is a special kind of Spring bean that is executed when the application boots:
 
 [source,java,linenums]
 ----
@@ -465,16 +467,15 @@ public class MyApplication {
                 	+ repositoryService.createProcessDefinitionQuery().count());
                 System.out.println("Number of tasks : " + taskService.createTaskQuery().count());
                 runtimeService.startProcessInstanceByKey("oneTaskProcess");
-                System.out.println("Number of tasks after process start: " + taskService.createTaskQuery().count());
+                System.out.println("Number of tasks after process start: " 
+                    + taskService.createTaskQuery().count());
             }
         };
-
     }
-
 }
 ----
 
-The output will be as expected:
+The output expected will be:
 
 ----
 Number of process definitions : 1
@@ -485,9 +486,9 @@ Number of tasks after process start : 1
 
 ==== Changing the database and connection pool
 
-As stated above, Spring Boot is about convention over configuration. By default, by having only H2 on the classpath, it created an in memory datasource and passed that to the Flowable process engine configuration.
+As stated above, Spring Boot is about convention over configuration. By default, by having only H2 on the classpath, it created an in-memory datasource and passed that to the Flowable process engine configuration.
 
-To change the datasource, simply override the default by providing a Datasource bean. We're using the _DataSourceBuilder_ class here, which is a helper class from Spring Boot. If Tomcat, HikariCP or Commons DBCP are on the classpath one of them will be selected (in that order with Tomcat first). For example, to switch to a MySQL database:
+To change the datasource, simply override the default by providing a Datasource bean. We're using the _DataSourceBuilder_ class here, which is a helper class from Spring Boot. If Tomcat, HikariCP or Commons DBCP are on the classpath, one of them will be selected (in that order, with Tomcat first). For example, to switch to a MySQL database:
 
 [source,java,linenums]
 ----
@@ -507,14 +508,14 @@ Remove H2 from the Maven dependencies and add the MySQL driver and the Tomcat co
 [source,xml,linenums]
 ----
 <dependency>
-	<groupId>mysql</groupId>
-	<artifactId>mysql-connector-java</artifactId>
-	<version>5.1.34</version>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>5.1.34</version>
 </dependency>
 <dependency>
-	<groupId>org.apache.tomcat</groupId>
-	<artifactId>tomcat-jdbc</artifactId>
-	<version>8.0.15</version>
+    <groupId>org.apache.tomcat</groupId>
+    <artifactId>tomcat-jdbc</artifactId>
+    <version>8.0.15</version>
 </dependency>
 ----
 
@@ -526,22 +527,22 @@ org.flowable.engine.impl.db.DbSqlSession   : performing create on history with r
 org.flowable.engine.impl.db.DbSqlSession   : performing create on identity with resource org/flowable/db/create/flowable.mysql.create.identity.sql
 ----
 
-When you reboot the application multiple times, you'll see the number of tasks go up (the H2 in-memory database does not survive a shutdown, the MySQL does).
+When you reboot the application multiple times, you'll see the number of tasks go up (the H2 in-memory database does not survive a shutdown, MySQL does).
 
 ==== REST support
 
-Often, a REST API is needed on top of the embedded Flowable engine (interacting with the different services in a company). Spring Boot makes this really easy. Add following dependency to the classpath:
+Often, a REST API is used on top of the embedded Flowable engine (interacting with the different services in a company). Spring Boot makes this really easy. Add following dependency to the classpath:
 
 [source,xml,linenums]
 ----
 <dependency>
-	<groupId>org.springframework.boot</groupId>
-	<artifactId>spring-boot-starter-web</artifactId>
-	<version>${spring.boot.version}</version>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <version>${spring.boot.version}</version>
 </dependency>
 ----
 
-Create a new class, a Spring service, and create two methods: one to start our process and one to get a task list for a given assignee. We simply wrap Flowable calls here, but in real-life scenario's this obviously will be more complex obviously.
+Create a new class, a Spring service and create two methods: one to start our process and one to get a task list for a given assignee. We simply wrap Flowable calls here, but in real-life scenarios this will be more complex.
 
 [source,java,linenums]
 ----
@@ -554,12 +555,12 @@ public class MyService {
     @Autowired
     private TaskService taskService;
 
-	@Transactional
+    @Transactional
     public void startProcess() {
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
     }
 
-	@Transactional
+    @Transactional
     public List<Task> getTasks(String assignee) {
         return taskService.createTaskQuery().taskAssignee(assignee).list();
     }
@@ -602,7 +603,7 @@ public class MyRestController {
             this.name = name;
         }
         
-         public String getId() {
+        public String getId() {
             return id;
         }
         public void setId(String id) {
@@ -620,7 +621,7 @@ public class MyRestController {
 }
 ----
 
-Both the _@Service_ and the _@RestController_ will be found by the automatic component scan (_@ComponentScan_) we added to our application class. Run the application class again. We can now interact with the REST API by using for example cURL:
+Both the _@Service_ and the _@RestController_ will be found by the automatic component scan (_@ComponentScan_) we added to our application class. Run the application class again. We can now interact with the REST API, for example, by using cURL:
 
 ----
 curl http://localhost:8080/tasks?assignee=kermit
@@ -634,18 +635,18 @@ curl http://localhost:8080/tasks?assignee=kermit
 
 ==== JPA support
 
-To add in JPA support for Flowable in Spring Boot, add following dependency:
+To add JPA support for Flowable in Spring Boot, add following dependency:
 
 [source,xml,linenums]
 ----
 <dependency>
-	<groupId>org.flowable</groupId>
-	<artifactId>flowable-spring-boot-starter-jpa</artifactId>
-	<version>${flowable.version}</version>
+    <groupId>org.flowable</groupId>
+    <artifactId>flowable-spring-boot-starter-jpa</artifactId>
+    <version>${flowable.version}</version>
 </dependency>
 ----
 
-This will add in the Spring configuration and beans for using JPA. By default the JPA provider will be Hibernate.
+This will add in the Spring configuration and beans for using JPA. By default, the JPA provider will be Hibernate.
 
 Let's create a simple Entity class:
 
@@ -731,16 +732,15 @@ Add following class:
 public interface PersonRepository extends JpaRepository<Person, Long> {
 
     Person findByUsername(String username);
-
 }
 ----
 
-This is a Spring repository, which offers CRUD out of the box. We add the method to find a Person by username. Spring will automagically implement this based on conventions (i.e. the property names used).
+This is a Spring repository, which offers CRUD out of the box. We add the method to find a Person by username. Spring will automatically implement this based on conventions (typically, the property names used).
 
 We now enhance our service further:
 
 * by adding _@Transactional_ to the class. Note that by adding the JPA dependency above, the DataSourceTransactionManager which we were using before is now automatically swapped out by a JpaTransactionManager. 
-* The _startProcess_ now gets an assignee username in, which is used to look up the Person, and put the Person JPA object as a process variable in the process instance.
+* The _startProcess_ now gets an assignee username passed in, which is used to look up the Person, and put the Person JPA object as a process variable in the process instance.
 * A method to create Dummy users is added. This is used in the CommandLineRunner to populate the database.
 
 [source,java,linenums]
@@ -772,7 +772,7 @@ public class MyService {
     }
 
     public void createDemoUsers() {
-		 if (personRepository.findAll().size() == 0) {
+        if (personRepository.findAll().size() == 0) {
             personRepository.save(new Person("jbarrez", "Joram", "Barrez", new Date()));
             personRepository.save(new Person("trademakers", "Tijs", "Rademakers", new Date()));
         }
@@ -788,16 +788,15 @@ The CommandLineRunner now looks like:
 @Bean
 public CommandLineRunner init(final MyService myService) {
 
-	return new CommandLineRunner() {
+    return new CommandLineRunner() {
     	public void run(String... strings) throws Exception {
         	myService.createDemoUsers();
         }
     };
-
 }
 ----
 
-The RestController is also slightly changed to incorporate the changes above (only showing new methods) and the HTTP POST now has a body that contains the assignee username:
+The RestController is also modified slightly to incorporate the changes above (only showing new methods) and the HTTP POST now has a body that contains the assignee username:
 
 ----
 @RestController
@@ -827,7 +826,7 @@ public class MyRestController {
     }
 ----
 
-And lastly, to try out the Spring-JPA-Flowable integration, we assign the task using the id of the Person JPA object in the process definition:
+And finally, to try out the Spring-JPA-Flowable integration, we assign the task using the ID of the Person JPA object in the process definition:
 
 [source,xml,linenums]
 ----
@@ -840,7 +839,7 @@ We can now start a new process instance, providing the user name in the POST bod
 curl -H "Content-Type: application/json" -d '{"assignee" : "jbarrez"}' http://localhost:8080/process
 ----
 
-And the task list is now fetched using the person id:
+And the task list is now fetched using the person ID:
 
 ----
 curl http://localhost:8080/tasks?assignee=1
@@ -850,12 +849,9 @@ curl http://localhost:8080/tasks?assignee=1
 
 ==== Further Reading
 
-Obviously there is a lot about Spring Boot that hasn't been touched yet, like very easy JTA integration or building a war file that can be run on major application servers. And there is a lot more to the Spring Boot integration: 
+Obviously, there is a lot about Spring Boot that hasn't been touched upon yet, like very easy JTA integration or building a WAR file that can be run on major application servers. And there is a lot more to the Spring Boot integration: 
 
 * Actuator support
 * Spring Integration support
 * Rest API integration: boot up the Flowable Rest API embedded within the Spring application
 * Spring Security support
-
-All these areas are a first version at the moment, but they will evolved in the future further.
-

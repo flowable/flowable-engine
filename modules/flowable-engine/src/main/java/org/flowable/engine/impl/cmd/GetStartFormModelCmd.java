@@ -41,77 +41,77 @@ import org.flowable.form.model.FormModel;
  */
 public class GetStartFormModelCmd implements Command<FormModel>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected String processDefinitionId;
-  protected String processInstanceId;
+    private static final long serialVersionUID = 1L;
 
-  public GetStartFormModelCmd(String processDefinitionId, String processInstanceId) {
-    this.processDefinitionId = processDefinitionId;
-    this.processInstanceId = processInstanceId;
-  }
+    protected String processDefinitionId;
+    protected String processInstanceId;
 
-  public FormModel execute(CommandContext commandContext) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    if (!processEngineConfiguration.isFormEngineInitialized()) {
-      throw new FlowableIllegalArgumentException("Form engine is not initialized");
-    }
-    
-    FormModel formModel = null;
-    ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
-    BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
-    Process process = bpmnModel.getProcessById(processDefinition.getKey());
-    FlowElement startElement = process.getInitialFlowElement();
-    if (startElement instanceof StartEvent) {
-      StartEvent startEvent = (StartEvent) startElement;
-      if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
-        formModel = processEngineConfiguration.getFormEngineFormService().getFormInstanceModelByKeyAndParentDeploymentId(
-            startEvent.getFormKey(), processDefinition.getDeploymentId(), null, processInstanceId, null, processDefinition.getTenantId());
-      }
+    public GetStartFormModelCmd(String processDefinitionId, String processInstanceId) {
+        this.processDefinitionId = processDefinitionId;
+        this.processInstanceId = processInstanceId;
     }
 
-    // If form does not exists, we don't want to leak out this info to just anyone
-    if (formModel == null) {
-      throw new FlowableObjectNotFoundException("Form model for process definition " + processDefinitionId + " cannot be found");
-    }
-    
-    fetchRelatedContentInfoIfNeeded(formModel, processEngineConfiguration);
-
-    return formModel;
-  }
-  
-  protected void fetchRelatedContentInfoIfNeeded(FormModel formModel, ProcessEngineConfigurationImpl processEngineConfiguration) {
-    if (!processEngineConfiguration.isContentEngineInitialized()) {
-      return;
-    }
-    
-    if (formModel.getFields() != null) {
-      for (FormField formField : formModel.getFields()) {
-        if (FormFieldTypes.UPLOAD.equals(formField.getType())) {
-          
-          List<String> contentItemIds = null;
-          if (formField.getValue() instanceof List) {
-            contentItemIds = (List<String>) formField.getValue();
-            
-          } else if (formField.getValue() instanceof String) {
-            String[] splittedString = ((String) formField.getValue()).split(",");
-            contentItemIds = new ArrayList<String>();
-            Collections.addAll(contentItemIds, splittedString);
-          }
-          
-          if (contentItemIds != null) {
-            Set<String> contentItemIdSet = new HashSet<>(contentItemIds);
-            
-            List<ContentItem> contentItems = processEngineConfiguration.getContentService()
-                .createContentItemQuery()
-                .ids(contentItemIdSet)
-                .list();
-            
-            formField.setValue(contentItems);
-          }
+    public FormModel execute(CommandContext commandContext) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+        if (!processEngineConfiguration.isFormEngineInitialized()) {
+            throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }
-      }
+
+        FormModel formModel = null;
+        ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
+        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
+        Process process = bpmnModel.getProcessById(processDefinition.getKey());
+        FlowElement startElement = process.getInitialFlowElement();
+        if (startElement instanceof StartEvent) {
+            StartEvent startEvent = (StartEvent) startElement;
+            if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
+                formModel = processEngineConfiguration.getFormEngineFormService().getFormInstanceModelByKeyAndParentDeploymentId(
+                        startEvent.getFormKey(), processDefinition.getDeploymentId(), null, processInstanceId, null, processDefinition.getTenantId());
+            }
+        }
+
+        // If form does not exists, we don't want to leak out this info to just anyone
+        if (formModel == null) {
+            throw new FlowableObjectNotFoundException("Form model for process definition " + processDefinitionId + " cannot be found");
+        }
+
+        fetchRelatedContentInfoIfNeeded(formModel, processEngineConfiguration);
+
+        return formModel;
     }
-  }
+
+    protected void fetchRelatedContentInfoIfNeeded(FormModel formModel, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        if (!processEngineConfiguration.isContentEngineInitialized()) {
+            return;
+        }
+
+        if (formModel.getFields() != null) {
+            for (FormField formField : formModel.getFields()) {
+                if (FormFieldTypes.UPLOAD.equals(formField.getType())) {
+
+                    List<String> contentItemIds = null;
+                    if (formField.getValue() instanceof List) {
+                        contentItemIds = (List<String>) formField.getValue();
+
+                    } else if (formField.getValue() instanceof String) {
+                        String[] splittedString = ((String) formField.getValue()).split(",");
+                        contentItemIds = new ArrayList<String>();
+                        Collections.addAll(contentItemIds, splittedString);
+                    }
+
+                    if (contentItemIds != null) {
+                        Set<String> contentItemIdSet = new HashSet<>(contentItemIds);
+
+                        List<ContentItem> contentItems = processEngineConfiguration.getContentService()
+                                .createContentItemQuery()
+                                .ids(contentItemIdSet)
+                                .list();
+
+                        formField.setValue(contentItems);
+                    }
+                }
+            }
+        }
+    }
 
 }

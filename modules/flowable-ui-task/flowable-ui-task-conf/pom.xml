@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.flowable</groupId>
     	<artifactId>flowable-ui-task</artifactId>
-    	<version>6.0.0-SNAPSHOT</version>
+    	<version>6.0.1-SNAPSHOT</version>
 	</parent>
 	<packaging>jar</packaging>
 
@@ -112,10 +112,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

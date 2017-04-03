@@ -24,26 +24,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Main {
-  
-  private static final Logger logger = LoggerFactory.getLogger(Main.class);
-  
-  public static void main(String[] args) throws Exception {
-    logger.info("Booting up v5 Process Engine");
-    ProcessEngine processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("v5.cfg.xml").buildProcessEngine();
-    logger.info("Starting test data generation.");
-    List<String> executedGenerators = new ArrayList<String>();
-    Reflections reflections = new Reflections("org.flowable.compatibility.testdata.generator");    
-    Set<Class<? extends Flowable5TestDataGenerator>> generatorClasses = reflections.getSubTypesOf(Flowable5TestDataGenerator.class);
-    for (Class<? extends Flowable5TestDataGenerator> generatorClass : generatorClasses) {
-      Flowable5TestDataGenerator testDataGenerator = generatorClass.newInstance();
-      testDataGenerator.generateTestData(processEngine);
-      executedGenerators.add(testDataGenerator.getClass().getCanonicalName());
+
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+
+    public static void main(String[] args) throws Exception {
+        logger.info("Booting up v5 Process Engine");
+        ProcessEngine processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("v5.cfg.xml").buildProcessEngine();
+        logger.info("Starting test data generation.");
+        List<String> executedGenerators = new ArrayList<String>();
+        Reflections reflections = new Reflections("org.flowable.compatibility.testdata.generator");
+        Set<Class<? extends Flowable5TestDataGenerator>> generatorClasses = reflections.getSubTypesOf(Flowable5TestDataGenerator.class);
+        for (Class<? extends Flowable5TestDataGenerator> generatorClass : generatorClasses) {
+            Flowable5TestDataGenerator testDataGenerator = generatorClass.newInstance();
+            testDataGenerator.generateTestData(processEngine);
+            executedGenerators.add(testDataGenerator.getClass().getCanonicalName());
+        }
+
+        logger.info("Test data generation completed.");
+        for (String generatorClass : executedGenerators) {
+            logger.info("Executed test data generator {}", generatorClass);
+        }
     }
 
-    logger.info("Test data generation completed.");
-    for (String generatorClass : executedGenerators) {
-      logger.info("Executed test data generator {}", generatorClass);
-    }
-  }
-  
 }

@@ -26,26 +26,26 @@ import org.flowable.rest.content.service.api.content.ContentItemResponse;
  */
 public class ContentRestResponseFactory {
 
-  public ContentItemResponse createContentItemResponse(ContentItem contentItem) {
-    return createContentItemResponse(contentItem, createUrlBuilder());
-  }
-
-  public ContentItemResponse createContentItemResponse(ContentItem contentItem, ContentRestUrlBuilder urlBuilder) {
-    ContentItemResponse response = new ContentItemResponse(contentItem, 
-        urlBuilder.buildUrl(ContentRestUrls.URL_CONTENT_ITEM, contentItem.getId()));
-    return response;
-  }
-  
-  public List<ContentItemResponse> createContentItemResponseList(List<ContentItem> contentItems) {
-    ContentRestUrlBuilder urlBuilder = createUrlBuilder();
-    List<ContentItemResponse> responseList = new ArrayList<ContentItemResponse>();
-    for (ContentItem contentItem : contentItems) {
-      responseList.add(createContentItemResponse(contentItem, urlBuilder));
+    public ContentItemResponse createContentItemResponse(ContentItem contentItem) {
+        return createContentItemResponse(contentItem, createUrlBuilder());
     }
-    return responseList;
-  }
 
-  protected ContentRestUrlBuilder createUrlBuilder() {
-    return ContentRestUrlBuilder.fromCurrentRequest();
-  }
+    public ContentItemResponse createContentItemResponse(ContentItem contentItem, ContentRestUrlBuilder urlBuilder) {
+        ContentItemResponse response = new ContentItemResponse(contentItem,
+                urlBuilder.buildUrl(ContentRestUrls.URL_CONTENT_ITEM, contentItem.getId()));
+        return response;
+    }
+
+    public List<ContentItemResponse> createContentItemResponseList(List<ContentItem> contentItems) {
+        ContentRestUrlBuilder urlBuilder = createUrlBuilder();
+        List<ContentItemResponse> responseList = new ArrayList<ContentItemResponse>();
+        for (ContentItem contentItem : contentItems) {
+            responseList.add(createContentItemResponse(contentItem, urlBuilder));
+        }
+        return responseList;
+    }
+
+    protected ContentRestUrlBuilder createUrlBuilder() {
+        return ContentRestUrlBuilder.fromCurrentRequest();
+    }
 }

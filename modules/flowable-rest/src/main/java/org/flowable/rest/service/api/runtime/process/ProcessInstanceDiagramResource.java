@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.apache.commons.io.IOUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -43,44 +44,44 @@ import java.util.Collections;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Instances" }, description = "Manage Process Instances")
+@Api(tags = { "Process Instances" }, description = "Manage Process Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceDiagramResource extends BaseProcessInstanceResource {
 
-  @Autowired
-  protected RepositoryService repositoryService;
+    @Autowired
+    protected RepositoryService repositoryService;
 
-  @Autowired
-  protected ProcessEngineConfiguration processEngineConfiguration;
+    @Autowired
+    protected ProcessEngineConfiguration processEngineConfiguration;
 
-  @ApiOperation(value = "Get diagram for a process instance", tags = { "Process Instances" })
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates the process instance was found and the diagram was returned."),
-          @ApiResponse(code = 400, message = "Indicates the requested process instance was not found but the process doesn’t contain any graphical information (BPMN:DI) and no diagram can be created."),
-          @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
-  })
-  @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/diagram", method = RequestMethod.GET)
-  public ResponseEntity<byte[]> getProcessInstanceDiagram(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletResponse response) {
-    ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
+    @ApiOperation(value = "Get diagram for a process instance", tags = { "Process Instances" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the process instance was found and the diagram was returned."),
+            @ApiResponse(code = 400, message = "Indicates the requested process instance was not found but the process doesn’t contain any graphical information (BPMN:DI) and no diagram can be created."),
+            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
+    })
+    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/diagram", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> getProcessInstanceDiagram(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletResponse response) {
+        ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
 
-    ProcessDefinition pde = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
+        ProcessDefinition pde = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
 
-    if (pde != null && pde.hasGraphicalNotation()) {
-      BpmnModel bpmnModel = repositoryService.getBpmnModel(pde.getId());
-      ProcessDiagramGenerator diagramGenerator = processEngineConfiguration.getProcessDiagramGenerator();
-      InputStream resource = diagramGenerator.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(processInstance.getId()), Collections.<String> emptyList(),
-          processEngineConfiguration.getActivityFontName(), processEngineConfiguration.getLabelFontName(), 
-          processEngineConfiguration.getAnnotationFontName(), processEngineConfiguration.getClassLoader(), 1.0);
+        if (pde != null && pde.hasGraphicalNotation()) {
+            BpmnModel bpmnModel = repositoryService.getBpmnModel(pde.getId());
+            ProcessDiagramGenerator diagramGenerator = processEngineConfiguration.getProcessDiagramGenerator();
+            InputStream resource = diagramGenerator.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(processInstance.getId()), Collections.<String>emptyList(),
+                    processEngineConfiguration.getActivityFontName(), processEngineConfiguration.getLabelFontName(),
+                    processEngineConfiguration.getAnnotationFontName(), processEngineConfiguration.getClassLoader(), 1.0);
 
-      HttpHeaders responseHeaders = new HttpHeaders();
-      responseHeaders.set("Content-Type", "image/png");
-      try {
-        return new ResponseEntity<byte[]>(IOUtils.toByteArray(resource), responseHeaders, HttpStatus.OK);
-      } catch (Exception e) {
-        throw new FlowableIllegalArgumentException("Error exporting diagram", e);
-      }
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.set("Content-Type", "image/png");
+            try {
+                return new ResponseEntity<byte[]>(IOUtils.toByteArray(resource), responseHeaders, HttpStatus.OK);
+            } catch (Exception e) {
+                throw new FlowableIllegalArgumentException("Error exporting diagram", e);
+            }
 
-    } else {
-      throw new FlowableIllegalArgumentException("Process instance with id '" + processInstance.getId() + "' has no graphical notation defined.");
+        } else {
+            throw new FlowableIllegalArgumentException("Process instance with id '" + processInstance.getId() + "' has no graphical notation defined.");
+        }
     }
-  }
 }

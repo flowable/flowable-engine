@@ -17,42 +17,42 @@ package org.flowable.bpmn.model;
  */
 public class AdhocSubProcess extends SubProcess {
 
-  public static final String ORDERING_PARALLEL = "Parallel";
-  public static final String ORDERING_SEQUENTIALL = "Sequential";
-  
-  protected String completionCondition;
-  protected String ordering = ORDERING_PARALLEL;
-  protected boolean cancelRemainingInstances = true;
+    public static final String ORDERING_PARALLEL = "Parallel";
+    public static final String ORDERING_SEQUENTIALL = "Sequential";
 
-  public String getCompletionCondition() {
-    return completionCondition;
-  }
+    protected String completionCondition;
+    protected String ordering = ORDERING_PARALLEL;
+    protected boolean cancelRemainingInstances = true;
 
-  public void setCompletionCondition(String completionCondition) {
-    this.completionCondition = completionCondition;
-  }
+    public String getCompletionCondition() {
+        return completionCondition;
+    }
 
-  public String getOrdering() {
-    return ordering;
-  }
+    public void setCompletionCondition(String completionCondition) {
+        this.completionCondition = completionCondition;
+    }
 
-  public void setOrdering(String ordering) {
-    this.ordering = ordering;
-  }
-  
-  public boolean hasParallelOrdering() {
-    return !ORDERING_SEQUENTIALL.equals(ordering);
-  }
-  
-  public boolean hasSequentialOrdering() {
-    return ORDERING_SEQUENTIALL.equals(ordering);
-  }
+    public String getOrdering() {
+        return ordering;
+    }
 
-  public boolean isCancelRemainingInstances() {
-    return cancelRemainingInstances;
-  }
+    public void setOrdering(String ordering) {
+        this.ordering = ordering;
+    }
 
-  public void setCancelRemainingInstances(boolean cancelRemainingInstances) {
-    this.cancelRemainingInstances = cancelRemainingInstances;
-  }
+    public boolean hasParallelOrdering() {
+        return !ORDERING_SEQUENTIALL.equals(ordering);
+    }
+
+    public boolean hasSequentialOrdering() {
+        return ORDERING_SEQUENTIALL.equals(ordering);
+    }
+
+    public boolean isCancelRemainingInstances() {
+        return cancelRemainingInstances;
+    }
+
+    public void setCancelRemainingInstances(boolean cancelRemainingInstances) {
+        this.cancelRemainingInstances = cancelRemainingInstances;
+    }
 }

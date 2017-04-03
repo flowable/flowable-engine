@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.cmd;
 
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -19,6 +20,7 @@ import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.Deployment;
 
 /**
@@ -26,55 +28,54 @@ import org.flowable.engine.repository.Deployment;
  */
 public class SetDeploymentKeyCmd implements Command<Void> {
 
-  protected String deploymentId;
-  protected String key;
+    protected String deploymentId;
+    protected String key;
 
-  public SetDeploymentKeyCmd(String deploymentId, String key) {
-    this.deploymentId = deploymentId;
-    this.key = key;
-  }
-
-  public Void execute(CommandContext commandContext) {
-
-    if (deploymentId == null) {
-      throw new FlowableIllegalArgumentException("Deployment id is null");
+    public SetDeploymentKeyCmd(String deploymentId, String key) {
+        this.deploymentId = deploymentId;
+        this.key = key;
     }
 
-    DeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
+    public Void execute(CommandContext commandContext) {
 
-    if (deployment == null) {
-      throw new FlowableObjectNotFoundException("No deployment found for id = '" + deploymentId + "'", Deployment.class);
+        if (deploymentId == null) {
+            throw new FlowableIllegalArgumentException("Deployment id is null");
+        }
+
+        DeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
+
+        if (deployment == null) {
+            throw new FlowableObjectNotFoundException("No deployment found for id = '" + deploymentId + "'", Deployment.class);
+        }
+
+        if (Flowable5Util.isFlowable5Deployment(deployment, commandContext)) {
+            throw new FlowableException("Not supported for version 5 deployments");
+        }
+
+        // Update category
+        deployment.setKey(key);
+
+        if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, deployment));
+        }
+
+        return null;
     }
-    
-    if (commandContext.getProcessEngineConfiguration().isFlowable5CompatibilityEnabled() && 
-        commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().isVersion5Tag(deployment.getEngineVersion())) {
-      return null;
+
+    public String getDeploymentId() {
+        return deploymentId;
     }
 
-    // Update category
-    deployment.setKey(key);
-
-    if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-      commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, deployment));
+    public void setDeploymentId(String deploymentId) {
+        this.deploymentId = deploymentId;
     }
 
-    return null;
-  }
+    public String getKey() {
+        return key;
+    }
 
-  public String getDeploymentId() {
-    return deploymentId;
-  }
-
-  public void setDeploymentId(String deploymentId) {
-    this.deploymentId = deploymentId;
-  }
-
-  public String getKey() {
-    return key;
-  }
-
-  public void setKey(String key) {
-    this.key = key;
-  }
+    public void setKey(String key) {
+        this.key = key;
+    }
 
 }

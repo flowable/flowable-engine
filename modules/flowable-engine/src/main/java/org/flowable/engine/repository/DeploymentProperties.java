@@ -13,7 +13,7 @@
 package org.flowable.engine.repository;
 
 public interface DeploymentProperties {
-  
-  String DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION = "deployAsFlowable5ProcessDefinition";
+
+    String DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION = "deployAsFlowable5ProcessDefinition";
 
 }

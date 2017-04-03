@@ -25,37 +25,37 @@ import org.flowable.engine.impl.util.Flowable5Util;
  */
 public class RemoveTaskVariablesCmd extends NeedsActiveTaskCmd<Void> {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private final Collection<String> variableNames;
-  private final boolean isLocal;
+    private final Collection<String> variableNames;
+    private final boolean isLocal;
 
-  public RemoveTaskVariablesCmd(String taskId, Collection<String> variableNames, boolean isLocal) {
-    super(taskId);
-    this.variableNames = variableNames;
-    this.isLocal = isLocal;
-  }
-
-  protected Void execute(CommandContext commandContext, TaskEntity task) {
-
-    if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      compatibilityHandler.removeTaskVariables(taskId, variableNames, isLocal);
-      return null;
-    }
-    
-    if (isLocal) {
-      task.removeVariablesLocal(variableNames);
-    } else {
-      task.removeVariables(variableNames);
+    public RemoveTaskVariablesCmd(String taskId, Collection<String> variableNames, boolean isLocal) {
+        super(taskId);
+        this.variableNames = variableNames;
+        this.isLocal = isLocal;
     }
 
-    return null;
-  }
+    protected Void execute(CommandContext commandContext, TaskEntity task) {
 
-  @Override
-  protected String getSuspendedTaskException() {
-    return "Cannot remove variables from a suspended task.";
-  }
+        if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
+            Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+            compatibilityHandler.removeTaskVariables(taskId, variableNames, isLocal);
+            return null;
+        }
+
+        if (isLocal) {
+            task.removeVariablesLocal(variableNames);
+        } else {
+            task.removeVariables(variableNames);
+        }
+
+        return null;
+    }
+
+    @Override
+    protected String getSuspendedTaskException() {
+        return "Cannot remove variables from a suspended task.";
+    }
 
 }

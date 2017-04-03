@@ -12,7 +12,6 @@
  */
 package org.activiti.engine.impl.jobexecutor;
 
-
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandContext;
@@ -24,36 +23,35 @@ import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * @author Tijs Rademakers
  */
 public class AsyncJobAddedNotification implements CommandContextCloseListener {
-  
-  private static Logger log = LoggerFactory.getLogger(AsyncJobAddedNotification.class);
-  
-  protected Job job;
-  protected AsyncExecutor asyncExecutor;
-  
-  public AsyncJobAddedNotification(Job job, AsyncExecutor asyncExecutor) {
-    this.job = job;
-    this.asyncExecutor = asyncExecutor;
-  }
-  
-  @Override
-  public void closed(CommandContext commandContext) {
-    CommandExecutor commandExecutor = commandContext.getProcessEngineConfiguration().getCommandExecutor(); 
-    CommandConfig commandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW); 
-    commandExecutor.execute(commandConfig, new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-        log.debug("notifying job executor of new job");
-        asyncExecutor.executeAsyncJob(job);
-        return null;
-      }
-    });
-  }
 
-  @Override
-  public void closing(CommandContext commandContext) {
-  }
+    private static Logger log = LoggerFactory.getLogger(AsyncJobAddedNotification.class);
+
+    protected Job job;
+    protected AsyncExecutor asyncExecutor;
+
+    public AsyncJobAddedNotification(Job job, AsyncExecutor asyncExecutor) {
+        this.job = job;
+        this.asyncExecutor = asyncExecutor;
+    }
+
+    @Override
+    public void closed(CommandContext commandContext) {
+        CommandExecutor commandExecutor = commandContext.getProcessEngineConfiguration().getCommandExecutor();
+        CommandConfig commandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
+        commandExecutor.execute(commandConfig, new Command<Void>() {
+            public Void execute(CommandContext commandContext) {
+                log.debug("notifying job executor of new job");
+                asyncExecutor.executeAsyncJob(job);
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public void closing(CommandContext commandContext) {
+    }
 }

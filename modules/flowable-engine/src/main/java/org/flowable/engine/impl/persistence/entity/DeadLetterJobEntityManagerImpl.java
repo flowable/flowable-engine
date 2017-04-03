@@ -31,124 +31,123 @@ import org.slf4j.LoggerFactory;
  */
 public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLetterJobEntity> implements DeadLetterJobEntityManager {
 
-  private static final Logger logger = LoggerFactory.getLogger(DeadLetterJobEntityManagerImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeadLetterJobEntityManagerImpl.class);
 
-  protected DeadLetterJobDataManager jobDataManager;
-  
-  public DeadLetterJobEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, DeadLetterJobDataManager jobDataManager) {
-    super(processEngineConfiguration);
-    this.jobDataManager = jobDataManager;
-  }
+    protected DeadLetterJobDataManager jobDataManager;
 
-  @Override
-  public List<DeadLetterJobEntity> findJobsByExecutionId(String id) {
-    return jobDataManager.findJobsByExecutionId(id);
-  }
-  
-  @Override
-  public List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery, Page page) {
-    return jobDataManager.findJobsByQueryCriteria(jobQuery, page);
-  }
-  
-  @Override
-  public long findJobCountByQueryCriteria(DeadLetterJobQueryImpl jobQuery) {
-    return jobDataManager.findJobCountByQueryCriteria(jobQuery);
-  }
-  
-  @Override
-  public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-    jobDataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
-  }
-  
-  @Override
-  public void insert(DeadLetterJobEntity jobEntity, boolean fireCreateEvent) {
+    public DeadLetterJobEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, DeadLetterJobDataManager jobDataManager) {
+        super(processEngineConfiguration);
+        this.jobDataManager = jobDataManager;
+    }
 
-    // add link to execution
-    if (jobEntity.getExecutionId() != null) {
-      ExecutionEntity execution = getExecutionEntityManager().findById(jobEntity.getExecutionId());
+    @Override
+    public List<DeadLetterJobEntity> findJobsByExecutionId(String id) {
+        return jobDataManager.findJobsByExecutionId(id);
+    }
 
-      // Inherit tenant if (if applicable)
-      if (execution.getTenantId() != null) {
-        jobEntity.setTenantId(execution.getTenantId());
-      }
-      
-      if (isExecutionRelatedEntityCountEnabledGlobally()) {
-        CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
-        if (isExecutionRelatedEntityCountEnabled(countingExecutionEntity)) {
-          countingExecutionEntity.setDeadLetterJobCount(countingExecutionEntity.getDeadLetterJobCount() + 1);
+    @Override
+    public List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery, Page page) {
+        return jobDataManager.findJobsByQueryCriteria(jobQuery, page);
+    }
+
+    @Override
+    public long findJobCountByQueryCriteria(DeadLetterJobQueryImpl jobQuery) {
+        return jobDataManager.findJobCountByQueryCriteria(jobQuery);
+    }
+
+    @Override
+    public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
+        jobDataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
+    }
+
+    @Override
+    public void insert(DeadLetterJobEntity jobEntity, boolean fireCreateEvent) {
+
+        // add link to execution
+        if (jobEntity.getExecutionId() != null) {
+            ExecutionEntity execution = getExecutionEntityManager().findById(jobEntity.getExecutionId());
+
+            // Inherit tenant if (if applicable)
+            if (execution.getTenantId() != null) {
+                jobEntity.setTenantId(execution.getTenantId());
+            }
+
+            if (isExecutionRelatedEntityCountEnabledGlobally()) {
+                CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
+                if (isExecutionRelatedEntityCountEnabled(countingExecutionEntity)) {
+                    countingExecutionEntity.setDeadLetterJobCount(countingExecutionEntity.getDeadLetterJobCount() + 1);
+                }
+            }
         }
-      }
+
+        super.insert(jobEntity, fireCreateEvent);
     }
 
-    super.insert(jobEntity, fireCreateEvent);
-  }
+    @Override
+    public void insert(DeadLetterJobEntity jobEntity) {
+        insert(jobEntity, true);
+    }
 
-  @Override
-  public void insert(DeadLetterJobEntity jobEntity) {
-    insert(jobEntity, true);
-  }
-  
-  @Override
-  public void delete(DeadLetterJobEntity jobEntity) {
-    super.delete(jobEntity);
+    @Override
+    public void delete(DeadLetterJobEntity jobEntity) {
+        super.delete(jobEntity);
 
-    deleteExceptionByteArrayRef(jobEntity);
-    deleteAdvancedJobHandlerConfigurationByteArrayRef(jobEntity);
+        deleteExceptionByteArrayRef(jobEntity);
+        deleteAdvancedJobHandlerConfigurationByteArrayRef(jobEntity);
+
+        if (jobEntity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
+            CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(jobEntity.getExecutionId());
+            if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
+                executionEntity.setDeadLetterJobCount(executionEntity.getDeadLetterJobCount() - 1);
+            }
+        }
+
+        // Send event
+        if (getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        }
+    }
+
+    /**
+     * Deletes a the byte array used to store the exception information. Subclasses may override to provide custom implementations.
+     */
+    protected void deleteExceptionByteArrayRef(DeadLetterJobEntity jobEntity) {
+        ByteArrayRef exceptionByteArrayRef = jobEntity.getExceptionByteArrayRef();
+        if (exceptionByteArrayRef != null) {
+            exceptionByteArrayRef.delete();
+        }
+    }
     
-    if (jobEntity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
-      CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(jobEntity.getExecutionId());
-      if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
-        executionEntity.setDeadLetterJobCount(executionEntity.getDeadLetterJobCount() - 1);
-      }
+    protected void deleteAdvancedJobHandlerConfigurationByteArrayRef(DeadLetterJobEntity jobEntity) {
+        ByteArrayRef configurationByteArrayRef = jobEntity.getAdvancedJobHandlerConfigurationByteArrayRef();
+        if (configurationByteArrayRef != null) {
+            configurationByteArrayRef.delete();
+        }
     }
-    
-    // Send event
-    if (getEventDispatcher().isEnabled()) {
-      getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+
+    protected DeadLetterJobEntity createDeadLetterJob(AbstractJobEntity job) {
+        DeadLetterJobEntity newJobEntity = create();
+        newJobEntity.setJobHandlerConfiguration(job.getJobHandlerConfiguration());
+        newJobEntity.setJobHandlerType(job.getJobHandlerType());
+        newJobEntity.setExclusive(job.isExclusive());
+        newJobEntity.setRepeat(job.getRepeat());
+        newJobEntity.setRetries(job.getRetries());
+        newJobEntity.setEndDate(job.getEndDate());
+        newJobEntity.setExecutionId(job.getExecutionId());
+        newJobEntity.setProcessInstanceId(job.getProcessInstanceId());
+        newJobEntity.setProcessDefinitionId(job.getProcessDefinitionId());
+
+        // Inherit tenant
+        newJobEntity.setTenantId(job.getTenantId());
+        newJobEntity.setJobType(job.getJobType());
+        return newJobEntity;
     }
-  }
 
-  /**
-   * Deletes a the byte array used to store the exception information.  Subclasses may override
-   * to provide custom implementations. 
-   */
-  protected void deleteExceptionByteArrayRef(DeadLetterJobEntity jobEntity) {
-    ByteArrayRef exceptionByteArrayRef = jobEntity.getExceptionByteArrayRef();
-    if (exceptionByteArrayRef != null) {
-      exceptionByteArrayRef.delete();
+    protected DeadLetterJobDataManager getDataManager() {
+        return jobDataManager;
     }
-  }
-  
-  protected void deleteAdvancedJobHandlerConfigurationByteArrayRef(DeadLetterJobEntity jobEntity) {
-    ByteArrayRef configurationByteArrayRef = jobEntity.getAdvancedJobHandlerConfigurationByteArrayRef();
-    if (configurationByteArrayRef != null) {
-      configurationByteArrayRef.delete();
+
+    public void setJobDataManager(DeadLetterJobDataManager jobDataManager) {
+        this.jobDataManager = jobDataManager;
     }
-  }
-  
-  protected DeadLetterJobEntity createDeadLetterJob(AbstractJobEntity job) {
-    DeadLetterJobEntity newJobEntity = create();
-    newJobEntity.setJobHandlerConfiguration(job.getJobHandlerConfiguration());
-    newJobEntity.setJobHandlerType(job.getJobHandlerType());
-    newJobEntity.setExclusive(job.isExclusive());
-    newJobEntity.setRepeat(job.getRepeat());
-    newJobEntity.setRetries(job.getRetries());
-    newJobEntity.setEndDate(job.getEndDate());
-    newJobEntity.setExecutionId(job.getExecutionId());
-    newJobEntity.setProcessInstanceId(job.getProcessInstanceId());
-    newJobEntity.setProcessDefinitionId(job.getProcessDefinitionId());
-
-    // Inherit tenant
-    newJobEntity.setTenantId(job.getTenantId());
-    newJobEntity.setJobType(job.getJobType());
-    return newJobEntity;
-  }
-
-  protected DeadLetterJobDataManager getDataManager() {
-    return jobDataManager;
-  }
-
-  public void setJobDataManager(DeadLetterJobDataManager jobDataManager) {
-    this.jobDataManager = jobDataManager;
-  }
 }

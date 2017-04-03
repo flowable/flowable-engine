@@ -31,42 +31,42 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class BaseDmnDeploymentResourceDataResource {
 
-  @Autowired
-  protected ContentTypeResolver contentTypeResolver;
+    @Autowired
+    protected ContentTypeResolver contentTypeResolver;
 
-  @Autowired
-  protected DmnRepositoryService dmnRepositoryService;
+    @Autowired
+    protected DmnRepositoryService dmnRepositoryService;
 
-  protected byte[] getDmnDeploymentResourceData(String deploymentId, String resourceId, HttpServletResponse response) {
+    protected byte[] getDmnDeploymentResourceData(String deploymentId, String resourceName, HttpServletResponse response) {
 
-    if (deploymentId == null) {
-      throw new FlowableIllegalArgumentException("No deployment id provided");
+        if (deploymentId == null) {
+            throw new FlowableIllegalArgumentException("No deployment id provided");
+        }
+        if (resourceName == null) {
+            throw new FlowableIllegalArgumentException("No resource name provided");
+        }
+
+        // Check if deployment exists
+        DmnDeployment deployment = dmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
+        if (deployment == null) {
+            throw new FlowableObjectNotFoundException("Could not find a DMN deployment with id '" + deploymentId);
+        }
+
+        List<String> resourceList = dmnRepositoryService.getDeploymentResourceNames(deploymentId);
+
+        if (resourceList.contains(resourceName)) {
+            final InputStream resourceStream = dmnRepositoryService.getResourceAsStream(deploymentId, resourceName);
+
+            String contentType = contentTypeResolver.resolveContentType(resourceName);
+            response.setContentType(contentType);
+            try {
+                return IOUtils.toByteArray(resourceStream);
+            } catch (Exception e) {
+                throw new FlowableException("Error converting resource stream", e);
+            }
+        } else {
+            // Resource not found in deployment
+            throw new FlowableObjectNotFoundException("Could not find a resource with name '" + resourceName + "' in deployment '" + deploymentId);
+        }
     }
-    if (resourceId == null) {
-      throw new FlowableIllegalArgumentException("No resource id provided");
-    }
-
-    // Check if deployment exists
-    DmnDeployment deployment = dmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
-    if (deployment == null) {
-      throw new FlowableObjectNotFoundException("Could not find a DMN deployment with id '" + deploymentId);
-    }
-
-    List<String> resourceList = dmnRepositoryService.getDeploymentResourceNames(deploymentId);
-
-    if (resourceList.contains(resourceId)) {
-      final InputStream resourceStream = dmnRepositoryService.getResourceAsStream(deploymentId, resourceId);
-
-      String contentType = contentTypeResolver.resolveContentType(resourceId);
-      response.setContentType(contentType);
-      try {
-        return IOUtils.toByteArray(resourceStream);
-      } catch (Exception e) {
-        throw new FlowableException("Error converting resource stream", e);
-      }
-    } else {
-      // Resource not found in deployment
-      throw new FlowableObjectNotFoundException("Could not find a resource with id '" + resourceId + "' in deployment '" + deploymentId);
-    }
-  }
 }

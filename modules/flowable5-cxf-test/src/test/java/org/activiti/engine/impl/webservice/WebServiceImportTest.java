@@ -22,17 +22,17 @@ import org.flowable.engine.test.Deployment;
  */
 public class WebServiceImportTest extends PluggableFlowableTestCase {
 
-  @Deployment
-  public void testImport() throws Exception {
-    processEngine.getRuntimeService().startProcessInstanceByKey("webServiceInvocationImport");
-    waitForJobExecutorToProcessAllJobs(10000L, 250L);
+    @Deployment
+    public void testImport() throws Exception {
+        processEngine.getRuntimeService().startProcessInstanceByKey("webServiceInvocationImport");
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
 
-  }
+    }
 
-  @Deployment
-  public void testImport_DifferentDirectories() throws Exception {
-    processEngine.getRuntimeService().startProcessInstanceByKey("webServiceInvocationImport_DifferentDirectories");
-    waitForJobExecutorToProcessAllJobs(10000L, 250L);
-  }
+    @Deployment
+    public void testImport_DifferentDirectories() throws Exception {
+        processEngine.getRuntimeService().startProcessInstanceByKey("webServiceInvocationImport_DifferentDirectories");
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
+    }
 
 }

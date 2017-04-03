@@ -14,35 +14,36 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-  
-  @Autowired
-  protected Environment environment;
 
-  @Bean
-  public AuthenticationProvider authenticationProvider() {
-    return new BasicAuthenticationProvider();
-  }
+    @Autowired
+    protected Environment environment;
 
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
-    HttpSecurity httpSecurity = http.authenticationProvider(authenticationProvider())
-      .sessionManagement()
-      .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-      .and()
-      .csrf().disable();
-    
-      boolean swaggerDocsEnable = environment.getProperty("rest.docs.swagger.enabled", Boolean.class, true);
-      if (swaggerDocsEnable) {
-        httpSecurity
-          .authorizeRequests()
-          .anyRequest()
-          .authenticated().and().httpBasic();
-      } else {
-        httpSecurity
-          .authorizeRequests()
-          .antMatchers("/docs/**").denyAll()
-          .anyRequest()
-          .authenticated().and().httpBasic();
-      }
-  }
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        return new BasicAuthenticationProvider();
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        HttpSecurity httpSecurity = http.authenticationProvider(authenticationProvider())
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .csrf().disable();
+
+        boolean swaggerDocsEnable = environment.getProperty("rest.docs.swagger.enabled", Boolean.class, true);
+        if (swaggerDocsEnable) {
+            httpSecurity
+                    .authorizeRequests()
+                    .antMatchers("/docs/**").permitAll()
+                    .anyRequest()
+                    .authenticated().and().httpBasic();
+        } else {
+            httpSecurity
+                    .authorizeRequests()
+                    .antMatchers("/docs/**").denyAll()
+                    .anyRequest()
+                    .authenticated().and().httpBasic();
+        }
+    }
 }

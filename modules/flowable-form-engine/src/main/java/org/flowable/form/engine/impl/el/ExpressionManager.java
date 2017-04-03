@@ -40,67 +40,67 @@ import de.odysseus.el.ExpressionFactoryImpl;
  */
 public class ExpressionManager {
 
-  protected ExpressionFactory expressionFactory;
-  // Default implementation (does nothing)
-  protected ELContext parsingElContext = new ParsingElContext();
-  protected Map<Object, Object> beans;
+    protected ExpressionFactory expressionFactory;
+    // Default implementation (does nothing)
+    protected ELContext parsingElContext = new ParsingElContext();
+    protected Map<Object, Object> beans;
 
-  public ExpressionManager() {
-    this(null);
-  }
-
-  public ExpressionManager(boolean initFactory) {
-    this(null, false);
-  }
-
-  public ExpressionManager(Map<Object, Object> beans) {
-    this(beans, true);
-  }
-
-  public ExpressionManager(Map<Object, Object> beans, boolean initFactory) {
-    expressionFactory = new ExpressionFactoryImpl();
-    this.beans = beans;
-  }
-
-  public FormExpression createExpression(String expression) {
-    ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expression.trim(), Object.class);
-    return new JuelExpression(valueExpression, expression, this);
-  }
-
-  public void setExpressionFactory(ExpressionFactory expressionFactory) {
-    this.expressionFactory = expressionFactory;
-  }
-
-  public FlowableFormElContext createElContext(Map<String, Object> variables) {
-    ELResolver elResolver = createElResolver(variables);
-    return new FlowableFormElContext(elResolver);
-  }
-
-  protected ELResolver createElResolver(Map<String, Object> variables) {
-    CompositeELResolver elResolver = new CompositeELResolver();
-    elResolver.add(new VariableElResolver(variables));
-
-    if (beans != null) {
-      // ACT-1102: Also expose all beans in configuration when using
-      // standalone activiti, not
-      // in spring-context
-      elResolver.add(new ReadOnlyMapELResolver(beans));
+    public ExpressionManager() {
+        this(null);
     }
 
-    elResolver.add(new ArrayELResolver());
-    elResolver.add(new ListELResolver());
-    elResolver.add(new MapELResolver());
-    elResolver.add(new JsonNodeELResolver());
-    elResolver.add(new BeanELResolver());
-    return elResolver;
-  }
+    public ExpressionManager(boolean initFactory) {
+        this(null, false);
+    }
 
-  public Map<Object, Object> getBeans() {
-    return beans;
-  }
+    public ExpressionManager(Map<Object, Object> beans) {
+        this(beans, true);
+    }
 
-  public void setBeans(Map<Object, Object> beans) {
-    this.beans = beans;
-  }
+    public ExpressionManager(Map<Object, Object> beans, boolean initFactory) {
+        expressionFactory = new ExpressionFactoryImpl();
+        this.beans = beans;
+    }
+
+    public FormExpression createExpression(String expression) {
+        ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expression.trim(), Object.class);
+        return new JuelExpression(valueExpression, expression, this);
+    }
+
+    public void setExpressionFactory(ExpressionFactory expressionFactory) {
+        this.expressionFactory = expressionFactory;
+    }
+
+    public FlowableFormElContext createElContext(Map<String, Object> variables) {
+        ELResolver elResolver = createElResolver(variables);
+        return new FlowableFormElContext(elResolver);
+    }
+
+    protected ELResolver createElResolver(Map<String, Object> variables) {
+        CompositeELResolver elResolver = new CompositeELResolver();
+        elResolver.add(new VariableElResolver(variables));
+
+        if (beans != null) {
+            // ACT-1102: Also expose all beans in configuration when using
+            // standalone activiti, not
+            // in spring-context
+            elResolver.add(new ReadOnlyMapELResolver(beans));
+        }
+
+        elResolver.add(new ArrayELResolver());
+        elResolver.add(new ListELResolver());
+        elResolver.add(new MapELResolver());
+        elResolver.add(new JsonNodeELResolver());
+        elResolver.add(new BeanELResolver());
+        return elResolver;
+    }
+
+    public Map<Object, Object> getBeans() {
+        return beans;
+    }
+
+    public void setBeans(Map<Object, Object> beans) {
+        this.beans = beans;
+    }
 
 }

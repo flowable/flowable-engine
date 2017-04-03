@@ -27,32 +27,32 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
  */
 public class GetDeploymentResourceCmd implements Command<InputStream>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String deploymentId;
-  protected String resourceName;
+    private static final long serialVersionUID = 1L;
+    protected String deploymentId;
+    protected String resourceName;
 
-  public GetDeploymentResourceCmd(String deploymentId, String resourceName) {
-    this.deploymentId = deploymentId;
-    this.resourceName = resourceName;
-  }
-
-  public InputStream execute(CommandContext commandContext) {
-    if (deploymentId == null) {
-      throw new FlowableIllegalArgumentException("deploymentId is null");
-    }
-    if (resourceName == null) {
-      throw new FlowableIllegalArgumentException("resourceName is null");
+    public GetDeploymentResourceCmd(String deploymentId, String resourceName) {
+        this.deploymentId = deploymentId;
+        this.resourceName = resourceName;
     }
 
-    ResourceEntity resource = commandContext.getResourceEntityManager().findResourceByDeploymentIdAndResourceName(deploymentId, resourceName);
-    if (resource == null) {
-      if (commandContext.getDeploymentEntityManager().findById(deploymentId) == null) {
-        throw new FlowableObjectNotFoundException("deployment does not exist: " + deploymentId);
-      } else {
-        throw new FlowableObjectNotFoundException("no resource found with name '" + resourceName + "' in deployment '" + deploymentId + "'");
-      }
+    public InputStream execute(CommandContext commandContext) {
+        if (deploymentId == null) {
+            throw new FlowableIllegalArgumentException("deploymentId is null");
+        }
+        if (resourceName == null) {
+            throw new FlowableIllegalArgumentException("resourceName is null");
+        }
+
+        ResourceEntity resource = commandContext.getResourceEntityManager().findResourceByDeploymentIdAndResourceName(deploymentId, resourceName);
+        if (resource == null) {
+            if (commandContext.getDeploymentEntityManager().findById(deploymentId) == null) {
+                throw new FlowableObjectNotFoundException("deployment does not exist: " + deploymentId);
+            } else {
+                throw new FlowableObjectNotFoundException("no resource found with name '" + resourceName + "' in deployment '" + deploymentId + "'");
+            }
+        }
+        return new ByteArrayInputStream(resource.getBytes());
     }
-    return new ByteArrayInputStream(resource.getBytes());
-  }
 
 }

@@ -22,10 +22,10 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
 @PropertySources({
-	
-	@PropertySource("classpath:/META-INF/flowable-ui-app/flowable-ui-app.properties"),
-	@PropertySource(value = "classpath:flowable-ui-app.properties", ignoreResourceNotFound = true),
-	@PropertySource(value = "file:flowable-ui-app.properties", ignoreResourceNotFound = true),
+
+        @PropertySource("classpath:/META-INF/flowable-ui-app/flowable-ui-app.properties"),
+        @PropertySource(value = "classpath:flowable-ui-app.properties", ignoreResourceNotFound = true),
+        @PropertySource(value = "file:flowable-ui-app.properties", ignoreResourceNotFound = true),
 
 })
 @ComponentScan(basePackages = {
@@ -34,24 +34,23 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
         "org.flowable.app.service",
         "org.flowable.app.filter",
         "org.flowable.app.security",
-        "org.flowable.app.model.component"})
+        "org.flowable.app.model.component" })
 public class ApplicationConfiguration {
-	
-	/**
-	 * This is needed to make property resolving work on annotations ...
-	 * (see http://stackoverflow.com/questions/11925952/custom-spring-property-source-does-not-resolve-placeholders-in-value) 
-	 * 
-	 * @Scheduled(cron="${someProperty}")
-	 */
-	@Bean
+
+    /**
+     * This is needed to make property resolving work on annotations ... (see http://stackoverflow.com/questions/11925952/custom-spring-property-source-does-not-resolve-placeholders-in-value)
+     * 
+     * @Scheduled(cron="${someProperty}")
+     */
+    @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-	@Bean
-	public static PropertyPlaceholderConfigurer propertyPlaceholderConfigurer() {
-		PropertyPlaceholderConfigurer placeholderConfigurer = new PropertyPlaceholderConfigurer();
-		placeholderConfigurer.setSystemPropertiesMode(PropertyPlaceholderConfigurer.SYSTEM_PROPERTIES_MODE_OVERRIDE);
-		return placeholderConfigurer;
-	}
+    @Bean
+    public static PropertyPlaceholderConfigurer propertyPlaceholderConfigurer() {
+        PropertyPlaceholderConfigurer placeholderConfigurer = new PropertyPlaceholderConfigurer();
+        placeholderConfigurer.setSystemPropertiesMode(PropertyPlaceholderConfigurer.SYSTEM_PROPERTIES_MODE_OVERRIDE);
+        return placeholderConfigurer;
+    }
 }

@@ -23,29 +23,29 @@ import org.flowable.idm.api.event.FlowableIdmEventType;
  */
 public class FlowableIdmEventImpl implements FlowableEvent {
 
-  protected FlowableIdmEventType type;
+    protected FlowableIdmEventType type;
 
-  /**
-   * Creates a new event implementation, not part of an execution context.
-   */
-  public FlowableIdmEventImpl(FlowableIdmEventType type) {
-    if (type == null) {
-      throw new FlowableIllegalArgumentException("type is null");
+    /**
+     * Creates a new event implementation, not part of an execution context.
+     */
+    public FlowableIdmEventImpl(FlowableIdmEventType type) {
+        if (type == null) {
+            throw new FlowableIllegalArgumentException("type is null");
+        }
+        this.type = type;
     }
-    this.type = type;
-  }
 
-  public FlowableIdmEventType getType() {
-    return type;
-  }
+    public FlowableIdmEventType getType() {
+        return type;
+    }
 
-  public void setType(FlowableIdmEventType type) {
-    this.type = type;
-  }
+    public void setType(FlowableIdmEventType type) {
+        this.type = type;
+    }
 
-  @Override
-  public String toString() {
-    return getClass() + " - " + type;
-  }
-  
+    @Override
+    public String toString() {
+        return getClass() + " - " + type;
+    }
+
 }

@@ -23,47 +23,47 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
  */
 public class SetDeploymentCategoryCmd implements Command<Void> {
 
-  protected String deploymentId;
-  protected String category;
+    protected String deploymentId;
+    protected String category;
 
-  public SetDeploymentCategoryCmd(String deploymentId, String category) {
-    this.deploymentId = deploymentId;
-    this.category = category;
-  }
-
-  public Void execute(CommandContext commandContext) {
-
-    if (deploymentId == null) {
-      throw new FlowableIllegalArgumentException("Deployment id is null");
+    public SetDeploymentCategoryCmd(String deploymentId, String category) {
+        this.deploymentId = deploymentId;
+        this.category = category;
     }
 
-    DmnDeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
+    public Void execute(CommandContext commandContext) {
 
-    if (deployment == null) {
-      throw new FlowableObjectNotFoundException("No deployment found for id = '" + deploymentId + "'");
+        if (deploymentId == null) {
+            throw new FlowableIllegalArgumentException("Deployment id is null");
+        }
+
+        DmnDeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
+
+        if (deployment == null) {
+            throw new FlowableObjectNotFoundException("No deployment found for id = '" + deploymentId + "'");
+        }
+
+        // Update category
+        deployment.setCategory(category);
+        commandContext.getDeploymentEntityManager().update(deployment);
+
+        return null;
     }
 
-    // Update category
-    deployment.setCategory(category);
-    commandContext.getDeploymentEntityManager().update(deployment);
+    public String getDeploymentId() {
+        return deploymentId;
+    }
 
-    return null;
-  }
+    public void setDeploymentId(String deploymentId) {
+        this.deploymentId = deploymentId;
+    }
 
-  public String getDeploymentId() {
-    return deploymentId;
-  }
+    public String getCategory() {
+        return category;
+    }
 
-  public void setDeploymentId(String deploymentId) {
-    this.deploymentId = deploymentId;
-  }
-
-  public String getCategory() {
-    return category;
-  }
-
-  public void setCategory(String category) {
-    this.category = category;
-  }
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
 }

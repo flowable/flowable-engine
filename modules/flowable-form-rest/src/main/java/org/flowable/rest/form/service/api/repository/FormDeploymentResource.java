@@ -19,6 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormRepositoryService;
@@ -34,39 +35,39 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Form Deployments" }, description = "Manage Form Deployments")
+@Api(tags = { "Form Deployments" }, description = "Manage Form Deployments", authorizations = { @Authorization(value = "basicAuth") })
 public class FormDeploymentResource {
 
-  @Autowired
-  protected FormRestResponseFactory formRestResponseFactory;
+    @Autowired
+    protected FormRestResponseFactory formRestResponseFactory;
 
-  @Autowired
-  protected FormRepositoryService formRepositoryService;
+    @Autowired
+    protected FormRepositoryService formRepositoryService;
 
-  @ApiOperation(value = "Get a form deployment", tags = {"Form Deployments"})
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Indicates the form deployment was found and returned."),
-      @ApiResponse(code = 404, message = "Indicates the requested form deployment was not found.")
-  })
-  @RequestMapping(value = "/form-repository/deployments/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
-  public FormDeploymentResponse getFormDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId) {
-    FormDeployment deployment = formRepositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
+    @ApiOperation(value = "Get a form deployment", tags = { "Form Deployments" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the form deployment was found and returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested form deployment was not found.")
+    })
+    @RequestMapping(value = "/form-repository/deployments/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
+    public FormDeploymentResponse getFormDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId) {
+        FormDeployment deployment = formRepositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
 
-    if (deployment == null) {
-      throw new FlowableObjectNotFoundException("Could not find a form deployment with id '"+deploymentId);
+        if (deployment == null) {
+            throw new FlowableObjectNotFoundException("Could not find a form deployment with id '" + deploymentId);
+        }
+
+        return formRestResponseFactory.createFormDeploymentResponse(deployment);
     }
 
-    return formRestResponseFactory.createFormDeploymentResponse(deployment);
-  }
-
-  @ApiOperation(value = "Delete a form deployment", tags = {"Form Deployments"})
-  @ApiResponses(value = {
-      @ApiResponse(code = 204, message = "Indicates the form deployment was found and has been deleted. Response-body is intentionally empty."),
-      @ApiResponse(code = 404, message = "Indicates the requested form deployment was not found.")
-  })
-  @RequestMapping(value = "/form-repository/deployments/{deploymentId}", method = RequestMethod.DELETE, produces = "application/json")
-  public void deleteFormDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, HttpServletResponse response) {
-    formRepositoryService.deleteDeployment(deploymentId);
-    response.setStatus(HttpStatus.NO_CONTENT.value());
-  }
+    @ApiOperation(value = "Delete a form deployment", tags = { "Form Deployments" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the form deployment was found and has been deleted. Response-body is intentionally empty."),
+            @ApiResponse(code = 404, message = "Indicates the requested form deployment was not found.")
+    })
+    @RequestMapping(value = "/form-repository/deployments/{deploymentId}", method = RequestMethod.DELETE, produces = "application/json")
+    public void deleteFormDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, HttpServletResponse response) {
+        formRepositoryService.deleteDeployment(deploymentId);
+        response.setStatus(HttpStatus.NO_CONTENT.value());
+    }
 }

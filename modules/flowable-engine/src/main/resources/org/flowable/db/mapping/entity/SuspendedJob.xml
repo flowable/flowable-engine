@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
 
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.flowable.engine.impl.persistence.entity.SuspendedJobEntityImpl">
 
@@ -36,7 +36,7 @@
         from ${prefix}ACT_RU_SUSPENDED_JOB J
         where J.EXECUTION_ID_ = #{parameter}
     </select>
-    
+
     <select id="selectSuspendedJobsByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select *
         from ${prefix}ACT_RU_SUSPENDED_JOB J
@@ -44,17 +44,17 @@
     </select>
 
     <!-- TIMER INSERT -->
-  
+
   	<insert id="insertSuspendedJob" parameterType="org.flowable.engine.impl.persistence.entity.SuspendedJobEntityImpl">
     insert into ${prefix}ACT_RU_SUSPENDED_JOB (
-            ID_, 
+            ID_,
             REV_,
             TYPE_,
             EXCLUSIVE_,
-            EXECUTION_ID_, 
+            EXECUTION_ID_,
             PROCESS_INSTANCE_ID_,
             PROC_DEF_ID_,
-            RETRIES_, 
+            RETRIES_,
             EXCEPTION_STACK_ID_,
 			EXCEPTION_MSG_,
             DUEDATE_,
@@ -88,12 +88,12 @@
             REV_,
             TYPE_,
             EXCLUSIVE_,
-            EXECUTION_ID_, 
+            EXECUTION_ID_,
             PROCESS_INSTANCE_ID_,
             PROC_DEF_ID_,
-            RETRIES_, 
+            RETRIES_,
             EXCEPTION_STACK_ID_,
-			      EXCEPTION_MSG_,
+			EXCEPTION_MSG_,
             DUEDATE_,
             REPEAT_,
             HANDLER_TYPE_,
@@ -110,7 +110,7 @@
 	         #{job.processDefinitionId, jdbcType=VARCHAR},
 	         #{job.retries, jdbcType=INTEGER},
 	         #{job.exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
-			     #{job.exceptionMessage, jdbcType=VARCHAR},
+			 #{job.exceptionMessage, jdbcType=VARCHAR},
 	         #{job.duedate, jdbcType=TIMESTAMP},
 	         #{job.repeat, jdbcType=VARCHAR},
 	         #{job.jobHandlerType, jdbcType=VARCHAR},
@@ -119,7 +119,7 @@
 	         #{job.tenantId, jdbcType=VARCHAR})
 	    </foreach>
   	</insert>
-  	
+
   	<insert id="bulkInsertSuspendedJob" databaseId="oracle"  parameterType="java.util.List" >
   	INSERT ALL
   	<foreach collection="list" item="job" index="index">
@@ -128,10 +128,10 @@
             REV_,
             TYPE_,
             EXCLUSIVE_,
-            EXECUTION_ID_, 
+            EXECUTION_ID_,
             PROCESS_INSTANCE_ID_,
             PROC_DEF_ID_,
-            RETRIES_, 
+            RETRIES_,
             EXCEPTION_STACK_ID_,
             EXCEPTION_MSG_,
             DUEDATE_,
@@ -184,6 +184,9 @@
             </if>
             <if test="executionId != null">
                 and RES.EXECUTION_ID_ = #{executionId}
+            </if>
+            <if test="handlerType != null">
+                and RES.HANDLER_TYPE_ = #{handlerType}
             </if>
             <if test="processDefinitionId != null">
                 and RES.PROC_DEF_ID_ = #{processDefinitionId}
@@ -258,7 +261,7 @@
 		        inner join ${prefix}ACT_RE_PROCDEF P on J.PROC_DEF_ID_  = P.ID_
 		        inner join ${prefix}ACT_RE_DEPLOYMENT D on P.DEPLOYMENT_ID_ = D.ID_
 		        where D.ID_ = #{deploymentId, jdbcType=VARCHAR}
-	
+
 	        ) AS tempTask
 
         )

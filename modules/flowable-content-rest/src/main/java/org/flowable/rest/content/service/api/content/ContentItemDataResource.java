@@ -18,6 +18,7 @@ import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.Authorization;
 import org.apache.commons.io.IOUtils;
 import org.flowable.content.api.ContentItem;
 import org.flowable.engine.common.api.FlowableException;
@@ -46,87 +47,85 @@ import io.swagger.annotations.ApiResponses;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Content item" }, description = "Manage content item data")
+@Api(tags = { "Content item" }, description = "Manage content item data", authorizations = { @Authorization(value = "basicAuth") })
 public class ContentItemDataResource extends ContentItemBaseResource {
-  
-  @Autowired
-  protected ContentRestResponseFactory contentRestResponseFactory;
 
-  @ApiOperation(value = "Get the data of a content item", tags = {"Content item"},
-  notes = "The response body contains the binary content. By default, the content-type of the response is set to application/octet-stream unless the content item type contains a valid mime type.")
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates the content item was found and the requested content is returned."),
-          @ApiResponse(code = 404, message = "Indicates the content item was not found or the content item doesn’t have a binary stream available. Status message provides additional information.")
-  })
-  @RequestMapping(value = "/content-service/content-items/{contentItemId}/data", method = RequestMethod.GET)
-  public ResponseEntity<byte[]> getContentItemData(@ApiParam(name = "contentItemId") @PathVariable("contentItemId") String contentItemId, HttpServletResponse response) {
+    @Autowired
+    protected ContentRestResponseFactory contentRestResponseFactory;
 
-    ContentItem contentItem = getContentItemFromRequest(contentItemId);
-    if (!contentItem.isContentAvailable()) {
-      throw new FlowableException("No data available for content item " + contentItemId);
-    }
-    
-    InputStream dataStream = contentService.getContentItemData(contentItemId);
-    if (dataStream == null) {
-      throw new FlowableObjectNotFoundException("Content item with id '" + contentItemId + "' doesn't have content associated with it.");
-    }
+    @ApiOperation(value = "Get the data of a content item", tags = {
+            "Content item" }, notes = "The response body contains the binary content. By default, the content-type of the response is set to application/octet-stream unless the content item type contains a valid mime type.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the content item was found and the requested content is returned."),
+            @ApiResponse(code = 404, message = "Indicates the content item was not found or the content item doesn’t have a binary stream available. Status message provides additional information.")
+    })
+    @RequestMapping(value = "/content-service/content-items/{contentItemId}/data", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> getContentItemData(@ApiParam(name = "contentItemId") @PathVariable("contentItemId") String contentItemId, HttpServletResponse response) {
 
-    HttpHeaders responseHeaders = new HttpHeaders();
-    MediaType mediaType = null;
-    if (contentItem.getMimeType() != null) {
-      try {
-        mediaType = MediaType.valueOf(contentItem.getMimeType());
-        responseHeaders.set("Content-Type", contentItem.getMimeType());
-      } catch (Exception e) {
-        // ignore if unknown media type
-      }
-    }
+        ContentItem contentItem = getContentItemFromRequest(contentItemId);
+        if (!contentItem.isContentAvailable()) {
+            throw new FlowableException("No data available for content item " + contentItemId);
+        }
 
-    if (mediaType == null) {
-      responseHeaders.set("Content-Type", "application/octet-stream");
-    }
+        InputStream dataStream = contentService.getContentItemData(contentItemId);
+        if (dataStream == null) {
+            throw new FlowableObjectNotFoundException("Content item with id '" + contentItemId + "' doesn't have content associated with it.");
+        }
 
-    try {
-      return new ResponseEntity<byte[]>(IOUtils.toByteArray(dataStream), responseHeaders, HttpStatus.OK);
-    } catch (Exception e) {
-      throw new FlowableException("Error getting content item data " + contentItemId, e);
-    }
-  }
-  
-  @ApiOperation(value = "Save the content item data", tags = {"Content item"},
-      notes="## Save the content item data with an attached file\n\n"
-              + "The request should be of type multipart/form-data. There should be a single file-part included with the binary value of the content item."
-      )
-  @ApiResponses(value = {
-      @ApiResponse(code = 201, message = "Indicates the content item data was saved and the result is returned."),
-      @ApiResponse(code = 400, message = "Indicates required content item data is missing from the request.")
-  })
-  @RequestMapping(value = "/content-service/content-items/{contentItemId}/data", method = RequestMethod.POST, produces = "application/json")
-  public ContentItemResponse saveContentItemData(@ApiParam(name = "contentItemId") @PathVariable("contentItemId") String contentItemId, 
-      HttpServletRequest request, HttpServletResponse response) {
-    
-    if (!(request instanceof MultipartHttpServletRequest)) {
-      throw new FlowableException("Multipart request required to save content item data");
-    }
-    
-    ContentItem contentItem = getContentItemFromRequest(contentItemId);
-    
-    MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-    MultipartFile file = multipartRequest.getFileMap().values().iterator().next();
+        HttpHeaders responseHeaders = new HttpHeaders();
+        MediaType mediaType = null;
+        if (contentItem.getMimeType() != null) {
+            try {
+                mediaType = MediaType.valueOf(contentItem.getMimeType());
+                responseHeaders.set("Content-Type", contentItem.getMimeType());
+            } catch (Exception e) {
+                // ignore if unknown media type
+            }
+        }
 
-    if (file == null) {
-      throw new FlowableIllegalArgumentException("Content item file is required.");
+        if (mediaType == null) {
+            responseHeaders.set("Content-Type", "application/octet-stream");
+        }
+
+        try {
+            return new ResponseEntity<byte[]>(IOUtils.toByteArray(dataStream), responseHeaders, HttpStatus.OK);
+        } catch (Exception e) {
+            throw new FlowableException("Error getting content item data " + contentItemId, e);
+        }
     }
 
-    try {
-      contentService.saveContentItem(contentItem, file.getInputStream());
+    @ApiOperation(value = "Save the content item data", tags = { "Content item" }, notes = "## Save the content item data with an attached file\n\n"
+            + "The request should be of type multipart/form-data. There should be a single file-part included with the binary value of the content item.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Indicates the content item data was saved and the result is returned."),
+            @ApiResponse(code = 400, message = "Indicates required content item data is missing from the request.")
+    })
+    @RequestMapping(value = "/content-service/content-items/{contentItemId}/data", method = RequestMethod.POST, produces = "application/json")
+    public ContentItemResponse saveContentItemData(@ApiParam(name = "contentItemId") @PathVariable("contentItemId") String contentItemId,
+            HttpServletRequest request, HttpServletResponse response) {
 
-      response.setStatus(HttpStatus.CREATED.value());
-      return contentRestResponseFactory.createContentItemResponse(contentItem);
+        if (!(request instanceof MultipartHttpServletRequest)) {
+            throw new FlowableException("Multipart request required to save content item data");
+        }
 
-    } catch (Exception e) {
-      throw new FlowableException("Error creating content item response", e);
+        ContentItem contentItem = getContentItemFromRequest(contentItemId);
+
+        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+        MultipartFile file = multipartRequest.getFileMap().values().iterator().next();
+
+        if (file == null) {
+            throw new FlowableIllegalArgumentException("Content item file is required.");
+        }
+
+        try {
+            contentService.saveContentItem(contentItem, file.getInputStream());
+
+            response.setStatus(HttpStatus.CREATED.value());
+            return contentRestResponseFactory.createContentItemResponse(contentItem);
+
+        } catch (Exception e) {
+            throw new FlowableException("Error creating content item response", e);
+        }
     }
-  }
 
 }

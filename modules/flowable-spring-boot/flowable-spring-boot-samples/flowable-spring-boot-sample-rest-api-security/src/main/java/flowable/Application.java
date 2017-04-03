@@ -1,6 +1,5 @@
 package flowable;
 
-
 import org.flowable.engine.IdentityService;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;

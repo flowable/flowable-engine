@@ -26,103 +26,103 @@ import org.flowable.idm.engine.impl.interceptor.CommandExecutor;
  */
 public class PrivilegeQueryImpl extends AbstractQuery<PrivilegeQuery, Privilege> implements PrivilegeQuery {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected String id;
-  protected String name;
-  protected String userId;
-  protected String groupId;
-  protected List<String> groupIds;
+    private static final long serialVersionUID = 1L;
 
-  public PrivilegeQueryImpl() {
-  }
+    protected String id;
+    protected String name;
+    protected String userId;
+    protected String groupId;
+    protected List<String> groupIds;
 
-  public PrivilegeQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
+    public PrivilegeQueryImpl() {
+    }
 
-  public PrivilegeQueryImpl(CommandExecutor commandExecutor) {
-    super(commandExecutor);
-  }
-  
-  @Override
-  public PrivilegeQuery privilegeId(String id) {
-    this.id = id;
-    return this;
-  }
+    public PrivilegeQueryImpl(CommandContext commandContext) {
+        super(commandContext);
+    }
 
-  @Override
-  public PrivilegeQuery privilegeName(String name) {
-    this.name = name;
-    return this;
-  }
+    public PrivilegeQueryImpl(CommandExecutor commandExecutor) {
+        super(commandExecutor);
+    }
 
-  @Override
-  public PrivilegeQuery userId(String userId) {
-    this.userId = userId;
-    return this;
-  }
+    @Override
+    public PrivilegeQuery privilegeId(String id) {
+        this.id = id;
+        return this;
+    }
 
-  @Override
-  public PrivilegeQuery groupId(String groupId) {
-    this.groupId = groupId;
-    return this;
-  }
-  
-  @Override
-  public PrivilegeQuery groupIds(List<String> groupIds) {
-    this.groupIds = groupIds;
-    return this;
-  }
+    @Override
+    public PrivilegeQuery privilegeName(String name) {
+        this.name = name;
+        return this;
+    }
 
-  public String getId() {
-    return id;
-  }
+    @Override
+    public PrivilegeQuery userId(String userId) {
+        this.userId = userId;
+        return this;
+    }
 
-  public void setId(String id) {
-    this.id = id;
-  }
+    @Override
+    public PrivilegeQuery groupId(String groupId) {
+        this.groupId = groupId;
+        return this;
+    }
 
-  public String getName() {
-    return name;
-  }
+    @Override
+    public PrivilegeQuery groupIds(List<String> groupIds) {
+        this.groupIds = groupIds;
+        return this;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public String getUserId() {
-    return userId;
-  }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public void setUserId(String userId) {
-    this.userId = userId;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String getGroupId() {
-    return groupId;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public void setGroupId(String groupId) {
-    this.groupId = groupId;
-  }
-  
-  public List<String> getGroupIds() {
-    return groupIds;
-  }
+    public String getUserId() {
+        return userId;
+    }
 
-  public void setGroupIds(List<String> groupIds) {
-    this.groupIds = groupIds;
-  }
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
-  @Override
-  public long executeCount(CommandContext commandContext) {
-    return commandContext.getPrivilegeEntityManager().findPrivilegeCountByQueryCriteria(this);
-  }
+    public String getGroupId() {
+        return groupId;
+    }
 
-  @Override
-  public List<Privilege> executeList(CommandContext commandContext, Page page) {
-    return commandContext.getPrivilegeEntityManager().findPrivilegeByQueryCriteria(this, page);
-  }
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    public List<String> getGroupIds() {
+        return groupIds;
+    }
+
+    public void setGroupIds(List<String> groupIds) {
+        this.groupIds = groupIds;
+    }
+
+    @Override
+    public long executeCount(CommandContext commandContext) {
+        return commandContext.getPrivilegeEntityManager().findPrivilegeCountByQueryCriteria(this);
+    }
+
+    @Override
+    public List<Privilege> executeList(CommandContext commandContext, Page page) {
+        return commandContext.getPrivilegeEntityManager().findPrivilegeByQueryCriteria(this, page);
+    }
 
 }

@@ -25,15 +25,15 @@ import org.flowable.idm.engine.impl.interceptor.CommandExecutor;
  */
 public class DbSchemaDrop {
 
-  public static void main(String[] args) {
-    IdmEngine idmEngine = IdmEngines.getDefaultIdmEngine();
-    CommandExecutor commandExecutor = idmEngine.getIdmEngineConfiguration().getCommandExecutor();
-    CommandConfig config = new CommandConfig().transactionNotSupported();
-    commandExecutor.execute(config, new Command<Object>() {
-      public Object execute(CommandContext commandContext) {
-        commandContext.getDbSqlSession().dbSchemaDrop();
-        return null;
-      }
-    });
-  }
+    public static void main(String[] args) {
+        IdmEngine idmEngine = IdmEngines.getDefaultIdmEngine();
+        CommandExecutor commandExecutor = idmEngine.getIdmEngineConfiguration().getCommandExecutor();
+        CommandConfig config = new CommandConfig().transactionNotSupported();
+        commandExecutor.execute(config, new Command<Object>() {
+            public Object execute(CommandContext commandContext) {
+                commandContext.getDbSqlSession().dbSchemaDrop();
+                return null;
+            }
+        });
+    }
 }

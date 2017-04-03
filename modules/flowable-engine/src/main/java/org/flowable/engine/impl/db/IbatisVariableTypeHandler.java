@@ -30,44 +30,44 @@ import org.flowable.engine.impl.variable.VariableTypes;
  */
 public class IbatisVariableTypeHandler implements TypeHandler<VariableType> {
 
-  protected VariableTypes variableTypes;
+    protected VariableTypes variableTypes;
 
-  public VariableType getResult(ResultSet rs, String columnName) throws SQLException {
-    String typeName = rs.getString(columnName);
-    VariableType type = getVariableTypes().getVariableType(typeName);
-    if (type == null && typeName != null) {
-      throw new FlowableException("unknown variable type name " + typeName);
+    public VariableType getResult(ResultSet rs, String columnName) throws SQLException {
+        String typeName = rs.getString(columnName);
+        VariableType type = getVariableTypes().getVariableType(typeName);
+        if (type == null && typeName != null) {
+            throw new FlowableException("unknown variable type name " + typeName);
+        }
+        return type;
     }
-    return type;
-  }
 
-  public VariableType getResult(CallableStatement cs, int columnIndex) throws SQLException {
-    String typeName = cs.getString(columnIndex);
-    VariableType type = getVariableTypes().getVariableType(typeName);
-    if (type == null) {
-      throw new FlowableException("unknown variable type name " + typeName);
+    public VariableType getResult(CallableStatement cs, int columnIndex) throws SQLException {
+        String typeName = cs.getString(columnIndex);
+        VariableType type = getVariableTypes().getVariableType(typeName);
+        if (type == null) {
+            throw new FlowableException("unknown variable type name " + typeName);
+        }
+        return type;
     }
-    return type;
-  }
 
-  public void setParameter(PreparedStatement ps, int i, VariableType parameter, JdbcType jdbcType) throws SQLException {
-    String typeName = parameter.getTypeName();
-    ps.setString(i, typeName);
-  }
-
-  protected VariableTypes getVariableTypes() {
-    if (variableTypes == null) {
-      variableTypes = Context.getProcessEngineConfiguration().getVariableTypes();
+    public void setParameter(PreparedStatement ps, int i, VariableType parameter, JdbcType jdbcType) throws SQLException {
+        String typeName = parameter.getTypeName();
+        ps.setString(i, typeName);
     }
-    return variableTypes;
-  }
 
-  public VariableType getResult(ResultSet resultSet, int columnIndex) throws SQLException {
-    String typeName = resultSet.getString(columnIndex);
-    VariableType type = getVariableTypes().getVariableType(typeName);
-    if (type == null) {
-      throw new FlowableException("unknown variable type name " + typeName);
+    protected VariableTypes getVariableTypes() {
+        if (variableTypes == null) {
+            variableTypes = Context.getProcessEngineConfiguration().getVariableTypes();
+        }
+        return variableTypes;
     }
-    return type;
-  }
+
+    public VariableType getResult(ResultSet resultSet, int columnIndex) throws SQLException {
+        String typeName = resultSet.getString(columnIndex);
+        VariableType type = getVariableTypes().getVariableType(typeName);
+        if (type == null) {
+            throw new FlowableException("unknown variable type name " + typeName);
+        }
+        return type;
+    }
 }

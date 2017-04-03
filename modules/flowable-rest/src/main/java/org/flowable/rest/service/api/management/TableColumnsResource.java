@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.management.TableMetaData;
@@ -31,24 +32,24 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Database tables" }, description = "Manage Database tables")
+@Api(tags = { "Database tables" }, description = "Manage Database tables", authorizations = { @Authorization(value = "basicAuth") })
 public class TableColumnsResource {
 
-  @Autowired
-  protected ManagementService managementService;
+    @Autowired
+    protected ManagementService managementService;
 
-  @ApiOperation(value = "Get column info for a single table", tags = {"Database tables"})
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates the table exists and the table column info is returned."),
-          @ApiResponse(code = 404, message = "Indicates the requested table does not exist.")
-  })
-  @RequestMapping(value = "/management/tables/{tableName}/columns", method = RequestMethod.GET, produces = "application/json")
-  public TableMetaData getTableMetaData(@ApiParam(name = "tableName") @PathVariable String tableName) {
-    TableMetaData response = managementService.getTableMetaData(tableName);
+    @ApiOperation(value = "Get column info for a single table", tags = { "Database tables" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the table exists and the table column info is returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested table does not exist.")
+    })
+    @RequestMapping(value = "/management/tables/{tableName}/columns", method = RequestMethod.GET, produces = "application/json")
+    public TableMetaData getTableMetaData(@ApiParam(name = "tableName") @PathVariable String tableName) {
+        TableMetaData response = managementService.getTableMetaData(tableName);
 
-    if (response == null) {
-      throw new FlowableObjectNotFoundException("Could not find a table with name '" + tableName + "'.", String.class);
+        if (response == null) {
+            throw new FlowableObjectNotFoundException("Could not find a table with name '" + tableName + "'.", String.class);
+        }
+        return response;
     }
-    return response;
-  }
 }

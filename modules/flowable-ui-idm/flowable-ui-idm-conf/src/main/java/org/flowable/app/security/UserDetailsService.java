@@ -22,6 +22,7 @@ import org.flowable.app.idm.service.UserService;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,73 +36,80 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService, CustomUserDetailService {
 
-  @Autowired
-  private UserCache userCache;
+    @Autowired
+    protected UserCache userCache;
 
-  @Autowired
-  protected IdmIdentityService identityService;
-  
-  @Autowired
-  protected UserService userService;
+    @Autowired
+    protected IdmIdentityService identityService;
 
-  private long userValidityPeriod;
-
-  @Override
-  @Transactional
-  public UserDetails loadUserByUsername(final String login) {
-
-    // This method is only called during the login.
-    // All subsequent calls use the method with the long userId as parameter.
-    // (Hence why the cache is NOT used here, but it is used in the loadByUserId)
-
-    String actualLogin = login;
-    User userFromDatabase = null;
-
-    actualLogin = login.toLowerCase();
-    userFromDatabase = identityService.createUserQuery().userId(actualLogin).singleResult();
-
-    // Verify user
-    if (userFromDatabase == null) {
-      throw new UsernameNotFoundException("User " + actualLogin + " was not found in the database");
-    }
-
-    Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
-    UserInformation userInformation = userService.getUserInformation(userFromDatabase.getId());
-    for (String privilege : userInformation.getPrivileges()) {
-      grantedAuthorities.add(new SimpleGrantedAuthority(privilege));
-    }
+    @Autowired
+    protected UserService userService;
     
-    userCache.putUser(userFromDatabase.getId(), new CachedUser(userFromDatabase, grantedAuthorities));
-    return new FlowableAppUser(userFromDatabase, actualLogin, grantedAuthorities);
-  }
+    @Autowired
+    protected Environment environment;
 
-  @Transactional
-  public UserDetails loadByUserId(final String userId) {
+    protected long userValidityPeriod;
 
-    CachedUser cachedUser = userCache.getUser(userId, true, true, false); // Do not check for validity. This would lead to A LOT of db requests! For login, there is a validity period (see below)
-    if (cachedUser == null) {
-      throw new UsernameNotFoundException("User " + userId + " was not found in the database");
+    @Override
+    @Transactional
+    public UserDetails loadUserByUsername(final String login) {
+
+        // This method is only called during the login.
+        // All subsequent calls use the method with the long userId as parameter.
+        // (Hence why the cache is NOT used here, but it is used in the loadByUserId)
+
+        String actualLogin = login;
+        User userFromDatabase = null;
+
+        if (!environment.getProperty("ldap.enabled", Boolean.class, false)) {
+            actualLogin = login.toLowerCase();
+            userFromDatabase = identityService.createUserQuery().userIdIgnoreCase(actualLogin).singleResult();
+            
+        } else {
+            userFromDatabase = identityService.createUserQuery().userId(actualLogin).singleResult();
+        }
+
+        // Verify user
+        if (userFromDatabase == null) {
+            throw new UsernameNotFoundException("User " + actualLogin + " was not found in the database");
+        }
+
+        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
+        UserInformation userInformation = userService.getUserInformation(userFromDatabase.getId());
+        for (String privilege : userInformation.getPrivileges()) {
+            grantedAuthorities.add(new SimpleGrantedAuthority(privilege));
+        }
+
+        userCache.putUser(userFromDatabase.getId(), new CachedUser(userFromDatabase, grantedAuthorities));
+        return new FlowableAppUser(userFromDatabase, actualLogin, grantedAuthorities);
     }
 
-    long lastDatabaseCheck = cachedUser.getLastDatabaseCheck();
-    long currentTime = System.currentTimeMillis(); // No need to create a Date object. The Date constructor simply calls this method too!
+    @Transactional
+    public UserDetails loadByUserId(final String userId) {
+        CachedUser cachedUser = userCache.getUser(userId, true, true, false); // Do not check for validity. This would lead to A LOT of db requests! For login, there is a validity period (see below)
+        if (cachedUser == null) {
+            throw new UsernameNotFoundException("User " + userId + " was not found in the database");
+        }
 
-    if (userValidityPeriod <= 0L || (currentTime - lastDatabaseCheck >= userValidityPeriod)) {
+        long lastDatabaseCheck = cachedUser.getLastDatabaseCheck();
+        long currentTime = System.currentTimeMillis(); // No need to create a Date object. The Date constructor simply calls this method too!
 
-      userCache.invalidate(userId);
-      cachedUser = userCache.getUser(userId, true, true, false); // Fetching it again will refresh data
+        if (userValidityPeriod <= 0L || (currentTime - lastDatabaseCheck >= userValidityPeriod)) {
 
-      cachedUser.setLastDatabaseCheck(currentTime);
+            userCache.invalidate(userId);
+            cachedUser = userCache.getUser(userId, true, true, false); // Fetching it again will refresh data
+
+            cachedUser.setLastDatabaseCheck(currentTime);
+        }
+
+        // The Spring security docs clearly state a new instance must be returned on every invocation
+        User user = cachedUser.getUser();
+        String actualUserId = user.getId();
+
+        return new FlowableAppUser(cachedUser.getUser(), actualUserId, cachedUser.getGrantedAuthorities());
     }
 
-    // The Spring security docs clearly state a new instance must be returned on every invocation
-    User user = cachedUser.getUser();
-    String actualUserId = user.getEmail();
-
-    return new FlowableAppUser(cachedUser.getUser(), actualUserId, cachedUser.getGrantedAuthorities());
-  }
-
-  public void setUserValidityPeriod(long userValidityPeriod) {
-    this.userValidityPeriod = userValidityPeriod;
-  }
+    public void setUserValidityPeriod(long userValidityPeriod) {
+        this.userValidityPeriod = userValidityPeriod;
+    }
 }

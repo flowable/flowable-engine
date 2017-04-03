@@ -27,25 +27,25 @@ import org.flowable.engine.impl.persistence.entity.ByteArrayEntity;
  */
 public class GetAttachmentContentCmd implements Command<InputStream>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String attachmentId;
+    private static final long serialVersionUID = 1L;
+    protected String attachmentId;
 
-  public GetAttachmentContentCmd(String attachmentId) {
-    this.attachmentId = attachmentId;
-  }
-
-  public InputStream execute(CommandContext commandContext) {
-    AttachmentEntity attachment = commandContext.getAttachmentEntityManager().findById(attachmentId);
-
-    String contentId = attachment.getContentId();
-    if (contentId == null) {
-      return null;
+    public GetAttachmentContentCmd(String attachmentId) {
+        this.attachmentId = attachmentId;
     }
 
-    ByteArrayEntity byteArray = commandContext.getByteArrayEntityManager().findById(contentId);
-    byte[] bytes = byteArray.getBytes();
+    public InputStream execute(CommandContext commandContext) {
+        AttachmentEntity attachment = commandContext.getAttachmentEntityManager().findById(attachmentId);
 
-    return new ByteArrayInputStream(bytes);
-  }
+        String contentId = attachment.getContentId();
+        if (contentId == null) {
+            return null;
+        }
+
+        ByteArrayEntity byteArray = commandContext.getByteArrayEntityManager().findById(contentId);
+        byte[] bytes = byteArray.getBytes();
+
+        return new ByteArrayInputStream(bytes);
+    }
 
 }

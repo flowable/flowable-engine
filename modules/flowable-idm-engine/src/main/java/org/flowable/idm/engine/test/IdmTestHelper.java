@@ -26,30 +26,30 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class IdmTestHelper {
 
-  private static Logger log = LoggerFactory.getLogger(IdmTestHelper.class);
+    private static Logger log = LoggerFactory.getLogger(IdmTestHelper.class);
 
-  public static final String EMPTY_LINE = "\n";
+    public static final String EMPTY_LINE = "\n";
 
-  static Map<String, IdmEngine> idmEngines = new HashMap<String, IdmEngine>();
+    static Map<String, IdmEngine> idmEngines = new HashMap<String, IdmEngine>();
 
-  public static IdmEngine getIdmEngine(String configurationResource) {
-    IdmEngine idmEngine = idmEngines.get(configurationResource);
-    if (idmEngine == null) {
-      log.debug("==== BUILDING IDM ENGINE ========================================================================");
-      idmEngine = IdmEngineConfiguration.createIdmEngineConfigurationFromResource(configurationResource)
-          .setDatabaseSchemaUpdate(IdmEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE)
-          .buildIdmEngine();
-      log.debug("==== IDM ENGINE CREATED =========================================================================");
-      idmEngines.put(configurationResource, idmEngine);
+    public static IdmEngine getIdmEngine(String configurationResource) {
+        IdmEngine idmEngine = idmEngines.get(configurationResource);
+        if (idmEngine == null) {
+            log.debug("==== BUILDING IDM ENGINE ========================================================================");
+            idmEngine = IdmEngineConfiguration.createIdmEngineConfigurationFromResource(configurationResource)
+                    .setDatabaseSchemaUpdate(IdmEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE)
+                    .buildIdmEngine();
+            log.debug("==== IDM ENGINE CREATED =========================================================================");
+            idmEngines.put(configurationResource, idmEngine);
+        }
+        return idmEngine;
     }
-    return idmEngine;
-  }
 
-  public static void closeIdmEngines() {
-    for (IdmEngine idmEngine : idmEngines.values()) {
-      idmEngine.close();
+    public static void closeIdmEngines() {
+        for (IdmEngine idmEngine : idmEngines.values()) {
+            idmEngine.close();
+        }
+        idmEngines.clear();
     }
-    idmEngines.clear();
-  }
 
 }

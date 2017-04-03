@@ -20,31 +20,28 @@ import java.util.Map;
  */
 public enum EndpointType {
 
-  PROCESS(1),
-  DMN(2),
-  FORM(3),
-  CONTENT(4);
+    PROCESS(1), DMN(2), FORM(3), CONTENT(4);
 
-  private static Map<Integer, EndpointType> map = new HashMap<>();
+    private static Map<Integer, EndpointType> map = new HashMap<>();
 
-  static {
-    for (EndpointType endpointType : EndpointType.values()) {
-      map.put(endpointType.endpointCode, endpointType);
+    static {
+        for (EndpointType endpointType : EndpointType.values()) {
+            map.put(endpointType.endpointCode, endpointType);
+        }
     }
-  }
 
-  private final int endpointCode;
+    private final int endpointCode;
 
-  EndpointType(int endpointCode) {
-    this.endpointCode = endpointCode;
-  }
+    EndpointType(int endpointCode) {
+        this.endpointCode = endpointCode;
+    }
 
-  public int getEndpointCode() {
-    return this.endpointCode;
-  }
+    public int getEndpointCode() {
+        return this.endpointCode;
+    }
 
-  public static EndpointType valueOf(int endpointCode) {
-    return map.get(endpointCode);
-  }
+    public static EndpointType valueOf(int endpointCode) {
+        return map.get(endpointCode);
+    }
 
 }

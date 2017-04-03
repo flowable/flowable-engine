@@ -20,16 +20,16 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
  */
 public interface PropertyEntity extends Entity, HasRevision {
 
-  String getName();
-  
-  void setName(String name);
+    String getName();
 
-  String getValue();
+    void setName(String name);
 
-  void setValue(String value);
+    String getValue();
 
-  String getId();
+    void setValue(String value);
 
-  Object getPersistentState();
+    String getId();
+
+    Object getPersistentState();
 
 }

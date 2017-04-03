@@ -3,7 +3,7 @@ package org.flowable.standalone.testing;
 /**
  * This test is explicitly empty.
  * 
- * The purpose of this test is to make sure that ActivitiRule works with tests methods that are defined in a parent class.
+ * The purpose of this test is to make sure that FlowableRule works with tests methods that are defined in a parent class.
  * 
  * When running the test suite over this class, JUnit will execute the test from {@link FlowableRuleJunit4Test}. This means that the code in {@link org.flowable.engine.impl.test.TestHelper} needs to
  * be able to find the test method even when it's not declared on the test class itself.

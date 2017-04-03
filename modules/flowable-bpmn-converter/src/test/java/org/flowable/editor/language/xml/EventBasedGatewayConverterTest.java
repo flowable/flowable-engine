@@ -20,27 +20,27 @@ import org.junit.Test;
  */
 public class EventBasedGatewayConverterTest extends AbstractConverterTest {
 
-  @Test
-  public void connvertXMLToModel() throws Exception {
-    BpmnModel bpmnModel = readXMLFile();
-    validateModel(bpmnModel);
-  }
+    @Test
+    public void convertXMLToModel() throws Exception {
+        BpmnModel bpmnModel = readXMLFile();
+        validateModel(bpmnModel);
+    }
 
-  protected String getResource() {
-    return "eventgatewaymodel.bpmn";
-  }
+    protected String getResource() {
+        return "eventgatewaymodel.bpmn";
+    }
 
-  private void validateModel(BpmnModel model) {
-    FlowElement flowElement = model.getMainProcess().getFlowElement("eventBasedGateway");
-    assertNotNull(flowElement);
-    assertTrue(flowElement instanceof EventGateway);
+    private void validateModel(BpmnModel model) {
+        FlowElement flowElement = model.getMainProcess().getFlowElement("eventBasedGateway");
+        assertNotNull(flowElement);
+        assertTrue(flowElement instanceof EventGateway);
 
-    EventGateway gateway = (EventGateway) flowElement;
-    List<FlowableListener> listeners = gateway.getExecutionListeners();
-    assertEquals(1, listeners.size());
-    FlowableListener listener = listeners.get(0);
-    assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, listener.getImplementationType());
-    assertEquals("org.test.TestClass", listener.getImplementation());
-    assertEquals("start", listener.getEvent());
-  }
+        EventGateway gateway = (EventGateway) flowElement;
+        List<FlowableListener> listeners = gateway.getExecutionListeners();
+        assertEquals(1, listeners.size());
+        FlowableListener listener = listeners.get(0);
+        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, listener.getImplementationType());
+        assertEquals("org.test.TestClass", listener.getImplementation());
+        assertEquals("start", listener.getEvent());
+    }
 }

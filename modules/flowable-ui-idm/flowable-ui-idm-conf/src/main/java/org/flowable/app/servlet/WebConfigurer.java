@@ -34,15 +34,15 @@ import org.springframework.web.servlet.DispatcherServlet;
  * Configuration of web application with Servlet 3.0 APIs.
  */
 public class WebConfigurer implements ServletContextListener {
-	
+
     private final Logger log = LoggerFactory.getLogger(WebConfigurer.class);
 
     public AnnotationConfigWebApplicationContext context;
-    
+
     public void setContext(AnnotationConfigWebApplicationContext context) {
         this.context = context;
     }
-    
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         log.debug("Configuring Spring root application context");
@@ -50,25 +50,25 @@ public class WebConfigurer implements ServletContextListener {
         ServletContext servletContext = sce.getServletContext();
 
         AnnotationConfigWebApplicationContext rootContext = null;
-        
+
         if (context == null) {
             rootContext = new AnnotationConfigWebApplicationContext();
             rootContext.register(ApplicationConfiguration.class);
-            
+
             if (rootContext.getServletContext() == null) {
-              rootContext.setServletContext(servletContext);
+                rootContext.setServletContext(servletContext);
             }
-            
+
             rootContext.refresh();
             context = rootContext;
-            
+
         } else {
             rootContext = context;
             if (rootContext.getServletContext() == null) {
-              rootContext.setServletContext(servletContext);
+                rootContext.setServletContext(servletContext);
             }
         }
-        
+
         servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, rootContext);
 
         EnumSet<DispatcherType> disps = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.ASYNC);
@@ -89,7 +89,7 @@ public class WebConfigurer implements ServletContextListener {
         appDispatcherServletConfiguration.register(AppDispatcherServletConfiguration.class);
 
         log.debug("Registering Spring MVC Servlet");
-        ServletRegistration.Dynamic appDispatcherServlet = servletContext.addServlet("appDispatcher", 
+        ServletRegistration.Dynamic appDispatcherServlet = servletContext.addServlet("appDispatcher",
                 new DispatcherServlet(appDispatcherServletConfiguration));
         appDispatcherServlet.addMapping("/app/*");
         appDispatcherServlet.setLoadOnStartup(1);
@@ -117,7 +117,6 @@ public class WebConfigurer implements ServletContextListener {
         springSecurityFilter.addMappingForUrlPatterns(disps, false, "/*");
         springSecurityFilter.setAsyncSupported(true);
     }
-
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {

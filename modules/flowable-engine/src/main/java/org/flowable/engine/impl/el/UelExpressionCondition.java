@@ -26,22 +26,22 @@ import org.flowable.engine.impl.Condition;
  */
 public class UelExpressionCondition implements Condition {
 
-  protected Expression expression;
+    protected Expression expression;
 
-  public UelExpressionCondition(Expression expression) {
-    this.expression = expression;
-  }
-
-  public boolean evaluate(String sequenceFlowId, DelegateExecution execution) {
-    Object result = expression.getValue(execution);
-
-    if (result == null) {
-      throw new FlowableException("condition expression returns null");
+    public UelExpressionCondition(Expression expression) {
+        this.expression = expression;
     }
-    if (!(result instanceof Boolean)) {
-      throw new FlowableException("condition expression returns non-Boolean: " + result + " (" + result.getClass().getName() + ")");
+
+    public boolean evaluate(String sequenceFlowId, DelegateExecution execution) {
+        Object result = expression.getValue(execution);
+
+        if (result == null) {
+            throw new FlowableException("condition expression returns null");
+        }
+        if (!(result instanceof Boolean)) {
+            throw new FlowableException("condition expression returns non-Boolean: " + result + " (" + result.getClass().getName() + ")");
+        }
+        return (Boolean) result;
     }
-    return (Boolean) result;
-  }
 
 }

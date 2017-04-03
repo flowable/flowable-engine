@@ -197,6 +197,7 @@ ORYX.CONFIG.EVENT_LAYOUT_BPEL_AUTORESIZE =	"layout.BPEL.autoresize";
 ORYX.CONFIG.EVENT_AUTOLAYOUT_LAYOUT =		"autolayout.layout";
 ORYX.CONFIG.EVENT_UNDO_EXECUTE =			"undo.execute";
 ORYX.CONFIG.EVENT_UNDO_ROLLBACK =			"undo.rollback";
+ORYX.CONFIG.EVENT_UNDO_RESET =              "undo.reset";
 ORYX.CONFIG.EVENT_BUTTON_UPDATE =           "toolbar.button.update";
 ORYX.CONFIG.EVENT_LAYOUT = 					"layout.dolayout";
 ORYX.CONFIG.EVENT_GLOSSARY_LINK_EDIT = 		"glossary.link.edit";
@@ -207,6 +208,12 @@ ORYX.CONFIG.EVENT_CANVAS_SCROLL = 			"canvas.scroll";
 	
 ORYX.CONFIG.EVENT_SHOW_PROPERTYWINDOW =		"propertywindow.show";
 ORYX.CONFIG.EVENT_ABOUT_TO_SAVE = "file.aboutToSave";
+
+//extra events
+ORYX.CONFIG.EVENT_EDITOR_INIT_COMPLETED = "editor.init.completed";
+
+//actions events that are fired when a button or key was pressed after completing the initial logic.
+ORYX.CONFIG.ACTION_DELETE_COMPLETED = 'delete.action.completed';
 	
 	/* Selection Shapes Highlights */
 ORYX.CONFIG.SELECTION_HIGHLIGHT_SIZE =				5;

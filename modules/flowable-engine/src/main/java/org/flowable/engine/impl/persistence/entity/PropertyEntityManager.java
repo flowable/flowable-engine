@@ -20,7 +20,7 @@ import org.flowable.engine.common.impl.persistence.entity.EntityManager;
  * @author Joram Barrez
  */
 public interface PropertyEntityManager extends EntityManager<PropertyEntity> {
-  
-  List<PropertyEntity> findAll();
+
+    List<PropertyEntity> findAll();
 
 }

@@ -12,14 +12,16 @@
  */
 package org.flowable.cdi.test.api.annotation;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.flowable.cdi.BusinessProcess;
 import org.flowable.cdi.impl.annotation.StartProcessInterceptor;
 import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.cdi.test.impl.beans.DeclarativeProcessController;
 import org.flowable.engine.test.Deployment;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Testcase for assuring that the {@link StartProcessInterceptor} behaves as expected.
@@ -28,39 +30,39 @@ import static org.junit.Assert.*;
  */
 public class StartProcessTest extends CdiFlowableTestCase {
 
-  @Test
-  @Deployment(resources = "org/activiti/cdi/test/api/annotation/StartProcessTest.bpmn20.xml")
-  public void testStartProcessByKey() {
+    @Test
+    @Deployment(resources = "org/flowable/cdi/test/api/annotation/StartProcessTest.bpmn20.xml")
+    public void testStartProcessByKey() {
 
-    assertNull(runtimeService.createProcessInstanceQuery().singleResult());
+        assertNull(runtimeService.createProcessInstanceQuery().singleResult());
 
-    getBeanInstance(DeclarativeProcessController.class).startProcessByKey();
-    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
+        getBeanInstance(DeclarativeProcessController.class).startProcessByKey();
+        BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
 
-    assertNotNull(runtimeService.createProcessInstanceQuery().singleResult());
+        assertNotNull(runtimeService.createProcessInstanceQuery().singleResult());
 
-    assertEquals("Activiti", businessProcess.getVariable("name"));
+        assertEquals("Flowable", businessProcess.getVariable("name"));
 
-    businessProcess.startTask(taskService.createTaskQuery().singleResult().getId());
-    businessProcess.completeTask();
-  }
+        businessProcess.startTask(taskService.createTaskQuery().singleResult().getId());
+        businessProcess.completeTask();
+    }
 
-  @Test
-  @Deployment(resources = "org/activiti/cdi/test/api/annotation/StartProcessTest.bpmn20.xml")
-  public void testStartProcessByName() {
+    @Test
+    @Deployment(resources = "org/flowable/cdi/test/api/annotation/StartProcessTest.bpmn20.xml")
+    public void testStartProcessByName() {
 
-    assertNull(runtimeService.createProcessInstanceQuery().singleResult());
+        assertNull(runtimeService.createProcessInstanceQuery().singleResult());
 
-    getBeanInstance(DeclarativeProcessController.class).startProcessByName();
+        getBeanInstance(DeclarativeProcessController.class).startProcessByName();
 
-    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
+        BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
 
-    assertNotNull(runtimeService.createProcessInstanceQuery().singleResult());
+        assertNotNull(runtimeService.createProcessInstanceQuery().singleResult());
 
-    assertEquals("Activiti", businessProcess.getVariable("name"));
+        assertEquals("Flowable", businessProcess.getVariable("name"));
 
-    businessProcess.startTask(taskService.createTaskQuery().singleResult().getId());
-    businessProcess.completeTask();
-  }
+        businessProcess.startTask(taskService.createTaskQuery().singleResult().getId());
+        businessProcess.completeTask();
+    }
 
 }

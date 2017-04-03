@@ -28,60 +28,60 @@ import org.flowable.engine.impl.el.ExpressionManager;
  */
 public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> extends AbstractFlowNodeBpmnParseHandler<T> {
 
-  @Override
-  public void parse(BpmnParse bpmnParse, BaseElement element) {
-    super.parse(bpmnParse, element);
+    @Override
+    public void parse(BpmnParse bpmnParse, BaseElement element) {
+        super.parse(bpmnParse, element);
 
-    if (element instanceof Activity && ((Activity) element).getLoopCharacteristics() != null) {
-      createMultiInstanceLoopCharacteristics(bpmnParse, (Activity) element);
-    }
-  }
-
-  protected void createMultiInstanceLoopCharacteristics(BpmnParse bpmnParse, Activity modelActivity) {
-
-    MultiInstanceLoopCharacteristics loopCharacteristics = modelActivity.getLoopCharacteristics();
-
-    // Activity Behavior
-    MultiInstanceActivityBehavior miActivityBehavior = null;
-
-    if (loopCharacteristics.isSequential()) {
-      miActivityBehavior = bpmnParse.getActivityBehaviorFactory().createSequentialMultiInstanceBehavior(modelActivity, (AbstractBpmnActivityBehavior) modelActivity.getBehavior());
-    } else {
-      miActivityBehavior = bpmnParse.getActivityBehaviorFactory().createParallelMultiInstanceBehavior(modelActivity, (AbstractBpmnActivityBehavior) modelActivity.getBehavior());
+        if (element instanceof Activity && ((Activity) element).getLoopCharacteristics() != null) {
+            createMultiInstanceLoopCharacteristics(bpmnParse, (Activity) element);
+        }
     }
 
-    modelActivity.setBehavior(miActivityBehavior);
+    protected void createMultiInstanceLoopCharacteristics(BpmnParse bpmnParse, Activity modelActivity) {
 
-    ExpressionManager expressionManager = Context.getProcessEngineConfiguration().getExpressionManager();
+        MultiInstanceLoopCharacteristics loopCharacteristics = modelActivity.getLoopCharacteristics();
 
-    // loop cardinality
-    if (StringUtils.isNotEmpty(loopCharacteristics.getLoopCardinality())) {
-      miActivityBehavior.setLoopCardinalityExpression(expressionManager.createExpression(loopCharacteristics.getLoopCardinality()));
+        // Activity Behavior
+        MultiInstanceActivityBehavior miActivityBehavior = null;
+
+        if (loopCharacteristics.isSequential()) {
+            miActivityBehavior = bpmnParse.getActivityBehaviorFactory().createSequentialMultiInstanceBehavior(modelActivity, (AbstractBpmnActivityBehavior) modelActivity.getBehavior());
+        } else {
+            miActivityBehavior = bpmnParse.getActivityBehaviorFactory().createParallelMultiInstanceBehavior(modelActivity, (AbstractBpmnActivityBehavior) modelActivity.getBehavior());
+        }
+
+        modelActivity.setBehavior(miActivityBehavior);
+
+        ExpressionManager expressionManager = Context.getProcessEngineConfiguration().getExpressionManager();
+
+        // loop cardinality
+        if (StringUtils.isNotEmpty(loopCharacteristics.getLoopCardinality())) {
+            miActivityBehavior.setLoopCardinalityExpression(expressionManager.createExpression(loopCharacteristics.getLoopCardinality()));
+        }
+
+        // completion condition
+        if (StringUtils.isNotEmpty(loopCharacteristics.getCompletionCondition())) {
+            miActivityBehavior.setCompletionConditionExpression(expressionManager.createExpression(loopCharacteristics.getCompletionCondition()));
+        }
+
+        // activiti:collection
+        if (StringUtils.isNotEmpty(loopCharacteristics.getInputDataItem())) {
+            if (loopCharacteristics.getInputDataItem().contains("{")) {
+                miActivityBehavior.setCollectionExpression(expressionManager.createExpression(loopCharacteristics.getInputDataItem()));
+            } else {
+                miActivityBehavior.setCollectionVariable(loopCharacteristics.getInputDataItem());
+            }
+        }
+
+        // activiti:elementVariable
+        if (StringUtils.isNotEmpty(loopCharacteristics.getElementVariable())) {
+            miActivityBehavior.setCollectionElementVariable(loopCharacteristics.getElementVariable());
+        }
+
+        // activiti:elementIndexVariable
+        if (StringUtils.isNotEmpty(loopCharacteristics.getElementIndexVariable())) {
+            miActivityBehavior.setCollectionElementIndexVariable(loopCharacteristics.getElementIndexVariable());
+        }
+
     }
-
-    // completion condition
-    if (StringUtils.isNotEmpty(loopCharacteristics.getCompletionCondition())) {
-      miActivityBehavior.setCompletionConditionExpression(expressionManager.createExpression(loopCharacteristics.getCompletionCondition()));
-    }
-
-    // activiti:collection
-    if (StringUtils.isNotEmpty(loopCharacteristics.getInputDataItem())) {
-      if (loopCharacteristics.getInputDataItem().contains("{")) {
-        miActivityBehavior.setCollectionExpression(expressionManager.createExpression(loopCharacteristics.getInputDataItem()));
-      } else {
-        miActivityBehavior.setCollectionVariable(loopCharacteristics.getInputDataItem());
-      }
-    }
-
-    // activiti:elementVariable
-    if (StringUtils.isNotEmpty(loopCharacteristics.getElementVariable())) {
-      miActivityBehavior.setCollectionElementVariable(loopCharacteristics.getElementVariable());
-    }
-
-    // activiti:elementIndexVariable
-    if (StringUtils.isNotEmpty(loopCharacteristics.getElementIndexVariable())) {
-      miActivityBehavior.setCollectionElementIndexVariable(loopCharacteristics.getElementIndexVariable());
-    }
-
-  }
 }

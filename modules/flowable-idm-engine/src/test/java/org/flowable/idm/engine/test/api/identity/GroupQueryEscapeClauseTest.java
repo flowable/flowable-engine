@@ -17,42 +17,42 @@ import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.engine.test.ResourceFlowableIdmTestCase;
 
 public class GroupQueryEscapeClauseTest extends ResourceFlowableIdmTestCase {
-  
-  public GroupQueryEscapeClauseTest() {
-    super("escapeclause/flowable.idm.cfg.xml");
-  }
 
-  protected void setUp() throws Exception {
-    super.setUp();
+    public GroupQueryEscapeClauseTest() {
+        super("escapeclause/flowable.idm.cfg.xml");
+    }
 
-    createGroup("muppets", "muppets%", "user");
-    createGroup("frogs", "frogs_", "user");
-  }
-  
-  @Override
-  protected void tearDown() throws Exception {
-    idmIdentityService.deleteGroup("muppets");
-    idmIdentityService.deleteGroup("frogs");
-    super.tearDown();
-  }
-  
-  public void testQueryByNameLike() {
-    GroupQuery query = idmIdentityService.createGroupQuery().groupNameLike("%\\%%");
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-    assertEquals("muppets", query.singleResult().getId());
-    
-    query = idmIdentityService.createGroupQuery().groupNameLike("%\\_%");
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-    assertEquals("frogs", query.singleResult().getId());
-  }
-  
-  private Group createGroup(String id, String name, String type) {
-    Group group = idmIdentityService.newGroup(id);
-    group.setName(name);
-    group.setType(type);
-    idmIdentityService.saveGroup(group);
-    return group;
-  }
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        createGroup("muppets", "muppets%", "user");
+        createGroup("frogs", "frogs_", "user");
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        idmIdentityService.deleteGroup("muppets");
+        idmIdentityService.deleteGroup("frogs");
+        super.tearDown();
+    }
+
+    public void testQueryByNameLike() {
+        GroupQuery query = idmIdentityService.createGroupQuery().groupNameLike("%\\%%");
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+        assertEquals("muppets", query.singleResult().getId());
+
+        query = idmIdentityService.createGroupQuery().groupNameLike("%\\_%");
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+        assertEquals("frogs", query.singleResult().getId());
+    }
+
+    private Group createGroup(String id, String name, String type) {
+        Group group = idmIdentityService.newGroup(id);
+        group.setName(name);
+        group.setType(type);
+        idmIdentityService.saveGroup(group);
+        return group;
+    }
 }

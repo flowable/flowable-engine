@@ -19,10 +19,10 @@ import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
  * @author Joram Barrez
  */
 public class EventSubscriptionsByExecutionIdMatcher extends CachedEntityMatcherAdapter<EventSubscriptionEntity> {
-  
-  @Override
-  public boolean isRetained(EventSubscriptionEntity eventSubscriptionEntity, Object parameter) {
-    return eventSubscriptionEntity.getExecutionId() != null && eventSubscriptionEntity.getExecutionId().equals((String) parameter);
-  }
-  
+
+    @Override
+    public boolean isRetained(EventSubscriptionEntity eventSubscriptionEntity, Object parameter) {
+        return eventSubscriptionEntity.getExecutionId() != null && eventSubscriptionEntity.getExecutionId().equals((String) parameter);
+    }
+
 }

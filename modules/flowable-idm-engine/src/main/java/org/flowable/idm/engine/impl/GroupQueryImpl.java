@@ -28,136 +28,149 @@ import org.flowable.idm.engine.impl.interceptor.CommandExecutor;
  */
 public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements GroupQuery {
 
-  private static final long serialVersionUID = 1L;
-  protected String id;
-  protected List<String> ids;
-  protected String name;
-  protected String nameLike;
-  protected String type;
-  protected String userId;
-  protected List<String> userIds;
+    private static final long serialVersionUID = 1L;
+    protected String id;
+    protected List<String> ids;
+    protected String name;
+    protected String nameLike;
+    protected String nameLikeIgnoreCase;
+    protected String type;
+    protected String userId;
+    protected List<String> userIds;
 
-  public GroupQueryImpl() {
-  }
-
-  public GroupQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
-  public GroupQueryImpl(CommandExecutor commandExecutor) {
-    super(commandExecutor);
-  }
-
-  public GroupQuery groupId(String id) {
-    if (id == null) {
-      throw new FlowableIllegalArgumentException("Provided id is null");
+    public GroupQueryImpl() {
     }
-    this.id = id;
-    return this;
-  }
-  
-  public GroupQuery groupIds(List<String> ids) {
-    if (ids == null) {
-      throw new FlowableIllegalArgumentException("Provided id list is null");
+
+    public GroupQueryImpl(CommandContext commandContext) {
+        super(commandContext);
     }
-    this.ids = ids;
-    return this;
-  }
 
-  public GroupQuery groupName(String name) {
-    if (name == null) {
-      throw new FlowableIllegalArgumentException("Provided name is null");
+    public GroupQueryImpl(CommandExecutor commandExecutor) {
+        super(commandExecutor);
     }
-    this.name = name;
-    return this;
-  }
 
-  public GroupQuery groupNameLike(String nameLike) {
-    if (nameLike == null) {
-      throw new FlowableIllegalArgumentException("Provided nameLike is null");
+    public GroupQuery groupId(String id) {
+        if (id == null) {
+            throw new FlowableIllegalArgumentException("Provided id is null");
+        }
+        this.id = id;
+        return this;
     }
-    this.nameLike = nameLike;
-    return this;
-  }
 
-  public GroupQuery groupType(String type) {
-    if (type == null) {
-      throw new FlowableIllegalArgumentException("Provided type is null");
+    public GroupQuery groupIds(List<String> ids) {
+        if (ids == null) {
+            throw new FlowableIllegalArgumentException("Provided id list is null");
+        }
+        this.ids = ids;
+        return this;
     }
-    this.type = type;
-    return this;
-  }
 
-  public GroupQuery groupMember(String userId) {
-    if (userId == null) {
-      throw new FlowableIllegalArgumentException("Provided userId is null");
+    public GroupQuery groupName(String name) {
+        if (name == null) {
+            throw new FlowableIllegalArgumentException("Provided name is null");
+        }
+        this.name = name;
+        return this;
     }
-    this.userId = userId;
-    return this;
-  }
 
-  public GroupQuery groupMembers(List<String> userIds) {
-    if (userIds == null) {
-      throw new FlowableIllegalArgumentException("Provided userIds is null");
+    public GroupQuery groupNameLike(String nameLike) {
+        if (nameLike == null) {
+            throw new FlowableIllegalArgumentException("Provided name is null");
+        }
+        this.nameLike = nameLike;
+        return this;
     }
-    this.userIds = userIds;
-    return this;
-  }
 
-  // sorting ////////////////////////////////////////////////////////
+    public GroupQuery groupNameLikeIgnoreCase(String nameLikeIgnoreCase) {
+        if (nameLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("Provided name is null");
+        }
+        this.nameLikeIgnoreCase = nameLikeIgnoreCase.toLowerCase();
+        return this;
+    }
 
-  public GroupQuery orderByGroupId() {
-    return orderBy(GroupQueryProperty.GROUP_ID);
-  }
+    public GroupQuery groupType(String type) {
+        if (type == null) {
+            throw new FlowableIllegalArgumentException("Provided type is null");
+        }
+        this.type = type;
+        return this;
+    }
 
-  public GroupQuery orderByGroupName() {
-    return orderBy(GroupQueryProperty.NAME);
-  }
+    public GroupQuery groupMember(String userId) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("Provided userId is null");
+        }
+        this.userId = userId;
+        return this;
+    }
 
-  public GroupQuery orderByGroupType() {
-    return orderBy(GroupQueryProperty.TYPE);
-  }
+    public GroupQuery groupMembers(List<String> userIds) {
+        if (userIds == null) {
+            throw new FlowableIllegalArgumentException("Provided userIds is null");
+        }
+        this.userIds = userIds;
+        return this;
+    }
 
-  // results ////////////////////////////////////////////////////////
+    // sorting ////////////////////////////////////////////////////////
 
-  public long executeCount(CommandContext commandContext) {
-    checkQueryOk();
-    return commandContext.getGroupEntityManager().findGroupCountByQueryCriteria(this);
-  }
+    public GroupQuery orderByGroupId() {
+        return orderBy(GroupQueryProperty.GROUP_ID);
+    }
 
-  public List<Group> executeList(CommandContext commandContext, Page page) {
-    checkQueryOk();
-    return commandContext.getGroupEntityManager().findGroupByQueryCriteria(this, page);
-  }
+    public GroupQuery orderByGroupName() {
+        return orderBy(GroupQueryProperty.NAME);
+    }
 
-  // getters ////////////////////////////////////////////////////////
+    public GroupQuery orderByGroupType() {
+        return orderBy(GroupQueryProperty.TYPE);
+    }
 
-  public String getId() {
-    return id;
-  }
+    // results ////////////////////////////////////////////////////////
 
-  public List<String> getIds() {
-    return ids;
-  }
+    public long executeCount(CommandContext commandContext) {
+        checkQueryOk();
+        return commandContext.getGroupEntityManager().findGroupCountByQueryCriteria(this);
+    }
 
-  public String getName() {
-    return name;
-  }
+    public List<Group> executeList(CommandContext commandContext, Page page) {
+        checkQueryOk();
+        return commandContext.getGroupEntityManager().findGroupByQueryCriteria(this, page);
+    }
 
-  public String getNameLike() {
-    return nameLike;
-  }
+    // getters ////////////////////////////////////////////////////////
 
-  public String getType() {
-    return type;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public String getUserId() {
-    return userId;
-  }
-  
-  public List<String> getUserIds() {
-    return userIds;
-  }
-  
+    public List<String> getIds() {
+        return ids;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getNameLike() {
+        return nameLike;
+    }
+
+    public String getNameLikeIgnoreCase() {
+        return nameLikeIgnoreCase;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public List<String> getUserIds() {
+        return userIds;
+    }
+
 }

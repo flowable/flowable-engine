@@ -29,129 +29,129 @@ import org.flowable.form.engine.FormEngineConfiguration;
  */
 public class FormDeploymentEntityImpl extends AbstractEntityNoRevision implements FormDeploymentEntity, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String name;
-  protected String category;
-  protected String tenantId = FormEngineConfiguration.NO_TENANT_ID;
-  protected String parentDeploymentId;
-  protected Map<String, ResourceEntity> resources;
-  protected Date deploymentTime;
-  protected boolean isNew;
-  
-  /**
-   * Will only be used during actual deployment to pass deployed artifacts (eg process definitions). Will be null otherwise.
-   */
-  protected Map<Class<?>, List<Object>> deployedArtifacts;
-  
-  public FormDeploymentEntityImpl() {
-    
-  }
+    protected String name;
+    protected String category;
+    protected String tenantId = FormEngineConfiguration.NO_TENANT_ID;
+    protected String parentDeploymentId;
+    protected Map<String, ResourceEntity> resources;
+    protected Date deploymentTime;
+    protected boolean isNew;
 
-  public void addResource(ResourceEntity resource) {
-    if (resources == null) {
-      resources = new HashMap<String, ResourceEntity>();
-    }
-    resources.put(resource.getName(), resource);
-  }
-  
-  public Map<String, ResourceEntity> getResources() {
-    return resources;
-  }
+    /**
+     * Will only be used during actual deployment to pass deployed artifacts (eg process definitions). Will be null otherwise.
+     */
+    protected Map<Class<?>, List<Object>> deployedArtifacts;
 
-  public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
-    persistentState.put("category", this.category);
-    persistentState.put("tenantId", tenantId);
-    return persistentState;
-  }
+    public FormDeploymentEntityImpl() {
 
-  // Deployed artifacts manipulation ////////////////////////////////////////////
-  
-  public void addDeployedArtifact(Object deployedArtifact) {
-    if (deployedArtifacts == null) {
-      deployedArtifacts = new HashMap<Class<?>, List<Object>>();
     }
 
-    Class<?> clazz = deployedArtifact.getClass();
-    List<Object> artifacts = deployedArtifacts.get(clazz);
-    if (artifacts == null) {
-      artifacts = new ArrayList<Object>();
-      deployedArtifacts.put(clazz, artifacts);
+    public void addResource(ResourceEntity resource) {
+        if (resources == null) {
+            resources = new HashMap<String, ResourceEntity>();
+        }
+        resources.put(resource.getName(), resource);
     }
 
-    artifacts.add(deployedArtifact);
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T> List<T> getDeployedArtifacts(Class<T> clazz) {
-    for (Class<?> deployedArtifactsClass : deployedArtifacts.keySet()) {
-      if (clazz.isAssignableFrom(deployedArtifactsClass)) {
-        return (List<T>) deployedArtifacts.get(deployedArtifactsClass);
-      }
+    public Map<String, ResourceEntity> getResources() {
+        return resources;
     }
-    return null;
-  }
 
-  // getters and setters ////////////////////////////////////////////////////////
+    public Object getPersistentState() {
+        Map<String, Object> persistentState = new HashMap<String, Object>();
+        persistentState.put("category", this.category);
+        persistentState.put("tenantId", tenantId);
+        return persistentState;
+    }
 
-  public String getName() {
-    return name;
-  }
+    // Deployed artifacts manipulation ////////////////////////////////////////////
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void addDeployedArtifact(Object deployedArtifact) {
+        if (deployedArtifacts == null) {
+            deployedArtifacts = new HashMap<Class<?>, List<Object>>();
+        }
 
-  public String getCategory() {
-    return category;
-  }
+        Class<?> clazz = deployedArtifact.getClass();
+        List<Object> artifacts = deployedArtifacts.get(clazz);
+        if (artifacts == null) {
+            artifacts = new ArrayList<Object>();
+            deployedArtifacts.put(clazz, artifacts);
+        }
 
-  public void setCategory(String category) {
-    this.category = category;
-  }
+        artifacts.add(deployedArtifact);
+    }
 
-  public String getTenantId() {
-    return tenantId;
-  }
+    @SuppressWarnings("unchecked")
+    public <T> List<T> getDeployedArtifacts(Class<T> clazz) {
+        for (Class<?> deployedArtifactsClass : deployedArtifacts.keySet()) {
+            if (clazz.isAssignableFrom(deployedArtifactsClass)) {
+                return (List<T>) deployedArtifacts.get(deployedArtifactsClass);
+            }
+        }
+        return null;
+    }
 
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
+    // getters and setters ////////////////////////////////////////////////////////
 
-  public String getParentDeploymentId() {
-    return parentDeploymentId;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setParentDeploymentId(String parentDeploymentId) {
-    this.parentDeploymentId = parentDeploymentId;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public void setResources(Map<String, ResourceEntity> resources) {
-    this.resources = resources;
-  }
+    public String getCategory() {
+        return category;
+    }
 
-  public Date getDeploymentTime() {
-    return deploymentTime;
-  }
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
-  public void setDeploymentTime(Date deploymentTime) {
-    this.deploymentTime = deploymentTime;
-  }
+    public String getTenantId() {
+        return tenantId;
+    }
 
-  public boolean isNew() {
-    return isNew;
-  }
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
 
-  public void setNew(boolean isNew) {
-    this.isNew = isNew;
-  }
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
+    }
 
-  // common methods //////////////////////////////////////////////////////////
+    public void setParentDeploymentId(String parentDeploymentId) {
+        this.parentDeploymentId = parentDeploymentId;
+    }
 
-  @Override
-  public String toString() {
-    return "FormDeploymentEntity[id=" + id + ", name=" + name + "]";
-  }
+    public void setResources(Map<String, ResourceEntity> resources) {
+        this.resources = resources;
+    }
+
+    public Date getDeploymentTime() {
+        return deploymentTime;
+    }
+
+    public void setDeploymentTime(Date deploymentTime) {
+        this.deploymentTime = deploymentTime;
+    }
+
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
+    }
+
+    // common methods //////////////////////////////////////////////////////////
+
+    @Override
+    public String toString() {
+        return "FormDeploymentEntity[id=" + id + ", name=" + name + "]";
+    }
 
 }

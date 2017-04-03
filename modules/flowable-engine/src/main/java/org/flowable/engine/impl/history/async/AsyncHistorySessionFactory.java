@@ -18,25 +18,25 @@ import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.impl.interceptor.CommandContext;
 
 public class AsyncHistorySessionFactory implements SessionFactory {
-  
-  protected AsyncHistoryJobProducer asyncHistoryJobProducer;
-  
-  @Override
-  public Class<?> getSessionType() {
-    return AsyncHistorySession.class;
-  }
 
-  @Override
-  public Session openSession(AbstractCommandContext commandContext) {
-    return new AsyncHistorySession((CommandContext) commandContext, asyncHistoryJobProducer);
-  }
+    protected AsyncHistoryJobProducer asyncHistoryJobProducer;
 
-  public AsyncHistoryJobProducer getAsyncHistoryJobProducer() {
-    return asyncHistoryJobProducer;
-  }
+    @Override
+    public Class<?> getSessionType() {
+        return AsyncHistorySession.class;
+    }
 
-  public void setAsyncHistoryJobProducer(AsyncHistoryJobProducer asyncHistoryJobProducer) {
-    this.asyncHistoryJobProducer = asyncHistoryJobProducer;
-  }
-  
+    @Override
+    public Session openSession(AbstractCommandContext commandContext) {
+        return new AsyncHistorySession((CommandContext) commandContext, asyncHistoryJobProducer);
+    }
+
+    public AsyncHistoryJobProducer getAsyncHistoryJobProducer() {
+        return asyncHistoryJobProducer;
+    }
+
+    public void setAsyncHistoryJobProducer(AsyncHistoryJobProducer asyncHistoryJobProducer) {
+        this.asyncHistoryJobProducer = asyncHistoryJobProducer;
+    }
+
 }

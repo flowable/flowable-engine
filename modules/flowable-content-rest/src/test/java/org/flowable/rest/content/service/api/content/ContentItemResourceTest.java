@@ -35,122 +35,122 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
 
-  public void testGetContentItem() throws Exception {
-    String contentItemId = createContentItem("test.pdf", "application/pdf", null, "12345", null, "test", "test2");
-    
-    ContentItem contentItem = contentService.createContentItemQuery().singleResult();
+    public void testGetContentItem() throws Exception {
+        String contentItemId = createContentItem("test.pdf", "application/pdf", null, "12345", null, "test", "test2");
 
-    try {
-      HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
-          ContentRestUrls.URL_CONTENT_ITEM, contentItemId));
-      CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
-      JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-      closeResponse(response);
-      
-      assertEquals(contentItem.getId(), responseNode.get("id").asText());
-      assertEquals(contentItem.getName(), responseNode.get("name").asText());
-      assertEquals(contentItem.getMimeType(), responseNode.get("mimeType").asText());
-      assertTrue(responseNode.get("taskId").isNull());
-      assertEquals(contentItem.getProcessInstanceId(), responseNode.get("processInstanceId").asText());
-      assertEquals("", responseNode.get("tenantId").asText());
-      assertEquals(contentItem.getCreatedBy(), responseNode.get("createdBy").asText());
-      assertEquals(contentItem.getLastModifiedBy(), responseNode.get("lastModifiedBy").asText());
-      assertEquals(contentItem.getCreated(), getDateFromISOString(responseNode.get("created").asText()));
-      assertEquals(contentItem.getLastModified(), getDateFromISOString(responseNode.get("lastModified").asText()));
-  
-      // Check URL's
-      assertEquals(httpGet.getURI().toString(), responseNode.get("url").asText());
-      
-    } finally {
-      contentService.deleteContentItem(contentItemId);
+        ContentItem contentItem = contentService.createContentItemQuery().singleResult();
+
+        try {
+            HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
+                    ContentRestUrls.URL_CONTENT_ITEM, contentItemId));
+            CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
+            JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+            closeResponse(response);
+
+            assertEquals(contentItem.getId(), responseNode.get("id").asText());
+            assertEquals(contentItem.getName(), responseNode.get("name").asText());
+            assertEquals(contentItem.getMimeType(), responseNode.get("mimeType").asText());
+            assertTrue(responseNode.get("taskId").isNull());
+            assertEquals(contentItem.getProcessInstanceId(), responseNode.get("processInstanceId").asText());
+            assertEquals("", responseNode.get("tenantId").asText());
+            assertEquals(contentItem.getCreatedBy(), responseNode.get("createdBy").asText());
+            assertEquals(contentItem.getLastModifiedBy(), responseNode.get("lastModifiedBy").asText());
+            assertEquals(contentItem.getCreated(), getDateFromISOString(responseNode.get("created").asText()));
+            assertEquals(contentItem.getLastModified(), getDateFromISOString(responseNode.get("lastModified").asText()));
+
+            // Check URL's
+            assertEquals(httpGet.getURI().toString(), responseNode.get("url").asText());
+
+        } finally {
+            contentService.deleteContentItem(contentItemId);
+        }
     }
-  }
 
-  public void testGetUnexistingContentItem() throws Exception {
-    HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
-        ContentRestUrls.URL_CONTENT_ITEM, "unexisting"));
-    CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
-    closeResponse(response);
-  }
-  
-  public void testGetContentItemData() throws Exception {
-    InputStream binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
-    String contentItemId = createContentItem("test.pdf", "application/pdf", null, "12345", null, "test", "test2", binaryContent);
-    
-    try {
-      // Get content item data
-      CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
-          ContentRestUrls.URL_CONTENT_ITEM_DATA, contentItemId)), HttpStatus.SC_OK);
-
-      // Check response headers
-      assertEquals("application/pdf", response.getEntity().getContentType().getValue());
-      assertEquals("This is binary content", IOUtils.toString(response.getEntity().getContent()));
-      closeResponse(response);
-
-    } finally {
-      contentService.deleteContentItem(contentItemId);
+    public void testGetUnexistingContentItem() throws Exception {
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
+                ContentRestUrls.URL_CONTENT_ITEM, "unexisting"));
+        CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
+        closeResponse(response);
     }
-  }
-  
-  public void testUpdateContentItem() throws Exception {
-    String contentItemId = createContentItem("test.pdf", "application/pdf", null, "12345", null, "test", "test2");
-    
-    ContentItem contentItem = contentService.createContentItemQuery().singleResult();
 
-    try {
-      ObjectNode requestNode = objectMapper.createObjectNode();
-      requestNode.put("name", "test2.txt");
-      requestNode.put("mimeType", "application/txt");
-      requestNode.put("createdBy", "testb");
-      requestNode.put("lastModifiedBy", "testc");
-  
-      HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
-          ContentRestUrls.URL_CONTENT_ITEM, contentItemId));
-      httpPut.setEntity(new StringEntity(requestNode.toString()));
-      CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
-      JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-      closeResponse(response);
-      
-      assertEquals(contentItem.getId(), responseNode.get("id").asText());
-      assertEquals("test2.txt", responseNode.get("name").asText());
-      assertEquals("application/txt", responseNode.get("mimeType").asText());
-      assertTrue(responseNode.get("taskId").isNull());
-      assertEquals(contentItem.getProcessInstanceId(), responseNode.get("processInstanceId").asText());
-      assertEquals("", responseNode.get("tenantId").asText());
-      assertEquals("testb", responseNode.get("createdBy").asText());
-      assertEquals("testc", responseNode.get("lastModifiedBy").asText());
-      assertEquals(contentItem.getCreated(), getDateFromISOString(responseNode.get("created").asText()));
-      assertEquals(contentItem.getLastModified(), getDateFromISOString(responseNode.get("lastModified").asText()));
-      
-    } finally {
-      contentService.deleteContentItem(contentItemId);
+    public void testGetContentItemData() throws Exception {
+        InputStream binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
+        String contentItemId = createContentItem("test.pdf", "application/pdf", null, "12345", null, "test", "test2", binaryContent);
+
+        try {
+            // Get content item data
+            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
+                    ContentRestUrls.URL_CONTENT_ITEM_DATA, contentItemId)), HttpStatus.SC_OK);
+
+            // Check response headers
+            assertEquals("application/pdf", response.getEntity().getContentType().getValue());
+            assertEquals("This is binary content", IOUtils.toString(response.getEntity().getContent()));
+            closeResponse(response);
+
+        } finally {
+            contentService.deleteContentItem(contentItemId);
+        }
     }
-  }
-  
-  public void testSaveContentItemData() throws Exception {
-    String contentItemId = createContentItem("test.pdf", "application/pdf", null, "12345", null, "test", "test2");
-    
-    InputStream binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
-    
-    try {
-      // Get content item data
-      HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
-          ContentRestUrls.URL_CONTENT_ITEM_DATA, contentItemId));
-      httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/octet-stream", binaryContent, null));
-      CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
-      closeResponse(response);
-      
-      response = executeRequest(new HttpGet(SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
-          ContentRestUrls.URL_CONTENT_ITEM_DATA, contentItemId)), HttpStatus.SC_OK);
 
-      // Check response headers
-      assertEquals("application/pdf", response.getEntity().getContentType().getValue());
-      assertEquals("This is binary content", IOUtils.toString(response.getEntity().getContent()));
-      closeResponse(response);
+    public void testUpdateContentItem() throws Exception {
+        String contentItemId = createContentItem("test.pdf", "application/pdf", null, "12345", null, "test", "test2");
 
-    } finally {
-      contentService.deleteContentItem(contentItemId);
+        ContentItem contentItem = contentService.createContentItemQuery().singleResult();
+
+        try {
+            ObjectNode requestNode = objectMapper.createObjectNode();
+            requestNode.put("name", "test2.txt");
+            requestNode.put("mimeType", "application/txt");
+            requestNode.put("createdBy", "testb");
+            requestNode.put("lastModifiedBy", "testc");
+
+            HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
+                    ContentRestUrls.URL_CONTENT_ITEM, contentItemId));
+            httpPut.setEntity(new StringEntity(requestNode.toString()));
+            CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+            JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+            closeResponse(response);
+
+            assertEquals(contentItem.getId(), responseNode.get("id").asText());
+            assertEquals("test2.txt", responseNode.get("name").asText());
+            assertEquals("application/txt", responseNode.get("mimeType").asText());
+            assertTrue(responseNode.get("taskId").isNull());
+            assertEquals(contentItem.getProcessInstanceId(), responseNode.get("processInstanceId").asText());
+            assertEquals("", responseNode.get("tenantId").asText());
+            assertEquals("testb", responseNode.get("createdBy").asText());
+            assertEquals("testc", responseNode.get("lastModifiedBy").asText());
+            assertEquals(contentItem.getCreated(), getDateFromISOString(responseNode.get("created").asText()));
+            assertEquals(contentItem.getLastModified(), getDateFromISOString(responseNode.get("lastModified").asText()));
+
+        } finally {
+            contentService.deleteContentItem(contentItemId);
+        }
     }
-  }
+
+    public void testSaveContentItemData() throws Exception {
+        String contentItemId = createContentItem("test.pdf", "application/pdf", null, "12345", null, "test", "test2");
+
+        InputStream binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
+
+        try {
+            // Get content item data
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
+                    ContentRestUrls.URL_CONTENT_ITEM_DATA, contentItemId));
+            httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/octet-stream", binaryContent, null));
+            CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
+            closeResponse(response);
+
+            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
+                    ContentRestUrls.URL_CONTENT_ITEM_DATA, contentItemId)), HttpStatus.SC_OK);
+
+            // Check response headers
+            assertEquals("application/pdf", response.getEntity().getContentType().getValue());
+            assertEquals("This is binary content", IOUtils.toString(response.getEntity().getContent()));
+            closeResponse(response);
+
+        } finally {
+            contentService.deleteContentItem(contentItemId);
+        }
+    }
 
 }

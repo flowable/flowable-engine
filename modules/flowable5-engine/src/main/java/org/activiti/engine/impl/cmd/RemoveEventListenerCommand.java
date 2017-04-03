@@ -23,24 +23,24 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
  * @author Frederik Heremans
  */
 public class RemoveEventListenerCommand implements Command<Void> {
-	
-	protected FlowableEventListener listener;
-	
-	public RemoveEventListenerCommand(FlowableEventListener listener) {
-	  super();
-	  this.listener = listener;
-  }
 
-	@Override
-  public Void execute(CommandContext commandContext) {
-		if(listener == null) {
-			throw new ActivitiIllegalArgumentException("listener is null.");
-		}
-		
-		commandContext.getProcessEngineConfiguration()
-			.getEventDispatcher().removeEventListener(listener);
-		
-	  return null;
-  }
-	
+    protected FlowableEventListener listener;
+
+    public RemoveEventListenerCommand(FlowableEventListener listener) {
+        super();
+        this.listener = listener;
+    }
+
+    @Override
+    public Void execute(CommandContext commandContext) {
+        if (listener == null) {
+            throw new ActivitiIllegalArgumentException("listener is null.");
+        }
+
+        commandContext.getProcessEngineConfiguration()
+                .getEventDispatcher().removeEventListener(listener);
+
+        return null;
+    }
+
 }

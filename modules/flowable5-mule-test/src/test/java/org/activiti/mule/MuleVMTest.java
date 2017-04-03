@@ -28,32 +28,32 @@ import org.junit.Test;
  */
 public class MuleVMTest extends AbstractMuleTest {
 
-  @Test
-  public void send() throws Exception {
-    Assert.assertTrue(muleContext.isStarted());
+    @Test
+    public void send() throws Exception {
+        Assert.assertTrue(muleContext.isStarted());
 
-    ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();
-    RepositoryService repositoryService = processEngine.getRepositoryService();
-    Deployment deployment = repositoryService.createDeployment()
-        .addClasspathResource("org/activiti/mule/testVM.bpmn20.xml")
-        .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
-        .deploy();
+        ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();
+        RepositoryService repositoryService = processEngine.getRepositoryService();
+        Deployment deployment = repositoryService.createDeployment()
+                .addClasspathResource("org/activiti/mule/testVM.bpmn20.xml")
+                .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
+                .deploy();
 
-    RuntimeService runtimeService = processEngine.getRuntimeService();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("muleProcess");
-    Assert.assertFalse(processInstance.isEnded());
-    Object result = runtimeService.getVariable(processInstance.getProcessInstanceId(), "theVariable");
-    Assert.assertEquals(30, result);
-    runtimeService.deleteProcessInstance(processInstance.getId(), "test");
+        RuntimeService runtimeService = processEngine.getRuntimeService();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("muleProcess");
+        Assert.assertFalse(processInstance.isEnded());
+        Object result = runtimeService.getVariable(processInstance.getProcessInstanceId(), "theVariable");
+        Assert.assertEquals(30, result);
+        runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
-    processEngine.getHistoryService().deleteHistoricProcessInstance(processInstance.getId());
-    repositoryService.deleteDeployment(deployment.getId());
-    assertAndEnsureCleanDb(processEngine);
-    ProcessEngines.destroy();
-  }
+        processEngine.getHistoryService().deleteHistoricProcessInstance(processInstance.getId());
+        repositoryService.deleteDeployment(deployment.getId());
+        assertAndEnsureCleanDb(processEngine);
+        ProcessEngines.destroy();
+    }
 
-  @Override
-  protected String getConfigFile() {
-    return "mule-config.xml";
-  }
+    @Override
+    protected String getConfigFile() {
+        return "mule-config.xml";
+    }
 }

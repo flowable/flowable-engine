@@ -25,31 +25,31 @@ import org.flowable.engine.common.api.query.QueryProperty;
  */
 public class FormQueryProperty implements QueryProperty {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private static final Map<String, FormQueryProperty> properties = new HashMap<String, FormQueryProperty>();
+    private static final Map<String, FormQueryProperty> properties = new HashMap<String, FormQueryProperty>();
 
-  public static final FormQueryProperty FORM_DEFINITION_KEY = new FormQueryProperty("RES.KEY_");
-  public static final FormQueryProperty FORM_CATEGORY = new FormQueryProperty("RES.CATEGORY_");
-  public static final FormQueryProperty FORM_ID = new FormQueryProperty("RES.ID_");
-  public static final FormQueryProperty FORM_VERSION = new FormQueryProperty("RES.VERSION_");
-  public static final FormQueryProperty FORM_NAME = new FormQueryProperty("RES.NAME_");
-  public static final FormQueryProperty DEPLOYMENT_ID = new FormQueryProperty("RES.DEPLOYMENT_ID_");
-  public static final FormQueryProperty FORM_TENANT_ID = new FormQueryProperty("RES.TENANT_ID_");
+    public static final FormQueryProperty FORM_DEFINITION_KEY = new FormQueryProperty("RES.KEY_");
+    public static final FormQueryProperty FORM_CATEGORY = new FormQueryProperty("RES.CATEGORY_");
+    public static final FormQueryProperty FORM_ID = new FormQueryProperty("RES.ID_");
+    public static final FormQueryProperty FORM_VERSION = new FormQueryProperty("RES.VERSION_");
+    public static final FormQueryProperty FORM_NAME = new FormQueryProperty("RES.NAME_");
+    public static final FormQueryProperty DEPLOYMENT_ID = new FormQueryProperty("RES.DEPLOYMENT_ID_");
+    public static final FormQueryProperty FORM_TENANT_ID = new FormQueryProperty("RES.TENANT_ID_");
 
-  private String name;
+    private String name;
 
-  public FormQueryProperty(String name) {
-    this.name = name;
-    properties.put(name, this);
-  }
+    public FormQueryProperty(String name) {
+        this.name = name;
+        properties.put(name, this);
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public static FormQueryProperty findByName(String propertyName) {
-    return properties.get(propertyName);
-  }
+    public static FormQueryProperty findByName(String propertyName) {
+        return properties.get(propertyName);
+    }
 
 }

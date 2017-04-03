@@ -28,41 +28,41 @@ import org.flowable.content.api.ContentStorageException;
  */
 public class FileSystemContentObject implements ContentObject {
 
-  protected File file;
-  protected InputStream inputStream;
-  protected String id;
-  protected Long length;
+    protected File file;
+    protected InputStream inputStream;
+    protected String id;
+    protected Long length;
 
-  public FileSystemContentObject(File file, String id) {
-    this.file = file;
-    this.id = id;
-  }
-
-  public FileSystemContentObject(File file, String id, Long length) {
-    this(file, id);
-    this.length = length;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public long getContentLength() {
-    if (length == null) {
-      length = file.length();
+    public FileSystemContentObject(File file, String id) {
+        this.file = file;
+        this.id = id;
     }
-    return length;
-  }
 
-  public InputStream getContent() {
-    if (inputStream == null) {
-      try {
-        inputStream = new FileInputStream(file);
-      } catch (FileNotFoundException e) {
-        throw new ContentStorageException("Error while opening file stream", e);
-      }
+    public FileSystemContentObject(File file, String id, Long length) {
+        this(file, id);
+        this.length = length;
     }
-    return inputStream;
-  }
+
+    public String getId() {
+        return id;
+    }
+
+    public long getContentLength() {
+        if (length == null) {
+            length = file.length();
+        }
+        return length;
+    }
+
+    public InputStream getContent() {
+        if (inputStream == null) {
+            try {
+                inputStream = new FileInputStream(file);
+            } catch (FileNotFoundException e) {
+                throw new ContentStorageException("Error while opening file stream", e);
+            }
+        }
+        return inputStream;
+    }
 
 }

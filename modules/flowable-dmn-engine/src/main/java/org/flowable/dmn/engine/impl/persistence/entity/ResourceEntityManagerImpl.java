@@ -24,40 +24,40 @@ import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
  * @author Joram Barrez
  */
 public class ResourceEntityManagerImpl extends AbstractEntityManager<ResourceEntity> implements ResourceEntityManager {
-  
-  protected ResourceDataManager resourceDataManager;
-  
-  public ResourceEntityManagerImpl(DmnEngineConfiguration dmnEngineConfiguration, ResourceDataManager resourceDataManager) {
-    super(dmnEngineConfiguration);
-    this.resourceDataManager = resourceDataManager;
-  }
-  
-  @Override
-  protected DataManager<ResourceEntity> getDataManager() {
-    return resourceDataManager;
-  }
 
-  @Override
-  public void deleteResourcesByDeploymentId(String deploymentId) {
-    resourceDataManager.deleteResourcesByDeploymentId(deploymentId);
-  }
+    protected ResourceDataManager resourceDataManager;
 
-  @Override
-  public ResourceEntity findResourceByDeploymentIdAndResourceName(String deploymentId, String resourceName) {
-    return resourceDataManager.findResourceByDeploymentIdAndResourceName(deploymentId, resourceName);
-  }
+    public ResourceEntityManagerImpl(DmnEngineConfiguration dmnEngineConfiguration, ResourceDataManager resourceDataManager) {
+        super(dmnEngineConfiguration);
+        this.resourceDataManager = resourceDataManager;
+    }
 
-  @Override
-  public List<ResourceEntity> findResourcesByDeploymentId(String deploymentId) {
-    return resourceDataManager.findResourcesByDeploymentId(deploymentId);
-  }
+    @Override
+    protected DataManager<ResourceEntity> getDataManager() {
+        return resourceDataManager;
+    }
 
-  public ResourceDataManager getResourceDataManager() {
-    return resourceDataManager;
-  }
+    @Override
+    public void deleteResourcesByDeploymentId(String deploymentId) {
+        resourceDataManager.deleteResourcesByDeploymentId(deploymentId);
+    }
 
-  public void setResourceDataManager(ResourceDataManager resourceDataManager) {
-    this.resourceDataManager = resourceDataManager;
-  }
-  
+    @Override
+    public ResourceEntity findResourceByDeploymentIdAndResourceName(String deploymentId, String resourceName) {
+        return resourceDataManager.findResourceByDeploymentIdAndResourceName(deploymentId, resourceName);
+    }
+
+    @Override
+    public List<ResourceEntity> findResourcesByDeploymentId(String deploymentId) {
+        return resourceDataManager.findResourcesByDeploymentId(deploymentId);
+    }
+
+    public ResourceDataManager getResourceDataManager() {
+        return resourceDataManager;
+    }
+
+    public void setResourceDataManager(ResourceDataManager resourceDataManager) {
+        this.resourceDataManager = resourceDataManager;
+    }
+
 }

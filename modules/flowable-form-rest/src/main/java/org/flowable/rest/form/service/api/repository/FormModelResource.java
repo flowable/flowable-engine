@@ -15,6 +15,7 @@ package org.flowable.rest.form.service.api.repository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
@@ -29,24 +30,24 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Form Definitions" }, description = "Manage Form Definitions")
+@Api(tags = { "Form Definitions" }, description = "Manage Form Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class FormModelResource {
 
-  @Autowired
-  protected FormService formService;
+    @Autowired
+    protected FormService formService;
 
-  @Autowired
-  protected FormRepositoryService formRepositoryService;
+    @Autowired
+    protected FormRepositoryService formRepositoryService;
 
-  @ApiOperation(value = "Get a process definition form model", tags = {"Form Definitions"}, nickname = "getModelResource")
-  @RequestMapping(value = "/form-repository/form-definitions/{formDefinitionId}/model", method = RequestMethod.GET, produces = "application/json")
-  public FormModel getModelResource(@ApiParam(name = "formDefinitionId") @PathVariable String formDefinitionId) {
-    FormModel formDefinition = formRepositoryService.getFormModelById(formDefinitionId);
+    @ApiOperation(value = "Get a process definition form model", tags = { "Form Definitions" }, nickname = "getModelResource")
+    @RequestMapping(value = "/form-repository/form-definitions/{formDefinitionId}/model", method = RequestMethod.GET, produces = "application/json")
+    public FormModel getModelResource(@ApiParam(name = "formDefinitionId") @PathVariable String formDefinitionId) {
+        FormModel formDefinition = formRepositoryService.getFormModelById(formDefinitionId);
 
-    if (formDefinition == null) {
-      throw new FlowableObjectNotFoundException("Could not find a form definition with id '" + formDefinitionId);
+        if (formDefinition == null) {
+            throw new FlowableObjectNotFoundException("Could not find a form definition with id '" + formDefinitionId);
+        }
+
+        return formDefinition;
     }
-
-    return formDefinition;
-  }
 }

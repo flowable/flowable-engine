@@ -19,19 +19,19 @@ import java.io.InputStream;
  */
 public interface ContentService {
 
-  ContentItem newContentItem();
-  
-  void saveContentItem(ContentItem contentItem);
-  
-  void saveContentItem(ContentItem contentItem, InputStream inputStream);
-  
-  InputStream getContentItemData(String contentItemId);
-  
-  void deleteContentItem(String contentItemId);
-  
-  void deleteContentItemsByProcessInstanceId(String processInstanceId);
-  
-  void deleteContentItemsByTaskId(String taskId);
+    ContentItem newContentItem();
 
-  ContentItemQuery createContentItemQuery();
+    void saveContentItem(ContentItem contentItem);
+
+    void saveContentItem(ContentItem contentItem, InputStream inputStream);
+
+    InputStream getContentItemData(String contentItemId);
+
+    void deleteContentItem(String contentItemId);
+
+    void deleteContentItemsByProcessInstanceId(String processInstanceId);
+
+    void deleteContentItemsByTaskId(String taskId);
+
+    ContentItemQuery createContentItemQuery();
 }

@@ -27,34 +27,34 @@ import java.util.List;
  * @author martin.grofcik
  */
 public abstract class AbstractRecordFlowableEventListener implements FlowableEventListener {
-  protected List<Function<FlowableEvent, SimulationEvent>> transformers;
+    protected List<Function<FlowableEvent, SimulationEvent>> transformers;
 
-  public AbstractRecordFlowableEventListener(List<Function<FlowableEvent, SimulationEvent>> transformers) {
-    this.transformers = transformers;
-  }
-
-  public abstract Collection<SimulationEvent> getSimulationEvents();
-
-  @Override
-  public void onEvent(FlowableEvent event) {
-    Collection<SimulationEvent> simulationEvents = transform(event);
-    store(simulationEvents);
-  }
-
-  protected abstract void store(Collection<SimulationEvent> simulationEvents);
-
-  protected Collection<SimulationEvent> transform(FlowableEvent event) {
-    List<SimulationEvent> simEvents = new ArrayList<SimulationEvent>();
-    for (Function<FlowableEvent, SimulationEvent> t : transformers) {
-      SimulationEvent simEvent = t.apply(event);
-      if (simEvent != null)
-        simEvents.add(simEvent);
+    public AbstractRecordFlowableEventListener(List<Function<FlowableEvent, SimulationEvent>> transformers) {
+        this.transformers = transformers;
     }
-    return simEvents;
-  }
 
-  @Override
-  public boolean isFailOnException() {
-    return true;
-  }
+    public abstract Collection<SimulationEvent> getSimulationEvents();
+
+    @Override
+    public void onEvent(FlowableEvent event) {
+        Collection<SimulationEvent> simulationEvents = transform(event);
+        store(simulationEvents);
+    }
+
+    protected abstract void store(Collection<SimulationEvent> simulationEvents);
+
+    protected Collection<SimulationEvent> transform(FlowableEvent event) {
+        List<SimulationEvent> simEvents = new ArrayList<SimulationEvent>();
+        for (Function<FlowableEvent, SimulationEvent> t : transformers) {
+            SimulationEvent simEvent = t.apply(event);
+            if (simEvent != null)
+                simEvents.add(simEvent);
+        }
+        return simEvents;
+    }
+
+    @Override
+    public boolean isFailOnException() {
+        return true;
+    }
 }

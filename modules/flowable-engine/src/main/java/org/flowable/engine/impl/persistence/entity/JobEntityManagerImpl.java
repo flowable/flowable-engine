@@ -33,159 +33,157 @@ import org.slf4j.LoggerFactory;
  * @author Joram Barrez
  */
 public class JobEntityManagerImpl extends AbstractEntityManager<JobEntity> implements JobEntityManager {
-  
-  private static final Logger logger = LoggerFactory.getLogger(JobEntityManagerImpl.class);
-  
-  protected JobDataManager jobDataManager;
-  
-  public JobEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, JobDataManager jobDataManager) {
-    super(processEngineConfiguration);
-    this.jobDataManager = jobDataManager;
-  }
-  
-  @Override
-  protected DataManager<JobEntity> getDataManager() {
-    return jobDataManager;
-  }
-  
-  @Override
-  public boolean insertJobEntity(JobEntity timerJobEntity) {
-    return doInsert(timerJobEntity, true);
-  }
-  
-  @Override
-  public void insert(JobEntity jobEntity, boolean fireCreateEvent) {
-    doInsert(jobEntity, fireCreateEvent);
-  }
 
-  protected boolean doInsert(JobEntity jobEntity, boolean fireCreateEvent) {
-    // add link to execution
-    if (jobEntity.getExecutionId() != null) {
-      ExecutionEntity execution = getExecutionEntityManager().findById(jobEntity.getExecutionId());
-      if (execution != null) {
-        execution.getJobs().add(jobEntity);
+    private static final Logger logger = LoggerFactory.getLogger(JobEntityManagerImpl.class);
 
-        // Inherit tenant if (if applicable)
-        if (execution.getTenantId() != null) {
-          jobEntity.setTenantId(execution.getTenantId());
-        }
-        
-        if (isExecutionRelatedEntityCountEnabled(execution)) {
-          CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
-          countingExecutionEntity.setJobCount(countingExecutionEntity.getJobCount() + 1);
-        }
-        
-      } else {
-        return false;
-      }
+    protected JobDataManager jobDataManager;
+
+    public JobEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, JobDataManager jobDataManager) {
+        super(processEngineConfiguration);
+        this.jobDataManager = jobDataManager;
     }
 
-    super.insert(jobEntity, fireCreateEvent);
-    return true;
-  }
+    @Override
+    protected DataManager<JobEntity> getDataManager() {
+        return jobDataManager;
+    }
 
-  public List<JobEntity> findJobsToExecute(Page page) {
-    return jobDataManager.findJobsToExecute(page); 
-  }
+    @Override
+    public boolean insertJobEntity(JobEntity timerJobEntity) {
+        return doInsert(timerJobEntity, true);
+    }
 
-  @Override
-  public List<JobEntity> findJobsByExecutionId(String executionId) {
-    return jobDataManager.findJobsByExecutionId(executionId);
-  }
-  
-  @Override
-  public List<JobEntity> findJobsByProcessInstanceId(String processInstanceId) {
-    return jobDataManager.findJobsByProcessInstanceId(processInstanceId);
-  }
+    @Override
+    public void insert(JobEntity jobEntity, boolean fireCreateEvent) {
+        doInsert(jobEntity, fireCreateEvent);
+    }
 
-  @Override
-  public List<JobEntity> findExpiredJobs(Page page) {
-    return jobDataManager.findExpiredJobs(page);
-  }
-  
-  @Override
-  public void resetExpiredJob(String jobId) {
-    jobDataManager.resetExpiredJob(jobId);
-  }
+    protected boolean doInsert(JobEntity jobEntity, boolean fireCreateEvent) {
+        // add link to execution
+        if (jobEntity.getExecutionId() != null) {
+            ExecutionEntity execution = getExecutionEntityManager().findById(jobEntity.getExecutionId());
+            if (execution != null) {
+                execution.getJobs().add(jobEntity);
 
-  @Override
-  public List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery, Page page) {
-    return jobDataManager.findJobsByQueryCriteria(jobQuery, page);
-  }
-  
-  @Override
-  public long findJobCountByQueryCriteria(JobQueryImpl jobQuery) {
-    return jobDataManager.findJobCountByQueryCriteria(jobQuery);
-  }
+                // Inherit tenant if (if applicable)
+                if (execution.getTenantId() != null) {
+                    jobEntity.setTenantId(execution.getTenantId());
+                }
 
-  @Override
-  public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-    jobDataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
-  }
+                if (isExecutionRelatedEntityCountEnabled(execution)) {
+                    CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
+                    countingExecutionEntity.setJobCount(countingExecutionEntity.getJobCount() + 1);
+                }
 
-  @Override
-  public void delete(JobEntity jobEntity) {
-    super.delete(jobEntity);
+            } else {
+                return false;
+            }
+        }
 
-    deleteExceptionByteArrayRef(jobEntity);
-    deleteAdvancedJobHandlerConfigurationByteArrayRef(jobEntity);
+        super.insert(jobEntity, fireCreateEvent);
+        return true;
+    }
 
-    removeExecutionLink(jobEntity);
+    public List<JobEntity> findJobsToExecute(Page page) {
+        return jobDataManager.findJobsToExecute(page);
+    }
+
+    @Override
+    public List<JobEntity> findJobsByExecutionId(String executionId) {
+        return jobDataManager.findJobsByExecutionId(executionId);
+    }
+
+    @Override
+    public List<JobEntity> findJobsByProcessInstanceId(String processInstanceId) {
+        return jobDataManager.findJobsByProcessInstanceId(processInstanceId);
+    }
+
+    @Override
+    public List<JobEntity> findExpiredJobs(Page page) {
+        return jobDataManager.findExpiredJobs(page);
+    }
+
+    @Override
+    public void resetExpiredJob(String jobId) {
+        jobDataManager.resetExpiredJob(jobId);
+    }
+
+    @Override
+    public List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery, Page page) {
+        return jobDataManager.findJobsByQueryCriteria(jobQuery, page);
+    }
+
+    @Override
+    public long findJobCountByQueryCriteria(JobQueryImpl jobQuery) {
+        return jobDataManager.findJobCountByQueryCriteria(jobQuery);
+    }
+
+    @Override
+    public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
+        jobDataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
+    }
+
+    @Override
+    public void delete(JobEntity jobEntity) {
+        super.delete(jobEntity);
+
+        deleteExceptionByteArrayRef(jobEntity);
+        deleteAdvancedJobHandlerConfigurationByteArrayRef(jobEntity);
+
+        removeExecutionLink(jobEntity);
+
+        // Send event
+        if (getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        }
+    }
+
+    @Override
+    public void delete(JobEntity entity, boolean fireDeleteEvent) {
+        if (entity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
+            CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(entity.getExecutionId());
+            if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
+                executionEntity.setJobCount(executionEntity.getJobCount() - 1);
+            }
+        }
+        super.delete(entity, fireDeleteEvent);
+    }
+
+    /**
+     * Removes the job's execution's reference to this job, if the job has an associated execution. Subclasses may override to provide custom implementations.
+     */
+    protected void removeExecutionLink(JobEntity jobEntity) {
+        if (jobEntity.getExecutionId() != null) {
+            ExecutionEntity execution = getExecutionEntityManager().findById(jobEntity.getExecutionId());
+            if (execution != null) {
+                execution.getJobs().remove(jobEntity);
+            }
+        }
+    }
+
+    /**
+     * Deletes a the byte array used to store the exception information. Subclasses may override to provide custom implementations.
+     */
+    protected void deleteExceptionByteArrayRef(JobEntity jobEntity) {
+        ByteArrayRef exceptionByteArrayRef = jobEntity.getExceptionByteArrayRef();
+        if (exceptionByteArrayRef != null) {
+            exceptionByteArrayRef.delete();
+        }
+    }
     
-    // Send event
-    if (getEventDispatcher().isEnabled()) {
-      getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+    protected void deleteAdvancedJobHandlerConfigurationByteArrayRef(JobEntity jobEntity) {
+        ByteArrayRef configurationByteArrayRef = jobEntity.getAdvancedJobHandlerConfigurationByteArrayRef();
+        if (configurationByteArrayRef != null) {
+            configurationByteArrayRef.delete();
+        }
     }
-  }
-  
-  @Override
-  public void delete(JobEntity entity, boolean fireDeleteEvent) {
-    if (entity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
-      CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(entity.getExecutionId());
-      if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
-        executionEntity.setJobCount(executionEntity.getJobCount() - 1);
-      }
-    }
-    super.delete(entity, fireDeleteEvent);
-  }
 
-  /**
-   * Removes the job's execution's reference to this job, if the job has an associated execution.
-   * Subclasses may override to provide custom implementations.
-   */
-  protected void removeExecutionLink(JobEntity jobEntity) {
-    if (jobEntity.getExecutionId() != null) {
-      ExecutionEntity execution = getExecutionEntityManager().findById(jobEntity.getExecutionId());
-      if (execution != null) {
-        execution.getJobs().remove(jobEntity);
-      }
+    public JobDataManager getJobDataManager() {
+        return jobDataManager;
     }
-  }
 
-  /**
-   * Deletes a the byte array used to store the exception information.  Subclasses may override
-   * to provide custom implementations. 
-   */
-  protected void deleteExceptionByteArrayRef(JobEntity jobEntity) {
-    ByteArrayRef exceptionByteArrayRef = jobEntity.getExceptionByteArrayRef();
-    if (exceptionByteArrayRef != null) {
-      exceptionByteArrayRef.delete();
+    public void setJobDataManager(JobDataManager jobDataManager) {
+        this.jobDataManager = jobDataManager;
     }
-  }
-  
-  protected void deleteAdvancedJobHandlerConfigurationByteArrayRef(JobEntity jobEntity) {
-    ByteArrayRef configurationByteArrayRef = jobEntity.getAdvancedJobHandlerConfigurationByteArrayRef();
-    if (configurationByteArrayRef != null) {
-      configurationByteArrayRef.delete();
-    }
-  }
 
-  public JobDataManager getJobDataManager() {
-    return jobDataManager;
-  }
-
-  public void setJobDataManager(JobDataManager jobDataManager) {
-    this.jobDataManager = jobDataManager;
-  }
-  
 }

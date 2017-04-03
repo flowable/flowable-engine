@@ -26,49 +26,49 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
  * @author Joram Barrez
  */
 public class SpringContentEngineConfigurator extends AbstractProcessEngineConfigurator {
-  
-  protected SpringContentEngineConfiguration contentEngineConfiguration;
-  
-  @Override
-  public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    if (contentEngineConfiguration == null) {
-      contentEngineConfiguration = new SpringContentEngineConfiguration();
-    }
-    
-    if (processEngineConfiguration.getDataSource() != null) {
-      DataSource originalDatasource = processEngineConfiguration.getDataSource();
-      contentEngineConfiguration.setDataSource(originalDatasource);
-      
-    } else {
-      throw new FlowableException("A datasource is required for initializing the Content engine ");
-    }
-    
-    contentEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
-    
-    contentEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
-    contentEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
-    contentEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
-    
-    ContentEngine contentEngine = initContentEngine();
-    processEngineConfiguration.setContentEngineInitialized(true);
-    processEngineConfiguration.setContentService(contentEngine.getContentService());
-  }
 
-  protected synchronized ContentEngine initContentEngine() {
-    if (contentEngineConfiguration == null) {
-      throw new FlowableException("ContentEngineConfiguration is required");
+    protected SpringContentEngineConfiguration contentEngineConfiguration;
+
+    @Override
+    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        if (contentEngineConfiguration == null) {
+            contentEngineConfiguration = new SpringContentEngineConfiguration();
+        }
+
+        if (processEngineConfiguration.getDataSource() != null) {
+            DataSource originalDatasource = processEngineConfiguration.getDataSource();
+            contentEngineConfiguration.setDataSource(originalDatasource);
+
+        } else {
+            throw new FlowableException("A datasource is required for initializing the Content engine ");
+        }
+
+        contentEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
+
+        contentEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
+        contentEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
+        contentEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
+
+        ContentEngine contentEngine = initContentEngine();
+        processEngineConfiguration.setContentEngineInitialized(true);
+        processEngineConfiguration.setContentService(contentEngine.getContentService());
     }
-    
-    return contentEngineConfiguration.buildContentEngine();
-  }
 
-  public SpringContentEngineConfiguration getContentEngineConfiguration() {
-    return contentEngineConfiguration;
-  }
+    protected synchronized ContentEngine initContentEngine() {
+        if (contentEngineConfiguration == null) {
+            throw new FlowableException("ContentEngineConfiguration is required");
+        }
 
-  public SpringContentEngineConfigurator setContentEngineConfiguration(SpringContentEngineConfiguration contentEngineConfiguration) {
-    this.contentEngineConfiguration = contentEngineConfiguration;
-    return this;
-  }
+        return contentEngineConfiguration.buildContentEngine();
+    }
+
+    public SpringContentEngineConfiguration getContentEngineConfiguration() {
+        return contentEngineConfiguration;
+    }
+
+    public SpringContentEngineConfigurator setContentEngineConfiguration(SpringContentEngineConfiguration contentEngineConfiguration) {
+        this.contentEngineConfiguration = contentEngineConfiguration;
+        return this;
+    }
 
 }

@@ -29,27 +29,27 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public class DefaultStartFormHandler extends DefaultFormHandler implements StartFormHandler {
 
-  @Override
-  public void parseConfiguration(List<FormProperty> formProperties, String formKey, DeploymentEntity deployment, ProcessDefinition processDefinition) {
-    super.parseConfiguration(formProperties, formKey, deployment, processDefinition);
-    if (StringUtils.isNotEmpty(formKey)) {
-      ((ProcessDefinitionEntity) processDefinition).setStartFormKey(true);
+    @Override
+    public void parseConfiguration(List<FormProperty> formProperties, String formKey, DeploymentEntity deployment, ProcessDefinition processDefinition) {
+        super.parseConfiguration(formProperties, formKey, deployment, processDefinition);
+        if (StringUtils.isNotEmpty(formKey)) {
+            ((ProcessDefinitionEntity) processDefinition).setStartFormKey(true);
+        }
     }
-  }
 
-  public StartFormData createStartFormData(ProcessDefinition processDefinition) {
-    StartFormDataImpl startFormData = new StartFormDataImpl();
-    if (formKey != null) {
-      startFormData.setFormKey(formKey.getExpressionText());
+    public StartFormData createStartFormData(ProcessDefinition processDefinition) {
+        StartFormDataImpl startFormData = new StartFormDataImpl();
+        if (formKey != null) {
+            startFormData.setFormKey(formKey.getExpressionText());
+        }
+        startFormData.setDeploymentId(deploymentId);
+        startFormData.setProcessDefinition(processDefinition);
+        initializeFormProperties(startFormData, null);
+        return startFormData;
     }
-    startFormData.setDeploymentId(deploymentId);
-    startFormData.setProcessDefinition(processDefinition);
-    initializeFormProperties(startFormData, null);
-    return startFormData;
-  }
 
-  public ExecutionEntity submitStartFormData(ExecutionEntity processInstance, Map<String, String> properties) {
-    submitFormProperties(properties, processInstance);
-    return processInstance;
-  }
+    public ExecutionEntity submitStartFormData(ExecutionEntity processInstance, Map<String, String> properties) {
+        submitFormProperties(properties, processInstance);
+        return processInstance;
+    }
 }

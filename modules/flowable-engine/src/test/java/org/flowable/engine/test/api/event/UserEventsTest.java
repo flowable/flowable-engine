@@ -25,73 +25,73 @@ import org.flowable.idm.api.event.FlowableIdmEventType;
  */
 public class UserEventsTest extends PluggableFlowableTestCase {
 
-  private TestFlowableEntityEventListener listener;
+    private TestFlowableEntityEventListener listener;
 
-  /**
-   * Test create, update and delete events of users.
-   */
-  public void testUserEntityEvents() throws Exception {
-    User user = null;
-    try {
-      user = identityService.newUser("fred");
-      user.setFirstName("Frederik");
-      user.setLastName("Heremans");
-      identityService.saveUser(user);
+    /**
+     * Test create, update and delete events of users.
+     */
+    public void testUserEntityEvents() throws Exception {
+        User user = null;
+        try {
+            user = identityService.newUser("fred");
+            user.setFirstName("Frederik");
+            user.setLastName("Heremans");
+            identityService.saveUser(user);
 
-      assertEquals(2, listener.getEventsReceived().size());
-      FlowableEntityEvent event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-      assertEquals(FlowableIdmEventType.ENTITY_CREATED, event.getType());
-      assertTrue(event.getEntity() instanceof User);
-      User userFromEvent = (User) event.getEntity();
-      assertEquals("fred", userFromEvent.getId());
+            assertEquals(2, listener.getEventsReceived().size());
+            FlowableEntityEvent event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+            assertEquals(FlowableIdmEventType.ENTITY_CREATED, event.getType());
+            assertTrue(event.getEntity() instanceof User);
+            User userFromEvent = (User) event.getEntity();
+            assertEquals("fred", userFromEvent.getId());
 
-      event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
-      assertEquals(FlowableIdmEventType.ENTITY_INITIALIZED, event.getType());
-      listener.clearEventsReceived();
+            event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
+            assertEquals(FlowableIdmEventType.ENTITY_INITIALIZED, event.getType());
+            listener.clearEventsReceived();
 
-      // Update user
-      user.setFirstName("Anna");
-      identityService.saveUser(user);
-      assertEquals(1, listener.getEventsReceived().size());
-      event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-      assertEquals(FlowableIdmEventType.ENTITY_UPDATED, event.getType());
-      assertTrue(event.getEntity() instanceof User);
-      userFromEvent = (User) event.getEntity();
-      assertEquals("fred", userFromEvent.getId());
-      assertEquals("Anna", userFromEvent.getFirstName());
-      listener.clearEventsReceived();
+            // Update user
+            user.setFirstName("Anna");
+            identityService.saveUser(user);
+            assertEquals(1, listener.getEventsReceived().size());
+            event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+            assertEquals(FlowableIdmEventType.ENTITY_UPDATED, event.getType());
+            assertTrue(event.getEntity() instanceof User);
+            userFromEvent = (User) event.getEntity();
+            assertEquals("fred", userFromEvent.getId());
+            assertEquals("Anna", userFromEvent.getFirstName());
+            listener.clearEventsReceived();
 
-      // Delete user
-      identityService.deleteUser(user.getId());
+            // Delete user
+            identityService.deleteUser(user.getId());
 
-      assertEquals(1, listener.getEventsReceived().size());
-      event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-      assertEquals(FlowableIdmEventType.ENTITY_DELETED, event.getType());
-      assertTrue(event.getEntity() instanceof User);
-      userFromEvent = (User) event.getEntity();
-      assertEquals("fred", userFromEvent.getId());
-      listener.clearEventsReceived();
+            assertEquals(1, listener.getEventsReceived().size());
+            event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
+            assertEquals(FlowableIdmEventType.ENTITY_DELETED, event.getType());
+            assertTrue(event.getEntity() instanceof User);
+            userFromEvent = (User) event.getEntity();
+            assertEquals("fred", userFromEvent.getId());
+            listener.clearEventsReceived();
 
-    } finally {
-      if (user != null && user.getId() != null) {
-        identityService.deleteUser(user.getId());
-      }
+        } finally {
+            if (user != null && user.getId() != null) {
+                identityService.deleteUser(user.getId());
+            }
+        }
     }
-  }
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-    listener = new TestFlowableEntityEventListener(User.class);
-    processEngineConfiguration.getEventDispatcher().addEventListener(listener);
-  }
-
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
-
-    if (listener != null) {
-      processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        listener = new TestFlowableEntityEventListener(User.class);
+        processEngineConfiguration.getEventDispatcher().addEventListener(listener);
     }
-  }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+
+        if (listener != null) {
+            processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
+        }
+    }
 }

@@ -17,90 +17,90 @@ import org.flowable.idm.api.UserQuery;
 import org.flowable.idm.engine.test.ResourceFlowableIdmTestCase;
 
 public class UserQueryEscapeClauseTest extends ResourceFlowableIdmTestCase {
-  
-  public UserQueryEscapeClauseTest() {
-    super("escapeclause/flowable.idm.cfg.xml");
-  }
 
-  protected void setUp() throws Exception {
-    super.setUp();
-    
-    createUser("kermit", "Kermit%", "Thefrog%", "kermit%@muppetshow.com");
-    createUser("fozzie", "Fozzie_", "Bear_", "fozzie_@muppetshow.com");
-  }
-  
-  private User createUser(String id, String firstName, String lastName, String email) {
-    User user = idmIdentityService.newUser(id);
-    user.setFirstName(firstName);
-    user.setLastName(lastName);
-    user.setEmail(email);
-    idmIdentityService.saveUser(user);
-    return user;
-  }
-  
-  @Override
-  protected void tearDown() throws Exception {
-    idmIdentityService.deleteUser("kermit");
-    idmIdentityService.deleteUser("fozzie");
-    
-    super.tearDown();
-  }
-  
-  public void testQueryByFirstNameLike() {
-    UserQuery query = idmIdentityService.createUserQuery().userFirstNameLike("%\\%%");
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-    assertEquals("kermit", query.singleResult().getId());
-    
-    query = idmIdentityService.createUserQuery().userFirstNameLike("%\\_%");
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-    assertEquals("fozzie", query.singleResult().getId());
-  }
-  
-  public void testQueryByLastNameLike() {
-    UserQuery query = idmIdentityService.createUserQuery().userLastNameLike("%\\%%");
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-    assertEquals("kermit", query.singleResult().getId());
-    
-    query = idmIdentityService.createUserQuery().userLastNameLike("%\\_%");
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-    assertEquals("fozzie", query.singleResult().getId());
-  }
+    public UserQueryEscapeClauseTest() {
+        super("escapeclause/flowable.idm.cfg.xml");
+    }
 
-  public void testQueryByFullNameLike() {
-    UserQuery query = idmIdentityService.createUserQuery().userFullNameLike("%og\\%%");
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-    assertEquals("kermit", query.singleResult().getId());
-    
-    query = idmIdentityService.createUserQuery().userFullNameLike("%it\\%%");
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-    assertEquals("kermit", query.singleResult().getId());
-    
-    query = idmIdentityService.createUserQuery().userFullNameLike("%ar\\_%");
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-    assertEquals("fozzie", query.singleResult().getId());
-    
-    query = idmIdentityService.createUserQuery().userFullNameLike("%ie\\_%");
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-    assertEquals("fozzie", query.singleResult().getId());
-  }
+    protected void setUp() throws Exception {
+        super.setUp();
 
-  public void testQueryByEmailLike() {
-    UserQuery query = idmIdentityService.createUserQuery().userEmailLike("%\\%%");
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-    assertEquals("kermit", query.singleResult().getId());
-    
-    query = idmIdentityService.createUserQuery().userEmailLike("%\\_%");
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
-    assertEquals("fozzie", query.singleResult().getId());
-  }
+        createUser("kermit", "Kermit%", "Thefrog%", "kermit%@muppetshow.com");
+        createUser("fozzie", "Fozzie_", "Bear_", "fozzie_@muppetshow.com");
+    }
+
+    private User createUser(String id, String firstName, String lastName, String email) {
+        User user = idmIdentityService.newUser(id);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setEmail(email);
+        idmIdentityService.saveUser(user);
+        return user;
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        idmIdentityService.deleteUser("kermit");
+        idmIdentityService.deleteUser("fozzie");
+
+        super.tearDown();
+    }
+
+    public void testQueryByFirstNameLike() {
+        UserQuery query = idmIdentityService.createUserQuery().userFirstNameLike("%\\%%");
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+        assertEquals("kermit", query.singleResult().getId());
+
+        query = idmIdentityService.createUserQuery().userFirstNameLike("%\\_%");
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+        assertEquals("fozzie", query.singleResult().getId());
+    }
+
+    public void testQueryByLastNameLike() {
+        UserQuery query = idmIdentityService.createUserQuery().userLastNameLike("%\\%%");
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+        assertEquals("kermit", query.singleResult().getId());
+
+        query = idmIdentityService.createUserQuery().userLastNameLike("%\\_%");
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+        assertEquals("fozzie", query.singleResult().getId());
+    }
+
+    public void testQueryByFullNameLike() {
+        UserQuery query = idmIdentityService.createUserQuery().userFullNameLike("%og\\%%");
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+        assertEquals("kermit", query.singleResult().getId());
+
+        query = idmIdentityService.createUserQuery().userFullNameLike("%it\\%%");
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+        assertEquals("kermit", query.singleResult().getId());
+
+        query = idmIdentityService.createUserQuery().userFullNameLike("%ar\\_%");
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+        assertEquals("fozzie", query.singleResult().getId());
+
+        query = idmIdentityService.createUserQuery().userFullNameLike("%ie\\_%");
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+        assertEquals("fozzie", query.singleResult().getId());
+    }
+
+    public void testQueryByEmailLike() {
+        UserQuery query = idmIdentityService.createUserQuery().userEmailLike("%\\%%");
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+        assertEquals("kermit", query.singleResult().getId());
+
+        query = idmIdentityService.createUserQuery().userEmailLike("%\\_%");
+        assertEquals(1, query.list().size());
+        assertEquals(1, query.count());
+        assertEquals("fozzie", query.singleResult().getId());
+    }
 }

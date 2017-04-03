@@ -30,24 +30,24 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class ProcessInstanceResource {
-  
-  @Autowired
-  protected FlowableProcessInstanceService processInstanceService;
 
-  @RequestMapping(value = "/rest/process-instances/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
-  public ProcessInstanceRepresentation getProcessInstance(@PathVariable String processInstanceId, HttpServletResponse response) {
-    return processInstanceService.getProcessInstance(processInstanceId, response);
-  }
+    @Autowired
+    protected FlowableProcessInstanceService processInstanceService;
 
-  @RequestMapping(value = "/rest/process-instances/{processInstanceId}/start-form", method = RequestMethod.GET, produces = "application/json")
-  public FormModel getProcessInstanceStartForm(@PathVariable String processInstanceId, HttpServletResponse response) {
-    return processInstanceService.getProcessInstanceStartForm(processInstanceId, response);
-  }
+    @RequestMapping(value = "/rest/process-instances/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
+    public ProcessInstanceRepresentation getProcessInstance(@PathVariable String processInstanceId, HttpServletResponse response) {
+        return processInstanceService.getProcessInstance(processInstanceId, response);
+    }
 
-  @RequestMapping(value = "/rest/process-instances/{processInstanceId}", method = RequestMethod.DELETE)
-  @ResponseStatus(value = HttpStatus.OK)
-  public void deleteProcessInstance(@PathVariable String processInstanceId) {
-    processInstanceService.deleteProcessInstance(processInstanceId);
-  }
+    @RequestMapping(value = "/rest/process-instances/{processInstanceId}/start-form", method = RequestMethod.GET, produces = "application/json")
+    public FormModel getProcessInstanceStartForm(@PathVariable String processInstanceId, HttpServletResponse response) {
+        return processInstanceService.getProcessInstanceStartForm(processInstanceId, response);
+    }
+
+    @RequestMapping(value = "/rest/process-instances/{processInstanceId}", method = RequestMethod.DELETE)
+    @ResponseStatus(value = HttpStatus.OK)
+    public void deleteProcessInstance(@PathVariable String processInstanceId) {
+        processInstanceService.deleteProcessInstance(processInstanceId);
+    }
 
 }

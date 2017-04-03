@@ -21,6 +21,6 @@ import javax.naming.directory.InitialDirContext;
  */
 public interface LDAPCallBack<T> {
 
-  T executeInContext(InitialDirContext initialDirContext);
+    T executeInContext(InitialDirContext initialDirContext);
 
 }

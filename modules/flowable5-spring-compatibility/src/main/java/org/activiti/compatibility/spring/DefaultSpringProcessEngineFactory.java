@@ -18,31 +18,30 @@ import org.flowable.compatibility.DefaultProcessEngineFactory;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 
-
 public class DefaultSpringProcessEngineFactory extends DefaultProcessEngineFactory {
 
-  /**
-   * Takes in an Activiti 6 process engine config, gives back an Activiti 5 Process engine.
-   */
-  @Override
-  public ProcessEngine buildProcessEngine(ProcessEngineConfigurationImpl activiti6Configuration) {
+    /**
+     * Takes in an Activiti 6 process engine config, gives back an Activiti 5 Process engine.
+     */
+    @Override
+    public ProcessEngine buildProcessEngine(ProcessEngineConfigurationImpl activiti6Configuration) {
 
-    org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration = null;
-    if (activiti6Configuration instanceof SpringProcessEngineConfiguration) {
-      activiti5Configuration = new org.activiti.spring.SpringProcessEngineConfiguration();
-      super.copyConfigItems(activiti6Configuration, activiti5Configuration);
-      copySpringConfigItems((SpringProcessEngineConfiguration) activiti6Configuration, (org.activiti.spring.SpringProcessEngineConfiguration) activiti5Configuration);
-      return activiti5Configuration.buildProcessEngine();
-    
-    } else {
-      return super.buildProcessEngine(activiti6Configuration);
+        org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration = null;
+        if (activiti6Configuration instanceof SpringProcessEngineConfiguration) {
+            activiti5Configuration = new org.activiti.spring.SpringProcessEngineConfiguration();
+            super.copyConfigItems(activiti6Configuration, activiti5Configuration);
+            copySpringConfigItems((SpringProcessEngineConfiguration) activiti6Configuration, (org.activiti.spring.SpringProcessEngineConfiguration) activiti5Configuration);
+            return activiti5Configuration.buildProcessEngine();
+
+        } else {
+            return super.buildProcessEngine(activiti6Configuration);
+        }
+
     }
-      
-  }
-  
-  protected void copySpringConfigItems(SpringProcessEngineConfiguration activiti6Configuration, org.activiti.spring.SpringProcessEngineConfiguration activiti5Configuration) {
-    activiti5Configuration.setApplicationContext(activiti6Configuration.getApplicationContext());
-    activiti5Configuration.setTransactionManager(activiti6Configuration.getTransactionManager());
-  }
-  
+
+    protected void copySpringConfigItems(SpringProcessEngineConfiguration activiti6Configuration, org.activiti.spring.SpringProcessEngineConfiguration activiti5Configuration) {
+        activiti5Configuration.setApplicationContext(activiti6Configuration.getApplicationContext());
+        activiti5Configuration.setTransactionManager(activiti6Configuration.getTransactionManager());
+    }
+
 }

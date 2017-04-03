@@ -27,37 +27,37 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
  */
 public class TestFlowableActivityEventListener implements FlowableEventListener {
 
-  private List<FlowableEvent> eventsReceived;
-  private boolean ignoreRawActivityEvents;
+    private List<FlowableEvent> eventsReceived;
+    private boolean ignoreRawActivityEvents;
 
-  public TestFlowableActivityEventListener(boolean ignoreRawActivityEvents) {
-    eventsReceived = new ArrayList<FlowableEvent>();
-    this.ignoreRawActivityEvents = ignoreRawActivityEvents;
-  }
-
-  public List<FlowableEvent> getEventsReceived() {
-    return eventsReceived;
-  }
-
-  public void clearEventsReceived() {
-    eventsReceived.clear();
-  }
-
-  @Override
-  public void onEvent(FlowableEvent event) {
-    if (event instanceof FlowableActivityEvent) {
-      if (!ignoreRawActivityEvents || (event.getType() != FlowableEngineEventType.ACTIVITY_STARTED && event.getType() != FlowableEngineEventType.ACTIVITY_COMPLETED)) {
-        eventsReceived.add(event);
-      }
+    public TestFlowableActivityEventListener(boolean ignoreRawActivityEvents) {
+        eventsReceived = new ArrayList<FlowableEvent>();
+        this.ignoreRawActivityEvents = ignoreRawActivityEvents;
     }
-  }
 
-  public void setIgnoreRawActivityEvents(boolean ignoreRawActivityEvents) {
-    this.ignoreRawActivityEvents = ignoreRawActivityEvents;
-  }
+    public List<FlowableEvent> getEventsReceived() {
+        return eventsReceived;
+    }
 
-  @Override
-  public boolean isFailOnException() {
-    return false;
-  }
+    public void clearEventsReceived() {
+        eventsReceived.clear();
+    }
+
+    @Override
+    public void onEvent(FlowableEvent event) {
+        if (event instanceof FlowableActivityEvent) {
+            if (!ignoreRawActivityEvents || (event.getType() != FlowableEngineEventType.ACTIVITY_STARTED && event.getType() != FlowableEngineEventType.ACTIVITY_COMPLETED)) {
+                eventsReceived.add(event);
+            }
+        }
+    }
+
+    public void setIgnoreRawActivityEvents(boolean ignoreRawActivityEvents) {
+        this.ignoreRawActivityEvents = ignoreRawActivityEvents;
+    }
+
+    @Override
+    public boolean isFailOnException() {
+        return false;
+    }
 }

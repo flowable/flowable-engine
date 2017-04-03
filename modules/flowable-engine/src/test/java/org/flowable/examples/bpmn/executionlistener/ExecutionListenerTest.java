@@ -29,149 +29,149 @@ import org.flowable.examples.bpmn.executionlistener.RecorderExecutionListener.Re
  */
 public class ExecutionListenerTest extends PluggableFlowableTestCase {
 
-  @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersProcess.bpmn20.xml" })
-  public void testExecutionListenersOnAllPossibleElements() {
-    RecorderExecutionListener.clear();
-    
-    // Process start executionListener will have executionListener class
-    // that sets 2 variables
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("executionListenersProcess", "businessKey123");
+    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersProcess.bpmn20.xml" })
+    public void testExecutionListenersOnAllPossibleElements() {
+        RecorderExecutionListener.clear();
 
-    String varSetInExecutionListener = (String) runtimeService.getVariable(processInstance.getId(), "variableSetInExecutionListener");
-    assertNotNull(varSetInExecutionListener);
-    assertEquals("firstValue", varSetInExecutionListener);
+        // Process start executionListener will have executionListener class
+        // that sets 2 variables
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("executionListenersProcess", "businessKey123");
 
-    // Check if business key was available in execution listener
-    String businessKey = (String) runtimeService.getVariable(processInstance.getId(), "businessKeyInExecution");
-    assertNotNull(businessKey);
-    assertEquals("businessKey123", businessKey);
+        String varSetInExecutionListener = (String) runtimeService.getVariable(processInstance.getId(), "variableSetInExecutionListener");
+        assertNotNull(varSetInExecutionListener);
+        assertEquals("firstValue", varSetInExecutionListener);
 
-    // Transition take executionListener will set 2 variables
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertNotNull(task);
-    taskService.complete(task.getId());
+        // Check if business key was available in execution listener
+        String businessKey = (String) runtimeService.getVariable(processInstance.getId(), "businessKeyInExecution");
+        assertNotNull(businessKey);
+        assertEquals("businessKey123", businessKey);
 
-    varSetInExecutionListener = (String) runtimeService.getVariable(processInstance.getId(), "variableSetInExecutionListener");
+        // Transition take executionListener will set 2 variables
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        taskService.complete(task.getId());
 
-    assertNotNull(varSetInExecutionListener);
-    assertEquals("secondValue", varSetInExecutionListener);
+        varSetInExecutionListener = (String) runtimeService.getVariable(processInstance.getId(), "variableSetInExecutionListener");
 
-    ExampleExecutionListenerPojo myPojo = new ExampleExecutionListenerPojo();
-    runtimeService.setVariable(processInstance.getId(), "myPojo", myPojo);
+        assertNotNull(varSetInExecutionListener);
+        assertEquals("secondValue", varSetInExecutionListener);
 
-    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertNotNull(task);
-    taskService.complete(task.getId());
+        ExampleExecutionListenerPojo myPojo = new ExampleExecutionListenerPojo();
+        runtimeService.setVariable(processInstance.getId(), "myPojo", myPojo);
 
-    // First usertask uses a method-expression as executionListener:
-    // ${myPojo.myMethod(execution.eventName)}
-    ExampleExecutionListenerPojo pojoVariable = (ExampleExecutionListenerPojo) runtimeService.getVariable(processInstance.getId(), "myPojo");
-    assertNotNull(pojoVariable.getReceivedEventName());
-    assertEquals("end", pojoVariable.getReceivedEventName());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        taskService.complete(task.getId());
 
-    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertNotNull(task);
-    taskService.complete(task.getId());
+        // First usertask uses a method-expression as executionListener:
+        // ${myPojo.myMethod(execution.eventName)}
+        ExampleExecutionListenerPojo pojoVariable = (ExampleExecutionListenerPojo) runtimeService.getVariable(processInstance.getId(), "myPojo");
+        assertNotNull(pojoVariable.getReceivedEventName());
+        assertEquals("end", pojoVariable.getReceivedEventName());
 
-    assertProcessEnded(processInstance.getId());
-    
-    List<RecordedEvent> events = RecorderExecutionListener.getRecordedEvents();
-    assertEquals(1, events.size());
-    RecordedEvent event = events.get(0);
-    assertEquals("End Process Listener", event.getParameter());
-  }
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        taskService.complete(task.getId());
 
-  @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersStartEndEvent.bpmn20.xml" })
-  public void testExecutionListenersOnStartEndEvents() {
-    RecorderExecutionListener.clear();
+        assertProcessEnded(processInstance.getId());
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("executionListenersProcess");
-    assertProcessEnded(processInstance.getId());
+        List<RecordedEvent> events = RecorderExecutionListener.getRecordedEvents();
+        assertEquals(1, events.size());
+        RecordedEvent event = events.get(0);
+        assertEquals("End Process Listener", event.getParameter());
+    }
 
-    List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
-    assertEquals(4, recordedEvents.size());
+    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersStartEndEvent.bpmn20.xml" })
+    public void testExecutionListenersOnStartEndEvents() {
+        RecorderExecutionListener.clear();
 
-    assertEquals("theStart", recordedEvents.get(0).getActivityId());
-    assertEquals("Start Event", recordedEvents.get(0).getActivityName());
-    assertEquals("Start Event Listener", recordedEvents.get(0).getParameter());
-    assertEquals("end", recordedEvents.get(0).getEventName());
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("executionListenersProcess");
+        assertProcessEnded(processInstance.getId());
 
-    assertEquals("noneEvent", recordedEvents.get(1).getActivityId());
-    assertEquals("None Event", recordedEvents.get(1).getActivityName());
-    assertEquals("Intermediate Catch Event Listener", recordedEvents.get(1).getParameter());
-    assertEquals("end", recordedEvents.get(1).getEventName());
+        List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+        assertEquals(4, recordedEvents.size());
 
-    assertEquals("signalEvent", recordedEvents.get(2).getActivityId());
-    assertEquals("Signal Event", recordedEvents.get(2).getActivityName());
-    assertEquals("Intermediate Throw Event Listener", recordedEvents.get(2).getParameter());
-    assertEquals("start", recordedEvents.get(2).getEventName());
+        assertEquals("theStart", recordedEvents.get(0).getActivityId());
+        assertEquals("Start Event", recordedEvents.get(0).getActivityName());
+        assertEquals("Start Event Listener", recordedEvents.get(0).getParameter());
+        assertEquals("end", recordedEvents.get(0).getEventName());
 
-    assertEquals("theEnd", recordedEvents.get(3).getActivityId());
-    assertEquals("End Event", recordedEvents.get(3).getActivityName());
-    assertEquals("End Event Listener", recordedEvents.get(3).getParameter());
-    assertEquals("start", recordedEvents.get(3).getEventName());
+        assertEquals("noneEvent", recordedEvents.get(1).getActivityId());
+        assertEquals("None Event", recordedEvents.get(1).getActivityName());
+        assertEquals("Intermediate Catch Event Listener", recordedEvents.get(1).getParameter());
+        assertEquals("end", recordedEvents.get(1).getEventName());
 
-  }
-  
-  @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersFieldInjectionProcess.bpmn20.xml" })
-  public void testExecutionListenerFieldInjection() {
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("myVar", "listening!");
+        assertEquals("signalEvent", recordedEvents.get(2).getActivityId());
+        assertEquals("Signal Event", recordedEvents.get(2).getActivityName());
+        assertEquals("Intermediate Throw Event Listener", recordedEvents.get(2).getParameter());
+        assertEquals("start", recordedEvents.get(2).getEventName());
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("executionListenersProcess", variables);
+        assertEquals("theEnd", recordedEvents.get(3).getActivityId());
+        assertEquals("End Event", recordedEvents.get(3).getActivityName());
+        assertEquals("End Event Listener", recordedEvents.get(3).getParameter());
+        assertEquals("start", recordedEvents.get(3).getEventName());
 
-    Object varSetByListener = runtimeService.getVariable(processInstance.getId(), "var");
-    assertNotNull(varSetByListener);
-    assertTrue(varSetByListener instanceof String);
+    }
 
-    // Result is a concatenation of fixed injected field and injected
-    // expression
-    assertEquals("Yes, I am listening!", varSetByListener);
-  }
+    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersFieldInjectionProcess.bpmn20.xml" })
+    public void testExecutionListenerFieldInjection() {
+        Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put("myVar", "listening!");
 
-  @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersCurrentActivity.bpmn20.xml" })
-  public void testExecutionListenerCurrentActivity() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("executionListenersProcess", variables);
 
-    CurrentActivityExecutionListener.clear();
+        Object varSetByListener = runtimeService.getVariable(processInstance.getId(), "var");
+        assertNotNull(varSetByListener);
+        assertTrue(varSetByListener instanceof String);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("executionListenersProcess");
-    assertProcessEnded(processInstance.getId());
+        // Result is a concatenation of fixed injected field and injected
+        // expression
+        assertEquals("Yes, I am listening!", varSetByListener);
+    }
 
-    List<CurrentActivity> currentActivities = CurrentActivityExecutionListener.getCurrentActivities();
-    assertEquals(3, currentActivities.size());
+    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersCurrentActivity.bpmn20.xml" })
+    public void testExecutionListenerCurrentActivity() {
 
-    assertEquals("theStart", currentActivities.get(0).getActivityId());
-    assertEquals("Start Event", currentActivities.get(0).getActivityName());
+        CurrentActivityExecutionListener.clear();
 
-    assertEquals("noneEvent", currentActivities.get(1).getActivityId());
-    assertEquals("None Event", currentActivities.get(1).getActivityName());
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("executionListenersProcess");
+        assertProcessEnded(processInstance.getId());
 
-    assertEquals("theEnd", currentActivities.get(2).getActivityId());
-    assertEquals("End Event", currentActivities.get(2).getActivityName());
-  }
-  
-  @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersForSubprocessStartEndEvent.bpmn20.xml" })
-  public void testExecutionListenersForSubprocessStartEndEvents() {
-    RecorderExecutionListener.clear();
+        List<CurrentActivity> currentActivities = CurrentActivityExecutionListener.getCurrentActivities();
+        assertEquals(3, currentActivities.size());
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("executionListenersProcess");
-    
-    List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
-    assertEquals(1, recordedEvents.size());
-    assertEquals("Process Start", recordedEvents.get(0).getParameter());
-    
-    RecorderExecutionListener.clear();
-    
-    Task task = taskService.createTaskQuery().singleResult();
-    taskService.complete(task.getId());
-    
-    assertProcessEnded(processInstance.getId());
+        assertEquals("theStart", currentActivities.get(0).getActivityId());
+        assertEquals("Start Event", currentActivities.get(0).getActivityName());
 
-    recordedEvents = RecorderExecutionListener.getRecordedEvents();
-    
-    assertEquals(3, recordedEvents.size());
-    assertEquals("Subprocess Start", recordedEvents.get(0).getParameter());
-    assertEquals("Subprocess End", recordedEvents.get(1).getParameter());
-    assertEquals("Process End", recordedEvents.get(2).getParameter());
-  }
+        assertEquals("noneEvent", currentActivities.get(1).getActivityId());
+        assertEquals("None Event", currentActivities.get(1).getActivityName());
+
+        assertEquals("theEnd", currentActivities.get(2).getActivityId());
+        assertEquals("End Event", currentActivities.get(2).getActivityName());
+    }
+
+    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersForSubprocessStartEndEvent.bpmn20.xml" })
+    public void testExecutionListenersForSubprocessStartEndEvents() {
+        RecorderExecutionListener.clear();
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("executionListenersProcess");
+
+        List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+        assertEquals(1, recordedEvents.size());
+        assertEquals("Process Start", recordedEvents.get(0).getParameter());
+
+        RecorderExecutionListener.clear();
+
+        Task task = taskService.createTaskQuery().singleResult();
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+
+        recordedEvents = RecorderExecutionListener.getRecordedEvents();
+
+        assertEquals(3, recordedEvents.size());
+        assertEquals("Subprocess Start", recordedEvents.get(0).getParameter());
+        assertEquals("Subprocess End", recordedEvents.get(1).getParameter());
+        assertEquals("Process End", recordedEvents.get(2).getParameter());
+    }
 }

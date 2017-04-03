@@ -20,7 +20,7 @@ import org.flowable.engine.runtime.Job;
  * @author Joram Barrez
  */
 public interface ExecuteAsyncRunnableFactory {
-  
-  Runnable createExecuteAsyncRunnable(Job job, ProcessEngineConfigurationImpl processEngineConfiguration);
+
+    Runnable createExecuteAsyncRunnable(Job job, ProcessEngineConfigurationImpl processEngineConfiguration);
 
 }

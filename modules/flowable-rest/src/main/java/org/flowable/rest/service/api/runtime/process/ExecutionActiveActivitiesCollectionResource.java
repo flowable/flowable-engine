@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.runtime.Execution;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,18 +32,17 @@ import java.util.List;
  */
 
 @RestController
-@Api(tags = { "Executions" }, description = "Manage Executions")
+@Api(tags = { "Executions" }, description = "Manage Executions", authorizations = { @Authorization(value = "basicAuth") })
 public class ExecutionActiveActivitiesCollectionResource extends ExecutionBaseResource {
 
-  @ApiOperation(value = "Get active activities in an execution", tags = {"Executions"},
-  notes = "Returns all activities which are active in the execution and in all child-executions (and their children, recursively), if any.")
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates the execution was found and activities are returned."),
-          @ApiResponse(code = 404, message = "Indicates the execution was not found.")
-  })
-  @RequestMapping(value = "/runtime/executions/{executionId}/activities", method = RequestMethod.GET, produces = "application/json")
-  public List<String> getActiveActivities(@ApiParam(name = "executionId") @PathVariable String executionId) {
-    Execution execution = getExecutionFromRequest(executionId);
-    return runtimeService.getActiveActivityIds(execution.getId());
-  }
+    @ApiOperation(value = "Get active activities in an execution", tags = { "Executions" }, notes = "Returns all activities which are active in the execution and in all child-executions (and their children, recursively), if any.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the execution was found and activities are returned."),
+            @ApiResponse(code = 404, message = "Indicates the execution was not found.")
+    })
+    @RequestMapping(value = "/runtime/executions/{executionId}/activities", method = RequestMethod.GET, produces = "application/json")
+    public List<String> getActiveActivities(@ApiParam(name = "executionId") @PathVariable String executionId) {
+        Execution execution = getExecutionFromRequest(executionId);
+        return runtimeService.getActiveActivityIds(execution.getId());
+    }
 }

@@ -31,128 +31,126 @@ import org.slf4j.LoggerFactory;
  */
 public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<SuspendedJobEntity> implements SuspendedJobEntityManager {
 
-  private static final Logger logger = LoggerFactory.getLogger(SuspendedJobEntityManagerImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(SuspendedJobEntityManagerImpl.class);
 
-  protected SuspendedJobDataManager jobDataManager;
-  
-  public SuspendedJobEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, SuspendedJobDataManager jobDataManager) {
-    super(processEngineConfiguration);
-    this.jobDataManager = jobDataManager;
-  }
+    protected SuspendedJobDataManager jobDataManager;
 
-  @Override
-  public List<SuspendedJobEntity> findJobsByExecutionId(String id) {
-    return jobDataManager.findJobsByExecutionId(id);
-  }
-  
-  @Override
-  public List<SuspendedJobEntity> findJobsByProcessInstanceId(String id) {
-    return jobDataManager.findJobsByProcessInstanceId(id);
-  }
-  
-  @Override
-  public List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery, Page page) {
-    return jobDataManager.findJobsByQueryCriteria(jobQuery, page);
-  }
-  
-  @Override
-  public long findJobCountByQueryCriteria(SuspendedJobQueryImpl jobQuery) {
-    return jobDataManager.findJobCountByQueryCriteria(jobQuery);
-  }
-  
-  @Override
-  public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-    jobDataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
-  }
-  
-  @Override
-  public void insert(SuspendedJobEntity jobEntity, boolean fireCreateEvent) {
-
-    // add link to execution
-    if (jobEntity.getExecutionId() != null) {
-      ExecutionEntity execution = getExecutionEntityManager().findById(jobEntity.getExecutionId());
-
-      // Inherit tenant if (if applicable)
-      if (execution.getTenantId() != null) {
-        jobEntity.setTenantId(execution.getTenantId());
-      }
-      
-
-      if (isExecutionRelatedEntityCountEnabled(execution)) {
-        CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
-        countingExecutionEntity.setSuspendedJobCount(countingExecutionEntity.getSuspendedJobCount() + 1);
-      }
+    public SuspendedJobEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, SuspendedJobDataManager jobDataManager) {
+        super(processEngineConfiguration);
+        this.jobDataManager = jobDataManager;
     }
 
-    super.insert(jobEntity, fireCreateEvent);
-  }
+    @Override
+    public List<SuspendedJobEntity> findJobsByExecutionId(String id) {
+        return jobDataManager.findJobsByExecutionId(id);
+    }
 
-  @Override
-  public void insert(SuspendedJobEntity jobEntity) {
-    insert(jobEntity, true);
-  }
-  
-  @Override
-  public void delete(SuspendedJobEntity jobEntity) {
-    super.delete(jobEntity);
+    @Override
+    public List<SuspendedJobEntity> findJobsByProcessInstanceId(String id) {
+        return jobDataManager.findJobsByProcessInstanceId(id);
+    }
 
-    deleteExceptionByteArrayRef(jobEntity);
-    deleteAdvancedJobHandlerConfigurationByteArrayRef(jobEntity);
+    @Override
+    public List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery, Page page) {
+        return jobDataManager.findJobsByQueryCriteria(jobQuery, page);
+    }
+
+    @Override
+    public long findJobCountByQueryCriteria(SuspendedJobQueryImpl jobQuery) {
+        return jobDataManager.findJobCountByQueryCriteria(jobQuery);
+    }
+
+    @Override
+    public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
+        jobDataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
+    }
+
+    @Override
+    public void insert(SuspendedJobEntity jobEntity, boolean fireCreateEvent) {
+
+        // add link to execution
+        if (jobEntity.getExecutionId() != null) {
+            ExecutionEntity execution = getExecutionEntityManager().findById(jobEntity.getExecutionId());
+
+            // Inherit tenant if (if applicable)
+            if (execution.getTenantId() != null) {
+                jobEntity.setTenantId(execution.getTenantId());
+            }
+
+            if (isExecutionRelatedEntityCountEnabled(execution)) {
+                CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
+                countingExecutionEntity.setSuspendedJobCount(countingExecutionEntity.getSuspendedJobCount() + 1);
+            }
+        }
+
+        super.insert(jobEntity, fireCreateEvent);
+    }
+
+    @Override
+    public void insert(SuspendedJobEntity jobEntity) {
+        insert(jobEntity, true);
+    }
+
+    @Override
+    public void delete(SuspendedJobEntity jobEntity) {
+        super.delete(jobEntity);
+
+        deleteExceptionByteArrayRef(jobEntity);
+        deleteAdvancedJobHandlerConfigurationByteArrayRef(jobEntity);
+
+        if (jobEntity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
+            CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(jobEntity.getExecutionId());
+            if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
+                executionEntity.setSuspendedJobCount(executionEntity.getSuspendedJobCount() - 1);
+            }
+        }
+
+        // Send event
+        if (getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        }
+    }
+
+    /**
+     * Deletes a the byte array used to store the exception information. Subclasses may override to provide custom implementations.
+     */
+    protected void deleteExceptionByteArrayRef(SuspendedJobEntity jobEntity) {
+        ByteArrayRef exceptionByteArrayRef = jobEntity.getExceptionByteArrayRef();
+        if (exceptionByteArrayRef != null) {
+            exceptionByteArrayRef.delete();
+        }
+    }
     
-    if (jobEntity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
-      CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(jobEntity.getExecutionId());
-      if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
-        executionEntity.setSuspendedJobCount(executionEntity.getSuspendedJobCount() - 1);
-      }
+    protected void deleteAdvancedJobHandlerConfigurationByteArrayRef(SuspendedJobEntity jobEntity) {
+        ByteArrayRef configurationByteArrayRef = jobEntity.getAdvancedJobHandlerConfigurationByteArrayRef();
+        if (configurationByteArrayRef != null) {
+            configurationByteArrayRef.delete();
+        }
     }
-    
-    // Send event
-    if (getEventDispatcher().isEnabled()) {
-      getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+
+    protected SuspendedJobEntity createSuspendedJob(AbstractJobEntity job) {
+        SuspendedJobEntity newSuspendedJobEntity = create();
+        newSuspendedJobEntity.setJobHandlerConfiguration(job.getJobHandlerConfiguration());
+        newSuspendedJobEntity.setJobHandlerType(job.getJobHandlerType());
+        newSuspendedJobEntity.setExclusive(job.isExclusive());
+        newSuspendedJobEntity.setRepeat(job.getRepeat());
+        newSuspendedJobEntity.setRetries(job.getRetries());
+        newSuspendedJobEntity.setEndDate(job.getEndDate());
+        newSuspendedJobEntity.setExecutionId(job.getExecutionId());
+        newSuspendedJobEntity.setProcessInstanceId(job.getProcessInstanceId());
+        newSuspendedJobEntity.setProcessDefinitionId(job.getProcessDefinitionId());
+
+        // Inherit tenant
+        newSuspendedJobEntity.setTenantId(job.getTenantId());
+        newSuspendedJobEntity.setJobType(job.getJobType());
+        return newSuspendedJobEntity;
     }
-  }
 
-  /**
-   * Deletes a the byte array used to store the exception information.  Subclasses may override
-   * to provide custom implementations. 
-   */
-  protected void deleteExceptionByteArrayRef(SuspendedJobEntity jobEntity) {
-    ByteArrayRef exceptionByteArrayRef = jobEntity.getExceptionByteArrayRef();
-    if (exceptionByteArrayRef != null) {
-      exceptionByteArrayRef.delete();
+    protected SuspendedJobDataManager getDataManager() {
+        return jobDataManager;
     }
-  }
-  
-  protected void deleteAdvancedJobHandlerConfigurationByteArrayRef(SuspendedJobEntity jobEntity) {
-    ByteArrayRef configurationByteArrayRef = jobEntity.getAdvancedJobHandlerConfigurationByteArrayRef();
-    if (configurationByteArrayRef != null) {
-      configurationByteArrayRef.delete();
+
+    public void setJobDataManager(SuspendedJobDataManager jobDataManager) {
+        this.jobDataManager = jobDataManager;
     }
-  }
-  
-  protected SuspendedJobEntity createSuspendedJob(AbstractJobEntity job) {
-    SuspendedJobEntity newSuspendedJobEntity = create();
-    newSuspendedJobEntity.setJobHandlerConfiguration(job.getJobHandlerConfiguration());
-    newSuspendedJobEntity.setJobHandlerType(job.getJobHandlerType());
-    newSuspendedJobEntity.setExclusive(job.isExclusive());
-    newSuspendedJobEntity.setRepeat(job.getRepeat());
-    newSuspendedJobEntity.setRetries(job.getRetries());
-    newSuspendedJobEntity.setEndDate(job.getEndDate());
-    newSuspendedJobEntity.setExecutionId(job.getExecutionId());
-    newSuspendedJobEntity.setProcessInstanceId(job.getProcessInstanceId());
-    newSuspendedJobEntity.setProcessDefinitionId(job.getProcessDefinitionId());
-
-    // Inherit tenant
-    newSuspendedJobEntity.setTenantId(job.getTenantId());
-    newSuspendedJobEntity.setJobType(job.getJobType());
-    return newSuspendedJobEntity;
-  }
-
-  protected SuspendedJobDataManager getDataManager() {
-    return jobDataManager;
-  }
-
-  public void setJobDataManager(SuspendedJobDataManager jobDataManager) {
-    this.jobDataManager = jobDataManager;
-  }
 }

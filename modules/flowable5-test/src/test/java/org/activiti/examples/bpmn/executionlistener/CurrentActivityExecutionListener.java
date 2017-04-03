@@ -27,35 +27,35 @@ import org.flowable.engine.delegate.ExecutionListener;
  */
 public class CurrentActivityExecutionListener implements ExecutionListener {
 
-  private static List<CurrentActivity> currentActivities = new ArrayList<CurrentActivity>();
+    private static List<CurrentActivity> currentActivities = new ArrayList<CurrentActivity>();
 
-  public static class CurrentActivity {
-    private final String activityId;
-    private final String activityName;
-    
-    public CurrentActivity(String activityId, String activityName) {
-      this.activityId = activityId;
-      this.activityName = activityName;
+    public static class CurrentActivity {
+        private final String activityId;
+        private final String activityName;
+
+        public CurrentActivity(String activityId, String activityName) {
+            this.activityId = activityId;
+            this.activityName = activityName;
+        }
+
+        public String getActivityId() {
+            return activityId;
+        }
+
+        public String getActivityName() {
+            return activityName;
+        }
     }
 
-    public String getActivityId() {
-      return activityId;
+    public void notify(DelegateExecution execution) {
+        currentActivities.add(new CurrentActivity(execution.getCurrentActivityId(), ((ExecutionEntity) execution).getCurrentActivityName()));
     }
-    
-    public String getActivityName() {
-      return activityName;
-    }
-  }
-  
-  public void notify(DelegateExecution execution) {
-    currentActivities.add(new CurrentActivity(execution.getCurrentActivityId(), ((ExecutionEntity) execution).getCurrentActivityName()));
-  }
 
-  public static List<CurrentActivity> getCurrentActivities() {
-    return currentActivities;
-  }
-  
-  public static void clear() {
-    currentActivities.clear();
-  }
+    public static List<CurrentActivity> getCurrentActivities() {
+        return currentActivities;
+    }
+
+    public static void clear() {
+        currentActivities.clear();
+    }
 }

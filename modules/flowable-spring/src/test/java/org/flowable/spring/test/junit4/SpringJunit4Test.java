@@ -38,40 +38,40 @@ import org.flowable.engine.test.Deployment;
 @ContextConfiguration("classpath:org/flowable/spring/test/junit4/springTypicalUsageTest-context.xml")
 public class SpringJunit4Test {
 
-  @Autowired
-  private ProcessEngine processEngine;
+    @Autowired
+    private ProcessEngine processEngine;
 
-  @Autowired
-  private RuntimeService runtimeService;
+    @Autowired
+    private RuntimeService runtimeService;
 
-  @Autowired
-  private TaskService taskService;
+    @Autowired
+    private TaskService taskService;
 
-  @Autowired
-  @Rule
-  public FlowableRule activitiSpringRule;
+    @Autowired
+    @Rule
+    public FlowableRule flowableSpringRule;
 
-  @After
-  public void closeProcessEngine() {
-    // Required, since all the other tests seem to do a specific drop on the
-    // end
-    processEngine.close();
-  }
+    @After
+    public void closeProcessEngine() {
+        // Required, since all the other tests seem to do a specific drop on the
+        // end
+        processEngine.close();
+    }
 
-  @Test
-  @Deployment
-  public void simpleProcessTest() {
-    runtimeService.startProcessInstanceByKey("simpleProcess");
-    Task task = taskService.createTaskQuery().singleResult();
-    assertEquals("My Task", task.getName());
+    @Test
+    @Deployment
+    public void simpleProcessTest() {
+        runtimeService.startProcessInstanceByKey("simpleProcess");
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("My Task", task.getName());
 
-    // ACT-1186: ActivitiRule services not initialized when using
-    // SpringJUnit4ClassRunner together with @ContextConfiguration
-    assertNotNull(activitiSpringRule.getRuntimeService());
+        // ACT-1186: ActivitiRule services not initialized when using
+        // SpringJUnit4ClassRunner together with @ContextConfiguration
+        assertNotNull(flowableSpringRule.getRuntimeService());
 
-    taskService.complete(task.getId());
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        taskService.complete(task.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
-  }
+    }
 
 }

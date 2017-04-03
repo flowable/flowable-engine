@@ -21,25 +21,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class FormJsonConverter {
 
-  protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper = new ObjectMapper();
 
-  public FormModel convertToFormModel(String modelJson, String modelId, int modelVersion) {
-    try {
-      FormModel definition = objectMapper.readValue(modelJson, FormModel.class);
-      definition.setId(modelId);
-      definition.setVersion(modelVersion);
-  
-      return definition;
-    } catch (Exception e) {
-      throw new FlowableFormJsonException("Error reading form json", e);
-    }
-  }
+    public FormModel convertToFormModel(String modelJson, String modelId, int modelVersion) {
+        try {
+            FormModel definition = objectMapper.readValue(modelJson, FormModel.class);
+            definition.setId(modelId);
+            definition.setVersion(modelVersion);
 
-  public String convertToJson(FormModel definition) {
-    try {
-      return objectMapper.writeValueAsString(definition);
-    } catch (Exception e) {
-      throw new FlowableFormJsonException("Error writing form json", e);
+            return definition;
+        } catch (Exception e) {
+            throw new FlowableFormJsonException("Error reading form json", e);
+        }
     }
-  }
+
+    public String convertToJson(FormModel definition) {
+        try {
+            return objectMapper.writeValueAsString(definition);
+        } catch (Exception e) {
+            throw new FlowableFormJsonException("Error writing form json", e);
+        }
+    }
 }

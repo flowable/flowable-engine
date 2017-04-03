@@ -25,17 +25,17 @@ import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntity;
  * @author Joram Barrez
  */
 public interface FormDeploymentDataManager extends DataManager<FormDeploymentEntity> {
-  
-  FormDeploymentEntity findLatestDeploymentByName(String deploymentName);
 
-  long findDeploymentCountByQueryCriteria(FormDeploymentQueryImpl deploymentQuery);
+    FormDeploymentEntity findLatestDeploymentByName(String deploymentName);
 
-  List<FormDeployment> findDeploymentsByQueryCriteria(FormDeploymentQueryImpl deploymentQuery, Page page);
+    long findDeploymentCountByQueryCriteria(FormDeploymentQueryImpl deploymentQuery);
 
-  List<String> getDeploymentResourceNames(String deploymentId);
+    List<FormDeployment> findDeploymentsByQueryCriteria(FormDeploymentQueryImpl deploymentQuery, Page page);
 
-  List<FormDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<String> getDeploymentResourceNames(String deploymentId);
 
-  long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap);
+    List<FormDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+
+    long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap);
 
 }

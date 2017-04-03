@@ -52,223 +52,223 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
  * 
  * <property name="camelBehaviorClass" value="org.flowable.camel.impl.CamelBehaviorCamelBodyImpl"/>
  * 
- * Note also that the manner in which variables are copied to the process engine from Camel has changed. It will always copy Camel properties to the process variables set; they can safely be ignored, of course,
- * if not required. It will conditionally copy the Camel body to the "camelBody" variable if it is of type java.lang.String, OR it will copy the Camel body to individual variables within the process engine if
- * it is of type Map<String,Object>.
+ * Note also that the manner in which variables are copied to the process engine from Camel has changed. It will always copy Camel properties to the process variables set; they can safely be ignored,
+ * of course, if not required. It will conditionally copy the Camel body to the "camelBody" variable if it is of type java.lang.String, OR it will copy the Camel body to individual variables within
+ * the process engine if it is of type Map<String,Object>.
  * 
  * @author Ryan Johnston (@rjfsu), Tijs Rademakers, Saeid Mirzaei
  * @version 5.12
  */
 public abstract class CamelBehavior extends AbstractBpmnActivityBehavior implements ActivityBehavior {
 
-  private static final long serialVersionUID = 1L;
-  protected Expression camelContext;
-  protected CamelContext camelContextObj;
-  protected List<MapExceptionEntry> mapExceptions;
+    private static final long serialVersionUID = 1L;
+    protected Expression camelContext;
+    protected CamelContext camelContextObj;
+    protected List<MapExceptionEntry> mapExceptions;
 
-  protected abstract void setPropertTargetVariable(FlowableEndpoint endpoint);
+    protected abstract void setPropertTargetVariable(FlowableEndpoint endpoint);
 
-  public enum TargetType {
-    BODY_AS_MAP, BODY, PROPERTIES
-  }
-
-  protected TargetType toTargetType;
-
-  protected void updateTargetVariables(FlowableEndpoint endpoint) {
-    toTargetType = null;
-    if (endpoint.isCopyVariablesToBodyAsMap())
-      toTargetType = TargetType.BODY_AS_MAP;
-    else if (endpoint.isCopyCamelBodyToBody())
-      toTargetType = TargetType.BODY;
-    else if (endpoint.isCopyVariablesToProperties())
-      toTargetType = TargetType.PROPERTIES;
-
-    if (toTargetType == null)
-      setPropertTargetVariable(endpoint);
-  }
-
-  protected void copyVariables(Map<String, Object> variables, Exchange exchange, FlowableEndpoint endpoint) {
-    switch (toTargetType) {
-    case BODY_AS_MAP:
-      copyVariablesToBodyAsMap(variables, exchange);
-      break;
-
-    case BODY:
-      copyVariablesToBody(variables, exchange);
-      break;
-
-    case PROPERTIES:
-      copyVariablesToProperties(variables, exchange);
+    public enum TargetType {
+        BODY_AS_MAP, BODY, PROPERTIES
     }
-  }
 
-  public void execute(DelegateExecution execution) {
-    setAppropriateCamelContext(execution);
+    protected TargetType toTargetType;
 
-    final FlowableEndpoint endpoint = createEndpoint(execution);
-    final Exchange exchange = createExchange(execution, endpoint);
+    protected void updateTargetVariables(FlowableEndpoint endpoint) {
+        toTargetType = null;
+        if (endpoint.isCopyVariablesToBodyAsMap())
+            toTargetType = TargetType.BODY_AS_MAP;
+        else if (endpoint.isCopyCamelBodyToBody())
+            toTargetType = TargetType.BODY;
+        else if (endpoint.isCopyVariablesToProperties())
+            toTargetType = TargetType.PROPERTIES;
 
-    try {
-      endpoint.process(exchange);
-    } catch (Exception e) {
-      throw new FlowableException("Exception while processing exchange", e);
+        if (toTargetType == null)
+            setPropertTargetVariable(endpoint);
     }
-    execution.setVariables(ExchangeUtils.prepareVariables(exchange, endpoint));
-    
-    boolean isV5Execution = false;
-    if ((Context.getCommandContext() != null && Flowable5Util.isFlowable5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
-        (Context.getCommandContext() == null && Flowable5Util.getFlowable5CompatibilityHandler() != null)) {
-      
-      isV5Execution = true;
-    }
-    
-    if (!handleCamelException(exchange, execution, isV5Execution)) {
-      if (isV5Execution) {
-        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-        compatibilityHandler.leaveExecution(execution);
-        return;
-      }
-      leave(execution);
-    }
-  }
 
-  protected FlowableEndpoint createEndpoint(DelegateExecution execution) {
-    String uri = "activiti://" + getProcessDefinitionKey(execution) + ":" + execution.getCurrentActivityId();
-    return getEndpoint(uri);
-  }
+    protected void copyVariables(Map<String, Object> variables, Exchange exchange, FlowableEndpoint endpoint) {
+        switch (toTargetType) {
+        case BODY_AS_MAP:
+            copyVariablesToBodyAsMap(variables, exchange);
+            break;
 
-  protected FlowableEndpoint getEndpoint(String key) {
-    for (Endpoint e : camelContextObj.getEndpoints()) {
-      if (e.getEndpointKey().equals(key) && (e instanceof FlowableEndpoint)) {
-        return (FlowableEndpoint) e;
-      }
-    }
-    throw new FlowableException("Endpoint not defined for " + key);    
-  }
+        case BODY:
+            copyVariablesToBody(variables, exchange);
+            break;
 
-  protected Exchange createExchange(DelegateExecution activityExecution, FlowableEndpoint endpoint) {
-    Exchange ex = endpoint.createExchange();
-    ex.setProperty(FlowableProducer.PROCESS_ID_PROPERTY, activityExecution.getProcessInstanceId());
-    ex.setProperty(FlowableProducer.EXECUTION_ID_PROPERTY, activityExecution.getId());
-    Map<String, Object> variables = activityExecution.getVariables();
-    updateTargetVariables(endpoint);
-    copyVariables(variables, ex, endpoint);
-    return ex;
-  }
-
-  protected boolean handleCamelException(Exchange exchange, DelegateExecution execution, boolean isV5Execution) {
-    Exception camelException = exchange.getException();
-    boolean notHandledByCamel = exchange.isFailed() && camelException != null;
-    if (notHandledByCamel) {
-      if (camelException instanceof BpmnError) {
-        if (isV5Execution) {
-          Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-          compatibilityHandler.propagateError((BpmnError) camelException, execution);
-          return true;
+        case PROPERTIES:
+            copyVariablesToProperties(variables, exchange);
         }
-        ErrorPropagation.propagateError((BpmnError) camelException, execution);
-        return true;
-      } else {
-        if (isV5Execution) {
-          Flowable5CompatibilityHandler ompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-          if (ompatibilityHandler.mapException(camelException, execution, mapExceptions)) {
-            return true;
-          } else {
-            throw new FlowableException("Unhandled exception on camel route", camelException);
-          }
-        }
-        
-        if (ErrorPropagation.mapException(camelException, (ExecutionEntity) execution, mapExceptions)) {
-          return true;
-        } else {
-          throw new FlowableException("Unhandled exception on camel route", camelException);
-        }
-      }
     }
-    return false;
-  }
 
-  protected void copyVariablesToProperties(Map<String, Object> variables, Exchange exchange) {
-    for (Map.Entry<String, Object> var : variables.entrySet()) {
-      exchange.setProperty(var.getKey(), var.getValue());
-    }
-  }
+    public void execute(DelegateExecution execution) {
+        setAppropriateCamelContext(execution);
 
-  protected void copyVariablesToBodyAsMap(Map<String, Object> variables, Exchange exchange) {
-    exchange.getIn().setBody(new HashMap<String, Object>(variables));
-  }
+        final FlowableEndpoint endpoint = createEndpoint(execution);
+        final Exchange exchange = createExchange(execution, endpoint);
 
-  protected void copyVariablesToBody(Map<String, Object> variables, Exchange exchange) {
-    Object camelBody = variables.get(ExchangeUtils.CAMELBODY);
-    if (camelBody != null) {
-      exchange.getIn().setBody(camelBody);
-    }
-  }
-
-  protected String getProcessDefinitionKey(DelegateExecution execution) {
-    Process process = ProcessDefinitionUtil.getProcess(execution.getProcessDefinitionId());
-    return process.getId();
-  }
-
-  protected boolean isASync(DelegateExecution execution) {
-    boolean async = false;
-    if (execution.getCurrentFlowElement() instanceof Activity) {
-      async = ((Activity) execution.getCurrentFlowElement()).isAsynchronous();
-    }
-    return async;
-  }
-
-  protected void setAppropriateCamelContext(DelegateExecution execution) {
-    // Get the appropriate String representation of the CamelContext object
-    // from ActivityExecution (if available).
-    String camelContextValue = getStringFromField(camelContext, execution);
-    
-    // If the String representation of the CamelContext object from ActivityExecution is empty, use the default.
-    if (StringUtils.isEmpty(camelContextValue) && camelContextObj != null) {
-      // No processing required. No custom CamelContext & the default is already set.
-      
-    } else {
-      // Get the ProcessEngineConfiguration object.
-      ProcessEngineConfiguration engineConfiguration = Context.getProcessEngineConfiguration();
-      if ((Context.getCommandContext() != null && Flowable5Util.isFlowable5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
-            (Context.getCommandContext() == null && Flowable5Util.getFlowable5CompatibilityHandler() != null)) {
-        
-        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-        camelContextObj = (CamelContext) compatibilityHandler.getCamelContextObject(camelContextValue);
-        
-      } else {
-        // Convert it to a SpringProcessEngineConfiguration. If this doesn't work, throw a RuntimeException.
         try {
-          SpringProcessEngineConfiguration springConfiguration = (SpringProcessEngineConfiguration) engineConfiguration;
-          if (StringUtils.isEmpty(camelContextValue) && camelContextObj == null) {
-            camelContextValue = springConfiguration.getDefaultCamelContext();
-          }
-
-          // Get the CamelContext object and set the super's member variable.
-          Object ctx = springConfiguration.getApplicationContext().getBean(camelContextValue);
-          if (!(ctx instanceof CamelContext)) {
-            throw new FlowableException("Could not find CamelContext named " + camelContextValue + ".");
-          }
-          camelContextObj = (CamelContext) ctx;
-          
+            endpoint.process(exchange);
         } catch (Exception e) {
-          throw new FlowableException("Expecting a SpringProcessEngineConfiguration for the Camel module.", e);
+            throw new FlowableException("Exception while processing exchange", e);
         }
-      }
-    }
-  }
+        execution.setVariables(ExchangeUtils.prepareVariables(exchange, endpoint));
 
-  protected String getStringFromField(Expression expression, DelegateExecution execution) {
-    if (expression != null) {
-      Object value = expression.getValue(execution);
-      if (value != null) {
-        return value.toString();
-      }
-    }
-    return null;
-  }
+        boolean isV5Execution = false;
+        if ((Context.getCommandContext() != null && Flowable5Util.isFlowable5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
+                (Context.getCommandContext() == null && Flowable5Util.getFlowable5CompatibilityHandler() != null)) {
 
-  public void setCamelContext(Expression camelContext) {
-    this.camelContext = camelContext;
-  }
+            isV5Execution = true;
+        }
+
+        if (!handleCamelException(exchange, execution, isV5Execution)) {
+            if (isV5Execution) {
+                Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+                compatibilityHandler.leaveExecution(execution);
+                return;
+            }
+            leave(execution);
+        }
+    }
+
+    protected FlowableEndpoint createEndpoint(DelegateExecution execution) {
+        String uri = "flowable://" + getProcessDefinitionKey(execution) + ":" + execution.getCurrentActivityId();
+        return getEndpoint(uri);
+    }
+
+    protected FlowableEndpoint getEndpoint(String key) {
+        for (Endpoint e : camelContextObj.getEndpoints()) {
+            if (e.getEndpointKey().equals(key) && (e instanceof FlowableEndpoint)) {
+                return (FlowableEndpoint) e;
+            }
+        }
+        throw new FlowableException("Endpoint not defined for " + key);
+    }
+
+    protected Exchange createExchange(DelegateExecution activityExecution, FlowableEndpoint endpoint) {
+        Exchange ex = endpoint.createExchange();
+        ex.setProperty(FlowableProducer.PROCESS_ID_PROPERTY, activityExecution.getProcessInstanceId());
+        ex.setProperty(FlowableProducer.EXECUTION_ID_PROPERTY, activityExecution.getId());
+        Map<String, Object> variables = activityExecution.getVariables();
+        updateTargetVariables(endpoint);
+        copyVariables(variables, ex, endpoint);
+        return ex;
+    }
+
+    protected boolean handleCamelException(Exchange exchange, DelegateExecution execution, boolean isV5Execution) {
+        Exception camelException = exchange.getException();
+        boolean notHandledByCamel = exchange.isFailed() && camelException != null;
+        if (notHandledByCamel) {
+            if (camelException instanceof BpmnError) {
+                if (isV5Execution) {
+                    Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+                    compatibilityHandler.propagateError((BpmnError) camelException, execution);
+                    return true;
+                }
+                ErrorPropagation.propagateError((BpmnError) camelException, execution);
+                return true;
+            } else {
+                if (isV5Execution) {
+                    Flowable5CompatibilityHandler ompatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+                    if (ompatibilityHandler.mapException(camelException, execution, mapExceptions)) {
+                        return true;
+                    } else {
+                        throw new FlowableException("Unhandled exception on camel route", camelException);
+                    }
+                }
+
+                if (ErrorPropagation.mapException(camelException, (ExecutionEntity) execution, mapExceptions)) {
+                    return true;
+                } else {
+                    throw new FlowableException("Unhandled exception on camel route", camelException);
+                }
+            }
+        }
+        return false;
+    }
+
+    protected void copyVariablesToProperties(Map<String, Object> variables, Exchange exchange) {
+        for (Map.Entry<String, Object> var : variables.entrySet()) {
+            exchange.setProperty(var.getKey(), var.getValue());
+        }
+    }
+
+    protected void copyVariablesToBodyAsMap(Map<String, Object> variables, Exchange exchange) {
+        exchange.getIn().setBody(new HashMap<String, Object>(variables));
+    }
+
+    protected void copyVariablesToBody(Map<String, Object> variables, Exchange exchange) {
+        Object camelBody = variables.get(ExchangeUtils.CAMELBODY);
+        if (camelBody != null) {
+            exchange.getIn().setBody(camelBody);
+        }
+    }
+
+    protected String getProcessDefinitionKey(DelegateExecution execution) {
+        Process process = ProcessDefinitionUtil.getProcess(execution.getProcessDefinitionId());
+        return process.getId();
+    }
+
+    protected boolean isASync(DelegateExecution execution) {
+        boolean async = false;
+        if (execution.getCurrentFlowElement() instanceof Activity) {
+            async = ((Activity) execution.getCurrentFlowElement()).isAsynchronous();
+        }
+        return async;
+    }
+
+    protected void setAppropriateCamelContext(DelegateExecution execution) {
+        // Get the appropriate String representation of the CamelContext object
+        // from ActivityExecution (if available).
+        String camelContextValue = getStringFromField(camelContext, execution);
+
+        // If the String representation of the CamelContext object from ActivityExecution is empty, use the default.
+        if (StringUtils.isEmpty(camelContextValue) && camelContextObj != null) {
+            // No processing required. No custom CamelContext & the default is already set.
+
+        } else {
+            // Get the ProcessEngineConfiguration object.
+            ProcessEngineConfiguration engineConfiguration = Context.getProcessEngineConfiguration();
+            if ((Context.getCommandContext() != null && Flowable5Util.isFlowable5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
+                    (Context.getCommandContext() == null && Flowable5Util.getFlowable5CompatibilityHandler() != null)) {
+
+                Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+                camelContextObj = (CamelContext) compatibilityHandler.getCamelContextObject(camelContextValue);
+
+            } else {
+                // Convert it to a SpringProcessEngineConfiguration. If this doesn't work, throw a RuntimeException.
+                try {
+                    SpringProcessEngineConfiguration springConfiguration = (SpringProcessEngineConfiguration) engineConfiguration;
+                    if (StringUtils.isEmpty(camelContextValue) && camelContextObj == null) {
+                        camelContextValue = springConfiguration.getDefaultCamelContext();
+                    }
+
+                    // Get the CamelContext object and set the super's member variable.
+                    Object ctx = springConfiguration.getApplicationContext().getBean(camelContextValue);
+                    if (!(ctx instanceof CamelContext)) {
+                        throw new FlowableException("Could not find CamelContext named " + camelContextValue + ".");
+                    }
+                    camelContextObj = (CamelContext) ctx;
+
+                } catch (Exception e) {
+                    throw new FlowableException("Expecting a SpringProcessEngineConfiguration for the Camel module.", e);
+                }
+            }
+        }
+    }
+
+    protected String getStringFromField(Expression expression, DelegateExecution execution) {
+        if (expression != null) {
+            Object value = expression.getValue(execution);
+            if (value != null) {
+                return value.toString();
+            }
+        }
+        return null;
+    }
+
+    public void setCamelContext(Expression camelContext) {
+        this.camelContext = camelContext;
+    }
 }

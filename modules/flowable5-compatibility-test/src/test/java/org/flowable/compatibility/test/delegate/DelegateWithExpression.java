@@ -20,12 +20,12 @@ import org.flowable.engine.delegate.JavaDelegate;
  * @author Joram Barrez
  */
 public class DelegateWithExpression implements JavaDelegate {
-  
-  private Expression param;
-  
-  @Override
-  public void execute(DelegateExecution execution) {
-    execution.setVariable("testVar", param.getValue(execution));
-  }
+
+    private Expression param;
+
+    @Override
+    public void execute(DelegateExecution execution) {
+        execution.setVariable("testVar", param.getValue(execution));
+    }
 
 }

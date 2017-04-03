@@ -19,14 +19,14 @@ import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 
 public class DummyServiceTask extends TaskActivityBehavior {
 
-	private static final Logger log = Logger.getLogger("DummyServiceTask");
+    private static final Logger log = Logger.getLogger("DummyServiceTask");
 
-  public DummyServiceTask() {
-    super();
-  }
-  
-  @Override
-  public void signal(ActivityExecution execution, String signalName, Object signalData) {
-    leave(execution);
-  }
+    public DummyServiceTask() {
+        super();
+    }
+
+    @Override
+    public void signal(ActivityExecution execution, String signalName, Object signalData) {
+        leave(execution);
+    }
 }

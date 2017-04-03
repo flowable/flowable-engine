@@ -29,47 +29,47 @@ import org.flowable.engine.runtime.ProcessInstance;
  * @author Joram Barrez
  */
 public interface ExecutionDataManager extends DataManager<ExecutionEntity> {
-  
-  ExecutionEntity findSubProcessInstanceBySuperExecutionId(final String superExecutionId);
 
-  List<ExecutionEntity> findChildExecutionsByParentExecutionId(final String parentExecutionId);
+    ExecutionEntity findSubProcessInstanceBySuperExecutionId(final String superExecutionId);
 
-  List<ExecutionEntity> findChildExecutionsByProcessInstanceId(final String processInstanceId);
+    List<ExecutionEntity> findChildExecutionsByParentExecutionId(final String parentExecutionId);
 
-  List<ExecutionEntity> findExecutionsByParentExecutionAndActivityIds(final String parentExecutionId, final Collection<String> activityIds);
-    
-  long findExecutionCountByQueryCriteria(ExecutionQueryImpl executionQuery);
+    List<ExecutionEntity> findChildExecutionsByProcessInstanceId(final String processInstanceId);
 
-  List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery, Page page);
-  
-  long findProcessInstanceCountByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
+    List<ExecutionEntity> findExecutionsByParentExecutionAndActivityIds(final String parentExecutionId, final Collection<String> activityIds);
 
-  List<ProcessInstance> findProcessInstanceByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
-  
-  List<ExecutionEntity> findExecutionsByRootProcessInstanceId(String rootProcessInstanceId);
-  
-  List<ExecutionEntity> findExecutionsByProcessInstanceId(String processInstanceId);
-  
-  List<ProcessInstance> findProcessInstanceAndVariablesByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
+    long findExecutionCountByQueryCriteria(ExecutionQueryImpl executionQuery);
 
-  Collection<ExecutionEntity> findInactiveExecutionsByProcessInstanceId(final String processInstanceId);
-  
-  Collection<ExecutionEntity> findInactiveExecutionsByActivityIdAndProcessInstanceId(final String activityId, final String processInstanceId);
-  
-  List<String> findProcessInstanceIdsByProcessDefinitionId(String processDefinitionId);
-  
-  List<Execution> findExecutionsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
-  
-  List<ProcessInstance> findProcessInstanceByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery, Page page);
 
-  long findExecutionCountByNativeQuery(Map<String, Object> parameterMap);
-  
-  void updateExecutionTenantIdForDeployment(String deploymentId, String newTenantId);
-  
-  void updateProcessInstanceLockTime(String processInstanceId, Date lockDate, Date expirationTime);
-  
-  void updateAllExecutionRelatedEntityCountFlags(boolean newValue);
-  
-  void clearProcessInstanceLockTime(String processInstanceId);
-  
+    long findProcessInstanceCountByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
+
+    List<ProcessInstance> findProcessInstanceByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
+
+    List<ExecutionEntity> findExecutionsByRootProcessInstanceId(String rootProcessInstanceId);
+
+    List<ExecutionEntity> findExecutionsByProcessInstanceId(String processInstanceId);
+
+    List<ProcessInstance> findProcessInstanceAndVariablesByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
+
+    Collection<ExecutionEntity> findInactiveExecutionsByProcessInstanceId(final String processInstanceId);
+
+    Collection<ExecutionEntity> findInactiveExecutionsByActivityIdAndProcessInstanceId(final String activityId, final String processInstanceId);
+
+    List<String> findProcessInstanceIdsByProcessDefinitionId(String processDefinitionId);
+
+    List<Execution> findExecutionsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+
+    List<ProcessInstance> findProcessInstanceByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+
+    long findExecutionCountByNativeQuery(Map<String, Object> parameterMap);
+
+    void updateExecutionTenantIdForDeployment(String deploymentId, String newTenantId);
+
+    void updateProcessInstanceLockTime(String processInstanceId, Date lockDate, Date expirationTime);
+
+    void updateAllExecutionRelatedEntityCountFlags(boolean newValue);
+
+    void clearProcessInstanceLockTime(String processInstanceId);
+
 }

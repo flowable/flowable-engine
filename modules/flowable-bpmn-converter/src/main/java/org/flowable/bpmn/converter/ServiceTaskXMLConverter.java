@@ -29,129 +29,129 @@ import org.flowable.bpmn.model.ServiceTask;
  */
 public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
-  public Class<? extends BaseElement> getBpmnElementType() {
-    return ServiceTask.class;
-  }
-
-  @Override
-  protected String getXMLElementName() {
-    return ELEMENT_TASK_SERVICE;
-  }
-
-  @Override
-  protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
-    ServiceTask serviceTask = new ServiceTask();
-    BpmnXMLUtil.addXMLLocation(serviceTask, xtr);
-    if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_CLASS, xtr))) {
-      serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
-      serviceTask.setImplementation(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_CLASS, xtr));
-
-    } else if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_EXPRESSION, xtr))) {
-      serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-      serviceTask.setImplementation(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_EXPRESSION, xtr));
-
-    } else if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_DELEGATEEXPRESSION, xtr))) {
-      serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
-      serviceTask.setImplementation(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_DELEGATEEXPRESSION, xtr));
-
-    } else if ("##WebService".equals(xtr.getAttributeValue(null, ATTRIBUTE_TASK_IMPLEMENTATION))) {
-      serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_WEBSERVICE);
-      serviceTask.setOperationRef(parseOperationRef(xtr.getAttributeValue(null, ATTRIBUTE_TASK_OPERATION_REF), model));
+    public Class<? extends BaseElement> getBpmnElementType() {
+        return ServiceTask.class;
     }
 
-    serviceTask.setResultVariableName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_RESULTVARIABLE, xtr));
-    if (StringUtils.isEmpty(serviceTask.getResultVariableName())) {
-      serviceTask.setResultVariableName(BpmnXMLUtil.getAttributeValue("resultVariable", xtr));
+    @Override
+    protected String getXMLElementName() {
+        return ELEMENT_TASK_SERVICE;
     }
 
-    serviceTask.setType(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TYPE, xtr));
-    serviceTask.setExtensionId(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_EXTENSIONID, xtr));
+    @Override
+    protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
+        ServiceTask serviceTask = new ServiceTask();
+        BpmnXMLUtil.addXMLLocation(serviceTask, xtr);
+        if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_CLASS, xtr))) {
+            serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
+            serviceTask.setImplementation(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_CLASS, xtr));
 
-    if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, xtr))) {
-      serviceTask.setSkipExpression(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, xtr));
-    }
-    parseChildElements(getXMLElementName(), serviceTask, model, xtr);
+        } else if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_EXPRESSION, xtr))) {
+            serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
+            serviceTask.setImplementation(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_EXPRESSION, xtr));
 
-    return serviceTask;
-  }
+        } else if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_DELEGATEEXPRESSION, xtr))) {
+            serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+            serviceTask.setImplementation(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_DELEGATEEXPRESSION, xtr));
 
-  @Override
-  protected void writeAdditionalAttributes(BaseElement element, BpmnModel model, XMLStreamWriter xtw) throws Exception {
-
-    ServiceTask serviceTask = (ServiceTask) element;
-
-    if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType())) {
-      writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_CLASS, serviceTask.getImplementation(), xtw);
-    } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(serviceTask.getImplementationType())) {
-      writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_EXPRESSION, serviceTask.getImplementation(), xtw);
-    } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(serviceTask.getImplementationType())) {
-      writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_DELEGATEEXPRESSION, serviceTask.getImplementation(), xtw);
-    }
-
-    if (StringUtils.isNotEmpty(serviceTask.getResultVariableName())) {
-      writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_RESULTVARIABLE, serviceTask.getResultVariableName(), xtw);
-    }
-    if (StringUtils.isNotEmpty(serviceTask.getType())) {
-      writeQualifiedAttribute(ATTRIBUTE_TYPE, serviceTask.getType(), xtw);
-    }
-    if (StringUtils.isNotEmpty(serviceTask.getExtensionId())) {
-      writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_EXTENSIONID, serviceTask.getExtensionId(), xtw);
-    }
-    if (StringUtils.isNotEmpty(serviceTask.getSkipExpression())) {
-      writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, serviceTask.getSkipExpression(), xtw);
-    }
-  }
-
-  @Override
-  protected boolean writeExtensionChildElements(BaseElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
-    ServiceTask serviceTask = (ServiceTask) element;
-
-    if (!serviceTask.getCustomProperties().isEmpty()) {
-      for (CustomProperty customProperty : serviceTask.getCustomProperties()) {
-
-        if (StringUtils.isEmpty(customProperty.getSimpleValue())) {
-          continue;
+        } else if ("##WebService".equals(xtr.getAttributeValue(null, ATTRIBUTE_TASK_IMPLEMENTATION))) {
+            serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_WEBSERVICE);
+            serviceTask.setOperationRef(parseOperationRef(xtr.getAttributeValue(null, ATTRIBUTE_TASK_OPERATION_REF), model));
         }
 
-        if (!didWriteExtensionStartElement) {
-          xtw.writeStartElement(ELEMENT_EXTENSIONS);
-          didWriteExtensionStartElement = true;
+        serviceTask.setResultVariableName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_RESULTVARIABLE, xtr));
+        if (StringUtils.isEmpty(serviceTask.getResultVariableName())) {
+            serviceTask.setResultVariableName(BpmnXMLUtil.getAttributeValue("resultVariable", xtr));
         }
-        xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_FIELD, FLOWABLE_EXTENSIONS_NAMESPACE);
-        xtw.writeAttribute(ATTRIBUTE_FIELD_NAME, customProperty.getName());
-        if ((customProperty.getSimpleValue().contains("${") || customProperty.getSimpleValue().contains("#{")) && customProperty.getSimpleValue().contains("}")) {
 
-          xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ATTRIBUTE_FIELD_EXPRESSION, FLOWABLE_EXTENSIONS_NAMESPACE);
+        serviceTask.setType(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TYPE, xtr));
+        serviceTask.setExtensionId(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_EXTENSIONID, xtr));
+
+        if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, xtr))) {
+            serviceTask.setSkipExpression(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, xtr));
+        }
+        parseChildElements(getXMLElementName(), serviceTask, model, xtr);
+
+        return serviceTask;
+    }
+
+    @Override
+    protected void writeAdditionalAttributes(BaseElement element, BpmnModel model, XMLStreamWriter xtw) throws Exception {
+
+        ServiceTask serviceTask = (ServiceTask) element;
+
+        if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType())) {
+            writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_CLASS, serviceTask.getImplementation(), xtw);
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(serviceTask.getImplementationType())) {
+            writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_EXPRESSION, serviceTask.getImplementation(), xtw);
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(serviceTask.getImplementationType())) {
+            writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_DELEGATEEXPRESSION, serviceTask.getImplementation(), xtw);
+        }
+
+        if (StringUtils.isNotEmpty(serviceTask.getResultVariableName())) {
+            writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_RESULTVARIABLE, serviceTask.getResultVariableName(), xtw);
+        }
+        if (StringUtils.isNotEmpty(serviceTask.getType())) {
+            writeQualifiedAttribute(ATTRIBUTE_TYPE, serviceTask.getType(), xtw);
+        }
+        if (StringUtils.isNotEmpty(serviceTask.getExtensionId())) {
+            writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_EXTENSIONID, serviceTask.getExtensionId(), xtw);
+        }
+        if (StringUtils.isNotEmpty(serviceTask.getSkipExpression())) {
+            writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, serviceTask.getSkipExpression(), xtw);
+        }
+    }
+
+    @Override
+    protected boolean writeExtensionChildElements(BaseElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
+        ServiceTask serviceTask = (ServiceTask) element;
+
+        if (!serviceTask.getCustomProperties().isEmpty()) {
+            for (CustomProperty customProperty : serviceTask.getCustomProperties()) {
+
+                if (StringUtils.isEmpty(customProperty.getSimpleValue())) {
+                    continue;
+                }
+
+                if (!didWriteExtensionStartElement) {
+                    xtw.writeStartElement(ELEMENT_EXTENSIONS);
+                    didWriteExtensionStartElement = true;
+                }
+                xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_FIELD, FLOWABLE_EXTENSIONS_NAMESPACE);
+                xtw.writeAttribute(ATTRIBUTE_FIELD_NAME, customProperty.getName());
+                if ((customProperty.getSimpleValue().contains("${") || customProperty.getSimpleValue().contains("#{")) && customProperty.getSimpleValue().contains("}")) {
+
+                    xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ATTRIBUTE_FIELD_EXPRESSION, FLOWABLE_EXTENSIONS_NAMESPACE);
+                } else {
+                    xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_FIELD_STRING, FLOWABLE_EXTENSIONS_NAMESPACE);
+                }
+                xtw.writeCharacters(customProperty.getSimpleValue());
+                xtw.writeEndElement();
+                xtw.writeEndElement();
+            }
         } else {
-          xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_FIELD_STRING, FLOWABLE_EXTENSIONS_NAMESPACE);
+            didWriteExtensionStartElement = FieldExtensionExport.writeFieldExtensions(serviceTask.getFieldExtensions(), didWriteExtensionStartElement, xtw);
         }
-        xtw.writeCharacters(customProperty.getSimpleValue());
-        xtw.writeEndElement();
-        xtw.writeEndElement();
-      }
-    } else {
-      didWriteExtensionStartElement = FieldExtensionExport.writeFieldExtensions(serviceTask.getFieldExtensions(), didWriteExtensionStartElement, xtw);
+
+        return didWriteExtensionStartElement;
     }
 
-    return didWriteExtensionStartElement;
-  }
-
-  @Override
-  protected void writeAdditionalChildElements(BaseElement element, BpmnModel model, XMLStreamWriter xtw) throws Exception {
-  }
-
-  protected String parseOperationRef(String operationRef, BpmnModel model) {
-    String result = null;
-    if (StringUtils.isNotEmpty(operationRef)) {
-      int indexOfP = operationRef.indexOf(':');
-      if (indexOfP != -1) {
-        String prefix = operationRef.substring(0, indexOfP);
-        String resolvedNamespace = model.getNamespace(prefix);
-        result = resolvedNamespace + ":" + operationRef.substring(indexOfP + 1);
-      } else {
-        result = model.getTargetNamespace() + ":" + operationRef;
-      }
+    @Override
+    protected void writeAdditionalChildElements(BaseElement element, BpmnModel model, XMLStreamWriter xtw) throws Exception {
     }
-    return result;
-  }
+
+    protected String parseOperationRef(String operationRef, BpmnModel model) {
+        String result = null;
+        if (StringUtils.isNotEmpty(operationRef)) {
+            int indexOfP = operationRef.indexOf(':');
+            if (indexOfP != -1) {
+                String prefix = operationRef.substring(0, indexOfP);
+                String resolvedNamespace = model.getNamespace(prefix);
+                result = resolvedNamespace + ":" + operationRef.substring(indexOfP + 1);
+            } else {
+                result = model.getTargetNamespace() + ":" + operationRef;
+            }
+        }
+        return result;
+    }
 }

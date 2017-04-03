@@ -27,47 +27,47 @@ import org.flowable.idm.engine.impl.persistence.entity.MembershipEntityManager;
  * @author Joram Barrez
  */
 public abstract class AbstractManager {
-  
-  protected IdmEngineConfiguration idmEngineConfiguration;
-  
-  public AbstractManager(IdmEngineConfiguration idmEngineConfiguration) {
-    this.idmEngineConfiguration = idmEngineConfiguration;
-  }
-  
-  // Command scoped 
-  
-  protected CommandContext getCommandContext() {
-    return Context.getCommandContext();
-  }
 
-  protected <T> T getSession(Class<T> sessionClass) {
-    return getCommandContext().getSession(sessionClass);
-  }
-  
-  // Engine scoped
-  
-  protected IdmEngineConfiguration getIdmEngineConfiguration() {
-    return idmEngineConfiguration;
-  }
-  
-  protected CommandExecutor getCommandExecutor() {
-    return getIdmEngineConfiguration().getCommandExecutor();
-  }
-  
-  protected FlowableEventDispatcher getEventDispatcher() {
-    return getIdmEngineConfiguration().getEventDispatcher();
-  }
+    protected IdmEngineConfiguration idmEngineConfiguration;
 
-  protected GroupEntityManager getGroupEntityManager() {
-    return getIdmEngineConfiguration().getGroupEntityManager();
-  }
-  
-  protected MembershipEntityManager getMembershipEntityManager() {
-    return getIdmEngineConfiguration().getMembershipEntityManager();
-  }
-  
-  protected IdentityInfoEntityManager getIdentityInfoEntityManager() {
-    return getIdmEngineConfiguration().getIdentityInfoEntityManager();
-  }
+    public AbstractManager(IdmEngineConfiguration idmEngineConfiguration) {
+        this.idmEngineConfiguration = idmEngineConfiguration;
+    }
+
+    // Command scoped
+
+    protected CommandContext getCommandContext() {
+        return Context.getCommandContext();
+    }
+
+    protected <T> T getSession(Class<T> sessionClass) {
+        return getCommandContext().getSession(sessionClass);
+    }
+
+    // Engine scoped
+
+    protected IdmEngineConfiguration getIdmEngineConfiguration() {
+        return idmEngineConfiguration;
+    }
+
+    protected CommandExecutor getCommandExecutor() {
+        return getIdmEngineConfiguration().getCommandExecutor();
+    }
+
+    protected FlowableEventDispatcher getEventDispatcher() {
+        return getIdmEngineConfiguration().getEventDispatcher();
+    }
+
+    protected GroupEntityManager getGroupEntityManager() {
+        return getIdmEngineConfiguration().getGroupEntityManager();
+    }
+
+    protected MembershipEntityManager getMembershipEntityManager() {
+        return getIdmEngineConfiguration().getMembershipEntityManager();
+    }
+
+    protected IdentityInfoEntityManager getIdentityInfoEntityManager() {
+        return getIdmEngineConfiguration().getIdentityInfoEntityManager();
+    }
 
 }

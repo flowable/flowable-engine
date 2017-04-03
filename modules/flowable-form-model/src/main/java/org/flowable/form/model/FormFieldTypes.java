@@ -17,29 +17,31 @@ package org.flowable.form.model;
  */
 public interface FormFieldTypes {
 
-  String SINGLE_LINE_TEXT = "text";
+    String SINGLE_LINE_TEXT = "text";
 
-  String MULTI_LINE_TEXT = "multi-line-text";
+    String MULTI_LINE_TEXT = "multi-line-text";
 
-  String INTEGER = "integer";
+    String INTEGER = "integer";
+    
+    String DECIMAL = "decimal";
 
-  String AMOUNT = "amount";
+    String AMOUNT = "amount";
 
-  String DATE = "date";
+    String DATE = "date";
 
-  String BOOLEAN = "boolean";
+    String BOOLEAN = "boolean";
 
-  String RADIO_BUTTONS = "radio-buttons";
+    String RADIO_BUTTONS = "radio-buttons";
 
-  String DROPDOWN = "dropdown";
+    String DROPDOWN = "dropdown";
 
-  String UPLOAD = "upload";
+    String UPLOAD = "upload";
 
-  String EXPRESSION = "expression";
+    String EXPRESSION = "expression";
 
-  String PEOPLE = "people";
+    String PEOPLE = "people";
 
-  String FUNCTIONAL_GROUP = "functional-group";
+    String FUNCTIONAL_GROUP = "functional-group";
 
-  String CONTAINER = "container";
+    String CONTAINER = "container";
 }

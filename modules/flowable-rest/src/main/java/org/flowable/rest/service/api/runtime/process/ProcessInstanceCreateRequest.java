@@ -32,87 +32,87 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
  */
 public class ProcessInstanceCreateRequest {
 
-  private String processDefinitionId;
-  private String processDefinitionKey;
-  private String message;
-  private String businessKey;
-  private List<RestVariable> variables;
-  private List<RestVariable> transientVariables;
-  private String tenantId;
+    private String processDefinitionId;
+    private String processDefinitionKey;
+    private String message;
+    private String businessKey;
+    private List<RestVariable> variables;
+    private List<RestVariable> transientVariables;
+    private String tenantId;
 
-  // Added by Ryan Johnston
-  private boolean returnVariables;
+    // Added by Ryan Johnston
+    private boolean returnVariables;
 
-  public String getProcessDefinitionId() {
-    return processDefinitionId;
-  }
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
 
-  public void setProcessDefinitionId(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
 
-  public String getProcessDefinitionKey() {
-    return processDefinitionKey;
-  }
+    public String getProcessDefinitionKey() {
+        return processDefinitionKey;
+    }
 
-  public void setProcessDefinitionKey(String processDefinitionKey) {
-    this.processDefinitionKey = processDefinitionKey;
-  }
+    public void setProcessDefinitionKey(String processDefinitionKey) {
+        this.processDefinitionKey = processDefinitionKey;
+    }
 
-  public String getBusinessKey() {
-    return businessKey;
-  }
+    public String getBusinessKey() {
+        return businessKey;
+    }
 
-  public void setBusinessKey(String businessKey) {
-    this.businessKey = businessKey;
-  }
+    public void setBusinessKey(String businessKey) {
+        this.businessKey = businessKey;
+    }
 
-  public String getMessage() {
-    return message;
-  }
+    public String getMessage() {
+        return message;
+    }
 
-  public void setMessage(String message) {
-    this.message = message;
-  }
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
 
-  public String getTenantId() {
-    return tenantId;
-  }
+    public String getTenantId() {
+        return tenantId;
+    }
 
-  @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
-  public List<RestVariable> getVariables() {
-    return variables;
-  }
+    @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
+    public List<RestVariable> getVariables() {
+        return variables;
+    }
 
-  public void setVariables(List<RestVariable> variables) {
-    this.variables = variables;
-  }
-  
-  @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
-  public List<RestVariable> getTransientVariables() {
-    return transientVariables;
-  }
+    public void setVariables(List<RestVariable> variables) {
+        this.variables = variables;
+    }
 
-  public void setTransientVariables(List<RestVariable> transientVariables) {
-    this.transientVariables = transientVariables;
-  }
+    @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
+    public List<RestVariable> getTransientVariables() {
+        return transientVariables;
+    }
 
-  @JsonIgnore
-  public boolean isTenantSet() {
-    return tenantId != null && !StringUtils.isEmpty(tenantId);
-  }
+    public void setTransientVariables(List<RestVariable> transientVariables) {
+        this.transientVariables = transientVariables;
+    }
 
-  // Added by Ryan Johnston
-  public boolean getReturnVariables() {
-    return returnVariables;
-  }
+    @JsonIgnore
+    public boolean isTenantSet() {
+        return tenantId != null && !StringUtils.isEmpty(tenantId);
+    }
 
-  // Added by Ryan Johnston
-  public void setReturnVariables(boolean returnVariables) {
-    this.returnVariables = returnVariables;
-  }
+    // Added by Ryan Johnston
+    public boolean getReturnVariables() {
+        return returnVariables;
+    }
+
+    // Added by Ryan Johnston
+    public void setReturnVariables(boolean returnVariables) {
+        this.returnVariables = returnVariables;
+    }
 }

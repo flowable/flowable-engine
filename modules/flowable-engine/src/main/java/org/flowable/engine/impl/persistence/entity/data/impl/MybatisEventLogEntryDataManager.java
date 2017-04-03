@@ -27,50 +27,49 @@ import org.flowable.engine.impl.persistence.entity.data.EventLogEntryDataManager
  * @author Joram Barrez
  */
 public class MybatisEventLogEntryDataManager extends AbstractDataManager<EventLogEntryEntity> implements EventLogEntryDataManager {
-  
-  public MybatisEventLogEntryDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    super(processEngineConfiguration);
-  }
 
-  @Override
-  public Class<? extends EventLogEntryEntity> getManagedEntityClass() {
-    return EventLogEntryEntityImpl.class;
-  }
-  
-  @Override
-  public EventLogEntryEntity create() {
-    return new EventLogEntryEntityImpl();
-  }
-  
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<EventLogEntry> findAllEventLogEntries() {
-    return getDbSqlSession().selectList("selectAllEventLogEntries");
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<EventLogEntry> findEventLogEntries(long startLogNr, long pageSize) {
-    Map<String, Object> params = new HashMap<String, Object>(2);
-    params.put("startLogNr", startLogNr);
-    if (pageSize > 0) {
-      params.put("endLogNr", startLogNr + pageSize + 1);
+    public MybatisEventLogEntryDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
     }
-    return getDbSqlSession().selectList("selectEventLogEntries", params);
-  }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<EventLogEntry> findEventLogEntriesByProcessInstanceId(String processInstanceId) {
-    Map<String, Object> params = new HashMap<String, Object>(2);
-    params.put("processInstanceId", processInstanceId);
-    return getDbSqlSession().selectList("selectEventLogEntriesByProcessInstanceId", params);
-  }
+    @Override
+    public Class<? extends EventLogEntryEntity> getManagedEntityClass() {
+        return EventLogEntryEntityImpl.class;
+    }
 
-  @Override
-  public void deleteEventLogEntry(long logNr) {
-    getDbSqlSession().getSqlSession().delete("deleteEventLogEntry", logNr);
-  }
+    @Override
+    public EventLogEntryEntity create() {
+        return new EventLogEntryEntityImpl();
+    }
 
-  
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<EventLogEntry> findAllEventLogEntries() {
+        return getDbSqlSession().selectList("selectAllEventLogEntries");
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<EventLogEntry> findEventLogEntries(long startLogNr, long pageSize) {
+        Map<String, Object> params = new HashMap<String, Object>(2);
+        params.put("startLogNr", startLogNr);
+        if (pageSize > 0) {
+            params.put("endLogNr", startLogNr + pageSize + 1);
+        }
+        return getDbSqlSession().selectList("selectEventLogEntries", params);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<EventLogEntry> findEventLogEntriesByProcessInstanceId(String processInstanceId) {
+        Map<String, Object> params = new HashMap<String, Object>(2);
+        params.put("processInstanceId", processInstanceId);
+        return getDbSqlSession().selectList("selectEventLogEntriesByProcessInstanceId", params);
+    }
+
+    @Override
+    public void deleteEventLogEntry(long logNr) {
+        getDbSqlSession().getSqlSession().delete("deleteEventLogEntry", logNr);
+    }
+
 }

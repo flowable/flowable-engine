@@ -232,6 +232,9 @@
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>
+      <if test="engineVersion != null">
+      	and RES.ENGINE_VERSION_ = #{engineVersion}
+      </if> 
       <if test="eventSubscriptionType != null">
       	and (EVT.EVENT_TYPE_ = #{eventSubscriptionType} and EVT.EVENT_NAME_ = #{eventSubscriptionName}) 
       </if>

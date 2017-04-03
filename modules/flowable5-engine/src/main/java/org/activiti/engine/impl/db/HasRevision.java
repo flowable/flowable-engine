@@ -18,9 +18,11 @@ package org.activiti.engine.impl.db;
  * @author Joram Barrez
  */
 public interface HasRevision {
-  
-  void setRevision(int revision);
-  int getRevision();
-  int getRevisionNext();
+
+    void setRevision(int revision);
+
+    int getRevision();
+
+    int getRevisionNext();
 
 }

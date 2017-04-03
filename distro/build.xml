@@ -4,7 +4,7 @@
 
 	<property file="${user.home}/.flowable/build.properties" />
 
-	<property name="flowable.version" value="6.0.0-SNAPSHOT" />
+	<property name="flowable.version" value="6.0.1-SNAPSHOT" />
 	<property name="target.distro.root" value="target/zip/flowable-${flowable.version}" />
 	<property name="flowable.website" value="../../flowable-website" />
 
@@ -313,6 +313,16 @@
 		<copy todir="${target.distro.root}/docs/userguide">
 			<fileset dir="../userguide/target/html/en" />
 		</copy>
+		<ant antfile="../userguide-dmn/build.xml" inheritall="false" />
+		<mkdir dir="${target.distro.root}/docs/userguide-dmn" />
+		<copy todir="${target.distro.root}/docs/userguide-dmn">
+			<fileset dir="../userguide-dmn/target/html/en" />
+		</copy>
+		<ant antfile="../userguide-form/build.xml" inheritall="false" />
+		<mkdir dir="${target.distro.root}/docs/userguide-form" />
+		<copy todir="${target.distro.root}/docs/userguide-form">
+			<fileset dir="../userguide-form/target/html/en" />
+		</copy>
 	</target>
 
 	<target name="copy.docs" depends="build.docs" unless="nodocs">
@@ -332,6 +342,14 @@
 		<mkdir dir="${flowable.website}/userguide" />
 		<copy todir="${flowable.website}/userguide" overwrite="true">
 			<fileset dir="../userguide/target/html/en" />
+		</copy>
+		<mkdir dir="${flowable.website}/userguide-dmn" />
+		<copy todir="${flowable.website}/userguide-dmn" overwrite="true">
+			<fileset dir="../userguide-dmn/target/html/en" />
+		</copy>
+		<mkdir dir="${flowable.website}/userguide-form" />
+		<copy todir="${flowable.website}/userguide-form" overwrite="true">
+			<fileset dir="../userguide-form/target/html/en" />
 		</copy>
 		<copy todir="${flowable.website}" overwrite="true">
 			<fileset dir="src">

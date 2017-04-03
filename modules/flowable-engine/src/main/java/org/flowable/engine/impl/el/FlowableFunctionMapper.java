@@ -14,20 +14,35 @@
 package org.flowable.engine.impl.el;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import javax.el.FunctionMapper;
 
+import org.flowable.engine.delegate.FlowableFunctionDelegate;
+
 /**
- * Default implementation of a {@link FunctionMapper}.
+ * A date function mapper that can be used in EL expressions
  * 
- * A non-null implementation is required by the javax.el.* classes, hence the reason for this pretty useless class.
- * 
- * @author Joram Barrez
+ * @author Tijs Rademakers
  */
 public class FlowableFunctionMapper extends FunctionMapper {
 
-  public Method resolveFunction(String prefix, String localName) {
-    return null;
-  }
+    protected List<FlowableFunctionDelegate> functionDelegates;
+
+    public FlowableFunctionMapper(List<FlowableFunctionDelegate> functionDelegates) {
+        this.functionDelegates = functionDelegates;
+    }
+
+    public Method resolveFunction(String prefix, String localName) {
+        if (functionDelegates != null) {
+            for (FlowableFunctionDelegate functionDelegate : functionDelegates) {
+                if (functionDelegate.prefix().equals(prefix) && functionDelegate.localName().equals(localName)) {
+                    return functionDelegate.functionMethod();
+                }
+            }
+        }
+
+        return null;
+    }
 
 }

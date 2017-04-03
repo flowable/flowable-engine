@@ -30,39 +30,39 @@ import java.util.Map;
  */
 public class UserTaskExecutionListener implements TaskListener {
 
-  private final String typeToFind;
-  protected final String typeToCreate;
-  private final Collection<SimulationEvent> events;
+    private final String typeToFind;
+    protected final String typeToCreate;
+    private final Collection<SimulationEvent> events;
 
-  public UserTaskExecutionListener(String typeToFind, String typeToCreate, Collection<SimulationEvent> events) {
-    this.typeToFind = typeToFind;
-    this.typeToCreate = typeToCreate;
-    this.events = events;
-  }
-
-  @Override
-  public void notify(DelegateTask delegateTask) {
-    SimulationEvent eventToSimulate = findUserTaskCompleteEvent(delegateTask);
-    if (eventToSimulate != null) {
-      Map<String, Object> properties = new HashMap<String, Object>();
-      properties.put("taskId", delegateTask.getId());
-      properties.put("variables", eventToSimulate.getProperty(UserTaskCompleteTransformer.TASK_VARIABLES));
-      // we were able to resolve event to simulate automatically
-      SimulationEvent e = new SimulationEvent.Builder(typeToCreate).properties(properties).build();
-      SimulationRunContext.getEventCalendar().addEvent(e);
+    public UserTaskExecutionListener(String typeToFind, String typeToCreate, Collection<SimulationEvent> events) {
+        this.typeToFind = typeToFind;
+        this.typeToCreate = typeToCreate;
+        this.events = events;
     }
-  }
 
-  private SimulationEvent findUserTaskCompleteEvent(DelegateTask delegateTask) {
-    if (delegateTask.hasVariable(StartReplayProcessEventHandler.PROCESS_INSTANCE_ID)) {
-      String toSimulateProcessInstanceId = (String) delegateTask.getVariable(StartReplayProcessEventHandler.PROCESS_INSTANCE_ID);
-      String toSimulateTaskDefinitionKey = delegateTask.getTaskDefinitionKey();
-      for (SimulationEvent e : events) {
-        if (typeToFind.equals(e.getType()) && toSimulateProcessInstanceId.equals(e.getProperty(UserTaskCompleteTransformer.PROCESS_INSTANCE_ID))
-            && toSimulateTaskDefinitionKey.equals(e.getProperty(UserTaskCompleteTransformer.TASK_DEFINITION_KEY)))
-          return e;
-      }
+    @Override
+    public void notify(DelegateTask delegateTask) {
+        SimulationEvent eventToSimulate = findUserTaskCompleteEvent(delegateTask);
+        if (eventToSimulate != null) {
+            Map<String, Object> properties = new HashMap<String, Object>();
+            properties.put("taskId", delegateTask.getId());
+            properties.put("variables", eventToSimulate.getProperty(UserTaskCompleteTransformer.TASK_VARIABLES));
+            // we were able to resolve event to simulate automatically
+            SimulationEvent e = new SimulationEvent.Builder(typeToCreate).properties(properties).build();
+            SimulationRunContext.getEventCalendar().addEvent(e);
+        }
     }
-    return null;
-  }
+
+    private SimulationEvent findUserTaskCompleteEvent(DelegateTask delegateTask) {
+        if (delegateTask.hasVariable(StartReplayProcessEventHandler.PROCESS_INSTANCE_ID)) {
+            String toSimulateProcessInstanceId = (String) delegateTask.getVariable(StartReplayProcessEventHandler.PROCESS_INSTANCE_ID);
+            String toSimulateTaskDefinitionKey = delegateTask.getTaskDefinitionKey();
+            for (SimulationEvent e : events) {
+                if (typeToFind.equals(e.getType()) && toSimulateProcessInstanceId.equals(e.getProperty(UserTaskCompleteTransformer.PROCESS_INSTANCE_ID))
+                        && toSimulateTaskDefinitionKey.equals(e.getProperty(UserTaskCompleteTransformer.TASK_DEFINITION_KEY)))
+                    return e;
+            }
+        }
+        return null;
+    }
 }

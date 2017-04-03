@@ -15,37 +15,34 @@ package org.flowable.cdi.impl;
 import org.flowable.cdi.impl.context.ExecutionContextHolder;
 import org.flowable.engine.impl.agenda.AbstractOperation;
 import org.flowable.engine.impl.interceptor.CommandInvoker;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
  * A customized version of the default {@link CommandInvoker} for use with CDI.
  * 
- * The Flowable-CDI integration builds upon the availability of the current execution
- * in a thread local 'execution context'. As this has a (very minimal) impact on 
- * performance, this thread local is not set by the default {@link CommandInvoker}
- * and thus this customized version is needed. 
+ * The Flowable-CDI integration builds upon the availability of the current execution in a thread local 'execution context'. As this has a (very minimal) impact on performance, this thread local is
+ * not set by the default {@link CommandInvoker} and thus this customized version is needed.
  * 
  * @author jbarrez
  */
 public class CdiCommandInvoker extends CommandInvoker {
-  
-  public void executeOperation(Runnable runnable) {
-    
-    boolean executionContextSet = false;
-    if (runnable instanceof AbstractOperation) {
-      AbstractOperation operation = (AbstractOperation) runnable;
-      if (operation.getExecution() != null) {
-        ExecutionContextHolder.setExecutionContext((ExecutionEntity) operation.getExecution());
-        executionContextSet = true;
-      }
+
+    public void executeOperation(Runnable runnable) {
+
+        boolean executionContextSet = false;
+        if (runnable instanceof AbstractOperation) {
+            AbstractOperation operation = (AbstractOperation) runnable;
+            if (operation.getExecution() != null) {
+                ExecutionContextHolder.setExecutionContext(operation.getExecution());
+                executionContextSet = true;
+            }
+        }
+
+        super.executeOperation(runnable);
+
+        if (executionContextSet) {
+            ExecutionContextHolder.removeExecutionContext();
+        }
+
     }
-    
-    super.executeOperation(runnable);
-    
-    if (executionContextSet) {
-      ExecutionContextHolder.removeExecutionContext();
-    }
-    
-  }
 
 }

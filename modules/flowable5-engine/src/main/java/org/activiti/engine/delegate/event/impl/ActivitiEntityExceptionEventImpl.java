@@ -19,32 +19,31 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
 
 /**
- * Base class for all {@link FlowableEvent} implementations, represents an exception occurred, related
- * to an entity.
+ * Base class for all {@link FlowableEvent} implementations, represents an exception occurred, related to an entity.
  * 
  * @author Frederik Heremans
  */
 public class ActivitiEntityExceptionEventImpl extends ActivitiEventImpl implements FlowableEngineEntityEvent, FlowableExceptionEvent {
 
-	protected Object entity;
-	protected Throwable cause;
-	
-	public ActivitiEntityExceptionEventImpl(Object entity, FlowableEngineEventType type, Throwable cause) {
-		super(type);
-		if(entity == null) {
-			throw new ActivitiIllegalArgumentException("Entity cannot be null.");
-		}
-	  this.entity = entity;
-	  this.cause = cause;
-  }
-	
-	@Override
-	public Object getEntity() {
-		return entity;
-	}
+    protected Object entity;
+    protected Throwable cause;
 
-	@Override
-  public Throwable getCause() {
-	  return cause;
-  }
+    public ActivitiEntityExceptionEventImpl(Object entity, FlowableEngineEventType type, Throwable cause) {
+        super(type);
+        if (entity == null) {
+            throw new ActivitiIllegalArgumentException("Entity cannot be null.");
+        }
+        this.entity = entity;
+        this.cause = cause;
+    }
+
+    @Override
+    public Object getEntity() {
+        return entity;
+    }
+
+    @Override
+    public Throwable getCause() {
+        return cause;
+    }
 }

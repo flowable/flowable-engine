@@ -25,18 +25,18 @@ import org.flowable.engine.common.impl.persistence.entity.EntityManager;
  */
 public interface DmnDeploymentEntityManager extends EntityManager<DmnDeploymentEntity> {
 
-  DmnDeploymentEntity findLatestDeploymentByName(String deploymentName);
+    DmnDeploymentEntity findLatestDeploymentByName(String deploymentName);
 
-  List<DmnDeployment> findDeploymentsByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery, Page page);
+    List<DmnDeployment> findDeploymentsByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery, Page page);
 
-  List<String> getDeploymentResourceNames(String deploymentId);
+    List<String> getDeploymentResourceNames(String deploymentId);
 
-  List<DmnDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<DmnDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
 
-  long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap);
+    long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap);
 
-  long findDeploymentCountByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery);
-  
-  void deleteDeployment(String deploymentId);
+    long findDeploymentCountByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery);
+
+    void deleteDeployment(String deploymentId);
 
 }

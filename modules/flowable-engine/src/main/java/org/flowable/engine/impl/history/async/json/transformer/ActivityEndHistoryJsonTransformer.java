@@ -24,32 +24,32 @@ import org.flowable.engine.impl.persistence.entity.JobEntity;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ActivityEndHistoryJsonTransformer extends AbstractNeedsHistoricActivityHistoryJsonTransformer {
-  
-  public static final String TYPE = "activity-end";
 
-  @Override
-  public String getType() {
-    return TYPE;
-  }
+    public static final String TYPE = "activity-end";
 
-  @Override
-  public void transformJson(JobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-    String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
-    String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
-    HistoricActivityInstanceEntity historicActivityInstanceEntity = findUnfinishedHistoricActivityInstance(commandContext, executionId, activityId);
-    if (historicActivityInstanceEntity != null) {
-      Date endTime = getDateFromJson(historicalData, HistoryJsonConstants.END_TIME);
-      historicActivityInstanceEntity.setEndTime(endTime);
-      historicActivityInstanceEntity.setDeleteReason(getStringFromJson(historicalData, HistoryJsonConstants.DELETE_REASON));
-
-      Date startTime = historicActivityInstanceEntity.getStartTime();
-      if (startTime != null && endTime != null) {
-        historicActivityInstanceEntity.setDurationInMillis(endTime.getTime() - startTime.getTime());
-      }
-      
-      dispatchEvent(commandContext, 
-          FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstanceEntity));
+    @Override
+    public String getType() {
+        return TYPE;
     }
-  }
+
+    @Override
+    public void transformJson(JobEntity job, ObjectNode historicalData, CommandContext commandContext) {
+        String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
+        String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
+        HistoricActivityInstanceEntity historicActivityInstanceEntity = findUnfinishedHistoricActivityInstance(commandContext, executionId, activityId);
+        if (historicActivityInstanceEntity != null) {
+            Date endTime = getDateFromJson(historicalData, HistoryJsonConstants.END_TIME);
+            historicActivityInstanceEntity.setEndTime(endTime);
+            historicActivityInstanceEntity.setDeleteReason(getStringFromJson(historicalData, HistoryJsonConstants.DELETE_REASON));
+
+            Date startTime = historicActivityInstanceEntity.getStartTime();
+            if (startTime != null && endTime != null) {
+                historicActivityInstanceEntity.setDurationInMillis(endTime.getTime() - startTime.getTime());
+            }
+
+            dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(
+                            FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstanceEntity));
+        }
+    }
 
 }

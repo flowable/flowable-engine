@@ -24,20 +24,20 @@ import org.flowable.engine.test.Deployment;
  */
 public class WebServiceSimplisticTest extends AbstractWebServiceTaskTest {
 
-  protected boolean isValidating() {
-    return false;
-  }
+    protected boolean isValidating() {
+        return false;
+    }
 
-  @Deployment
-  public void testAsyncInvocationWithSimplisticDataFlow() throws Exception {
-    assertEquals(-1, webServiceMock.getCount());
+    @Deployment
+    public void testAsyncInvocationWithSimplisticDataFlow() throws Exception {
+        assertEquals(-1, webServiceMock.getCount());
 
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("NewCounterValueVariable", 23);
+        Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put("NewCounterValueVariable", 23);
 
-    processEngine.getRuntimeService().startProcessInstanceByKey("asyncWebServiceInvocationWithSimplisticDataFlow", variables);
-    waitForJobExecutorToProcessAllJobs(10000L, 250L);
+        processEngine.getRuntimeService().startProcessInstanceByKey("asyncWebServiceInvocationWithSimplisticDataFlow", variables);
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
 
-    assertEquals(23, webServiceMock.getCount());
-  }
+        assertEquals(23, webServiceMock.getCount());
+    }
 }

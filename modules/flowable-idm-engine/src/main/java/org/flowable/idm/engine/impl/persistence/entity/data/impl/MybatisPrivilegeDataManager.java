@@ -29,40 +29,40 @@ import org.flowable.idm.engine.impl.persistence.entity.data.PrivilegeDataManager
  */
 public class MybatisPrivilegeDataManager extends AbstractDataManager<PrivilegeEntity> implements PrivilegeDataManager {
 
-  public MybatisPrivilegeDataManager(IdmEngineConfiguration idmEngineConfiguration) {
-    super(idmEngineConfiguration);
-  }
+    public MybatisPrivilegeDataManager(IdmEngineConfiguration idmEngineConfiguration) {
+        super(idmEngineConfiguration);
+    }
 
-  @Override
-  public PrivilegeEntity create() {
-    return new PrivilegeEntityImpl();
-  }
+    @Override
+    public PrivilegeEntity create() {
+        return new PrivilegeEntityImpl();
+    }
 
-  @Override
-  public Class<? extends PrivilegeEntity> getManagedEntityClass() {
-    return PrivilegeEntityImpl.class;
-  }
+    @Override
+    public Class<? extends PrivilegeEntity> getManagedEntityClass() {
+        return PrivilegeEntityImpl.class;
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<Privilege> findPrivilegeByQueryCriteria(PrivilegeQueryImpl query, Page page) {
-    return getDbSqlSession().selectList("selectPrivilegeByQueryCriteria", query, page);
-  }
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Privilege> findPrivilegeByQueryCriteria(PrivilegeQueryImpl query, Page page) {
+        return getDbSqlSession().selectList("selectPrivilegeByQueryCriteria", query, page);
+    }
 
-  @Override
-  public long findPrivilegeCountByQueryCriteria(PrivilegeQueryImpl query) {
-    return (Long) getDbSqlSession().selectOne("selectPrivilegeCountByQueryCriteria", query);
-  }
+    @Override
+    public long findPrivilegeCountByQueryCriteria(PrivilegeQueryImpl query) {
+        return (Long) getDbSqlSession().selectOne("selectPrivilegeCountByQueryCriteria", query);
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<Privilege> findPrivilegeByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return getDbSqlSession().selectListWithRawParameter("selectPrivilegeByNativeQuery", parameterMap, firstResult, maxResults);
-  }
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Privilege> findPrivilegeByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
+        return getDbSqlSession().selectListWithRawParameter("selectPrivilegeByNativeQuery", parameterMap, firstResult, maxResults);
+    }
 
-  @Override
-  public long findPrivilegeCountByNativeQuery(Map<String, Object> parameterMap) {
-    return (Long) getDbSqlSession().selectOne("selectPrivilegeCountByNativeQuery", parameterMap);
-  }
+    @Override
+    public long findPrivilegeCountByNativeQuery(Map<String, Object> parameterMap) {
+        return (Long) getDbSqlSession().selectOne("selectPrivilegeCountByNativeQuery", parameterMap);
+    }
 
 }

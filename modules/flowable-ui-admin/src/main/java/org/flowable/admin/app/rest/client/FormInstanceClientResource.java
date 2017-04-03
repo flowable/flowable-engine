@@ -36,41 +36,41 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @RestController
 public class FormInstanceClientResource extends AbstractClientResource {
-  
-  private static final Logger logger = LoggerFactory.getLogger(FormInstanceClientResource.class);
 
-  @Autowired
-  protected FormInstanceService clientService;
+    private static final Logger logger = LoggerFactory.getLogger(FormInstanceClientResource.class);
 
-  @Autowired
-  protected ObjectMapper objectMapper;
+    @Autowired
+    protected FormInstanceService clientService;
 
-  @RequestMapping(value = "/rest/admin/form-instances/{formInstanceId}", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getFormInstance(HttpServletRequest request, @PathVariable String formInstanceId) {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
-    return clientService.getFormInstance(serverConfig, formInstanceId);
-  }
+    @Autowired
+    protected ObjectMapper objectMapper;
 
-  @RequestMapping(value = "/rest/admin/task-form-instance/{taskId}", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getTaskFormInstance(@PathVariable String taskId) {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
-
-    try {
-      ObjectNode bodyNode = objectMapper.createObjectNode();
-      bodyNode.put("taskId", taskId);
-
-      return clientService.getFormInstances(serverConfig, bodyNode);
-
-    } catch (FlowableServiceException e) {
-      logger.error("Error getting form instance for task id {}", taskId, e);
-      throw new BadRequestException(e.getMessage());
+    @RequestMapping(value = "/rest/admin/form-instances/{formInstanceId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getFormInstance(HttpServletRequest request, @PathVariable String formInstanceId) {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+        return clientService.getFormInstance(serverConfig, formInstanceId);
     }
-  }
 
-  @RequestMapping(value = "/rest/admin/form-instances/{formInstanceId}/form-field-values", method = RequestMethod.GET, produces = "application/json")
-  public JsonNode getFormInstanceFormFieldValues(HttpServletRequest request, @PathVariable String formInstanceId) {
-    ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
-    return clientService.getFormInstanceFormFieldValues(serverConfig, formInstanceId);
-  }
+    @RequestMapping(value = "/rest/admin/task-form-instance/{taskId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getTaskFormInstance(@PathVariable String taskId) {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+
+        try {
+            ObjectNode bodyNode = objectMapper.createObjectNode();
+            bodyNode.put("taskId", taskId);
+
+            return clientService.getFormInstances(serverConfig, bodyNode);
+
+        } catch (FlowableServiceException e) {
+            logger.error("Error getting form instance for task id {}", taskId, e);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/rest/admin/form-instances/{formInstanceId}/form-field-values", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getFormInstanceFormFieldValues(HttpServletRequest request, @PathVariable String formInstanceId) {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+        return clientService.getFormInstanceFormFieldValues(serverConfig, formInstanceId);
+    }
 
 }

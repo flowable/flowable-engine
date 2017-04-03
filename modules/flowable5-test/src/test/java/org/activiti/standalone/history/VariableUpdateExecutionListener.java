@@ -13,22 +13,20 @@
 
 package org.activiti.standalone.history;
 
-
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.Expression;
-
 
 /**
  * @author Frederik Heremans
  */
 public class VariableUpdateExecutionListener implements ExecutionListener {
 
-  private Expression varName;
-  
-  public void notify(DelegateExecution execution) {
-    String variableName = (String) varName.getValue(execution);
-    execution.setVariable(variableName, "Event: " + execution.getEventName());
-  }
- 
+    private Expression varName;
+
+    public void notify(DelegateExecution execution) {
+        String variableName = (String) varName.getValue(execution);
+        execution.setVariable(variableName, "Event: " + execution.getEventName());
+    }
+
 }

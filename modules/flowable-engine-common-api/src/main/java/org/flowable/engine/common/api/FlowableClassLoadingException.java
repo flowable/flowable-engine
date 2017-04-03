@@ -20,27 +20,27 @@ package org.flowable.engine.common.api;
  */
 public class FlowableClassLoadingException extends FlowableException {
 
-  private static final long serialVersionUID = 1L;
-  protected String className;
+    private static final long serialVersionUID = 1L;
+    protected String className;
 
-  public FlowableClassLoadingException(String className, Throwable cause) {
-    super(getExceptionMessageMessage(className, cause), cause);
-    this.className = className;
-  }
-
-  /**
-   * Returns the name of the class this exception is related to.
-   */
-  public String getClassName() {
-    return className;
-  }
-
-  private static String getExceptionMessageMessage(String className, Throwable cause) {
-    if (cause instanceof ClassNotFoundException) {
-      return "Class not found: " + className;
-    } else {
-      return "Could not load class: " + className;
+    public FlowableClassLoadingException(String className, Throwable cause) {
+        super(getExceptionMessageMessage(className, cause), cause);
+        this.className = className;
     }
-  }
+
+    /**
+     * Returns the name of the class this exception is related to.
+     */
+    public String getClassName() {
+        return className;
+    }
+
+    private static String getExceptionMessageMessage(String className, Throwable cause) {
+        if (cause instanceof ClassNotFoundException) {
+            return "Class not found: " + className;
+        } else {
+            return "Could not load class: " + className;
+        }
+    }
 
 }

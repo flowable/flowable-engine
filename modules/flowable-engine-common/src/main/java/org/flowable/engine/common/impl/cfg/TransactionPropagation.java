@@ -19,6 +19,6 @@ package org.flowable.engine.common.impl.cfg;
  */
 public enum TransactionPropagation {
 
-  REQUIRED, REQUIRES_NEW, NOT_SUPPORTED,
+    REQUIRED, REQUIRES_NEW, NOT_SUPPORTED,
 
 }

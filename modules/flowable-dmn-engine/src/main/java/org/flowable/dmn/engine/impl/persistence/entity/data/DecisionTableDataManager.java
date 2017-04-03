@@ -15,7 +15,7 @@ package org.flowable.dmn.engine.impl.persistence.entity.data;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.dmn.api.DecisionTable;
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.engine.impl.DecisionTableQueryImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.engine.common.impl.Page;
@@ -26,33 +26,33 @@ import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
  */
 public interface DecisionTableDataManager extends DataManager<DecisionTableEntity> {
 
-  DecisionTableEntity findLatestDecisionTableByKey(String decisionTableKey);
+    DecisionTableEntity findLatestDecisionTableByKey(String decisionTableKey);
 
-  DecisionTableEntity findLatestDecisionTableByKeyAndTenantId(String decisionTableKey, String tenantId);
-  
-  DecisionTableEntity findLatestDecisionTableByKeyAndParentDeploymentId(String decisionTableKey, String parentDeploymentId);
-  
-  DecisionTableEntity findLatestDecisionTableByKeyParentDeploymentIdAndTenantId(String decisionTableKey, 
-      String parentDeploymentId, String tenantId);
+    DecisionTableEntity findLatestDecisionTableByKeyAndTenantId(String decisionTableKey, String tenantId);
 
-  void deleteDecisionTablesByDeploymentId(String deploymentId);
+    DecisionTableEntity findLatestDecisionTableByKeyAndParentDeploymentId(String decisionTableKey, String parentDeploymentId);
 
-  List<DecisionTable> findDecisionTablesByQueryCriteria(DecisionTableQueryImpl decisionTableQuery, Page page);
+    DecisionTableEntity findLatestDecisionTableByKeyParentDeploymentIdAndTenantId(String decisionTableKey,
+            String parentDeploymentId, String tenantId);
 
-  long findDecisionTableCountByQueryCriteria(DecisionTableQueryImpl decisionTableQuery);
+    void deleteDecisionTablesByDeploymentId(String deploymentId);
 
-  DecisionTableEntity findDecisionTableByDeploymentAndKey(String deploymentId, String decisionTableKey);
+    List<DmnDecisionTable> findDecisionTablesByQueryCriteria(DecisionTableQueryImpl decisionTableQuery, Page page);
 
-  DecisionTableEntity findDecisionTableByDeploymentAndKeyAndTenantId(String deploymentId, String decisionTableKey, String tenantId);
+    long findDecisionTableCountByQueryCriteria(DecisionTableQueryImpl decisionTableQuery);
 
-  DecisionTableEntity findDecisionTableByKeyAndVersion(String decisionTableKey, Integer decisionTableVersion);
-  
-  DecisionTableEntity findDecisionTableByKeyAndVersionAndTenantId(String decisionTableKey, Integer decisionTableVersion, String tenantId);
+    DecisionTableEntity findDecisionTableByDeploymentAndKey(String deploymentId, String decisionTableKey);
 
-  List<DecisionTable> findDecisionTablesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    DecisionTableEntity findDecisionTableByDeploymentAndKeyAndTenantId(String deploymentId, String decisionTableKey, String tenantId);
 
-  long findDecisionTableCountByNativeQuery(Map<String, Object> parameterMap);
+    DecisionTableEntity findDecisionTableByKeyAndVersion(String decisionTableKey, Integer decisionTableVersion);
 
-  void updateDecisionTableTenantIdForDeployment(String deploymentId, String newTenantId);
-  
+    DecisionTableEntity findDecisionTableByKeyAndVersionAndTenantId(String decisionTableKey, Integer decisionTableVersion, String tenantId);
+
+    List<DmnDecisionTable> findDecisionTablesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+
+    long findDecisionTableCountByNativeQuery(Map<String, Object> parameterMap);
+
+    void updateDecisionTableTenantIdForDeployment(String deploymentId, String newTenantId);
+
 }

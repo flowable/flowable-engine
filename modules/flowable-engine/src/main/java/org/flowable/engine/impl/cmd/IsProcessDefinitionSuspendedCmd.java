@@ -26,20 +26,20 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
  */
 public class IsProcessDefinitionSuspendedCmd implements Command<Boolean>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String processDefinitionId;
+    private static final long serialVersionUID = 1L;
+    protected String processDefinitionId;
 
-  public IsProcessDefinitionSuspendedCmd(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
-
-  public Boolean execute(CommandContext commandContext) {
-    // Backwards compatibility
-    if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processDefinitionId)) {
-      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      return compatibilityHandler.isProcessDefinitionSuspended(processDefinitionId);
+    public IsProcessDefinitionSuspendedCmd(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
     }
-    
-    return ProcessDefinitionUtil.isProcessDefinitionSuspended(processDefinitionId);
-  }
+
+    public Boolean execute(CommandContext commandContext) {
+        // Backwards compatibility
+        if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processDefinitionId)) {
+            Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+            return compatibilityHandler.isProcessDefinitionSuspended(processDefinitionId);
+        }
+
+        return ProcessDefinitionUtil.isProcessDefinitionSuspended(processDefinitionId);
+    }
 }

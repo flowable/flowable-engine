@@ -22,25 +22,25 @@ import org.flowable.cdi.annotation.StartProcess;
  */
 public class DeclarativeProcessController {
 
-  @ProcessVariable
-  String name; // this is going to be set as a process variable
+    @ProcessVariable
+    String name; // this is going to be set as a process variable
 
-  @StartProcess(name = "Name of the Process")
-  public void startProcessByName() {
-    name = "Activiti";
-  }
+    @StartProcess(name = "Name of the Process")
+    public void startProcessByName() {
+        name = "Flowable";
+    }
 
-  @StartProcess("keyOfTheProcess")
-  public void startProcessByKey() {
-    name = "Activiti";
-  }
+    @StartProcess("keyOfTheProcess")
+    public void startProcessByKey() {
+        name = "Flowable";
+    }
 
-  @CompleteTask(endConversation = false)
-  public void completeTask() {
-  }
+    @CompleteTask(endConversation = false)
+    public void completeTask() {
+    }
 
-  @CompleteTask(endConversation = true)
-  public void completeTaskEndConversation() {
-  }
+    @CompleteTask(endConversation = true)
+    public void completeTaskEndConversation() {
+    }
 
 }

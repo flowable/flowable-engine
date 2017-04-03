@@ -43,147 +43,147 @@ import org.slf4j.LoggerFactory;
  */
 public class FormDefinitionParse {
 
-  protected static final Logger LOGGER = LoggerFactory.getLogger(FormDefinitionParse.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(FormDefinitionParse.class);
 
-  protected String name;
+    protected String name;
 
-  protected boolean validateSchema = true;
+    protected boolean validateSchema = true;
 
-  protected StreamSource streamSource;
-  protected String sourceSystemId;
+    protected StreamSource streamSource;
+    protected String sourceSystemId;
 
-  protected FormModel formModel;
+    protected FormModel formModel;
 
-  protected String targetNamespace;
+    protected String targetNamespace;
 
-  /** The deployment to which the parsed decision tables will be added. */
-  protected FormDeploymentEntity deployment;
+    /** The deployment to which the parsed decision tables will be added. */
+    protected FormDeploymentEntity deployment;
 
-  /** The end result of the parsing: a list of decision tables. */
-  protected List<FormDefinitionEntity> formDefinitions = new ArrayList<FormDefinitionEntity>();
+    /** The end result of the parsing: a list of decision tables. */
+    protected List<FormDefinitionEntity> formDefinitions = new ArrayList<FormDefinitionEntity>();
 
-  public FormDefinitionParse deployment(FormDeploymentEntity deployment) {
-    this.deployment = deployment;
-    return this;
-  }
-
-  public FormDefinitionParse execute(FormEngineConfiguration formEngineConfig) {
-    String encoding = formEngineConfig.getXmlEncoding();
-    FormJsonConverter converter = new FormJsonConverter();
-    
-    try {
-      InputStreamReader in = null;
-      if (encoding != null) {
-        in = new InputStreamReader(streamSource.getInputStream(), encoding);
-      } else {
-        in = new InputStreamReader(streamSource.getInputStream());
-      }
-    
-      String formJson = IOUtils.toString(in);
-      formModel = converter.convertToFormModel(formJson, null, 1);
-  
-      if (formModel != null && formModel.getFields() != null) {
-        FormDefinitionEntity formDefinitionEntity = Context.getFormEngineConfiguration().getFormDefinitionEntityManager().create();
-        formDefinitionEntity.setKey(formModel.getKey());
-        formDefinitionEntity.setName(formModel.getName());
-        formDefinitionEntity.setResourceName(name);
-        formDefinitionEntity.setDeploymentId(deployment.getId());
-        formDefinitionEntity.setParentDeploymentId(deployment.getParentDeploymentId());
-        formDefinitionEntity.setDescription(formModel.getDescription());
-        formDefinitions.add(formDefinitionEntity);
-      }
-    } catch(Exception e) {
-      throw new FlowableException("Error parsing form definition JSON", e);
+    public FormDefinitionParse deployment(FormDeploymentEntity deployment) {
+        this.deployment = deployment;
+        return this;
     }
-    return this;
-  }
 
-  public FormDefinitionParse name(String name) {
-    this.name = name;
-    return this;
-  }
+    public FormDefinitionParse execute(FormEngineConfiguration formEngineConfig) {
+        String encoding = formEngineConfig.getXmlEncoding();
+        FormJsonConverter converter = new FormJsonConverter();
 
-  public FormDefinitionParse sourceInputStream(InputStream inputStream) {
-    if (name == null) {
-        name("inputStream");
+        try {
+            InputStreamReader in = null;
+            if (encoding != null) {
+                in = new InputStreamReader(streamSource.getInputStream(), encoding);
+            } else {
+                in = new InputStreamReader(streamSource.getInputStream());
+            }
+
+            String formJson = IOUtils.toString(in);
+            formModel = converter.convertToFormModel(formJson, null, 1);
+
+            if (formModel != null && formModel.getFields() != null) {
+                FormDefinitionEntity formDefinitionEntity = Context.getFormEngineConfiguration().getFormDefinitionEntityManager().create();
+                formDefinitionEntity.setKey(formModel.getKey());
+                formDefinitionEntity.setName(formModel.getName());
+                formDefinitionEntity.setResourceName(name);
+                formDefinitionEntity.setDeploymentId(deployment.getId());
+                formDefinitionEntity.setParentDeploymentId(deployment.getParentDeploymentId());
+                formDefinitionEntity.setDescription(formModel.getDescription());
+                formDefinitions.add(formDefinitionEntity);
+            }
+        } catch (Exception e) {
+            throw new FlowableException("Error parsing form definition JSON", e);
+        }
+        return this;
     }
-    setStreamSource(new InputStreamSource(inputStream));
-    return this;
-  }
 
-  public FormDefinitionParse sourceUrl(URL url) {
-    if (name == null) {
-      name(url.toString());
+    public FormDefinitionParse name(String name) {
+        this.name = name;
+        return this;
     }
-    setStreamSource(new UrlStreamSource(url));
-    return this;
-  }
 
-  public FormDefinitionParse sourceUrl(String url) {
-    try {
-      return sourceUrl(new URL(url));
-    } catch (MalformedURLException e) {
-      throw new FlowableException("malformed url: " + url, e);
+    public FormDefinitionParse sourceInputStream(InputStream inputStream) {
+        if (name == null) {
+            name("inputStream");
+        }
+        setStreamSource(new InputStreamSource(inputStream));
+        return this;
     }
-  }
 
-  public FormDefinitionParse sourceResource(String resource) {
-    if (name == null) {
-      name(resource);
+    public FormDefinitionParse sourceUrl(URL url) {
+        if (name == null) {
+            name(url.toString());
+        }
+        setStreamSource(new UrlStreamSource(url));
+        return this;
     }
-    setStreamSource(new ResourceStreamSource(resource));
-    return this;
-  }
 
-  public FormDefinitionParse sourceString(String string) {
-    if (name == null) {
-      name("string");
+    public FormDefinitionParse sourceUrl(String url) {
+        try {
+            return sourceUrl(new URL(url));
+        } catch (MalformedURLException e) {
+            throw new FlowableException("malformed url: " + url, e);
+        }
     }
-    setStreamSource(new StringStreamSource(string));
-    return this;
-  }
 
-  protected void setStreamSource(StreamSource streamSource) {
-    if (this.streamSource != null) {
-      throw new FlowableException("invalid: multiple sources " + this.streamSource + " and " + streamSource);
+    public FormDefinitionParse sourceResource(String resource) {
+        if (name == null) {
+            name(resource);
+        }
+        setStreamSource(new ResourceStreamSource(resource));
+        return this;
     }
-    this.streamSource = streamSource;
-  }
 
-  public String getSourceSystemId() {
-    return sourceSystemId;
-  }
+    public FormDefinitionParse sourceString(String string) {
+        if (name == null) {
+            name("string");
+        }
+        setStreamSource(new StringStreamSource(string));
+        return this;
+    }
 
-  public FormDefinitionParse setSourceSystemId(String sourceSystemId) {
-    this.sourceSystemId = sourceSystemId;
-    return this;
-  }
+    protected void setStreamSource(StreamSource streamSource) {
+        if (this.streamSource != null) {
+            throw new FlowableException("invalid: multiple sources " + this.streamSource + " and " + streamSource);
+        }
+        this.streamSource = streamSource;
+    }
 
-  /*
-   * ------------------- GETTERS AND SETTERS -------------------
-   */
+    public String getSourceSystemId() {
+        return sourceSystemId;
+    }
 
-  public List<FormDefinitionEntity> getFormDefinitions() {
-    return formDefinitions;
-  }
+    public FormDefinitionParse setSourceSystemId(String sourceSystemId) {
+        this.sourceSystemId = sourceSystemId;
+        return this;
+    }
 
-  public String getTargetNamespace() {
-    return targetNamespace;
-  }
+    /*
+     * ------------------- GETTERS AND SETTERS -------------------
+     */
 
-  public FormDeploymentEntity getDeployment() {
-    return deployment;
-  }
+    public List<FormDefinitionEntity> getFormDefinitions() {
+        return formDefinitions;
+    }
 
-  public void setDeployment(FormDeploymentEntity deployment) {
-    this.deployment = deployment;
-  }
+    public String getTargetNamespace() {
+        return targetNamespace;
+    }
 
-  public FormModel getFormModel() {
-    return formModel;
-  }
+    public FormDeploymentEntity getDeployment() {
+        return deployment;
+    }
 
-  public void setFormModel(FormModel formModel) {
-    this.formModel = formModel;
-  }
+    public void setDeployment(FormDeploymentEntity deployment) {
+        this.deployment = deployment;
+    }
+
+    public FormModel getFormModel() {
+        return formModel;
+    }
+
+    public void setFormModel(FormModel formModel) {
+        this.formModel = formModel;
+    }
 }

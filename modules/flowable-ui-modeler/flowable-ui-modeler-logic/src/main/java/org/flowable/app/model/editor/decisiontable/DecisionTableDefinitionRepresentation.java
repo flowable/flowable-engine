@@ -32,7 +32,7 @@ public class DecisionTableDefinitionRepresentation {
     protected String completenessIndicator;
     protected List<DecisionTableExpressionRepresentation> inputExpressions;
     protected List<DecisionTableExpressionRepresentation> outputExpressions;
-    protected List<Map<String,Object>> rules;
+    protected List<Map<String, Object>> rules;
 
     public String getId() {
         return id;
@@ -57,11 +57,11 @@ public class DecisionTableDefinitionRepresentation {
     public void setKey(String key) {
         this.key = key;
     }
-    
+
     public String getDescription() {
         return description;
     }
-    
+
     public void setDescription(String description) {
         this.description = description;
     }

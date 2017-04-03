@@ -27,135 +27,135 @@ import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
  */
 public class ModelEntityImpl extends AbstractEntity implements ModelEntity, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String name;
-  protected String key;
-  protected String category;
-  protected Date createTime;
-  protected Date lastUpdateTime;
-  protected Integer version = 1;
-  protected String metaInfo;
-  protected String deploymentId;
-  protected String editorSourceValueId;
-  protected String editorSourceExtraValueId;
-  protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
-  
-  public ModelEntityImpl() {
-    
-  }
+    protected String name;
+    protected String key;
+    protected String category;
+    protected Date createTime;
+    protected Date lastUpdateTime;
+    protected Integer version = 1;
+    protected String metaInfo;
+    protected String deploymentId;
+    protected String editorSourceValueId;
+    protected String editorSourceExtraValueId;
+    protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
 
-  public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
-    persistentState.put("name", this.name);
-    persistentState.put("key", key);
-    persistentState.put("category", this.category);
-    persistentState.put("createTime", this.createTime);
-    persistentState.put("lastUpdateTime", lastUpdateTime);
-    persistentState.put("version", this.version);
-    persistentState.put("metaInfo", this.metaInfo);
-    persistentState.put("deploymentId", deploymentId);
-    persistentState.put("editorSourceValueId", this.editorSourceValueId);
-    persistentState.put("editorSourceExtraValueId", this.editorSourceExtraValueId);
-    return persistentState;
-  }
+    public ModelEntityImpl() {
 
-  // getters and setters ////////////////////////////////////////////////////////
+    }
 
-  public String getName() {
-    return name;
-  }
+    public Object getPersistentState() {
+        Map<String, Object> persistentState = new HashMap<String, Object>();
+        persistentState.put("name", this.name);
+        persistentState.put("key", key);
+        persistentState.put("category", this.category);
+        persistentState.put("createTime", this.createTime);
+        persistentState.put("lastUpdateTime", lastUpdateTime);
+        persistentState.put("version", this.version);
+        persistentState.put("metaInfo", this.metaInfo);
+        persistentState.put("deploymentId", deploymentId);
+        persistentState.put("editorSourceValueId", this.editorSourceValueId);
+        persistentState.put("editorSourceExtraValueId", this.editorSourceExtraValueId);
+        return persistentState;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    // getters and setters ////////////////////////////////////////////////////////
 
-  public String getKey() {
-    return key;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setKey(String key) {
-    this.key = key;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public String getCategory() {
-    return category;
-  }
+    public String getKey() {
+        return key;
+    }
 
-  public void setCategory(String category) {
-    this.category = category;
-  }
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-  public Date getCreateTime() {
-    return createTime;
-  }
+    public String getCategory() {
+        return category;
+    }
 
-  public void setCreateTime(Date createTime) {
-    this.createTime = createTime;
-  }
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
-  public Date getLastUpdateTime() {
-    return lastUpdateTime;
-  }
+    public Date getCreateTime() {
+        return createTime;
+    }
 
-  public void setLastUpdateTime(Date lastUpdateTime) {
-    this.lastUpdateTime = lastUpdateTime;
-  }
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
-  public Integer getVersion() {
-    return version;
-  }
+    public Date getLastUpdateTime() {
+        return lastUpdateTime;
+    }
 
-  public void setVersion(Integer version) {
-    this.version = version;
-  }
+    public void setLastUpdateTime(Date lastUpdateTime) {
+        this.lastUpdateTime = lastUpdateTime;
+    }
 
-  public String getMetaInfo() {
-    return metaInfo;
-  }
+    public Integer getVersion() {
+        return version;
+    }
 
-  public void setMetaInfo(String metaInfo) {
-    this.metaInfo = metaInfo;
-  }
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
 
-  public String getDeploymentId() {
-    return deploymentId;
-  }
+    public String getMetaInfo() {
+        return metaInfo;
+    }
 
-  public void setDeploymentId(String deploymentId) {
-    this.deploymentId = deploymentId;
-  }
+    public void setMetaInfo(String metaInfo) {
+        this.metaInfo = metaInfo;
+    }
 
-  public String getEditorSourceValueId() {
-    return editorSourceValueId;
-  }
+    public String getDeploymentId() {
+        return deploymentId;
+    }
 
-  public void setEditorSourceValueId(String editorSourceValueId) {
-    this.editorSourceValueId = editorSourceValueId;
-  }
+    public void setDeploymentId(String deploymentId) {
+        this.deploymentId = deploymentId;
+    }
 
-  public String getEditorSourceExtraValueId() {
-    return editorSourceExtraValueId;
-  }
+    public String getEditorSourceValueId() {
+        return editorSourceValueId;
+    }
 
-  public void setEditorSourceExtraValueId(String editorSourceExtraValueId) {
-    this.editorSourceExtraValueId = editorSourceExtraValueId;
-  }
+    public void setEditorSourceValueId(String editorSourceValueId) {
+        this.editorSourceValueId = editorSourceValueId;
+    }
 
-  public String getTenantId() {
-    return tenantId;
-  }
+    public String getEditorSourceExtraValueId() {
+        return editorSourceExtraValueId;
+    }
 
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
+    public void setEditorSourceExtraValueId(String editorSourceExtraValueId) {
+        this.editorSourceExtraValueId = editorSourceExtraValueId;
+    }
 
-  public boolean hasEditorSource() {
-    return this.editorSourceValueId != null;
-  }
+    public String getTenantId() {
+        return tenantId;
+    }
 
-  public boolean hasEditorSourceExtra() {
-    return this.editorSourceExtraValueId != null;
-  }
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public boolean hasEditorSource() {
+        return this.editorSourceValueId != null;
+    }
+
+    public boolean hasEditorSourceExtra() {
+        return this.editorSourceExtraValueId != null;
+    }
 
 }

@@ -19,76 +19,76 @@ import java.util.Map;
  */
 public class FormRequest {
 
-  private String formInstanceId;
-  private String formDefinitionId;
-  private String formDefinitionKey;
-  private String processInstanceId;
-  private String taskId;
-  private String tenantId;
-  private String parentDeploymentId;
-  private Map<String, Object> variables;
+    private String formInstanceId;
+    private String formDefinitionId;
+    private String formDefinitionKey;
+    private String processInstanceId;
+    private String taskId;
+    private String tenantId;
+    private String parentDeploymentId;
+    private Map<String, Object> variables;
 
-  public String getFormInstanceId() {
-    return formInstanceId;
-  }
+    public String getFormInstanceId() {
+        return formInstanceId;
+    }
 
-  public void setFormInstanceId(String formInstanceId) {
-    this.formInstanceId = formInstanceId;
-  }
+    public void setFormInstanceId(String formInstanceId) {
+        this.formInstanceId = formInstanceId;
+    }
 
-  public String getFormDefinitionId() {
-    return formDefinitionId;
-  }
+    public String getFormDefinitionId() {
+        return formDefinitionId;
+    }
 
-  public void setFormDefinitionId(String formDefinitionId) {
-    this.formDefinitionId = formDefinitionId;
-  }
+    public void setFormDefinitionId(String formDefinitionId) {
+        this.formDefinitionId = formDefinitionId;
+    }
 
-  public String getFormDefinitionKey() {
-    return formDefinitionKey;
-  }
+    public String getFormDefinitionKey() {
+        return formDefinitionKey;
+    }
 
-  public void setFormDefinitionKey(String formDefinitionKey) {
-    this.formDefinitionKey = formDefinitionKey;
-  }
+    public void setFormDefinitionKey(String formDefinitionKey) {
+        this.formDefinitionKey = formDefinitionKey;
+    }
 
-  public String getProcessInstanceId() {
-    return processInstanceId;
-  }
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
 
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
 
-  public String getTaskId() {
-    return taskId;
-  }
+    public String getTaskId() {
+        return taskId;
+    }
 
-  public void setTaskId(String taskId) {
-    this.taskId = taskId;
-  }
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
 
-  public String getTenantId() {
-    return tenantId;
-  }
+    public String getTenantId() {
+        return tenantId;
+    }
 
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
 
-  public String getParentDeploymentId() {
-    return parentDeploymentId;
-  }
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
+    }
 
-  public void setParentDeploymentId(String parentDeploymentId) {
-    this.parentDeploymentId = parentDeploymentId;
-  }
+    public void setParentDeploymentId(String parentDeploymentId) {
+        this.parentDeploymentId = parentDeploymentId;
+    }
 
-  public Map<String, Object> getVariables() {
-    return variables;
-  }
+    public Map<String, Object> getVariables() {
+        return variables;
+    }
 
-  public void setVariables(Map<String, Object> variables) {
-    this.variables = variables;
-  }
+    public void setVariables(Map<String, Object> variables) {
+        this.variables = variables;
+    }
 }

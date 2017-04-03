@@ -21,77 +21,76 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.AbstractManager;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
-
 /**
  * @author Tijs Rademakers
  */
 public class ProcessDefinitionInfoEntityManager extends AbstractManager {
 
-  public void insertProcessDefinitionInfo(ProcessDefinitionInfoEntity processDefinitionInfo) {
-    getDbSqlSession().insert((PersistentObject) processDefinitionInfo);
-    
-    if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-      Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinitionInfo));
-      Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, processDefinitionInfo));
-    }
-  }
+    public void insertProcessDefinitionInfo(ProcessDefinitionInfoEntity processDefinitionInfo) {
+        getDbSqlSession().insert((PersistentObject) processDefinitionInfo);
 
-  public void updateProcessDefinitionInfo(ProcessDefinitionInfoEntity updatedProcessDefinitionInfo) {
-    CommandContext commandContext = Context.getCommandContext();
-    DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
-    dbSqlSession.update(updatedProcessDefinitionInfo);
-    
-    if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-      Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-          ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, updatedProcessDefinitionInfo));
+        if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinitionInfo));
+            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, processDefinitionInfo));
+        }
     }
-  }
 
-  public void deleteProcessDefinitionInfo(String processDefinitionId) {
-    ProcessDefinitionInfoEntity processDefinitionInfo = findProcessDefinitionInfoByProcessDefinitionId(processDefinitionId);
-    if (processDefinitionInfo != null) {
-      getDbSqlSession().delete(processDefinitionInfo);
-      deleteInfoJson(processDefinitionInfo);
-      
-      if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-        Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, processDefinitionInfo));
-      }
-    }
-  }
-  
-  public void updateInfoJson(String id, byte[] json) {
-    ProcessDefinitionInfoEntity processDefinitionInfo = getDbSqlSession().selectById(ProcessDefinitionInfoEntity.class, id);
-    if (processDefinitionInfo != null) {
-      ByteArrayRef ref = new ByteArrayRef(processDefinitionInfo.getInfoJsonId());
-      ref.setValue("json", json);
-      
-      if (processDefinitionInfo.getInfoJsonId() == null) {
-        processDefinitionInfo.setInfoJsonId(ref.getId());
-        updateProcessDefinitionInfo(processDefinitionInfo);
-      }
-    }
-  }
-  
-  public void deleteInfoJson(ProcessDefinitionInfoEntity processDefinitionInfo) {
-    if (processDefinitionInfo.getInfoJsonId() != null) {
-      ByteArrayRef ref = new ByteArrayRef(processDefinitionInfo.getInfoJsonId());
-      ref.delete();
-    }
-  }
+    public void updateProcessDefinitionInfo(ProcessDefinitionInfoEntity updatedProcessDefinitionInfo) {
+        CommandContext commandContext = Context.getCommandContext();
+        DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
+        dbSqlSession.update(updatedProcessDefinitionInfo);
 
-  public ProcessDefinitionInfoEntity findProcessDefinitionInfoById(String id) {
-    return (ProcessDefinitionInfoEntity) getDbSqlSession().selectOne("selectProcessDefinitionInfo", id);
-  }
-  
-  public ProcessDefinitionInfoEntity findProcessDefinitionInfoByProcessDefinitionId(String processDefinitionId) {
-    return (ProcessDefinitionInfoEntity) getDbSqlSession().selectOne("selectProcessDefinitionInfoByProcessDefinitionId", processDefinitionId);
-  }
-  
-  public byte[] findInfoJsonById(String infoJsonId) {
-    ByteArrayRef ref = new ByteArrayRef(infoJsonId);
-    return ref.getBytes();
-  }
+        if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, updatedProcessDefinitionInfo));
+        }
+    }
+
+    public void deleteProcessDefinitionInfo(String processDefinitionId) {
+        ProcessDefinitionInfoEntity processDefinitionInfo = findProcessDefinitionInfoByProcessDefinitionId(processDefinitionId);
+        if (processDefinitionInfo != null) {
+            getDbSqlSession().delete(processDefinitionInfo);
+            deleteInfoJson(processDefinitionInfo);
+
+            if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+                Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, processDefinitionInfo));
+            }
+        }
+    }
+
+    public void updateInfoJson(String id, byte[] json) {
+        ProcessDefinitionInfoEntity processDefinitionInfo = getDbSqlSession().selectById(ProcessDefinitionInfoEntity.class, id);
+        if (processDefinitionInfo != null) {
+            ByteArrayRef ref = new ByteArrayRef(processDefinitionInfo.getInfoJsonId());
+            ref.setValue("json", json);
+
+            if (processDefinitionInfo.getInfoJsonId() == null) {
+                processDefinitionInfo.setInfoJsonId(ref.getId());
+                updateProcessDefinitionInfo(processDefinitionInfo);
+            }
+        }
+    }
+
+    public void deleteInfoJson(ProcessDefinitionInfoEntity processDefinitionInfo) {
+        if (processDefinitionInfo.getInfoJsonId() != null) {
+            ByteArrayRef ref = new ByteArrayRef(processDefinitionInfo.getInfoJsonId());
+            ref.delete();
+        }
+    }
+
+    public ProcessDefinitionInfoEntity findProcessDefinitionInfoById(String id) {
+        return (ProcessDefinitionInfoEntity) getDbSqlSession().selectOne("selectProcessDefinitionInfo", id);
+    }
+
+    public ProcessDefinitionInfoEntity findProcessDefinitionInfoByProcessDefinitionId(String processDefinitionId) {
+        return (ProcessDefinitionInfoEntity) getDbSqlSession().selectOne("selectProcessDefinitionInfoByProcessDefinitionId", processDefinitionId);
+    }
+
+    public byte[] findInfoJsonById(String infoJsonId) {
+        ByteArrayRef ref = new ByteArrayRef(infoJsonId);
+        return ref.getBytes();
+    }
 }

@@ -23,34 +23,34 @@ import org.flowable.engine.impl.interceptor.CommandContext;
  */
 public class GetEventLogEntriesCmd implements Command<List<EventLogEntry>> {
 
-  protected String processInstanceId;
-  protected Long startLogNr;
-  protected Long pageSize;
+    protected String processInstanceId;
+    protected Long startLogNr;
+    protected Long pageSize;
 
-  public GetEventLogEntriesCmd() {
+    public GetEventLogEntriesCmd() {
 
-  }
-
-  public GetEventLogEntriesCmd(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
-
-  public GetEventLogEntriesCmd(Long startLogNr, Long pageSize) {
-    this.startLogNr = startLogNr;
-    this.pageSize = pageSize;
-  }
-
-  @Override
-  public List<EventLogEntry> execute(CommandContext commandContext) {
-    if (processInstanceId != null) {
-      return commandContext.getEventLogEntryEntityManager().findEventLogEntriesByProcessInstanceId(processInstanceId);
-
-    } else if (startLogNr != null) {
-      return commandContext.getEventLogEntryEntityManager().findEventLogEntries(startLogNr, pageSize != null ? pageSize : -1);
-
-    } else {
-      return commandContext.getEventLogEntryEntityManager().findAllEventLogEntries();
     }
-  }
+
+    public GetEventLogEntriesCmd(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+
+    public GetEventLogEntriesCmd(Long startLogNr, Long pageSize) {
+        this.startLogNr = startLogNr;
+        this.pageSize = pageSize;
+    }
+
+    @Override
+    public List<EventLogEntry> execute(CommandContext commandContext) {
+        if (processInstanceId != null) {
+            return commandContext.getEventLogEntryEntityManager().findEventLogEntriesByProcessInstanceId(processInstanceId);
+
+        } else if (startLogNr != null) {
+            return commandContext.getEventLogEntryEntityManager().findEventLogEntries(startLogNr, pageSize != null ? pageSize : -1);
+
+        } else {
+            return commandContext.getEventLogEntryEntityManager().findAllEventLogEntries();
+        }
+    }
 
 }

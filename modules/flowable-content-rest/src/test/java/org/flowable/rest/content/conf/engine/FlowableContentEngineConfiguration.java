@@ -26,15 +26,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class FlowableContentEngineConfiguration {
 
-  @Bean
-  public ContentEngine contentEngine() {
-    ContentEngineConfiguration contentEngineConfiguration = new StandaloneInMemContentEngineConfiguration();
-    contentEngineConfiguration.setDatabaseSchemaUpdate(AbstractEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
-    return contentEngineConfiguration.buildContentEngine();
-  }
+    @Bean
+    public ContentEngine contentEngine() {
+        ContentEngineConfiguration contentEngineConfiguration = new StandaloneInMemContentEngineConfiguration();
+        contentEngineConfiguration.setDatabaseSchemaUpdate(AbstractEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+        return contentEngineConfiguration.buildContentEngine();
+    }
 
-  @Bean
-  public ContentService contentService() {
-    return contentEngine().getContentService();
-  }
+    @Bean
+    public ContentService contentService() {
+        return contentEngine().getContentService();
+    }
 }

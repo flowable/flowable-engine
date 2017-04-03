@@ -17,20 +17,19 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.JavaDelegate;
 
-
 /**
  * @author Tom Baeyens
  */
 public class BackwardsCompatibleExpressionDelegate implements JavaDelegate {
-  
-  private Expression expression;
-  
-  public void execute(DelegateExecution execution) {
-    Object result = expression.getValue(execution);
-    execution.setVariable("result", result);
-  }
-  
-  public void setExpression(Expression expression) {
-    this.expression = expression;
-  }
+
+    private Expression expression;
+
+    public void execute(DelegateExecution execution) {
+        Object result = expression.getValue(execution);
+        execution.setVariable("result", result);
+    }
+
+    public void setExpression(Expression expression) {
+        this.expression = expression;
+    }
 }

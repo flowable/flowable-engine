@@ -19,21 +19,22 @@ import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 
 public class PrivilegeEntityImpl extends AbstractEntity implements PrivilegeEntity {
 
-  protected String name;
-  
-  @Override
-  public Object getPersistentState() {
-    Map<String, String> state = new HashMap<String, String>();
-    state.put("id", id);
-    state.put("name", name);
-    return state;
-  }
-  
-  public String getName() {
-    return name;
-  }
-  public void setName(String name) {
-    this.name = name;
-  }
-  
+    protected String name;
+
+    @Override
+    public Object getPersistentState() {
+        Map<String, String> state = new HashMap<String, String>();
+        state.put("id", id);
+        state.put("name", name);
+        return state;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
 }

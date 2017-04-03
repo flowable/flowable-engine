@@ -19,10 +19,10 @@ package org.flowable.engine.impl.bpmn.behavior;
  */
 public class NoneStartEventActivityBehavior extends FlowNodeActivityBehavior {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  // Nothing to see here.
-  // The default behaviour of the BpmnActivity is exactly what
-  // a none start event should be doing.
+    // Nothing to see here.
+    // The default behaviour of the BpmnActivity is exactly what
+    // a none start event should be doing.
 
 }

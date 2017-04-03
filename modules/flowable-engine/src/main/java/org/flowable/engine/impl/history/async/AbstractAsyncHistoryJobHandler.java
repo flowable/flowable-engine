@@ -28,56 +28,56 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public abstract class AbstractAsyncHistoryJobHandler implements JobHandler {
-  
-  protected boolean isJsonGzipCompressionEnabled;
-  
-  @Override
-  public void execute(JobEntity job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
-    ObjectMapper objectMapper = commandContext.getProcessEngineConfiguration().getObjectMapper();
-    ArrayNode historicalDataArrayNode = null;
-    if (job.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
-      try {
-        
-        byte[] bytes = job.getAdvancedJobHandlerConfigurationByteArrayRef().getBytes();
-        if (isJsonGzipCompressionEnabled) {
-          bytes = decompress(bytes);
-        }
-        JsonNode objectNode = objectMapper.readTree(bytes);
-        if (objectNode.isArray()) {
-          historicalDataArrayNode = (ArrayNode) objectNode;
-          processHistoryJson(commandContext, job, historicalDataArrayNode);
-        }
-        
-      } catch (Exception e) {
-        // The transaction will be rolled back and the job retries decremented,
-        // which is different from unacquiring the job where the retries are not changed.
-        if (e instanceof AsyncHistoryJobNotApplicableException) {
-          throw (AsyncHistoryJobNotApplicableException) e;
-        } else {
-          throw new FlowableException("Could not deserialize async history json for job (id=" + job.getId() + ")", e);
-        }
-      }
-    }
-  }
-  
-  protected byte[] decompress(final byte[] compressed) {
-    try (ByteArrayInputStream bais = new ByteArrayInputStream(compressed)) {
-        try (GZIPInputStream gis = new GZIPInputStream(bais)) {
-          return IoUtil.readInputStream(gis, "async-history-configuration");
-        }
-    } catch(IOException e) {
-        throw new RuntimeException("Error while decompressing json bytes", e);
-    }
-  }
-  
-  protected abstract void processHistoryJson(CommandContext commandContext, JobEntity job, ArrayNode historicalDataArrayNode);
-  
-  public boolean isJsonGzipCompressionEnabled() {
-    return isJsonGzipCompressionEnabled;
-  }
 
-  public void setJsonGzipCompressionEnabled(boolean isJsonGzipCompressionEnabled) {
-    this.isJsonGzipCompressionEnabled = isJsonGzipCompressionEnabled;
-  }
+    protected boolean isJsonGzipCompressionEnabled;
+
+    @Override
+    public void execute(JobEntity job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
+        ObjectMapper objectMapper = commandContext.getProcessEngineConfiguration().getObjectMapper();
+        ArrayNode historicalDataArrayNode = null;
+        if (job.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
+            try {
+
+                byte[] bytes = job.getAdvancedJobHandlerConfigurationByteArrayRef().getBytes();
+                if (isJsonGzipCompressionEnabled) {
+                    bytes = decompress(bytes);
+                }
+                JsonNode objectNode = objectMapper.readTree(bytes);
+                if (objectNode.isArray()) {
+                    historicalDataArrayNode = (ArrayNode) objectNode;
+                    processHistoryJson(commandContext, job, historicalDataArrayNode);
+                }
+
+            } catch (Exception e) {
+                // The transaction will be rolled back and the job retries decremented,
+                // which is different from unacquiring the job where the retries are not changed.
+                if (e instanceof AsyncHistoryJobNotApplicableException) {
+                    throw (AsyncHistoryJobNotApplicableException) e;
+                } else {
+                    throw new FlowableException("Could not deserialize async history json for job (id=" + job.getId() + ")", e);
+                }
+            }
+        }
+    }
+
+    protected byte[] decompress(final byte[] compressed) {
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(compressed)) {
+            try (GZIPInputStream gis = new GZIPInputStream(bais)) {
+                return IoUtil.readInputStream(gis, "async-history-configuration");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error while decompressing json bytes", e);
+        }
+    }
+
+    protected abstract void processHistoryJson(CommandContext commandContext, JobEntity job, ArrayNode historicalDataArrayNode);
+
+    public boolean isJsonGzipCompressionEnabled() {
+        return isJsonGzipCompressionEnabled;
+    }
+
+    public void setJsonGzipCompressionEnabled(boolean isJsonGzipCompressionEnabled) {
+        this.isJsonGzipCompressionEnabled = isJsonGzipCompressionEnabled;
+    }
 
 }

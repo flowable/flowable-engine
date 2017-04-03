@@ -16,44 +16,43 @@ import org.flowable.app.model.runtime.RestVariable;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.springframework.stereotype.Component;
 
-
 /**
  * @author Frederik Heremans
  */
 @Component
 public class LongRestVariableConverter implements RestVariableConverter {
 
-  @Override
-  public String getRestTypeName() {
-    return "long";
-  }
-
-  @Override
-  public Class< ? > getVariableType() {
-    return Long.class;
-  }
-
-  @Override
-  public Object getVariableValue(RestVariable result) {
-    if(result.getValue() != null) {
-      if(!(result.getValue() instanceof Number)) {
-        throw new FlowableIllegalArgumentException("Converter can only convert longs");
-      }
-      return ((Number) result.getValue()).longValue();
+    @Override
+    public String getRestTypeName() {
+        return "long";
     }
-    return null;
-  }
 
-  @Override
-  public void convertVariableValue(Object variableValue, RestVariable result) {
-    if(variableValue != null) {
-      if(!(variableValue instanceof Long)) {
-        throw new FlowableIllegalArgumentException("Converter can only convert integers");
-      }
-      result.setValue(variableValue);
-    } else {
-      result.setValue(null);
+    @Override
+    public Class<?> getVariableType() {
+        return Long.class;
     }
-  }
+
+    @Override
+    public Object getVariableValue(RestVariable result) {
+        if (result.getValue() != null) {
+            if (!(result.getValue() instanceof Number)) {
+                throw new FlowableIllegalArgumentException("Converter can only convert longs");
+            }
+            return ((Number) result.getValue()).longValue();
+        }
+        return null;
+    }
+
+    @Override
+    public void convertVariableValue(Object variableValue, RestVariable result) {
+        if (variableValue != null) {
+            if (!(variableValue instanceof Long)) {
+                throw new FlowableIllegalArgumentException("Converter can only convert integers");
+            }
+            result.setValue(variableValue);
+        } else {
+            result.setValue(null);
+        }
+    }
 
 }

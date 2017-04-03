@@ -29,36 +29,36 @@ import org.flowable.engine.impl.util.Flowable5Util;
  */
 public class DeleteHistoricProcessInstanceCmd implements Command<Object>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String processInstanceId;
+    private static final long serialVersionUID = 1L;
+    protected String processInstanceId;
 
-  public DeleteHistoricProcessInstanceCmd(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
-
-  public Object execute(CommandContext commandContext) {
-    if (processInstanceId == null) {
-      throw new FlowableIllegalArgumentException("processInstanceId is null");
-    }
-    // Check if process instance is still running
-    HistoricProcessInstance instance = commandContext.getHistoricProcessInstanceEntityManager().findById(processInstanceId);
-
-    if (instance == null) {
-      throw new FlowableObjectNotFoundException("No historic process instance found with id: " + processInstanceId, HistoricProcessInstance.class);
-    }
-    if (instance.getEndTime() == null) {
-      throw new FlowableException("Process instance is still running, cannot delete historic process instance: " + processInstanceId);
+    public DeleteHistoricProcessInstanceCmd(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
     }
 
-    if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, instance.getProcessDefinitionId())) {
-      Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler(); 
-      compatibilityHandler.deleteHistoricProcessInstance(processInstanceId);
-      return null;
-    }
-    
-    commandContext.getHistoricProcessInstanceEntityManager().delete(processInstanceId);
+    public Object execute(CommandContext commandContext) {
+        if (processInstanceId == null) {
+            throw new FlowableIllegalArgumentException("processInstanceId is null");
+        }
+        // Check if process instance is still running
+        HistoricProcessInstance instance = commandContext.getHistoricProcessInstanceEntityManager().findById(processInstanceId);
 
-    return null;
-  }
+        if (instance == null) {
+            throw new FlowableObjectNotFoundException("No historic process instance found with id: " + processInstanceId, HistoricProcessInstance.class);
+        }
+        if (instance.getEndTime() == null) {
+            throw new FlowableException("Process instance is still running, cannot delete historic process instance: " + processInstanceId);
+        }
+
+        if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, instance.getProcessDefinitionId())) {
+            Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+            compatibilityHandler.deleteHistoricProcessInstance(processInstanceId);
+            return null;
+        }
+
+        commandContext.getHistoricProcessInstanceEntityManager().delete(processInstanceId);
+
+        return null;
+    }
 
 }

@@ -26,42 +26,42 @@ import org.flowable.engine.form.AbstractFormType;
  */
 public class DateFormType extends AbstractFormType {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected String datePattern;
-  protected Format dateFormat;
+    protected String datePattern;
+    protected Format dateFormat;
 
-  public DateFormType(String datePattern) {
-    this.datePattern = datePattern;
-    this.dateFormat = FastDateFormat.getInstance(datePattern);
-  }
-
-  public String getName() {
-    return "date";
-  }
-
-  public Object getInformation(String key) {
-    if ("datePattern".equals(key)) {
-      return datePattern;
+    public DateFormType(String datePattern) {
+        this.datePattern = datePattern;
+        this.dateFormat = FastDateFormat.getInstance(datePattern);
     }
-    return null;
-  }
 
-  public Object convertFormValueToModelValue(String propertyValue) {
-    if (StringUtils.isEmpty(propertyValue)) {
-      return null;
+    public String getName() {
+        return "date";
     }
-    try {
-      return dateFormat.parseObject(propertyValue);
-    } catch (ParseException e) {
-      throw new FlowableIllegalArgumentException("invalid date value " + propertyValue);
-    }
-  }
 
-  public String convertModelValueToFormValue(Object modelValue) {
-    if (modelValue == null) {
-      return null;
+    public Object getInformation(String key) {
+        if ("datePattern".equals(key)) {
+            return datePattern;
+        }
+        return null;
     }
-    return dateFormat.format(modelValue);
-  }
+
+    public Object convertFormValueToModelValue(String propertyValue) {
+        if (StringUtils.isEmpty(propertyValue)) {
+            return null;
+        }
+        try {
+            return dateFormat.parseObject(propertyValue);
+        } catch (ParseException e) {
+            throw new FlowableIllegalArgumentException("invalid date value " + propertyValue);
+        }
+    }
+
+    public String convertModelValueToFormValue(Object modelValue) {
+        if (modelValue == null) {
+            return null;
+        }
+        return dateFormat.format(modelValue);
+    }
 }

@@ -12,7 +12,6 @@
  */
 package org.flowable.spring.security;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,11 +69,10 @@ public class IdentityServiceUserDetailsService
 
         return new org.springframework.security.core.userdetails.User(
                 user.getId(),
-                user.getPassword() ,
+                user.getPassword(),
                 active, active, active, active,
                 grantedAuthorityList);
     }
-
 
     public static class GroupGrantedAuthority implements GrantedAuthority {
         private final Group group;
@@ -92,6 +90,5 @@ public class IdentityServiceUserDetailsService
             return group.getName();
         }
     }
-
 
 }

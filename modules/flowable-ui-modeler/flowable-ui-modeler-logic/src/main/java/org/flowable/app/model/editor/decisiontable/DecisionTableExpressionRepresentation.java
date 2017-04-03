@@ -27,7 +27,7 @@ public class DecisionTableExpressionRepresentation {
     protected String variableType;
     protected String type;
     protected String label;
-    protected List<Map<String,String>> entries;
+    protected List<Map<String, String>> entries;
     protected boolean newVariable;
 
     public boolean isNewVariable() {

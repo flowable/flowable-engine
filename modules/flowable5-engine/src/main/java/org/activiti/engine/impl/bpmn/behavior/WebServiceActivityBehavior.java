@@ -34,105 +34,102 @@ import org.flowable.engine.impl.bpmn.webservice.Operation;
  * @author Joram Barrez
  */
 public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
-  
-  public static final String CURRENT_MESSAGE = "org.activiti.engine.impl.bpmn.CURRENT_MESSAGE";
 
-  protected Operation operation;
-  
-  protected IOSpecification ioSpecification;
-  
-  protected List<AbstractDataAssociation> dataInputAssociations;
+    public static final String CURRENT_MESSAGE = "org.activiti.engine.impl.bpmn.CURRENT_MESSAGE";
 
-  protected List<AbstractDataAssociation> dataOutputAssociations;
+    protected Operation operation;
 
-  public WebServiceActivityBehavior() {
-    this.dataInputAssociations = new ArrayList<AbstractDataAssociation>();
-    this.dataOutputAssociations = new ArrayList<AbstractDataAssociation>();
-  }
-  
-  public void addDataInputAssociation(AbstractDataAssociation dataAssociation) {
-    this.dataInputAssociations.add(dataAssociation);
-  }
-  
-  public void addDataOutputAssociation(AbstractDataAssociation dataAssociation) {
-    this.dataOutputAssociations.add(dataAssociation);
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  public void execute(ActivityExecution execution) throws Exception {
-    MessageInstance message;
-    
-    try {
-       if (ioSpecification != null) {
-         this.ioSpecification.initialize(execution);
-         ItemInstance inputItem = (ItemInstance) execution.getVariable(this.ioSpecification.getFirstDataInputName());
-         message = new MessageInstance(this.operation.getInMessage(), inputItem);
-       } else {
-         message = this.operation.getInMessage().createInstance();
-       }
-    
-       execution.setVariable(CURRENT_MESSAGE, message);
-    
-       this.fillMessage(message, execution);
-    
-       ProcessEngineConfigurationImpl processEngineConfig = Context.getProcessEngineConfiguration();
-       MessageInstance receivedMessage = this.operation.sendMessage(message,
-           processEngineConfig.getWsOverridenEndpointAddresses());
+    protected IOSpecification ioSpecification;
 
-       execution.setVariable(CURRENT_MESSAGE, receivedMessage);
+    protected List<AbstractDataAssociation> dataInputAssociations;
 
-       if (ioSpecification != null) {
-         String firstDataOutputName = this.ioSpecification.getFirstDataOutputName();
-         if (firstDataOutputName != null) {
-           ItemInstance outputItem = (ItemInstance) execution.getVariable(firstDataOutputName);
-           outputItem.getStructureInstance().loadFrom(receivedMessage.getStructureInstance().toArray());
-         }
-       }
-    
-       this.returnMessage(receivedMessage, execution);
-    
-       execution.setVariable(CURRENT_MESSAGE, null);
-       leave(execution);
-    } catch (Exception exc) {
+    protected List<AbstractDataAssociation> dataOutputAssociations;
 
-       Throwable cause = exc;
-       BpmnError error = null;
-       while (cause != null) {
-          if (cause instanceof BpmnError) {
-             error = (BpmnError) cause;
-             break;
-          }
-          cause = cause.getCause();
-       }
-
-       if (error != null) {
-          ErrorPropagation.propagateError(error, execution);
-       } else {
-          throw exc;
-       }
+    public WebServiceActivityBehavior() {
+        this.dataInputAssociations = new ArrayList<AbstractDataAssociation>();
+        this.dataOutputAssociations = new ArrayList<AbstractDataAssociation>();
     }
-  }
-  
-  private void returnMessage(MessageInstance message, ActivityExecution execution) {
-    for (AbstractDataAssociation dataAssociation : this.dataOutputAssociations) {
-      dataAssociation.evaluate(execution);
+
+    public void addDataInputAssociation(AbstractDataAssociation dataAssociation) {
+        this.dataInputAssociations.add(dataAssociation);
     }
-  }
 
-  private void fillMessage(MessageInstance message, ActivityExecution execution) {
-    for (AbstractDataAssociation dataAssociation : this.dataInputAssociations) {
-      dataAssociation.evaluate(execution);
+    public void addDataOutputAssociation(AbstractDataAssociation dataAssociation) {
+        this.dataOutputAssociations.add(dataAssociation);
     }
-  }
 
-  public void setIoSpecification(IOSpecification ioSpecification) {
-    this.ioSpecification = ioSpecification;
-  }
+    public void execute(ActivityExecution execution) throws Exception {
+        MessageInstance message;
 
-  public void setOperation(Operation operation) {
-    this.operation = operation;
-  }
-  
+        try {
+            if (ioSpecification != null) {
+                this.ioSpecification.initialize(execution);
+                ItemInstance inputItem = (ItemInstance) execution.getVariable(this.ioSpecification.getFirstDataInputName());
+                message = new MessageInstance(this.operation.getInMessage(), inputItem);
+            } else {
+                message = this.operation.getInMessage().createInstance();
+            }
+
+            execution.setVariable(CURRENT_MESSAGE, message);
+
+            this.fillMessage(message, execution);
+
+            ProcessEngineConfigurationImpl processEngineConfig = Context.getProcessEngineConfiguration();
+            MessageInstance receivedMessage = this.operation.sendMessage(message,
+                    processEngineConfig.getWsOverridenEndpointAddresses());
+
+            execution.setVariable(CURRENT_MESSAGE, receivedMessage);
+
+            if (ioSpecification != null) {
+                String firstDataOutputName = this.ioSpecification.getFirstDataOutputName();
+                if (firstDataOutputName != null) {
+                    ItemInstance outputItem = (ItemInstance) execution.getVariable(firstDataOutputName);
+                    outputItem.getStructureInstance().loadFrom(receivedMessage.getStructureInstance().toArray());
+                }
+            }
+
+            this.returnMessage(receivedMessage, execution);
+
+            execution.setVariable(CURRENT_MESSAGE, null);
+            leave(execution);
+        } catch (Exception exc) {
+
+            Throwable cause = exc;
+            BpmnError error = null;
+            while (cause != null) {
+                if (cause instanceof BpmnError) {
+                    error = (BpmnError) cause;
+                    break;
+                }
+                cause = cause.getCause();
+            }
+
+            if (error != null) {
+                ErrorPropagation.propagateError(error, execution);
+            } else {
+                throw exc;
+            }
+        }
+    }
+
+    private void returnMessage(MessageInstance message, ActivityExecution execution) {
+        for (AbstractDataAssociation dataAssociation : this.dataOutputAssociations) {
+            dataAssociation.evaluate(execution);
+        }
+    }
+
+    private void fillMessage(MessageInstance message, ActivityExecution execution) {
+        for (AbstractDataAssociation dataAssociation : this.dataInputAssociations) {
+            dataAssociation.evaluate(execution);
+        }
+    }
+
+    public void setIoSpecification(IOSpecification ioSpecification) {
+        this.ioSpecification = ioSpecification;
+    }
+
+    public void setOperation(Operation operation) {
+        this.operation = operation;
+    }
+
 }

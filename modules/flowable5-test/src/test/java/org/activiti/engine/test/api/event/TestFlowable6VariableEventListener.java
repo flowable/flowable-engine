@@ -21,30 +21,30 @@ import org.flowable.engine.delegate.event.FlowableVariableEvent;
 
 public class TestFlowable6VariableEventListener implements FlowableEventListener {
 
-	private List<FlowableEvent> eventsReceived;
-	
-	public TestFlowable6VariableEventListener() {
-		eventsReceived = new ArrayList<FlowableEvent>();
-  }
-	
-	public List<FlowableEvent> getEventsReceived() {
-	  return eventsReceived;
-  }
-	
-	public void clearEventsReceived() {
-		eventsReceived.clear();
-	}
-	
-	@Override
-	public void onEvent(FlowableEvent event) {
-		if(event instanceof FlowableVariableEvent) {
-			eventsReceived.add(event);
-		}
-	}
+    private List<FlowableEvent> eventsReceived;
 
-	@Override
-	public boolean isFailOnException() {
-		return true;
-	}
+    public TestFlowable6VariableEventListener() {
+        eventsReceived = new ArrayList<FlowableEvent>();
+    }
+
+    public List<FlowableEvent> getEventsReceived() {
+        return eventsReceived;
+    }
+
+    public void clearEventsReceived() {
+        eventsReceived.clear();
+    }
+
+    @Override
+    public void onEvent(FlowableEvent event) {
+        if (event instanceof FlowableVariableEvent) {
+            eventsReceived.add(event);
+        }
+    }
+
+    @Override
+    public boolean isFailOnException() {
+        return true;
+    }
 
 }

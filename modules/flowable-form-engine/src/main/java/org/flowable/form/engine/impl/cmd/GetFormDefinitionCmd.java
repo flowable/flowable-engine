@@ -24,15 +24,15 @@ import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
  */
 public class GetFormDefinitionCmd implements Command<FormDefinitionEntity>, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  protected String formDefinitionId;
+    private static final long serialVersionUID = 1L;
+    protected String formDefinitionId;
 
-  public GetFormDefinitionCmd(String formDefinitionId) {
-    this.formDefinitionId = formDefinitionId;
-  }
+    public GetFormDefinitionCmd(String formDefinitionId) {
+        this.formDefinitionId = formDefinitionId;
+    }
 
-  public FormDefinitionEntity execute(CommandContext commandContext) {
-    return commandContext.getFormEngineConfiguration().getDeploymentManager()
-        .findDeployedFormDefinitionById(formDefinitionId);
-  }
+    public FormDefinitionEntity execute(CommandContext commandContext) {
+        return commandContext.getFormEngineConfiguration().getDeploymentManager()
+                .findDeployedFormDefinitionById(formDefinitionId);
+    }
 }

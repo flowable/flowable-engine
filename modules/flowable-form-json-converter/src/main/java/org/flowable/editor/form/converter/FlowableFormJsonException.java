@@ -14,13 +14,13 @@ package org.flowable.editor.form.converter;
 
 public class FlowableFormJsonException extends RuntimeException {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public FlowableFormJsonException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public FlowableFormJsonException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-  public FlowableFormJsonException(String message) {
-    super(message);
-  }
+    public FlowableFormJsonException(String message) {
+        super(message);
+    }
 }

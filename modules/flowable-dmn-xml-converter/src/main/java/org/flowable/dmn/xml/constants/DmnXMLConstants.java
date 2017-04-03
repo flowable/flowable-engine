@@ -17,39 +17,39 @@ package org.flowable.dmn.xml.constants;
  */
 public interface DmnXMLConstants {
 
-  public static final String DMN_NAMESPACE = "http://www.omg.org/spec/DMN/20151130";
-  public static final String XSI_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";
-  public static final String XSI_PREFIX = "xsi";
-  public static final String SCHEMA_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
-  public static final String MODEL_NAMESPACE = "http://www.flowable.org/dmn";
-  public static final String TARGET_NAMESPACE_ATTRIBUTE = "targetNamespace";
-  public static final String FLOWABLE_EXTENSIONS_NAMESPACE = "http://flowable.org/dmn";
-  public static final String FLOWABLE_EXTENSIONS_PREFIX = "flowable";
+    public static final String DMN_NAMESPACE = "http://www.omg.org/spec/DMN/20151101";
+    public static final String XSI_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";
+    public static final String XSI_PREFIX = "xsi";
+    public static final String SCHEMA_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
+    public static final String MODEL_NAMESPACE = "http://www.flowable.org/dmn";
+    public static final String TARGET_NAMESPACE_ATTRIBUTE = "targetNamespace";
+    public static final String FLOWABLE_EXTENSIONS_NAMESPACE = "http://flowable.org/dmn";
+    public static final String FLOWABLE_EXTENSIONS_PREFIX = "flowable";
 
-  public static final String ATTRIBUTE_ID = "id";
-  public static final String ATTRIBUTE_NAME = "name";
-  public static final String ATTRIBUTE_LABEL = "label";
-  public static final String ATTRIBUTE_TYPE_REF = "typeRef";
-  public static final String ATTRIBUTE_HREF = "href";
-  public static final String ATTRIBUTE_HIT_POLICY = "hitPolicy";
-  public static final String ATTRIBUTE_NAMESPACE = "namespace";
+    public static final String ATTRIBUTE_ID = "id";
+    public static final String ATTRIBUTE_NAME = "name";
+    public static final String ATTRIBUTE_LABEL = "label";
+    public static final String ATTRIBUTE_TYPE_REF = "typeRef";
+    public static final String ATTRIBUTE_HREF = "href";
+    public static final String ATTRIBUTE_HIT_POLICY = "hitPolicy";
+    public static final String ATTRIBUTE_NAMESPACE = "namespace";
 
-  public static final String ELEMENT_DEFINITIONS = "definitions";
-  public static final String ELEMENT_DECISION = "decision";
-  public static final String ELEMENT_DECISION_TABLE = "decisionTable";
+    public static final String ELEMENT_DEFINITIONS = "definitions";
+    public static final String ELEMENT_DECISION = "decision";
+    public static final String ELEMENT_DECISION_TABLE = "decisionTable";
 
-  public static final String ELEMENT_ITEM_DEFINITION = "itemDefinition";
-  public static final String ELEMENT_TYPE_DEFINITION = "typeDefinition";
+    public static final String ELEMENT_ITEM_DEFINITION = "itemDefinition";
+    public static final String ELEMENT_TYPE_DEFINITION = "typeDefinition";
 
-  public static final String ELEMENT_INPUT_CLAUSE = "input";
-  public static final String ELEMENT_OUTPUT_CLAUSE = "output";
-  public static final String ELEMENT_INPUT_EXPRESSION = "inputExpression";
-  public static final String ELEMENT_TEXT = "text";
+    public static final String ELEMENT_INPUT_CLAUSE = "input";
+    public static final String ELEMENT_OUTPUT_CLAUSE = "output";
+    public static final String ELEMENT_INPUT_EXPRESSION = "inputExpression";
+    public static final String ELEMENT_TEXT = "text";
 
-  public static final String ELEMENT_RULE = "rule";
-  public static final String ELEMENT_INPUT_ENTRY = "inputEntry";
-  public static final String ELEMENT_OUTPUT_ENTRY = "outputEntry";
-  
-  public static final String ELEMENT_DESCRIPTION = "description";
-  public static final String ELEMENT_EXTENSIONS = "extensionElements";
+    public static final String ELEMENT_RULE = "rule";
+    public static final String ELEMENT_INPUT_ENTRY = "inputEntry";
+    public static final String ELEMENT_OUTPUT_ENTRY = "outputEntry";
+
+    public static final String ELEMENT_DESCRIPTION = "description";
+    public static final String ELEMENT_EXTENSIONS = "extensionElements";
 }

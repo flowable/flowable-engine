@@ -20,61 +20,60 @@ import java.util.Map;
 import org.activiti.engine.impl.db.HasRevision;
 import org.activiti.engine.impl.db.PersistentObject;
 
-
 /**
  * @author Tijs Rademakers
  */
 public class ProcessDefinitionInfoEntity implements HasRevision, PersistentObject, Serializable {
 
-  private static final long serialVersionUID = 1L;
-  
-  protected String id;
-  protected String processDefinitionId;
-  protected int revision = 1;
-  protected String infoJsonId;
+    private static final long serialVersionUID = 1L;
 
-  public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
-    persistentState.put("processDefinitionId", this.processDefinitionId);
-    persistentState.put("infoJsonId", this.infoJsonId);
-    return persistentState;
-  }
+    protected String id;
+    protected String processDefinitionId;
+    protected int revision = 1;
+    protected String infoJsonId;
 
-  // getters and setters //////////////////////////////////////////////////////
+    public Object getPersistentState() {
+        Map<String, Object> persistentState = new HashMap<String, Object>();
+        persistentState.put("processDefinitionId", this.processDefinitionId);
+        persistentState.put("infoJsonId", this.infoJsonId);
+        return persistentState;
+    }
 
-  public String getId() {
-    return id;
-  }
+    // getters and setters //////////////////////////////////////////////////////
 
-  public void setId(String id) {
-    this.id = id;
-  }
-  
-  public String getProcessDefinitionId() {
-    return processDefinitionId;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public void setProcessDefinitionId(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public int getRevision() {
-    return revision;
-  }
-  
-  public int getRevisionNext() {
-    return revision + 1;
-  }
-  
-  public void setRevision(int revision) {
-    this.revision = revision;
-  }
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
 
-  public String getInfoJsonId() {
-    return infoJsonId;
-  }
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
 
-  public void setInfoJsonId(String infoJsonId) {
-    this.infoJsonId = infoJsonId;
-  }
+    public int getRevision() {
+        return revision;
+    }
+
+    public int getRevisionNext() {
+        return revision + 1;
+    }
+
+    public void setRevision(int revision) {
+        this.revision = revision;
+    }
+
+    public String getInfoJsonId() {
+        return infoJsonId;
+    }
+
+    public void setInfoJsonId(String infoJsonId) {
+        this.infoJsonId = infoJsonId;
+    }
 }

@@ -20,11 +20,11 @@ package org.flowable.engine.history;
  */
 public interface HistoricVariableUpdate extends HistoricDetail {
 
-  String getVariableName();
+    String getVariableName();
 
-  String getVariableTypeName();
+    String getVariableTypeName();
 
-  Object getValue();
+    Object getValue();
 
-  int getRevision();
+    int getRevision();
 }

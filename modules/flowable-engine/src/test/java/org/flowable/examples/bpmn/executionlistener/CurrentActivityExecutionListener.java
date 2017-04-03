@@ -28,38 +28,38 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
  */
 public class CurrentActivityExecutionListener implements ExecutionListener {
 
-  private static List<CurrentActivity> currentActivities = new ArrayList<CurrentActivity>();
+    private static List<CurrentActivity> currentActivities = new ArrayList<CurrentActivity>();
 
-  public static class CurrentActivity {
-    private final String activityId;
-    private final String activityName;
+    public static class CurrentActivity {
+        private final String activityId;
+        private final String activityName;
 
-    public CurrentActivity(String activityId, String activityName) {
-      this.activityId = activityId;
-      this.activityName = activityName;
+        public CurrentActivity(String activityId, String activityName) {
+            this.activityId = activityId;
+            this.activityName = activityName;
+        }
+
+        public String getActivityId() {
+            return activityId;
+        }
+
+        public String getActivityName() {
+            return activityName;
+        }
     }
 
-    public String getActivityId() {
-      return activityId;
+    public void notify(DelegateExecution execution) {
+        org.flowable.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(execution.getProcessDefinitionId());
+        String activityId = execution.getCurrentActivityId();
+        FlowElement currentFlowElement = process.getFlowElement(activityId, true);
+        currentActivities.add(new CurrentActivity(execution.getCurrentActivityId(), currentFlowElement.getName()));
     }
 
-    public String getActivityName() {
-      return activityName;
+    public static List<CurrentActivity> getCurrentActivities() {
+        return currentActivities;
     }
-  }
 
-  public void notify(DelegateExecution execution) {
-    org.flowable.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(execution.getProcessDefinitionId());
-    String activityId = execution.getCurrentActivityId();
-    FlowElement currentFlowElement = process.getFlowElement(activityId, true);
-    currentActivities.add(new CurrentActivity(execution.getCurrentActivityId(), currentFlowElement.getName()));
-  }
-
-  public static List<CurrentActivity> getCurrentActivities() {
-    return currentActivities;
-  }
-
-  public static void clear() {
-    currentActivities.clear();
-  }
+    public static void clear() {
+        currentActivities.clear();
+    }
 }

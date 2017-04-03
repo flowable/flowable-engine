@@ -24,22 +24,22 @@ import org.flowable.engine.impl.interceptor.CommandContext;
  */
 public class RemoveEventListenerCommand implements Command<Void> {
 
-  protected FlowableEventListener listener;
+    protected FlowableEventListener listener;
 
-  public RemoveEventListenerCommand(FlowableEventListener listener) {
-    super();
-    this.listener = listener;
-  }
-
-  @Override
-  public Void execute(CommandContext commandContext) {
-    if (listener == null) {
-      throw new FlowableIllegalArgumentException("listener is null.");
+    public RemoveEventListenerCommand(FlowableEventListener listener) {
+        super();
+        this.listener = listener;
     }
 
-    commandContext.getProcessEngineConfiguration().getEventDispatcher().removeEventListener(listener);
+    @Override
+    public Void execute(CommandContext commandContext) {
+        if (listener == null) {
+            throw new FlowableIllegalArgumentException("listener is null.");
+        }
 
-    return null;
-  }
+        commandContext.getProcessEngineConfiguration().getEventDispatcher().removeEventListener(listener);
+
+        return null;
+    }
 
 }

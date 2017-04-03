@@ -26,23 +26,23 @@ import org.flowable.engine.test.Deployment;
  */
 public class FirstSimulationRunTest extends ResourceFlowableTestCase {
 
-  public FirstSimulationRunTest() {
-    super("org/flowable/crystalball/examples/tutorial/step01/FirstSimulationRunTest.cfg.xml");
-  }
+    public FirstSimulationRunTest() {
+        super("org/flowable/crystalball/examples/tutorial/step01/FirstSimulationRunTest.cfg.xml");
+    }
 
-  @Deployment
-  public void testSimulationRun() {
-    runtimeService.startProcessInstanceByKey("basicSimulationRun");
-    // all simulationManager executions are finished
-    assertEquals(0, runtimeService.createExecutionQuery().count());
+    @Deployment
+    public void testSimulationRun() {
+        runtimeService.startProcessInstanceByKey("basicSimulationRun");
+        // all simulationManager executions are finished
+        assertEquals(0, runtimeService.createExecutionQuery().count());
 
-    // simulation run check (Simulation run has side effect. The counter value is increased)
-    assertThat(Counter.value.get(), is(1l));
-  }
+        // simulation run check (Simulation run has side effect. The counter value is increased)
+        assertThat(Counter.value.get(), is(1l));
+    }
 
-  @Override
-  protected void closeDownProcessEngine() {
-    super.closeDownProcessEngine();
-    ProcessEngines.destroy();
-  }
+    @Override
+    protected void closeDownProcessEngine() {
+        super.closeDownProcessEngine();
+        ProcessEngines.destroy();
+    }
 }

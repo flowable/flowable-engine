@@ -27,83 +27,83 @@ import org.flowable.engine.test.Deployment;
  */
 public class ServiceTaskVariablesTest extends PluggableFlowableTestCase {
 
-  static boolean isOkInDelegate2;
-  static boolean isOkInDelegate3;
+    static boolean isOkInDelegate2;
+    static boolean isOkInDelegate3;
 
-  public static class Variable implements Serializable {
-    private static final long serialVersionUID = 1L;
-    public String value;
-  }
-
-  public static class Delegate1 implements JavaDelegate {
-
-    public void execute(DelegateExecution execution) {
-      Variable v = new Variable();
-      v.value = "delegate1";
-      execution.setVariable("variable", v);
+    public static class Variable implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public String value;
     }
 
-  }
+    public static class Delegate1 implements JavaDelegate {
 
-  public static class Delegate2 implements JavaDelegate {
+        public void execute(DelegateExecution execution) {
+            Variable v = new Variable();
+            v.value = "delegate1";
+            execution.setVariable("variable", v);
+        }
 
-    public void execute(DelegateExecution execution) {
-      Variable v = (Variable) execution.getVariable("variable");
-      synchronized (ServiceTaskVariablesTest.class) {
-        // we expect this to be 'true'
-        isOkInDelegate2 = ("delegate1".equals(v.value));
-      }
-      v.value = "delegate2";
-      execution.setVariable("variable", v);
     }
 
-  }
+    public static class Delegate2 implements JavaDelegate {
 
-  public static class Delegate3 implements JavaDelegate {
+        public void execute(DelegateExecution execution) {
+            Variable v = (Variable) execution.getVariable("variable");
+            synchronized (ServiceTaskVariablesTest.class) {
+                // we expect this to be 'true'
+                isOkInDelegate2 = ("delegate1".equals(v.value));
+            }
+            v.value = "delegate2";
+            execution.setVariable("variable", v);
+        }
 
-    public void execute(DelegateExecution execution) {
-      Variable v = (Variable) execution.getVariable("variable");
-      synchronized (ServiceTaskVariablesTest.class) {
-        // we expect this to be 'true' as well
-        isOkInDelegate3 = ("delegate2".equals(v.value));
-      }
     }
 
-  }
+    public static class Delegate3 implements JavaDelegate {
 
-  @Deployment
-  public void testSerializedVariablesBothAsync() {
+        public void execute(DelegateExecution execution) {
+            Variable v = (Variable) execution.getVariable("variable");
+            synchronized (ServiceTaskVariablesTest.class) {
+                // we expect this to be 'true' as well
+                isOkInDelegate3 = ("delegate2".equals(v.value));
+            }
+        }
 
-    // in this test, there is an async cont. both before the second and the
-    // third service task in the sequence
-
-    runtimeService.startProcessInstanceByKey("process");
-    
-    Job job = managementService.createJobQuery().singleResult();
-    assertNotNull(job);
-    managementService.executeJob(job.getId());
-    
-    job = managementService.createJobQuery().singleResult();
-    assertNotNull(job);
-    managementService.executeJob(job.getId());
-    
-    assertTrue(isOkInDelegate2);
-    assertTrue(isOkInDelegate3);
-  }
-
-  @Deployment
-  public void testSerializedVariablesThirdAsync() {
-
-    // in this test, only the third service task is async
-
-    runtimeService.startProcessInstanceByKey("process");
-    waitForJobExecutorToProcessAllJobs(10000, 500);
-    
-    synchronized (ServiceTaskVariablesTest.class) {
-      assertTrue(isOkInDelegate2);
-      assertTrue(isOkInDelegate3);
     }
 
-  }
+    @Deployment
+    public void testSerializedVariablesBothAsync() {
+
+        // in this test, there is an async cont. both before the second and the
+        // third service task in the sequence
+
+        runtimeService.startProcessInstanceByKey("process");
+
+        Job job = managementService.createJobQuery().singleResult();
+        assertNotNull(job);
+        managementService.executeJob(job.getId());
+
+        job = managementService.createJobQuery().singleResult();
+        assertNotNull(job);
+        managementService.executeJob(job.getId());
+
+        assertTrue(isOkInDelegate2);
+        assertTrue(isOkInDelegate3);
+    }
+
+    @Deployment
+    public void testSerializedVariablesThirdAsync() {
+
+        // in this test, only the third service task is async
+
+        runtimeService.startProcessInstanceByKey("process");
+        waitForJobExecutorToProcessAllJobs(10000, 500);
+
+        synchronized (ServiceTaskVariablesTest.class) {
+            assertTrue(isOkInDelegate2);
+            assertTrue(isOkInDelegate3);
+        }
+
+    }
 
 }

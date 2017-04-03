@@ -18,22 +18,21 @@ import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.Task;
 
-
 /**
  * @author Joram Barrez
  */
 public class TaskParseHandler extends AbstractActivityBpmnParseHandler<Task> {
-   
-  public Class< ? extends BaseElement> getHandledType() {
-    return Task.class;
-  }
-  
-  protected void executeParse(BpmnParse bpmnParse, Task task) {
-    ActivityImpl activity = createActivityOnCurrentScope(bpmnParse, task, BpmnXMLConstants.ELEMENT_TASK);
-    activity.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createTaskActivityBehavior(task));
-    
-    activity.setAsync(task.isAsynchronous());
-    activity.setExclusive(!task.isNotExclusive());
-  }
+
+    public Class<? extends BaseElement> getHandledType() {
+        return Task.class;
+    }
+
+    protected void executeParse(BpmnParse bpmnParse, Task task) {
+        ActivityImpl activity = createActivityOnCurrentScope(bpmnParse, task, BpmnXMLConstants.ELEMENT_TASK);
+        activity.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createTaskActivityBehavior(task));
+
+        activity.setAsync(task.isAsynchronous());
+        activity.setExclusive(!task.isNotExclusive());
+    }
 
 }

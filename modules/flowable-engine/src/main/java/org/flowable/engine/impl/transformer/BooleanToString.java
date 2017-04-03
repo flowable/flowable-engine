@@ -19,11 +19,8 @@ package org.flowable.engine.impl.transformer;
  */
 public class BooleanToString extends AbstractTransformer {
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected Object primTransform(Object anObject) throws Exception {
-    return ((Boolean) anObject).toString();
-  }
+    @Override
+    protected Object primTransform(Object anObject) throws Exception {
+        return ((Boolean) anObject).toString();
+    }
 }

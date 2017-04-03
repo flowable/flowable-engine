@@ -24,131 +24,131 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  */
 public class EventSubscriptionResponse {
 
-  protected String id;
-  protected String url;
-  protected String eventType;
-  protected String eventName;
-  protected String activityId;
-  protected String executionId;
-  protected String executionUrl;
-  protected String processInstanceId;
-  protected String processInstanceUrl;
-  protected String processDefinitionId;
-  protected String processDefinitionUrl;
-  @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
-  protected Date created;
-  protected String configuration;
-  protected String tenantId;
+    protected String id;
+    protected String url;
+    protected String eventType;
+    protected String eventName;
+    protected String activityId;
+    protected String executionId;
+    protected String executionUrl;
+    protected String processInstanceId;
+    protected String processInstanceUrl;
+    protected String processDefinitionId;
+    protected String processDefinitionUrl;
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
+    protected Date created;
+    protected String configuration;
+    protected String tenantId;
 
-  public String getId() {
-    return id;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public void setId(String id) {
-    this.id = id;
-  }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public String getUrl() {
-    return url;
-  }
+    public String getUrl() {
+        return url;
+    }
 
-  public void setUrl(String url) {
-    this.url = url;
-  }
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-  public String getEventType() {
-    return eventType;
-  }
+    public String getEventType() {
+        return eventType;
+    }
 
-  public void setEventType(String eventType) {
-    this.eventType = eventType;
-  }
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
 
-  public String getEventName() {
-    return eventName;
-  }
+    public String getEventName() {
+        return eventName;
+    }
 
-  public void setEventName(String eventName) {
-    this.eventName = eventName;
-  }
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
 
-  public String getActivityId() {
-    return activityId;
-  }
+    public String getActivityId() {
+        return activityId;
+    }
 
-  public void setActivityId(String activityId) {
-    this.activityId = activityId;
-  }
+    public void setActivityId(String activityId) {
+        this.activityId = activityId;
+    }
 
-  public String getProcessInstanceId() {
-    return processInstanceId;
-  }
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
 
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
 
-  public String getProcessInstanceUrl() {
-    return processInstanceUrl;
-  }
+    public String getProcessInstanceUrl() {
+        return processInstanceUrl;
+    }
 
-  public void setProcessInstanceUrl(String processInstanceUrl) {
-    this.processInstanceUrl = processInstanceUrl;
-  }
+    public void setProcessInstanceUrl(String processInstanceUrl) {
+        this.processInstanceUrl = processInstanceUrl;
+    }
 
-  public String getProcessDefinitionId() {
-    return processDefinitionId;
-  }
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
 
-  public void setProcessDefinitionId(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
 
-  public String getProcessDefinitionUrl() {
-    return processDefinitionUrl;
-  }
+    public String getProcessDefinitionUrl() {
+        return processDefinitionUrl;
+    }
 
-  public void setProcessDefinitionUrl(String processDefinitionUrl) {
-    this.processDefinitionUrl = processDefinitionUrl;
-  }
+    public void setProcessDefinitionUrl(String processDefinitionUrl) {
+        this.processDefinitionUrl = processDefinitionUrl;
+    }
 
-  public String getExecutionId() {
-    return executionId;
-  }
+    public String getExecutionId() {
+        return executionId;
+    }
 
-  public void setExecutionId(String executionId) {
-    this.executionId = executionId;
-  }
+    public void setExecutionId(String executionId) {
+        this.executionId = executionId;
+    }
 
-  public String getExecutionUrl() {
-    return executionUrl;
-  }
+    public String getExecutionUrl() {
+        return executionUrl;
+    }
 
-  public void setExecutionUrl(String executionUrl) {
-    this.executionUrl = executionUrl;
-  }
+    public void setExecutionUrl(String executionUrl) {
+        this.executionUrl = executionUrl;
+    }
 
-  public Date getCreated() {
-    return created;
-  }
+    public Date getCreated() {
+        return created;
+    }
 
-  public void setCreated(Date created) {
-    this.created = created;
-  }
+    public void setCreated(Date created) {
+        this.created = created;
+    }
 
-  public String getConfiguration() {
-    return configuration;
-  }
+    public String getConfiguration() {
+        return configuration;
+    }
 
-  public void setConfiguration(String configuration) {
-    this.configuration = configuration;
-  }
+    public void setConfiguration(String configuration) {
+        this.configuration = configuration;
+    }
 
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
 
-  public String getTenantId() {
-    return tenantId;
-  }
+    public String getTenantId() {
+        return tenantId;
+    }
 }

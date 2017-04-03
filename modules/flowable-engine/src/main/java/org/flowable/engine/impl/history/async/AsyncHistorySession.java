@@ -23,78 +23,81 @@ import org.flowable.engine.impl.interceptor.CommandContextCloseListener;
 
 public class AsyncHistorySession implements Session {
 
-  protected CommandContext commandContext;
-  protected AsyncHistoryJobProducer asyncHistoryJobProducer;
-  protected CommandContextCloseListener commandContextCloseListener;
-  
-  protected String tenantId;
-  protected List<Pair<String, Map<String, String>>> jobData;
-  
-  public AsyncHistorySession(CommandContext commandContext, AsyncHistoryJobProducer asyncHistoryJobProducer) {
-    this.commandContext = commandContext;
-    this.asyncHistoryJobProducer = asyncHistoryJobProducer;
-    initCommandContextCloseListener();
-  }
+    protected CommandContext commandContext;
+    protected AsyncHistoryJobProducer asyncHistoryJobProducer;
+    protected CommandContextCloseListener commandContextCloseListener;
 
-  protected void initCommandContextCloseListener() {
-    this.commandContextCloseListener = new CommandContextCloseListener() {
-      
-      @Override
-      public void closing(CommandContext commandContext) {
-        AsyncHistorySession.this.asyncHistoryJobProducer.createAsyncHistoryJob(commandContext);
-      }
-      
-      @Override
-      public void closed(CommandContext commandContext) { }
-      
-      @Override
-      public void closeFailure(CommandContext commandContext) { }
-      
-      @Override
-      public void afterSessionsFlush(CommandContext commandContext) { }
-      
-    };
-  }
-  
-  public void addHistoricData(String type, Map<String, String> data) {
-    addHistoricData(type, data, null);
-  }
-  
-  public void addHistoricData(String type, Map<String, String> data, String tenantId) {
-    if (jobData == null) {
-      jobData = new ArrayList<Pair<String, Map<String, String>>>();
-      commandContext.addCloseListener(commandContextCloseListener);
+    protected String tenantId;
+    protected List<Pair<String, Map<String, String>>> jobData;
+
+    public AsyncHistorySession(CommandContext commandContext, AsyncHistoryJobProducer asyncHistoryJobProducer) {
+        this.commandContext = commandContext;
+        this.asyncHistoryJobProducer = asyncHistoryJobProducer;
+        initCommandContextCloseListener();
     }
-    if (tenantId != null) {
-      this.tenantId = tenantId;
+
+    protected void initCommandContextCloseListener() {
+        this.commandContextCloseListener = new CommandContextCloseListener() {
+
+            @Override
+            public void closing(CommandContext commandContext) {
+                AsyncHistorySession.this.asyncHistoryJobProducer.createAsyncHistoryJob(commandContext);
+            }
+
+            @Override
+            public void closed(CommandContext commandContext) {
+            }
+
+            @Override
+            public void closeFailure(CommandContext commandContext) {
+            }
+
+            @Override
+            public void afterSessionsFlush(CommandContext commandContext) {
+            }
+
+        };
     }
-    jobData.add(Pair.of(type, data));
-  }
-  
-  @Override
-  public void flush() {
-    
-  }
 
-  @Override
-  public void close() {
-    
-  }
+    public void addHistoricData(String type, Map<String, String> data) {
+        addHistoricData(type, data, null);
+    }
 
-  public String getTenantId() {
-    return tenantId;
-  }
+    public void addHistoricData(String type, Map<String, String> data, String tenantId) {
+        if (jobData == null) {
+            jobData = new ArrayList<Pair<String, Map<String, String>>>();
+            commandContext.addCloseListener(commandContextCloseListener);
+        }
+        if (tenantId != null) {
+            this.tenantId = tenantId;
+        }
+        jobData.add(Pair.of(type, data));
+    }
 
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
+    @Override
+    public void flush() {
 
-  public List<Pair<String, Map<String, String>>> getJobData() {
-    return jobData;
-  }
+    }
 
-  public void setJobData(List<Pair<String, Map<String, String>>> jobData) {
-    this.jobData = jobData;
-  }
-  
+    @Override
+    public void close() {
+
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public List<Pair<String, Map<String, String>>> getJobData() {
+        return jobData;
+    }
+
+    public void setJobData(List<Pair<String, Map<String, String>>> jobData) {
+        this.jobData = jobData;
+    }
+
 }

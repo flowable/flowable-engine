@@ -21,26 +21,25 @@ import static org.junit.Assert.*;
 
 public class ParseHandlerTest extends AbstractFlowable6CompatibilityTest {
 
-  @Test
-  public void testFlowable5ParseHandlersApplied() {
-      Task task = taskService.createTaskQuery().processDefinitionKey("parseHandlerTestProcess").singleResult();
-      assertNotNull(task);
-      assertEquals("The task-activiti 5", task.getName());
-      
-      runtimeService.startProcessInstanceByKey("parseHandlerTestProcess");
-      List<Task> tasks = taskService.createTaskQuery().processDefinitionKey("parseHandlerTestProcess").list();
-      assertEquals(2, tasks.size());
-      for (Task t : tasks) {
-        assertEquals("The task-activiti 5", t.getName());
-        taskService.complete(t.getId());
-      }
-      
-      
-      // Redeploy, the parse handler should NOT have been reapplied
-      repositoryService.createDeployment().addClasspathResource("parseHandlerProcess.bpmn20.xml").deploy();
-      runtimeService.startProcessInstanceByKey("parseHandlerTestProcess");
-      task = taskService.createTaskQuery().processDefinitionKey("parseHandlerTestProcess").singleResult();
-      assertEquals("The task", task.getName());
-  }
+    @Test
+    public void testFlowable5ParseHandlersApplied() {
+        Task task = taskService.createTaskQuery().processDefinitionKey("parseHandlerTestProcess").singleResult();
+        assertNotNull(task);
+        assertEquals("The task-activiti 5", task.getName());
+
+        runtimeService.startProcessInstanceByKey("parseHandlerTestProcess");
+        List<Task> tasks = taskService.createTaskQuery().processDefinitionKey("parseHandlerTestProcess").list();
+        assertEquals(2, tasks.size());
+        for (Task t : tasks) {
+            assertEquals("The task-activiti 5", t.getName());
+            taskService.complete(t.getId());
+        }
+
+        // Redeploy, the parse handler should NOT have been reapplied
+        repositoryService.createDeployment().addClasspathResource("parseHandlerProcess.bpmn20.xml").deploy();
+        runtimeService.startProcessInstanceByKey("parseHandlerTestProcess");
+        task = taskService.createTaskQuery().processDefinitionKey("parseHandlerTestProcess").singleResult();
+        assertEquals("The task", task.getName());
+    }
 
 }

@@ -20,15 +20,15 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
  */
 public interface ProcessDefinitionInfoEntity extends Entity, HasRevision {
 
-  String getId();
+    String getId();
 
-  void setId(String id);
-  
-  String getProcessDefinitionId();
+    void setId(String id);
 
-  void setProcessDefinitionId(String processDefinitionId);
+    String getProcessDefinitionId();
 
-  String getInfoJsonId();
+    void setProcessDefinitionId(String processDefinitionId);
 
-  void setInfoJsonId(String infoJsonId);
+    String getInfoJsonId();
+
+    void setInfoJsonId(String infoJsonId);
 }

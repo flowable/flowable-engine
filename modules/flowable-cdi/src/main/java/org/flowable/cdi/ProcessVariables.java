@@ -31,37 +31,37 @@ import org.slf4j.LoggerFactory;
  */
 public class ProcessVariables {
 
-  private Logger logger = LoggerFactory.getLogger(ProcessVariables.class);
+    private Logger logger = LoggerFactory.getLogger(ProcessVariables.class);
 
-  @Inject
-  private BusinessProcess businessProcess;
-  @Inject
-  private ProcessVariableMap processVariableMap;
+    @Inject
+    private BusinessProcess businessProcess;
+    @Inject
+    private ProcessVariableMap processVariableMap;
 
-  protected String getVariableName(InjectionPoint ip) {
-    String variableName = ip.getAnnotated().getAnnotation(ProcessVariable.class).value();
-    if (variableName.length() == 0) {
-      variableName = ip.getMember().getName();
-    }
-    return variableName;
-  }
-
-  @Produces
-  @ProcessVariable
-  protected Object getProcessVariable(InjectionPoint ip) {
-    String processVariableName = getVariableName(ip);
-
-    if (logger.isDebugEnabled()) {
-      logger.debug("Getting process variable '{}' from ProcessInstance[{}].", processVariableName, businessProcess.getProcessInstanceId());
+    protected String getVariableName(InjectionPoint ip) {
+        String variableName = ip.getAnnotated().getAnnotation(ProcessVariable.class).value();
+        if (variableName.length() == 0) {
+            variableName = ip.getMember().getName();
+        }
+        return variableName;
     }
 
-    return businessProcess.getVariable(processVariableName);
-  }
+    @Produces
+    @ProcessVariable
+    protected Object getProcessVariable(InjectionPoint ip) {
+        String processVariableName = getVariableName(ip);
 
-  @Produces
-  @Named
-  protected Map<String, Object> processVariables() {
-    return processVariableMap;
-  }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Getting process variable '{}' from ProcessInstance[{}].", processVariableName, businessProcess.getProcessInstanceId());
+        }
+
+        return businessProcess.getVariable(processVariableName);
+    }
+
+    @Produces
+    @Named
+    protected Map<String, Object> processVariables() {
+        return processVariableMap;
+    }
 
 }

@@ -26,32 +26,30 @@ import org.flowable.engine.repository.Deployment;
  */
 public interface DeploymentEntity extends Deployment, Entity {
 
-  void addResource(ResourceEntity resource);
+    void addResource(ResourceEntity resource);
 
-  Map<String, ResourceEntity> getResources();
+    Map<String, ResourceEntity> getResources();
 
-  void addDeployedArtifact(Object deployedArtifact);
+    void addDeployedArtifact(Object deployedArtifact);
 
-  <T> List<T> getDeployedArtifacts(Class<T> clazz);
+    <T> List<T> getDeployedArtifacts(Class<T> clazz);
 
-  void setName(String name);
+    void setName(String name);
 
-  void setCategory(String category);
-  
-  void setKey(String key);
+    void setCategory(String category);
 
-  void setTenantId(String tenantId);
+    void setKey(String key);
 
-  void setResources(Map<String, ResourceEntity> resources);
+    void setTenantId(String tenantId);
 
-  void setDeploymentTime(Date deploymentTime);
+    void setResources(Map<String, ResourceEntity> resources);
 
-  boolean isNew();
+    void setDeploymentTime(Date deploymentTime);
 
-  void setNew(boolean isNew);
+    boolean isNew();
 
-  String getEngineVersion();
+    void setNew(boolean isNew);
 
-  void setEngineVersion(String engineVersion);
+    void setEngineVersion(String engineVersion);
 
 }

@@ -16,7 +16,7 @@
 
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
-  
+
 <mapper namespace="org.flowable.engine.impl.persistence.entity.TaskEntityImpl">
 
   <!-- TASK INSERT -->
@@ -222,7 +222,7 @@
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
   </resultMap>
   
-  <resultMap id="taskAndVariablesResultMap" type="org.flowable.engine.impl.persistence.entity.TaskEntityImpl">
+  <resultMap id="taskAndRelatedEntitiesResultMap" type="org.flowable.engine.impl.persistence.entity.TaskEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR"/>
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
     <result property="name" column="NAME_" jdbcType="VARCHAR"/>
@@ -259,6 +259,15 @@
       <result property="textValue" column="VAR_TEXT_" jdbcType="VARCHAR" />
       <result property="textValue2" column="VAR_TEXT2_" jdbcType="VARCHAR" />
       <result property="longValue" column="VAR_LONG_" jdbcType="BIGINT" />
+    </collection>
+    <collection property="queryIdentityLinks" column="TASK_ID_" javaType="ArrayList" ofType="org.flowable.engine.impl.persistence.entity.IdentityLinkEntityImpl">
+      <id property="id" column="ILINK_ID_"/>
+      <result property="type" column="ILINK_TYPE_" jdbcType="VARCHAR" />
+      <result property="userId" column="ILINK_USER_ID_" jdbcType="VARCHAR" />
+      <result property="groupId" column="ILINK_GROUP_ID_" jdbcType="VARCHAR" />
+      <result property="taskId" column="ILINK_TASK_ID_" jdbcType="VARCHAR" />
+      <result property="processInstanceId" column="ILINK_PROC_INST_ID_" jdbcType="VARCHAR" />
+      <result property="processDefId" column="ILINK_PROC_DEF_ID_" jdbcType="VARCHAR" />
     </collection>
   </resultMap>
 
@@ -303,53 +312,81 @@
     <include refid="commonSelectTaskByQueryCriteriaSql"/>
   </sql>
   
-  <select id="selectTaskWithVariablesByQueryCriteria" parameterType="org.flowable.engine.impl.TaskQueryImpl" resultMap="taskAndVariablesResultMap">
-    <include refid="selectTaskWithVariablesByQueryCriteriaColumns"/> 
-    <include refid="selectTaskWithVariablesByQueryCriteriaSql"/> 
+  <select id="selectTasksWithRelatedEntitiesByQueryCriteria" parameterType="org.flowable.engine.impl.TaskQueryImpl" resultMap="taskAndRelatedEntitiesResultMap">
+    <include refid="selectTasksWithRelatedEntitiesByQueryCriteriaColumns"/>
+    <include refid="selectTasksWithRelatedEntitiesByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
   </select>
-  
-  <sql id="selectTaskWithVariablesByQueryCriteriaColumns">
+
+  <sql id="selectTasksWithRelatedEntitiesByQueryCriteriaColumns">
     ${limitBefore}
   	<if test="_databaseId != 'db2' and _databaseId != 'mssql'">
     select RES.*,
-    VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
-    VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, VAR.TASK_ID_ as VAR_TASK_ID_,
-    VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, VAR.DOUBLE_ as VAR_DOUBLE_, 
-    VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LONG_ as VAR_LONG_
+      <if test="includeTaskLocalVariables or includeProcessVariables">
+        VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
+        VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, VAR.TASK_ID_ as VAR_TASK_ID_,
+        VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, VAR.DOUBLE_ as VAR_DOUBLE_,
+        VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LONG_ as VAR_LONG_
+      </if>
+      <if test="(includeTaskLocalVariables or includeProcessVariables) and includeIdentityLinks">
+        ,
+      </if>
+      <if test="includeIdentityLinks">
+        ILINK.ID_ as ILINK_ID_, ILINK.TYPE_ as ILINK_TYPE_, ILINK.USER_ID_ as ILINK_USER_ID_,
+        ILINK.GROUP_ID_ as ILINK_GROUP_ID_, ILINK.TASK_ID_ as ILINK_TASK_ID_,
+        ILINK.PROC_INST_ID_ as ILINK_PROC_INST_ID_, ILINK.PROC_DEF_ID_ as ILINK_PROC_DEF_ID_
+      </if>
     ${limitBetween}
     </if>
     <if test="_databaseId == 'db2' || _databaseId == 'mssql'">
-    select distinct TEMPRES_ID_ as ID_, TEMPRES_REV_ as REV_, TEMPRES_NAME_ as NAME_,
-    TEMPRES_PARENT_TASK_ID_ as PARENT_TASK_ID_, TEMPRES_DESCRIPTION_ as DESCRIPTION_,
-    TEMPRES_PRIORITY_ as PRIORITY_, TEMPRES_CREATE_TIME_ as CREATE_TIME_,
-    TEMPRES_OWNER_ as OWNER_, TEMPRES_ASSIGNEE_ as ASSIGNEE_, TEMPRES_DELEGATION_ as DELEGATION_,
-    TEMPRES_FORM_KEY_ as FORM_KEY_, TEMPRES_CLAIM_TIME_ as CLAIM_TIME_, TEMPRES_EXECUTION_ID_ as EXECUTION_ID_,
-    TEMPRES_PROC_INST_ID_ as PROC_INST_ID_, TEMPRES_PROC_DEF_ID_ as PROC_DEF_ID_, TEMPRES_TASK_DEF_KEY_ as TASK_DEF_KEY_,
-    TEMPRES_DUE_DATE_ as DUE_DATE_, TEMPRES_SUSPENSION_STATE_ as SUSPENSION_STATE_, TEMPRES_CATEGORY_ as CATEGORY_,
-    TEMPRES_IS_COUNT_ENABLED_ as IS_COUNT_ENABLED_,	TEMPRES_VAR_COUNT_ as VAR_COUNT_, TEMPRES_ID_LINK_COUNT_ as ID_LINK_COUNT_,
-    TEMPVAR_ID_ as VAR_ID_, TEMPVAR_NAME_ as VAR_NAME_, TEMPVAR_TYPE_ as VAR_TYPE_, TEMPVAR_REV_ as VAR_REV_,
-    TEMPVAR_PROC_INST_ID_ as VAR_PROC_INST_ID_, TEMPVAR_EXECUTION_ID_ as VAR_EXECUTION_ID_, TEMPVAR_TASK_ID_ as VAR_TASK_ID_,
-    TEMPVAR_BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, TEMPVAR_DOUBLE_ as VAR_DOUBLE_, 
-    TEMPVAR_TEXT_ as VAR_TEXT_, TEMPVAR_TEXT2_ as VAR_TEXT2_, TEMPVAR_LONG_ as VAR_LONG_
-    ${limitOuterJoinBetween}
-    RES.ID_ as TEMPRES_ID_, RES.REV_ as TEMPRES_REV_, RES.NAME_ as TEMPRES_NAME_,
-    RES.PARENT_TASK_ID_ as TEMPRES_PARENT_TASK_ID_, RES.DESCRIPTION_ as TEMPRES_DESCRIPTION_,
-    RES.PRIORITY_ as TEMPRES_PRIORITY_, RES.CREATE_TIME_ as TEMPRES_CREATE_TIME_,
-    RES.OWNER_ as TEMPRES_OWNER_, RES.ASSIGNEE_ as TEMPRES_ASSIGNEE_, RES.DELEGATION_ as TEMPRES_DELEGATION_,
-    RES.FORM_KEY_ as TEMPRES_FORM_KEY_, RES.CLAIM_TIME_ as TEMPRES_CLAIM_TIME_, RES.EXECUTION_ID_ as TEMPRES_EXECUTION_ID_,
-    RES.PROC_INST_ID_ as TEMPRES_PROC_INST_ID_, RES.PROC_DEF_ID_ as TEMPRES_PROC_DEF_ID_, RES.TASK_DEF_KEY_ as TEMPRES_TASK_DEF_KEY_,
-    RES.DUE_DATE_ as TEMPRES_DUE_DATE_, RES.SUSPENSION_STATE_ as TEMPRES_SUSPENSION_STATE_, RES.CATEGORY_ as TEMPRES_CATEGORY_,
-    RES.IS_COUNT_ENABLED_ as TEMPRES_IS_COUNT_ENABLED_, RES.VAR_COUNT_ as TEMPRES_VAR_COUNT_, RES.ID_LINK_COUNT_ as TEMPRES_ID_LINK_COUNT_,
-    VAR.ID_ as TEMPVAR_ID_, VAR.NAME_ as TEMPVAR_NAME_, VAR.TYPE_ as TEMPVAR_TYPE_, VAR.REV_ as TEMPVAR_REV_,
-    VAR.PROC_INST_ID_ as TEMPVAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as TEMPVAR_EXECUTION_ID_, VAR.TASK_ID_ as TEMPVAR_TASK_ID_,
-    VAR.BYTEARRAY_ID_ as TEMPVAR_BYTEARRAY_ID_, VAR.DOUBLE_ as TEMPVAR_DOUBLE_, 
-    VAR.TEXT_ as TEMPVAR_TEXT_, VAR.TEXT2_ as TEMPVAR_TEXT2_, VAR.LONG_ as TEMPVAR_LONG_
+      select distinct TEMPRES_ID_ as ID_, TEMPRES_REV_ as REV_, TEMPRES_NAME_ as NAME_,
+      TEMPRES_PARENT_TASK_ID_ as PARENT_TASK_ID_, TEMPRES_DESCRIPTION_ as DESCRIPTION_,
+      TEMPRES_PRIORITY_ as PRIORITY_, TEMPRES_CREATE_TIME_ as CREATE_TIME_,
+      TEMPRES_OWNER_ as OWNER_, TEMPRES_ASSIGNEE_ as ASSIGNEE_, TEMPRES_DELEGATION_ as DELEGATION_,
+      TEMPRES_FORM_KEY_ as FORM_KEY_, TEMPRES_CLAIM_TIME_ as CLAIM_TIME_, TEMPRES_EXECUTION_ID_ as EXECUTION_ID_,
+      TEMPRES_PROC_INST_ID_ as PROC_INST_ID_, TEMPRES_PROC_DEF_ID_ as PROC_DEF_ID_, TEMPRES_TASK_DEF_KEY_ as TASK_DEF_KEY_,
+      TEMPRES_DUE_DATE_ as DUE_DATE_, TEMPRES_SUSPENSION_STATE_ as SUSPENSION_STATE_, TEMPRES_CATEGORY_ as CATEGORY_,
+      TEMPRES_IS_COUNT_ENABLED_ as IS_COUNT_ENABLED_,	TEMPRES_VAR_COUNT_ as VAR_COUNT_, TEMPRES_ID_LINK_COUNT_ as ID_LINK_COUNT_
+      <if test="includeTaskLocalVariables or includeProcessVariables">
+        ,
+        TEMPVAR_ID_ as VAR_ID_, TEMPVAR_NAME_ as VAR_NAME_, TEMPVAR_TYPE_ as VAR_TYPE_, TEMPVAR_REV_ as VAR_REV_,
+        TEMPVAR_PROC_INST_ID_ as VAR_PROC_INST_ID_, TEMPVAR_EXECUTION_ID_ as VAR_EXECUTION_ID_, TEMPVAR_TASK_ID_ as VAR_TASK_ID_,
+        TEMPVAR_BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, TEMPVAR_DOUBLE_ as VAR_DOUBLE_,
+        TEMPVAR_TEXT_ as VAR_TEXT_, TEMPVAR_TEXT2_ as VAR_TEXT2_, TEMPVAR_LONG_ as VAR_LONG_
+      </if>
+      <if test="includeIdentityLinks">
+        ,
+        TEMPILINK_ID_ as ILINK_ID_, TEMPILINK_TYPE_ as ILINK_TYPE_, TEMPILINK_USER_ID_ as ILINK_USER_ID_,
+        TEMPILINK_GROUP_ID_ as ILINK_GROUP_ID_, TEMPILINK_TASK_ID_ as ILINK_TASK_ID_,
+        TEMPILINK_PROC_INST_ID_ as ILINK_PROC_INST_ID_, TEMPILINK_PROC_DEF_ID_ as ILINK_PROC_DEF_ID_
+      </if>
+      ${limitOuterJoinBetween}
+      RES.ID_ as TEMPRES_ID_, RES.REV_ as TEMPRES_REV_, RES.NAME_ as TEMPRES_NAME_,
+      RES.PARENT_TASK_ID_ as TEMPRES_PARENT_TASK_ID_, RES.DESCRIPTION_ as TEMPRES_DESCRIPTION_,
+      RES.PRIORITY_ as TEMPRES_PRIORITY_, RES.CREATE_TIME_ as TEMPRES_CREATE_TIME_,
+      RES.OWNER_ as TEMPRES_OWNER_, RES.ASSIGNEE_ as TEMPRES_ASSIGNEE_, RES.DELEGATION_ as TEMPRES_DELEGATION_,
+      RES.FORM_KEY_ as TEMPRES_FORM_KEY_, RES.CLAIM_TIME_ as TEMPRES_CLAIM_TIME_, RES.EXECUTION_ID_ as TEMPRES_EXECUTION_ID_,
+      RES.PROC_INST_ID_ as TEMPRES_PROC_INST_ID_, RES.PROC_DEF_ID_ as TEMPRES_PROC_DEF_ID_, RES.TASK_DEF_KEY_ as TEMPRES_TASK_DEF_KEY_,
+      RES.DUE_DATE_ as TEMPRES_DUE_DATE_, RES.SUSPENSION_STATE_ as TEMPRES_SUSPENSION_STATE_, RES.CATEGORY_ as TEMPRES_CATEGORY_,
+      RES.IS_COUNT_ENABLED_ as TEMPRES_IS_COUNT_ENABLED_, RES.VAR_COUNT_ as TEMPRES_VAR_COUNT_, RES.ID_LINK_COUNT_ as TEMPRES_ID_LINK_COUNT_
+      <if test="includeTaskLocalVariables or includeProcessVariables">
+        ,
+        VAR.ID_ as TEMPVAR_ID_, VAR.NAME_ as TEMPVAR_NAME_, VAR.TYPE_ as TEMPVAR_TYPE_, VAR.REV_ as TEMPVAR_REV_,
+        VAR.PROC_INST_ID_ as TEMPVAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as TEMPVAR_EXECUTION_ID_, VAR.TASK_ID_ as TEMPVAR_TASK_ID_,
+        VAR.BYTEARRAY_ID_ as TEMPVAR_BYTEARRAY_ID_, VAR.DOUBLE_ as TEMPVAR_DOUBLE_,
+        VAR.TEXT_ as TEMPVAR_TEXT_, VAR.TEXT2_ as TEMPVAR_TEXT2_, VAR.LONG_ as TEMPVAR_LONG_
+      </if>
+      <if test="includeIdentityLinks">
+        ,
+        ILINK.ID_ as TEMPILINK_ID_, ILINK.TYPE_ as TEMPILINK_TYPE_, ILINK.USER_ID_ as TEMPILINK_USER_ID_,
+        ILINK.GROUP_ID_ as TEMPILINK_GROUP_ID_, ILINK.TASK_ID_ as TEMPILINK_TASK_ID_,
+        ILINK.PROC_INST_ID_ as TEMPILINK_PROC_INST_ID_, ILINK.PROC_DEF_ID_ as TEMPILINK_PROC_DEF_ID_
+      </if>
     </if>
   </sql>
   
-  <sql id="selectTaskWithVariablesByQueryCriteriaSql">  
+  <sql id="selectTasksWithRelatedEntitiesByQueryCriteriaSql">
     from ${prefix}ACT_RU_TASK RES
     <choose>
       <when test="includeTaskLocalVariables &amp;&amp; includeProcessVariables">
@@ -364,6 +401,9 @@
         </if>
       </otherwise>
     </choose>
+    <if test="includeIdentityLinks">
+      left outer join ${prefix}ACT_RU_IDENTITYLINK ILINK on RES.ID_ = ILINK.TASK_ID_
+    </if>
     <include refid="commonSelectTaskByQueryCriteriaSql"/>
   </sql>
   

@@ -29,60 +29,60 @@ import org.slf4j.LoggerFactory;
 
 public class ParsedDeploymentBuilder {
 
-  private static final Logger log = LoggerFactory.getLogger(ParsedDeploymentBuilder.class);
-  
-  public static final String[] FORM_RESOURCE_SUFFIXES = new String[] { "form" };
+    private static final Logger log = LoggerFactory.getLogger(ParsedDeploymentBuilder.class);
 
-  protected FormDeploymentEntity deployment;
-  protected FormDefinitionParseFactory formDefinitionParseFactory;
+    public static final String[] FORM_RESOURCE_SUFFIXES = new String[] { "form" };
 
-  public ParsedDeploymentBuilder(FormDeploymentEntity deployment, FormDefinitionParseFactory formDefinitionParseFactory) {
-    this.deployment = deployment;
-    this.formDefinitionParseFactory = formDefinitionParseFactory;
-  }
+    protected FormDeploymentEntity deployment;
+    protected FormDefinitionParseFactory formDefinitionParseFactory;
 
-  public ParsedDeployment build() {
-    List<FormDefinitionEntity> formDefinitions = new ArrayList<FormDefinitionEntity>();
-    Map<FormDefinitionEntity, FormDefinitionParse> formDefinitionToParseMap = new LinkedHashMap<FormDefinitionEntity, FormDefinitionParse>();
-    Map<FormDefinitionEntity, ResourceEntity> formDefintionToResourceMap = new LinkedHashMap<FormDefinitionEntity, ResourceEntity>();
+    public ParsedDeploymentBuilder(FormDeploymentEntity deployment, FormDefinitionParseFactory formDefinitionParseFactory) {
+        this.deployment = deployment;
+        this.formDefinitionParseFactory = formDefinitionParseFactory;
+    }
 
-    for (ResourceEntity resource : deployment.getResources().values()) {
-      if (isFormResource(resource.getName())) {
-        log.debug("Processing Form definition resource {}", resource.getName());
-        FormDefinitionParse parse = createFormParseFromResource(resource);
-        for (FormDefinitionEntity formDefinition : parse.getFormDefinitions()) {
-          formDefinitions.add(formDefinition);
-          formDefinitionToParseMap.put(formDefinition, parse);
-          formDefintionToResourceMap.put(formDefinition, resource);
+    public ParsedDeployment build() {
+        List<FormDefinitionEntity> formDefinitions = new ArrayList<FormDefinitionEntity>();
+        Map<FormDefinitionEntity, FormDefinitionParse> formDefinitionToParseMap = new LinkedHashMap<FormDefinitionEntity, FormDefinitionParse>();
+        Map<FormDefinitionEntity, ResourceEntity> formDefinitionToResourceMap = new LinkedHashMap<FormDefinitionEntity, ResourceEntity>();
+
+        for (ResourceEntity resource : deployment.getResources().values()) {
+            if (isFormResource(resource.getName())) {
+                log.debug("Processing Form definition resource {}", resource.getName());
+                FormDefinitionParse parse = createFormParseFromResource(resource);
+                for (FormDefinitionEntity formDefinition : parse.getFormDefinitions()) {
+                    formDefinitions.add(formDefinition);
+                    formDefinitionToParseMap.put(formDefinition, parse);
+                    formDefinitionToResourceMap.put(formDefinition, resource);
+                }
+            }
         }
-      }
+
+        return new ParsedDeployment(deployment, formDefinitions, formDefinitionToParseMap, formDefinitionToResourceMap);
     }
 
-    return new ParsedDeployment(deployment, formDefinitions, formDefinitionToParseMap, formDefintionToResourceMap);
-  }
+    protected FormDefinitionParse createFormParseFromResource(ResourceEntity resource) {
+        String resourceName = resource.getName();
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(resource.getBytes());
 
-  protected FormDefinitionParse createFormParseFromResource(ResourceEntity resource) {
-    String resourceName = resource.getName();
-    ByteArrayInputStream inputStream = new ByteArrayInputStream(resource.getBytes());
+        FormDefinitionParse formParse = formDefinitionParseFactory.createParse()
+                .sourceInputStream(inputStream)
+                .setSourceSystemId(resourceName)
+                .deployment(deployment)
+                .name(resourceName);
 
-    FormDefinitionParse formParse = formDefinitionParseFactory.createParse()
-        .sourceInputStream(inputStream)
-        .setSourceSystemId(resourceName)
-        .deployment(deployment)
-        .name(resourceName);
-    
-    formParse.execute(Context.getFormEngineConfiguration());
-    return formParse;
-  }
-
-  protected boolean isFormResource(String resourceName) {
-    for (String suffix : FORM_RESOURCE_SUFFIXES) {
-      if (resourceName.endsWith(suffix)) {
-        return true;
-      }
+        formParse.execute(Context.getFormEngineConfiguration());
+        return formParse;
     }
 
-    return false;
-  }
+    protected boolean isFormResource(String resourceName) {
+        for (String suffix : FORM_RESOURCE_SUFFIXES) {
+            if (resourceName.endsWith(suffix)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 }

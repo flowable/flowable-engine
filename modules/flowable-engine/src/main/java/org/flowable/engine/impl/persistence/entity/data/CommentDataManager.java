@@ -24,26 +24,26 @@ import org.flowable.engine.task.Event;
  */
 public interface CommentDataManager extends DataManager<CommentEntity> {
 
-  List<Comment> findCommentsByTaskId(String taskId);
-  
-  List<Comment> findCommentsByTaskIdAndType(String taskId, String type);
-  
-  List<Comment> findCommentsByType(String type);
+    List<Comment> findCommentsByTaskId(String taskId);
 
-  List<Event> findEventsByTaskId(String taskId);
+    List<Comment> findCommentsByTaskIdAndType(String taskId, String type);
 
-  List<Event> findEventsByProcessInstanceId(String processInstanceId);
+    List<Comment> findCommentsByType(String type);
 
-  void deleteCommentsByTaskId(String taskId);
+    List<Event> findEventsByTaskId(String taskId);
 
-  void deleteCommentsByProcessInstanceId(String processInstanceId);
+    List<Event> findEventsByProcessInstanceId(String processInstanceId);
 
-  List<Comment> findCommentsByProcessInstanceId(String processInstanceId);
+    void deleteCommentsByTaskId(String taskId);
 
-  List<Comment> findCommentsByProcessInstanceId(String processInstanceId, String type);
+    void deleteCommentsByProcessInstanceId(String processInstanceId);
 
-  Comment findComment(String commentId);
+    List<Comment> findCommentsByProcessInstanceId(String processInstanceId);
 
-  Event findEvent(String commentId);
-  
+    List<Comment> findCommentsByProcessInstanceId(String processInstanceId, String type);
+
+    Comment findComment(String commentId);
+
+    Event findEvent(String commentId);
+
 }

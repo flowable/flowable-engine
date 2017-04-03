@@ -21,64 +21,64 @@ import org.flowable.app.model.common.AbstractRepresentation;
  * @author Joram Barrez
  */
 public class UpdateUsersRepresentation extends AbstractRepresentation {
-  
-  protected String id;
-  protected String firstName;
-  protected String lastName;
-  protected String email;
-  protected String password;
-  protected List<String> users = new ArrayList<String>();
-  
-  public UpdateUsersRepresentation() {
-    
-  }
 
-  public String getId() {
-    return id;
-  }
+    protected String id;
+    protected String firstName;
+    protected String lastName;
+    protected String email;
+    protected String password;
+    protected List<String> users = new ArrayList<String>();
 
-  public void setId(String id) {
-    this.id = id;
-  }
+    public UpdateUsersRepresentation() {
 
-  public String getFirstName() {
-    return firstName;
-  }
+    }
 
-  public void setFirstName(String firstName) {
-    this.firstName = firstName;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public String getLastName() {
-    return lastName;
-  }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public void setLastName(String lastName) {
-    this.lastName = lastName;
-  }
+    public String getFirstName() {
+        return firstName;
+    }
 
-  public String getEmail() {
-    return email;
-  }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-  public void setEmail(String email) {
-    this.email = email;
-  }
+    public String getLastName() {
+        return lastName;
+    }
 
-  public String getPassword() {
-    return password;
-  }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-  public void setPassword(String password) {
-    this.password = password;
-  }
+    public String getEmail() {
+        return email;
+    }
 
-  public List<String> getUsers() {
-    return users;
-  }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-  public void setUsers(List<String> users) {
-    this.users = users;
-  }
-  
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public List<String> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<String> users) {
+        this.users = users;
+    }
+
 }

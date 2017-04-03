@@ -30,16 +30,18 @@ import java.util.Date;
  */
 public interface Deployment {
 
-  String getId();
+    String getId();
 
-  String getName();
+    String getName();
 
-  Date getDeploymentTime();
+    Date getDeploymentTime();
 
-  String getCategory();
-  
-  String getKey();
+    String getCategory();
 
-  String getTenantId();
+    String getKey();
+
+    String getTenantId();
+
+    String getEngineVersion();
 
 }

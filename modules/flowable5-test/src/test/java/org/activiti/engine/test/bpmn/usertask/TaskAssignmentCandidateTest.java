@@ -25,31 +25,31 @@ import org.flowable.engine.test.Deployment;
  */
 public class TaskAssignmentCandidateTest extends PluggableFlowableTestCase {
 
-  public void setUp() throws Exception {
-    identityService.saveGroup(identityService.newGroup("accounting"));
-    identityService.saveGroup(identityService.newGroup("management"));
-  }
+    public void setUp() throws Exception {
+        identityService.saveGroup(identityService.newGroup("accounting"));
+        identityService.saveGroup(identityService.newGroup("management"));
+    }
 
-  public void tearDown() throws Exception {
-    identityService.deleteGroup("accounting");
-    identityService.deleteGroup("management");
-  }
+    public void tearDown() throws Exception {
+        identityService.deleteGroup("accounting");
+        identityService.deleteGroup("management");
+    }
 
-  @Deployment
-  public void testCandidateGroups() {
-    runtimeService.startProcessInstanceByKey("taskCandidateExample");
-    List<Task> tasks = taskService
-      .createTaskQuery()
-      .taskCandidateGroup("management")
-      .list();
-    assertEquals(1, tasks.size());
-    assertEquals("theTask", tasks.get(0).getTaskDefinitionKey());
-    taskService.complete(tasks.get(0).getId());
+    @Deployment
+    public void testCandidateGroups() {
+        runtimeService.startProcessInstanceByKey("taskCandidateExample");
+        List<Task> tasks = taskService
+                .createTaskQuery()
+                .taskCandidateGroup("management")
+                .list();
+        assertEquals(1, tasks.size());
+        assertEquals("theTask", tasks.get(0).getTaskDefinitionKey());
+        taskService.complete(tasks.get(0).getId());
 
-    tasks = taskService.createTaskQuery().taskCandidateGroup("accounting").list();
-    assertEquals(1, tasks.size());
-    assertEquals("theOtherTask", tasks.get(0).getTaskDefinitionKey());
-    taskService.complete(tasks.get(0).getId());
-  }
+        tasks = taskService.createTaskQuery().taskCandidateGroup("accounting").list();
+        assertEquals(1, tasks.size());
+        assertEquals("theOtherTask", tasks.get(0).getTaskDefinitionKey());
+        taskService.complete(tasks.get(0).getId());
+    }
 
 }

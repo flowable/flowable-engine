@@ -17,6 +17,6 @@ package org.flowable.engine.common.impl.interceptor;
  */
 public interface BaseCommand<T, C extends AbstractCommandContext> {
 
-  T execute(C commandContext);
+    T execute(C commandContext);
 
 }

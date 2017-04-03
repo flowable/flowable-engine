@@ -24,41 +24,41 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventType;
  */
 public class FlowableIdmEventDispatcherImpl implements FlowableEventDispatcher {
 
-  protected FlowableIdmEventSupport eventSupport;
-  protected boolean enabled = true;
+    protected FlowableIdmEventSupport eventSupport;
+    protected boolean enabled = true;
 
-  public FlowableIdmEventDispatcherImpl() {
-    eventSupport = new FlowableIdmEventSupport();
-  }
-
-  public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
-  }
-
-  public boolean isEnabled() {
-    return enabled;
-  }
-
-  @Override
-  public void addEventListener(FlowableEventListener listenerToAdd) {
-    eventSupport.addEventListener(listenerToAdd);
-  }
-
-  @Override
-  public void addEventListener(FlowableEventListener listenerToAdd, FlowableEventType... types) {
-    eventSupport.addEventListener(listenerToAdd, types);
-  }
-
-  @Override
-  public void removeEventListener(FlowableEventListener listenerToRemove) {
-    eventSupport.removeEventListener(listenerToRemove);
-  }
-
-  @Override
-  public void dispatchEvent(FlowableEvent event) {
-    if (enabled) {
-      eventSupport.dispatchEvent(event);
+    public FlowableIdmEventDispatcherImpl() {
+        eventSupport = new FlowableIdmEventSupport();
     }
-  }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    @Override
+    public void addEventListener(FlowableEventListener listenerToAdd) {
+        eventSupport.addEventListener(listenerToAdd);
+    }
+
+    @Override
+    public void addEventListener(FlowableEventListener listenerToAdd, FlowableEventType... types) {
+        eventSupport.addEventListener(listenerToAdd, types);
+    }
+
+    @Override
+    public void removeEventListener(FlowableEventListener listenerToRemove) {
+        eventSupport.removeEventListener(listenerToRemove);
+    }
+
+    @Override
+    public void dispatchEvent(FlowableEvent event) {
+        if (enabled) {
+            eventSupport.dispatchEvent(event);
+        }
+    }
 
 }

@@ -13,17 +13,16 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
-
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
 public interface SignalEventSubscriptionEntity extends EventSubscriptionEntity {
-  
-  String EVENT_TYPE = "signal";
 
-  boolean isProcessInstanceScoped();
+    String EVENT_TYPE = "signal";
 
-  boolean isGlobalScoped();
+    boolean isProcessInstanceScoped();
+
+    boolean isGlobalScoped();
 
 }

@@ -26,18 +26,18 @@ import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntit
  */
 public interface HistoricVariableInstanceDataManager extends DataManager<HistoricVariableInstanceEntity> {
 
-  List<HistoricVariableInstanceEntity> findHistoricVariableInstancesByProcessInstanceId(String processInstanceId);
-  
-  List<HistoricVariableInstanceEntity> findHistoricVariableInstancesByTaskId(String taskId);
-  
-  long findHistoricVariableInstanceCountByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery);
+    List<HistoricVariableInstanceEntity> findHistoricVariableInstancesByProcessInstanceId(String processInstanceId);
 
-  List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery, Page page);
+    List<HistoricVariableInstanceEntity> findHistoricVariableInstancesByTaskId(String taskId);
 
-  HistoricVariableInstanceEntity findHistoricVariableInstanceByVariableInstanceId(String variableInstanceId);
-  
-  List<HistoricVariableInstance> findHistoricVariableInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    long findHistoricVariableInstanceCountByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery);
 
-  long findHistoricVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap);
-  
+    List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery, Page page);
+
+    HistoricVariableInstanceEntity findHistoricVariableInstanceByVariableInstanceId(String variableInstanceId);
+
+    List<HistoricVariableInstance> findHistoricVariableInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+
+    long findHistoricVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap);
+
 }

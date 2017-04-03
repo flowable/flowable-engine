@@ -26,60 +26,60 @@ import org.slf4j.LoggerFactory;
  */
 public class ServiceTaskParseHandler extends AbstractActivityBpmnParseHandler<ServiceTask> {
 
-  private static Logger logger = LoggerFactory.getLogger(ServiceTaskParseHandler.class);
+    private static Logger logger = LoggerFactory.getLogger(ServiceTaskParseHandler.class);
 
-  public Class<? extends BaseElement> getHandledType() {
-    return ServiceTask.class;
-  }
-
-  protected void executeParse(BpmnParse bpmnParse, ServiceTask serviceTask) {
-
-    // Email, Mule and Shell service tasks
-    if (StringUtils.isNotEmpty(serviceTask.getType())) {
-
-      if (serviceTask.getType().equalsIgnoreCase("mail")) {
-        serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createMailActivityBehavior(serviceTask));
-
-      } else if (serviceTask.getType().equalsIgnoreCase("mule")) {
-        serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createMuleActivityBehavior(serviceTask));
-
-      } else if (serviceTask.getType().equalsIgnoreCase("camel")) {
-        serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createCamelActivityBehavior(serviceTask));
-
-      } else if (serviceTask.getType().equalsIgnoreCase("shell")) {
-        serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createShellActivityBehavior(serviceTask));
-        
-      } else if (serviceTask.getType().equalsIgnoreCase("dmn")) {
-        serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createDmnActivityBehavior(serviceTask));
-
-      } else {
-          logger.warn("Invalid service task type: '{}'  for service task {}", serviceTask.getType(), serviceTask.getId());
-      }
-
-      // activiti:class
-    } else if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(serviceTask.getImplementationType())) {
-
-      serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createClassDelegateServiceTask(serviceTask));
-
-      // activiti:delegateExpression
-    } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(serviceTask.getImplementationType())) {
-
-      serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createServiceTaskDelegateExpressionActivityBehavior(serviceTask));
-
-      // activiti:expression
-    } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equalsIgnoreCase(serviceTask.getImplementationType())) {
-
-      serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createServiceTaskExpressionActivityBehavior(serviceTask));
-
-      // Webservice
-    } else if (ImplementationType.IMPLEMENTATION_TYPE_WEBSERVICE.equalsIgnoreCase(serviceTask.getImplementationType()) && StringUtils.isNotEmpty(serviceTask.getOperationRef())) {
-
-      WebServiceActivityBehavior webServiceActivityBehavior = bpmnParse.getActivityBehaviorFactory().createWebServiceActivityBehavior(serviceTask);
-      serviceTask.setBehavior(webServiceActivityBehavior);
-      
-    } else {
-        logger.warn("One of the attributes 'class', 'delegateExpression', 'type', 'operation', or 'expression' is mandatory on serviceTask {}", serviceTask.getId());
+    public Class<? extends BaseElement> getHandledType() {
+        return ServiceTask.class;
     }
 
-  }
+    protected void executeParse(BpmnParse bpmnParse, ServiceTask serviceTask) {
+
+        // Email, Mule and Shell service tasks
+        if (StringUtils.isNotEmpty(serviceTask.getType())) {
+
+            if (serviceTask.getType().equalsIgnoreCase("mail")) {
+                serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createMailActivityBehavior(serviceTask));
+
+            } else if (serviceTask.getType().equalsIgnoreCase("mule")) {
+                serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createMuleActivityBehavior(serviceTask));
+
+            } else if (serviceTask.getType().equalsIgnoreCase("camel")) {
+                serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createCamelActivityBehavior(serviceTask));
+
+            } else if (serviceTask.getType().equalsIgnoreCase("shell")) {
+                serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createShellActivityBehavior(serviceTask));
+
+            } else if (serviceTask.getType().equalsIgnoreCase("dmn")) {
+                serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createDmnActivityBehavior(serviceTask));
+
+            } else {
+                logger.warn("Invalid service task type: '{}'  for service task {}", serviceTask.getType(), serviceTask.getId());
+            }
+
+            // activiti:class
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(serviceTask.getImplementationType())) {
+
+            serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createClassDelegateServiceTask(serviceTask));
+
+            // activiti:delegateExpression
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(serviceTask.getImplementationType())) {
+
+            serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createServiceTaskDelegateExpressionActivityBehavior(serviceTask));
+
+            // activiti:expression
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equalsIgnoreCase(serviceTask.getImplementationType())) {
+
+            serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createServiceTaskExpressionActivityBehavior(serviceTask));
+
+            // Webservice
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_WEBSERVICE.equalsIgnoreCase(serviceTask.getImplementationType()) && StringUtils.isNotEmpty(serviceTask.getOperationRef())) {
+
+            WebServiceActivityBehavior webServiceActivityBehavior = bpmnParse.getActivityBehaviorFactory().createWebServiceActivityBehavior(serviceTask);
+            serviceTask.setBehavior(webServiceActivityBehavior);
+
+        } else {
+            logger.warn("One of the attributes 'class', 'delegateExpression', 'type', 'operation', or 'expression' is mandatory on serviceTask {}", serviceTask.getId());
+        }
+
+    }
 }

@@ -26,24 +26,24 @@ import org.flowable.engine.common.api.management.TablePageQuery;
  */
 public interface FormManagementService {
 
-  /**
-   * Get the mapping containing {table name, row count} entries of the Flowable database schema.
-   */
-  Map<String, Long> getTableCount();
+    /**
+     * Get the mapping containing {table name, row count} entries of the Flowable database schema.
+     */
+    Map<String, Long> getTableCount();
 
-  /**
-   * Gets the table name (including any configured prefix) for an Flowable entity like Task, Execution or the like.
-   */
-  String getTableName(Class<?> idmEntityClass);
+    /**
+     * Gets the table name (including any configured prefix) for an Flowable entity like Task, Execution or the like.
+     */
+    String getTableName(Class<?> idmEntityClass);
 
-  /**
-   * Gets the metadata (column names, column types, etc.) of a certain table. Returns null when no table exists with the given name.
-   */
-  TableMetaData getTableMetaData(String tableName);
+    /**
+     * Gets the metadata (column names, column types, etc.) of a certain table. Returns null when no table exists with the given name.
+     */
+    TableMetaData getTableMetaData(String tableName);
 
-  /**
-   * Creates a {@link TablePageQuery} that can be used to fetch {@link org.flowable.engine.common.api.management.TablePage} containing specific sections of table row data.
-   */
-  TablePageQuery createTablePageQuery();
+    /**
+     * Creates a {@link TablePageQuery} that can be used to fetch {@link org.flowable.engine.common.api.management.TablePage} containing specific sections of table row data.
+     */
+    TablePageQuery createTablePageQuery();
 
 }

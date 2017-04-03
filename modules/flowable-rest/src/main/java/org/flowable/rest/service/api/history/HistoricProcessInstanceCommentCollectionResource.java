@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -38,53 +39,53 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
-@Api(tags = { "History" }, description = "Manage History")
+@Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricProcessInstanceCommentCollectionResource {
 
-  @Autowired
-  protected RestResponseFactory restResponseFactory;
+    @Autowired
+    protected RestResponseFactory restResponseFactory;
 
-  @Autowired
-  protected HistoryService historyService;
+    @Autowired
+    protected HistoryService historyService;
 
-  @Autowired
-  protected TaskService taskService;
+    @Autowired
+    protected TaskService taskService;
 
-  @ApiOperation(value = "Get all comments on a historic process instance", tags = { "History" }, notes = "")
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "Indicates the process instance was found and the comments are returned."),
-          @ApiResponse(code = 404, message = "Indicates that the historic process instance could not be found.") })
-  @RequestMapping(value = "/history/historic-process-instances/{processInstanceId}/comments", method = RequestMethod.GET, produces = "application/json")
-  public List<CommentResponse> getComments(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
-    HistoricProcessInstance instance = getHistoricProcessInstanceFromRequest(processInstanceId);
-    return restResponseFactory.createRestCommentList(taskService.getProcessInstanceComments(instance.getId()));
-  }
-
-  @ApiOperation(value = "Create a new comment on a historic process instance", tags = { "History" }, notes = "Parameter saveProcessInstanceId is optional, if true save process instance id of task with comment.")
-  @ApiResponses(value = {
-          @ApiResponse(code = 201, message = "Indicates the comment was created and the result is returned."),
-          @ApiResponse(code = 400, message = "Indicates the comment is missing from the request."),
-          @ApiResponse(code = 404, message = "Indicates that the historic process instance could not be found.") })
-  @RequestMapping(value = "/history/historic-process-instances/{processInstanceId}/comments", method = RequestMethod.POST, produces = "application/json")
-  public CommentResponse createComment(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestBody CommentResponse comment, HttpServletRequest request, HttpServletResponse response) {
-
-    HistoricProcessInstance instance = getHistoricProcessInstanceFromRequest(processInstanceId);
-
-    if (comment.getMessage() == null) {
-      throw new FlowableIllegalArgumentException("Comment text is required.");
+    @ApiOperation(value = "Get all comments on a historic process instance", tags = { "History" }, notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the process instance was found and the comments are returned."),
+            @ApiResponse(code = 404, message = "Indicates that the historic process instance could not be found.") })
+    @RequestMapping(value = "/history/historic-process-instances/{processInstanceId}/comments", method = RequestMethod.GET, produces = "application/json")
+    public List<CommentResponse> getComments(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
+        HistoricProcessInstance instance = getHistoricProcessInstanceFromRequest(processInstanceId);
+        return restResponseFactory.createRestCommentList(taskService.getProcessInstanceComments(instance.getId()));
     }
 
-    Comment createdComment = taskService.addComment(null, instance.getId(), comment.getMessage());
-    response.setStatus(HttpStatus.CREATED.value());
+    @ApiOperation(value = "Create a new comment on a historic process instance", tags = { "History" }, notes = "Parameter saveProcessInstanceId is optional, if true save process instance id of task with comment.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Indicates the comment was created and the result is returned."),
+            @ApiResponse(code = 400, message = "Indicates the comment is missing from the request."),
+            @ApiResponse(code = 404, message = "Indicates that the historic process instance could not be found.") })
+    @RequestMapping(value = "/history/historic-process-instances/{processInstanceId}/comments", method = RequestMethod.POST, produces = "application/json")
+    public CommentResponse createComment(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestBody CommentResponse comment, HttpServletRequest request, HttpServletResponse response) {
 
-    return restResponseFactory.createRestComment(createdComment);
-  }
+        HistoricProcessInstance instance = getHistoricProcessInstanceFromRequest(processInstanceId);
 
-  protected HistoricProcessInstance getHistoricProcessInstanceFromRequest(String processInstanceId) {
-    HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-    if (processInstance == null) {
-      throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", HistoricProcessInstance.class);
+        if (comment.getMessage() == null) {
+            throw new FlowableIllegalArgumentException("Comment text is required.");
+        }
+
+        Comment createdComment = taskService.addComment(null, instance.getId(), comment.getMessage());
+        response.setStatus(HttpStatus.CREATED.value());
+
+        return restResponseFactory.createRestComment(createdComment);
     }
-    return processInstance;
-  }
+
+    protected HistoricProcessInstance getHistoricProcessInstanceFromRequest(String processInstanceId) {
+        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        if (processInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", HistoricProcessInstance.class);
+        }
+        return processInstance;
+    }
 }

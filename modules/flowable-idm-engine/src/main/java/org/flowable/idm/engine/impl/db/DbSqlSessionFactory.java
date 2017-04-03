@@ -32,209 +32,206 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
  */
 public class DbSqlSessionFactory implements SessionFactory {
 
-  protected static final Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<String, Map<String, String>>();
-  
-  protected String databaseType;
-  protected String databaseTablePrefix = "";
-  private boolean tablePrefixIsSchema;
+    protected static final Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<String, Map<String, String>>();
 
-  protected String databaseCatalog;
-  /**
-   * In some situations you want to set the schema to use for table checks /
-   * generation if the database metadata doesn't return that correctly, see
-   * https://activiti.atlassian.net/browse/ACT-1220,
-   * https://activiti.atlassian.net/browse/ACT-1062
-   */
-  protected String databaseSchema;
-  protected SqlSessionFactory sqlSessionFactory;
-  protected IdGenerator idGenerator;
-  protected Map<String, String> statementMappings;
-  protected Map<Class<?>,String> insertStatements = new ConcurrentHashMap<Class<?>, String>();
-  protected Map<Class<?>,String> updateStatements = new ConcurrentHashMap<Class<?>, String>();
-  protected Map<Class<?>,String> deleteStatements = new ConcurrentHashMap<Class<?>, String>();
-  protected Map<Class<?>,String> selectStatements = new ConcurrentHashMap<Class<?>, String>();
-  
-  public Class<?> getSessionType() {
-    return DbSqlSession.class;
-  }
+    protected String databaseType;
+    protected String databaseTablePrefix = "";
+    private boolean tablePrefixIsSchema;
 
-  public Session openSession(AbstractCommandContext commandContext) {
-    DbSqlSession dbSqlSession = new DbSqlSession(this);
-    if (getDatabaseSchema() != null && getDatabaseSchema().length() > 0) {
-      try {
-        dbSqlSession.getSqlSession().getConnection().setSchema(getDatabaseSchema());
-      } catch (SQLException e) {
-        throw new FlowableException("Could not set database schema on connection", e);
-      }
+    protected String databaseCatalog;
+    /**
+     * In some situations you want to set the schema to use for table checks / generation if the database metadata doesn't return that correctly, see https://activiti.atlassian.net/browse/ACT-1220,
+     * https://activiti.atlassian.net/browse/ACT-1062
+     */
+    protected String databaseSchema;
+    protected SqlSessionFactory sqlSessionFactory;
+    protected IdGenerator idGenerator;
+    protected Map<String, String> statementMappings;
+    protected Map<Class<?>, String> insertStatements = new ConcurrentHashMap<Class<?>, String>();
+    protected Map<Class<?>, String> updateStatements = new ConcurrentHashMap<Class<?>, String>();
+    protected Map<Class<?>, String> deleteStatements = new ConcurrentHashMap<Class<?>, String>();
+    protected Map<Class<?>, String> selectStatements = new ConcurrentHashMap<Class<?>, String>();
+
+    public Class<?> getSessionType() {
+        return DbSqlSession.class;
     }
-    if (getDatabaseCatalog() != null && getDatabaseCatalog().length() > 0) {
-      try {
-        dbSqlSession.getSqlSession().getConnection().setCatalog(getDatabaseCatalog());
-      } catch (SQLException e) {
-        throw new FlowableException("Could not set database catalog on connection", e);
-      }
+
+    public Session openSession(AbstractCommandContext commandContext) {
+        DbSqlSession dbSqlSession = new DbSqlSession(this);
+        if (getDatabaseSchema() != null && getDatabaseSchema().length() > 0) {
+            try {
+                dbSqlSession.getSqlSession().getConnection().setSchema(getDatabaseSchema());
+            } catch (SQLException e) {
+                throw new FlowableException("Could not set database schema on connection", e);
+            }
+        }
+        if (getDatabaseCatalog() != null && getDatabaseCatalog().length() > 0) {
+            try {
+                dbSqlSession.getSqlSession().getConnection().setCatalog(getDatabaseCatalog());
+            } catch (SQLException e) {
+                throw new FlowableException("Could not set database catalog on connection", e);
+            }
+        }
+        return dbSqlSession;
     }
-    return dbSqlSession;
-  }
 
-  // insert, update and delete statements
-  // /////////////////////////////////////
+    // insert, update and delete statements
+    // /////////////////////////////////////
 
-  public String getInsertStatement(Entity object) {
-    return getStatement(object.getClass(), insertStatements, "insert");
-  }
-  
-  
-  public String getInsertStatement(Class<? extends Entity> clazz) {
-    return getStatement(clazz, insertStatements, "insert");
-  }
-
-  public String getUpdateStatement(Entity object) {
-    return getStatement(object.getClass(), updateStatements, "update");
-  }
-
-  public String getDeleteStatement(Class<?> entityClass) {
-    return getStatement(entityClass, deleteStatements, "delete");
-  }
-
-  public String getSelectStatement(Class<?> entityClass) {
-    return getStatement(entityClass, selectStatements, "select");
-  }
-
-  private String getStatement(Class<?> entityClass, Map<Class<?>, String> cachedStatements, String prefix) {
-    String statement = cachedStatements.get(entityClass);
-    if (statement != null) {
-      return statement;
+    public String getInsertStatement(Entity object) {
+        return getStatement(object.getClass(), insertStatements, "insert");
     }
-    statement = prefix + entityClass.getSimpleName();
-    if (statement.endsWith("Impl")) {
-      statement = statement.substring(0, statement.length() - 10); // removing 'entityImpl'
-    } else {
-      statement = statement.substring(0, statement.length() - 6); // removing 'entity'
+
+    public String getInsertStatement(Class<? extends Entity> clazz) {
+        return getStatement(clazz, insertStatements, "insert");
     }
-    cachedStatements.put(entityClass, statement);
-    return statement;
-  }
 
-  // db specific mappings
-  // /////////////////////////////////////////////////////
-
-  protected static void addDatabaseSpecificStatement(String databaseType, String flowableStatement, String ibatisStatement) {
-    Map<String, String> specificStatements = databaseSpecificStatements.get(databaseType);
-    if (specificStatements == null) {
-      specificStatements = new HashMap<String, String>();
-      databaseSpecificStatements.put(databaseType, specificStatements);
+    public String getUpdateStatement(Entity object) {
+        return getStatement(object.getClass(), updateStatements, "update");
     }
-    specificStatements.put(flowableStatement, ibatisStatement);
-  }
 
-  public String mapStatement(String statement) {
-    if (statementMappings == null) {
-      return statement;
+    public String getDeleteStatement(Class<?> entityClass) {
+        return getStatement(entityClass, deleteStatements, "delete");
     }
-    String mappedStatement = statementMappings.get(statement);
-    return (mappedStatement != null ? mappedStatement : statement);
-  }
 
-  // customized getters and setters
-  // ///////////////////////////////////////////
+    public String getSelectStatement(Class<?> entityClass) {
+        return getStatement(entityClass, selectStatements, "select");
+    }
 
-  public void setDatabaseType(String databaseType) {
-    this.databaseType = databaseType;
-    this.statementMappings = databaseSpecificStatements.get(databaseType);
-  }
+    private String getStatement(Class<?> entityClass, Map<Class<?>, String> cachedStatements, String prefix) {
+        String statement = cachedStatements.get(entityClass);
+        if (statement != null) {
+            return statement;
+        }
+        statement = prefix + entityClass.getSimpleName();
+        if (statement.endsWith("Impl")) {
+            statement = statement.substring(0, statement.length() - 10); // removing 'entityImpl'
+        } else {
+            statement = statement.substring(0, statement.length() - 6); // removing 'entity'
+        }
+        cachedStatements.put(entityClass, statement);
+        return statement;
+    }
 
-  // getters and setters //////////////////////////////////////////////////////
-  
-  public SqlSessionFactory getSqlSessionFactory() {
-    return sqlSessionFactory;
-  }
+    // db specific mappings
+    // /////////////////////////////////////////////////////
 
-  public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
-    this.sqlSessionFactory = sqlSessionFactory;
-  }
-  
-  public IdGenerator getIdGenerator() {
-    return idGenerator;
-  }
+    protected static void addDatabaseSpecificStatement(String databaseType, String flowableStatement, String ibatisStatement) {
+        Map<String, String> specificStatements = databaseSpecificStatements.get(databaseType);
+        if (specificStatements == null) {
+            specificStatements = new HashMap<String, String>();
+            databaseSpecificStatements.put(databaseType, specificStatements);
+        }
+        specificStatements.put(flowableStatement, ibatisStatement);
+    }
 
-  public void setIdGenerator(IdGenerator idGenerator) {
-    this.idGenerator = idGenerator;
-  }
+    public String mapStatement(String statement) {
+        if (statementMappings == null) {
+            return statement;
+        }
+        String mappedStatement = statementMappings.get(statement);
+        return (mappedStatement != null ? mappedStatement : statement);
+    }
 
-  public String getDatabaseType() {
-    return databaseType;
-  }
+    // customized getters and setters
+    // ///////////////////////////////////////////
 
-  public Map<String, String> getStatementMappings() {
-    return statementMappings;
-  }
+    public void setDatabaseType(String databaseType) {
+        this.databaseType = databaseType;
+        this.statementMappings = databaseSpecificStatements.get(databaseType);
+    }
 
-  public void setStatementMappings(Map<String, String> statementMappings) {
-    this.statementMappings = statementMappings;
-  }
+    // getters and setters //////////////////////////////////////////////////////
 
-  public Map<Class<?>, String> getInsertStatements() {
-    return insertStatements;
-  }
+    public SqlSessionFactory getSqlSessionFactory() {
+        return sqlSessionFactory;
+    }
 
-  public void setInsertStatements(Map<Class<?>, String> insertStatements) {
-    this.insertStatements = insertStatements;
-  }
+    public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
+        this.sqlSessionFactory = sqlSessionFactory;
+    }
 
-  public Map<Class< ? >, String> getUpdateStatements() {
-    return updateStatements;
-  }
+    public IdGenerator getIdGenerator() {
+        return idGenerator;
+    }
 
-  public void setUpdateStatements(Map<Class<?>, String> updateStatements) {
-    this.updateStatements = updateStatements;
-  }
+    public void setIdGenerator(IdGenerator idGenerator) {
+        this.idGenerator = idGenerator;
+    }
 
-  public Map<Class<?>, String> getDeleteStatements() {
-    return deleteStatements;
-  }
+    public String getDatabaseType() {
+        return databaseType;
+    }
 
-  public void setDeleteStatements(Map<Class<?>, String> deleteStatements) {
-    this.deleteStatements = deleteStatements;
-  }
+    public Map<String, String> getStatementMappings() {
+        return statementMappings;
+    }
 
-  public Map<Class<?>, String> getSelectStatements() {
-    return selectStatements;
-  }
+    public void setStatementMappings(Map<String, String> statementMappings) {
+        this.statementMappings = statementMappings;
+    }
 
-  public void setSelectStatements(Map<Class<?>, String> selectStatements) {
-    this.selectStatements = selectStatements;
-  }
+    public Map<Class<?>, String> getInsertStatements() {
+        return insertStatements;
+    }
 
-  public void setDatabaseTablePrefix(String databaseTablePrefix) {
-    this.databaseTablePrefix = databaseTablePrefix;
-  }
+    public void setInsertStatements(Map<Class<?>, String> insertStatements) {
+        this.insertStatements = insertStatements;
+    }
 
-  public String getDatabaseTablePrefix() {
-    return databaseTablePrefix;
-  }
+    public Map<Class<?>, String> getUpdateStatements() {
+        return updateStatements;
+    }
 
-  public String getDatabaseCatalog() {
-    return databaseCatalog;
-  }
+    public void setUpdateStatements(Map<Class<?>, String> updateStatements) {
+        this.updateStatements = updateStatements;
+    }
 
-  public void setDatabaseCatalog(String databaseCatalog) {
-    this.databaseCatalog = databaseCatalog;
-  }
+    public Map<Class<?>, String> getDeleteStatements() {
+        return deleteStatements;
+    }
 
-  public String getDatabaseSchema() {
-    return databaseSchema;
-  }
+    public void setDeleteStatements(Map<Class<?>, String> deleteStatements) {
+        this.deleteStatements = deleteStatements;
+    }
 
-  public void setDatabaseSchema(String databaseSchema) {
-    this.databaseSchema = databaseSchema;
-  }
+    public Map<Class<?>, String> getSelectStatements() {
+        return selectStatements;
+    }
 
-  public void setTablePrefixIsSchema(boolean tablePrefixIsSchema) {
-    this.tablePrefixIsSchema = tablePrefixIsSchema;
-  }
+    public void setSelectStatements(Map<Class<?>, String> selectStatements) {
+        this.selectStatements = selectStatements;
+    }
 
-  public boolean isTablePrefixIsSchema() {
-    return tablePrefixIsSchema;
-  }
+    public void setDatabaseTablePrefix(String databaseTablePrefix) {
+        this.databaseTablePrefix = databaseTablePrefix;
+    }
+
+    public String getDatabaseTablePrefix() {
+        return databaseTablePrefix;
+    }
+
+    public String getDatabaseCatalog() {
+        return databaseCatalog;
+    }
+
+    public void setDatabaseCatalog(String databaseCatalog) {
+        this.databaseCatalog = databaseCatalog;
+    }
+
+    public String getDatabaseSchema() {
+        return databaseSchema;
+    }
+
+    public void setDatabaseSchema(String databaseSchema) {
+        this.databaseSchema = databaseSchema;
+    }
+
+    public void setTablePrefixIsSchema(boolean tablePrefixIsSchema) {
+        this.tablePrefixIsSchema = tablePrefixIsSchema;
+    }
+
+    public boolean isTablePrefixIsSchema() {
+        return tablePrefixIsSchema;
+    }
 }

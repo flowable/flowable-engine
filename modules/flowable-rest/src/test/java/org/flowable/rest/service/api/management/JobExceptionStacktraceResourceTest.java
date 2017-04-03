@@ -21,58 +21,58 @@ import org.flowable.rest.service.api.RestUrls;
  */
 public class JobExceptionStacktraceResourceTest extends BaseSpringRestTestCase {
 
-  /**
-   * Test getting the stacktrace for a failed job
-   */
-  @Deployment(resources = { "org/flowable/rest/service/api/management/JobExceptionStacktraceResourceTest.testTimerProcess.bpmn20.xml" })
-  public void testGetJobStacktrace() throws Exception {
-    // Start process, forcing error on job-execution
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess", Collections.singletonMap("error", (Object) Boolean.TRUE));
+    /**
+     * Test getting the stacktrace for a failed job
+     */
+    @Deployment(resources = { "org/flowable/rest/service/api/management/JobExceptionStacktraceResourceTest.testTimerProcess.bpmn20.xml" })
+    public void testGetJobStacktrace() throws Exception {
+        // Start process, forcing error on job-execution
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess", Collections.singletonMap("error", (Object) Boolean.TRUE));
 
-    Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertNotNull(timerJob);
+        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(timerJob);
 
-    // Force execution of job
-    try {
-      managementService.moveTimerToExecutableJob(timerJob.getId());
-      managementService.executeJob(timerJob.getId());
-      fail();
-    } catch (FlowableException expected) {
-      // Ignore, we expect the exception
+        // Force execution of job
+        try {
+            managementService.moveTimerToExecutableJob(timerJob.getId());
+            managementService.executeJob(timerJob.getId());
+            fail();
+        } catch (FlowableException expected) {
+            // Ignore, we expect the exception
+        }
+
+        Calendar now = Calendar.getInstance();
+        now.set(Calendar.MILLISECOND, 0);
+        processEngineConfiguration.getClock().setCurrentTime(now.getTime());
+
+        CloseableHttpResponse response = executeRequest(new HttpGet(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_EXCEPTION_STRACKTRACE, timerJob.getId())), HttpStatus.SC_OK);
+
+        String stack = IOUtils.toString(response.getEntity().getContent());
+        assertNotNull(stack);
+        assertEquals(managementService.getTimerJobExceptionStacktrace(timerJob.getId()), stack);
+
+        // Also check content-type
+        assertEquals("text/plain", response.getEntity().getContentType().getValue());
+        closeResponse(response);
     }
 
-    Calendar now = Calendar.getInstance();
-    now.set(Calendar.MILLISECOND, 0);
-    processEngineConfiguration.getClock().setCurrentTime(now.getTime());
+    /**
+     * Test getting the stacktrace for an unexisting job.
+     */
+    public void testGetStackForUnexistingJob() throws Exception {
+        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_EXCEPTION_STRACKTRACE, "unexistingjob")), HttpStatus.SC_NOT_FOUND));
+    }
 
-    CloseableHttpResponse response = executeRequest(new HttpGet(
-        SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_EXCEPTION_STRACKTRACE, timerJob.getId())), HttpStatus.SC_OK);
+    /**
+     * Test getting the stacktrace for an unexisting job.
+     */
+    @Deployment(resources = { "org/flowable/rest/service/api/management/JobExceptionStacktraceResourceTest.testTimerProcess.bpmn20.xml" })
+    public void testGetStackForJobWithoutException() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess", Collections.singletonMap("error", (Object) Boolean.FALSE));
+        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(timerJob);
 
-    String stack = IOUtils.toString(response.getEntity().getContent());
-    assertNotNull(stack);
-    assertEquals(managementService.getTimerJobExceptionStacktrace(timerJob.getId()), stack);
-
-    // Also check content-type
-    assertEquals("text/plain", response.getEntity().getContentType().getValue());
-    closeResponse(response);
-  }
-
-  /**
-   * Test getting the stacktrace for an unexisting job.
-   */
-  public void testGetStrackForUnexistingJob() throws Exception {
-    closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_EXCEPTION_STRACKTRACE, "unexistingjob")), HttpStatus.SC_NOT_FOUND));
-  }
-
-  /**
-   * Test getting the stacktrace for an unexisting job.
-   */
-  @Deployment(resources = { "org/flowable/rest/service/api/management/JobExceptionStacktraceResourceTest.testTimerProcess.bpmn20.xml" })
-  public void testGetStrackForJobWithoutException() throws Exception {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess", Collections.singletonMap("error", (Object) Boolean.FALSE));
-    Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertNotNull(timerJob);
-
-    closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_EXCEPTION_STRACKTRACE, timerJob.getId())), HttpStatus.SC_NOT_FOUND));
-  }
+        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_EXCEPTION_STRACKTRACE, timerJob.getId())), HttpStatus.SC_NOT_FOUND));
+    }
 }

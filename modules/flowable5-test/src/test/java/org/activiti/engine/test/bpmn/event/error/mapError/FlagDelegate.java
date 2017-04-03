@@ -15,25 +15,24 @@ package org.activiti.engine.test.bpmn.event.error.mapError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
-
 /**
  * @author Saeid Mirzaei
  */
-public class FlagDelegate implements JavaDelegate{
-  static boolean visited;
+public class FlagDelegate implements JavaDelegate {
+    static boolean visited;
 
-  public static void reset() {
-    visited = false;
-  }
-  
-  public static boolean isVisited() {
-    return visited;
-  }
-  
-  @Override
-  public void execute(DelegateExecution execution) {
-    visited =   true;
-    
-  }
+    public static void reset() {
+        visited = false;
+    }
+
+    public static boolean isVisited() {
+        return visited;
+    }
+
+    @Override
+    public void execute(DelegateExecution execution) {
+        visited = true;
+
+    }
 
 }

@@ -22,23 +22,22 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * Created by Pardo David on 5/12/2016.
  */
 public class ScriptTaskPropertiesParser extends BasePropertiesParser {
-	
-  @Override
-	protected ObjectNode createPropertiesNode(FlowElement flowElement, ObjectNode flowElementNode, ObjectMapper objectMapper) {
-		ScriptTask scriptTask = (ScriptTask) flowElement;
 
-		ObjectNode scriptTextNode = objectMapper.createObjectNode();
-		putPropertyValue(BPMN_MODEL_VALUE, scriptTask.getScript(),scriptTextNode);
-		putPropertyValue(DYNAMIC_VALUE, flowElementNode.path(SCRIPT_TASK_SCRIPT).textValue(),scriptTextNode);
+    @Override
+    protected ObjectNode createPropertiesNode(FlowElement flowElement, ObjectNode flowElementNode, ObjectMapper objectMapper) {
+        ScriptTask scriptTask = (ScriptTask) flowElement;
 
+        ObjectNode scriptTextNode = objectMapper.createObjectNode();
+        putPropertyValue(BPMN_MODEL_VALUE, scriptTask.getScript(), scriptTextNode);
+        putPropertyValue(DYNAMIC_VALUE, flowElementNode.path(SCRIPT_TASK_SCRIPT).textValue(), scriptTextNode);
 
-		ObjectNode propertiesNode = objectMapper.createObjectNode();
-		propertiesNode.set(SCRIPT_TASK_SCRIPT, scriptTextNode);
-		return propertiesNode;
-	}
+        ObjectNode propertiesNode = objectMapper.createObjectNode();
+        propertiesNode.set(SCRIPT_TASK_SCRIPT, scriptTextNode);
+        return propertiesNode;
+    }
 
-	@Override
-	public boolean supports(FlowElement flowElement) {
-		return flowElement instanceof ScriptTask;
-	}
+    @Override
+    public boolean supports(FlowElement flowElement) {
+        return flowElement instanceof ScriptTask;
+    }
 }

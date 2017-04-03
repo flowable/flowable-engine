@@ -28,157 +28,157 @@ import org.slf4j.LoggerFactory;
  */
 public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
 
-  private static final Logger logger = LoggerFactory.getLogger(JPAEnhancedVariableTest.class);
-  private static EntityManagerFactory entityManagerFactory;
-  protected static ProcessEngine cachedProcessEngine;
+    private static final Logger logger = LoggerFactory.getLogger(JPAEnhancedVariableTest.class);
+    private static EntityManagerFactory entityManagerFactory;
+    protected static ProcessEngine cachedProcessEngine;
 
-  private static FieldAccessJPAEntity fieldEntity;
-  private static FieldAccessJPAEntity fieldEntity2;
-  private static PropertyAccessJPAEntity propertyEntity;
+    private static FieldAccessJPAEntity fieldEntity;
+    private static FieldAccessJPAEntity fieldEntity2;
+    private static PropertyAccessJPAEntity propertyEntity;
 
-  @Override
-  protected void initializeProcessEngine() {
-    if (cachedProcessEngine == null) {
-      ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-          .createProcessEngineConfigurationFromResource("org/flowable/standalone/jpa/flowable.cfg.xml");
+    @Override
+    protected void initializeProcessEngine() {
+        if (cachedProcessEngine == null) {
+            ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
+                    .createProcessEngineConfigurationFromResource("org/flowable/standalone/jpa/flowable.cfg.xml");
 
-      cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
+            cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
 
-      EntityManagerSessionFactory entityManagerSessionFactory = (EntityManagerSessionFactory) processEngineConfiguration.getSessionFactories().get(EntityManagerSession.class);
+            EntityManagerSessionFactory entityManagerSessionFactory = (EntityManagerSessionFactory) processEngineConfiguration.getSessionFactories().get(EntityManagerSession.class);
 
-      entityManagerFactory = entityManagerSessionFactory.getEntityManagerFactory();
+            entityManagerFactory = entityManagerSessionFactory.getEntityManagerFactory();
 
-      setupJPAVariables();
-    }
-    processEngine = cachedProcessEngine;
-  }
-
-  private static void setupJPAVariables() {
-    EntityManager em = entityManagerFactory.createEntityManager();
-    em.getTransaction().begin();
-
-    fieldEntity = new FieldAccessJPAEntity();
-    fieldEntity.setId(1L);
-    fieldEntity.setValue("fieldEntity");
-    em.persist(fieldEntity);
-
-    propertyEntity = new PropertyAccessJPAEntity();
-    propertyEntity.setId(1L);
-    propertyEntity.setValue("propertyEntity");
-    em.persist(propertyEntity);
-
-    em.flush();
-    em.getTransaction().commit();
-    em.close();
-
-    // load enhanced versions of entities
-    em = entityManagerFactory.createEntityManager();
-
-    fieldEntity = em.find(FieldAccessJPAEntity.class, fieldEntity.getId());
-    propertyEntity = em.find(PropertyAccessJPAEntity.class, propertyEntity.getId());
-
-    em.getTransaction().begin();
-
-    fieldEntity2 = new FieldAccessJPAEntity();
-    fieldEntity2.setId(2L);
-    fieldEntity2.setValue("fieldEntity2");
-    em.persist(fieldEntity2);
-
-    em.flush();
-    em.getTransaction().commit();
-    em.close();
-  }
-
-  private Task getTask(ProcessInstance instance) {
-    return processEngine.getTaskService().createTaskQuery().processInstanceId(instance.getProcessInstanceId()).includeProcessVariables().singleResult();
-  }
-
-  @Deployment(resources = { "org/flowable/standalone/jpa/JPAVariableTest.testStoreJPAEntityAsVariable.bpmn20.xml" })
-  public void testEnhancedEntityVariables() throws Exception {
-    // test if enhancement is used
-    if (FieldAccessJPAEntity.class == fieldEntity.getClass() || PropertyAccessJPAEntity.class == propertyEntity.getClass()) {
-      logger.warn("Entity enhancement is not used");
-      return;
+            setupJPAVariables();
+        }
+        processEngine = cachedProcessEngine;
     }
 
-    // start process with enhanced jpa variables
-    Map<String, Object> params = new HashMap<String, Object>();
-    params.put("fieldEntity", fieldEntity);
-    params.put("propertyEntity", propertyEntity);
-    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params);
+    private static void setupJPAVariables() {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
 
-    Task task = getTask(instance);
-    for (Map.Entry<String, Object> entry : task.getProcessVariables().entrySet()) {
-      String name = entry.getKey();
-      Object value = entry.getValue();
-      if (name.equals("fieldEntity")) {
-        assertTrue(value instanceof FieldAccessJPAEntity);
-      } else if (name.equals("propertyEntity")) {
-        assertTrue(value instanceof PropertyAccessJPAEntity);
-      } else {
-        fail();
-      }
+        fieldEntity = new FieldAccessJPAEntity();
+        fieldEntity.setId(1L);
+        fieldEntity.setValue("fieldEntity");
+        em.persist(fieldEntity);
+
+        propertyEntity = new PropertyAccessJPAEntity();
+        propertyEntity.setId(1L);
+        propertyEntity.setValue("propertyEntity");
+        em.persist(propertyEntity);
+
+        em.flush();
+        em.getTransaction().commit();
+        em.close();
+
+        // load enhanced versions of entities
+        em = entityManagerFactory.createEntityManager();
+
+        fieldEntity = em.find(FieldAccessJPAEntity.class, fieldEntity.getId());
+        propertyEntity = em.find(PropertyAccessJPAEntity.class, propertyEntity.getId());
+
+        em.getTransaction().begin();
+
+        fieldEntity2 = new FieldAccessJPAEntity();
+        fieldEntity2.setId(2L);
+        fieldEntity2.setValue("fieldEntity2");
+        em.persist(fieldEntity2);
+
+        em.flush();
+        em.getTransaction().commit();
+        em.close();
     }
-  }
 
-  @Deployment(resources = { "org/flowable/standalone/jpa/JPAVariableTest.testStoreJPAEntityAsVariable.bpmn20.xml" })
-  public void testEnhancedEntityListVariables() throws Exception {
-    // test if enhancement is used
-    if (FieldAccessJPAEntity.class == fieldEntity.getClass() || PropertyAccessJPAEntity.class == propertyEntity.getClass()) {
-      logger.warn("Entity enhancement is not used");
-      return;
+    private Task getTask(ProcessInstance instance) {
+        return processEngine.getTaskService().createTaskQuery().processInstanceId(instance.getProcessInstanceId()).includeProcessVariables().singleResult();
     }
 
-    // start process with lists of enhanced jpa variables
-    Map<String, Object> params = new HashMap<String, Object>();
-    params.put("list1", Arrays.asList(fieldEntity, fieldEntity));
-    params.put("list2", Arrays.asList(propertyEntity, propertyEntity));
-    ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params);
+    @Deployment(resources = { "org/flowable/standalone/jpa/JPAVariableTest.testStoreJPAEntityAsVariable.bpmn20.xml" })
+    public void testEnhancedEntityVariables() throws Exception {
+        // test if enhancement is used
+        if (FieldAccessJPAEntity.class == fieldEntity.getClass() || PropertyAccessJPAEntity.class == propertyEntity.getClass()) {
+            logger.warn("Entity enhancement is not used");
+            return;
+        }
 
-    Task task = getTask(instance);
-    List list = (List) task.getProcessVariables().get("list1");
-    assertEquals(2, list.size());
-    assertTrue(list.get(0) instanceof FieldAccessJPAEntity);
-    assertTrue(list.get(1) instanceof FieldAccessJPAEntity);
+        // start process with enhanced jpa variables
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("fieldEntity", fieldEntity);
+        params.put("propertyEntity", propertyEntity);
+        ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params);
 
-    list = (List) task.getProcessVariables().get("list2");
-    assertEquals(2, list.size());
-    assertTrue(list.get(0) instanceof PropertyAccessJPAEntity);
-    assertTrue(list.get(1) instanceof PropertyAccessJPAEntity);
-
-    // start process with enhanced and persisted only jpa variables in the
-    // same list
-    params.putAll(Collections.singletonMap("list", Arrays.asList(fieldEntity, fieldEntity2)));
-    instance = processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params);
-
-    task = getTask(instance);
-    list = (List) task.getProcessVariables().get("list");
-    assertEquals(2, list.size());
-    assertTrue(list.get(0) instanceof FieldAccessJPAEntity);
-    assertEquals(1L, (long) ((FieldAccessJPAEntity) list.get(0)).getId());
-    assertTrue(list.get(1) instanceof FieldAccessJPAEntity);
-    assertEquals(2L, (long) ((FieldAccessJPAEntity) list.get(1)).getId());
-
-    // shuffle list and start a new process
-    params.putAll(Collections.singletonMap("list", Arrays.asList(fieldEntity2, fieldEntity)));
-    instance = processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params);
-
-    task = getTask(instance);
-    list = (List) task.getProcessVariables().get("list");
-    assertEquals(2, list.size());
-    assertTrue(list.get(0) instanceof FieldAccessJPAEntity);
-    assertEquals(2L, (long) ((FieldAccessJPAEntity) list.get(0)).getId());
-    assertTrue(list.get(1) instanceof FieldAccessJPAEntity);
-    assertEquals(1L, (long) ((FieldAccessJPAEntity) list.get(1)).getId());
-
-    // start process with mixed jpa entities in list
-    try {
-      params = new HashMap<String, Object>();
-      params.put("list", Arrays.asList(fieldEntity, propertyEntity));
-      instance = processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params);
-      fail();
-    } catch (Exception e) {
-      /* do nothing */
+        Task task = getTask(instance);
+        for (Map.Entry<String, Object> entry : task.getProcessVariables().entrySet()) {
+            String name = entry.getKey();
+            Object value = entry.getValue();
+            if (name.equals("fieldEntity")) {
+                assertTrue(value instanceof FieldAccessJPAEntity);
+            } else if (name.equals("propertyEntity")) {
+                assertTrue(value instanceof PropertyAccessJPAEntity);
+            } else {
+                fail();
+            }
+        }
     }
-  }
+
+    @Deployment(resources = { "org/flowable/standalone/jpa/JPAVariableTest.testStoreJPAEntityAsVariable.bpmn20.xml" })
+    public void testEnhancedEntityListVariables() throws Exception {
+        // test if enhancement is used
+        if (FieldAccessJPAEntity.class == fieldEntity.getClass() || PropertyAccessJPAEntity.class == propertyEntity.getClass()) {
+            logger.warn("Entity enhancement is not used");
+            return;
+        }
+
+        // start process with lists of enhanced jpa variables
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("list1", Arrays.asList(fieldEntity, fieldEntity));
+        params.put("list2", Arrays.asList(propertyEntity, propertyEntity));
+        ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params);
+
+        Task task = getTask(instance);
+        List list = (List) task.getProcessVariables().get("list1");
+        assertEquals(2, list.size());
+        assertTrue(list.get(0) instanceof FieldAccessJPAEntity);
+        assertTrue(list.get(1) instanceof FieldAccessJPAEntity);
+
+        list = (List) task.getProcessVariables().get("list2");
+        assertEquals(2, list.size());
+        assertTrue(list.get(0) instanceof PropertyAccessJPAEntity);
+        assertTrue(list.get(1) instanceof PropertyAccessJPAEntity);
+
+        // start process with enhanced and persisted only jpa variables in the
+        // same list
+        params.putAll(Collections.singletonMap("list", Arrays.asList(fieldEntity, fieldEntity2)));
+        instance = processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params);
+
+        task = getTask(instance);
+        list = (List) task.getProcessVariables().get("list");
+        assertEquals(2, list.size());
+        assertTrue(list.get(0) instanceof FieldAccessJPAEntity);
+        assertEquals(1L, (long) ((FieldAccessJPAEntity) list.get(0)).getId());
+        assertTrue(list.get(1) instanceof FieldAccessJPAEntity);
+        assertEquals(2L, (long) ((FieldAccessJPAEntity) list.get(1)).getId());
+
+        // shuffle list and start a new process
+        params.putAll(Collections.singletonMap("list", Arrays.asList(fieldEntity2, fieldEntity)));
+        instance = processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params);
+
+        task = getTask(instance);
+        list = (List) task.getProcessVariables().get("list");
+        assertEquals(2, list.size());
+        assertTrue(list.get(0) instanceof FieldAccessJPAEntity);
+        assertEquals(2L, (long) ((FieldAccessJPAEntity) list.get(0)).getId());
+        assertTrue(list.get(1) instanceof FieldAccessJPAEntity);
+        assertEquals(1L, (long) ((FieldAccessJPAEntity) list.get(1)).getId());
+
+        // start process with mixed jpa entities in list
+        try {
+            params = new HashMap<String, Object>();
+            params.put("list", Arrays.asList(fieldEntity, propertyEntity));
+            instance = processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params);
+            fail();
+        } catch (Exception e) {
+            /* do nothing */
+        }
+    }
 }
