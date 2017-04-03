@@ -84,7 +84,7 @@
       </userTask>
       <endEvent id="sid-913C9E89-0920-4394-8964-FDA61EAEC82A"/>
       <endEvent id="sid-3CF76719-CEE8-4364-9C45-5785D9A65711"/>
-      <endEvent id="sid-F9B50FD9-6A06-4C74-BF2C-BAEF468414C6">
+      <endEvent id="sid-F9B50FD9-6A06-4C74-BF2C-BAEF468414C6" name="terminateAll">
         <terminateEventDefinition activiti:terminateAll="true" />
       </endEvent>
       <sequenceFlow id="sid-5C84D33B-345D-40AF-B5A7-7D60AFB65D0B" sourceRef="sid-68A00DAF-4506-447F-960F-A405E5C84D06" targetRef="sid-A3CE6115-E19A-4D2C-A7B1-796C6D89751C"/>

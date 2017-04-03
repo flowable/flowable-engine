@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -120,7 +120,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     /**
      * Persisted reference to the processDefinition.
-     * 
+     *
      * @see #processDefinition
      * @see #setProcessDefinition(ProcessDefinitionImpl)
      * @see #getProcessDefinition()
@@ -149,7 +149,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     /**
      * Persisted reference to the current position in the diagram within the {@link #processDefinition}.
-     * 
+     *
      * @see #activity
      * @see #setActivity(ActivityImpl)
      * @see #getActivity()
@@ -163,7 +163,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     /**
      * Persisted reference to the process instance.
-     * 
+     *
      * @see #getProcessInstance()
      */
     protected String processInstanceId;
@@ -175,7 +175,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     /**
      * Persisted reference to the parent of this execution.
-     * 
+     *
      * @see #getParent()
      * @see #setParentId(String)
      */
@@ -183,7 +183,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     /**
      * Persisted reference to the super execution of this execution
-     * 
+     *
      * @see #getSuperExecution()
      * @see #setSuperExecution(ExecutionEntityImpl)
      */
@@ -292,6 +292,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
     @Override
     public void addChildExecution(ExecutionEntity executionEntity) {
         ensureExecutionsInitialized();
+        executions.remove(executionEntity);
         executions.add((ExecutionEntityImpl) executionEntity);
     }
 
