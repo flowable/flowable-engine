@@ -12,35 +12,36 @@
  */
 package org.flowable.dmn.xml.converter;
 
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnElement;
 import org.flowable.dmn.model.InputClause;
+import org.flowable.dmn.model.OutputClause;
+
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 /**
- * @author Tijs Rademakers
  * @author Yvo Swillens
  */
-public class InputClauseXMLConverter extends BaseDmnXMLConverter {
+public class OutputClauseXMLConverter extends BaseDmnXMLConverter {
 
     public Class<? extends DmnElement> getDmnElementType() {
         return InputClause.class;
     }
 
-    protected static int inputClauseCounter = 1;
-
     @Override
     protected String getXMLElementName() {
-        return ELEMENT_INPUT_CLAUSE;
+        return ELEMENT_OUTPUT_CLAUSE;
     }
 
     @Override
     protected DmnElement convertXMLToElement(XMLStreamReader xtr, DmnDefinition model, DecisionTable decisionTable) throws Exception {
-        InputClause clause = new InputClause();
-        parseChildElements(getXMLElementName(), clause, decisionTable, xtr);
+        OutputClause clause = new OutputClause();
+        clause.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
+        clause.setLabel(xtr.getAttributeValue(null, ATTRIBUTE_LABEL));
+        clause.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
+        clause.setTypeRef(xtr.getAttributeValue(null, ATTRIBUTE_TYPE_REF));
         return clause;
     }
 

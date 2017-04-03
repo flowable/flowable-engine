@@ -21,6 +21,8 @@ public class OutputClause extends DmnElement {
     protected String name;
     protected String typeRef;
 
+    protected int outputNumber;
+
     public LiteralExpression getDefaultOutputEntry() {
         return defaultOutputEntry;
     }
@@ -43,5 +45,13 @@ public class OutputClause extends DmnElement {
 
     public void setTypeRef(String typeRef) {
         this.typeRef = typeRef;
+    }
+
+    public int getOutputNumber() {
+        return outputNumber;
+    }
+
+    public void setOutputNumber(int outputNumber) {
+        this.outputNumber = outputNumber;
     }
 }
