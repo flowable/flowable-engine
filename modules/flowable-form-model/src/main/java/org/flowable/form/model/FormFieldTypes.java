@@ -22,6 +22,8 @@ public interface FormFieldTypes {
     String MULTI_LINE_TEXT = "multi-line-text";
 
     String INTEGER = "integer";
+    
+    String DECIMAL = "decimal";
 
     String AMOUNT = "amount";
 

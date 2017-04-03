@@ -61,10 +61,12 @@ import org.flowable.engine.impl.cmd.NewTaskCmd;
 import org.flowable.engine.impl.cmd.RemoveTaskVariablesCmd;
 import org.flowable.engine.impl.cmd.ResolveTaskCmd;
 import org.flowable.engine.impl.cmd.SaveAttachmentCmd;
+import org.flowable.engine.impl.cmd.SaveCommentCmd;
 import org.flowable.engine.impl.cmd.SaveTaskCmd;
 import org.flowable.engine.impl.cmd.SetTaskDueDateCmd;
 import org.flowable.engine.impl.cmd.SetTaskPriorityCmd;
 import org.flowable.engine.impl.cmd.SetTaskVariablesCmd;
+import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.VariableInstance;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.task.Attachment;
@@ -349,6 +351,10 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
 
     public Comment addComment(String taskId, String processInstance, String type, String message) {
         return commandExecutor.execute(new AddCommentCmd(taskId, processInstance, type, message));
+    }
+    
+    public void saveComment(Comment comment) {
+        commandExecutor.execute(new SaveCommentCmd((CommentEntity) comment));
     }
 
     @Override

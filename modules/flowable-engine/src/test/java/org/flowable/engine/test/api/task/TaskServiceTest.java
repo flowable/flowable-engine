@@ -202,6 +202,36 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             taskService.deleteTask(taskId, true);
         }
     }
+    
+    public void testUpdateTaskComments() {
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            Task task = taskService.newTask();
+            task.setOwner("johndoe");
+            taskService.saveTask(task);
+            String taskId = task.getId();
+
+            identityService.setAuthenticatedUserId("johndoe");
+
+            Comment comment = taskService.addComment(taskId, null, "This is a regular comment");
+
+            assertEquals(CommentEntity.TYPE_COMMENT, comment.getType());
+            assertNotNull(taskService.getComment(comment.getId()));
+            
+            List<Comment> regularComments = taskService.getTaskComments(taskId);
+            assertEquals(1, regularComments.size());
+            assertEquals("This is a regular comment", regularComments.get(0).getFullMessage());
+
+            comment.setFullMessage("Updated comment");
+            taskService.saveComment(comment);
+            
+            regularComments = taskService.getTaskComments(taskId);
+            assertEquals(1, regularComments.size());
+            assertEquals("Updated comment", regularComments.get(0).getFullMessage());
+
+            // Clean up
+            taskService.deleteTask(taskId, true);
+        }
+    }
 
     public void testTaskAttachments() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {

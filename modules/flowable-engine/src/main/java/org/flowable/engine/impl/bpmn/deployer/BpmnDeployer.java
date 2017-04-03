@@ -184,6 +184,8 @@ public class BpmnDeployer implements Deployer {
                 }
             }
 
+            cachingAndArtifactsManager.updateProcessDefinitionCache(parsedDeployment);
+
             if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
                 commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition));
             }
