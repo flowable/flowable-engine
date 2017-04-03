@@ -274,7 +274,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
     }
 
     protected String getExceptionMessage(Exception exception) {
-        String exceptionMessage = null;
+        String exceptionMessage;
         if (exception.getCause() != null && exception.getCause().getMessage() != null) {
             exceptionMessage = exception.getCause().getMessage();
         } else {
