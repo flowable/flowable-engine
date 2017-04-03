@@ -19,6 +19,18 @@ package org.flowable.engine.runtime;
 public interface DataObject {
 
     /**
+     /**
+     * The id of the process instance that this Data Object is associated with.
+     */
+    String getProcessInstanceId();
+
+    /**
+     * The id of the execution in which this Data Object resides. A DataObject only resides on a process instance
+     * execution or a subprocess execution.
+     */
+    String getExecutionId();
+
+    /**
      * Name of the DataObject.
      */
     String getName();

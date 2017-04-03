@@ -133,7 +133,8 @@ public class GetDataObjectCmd implements Command<DataObject>, Serializable {
             }
 
             if (foundDataObject != null) {
-                dataObject = new DataObjectImpl(variableEntity.getName(), variableEntity.getValue(), foundDataObject.getDocumentation(),
+                dataObject = new DataObjectImpl(variableEntity.getProcessInstanceId(), variableEntity.getExecutionId(),
+                        variableEntity.getName(), variableEntity.getValue(), foundDataObject.getDocumentation(),
                         foundDataObject.getType(), localizedName, localizedDescription, foundDataObject.getId());
             }
         }
