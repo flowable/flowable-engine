@@ -46,6 +46,7 @@ import org.flowable.dmn.model.ItemDefinition;
 import org.flowable.dmn.model.OutputClause;
 import org.flowable.dmn.model.RuleInputClauseContainer;
 import org.flowable.dmn.model.RuleOutputClauseContainer;
+import org.flowable.dmn.model.UnaryTests;
 import org.flowable.dmn.xml.constants.DmnXMLConstants;
 import org.flowable.dmn.xml.exception.DmnXMLException;
 import org.flowable.engine.common.api.io.InputStreamProvider;
@@ -353,6 +354,14 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     }
                     if (StringUtils.isNotEmpty(clause.getTypeRef())) {
                         xtw.writeAttribute(ATTRIBUTE_TYPE_REF, clause.getTypeRef());
+                    }
+
+                    if (clause.getOutputValues() != null && StringUtils.isNotEmpty(clause.getOutputValues().getText())) {
+                        xtw.writeStartElement(ELEMENT_OUTPUT_VALUES);
+                        xtw.writeStartElement(ELEMENT_TEXT);
+                        xtw.writeCharacters(clause.getOutputValues().getText());
+                        xtw.writeEndElement();
+                        xtw.writeEndElement();
                     }
 
                     DmnXMLUtil.writeElementDescription(clause, xtw);

@@ -12,12 +12,17 @@
  */
 package org.flowable.dmn.model;
 
+import com.sun.deploy.util.StringUtils;
+
+import java.util.List;
+
 /**
  * @author Yvo Swillens
  */
 public class UnaryTests extends DmnElement {
 
     protected String text;
+    protected List<String> textValues;
     protected String expressionLanguage;
 
     public String getText() {
@@ -26,6 +31,16 @@ public class UnaryTests extends DmnElement {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public List<String> getTextValues() {
+        return textValues;
+    }
+
+    public void setTextValues(List<String> textValues) {
+        this.textValues = textValues;
+        this.text = "\"" + StringUtils.join(textValues, "\",\"") + "\"";
+
     }
 
     public String getExpressionLanguage() {

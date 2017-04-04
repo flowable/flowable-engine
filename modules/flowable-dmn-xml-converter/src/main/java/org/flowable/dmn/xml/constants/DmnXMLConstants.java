@@ -44,6 +44,7 @@ public interface DmnXMLConstants {
     public static final String ELEMENT_INPUT_CLAUSE = "input";
     public static final String ELEMENT_OUTPUT_CLAUSE = "output";
     public static final String ELEMENT_INPUT_EXPRESSION = "inputExpression";
+    public static final String ELEMENT_OUTPUT_VALUES = "outputValues";
     public static final String ELEMENT_TEXT = "text";
 
     public static final String ELEMENT_RULE = "rule";
