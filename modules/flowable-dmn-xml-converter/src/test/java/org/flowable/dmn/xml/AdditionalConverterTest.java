@@ -57,6 +57,9 @@ public class AdditionalConverterTest extends AbstractConverterTest {
         List<OutputClause> outputClauses = decisionTable.getOutputs();
         assertEquals(2, outputClauses.size());
 
+        assertEquals("\"result2\",\"result1\"", decisionTable.getOutputs().get(0).getOutputValues().getText());
+        assertEquals("\"result2,2\",\"result1,1\"", decisionTable.getOutputs().get(1).getOutputValues().getText());
+        
         List<DecisionRule> rules = decisionTable.getRules();
         assertEquals(2, rules.size());
 
