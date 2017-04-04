@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,6 +30,9 @@ import org.flowable.engine.runtime.TimerJobQuery;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 /**
  * @author Joram Barrez
  */
@@ -53,9 +56,9 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
     /*
      * Test for when multiple boundary timer events are defined on the same user task
-     * 
+     *
      * Configuration: - timer 1 -> 2 hours -> secondTask - timer 2 -> 1 hour -> thirdTask - timer 3 -> 3 hours -> fourthTask
-     * 
+     *
      * See process image next to the process xml resource
      */
     @Deployment
@@ -534,4 +537,112 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(timerJob);
     }
+
+    @Deployment
+    public void test3BoundaryTimerEvents() throws Exception {
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyy.MM.dd hh:mm");
+        Date currentTime = simpleDateFormat.parse("2015.10.01 11:01");
+        processEngineConfiguration.getClock().setCurrentTime(currentTime);
+
+        runtimeService.startProcessInstanceByKey("threeTimersProcess");
+
+        // just wait for 2 seconds to run any job if it's the case
+        try {
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
+        } catch (Exception ex) {
+            // expected exception because the boundary timer event created a timer job to be executed after 10 minutes
+        }
+
+        // there should be a userTask waiting for user input
+        List<Task> tasks = taskService.createTaskQuery().list();
+        assertEquals(1, tasks.size());
+        assertEquals("First Task", tasks.get(0).getName());
+        List<Job> jobList = managementService.createTimerJobQuery().list();
+        assertEquals(2, jobList.size());
+
+        // after another 5 seconds
+        long fiveSeconds = 5 * 1000L;
+        currentTime = new Date(currentTime.getTime() + fiveSeconds);
+        processEngineConfiguration.getClock().setCurrentTime(currentTime);
+
+        try {
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
+        } catch (Exception ex) {
+            ex.getCause();
+            // expected exception because a new job is prepared
+        }
+
+        // there should be no userTask
+        tasks = taskService.createTaskQuery().list();
+        assertEquals(2, tasks.size());
+        jobList = managementService.createTimerJobQuery().list();
+        assertEquals(2, jobList.size());
+
+        currentTime = new Date(currentTime.getTime() + 3 * fiveSeconds);
+        processEngineConfiguration.getClock().setCurrentTime(currentTime);
+
+        try {
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
+        } catch (Exception ex) {
+            ex.getCause();
+            // expected exception because a new job is prepared
+        }
+        assertThat("There is still on process instance running.", runtimeService.createProcessInstanceQuery().count(), is(1L));
+    }
+
+    @Deployment
+    public void test2Boundary1IntermediateTimerEvents() throws Exception {
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyy.MM.dd hh:mm");
+        Date currentTime = simpleDateFormat.parse("2015.10.01 11:01");
+        processEngineConfiguration.getClock().setCurrentTime(currentTime);
+
+        runtimeService.startProcessInstanceByKey("threeTimersProcess");
+
+        // just wait for 2 seconds to run any job if it's the case
+        try {
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
+        } catch (Exception ex) {
+            // expected exception because the boundary timer event created a timer job to be executed after 10 minutes
+        }
+
+        // there should be a userTask waiting for user input
+        List<Task> tasks = taskService.createTaskQuery().list();
+        assertEquals(1, tasks.size());
+        assertEquals("First Task", tasks.get(0).getName());
+        List<Job> jobList = managementService.createTimerJobQuery().list();
+        assertEquals(2, jobList.size());
+
+        // after another 5 seconds
+        long fiveSeconds = 5 * 1000L;
+        currentTime = new Date(currentTime.getTime() + fiveSeconds);
+        processEngineConfiguration.getClock().setCurrentTime(currentTime);
+
+        try {
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
+        } catch (Exception ex) {
+            ex.getCause();
+            // expected exception because a new job is prepared
+        }
+
+        // there should be no userTask
+        tasks = taskService.createTaskQuery().taskName("Reminder Task").list();
+        assertEquals(1, tasks.size());
+        taskService.complete(tasks.get(0).getId());
+        jobList = managementService.createTimerJobQuery().list();
+        assertEquals(2, jobList.size());
+
+        currentTime = new Date(currentTime.getTime() + 3 * fiveSeconds);
+        processEngineConfiguration.getClock().setCurrentTime(currentTime);
+
+        try {
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
+        } catch (Exception ex) {
+            ex.getCause();
+            // expected exception because a new job is prepared
+        }
+        assertThat("There is still on process instance running.", runtimeService.createProcessInstanceQuery().count(), is(1L));
+    }
+
 }
