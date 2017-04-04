@@ -12,6 +12,13 @@
  */
 package org.flowable.app.service.editor;
 
+import static au.com.rds.activiti.RDSActivitiConstants.ARROW_FORM_KEY;
+import static au.com.rds.activiti.RDSActivitiConstants.BPMN_RDS_EXTENSION_ATTRIBUTE_FORM_KEY;
+import static au.com.rds.activiti.RDSActivitiConstants.BPMN_RDS_EXTENSION_ELEMENT_FORM_DEFINITION;
+import static au.com.rds.activiti.RDSActivitiConstants.BPMN_RDS_NAMESPACE;
+import static au.com.rds.activiti.RDSActivitiConstants.BPMN_RDS_NAMESPACE_PREFIX;
+import static au.com.rds.activiti.RDSActivitiConstants.PROCESS_FORMKEY;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -26,6 +33,7 @@ import java.util.Set;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
+import org.activiti.editor.language.json.converter.RDSBpmnJsonConverter;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.domain.editor.AppDefinition;
@@ -50,18 +58,23 @@ import org.flowable.app.service.exception.NotFoundException;
 import org.flowable.app.util.XmlUtil;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.ExtensionElement;
+import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.editor.language.json.converter.util.JsonConverterUtil;
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -92,7 +105,7 @@ public class ModelServiceImpl implements ModelService {
   @Autowired
   protected ObjectMapper objectMapper;
 
-  protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
+  protected RDSBpmnJsonConverter bpmnJsonConverter = new RDSBpmnJsonConverter();
 
   protected BpmnXMLConverter bpmnXMLConverter = new BpmnXMLConverter();
 
@@ -412,7 +425,7 @@ public class ModelServiceImpl implements ModelService {
 
       List<Model> referencedModels = modelRepository.findByParentModelId(model.getId());
             for (Model childModel : referencedModels) {
-                if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
+                if (Model.MODEL_TYPE_FORM_RDS == childModel.getModelType()) {
           formMap.put(childModel.getId(), childModel);
 
                 } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
@@ -444,7 +457,9 @@ public class ModelServiceImpl implements ModelService {
         decisionTableKeyMap.put(decisionTableModel.getId(), decisionTableModel.getKey());
       }
 
-      return bpmnJsonConverter.convertToBpmnModel(editorJsonNode, formKeyMap, decisionTableKeyMap);
+      BpmnModel bpmnModel = bpmnJsonConverter.convertToBpmnModel(editorJsonNode, formKeyMap, decisionTableKeyMap);
+      formsAsExtension(bpmnModel);
+      return bpmnModel;
 
         } catch (Exception e) {
       log.error("Could not generate BPMN 2.0 model for {}", model.getId(), e);
@@ -621,5 +636,88 @@ public class ModelServiceImpl implements ModelService {
     model.setModelType(basedOn.getModelType());
     model.setVersion(basedOn.getVersion());
     model.setComment(basedOn.getComment());
+  }
+    
+  private void formsAsExtension(BpmnModel bpmnModel)
+  {
+    Map<String, String> processedForms = new HashMap<String, String>();
+    List<Process> processes = bpmnModel.getProcesses();
+    for (Process process : processes)
+    {
+      String processFormAttribute = process.getAttributeValue(BPMN_RDS_NAMESPACE, PROCESS_FORMKEY);
+      if (StringUtils.isNotBlank(processFormAttribute) && !processedForms.containsKey(processFormAttribute))
+      {
+        addFormToProcess(process, processFormAttribute, processedForms);
+      }
+
+      for (FlowElement flowElement : process.getFlowElements())
+      {
+        if (flowElement instanceof UserTask || flowElement instanceof StartEvent)
+        {
+          String formKey = (flowElement instanceof UserTask) ? ((UserTask) flowElement).getFormKey()
+                  : ((StartEvent) flowElement).getFormKey();
+          if (StringUtils.isNotBlank(formKey) && !processedForms.containsKey(formKey))
+          {
+            addFormToProcess(process, formKey, processedForms);
+          }
+        }
+        else if (flowElement instanceof SequenceFlow)
+        {
+          String arrowFormKey = flowElement.getAttributeValue(BPMN_RDS_NAMESPACE, ARROW_FORM_KEY);
+          if (StringUtils.isNotBlank(arrowFormKey) && !processedForms.containsKey(arrowFormKey))
+          {
+            addFormToProcess(process, arrowFormKey, processedForms);
+          }
+        }
+      }
+    }
+  }
+
+  private void addFormToProcess(Process process, String formKey, Map<String, String> processedForms)
+  {
+    List<Model> formModels = this.modelRepository.findByKeyAndType(formKey, Model.MODEL_TYPE_FORM_RDS);
+    
+    Assert.isTrue(formModels.size()==1, "Cannot find form design for " + formKey);
+    Model formModel = formModels.get(0);    
+
+    String formContent = formModel.getModelEditorJson();
+    ExtensionElement extensionElement = new ExtensionElement();
+    extensionElement.setNamespace(BPMN_RDS_NAMESPACE);
+    extensionElement.setNamespacePrefix(BPMN_RDS_NAMESPACE_PREFIX);
+    extensionElement.setName(BPMN_RDS_EXTENSION_ELEMENT_FORM_DEFINITION);
+    extensionElement.setElementText(formContent);
+
+    ExtensionAttribute attribute = new ExtensionAttribute();
+    attribute.setName(BPMN_RDS_EXTENSION_ATTRIBUTE_FORM_KEY);
+    attribute.setValue(formKey);
+    extensionElement.addAttribute(attribute);
+    process.addExtensionElement(extensionElement);
+
+    processedForms.put(formKey, formKey);
+
+    try
+    {
+      JsonNode objectNode = objectMapper.readTree(formContent);
+      List<JsonNode> parentNodes = objectNode.findParents("formId");
+      if (parentNodes != null)
+      {
+        for (JsonNode parent : parentNodes)
+        {
+          if ("rds-asf-modal-form".equalsIgnoreCase(parent.get("type").asText()))
+          {
+            String formId = parent.get("formId").asText();
+            if (StringUtils.isNotBlank(formId) && !processedForms.containsKey(formId))
+            {
+              addFormToProcess(process, formId, processedForms);
+            }
+          }
+        }
+      }
+    }
+    catch (Exception e)
+    {
+      log.error("Error addFormToProcess ", e);
+      throw new FlowableException("Error addFormToProcess", e);
+    }
   }
 }
