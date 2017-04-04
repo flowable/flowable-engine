@@ -26,4 +26,5 @@ public interface RuleEngineExecutor {
 
     RuleEngineExecutionResult execute(Decision decision, Map<String, Object> inputVariables,
             Map<String, Method> customExpressionFunctions, Map<Class<?>, PropertyHandler> propertyHandlers);
+
 }
