@@ -14,7 +14,7 @@ package org.flowable.dmn.engine.test.runtime;
 
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyBehavior;
+import org.flowable.dmn.engine.impl.hitpolicy.AbstractHitPolicy;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -52,7 +52,7 @@ public class CustomHitPoliciesEngineConfigTest {
         DmnEngineConfiguration dmnEngineConfiguration = dmnEngine.getDmnEngineConfiguration();
 
         Assert.assertEquals(4, dmnEngineConfiguration.getHitPolicyBehaviors().size());
-        HitPolicyBehavior overwrittenHitPolicyBehavior = dmnEngineConfiguration.getHitPolicyBehaviors().get("FIRST");
+        AbstractHitPolicy overwrittenHitPolicyBehavior = dmnEngineConfiguration.getHitPolicyBehaviors().get("FIRST");
         Assert.assertEquals("CUSTOM_HIT_POLICY", overwrittenHitPolicyBehavior.getHitPolicyName());
     }
 

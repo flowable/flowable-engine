@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * @author Yvo Swillens
  */
-public class HitPolicyAny extends AbstractHitPolicy {
+public class HitPolicyAny extends AbstractHitPolicy implements EvaluateConclusionBehavior {
 
     @Override
     public String getHitPolicyName() {

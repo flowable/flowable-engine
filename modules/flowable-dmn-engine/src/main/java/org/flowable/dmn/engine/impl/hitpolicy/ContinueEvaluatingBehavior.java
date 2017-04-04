@@ -12,26 +12,10 @@
  */
 package org.flowable.dmn.engine.impl.hitpolicy;
 
-import org.flowable.dmn.model.HitPolicy;
-
 /**
  * @author Yvo Swillens
  */
-public class HitPolicyFirst extends AbstractHitPolicy implements ContinueEvaluatingBehavior {
+public interface ContinueEvaluatingBehavior {
 
-    @Override
-    public String getHitPolicyName() {
-        return HitPolicy.FIRST.getValue();
-    }
-
-    @Override
-    public boolean shouldContinueEvaluating(boolean ruleResult) {
-        boolean shouldContinue = true;
-
-        if (ruleResult) {
-            shouldContinue = false;
-        }
-
-        return shouldContinue;
-    }
+    boolean shouldContinueEvaluating(boolean ruleResult);
 }

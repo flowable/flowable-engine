@@ -11,15 +11,7 @@ import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
 /**
  * @author Yvo Swillens
  */
-public interface HitPolicyBehavior {
-
-    String getHitPolicyName();
-
-    boolean shouldContinueEvaluating(boolean ruleResult);
+public interface EvaluateRuleValidityBehavior {
 
     void evaluateRuleValidity(int ruleNumber, MvelExecutionContext executionContext);
-
-    void evaluateRuleConclusionValidity(Object resultValue, int ruleNumber, int ruleConclusionNumber, MvelExecutionContext executionContext);
-
-    void composeOutput(String outputVariableId, Object executionVariable, MvelExecutionContext executionContext);
 }

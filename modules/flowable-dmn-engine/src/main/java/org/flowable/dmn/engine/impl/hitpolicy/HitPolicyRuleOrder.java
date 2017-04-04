@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * @author Yvo Swillens
  */
-public class HitPolicyRuleOrder extends AbstractHitPolicy {
+public class HitPolicyRuleOrder extends AbstractHitPolicy implements ComposeRuleOutputBehavior {
 
     @Override
     public String getHitPolicyName() {
@@ -30,7 +30,7 @@ public class HitPolicyRuleOrder extends AbstractHitPolicy {
     }
 
     @Override
-    public void composeOutput(String outputVariableId, Object executionVariable, MvelExecutionContext executionContext) {
+    public void composeRuleOutput(int outputNumber, String outputVariableId, Object executionVariable, MvelExecutionContext executionContext) {
         Object resultVariable = executionContext.getResultVariables().get(outputVariableId);
         if (resultVariable == null) {
             resultVariable = new ArrayList<>();

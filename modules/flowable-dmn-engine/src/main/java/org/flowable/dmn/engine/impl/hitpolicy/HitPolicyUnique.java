@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * @author Yvo Swillens
  */
-public class HitPolicyUnique extends AbstractHitPolicy {
+public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleValidityBehavior {
 
     @Override
     public String getHitPolicyName() {
@@ -42,6 +42,5 @@ public class HitPolicyUnique extends AbstractHitPolicy {
                 }
             }
         }
-
     }
 }
