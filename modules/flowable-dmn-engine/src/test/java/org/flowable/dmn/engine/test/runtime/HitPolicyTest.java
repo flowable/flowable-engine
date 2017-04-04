@@ -185,7 +185,55 @@ public class HitPolicyTest {
         Assert.assertEquals("result2", ruleResults.get(0));
         Assert.assertEquals("result4", ruleResults.get(1));
 
+        List auditResults = (List) result.getAuditTrail().getOutputVariables().get("outputVariable1");
+
+        Assert.assertEquals(2, auditResults.size());
+
+        Assert.assertEquals("result2", auditResults.get(0));
+        Assert.assertEquals("result4", auditResults.get(1));
+
         Assert.assertFalse(result.getAuditTrail().isFailed());
         Assert.assertNull(result.getAuditTrail().getExceptionMessage());
+    }
+
+    @Test
+    @DmnDeploymentAnnotation
+    public void priorityHitPolicy() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.put("inputVariable1", 5);
+
+        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
+
+        Assert.assertEquals(1, result.getResultVariables().size());
+        Assert.assertEquals("OUTPUT2", result.getResultVariables().get("outputVariable1"));
+
+        Assert.assertEquals(1, result.getAuditTrail().getOutputVariables().size());
+        Assert.assertEquals("OUTPUT2", result.getAuditTrail().getOutputVariables().get("outputVariable1"));
+
+        Assert.assertFalse(result.getAuditTrail().isFailed());
+        Assert.assertNull(result.getAuditTrail().getExceptionMessage());
+    }
+
+    @Test
+    @DmnDeploymentAnnotation
+    public void priorityHitPolicyFailed() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.put("inputVariable1", 5);
+
+        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
+
+        Assert.assertEquals(0, result.getResultVariables().size());
+        Assert.assertEquals(0, result.getAuditTrail().getOutputVariables().size());
+
+        Assert.assertTrue(result.getAuditTrail().isFailed());
+        Assert.assertNotNull(result.getAuditTrail().getExceptionMessage());
     }
 }

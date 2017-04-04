@@ -53,6 +53,7 @@ public class MvelExecutionContextBuilder {
 
         executionContext.setParserContext(parserContext);
 
+        // add property handlers to context
         if (propertyHandlers != null) {
             for (Class<?> variableClass : propertyHandlers.keySet()) {
                 executionContext.addPropertyHandler(variableClass, propertyHandlers.get(variableClass));
@@ -60,6 +61,15 @@ public class MvelExecutionContextBuilder {
         }
 
         DecisionTable decisionTable = (DecisionTable) decision.getExpression();
+
+        // add output values to context
+        if (decisionTable.getOutputs() != null) {
+            for (OutputClause outputClause : decisionTable.getOutputs()) {
+                if (outputClause.getOutputValues() != null && outputClause.getOutputValues().getTextValues() != null) {
+                    executionContext.addOutputValues(outputClause.getOutputNumber(), outputClause.getOutputValues().getTextValues());
+                }
+            }
+        }
 
         preProcessInputVariables(decisionTable, inputVariables);
 

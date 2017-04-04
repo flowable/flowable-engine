@@ -13,6 +13,7 @@
 package org.flowable.dmn.engine.impl.mvel;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,11 +27,12 @@ import org.mvel2.integration.PropertyHandler;
  */
 public class MvelExecutionContext {
 
-    protected Map<String, Object> resultVariables = new HashMap<String, Object>();
+    protected Map<String, Object> resultVariables = new HashMap<>();
     protected Map<String, Object> stackVariables;
     protected ParserContext parserContext;
-    protected Map<Class<?>, PropertyHandler> propertyHandlers = new HashMap<Class<?>, PropertyHandler>();
+    protected Map<Class<?>, PropertyHandler> propertyHandlers = new HashMap<>();
     protected DecisionExecutionAuditContainer auditContainer;
+    protected Map<Integer, List<String>> outputValues = new HashMap<>();
 
     public void checkExecutionContext(String variableId) {
 
@@ -91,5 +93,13 @@ public class MvelExecutionContext {
 
     public void setAuditContainer(DecisionExecutionAuditContainer auditContainer) {
         this.auditContainer = auditContainer;
+    }
+
+    public Map<Integer, List<String>> getOutputValues() {
+        return outputValues;
+    }
+
+    public void addOutputValues(int outputNumber, List<String> outputValues) {
+        this.outputValues.put(outputNumber, outputValues);
     }
 }
