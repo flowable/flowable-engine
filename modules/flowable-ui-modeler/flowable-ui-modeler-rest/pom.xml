@@ -15,7 +15,6 @@
         <dependency>
             <groupId>au.com.rds.sb</groupId>
             <artifactId>workflow-builder</artifactId>
-            <version>0.5.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
