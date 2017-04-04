@@ -19,7 +19,7 @@ angular.module('flowableModeler')
 
         var authdata = Base64.encode(vm.loginDetail.name + ':' + vm.loginDetail.password);
 
-        $http.get("app/rest/model/exportForDeploy/" + deployModelId).then(function(response) {
+        $http.get("app/rest/models/" + deployModelId + "/exportForDeploy").then(function(response) {
           $http.defaults.headers.common['Authorization'] = 'Basic ' + authdata;
           $http({
             method : "POST",
