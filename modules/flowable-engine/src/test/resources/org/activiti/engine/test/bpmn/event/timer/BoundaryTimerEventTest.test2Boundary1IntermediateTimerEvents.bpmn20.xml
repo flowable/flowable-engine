@@ -14,21 +14,21 @@
 
     <boundaryEvent id="reminderTimer" attachedToRef="firstTask" cancelActivity="false">
       <timerEventDefinition>
-        <timeDuration>PT5S</timeDuration>
+        <timeDuration>PT1H</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
     <sequenceFlow id="reminderTimer-reminderTask" sourceRef="reminderTimer" targetRef="reminderTask"/>
 
     <boundaryEvent id="fireExecution" attachedToRef="firstTask" cancelActivity="true">
       <timerEventDefinition>
-        <timeDuration>PT30S</timeDuration>
+        <timeDuration>PT4H</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
     <sequenceFlow id="fireExecution-end" sourceRef="fireExecution" targetRef="end"/>
 
     <intermediateCatchEvent id="afterReminderTimer">
       <timerEventDefinition>
-        <timeDuration>PT15S</timeDuration>
+        <timeDuration>PT1H</timeDuration>
       </timerEventDefinition>
     </intermediateCatchEvent>
     <sequenceFlow id="closeReminder-end" sourceRef="afterReminderTimer" targetRef="end"/>
