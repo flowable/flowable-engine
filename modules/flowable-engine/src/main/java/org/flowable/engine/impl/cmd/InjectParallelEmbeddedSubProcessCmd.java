@@ -167,9 +167,8 @@ public class InjectParallelEmbeddedSubProcessCmd extends AbstractDynamicInjectio
                         IoUtil.closeSilently(inputStream);
                     }
                 }
-            }
-
-            if (flowElement instanceof ServiceTask 
+                
+            } else if (flowElement instanceof ServiceTask 
                     && ServiceTask.DMN_TASK.equals(((ServiceTask) flowElement).getType()) 
                     && commandContext.getProcessEngineConfiguration().isDmnEngineInitialized()) {
                 
@@ -195,6 +194,10 @@ public class InjectParallelEmbeddedSubProcessCmd extends AbstractDynamicInjectio
                         }
                     }
                 }
+                
+            } else if (flowElement instanceof SubProcess) {
+                processSubProcessFlowElements(commandContext, process, (SubProcess) flowElement, 
+                        originalProcessDefinitionEntity, newDeploymentEntity);
             }
         }
     }

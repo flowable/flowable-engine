@@ -10,7 +10,7 @@
     <sequenceFlow id="flow4" sourceRef="parallelgateway1" targetRef="four"></sequenceFlow>
     <userTask id="five" name="five"></userTask>
     <sequenceFlow id="flow5" sourceRef="parallelgateway1" targetRef="five"></sequenceFlow>
-    <subProcess id="subprocess1" name="Sub Process">
+    <subProcess id="childSubprocess1" name="Sub Process">
       <startEvent id="startevent2" name="Start"></startEvent>
       <sequenceFlow id="flow7" sourceRef="startevent2" targetRef="parallelgateway2"></sequenceFlow>
       <parallelGateway id="parallelgateway2" name="Exclusive Gateway"></parallelGateway>
@@ -24,9 +24,9 @@
       <sequenceFlow id="flow13" sourceRef="parallelgateway3" targetRef="endevent2"></sequenceFlow>
       <parallelGateway id="parallelgateway3" name="Exclusive Gateway"></parallelGateway>
     </subProcess>
-    <sequenceFlow id="flow6" sourceRef="parallelgateway1" targetRef="subprocess1"></sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="parallelgateway1" targetRef="childSubprocess1"></sequenceFlow>
     <endEvent id="endevent1" name="End"></endEvent>
-    <sequenceFlow id="flow12" sourceRef="subprocess1" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow12" sourceRef="childSubprocess1" targetRef="endevent1"></sequenceFlow>
     <endEvent id="endevent3" name="End"></endEvent>
     <sequenceFlow id="flow14" sourceRef="one" targetRef="endevent3"></sequenceFlow>
     <endEvent id="endevent4" name="End"></endEvent>
@@ -51,7 +51,7 @@
       <bpmndi:BPMNShape bpmnElement="five" id="BPMNShape_five">
         <omgdc:Bounds height="55.0" width="105.0" x="180.0" y="510.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="subprocess1" id="BPMNShape_subprocess1">
+      <bpmndi:BPMNShape bpmnElement="childSubprocess1" id="BPMNShape_childSubprocess1">
         <omgdc:Bounds height="211.0" width="461.0" x="300.0" y="150.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="startevent2" id="BPMNShape_startevent2">
