@@ -12,25 +12,15 @@
  */
 package org.flowable.app.rest.editor;
 
-import static au.com.rds.activiti.RDSActivitiConstants.ARROW_FORM_KEY;
-import static au.com.rds.activiti.RDSActivitiConstants.BPMN_RDS_EXTENSION_ATTRIBUTE_FORM_KEY;
-import static au.com.rds.activiti.RDSActivitiConstants.BPMN_RDS_EXTENSION_ELEMENT_FORM_DEFINITION;
-import static au.com.rds.activiti.RDSActivitiConstants.BPMN_RDS_NAMESPACE;
-import static au.com.rds.activiti.RDSActivitiConstants.BPMN_RDS_NAMESPACE_PREFIX;
-import static au.com.rds.activiti.RDSActivitiConstants.PROCESS_FORMKEY;
-
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
 
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.domain.editor.Model;
@@ -43,16 +33,7 @@ import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.ConflictingRequestException;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
-import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.ExtensionAttribute;
-import org.flowable.bpmn.model.ExtensionElement;
-import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.Process;
-import org.flowable.bpmn.model.SequenceFlow;
-import org.flowable.bpmn.model.StartEvent;
-import org.flowable.bpmn.model.UserTask;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +41,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -74,6 +54,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
@@ -84,6 +65,8 @@ public class ModelResource {
   private static final String RESOLVE_ACTION_OVERWRITE = "overwrite";
   private static final String RESOLVE_ACTION_SAVE_AS = "saveAs";
   private static final String RESOLVE_ACTION_NEW_VERSION = "newVersion";
+  
+  private static final String FORM_REFERENCE = "formreference";
 
   @Autowired
   protected ModelService modelService;
@@ -333,5 +316,55 @@ public class ModelResource {
     result.put("diagram", diagramBase64String);
     result.put("name", model.getName());
     return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
+  }
+  
+  @RequestMapping(value = "/rest/models/{modelId}/editorhints", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+  @ResponseBody
+  public ResponseEntity<Map<String, Object>> editorHints(@PathVariable String modelId) 
+  {
+    try {
+      Map<String, Object> resultMap = new TreeMap<String, Object>();
+      JsonNode editorNode = objectMapper.readTree(modelService.getModel(modelId).getModelEditorJson());
+      List<JsonNode> formReferences = editorNode.findValues(FORM_REFERENCE);
+      for (JsonNode ref : formReferences)
+      {
+        if(ref == null || ref instanceof NullNode) {
+          continue;
+        }
+        String formKey = ref.get("key").asText();
+        AbstractModel form = modelRepository.findByKeyAndType(formKey, AbstractModel.MODEL_TYPE_FORM_RDS).get(0);
+        
+        if (form == null)
+        {
+          log.debug("form cannot be found : " + formKey);
+          // Just continue to next form in case we cannot find particular form due to wrong form name/key is given in
+          // workflow model, or the form hasn't been defined yet.
+          continue;
+        }
+        JsonNode formNode = objectMapper.readTree(form.getModelEditorJson());
+        List<String> keys = formNode.findValuesAsText("key");
+        for (String key : keys)
+        {
+          StringTokenizer st = new StringTokenizer(key, ".");
+  
+          Map<String, Object> parentMap = resultMap;
+  
+          while (st.hasMoreTokens())
+          {
+            String token = st.nextToken();
+            Object child = parentMap.get(token);
+            if (child == null)
+            {
+              child = new TreeMap();
+              parentMap.put(token, child);
+            }
+            parentMap = (Map) child;
+          }
+        }
+      }
+      return new ResponseEntity<Map<String, Object>>(resultMap, HttpStatus.OK);
+    } catch (Exception e) {
+      throw new InternalServerErrorException("Exception during genereting editorHints", e);
+    }
   }
 }

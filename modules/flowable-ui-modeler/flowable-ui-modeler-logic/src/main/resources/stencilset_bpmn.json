@@ -307,7 +307,7 @@
     "name" : "scripttextpackage",
     "properties" : [ {
       "id" : "scripttext",
-      "type" : "Text",
+      "type" : "Script",
       "title" : "Script",
       "value" : "",
       "description" : "Script text of the script task.",
