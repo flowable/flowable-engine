@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,7 +39,7 @@ import org.flowable.engine.test.Deployment;
 
 /**
  * Test case for all {@link FlowableEvent}s related to process instances.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
@@ -319,7 +319,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
     /**
      * Test +-->Task1 Start-<> +-->Task1
-     * 
+     *
      * process on PROCESS_COMPLETED event
      */
     @Deployment(resources = { "org/flowable/engine/test/api/event/ProcessInstanceEventsTest.parallelGatewayNoEndProcess.bpmn20.xml" })
@@ -340,6 +340,16 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
         List<FlowableEvent> events = listener.filterEvents(FlowableEngineEventType.PROCESS_COMPLETED);
         assertEquals("ActivitiEventType.PROCESS_COMPLETED was expected 1 time.", 1, events.size());
+    }
+
+    @Deployment(resources = {
+            "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInCallActivityMulitInstance.bpmn",
+            "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessTerminateTerminateAll.bpmn20.xml"})
+    public void testProcessCompleted_TerminateInCallActivityMultiInstanceTerminateAll() throws Exception {
+        runtimeService.startProcessInstanceByKey("terminateEndEventExample");
+
+        List<FlowableEvent> events = listener.filterEvents(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
+        assertEquals("FlowableEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT was expected 6 times.", 6, events.size());
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -441,7 +451,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
 
         List<FlowableEvent> processTerminatedEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
-        assertEquals("There should be exactly one FlowableEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT event after the task complete.", 1,
+        assertEquals("There should be exactly two FlowableEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT event after the task complete.", 1,
                 processTerminatedEvents.size());
         FlowableEngineEntityEvent processCompletedEvent = (FlowableEngineEntityEvent) processTerminatedEvents.get(0);
         assertThat(processCompletedEvent.getProcessInstanceId(), is(pi.getProcessInstanceId()));
@@ -492,9 +502,9 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
         assertProcessEnded(pi.getId());
         List<FlowableEvent> processTerminatedEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
-        assertEquals("There should be exactly one FlowableEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT event after the task complete.", 1,
+        assertEquals("There should be exactly two (parent process and subprocess) FlowableEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT event after the task complete.", 2,
                 processTerminatedEvents.size());
-        FlowableEngineEntityEvent processCompletedEvent = (FlowableEngineEntityEvent) processTerminatedEvents.get(0);
+        FlowableEngineEntityEvent processCompletedEvent = (FlowableEngineEntityEvent) processTerminatedEvents.get(1);
         assertThat(processCompletedEvent.getProcessInstanceId(), is(pi.getProcessInstanceId()));
         assertThat(processCompletedEvent.getProcessDefinitionId(), containsString("terminateParentProcess"));
 
