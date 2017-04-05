@@ -13,6 +13,9 @@
 
 package org.flowable.engine.test.bpmn.event.timer;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -29,9 +32,6 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.TimerJobQuery;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Joram Barrez
@@ -541,108 +541,156 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     @Deployment
     public void test3BoundaryTimerEvents() throws Exception {
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyy.MM.dd hh:mm");
-        Date currentTime = simpleDateFormat.parse("2015.10.01 11:01");
-        processEngineConfiguration.getClock().setCurrentTime(currentTime);
-
-        runtimeService.startProcessInstanceByKey("threeTimersProcess");
-
-        // just wait for 2 seconds to run any job if it's the case
-        try {
-            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
-        } catch (Exception ex) {
-            // expected exception because the boundary timer event created a timer job to be executed after 10 minutes
-        }
-
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("threeTimersProcess");
+        assertEquals(0, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(2, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(0, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
+        
         // there should be a userTask waiting for user input
         List<Task> tasks = taskService.createTaskQuery().list();
         assertEquals(1, tasks.size());
         assertEquals("First Task", tasks.get(0).getName());
-        List<Job> jobList = managementService.createTimerJobQuery().list();
-        assertEquals(2, jobList.size());
-
-        // after another 5 seconds
-        long fiveSeconds = 5 * 1000L;
-        currentTime = new Date(currentTime.getTime() + fiveSeconds);
-        processEngineConfiguration.getClock().setCurrentTime(currentTime);
-
-        try {
-            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
-        } catch (Exception ex) {
-            ex.getCause();
-            // expected exception because a new job is prepared
-        }
-
-        // there should be no userTask
+        
+        // first job fires after 1 hour
+        Calendar currentCal = processEngineConfiguration.getClock().getCurrentCalendar();
+        currentCal.add(Calendar.MINUTE, 61);
+        processEngineConfiguration.getClock().setCurrentCalendar(currentCal);
+        
+        assertEquals(1, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
+        
+        Job timerJob = managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).singleResult();
+        managementService.moveTimerToExecutableJob(timerJob.getId());
+        
+        assertEquals(1, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        
+        timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        
+        managementService.executeJob(timerJob.getId());
+        
         tasks = taskService.createTaskQuery().list();
         assertEquals(2, tasks.size());
-        jobList = managementService.createTimerJobQuery().list();
-        assertEquals(2, jobList.size());
+        assertEquals(0, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(2, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(0, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
+        
+        // second job fires after 1 hour
+        currentCal.add(Calendar.MINUTE, 61);
+        processEngineConfiguration.getClock().setCurrentCalendar(currentCal);
+        
+        assertEquals(1, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
+        
+        timerJob = managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).singleResult();
+        managementService.moveTimerToExecutableJob(timerJob.getId());
+        
+        assertEquals(1, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
 
-        currentTime = new Date(currentTime.getTime() + 3 * fiveSeconds);
-        processEngineConfiguration.getClock().setCurrentTime(currentTime);
+        timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        
+        managementService.executeJob(timerJob.getId());
+        
+        tasks = taskService.createTaskQuery().list();
+        assertEquals(1, tasks.size());
+        assertEquals("First Task", tasks.get(0).getName());
 
-        try {
-            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
-        } catch (Exception ex) {
-            ex.getCause();
-            // expected exception because a new job is prepared
-        }
-        assertThat("There is still on process instance running.", runtimeService.createProcessInstanceQuery().count(), is(1L));
+        // last timer fires after another 2 hours
+        currentCal.add(Calendar.MINUTE, 121);
+        processEngineConfiguration.getClock().setCurrentCalendar(currentCal);
+        
+        assertEquals(1, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
+        
+        timerJob = managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).singleResult();
+        managementService.moveTimerToExecutableJob(timerJob.getId());
+        
+        assertEquals(1, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        
+        timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        
+        managementService.executeJob(timerJob.getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        
+        processEngineConfiguration.getClock().reset();
     }
 
     @Deployment
     public void test2Boundary1IntermediateTimerEvents() throws Exception {
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyy.MM.dd hh:mm");
-        Date currentTime = simpleDateFormat.parse("2015.10.01 11:01");
-        processEngineConfiguration.getClock().setCurrentTime(currentTime);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("threeTimersProcess");
 
-        runtimeService.startProcessInstanceByKey("threeTimersProcess");
-
-        // just wait for 2 seconds to run any job if it's the case
-        try {
-            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
-        } catch (Exception ex) {
-            // expected exception because the boundary timer event created a timer job to be executed after 10 minutes
-        }
+        assertEquals(0, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(2, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(0, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
 
         // there should be a userTask waiting for user input
         List<Task> tasks = taskService.createTaskQuery().list();
         assertEquals(1, tasks.size());
         assertEquals("First Task", tasks.get(0).getName());
-        List<Job> jobList = managementService.createTimerJobQuery().list();
-        assertEquals(2, jobList.size());
 
-        // after another 5 seconds
-        long fiveSeconds = 5 * 1000L;
-        currentTime = new Date(currentTime.getTime() + fiveSeconds);
-        processEngineConfiguration.getClock().setCurrentTime(currentTime);
+        // first job fires after 1 hour
+        Calendar currentCal = processEngineConfiguration.getClock().getCurrentCalendar();
+        currentCal.add(Calendar.MINUTE, 61);
+        processEngineConfiguration.getClock().setCurrentCalendar(currentCal);
+        
+        assertEquals(1, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
+        
+        Job timerJob = managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).singleResult();
+        managementService.moveTimerToExecutableJob(timerJob.getId());
+        
+        assertEquals(1, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        
+        timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        
+        managementService.executeJob(timerJob.getId());
 
-        try {
-            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
-        } catch (Exception ex) {
-            ex.getCause();
-            // expected exception because a new job is prepared
-        }
-
-        // there should be no userTask
         tasks = taskService.createTaskQuery().taskName("Reminder Task").list();
         assertEquals(1, tasks.size());
         taskService.complete(tasks.get(0).getId());
-        jobList = managementService.createTimerJobQuery().list();
-        assertEquals(2, jobList.size());
+        
+        assertEquals(2, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
 
-        currentTime = new Date(currentTime.getTime() + 3 * fiveSeconds);
-        processEngineConfiguration.getClock().setCurrentTime(currentTime);
-
-        try {
-            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
-        } catch (Exception ex) {
-            ex.getCause();
-            // expected exception because a new job is prepared
-        }
-        assertThat("There is still on process instance running.", runtimeService.createProcessInstanceQuery().count(), is(1L));
+        // intermediate timer catch event job fires after 1 hour
+        currentCal.add(Calendar.MINUTE, 61);
+        processEngineConfiguration.getClock().setCurrentCalendar(currentCal);
+        
+        assertEquals(1, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
+        
+        timerJob = managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).singleResult();
+        managementService.moveTimerToExecutableJob(timerJob.getId());
+        
+        assertEquals(1, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        
+        timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        
+        managementService.executeJob(timerJob.getId());
+        
+        tasks = taskService.createTaskQuery().list();
+        assertEquals(1, tasks.size());
+        assertEquals("First Task", tasks.get(0).getName());
+        
+        // last timer fires after another 2 hours
+        currentCal.add(Calendar.MINUTE, 121);
+        processEngineConfiguration.getClock().setCurrentCalendar(currentCal);
+        
+        assertEquals(1, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
+        
+        timerJob = managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).singleResult();
+        managementService.moveTimerToExecutableJob(timerJob.getId());
+        
+        assertEquals(1, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+        assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        
+        timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        
+        managementService.executeJob(timerJob.getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        
+        processEngineConfiguration.getClock().reset();
     }
 
 }
