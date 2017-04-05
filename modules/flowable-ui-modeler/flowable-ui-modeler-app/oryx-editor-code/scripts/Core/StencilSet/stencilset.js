@@ -411,7 +411,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
         });           
     }
     
-    // start added by simon to handle custom task 
+    // rds - start added by simon to handle custom task 
       for (var i = 0; i < customTaskConfigs.length; i++) {
           var taskConfig = customTaskConfigs[i]; 
           var taskclasspackage = taskConfig.id+"implpackage";     
@@ -504,7 +504,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
           
     }
     
-    //end added by simon to hanlde custom task type
+    // rds - end added by simon to hanlde custom task type
     
         // init each stencil
         $A(this._jsonObject.stencils).each((function(stencil){
