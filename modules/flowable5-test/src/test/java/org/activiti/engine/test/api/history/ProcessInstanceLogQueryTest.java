@@ -12,6 +12,7 @@ import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Task;
 

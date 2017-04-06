@@ -23,6 +23,7 @@ import org.flowable.engine.history.ProcessInstanceHistoryLog;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.task.Task;
 
 /**

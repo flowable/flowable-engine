@@ -15,14 +15,14 @@ package org.activiti.engine.test.bpmn.dynamic;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.ArrayList;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Created by Pardo David on 7/12/2016.
