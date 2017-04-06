@@ -15,6 +15,7 @@ package org.flowable.engine.impl;
 import org.flowable.engine.runtime.DataObject;
 
 public class DataObjectImpl implements DataObject {
+    protected String id;
     protected String processInstanceId;
     protected String executionId;
     protected String name;
@@ -26,9 +27,10 @@ public class DataObjectImpl implements DataObject {
 
     private String type;
 
-    public DataObjectImpl(String processInstanceId, String executionId, String name, Object value, String description, String type, String localizedName,
+    public DataObjectImpl(String id, String processInstanceId, String executionId, String name, Object value, String description, String type, String localizedName,
             String localizedDescription, String dataObjectDefinitionKey) {
 
+        this.id = id;
         this.processInstanceId = processInstanceId;
         this.executionId = executionId;
         this.name = name;
@@ -39,8 +41,25 @@ public class DataObjectImpl implements DataObject {
         this.localizedDescription = localizedDescription;
         this.dataObjectDefinitionKey = dataObjectDefinitionKey;
     }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+
     public String getProcessInstanceId() {
         return processInstanceId;
+    }
+
+    public void setExecutionId(String executionId) {
+        this.executionId = executionId;
     }
 
     public String getExecutionId() {
