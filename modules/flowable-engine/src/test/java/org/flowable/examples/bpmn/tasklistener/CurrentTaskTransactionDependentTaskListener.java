@@ -12,12 +12,12 @@
  */
 package org.flowable.examples.bpmn.tasklistener;
 
-import org.flowable.bpmn.model.Task;
-import org.flowable.engine.delegate.TransactionDependentTaskListener;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.flowable.bpmn.model.Task;
+import org.flowable.engine.delegate.TransactionDependentTaskListener;
 
 /**
  * Simple {@link TransactionDependentTaskListener} that collects current process scope data and custom properties.

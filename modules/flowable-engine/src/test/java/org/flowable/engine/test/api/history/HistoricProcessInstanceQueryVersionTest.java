@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 
 public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTestCase {
@@ -50,7 +51,7 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionVersion(3).list().size());
 
         // Variables Case
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .variableValueEquals("test", 123).processDefinitionVersion(1).singleResult();
             assertEquals(1, processInstance.getProcessDefinitionVersion().intValue());
@@ -89,7 +90,7 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().or().processDefinitionVersion(3).processDefinitionId("undefined").endOr().list().size());
 
         // Variables Case
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .or().variableValueEquals("test", "invalid").processDefinitionVersion(1).endOr().singleResult();
             assertEquals(1, processInstance.getProcessDefinitionVersion().intValue());

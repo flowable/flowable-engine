@@ -25,6 +25,7 @@ import org.flowable.engine.impl.cmd.SetProcessDefinitionVersionCmd;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
@@ -172,7 +173,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals(newProcessDefinition.getId(), pi.getProcessDefinitionId());
 
         // check history
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance historicPI = historyService.createHistoricProcessInstanceQuery().processInstanceId(pi.getId()).singleResult();
             assertEquals(newProcessDefinition.getId(), historicPI.getProcessDefinitionId());
 
@@ -267,7 +268,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             assertEquals(newProcessDefinition.getId(), task.getProcessDefinitionId());
             assertEquals("testFormKey", formService.getTaskFormData(task.getId()).getFormKey());
 
-            if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
                 HistoricTaskInstance historicTask = historyService.createHistoricTaskInstanceQuery().processInstanceId(pi.getId()).singleResult();
                 assertEquals(newProcessDefinition.getId(), historicTask.getProcessDefinitionId());
                 assertEquals("testFormKey", formService.getTaskFormData(historicTask.getId()).getFormKey());

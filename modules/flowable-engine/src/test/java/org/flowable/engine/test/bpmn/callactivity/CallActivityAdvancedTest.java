@@ -26,6 +26,7 @@ import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -66,7 +67,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
 
         // Validate subprocess history
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // Subprocess should have initial activity set
             HistoricProcessInstance historicProcess = historyService.createHistoricProcessInstanceQuery().processInstanceId(taskInSubProcess.getProcessInstanceId()).singleResult();
             assertNotNull(historicProcess);
@@ -247,7 +248,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         taskService.complete(escalatedTask.getId());
         assertEquals(0, runtimeService.createExecutionQuery().list().size());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             assertTrue(historyService.createHistoricProcessInstanceQuery().processInstanceId(pi2.getId()).singleResult()
                     .getDeleteReason().startsWith(DeleteReason.BOUNDARY_EVENT_INTERRUPTING));
             assertHistoricTasksDeleteReason(pi2, DeleteReason.BOUNDARY_EVENT_INTERRUPTING, "Task in subprocess");
@@ -367,7 +368,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Final task", task.getName());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
                     .superProcessInstanceId(processInstance.getId()).list();
             assertEquals(3, historicProcessInstances.size());

@@ -19,6 +19,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -57,7 +58,7 @@ public class HistoricActivityEventsTest extends PluggableFlowableTestCase {
      */
     @Deployment
     public void testHistoricActivityEventDispatched() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
 
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestActivityEvents");
             assertNotNull(processInstance);

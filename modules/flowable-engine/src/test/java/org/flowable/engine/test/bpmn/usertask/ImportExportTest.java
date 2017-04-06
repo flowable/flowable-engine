@@ -1,14 +1,14 @@
 package org.flowable.engine.test.bpmn.usertask;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.common.impl.util.io.InputStreamSource;
 import org.flowable.engine.common.impl.util.io.StreamSource;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 
 /**
  * Created by p3700487 on 23/02/15.

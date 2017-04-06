@@ -67,7 +67,7 @@ public class ProcessInstanceLogQueryAndByteArrayTypeVariableTest extends Pluggab
     }
 
     public void testIncludeVariables() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId)
                     .includeVariables()
                     .singleResult();
@@ -82,7 +82,7 @@ public class ProcessInstanceLogQueryAndByteArrayTypeVariableTest extends Pluggab
     }
 
     public void testIncludeVariableUpdates() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
 
             HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
                     .processInstanceId(processInstanceId).variableName("var").singleResult();

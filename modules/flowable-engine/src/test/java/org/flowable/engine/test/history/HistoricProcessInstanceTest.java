@@ -27,6 +27,7 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.history.HistoricIdentityLink;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
@@ -393,7 +394,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     // ACT-1098
     public void testDeleteReason() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             final String deleteReason = "some delete reason";
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess");
             runtimeService.deleteProcessInstance(pi.getId(), deleteReason);
@@ -404,7 +405,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testHistoricIdentityLinksOnProcessInstance() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess");
             runtimeService.addUserIdentityLink(pi.getId(), "kermit", "myType");
 
@@ -435,7 +436,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/history/HistoricProcessInstanceTest.testDeleteHistoricProcessInstanceWithCallActivity.bpmn20.xml",
             "org/flowable/engine/test/history/HistoricProcessInstanceTest.testDeleteHistoricProcessInstanceWithCallActivity-subprocess.bpmn20.xml" })
     public void testDeleteHistoricProcessInstanceWithCallActivity() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
 
             runtimeService.deleteProcessInstance(pi.getId(), "testing");

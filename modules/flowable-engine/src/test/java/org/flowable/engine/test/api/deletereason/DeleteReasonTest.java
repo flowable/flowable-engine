@@ -18,6 +18,7 @@ import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.Job;
@@ -38,7 +39,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
         runtimeService.deleteProcessInstance(processInstance.getId(), null);
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             assertEquals(DeleteReason.PROCESS_INSTANCE_DELETED, historyService.createHistoricProcessInstanceQuery()
                     .processInstanceId(processInstance.getId()).singleResult().getDeleteReason());
 
@@ -72,7 +73,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
         runtimeService.deleteProcessInstance(processInstance.getId(), customDeleteReason);
         assertEquals(0L, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             assertEquals(customDeleteReason, historyService.createHistoricProcessInstanceQuery()
                     .processInstanceId(processInstance.getId()).singleResult().getDeleteReason());
 
@@ -106,7 +107,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
         }
         assertEquals(0L, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             assertNull(historyService.createHistoricProcessInstanceQuery()
                     .processInstanceId(processInstance.getId()).singleResult().getDeleteReason());
 
@@ -130,7 +131,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
         assertNotNull(execution);
         runtimeService.deleteProcessInstance(processInstance.getId(), null);
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             assertEquals(DeleteReason.PROCESS_INSTANCE_DELETED, historyService.createHistoricProcessInstanceQuery()
                     .processInstanceId(processInstance.getId()).singleResult().getDeleteReason());
 
@@ -156,7 +157,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
 
         runtimeService.deleteProcessInstance(processInstance.getId(), null);
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             assertEquals(DeleteReason.PROCESS_INSTANCE_DELETED, historyService.createHistoricProcessInstanceQuery()
                     .processInstanceId(processInstance.getId()).singleResult().getDeleteReason());
 

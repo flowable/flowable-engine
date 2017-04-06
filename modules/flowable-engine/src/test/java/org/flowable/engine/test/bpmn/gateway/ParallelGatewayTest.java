@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -166,7 +167,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testHistoricActivityInstanceEndTimes() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             runtimeService.startProcessInstanceByKey("nestedForkJoin");
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().list();
             assertEquals(21, historicActivityInstances.size());

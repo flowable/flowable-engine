@@ -20,6 +20,7 @@ import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -157,7 +158,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
         }
 
@@ -167,7 +168,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
 
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertEquals(6, historyService.createHistoricProcessInstanceQuery().count());
         }
 
@@ -182,7 +183,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
         }
 
@@ -215,7 +216,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             final HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery().activityId("compensationScriptTask");
             assertEquals(1, query.count());
             final HistoricActivityInstance compensationScriptTask = query.singleResult();
@@ -229,7 +230,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
     public void testCompensateWithSubprocess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
                     .processInstanceId(processInstance.getId()).activityId("bookHotel").singleResult();
             assertNotNull(historicActivityInstance.getEndTime());

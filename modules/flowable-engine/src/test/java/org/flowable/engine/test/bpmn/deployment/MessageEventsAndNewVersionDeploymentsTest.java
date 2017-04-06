@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -395,7 +396,7 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
             runtimeService.startProcessInstanceByMessage("myMessage");
         }
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertEquals(9, historyService.createHistoricProcessInstanceQuery().count());
         }
         assertEquals(10, getAllEventSubscriptions().size()); // 1 for the start, 9 for boundary

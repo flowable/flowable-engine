@@ -11,6 +11,7 @@ import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Task;
@@ -115,7 +116,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
     }
 
     public void testIncludeVariables() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeVariables().singleResult();
             List<HistoricData> events = log.getHistoricData();
             assertEquals(2, events.size());
@@ -127,7 +128,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
     }
 
     public void testIncludeVariableUpdates() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeVariableUpdates().singleResult();
             List<HistoricData> events = log.getHistoricData();
             assertEquals(3, events.size());
@@ -139,7 +140,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
     }
 
     public void testEverything() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeTasks().includeActivities().includeComments().includeVariables()
                     .includeVariableUpdates().singleResult();
             List<HistoricData> events = log.getHistoricData();

@@ -8,6 +8,7 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
@@ -410,7 +411,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
 
     public void testHistoryTenancy() {
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
 
             // Generate 3 tasks with tenant
             String processDefinitionIdWithTenant = deployTestProcessWithTestTenant();
@@ -832,7 +833,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
 
     // Bug from http://forums.activiti.org/content/callactiviti-tenant-id
     public void testCallActivityWithTenant() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             String tenantId = "apache";
 
             // deploying both processes. Process 1 will call Process 2

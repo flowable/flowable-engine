@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -56,7 +57,7 @@ public class SubTaskTest extends PluggableFlowableTestCase {
             subTaskNames.add(subTask.getName());
         }
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             Set<String> expectedSubTaskNames = new HashSet<String>();
             expectedSubTaskNames.add("subtask one");
             expectedSubTaskNames.add("subtask two");
@@ -105,7 +106,7 @@ public class SubTaskTest extends PluggableFlowableTestCase {
         tasks = taskService.createTaskQuery().taskAssignee("test").list();
         assertEquals(0, tasks.size());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().taskAssignee("test").list();
             assertEquals(3, historicTasks.size());
 

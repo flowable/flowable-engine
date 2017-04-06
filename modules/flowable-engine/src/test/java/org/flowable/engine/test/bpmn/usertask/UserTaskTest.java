@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -46,7 +47,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
 
         // the next test verifies that if an execution creates a task, that no
         // events are created during creation of the task.
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertEquals(0, taskService.getTaskEvents(task.getId()).size());
         }
     }
@@ -89,7 +90,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         assertEquals("Task with category", taskService.createTaskQuery().taskCategory(testCategory).singleResult().getName());
         assertEquals(0, taskService.createTaskQuery().taskCategory("Does not exist").count());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             // Check historic task
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
             assertEquals(testCategory, historicTaskInstance.getCategory());

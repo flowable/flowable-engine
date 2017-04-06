@@ -124,7 +124,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
     }
 
     public void testIncludeVariables() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId)
                     .includeVariables()
                     .singleResult();
@@ -138,7 +138,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
     }
 
     public void testIncludeVariableUpdates() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId)
                     .includeVariableUpdates()
                     .singleResult();
@@ -152,7 +152,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
     }
 
     public void testEverything() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId)
                     .includeTasks()
                     .includeActivities()

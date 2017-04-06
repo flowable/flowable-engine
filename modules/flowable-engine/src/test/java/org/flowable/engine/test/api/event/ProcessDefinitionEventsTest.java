@@ -23,10 +23,6 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
 
-import java.util.List;
-
-import static org.flowable.engine.impl.context.Context.getProcessEngineConfiguration;
-
 /**
  * Test case for all {@link FlowableEvent}s related to process definitions.
  *

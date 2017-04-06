@@ -13,8 +13,6 @@
 
 package org.flowable.engine.test.api.history;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +36,8 @@ import org.flowable.engine.task.Task;
 import org.flowable.engine.task.TaskQuery;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.api.runtime.ProcessInstanceQueryTest;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Frederik Heremans
