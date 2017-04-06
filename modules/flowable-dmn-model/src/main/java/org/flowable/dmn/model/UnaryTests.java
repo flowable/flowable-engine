@@ -12,7 +12,7 @@
  */
 package org.flowable.dmn.model;
 
-import com.sun.deploy.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
