@@ -387,6 +387,31 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
             assertTrue(e.getMessage().contains("No outgoing sequence flow"));
         }
     }
+    
+    @Deployment
+    public void testJoinAfterParallelGateway() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("InclusiveGateway");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        assertEquals("Task1", task.getName());
+        
+        taskService.complete(task.getId());
+        
+        Execution execution = runtimeService.createExecutionQuery()
+                .processInstanceId(processInstance.getId())
+                .activityId("receiveTask1")
+                .singleResult();
+        
+        assertNotNull(execution);
+        runtimeService.trigger(execution.getId());
+        
+        execution = runtimeService.createExecutionQuery()
+                .processInstanceId(processInstance.getId())
+                .activityId("receiveTask1")
+                .singleResult();
+        
+        assertNotNull(execution);
+    }
 
     @Deployment(resources = { "org/flowable/engine/test/bpmn/gateway/InclusiveGatewayTest.testJoinAfterCall.bpmn20.xml",
             "org/flowable/engine/test/bpmn/gateway/InclusiveGatewayTest.testJoinAfterCallSubProcess.bpmn20.xml" })
