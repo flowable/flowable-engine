@@ -342,6 +342,16 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertEquals("ActivitiEventType.PROCESS_COMPLETED was expected 1 time.", 1, events.size());
     }
 
+    @Deployment(resources = {
+            "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInCallActivityMulitInstance.bpmn",
+            "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessTerminateTerminateAll.bpmn20.xml"})
+    public void testProcessCompleted_TerminateInCallActivityMultiInstanceTerminateAll() throws Exception {
+        runtimeService.startProcessInstanceByKey("terminateEndEventExample");
+
+        List<FlowableEvent> events = listener.filterEvents(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
+        assertEquals("FlowableEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT was expected 6 times.", 6, events.size());
+    }
+
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testProcessInstanceCancelledEvents_cancel() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -498,7 +508,8 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
     }
 
-    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInParentProcess.bpmn", "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInParentProcess.bpmn",
+                    "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testProcessInstanceTerminatedEvents_terminateInParentProcess() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateParentProcess");
 
@@ -508,7 +519,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
         assertProcessEnded(pi.getId());
         List<FlowableEvent> processTerminatedEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
-        assertEquals("There should be exactly two FlowableEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT event after the task complete.", 2,
+        assertEquals("There should be exactly two FlowableEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT events after the task complete.", 2,
                 processTerminatedEvents.size());
         FlowableEngineEntityEvent processCompletedEvent = (FlowableEngineEntityEvent) processTerminatedEvents.get(1);
         assertThat(processCompletedEvent.getProcessInstanceId(), is(pi.getProcessInstanceId()));

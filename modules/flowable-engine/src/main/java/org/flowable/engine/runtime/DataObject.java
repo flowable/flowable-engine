@@ -19,6 +19,11 @@ package org.flowable.engine.runtime;
 public interface DataObject {
 
     /**
+     * The unique id of this Data Object.
+     */
+    public String getId();
+
+    /**
      /**
      * The id of the process instance that this Data Object is associated with.
      */
