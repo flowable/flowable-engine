@@ -33,6 +33,7 @@ import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
@@ -650,5 +651,40 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
             return filteredEvents;
         }
 
+    }
+
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/subProcessWithTerminateEnd.bpmn20.xml")
+    public void testProcessInstanceTerminatedEventInSubProcess() throws Exception {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("subProcessWithTerminateEndTest");
+
+        long executionEntities = runtimeService.createExecutionQuery().processInstanceId(pi.getId()).count();
+        assertEquals(4, executionEntities);
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();//taskDefinitionKey("preTerminateTask").singleResult();
+        assertEquals(1, tasks.size());
+
+        Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("cancel").singleResult();
+        assertNotNull(execution);
+
+        // message received cancels the SubProcess. We expect an event for all flow elements
+        // when the process state changes. We expect the activity cancelled event for the task within the
+        // Subprocess and the SubProcess itself
+        runtimeService.messageEventReceived("cancel", execution.getId());
+
+        List<FlowableEvent> activityTerminatedEvents = listener.filterEvents(FlowableEngineEventType.ACTIVITY_CANCELLED);
+        assertEquals(3, activityTerminatedEvents.size());
+
+        FlowableActivityCancelledEvent activityEvent = (FlowableActivityCancelledEvent) activityTerminatedEvents.get(0);
+        assertEquals("endEvent", activityEvent.getActivityType());
+
+        // validate ActivityCancelledEvent received for the user task within the SubProcess
+        activityEvent = (FlowableActivityCancelledEvent) activityTerminatedEvents.get(1);
+        assertEquals("userTask", activityEvent.getActivityType());
+        assertEquals("task", activityEvent.getActivityId());
+
+        //validate ActivityCancelledEvent received for the SubProcess itself
+        activityEvent = (FlowableActivityCancelledEvent) activityTerminatedEvents.get(2);
+        assertEquals("subProcess", activityEvent.getActivityType());
+        assertEquals("embeddedSubprocess", activityEvent.getActivityId());
     }
 }
