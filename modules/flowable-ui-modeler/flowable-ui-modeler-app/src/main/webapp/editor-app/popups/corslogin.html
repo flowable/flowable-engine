@@ -11,6 +11,9 @@
   			<div class="field form-group">
     			<label for="j_password">Password</label> <input class="password form-control" type="password" id="j_password" ng-model="loginCtrl.loginDetail.password" />
   			</div>
+  			<div class="field form-group">
+    			<label for="deployTo">Deploy to</label> <select class="form-control" id="deployTo" ng-model="loginCtrl.deployUrl" ng-options="item.url as item.name for item in loginCtrl.deployOptions" />
+  			</div>
   			<span ng-if="loginCtrl.deploying" class="glyphicon glyphicon-refresh spinning ng-animate"></span>
   			<span ng-if="loginCtrl.errorMsg">{{loginCtrl.errorMsg}}</span>	        
         </div>
