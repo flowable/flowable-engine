@@ -761,12 +761,16 @@ ORYX.Editor = {
         if(model.properties) {
         	for(key in model.properties) {
         		var value = model.properties[key];
-				var prop = this.getCanvas().getStencil().property("oryx-"+key);
-        		if (!(typeof value === "string") && (!prop || !prop.isList())) {
+        		var prop = this.getCanvas().getStencil().property("oryx-"+key);
+            /**
+             * stringify the value caused problem form reference as it's a object , not sure why need to stringify the value here,
+             * in activiti version, this code this been commented out. Here just bypass stringify value for rds customized properties.
+             */
+        		if (!(typeof value === "string") && (!prop || !prop.isList())&& key.indexOf("rds")<0) {
         			value = JSON.stringify(value);
         		}
-            	this.getCanvas().setProperty("oryx-" + key, value);
-            }
+            this.getCanvas().setProperty("oryx-" + key, value);
+          }
         }
         
         

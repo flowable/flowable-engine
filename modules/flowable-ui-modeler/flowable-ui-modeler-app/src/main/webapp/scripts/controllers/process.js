@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 angular.module('flowableModeler')
-  .controller('ProcessCtrl', ['$rootScope', '$scope', '$translate', '$http', '$location', '$routeParams','$modal', '$popover', '$timeout', 'appResourceRoot', 'ResourceService',
+  .controller('ProcessCtrl', ['$rootScope', '$scope', '$translate', '$http', '$location', '$routeParams','$modal', '$popover', '$timeout', 'appResourceRoot', 'ResourceService', 
                               function ($rootScope, $scope, $translate, $http, $location, $routeParams, $modal, $popover, $timeout, appResourceRoot, ResourceService) {
 
     // Main page (needed for visual indicator of current page)
@@ -168,6 +168,22 @@ angular.module('flowableModeler')
           $scope.$on('$destroy', destroy);
         }
     };
+    
+    $scope.deploy = function() {
+      if ($scope.model.process) {
+        
+     // Config for the modal window
+        var opts = {
+            template:  'editor-app/popups/corslogin.html?version=' + Date.now(),
+            scope: $scope
+        };
+
+        // Open the dialog
+        _internalCreateModal(opts, $modal, $scope);
+        
+        
+      }      
+    }
     
     $scope.loadProcess();
 }]);

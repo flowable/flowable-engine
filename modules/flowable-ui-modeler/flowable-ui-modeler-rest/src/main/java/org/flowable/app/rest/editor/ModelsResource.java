@@ -30,7 +30,6 @@ import org.flowable.app.service.editor.FlowableModelQueryService;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.flowable.form.model.FormModel;
-import org.flowable.form.model.RdsFormModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +50,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class ModelsResource {
 
   private final Logger logger = LoggerFactory.getLogger(ModelsResource.class);
+  
+  public static String RDS_FORM_EMPTY_DEFINITION = "{\"sfFormProperties\": {\"items\": [],\"type\": \"root\" },\"sfSchemaProperties\": {}}";
 
   @Autowired
   protected FlowableModelQueryService modelQueryService;
@@ -139,9 +140,8 @@ public class ModelsResource {
     else if (modelRepresentation.getModelType() != null && modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_FORM_RDS))
     {
       try
-      {
-        RdsFormModel rdsFormModel = new RdsFormModel();
-        json = rdsFormModel.getDefinition();
+      {         
+        json = RDS_FORM_EMPTY_DEFINITION ;
       }
       catch (Exception e)
       {

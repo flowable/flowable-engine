@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.activiti.editor.language.json.converter.RDSBpmnJsonConverter;
 import org.flowable.app.domain.editor.Model;
 import org.flowable.app.util.ImageGenerator;
 import org.flowable.bpmn.model.Artifact;
@@ -45,7 +46,7 @@ public class ModelImageService {
 
     private static float THUMBNAIL_WIDTH = 300f;
 
-    protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
+    protected RDSBpmnJsonConverter bpmnJsonConverter = new RDSBpmnJsonConverter();
 
     public byte[] generateThumbnailImage(Model model, ObjectNode editorJsonNode) {
         try {
