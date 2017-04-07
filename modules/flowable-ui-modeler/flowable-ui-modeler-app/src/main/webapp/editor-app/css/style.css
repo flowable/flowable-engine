@@ -902,3 +902,20 @@ li.x-menu-list-item.x-menu-item-active a {
 .current-process{
 	border: 1px solid green;
 }
+
+.glyphicon.spinning {
+    animation: spin 1s infinite linear;
+    -webkit-animation: spin2 1s infinite linear;
+}
+
+.glyphicon.spinning.ng-animate { -webkit-animation: none 0s; }
+
+@keyframes spin {
+    from { transform: scale(1) rotate(0deg); }
+    to { transform: scale(1) rotate(360deg); }
+}
+
+@-webkit-keyframes spin2 {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); }
+}

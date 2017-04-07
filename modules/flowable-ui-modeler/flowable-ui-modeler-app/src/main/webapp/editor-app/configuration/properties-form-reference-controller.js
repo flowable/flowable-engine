@@ -41,7 +41,7 @@ angular.module('flowableModeler').controller('FlowableFormReferenceCtrl',
 }]);
 
 angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
-    [ '$rootScope', '$scope', '$http', '$location', 'editorManager', function($rootScope, $scope, $http, $location, editorManager) {
+    [ '$rootScope', '$scope', '$http', '$location', 'editorManager', '$window', function($rootScope, $scope, $http, $location, editorManager, $window) {
 	 
 	$scope.state = {'loadingForms' : true, 'formError' : false};
 	
@@ -129,9 +129,10 @@ angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
 
                     var allSteps = EDITOR.UTIL.collectSortedElementsFromPrecedingElements($scope.selectedShape);
 
-					$rootScope.addHistoryItem($scope.selectedShape.resourceId);
-                    $location.path('form-editor/' + $scope.selectedForm.id);
-
+                    $rootScope.addHistoryItem($scope.selectedShape.resourceId);
+                    //$location.path('form-editor/' + $scope.selectedForm.id);
+                    var returnurl = encodeURIComponent($location.absUrl())
+                    $window.location.href = 'rdsFormBuilder.jsp#?form=' + $scope.selectedForm.id + "&returnurl=" + returnurl;
                 })
                 .error(function (data, status, headers, config) {
                     
@@ -152,7 +153,7 @@ angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
                  name: '',
                  key: '',
                  description: '',
-                 modelType: 2
+                 modelType: FLOWABLE.CONFIG.formType
             }
         };
     };
@@ -218,8 +219,10 @@ angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
                         var allSteps = EDITOR.UTIL.collectSortedElementsFromPrecedingElements($scope.selectedShape);
 
                         $rootScope.addHistoryItem($scope.selectedShape.resourceId);
-                        $location.path('form-editor/' + newFormId);
-
+                        //$location.path('form-editor/' + newFormId);
+                        var returnurl = encodeURIComponent($location.absUrl())
+                        $window.location.href = 'rdsFormBuilder.jsp#?form=' + newFormId + "&returnurl=" + returnurl; 
+                        
                     })
                     .error(function (data, status, headers, config) {
                         $scope.model.loading = false;

@@ -26,6 +26,10 @@ FLOWABLE.PROPERTY_CONFIG =
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/text-property-write-template.html"
     },
+    "script" : {
+      "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
+      "writeModeTemplateUrl": "editor-app/configuration/properties/script-property-write-template.html"
+  },
     "flowable-multiinstance" : {
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/multiinstance-property-write-template.html"
@@ -53,6 +57,22 @@ FLOWABLE.PROPERTY_CONFIG =
     "oryx-usertaskassignment-complex": {
         "readModeTemplateUrl": "editor-app/configuration/properties/assignment-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/assignment-write-template.html"
+    },
+    "oryx-formkeydefinition-complex": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/form-reference-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/form-reference-write-template.html"
+    },
+    "oryx-rds_processformkey-complex": {
+      	"readModeTemplateUrl": "editor-app/configuration/properties/form-reference-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/form-reference-write-template.html"
+    },
+    "oryx-rds_conditionsequenceflowformkey-complex": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/form-reference-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/form-reference-write-template.html"
+    },
+    "oryx-rds_editprocessformkey-complex": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/form-reference-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/form-reference-write-template.html"
     },
     "oryx-servicetaskfields-complex": {
         "readModeTemplateUrl": "editor-app/configuration/properties/fields-display-template.html",
@@ -105,5 +125,13 @@ FLOWABLE.PROPERTY_CONFIG =
     "oryx-decisiontaskdecisiontablereference-complex": {
         "readModeTemplateUrl": "editor-app/configuration/properties/decisiontable-reference-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/decisiontable-reference-write-template.html"
+    },
+    "parameter": {
+      "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
+      "writeModeTemplateUrl": "editor-app/configuration/properties/parameter-property-write-mode-template.html"
+    },
+    "oryx-pagelevelmessagetask-type-parameter": {
+      "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
+      "writeModeTemplateUrl": "editor-app/configuration/properties/pagelevelmessage-type-write-template.html"
     }
 };

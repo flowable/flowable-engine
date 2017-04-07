@@ -35,7 +35,7 @@ angular.module('flowableModeler').controller('FlowableConditionExpressionPopupCt
         && $scope.property.value.expression !== undefined
         && $scope.property.value.expression !== null) {
 
-        $scope.expression = $scope.property.value.expression;
+        $scope.expression = {type: 'static', staticValue: $scope.property.value.expression.staticValue};
 
     } else if ($scope.property.value !== undefined && $scope.property.value !== null) {
         $scope.expression = {type: 'static', staticValue: $scope.property.value};

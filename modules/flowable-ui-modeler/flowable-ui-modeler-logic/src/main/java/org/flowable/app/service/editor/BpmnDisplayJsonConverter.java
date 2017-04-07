@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.editor.language.json.converter.RDSBpmnJsonConverter;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.service.editor.mapper.EventInfoMapper;
@@ -46,7 +47,6 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.TextAnnotation;
 import org.flowable.bpmn.model.TimerEventDefinition;
-import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +62,7 @@ public class BpmnDisplayJsonConverter {
 
     private final Logger log = LoggerFactory.getLogger(BpmnDisplayJsonConverter.class);
 
-    protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
+    protected RDSBpmnJsonConverter bpmnJsonConverter = new RDSBpmnJsonConverter();
 
     protected ObjectMapper objectMapper = new ObjectMapper();
     protected List<String> eventElementTypes = new ArrayList<String>();

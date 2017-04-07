@@ -54,6 +54,19 @@ angular.module('flowableModeler')
                 groupArray.push(group);
                 return group;
             };
+            
+            //added by Simon to handle custom Task config    
+            if(!customTaskConfigs) {
+              new Ajax.Request(
+                  FLOWABLE.CONFIG.contextRoot + "/app/workflow/model/taskconfigs", {
+                    asynchronous:false, method:'get',
+                    onSuccess:function(result) {
+                      customTaskConfigs=result.responseText.evalJSON();
+                      },
+                    onFailure:function(result) {console.log(result);}
+                });           
+            }
+            
 
             /*
              StencilSet items
@@ -190,6 +203,34 @@ angular.module('flowableModeler')
                 }
             }
             
+            //start add by Simon to handle customization task node
+            for (var i = 0; i < customTaskConfigs.length; i++) {
+              var taskConfig = customTaskConfigs[i]; 
+              var currentGroupName = taskConfig.group;
+              currentGroup = findGroup(currentGroupName, stencilItemGroups); // Find group in root groups array
+                if (currentGroup === null) {
+                    currentGroup = addGroup(currentGroupName, stencilItemGroups);
+                }
+                
+             // Construct the stencil item
+                var stencilItem = {'id': taskConfig.id,
+                    'name': taskConfig.title,
+                    'description': taskConfig.description,
+                    'icon': taskConfig.iconUrl,
+                    'type': 'node',
+                    'roles': ["Activity", "sequence_start", "sequence_end", "ActivitiesMorph", "all"],
+                    'removed': false,
+                    'customIcon': false,
+                    'canConnect': true,
+                    'canConnectTo': true,
+                    'canConnectAssociation': false};
+                
+                currentGroup.items.push(stencilItem);
+                currentGroup.paletteItems.push(stencilItem);
+
+            }
+            //end add by Simon to handle customization task node
+            
             for (var i = 0; i < stencilItemGroups.length; i++) 
             {
               if (stencilItemGroups[i].paletteItems && stencilItemGroups[i].paletteItems.length == 0)
@@ -272,9 +313,11 @@ angular.module('flowableModeler')
 
                     // Gather properties of selected item
                     var properties = stencil.properties();
+                    var servicetaskfields = null;
                     for (var i = 0; i < properties.length; i++) {
                         var property = properties[i];
-                        if (property.popular() == false) continue;
+                        //if (property.popular() == false) continue;
+                        
                         var key = property.prefix() + "-" + property.id();
 
                         if (key === 'oryx-name') {
@@ -295,10 +338,6 @@ angular.module('flowableModeler')
                                 selectedShape.properties.set(key, true);
                             }
                             
-                            if (FLOWABLE.UI_CONFIG.showRemovedProperties == false && property.isHidden())
-                            {
-                              continue;
-                            }
 
                             var currentProperty = {
                                 'key': key,
@@ -309,6 +348,25 @@ angular.module('flowableModeler')
                                 'hidden': property.isHidden(),
                                 'value': selectedShape.properties.get(key)
                             };
+                            
+                            if(property.id()=== 'servicetaskfields') {
+                              servicetaskfields = currentProperty;                              
+                            }
+                            
+                            if ((FLOWABLE.CONFIG.showRemovedProperties == false && property.isHidden())||property.popular() == false)
+                            {
+                              continue;
+                            }
+                            
+                            if(property._jsonProp.paraName) {
+                              servicetaskfields.value.fields.forEach(function(field) {
+                                if(field.name===property._jsonProp.paraName) {
+                                  currentProperty.value = field.string;                                  
+                                  currentProperty._servicetaskfields = servicetaskfields;
+                                  currentProperty._paraName = field.name;
+                                }
+                              })                               
+                            }
                             
                             if ((currentProperty.type === 'complex' || currentProperty.type === 'multiplecomplex') && currentProperty.value && currentProperty.value.length > 0) {
                                 try {
@@ -650,6 +708,17 @@ angular.module('flowableModeler')
             var key = property.key;
             var newValue = property.value;
             var oldValue = shape.properties.get(key);
+            
+            if (property._servicetaskfields) {
+              key = property._servicetaskfields.key;
+              oldValue = shape.properties.get(key);
+              newValue = angular.copy(oldValue);
+              newValue.fields.forEach(function(field) {
+                if(field.name===property._paraName) {
+                  field.string = property.value;
+                }
+              });
+            }
 
             if (newValue != oldValue) {
                 var commandClass = ORYX.Core.Command.extend({

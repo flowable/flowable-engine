@@ -13,7 +13,7 @@
 'use strict';
 
 angular.module('flowableModeler')
-  .controller('FormsCtrl', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$modal', function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal) {
+  .controller('FormsCtrl', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$modal', '$window', function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal, $window) {
 
       // Main page (needed for visual indicator of current page)
       $rootScope.setMainPageById('forms');
@@ -69,7 +69,7 @@ angular.module('flowableModeler')
 		  var params = {
 		      filter: $scope.model.activeFilter.id,
 		      sort: $scope.model.activeSort.id,
-		      modelType: 2
+		      modelType: FLOWABLE.CONFIG.formType
 		  };
 
 		  if ($scope.model.filterText && $scope.model.filterText != '') {
@@ -113,7 +113,8 @@ angular.module('flowableModeler')
 	      $rootScope.currentKickstartModel = undefined;
 		  $scope.createFormCallback = function(result) {
 		      $rootScope.editorHistory = [];
-			  $location.path("/form-editor/" + result.id);
+		      $window.location.href = 'rdsFormBuilder.jsp#?form='+result.id;  
+			  //$location.path("/form-editor/" + result.id);
 		  };
           _internalCreateModal({
 			  template: 'views/popup/form-create.html?version=' + Date.now(),
@@ -131,7 +132,8 @@ angular.module('flowableModeler')
 	  $scope.editFormDetails = function(form) {
 		  if (form) {
 		      $rootScope.editorHistory = [];
-			  $location.path("/form-editor/" + form.id);
+		      $window.location.href = 'rdsFormBuilder.jsp#?form='+form.id;
+		      //$location.path("/form-editor/" + form.id);
 		  }
 	  };
 
@@ -150,7 +152,7 @@ angular.module('flowableModeler')
             name: '',
             key: '',
             description: '',
-            modelType: 2
+            modelType: FLOWABLE.CONFIG.formType
        }
     };
 
@@ -199,7 +201,7 @@ angular.module('flowableModeler')
 					name: '',
 					key: '',
 					description: '',
-					modelType: 2
+					modelType: FLOWABLE.CONFIG.formType
 				}
 			};
 
