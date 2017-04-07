@@ -12,6 +12,8 @@
  */
 package org.flowable.app.rest.editor;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Date;
@@ -20,7 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.domain.editor.Model;
@@ -305,11 +310,18 @@ public class ModelResource {
     Model model = modelService.getModel(modelId);
     
     byte[] bpmnBytes = modelService.getBpmnXML(model);
+    
+    Map<String, byte[]> map = modelService.getDecisionTableDefinitionsForProcess(modelId);
+    map.put(model.getName()+".bpmn20.xml", bpmnBytes);
+    
+    byte[] barBytes = createDeployZipArtifact(map);
 
     final byte[] editorSourceExtra = model.getThumbnail();
 
     Map<String, String> result = new HashMap<String, String>();
-    result.put("bpmn", new String(bpmnBytes));
+    String barBase64String = org.apache.commons.codec.binary.StringUtils
+            .newStringUtf8(org.apache.commons.codec.binary.Base64.encodeBase64(barBytes));
+    result.put("bar", barBase64String);
 
     String diagramBase64String = org.apache.commons.codec.binary.StringUtils
             .newStringUtf8(org.apache.commons.codec.binary.Base64.encodeBase64(editorSourceExtra));
@@ -366,5 +378,35 @@ public class ModelResource {
     } catch (Exception e) {
       throw new InternalServerErrorException("Exception during genereting editorHints", e);
     }
+  }
+  
+  protected byte[] createDeployZipArtifact(Map<String, byte[]> deployableAssets) {
+    ByteArrayOutputStream baos = null;
+    ZipOutputStream zos = null;
+    byte[] deployZipArtifact = null;
+    try {
+        baos = new ByteArrayOutputStream();
+        zos = new ZipOutputStream(baos);
+
+        for (Map.Entry<String, byte[]> entry : deployableAssets.entrySet()) {
+            ZipEntry zipEntry = new ZipEntry(entry.getKey());
+            zipEntry.setSize(entry.getValue().length);
+            zos.putNextEntry(zipEntry);
+            zos.write(entry.getValue());
+            zos.closeEntry();
+        }
+        
+        IOUtils.closeQuietly(zos);
+
+        // this is the zip file as byte[]
+        deployZipArtifact = baos.toByteArray();
+        
+        IOUtils.closeQuietly(baos);
+        
+    } catch (IOException ioe) {
+        throw new InternalServerErrorException("Could not create deploy zip artifact");
+    }
+
+    return deployZipArtifact;
   }
 }

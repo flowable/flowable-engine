@@ -65,6 +65,9 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.dmn.model.DmnDefinition;
+import org.flowable.dmn.xml.converter.DmnXMLConverter;
+import org.flowable.editor.dmn.converter.DmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.editor.language.json.converter.util.JsonConverterUtil;
 import org.flowable.engine.common.api.FlowableException;
@@ -108,6 +111,9 @@ public class ModelServiceImpl implements ModelService {
   protected RDSBpmnJsonConverter bpmnJsonConverter = new RDSBpmnJsonConverter();
 
   protected BpmnXMLConverter bpmnXMLConverter = new BpmnXMLConverter();
+  
+  protected DmnJsonConverter dmnJsonConverter = new DmnJsonConverter();
+  protected DmnXMLConverter dmnXMLConverter = new DmnXMLConverter();
 
   @Override
     public Model getModel(String modelId) {
@@ -164,6 +170,27 @@ public class ModelServiceImpl implements ModelService {
     }
     byte[] xmlBytes = bpmnXMLConverter.convertToXML(bpmnModel);
     return xmlBytes;
+  }
+  
+  public Map<String,byte[]> getDecisionTableDefinitionsForProcess(String modelId) {
+    Map<String,byte[]> dtMaps= new HashMap<String, byte[]>();
+    
+    List<Model> referencedModels = modelRepository.findByParentModelId(modelId);
+    for (Model childModel : referencedModels) {
+        if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
+          try {
+            JsonNode decisionTableNode = objectMapper.readTree(childModel.getModelEditorJson());
+            DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, childModel.getId(),
+                    childModel.getVersion(), childModel.getLastUpdated());
+            byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
+            dtMaps.put("dmn-" + childModel.getKey() + ".dmn", dmnXMLBytes);
+          } catch (Exception e) {
+              throw new InternalServerErrorException(String.format("Error converting decision table %s to XML", childModel.getName()));
+          }
+        }
+    } 
+    
+    return dtMaps;    
   }
 
     public ModelKeyRepresentation validateModelKey(Model model, Integer modelType, String key) {
