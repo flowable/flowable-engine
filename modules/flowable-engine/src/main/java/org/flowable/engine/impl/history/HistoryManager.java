@@ -54,6 +54,16 @@ public interface HistoryManager {
      * Record a sub-process-instance started and alters the calledProcessinstanceId on the current active activity's historic counterpart. Only effective when activity history is enabled.
      */
     void recordSubProcessInstanceStart(ExecutionEntity parentExecution, ExecutionEntity subProcessInstance, FlowElement initialFlowElement);
+    
+    /**
+     * Deletes a historic process instance and all historic data included
+     */
+    void recordProcessInstanceDeleted(String processInstanceId);
+    
+    /**
+     * Deletes historic process instances for a provided process definition id
+     */
+    void recordDeleteHistoricProcessInstancesByProcessDefinitionId(String processDefinitionId);
 
     /**
      * Record the start of an activity, if activity history is enabled.

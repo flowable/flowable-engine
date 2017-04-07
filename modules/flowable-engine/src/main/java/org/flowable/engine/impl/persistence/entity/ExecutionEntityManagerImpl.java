@@ -349,7 +349,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         }
 
         if (cascade) {
-            getHistoricProcessInstanceEntityManager().deleteHistoricProcessInstanceByProcessDefinitionId(processDefinitionId);
+            getHistoryManager().recordDeleteHistoricProcessInstancesByProcessDefinitionId(processDefinitionId);
         }
     }
 
@@ -408,7 +408,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         deleteExecutionAndRelatedData(execution, deleteReason, false);
 
         if (deleteHistory) {
-            getHistoricProcessInstanceEntityManager().delete(execution.getId());
+            getHistoryManager().recordProcessInstanceDeleted(execution.getId());
         }
 
         getHistoryManager().recordProcessInstanceEnd(processInstanceExecutionEntity.getId(), deleteReason, null);

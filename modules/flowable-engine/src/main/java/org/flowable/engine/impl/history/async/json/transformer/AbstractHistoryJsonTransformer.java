@@ -67,6 +67,19 @@ public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTrans
         }
         return false;
     }
+    
+    public boolean historicActivityInstanceExistsForDataIncludingFinished(ObjectNode historicalData, CommandContext commandContext) {
+        String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
+        if (StringUtils.isNotEmpty(executionId)) {
+            String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
+            
+            if (StringUtils.isNotEmpty(activityId)) {
+                HistoricActivityInstanceEntity historicActivityInstanceEntity = findHistoricActivityInstance(commandContext, executionId, activityId);
+                return historicActivityInstanceEntity != null;
+            }
+        }
+        return false;
+    }
 
     protected HistoricActivityInstanceEntity findUnfinishedHistoricActivityInstance(CommandContext commandContext, String executionId, String activityId) {
         if (executionId == null || activityId == null) {
@@ -92,6 +105,37 @@ public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTrans
             if (activityId != null
                             && activityId.equals(cachedHistoricActivityInstance.getActivityId())
                             && cachedHistoricActivityInstance.getEndTime() == null
+                            && executionId.equals(cachedHistoricActivityInstance.getExecutionId())) {
+                
+                return cachedHistoricActivityInstance;
+            }
+        }
+        return null;
+    }
+    
+    protected HistoricActivityInstanceEntity findHistoricActivityInstance(CommandContext commandContext, String executionId, String activityId) {
+        if (executionId == null || activityId == null) {
+            return null;
+        }
+
+        HistoricActivityInstanceEntity historicActivityInstanceEntity = getHistoricActivityInstanceFromCache(commandContext, executionId, activityId);
+        if (historicActivityInstanceEntity == null) {
+            List<HistoricActivityInstanceEntity> historicActivityInstances = commandContext.getHistoricActivityInstanceEntityManager()
+                            .findHistoricActivityInstancesByExecutionAndActivityId(executionId, activityId);
+            if (!historicActivityInstances.isEmpty()) {
+                historicActivityInstanceEntity = historicActivityInstances.get(0);
+            }
+        }
+        return historicActivityInstanceEntity;
+    }
+    
+    protected HistoricActivityInstanceEntity getHistoricActivityInstanceFromCache(CommandContext commandContext,
+                    String executionId, String activityId) {
+        
+        List<HistoricActivityInstanceEntity> cachedHistoricActivityInstances = commandContext.getEntityCache().findInCache(HistoricActivityInstanceEntity.class);
+        for (HistoricActivityInstanceEntity cachedHistoricActivityInstance : cachedHistoricActivityInstances) {
+            if (activityId != null
+                            && activityId.equals(cachedHistoricActivityInstance.getActivityId())
                             && executionId.equals(cachedHistoricActivityInstance.getExecutionId())) {
                 
                 return cachedHistoricActivityInstance;

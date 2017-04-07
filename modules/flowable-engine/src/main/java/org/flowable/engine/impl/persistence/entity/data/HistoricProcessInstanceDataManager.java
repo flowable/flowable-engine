@@ -30,7 +30,7 @@ public interface HistoricProcessInstanceDataManager extends DataManager<Historic
 
     List<String> findHistoricProcessInstanceIdsByProcessDefinitionId(String processDefinitionId);
 
-    List<HistoricProcessInstanceEntity> findHistoricProcessInstancesBySuperProcessInstanceId(String superProcessInstanceId);
+    List<HistoricProcessInstance> findHistoricProcessInstancesBySuperProcessInstanceId(String superProcessInstanceId);
 
     long findHistoricProcessInstanceCountByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery);
 

@@ -36,8 +36,10 @@ public interface HistoricProcessInstanceEntityManager extends EntityManager<Hist
 
     List<HistoricProcessInstance> findHistoricProcessInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
 
+    List<HistoricProcessInstance> findHistoricProcessInstancesBySuperProcessInstanceId(String historicProcessInstanceId);
+    
+    List<String> findHistoricProcessInstanceIdsByProcessDefinitionId(String processDefinitionId);
+    
     long findHistoricProcessInstanceCountByNativeQuery(Map<String, Object> parameterMap);
-
-    void deleteHistoricProcessInstanceByProcessDefinitionId(String processDefinitionId);
 
 }

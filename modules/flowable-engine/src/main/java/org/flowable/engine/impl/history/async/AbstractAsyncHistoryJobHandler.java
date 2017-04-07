@@ -47,15 +47,14 @@ public abstract class AbstractAsyncHistoryJobHandler implements JobHandler {
                     historicalDataArrayNode = (ArrayNode) objectNode;
                     processHistoryJson(commandContext, job, historicalDataArrayNode);
                 }
+                
+            } catch (AsyncHistoryJobNotApplicableException e) {
+                throw e;
 
             } catch (Exception e) {
                 // The transaction will be rolled back and the job retries decremented,
                 // which is different from unacquiring the job where the retries are not changed.
-                if (e instanceof AsyncHistoryJobNotApplicableException) {
-                    throw (AsyncHistoryJobNotApplicableException) e;
-                } else {
-                    throw new FlowableException("Could not deserialize async history json for job (id=" + job.getId() + ")", e);
-                }
+                throw new FlowableException("Could not deserialize async history json for job (id=" + job.getId() + ")", e);
             }
         }
     }

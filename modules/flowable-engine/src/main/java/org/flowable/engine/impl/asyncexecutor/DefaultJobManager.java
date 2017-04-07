@@ -300,6 +300,33 @@ public class DefaultJobManager implements JobManager {
         }
 
     }
+    
+    @Override
+    public void unacquireWithDecrementRetries(Job job) {
+
+        JobEntity jobEntity = (JobEntity) job;
+
+        JobEntity newJobEntity = processEngineConfiguration.getJobEntityManager().create();
+        copyJobInfo(newJobEntity, jobEntity);
+        newJobEntity.setId(null); // We want a new id to be assigned to this job
+        newJobEntity.setLockExpirationTime(null);
+        newJobEntity.setLockOwner(null);
+        
+        if (newJobEntity.getRetries() > 0) {
+            newJobEntity.setRetries(newJobEntity.getRetries() - 1);
+            processEngineConfiguration.getJobEntityManager().insert(newJobEntity);
+            
+        } else {
+            DeadLetterJobEntity deadLetterJob = createDeadLetterJobFromOtherJob(newJobEntity);
+            processEngineConfiguration.getDeadLetterJobEntityManager().insert(deadLetterJob);
+        }
+        
+        processEngineConfiguration.getJobEntityManager().delete(jobEntity.getId());
+
+        // We're not calling triggerExecutorIfNeeded here after the insert. The unacquire happened
+        // for a reason (eg queue full or exclusive lock failure). No need to try it immediately again,
+        // as the chance of failure will be high.
+    }
 
     protected void executeMessageJob(JobEntity jobEntity) {
         executeJobHandler(jobEntity);

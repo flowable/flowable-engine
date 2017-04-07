@@ -20,6 +20,8 @@ import java.util.Map;
 import org.flowable.engine.impl.history.async.json.transformer.ActivityEndHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ActivityStartHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.HistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceDeleteHistoryByProcessDefinitionIdJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceDeleteHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceEndHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceStartHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskAssigneeChangedHistoryJsonTransformer;
@@ -55,6 +57,8 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
     protected void initDefaultTransformers() {
         addHistoryJsonTransformer(new ProcessInstanceStartHistoryJsonTransformer());
         addHistoryJsonTransformer(new ProcessInstanceEndHistoryJsonTransformer());
+        addHistoryJsonTransformer(new ProcessInstanceDeleteHistoryJsonTransformer());
+        addHistoryJsonTransformer(new ProcessInstanceDeleteHistoryByProcessDefinitionIdJsonTransformer());
 
         addHistoryJsonTransformer(new ActivityStartHistoryJsonTransformer());
         addHistoryJsonTransformer(new ActivityEndHistoryJsonTransformer());

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
 
@@ -10,23 +10,20 @@
     <property name="jdbcDriver" value="org.h2.Driver" />
     <property name="jdbcUsername" value="sa" />
     <property name="jdbcPassword" value="" />
-    
+  
+    <property name="history" value="full" />
+    <property name="asyncHistoryEnabled" value="true" />
+
     <!-- Database configurations -->
     <property name="databaseSchemaUpdate" value="drop-create" />
-
-	<!-- Test logger -->
-	<!-- <property name="configurators">
-		<list>
-			<bean class="org.flowable.engine.test.impl.logger.ProcessExecutionLoggerConfigurator" />
-		</list>
-	</property> -->
-
+    
     <!-- job executor configurations -->
     <property name="asyncExecutor" ref="asyncExecutor" />
     <property name="asyncExecutorActivate" value="false" />
     
+    <property name="defaultFailedJobWaitTime" value="1" />
     <property name="asyncFailedJobWaitTime" value="1" />
-
+    
     <!-- mail server configurations -->
     <property name="mailServerPort" value="5025" />
     
@@ -44,10 +41,7 @@
           </bean>
         </entry>
       </map>
-    </property>
-    
-    <property name="history" value="full" />
-    <property name="asyncHistoryEnabled" value="true" />
+    </property>    
     
     <property name="enableProcessDefinitionInfoCache" value="true" />
   </bean>
@@ -56,7 +50,7 @@
     <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
     <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
   </bean>
-  
+
   <bean id="throwCustomExceptionBean" class="org.flowable.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionBean" />
   <bean id="throwCustomExceptionDelegate" class="org.flowable.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionDelegate" />
 

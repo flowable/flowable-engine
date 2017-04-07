@@ -22,7 +22,7 @@ import org.flowable.engine.impl.persistence.entity.JobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class TaskCreatedHistoryJsonTransformer extends AbstractNeedsHistoricActivityHistoryJsonTransformer {
+public class TaskCreatedHistoryJsonTransformer extends AbstractNeedsUnfinishedHistoricActivityHistoryJsonTransformer {
 
     public static final String TYPE = "task-created";
 

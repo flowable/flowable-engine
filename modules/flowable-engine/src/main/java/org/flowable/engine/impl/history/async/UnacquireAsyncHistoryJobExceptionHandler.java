@@ -31,7 +31,7 @@ public class UnacquireAsyncHistoryJobExceptionHandler implements AsyncRunnableEx
                     CommandConfig commandConfig = processEngineConfiguration.getCommandExecutor().getDefaultConfig().transactionRequiresNew();
                     return processEngineConfiguration.getCommandExecutor().execute(commandConfig, new Command<Boolean>() {
                         public Boolean execute(CommandContext commandContext2) {
-                            commandContext2.getJobManager().unacquire(job);
+                            commandContext2.getJobManager().unacquireWithDecrementRetries(job);
                             return true;
                         }
                     });

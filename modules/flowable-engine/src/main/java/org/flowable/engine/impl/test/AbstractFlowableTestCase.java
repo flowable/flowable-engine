@@ -172,6 +172,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
                 // tasks
                 List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery()
                         .processInstanceId(processInstanceId).list();
+                
                 if (historicTaskInstances != null && historicTaskInstances.size() > 0) {
                     for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
                         assertEquals(processInstanceId, historicTaskInstance.getProcessInstanceId());

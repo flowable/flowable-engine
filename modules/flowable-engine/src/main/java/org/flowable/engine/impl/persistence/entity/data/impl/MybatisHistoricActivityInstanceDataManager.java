@@ -25,6 +25,7 @@ import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntit
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoricActivityInstanceDataManager;
+import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.HistoricActivityInstanceMatcher;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.UnfinishedHistoricActivityInstanceMatcher;
 
 /**
@@ -33,6 +34,7 @@ import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.Unfini
 public class MybatisHistoricActivityInstanceDataManager extends AbstractDataManager<HistoricActivityInstanceEntity> implements HistoricActivityInstanceDataManager {
 
     protected CachedEntityMatcher<HistoricActivityInstanceEntity> unfinishedHistoricActivityInstanceMatcher = new UnfinishedHistoricActivityInstanceMatcher();
+    protected CachedEntityMatcher<HistoricActivityInstanceEntity> historicActivityInstanceMatcher = new HistoricActivityInstanceMatcher();
 
     public MybatisHistoricActivityInstanceDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);
@@ -54,6 +56,14 @@ public class MybatisHistoricActivityInstanceDataManager extends AbstractDataMana
         params.put("executionId", executionId);
         params.put("activityId", activityId);
         return getList("selectUnfinishedHistoricActivityInstanceExecutionIdAndActivityId", params, unfinishedHistoricActivityInstanceMatcher, true);
+    }
+    
+    @Override
+    public List<HistoricActivityInstanceEntity> findHistoricActivityInstancesByExecutionIdAndActivityId(final String executionId, final String activityId) {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("executionId", executionId);
+        params.put("activityId", activityId);
+        return getList("selectHistoricActivityInstanceExecutionIdAndActivityId", params, historicActivityInstanceMatcher, true);
     }
 
     @Override

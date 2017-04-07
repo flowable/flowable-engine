@@ -14,12 +14,14 @@
 package org.flowable.engine.impl.history;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
@@ -51,11 +53,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     // Process related history
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordProcessInstanceEnd(java.lang.String, java.lang.String, java.lang.String)
-     */
     @Override
     public void recordProcessInstanceEnd(String processInstanceId, String deleteReason, String activityId) {
 
@@ -69,8 +66,8 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
                 // Fire event
                 FlowableEventDispatcher eventDispatcher = getEventDispatcher();
                 if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-                    eventDispatcher.dispatchEvent(
-                                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
+                    eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(
+                            FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
                 }
 
             }
@@ -88,11 +85,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordProcessInstanceStart (org.flowable.engine.impl.persistence.entity.ExecutionEntity)
-     */
     @Override
     public void recordProcessInstanceStart(ExecutionEntity processInstance, FlowElement startElement) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
@@ -105,19 +97,13 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             // Fire event
             FlowableEventDispatcher eventDispatcher = getEventDispatcher();
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-                eventDispatcher.dispatchEvent(
-                                FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
+                eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(
+                        FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
             }
 
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordSubProcessInstanceStart (org.flowable.engine.impl.persistence.entity.ExecutionEntity,
-     * org.flowable.engine.impl.persistence.entity.ExecutionEntity)
-     */
     @Override
     public void recordSubProcessInstanceStart(ExecutionEntity parentExecution, ExecutionEntity subProcessInstance, FlowElement initialElement) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
@@ -144,14 +130,42 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
         }
     }
+    
+    @Override
+    public void recordProcessInstanceDeleted(String processInstanceId) {
+        if (getHistoryManager().isHistoryEnabled()) {
+            HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstanceId);
+
+            getHistoricDetailEntityManager().deleteHistoricDetailsByProcessInstanceId(processInstanceId);
+            getHistoricVariableInstanceEntityManager().deleteHistoricVariableInstanceByProcessInstanceId(processInstanceId);
+            getHistoricActivityInstanceEntityManager().deleteHistoricActivityInstancesByProcessInstanceId(processInstanceId);
+            getHistoricTaskInstanceEntityManager().deleteHistoricTaskInstancesByProcessInstanceId(processInstanceId);
+            getHistoricIdentityLinkEntityManager().deleteHistoricIdentityLinksByProcInstance(processInstanceId);
+            getCommentEntityManager().deleteCommentsByProcessInstanceId(processInstanceId);
+
+            getHistoricProcessInstanceEntityManager().delete(historicProcessInstance, false);
+
+            // Also delete any sub-processes that may be active (ACT-821)
+
+            List<HistoricProcessInstance> selectList = getHistoricProcessInstanceEntityManager().findHistoricProcessInstancesBySuperProcessInstanceId(processInstanceId);
+            for (HistoricProcessInstance child : selectList) {
+                recordProcessInstanceDeleted(child.getId());
+            }
+        }
+    }
+    
+    @Override
+    public void recordDeleteHistoricProcessInstancesByProcessDefinitionId(String processDefinitionId) {
+        if (getHistoryManager().isHistoryEnabled()) {
+            List<String> historicProcessInstanceIds = getHistoricProcessInstanceEntityManager().findHistoricProcessInstanceIdsByProcessDefinitionId(processDefinitionId);
+            for (String historicProcessInstanceId : historicProcessInstanceIds) {
+                recordProcessInstanceDeleted(historicProcessInstanceId);
+            }
+        }
+    }
 
     // Activity related history
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordActivityStart (org.flowable.engine.impl.persistence.entity.ExecutionEntity)
-     */
     @Override
     public void recordActivityStart(ExecutionEntity executionEntity) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
@@ -179,11 +193,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordActivityEnd (org.flowable.engine.impl.persistence.entity.ExecutionEntity)
-     */
     @Override
     public void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
@@ -201,11 +210,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordProcessDefinitionChange(java.lang.String, java.lang.String)
-     */
     @Override
     public void recordProcessDefinitionChange(String processInstanceId, String processDefinitionId) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
@@ -218,12 +222,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     // Task related history
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordTaskCreated (org.flowable.engine.impl.persistence.entity.TaskEntity,
-     * org.flowable.engine.impl.persistence.entity.ExecutionEntity)
-     */
     @Override
     public void recordTaskCreated(TaskEntity task, ExecutionEntity execution) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
@@ -246,12 +244,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordTaskClaim (org.flowable.engine.impl.persistence.entity.TaskEntity)
-     */
-
     @Override
     public void recordTaskClaim(TaskEntity task) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
@@ -262,11 +254,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordTaskEnd (java.lang.String, java.lang.String)
-     */
     @Override
     public void recordTaskEnd(String taskId, String deleteReason) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
@@ -277,11 +264,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordTaskAssigneeChange(org.flowable.engine.impl.persistence.entity.TaskEntity, java.lang.String)
-     */
     @Override
     public void recordTaskAssigneeChange(TaskEntity task, String assignee) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
@@ -310,11 +292,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordTaskOwnerChange(java.lang.String, java.lang.String)
-     */
     @Override
     public void recordTaskOwnerChange(String taskId, String owner) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
@@ -333,11 +310,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordTaskNameChange (java.lang.String, java.lang.String)
-     */
     @Override
     public void recordTaskNameChange(String taskId, String taskName) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
@@ -348,11 +320,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordTaskDescriptionChange(java.lang.String, java.lang.String)
-     */
     @Override
     public void recordTaskDescriptionChange(String taskId, String description) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
@@ -363,11 +330,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordTaskDueDateChange(java.lang.String, java.util.Date)
-     */
     @Override
     public void recordTaskDueDateChange(String taskId, Date dueDate) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
@@ -378,11 +340,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordTaskPriorityChange(java.lang.String, int)
-     */
     @Override
     public void recordTaskPriorityChange(String taskId, int priority) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
@@ -393,11 +350,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordTaskCategoryChange(java.lang.String, java.lang.String)
-     */
     @Override
     public void recordTaskCategoryChange(String taskId, String category) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
@@ -418,11 +370,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordTaskParentTaskIdChange(java.lang.String, java.lang.String)
-     */
     @Override
     public void recordTaskParentTaskIdChange(String taskId, String parentTaskId) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
@@ -448,11 +395,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordTaskProcessDefinitionChange(java.lang.String, java.lang.String)
-     */
     @Override
     public void recordTaskProcessDefinitionChange(String taskId, String processDefinitionId) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
@@ -465,11 +407,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     // Variables related history
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordVariableCreate (org.flowable.engine.impl.persistence.entity.VariableInstanceEntity)
-     */
     @Override
     public void recordVariableCreate(VariableInstanceEntity variable) {
         // Historic variables
@@ -478,12 +415,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordHistoricDetailVariableCreate (org.flowable.engine.impl.persistence.entity.VariableInstanceEntity,
-     * org.flowable.engine.impl.persistence.entity.ExecutionEntity, boolean)
-     */
     @Override
     public void recordHistoricDetailVariableCreate(VariableInstanceEntity variable, ExecutionEntity sourceActivityExecution, boolean useActivityId) {
         if (isHistoryLevelAtLeast(HistoryLevel.FULL)) {
@@ -499,11 +430,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface#recordVariableUpdate (org.flowable.engine.impl.persistence.entity.VariableInstanceEntity)
-     */
     @Override
     public void recordVariableUpdate(VariableInstanceEntity variable) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
@@ -520,11 +446,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface# reportFormPropertiesSubmitted (org.flowable.engine.impl.persistence.entity.ExecutionEntity, java.util.Map, java.lang.String)
-     */
     @Override
     public void recordFormPropertiesSubmitted(ExecutionEntity processInstance, Map<String, String> properties, String taskId) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
@@ -536,15 +457,9 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     }
 
     // Identity link related history
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordIdentityLinkCreated (org.flowable.engine.impl.persistence.entity.IdentityLinkEntity)
-     */
     @Override
     public void recordIdentityLinkCreated(IdentityLinkEntity identityLink) {
-        // It makes no sense storing historic counterpart for an identity-link
-        // that is related
+        // It makes no sense storing historic counterpart for an identity-link that is related
         // to a process-definition only as this is never kept in history
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT) && (identityLink.getProcessInstanceId() != null || identityLink.getTaskId() != null)) {
             HistoricIdentityLinkEntity historicIdentityLinkEntity = getHistoricIdentityLinkEntityManager().create();
@@ -558,11 +473,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface# updateProcessBusinessKeyInHistory (org.flowable.engine.impl.persistence.entity.ExecutionEntity)
-     */
     @Override
     public void updateProcessBusinessKeyInHistory(ExecutionEntity processInstance) {
         if (isHistoryEnabled()) {
@@ -583,10 +493,11 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     public void recordVariableRemoved(VariableInstanceEntity variable) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricVariableInstanceEntity historicProcessVariable = getEntityCache()
-                            .findInCache(HistoricVariableInstanceEntity.class, variable.getId());
+                    .findInCache(HistoricVariableInstanceEntity.class, variable.getId());
+            
             if (historicProcessVariable == null) {
                 historicProcessVariable = getHistoricVariableInstanceEntityManager()
-                                .findHistoricVariableInstanceByVariableInstanceId(variable.getId());
+                        .findHistoricVariableInstanceByVariableInstanceId(variable.getId());
             }
 
             if (historicProcessVariable != null) {

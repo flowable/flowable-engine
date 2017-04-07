@@ -69,8 +69,7 @@ public class DelegateTaskTest extends PluggableFlowableTestCase {
             taskService.complete(task.getId(), taskVariables, true);
         }
 
-        // After completion, the task category should be changed in the script
-        // listener working on the delegate task
+        // After completion, the task category should be changed in the script listener working on the delegate task
         assertEquals(0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
         for (HistoricTaskInstance historicTaskInstance : historyService.createHistoricTaskInstanceQuery().list()) {
             assertEquals("approved", historicTaskInstance.getCategory());

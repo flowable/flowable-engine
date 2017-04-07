@@ -40,6 +40,11 @@ public interface JobManager {
      * Unacquires a job, meaning that this job was previously locked, and it is now freed to be acquired by other executor nodes.
      */
     void unacquire(Job job);
+    
+    /**
+     * Unacquires a job, meaning that this job was previously locked, and it is now freed to be acquired by other executor nodes.
+     */
+    void unacquireWithDecrementRetries(Job job);
 
     /**
      * Creates an async job for the provided {@link ExecutionEntity}, so that it can be continued later in a background thread.

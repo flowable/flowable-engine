@@ -23,6 +23,8 @@ import org.flowable.engine.impl.history.AbstractHistoryManager;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.history.async.json.transformer.ActivityEndHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ActivityStartHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceDeleteHistoryByProcessDefinitionIdJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceDeleteHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceEndHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceStartHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskAssigneeChangedHistoryJsonTransformer;
@@ -92,14 +94,33 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
     @Override
     public void recordProcessInstanceNameChange(String processInstanceId, String newName) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
-    public void recordSubProcessInstanceStart(ExecutionEntity parentExecution, ExecutionEntity subProcessInstance,
-                    FlowElement initialFlowElement) {
+    public void recordSubProcessInstanceStart(ExecutionEntity parentExecution, 
+            ExecutionEntity subProcessInstance, FlowElement initialFlowElement) {
+        
         // TODO Auto-generated method stub
+    }
+    
+    @Override
+    public void recordProcessInstanceDeleted(String processInstanceId) {
+        if (isHistoryEnabled()) {
+            Map<String, String> data = new HashMap<String, String>();
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_INSTANCE_ID, processInstanceId);
 
+            getAsyncHistorySession().addHistoricData(ProcessInstanceDeleteHistoryJsonTransformer.TYPE, data);
+        }
+    }
+    
+    @Override
+    public void recordDeleteHistoricProcessInstancesByProcessDefinitionId(String processDefinitionId) {
+        if (isHistoryEnabled()) {
+            Map<String, String> data = new HashMap<String, String>();
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, processDefinitionId);
+
+            getAsyncHistorySession().addHistoricData(ProcessInstanceDeleteHistoryByProcessDefinitionIdJsonTransformer.TYPE, data);
+        }
     }
 
     @Override
@@ -136,10 +157,24 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             String activityId = getActivityIdForExecution(executionEntity);
             if (StringUtils.isNotEmpty(activityId)) {
                 Map<String, String> data = new HashMap<String, String>();
-                putIfNotNull(data, HistoryJsonConstants.DELETE_REASON, deleteReason);
-                putIfNotNull(data, HistoryJsonConstants.END_TIME, getClock().getCurrentTime());
+                
+                putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, executionEntity.getProcessDefinitionId());
+                putIfNotNull(data, HistoryJsonConstants.PROCESS_INSTANCE_ID, executionEntity.getProcessInstanceId());
                 putIfNotNull(data, HistoryJsonConstants.EXECUTION_ID, executionEntity.getId());
                 putIfNotNull(data, HistoryJsonConstants.ACTIVITY_ID, activityId);
+                putIfNotNull(data, HistoryJsonConstants.START_TIME, getClock().getCurrentTime());
+
+                if (executionEntity.getCurrentFlowElement() != null) {
+                    putIfNotNull(data, HistoryJsonConstants.ACTIVITY_NAME, executionEntity.getCurrentFlowElement().getName());
+                    putIfNotNull(data, HistoryJsonConstants.ACTIVITY_TYPE, parseActivityType(executionEntity.getCurrentFlowElement()));
+                }
+
+                if (executionEntity.getTenantId() != null) {
+                    putIfNotNull(data, HistoryJsonConstants.TENANT_ID, executionEntity.getTenantId());
+                }
+                
+                putIfNotNull(data, HistoryJsonConstants.DELETE_REASON, deleteReason);
+                putIfNotNull(data, HistoryJsonConstants.END_TIME, getClock().getCurrentTime());
 
                 getAsyncHistorySession().addHistoricData(ActivityEndHistoryJsonTransformer.TYPE, data);
             }
