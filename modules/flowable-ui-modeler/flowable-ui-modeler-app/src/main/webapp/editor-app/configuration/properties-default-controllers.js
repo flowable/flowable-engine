@@ -109,3 +109,35 @@ angular.module('flowableModeler').controller('FlowableTextPropertyPopupCtrl', ['
         $scope.$hide();
     };
 }]);
+
+/*
+ * Script controller
+ */
+
+angular.module('flowableModeler').controller('FlowableScriptPropertyCtrl', [ '$scope', '$modal', function($scope, $modal) {
+
+    var opts = {
+        template:  'editor-app/configuration/properties/script-popup.html?version=' + Date.now(),
+        scope: $scope,
+        backdrop: false
+    };
+
+    // Open the dialog
+    _internalCreateModal(opts, $modal, $scope);
+}]);
+
+angular.module('flowableModeler').controller('FlowableScriptPropertyPopupCtrl', ['$scope', function($scope) {
+  
+    $scope.expression = {"staticValue": $scope.property.value};
+  
+    $scope.save = function() {
+        $scope.property.value = $scope.expression.staticValue;
+        $scope.updatePropertyInModel($scope.property);
+        $scope.close();
+    };
+
+    $scope.close = function() {
+        $scope.property.mode = 'read';
+        $scope.$hide();
+    };
+}]);

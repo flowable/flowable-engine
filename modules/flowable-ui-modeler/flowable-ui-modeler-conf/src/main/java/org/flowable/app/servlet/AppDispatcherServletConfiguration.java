@@ -14,6 +14,7 @@ package org.flowable.app.servlet;
 
 import java.util.List;
 
+import org.activiti.bpmn.converter.RDSSequenceFlowXMLConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
-@ComponentScan(value = { "org.flowable.app.rest" })
+@ComponentScan(basePackages = { "org.flowable.app.rest", "au.com.rds.modeler.customization"})
 @EnableAsync
 public class AppDispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
@@ -87,5 +88,10 @@ public class AppDispatcherServletConfiguration extends WebMvcConfigurationSuppor
                 break;
             }
         }
+    }
+    
+    @Bean
+    public RDSSequenceFlowXMLConverter rdsSequenceFlowXMLConverter() {
+      return new RDSSequenceFlowXMLConverter();
     }
 }

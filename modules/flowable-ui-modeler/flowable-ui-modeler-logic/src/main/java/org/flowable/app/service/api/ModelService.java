@@ -44,6 +44,8 @@ public interface ModelService {
     byte[] getBpmnXML(BpmnModel bpmnMode);
 
     byte[] getBpmnXML(AbstractModel model);
+    
+    Map<String,byte[]> getDecisionTableDefinitionsForProcess(String modelId);
 
     BpmnModel getBpmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap);
 

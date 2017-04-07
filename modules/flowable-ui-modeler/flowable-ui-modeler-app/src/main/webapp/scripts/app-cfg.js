@@ -21,5 +21,9 @@ FLOWABLE.CONFIG = {
 	'onPremise' : true,
 	'contextRoot' : '/flowable-modeler',
 	'webContextRoot' : '/flowable-modeler',
-	'formType': 9
+	'formType': 9, 
+	'deployUrls': [{
+	  "name": "localhost",
+	  "url": "http://localhost:8080/runtime/workflow/deploy"
+	}]
 };

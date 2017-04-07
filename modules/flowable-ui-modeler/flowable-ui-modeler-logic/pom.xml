@@ -12,7 +12,10 @@
 	<packaging>jar</packaging>
 
 	<dependencies>
-	
+	    <dependency>
+            <groupId>au.com.rds.sb</groupId>
+            <artifactId>workflow-builder</artifactId>
+        </dependency>
         <!-- Flowable -->
         <dependency>
            <groupId>org.flowable</groupId>

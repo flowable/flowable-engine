@@ -20,6 +20,8 @@
 		
 		<!-- Web container version -->
 		<tomcat.version>7.0.53</tomcat.version>
+
+    <system.builder.version>1.0.0-SNAPSHOT</system.builder.version>
   </properties>
 
 	<prerequisites>
@@ -35,6 +37,11 @@
 
 	<dependencyManagement>
 	  <dependencies>
+        <dependency>
+            <groupId>au.com.rds.sb</groupId>
+            <artifactId>workflow-builder</artifactId>
+            <version>${system.builder.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-ui-modeler-logic</artifactId>

@@ -6,24 +6,27 @@ angular.module('flowableModeler')
       "name" : " ",
       "password" : ""
     };
+    
+    vm.deployOptions = FLOWABLE.CONFIG.deployUrls || [];
+    
     vm.deploy = deploy;
     vm.cancel = cancel;
     
     var deployModelId = $scope.model.process.id
 
-    var deployUrl = FLOWABLE.CONFIG.deployUrl ? FLOWABLE.CONFIG.deployUrl : "http://localhost:8080/runtime/workflow/deploy";
+    //var deployUrl = FLOWABLE.CONFIG.deployUrl ? FLOWABLE.CONFIG.deployUrl : "http://localhost:8080/runtime/workflow/deploy";
     function deploy() {
-      if (vm.loginDetail.name && vm.loginDetail.password) {
+      if (vm.loginDetail.name && vm.loginDetail.password && vm.deployUrl) {
         vm.deploying = true;
         vm.errorMsg = "Deployment in progress!";
 
         var authdata = Base64.encode(vm.loginDetail.name + ':' + vm.loginDetail.password);
 
-        $http.get("app/rest/model/exportForDeploy/" + deployModelId).then(function(response) {
+        $http.get("app/rest/models/" + deployModelId + "/exportForDeploy").then(function(response) {
           $http.defaults.headers.common['Authorization'] = 'Basic ' + authdata;
           $http({
             method : "POST",
-            url : deployUrl,
+            url : vm.deployUrl,
             data : response.data
           }).then(function(deployResponse) {
             $log.debug('deployed!', deployResponse);
@@ -45,7 +48,7 @@ angular.module('flowableModeler')
         });
 
       } else {
-        vm.errorMsg = "Please give username and password for deployment!";
+        vm.errorMsg = "Please give username, password, deploy env for deployment!";
       }
     }
 
