@@ -236,4 +236,26 @@ public class HitPolicyTest {
         Assert.assertTrue(result.getAuditTrail().isFailed());
         Assert.assertNotNull(result.getAuditTrail().getExceptionMessage());
     }
+
+    @Test
+    @DmnDeploymentAnnotation
+    public void priorityHitPolicyTypeConversion() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.put("inputVariable1", 5);
+
+        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
+
+        Assert.assertEquals(1, result.getResultVariables().size());
+        Assert.assertEquals("20", result.getResultVariables().get("outputVariable1"));
+
+        Assert.assertEquals(1, result.getAuditTrail().getOutputVariables().size());
+        Assert.assertEquals("20", result.getAuditTrail().getOutputVariables().get("outputVariable1"));
+
+        Assert.assertFalse(result.getAuditTrail().isFailed());
+        Assert.assertNull(result.getAuditTrail().getExceptionMessage());
+    }
 }
