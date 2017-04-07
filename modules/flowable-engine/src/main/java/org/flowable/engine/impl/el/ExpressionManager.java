@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,6 +29,8 @@ import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.bpmn.data.ItemInstance;
+import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
+import org.flowable.engine.impl.interceptor.DelegateInterceptor;
 import org.flowable.engine.impl.persistence.entity.VariableScopeImpl;
 
 import de.odysseus.el.ExpressionFactoryImpl;
@@ -43,13 +45,14 @@ import de.odysseus.el.ExpressionFactoryImpl;
  * <p>
  * Then also this class is used as an entry point for runtime evaluation of the expressions.
  * </p>
- * 
+ *
  * @author Tom Baeyens
  * @author Dave Syer
  * @author Frederik Heremans
  */
 public class ExpressionManager {
 
+    protected DelegateInterceptor delegateInterceptor;
     protected ExpressionFactory expressionFactory;
     protected List<FlowableFunctionDelegate> functionDelegates;
 
@@ -70,7 +73,11 @@ public class ExpressionManager {
     }
 
     public ExpressionManager(Map<Object, Object> beans, boolean initFactory) {
+        this(new DefaultDelegateInterceptor(), beans, initFactory);
+    }
+    public ExpressionManager(DelegateInterceptor delegateInterceptor, Map<Object, Object> beans, boolean initFactory) {
         // Use the ExpressionFactoryImpl in flowable build in version of juel, with parametrised method expressions enabled
+        this.delegateInterceptor = delegateInterceptor;
         this.expressionFactory = new ExpressionFactoryImpl();
         this.beans = beans;
     }
@@ -79,9 +86,9 @@ public class ExpressionManager {
         if (parsingElContext == null) {
             this.parsingElContext = new ParsingElContext(functionDelegates);
         }
-        
+
         ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expression.trim(), Object.class);
-        return new JuelExpression(valueExpression, expression);
+        return new JuelExpression(this, this.delegateInterceptor, valueExpression, expression);
     }
 
     public void setExpressionFactory(ExpressionFactory expressionFactory) {

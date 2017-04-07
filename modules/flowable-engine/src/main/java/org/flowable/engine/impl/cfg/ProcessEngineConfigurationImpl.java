@@ -848,6 +848,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initProcessDiagramGenerator();
         initHistoryLevel();
         initFunctionDelegates();
+        initDelegateInterceptor();
         initExpressionManager();
         initAgendaFactory();
 
@@ -892,7 +893,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initHistoryManager();
         initJpa();
         initDeployers();
-        initDelegateInterceptor();
         initEventHandlers();
         initFailedJobCommandFactory();
         initEventDispatcher();
@@ -1853,9 +1853,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initExpressionManager() {
         if (expressionManager == null) {
-            expressionManager = new ExpressionManager(beans);
+            expressionManager = new ExpressionManager(delegateInterceptor, beans, true);
         }
-        
+
         expressionManager.setFunctionDelegates(flowableFunctionDelegates);
     }
 
@@ -2429,7 +2429,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     /**
      * Add or replace the address of the given web-service endpoint with the given value
-     * 
+     *
      * @param endpointName
      *            The endpoint name for which a new address must be set
      * @param address
@@ -2442,7 +2442,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     /**
      * Remove the address definition of the given web-service endpoint
-     * 
+     *
      * @param endpointName
      *            The endpoint name for which the address definition must be removed
      */
