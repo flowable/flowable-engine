@@ -43,6 +43,7 @@ public class SpringIdmEngineConfigurator extends AbstractProcessEngineConfigurat
             throw new FlowableException("A datasource is required for initializing the IDM engine ");
         }
 
+        idmEngineConfiguration.setDatabaseType(processEngineConfiguration.getDatabaseCatalog());
         idmEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
         idmEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
         idmEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
