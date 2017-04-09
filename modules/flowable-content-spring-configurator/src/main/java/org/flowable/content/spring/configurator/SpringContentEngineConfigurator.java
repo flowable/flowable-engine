@@ -45,7 +45,7 @@ public class SpringContentEngineConfigurator extends AbstractProcessEngineConfig
 
         contentEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
 
-        contentEngineConfiguration.setDatabaseType(processEngineConfiguration.getDatabaseCatalog());
+        contentEngineConfiguration.setDatabaseType(processEngineConfiguration.getDatabaseType());
         contentEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
         contentEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
         contentEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());

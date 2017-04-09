@@ -65,7 +65,7 @@ public class SpringFormEngineConfigurator extends AbstractProcessEngineConfigura
 
         formEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
 
-        formEngineConfiguration.setDatabaseType(processEngineConfiguration.getDatabaseCatalog());
+        formEngineConfiguration.setDatabaseType(processEngineConfiguration.getDatabaseType());
         formEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
         formEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
         formEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());

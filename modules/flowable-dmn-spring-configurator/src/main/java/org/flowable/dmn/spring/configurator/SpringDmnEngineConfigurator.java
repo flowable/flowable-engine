@@ -65,7 +65,7 @@ public class SpringDmnEngineConfigurator extends AbstractProcessEngineConfigurat
 
         dmnEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
 
-        dmnEngineConfiguration.setDatabaseType(processEngineConfiguration.getDatabaseCatalog());
+        dmnEngineConfiguration.setDatabaseType(processEngineConfiguration.getDatabaseType());
         dmnEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
         dmnEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
         dmnEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
