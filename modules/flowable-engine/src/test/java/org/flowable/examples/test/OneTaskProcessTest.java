@@ -36,10 +36,13 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
 
         // start testing process instance
         this.runtimeService.startProcessInstanceByKey("oneTaskProcessPUnitTest");
+
+        executeJobExecutorForTime(10000, 500);
     }
 
     @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
     public void testProcessModelFailure() {
+        // deploy different process
         BpmnModel model = createTestProcessBpmnModel("twoTasksProcess");
         deployTestProcess(model);
 
@@ -49,12 +52,8 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         Date currentTime = processEngine.getProcessEngineConfiguration().getClock().getCurrentTime();
         processEngine.getProcessEngineConfiguration().getClock().setCurrentTime(new Date(currentTime.getTime() + (15 * 1000L)));
 
-        waitForJobExecutorOnCondition(10000L, 500L, new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                return runtimeService.createProcessInstanceQuery().processInstanceId(oneTaskProcessPUnitTest.getId()).count() == 0;
-            }
-        });
+        executeJobExecutorForTime(10000, 500);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(oneTaskProcessPUnitTest.getId()).count(), is(0L));
     }
 
 
@@ -103,7 +102,7 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         assertTask.setScript(
                 "import org.flowable.engine.ProcessEngines;\n" +
                         "import static org.hamcrest.core.Is.is;\n" +
-                        "import static org.junit.Assert.assertThat;\n" +
+                        "import static org.flowable.examples.test.MatcherAssert.assertThat;\n" +
                         "\n" +
                         "assertThat(ProcessEngines.getDefaultProcessEngine().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));"
         );
