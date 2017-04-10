@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="org.flowable.engine.test.api.runtime">
+
+  <message id="ID_cancel" name="cancel" />
+  <process id="multiplesubProcessWithTerminateEndTest" name="multiplesubProcessWithTerminateEndTest">
+
+    <startEvent id="theStart" />
+    <endEvent id="endevent1" name="End">
+       <terminateEventDefinition></terminateEventDefinition>
+    </endEvent>
+
+    <sequenceFlow id="flow2" sourceRef="theStart" targetRef="subprocess1" />
+    <sequenceFlow id="flow3" sourceRef="theStart" targetRef="subprocess2" />
+    <sequenceFlow id="done1" sourceRef="subprocess2" targetRef="endevent1" />
+
+    <boundaryEvent id="cancelBoundaryEvent" attachedToRef="subprocess1">
+          <messageEventDefinition messageRef="ID_cancel"/>
+    </boundaryEvent>
+
+    <subProcess id="subprocess1" name="SubProcessWitTimerEvent">
+      <intermediateCatchEvent id="timer">
+        <timerEventDefinition>
+          <timeDuration>PT24H</timeDuration>
+        </timerEventDefinition>
+      </intermediateCatchEvent>
+      <startEvent id="start1" />
+      <sequenceFlow id="sub1flow1" sourceRef="start1" targetRef="task1" />
+      <sequenceFlow id="sub1flow2" sourceRef="start1" targetRef="timer" />
+      <sequenceFlow id="sub1flow3" sourceRef="timer" targetRef="end1" />
+      <userTask id="task1" name="Task in subprocess1" />
+      <sequenceFlow id="sub1flow4" sourceRef="task1" targetRef="end1" />
+      <endEvent id="end1" />
+    </subProcess>
+
+    <subProcess id="subprocess2" name="SubProcess Two">
+      <startEvent id="start2" />
+      <endEvent id="end2" />
+      <sequenceFlow id="sub2flow1" sourceRef="start2" targetRef="task2" />
+      <userTask id="task2" name="Task in subprocess2" />
+      <sequenceFlow id="sub2flow2" sourceRef="task2" targetRef="end2" />
+    </subProcess>
+
+  </process>
+
+</definitions>
