@@ -32,6 +32,7 @@ public class FlowableProcessTerminatedEventImpl extends FlowableEntityEventImpl 
         }
         this.executionId = execution.getId();
         this.processInstanceId = execution.getProcessInstanceId();
+        this.processDefinitionId = execution.getProcessDefinitionId();
         this.cause = cause;
     }
 
