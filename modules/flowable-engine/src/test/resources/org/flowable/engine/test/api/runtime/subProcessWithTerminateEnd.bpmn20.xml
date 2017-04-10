@@ -12,14 +12,14 @@
     <sequenceFlow id="flow2" sourceRef="theStart" targetRef="embeddedSubprocess" />
 
     <subProcess id="embeddedSubprocess" name="embeddedSubProcess">
+      <startEvent id="theSubStart" />
+      <sequenceFlow id="subflow1" sourceRef="theSubStart" targetRef="task" />
+      <userTask id="task" name="Task in subprocess" />
+      <sequenceFlow id="subflow2" sourceRef="theSubStart" targetRef="ID_msgevent" />
       <intermediateCatchEvent id="ID_msgevent" >
         <messageEventDefinition messageRef="ID_cancel" />
       </intermediateCatchEvent>
-      <startEvent id="theSubStart" />
-      <sequenceFlow id="subflow1" sourceRef="theSubStart" targetRef="task" />
-      <sequenceFlow id="subflow2" sourceRef="theSubStart" targetRef="ID_msgevent" />
       <sequenceFlow id="subflow3" sourceRef="ID_msgevent" targetRef="theSubEnd" />
-      <userTask id="task" name="Task in subprocess" />
       <sequenceFlow id="subflow4" sourceRef="task" targetRef="theSubEnd" />
       <endEvent id="theSubEnd">
         <terminateEventDefinition></terminateEventDefinition>
@@ -27,7 +27,7 @@
     </subProcess>
 
     <sequenceFlow id="flow4" sourceRef="embeddedSubprocess" targetRef="usertask1" />
-     <sequenceFlow id="flow5" sourceRef="usertask1" targetRef="theEnd" />
+    <sequenceFlow id="flow5" sourceRef="usertask1" targetRef="theEnd" />
     <userTask id="usertask1" name="Outside Task"/>
 
     <endEvent id="theEnd"/>
