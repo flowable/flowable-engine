@@ -31,11 +31,11 @@ public class HitPolicyPriority extends AbstractHitPolicy implements ComposeRuleO
     @Override
     public void composeRuleOutput(int outputNumber, String outputVariableId, Object executionVariable, MvelExecutionContext executionContext) {
 
-        List<String> outputValues = executionContext.getOutputValues().get(outputNumber);
+        List<Object> outputValues = executionContext.getOutputValues().get(outputNumber);
         Object currentResultVariable = executionContext.getResultVariables().get(outputVariableId);
 
         if (currentResultVariable == null) {
-            executionContext.getResultVariables().put(outputVariableId, executionVariable);
+            executionContext.addOutputResultVariable(outputNumber, outputVariableId, executionVariable);
         } else if (outputValues != null && !outputValues.isEmpty()) {
 
             if (!outputValues.contains(currentResultVariable)) {
@@ -51,7 +51,7 @@ public class HitPolicyPriority extends AbstractHitPolicy implements ComposeRuleO
             int indexCurrent = outputValues.indexOf(executionVariable);
 
             if (indexCurrent < indexPrevious) {
-                executionContext.getResultVariables().put(outputVariableId, executionVariable);
+                executionContext.addOutputResultVariable(outputNumber, outputVariableId, executionVariable);
             }
         }
     }

@@ -121,7 +121,6 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                     validRuleOutputEntries.put(rule.getRuleNumber(), rule.getOutputEntries());
                 }
 
-
                 // should continue evaluating
                 if (getHitPolicyBehavior(decisionTable.getHitPolicy()) instanceof ContinueEvaluatingBehavior) {
                     if (((ContinueEvaluatingBehavior) getHitPolicyBehavior(decisionTable.getHitPolicy())).shouldContinueEvaluating(ruleResult) == false) {
@@ -137,9 +136,9 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
             }
 
             // post rule conclusion actions
-//            if (getHitPolicyBehavior(decisionTable.getHitPolicy()) instanceof ComposeDecisionTableOutputBehavior) {
-//                ((ComposeDecisionTableOutputBehavior) getHitPolicyBehavior(decisionTable.getHitPolicy())).composeDecisionTableOutput(rule.getRuleNumber(), executionContext);
-//            }
+            if (getHitPolicyBehavior(decisionTable.getHitPolicy()) instanceof ComposeDecisionTableOutputBehavior) {
+                ((ComposeDecisionTableOutputBehavior) getHitPolicyBehavior(decisionTable.getHitPolicy())).composeDecisionTableOutput(validRuleOutputEntries, executionContext);
+            }
 
         } catch (FlowableException ade) {
             logger.error("decision table execution failed", ade);

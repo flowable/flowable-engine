@@ -14,19 +14,22 @@ package org.flowable.dmn.engine.impl.hitpolicy;
 
 import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
 import org.flowable.dmn.model.HitPolicy;
+import org.flowable.dmn.model.RuleOutputClauseContainer;
 import org.flowable.engine.common.api.FlowableException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Yvo Swillens
  */
-public class HitPolicyRuleOrder extends AbstractHitPolicy implements ComposeRuleOutputBehavior {
+public class HitPolicyOutputOrder extends AbstractHitPolicy implements ComposeRuleOutputBehavior, ComposeDecisionTableOutputBehavior {
 
     @Override
     public String getHitPolicyName() {
-        return HitPolicy.RULE_ORDER.getValue();
+        return HitPolicy.OUTPUT_ORDER.getValue();
     }
 
     @Override
@@ -42,6 +45,30 @@ public class HitPolicyRuleOrder extends AbstractHitPolicy implements ComposeRule
             executionContext.addOutputResultVariable(outputNumber, outputVariableId, resultVariable);
         } else {
             throw new FlowableException(String.format("HitPolicy: %s has wrong output variable type", getHitPolicyName()));
+        }
+    }
+
+
+    @Override
+    public void composeDecisionTableOutput(Map<Integer, List<RuleOutputClauseContainer>> validRuleOutputEntries, MvelExecutionContext executionContext) {
+        if (executionContext.getResultVariables() != null) {
+            for (Map.Entry<Integer, Object> entry : executionContext.getOutputVariables().entrySet()) {
+                if (entry.getValue() == null) {
+                    break;
+                }
+
+                if (!executionContext.getOutputValues().containsKey(entry.getKey()) || executionContext.getOutputValues().get(entry.getKey()).isEmpty()) {
+                    throw new FlowableException(String.format("HitPolicy: %s; no output values present for output: %d", getHitPolicyName(), entry.getKey()));
+                }
+
+                if (entry.getValue() instanceof List) {
+                    List<Comparable> outputValues = (List<Comparable>) entry.getValue();
+                    List<Object> outputValueList = executionContext.getOutputValues().get(entry.getKey());
+                    Collections.sort(outputValues, new OutputOrderComparator<>(outputValueList.toArray(new Comparable[outputValueList.size()])));
+                } else {
+                    throw new FlowableException(String.format("HitPolicy: %s has wrong output variable type", getHitPolicyName()));
+                }
+            }
         }
     }
 }

@@ -22,7 +22,7 @@ import java.util.List;
 public class UnaryTests extends DmnElement {
 
     protected String text;
-    protected List<String> textValues;
+    protected List<Object> textValues;
     protected String expressionLanguage;
 
     public String getText() {
@@ -33,11 +33,11 @@ public class UnaryTests extends DmnElement {
         this.text = text;
     }
 
-    public List<String> getTextValues() {
+    public List<Object> getTextValues() {
         return textValues;
     }
 
-    public void setTextValues(List<String> textValues) {
+    public void setTextValues(List<Object> textValues) {
         this.textValues = textValues;
         this.text = "\"" + StringUtils.join(textValues, "\",\"") + "\"";
 

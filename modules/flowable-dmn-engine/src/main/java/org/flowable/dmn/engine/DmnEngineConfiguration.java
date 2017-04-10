@@ -48,6 +48,7 @@ import org.flowable.dmn.engine.impl.deployer.ParsedDeploymentBuilderFactory;
 import org.flowable.dmn.engine.impl.hitpolicy.AbstractHitPolicy;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyAny;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyFirst;
+import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyOutputOrder;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyPriority;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyRuleOrder;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyUnique;
@@ -591,6 +592,10 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
         // PRIORITY
         AbstractHitPolicy HitPolicyPriorityBehavior = new HitPolicyPriority();
         defaultHitPolicyBehaviors.put(HitPolicyPriorityBehavior.getHitPolicyName(), HitPolicyPriorityBehavior);
+
+        // OUTPUT ORDER
+        AbstractHitPolicy HitPolicyOutputOrderBehavior = new HitPolicyOutputOrder();
+        defaultHitPolicyBehaviors.put(HitPolicyOutputOrderBehavior.getHitPolicyName(), HitPolicyOutputOrderBehavior);
 
         return defaultHitPolicyBehaviors;
     }

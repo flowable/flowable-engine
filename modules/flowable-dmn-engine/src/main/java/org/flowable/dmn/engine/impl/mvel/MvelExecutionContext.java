@@ -28,11 +28,12 @@ import org.mvel2.integration.PropertyHandler;
 public class MvelExecutionContext {
 
     protected Map<String, Object> resultVariables = new HashMap<>();
+    protected Map<Integer, Object> outputVariables = new HashMap<>();
     protected Map<String, Object> stackVariables;
     protected ParserContext parserContext;
     protected Map<Class<?>, PropertyHandler> propertyHandlers = new HashMap<>();
     protected DecisionExecutionAuditContainer auditContainer;
-    protected Map<Integer, List<String>> outputValues = new HashMap<>();
+    protected Map<Integer, List<Object>> outputValues = new HashMap<>();
 
     public void checkExecutionContext(String variableId) {
 
@@ -55,7 +56,8 @@ public class MvelExecutionContext {
         }
     }
 
-    public void addResultVariable(String key, Object value) {
+    public void addOutputResultVariable(int outputNumber, String key, Object value) {
+        outputVariables.put(outputNumber, value);
         resultVariables.put(key, value);
     }
 
@@ -69,6 +71,14 @@ public class MvelExecutionContext {
 
     public Map<String, Object> getResultVariables() {
         return resultVariables;
+    }
+
+    public Map<Integer, Object> getOutputVariables() {
+        return outputVariables;
+    }
+
+    public void setOutputVariables(Map<Integer, Object> outputVariables) {
+        this.outputVariables = outputVariables;
     }
 
     public ParserContext getParserContext() {
@@ -95,11 +105,11 @@ public class MvelExecutionContext {
         this.auditContainer = auditContainer;
     }
 
-    public Map<Integer, List<String>> getOutputValues() {
+    public Map<Integer, List<Object>> getOutputValues() {
         return outputValues;
     }
 
-    public void addOutputValues(int outputNumber, List<String> outputValues) {
+    public void addOutputValues(int outputNumber, List<Object> outputValues) {
         this.outputValues.put(outputNumber, outputValues);
     }
 }

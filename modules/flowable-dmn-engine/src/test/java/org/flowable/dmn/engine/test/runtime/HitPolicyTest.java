@@ -258,4 +258,51 @@ public class HitPolicyTest {
         Assert.assertFalse(result.getAuditTrail().isFailed());
         Assert.assertNull(result.getAuditTrail().getExceptionMessage());
     }
+
+    @Test
+    @DmnDeploymentAnnotation
+    public void outputOrderHitPolicy() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.put("inputVariable1", 5);
+
+        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
+
+        Assert.assertEquals(1, result.getResultVariables().size());
+        Assert.assertArrayEquals(new String[]{"OUTPUT2", "OUTPUT3", "OUTPUT1"}, ((List) result.getResultVariables().get("outputVariable1")).toArray());
+
+        Assert.assertEquals(1, result.getAuditTrail().getOutputVariables().size());
+        Assert.assertArrayEquals(new String[]{"OUTPUT2", "OUTPUT3", "OUTPUT1"}, ((List) result.getAuditTrail().getOutputVariables().get("outputVariable1")).toArray());
+
+        Assert.assertFalse(result.getAuditTrail().isFailed());
+        Assert.assertNull(result.getAuditTrail().getExceptionMessage());
+    }
+
+    @Test
+    @DmnDeploymentAnnotation
+    public void outputOrderHitPolicyCompound() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.put("inputVariable1", 5);
+
+        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
+
+        Assert.assertEquals(2, result.getResultVariables().size());
+        Assert.assertArrayEquals(new String[]{"OUTPUT2", "OUTPUT3", "OUTPUT1"}, ((List) result.getResultVariables().get("outputVariable1")).toArray());
+        Assert.assertArrayEquals(new Double[]{20D, 30D, 10D}, ((List) result.getResultVariables().get("outputVariable2")).toArray());
+
+        Assert.assertEquals(2, result.getAuditTrail().getOutputVariables().size());
+        Assert.assertArrayEquals(new String[]{"OUTPUT2", "OUTPUT3", "OUTPUT1"}, ((List) result.getAuditTrail().getOutputVariables().get("outputVariable1")).toArray());
+        Assert.assertArrayEquals(new Double[]{20D, 30D, 10D},  ((List) result.getAuditTrail().getOutputVariables().get("outputVariable2")).toArray());
+
+
+        Assert.assertFalse(result.getAuditTrail().isFailed());
+        Assert.assertNull(result.getAuditTrail().getExceptionMessage());
+    }
 }
