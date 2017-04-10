@@ -12,8 +12,6 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
-import java.util.List;
-
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
@@ -29,6 +27,8 @@ import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
+
+import java.util.List;
 
 /**
  * @author Joram Barrez
@@ -185,35 +185,25 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         executionEntityManager.deleteExecutionAndRelatedData(rootExecutionEntity, deleteReason, false);
     }
 
-    protected void sendProcessInstanceCompletedEvent(DelegateExecution execution, FlowElement terminateEndEvent) {
+    protected void sendProcessInstanceCompletedEvent(ExecutionEntity execution, FlowElement terminateEndEvent) {
         if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             if ((execution.isProcessInstanceType() && execution.getSuperExecutionId() == null) ||
                     (execution.getParentId() == null && execution.getSuperExecutionId() != null)) {
 
                 Context.getProcessEngineConfiguration().getEventDispatcher()
-                        .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT, execution));
+                        .dispatchEvent(FlowableEventBuilder.createTerminateEvent(execution, terminateEndEvent));
             }
         }
 
         dispatchExecutionCancelled(execution, terminateEndEvent);
     }
 
-    protected void dispatchExecutionCancelled(DelegateExecution execution, FlowElement terminateEndEvent) {
+    protected void dispatchExecutionCancelled(ExecutionEntity execution, FlowElement terminateEndEvent) {
 
         ExecutionEntityManager executionEntityManager = Context.getCommandContext().getExecutionEntityManager();
 
-        if ((execution.isProcessInstanceType() && execution.getSuperExecutionId() == null) ||
-                (execution.getParentId() == null && execution.getSuperExecutionId() != null)) {
-            Context.getProcessEngineConfiguration()
-                    .getEventDispatcher()
-                    .dispatchEvent(
-                            FlowableEventBuilder.createCancelledEvent(
-                                    execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), terminateEndEvent)
-                    );
-        }
-
         // subprocesses
-        for (DelegateExecution subExecution : executionEntityManager.findChildExecutionsByParentExecutionId(execution.getId())) {
+        for (ExecutionEntity subExecution : executionEntityManager.findChildExecutionsByParentExecutionId(execution.getId())) {
             dispatchExecutionCancelled(subExecution, terminateEndEvent);
         }
 
