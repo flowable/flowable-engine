@@ -30,6 +30,8 @@ public class InputClauseXMLConverter extends BaseDmnXMLConverter {
         return InputClause.class;
     }
 
+    protected static int inputClauseCounter = 1;
+
     @Override
     protected String getXMLElementName() {
         return ELEMENT_INPUT_CLAUSE;

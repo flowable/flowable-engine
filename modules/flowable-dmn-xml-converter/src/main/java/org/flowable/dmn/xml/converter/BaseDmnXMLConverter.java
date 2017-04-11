@@ -39,6 +39,8 @@ public abstract class BaseDmnXMLConverter implements DmnXMLConstants {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(BaseDmnXMLConverter.class);
 
+    private int elementCounter;
+
     public void convertToDmnModel(XMLStreamReader xtr, DmnDefinition model, DecisionTable decisionTable) throws Exception {
 
         String elementId = xtr.getAttributeValue(null, ATTRIBUTE_ID);
@@ -49,11 +51,23 @@ public abstract class BaseDmnXMLConverter implements DmnXMLConstants {
         // parsedElement.setName(elementName);
 
         if (parsedElement instanceof InputClause) {
-            decisionTable.addInput((InputClause) parsedElement);
+            InputClause inputClause = (InputClause) parsedElement;
+            inputClause.setInputNumber(elementCounter);
+            decisionTable.addInput(inputClause);
+
+            elementCounter++;
         } else if (parsedElement instanceof OutputClause) {
-            decisionTable.addOutput((OutputClause) parsedElement);
+            OutputClause outputClause = (OutputClause) parsedElement;
+            outputClause.setOutputNumber(elementCounter);
+            decisionTable.addOutput(outputClause);
+
+            elementCounter++;
         } else if (parsedElement instanceof DecisionRule) {
-            decisionTable.addRule((DecisionRule) parsedElement);
+            DecisionRule decisionRule = (DecisionRule) parsedElement;
+            decisionRule.setRuleNumber(elementCounter);
+            decisionTable.addRule(decisionRule);
+
+            elementCounter++;
         } else if (parsedElement instanceof ItemDefinition) {
             model.addItemDefinition((ItemDefinition) parsedElement);
         }
@@ -105,5 +119,9 @@ public abstract class BaseDmnXMLConverter implements DmnXMLConstants {
 
     protected void writeQualifiedAttribute(String attributeName, String value, XMLStreamWriter xtw) throws Exception {
         DmnXMLUtil.writeQualifiedAttribute(attributeName, value, xtw);
+    }
+
+    protected void initializeElementCounter() {
+        elementCounter = 1;
     }
 }

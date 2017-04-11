@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="org.flowable.engine.test.api.runtime">
+
+  <message id="ID_cancel" name="cancel" />
+  <process id="subProcessWithTerminateEndTest" name="subProcessWithTerminateEndTest">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow id="flow2" sourceRef="theStart" targetRef="embeddedSubprocess" />
+
+    <subProcess id="embeddedSubprocess" name="embeddedSubProcess">
+      <startEvent id="theSubStart" />
+      <sequenceFlow id="subflow1" sourceRef="theSubStart" targetRef="task" />
+      <userTask id="task" name="Task in subprocess" />
+      <sequenceFlow id="subflow2" sourceRef="theSubStart" targetRef="ID_msgevent" />
+      <intermediateCatchEvent id="ID_msgevent" >
+        <messageEventDefinition messageRef="ID_cancel" />
+      </intermediateCatchEvent>
+      <sequenceFlow id="subflow3" sourceRef="ID_msgevent" targetRef="theSubEnd" />
+      <sequenceFlow id="subflow4" sourceRef="task" targetRef="theSubEnd" />
+      <endEvent id="theSubEnd">
+        <terminateEventDefinition></terminateEventDefinition>
+      </endEvent>
+    </subProcess>
+
+    <sequenceFlow id="flow4" sourceRef="embeddedSubprocess" targetRef="usertask1" />
+    <sequenceFlow id="flow5" sourceRef="usertask1" targetRef="theEnd" />
+    <userTask id="usertask1" name="Outside Task"/>
+
+    <endEvent id="theEnd"/>
+
+  </process>
+
+</definitions>

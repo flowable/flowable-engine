@@ -19,11 +19,21 @@ public class InputClause extends DmnElement {
 
     protected LiteralExpression inputExpression;
 
+    protected int inputNumber;
+
     public LiteralExpression getInputExpression() {
         return inputExpression;
     }
 
     public void setInputExpression(LiteralExpression inputExpression) {
         this.inputExpression = inputExpression;
+    }
+
+    public int getInputNumber() {
+        return inputNumber;
+    }
+
+    public void setInputNumber(int inputNumber) {
+        this.inputNumber = inputNumber;
     }
 }

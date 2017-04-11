@@ -49,7 +49,7 @@ public class SpringLimitedExpressionsTest extends SpringFlowableTestCase {
             taskService.complete(task.getId());
             fail("Exception should have been thrown");
         } catch (FlowableException ae) {
-            assertTextPresent("Unknown property used in expression", ae.getCause().getMessage());
+            assertTextPresent("Cannot resolve identifier 'bean2'", ae.getCause().getMessage());
         }
     }
 }

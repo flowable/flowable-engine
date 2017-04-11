@@ -48,6 +48,7 @@ public class ContentEngineConfigurator extends AbstractProcessEngineConfigurator
                 throw new FlowableException("A datasource is required for initializing the Content engine ");
             }
 
+            contentEngineConfiguration.setDatabaseType(processEngineConfiguration.getDatabaseType());
             contentEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
             contentEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
             contentEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
