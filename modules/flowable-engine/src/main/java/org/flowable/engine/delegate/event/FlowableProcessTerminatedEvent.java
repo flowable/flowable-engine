@@ -15,7 +15,7 @@ package org.flowable.engine.delegate.event;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 
 /**
- * Envent extends default {@link FlowableEntityEvent} with the cause of termination
+ * Event extends default {@link FlowableEntityEvent} with the cause of termination
  *
  * @author martin.grofcik
  */
