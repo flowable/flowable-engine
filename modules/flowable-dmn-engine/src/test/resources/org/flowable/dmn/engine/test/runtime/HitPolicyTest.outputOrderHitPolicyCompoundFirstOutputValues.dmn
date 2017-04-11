@@ -12,9 +12,6 @@
         </outputValues>
       </output>
       <output id="output2" label="Output 2" name="outputVariable2" typeRef="string">
-        <outputValues>
-            <text>"LEVEL 2", "LEVEL 1", "NONE"</text>
-        </outputValues>
       </output>
       <rule>
         <inputEntry id="inputEntry1">

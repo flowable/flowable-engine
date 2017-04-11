@@ -28,12 +28,13 @@ import org.mvel2.integration.PropertyHandler;
 public class MvelExecutionContext {
 
     protected Map<String, Object> resultVariables = new HashMap<>();
-    protected Map<Integer, Object> outputVariables = new HashMap<>();
+    protected Map<Integer, Object> resultValues = new HashMap<>();
     protected Map<String, Object> stackVariables;
     protected ParserContext parserContext;
     protected Map<Class<?>, PropertyHandler> propertyHandlers = new HashMap<>();
     protected DecisionExecutionAuditContainer auditContainer;
     protected Map<Integer, List<Object>> outputValues = new HashMap<>();
+    protected Map<Integer, String> outputNumberVariableIds = new HashMap<>();
 
     public void checkExecutionContext(String variableId) {
 
@@ -56,8 +57,8 @@ public class MvelExecutionContext {
         }
     }
 
-    public void addOutputResultVariable(int outputNumber, String key, Object value) {
-        outputVariables.put(outputNumber, value);
+    public void addOutputResult(int outputNumber, String key, Object value) {
+        resultValues.put(outputNumber, value);
         resultVariables.put(key, value);
     }
 
@@ -73,12 +74,8 @@ public class MvelExecutionContext {
         return resultVariables;
     }
 
-    public Map<Integer, Object> getOutputVariables() {
-        return outputVariables;
-    }
-
-    public void setOutputVariables(Map<Integer, Object> outputVariables) {
-        this.outputVariables = outputVariables;
+    public Map<Integer, Object> getResultValues() {
+        return resultValues;
     }
 
     public ParserContext getParserContext() {
@@ -111,5 +108,13 @@ public class MvelExecutionContext {
 
     public void addOutputValues(int outputNumber, List<Object> outputValues) {
         this.outputValues.put(outputNumber, outputValues);
+    }
+
+    public String getVariableId(Integer outputNumber) {
+        return outputNumberVariableIds.get(outputNumber);
+    }
+
+    public void addOutputNumberVariableId(Integer outputNumber, String variableId) {
+        outputNumberVariableIds.put(outputNumber, variableId);
     }
 }

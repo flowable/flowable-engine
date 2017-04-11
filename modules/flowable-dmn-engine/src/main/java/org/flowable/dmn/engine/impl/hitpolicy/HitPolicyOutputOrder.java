@@ -12,6 +12,9 @@
  */
 package org.flowable.dmn.engine.impl.hitpolicy;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.flowable.dmn.engine.DmnEngineConfiguration;
+import org.flowable.dmn.engine.impl.context.Context;
 import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.dmn.model.RuleOutputClauseContainer;
@@ -19,6 +22,8 @@ import org.flowable.engine.common.api.FlowableException;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,31 +47,75 @@ public class HitPolicyOutputOrder extends AbstractHitPolicy implements ComposeRu
             ((List) resultVariable).add(executionVariable);
 
             // add result variable
-            executionContext.addOutputResultVariable(outputNumber, outputVariableId, resultVariable);
+            executionContext.addOutputResult(outputNumber, outputVariableId, resultVariable);
         } else {
             throw new FlowableException(String.format("HitPolicy: %s has wrong output variable type", getHitPolicyName()));
         }
     }
 
-
     @Override
-    public void composeDecisionTableOutput(Map<Integer, List<RuleOutputClauseContainer>> validRuleOutputEntries, MvelExecutionContext executionContext) {
-        if (executionContext.getResultVariables() != null) {
-            for (Map.Entry<Integer, Object> entry : executionContext.getOutputVariables().entrySet()) {
-                if (entry.getValue() == null) {
-                    break;
-                }
+    public void composeDecisionTableOutput(Map<Integer, List<RuleOutputClauseContainer>> validRuleOutputEntries, final MvelExecutionContext executionContext) {
+        if (executionContext.getResultValues() != null && !executionContext.getResultValues().isEmpty()) {
 
-                if (!executionContext.getOutputValues().containsKey(entry.getKey()) || executionContext.getOutputValues().get(entry.getKey()).isEmpty()) {
-                    throw new FlowableException(String.format("HitPolicy: %s; no output values present for output: %d", getHitPolicyName(), entry.getKey()));
+            // create comparable list of compound output values per rule
+            List<Map> ruleOutputValues = new ArrayList<>();
+            boolean outputValuesPresent = false;
+            for (Map.Entry<Integer, Object> entry : executionContext.getResultValues().entrySet()) {
+                if (executionContext.getOutputValues().containsKey(entry.getKey()) && !executionContext.getOutputValues().get(entry.getKey()).isEmpty()) {
+                    outputValuesPresent = true;
                 }
 
                 if (entry.getValue() instanceof List) {
-                    List<Comparable> outputValues = (List<Comparable>) entry.getValue();
-                    List<Object> outputValueList = executionContext.getOutputValues().get(entry.getKey());
-                    Collections.sort(outputValues, new OutputOrderComparator<>(outputValueList.toArray(new Comparable[outputValueList.size()])));
+                    int ruleCounter = 0;
+                    for (Object outputVariable : (List) entry.getValue()) {
+                        Map<Integer, Comparable> ruleOutputNumberVariableValue;
+                        try {
+                            ruleOutputNumberVariableValue = ruleOutputValues.get(ruleCounter);
+                            ruleOutputNumberVariableValue.put(entry.getKey(), (Comparable) outputVariable);
+                        } catch (IndexOutOfBoundsException iobe) {
+                            ruleOutputNumberVariableValue = new HashMap<>();
+                            ruleOutputNumberVariableValue.put(entry.getKey(), (Comparable) outputVariable);
+                            ruleOutputValues.add(ruleCounter, ruleOutputNumberVariableValue);
+                        }
+                        ruleCounter++;
+                    }
                 } else {
                     throw new FlowableException(String.format("HitPolicy: %s has wrong output variable type", getHitPolicyName()));
+                }
+            }
+
+            if (Context.getDmnEngineConfiguration().isStrictMode()) {
+                if (!outputValuesPresent) {
+                    throw new FlowableException(String.format("HitPolicy: %s; no output values present", getHitPolicyName()));
+                }
+            }
+
+            // sort on predefined list(s) of output values
+            Collections.sort(ruleOutputValues, new Comparator() {
+                public int compare(Object o1, Object o2) {
+                    CompareToBuilder compareToBuilder = new CompareToBuilder();
+                    for (Map.Entry<Integer, List<Object>> entry : executionContext.getOutputValues().entrySet()) {
+                        List<Object> outputValues = entry.getValue();
+                        compareToBuilder.append(((Map) o1).get(entry.getKey()), ((Map) o2).get(entry.getKey()), new OutputOrderComparator<>(outputValues.toArray(new Comparable[outputValues.size()])));
+                    }
+                    return compareToBuilder.toComparison();
+                }
+            });
+
+            // reset result variables with sorted values per variable
+            executionContext.getResultVariables().clear();
+            for (Map<Integer, Object> ruleOutputValue : ruleOutputValues) {
+                for (Map.Entry<Integer, Object> entry : ruleOutputValue.entrySet()) {
+                    List<Object> outputValues;
+                    String variableId = executionContext.getVariableId(entry.getKey());
+
+                    if (!executionContext.getResultVariables().containsKey(variableId) || executionContext.getResultVariables().get(variableId) instanceof List == false) {
+                        outputValues = new ArrayList<>();
+                        executionContext.getResultVariables().put(variableId, outputValues);
+                    } else {
+                        outputValues = (List) executionContext.getResultVariables().get(variableId);
+                    }
+                    outputValues.add(entry.getValue());
                 }
             }
         }

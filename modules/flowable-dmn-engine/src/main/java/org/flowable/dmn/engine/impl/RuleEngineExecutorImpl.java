@@ -142,6 +142,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
 
         } catch (FlowableException ade) {
             logger.error("decision table execution failed", ade);
+            executionContext.getResultVariables().clear();
             executionContext.getAuditContainer().setFailed();
             executionContext.getAuditContainer().setExceptionMessage(getExceptionMessage(ade));
         }

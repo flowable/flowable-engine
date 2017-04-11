@@ -39,6 +39,6 @@ public abstract class AbstractHitPolicy implements ContinueEvaluatingBehavior, C
      */
     @Override
     public void composeRuleOutput(int outputNumber, String outputVariableId, Object executionVariable, MvelExecutionContext executionContext) {
-        executionContext.addOutputResultVariable(outputNumber, outputVariableId, executionVariable);
+        executionContext.addOutputResult(outputNumber, outputVariableId, executionVariable);
     }
 }

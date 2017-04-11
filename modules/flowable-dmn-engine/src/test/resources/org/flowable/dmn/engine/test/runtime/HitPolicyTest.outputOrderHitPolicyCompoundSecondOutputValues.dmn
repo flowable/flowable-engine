@@ -7,9 +7,6 @@
         </inputExpression>
       </input>
       <output id="output1" label="Output 1" name="outputVariable1" typeRef="string">
-        <outputValues>
-            <text>"DECLINE", "REFER", "ACCEPT"</text>
-        </outputValues>
       </output>
       <output id="output2" label="Output 2" name="outputVariable2" typeRef="string">
         <outputValues>

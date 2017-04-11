@@ -35,7 +35,7 @@ public class HitPolicyPriority extends AbstractHitPolicy implements ComposeRuleO
         Object currentResultVariable = executionContext.getResultVariables().get(outputVariableId);
 
         if (currentResultVariable == null) {
-            executionContext.addOutputResultVariable(outputNumber, outputVariableId, executionVariable);
+            executionContext.addOutputResult(outputNumber, outputVariableId, executionVariable);
         } else if (outputValues != null && !outputValues.isEmpty()) {
 
             if (!outputValues.contains(currentResultVariable)) {
@@ -51,7 +51,7 @@ public class HitPolicyPriority extends AbstractHitPolicy implements ComposeRuleO
             int indexCurrent = outputValues.indexOf(executionVariable);
 
             if (indexCurrent < indexPrevious) {
-                executionContext.addOutputResultVariable(outputNumber, outputVariableId, executionVariable);
+                executionContext.addOutputResult(outputNumber, outputVariableId, executionVariable);
             }
         }
     }

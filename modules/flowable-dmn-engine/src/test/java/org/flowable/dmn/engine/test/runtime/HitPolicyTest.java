@@ -283,6 +283,48 @@ public class HitPolicyTest {
 
     @Test
     @DmnDeploymentAnnotation
+    public void outputOrderHitPolicyNoOutputValuesStrictModeDisabled() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        dmnEngine.getDmnEngineConfiguration().setStrictMode(false);
+
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.put("inputVariable1", 5);
+
+        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
+
+        Assert.assertEquals(1, result.getResultVariables().size());
+        Assert.assertArrayEquals(new String[]{"OUTPUT1", "OUTPUT2", "OUTPUT3"}, ((List) result.getResultVariables().get("outputVariable1")).toArray());
+
+        Assert.assertEquals(1, result.getAuditTrail().getOutputVariables().size());
+        Assert.assertArrayEquals(new String[]{"OUTPUT1", "OUTPUT2", "OUTPUT3"}, ((List) result.getAuditTrail().getOutputVariables().get("outputVariable1")).toArray());
+
+        Assert.assertFalse(result.getAuditTrail().isFailed());
+        Assert.assertNull(result.getAuditTrail().getExceptionMessage());
+    }
+
+    @Test
+    @DmnDeploymentAnnotation
+    public void outputOrderHitPolicyNoOutputValues() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.put("inputVariable1", 5);
+
+        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
+
+        Assert.assertEquals(0, result.getResultVariables().size());
+        Assert.assertEquals(0, result.getAuditTrail().getOutputVariables().size());
+
+        Assert.assertTrue(result.getAuditTrail().isFailed());
+        Assert.assertNotNull(result.getAuditTrail().getExceptionMessage());
+    }
+
+    @Test
+    @DmnDeploymentAnnotation
     public void outputOrderHitPolicyCompound() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -294,15 +336,66 @@ public class HitPolicyTest {
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
         Assert.assertEquals(2, result.getResultVariables().size());
-        Assert.assertArrayEquals(new String[]{"OUTPUT2", "OUTPUT3", "OUTPUT1"}, ((List) result.getResultVariables().get("outputVariable1")).toArray());
-        Assert.assertArrayEquals(new Double[]{20D, 30D, 10D}, ((List) result.getResultVariables().get("outputVariable2")).toArray());
+        Assert.assertArrayEquals(new String[]{"DECLINE", "REFER", "REFER", "ACCEPT"}, ((List) result.getResultVariables().get("outputVariable1")).toArray());
+        Assert.assertArrayEquals(new String[]{"NONE", "LEVEL 2", "LEVEL 1", "NONE"}, ((List) result.getResultVariables().get("outputVariable2")).toArray());
 
         Assert.assertEquals(2, result.getAuditTrail().getOutputVariables().size());
-        Assert.assertArrayEquals(new String[]{"OUTPUT2", "OUTPUT3", "OUTPUT1"}, ((List) result.getAuditTrail().getOutputVariables().get("outputVariable1")).toArray());
-        Assert.assertArrayEquals(new Double[]{20D, 30D, 10D},  ((List) result.getAuditTrail().getOutputVariables().get("outputVariable2")).toArray());
+        Assert.assertArrayEquals(new String[]{"DECLINE", "REFER", "REFER", "ACCEPT"}, ((List) result.getAuditTrail().getOutputVariables().get("outputVariable1")).toArray());
+        Assert.assertArrayEquals(new String[]{"NONE", "LEVEL 2", "LEVEL 1", "NONE"},  ((List) result.getAuditTrail().getOutputVariables().get("outputVariable2")).toArray());
 
 
         Assert.assertFalse(result.getAuditTrail().isFailed());
         Assert.assertNull(result.getAuditTrail().getExceptionMessage());
     }
+
+    @Test
+    @DmnDeploymentAnnotation
+    public void outputOrderHitPolicyCompoundFirstOutputValues() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.put("inputVariable1", 5);
+
+        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
+
+        Assert.assertEquals(2, result.getResultVariables().size());
+        Assert.assertArrayEquals(new String[]{"DECLINE", "REFER", "REFER", "ACCEPT"}, ((List) result.getResultVariables().get("outputVariable1")).toArray());
+        Assert.assertArrayEquals(new String[]{"NONE", "LEVEL 1", "LEVEL 2", "NONE"}, ((List) result.getResultVariables().get("outputVariable2")).toArray());
+
+        Assert.assertEquals(2, result.getAuditTrail().getOutputVariables().size());
+        Assert.assertArrayEquals(new String[]{"DECLINE", "REFER", "REFER", "ACCEPT"}, ((List) result.getAuditTrail().getOutputVariables().get("outputVariable1")).toArray());
+        Assert.assertArrayEquals(new String[]{"NONE", "LEVEL 1", "LEVEL 2", "NONE"},  ((List) result.getAuditTrail().getOutputVariables().get("outputVariable2")).toArray());
+
+
+        Assert.assertFalse(result.getAuditTrail().isFailed());
+        Assert.assertNull(result.getAuditTrail().getExceptionMessage());
+    }
+
+    @Test
+    @DmnDeploymentAnnotation
+    public void outputOrderHitPolicyCompoundSecondOutputValues() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.put("inputVariable1", 5);
+
+        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
+
+        Assert.assertEquals(2, result.getResultVariables().size());
+        Assert.assertArrayEquals(new String[]{"REFER", "REFER", "ACCEPT", "DECLINE"}, ((List) result.getResultVariables().get("outputVariable1")).toArray());
+        Assert.assertArrayEquals(new String[]{"LEVEL 2", "LEVEL 1", "NONE", "NONE"}, ((List) result.getResultVariables().get("outputVariable2")).toArray());
+
+        Assert.assertEquals(2, result.getAuditTrail().getOutputVariables().size());
+        Assert.assertArrayEquals(new String[]{"REFER", "REFER", "ACCEPT", "DECLINE"}, ((List) result.getAuditTrail().getOutputVariables().get("outputVariable1")).toArray());
+        Assert.assertArrayEquals(new String[]{"LEVEL 2", "LEVEL 1", "NONE", "NONE"},  ((List) result.getAuditTrail().getOutputVariables().get("outputVariable2")).toArray());
+
+
+        Assert.assertFalse(result.getAuditTrail().isFailed());
+        Assert.assertNull(result.getAuditTrail().getExceptionMessage());
+    }
+
 }

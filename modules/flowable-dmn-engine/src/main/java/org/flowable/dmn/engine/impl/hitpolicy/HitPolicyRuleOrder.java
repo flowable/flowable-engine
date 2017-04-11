@@ -39,7 +39,7 @@ public class HitPolicyRuleOrder extends AbstractHitPolicy implements ComposeRule
             ((List) resultVariable).add(executionVariable);
 
             // add result variable
-            executionContext.addOutputResultVariable(outputNumber, outputVariableId, resultVariable);
+            executionContext.addOutputResult(outputNumber, outputVariableId, resultVariable);
         } else {
             throw new FlowableException(String.format("HitPolicy: %s has wrong output variable type", getHitPolicyName()));
         }
