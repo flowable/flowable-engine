@@ -470,6 +470,12 @@
 			    <artifactId>flowable-ui-common</artifactId>
 			    <version>${project.version}</version>
 			</dependency>
+            <dependency>
+			    <groupId>org.flowable</groupId>
+			    <artifactId>flowable-groovy-script-static-engine</artifactId>
+                <scope>provided</scope>
+			    <version>${project.version}</version>
+			</dependency>
 			<!-- EMAIL -->
 			<dependency>
 				<groupId>org.apache.commons</groupId>
@@ -863,6 +869,7 @@
 		<module>modules/flowable-dmn-api</module>
 		<module>modules/flowable-content-api</module>
 		<module>modules/flowable-engine</module>
+        <module>modules/flowable-groovy-script-static-engine</module>
 	</modules>
 
 	<build>
