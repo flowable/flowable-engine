@@ -13,6 +13,7 @@
         <script type="text/javascript" src="display/bpmn-icons.js"></script>
         <script type="text/javascript" src="display/Polyline.js"></script>
         <script type="text/javascript">
+        
         	var NORMAL_STROKE = 1;
         	var SEQUENCEFLOW_STROKE = 1.5;
         	var TASK_STROKE = 1;
@@ -59,22 +60,20 @@
             var startGlowElement;
             var endElement;
             var endGlowElement;
+            
+            var collapsedItemNavigation = new Array();
+            var bpmnData;
         	
-        	function _showTip(htmlNode, element)
-          	{
+        	function _showTip(htmlNode, element) {
         		var documentation = "";
-        		if (element.name && element.name.length > 0)
-        		{
+        		if (element.name && element.name.length > 0) {
         			documentation += "<b>Name</b>: <i>" + element.name + "</i><br/><br/>";
         		}
         		
         		var text;
-        		if (element.name && element.name.length > 0)
-        		{
+        		if (element.name && element.name.length > 0) {
         			text = element.name;
-        		}
-        		else
-        		{
+        		} else {
         			text = element.id;
         		}
         		
@@ -99,9 +98,121 @@
 	                }
               });
           	}
+          	
+          	function _expandCollapsedElement(element) {
+          		if (bpmnData.collapsed) {
+          			for (var i = 0; i < bpmnData.collapsed.length; i++) {
+          				var collapsedItem = bpmnData.collapsed[i];
+          				if (element.id == collapsedItem.id) {
+          					paper.clear();
+          					
+          					var modelElements = collapsedItem.elements;
+						    for (var i = 0; i < modelElements.length; i++) {
+						    	var subElement = modelElements[i];
+						    	var drawFunction = eval("_draw" + subElement.type);
+						    	drawFunction(subElement);
+						    }
+						    
+						    if (collapsedItem.flows) {
+							    for (var i = 0; i < collapsedItem.flows.length; i++) {
+							    	var subFlow = collapsedItem.flows[i];
+							    	_drawFlow(subFlow);
+							    }
+						    }
+						    
+						    var collapsedName;
+						    if (element.name) {
+						    	collapsedName = element.name;
+						    } else {
+						    	collapsedName = 'sub process ' + element.id;
+						    }
+						    
+						    collapsedItemNavigation.push({
+						    	"id": element.id,
+						    	"name": collapsedName
+						    });
+						    
+						    _buildNavigationTree();
+						    
+          					break;
+          				}
+          			}
+          		}
+          	}
+          	
+          	function _navigateTo(elementId) {
+          		var modelElements = undefined;
+          		var modelFlows = undefined;
+          		newCollapsedItemNavigation = new Array();
+          		
+          		if (elementId == 'FLOWABLE_ROOT_PROCESS') {
+          			modelElements = bpmnData.elements;
+          			modelFlows = bpmnData.flows;
+          			
+          		} else {
+          		
+          			for (var i = 0; i < bpmnData.collapsed.length; i++) {
+          				var collapsedItem = bpmnData.collapsed[i];
+          				
+          				var collapsedName = undefined;
+	          			for (var j = 0; j < collapsedItemNavigation.length; j++) {
+	          				if (elementId == collapsedItemNavigation[j].id) {
+	          					collapsedName = collapsedItemNavigation[j].name;
+	          					break;
+	          				}
+	          			}
+	          		
+	          			if (!collapsedName) {
+	          				continue;
+	          			}
+          				
+          				newCollapsedItemNavigation.push({
+					    	"id": collapsedItem.id,
+					    	"name": collapsedName
+					    });
+          				
+          				if (elementId == collapsedItem.id) {
+          					modelElements = collapsedItem.elements;
+          					modelFlows = collapsedItem.flows;
+          					break;
+          				}
+          			}
+          		}
+          		
+          		if (modelElements) {
+	          		paper.clear();
+	          					
+				    for (var i = 0; i < modelElements.length; i++) {
+				    	var subElement = modelElements[i];
+				    	var drawFunction = eval("_draw" + subElement.type);
+				    	drawFunction(subElement);
+				    }
+				    
+				    if (modelFlows) {
+					    for (var i = 0; i < modelFlows.length; i++) {
+					    	var subFlow = modelFlows[i];
+					    	_drawFlow(subFlow);
+					    }
+				    }
+				    
+				    collapsedItemNavigation = newCollapsedItemNavigation;
+				    
+				    _buildNavigationTree();
+				}
+          	}
+          	
+          	function _buildNavigationTree() {
+          		var navigationUrl = '| <a href="javascript:_navigateTo(\'FLOWABLE_ROOT_PROCESS\')">Root</a>';
+						    
+			    for (var i = 0; i < collapsedItemNavigation.length; i++) {
+			    	navigationUrl += ' > <a href="javascript:_navigateTo(\'' + collapsedItemNavigation[i].id + '\')">' + 
+			    		collapsedItemNavigation[i].name + '</a>';
+			    }
+			  	
+			    $('#navigationTree').html(navigationUrl);
+          	}
         	
-        	function _addHoverLogic(element, type, defaultColor)
-        	{
+        	function _addHoverLogic(element, type, defaultColor) {
         	    var strokeColor = _bpmnGetColor(element, defaultColor);
         		var topBodyRect;
         		if (type === "rect") {
@@ -259,8 +370,7 @@
 					viewBoxHeight = INITIAL_CANVAS_HEIGHT;
 					
 					var x = 0;
-					if ($(window).width() > canvasWidth)
-					{
+					if ($(window).width() > canvasWidth) {
 						x = ($(window).width() - canvasWidth) / 2 - (data.diagramBeginX / 2);
 					}
 					
@@ -270,18 +380,15 @@
 					paper.setViewBox(0, 0, viewBoxWidth, viewBoxHeight, false);
 	          		paper.renderfix();
 	          		
-	          		if (data.pools)
-	          		{
-	          			for (var i = 0; i < data.pools.length; i++)
-					    {
+	          		if (data.pools) {
+	          			for (var i = 0; i < data.pools.length; i++) {
 					    	var pool = data.pools[i];
 					    	_drawPool(pool);
 					    }
 	          		}
 	          		
 				    var modelElements = data.elements;
-				    for (var i = 0; i < modelElements.length; i++)
-				    {
+				    for (var i = 0; i < modelElements.length; i++) {
 				    	var element = modelElements[i];
 				    	//try {
 				    		//console.log(element.type);
@@ -290,14 +397,14 @@
 				    	//} catch(err) {console.log(err);}
 				    }
 				    
-				    if (data.flows)
-				    {
-					    for (var i = 0; i < data.flows.length; i++)
-					    {
+				    if (data.flows) {
+					    for (var i = 0; i < data.flows.length; i++) {
 					    	var flow = data.flows[i];
 					    	_drawFlow(flow);
 					    }
 				    }
+				    
+				    bpmnData = data;
 				});
 	
 				request.error(function(jqXHR, textStatus, errorThrown) {
