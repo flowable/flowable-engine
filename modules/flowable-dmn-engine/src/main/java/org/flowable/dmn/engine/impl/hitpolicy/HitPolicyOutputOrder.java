@@ -13,7 +13,6 @@
 package org.flowable.dmn.engine.impl.hitpolicy;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.context.Context;
 import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
 import org.flowable.dmn.model.HitPolicy;
@@ -84,10 +83,8 @@ public class HitPolicyOutputOrder extends AbstractHitPolicy implements ComposeRu
                 }
             }
 
-            if (Context.getDmnEngineConfiguration().isStrictMode()) {
-                if (!outputValuesPresent) {
-                    throw new FlowableException(String.format("HitPolicy: %s; no output values present", getHitPolicyName()));
-                }
+            if (Context.getDmnEngineConfiguration().isStrictMode() && !outputValuesPresent) {
+                throw new FlowableException(String.format("HitPolicy: %s; no output values present", getHitPolicyName()));
             }
 
             // sort on predefined list(s) of output values

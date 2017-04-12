@@ -350,6 +350,31 @@ public class HitPolicyTest {
 
     @Test
     @DmnDeploymentAnnotation
+    public void outputOrderHitPolicyCompoundOtherTypes() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.put("inputVariable1", 5);
+
+        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
+
+        Assert.assertEquals(2, result.getResultVariables().size());
+        Assert.assertArrayEquals(new String[]{"DECLINE", "REFER", "REFER", "ACCEPT"}, ((List) result.getResultVariables().get("outputVariable1")).toArray());
+        Assert.assertArrayEquals(new Double[]{10D, 30D, 20D, 10D}, ((List) result.getResultVariables().get("outputVariable2")).toArray());
+
+        Assert.assertEquals(2, result.getAuditTrail().getOutputVariables().size());
+        Assert.assertArrayEquals(new String[]{"DECLINE", "REFER", "REFER", "ACCEPT"}, ((List) result.getAuditTrail().getOutputVariables().get("outputVariable1")).toArray());
+        Assert.assertArrayEquals(new Double[]{10D, 30D, 20D, 10D}, ((List) result.getAuditTrail().getOutputVariables().get("outputVariable2")).toArray());
+
+
+        Assert.assertFalse(result.getAuditTrail().isFailed());
+        Assert.assertNull(result.getAuditTrail().getExceptionMessage());
+    }
+
+    @Test
+    @DmnDeploymentAnnotation
     public void outputOrderHitPolicyCompoundFirstOutputValues() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
