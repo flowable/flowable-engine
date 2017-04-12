@@ -58,9 +58,9 @@ public class CustomConfigRuntimeTest {
 
         processVariablesInput.put("input1", localDate.toDate());
         RuleEngineExecutionResult result = ruleService.executeDecisionByKey("decision", processVariablesInput);
-        Assert.assertNotNull(result);
-        Assert.assertSame(String.class, result.getResultVariables().get("output1").getClass());
-        Assert.assertEquals("test2", result.getResultVariables().get("output1"));
+        Assert.assertNotNull(result.getDecisionResult());
+        Assert.assertSame(String.class, result.getDecisionResult().getSingleOutputValue("output1").getClass());
+        Assert.assertEquals("test2", result.getDecisionResult().getSingleOutputValue("output1"));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class CustomConfigRuntimeTest {
         processVariablesInput.put("input1", localDate.toDate());
         RuleEngineExecutionResult result = ruleService.executeDecisionByKey("decision", processVariablesInput);
 
-        Assert.assertEquals(0, result.getResultVariables().size());
+        Assert.assertEquals(0, result.getDecisionResult().getRuleResults().size());
         Assert.assertNotEquals(true, StringUtils.isEmpty(result.getAuditTrail().getRuleExecutions().get(2).getConditionResults().get(1).getException()));
     }
 }

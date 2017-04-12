@@ -18,12 +18,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.dmn.api.DmnDecisionResult;
 import org.flowable.dmn.api.RuleEngineExecutionResult;
 import org.flowable.dmn.engine.FlowableDmnExpressionException;
 import org.flowable.dmn.engine.RuleEngineExecutor;
 import org.flowable.dmn.engine.impl.hitpolicy.AbstractHitPolicy;
-import org.flowable.dmn.engine.impl.hitpolicy.ComposeDecisionTableOutputBehavior;
-import org.flowable.dmn.engine.impl.hitpolicy.ComposeRuleOutputBehavior;
+import org.flowable.dmn.engine.impl.hitpolicy.ComposeDecisionResultBehavior;
+import org.flowable.dmn.engine.impl.hitpolicy.ComposeRuleResultBehavior;
 import org.flowable.dmn.engine.impl.hitpolicy.ContinueEvaluatingBehavior;
 import org.flowable.dmn.engine.impl.hitpolicy.EvaluateConclusionBehavior;
 import org.flowable.dmn.engine.impl.hitpolicy.EvaluateRuleValidityBehavior;
@@ -81,18 +82,18 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
             customExpressionFunctions, propertyHandlers);
 
         // evaluate decision table
-        Map<String, Object> resultVariables = evaluateDecisionTable(currentDecisionTable, executionContext);
+        DmnDecisionResult decisionResult = evaluateDecisionTable(currentDecisionTable, executionContext);
 
         // end audit trail
-        executionContext.getAuditContainer().stopAudit(resultVariables);
+        executionContext.getAuditContainer().stopAudit(decisionResult);
 
         // create result container
-        RuleEngineExecutionResult executionResult = new RuleEngineExecutionResult(resultVariables, executionContext.getAuditContainer());
+        RuleEngineExecutionResult executionResult = new RuleEngineExecutionResult(decisionResult, executionContext.getAuditContainer());
 
         return executionResult;
     }
 
-    protected Map<String, Object> evaluateDecisionTable(DecisionTable decisionTable, MvelExecutionContext executionContext) {
+    protected DmnDecisionResult evaluateDecisionTable(DecisionTable decisionTable, MvelExecutionContext executionContext) {
         logger.debug("Start table evaluation: {}", decisionTable.getId());
 
 
@@ -136,20 +137,20 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
             }
 
             // post rule conclusion actions
-            if (getHitPolicyBehavior(decisionTable.getHitPolicy()) instanceof ComposeDecisionTableOutputBehavior) {
-                ((ComposeDecisionTableOutputBehavior) getHitPolicyBehavior(decisionTable.getHitPolicy())).composeDecisionTableOutput(validRuleOutputEntries, executionContext);
+            if (getHitPolicyBehavior(decisionTable.getHitPolicy()) instanceof ComposeDecisionResultBehavior) {
+                ((ComposeDecisionResultBehavior) getHitPolicyBehavior(decisionTable.getHitPolicy())).composeDecisionResult(executionContext);
             }
 
         } catch (FlowableException ade) {
             logger.error("decision table execution failed", ade);
-            executionContext.getResultVariables().clear();
+            executionContext.getRuleResults().clear();
             executionContext.getAuditContainer().setFailed();
             executionContext.getAuditContainer().setExceptionMessage(getExceptionMessage(ade));
         }
 
         logger.debug("End table evaluation: {}", decisionTable.getId());
 
-        return executionContext.getResultVariables();
+        return executionContext.getDecisionResult();
     }
 
     protected Boolean executeRule(DecisionRule rule, MvelExecutionContext executionContext) {
@@ -251,8 +252,8 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 }
 
                 // create result
-                if (getHitPolicyBehavior(hitPolicy) instanceof ComposeRuleOutputBehavior) {
-                    ((ComposeRuleOutputBehavior) getHitPolicyBehavior(hitPolicy)).composeRuleOutput(ruleClauseContainer.getOutputClause().getOutputNumber(), outputVariableId, executionVariable, executionContext);
+                if (getHitPolicyBehavior(hitPolicy) instanceof ComposeRuleResultBehavior) {
+                    ((ComposeRuleResultBehavior) getHitPolicyBehavior(hitPolicy)).composeRuleResult(ruleNumber, outputVariableId, executionVariable, executionContext);
                 }
 
                 // add audit entry
@@ -265,7 +266,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 }
             } catch (FlowableException ade) {
                 // clear result variables
-                executionContext.getResultVariables().clear();
+                executionContext.getRuleResults().clear();
 
                 // add failed audit entry and rethrow
                 executionContext.getAuditContainer().addOutputEntry(ruleNumber, ruleClauseContainer.getOutputClause().getOutputNumber(), outputEntryExpression.getId(), getExceptionMessage(ade), executionVariable);
@@ -273,7 +274,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
 
             } catch (Exception e) {
                 // clear result variables
-                executionContext.getResultVariables().clear();
+                executionContext.getRuleResults().clear();
 
                 // add failed audit entry and rethrow
                 executionContext.getAuditContainer().addOutputEntry(ruleNumber, ruleClauseContainer.getOutputClause().getOutputNumber(), outputEntryExpression.getId(), getExceptionMessage(e), executionVariable);

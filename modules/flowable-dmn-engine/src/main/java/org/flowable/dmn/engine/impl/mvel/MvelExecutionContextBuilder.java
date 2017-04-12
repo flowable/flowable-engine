@@ -62,15 +62,11 @@ public class MvelExecutionContextBuilder {
 
         DecisionTable decisionTable = (DecisionTable) decision.getExpression();
 
-        // add output values to
-        // and create convenience mapping
+        // add output values to context
         if (decisionTable.getOutputs() != null) {
             for (OutputClause outputClause : decisionTable.getOutputs()) {
-
-                executionContext.addOutputNumberVariableId(outputClause.getOutputNumber(), outputClause.getName());
-
                 if (outputClause.getOutputValues() != null && outputClause.getOutputValues().getTextValues() != null) {
-                    executionContext.addOutputValues(outputClause.getOutputNumber(),
+                    executionContext.addOutputValues(outputClause.getName(),
                         ExecutionVariableFactory.getExecutionVariables(outputClause.getTypeRef(), outputClause.getOutputValues().getTextValues()));
                 }
             }

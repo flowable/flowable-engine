@@ -44,9 +44,8 @@ public class HitPolicyTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals(2, result.getResultVariables().size());
-        Assert.assertEquals(10D, result.getResultVariables().get("outputVariable1"));
-        Assert.assertEquals("result1", result.getResultVariables().get("outputVariable2"));
+        Assert.assertEquals(10D, result.getDecisionResult().getFirstOutputValue("outputVariable1"));
+        Assert.assertEquals("result1", result.getDecisionResult().getFirstOutputValue("outputVariable2"));
         Assert.assertFalse(result.getAuditTrail().isFailed());
         Assert.assertNull(result.getAuditTrail().getExceptionMessage());
     }
@@ -62,7 +61,7 @@ public class HitPolicyTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals(0, result.getResultVariables().size());
+        Assert.assertNull(result.getDecisionResult());
         Assert.assertTrue(result.getAuditTrail().isFailed());
         Assert.assertNotNull(result.getAuditTrail().getRuleExecutions().get(3).getConclusionResults().get(2).getException());
         Assert.assertNotNull(result.getAuditTrail().getExceptionMessage());
@@ -81,7 +80,7 @@ public class HitPolicyTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals(2, result.getResultVariables().size());
+        Assert.assertEquals(2, result.getDecisionResult().getRuleResults().size());
         Assert.assertFalse(result.getAuditTrail().isFailed());
         Assert.assertNull(result.getAuditTrail().getRuleExecutions().get(3).getConclusionResults().get(1).getException());
         Assert.assertNull(result.getAuditTrail().getExceptionMessage());
@@ -101,8 +100,8 @@ public class HitPolicyTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals(1, result.getResultVariables().size());
-        Assert.assertEquals("eq 10", result.getResultVariables().get("outputVariable1"));
+        Assert.assertEquals(1, result.getDecisionResult().getRuleResults().size());
+        Assert.assertEquals("eq 10", result.getDecisionResult().getSingleOutputValue("outputVariable1"));
         Assert.assertFalse(result.getAuditTrail().isFailed());
         Assert.assertNull(result.getAuditTrail().getExceptionMessage());
     }
@@ -118,7 +117,7 @@ public class HitPolicyTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals(0, result.getResultVariables().size());
+        Assert.assertNull(result.getDecisionResult());
         Assert.assertTrue(result.getAuditTrail().isFailed());
         Assert.assertNotNull(result.getAuditTrail().getExceptionMessage());
     }
@@ -136,8 +135,9 @@ public class HitPolicyTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals(1, result.getResultVariables().size());
-        Assert.assertEquals("lt 20", result.getResultVariables().get("outputVariable1"));
+        Assert.assertEquals(1, result.getDecisionResult().getRuleResults().size());
+        Assert.assertEquals("lt 20", result.getDecisionResult().getSingleOutputValue("outputVariable1"));
+        Assert.assertEquals(10D, result.getDecisionResult().getSingleOutputValue("outputVariable2"));
         Assert.assertFalse(result.getAuditTrail().isFailed());
         Assert.assertNull(result.getAuditTrail().getExceptionMessage());
 
@@ -157,9 +157,9 @@ public class HitPolicyTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals(2, result.getResultVariables().size());
-        Assert.assertEquals("gt 10", result.getResultVariables().get("outputVariable1"));
-        Assert.assertEquals("result2", result.getResultVariables().get("outputVariable2"));
+        Assert.assertEquals(1, result.getDecisionResult().getRuleResults().size());
+        Assert.assertEquals("gt 10", result.getDecisionResult().getSingleOutputValue("outputVariable1"));
+        Assert.assertEquals("result2", result.getDecisionResult().getSingleOutputValue("outputVariable2"));
         Assert.assertFalse(result.getAuditTrail().isFailed());
         Assert.assertNull(result.getAuditTrail().getExceptionMessage());
     }
@@ -176,21 +176,12 @@ public class HitPolicyTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals(1, result.getResultVariables().size());
+        Assert.assertEquals(2, result.getDecisionResult().getRuleResults().size());
 
-        List ruleResults = (List) result.getResultVariables().get("outputVariable1");
+        Assert.assertEquals(2, result.getDecisionResult().getOutputValues("outputVariable1").size());
 
-        Assert.assertEquals(2, ruleResults.size());
-
-        Assert.assertEquals("result2", ruleResults.get(0));
-        Assert.assertEquals("result4", ruleResults.get(1));
-
-        List auditResults = (List) result.getAuditTrail().getOutputVariables().get("outputVariable1");
-
-        Assert.assertEquals(2, auditResults.size());
-
-        Assert.assertEquals("result2", auditResults.get(0));
-        Assert.assertEquals("result4", auditResults.get(1));
+        Assert.assertEquals("result2", result.getDecisionResult().getOutputValues("outputVariable1").get(0));
+        Assert.assertEquals("result4", result.getDecisionResult().getOutputValues("outputVariable1").get(1));
 
         Assert.assertFalse(result.getAuditTrail().isFailed());
         Assert.assertNull(result.getAuditTrail().getExceptionMessage());
@@ -208,11 +199,8 @@ public class HitPolicyTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals(1, result.getResultVariables().size());
-        Assert.assertEquals("OUTPUT2", result.getResultVariables().get("outputVariable1"));
-
-        Assert.assertEquals(1, result.getAuditTrail().getOutputVariables().size());
-        Assert.assertEquals("OUTPUT2", result.getAuditTrail().getOutputVariables().get("outputVariable1"));
+        Assert.assertEquals(1, result.getDecisionResult().getRuleResults().size());
+        Assert.assertEquals("OUTPUT2", result.getDecisionResult().getSingleOutputValue("outputVariable1"));
 
         Assert.assertFalse(result.getAuditTrail().isFailed());
         Assert.assertNull(result.getAuditTrail().getExceptionMessage());
@@ -220,7 +208,7 @@ public class HitPolicyTest {
 
     @Test
     @DmnDeploymentAnnotation
-    public void priorityHitPolicyFailed() {
+    public void priorityHitPolicyCompound() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
@@ -230,12 +218,94 @@ public class HitPolicyTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals(0, result.getResultVariables().size());
-        Assert.assertEquals(0, result.getAuditTrail().getOutputVariables().size());
+        Assert.assertEquals(1, result.getDecisionResult().getRuleResults().size());
+        Assert.assertEquals("REFER", result.getDecisionResult().getSingleOutputValue("outputVariable1"));
+        Assert.assertEquals("LEVEL 2", result.getDecisionResult().getSingleOutputValue("outputVariable2"));
 
+        Assert.assertFalse(result.getAuditTrail().isFailed());
+        Assert.assertNull(result.getAuditTrail().getExceptionMessage());
+    }
+
+    @Test
+    @DmnDeploymentAnnotation
+    public void priorityHitPolicyCompoundFirstOutputValues() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.put("inputVariable1", 5);
+
+        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
+
+        Assert.assertEquals(1, result.getDecisionResult().getRuleResults().size());
+        Assert.assertEquals("REFER", result.getDecisionResult().getSingleOutputValue("outputVariable1"));
+        Assert.assertEquals("LEVEL 1", result.getDecisionResult().getSingleOutputValue("outputVariable2"));
+
+        Assert.assertFalse(result.getAuditTrail().isFailed());
+        Assert.assertNull(result.getAuditTrail().getExceptionMessage());
+    }
+
+    @Test
+    @DmnDeploymentAnnotation
+    public void priorityHitPolicyCompoundSecondOutputValues() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.put("inputVariable1", 5);
+
+        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
+
+        Assert.assertEquals(1, result.getDecisionResult().getRuleResults().size());
+        Assert.assertEquals("REFER", result.getDecisionResult().getSingleOutputValue("outputVariable1"));
+        Assert.assertEquals("LEVEL 2", result.getDecisionResult().getSingleOutputValue("outputVariable2"));
+
+        Assert.assertFalse(result.getAuditTrail().isFailed());
+        Assert.assertNull(result.getAuditTrail().getExceptionMessage());
+    }
+
+    @Test
+    @DmnDeploymentAnnotation
+    public void priorityHitPolicyCompoundNoOutputValues() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.put("inputVariable1", 5);
+
+        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
+
+        Assert.assertNull(result.getDecisionResult());
         Assert.assertTrue(result.getAuditTrail().isFailed());
         Assert.assertNotNull(result.getAuditTrail().getExceptionMessage());
     }
+
+    @Test
+    @DmnDeploymentAnnotation
+    public void priorityHitPolicyCompoundNoOutputValuesStrictModeDisabled() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        dmnEngine.getDmnEngineConfiguration().setStrictMode(false);
+
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.put("inputVariable1", 5);
+
+        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
+
+        Assert.assertEquals(1, result.getDecisionResult().getRuleResults().size());
+        Assert.assertEquals("ACCEPT", result.getDecisionResult().getSingleOutputValue("outputVariable1"));
+        Assert.assertEquals("NONE", result.getDecisionResult().getSingleOutputValue("outputVariable2"));
+
+        Assert.assertFalse(result.getAuditTrail().isFailed());
+        Assert.assertNull(result.getAuditTrail().getExceptionMessage());
+
+        dmnEngine.getDmnEngineConfiguration().setStrictMode(true);
+    }
+
 
     @Test
     @DmnDeploymentAnnotation
@@ -249,11 +319,8 @@ public class HitPolicyTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals(1, result.getResultVariables().size());
-        Assert.assertEquals("20", result.getResultVariables().get("outputVariable1"));
-
-        Assert.assertEquals(1, result.getAuditTrail().getOutputVariables().size());
-        Assert.assertEquals("20", result.getAuditTrail().getOutputVariables().get("outputVariable1"));
+        Assert.assertEquals(1, result.getDecisionResult().getRuleResults().size());
+        Assert.assertEquals(20D, result.getDecisionResult().getSingleOutputValue("outputVariable1"));
 
         Assert.assertFalse(result.getAuditTrail().isFailed());
         Assert.assertNull(result.getAuditTrail().getExceptionMessage());
@@ -271,11 +338,8 @@ public class HitPolicyTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals(1, result.getResultVariables().size());
-        Assert.assertArrayEquals(new String[]{"OUTPUT2", "OUTPUT3", "OUTPUT1"}, ((List) result.getResultVariables().get("outputVariable1")).toArray());
-
-        Assert.assertEquals(1, result.getAuditTrail().getOutputVariables().size());
-        Assert.assertArrayEquals(new String[]{"OUTPUT2", "OUTPUT3", "OUTPUT1"}, ((List) result.getAuditTrail().getOutputVariables().get("outputVariable1")).toArray());
+        Assert.assertEquals(3, result.getDecisionResult().getRuleResults().size());
+        Assert.assertArrayEquals(new String[]{"OUTPUT2", "OUTPUT3", "OUTPUT1"}, result.getDecisionResult().getOutputValues("outputVariable1").toArray());
 
         Assert.assertFalse(result.getAuditTrail().isFailed());
         Assert.assertNull(result.getAuditTrail().getExceptionMessage());
@@ -294,11 +358,8 @@ public class HitPolicyTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals(1, result.getResultVariables().size());
-        Assert.assertArrayEquals(new String[]{"OUTPUT1", "OUTPUT2", "OUTPUT3"}, ((List) result.getResultVariables().get("outputVariable1")).toArray());
-
-        Assert.assertEquals(1, result.getAuditTrail().getOutputVariables().size());
-        Assert.assertArrayEquals(new String[]{"OUTPUT1", "OUTPUT2", "OUTPUT3"}, ((List) result.getAuditTrail().getOutputVariables().get("outputVariable1")).toArray());
+        Assert.assertEquals(3, result.getDecisionResult().getRuleResults().size());
+        Assert.assertArrayEquals(new String[]{"OUTPUT1", "OUTPUT2", "OUTPUT3"}, result.getDecisionResult().getOutputValues("outputVariable1").toArray());
 
         Assert.assertFalse(result.getAuditTrail().isFailed());
         Assert.assertNull(result.getAuditTrail().getExceptionMessage());
@@ -316,8 +377,7 @@ public class HitPolicyTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals(0, result.getResultVariables().size());
-        Assert.assertEquals(0, result.getAuditTrail().getOutputVariables().size());
+        Assert.assertNull(result.getDecisionResult());
 
         Assert.assertTrue(result.getAuditTrail().isFailed());
         Assert.assertNotNull(result.getAuditTrail().getExceptionMessage());
@@ -335,14 +395,9 @@ public class HitPolicyTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals(2, result.getResultVariables().size());
-        Assert.assertArrayEquals(new String[]{"DECLINE", "REFER", "REFER", "ACCEPT"}, ((List) result.getResultVariables().get("outputVariable1")).toArray());
-        Assert.assertArrayEquals(new String[]{"NONE", "LEVEL 2", "LEVEL 1", "NONE"}, ((List) result.getResultVariables().get("outputVariable2")).toArray());
-
-        Assert.assertEquals(2, result.getAuditTrail().getOutputVariables().size());
-        Assert.assertArrayEquals(new String[]{"DECLINE", "REFER", "REFER", "ACCEPT"}, ((List) result.getAuditTrail().getOutputVariables().get("outputVariable1")).toArray());
-        Assert.assertArrayEquals(new String[]{"NONE", "LEVEL 2", "LEVEL 1", "NONE"},  ((List) result.getAuditTrail().getOutputVariables().get("outputVariable2")).toArray());
-
+        Assert.assertEquals(4, result.getDecisionResult().getRuleResults().size());
+        Assert.assertArrayEquals(new String[]{"DECLINE", "REFER", "REFER", "ACCEPT"}, result.getDecisionResult().getOutputValues("outputVariable1").toArray());
+        Assert.assertArrayEquals(new String[]{"NONE", "LEVEL 2", "LEVEL 1", "NONE"}, result.getDecisionResult().getOutputValues("outputVariable2").toArray());
 
         Assert.assertFalse(result.getAuditTrail().isFailed());
         Assert.assertNull(result.getAuditTrail().getExceptionMessage());
@@ -360,14 +415,9 @@ public class HitPolicyTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals(2, result.getResultVariables().size());
-        Assert.assertArrayEquals(new String[]{"DECLINE", "REFER", "REFER", "ACCEPT"}, ((List) result.getResultVariables().get("outputVariable1")).toArray());
-        Assert.assertArrayEquals(new Double[]{10D, 30D, 20D, 10D}, ((List) result.getResultVariables().get("outputVariable2")).toArray());
-
-        Assert.assertEquals(2, result.getAuditTrail().getOutputVariables().size());
-        Assert.assertArrayEquals(new String[]{"DECLINE", "REFER", "REFER", "ACCEPT"}, ((List) result.getAuditTrail().getOutputVariables().get("outputVariable1")).toArray());
-        Assert.assertArrayEquals(new Double[]{10D, 30D, 20D, 10D}, ((List) result.getAuditTrail().getOutputVariables().get("outputVariable2")).toArray());
-
+        Assert.assertEquals(4, result.getDecisionResult().getRuleResults().size());
+        Assert.assertArrayEquals(new String[]{"DECLINE", "REFER", "REFER", "ACCEPT"}, result.getDecisionResult().getOutputValues("outputVariable1").toArray());
+        Assert.assertArrayEquals(new Double[]{10D, 30D, 20D, 10D}, result.getDecisionResult().getOutputValues("outputVariable2").toArray());
 
         Assert.assertFalse(result.getAuditTrail().isFailed());
         Assert.assertNull(result.getAuditTrail().getExceptionMessage());
@@ -385,14 +435,9 @@ public class HitPolicyTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals(2, result.getResultVariables().size());
-        Assert.assertArrayEquals(new String[]{"DECLINE", "REFER", "REFER", "ACCEPT"}, ((List) result.getResultVariables().get("outputVariable1")).toArray());
-        Assert.assertArrayEquals(new String[]{"NONE", "LEVEL 1", "LEVEL 2", "NONE"}, ((List) result.getResultVariables().get("outputVariable2")).toArray());
-
-        Assert.assertEquals(2, result.getAuditTrail().getOutputVariables().size());
-        Assert.assertArrayEquals(new String[]{"DECLINE", "REFER", "REFER", "ACCEPT"}, ((List) result.getAuditTrail().getOutputVariables().get("outputVariable1")).toArray());
-        Assert.assertArrayEquals(new String[]{"NONE", "LEVEL 1", "LEVEL 2", "NONE"},  ((List) result.getAuditTrail().getOutputVariables().get("outputVariable2")).toArray());
-
+        Assert.assertEquals(4, result.getDecisionResult().getRuleResults().size());
+        Assert.assertArrayEquals(new String[]{"DECLINE", "REFER", "REFER", "ACCEPT"}, result.getDecisionResult().getOutputValues("outputVariable1").toArray());
+        Assert.assertArrayEquals(new String[]{"NONE", "LEVEL 1", "LEVEL 2", "NONE"}, result.getDecisionResult().getOutputValues("outputVariable2").toArray());
 
         Assert.assertFalse(result.getAuditTrail().isFailed());
         Assert.assertNull(result.getAuditTrail().getExceptionMessage());
@@ -410,14 +455,9 @@ public class HitPolicyTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals(2, result.getResultVariables().size());
-        Assert.assertArrayEquals(new String[]{"REFER", "REFER", "ACCEPT", "DECLINE"}, ((List) result.getResultVariables().get("outputVariable1")).toArray());
-        Assert.assertArrayEquals(new String[]{"LEVEL 2", "LEVEL 1", "NONE", "NONE"}, ((List) result.getResultVariables().get("outputVariable2")).toArray());
-
-        Assert.assertEquals(2, result.getAuditTrail().getOutputVariables().size());
-        Assert.assertArrayEquals(new String[]{"REFER", "REFER", "ACCEPT", "DECLINE"}, ((List) result.getAuditTrail().getOutputVariables().get("outputVariable1")).toArray());
-        Assert.assertArrayEquals(new String[]{"LEVEL 2", "LEVEL 1", "NONE", "NONE"},  ((List) result.getAuditTrail().getOutputVariables().get("outputVariable2")).toArray());
-
+        Assert.assertEquals(4, result.getDecisionResult().getRuleResults().size());
+        Assert.assertArrayEquals(new String[]{"REFER", "REFER", "ACCEPT", "DECLINE"}, result.getDecisionResult().getOutputValues("outputVariable1").toArray());
+        Assert.assertArrayEquals(new String[]{"LEVEL 2", "LEVEL 1", "NONE", "NONE"}, result.getDecisionResult().getOutputValues("outputVariable2").toArray());
 
         Assert.assertFalse(result.getAuditTrail().isFailed());
         Assert.assertNull(result.getAuditTrail().getExceptionMessage());

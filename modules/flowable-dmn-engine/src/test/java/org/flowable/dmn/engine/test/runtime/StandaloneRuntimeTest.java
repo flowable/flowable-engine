@@ -44,6 +44,6 @@ public class StandaloneRuntimeTest {
 
         RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
 
-        Assert.assertEquals("result2", result.getResultVariables().get("outputVariable1"));
+        Assert.assertEquals("result2", result.getDecisionResult().getSingleOutputValue("outputVariable1"));
     }
 }

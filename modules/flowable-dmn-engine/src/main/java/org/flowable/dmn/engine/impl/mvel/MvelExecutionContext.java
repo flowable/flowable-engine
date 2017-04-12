@@ -13,11 +13,13 @@
 package org.flowable.dmn.engine.impl.mvel;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.api.DmnDecisionResult;
 import org.flowable.engine.common.api.FlowableException;
 import org.mvel2.ParserContext;
 import org.mvel2.integration.PropertyHandler;
@@ -27,14 +29,13 @@ import org.mvel2.integration.PropertyHandler;
  */
 public class MvelExecutionContext {
 
-    protected Map<String, Object> resultVariables = new HashMap<>();
-    protected Map<Integer, Object> resultValues = new HashMap<>();
+    protected Map<Integer, Map<String, Object>> ruleResults = new LinkedHashMap<>();
+    protected DmnDecisionResult decisionResult;
     protected Map<String, Object> stackVariables;
     protected ParserContext parserContext;
     protected Map<Class<?>, PropertyHandler> propertyHandlers = new HashMap<>();
     protected DecisionExecutionAuditContainer auditContainer;
-    protected Map<Integer, List<Object>> outputValues = new HashMap<>();
-    protected Map<Integer, String> outputNumberVariableIds = new HashMap<>();
+    protected Map<String, List<Object>> outputValues = new HashMap<>();
 
     public void checkExecutionContext(String variableId) {
 
@@ -57,9 +58,15 @@ public class MvelExecutionContext {
         }
     }
 
-    public void addOutputResult(int outputNumber, String key, Object value) {
-        resultValues.put(outputNumber, value);
-        resultVariables.put(key, value);
+    public void addRuleResult(int ruleNumber, String outputName, Object outputValue) {
+        Map ruleResult;
+        if (ruleResults.containsKey(ruleNumber)) {
+            ruleResult = ruleResults.get(ruleNumber);
+        } else {
+            ruleResult = new HashMap();
+            ruleResults.put(ruleNumber, ruleResult);
+        }
+        ruleResult.put(outputName, outputValue);
     }
 
     public void setStackVariables(Map<String, Object> variables) {
@@ -70,12 +77,12 @@ public class MvelExecutionContext {
         return stackVariables;
     }
 
-    public Map<String, Object> getResultVariables() {
-        return resultVariables;
+    public Map<String, Object> getRuleResult(int ruleNumber) {
+        return ruleResults.get(ruleNumber);
     }
 
-    public Map<Integer, Object> getResultValues() {
-        return resultValues;
+    public Map<Integer, Map<String, Object>> getRuleResults() {
+        return ruleResults;
     }
 
     public ParserContext getParserContext() {
@@ -102,19 +109,19 @@ public class MvelExecutionContext {
         this.auditContainer = auditContainer;
     }
 
-    public Map<Integer, List<Object>> getOutputValues() {
+    public Map<String, List<Object>> getOutputValues() {
         return outputValues;
     }
 
-    public void addOutputValues(int outputNumber, List<Object> outputValues) {
-        this.outputValues.put(outputNumber, outputValues);
+    public void addOutputValues(String outputName, List<Object> outputValues) {
+        this.outputValues.put(outputName, outputValues);
     }
 
-    public String getVariableId(Integer outputNumber) {
-        return outputNumberVariableIds.get(outputNumber);
+    public void setDecisionResult(DmnDecisionResult decisionResult) {
+        this.decisionResult = decisionResult;
     }
 
-    public void addOutputNumberVariableId(Integer outputNumber, String variableId) {
-        outputNumberVariableIds.put(outputNumber, variableId);
+    public DmnDecisionResult getDecisionResult() {
+        return decisionResult;
     }
 }

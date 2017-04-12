@@ -7,15 +7,11 @@
 package org.flowable.dmn.engine.impl.hitpolicy;
 
 import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
-import org.flowable.dmn.model.RuleOutputClauseContainer;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Yvo Swillens
  */
-public interface ComposeDecisionTableOutputBehavior {
+public interface ComposeRuleResultBehavior {
 
-    void composeDecisionTableOutput(Map<Integer, List<RuleOutputClauseContainer>> validRuleOutputEntries, MvelExecutionContext executionContext);
+    void composeRuleResult(int ruleNumber, String outputName, Object outputValue, MvelExecutionContext executionContext);
 }

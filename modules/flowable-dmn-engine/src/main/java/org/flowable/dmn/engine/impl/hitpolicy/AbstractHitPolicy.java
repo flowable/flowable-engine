@@ -12,14 +12,20 @@
  */
 package org.flowable.dmn.engine.impl.hitpolicy;
 
+import org.flowable.dmn.api.DmnDecisionResult;
 import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
+import org.flowable.dmn.model.RuleOutputClauseContainer;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Yvo Swillens
  *
  * (Abstact) base class for all Hit Policy behaviors
  */
-public abstract class AbstractHitPolicy implements ContinueEvaluatingBehavior, ComposeRuleOutputBehavior {
+public abstract class AbstractHitPolicy implements ContinueEvaluatingBehavior, ComposeRuleResultBehavior, ComposeDecisionResultBehavior {
 
     /**
      * Returns the name for the specific Hit Policy behavior
@@ -38,7 +44,16 @@ public abstract class AbstractHitPolicy implements ContinueEvaluatingBehavior, C
      * Default behavior for ComposeRuleOutput behavior
      */
     @Override
-    public void composeRuleOutput(int outputNumber, String outputVariableId, Object executionVariable, MvelExecutionContext executionContext) {
-        executionContext.addOutputResult(outputNumber, outputVariableId, executionVariable);
+    public void composeRuleResult(int ruleNumber, String outputName, Object outputValue, MvelExecutionContext executionContext) {
+        executionContext.addRuleResult(ruleNumber, outputName, outputValue);
+    }
+
+    /**
+     * Default behavior for ComposeRuleOutput behavior
+     */
+    @Override
+    public void composeDecisionResult(MvelExecutionContext executionContext) {
+        DmnDecisionResult decisionResult = new DmnDecisionResult(new ArrayList<>(executionContext.getRuleResults().values()));
+        executionContext.setDecisionResult(decisionResult);
     }
 }
