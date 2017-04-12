@@ -1660,6 +1660,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initAsyncExecutor() {
         if (asyncExecutor == null) {
             DefaultAsyncJobExecutor defaultAsyncExecutor = new DefaultAsyncJobExecutor();
+            defaultAsyncExecutor.setExecuteAsyncRunnableFactory(getAsyncExecutorExecuteAsyncRunnableFactory());
 
             // Message queue mode
             defaultAsyncExecutor.setMessageQueueMode(asyncExecutorMessageQueueMode);
