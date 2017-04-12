@@ -168,7 +168,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
 
     public TimerJobQuery jobTenantId(String tenantId) {
         if (tenantId == null) {
-            throw new ActivitiIllegalArgumentException("job is null");
+            throw new ActivitiIllegalArgumentException("Provided tentant id is null");
         }
         this.tenantId = tenantId;
         return this;
@@ -176,7 +176,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
 
     public TimerJobQuery jobTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
-            throw new ActivitiIllegalArgumentException("job is null");
+            throw new ActivitiIllegalArgumentException("Provided tentant id is null");
         }
         this.tenantIdLike = tenantIdLike;
         return this;
