@@ -1,13 +1,17 @@
 package org.flowable.examples.test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.bpmn.model.*;
+import org.flowable.engine.event.EventLogEntry;
+import org.flowable.engine.impl.event.logger.EventLogger;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.concurrent.Callable;
+import java.util.List;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -17,7 +21,33 @@ import static org.junit.Assert.assertThat;
  */
 public class OneTaskProcessTest extends PluggableFlowableTestCase {
 
-    @Deployment(resources={"org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+    protected EventLogger databaseEventLogger;
+
+    protected ObjectMapper objectMapper = new ObjectMapper();
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        // Database event logger setup
+        databaseEventLogger = new EventLogger(processEngineConfiguration.getClock(), processEngineConfiguration.getObjectMapper());
+        runtimeService.addEventListener(databaseEventLogger);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        // Cleanup
+        for (EventLogEntry eventLogEntry : managementService.getEventLogEntries(null, null)) {
+            managementService.deleteEventLogEntry(eventLogEntry.getLogNumber());
+        }
+
+        // Database event logger teardown
+        runtimeService.removeEventListener(databaseEventLogger);
+
+        super.tearDown();
+    }
+
+    @Deployment(resources = {"org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
     public void testStandardJUnitOneTaskProcess() {
         // Arrange -> start process
         ProcessInstance oneTaskProcess = this.runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess").start();
@@ -29,33 +59,124 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         assertThat(this.runtimeService.createProcessInstanceQuery().processInstanceId(oneTaskProcess.getId()).count(), is(0L));
     }
 
-    @Deployment(resources={"org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+    @Deployment(resources = {"org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
     public void testProcessModelByAnotherProcess() {
-        BpmnModel model = createTestProcessBpmnModel("oneTaskProcess");
+        testProcessModelByAnotherProcess(
+                createTestProcessBpmnModel("oneTaskProcess")
+        );
+    }
+
+    private void testProcessModelByAnotherProcess(BpmnModel model) {
         deployTestProcess(model);
 
         // start testing process instance
-        this.runtimeService.startProcessInstanceByKey("oneTaskProcessPUnitTest");
+        ProcessInstance pUnitTestProcessInstance = this.runtimeService.startProcessInstanceByKey(model.getMainProcess().getId());
 
         executeJobExecutorForTime(10000, 500);
+        assertThat(this.runtimeService.createProcessInstanceQuery().processInstanceId(pUnitTestProcessInstance.getId()).count(), is(0L));
     }
 
     @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
     public void testProcessModelFailure() {
-        // deploy different process
-        BpmnModel model = createTestProcessBpmnModel("twoTasksProcess");
-        deployTestProcess(model);
-
-        // start testing process instance
-        final ProcessInstance oneTaskProcessPUnitTest = this.runtimeService.startProcessInstanceByKey("oneTaskProcessPUnitTest");
-
-        Date currentTime = processEngine.getProcessEngineConfiguration().getClock().getCurrentTime();
-        processEngine.getProcessEngineConfiguration().getClock().setCurrentTime(new Date(currentTime.getTime() + (15 * 1000L)));
-
-        executeJobExecutorForTime(10000, 500);
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(oneTaskProcessPUnitTest.getId()).count(), is(0L));
+        // deploy different process - test should fail
+        testProcessModelByAnotherProcess(createTestProcessBpmnModel("twoTasksProcess"));
     }
 
+    @Deployment(resources = {"org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"})
+    public void testGenerateProcessTestSemiAutomatically() {
+        // Generate "user" events
+        testStandardJUnitOneTaskProcess();
+
+        List<EventLogEntry> eventLogEntries = managementService.getEventLogEntries(null, null);
+        // automatic step to generate process test skeleton from already generated "user" events
+        List<FlowNode> testFlowNodesSkeleton = createTestFlowNodesFromEventLogEntries(eventLogEntries);
+
+        // add assertion manually
+        ScriptTask assertTask = new ScriptTask();
+        assertTask.setName("Assert task");
+        assertTask.setId("assertTask");
+        assertTask.setAsynchronous(true);
+        assertTask.setScriptFormat("groovy");
+        assertTask.setScript(
+                "import org.flowable.engine.impl.context.Context;\n" +
+                        "import static org.hamcrest.core.Is.is;\n" +
+                        "import static org.flowable.examples.test.MatcherAssert.assertThat;\n" +
+                        "\n" +
+                        "assertThat(Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));"
+        );
+        testFlowNodesSkeleton.add(assertTask);
+
+        BpmnModel bpmnModel = decorateTestSkeletonAsProcess(testFlowNodesSkeleton);
+
+        testProcessModelByAnotherProcess(bpmnModel);
+    }
+
+    private BpmnModel decorateTestSkeletonAsProcess(List<FlowNode> testFlowNodesSkeleton) {
+        ArrayList<FlowNode> flowNodes = new ArrayList<>(testFlowNodesSkeleton);
+        StartEvent startEvent = new StartEvent();
+        startEvent.setId("start");
+        flowNodes.add(0, startEvent);
+        EndEvent endEvent = new EndEvent();
+        endEvent.setId("theEnd");
+        flowNodes.add(endEvent);
+
+        BpmnModel model = new BpmnModel();
+        org.flowable.bpmn.model.Process process = new org.flowable.bpmn.model.Process();
+        model.addProcess(process);
+        model.setTargetNamespace("pUnit");
+        process.setId("oneTaskProcessPUnitTest");
+        process.setName("ProcessUnit test for oneTaskProcess");
+
+        for (int i=0; i<flowNodes.size() -1; i++) {
+            process.addFlowElement(flowNodes.get(i));
+            process.addFlowElement(new SequenceFlow(flowNodes.get(i).getId(), flowNodes.get(i+1).getId()));
+        }
+        process.addFlowElement(flowNodes.get(flowNodes.size()-1));
+        return model;
+    }
+
+    private List<FlowNode> createTestFlowNodesFromEventLogEntries(List<EventLogEntry> eventLogEntries) {
+        List<FlowNode> flowNodes = new ArrayList<>();
+        for (EventLogEntry eventLogEntry : eventLogEntries) {
+            switch (eventLogEntry.getType()) {
+                case "PROCESSINSTANCE_START" :
+                    String processDefinitionId = eventLogEntry.getProcessDefinitionId();
+                    ProcessDefinition processDefinition = this.repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
+                    ScriptTask startProcess = new ScriptTask();
+                    startProcess.setName("Start " + processDefinition.getKey() + " process");
+                    startProcess.setId("startProcess-" + processDefinition.getKey());
+                    startProcess.setScriptFormat("groovy");
+                    startProcess.setAsynchronous(true);
+                    startProcess.setScript(
+                            "import org.flowable.engine.impl.context.Context;\n" +
+                                    "\n" +
+                                    "execution.setVariable('processInstanceId', Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceBuilder().processDefinitionKey('" +
+                                    processDefinition.getKey() + "').start().getId());"
+                    );
+                    flowNodes.add(startProcess);
+                    break;
+                case "TASK_COMPLETE" :
+                    ScriptTask completeTask = new ScriptTask();
+                    completeTask.setName("Complete task");
+                    completeTask.setId("completeTask");
+                    completeTask.setAsynchronous(true);
+                    completeTask.setScriptFormat("groovy");
+                    completeTask.setScript(
+                            "import org.flowable.engine.impl.context.Context;\n" +
+                                    "\n" +
+                                    "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId()\n" +
+                                    "ProcessEngines.getDefaultProcessEngine().getTaskService().complete(taskId);"
+                    );
+                    flowNodes.add(completeTask);
+                    break;
+                default:
+                    break;
+            }
+
+
+        }
+        return flowNodes;
+    }
 
     private BpmnModel createTestProcessBpmnModel(String processToTestDefinitionKey) {
         BpmnModel model = new BpmnModel();
@@ -75,9 +196,9 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         startProcess.setScriptFormat("groovy");
         startProcess.setAsynchronous(true);
         startProcess.setScript(
-                "import org.flowable.engine.ProcessEngines;\n" +
+                "import org.flowable.engine.impl.context.Context;\n" +
                         "\n" +
-                        "execution.setVariable('processInstanceId', ProcessEngines.getDefaultProcessEngine().getRuntimeService().createProcessInstanceBuilder().processDefinitionKey('"+ processToTestDefinitionKey +"').start().getId());"
+                        "execution.setVariable('processInstanceId', Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceBuilder().processDefinitionKey('" + processToTestDefinitionKey + "').start().getId());"
         );
         process.addFlowElement(startProcess);
 
@@ -87,9 +208,9 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         completeTask.setAsynchronous(true);
         completeTask.setScriptFormat("groovy");
         completeTask.setScript(
-                "import org.flowable.engine.ProcessEngines;\n" +
+                "import org.flowable.engine.impl.context.Context;\n" +
                         "\n" +
-                        "taskId = ProcessEngines.getDefaultProcessEngine().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId()\n" +
+                        "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId()\n" +
                         "ProcessEngines.getDefaultProcessEngine().getTaskService().complete(taskId);"
         );
         process.addFlowElement(completeTask);
@@ -100,11 +221,11 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         assertTask.setAsynchronous(true);
         assertTask.setScriptFormat("groovy");
         assertTask.setScript(
-                "import org.flowable.engine.ProcessEngines;\n" +
+                "import org.flowable.engine.impl.context.Context;\n" +
                         "import static org.hamcrest.core.Is.is;\n" +
                         "import static org.flowable.examples.test.MatcherAssert.assertThat;\n" +
                         "\n" +
-                        "assertThat(ProcessEngines.getDefaultProcessEngine().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));"
+                        "assertThat(Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));"
         );
         process.addFlowElement(assertTask);
 
