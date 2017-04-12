@@ -13,8 +13,6 @@
 
 package org.flowable.engine.impl.cfg;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
@@ -345,6 +343,8 @@ import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tom Baeyens
@@ -1660,6 +1660,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initAsyncExecutor() {
         if (asyncExecutor == null) {
             DefaultAsyncJobExecutor defaultAsyncExecutor = new DefaultAsyncJobExecutor();
+            if (asyncExecutorExecuteAsyncRunnableFactory != null) {
+                defaultAsyncExecutor.setExecuteAsyncRunnableFactory(asyncExecutorExecuteAsyncRunnableFactory);
+            }
 
             // Message queue mode
             defaultAsyncExecutor.setMessageQueueMode(asyncExecutorMessageQueueMode);
