@@ -14,10 +14,11 @@ package org.flowable.engine.impl.dynamic;
 
 import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
 
 public interface DynamicUserTaskCallback {
 
-    void handleCreatedDynamicUserTask(UserTask userTask, FlowElementsContainer parentContainer, Process process);
+    void handleCreatedDynamicUserTask(UserTask userTask, SubProcess newSubProcess, FlowElementsContainer parentContainer, Process process);
 
 }

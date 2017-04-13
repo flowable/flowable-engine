@@ -369,4 +369,13 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     public void setEngineVersion(String engineVersion) {
         this.engineVersion = engineVersion;
     }
+
+    // only valid in Flowable 6
+    public String getDerivedFrom() {
+        return null;
+    }
+
+    public String getDerivedFromRoot() {
+        return null;
+    }
 }

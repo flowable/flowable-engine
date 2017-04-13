@@ -143,6 +143,20 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         assertProcessEnded(pi.getId());
     }
+    
+    @Deployment
+    public void testNestedSubProcess2Tasks() {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("nestedSubProcess");
+        
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
+        assertEquals(2, tasks.size());
+
+        for (Task task : tasks) {
+            taskService.complete(task.getId());
+        }
+        
+        assertProcessEnded(pi.getId());
+    }
 
     @Deployment
     public void testNestedSimpleSubprocessWithTimerOnInnerSubProcess() {

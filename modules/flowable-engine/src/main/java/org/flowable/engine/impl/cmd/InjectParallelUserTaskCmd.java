@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.cmd;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,9 +20,12 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowElementsContainer;
+import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.bpmn.model.ParallelGateway;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.context.Context;
@@ -57,64 +61,141 @@ public class InjectParallelUserTaskCmd extends AbstractDynamicInjectionCmd imple
 
     @Override
     protected void updateBpmnProcess(CommandContext commandContext, Process process,
-            ProcessDefinitionEntity originalProcessDefinitionEntity, DeploymentEntity newDeploymentEntity) {
+            BpmnModel bpmnModel, ProcessDefinitionEntity originalProcessDefinitionEntity, DeploymentEntity newDeploymentEntity) {
         
         TaskEntity taskEntity = commandContext.getTaskEntityManager().findById(taskId);
         FlowElement flowElement = process.getFlowElement(taskEntity.getTaskDefinitionKey());
         if (flowElement == null || !(flowElement instanceof UserTask)) {
             throw new FlowableException("No UserTask instance found for task definition key " + taskEntity.getTaskDefinitionKey());
         }
-
+        
         UserTask userTask = (UserTask) flowElement;
-        FlowElementsContainer parentContainer = userTask.getParentContainer();
 
+        SubProcess subProcess = new SubProcess();
+        subProcess.setId("subProcess-" + flowElement.getId());
+        subProcess.setName(flowElement.getName());
+        
+        for (SequenceFlow incomingFlow : userTask.getIncomingFlows()) {
+            incomingFlow.setTargetRef(subProcess.getId());
+        }
+        subProcess.setIncomingFlows(userTask.getIncomingFlows());
+        
+        for (SequenceFlow outgoingFlow : userTask.getOutgoingFlows()) {
+            outgoingFlow.setSourceRef(subProcess.getId());
+        }
+        subProcess.setOutgoingFlows(userTask.getOutgoingFlows());
+        
+        userTask.setIncomingFlows(new ArrayList<SequenceFlow>());
+        userTask.setOutgoingFlows(new ArrayList<SequenceFlow>());
+        
+        GraphicInfo elementGraphicInfo = bpmnModel.getGraphicInfo(flowElement.getId());
+        if (elementGraphicInfo != null) {
+            elementGraphicInfo.setExpanded(false);
+            bpmnModel.addGraphicInfo(subProcess.getId(), elementGraphicInfo);
+        }
+        
+        FlowElementsContainer parentContainer = userTask.getParentContainer();
+        
+        parentContainer.removeFlowElement(userTask.getId());
+        bpmnModel.removeGraphicInfo(userTask.getId());
+        subProcess.addFlowElement(userTask);
+        
+        parentContainer.addFlowElement(subProcess);
+        
+        StartEvent startEvent = new StartEvent();
+        startEvent.setId("start-" + UUID.randomUUID().toString());
+        subProcess.addFlowElement(startEvent);
+
+        ParallelGateway fork = new ParallelGateway();
+        fork.setId("fork-" + UUID.randomUUID().toString());
+        subProcess.addFlowElement(fork);
+        
+        SequenceFlow startFlow1 = new SequenceFlow(startEvent.getId(), fork.getId());
+        startFlow1.setId("flow-" + UUID.randomUUID().toString());
+        subProcess.addFlowElement(startFlow1);
+        
         UserTask newUserTask = new UserTask();
         newUserTask.setId(dynamicUserTaskBuilder.getId());
         newUserTask.setName(dynamicUserTaskBuilder.getName());
         newUserTask.setAssignee(dynamicUserTaskBuilder.getAssignee());
-        parentContainer.addFlowElement(newUserTask);
-
-        ParallelGateway fork = new ParallelGateway();
-        fork.setId("fork-" + UUID.randomUUID().toString());
-        parentContainer.addFlowElement(fork);
-        userTask.getIncomingFlows().get(0).setTargetRef(fork.getId());
+        subProcess.addFlowElement(newUserTask);
 
         SequenceFlow forkFlow1 = new SequenceFlow(fork.getId(), userTask.getId());
         forkFlow1.setId("flow-" + UUID.randomUUID().toString());
-        parentContainer.addFlowElement(forkFlow1);
+        subProcess.addFlowElement(forkFlow1);
 
         SequenceFlow forkFlow2 = new SequenceFlow(fork.getId(), newUserTask.getId());
         forkFlow2.setId("flow-" + UUID.randomUUID().toString());
-        parentContainer.addFlowElement(forkFlow2);
+        subProcess.addFlowElement(forkFlow2);
 
+        EndEvent endEvent = new EndEvent();
+        endEvent.setId("end-" + UUID.randomUUID().toString());
+        subProcess.addFlowElement(endEvent);
+        
+        ParallelGateway join = null;
+        SequenceFlow joinFlow1 = null;
+        SequenceFlow joinFlow2 = null;
+        SequenceFlow endFlow = null;
+        
         if (dynamicUserTaskBuilder.isJoinParallelActivitiesOnComplete()) {
-            ParallelGateway join = new ParallelGateway();
+            join = new ParallelGateway();
             join.setId("join-" + UUID.randomUUID().toString());
-            parentContainer.addFlowElement(join);
+            subProcess.addFlowElement(join);
 
-            SequenceFlow joinFlow1 = new SequenceFlow(userTask.getId(), join.getId());
+            joinFlow1 = new SequenceFlow(userTask.getId(), join.getId());
             joinFlow1.setId("flow-" + UUID.randomUUID().toString());
-            parentContainer.addFlowElement(joinFlow1);
+            subProcess.addFlowElement(joinFlow1);
 
-            SequenceFlow joinFlow2 = new SequenceFlow(newUserTask.getId(), join.getId());
+            joinFlow2 = new SequenceFlow(newUserTask.getId(), join.getId());
             joinFlow2.setId("flow-" + UUID.randomUUID().toString());
-            parentContainer.addFlowElement(joinFlow2);
-
-            SequenceFlow outgoingFlow = userTask.getOutgoingFlows().get(0);
-            outgoingFlow.setSourceRef(join.getId());
+            subProcess.addFlowElement(joinFlow2);
+            
+            endFlow = new SequenceFlow(join.getId(), endEvent.getId());
+            endFlow.setId("flow-" + UUID.randomUUID().toString());
+            subProcess.addFlowElement(endFlow);
 
         } else {
-            EndEvent endEvent = new EndEvent();
-            endEvent.setId("end-" + UUID.randomUUID().toString());
-            parentContainer.addFlowElement(endEvent);
-
-            SequenceFlow endFlow = new SequenceFlow(newUserTask.getId(), endEvent.getId());
+            endFlow = new SequenceFlow(newUserTask.getId(), endEvent.getId());
             endFlow.setId("flow-" + UUID.randomUUID().toString());
-            parentContainer.addFlowElement(endFlow);
+            subProcess.addFlowElement(endFlow);
         }
         
         if (dynamicUserTaskBuilder.getDynamicUserTaskCallback() != null) {
-            dynamicUserTaskBuilder.getDynamicUserTaskCallback().handleCreatedDynamicUserTask(newUserTask, parentContainer, process);
+            dynamicUserTaskBuilder.getDynamicUserTaskCallback().handleCreatedDynamicUserTask(newUserTask, subProcess, parentContainer, process);
+        }
+        
+        if (elementGraphicInfo != null) {
+            GraphicInfo startGraphicInfo = new GraphicInfo(45, 135, 30, 30);
+            bpmnModel.addGraphicInfo(startEvent.getId(), startGraphicInfo);
+            
+            GraphicInfo forkGraphicInfo = new GraphicInfo(120, 130, 40, 40);
+            bpmnModel.addGraphicInfo(fork.getId(), forkGraphicInfo);
+            
+            bpmnModel.addFlowGraphicInfoList(startFlow1.getId(), createWayPoints(75, 150.093, 120.375, 150.375));
+            
+            GraphicInfo taskGraphicInfo = new GraphicInfo(205, 30, 80, 100);
+            bpmnModel.addGraphicInfo(userTask.getId(), taskGraphicInfo);
+            
+            bpmnModel.addFlowGraphicInfoList(forkFlow1.getId(), createWayPoints(140.5, 130.5, 140.5, 70, 205, 70));
+            
+            GraphicInfo newTaskGraphicInfo = new GraphicInfo(205, 195, 80, 100);
+            bpmnModel.addGraphicInfo(newUserTask.getId(), newTaskGraphicInfo);
+            
+            bpmnModel.addFlowGraphicInfoList(forkFlow2.getId(), createWayPoints(140.5, 169.5, 140.5, 235, 205, 235));
+            
+            if (join != null) {
+                GraphicInfo joinGraphicInfo = new GraphicInfo(350, 130, 40, 40);
+                bpmnModel.addGraphicInfo(join.getId(), joinGraphicInfo);
+                
+                bpmnModel.addFlowGraphicInfoList(joinFlow1.getId(), createWayPoints(305, 70, 370, 70, 370, 130));
+                
+                bpmnModel.addFlowGraphicInfoList(joinFlow2.getId(), createWayPoints(305, 235, 370, 235, 370, 169.5));
+            }
+            
+            GraphicInfo endGraphicInfo = new GraphicInfo(435, 136, 28, 28);
+            bpmnModel.addGraphicInfo(endEvent.getId(), endGraphicInfo);
+            
+            bpmnModel.addFlowGraphicInfoList(endFlow.getId(), createWayPoints(389.621, 150.378, 435, 150.089));
         }
     }
 
@@ -122,27 +203,40 @@ public class InjectParallelUserTaskCmd extends AbstractDynamicInjectionCmd imple
     protected void updateExecutions(CommandContext commandContext, ProcessDefinitionEntity processDefinitionEntity, 
             ExecutionEntity processInstance, List<ExecutionEntity> childExecutions) {
         
+        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionEntity.getId());
         TaskEntity taskEntity = commandContext.getTaskEntityManager().findById(taskId);
         ExecutionEntity executionAtTask = taskEntity.getExecution();
 
+        FlowElement subProcessElement = bpmnModel.getFlowElement("subProcess-" + executionAtTask.getCurrentActivityId());
         ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
-        ExecutionEntity execution = executionEntityManager.create();
-        execution.setProcessInstanceId(processInstance.getId());
-        execution.setParentId(executionAtTask.getParentId());
-        execution.setProcessDefinitionId(processDefinitionEntity.getId());
-        execution.setRootProcessInstanceId(processInstance.getRootProcessInstanceId());
-        execution.setActive(true);
-        execution.setScope(false);
-        execution.setTenantId(processInstance.getTenantId());
-        execution.setStartTime(processInstance.getStartTime());
-        execution.setStartUserId(processInstance.getStartUserId());
-        executionEntityManager.insert(execution);
-
-        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionEntity.getId());
-        UserTask userTask = (UserTask) bpmnModel.getFlowElement(dynamicUserTaskBuilder.getId());
-        execution.setCurrentFlowElement(userTask);
+        ExecutionEntity subProcessExecution = executionEntityManager.create();
+        subProcessExecution.setProcessInstanceId(processInstance.getId());
+        subProcessExecution.setParentId(executionAtTask.getParentId());
+        subProcessExecution.setProcessDefinitionId(processDefinitionEntity.getId());
+        subProcessExecution.setRootProcessInstanceId(processInstance.getRootProcessInstanceId());
+        subProcessExecution.setActive(true);
+        subProcessExecution.setScope(true);
+        subProcessExecution.setTenantId(processInstance.getTenantId());
+        subProcessExecution.setStartTime(processInstance.getStartTime());
+        subProcessExecution.setCurrentFlowElement(subProcessElement);
+        executionEntityManager.insert(subProcessExecution);
         
-        Context.getAgenda().planContinueProcessOperation(execution);
-    }
+        executionAtTask.setParent(subProcessExecution);
+        
+        ExecutionEntity taskExecution = executionEntityManager.create();
+        taskExecution.setProcessInstanceId(processInstance.getId());
+        taskExecution.setParentId(subProcessExecution.getId());
+        taskExecution.setProcessDefinitionId(processDefinitionEntity.getId());
+        taskExecution.setRootProcessInstanceId(processInstance.getRootProcessInstanceId());
+        taskExecution.setActive(true);
+        taskExecution.setScope(false);
+        taskExecution.setTenantId(processInstance.getTenantId());
+        taskExecution.setStartTime(processInstance.getStartTime());
+        executionEntityManager.insert(taskExecution);
 
+        FlowElement userTaskElement = bpmnModel.getFlowElement(dynamicUserTaskBuilder.getId());
+        taskExecution.setCurrentFlowElement(userTaskElement);
+        
+        Context.getAgenda().planContinueProcessOperation(taskExecution);
+    }
 }

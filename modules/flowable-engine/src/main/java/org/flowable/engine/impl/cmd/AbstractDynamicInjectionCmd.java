@@ -12,18 +12,30 @@
  */
 package org.flowable.engine.impl.cmd;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.engine.common.impl.util.io.BytesStreamSource;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.impl.HistoricActivityInstanceQueryImpl;
+import org.flowable.engine.impl.HistoricTaskInstanceQueryImpl;
 import org.flowable.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
+import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
+import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
+import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
+import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
@@ -115,19 +127,47 @@ public abstract class AbstractDynamicInjectionCmd {
         BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(new BytesStreamSource(originalBpmnResource.getBytes()), false, false);
 
         org.flowable.bpmn.model.Process process = bpmnModel.getProcessById(originalProcessDefinitionEntity.getKey());
-        updateBpmnProcess(commandContext, process, originalProcessDefinitionEntity, newDeploymentEntity);
+        updateBpmnProcess(commandContext, process, bpmnModel, originalProcessDefinitionEntity, newDeploymentEntity);
         return bpmnModel;
     }
 
     protected abstract void updateBpmnProcess(CommandContext commandContext, org.flowable.bpmn.model.Process process, 
-            ProcessDefinitionEntity originalProcessDefinitionEntity, DeploymentEntity newDeploymentEntity);
+            BpmnModel bpmnModel, ProcessDefinitionEntity originalProcessDefinitionEntity, DeploymentEntity newDeploymentEntity);
 
     protected void updateExecutions(CommandContext commandContext, ProcessDefinitionEntity processDefinitionEntity, ExecutionEntity processInstance) {
         processInstance.setProcessDefinitionId(processDefinitionEntity.getId());
-        processInstance.setProcessDefinitionKey(processDefinitionEntity.getKey());
         processInstance.setProcessDefinitionVersion(processDefinitionEntity.getVersion());
-        processInstance.setProcessDefinitionName(processDefinitionEntity.getName());
+        
+        HistoricProcessInstanceEntityManager historicProcessInstanceEntityManager = commandContext.getHistoricProcessInstanceEntityManager();
+        HistoricProcessInstanceEntity historicProcessInstance = (HistoricProcessInstanceEntity) historicProcessInstanceEntityManager.findById(processInstance.getId());
+        historicProcessInstance.setProcessDefinitionId(processDefinitionEntity.getId());
+        historicProcessInstance.setProcessDefinitionVersion(processDefinitionEntity.getVersion());
+        historicProcessInstanceEntityManager.update(historicProcessInstance);
 
+        HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager = commandContext.getHistoricTaskInstanceEntityManager();
+        HistoricTaskInstanceQueryImpl taskQuery = new HistoricTaskInstanceQueryImpl();
+        taskQuery.processInstanceId(processInstance.getId());
+        List<HistoricTaskInstance> historicTasks = historicTaskInstanceEntityManager.findHistoricTaskInstancesByQueryCriteria(taskQuery);
+        if (historicTasks != null) {
+            for (HistoricTaskInstance historicTaskInstance : historicTasks) {
+                HistoricTaskInstanceEntity taskEntity = (HistoricTaskInstanceEntity) historicTaskInstance;
+                taskEntity.setProcessDefinitionId(processDefinitionEntity.getId());
+                historicTaskInstanceEntityManager.update(taskEntity);
+            }
+        }
+        
+        HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = commandContext.getHistoricActivityInstanceEntityManager();
+        HistoricActivityInstanceQueryImpl activityQuery = new HistoricActivityInstanceQueryImpl();
+        activityQuery.processInstanceId(processInstance.getId());
+        List<HistoricActivityInstance> historicActivities = historicActivityInstanceEntityManager.findHistoricActivityInstancesByQueryCriteria(activityQuery, null);
+        if (historicActivities != null) {
+            for (HistoricActivityInstance historicActivityInstance : historicActivities) {
+                HistoricActivityInstanceEntity activityEntity = (HistoricActivityInstanceEntity) historicActivityInstance;
+                activityEntity.setProcessDefinitionId(processDefinitionEntity.getId());
+                historicActivityInstanceEntityManager.update(activityEntity);
+            }
+        }
+        
         List<ExecutionEntity> childExecutions = commandContext.getExecutionEntityManager().findChildExecutionsByProcessInstanceId(processInstance.getId());
         for (ExecutionEntity childExecution : childExecutions) {
             childExecution.setProcessDefinitionId(processDefinitionEntity.getId());
@@ -138,5 +178,20 @@ public abstract class AbstractDynamicInjectionCmd {
 
     protected abstract void updateExecutions(CommandContext commandContext, 
             ProcessDefinitionEntity processDefinitionEntity, ExecutionEntity processInstance, List<ExecutionEntity> childExecutions);
+    
+    protected List<GraphicInfo> createWayPoints(double x1, double y1, double x2, double y2) {
+        List<GraphicInfo> wayPoints = new ArrayList<>();
+        wayPoints.add(new GraphicInfo(x1, y1));
+        wayPoints.add(new GraphicInfo(x2, y2));
+        
+        return wayPoints;
+    }
+    
+    protected List<GraphicInfo> createWayPoints(double x1, double y1, double x2, double y2, double x3, double y3) {
+        List<GraphicInfo> wayPoints = createWayPoints(x1, y1, x2, y2);
+        wayPoints.add(new GraphicInfo(x3, y3));
+        
+        return wayPoints;
+    } 
 
 }

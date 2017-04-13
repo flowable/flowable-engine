@@ -136,6 +136,7 @@
   
   <update id="updateHistoricActivityInstance" parameterType="org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityImpl">
     update ${prefix}ACT_HI_ACTINST set
+      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
       ASSIGNEE_ = #{assignee, jdbcType=VARCHAR},
       END_TIME_ = #{endTime, jdbcType=TIMESTAMP},

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/test">
+  <process id="nestedSubProcess">
+    <startEvent id="start"></startEvent>
+    <endEvent id="theEnd"></endEvent>
+    <sequenceFlow sourceRef="start" targetRef="subProcess-theTask"></sequenceFlow>
+    <sequenceFlow sourceRef="subProcess-theTask" targetRef="theEnd"></sequenceFlow>
+    <subProcess id="subProcess-theTask" name="The Task">
+      <userTask id="theTask" name="The Task" flowable:assignee="kermit"></userTask>
+      <subProcess id="customSubprocess" name="subProcess">
+        <startEvent id="starteventV2" name="Start"></startEvent>
+        <userTask id="usertaskV2" name="user task v2"></userTask>
+        <sequenceFlow id="flow1_v2" sourceRef="starteventV2" targetRef="usertaskV2"></sequenceFlow>
+        <endEvent id="endeventV2" name="The End"></endEvent>
+        <sequenceFlow id="flow2_v2" sourceRef="usertaskV2" targetRef="endeventV2"></sequenceFlow>
+      </subProcess>
+      <startEvent id="start-28270b34-f03f-48d3-9e7e-08b2438ec0c2"></startEvent>
+      <parallelGateway id="fork-11bfcea0-d434-4c7f-bb51-c6d8c987d1a4"></parallelGateway>
+      <sequenceFlow id="flow-732c8dbe-0b02-4bd5-b4b7-5013303e2092" sourceRef="start-28270b34-f03f-48d3-9e7e-08b2438ec0c2" targetRef="fork-11bfcea0-d434-4c7f-bb51-c6d8c987d1a4"></sequenceFlow>
+      <sequenceFlow id="flow-72b0560b-23c5-4714-8723-06f6f1c862f1" sourceRef="fork-11bfcea0-d434-4c7f-bb51-c6d8c987d1a4" targetRef="theTask"></sequenceFlow>
+      <sequenceFlow id="flow-711a00e6-4863-436a-b979-03be188c6167" sourceRef="fork-11bfcea0-d434-4c7f-bb51-c6d8c987d1a4" targetRef="customSubprocess"></sequenceFlow>
+      <endEvent id="end-7378f54f-3890-40e8-9bf6-e7d89b4de550"></endEvent>
+      <parallelGateway id="join-c7356e08-f87d-489c-9c6d-d919ed41eed0"></parallelGateway>
+      <sequenceFlow id="flow-7ac4caf0-4d12-4b8f-b3d5-39d069a6abb1" sourceRef="theTask" targetRef="join-c7356e08-f87d-489c-9c6d-d919ed41eed0"></sequenceFlow>
+      <sequenceFlow id="flow-1e2cf017-5e7c-45c7-b34a-88bf3fec8270" sourceRef="customSubprocess" targetRef="join-c7356e08-f87d-489c-9c6d-d919ed41eed0"></sequenceFlow>
+      <sequenceFlow id="flow-eb53d57c-b267-4418-bf8d-1971395692a7" sourceRef="join-c7356e08-f87d-489c-9c6d-d919ed41eed0" targetRef="end-7378f54f-3890-40e8-9bf6-e7d89b4de550"></sequenceFlow>
+    </subProcess>
+  </process>
+</definitions>

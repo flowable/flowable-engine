@@ -54,7 +54,7 @@ public class InjectUserTaskInProcessInstanceCmd extends AbstractDynamicInjection
 
     @Override
     protected void updateBpmnProcess(CommandContext commandContext, Process process,
-            ProcessDefinitionEntity originalProcessDefinitionEntity, DeploymentEntity newDeploymentEntity) {
+            BpmnModel bpmnModel, ProcessDefinitionEntity originalProcessDefinitionEntity, DeploymentEntity newDeploymentEntity) {
         
         List<StartEvent> startEvents = process.findFlowElementsOfType(StartEvent.class);
         StartEvent initialStartEvent = null;
