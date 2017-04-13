@@ -34,6 +34,7 @@ import javax.xml.validation.Validator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.converter.util.DmnXMLUtil;
+import org.flowable.dmn.model.BuiltinAggregator;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
@@ -212,6 +213,10 @@ public class DmnXMLConverter implements DmnXMLConstants {
                         currentDecisionTable.setHitPolicy(HitPolicy.FIRST);
                     }
 
+                    if (xtr.getAttributeValue(null, ATTRIBUTE_AGGREGATION) != null) {
+                        currentDecisionTable.setAggregation(BuiltinAggregator.get(xtr.getAttributeValue(null, ATTRIBUTE_AGGREGATION)));
+                    }
+
                     model.getDecisions().get(model.getDecisions().size() - 1).setExpression(currentDecisionTable);
                     parentElement = currentDecisionTable;
                 } else if (ELEMENT_DESCRIPTION.equals(xtr.getLocalName())) {
@@ -304,6 +309,10 @@ public class DmnXMLConverter implements DmnXMLConstants {
 
                 if (decisionTable.getHitPolicy() != null) {
                     xtw.writeAttribute(ATTRIBUTE_HIT_POLICY, decisionTable.getHitPolicy().toString());
+                }
+
+                if (decisionTable.getAggregation() != null) {
+                    xtw.writeAttribute(ATTRIBUTE_AGGREGATION, decisionTable.getAggregation().toString());
                 }
 
                 DmnXMLUtil.writeElementDescription(decisionTable, xtw);

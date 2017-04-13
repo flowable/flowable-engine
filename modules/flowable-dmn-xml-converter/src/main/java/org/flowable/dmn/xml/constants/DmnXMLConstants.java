@@ -33,7 +33,8 @@ public interface DmnXMLConstants {
     public static final String ATTRIBUTE_HREF = "href";
     public static final String ATTRIBUTE_HIT_POLICY = "hitPolicy";
     public static final String ATTRIBUTE_NAMESPACE = "namespace";
-
+    public static final String ATTRIBUTE_AGGREGATION = "aggregation";
+    
     public static final String ELEMENT_DEFINITIONS = "definitions";
     public static final String ELEMENT_DECISION = "decision";
     public static final String ELEMENT_DECISION_TABLE = "decisionTable";
