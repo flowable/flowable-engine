@@ -479,7 +479,8 @@
             "REQUIRED": "Required",
             "EXPRESSION": "Expression",
             "ADD-OPTION": "+ Add a new option",
-            "UPLOAD-ALLOW-MULTIPLE": "Allow uploading multiple files"
+            "UPLOAD-ALLOW-MULTIPLE": "Allow uploading multiple files",
+            "SIZE": "Size"
         },
         "OUTCOMES": {
             "DESCRIPTION": "You can define multiple outcomes for this task. When completing a task, the users selects one of the available outcomes, which can be used in eg. a condition further on in the process.",
