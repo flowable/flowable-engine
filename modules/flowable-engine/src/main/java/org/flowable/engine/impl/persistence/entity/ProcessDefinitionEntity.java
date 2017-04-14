@@ -65,6 +65,8 @@ public interface ProcessDefinitionEntity extends ProcessDefinition, Entity, HasR
     void setDerivedFrom(String derivedFrom);
 
     void setDerivedFromRoot(String derivedFromRoot);
+    
+    void setDerivedVersion(int derivedVersion);
 
     void setEngineVersion(String engineVersion);
 

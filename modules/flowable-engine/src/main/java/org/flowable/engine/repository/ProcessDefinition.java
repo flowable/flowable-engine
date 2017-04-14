@@ -82,6 +82,9 @@ public interface ProcessDefinition {
 
     /** The root derived from process definition value when this is a dynamic process definition */
     String getDerivedFromRoot();
+    
+    /** The derived version of the process definition */
+    int getDerivedVersion();
 
     /** The engine version for this process definition (5 or 6) */
     String getEngineVersion();

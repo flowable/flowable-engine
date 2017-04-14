@@ -50,7 +50,7 @@ public class ProcessDefinitionEntityImpl extends AbstractEntity implements Proce
     protected IOSpecification ioSpecification;
     protected String derivedFrom;
     protected String derivedFromRoot;
-
+    protected int derivedVersion;
 
     // Backwards compatibility
     protected String engineVersion;
@@ -216,6 +216,14 @@ public class ProcessDefinitionEntityImpl extends AbstractEntity implements Proce
 
     public void setDerivedFromRoot(String derivedFromRoot) {
         this.derivedFromRoot = derivedFromRoot;
+    }
+
+    public int getDerivedVersion() {
+        return derivedVersion;
+    }
+
+    public void setDerivedVersion(int derivedVersion) {
+        this.derivedVersion = derivedVersion;
     }
 
     public String getEngineVersion() {

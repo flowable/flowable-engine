@@ -64,7 +64,7 @@ public class InjectParallelUserTaskCmd extends AbstractDynamicInjectionCmd imple
             BpmnModel bpmnModel, ProcessDefinitionEntity originalProcessDefinitionEntity, DeploymentEntity newDeploymentEntity) {
         
         TaskEntity taskEntity = commandContext.getTaskEntityManager().findById(taskId);
-        FlowElement flowElement = process.getFlowElement(taskEntity.getTaskDefinitionKey());
+        FlowElement flowElement = process.getFlowElement(taskEntity.getTaskDefinitionKey(), true);
         if (flowElement == null || !(flowElement instanceof UserTask)) {
             throw new FlowableException("No UserTask instance found for task definition key " + taskEntity.getTaskDefinitionKey());
         }
@@ -72,7 +72,8 @@ public class InjectParallelUserTaskCmd extends AbstractDynamicInjectionCmd imple
         UserTask userTask = (UserTask) flowElement;
 
         SubProcess subProcess = new SubProcess();
-        subProcess.setId("subProcess-" + flowElement.getId());
+        String subProcessId = "subProcess-" + UUID.randomUUID().toString();
+        subProcess.setId(subProcessId);
         subProcess.setName(flowElement.getName());
         
         for (SequenceFlow incomingFlow : userTask.getIncomingFlows()) {
@@ -207,7 +208,8 @@ public class InjectParallelUserTaskCmd extends AbstractDynamicInjectionCmd imple
         TaskEntity taskEntity = commandContext.getTaskEntityManager().findById(taskId);
         ExecutionEntity executionAtTask = taskEntity.getExecution();
 
-        FlowElement subProcessElement = bpmnModel.getFlowElement("subProcess-" + executionAtTask.getCurrentActivityId());
+        FlowElement taskElement = bpmnModel.getFlowElement(executionAtTask.getCurrentActivityId());
+        FlowElement subProcessElement = bpmnModel.getFlowElement(((SubProcess) taskElement.getParentContainer()).getId());
         ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
         ExecutionEntity subProcessExecution = executionEntityManager.create();
         subProcessExecution.setProcessInstanceId(processInstance.getId());

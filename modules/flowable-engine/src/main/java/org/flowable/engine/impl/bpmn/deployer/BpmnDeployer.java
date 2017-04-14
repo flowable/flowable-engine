@@ -89,7 +89,9 @@ public class BpmnDeployer implements Deployer {
                 updateTimersAndEvents(parsedDeployment, mapOfNewProcessDefinitionToPreviousVersion);
 
             } else {
-                setDerivedProcessDefinitionVersionsAndIds(parsedDeployment, deploymentSettings);
+                Map<ProcessDefinitionEntity, ProcessDefinitionEntity> mapOfNewProcessDefinitionToPreviousDerivedVersion = 
+                        getPreviousDerivedFromVersionsOfProcessDefinitions(parsedDeployment);
+                setDerivedProcessDefinitionVersionsAndIds(parsedDeployment, mapOfNewProcessDefinitionToPreviousDerivedVersion, deploymentSettings);
                 persistProcessDefinitionsAndAuthorizations(parsedDeployment);
             }
 
@@ -164,6 +166,25 @@ public class BpmnDeployer implements Deployer {
 
         return result;
     }
+    
+    /**
+     * Constructs a map from new ProcessDefinitionEntities to the previous derived from version by key and tenant. If no previous version exists, no map entry is created.
+     */
+    protected Map<ProcessDefinitionEntity, ProcessDefinitionEntity> getPreviousDerivedFromVersionsOfProcessDefinitions(
+            ParsedDeployment parsedDeployment) {
+
+        Map<ProcessDefinitionEntity, ProcessDefinitionEntity> result = new LinkedHashMap<ProcessDefinitionEntity, ProcessDefinitionEntity>();
+
+        for (ProcessDefinitionEntity newDefinition : parsedDeployment.getAllProcessDefinitions()) {
+            ProcessDefinitionEntity existingDefinition = bpmnDeploymentHelper.getMostRecentDerivedVersionOfProcessDefinition(newDefinition);
+
+            if (existingDefinition != null) {
+                result.put(newDefinition, existingDefinition);
+            }
+        }
+
+        return result;
+    }
 
     /**
      * Sets the version on each process definition entity, and the identifier. If the map contains an older version for a process definition, then the version is set to that older entity's version
@@ -201,11 +222,21 @@ public class BpmnDeployer implements Deployer {
         }
     }
 
-    protected void setDerivedProcessDefinitionVersionsAndIds(ParsedDeployment parsedDeployment, Map<String, Object> deploymentSettings) {
+    protected void setDerivedProcessDefinitionVersionsAndIds(ParsedDeployment parsedDeployment, 
+            Map<ProcessDefinitionEntity, ProcessDefinitionEntity> mapNewToOldProcessDefinitions, Map<String, Object> deploymentSettings) {
+        
         CommandContext commandContext = Context.getCommandContext();
         
         for (ProcessDefinitionEntity processDefinition : parsedDeployment.getAllProcessDefinitions()) {
+            int derivedVersion = 0;
+            
+            ProcessDefinitionEntity latest = mapNewToOldProcessDefinitions.get(processDefinition);
+            if (latest != null) {
+                derivedVersion = latest.getDerivedVersion() + 1;
+            }
+            
             processDefinition.setVersion(0);
+            processDefinition.setDerivedVersion(derivedVersion);
             processDefinition.setId(idGenerator.getNextId());
             processDefinition.setDerivedFrom((String) deploymentSettings.get(DeploymentSettings.DERIVED_PROCESS_DEFINITION_ID));
             processDefinition.setDerivedFromRoot((String) deploymentSettings.get(DeploymentSettings.DERIVED_PROCESS_DEFINITION_ROOT_ID));

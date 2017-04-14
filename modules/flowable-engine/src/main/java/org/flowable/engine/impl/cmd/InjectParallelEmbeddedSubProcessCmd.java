@@ -93,7 +93,8 @@ public class InjectParallelEmbeddedSubProcessCmd extends AbstractDynamicInjectio
         }
         
         SubProcess parentSubProcess = new SubProcess();
-        parentSubProcess.setId("subProcess-" + userTask.getId());
+        String subProcessId = "subProcess-" + UUID.randomUUID().toString();
+        parentSubProcess.setId(subProcessId);
         parentSubProcess.setName(userTask.getName());
         
         for (SequenceFlow incomingFlow : userTask.getIncomingFlows()) {
@@ -387,7 +388,8 @@ public class InjectParallelEmbeddedSubProcessCmd extends AbstractDynamicInjectio
         TaskEntity taskEntity = commandContext.getTaskEntityManager().findById(taskId);
         ExecutionEntity executionAtTask = taskEntity.getExecution();
         
-        FlowElement subProcessElement = bpmnModel.getFlowElement("subProcess-" + executionAtTask.getCurrentActivityId());
+        FlowElement taskElement = bpmnModel.getFlowElement(executionAtTask.getCurrentActivityId());
+        FlowElement subProcessElement = bpmnModel.getFlowElement(((SubProcess) taskElement.getParentContainer()).getId());
         ExecutionEntity subProcessExecution = executionEntityManager.create();
         subProcessExecution.setProcessInstanceId(processInstance.getId());
         subProcessExecution.setParentId(executionAtTask.getParentId());

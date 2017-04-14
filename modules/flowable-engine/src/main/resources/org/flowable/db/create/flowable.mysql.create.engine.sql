@@ -184,6 +184,7 @@ create table ACT_RE_PROCDEF (
     TENANT_ID_ varchar(255) default '',
     DERIVED_FROM_ varchar(64),
     DERIVED_FROM_ROOT_ varchar(64),
+    DERIVED_VERSION_ integer default 0,
     ENGINE_VERSION_ varchar(255),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
@@ -299,7 +300,7 @@ alter table ACT_GE_BYTEARRAY
 
 alter table ACT_RE_PROCDEF
     add constraint ACT_UNIQ_PROCDEF
-    unique (KEY_,VERSION_, TENANT_ID_);
+    unique (KEY_,VERSION_, DERIVED_VERSION_, TENANT_ID_);
     
 alter table ACT_RU_EXECUTION
     add constraint ACT_FK_EXE_PROCINST 

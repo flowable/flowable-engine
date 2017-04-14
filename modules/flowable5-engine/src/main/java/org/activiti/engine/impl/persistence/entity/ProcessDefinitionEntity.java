@@ -378,4 +378,8 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     public String getDerivedFromRoot() {
         return null;
     }
+    
+    public int getDerivedVersion() {
+        return 0;
+    }
 }

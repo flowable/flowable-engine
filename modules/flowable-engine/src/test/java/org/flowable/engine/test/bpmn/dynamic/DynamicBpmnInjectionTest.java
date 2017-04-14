@@ -18,6 +18,7 @@ import java.util.List;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.bpmn.model.SubProcess;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricTaskInstance;
@@ -100,7 +101,8 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         assertNotNull(derivedFromDefinition);
         
         BpmnModel bpmnModel = repositoryService.getBpmnModel(derivedFromDefinition.getId());
-        FlowElement subProcessElement = bpmnModel.getFlowElement("subProcess-theTask");
+        FlowElement taskElement = bpmnModel.getFlowElement("theTask");
+        SubProcess subProcessElement = (SubProcess) taskElement.getParentContainer();
         assertNotNull(subProcessElement);
         GraphicInfo subProcessGraphicInfo = bpmnModel.getGraphicInfo(subProcessElement.getId());
         assertNotNull(subProcessGraphicInfo);
@@ -239,6 +241,56 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
 
         removeDerivedDeployments();
         repositoryService.deleteDeployment(deployment.getId(), true);
+    }
+    
+    public void testInjectParallelTask2Times() {
+        deployOneTaskTestProcess();
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        Task task = taskService.createTaskQuery().singleResult();
+
+        DynamicUserTaskBuilder taskBuilder = new DynamicUserTaskBuilder();
+        taskBuilder.id("custom_task")
+            .name("My injected task")
+            .assignee("kermit");
+        dynamicBpmnService.injectParallelUserTask(task.getId(), taskBuilder);
+        
+        processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processInstance.getProcessDefinitionId()).singleResult();
+        assertNotNull(processDefinition.getDerivedFrom());
+        assertNotNull(processDefinition.getDerivedFromRoot());
+        assertEquals(1, processDefinition.getDerivedVersion());
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+        for (Task t : tasks) {
+            taskService.complete(t.getId());
+        }
+        assertProcessEnded(processInstance.getId());
+        
+        processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        task = taskService.createTaskQuery().singleResult();
+        
+        taskBuilder = new DynamicUserTaskBuilder()
+                .id("custom_task")
+                .name("My injected task")
+                .assignee("kermit");
+        dynamicBpmnService.injectParallelUserTask(task.getId(), taskBuilder);
+        
+        processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processInstance.getProcessDefinitionId()).singleResult();
+        assertNotNull(processDefinition.getDerivedFrom());
+        assertNotNull(processDefinition.getDerivedFromRoot());
+        assertEquals(2, processDefinition.getDerivedVersion());
+
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+        for (Task t : tasks) {
+            taskService.complete(t.getId());
+        }
+        assertProcessEnded(processInstance.getId());
+
+        removeDerivedDeployments();
     }
 
     // Todo Enable test again after fixing no join logic
