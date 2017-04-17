@@ -7,6 +7,7 @@ import org.flowable.spring.boot.DataSourceProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.EndpointAutoConfiguration;
 import org.flowable.spring.boot.actuate.endpoint.ProcessEngineEndpoint;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.autoconfigure.EndpointWebMvcAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.ManagementServerPropertiesAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.MetricFilterAutoConfiguration;
@@ -23,6 +24,8 @@ import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomi
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -69,7 +72,9 @@ public class EndpointAutoConfigurationTest {
 
         RestTemplate restTemplate = applicationContext.getBean(RestTemplate.class);
 
-        ResponseEntity<Map> mapResponseEntity = restTemplate.getForEntity("http://localhost:9091/flowable/", Map.class);
+        CallbackEmbeddedContainerCustomizer container = applicationContext.getBean(CallbackEmbeddedContainerCustomizer.class);
+
+        ResponseEntity<Map> mapResponseEntity = restTemplate.getForEntity("http://localhost:"+ container.getPortNumber() +"/flowable/", Map.class);
 
         Map map = mapResponseEntity.getBody();
 
@@ -83,10 +88,29 @@ public class EndpointAutoConfigurationTest {
     }
 
     @Component
+    @PropertySource(
+            value = {"classpath:properties/${property:defaultValue}.properties"},
+            ignoreResourceNotFound = true)
     public static class CallbackEmbeddedContainerCustomizer implements EmbeddedServletContainerCustomizer {
+
+        @Value("${portNumber:9091}")
+        protected int portNumber;
+
         @Override
         public void customize(ConfigurableEmbeddedServletContainer container) {
-            container.setPort(9091);
+            container.setPort(portNumber);
+        }
+
+        public int getPortNumber() {
+            return portNumber;
+        }
+
+        /**
+         * Property placeholder configurer needed to process @Value annotations
+         */
+        @Bean
+        public static PropertySourcesPlaceholderConfigurer propertyConfigurer() {
+            return new PropertySourcesPlaceholderConfigurer();
         }
     }
 }

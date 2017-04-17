@@ -68,6 +68,7 @@ public class FormEngineConfigurator extends AbstractProcessEngineConfigurator {
                 throw new FlowableException("A datasource is required for initializing the Form engine ");
             }
 
+            formEngineConfiguration.setDatabaseType(processEngineConfiguration.getDatabaseType());
             formEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
             formEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
             formEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());

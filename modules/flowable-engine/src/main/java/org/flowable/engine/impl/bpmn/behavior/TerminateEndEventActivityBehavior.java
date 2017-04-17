@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,8 +11,6 @@
  * limitations under the License.
  */
 package org.flowable.engine.impl.bpmn.behavior;
-
-import java.util.List;
 
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
@@ -29,6 +27,8 @@ import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
+
+import java.util.List;
 
 /**
  * @author Joram Barrez
@@ -93,12 +93,13 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
 
             scopeExecutionEntity.setDeleteReason(deleteReason);
             if (subProcess.hasMultiInstanceLoopCharacteristics()) {
-
+                sendProcessInstanceCompletedEvent(scopeExecutionEntity, execution.getCurrentFlowElement());
                 commandContext.getAgenda().planDestroyScopeOperation(scopeExecutionEntity);
                 MultiInstanceActivityBehavior multiInstanceBehavior = (MultiInstanceActivityBehavior) subProcess.getBehavior();
                 multiInstanceBehavior.leave(scopeExecutionEntity);
 
             } else {
+                sendProcessInstanceCompletedEvent(scopeExecutionEntity, execution.getCurrentFlowElement());
                 commandContext.getAgenda().planDestroyScopeOperation(scopeExecutionEntity);
                 ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(scopeExecutionEntity.getParent());
                 outgoingFlowExecution.setCurrentFlowElement(scopeExecutionEntity.getCurrentFlowElement());
@@ -113,6 +114,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
 
             if (callActivity.hasMultiInstanceLoopCharacteristics()) {
 
+                sendProcessInstanceCompletedEvent(scopeExecutionEntity, execution.getCurrentFlowElement());
                 MultiInstanceActivityBehavior multiInstanceBehavior = (MultiInstanceActivityBehavior) callActivity.getBehavior();
                 multiInstanceBehavior.leave(callActivityExecution);
                 executionEntityManager.deleteProcessInstanceExecutionEntity(scopeExecutionEntity.getId(), execution.getCurrentFlowElement().getId(), "terminate end event", false, false);
@@ -170,7 +172,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         }
     }
 
-    protected void deleteExecutionEntities(ExecutionEntityManager executionEntityManager, ExecutionEntity rootExecutionEntity, 
+    protected void deleteExecutionEntities(ExecutionEntityManager executionEntityManager, ExecutionEntity rootExecutionEntity,
                     FlowElement terminateEndEvent, String deleteReason) {
 
         List<ExecutionEntity> childExecutions = executionEntityManager.collectChildren(rootExecutionEntity);
@@ -178,30 +180,30 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
             sendProcessInstanceCompletedEvent(childExecutions.get(i), terminateEndEvent);
             executionEntityManager.deleteExecutionAndRelatedData(childExecutions.get(i), deleteReason, false);
         }
-        
+
         sendProcessInstanceCompletedEvent(rootExecutionEntity, terminateEndEvent);
         executionEntityManager.deleteExecutionAndRelatedData(rootExecutionEntity, deleteReason, false);
     }
 
-    protected void sendProcessInstanceCompletedEvent(DelegateExecution execution, FlowElement terminateEndEvent) {
+    protected void sendProcessInstanceCompletedEvent(ExecutionEntity execution, FlowElement terminateEndEvent) {
         if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             if ((execution.isProcessInstanceType() && execution.getSuperExecutionId() == null) ||
                     (execution.getParentId() == null && execution.getSuperExecutionId() != null)) {
 
                 Context.getProcessEngineConfiguration().getEventDispatcher()
-                        .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT, execution));
+                        .dispatchEvent(FlowableEventBuilder.createTerminateEvent(execution, terminateEndEvent));
             }
         }
 
         dispatchExecutionCancelled(execution, terminateEndEvent);
     }
 
-    protected void dispatchExecutionCancelled(DelegateExecution execution, FlowElement terminateEndEvent) {
+    protected void dispatchExecutionCancelled(ExecutionEntity execution, FlowElement terminateEndEvent) {
 
         ExecutionEntityManager executionEntityManager = Context.getCommandContext().getExecutionEntityManager();
 
         // subprocesses
-        for (DelegateExecution subExecution : executionEntityManager.findChildExecutionsByParentExecutionId(execution.getId())) {
+        for (ExecutionEntity subExecution : executionEntityManager.findChildExecutionsByParentExecutionId(execution.getId())) {
             dispatchExecutionCancelled(subExecution, terminateEndEvent);
         }
 

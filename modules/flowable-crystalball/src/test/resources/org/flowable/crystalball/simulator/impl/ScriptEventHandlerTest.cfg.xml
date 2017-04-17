@@ -30,7 +30,7 @@
             <entry key="simulationRunFactory" value-ref="&amp;simulationRunFactory"/>
           </map>
         </constructor-arg>
-        <constructor-arg name="processEngineConfiguration" ref="processEngineConfiguration" />
+        <constructor-arg name="delegateInterceptor" ref="delegateInterceptor" />
       </bean>
     </property>
 
@@ -71,7 +71,7 @@
 
         <property name="clock" ref="clock"/>
         <property name="disableIdmEngine" value="true"/>
-
+        <property name="delegateInterceptor" ref="delegateInterceptor"/>
         <!--
         command context reuse is not possible when there are 2 engines running -> both with different
         process definitions in the repository.
@@ -117,5 +117,7 @@
       </list>
     </constructor-arg>
   </bean>
+
+  <bean id="delegateInterceptor" class="org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor"/>
 
 </beans>

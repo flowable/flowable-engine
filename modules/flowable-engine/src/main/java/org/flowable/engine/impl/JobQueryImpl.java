@@ -193,7 +193,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
 
     public JobQuery jobTenantId(String tenantId) {
         if (tenantId == null) {
-            throw new FlowableIllegalArgumentException("job is null");
+            throw new FlowableIllegalArgumentException("Provided tenant id is null");
         }
         this.tenantId = tenantId;
         return this;
@@ -201,7 +201,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
 
     public JobQuery jobTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
-            throw new FlowableIllegalArgumentException("job is null");
+            throw new FlowableIllegalArgumentException("Provided tenant id is null");
         }
         this.tenantIdLike = tenantIdLike;
         return this;

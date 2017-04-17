@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,13 +33,14 @@ import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
  * Test case for all {@link FlowableEvent}s related to process instances.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
@@ -319,7 +320,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
     /**
      * Test +-->Task1 Start-<> +-->Task1
-     * 
+     *
      * process on PROCESS_COMPLETED event
      */
     @Deployment(resources = { "org/flowable/engine/test/api/event/ProcessInstanceEventsTest.parallelGatewayNoEndProcess.bpmn20.xml" })
@@ -341,7 +342,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         List<FlowableEvent> events = listener.filterEvents(FlowableEngineEventType.PROCESS_COMPLETED);
         assertEquals("ActivitiEventType.PROCESS_COMPLETED was expected 1 time.", 1, events.size());
     }
-    
+
     @Deployment(resources = {
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInCallActivityMulitInstance.bpmn",
             "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessTerminateTerminateAll.bpmn20.xml"})
@@ -492,7 +493,23 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
     }
 
-    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInParentProcess.bpmn", 
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInSubProcessWithBoundaryTerminateAll.bpmn20.xml"})
+    public void testTerminateAllInSubProcess() throws Exception {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventWithBoundary");
+
+        Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTermInnerTask").singleResult();
+        taskService.complete(task.getId());
+
+        assertProcessEnded(pi.getId());
+        List<FlowableEvent> processTerminatedEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
+        assertEquals("There should be exactly one FlowableEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT event after the task complete.", 1,
+                processTerminatedEvents.size());
+        FlowableEngineEntityEvent processCompletedEvent = (FlowableEngineEntityEvent) processTerminatedEvents.get(0);
+        assertEquals(pi.getProcessInstanceId(), processCompletedEvent.getProcessInstanceId());
+
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInParentProcess.bpmn",
                     "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testProcessInstanceTerminatedEvents_terminateInParentProcess() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateParentProcess");
@@ -584,6 +601,132 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
         assertEquals(0, taskService.createTaskQuery().count());
     }
+    
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/subProcessWithTerminateEnd.bpmn20.xml")
+    public void testProcessInstanceTerminatedEventInSubProcess() throws Exception {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("subProcessWithTerminateEndTest");
+
+        long executionEntities = runtimeService.createExecutionQuery().processInstanceId(pi.getId()).count();
+        assertEquals(4, executionEntities);
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
+        assertEquals(1, tasks.size());
+
+        Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("cancel").singleResult();
+        assertNotNull(execution);
+
+        // message received cancels the SubProcess. We expect an event for all flow elements
+        // when the process state changes. We expect the activity cancelled event for the task within the
+        // Subprocess and the SubProcess itself
+        runtimeService.messageEventReceived("cancel", execution.getId());
+
+        List<FlowableEvent> activityTerminatedEvents = listener.filterEvents(FlowableEngineEventType.ACTIVITY_CANCELLED);
+        assertEquals(3, activityTerminatedEvents.size());
+
+        boolean endEventFound = false;
+        boolean taskFound = false;
+        boolean subProcessFound = false;
+        for (FlowableEvent terminatedEvent : activityTerminatedEvents) {
+            FlowableActivityCancelledEvent activityEvent = (FlowableActivityCancelledEvent) terminatedEvent;
+            if ("endEvent".equals(activityEvent.getActivityType())) {
+                endEventFound = true;
+            
+            } else if ("userTask".equals(activityEvent.getActivityType())) {
+                taskFound = true;
+                assertEquals("task", activityEvent.getActivityId());
+            
+            } else if ("subProcess".equals(activityEvent.getActivityType())) {
+                subProcessFound = true;
+                assertEquals("embeddedSubprocess", activityEvent.getActivityId());
+            }
+        }
+        
+        assertTrue(endEventFound);
+        assertTrue(taskFound);
+        assertTrue(subProcessFound);
+    }
+
+
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/multipleSubprocessTerminateEnd.bpmn20.xml")
+    public void testProcessInstanceWithMultipleSubprocessAndTerminateEnd2() throws Exception {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("multiplesubProcessWithTerminateEndTest");
+
+        List<Execution> subprocesses = runtimeService.createExecutionQuery().processInstanceId(pi.getId())
+                .onlySubProcessExecutions().list();
+        assertEquals(2, subprocesses.size());
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
+        assertEquals(2, tasks.size());
+
+        Task task2 = null;
+        for (Task task : tasks) {
+            if ("Task in subprocess2".equals(task.getName())) {
+                task2 = task;
+                break;
+
+            }
+        }
+
+        // Complete user task in subprocess2. This flows out of subprocess2 to
+        // the terminate end event. This will cause subprocess1 to be cancelled along
+        // with the user task, boundary event and intermediate catch event defined in or
+        // on subprocess1.
+        assertNotNull(task2);
+        taskService.complete(task2.getId());
+
+        // Subprocess2 completed and transitioned to terminate end. We expect
+        // ACTIVITY_CANCELLED for Subprocess1, task1 defined in subprocess1, boundary event defined on
+        // and the timer intermediate catch event defined in subprocess1
+        boolean endEventFound = false;
+        boolean userTaskFound = false;
+        boolean subprocessFound = false;
+        boolean timerCatchEventFound = false;
+        boolean boundaryEventFound = false;
+        List<FlowableEvent> activityTerminatedEvents = listener
+                .filterEvents(FlowableEngineEventType.ACTIVITY_CANCELLED);
+        assertEquals(5, activityTerminatedEvents.size());
+        for (FlowableEvent flowableEvent: activityTerminatedEvents)
+        {
+            FlowableActivityCancelledEvent activityCancelledEvent = (FlowableActivityCancelledEvent) flowableEvent;
+            if ("endEvent".equals(activityCancelledEvent.getActivityType())) {
+                assertEquals("End", activityCancelledEvent.getActivityName());
+                endEventFound = true;
+            }
+            else if ("intermediateCatchEvent".equals(activityCancelledEvent.getActivityType())) {
+                assertEquals("timer", activityCancelledEvent.getActivityId());
+                timerCatchEventFound = true;
+            }
+            else if ("boundaryEvent".equals(activityCancelledEvent.getActivityType())) {
+                boundaryEventFound = true;
+            }
+            else if ("userTask".equals(activityCancelledEvent.getActivityType())) {
+                assertEquals("Task in subprocess1", activityCancelledEvent.getActivityName());
+                userTaskFound = true;
+            }
+            else if ("subProcess".equals(activityCancelledEvent.getActivityType())) {
+                assertEquals("subprocess1", activityCancelledEvent.getActivityId());
+                subprocessFound = true;
+            }
+        }
+
+        assertTrue(endEventFound);
+        assertTrue(timerCatchEventFound);
+        assertTrue(boundaryEventFound);
+        assertTrue(userTaskFound);
+        assertTrue(subprocessFound);
+
+        List<FlowableEvent> processCompletedEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_COMPLETED);
+        assertEquals(0, processCompletedEvents.size());
+
+        List<FlowableEvent> processCompletedTerminateEndEvents = listener
+                .filterEvents(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
+        assertEquals(1, processCompletedTerminateEndEvents.size());
+
+        // Only expect PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT, not
+        // PROCESS_CANCELLED.
+        List<FlowableEvent> processCanceledEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_CANCELLED);
+        assertEquals(0, processCanceledEvents.size());
+    }
 
     @Override
     protected void initializeServices() {
@@ -637,9 +780,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         }
 
         public List<FlowableEvent> filterEvents(FlowableEngineEventType eventType) {// count
-            // timer
-            // cancelled
-            // events
+            // timer cancelled events
             List<FlowableEvent> filteredEvents = new ArrayList<FlowableEvent>();
             List<FlowableEvent> eventsReceived = listener.getEventsReceived();
             for (FlowableEvent eventReceived : eventsReceived) {
