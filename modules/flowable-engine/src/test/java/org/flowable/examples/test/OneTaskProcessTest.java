@@ -72,14 +72,19 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         // start testing process instance
         ProcessInstance pUnitTestProcessInstance = this.runtimeService.startProcessInstanceByKey(model.getMainProcess().getId());
 
-        executeJobExecutorForTime(10000, 500);
+        waitForJobExecutorToProcessAllJobs(15000, 200);
         assertThat(this.runtimeService.createProcessInstanceQuery().processInstanceId(pUnitTestProcessInstance.getId()).count(), is(0L));
     }
 
     @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
     public void testProcessModelFailure() {
         // deploy different process - test should fail
-        testProcessModelByAnotherProcess(createTestProcessBpmnModel("twoTasksProcess"));
+        try {
+            testProcessModelByAnotherProcess(createTestProcessBpmnModel("twoTasksProcess"));
+            fail("Expected exception was not thrown.");
+        } catch (AssertionError e) {
+            assertThat(e.getMessage(), is("\nExpected: is <0L>\n     but: was <1L>"));
+        }
     }
 
     @Deployment(resources = {"org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -155,7 +160,7 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
                     );
                     flowNodes.add(startProcess);
                     break;
-                case "TASK_COMPLETE" :
+                case "TASK_COMPLETED" :
                     ScriptTask completeTask = new ScriptTask();
                     completeTask.setName("Complete task");
                     completeTask.setId("completeTask");
@@ -164,8 +169,8 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
                     completeTask.setScript(
                             "import org.flowable.engine.impl.context.Context;\n" +
                                     "\n" +
-                                    "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId()\n" +
-                                    "ProcessEngines.getDefaultProcessEngine().getTaskService().complete(taskId);"
+                                    "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();\n" +
+                                    "Context.getProcessEngineConfiguration().getTaskService().complete(taskId);"
                     );
                     flowNodes.add(completeTask);
                     break;
@@ -210,8 +215,8 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         completeTask.setScript(
                 "import org.flowable.engine.impl.context.Context;\n" +
                         "\n" +
-                        "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId()\n" +
-                        "ProcessEngines.getDefaultProcessEngine().getTaskService().complete(taskId);"
+                        "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();\n" +
+                        "Context.getProcessEngineConfiguration().getTaskService().complete(taskId);"
         );
         process.addFlowElement(completeTask);
 
@@ -249,5 +254,8 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         return processDefinition.getId();
     }
 
+    private void moveByMinutes(int minutes) {
+        processEngineConfiguration.getClock().setCurrentTime(new Date(processEngineConfiguration.getClock().getCurrentTime().getTime() + ((minutes * 60 * 1000))));
+    }
 
 }
