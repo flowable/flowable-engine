@@ -1,22 +1,16 @@
 package org.flowable.engine.impl.scripting;
 
 import groovy.lang.GroovyClassLoader;
+import groovy.lang.GroovySystem;
 import groovy.lang.Script;
 import groovy.transform.CompileStatic;
 import org.codehaus.groovy.ast.ClassHelper;
 import org.codehaus.groovy.ast.ClassNode;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer;
+import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import org.codehaus.groovy.jsr223.GroovyScriptEngineImpl;
-import org.codehaus.groovy.util.ManagedConcurrentValueMap;
-import org.codehaus.groovy.util.ReferenceBundle;
-import org.flowable.engine.delegate.DelegateExecution;
-
-//import org.flowable.engine.delegate.*;
-
 import javax.script.*;
-import java.io.Reader;
-import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,13 +27,15 @@ public class GroovyStaticScriptEngine extends GroovyScriptEngineImpl {
     // lazily initialized factory
     private volatile GroovyStaticScriptEngineFactory factory;
 
+    private static Class clazz;
+
     public GroovyStaticScriptEngine(GroovyStaticScriptEngineFactory factory) {
         this();
         this.factory = factory;
     }
 
     public GroovyStaticScriptEngine() {
-        this(new GroovyClassLoader(getParentLoader(), createStaticConfiguration()));
+        this(new GroovyClassLoader(getParentLoader(), createStaticConfiguration(), true));
     }
 
     public GroovyStaticScriptEngine(GroovyClassLoader classLoader) {
@@ -59,8 +55,9 @@ public class GroovyStaticScriptEngine extends GroovyScriptEngineImpl {
             variableTypes.put(entry.getKey(),
                     ClassHelper.make(entry.getValue().getClass()));
         }
+        System.out.println(String.format("---------------Loaded execution class : %s -----------------------------",clazz));
 
-        variableTypes.put("execution",ClassHelper.make(org.flowable.engine.delegate.DelegateExecution.class));
+        variableTypes.put("execution",ClassHelper.make(clazz));
         Map<String,Object> options = new HashMap<String, Object>();
         options.put(VAR_TYPES, variableTypes);
         COMPILE_OPTIONS.set(options);
@@ -73,22 +70,31 @@ public class GroovyStaticScriptEngine extends GroovyScriptEngineImpl {
         ASTTransformationCustomizer astTransformationCustomizer = new ASTTransformationCustomizer(
                 Collections.singletonMap("extensions", Collections.singletonList("EngineVariablesExtension.groovy")),
                 CompileStatic.class);
+        ImportCustomizer imports = new ImportCustomizer();
+        imports.addStaticStars("org.flowable.engine.delegate.VariableScope");
+        //imports.addImports("org.flowable.engine.delegate.DelegateExecution","org.flowable.engine.delegate.VariableScope");
         compilerConfiguration.addCompilationCustomizers(astTransformationCustomizer);
+        compilerConfiguration.addCompilationCustomizers(imports);
         return compilerConfiguration;
     }
 
     private static ClassLoader getParentLoader() {
+        String v = GroovySystem.getVersion();
+        System.out.println(String.format("---------------Groovy version: %s-----------------------------",v));
         ClassLoader ctxtLoader = Thread.currentThread().getContextClassLoader();
-
         try {
             Class c = ctxtLoader.loadClass(Script.class.getName());
-            if(c == Script.class) {
+            clazz = ctxtLoader.loadClass("org.flowable.engine.delegate.VariableScope");
+
+           //if(c == Script.class) {
+            if(c != null && c.getName() == Script.class.getName()) {
+                System.out.println("---------------Returning ctxtLoader-----------------------------");
                 return ctxtLoader;
             }
         } catch (ClassNotFoundException var2) {
-            ;
+            System.out.println("---------------ClassNotFoundException in getParentLoader-----------------------------");
+            var2.printStackTrace();
         }
-
         return Script.class.getClassLoader();
     }
 }
