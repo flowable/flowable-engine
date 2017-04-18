@@ -169,6 +169,28 @@ create table ACT_RU_DEADLETTER_JOB (
     primary key (ID_)
 );
 
+create table ACT_RU_HISTORY_JOB (
+    ID_ varchar(64) NOT NULL,
+    REV_ integer,
+    TYPE_ varchar(255) NOT NULL,
+    LOCK_EXP_TIME_ timestamp,
+    LOCK_OWNER_ varchar(255),
+    EXCLUSIVE_ boolean,
+    EXECUTION_ID_ varchar(64),
+    PROCESS_INSTANCE_ID_ varchar(64),
+    PROC_DEF_ID_ varchar(64),
+    RETRIES_ integer,
+    EXCEPTION_STACK_ID_ varchar(64),
+    EXCEPTION_MSG_ varchar(4000),
+    DUEDATE_ timestamp,
+    REPEAT_ varchar(255),
+    HANDLER_TYPE_ varchar(255),
+    HANDLER_CFG_ varchar(4000),
+    ADV_HANDLER_CFG_ID_ varchar(64),
+    TENANT_ID_ varchar(255) default '',
+    primary key (ID_)
+);
+
 create table ACT_RE_PROCDEF (
     ID_ varchar(64) NOT NULL,
     REV_ integer,

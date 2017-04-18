@@ -238,6 +238,8 @@ import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityMan
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityManagerImpl;
+import org.flowable.engine.impl.persistence.entity.HistoryJobEntityManager;
+import org.flowable.engine.impl.persistence.entity.HistoryJobEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.engine.impl.persistence.entity.IdentityLinkEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.JobEntityManager;
@@ -276,6 +278,7 @@ import org.flowable.engine.impl.persistence.entity.data.HistoricIdentityLinkData
 import org.flowable.engine.impl.persistence.entity.data.HistoricProcessInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoricTaskInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoricVariableInstanceDataManager;
+import org.flowable.engine.impl.persistence.entity.data.HistoryJobDataManager;
 import org.flowable.engine.impl.persistence.entity.data.IdentityLinkDataManager;
 import org.flowable.engine.impl.persistence.entity.data.JobDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ModelDataManager;
@@ -301,6 +304,7 @@ import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoricIden
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoricProcessInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoricTaskInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoricVariableInstanceDataManager;
+import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoryJobDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisIdentityLinkDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisJobDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisModelDataManager;
@@ -434,6 +438,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected TimerJobDataManager timerJobDataManager;
     protected SuspendedJobDataManager suspendedJobDataManager;
     protected DeadLetterJobDataManager deadLetterJobDataManager;
+    protected HistoryJobDataManager historyJobDataManager;
     protected ModelDataManager modelDataManager;
     protected ProcessDefinitionDataManager processDefinitionDataManager;
     protected ProcessDefinitionInfoDataManager processDefinitionInfoDataManager;
@@ -462,6 +467,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected TimerJobEntityManager timerJobEntityManager;
     protected SuspendedJobEntityManager suspendedJobEntityManager;
     protected DeadLetterJobEntityManager deadLetterJobEntityManager;
+    protected HistoryJobEntityManager historyJobEntityManager;
     protected ModelEntityManager modelEntityManager;
     protected ProcessDefinitionEntityManager processDefinitionEntityManager;
     protected ProcessDefinitionInfoEntityManager processDefinitionInfoEntityManager;
@@ -1129,6 +1135,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (deadLetterJobDataManager == null) {
             deadLetterJobDataManager = new MybatisDeadLetterJobDataManager(this);
         }
+        if (historyJobDataManager == null) {
+            historyJobDataManager = new MybatisHistoryJobDataManager(this);
+        }
         if (modelDataManager == null) {
             modelDataManager = new MybatisModelDataManager(this);
         }
@@ -1208,6 +1217,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
         if (deadLetterJobEntityManager == null) {
             deadLetterJobEntityManager = new DeadLetterJobEntityManagerImpl(this, deadLetterJobDataManager);
+        }
+        if (historyJobEntityManager == null) {
+            historyJobEntityManager = new HistoryJobEntityManagerImpl(this, historyJobDataManager);
         }
         if (modelEntityManager == null) {
             modelEntityManager = new ModelEntityManagerImpl(this, modelDataManager);
@@ -3263,6 +3275,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.deadLetterJobDataManager = deadLetterJobDataManager;
         return this;
     }
+    
+    public HistoryJobDataManager getHistoryJobDataManager() {
+        return historyJobDataManager;
+    }
+
+    public ProcessEngineConfigurationImpl setHistoryJobDataManager(HistoryJobDataManager historyJobDataManager) {
+        this.historyJobDataManager = historyJobDataManager;
+        return this;
+    }
 
     public ModelDataManager getModelDataManager() {
         return modelDataManager;
@@ -3490,6 +3511,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setDeadLetterJobEntityManager(DeadLetterJobEntityManager deadLetterJobEntityManager) {
         this.deadLetterJobEntityManager = deadLetterJobEntityManager;
+        return this;
+    }
+    
+    public HistoryJobEntityManager getHistoryJobEntityManager() {
+        return historyJobEntityManager;
+    }
+
+    public ProcessEngineConfigurationImpl setHistoryJobEntityManager(HistoryJobEntityManager historyJobEntityManager) {
+        this.historyJobEntityManager = historyJobEntityManager;
         return this;
     }
 
