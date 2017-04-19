@@ -405,7 +405,7 @@ public class ModelResource {
         IOUtils.closeQuietly(baos);
         
     } catch (IOException ioe) {
-        log.error("Exception during genereting editorHints", ioe);
+        log.error("Could not create deploy zip artifact", ioe);
         throw new InternalServerErrorException("Could not create deploy zip artifact");
     }
 
