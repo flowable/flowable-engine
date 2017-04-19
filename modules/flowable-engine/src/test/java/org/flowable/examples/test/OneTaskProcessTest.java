@@ -91,8 +91,8 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
     public void testGenerateProcessTestSemiAutomatically() {
         // Generate "user" events
         testStandardJUnitOneTaskProcess();
-
         List<EventLogEntry> eventLogEntries = managementService.getEventLogEntries(null, null);
+
         // automatic step to generate process test skeleton from already generated "user" events
         List<FlowNode> testFlowNodesSkeleton = createTestFlowNodesFromEventLogEntries(eventLogEntries);
 
@@ -111,8 +111,10 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         );
         testFlowNodesSkeleton.add(assertTask);
 
+        // generate BpmnModel from given skeleton
         BpmnModel bpmnModel = decorateTestSkeletonAsProcess(testFlowNodesSkeleton);
 
+        // run process in the same way as ordinary process model test
         testProcessModelByAnotherProcess(bpmnModel);
     }
 
@@ -252,10 +254,6 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
 
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
         return processDefinition.getId();
-    }
-
-    private void moveByMinutes(int minutes) {
-        processEngineConfiguration.getClock().setCurrentTime(new Date(processEngineConfiguration.getClock().getCurrentTime().getTime() + ((minutes * 60 * 1000))));
     }
 
 }
