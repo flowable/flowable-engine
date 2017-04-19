@@ -35,7 +35,6 @@ public class DecisionExecutionAuditContainer {
     protected Date endTime;
     protected Map<String, Object> inputVariables;
     protected Map<String, String> inputVariableTypes;
-    protected DmnDecisionResult decisionResult;
     protected Map<Integer, RuleExecutionAuditContainer> ruleExecutions = new HashMap<>();
     protected Boolean failed = Boolean.FALSE;
     protected String exceptionMessage;
@@ -85,9 +84,8 @@ public class DecisionExecutionAuditContainer {
         return variablesTypesMap;
     }
 
-    public void stopAudit(DmnDecisionResult decisionResult) {
+    public void stopAudit() {
         endTime = new Date();
-        this.decisionResult = decisionResult;
     }
 
     public void addRuleEntry(DecisionRule rule) {
@@ -140,10 +138,6 @@ public class DecisionExecutionAuditContainer {
 
     public Map<String, Object> getInputVariables() {
         return inputVariables;
-    }
-
-    public DmnDecisionResult getDecisionResult() {
-        return decisionResult;
     }
 
     public Map<Integer, RuleExecutionAuditContainer> getRuleExecutions() {

@@ -12,9 +12,7 @@
  */
 package org.flowable.dmn.engine.impl.hitpolicy;
 
-import org.flowable.dmn.api.DmnDecisionResult;
 import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
-import org.flowable.dmn.model.RuleOutputClauseContainer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,8 +50,8 @@ public abstract class AbstractHitPolicy implements ContinueEvaluatingBehavior, C
      * Default behavior for ComposeRuleOutput behavior
      */
     @Override
-    public void composeDecisionResult(MvelExecutionContext executionContext) {
-        DmnDecisionResult decisionResult = new DmnDecisionResult(new ArrayList<>(executionContext.getRuleResults().values()));
-        executionContext.setDecisionResult(decisionResult);
+    public void composeDecisionResults(MvelExecutionContext executionContext) {
+        List<Map<String, Object>> decisionResults = new ArrayList<>(executionContext.getRuleResults().values());
+        executionContext.setDecisionResults(decisionResults);
     }
 }

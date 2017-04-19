@@ -13,12 +13,12 @@
 package org.flowable.dmn.engine.impl;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.dmn.api.DmnDecisionResult;
 import org.flowable.dmn.api.RuleEngineExecutionResult;
 import org.flowable.dmn.engine.FlowableDmnExpressionException;
 import org.flowable.dmn.engine.RuleEngineExecutor;
@@ -26,7 +26,6 @@ import org.flowable.dmn.engine.impl.hitpolicy.AbstractHitPolicy;
 import org.flowable.dmn.engine.impl.hitpolicy.ComposeDecisionResultBehavior;
 import org.flowable.dmn.engine.impl.hitpolicy.ComposeRuleResultBehavior;
 import org.flowable.dmn.engine.impl.hitpolicy.ContinueEvaluatingBehavior;
-import org.flowable.dmn.engine.impl.hitpolicy.EvaluateConclusionBehavior;
 import org.flowable.dmn.engine.impl.hitpolicy.EvaluateRuleValidityBehavior;
 import org.flowable.dmn.engine.impl.mvel.ExecutionVariableFactory;
 import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
@@ -51,9 +50,9 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(RuleEngineExecutorImpl.class);
 
-    protected Map<String, ? extends AbstractHitPolicy> hitPolicyBehaviors;
+    protected Map<String, AbstractHitPolicy> hitPolicyBehaviors;
 
-    public RuleEngineExecutorImpl(Map<String, ? extends AbstractHitPolicy> hitPolicyBehaviors) {
+    public RuleEngineExecutorImpl(Map<String, AbstractHitPolicy> hitPolicyBehaviors) {
         this.hitPolicyBehaviors = hitPolicyBehaviors;
     }
 
@@ -81,19 +80,29 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         MvelExecutionContext executionContext = MvelExecutionContextBuilder.build(decision, inputVariables,
             customExpressionFunctions, propertyHandlers);
 
-        // evaluate decision table
-        DmnDecisionResult decisionResult = evaluateDecisionTable(currentDecisionTable, executionContext);
+        List<Map<String, Object>> decisionResult = null;
+        RuleEngineExecutionResult executionResult;
+        try {
+            sanityCheckDecisionTable(currentDecisionTable);
 
-        // end audit trail
-        executionContext.getAuditContainer().stopAudit(decisionResult);
+            // evaluate decision table
+            decisionResult = evaluateDecisionTable(currentDecisionTable, executionContext);
+        } catch (FlowableException fe) {
+            logger.error("decision table execution sanity check failed", fe);
+            executionContext.getAuditContainer().setFailed();
+            executionContext.getAuditContainer().setExceptionMessage(getExceptionMessage(fe));
+        } finally {
+            // end audit trail
+            executionContext.getAuditContainer().stopAudit();
 
-        // create result container
-        RuleEngineExecutionResult executionResult = new RuleEngineExecutionResult(decisionResult, executionContext.getAuditContainer());
+            // create result container
+            executionResult = new RuleEngineExecutionResult(decisionResult, executionContext.getAuditContainer());
+        }
 
         return executionResult;
     }
 
-    protected DmnDecisionResult evaluateDecisionTable(DecisionTable decisionTable, MvelExecutionContext executionContext) {
+    protected List<Map<String, Object>> evaluateDecisionTable(DecisionTable decisionTable, MvelExecutionContext executionContext) {
         logger.debug("Start table evaluation: {}", decisionTable.getId());
 
 
@@ -131,14 +140,14 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 }
             }
 
-            // evaluate rule conclusions
+            // compose rule conclusions
             for (Map.Entry<Integer, List<RuleOutputClauseContainer>> entry : validRuleOutputEntries.entrySet()) {
                 executeOutputEntryAction(entry.getKey(), entry.getValue(), decisionTable.getHitPolicy(), executionContext);
             }
 
             // post rule conclusion actions
             if (getHitPolicyBehavior(decisionTable.getHitPolicy()) instanceof ComposeDecisionResultBehavior) {
-                ((ComposeDecisionResultBehavior) getHitPolicyBehavior(decisionTable.getHitPolicy())).composeDecisionResult(executionContext);
+                ((ComposeDecisionResultBehavior) getHitPolicyBehavior(decisionTable.getHitPolicy())).composeDecisionResults(executionContext);
             }
 
         } catch (FlowableException ade) {
@@ -150,7 +159,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
 
         logger.debug("End table evaluation: {}", decisionTable.getId());
 
-        return executionContext.getDecisionResult();
+        return executionContext.getDecisionResults();
     }
 
     protected Boolean executeRule(DecisionRule rule, MvelExecutionContext executionContext) {
@@ -246,11 +255,6 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 Object resultValue = MvelExpressionExecutor.executeOutputExpression(ruleClauseContainer.getOutputClause(), outputEntryExpression, executionContext);
                 executionVariable = ExecutionVariableFactory.getExecutionVariable(outputVariableType, resultValue);
 
-                // check validity
-                if (getHitPolicyBehavior(hitPolicy) instanceof EvaluateConclusionBehavior) {
-                    ((EvaluateConclusionBehavior) getHitPolicyBehavior(hitPolicy)).evaluateRuleConclusionValidity(executionVariable, ruleNumber, ruleClauseContainer.getOutputClause().getOutputNumber(), executionContext);
-                }
-
                 // create result
                 if (getHitPolicyBehavior(hitPolicy) instanceof ComposeRuleResultBehavior) {
                     ((ComposeRuleResultBehavior) getHitPolicyBehavior(hitPolicy)).composeRuleResult(ruleNumber, outputVariableId, executionVariable, executionContext);
@@ -312,5 +316,16 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         }
 
         return hitPolicyBehavior;
+    }
+
+    protected void sanityCheckDecisionTable(DecisionTable decisionTable) {
+        if (decisionTable.getHitPolicy() == HitPolicy.COLLECT && decisionTable.getAggregation() != null && decisionTable.getOutputs() != null) {
+            if (decisionTable.getOutputs().size() > 1) {
+                throw new FlowableException(String.format("HitPolicy: %s has aggregation: %s and multiple outputs. This is not supported", decisionTable.getHitPolicy(), decisionTable.getAggregation()));
+            }
+            if (!"number".equals(decisionTable.getOutputs().get(0).getTypeRef())) {
+                throw new FlowableException(String.format("HitPolicy: %s has aggregation: %s needs output type number", decisionTable.getHitPolicy(), decisionTable.getAggregation()));
+            }
+        }
     }
 }

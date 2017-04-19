@@ -72,6 +72,10 @@ public class MvelExecutionContextBuilder {
             }
         }
 
+        // set aggregator
+        if (decisionTable.getAggregation() != null) {
+            executionContext.setAggregator(decisionTable.getAggregation());
+        }
 
         preProcessInputVariables(decisionTable, inputVariables);
 

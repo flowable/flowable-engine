@@ -12,43 +12,52 @@
  */
 package org.flowable.dmn.engine.impl.hitpolicy;
 
-import org.flowable.dmn.api.ExpressionExecution;
-import org.flowable.dmn.api.RuleExecutionAuditContainer;
 import org.flowable.dmn.engine.impl.context.Context;
 import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.engine.common.api.FlowableException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Yvo Swillens
  */
-public class HitPolicyAny extends AbstractHitPolicy implements EvaluateConclusionBehavior {
+public class HitPolicyAny extends AbstractHitPolicy implements  ComposeDecisionResultBehavior {
 
     @Override
     public String getHitPolicyName() {
         return HitPolicy.ANY.getValue();
     }
 
-    @Override
-    public void evaluateRuleConclusionValidity(Object resultValue, int ruleNumber, int ruleConclusionNumber, MvelExecutionContext executionContext) {
-        for (Map.Entry<Integer, RuleExecutionAuditContainer> entry : executionContext.getAuditContainer().getRuleExecutions().entrySet()) {
-            if (entry.getKey().equals(ruleNumber) == false &&
-                !entry.getValue().getConclusionResults().isEmpty() &&
-                entry.getValue().getConclusionResults().size() >= ruleConclusionNumber) {
+    public void composeDecisionResults(final MvelExecutionContext executionContext) {
+        if (Context.getDmnEngineConfiguration().isStrictMode()) {
 
-                ExpressionExecution expressionExecution = entry.getValue().getConclusionResults().get(ruleConclusionNumber);
+            for (Map.Entry<Integer, Map<String, Object>> ruleResults : executionContext.getRuleResults().entrySet()) {
 
-                // conclusion value must be the same as for other valid rules
-                if (expressionExecution != null && expressionExecution.getResult() != null && !expressionExecution.getResult().equals(resultValue)) {
-                    String hitPolicyViolatedMessage = String.format("HitPolicy ANY violated: conclusion %d of rule %d is not the same as for rule %d", ruleConclusionNumber, ruleNumber, entry.getKey());
+                for (Map.Entry<Integer, Map<String, Object>> otherRuleResults : executionContext.getRuleResults().entrySet()) {
 
-                    if (Context.getDmnEngineConfiguration().isStrictMode()) {
-                        throw new FlowableException("HitPolicy ANY violated");
+                    if (!otherRuleResults.getKey().equals(ruleResults.getKey())) {
+
+                        for (Map.Entry<String, Object> outputValues : otherRuleResults.getValue().entrySet()) {
+                            if (!ruleResults.getValue().containsKey(outputValues.getKey()) ||
+                                (ruleResults.getValue().containsKey(outputValues.getKey()) && !outputValues.getValue().equals(ruleResults.getValue().get(outputValues.getKey())))) {
+                                throw new FlowableException(
+                                    String.format("HitPolicy: %s; both rule %d and %d are valid but output %s has different values",
+                                        getHitPolicyName(), otherRuleResults.getKey(), ruleResults.getKey(), outputValues.getKey()));
+                            }
+                        }
                     }
                 }
             }
         }
+
+        List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
+        if (!ruleResults.isEmpty()) {
+            executionContext.setDecisionResults(Arrays.asList(ruleResults.get(ruleResults.size() - 1)));
+        }
     }
+
 }

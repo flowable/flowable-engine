@@ -12,23 +12,22 @@
  */
 package org.flowable.dmn.api;
 
-import java.util.List;
 import java.util.Map;
 
 /**
  * @author Yvo Swillens
  */
-public class RuleEngineExecutionResult {
+public class RuleEngineExecutionSingleResult {
 
-    protected List<Map<String, Object>> decisionResult;
+    protected Map<String, Object> decisionResult;
     protected DecisionExecutionAuditContainer auditTrail;
 
-    public RuleEngineExecutionResult(List<Map<String, Object>> decisionResult, DecisionExecutionAuditContainer auditTrail) {
+    public RuleEngineExecutionSingleResult(Map<String, Object> decisionResult, DecisionExecutionAuditContainer auditTrail) {
         this.decisionResult = decisionResult;
         this.auditTrail = auditTrail;
     }
 
-    public List<Map<String, Object>> getDecisionResult() {
+    public Map<String, Object> getDecisionResult() {
         return decisionResult;
     }
 

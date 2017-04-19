@@ -12,6 +12,7 @@
  */
 package org.flowable.dmn.engine.impl.mvel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.api.DmnDecisionResult;
+import org.flowable.dmn.model.BuiltinAggregator;
 import org.flowable.engine.common.api.FlowableException;
 import org.mvel2.ParserContext;
 import org.mvel2.integration.PropertyHandler;
@@ -30,12 +31,13 @@ import org.mvel2.integration.PropertyHandler;
 public class MvelExecutionContext {
 
     protected Map<Integer, Map<String, Object>> ruleResults = new LinkedHashMap<>();
-    protected DmnDecisionResult decisionResult;
+    protected List<Map<String, Object>> decisionResults;
     protected Map<String, Object> stackVariables;
     protected ParserContext parserContext;
     protected Map<Class<?>, PropertyHandler> propertyHandlers = new HashMap<>();
     protected DecisionExecutionAuditContainer auditContainer;
     protected Map<String, List<Object>> outputValues = new HashMap<>();
+    protected BuiltinAggregator aggregator;
 
     public void checkExecutionContext(String variableId) {
 
@@ -117,11 +119,19 @@ public class MvelExecutionContext {
         this.outputValues.put(outputName, outputValues);
     }
 
-    public void setDecisionResult(DmnDecisionResult decisionResult) {
-        this.decisionResult = decisionResult;
+    public void setDecisionResults(List<Map<String, Object>> decisionResults) {
+        this.decisionResults = decisionResults;
     }
 
-    public DmnDecisionResult getDecisionResult() {
-        return decisionResult;
+    public List<Map<String, Object>> getDecisionResults() {
+        return decisionResults;
+    }
+
+    public BuiltinAggregator getAggregator() {
+        return aggregator;
+    }
+
+    public void setAggregator(BuiltinAggregator aggregator) {
+        this.aggregator = aggregator;
     }
 }

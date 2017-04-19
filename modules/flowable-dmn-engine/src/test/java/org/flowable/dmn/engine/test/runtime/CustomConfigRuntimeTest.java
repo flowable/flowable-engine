@@ -18,6 +18,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.api.RuleEngineExecutionResult;
+import org.flowable.dmn.api.RuleEngineExecutionSingleResult;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
@@ -57,10 +58,9 @@ public class CustomConfigRuntimeTest {
         LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
 
         processVariablesInput.put("input1", localDate.toDate());
-        RuleEngineExecutionResult result = ruleService.executeDecisionByKey("decision", processVariablesInput);
-        Assert.assertNotNull(result.getDecisionResult());
-        Assert.assertSame(String.class, result.getDecisionResult().getSingleOutputValue("output1").getClass());
-        Assert.assertEquals("test2", result.getDecisionResult().getSingleOutputValue("output1"));
+        Map<String, Object> result = ruleService.executeDecisionByKeySingleResult("decision", processVariablesInput);
+        Assert.assertSame(String.class, result.get("output1").getClass());
+        Assert.assertEquals("test2", result.get("output1"));
     }
 
     @Test
@@ -76,9 +76,9 @@ public class CustomConfigRuntimeTest {
         LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
 
         processVariablesInput.put("input1", localDate.toDate());
-        RuleEngineExecutionResult result = ruleService.executeDecisionByKey("decision", processVariablesInput);
+        RuleEngineExecutionSingleResult result = ruleService.executeDecisionByKeySingleResultWithAuditTrail("decision", processVariablesInput);
 
-        Assert.assertEquals(0, result.getDecisionResult().getRuleResults().size());
+        Assert.assertNull(result.getDecisionResult());
         Assert.assertNotEquals(true, StringUtils.isEmpty(result.getAuditTrail().getRuleExecutions().get(2).getConditionResults().get(1).getException()));
     }
 }

@@ -51,7 +51,7 @@ public class CustomHitPoliciesEngineConfigTest {
         DmnEngine dmnEngine = flowableDmnRule2.getDmnEngine();
         DmnEngineConfiguration dmnEngineConfiguration = dmnEngine.getDmnEngineConfiguration();
 
-        Assert.assertEquals(6, dmnEngineConfiguration.getHitPolicyBehaviors().size());
+        Assert.assertEquals(7, dmnEngineConfiguration.getHitPolicyBehaviors().size());
         AbstractHitPolicy overwrittenHitPolicyBehavior = dmnEngineConfiguration.getHitPolicyBehaviors().get("FIRST");
         Assert.assertEquals("CUSTOM_HIT_POLICY", overwrittenHitPolicyBehavior.getHitPolicyName());
     }
@@ -61,7 +61,7 @@ public class CustomHitPoliciesEngineConfigTest {
         DmnEngine dmnEngine = flowableDmnRule3.getDmnEngine();
         DmnEngineConfiguration dmnEngineConfiguration = dmnEngine.getDmnEngineConfiguration();
 
-        Assert.assertEquals(7, dmnEngineConfiguration.getHitPolicyBehaviors().size());
+        Assert.assertEquals(8, dmnEngineConfiguration.getHitPolicyBehaviors().size());
         Assert.assertTrue(dmnEngineConfiguration.getHitPolicyBehaviors().containsKey("CUSTOM_HIT_POLICY"));
     }
 

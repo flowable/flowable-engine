@@ -13,7 +13,6 @@
 package org.flowable.dmn.engine.impl.hitpolicy;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.flowable.dmn.api.DmnDecisionResult;
 import org.flowable.dmn.engine.impl.context.Context;
 import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
 import org.flowable.dmn.model.HitPolicy;
@@ -35,7 +34,7 @@ public class HitPolicyPriority extends AbstractHitPolicy implements ComposeDecis
         return HitPolicy.PRIORITY.getValue();
     }
 
-    public void composeDecisionResult(final MvelExecutionContext executionContext) {
+    public void composeDecisionResults(final MvelExecutionContext executionContext) {
 
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
 
@@ -64,6 +63,6 @@ public class HitPolicyPriority extends AbstractHitPolicy implements ComposeDecis
             }
         });
 
-        executionContext.setDecisionResult(new DmnDecisionResult(ruleResults.subList(0,1)));
+        executionContext.setDecisionResults(ruleResults.subList(0,1));
     }
 }

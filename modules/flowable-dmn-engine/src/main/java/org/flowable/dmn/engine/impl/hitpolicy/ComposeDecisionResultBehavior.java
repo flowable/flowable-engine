@@ -17,5 +17,5 @@ import java.util.Map;
  */
 public interface ComposeDecisionResultBehavior {
 
-    void composeDecisionResult(MvelExecutionContext executionContext);
+    void composeDecisionResults(MvelExecutionContext executionContext);
 }

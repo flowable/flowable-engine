@@ -20,31 +20,30 @@ import org.flowable.dmn.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.model.Decision;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 
-import java.util.List;
 import java.util.Map;
 
 /**
  * @author Tijs Rademakers
  * @author Yvo Swillens
  */
-public class ExecuteDecisionCmd extends AbstractExecuteDecisionCmd implements Command<List<Map<String, Object>>> {
+public class ExecuteDecisionWithAuditTrailCmd extends AbstractExecuteDecisionCmd implements Command<RuleEngineExecutionResult> {
 
-    public ExecuteDecisionCmd(String decisionKey, Map<String, Object> variables) {
+    public ExecuteDecisionWithAuditTrailCmd(String decisionKey, Map<String, Object> variables) {
         this.decisionKey = decisionKey;
         this.variables = variables;
     }
 
-    public ExecuteDecisionCmd(String decisionKey, String parentDeploymentId, Map<String, Object> variables) {
+    public ExecuteDecisionWithAuditTrailCmd(String decisionKey, String parentDeploymentId, Map<String, Object> variables) {
         this(decisionKey, variables);
         this.parentDeploymentId = parentDeploymentId;
     }
 
-    public ExecuteDecisionCmd(String decisionKey, String parentDeploymentId, Map<String, Object> variables, String tenantId) {
+    public ExecuteDecisionWithAuditTrailCmd(String decisionKey, String parentDeploymentId, Map<String, Object> variables, String tenantId) {
         this(decisionKey, parentDeploymentId, variables);
         this.tenantId = tenantId;
     }
 
-    public List<Map<String, Object>> execute(CommandContext commandContext) {
+    public RuleEngineExecutionResult execute(CommandContext commandContext) {
         if (decisionKey == null) {
             throw new FlowableIllegalArgumentException("decisionKey is null");
         }
@@ -56,11 +55,7 @@ public class ExecuteDecisionCmd extends AbstractExecuteDecisionCmd implements Co
         RuleEngineExecutionResult executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decision, variables,
                 dmnEngineConfiguration.getCustomExpressionFunctions(), dmnEngineConfiguration.getCustomPropertyHandlers());
 
-        if (executionResult != null) {
-            return executionResult.getDecisionResult();
-        } else {
-            return null;
-        }
+        return executionResult;
     }
 
 }
