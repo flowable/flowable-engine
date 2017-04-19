@@ -376,6 +376,7 @@ public class ModelResource {
       }
       return new ResponseEntity<Map<String, Object>>(resultMap, HttpStatus.OK);
     } catch (Exception e) {
+      log.error("Exception during genereting editorHints", e);
       throw new InternalServerErrorException("Exception during genereting editorHints", e);
     }
   }
@@ -404,6 +405,7 @@ public class ModelResource {
         IOUtils.closeQuietly(baos);
         
     } catch (IOException ioe) {
+        log.error("Exception during genereting editorHints", ioe);
         throw new InternalServerErrorException("Could not create deploy zip artifact");
     }
 
