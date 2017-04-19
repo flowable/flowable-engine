@@ -340,7 +340,7 @@ public class ModelResource {
       List<JsonNode> formReferences = editorNode.findValues(FORM_REFERENCE);
       for (JsonNode ref : formReferences)
       {
-        if(ref == null || ref instanceof NullNode) {
+        if(ref == null || ref instanceof NullNode || ref.get("key")==null) {
           continue;
         }
         String formKey = ref.get("key").asText();
