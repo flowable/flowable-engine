@@ -7,10 +7,6 @@
 package org.flowable.dmn.engine.impl.hitpolicy;
 
 import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
-import org.flowable.dmn.model.RuleOutputClauseContainer;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Yvo Swillens

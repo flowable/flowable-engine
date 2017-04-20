@@ -26,6 +26,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -60,9 +61,9 @@ public class SpringJunit4Test {
     public void simpleDecisionTest() {
         Map<String, Object> inputVariables = new HashMap<>();
         inputVariables.put("input1", "testString");
-        RuleEngineExecutionResult executionResult = ruleService.executeDecisionByKey("decision1", inputVariables);
+        Map<String, Object> executionResult = ruleService.executeDecisionByKeySingleResult("decision1", inputVariables);
 
-        assertEquals("test1", executionResult.getResultVariables().get("output1"));
+        assertEquals("test1", executionResult.get("output1"));
         assertNotNull(flowableDmnSpringRule.getRepositoryService());
     }
 }
