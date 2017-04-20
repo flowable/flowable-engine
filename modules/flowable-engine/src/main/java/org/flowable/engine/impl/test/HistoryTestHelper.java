@@ -13,25 +13,109 @@
 
 package org.flowable.engine.impl.test;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.impl.asyncexecutor.AsyncHistoryExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.test.FlowableRule;
 
 /**
  * @author Tijs Rademakers
  */
 
 public class HistoryTestHelper {
-
+    
     public static boolean isHistoryLevelAtLeast(HistoryLevel historyLevel, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        return isHistoryLevelAtLeast(historyLevel, processEngineConfiguration, 10000);
+    }
+    
+    public static boolean isHistoryLevelAtLeast(HistoryLevel historyLevel, ProcessEngineConfigurationImpl processEngineConfiguration, long time) {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(historyLevel)) {
             if (processEngineConfiguration.isAsyncHistoryEnabled()) {
-                JobTestHelper.waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(processEngineConfiguration, 
-                                processEngineConfiguration.getManagementService(), 5000, 200);
+                waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, processEngineConfiguration.getManagementService(), time, 200);
             }
             
             return true;
         }
         
         return false;
+    }
+    
+    public static void waitForJobExecutorToProcessAllHistoryJobs(FlowableRule activitiRule, long maxMillisToWait, long intervalMillis) {
+        waitForJobExecutorToProcessAllHistoryJobs(activitiRule.getProcessEngine().getProcessEngineConfiguration(), activitiRule.getManagementService(), maxMillisToWait, intervalMillis);
+    }
+
+    public static void waitForJobExecutorToProcessAllHistoryJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService, long maxMillisToWait, long intervalMillis) {
+        waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, maxMillisToWait, intervalMillis, true);
+    }
+
+    public static void waitForJobExecutorToProcessAllHistoryJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService, long maxMillisToWait, long intervalMillis,
+            boolean shutdownExecutorWhenFinished) {
+
+        AsyncHistoryExecutor asyncHistoryExecutor = processEngineConfiguration.getAsyncHistoryExecutor();
+        asyncHistoryExecutor.start();
+
+        try {
+            Timer timer = new Timer();
+            InterruptTask task = new InterruptTask(Thread.currentThread());
+            timer.schedule(task, maxMillisToWait);
+            boolean areJobsAvailable = true;
+            try {
+                while (areJobsAvailable && !task.isTimeLimitExceeded()) {
+                    Thread.sleep(intervalMillis);
+                    try {
+                        areJobsAvailable = areHistoryJobsAvailable(managementService);
+                    } catch (Throwable t) {
+                        // Ignore, possible that exception occurs due to locking/updating of table on MSSQL when
+                        // isolation level doesn't allow READ of the table
+                    }
+                }
+            } catch (InterruptedException e) {
+                // ignore
+            } finally {
+                timer.cancel();
+            }
+            if (areJobsAvailable) {
+                throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded");
+            }
+
+        } finally {
+            if (shutdownExecutorWhenFinished) {
+                asyncHistoryExecutor.shutdown();
+            }
+        }
+    }
+
+    public static boolean areHistoryJobsAvailable(FlowableRule activitiRule) {
+        return areHistoryJobsAvailable(activitiRule.getManagementService());
+
+    }
+
+    public static boolean areHistoryJobsAvailable(ManagementService managementService) {
+        return !managementService.createHistoryJobQuery().list().isEmpty();
+    }
+
+    private static class InterruptTask extends TimerTask {
+
+        protected boolean timeLimitExceeded;
+        protected Thread thread;
+
+        public InterruptTask(Thread thread) {
+            this.thread = thread;
+        }
+
+        public boolean isTimeLimitExceeded() {
+            return timeLimitExceeded;
+        }
+
+        public void run() {
+            timeLimitExceeded = true;
+            thread.interrupt();
+        }
     }
 }

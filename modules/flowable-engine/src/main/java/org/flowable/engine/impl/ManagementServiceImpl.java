@@ -26,6 +26,7 @@ import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.cmd.DeleteDeadLetterJobCmd;
 import org.flowable.engine.impl.cmd.DeleteEventLogEntry;
+import org.flowable.engine.impl.cmd.DeleteHistoryJobCmd;
 import org.flowable.engine.impl.cmd.DeleteJobCmd;
 import org.flowable.engine.impl.cmd.DeleteTimerJobCmd;
 import org.flowable.engine.impl.cmd.ExecuteCustomSqlCmd;
@@ -48,6 +49,7 @@ import org.flowable.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.runtime.DeadLetterJobQuery;
+import org.flowable.engine.runtime.HistoryJobQuery;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.JobQuery;
 import org.flowable.engine.runtime.SuspendedJobQuery;
@@ -114,6 +116,10 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     public void deleteDeadLetterJob(String jobId) {
         commandExecutor.execute(new DeleteDeadLetterJobCmd(jobId));
     }
+    
+    public void deleteHistoryJob(String jobId) {
+        commandExecutor.execute(new DeleteHistoryJobCmd(jobId));
+    }
 
     public void setJobRetries(String jobId, int retries) {
         commandExecutor.execute(new SetJobRetriesCmd(jobId, retries));
@@ -161,6 +167,10 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
     public DeadLetterJobQuery createDeadLetterJobQuery() {
         return new DeadLetterJobQueryImpl(commandExecutor);
+    }
+    
+    public HistoryJobQuery createHistoryJobQuery() {
+        return new HistoryJobQueryImpl(commandExecutor);
     }
 
     public String getJobExceptionStacktrace(String jobId) {

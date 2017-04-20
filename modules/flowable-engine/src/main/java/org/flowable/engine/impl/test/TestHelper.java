@@ -26,13 +26,11 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.db.DbSqlSession;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.ReflectUtil;
 import org.flowable.engine.repository.DeploymentBuilder;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.TestActivityBehaviorFactory;
@@ -112,12 +110,6 @@ public abstract class TestHelper {
         if (deploymentId != null) {
             try {
                 processEngine.getRepositoryService().deleteDeployment(deploymentId, true);
-                ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
-                if (processEngineConfiguration.isAsyncHistoryEnabled()) {
-                    List<Job> jobs = processEngineConfiguration.getManagementService().createJobQuery().list();
-                    JobTestHelper.waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(processEngineConfiguration, 
-                                    processEngine.getManagementService(), 5000, 200);
-                }
             
             } catch (FlowableObjectNotFoundException e) {
                 // Deployment was already deleted by the test case. Ignore.

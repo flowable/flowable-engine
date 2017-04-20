@@ -90,9 +90,12 @@ import org.flowable.engine.impl.agenda.DefaultFlowableEngineAgendaFactory;
 import org.flowable.engine.impl.app.AppDeployer;
 import org.flowable.engine.impl.app.AppResourceConverterImpl;
 import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.engine.impl.asyncexecutor.AsyncHistoryExceptionHandler;
 import org.flowable.engine.impl.asyncexecutor.AsyncRunnableExecutionExceptionHandler;
+import org.flowable.engine.impl.asyncexecutor.DefaultAsyncHistoryJobExecutor;
 import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.engine.impl.asyncexecutor.DefaultJobManager;
+import org.flowable.engine.impl.asyncexecutor.ExecuteAsyncHistoryRunnableFactory;
 import org.flowable.engine.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.engine.impl.asyncexecutor.JobManager;
 import org.flowable.engine.impl.bpmn.data.ItemInstance;
@@ -195,6 +198,7 @@ import org.flowable.engine.impl.interceptor.TransactionContextInterceptor;
 import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
 import org.flowable.engine.impl.jobexecutor.FailedJobCommandFactory;
+import org.flowable.engine.impl.jobexecutor.HistoryJobHandler;
 import org.flowable.engine.impl.jobexecutor.JobHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
@@ -486,7 +490,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected HistoryManager historyManager;
     
     protected boolean isAsyncHistoryEnabled;
-    protected boolean isAsyncHistoryJsonGzipCompressionEnabled = true;
+    protected boolean isAsyncHistoryJsonGzipCompressionEnabled = false;
     protected AsyncHistoryJobProducer asyncHistoryJobProducer;
 
     // Job Manager
@@ -540,6 +544,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected List<JobHandler> customJobHandlers;
     protected Map<String, JobHandler> jobHandlers;
     protected AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler;
+    protected AsyncHistoryExceptionHandler asyncHistoryExceptionHandler;
+    
+    protected List<HistoryJobHandler> customHistoryJobHandlers;
+    protected Map<String, HistoryJobHandler> historyJobHandlers;
 
     // HELPERS //////////////////////////////////////////////////////////////////
     protected ProcessInstanceHelper processInstanceHelper;
@@ -551,6 +559,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      * The number of retries for a job.
      */
     protected int asyncExecutorNumberOfRetries = 3;
+    
+    protected int asyncHistoryExecutorNumberOfRetries = 3;
 
     /**
      * The minimal number of threads that are kept alive in the threadpool for job execution. Default value = 2. (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
@@ -687,6 +697,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      * Set this to true when using the message queue based job executor.
      */
     protected boolean asyncExecutorMessageQueueMode;
+    protected boolean asyncHistoryExecutorMessageQueueMode;
 
     /**
      * Allows to define a custom factory for creating the {@link Runnable} that is executed by the async executor.
@@ -694,6 +705,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected ExecuteAsyncRunnableFactory asyncExecutorExecuteAsyncRunnableFactory;
+    protected ExecuteAsyncHistoryRunnableFactory asyncHistoryExecutorExecuteAsyncRunnableFactory;
 
     // JUEL functions ///////////////////////////////////////////////////////////
     protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
@@ -896,8 +908,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initAppResourceCache();
         initKnowledgeBaseCache();
         initJobHandlers();
+        initHistoryJobHandlers();
         initJobManager();
         initAsyncExecutor();
+        initAsyncHistoryExecutor();
 
         initTransactionFactory();
 
@@ -1693,10 +1707,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         ProcessEventJobHandler processEventJobHandler = new ProcessEventJobHandler();
         jobHandlers.put(processEventJobHandler.getType(), processEventJobHandler);
-        
-        if (isAsyncHistoryEnabled) {
-            initAsyncHistoryJobHandler();
-        }
 
         // if we have custom job handlers, register them
         if (getCustomJobHandlers() != null) {
@@ -1706,12 +1716,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
     
-    protected void initAsyncHistoryJobHandler() {
-        AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler();
-        asyncHistoryJobHandler.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
-        jobHandlers.put(asyncHistoryJobHandler.getType(), asyncHistoryJobHandler);
-
-        asyncRunnableExecutionExceptionHandler = new UnacquireAsyncHistoryJobExceptionHandler();
+    protected void initHistoryJobHandlers() {
+        if (isAsyncHistoryEnabled) {
+            historyJobHandlers = new HashMap<String, HistoryJobHandler>();
+            
+            AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler();
+            asyncHistoryJobHandler.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
+            historyJobHandlers.put(asyncHistoryJobHandler.getType(), asyncHistoryJobHandler);
+    
+            asyncHistoryExceptionHandler = new UnacquireAsyncHistoryJobExceptionHandler();
+            
+            if (getCustomHistoryJobHandlers() != null) {
+                for (HistoryJobHandler customJobHandler : getCustomHistoryJobHandlers()) {
+                    historyJobHandlers.put(customJobHandler.getType(), customJobHandler);
+                }
+            }
+        }
     }
 
     // async executor
@@ -1764,6 +1784,53 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         asyncExecutor.setProcessEngineConfiguration(this);
         asyncExecutor.setAutoActivate(asyncExecutorActivate);
+    }
+    
+    public void initAsyncHistoryExecutor() {
+        if (asyncHistoryExecutor == null) {
+            DefaultAsyncHistoryJobExecutor defaultAsyncHistoryExecutor = new DefaultAsyncHistoryJobExecutor();
+            if (asyncHistoryExecutorExecuteAsyncRunnableFactory != null) {
+                defaultAsyncHistoryExecutor.setExecuteAsyncHistoryRunnableFactory(asyncHistoryExecutorExecuteAsyncRunnableFactory);
+            }
+
+            // Message queue mode
+            defaultAsyncHistoryExecutor.setMessageQueueMode(asyncHistoryExecutorMessageQueueMode);
+
+            // Thread pool config
+            defaultAsyncHistoryExecutor.setCorePoolSize(asyncExecutorCorePoolSize);
+            defaultAsyncHistoryExecutor.setMaxPoolSize(asyncExecutorMaxPoolSize);
+            defaultAsyncHistoryExecutor.setKeepAliveTime(asyncExecutorThreadKeepAliveTime);
+
+            // Threadpool queue
+            if (asyncExecutorThreadPoolQueue != null) {
+                defaultAsyncHistoryExecutor.setThreadPoolQueue(asyncExecutorThreadPoolQueue);
+            }
+            defaultAsyncHistoryExecutor.setQueueSize(asyncExecutorThreadPoolQueueSize);
+
+            // Acquisition wait time
+            defaultAsyncHistoryExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(asyncExecutorDefaultAsyncJobAcquireWaitTime);
+
+            // Queue full wait time
+            defaultAsyncHistoryExecutor.setDefaultQueueSizeFullWaitTimeInMillis(asyncExecutorDefaultQueueSizeFullWaitTime);
+
+            // Job locking
+            defaultAsyncHistoryExecutor.setAsyncJobLockTimeInMillis(asyncExecutorAsyncJobLockTimeInMillis);
+            if (asyncExecutorLockOwner != null) {
+                defaultAsyncHistoryExecutor.setLockOwner(asyncExecutorLockOwner);
+            }
+
+            // Reset expired
+            defaultAsyncHistoryExecutor.setResetExpiredJobsInterval(asyncExecutorResetExpiredJobsInterval);
+            defaultAsyncHistoryExecutor.setResetExpiredJobsPageSize(asyncExecutorResetExpiredJobsPageSize);
+
+            // Shutdown
+            defaultAsyncHistoryExecutor.setSecondsToWaitOnShutdown(asyncExecutorSecondsToWaitOnShutdown);
+
+            asyncHistoryExecutor = defaultAsyncHistoryExecutor;
+        }
+
+        asyncHistoryExecutor.setProcessEngineConfiguration(this);
+        asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
     }
 
     // history
@@ -2676,6 +2743,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.jobHandlers = jobHandlers;
         return this;
     }
+    
+    public Map<String, HistoryJobHandler> getHistoryJobHandlers() {
+        return historyJobHandlers;
+    }
+
+    public ProcessEngineConfigurationImpl setHistoryJobHandlers(Map<String, HistoryJobHandler> historyJobHandlers) {
+        this.historyJobHandlers = historyJobHandlers;
+        return this;
+    }
 
     public ProcessInstanceHelper getProcessInstanceHelper() {
         return processInstanceHelper;
@@ -2728,6 +2804,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setCustomJobHandlers(List<JobHandler> customJobHandlers) {
         this.customJobHandlers = customJobHandlers;
+        return this;
+    }
+    
+    public List<HistoryJobHandler> getCustomHistoryJobHandlers() {
+        return customHistoryJobHandlers;
+    }
+
+    public ProcessEngineConfigurationImpl setCustomHistoryJobHandlers(List<HistoryJobHandler> customHistoryJobHandlers) {
+        this.customHistoryJobHandlers = customHistoryJobHandlers;
         return this;
     }
 
@@ -3613,6 +3698,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.asyncRunnableExecutionExceptionHandler = asyncRunnableExecutionExceptionHandler;
         return this;
     }
+    
+    public AsyncHistoryExceptionHandler getAsyncHistoryExceptionHandler() {
+        return asyncHistoryExceptionHandler;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExceptionHandler(AsyncHistoryExceptionHandler asyncHistoryExceptionHandler) {
+        this.asyncHistoryExceptionHandler = asyncHistoryExceptionHandler;
+        return this;
+    }
 
     public HistoryManager getHistoryManager() {
         return historyManager;
@@ -3832,6 +3926,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.asyncExecutorNumberOfRetries = asyncExecutorNumberOfRetries;
         return this;
     }
+    
+    public int getAsyncHistoryExecutorNumberOfRetries() {
+        return asyncHistoryExecutorNumberOfRetries;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorNumberOfRetries(int asyncHistoryExecutorNumberOfRetries) {
+        this.asyncHistoryExecutorNumberOfRetries = asyncHistoryExecutorNumberOfRetries;
+        return this;
+    }
 
     public int getAsyncExecutorMaxPoolSize() {
         return asyncExecutorMaxPoolSize;
@@ -3967,6 +4070,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.asyncExecutorExecuteAsyncRunnableFactory = asyncExecutorExecuteAsyncRunnableFactory;
         return this;
     }
+    
+    public ExecuteAsyncHistoryRunnableFactory getAsyncHistoryExecutorExecuteAsyncRunnableFactory() {
+        return asyncHistoryExecutorExecuteAsyncRunnableFactory;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorExecuteAsyncRunnableFactory(ExecuteAsyncHistoryRunnableFactory asyncHistoryExecutorExecuteAsyncRunnableFactory) {
+        this.asyncHistoryExecutorExecuteAsyncRunnableFactory = asyncHistoryExecutorExecuteAsyncRunnableFactory;
+        return this;
+    }
 
     public int getAsyncExecutorResetExpiredJobsPageSize() {
         return asyncExecutorResetExpiredJobsPageSize;
@@ -3986,4 +4098,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    public boolean isAsyncHistoryExecutorIsMessageQueueMode() {
+        return asyncHistoryExecutorMessageQueueMode;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorMessageQueueMode(boolean asyncHistoryExecutorMessageQueueMode) {
+        this.asyncHistoryExecutorMessageQueueMode = asyncHistoryExecutorMessageQueueMode;
+        return this;
+    }
 }

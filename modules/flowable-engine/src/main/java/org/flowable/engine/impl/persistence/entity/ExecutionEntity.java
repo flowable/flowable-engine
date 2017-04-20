@@ -123,6 +123,10 @@ public interface ExecutionEntity extends DelegateExecution, Execution, ProcessIn
     void setDeleted(boolean isDeleted);
 
     void forceUpdate();
+    
+    String getStartActivityId();
+
+    void setStartActivityId(String startActivityId);
 
     String getStartUserId();
 

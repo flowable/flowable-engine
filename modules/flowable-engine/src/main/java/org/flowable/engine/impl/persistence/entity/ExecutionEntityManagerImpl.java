@@ -204,7 +204,9 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
     // CREATE METHODS
 
     @Override
-    public ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String businessKey, String tenantId, String initiatorVariableName) {
+    public ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String businessKey, String tenantId, 
+                    String initiatorVariableName, String startActivityId) {
+        
         ExecutionEntity processInstanceExecution = executionDataManager.create();
 
         if (isExecutionRelatedEntityCountEnabledGlobally()) {
@@ -225,6 +227,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
 
         String authenticatedUserId = Authentication.getAuthenticatedUserId();
 
+        processInstanceExecution.setStartActivityId(startActivityId);
         processInstanceExecution.setStartTime(Context.getProcessEngineConfiguration().getClock().getCurrentTime());
         processInstanceExecution.setStartUserId(authenticatedUserId);
 
@@ -283,7 +286,9 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
     }
 
     @Override
-    public ExecutionEntity createSubprocessInstance(ProcessDefinition processDefinition, ExecutionEntity superExecutionEntity, String businessKey) {
+    public ExecutionEntity createSubprocessInstance(ProcessDefinition processDefinition, ExecutionEntity superExecutionEntity, 
+                    String businessKey, String activityId) {
+        
         ExecutionEntity subProcessInstance = executionDataManager.create();
         inheritCommonProperties(superExecutionEntity, subProcessInstance);
         subProcessInstance.setProcessDefinitionId(processDefinition.getId());
@@ -292,6 +297,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         subProcessInstance.setSuperExecution(superExecutionEntity);
         subProcessInstance.setRootProcessInstanceId(superExecutionEntity.getRootProcessInstanceId());
         subProcessInstance.setScope(true); // process instance is always a scope for all child executions
+        subProcessInstance.setStartActivityId(activityId);
         subProcessInstance.setStartUserId(Authentication.getAuthenticatedUserId());
         subProcessInstance.setBusinessKey(businessKey);
 
@@ -411,7 +417,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
             getHistoryManager().recordProcessInstanceDeleted(execution.getId());
         }
 
-        getHistoryManager().recordProcessInstanceEnd(processInstanceExecutionEntity.getId(), deleteReason, null);
+        getHistoryManager().recordProcessInstanceEnd(processInstanceExecutionEntity, deleteReason, null);
         processInstanceExecutionEntity.setDeleted(true);
     }
 
@@ -463,7 +469,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         }
 
         // TODO: what about delete reason?
-        getHistoryManager().recordProcessInstanceEnd(processInstanceEntity.getId(), deleteReason, currentFlowElementId);
+        getHistoryManager().recordProcessInstanceEnd(processInstanceEntity, deleteReason, currentFlowElementId);
         processInstanceEntity.setDeleted(true);
     }
 

@@ -18,7 +18,7 @@ import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -37,8 +37,9 @@ public class ActivityStartHistoryJsonTransformer extends AbstractHistoryJsonTran
     }
 
     @Override
-    public void transformJson(JobEntity job, ObjectNode historicalData, CommandContext commandContext) {
+    public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = commandContext.getProcessEngineConfiguration().getHistoricActivityInstanceEntityManager();
+        
         HistoricActivityInstanceEntity historicActivityInstanceEntity = historicActivityInstanceEntityManager.create();
         historicActivityInstanceEntity.setId(commandContext.getProcessEngineConfiguration().getIdGenerator().getNextId());
         historicActivityInstanceEntity.setProcessDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_ID));
@@ -51,8 +52,8 @@ public class ActivityStartHistoryJsonTransformer extends AbstractHistoryJsonTran
         historicActivityInstanceEntity.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
 
         historicActivityInstanceEntityManager.insert(historicActivityInstanceEntity);
-        dispatchEvent(commandContext,
-                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstanceEntity));
+        dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(
+                FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstanceEntity));
     }
 
 }

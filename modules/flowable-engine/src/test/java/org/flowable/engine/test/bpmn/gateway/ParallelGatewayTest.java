@@ -167,8 +167,9 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testHistoricActivityInstanceEndTimes() {
+        runtimeService.startProcessInstanceByKey("nestedForkJoin");
+        
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            runtimeService.startProcessInstanceByKey("nestedForkJoin");
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().list();
             assertEquals(21, historicActivityInstances.size());
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {

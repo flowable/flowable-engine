@@ -129,15 +129,33 @@
   <!-- HISTORIC PROCESS INSTANCE UPDATE -->
   
   <update id="updateHistoricProcessInstance" parameterType="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
-    update ${prefix}ACT_HI_PROCINST set
-      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
-      BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR},
-      START_TIME_ = #{startTime, jdbcType=TIMESTAMP},
-      END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
-      DURATION_ = #{durationInMillis ,jdbcType=BIGINT},
-      END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
-      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
-      NAME_ = #{name, jdbcType=VARCHAR}
+    update ${prefix}ACT_HI_PROCINST
+      <set>
+      	<if test="originalPersistentState.processDefinitionId != processDefinitionId">
+	      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+	    </if>
+	    <if test="originalPersistentState.businessKey != businessKey">
+	      BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR},
+	    </if>
+	    <if test="originalPersistentState.startTime != startTime">
+	      START_TIME_ = #{startTime, jdbcType=TIMESTAMP},
+	    </if>
+	    <if test="originalPersistentState.endTime != endTime">
+	      END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
+	    </if>
+	    <if test="originalPersistentState.durationInMillis != durationInMillis">
+	      DURATION_ = #{durationInMillis ,jdbcType=BIGINT},
+	    </if>
+	    <if test="originalPersistentState.endActivityId != endActivityId">
+	      END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.deleteReason != deleteReason">
+	      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
+	    </if>
+	    <if test="originalPersistentState.name != name">
+	      NAME_ = #{name, jdbcType=VARCHAR}
+	    </if>
+      </set>
     where ID_ = #{id}
   </update>
 

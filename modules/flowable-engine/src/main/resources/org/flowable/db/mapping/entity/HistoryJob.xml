@@ -9,13 +9,8 @@
 	<resultMap id="historyJobResultMap" type="org.flowable.engine.impl.persistence.entity.HistoryJobEntityImpl">
 		<id property="id" column="ID_" jdbcType="VARCHAR" />
 		<result property="revision" column="REV_" jdbcType="INTEGER" />
-		<result property="jobType" column="TYPE_" jdbcType="VARCHAR" />
 		<result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
 	    <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP" />
-		<result property="exclusive" column="EXCLUSIVE_" jdbcType="BOOLEAN" />
-		<result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
-		<result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
-		<result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
 		<result property="retries" column="RETRIES_" jdbcType="INTEGER" />
 		<result property="exceptionByteArrayRef" column="EXCEPTION_STACK_ID_" typeHandler="ByteArrayRefTypeHandler" />
 		<result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
@@ -23,8 +18,7 @@
 		<result property="jobHandlerConfiguration" column="HANDLER_CFG_" jdbcType="VARCHAR" />
 		<result property="advancedJobHandlerConfigurationByteArrayRef" column="ADV_HANDLER_CFG_ID_" typeHandler="ByteArrayRefTypeHandler" />
 		<result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
-		<result property="duedate" column="DUEDATE_" jdbcType="TIMESTAMP" />
-		<result property="repeat" column="REPEAT_" jdbcType="VARCHAR" />
+		<result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
 	</resultMap>
 
 	<!-- HISTORY JOB SELECT -->
@@ -39,6 +33,7 @@
 		RES.* ${limitBetween}
 		from ${prefix}ACT_RU_HISTORY_JOB RES
 		where LOCK_EXP_TIME_ is null
+		order by CREATE_TIME_ ASC
 		${limitAfter}
 	</select>
 
@@ -51,28 +46,10 @@
     	${limitAfter}
   	</select>
 
-	<select id="selectHistoryJobsByTypeAndProcessDefinitionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
-		select * from ${prefix}ACT_RU_HISTORY_JOB
-		where HANDLER_TYPE_ = #{parameter.handlerType}
-		and PROC_DEF_ID_ = #{parameter.processDefinitionId}
-	</select>
-
 	<select id="selectHistoryJobsByConfiguration" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
 		select * from ${prefix}ACT_RU_HISTORY_JOB
 		where HANDLER_TYPE_ = #{parameter.handlerType}
 		and HANDLER_CFG_ like #{parameter.handlerConfiguration}${wildcardEscapeClause}
-	</select>
-
-	<select id="selectHistoryJobsByExecutionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
-		select *
-		from ${prefix}ACT_RU_HISTORY_JOB J
-		where J.EXECUTION_ID_ = #{parameter}
-	</select>
-
-	<select id="selectHistoryJobsByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
-		select *
-		from ${prefix}ACT_RU_HISTORY_JOB J
-		where J.PROCESS_INSTANCE_ID_ = #{parameter}
 	</select>
 
 	<select id="selectHistoryJobByQueryCriteria" parameterType="org.flowable.engine.impl.HistoryJobQueryImpl" resultMap="historyJobResultMap">
@@ -90,36 +67,12 @@
 
 	<sql id="selectHistoryJobByQueryCriteriaSql">
 		from ${prefix}ACT_RU_HISTORY_JOB RES
-		<if test="executable">
-        	LEFT OUTER JOIN ${prefix}ACT_RU_EXECUTION PI ON PI.ID_ = RES.PROCESS_INSTANCE_ID_
-    	</if>
 		<where>
 			<if test="id != null">
 				RES.ID_ = #{id}
 			</if>
-			<if test="processInstanceId != null">
-				and RES.PROCESS_INSTANCE_ID_ = #{processInstanceId}
-			</if>
-			<if test="executionId != null">
-				and RES.EXECUTION_ID_ = #{executionId}
-			</if>
 			<if test="handlerType != null">
 				and RES.HANDLER_TYPE_ = #{handlerType}
-			</if>
-			<if test="processDefinitionId != null">
-				and RES.PROC_DEF_ID_ = #{processDefinitionId}
-			</if>
-			<if test="duedateHigherThan != null">
-				and RES.DUEDATE_ &gt; #{duedateHigherThan}
-			</if>
-			<if test="duedateLowerThan != null">
-				and RES.DUEDATE_ &lt; #{duedateLowerThan}
-			</if>
-			<if test="duedateHigherThanOrEqual != null">
-				and RES.DUEDATE_ &gt;= #{duedateHigherThanOrEqual}
-			</if>
-			<if test="duedateLowerThanOrEqual != null">
-				and RES.DUEDATE_ &lt;= #{duedateLowerThanOrEqual}
 			</if>
 			<if test="withException">
 				and (RES.EXCEPTION_MSG_ is not null or RES.EXCEPTION_STACK_ID_ is not null)
@@ -161,41 +114,6 @@
 		</foreach>
 	</delete>
 
-	<!-- HISTORY JOB UPDATE STATEMENTS -->
-	<update id="updateHistoryJobTenantIdForDeployment" parameterType="java.util.Map">
-		update ${prefix}ACT_RU_HISTORY_JOB set
-		TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
-		where
-		ID_ in (
-			SELECT J.ID_ from ${prefix}ACT_RU_HISTORY_JOB J
-			inner join ${prefix}ACT_RE_PROCDEF P on J.PROC_DEF_ID_ = P.ID_
-			inner join ${prefix}ACT_RE_DEPLOYMENT D on P.DEPLOYMENT_ID_ = D.ID_
-			where D.ID_ = #{deploymentId, jdbcType=VARCHAR}
-		)
-	</update>
-
-	<!-- See http://stackoverflow.com/questions/4429319/you-cant-specify-target-table-for-update-in-from-clause
-		Tested this on MySQL 5.6: does NOT use a temporary table (so good, performance) -->
-	<update id="updateHistoryJobTenantIdForDeployment" databaseId="mysql"
-		parameterType="java.util.Map">
-		update ${prefix}ACT_RU_HISTORY_JOB set
-		TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
-		where
-		ID_ in (
-
-			SELECT tempTask.tempId
-			FROM (
-				SELECT J.ID_ as tempId
-				FROM ${prefix}ACT_RU_HISTORY_JOB J
-				inner join ${prefix}ACT_RE_PROCDEF P on J.PROC_DEF_ID_ = P.ID_
-				inner join ${prefix}ACT_RE_DEPLOYMENT D on P.DEPLOYMENT_ID_ = D.ID_
-				where D.ID_ = #{deploymentId, jdbcType=VARCHAR}
-
-			) AS tempTask
-
-		)
-	</update>
-
 	<!-- HISTORY JOB INSERT -->
 
 	<insert id="insertHistoryJob"
@@ -203,40 +121,28 @@
 		insert into ${prefix}ACT_RU_HISTORY_JOB (
 		ID_,
 		REV_,
-		TYPE_,
 		LOCK_OWNER_,
         LOCK_EXP_TIME_,
-		EXCLUSIVE_,
-		EXECUTION_ID_,
-		PROCESS_INSTANCE_ID_,
-		PROC_DEF_ID_,
 		RETRIES_,
 		EXCEPTION_STACK_ID_,
 		EXCEPTION_MSG_,
-		DUEDATE_,
-		REPEAT_,
 		HANDLER_TYPE_,
 		HANDLER_CFG_,
 		ADV_HANDLER_CFG_ID_,
-		TENANT_ID_)
+		TENANT_ID_,
+		CREATE_TIME_)
 		values (#{id, jdbcType=VARCHAR},
 		#{revision, jdbcType=INTEGER},
-		#{jobType, jdbcType=VARCHAR},
 		#{lockOwner, jdbcType=VARCHAR},
         #{lockExpirationTime, jdbcType=TIMESTAMP},
-		#{exclusive, jdbcType=BOOLEAN},
-		#{executionId, jdbcType=VARCHAR},
-		#{processInstanceId, jdbcType=VARCHAR},
-		#{processDefinitionId, jdbcType=VARCHAR},
 		#{retries, jdbcType=INTEGER},
 		#{exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
 		#{exceptionMessage, jdbcType=VARCHAR},
-		#{duedate, jdbcType=TIMESTAMP},
-		#{repeat, jdbcType=VARCHAR},
 		#{jobHandlerType, jdbcType=VARCHAR},
 		#{jobHandlerConfiguration, jdbcType=VARCHAR},
 		#{advancedJobHandlerConfigurationByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
-		#{tenantId, jdbcType=VARCHAR}
+		#{tenantId, jdbcType=VARCHAR},
+		#{createTime, jdbcType=TIMESTAMP}
 		)
 	</insert>
 
@@ -244,41 +150,29 @@
 		INSERT INTO ${prefix}ACT_RU_HISTORY_JOB (
 		ID_,
 		REV_,
-		TYPE_,
 		LOCK_OWNER_,
 		LOCK_EXP_TIME_,
-		EXCLUSIVE_,
-		EXECUTION_ID_,
-		PROCESS_INSTANCE_ID_,
-		PROC_DEF_ID_,
 		RETRIES_,
 		EXCEPTION_STACK_ID_,
 		EXCEPTION_MSG_,
-		DUEDATE_,
-		REPEAT_,
 		HANDLER_TYPE_,
 		HANDLER_CFG_,
 		ADV_HANDLER_CFG_ID_,
-		TENANT_ID_) VALUES
+		TENANT_ID_,
+		CREATE_TIME_) VALUES
 		<foreach collection="list" item="job" index="index" separator=",">
 			(#{job.id, jdbcType=VARCHAR},
 			#{job.revision, jdbcType=INTEGER},
-			#{job.jobType, jdbcType=VARCHAR},
 			#{job.lockOwner, jdbcType=VARCHAR},
             #{job.lockExpirationTime, jdbcType=TIMESTAMP},
-			#{job.exclusive, jdbcType=BOOLEAN},
-			#{job.executionId, jdbcType=VARCHAR},
-			#{job.processInstanceId, jdbcType=VARCHAR},
-			#{job.processDefinitionId, jdbcType=VARCHAR},
 			#{job.retries, jdbcType=INTEGER},
 			#{job.exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
 			#{job.exceptionMessage, jdbcType=VARCHAR},
-			#{job.duedate, jdbcType=TIMESTAMP},
-			#{job.repeat, jdbcType=VARCHAR},
 			#{job.jobHandlerType, jdbcType=VARCHAR},
 			#{job.jobHandlerConfiguration, jdbcType=VARCHAR},
 			#{job.advancedJobHandlerConfigurationByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
-			#{job.tenantId, jdbcType=VARCHAR})
+			#{job.tenantId, jdbcType=VARCHAR},
+			#{job.createTime, jdbcType=TIMESTAMP})
 		</foreach>
 	</insert>
 
@@ -289,38 +183,28 @@
 			INTO ${prefix}ACT_RU_HISTORY_JOB (
 			ID_,
 			REV_,
-			TYPE_,
 			LOCK_OWNER_,
 			LOCK_EXP_TIME_,
-			EXCLUSIVE_,
-			EXECUTION_ID_,
-			PROCESS_INSTANCE_ID_,
-			PROC_DEF_ID_,
-			DUEDATE_,
 			RETRIES_,
 			EXCEPTION_STACK_ID_,
 			EXCEPTION_MSG_,
 			HANDLER_TYPE_,
 			HANDLER_CFG_,
 			ADV_HANDLER_CFG_ID_,
-			TENANT_ID_) VALUES
+			TENANT_ID_,
+			CREATE_TIME_) VALUES
 			(#{job.id, jdbcType=VARCHAR},
 			#{job.revision, jdbcType=INTEGER},
-			#{job.jobType, jdbcType=VARCHAR},
 			#{job.lockOwner, jdbcType=VARCHAR},
       		#{job.lockExpirationTime, jdbcType=TIMESTAMP},
-			#{job.exclusive, jdbcType=BOOLEAN},
-			#{job.executionId, jdbcType=VARCHAR},
-			#{job.processInstanceId, jdbcType=VARCHAR},
-			#{job.processDefinitionId, jdbcType=VARCHAR},
-			#{job.duedate, jdbcType=TIMESTAMP},
 			#{job.retries, jdbcType=INTEGER},
 			#{job.exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
 			#{job.exceptionMessage, jdbcType=VARCHAR},
 			#{job.jobHandlerType, jdbcType=VARCHAR},
 			#{job.jobHandlerConfiguration, jdbcType=VARCHAR},
 			#{job.advancedJobHandlerConfigurationByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
-			#{job.tenantId, jdbcType=VARCHAR})
+			#{job.tenantId, jdbcType=VARCHAR},
+			#{job.createTime, jdbcType=TIMESTAMP})
 		</foreach>
 		SELECT * FROM dual
 	</insert>

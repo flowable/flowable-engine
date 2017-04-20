@@ -19,7 +19,7 @@ import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 import org.flowable.engine.impl.HistoryJobQueryImpl;
 import org.flowable.engine.impl.asyncexecutor.AcquireTimerJobsRunnable;
 import org.flowable.engine.impl.cmd.AcquireJobsCmd;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.HistoryJob;
 
 /**
  * {@link EntityManager} responsible for the {@link HistoryJobEntity} class.
@@ -59,7 +59,7 @@ public interface HistoryJobEntityManager extends EntityManager<HistoryJobEntity>
     /**
      * Executes a {@link HistoryJobQueryImpl} and returns the matching {@link HistoryJobEntity} instances.
      */
-    List<Job> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl jobQuery, Page page);
+    List<HistoryJob> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl jobQuery, Page page);
 
     /**
      * Same as {@link #findHistoryJobsByQueryCriteria(HistoryJobQueryImpl, Page)}, but only returns a count and not the instances itself.

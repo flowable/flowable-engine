@@ -34,6 +34,7 @@ public class CachedEntity {
         this.entity = entity;
         if (storeState) {
             this.originalPersistentState = entity.getPersistentState();
+            entity.setOriginalPersistentState(originalPersistentState);
         }
     }
 

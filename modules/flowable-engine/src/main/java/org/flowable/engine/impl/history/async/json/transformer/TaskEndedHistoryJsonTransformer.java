@@ -14,14 +14,17 @@ package org.flowable.engine.impl.history.async.json.transformer;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
+import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class TaskEndedHistoryJsonTransformer extends AbstractNeedsTaskHistoryJsonTransformer {
+public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
     public static final String TYPE = "task-ended";
 
@@ -29,18 +32,68 @@ public class TaskEndedHistoryJsonTransformer extends AbstractNeedsTaskHistoryJso
     public String getType() {
         return TYPE;
     }
+    
+    @Override
+    public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
+        return true;
+    }
 
     @Override
-    public void transformJson(JobEntity job, ObjectNode historicalData, CommandContext commandContext) {
+    public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
-        HistoricTaskInstanceEntity historicTaskInstance = commandContext.getHistoricTaskInstanceEntityManager().findById(taskId);
-        Date endTime = getDateFromJson(historicalData, HistoryJsonConstants.END_TIME);
-        historicTaskInstance.setEndTime(endTime);
-        historicTaskInstance.setDeleteReason(getStringFromJson(historicalData, HistoryJsonConstants.DELETE_REASON));
+        HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager = commandContext.getHistoricTaskInstanceEntityManager();
+        HistoricTaskInstanceEntity historicTaskInstance = historicTaskInstanceEntityManager.findById(taskId);
+        
+        if (historicTaskInstance != null) {
+            Date endTime = getDateFromJson(historicalData, HistoryJsonConstants.END_TIME);
+            historicTaskInstance.setEndTime(endTime);
+            historicTaskInstance.setDeleteReason(getStringFromJson(historicalData, HistoryJsonConstants.DELETE_REASON));
+    
+            Date startTime = historicTaskInstance.getStartTime();
+            if (startTime != null && endTime != null) {
+                historicTaskInstance.setDurationInMillis(endTime.getTime() - startTime.getTime());
+            }
+            
+        } else {
+            String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
+            
+            historicTaskInstance = historicTaskInstanceEntityManager.create();
+            historicTaskInstance.setId(taskId);
+            historicTaskInstance.setProcessDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_ID));
+            historicTaskInstance.setProcessInstanceId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID));
+            historicTaskInstance.setExecutionId(executionId);
+            historicTaskInstance.setName(getStringFromJson(historicalData, HistoryJsonConstants.NAME));
+            historicTaskInstance.setParentTaskId(getStringFromJson(historicalData, HistoryJsonConstants.PARENT_TASK_ID));
+            historicTaskInstance.setDescription(getStringFromJson(historicalData, HistoryJsonConstants.DESCRIPTION));
+            historicTaskInstance.setOwner(getStringFromJson(historicalData, HistoryJsonConstants.OWNER));
+            historicTaskInstance.setAssignee(getStringFromJson(historicalData, HistoryJsonConstants.ASSIGNEE));
+            historicTaskInstance.setStartTime(getDateFromJson(historicalData, HistoryJsonConstants.START_TIME));
+            historicTaskInstance.setTaskDefinitionKey(getStringFromJson(historicalData, HistoryJsonConstants.TASK_DEFINITION_KEY));
+            historicTaskInstance.setPriority(getIntegerFromJson(historicalData, HistoryJsonConstants.PRIORITY));
+            historicTaskInstance.setDueDate(getDateFromJson(historicalData, HistoryJsonConstants.DUE_DATE));
+            historicTaskInstance.setCategory(getStringFromJson(historicalData, HistoryJsonConstants.CATEGORY));
+            historicTaskInstance.setTenantId(getStringFromJson(historicalData, getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID)));
+    
+            Date endTime = getDateFromJson(historicalData, HistoryJsonConstants.END_TIME);
+            historicTaskInstance.setEndTime(endTime);
+            historicTaskInstance.setDeleteReason(getStringFromJson(historicalData, HistoryJsonConstants.DELETE_REASON));
+    
+            Date startTime = historicTaskInstance.getStartTime();
+            if (startTime != null && endTime != null) {
+                historicTaskInstance.setDurationInMillis(endTime.getTime() - startTime.getTime());
+            }
+            
+            historicTaskInstanceEntityManager.insert(historicTaskInstance);
 
-        Date startTime = historicTaskInstance.getStartTime();
-        if (startTime != null && endTime != null) {
-            historicTaskInstance.setDurationInMillis(endTime.getTime() - startTime.getTime());
+            if (StringUtils.isNotEmpty(executionId)) {
+                String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
+                if (StringUtils.isNotEmpty(activityId)) {
+                    HistoricActivityInstanceEntity historicActivityInstanceEntity = findHistoricActivityInstance(commandContext, executionId, activityId);
+                    if (historicActivityInstanceEntity != null) {
+                        historicActivityInstanceEntity.setTaskId(taskId);
+                    }
+                }
+            }
         }
     }
 

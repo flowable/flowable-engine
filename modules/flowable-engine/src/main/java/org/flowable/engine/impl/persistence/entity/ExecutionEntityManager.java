@@ -29,11 +29,13 @@ import org.flowable.engine.runtime.ProcessInstance;
  */
 public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
 
-    ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String businessKey, String tenantId, String initiatorVariableName);
+    ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String businessKey, String tenantId, 
+                    String initiatorVariableName, String startActivityId);
 
     ExecutionEntity createChildExecution(ExecutionEntity parentExecutionEntity);
 
-    ExecutionEntity createSubprocessInstance(ProcessDefinition processDefinition, ExecutionEntity superExecutionEntity, String businessKey);
+    ExecutionEntity createSubprocessInstance(ProcessDefinition processDefinition, ExecutionEntity superExecutionEntity, 
+                    String businessKey, String startActivityId);
 
     /**
      * Finds the {@link ExecutionEntity} for the given root process instance id. All children will have been fetched and initialized.

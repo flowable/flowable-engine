@@ -71,6 +71,7 @@ create table ACT_RU_EXECUTION (
     CACHED_ENT_STATE_ integer,
     TENANT_ID_ varchar(255) default '',
     NAME_ varchar(255),
+    START_ACT_ID_ varchar(255),
     START_TIME_ timestamp,
     START_USER_ID_ varchar(255),
     LOCK_TIME_ timestamp,
@@ -172,22 +173,16 @@ create table ACT_RU_DEADLETTER_JOB (
 create table ACT_RU_HISTORY_JOB (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
-    TYPE_ varchar(255) NOT NULL,
     LOCK_EXP_TIME_ timestamp,
     LOCK_OWNER_ varchar(255),
-    EXCLUSIVE_ boolean,
-    EXECUTION_ID_ varchar(64),
-    PROCESS_INSTANCE_ID_ varchar(64),
-    PROC_DEF_ID_ varchar(64),
     RETRIES_ integer,
     EXCEPTION_STACK_ID_ varchar(64),
     EXCEPTION_MSG_ varchar(4000),
-    DUEDATE_ timestamp,
-    REPEAT_ varchar(255),
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
     ADV_HANDLER_CFG_ID_ varchar(64),
     TENANT_ID_ varchar(255) default '',
+    CREATE_TIME_ timestamp,
     primary key (ID_)
 );
 

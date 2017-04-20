@@ -19,22 +19,19 @@ import java.util.zip.GZIPInputStream;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.IoUtil;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.jobexecutor.JobHandler;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.jobexecutor.HistoryJobHandler;
+import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
-public abstract class AbstractAsyncHistoryJobHandler implements JobHandler {
+public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandler {
 
     protected boolean isJsonGzipCompressionEnabled;
 
     @Override
-    public void execute(JobEntity job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
+    public void execute(HistoryJobEntity job, String configuration, CommandContext commandContext) {
         ObjectMapper objectMapper = commandContext.getProcessEngineConfiguration().getObjectMapper();
-        ArrayNode historicalDataArrayNode = null;
         if (job.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
             try {
 
@@ -42,11 +39,8 @@ public abstract class AbstractAsyncHistoryJobHandler implements JobHandler {
                 if (isJsonGzipCompressionEnabled) {
                     bytes = decompress(bytes);
                 }
-                JsonNode objectNode = objectMapper.readTree(bytes);
-                if (objectNode.isArray()) {
-                    historicalDataArrayNode = (ArrayNode) objectNode;
-                    processHistoryJson(commandContext, job, historicalDataArrayNode);
-                }
+                JsonNode historyNode = objectMapper.readTree(bytes);
+                processHistoryJson(commandContext, job, historyNode);
                 
             } catch (AsyncHistoryJobNotApplicableException e) {
                 throw e;
@@ -69,7 +63,7 @@ public abstract class AbstractAsyncHistoryJobHandler implements JobHandler {
         }
     }
 
-    protected abstract void processHistoryJson(CommandContext commandContext, JobEntity job, ArrayNode historicalDataArrayNode);
+    protected abstract void processHistoryJson(CommandContext commandContext, HistoryJobEntity job, JsonNode historyNode);
 
     public boolean isJsonGzipCompressionEnabled() {
         return isJsonGzipCompressionEnabled;

@@ -18,23 +18,25 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.impl.history.async.json.transformer.ActivityEndHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.ActivityFullHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ActivityStartHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.HistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceDeleteHistoryByProcessDefinitionIdJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceDeleteHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceEndHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.ProcessInstancePropertyChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceStartHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.SubProcessInstanceHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskAssigneeChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskCreatedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskEndedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskPropertyChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
@@ -59,9 +61,12 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
         addHistoryJsonTransformer(new ProcessInstanceEndHistoryJsonTransformer());
         addHistoryJsonTransformer(new ProcessInstanceDeleteHistoryJsonTransformer());
         addHistoryJsonTransformer(new ProcessInstanceDeleteHistoryByProcessDefinitionIdJsonTransformer());
+        addHistoryJsonTransformer(new ProcessInstancePropertyChangedHistoryJsonTransformer());
+        addHistoryJsonTransformer(new SubProcessInstanceHistoryJsonTransformer());
 
         addHistoryJsonTransformer(new ActivityStartHistoryJsonTransformer());
         addHistoryJsonTransformer(new ActivityEndHistoryJsonTransformer());
+        addHistoryJsonTransformer(new ActivityFullHistoryJsonTransformer());
 
         addHistoryJsonTransformer(new TaskCreatedHistoryJsonTransformer());
         addHistoryJsonTransformer(new TaskEndedHistoryJsonTransformer());
@@ -79,33 +84,33 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
     }
 
     @Override
-    protected void processHistoryJson(CommandContext commandContext, JobEntity job, ArrayNode historicalDataArrayNode) {
-        for (JsonNode element : historicalDataArrayNode) {
-            String type = element.get("type").asText();
-            ObjectNode historicalJsonData = (ObjectNode) element.get("data");
+    protected void processHistoryJson(CommandContext commandContext, HistoryJobEntity job, JsonNode historyNode) {
+        System.out.println("!!!!!!! processHistoryJson id=" + job.getId() + " " + historyNode);
+        
+        String type = historyNode.get("type").asText();
+        ObjectNode historicalJsonData = (ObjectNode) historyNode.get("data");
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Handling async history job (id={}, type={})", job.getId(), type);
-            }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Handling async history job (id={}, type={})", job.getId(), type);
+        }
 
-            List<HistoryJsonTransformer> transformers = historyJsonTransformers.get(type);
-            if (transformers != null && !transformers.isEmpty()) {
-                for (HistoryJsonTransformer transformer : transformers) {
-                    if (transformer.isApplicable(historicalJsonData, commandContext)) {
-                        transformer.transformJson(job, historicalJsonData, commandContext);
+        List<HistoryJsonTransformer> transformers = historyJsonTransformers.get(type);
+        if (transformers != null && !transformers.isEmpty()) {
+            for (HistoryJsonTransformer transformer : transformers) {
+                if (transformer.isApplicable(historicalJsonData, commandContext)) {
+                    transformer.transformJson(job, historicalJsonData, commandContext);
 
-                    } else {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Could not handle job (id={}) for transformer {}. as it is not applicable. Unacquiring.", 
-                                    job.getId(), transformer.getType());
-                        }
-                        throw new AsyncHistoryJobNotApplicableException();
-
+                } else {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Could not handle history job (id={}) for transformer {}. as it is not applicable. Unacquiring. " + historicalJsonData, 
+                                job.getId(), transformer.getType());
                     }
+                    throw new AsyncHistoryJobNotApplicableException();
+
                 }
-            } else {
-                logger.debug("Cannot transform history json: no transformers found for type {}", type);
             }
+        } else {
+            logger.debug("Cannot transform history json: no transformers found for type {}", type);
         }
     }
 

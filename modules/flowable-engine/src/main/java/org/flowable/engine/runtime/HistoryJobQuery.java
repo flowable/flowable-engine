@@ -13,8 +13,6 @@
 
 package org.flowable.engine.runtime;
 
-import java.util.Date;
-
 import org.flowable.engine.common.api.query.Query;
 
 /**
@@ -23,28 +21,13 @@ import org.flowable.engine.common.api.query.Query;
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public interface HistoryJobQuery extends Query<HistoryJobQuery, Job> {
+public interface HistoryJobQuery extends Query<HistoryJobQuery, HistoryJob> {
 
     /** Only select jobs with the given id */
     HistoryJobQuery jobId(String jobId);
 
-    /** Only select jobs which exist for the given process instance. **/
-    HistoryJobQuery processInstanceId(String processInstanceId);
-
-    /** Only select jobs which exist for the given execution */
-    HistoryJobQuery executionId(String executionId);
-
     /** Select jobs which have given job handler type */
     HistoryJobQuery handlerType(String handlerType);
-
-    /** Only select jobs which exist for the given process definition id */
-    HistoryJobQuery processDefinitionId(String processDefinitionId);
-
-    /** Only select jobs where the duedate is lower than the given date. */
-    HistoryJobQuery duedateLowerThan(Date date);
-
-    /** Only select jobs where the duedate is higher then the given date. */
-    HistoryJobQuery duedateHigherThan(Date date);
 
     /** Only select jobs that failed due to an exception. */
     HistoryJobQuery withException();

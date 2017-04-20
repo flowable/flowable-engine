@@ -21,6 +21,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
+import org.flowable.engine.runtime.HistoryJob;
 import org.flowable.engine.runtime.Job;
 
 /**
@@ -35,6 +36,11 @@ public interface JobManager {
      * Execute a job, which means that the logic (async logic, timer that fires, etc) is executed, typically by a background thread of an executor.
      */
     void execute(Job job);
+    
+    /**
+     * Execute a history job, which means that the logic is executed, typically by a background thread of an executor.
+     */
+    void execute(HistoryJob job);
 
     /**
      * Unacquires a job, meaning that this job was previously locked, and it is now freed to be acquired by other executor nodes.
@@ -42,9 +48,19 @@ public interface JobManager {
     void unacquire(Job job);
     
     /**
+     * Unacquires a history job, meaning that this history job was previously locked, and it is now freed to be acquired by other executor nodes.
+     */
+    void unacquire(HistoryJob job);
+    
+    /**
      * Unacquires a job, meaning that this job was previously locked, and it is now freed to be acquired by other executor nodes.
      */
     void unacquireWithDecrementRetries(Job job);
+    
+    /**
+     * Unacquires a history job, meaning that this history job was previously locked, and it is now freed to be acquired by other executor nodes.
+     */
+    void unacquireWithDecrementRetries(HistoryJob job);
 
     /**
      * Creates an async job for the provided {@link ExecutionEntity}, so that it can be continued later in a background thread.

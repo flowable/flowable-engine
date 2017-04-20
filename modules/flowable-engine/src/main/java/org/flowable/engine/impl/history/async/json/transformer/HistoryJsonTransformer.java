@@ -13,7 +13,7 @@
 package org.flowable.engine.impl.history.async.json.transformer;
 
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -23,6 +23,6 @@ public interface HistoryJsonTransformer {
 
     boolean isApplicable(ObjectNode historicalData, CommandContext commandContext);
 
-    void transformJson(JobEntity job, ObjectNode historicalData, CommandContext commandContext);
+    void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext);
 
 }

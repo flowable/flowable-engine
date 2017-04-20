@@ -190,6 +190,10 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             task.setDeleted(true);
 
             String taskId = task.getId();
+            ExecutionEntity execution = null;
+            if (task.getExecutionId() != null) {
+                execution = task.getExecution();
+            }
 
             List<Task> subTasks = findTasksByParentTaskId(taskId);
             for (Task subTask : subTasks) {
@@ -209,7 +213,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             if (cascade) {
                 getHistoricTaskInstanceEntityManager().delete(taskId);
             } else {
-                getHistoryManager().recordTaskEnd(taskId, deleteReason);
+                getHistoryManager().recordTaskEnd(task, execution, deleteReason);
             }
 
             delete(task, false);

@@ -13,18 +13,17 @@
 package org.flowable.engine.impl.history.async;
 
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.impl.asyncexecutor.AsyncRunnableExecutionExceptionHandler;
+import org.flowable.engine.impl.asyncexecutor.AsyncHistoryExceptionHandler;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.HistoryJob;
 
-public class UnacquireAsyncHistoryJobExceptionHandler implements AsyncRunnableExecutionExceptionHandler {
+public class UnacquireAsyncHistoryJobExceptionHandler implements AsyncHistoryExceptionHandler {
 
     @Override
-    public boolean handleException(final ProcessEngineConfigurationImpl processEngineConfiguration, final Job job, final Throwable exception) {
-        if (job != null && AsyncHistoryJobHandler.JOB_TYPE.equals(job.getJobHandlerType()) 
-                        && exception instanceof AsyncHistoryJobNotApplicableException) {
+    public boolean handleException(final ProcessEngineConfigurationImpl processEngineConfiguration, final HistoryJob job, final Throwable exception) {
+        if (job != null && AsyncHistoryJobHandler.JOB_TYPE.equals(job.getJobHandlerType())) {
             
             return processEngineConfiguration.getCommandExecutor().execute(new Command<Boolean>() {
                 public Boolean execute(CommandContext commandContext) {

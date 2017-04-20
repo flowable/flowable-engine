@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -42,7 +42,7 @@ public class TaskAssigneeChangedHistoryJsonTransformer extends TaskPropertyChang
     }
 
     @Override
-    public void transformJson(JobEntity job, ObjectNode historicalData, CommandContext commandContext) {
+    public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
 
         super.transformJson(job, historicalData, commandContext);
 

@@ -13,6 +13,7 @@
 package org.flowable.engine.impl.history.async;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +42,7 @@ public class AsyncHistorySession implements Session {
 
             @Override
             public void closing(CommandContext commandContext) {
-                AsyncHistorySession.this.asyncHistoryJobProducer.createAsyncHistoryJob(commandContext);
+                asyncHistoryJobProducer.createAsyncHistoryJobs(commandContext);
             }
 
             @Override
@@ -72,6 +73,54 @@ public class AsyncHistorySession implements Session {
             this.tenantId = tenantId;
         }
         jobData.add(Pair.of(type, data));
+    }
+    
+    public boolean isActivityStartPresentWithoutEnd(String activityId, String executionId) {
+        boolean foundActivityStartWithoutEnd = false;
+        if (jobData != null) {
+            Map<String, List<Pair<String, Map<String, String>>>> activityStartMap = new HashMap<>();
+            for (Pair<String, Map<String, String>> historicData : jobData) {
+                if ("activity-start".equals(historicData.getKey())) {
+                    
+                    String activityKey = historicData.getValue().get(HistoryJsonConstants.EXECUTION_ID) + "_" + 
+                                    historicData.getValue().get(HistoryJsonConstants.ACTIVITY_ID);
+                    
+                    List<Pair<String, Map<String, String>>> activityHistoricData = null;
+                    if (activityStartMap.containsKey(activityKey)) {
+                        activityHistoricData = activityStartMap.get(activityKey);
+                    } else {
+                        activityHistoricData = new ArrayList<>();
+                    }
+                    
+                    activityHistoricData.add(historicData);
+                    activityStartMap.put(activityKey, activityHistoricData);
+                }
+            }
+            
+            for (Pair<String, Map<String, String>> historicData : jobData) {
+                if ("activity-end".equals(historicData.getKey())) {
+                    
+                    String activityKey = historicData.getValue().get(HistoryJsonConstants.EXECUTION_ID) + "_" + 
+                                    historicData.getValue().get(HistoryJsonConstants.ACTIVITY_ID);
+                    
+                    if (activityStartMap.containsKey(activityKey)) {
+                        List<Pair<String, Map<String, String>>> activityHistoricData = activityStartMap.get(activityKey);
+                        activityHistoricData.remove(0);
+                        if (activityHistoricData.size() == 0) {
+                            activityStartMap.remove(activityKey);
+                        } else {
+                            activityStartMap.put(activityKey, activityHistoricData); 
+                        }
+                    }
+                }
+            }
+            
+            if (activityStartMap.containsKey(executionId + "_" + activityId)) {
+                foundActivityStartWithoutEnd = true;
+            }
+        }
+        
+        return foundActivityStartWithoutEnd;
     }
 
     @Override

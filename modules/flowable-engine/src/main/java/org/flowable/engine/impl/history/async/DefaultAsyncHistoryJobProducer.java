@@ -14,17 +14,20 @@ package org.flowable.engine.impl.history.async;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntityManager;
+import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.engine.impl.persistence.entity.HistoryJobEntityManager;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class DefaultAsyncHistoryJobProducer implements AsyncHistoryJobProducer {
@@ -32,45 +35,103 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryJobProducer {
     protected boolean isJsonGzipCompressionEnabled;
 
     @Override
-    public JobEntity createAsyncHistoryJob(CommandContext commandContext) {
-        return createJobWithHistoricalData(commandContext, commandContext.getSession(AsyncHistorySession.class));
+    public void createAsyncHistoryJobs(CommandContext commandContext) {
+        createJobsWithHistoricalData(commandContext, commandContext.getSession(AsyncHistorySession.class));
     }
 
-    protected JobEntity createJobWithHistoricalData(CommandContext commandContext, AsyncHistorySession asyncHistorySession) {
-        JobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession);
-        ArrayNode historyJson = generateJson(commandContext, asyncHistorySession);
-        addJsonToJob(commandContext, jobEntity, historyJson);
-        return jobEntity;
+    protected void createJobsWithHistoricalData(CommandContext commandContext, AsyncHistorySession asyncHistorySession) {
+        List<Pair<String, Map<String, String>>> filteredJobs = filterHistoricData(asyncHistorySession.getJobData());
+        for (Pair<String, Map<String, String>> historicData : filteredJobs) {
+            HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession);
+            ObjectNode historyJson = generateJson(commandContext, historicData);
+            addJsonToJob(commandContext, jobEntity, historyJson);
+        }
+    }
+    
+    protected List<Pair<String, Map<String, String>>> filterHistoricData(List<Pair<String, Map<String, String>>> jobData) {
+        List<Pair<String, Map<String, String>>> filteredJobs = new ArrayList<>();
+        Map<String, List<Pair<String, Map<String, String>>>> activityStartMap = new HashMap<>();
+        for (Pair<String, Map<String, String>> historicData : jobData) {
+            if ("activity-start".equals(historicData.getKey())) {
+                
+                String activityKey = historicData.getValue().get(HistoryJsonConstants.EXECUTION_ID) + "_" + 
+                                historicData.getValue().get(HistoryJsonConstants.ACTIVITY_ID);
+                
+                List<Pair<String, Map<String, String>>> activityHistoricData = null;
+                if (activityStartMap.containsKey(activityKey)) {
+                    activityHistoricData = activityStartMap.get(activityKey);
+                } else {
+                    activityHistoricData = new ArrayList<>();
+                }
+                
+                activityHistoricData.add(historicData);
+                activityStartMap.put(activityKey, activityHistoricData);
+            
+            } else if (!"activity-end".equals(historicData.getKey())) {
+                filteredJobs.add(historicData);
+            }
+        }
+        
+        for (Pair<String, Map<String, String>> historicData : jobData) {
+            if ("activity-end".equals(historicData.getKey())) {
+                
+                String activityKey = historicData.getValue().get(HistoryJsonConstants.EXECUTION_ID) + "_" + 
+                                historicData.getValue().get(HistoryJsonConstants.ACTIVITY_ID);
+                
+                if (activityStartMap.containsKey(activityKey)) {
+                    List<Pair<String, Map<String, String>>> activityHistoricData = activityStartMap.get(activityKey);
+                    filteredJobs.add(Pair.of("activity-full", historicData.getValue()));
+                    activityHistoricData.remove(0);
+                    if (activityHistoricData.size() == 0) {
+                        activityStartMap.remove(activityKey);
+                    } else {
+                        activityStartMap.put(activityKey, activityHistoricData); 
+                    }
+                    
+                } else {
+                    filteredJobs.add(historicData);
+                } 
+            }
+        }
+        
+        for (String activityStartKey : activityStartMap.keySet()) {
+            List<Pair<String, Map<String, String>>> activityHistoricData = activityStartMap.get(activityStartKey);
+            for (Pair<String, Map<String, String>> historicData : activityHistoricData) {
+                filteredJobs.add(historicData);
+            }
+        }
+        
+        return filteredJobs;
     }
 
-    protected JobEntity createAndInsertJobEntity(CommandContext commandContext, AsyncHistorySession asyncHistorySession) {
-        JobEntityManager jobEntityManager = commandContext.getJobEntityManager();
-        JobEntity currentJobEntity = jobEntityManager.create();
-        currentJobEntity.setJobType(JobEntity.JOB_TYPE_MESSAGE);
+    protected HistoryJobEntity createAndInsertJobEntity(CommandContext commandContext, AsyncHistorySession asyncHistorySession) {
+        ProcessEngineConfiguration processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+        HistoryJobEntityManager historyJobEntityManager = commandContext.getHistoryJobEntityManager();
+        HistoryJobEntity currentJobEntity = historyJobEntityManager.create();
         currentJobEntity.setJobHandlerType(AsyncHistoryJobHandler.JOB_TYPE);
-        currentJobEntity.setRetries(commandContext.getProcessEngineConfiguration().getAsyncExecutorNumberOfRetries());
-        currentJobEntity.setExclusive(false);
+        currentJobEntity.setRetries(commandContext.getProcessEngineConfiguration().getAsyncHistoryExecutorNumberOfRetries());
         currentJobEntity.setTenantId(asyncHistorySession.getTenantId());
-        jobEntityManager.insert(currentJobEntity);
+        currentJobEntity.setCreateTime(processEngineConfiguration.getClock().getCurrentTime());
+        historyJobEntityManager.insert(currentJobEntity);
         return currentJobEntity;
     }
 
-    protected ArrayNode generateJson(CommandContext commandContext, AsyncHistorySession asyncHistorySession) {
-        ArrayNode objectNode = commandContext.getProcessEngineConfiguration().getObjectMapper().createArrayNode();
-        for (Pair<String, Map<String, String>> historicData : asyncHistorySession.getJobData()) {
-            ObjectNode elementObjectNode = objectNode.addObject();
-            elementObjectNode.put("type", historicData.getLeft());
+    protected ObjectNode generateJson(CommandContext commandContext, Pair<String, Map<String, String>> historicData) {
+        ObjectNode elementObjectNode = commandContext.getProcessEngineConfiguration().getObjectMapper().createObjectNode();
+        elementObjectNode.put("type", historicData.getLeft());
 
-            ObjectNode dataNode = elementObjectNode.putObject("data");
-            Map<String, String> dataMap = historicData.getRight();
-            for (String key : dataMap.keySet()) {
-                dataNode.put(key, dataMap.get(key));
-            }
+        ObjectNode dataNode = elementObjectNode.putObject("data");
+        Map<String, String> dataMap = historicData.getRight();
+        for (String key : dataMap.keySet()) {
+            dataNode.put(key, dataMap.get(key));
         }
-        return objectNode;
+        
+        System.out.println("!!!!!! generating history job with type " + historicData.getLeft() + " " + elementObjectNode);
+        
+        return elementObjectNode;
     }
 
-    protected void addJsonToJob(CommandContext commandContext, JobEntity jobEntity, ArrayNode rootObjectNode) {
+    protected void addJsonToJob(CommandContext commandContext, HistoryJobEntity jobEntity, ObjectNode rootObjectNode) {
         try {
             byte[] bytes = commandContext.getProcessEngineConfiguration().getObjectMapper().writeValueAsBytes(rootObjectNode);
             if (isJsonGzipCompressionEnabled) {

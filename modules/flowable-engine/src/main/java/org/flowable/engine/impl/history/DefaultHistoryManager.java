@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.bpmn.model.FlowElement;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
@@ -54,10 +53,10 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     // Process related history
 
     @Override
-    public void recordProcessInstanceEnd(String processInstanceId, String deleteReason, String activityId) {
+    public void recordProcessInstanceEnd(ExecutionEntity processInstance, String deleteReason, String activityId) {
 
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
-            HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstanceId);
+            HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstance.getId());
 
             if (historicProcessInstance != null) {
                 historicProcessInstance.markEnded(deleteReason);
@@ -86,10 +85,9 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     }
 
     @Override
-    public void recordProcessInstanceStart(ExecutionEntity processInstance, FlowElement startElement) {
+    public void recordProcessInstanceStart(ExecutionEntity processInstance) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().create(processInstance);
-            historicProcessInstance.setStartActivityId(startElement.getId());
 
             // Insert historic process-instance
             getHistoricProcessInstanceEntityManager().insert(historicProcessInstance, false);
@@ -105,15 +103,10 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     }
 
     @Override
-    public void recordSubProcessInstanceStart(ExecutionEntity parentExecution, ExecutionEntity subProcessInstance, FlowElement initialElement) {
+    public void recordSubProcessInstanceStart(ExecutionEntity parentExecution, ExecutionEntity subProcessInstance) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
 
             HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().create(subProcessInstance);
-
-            // Fix for ACT-1728: startActivityId not initialized with subprocess instance
-            if (historicProcessInstance.getStartActivityId() == null) {
-                historicProcessInstance.setStartActivityId(initialElement.getId());
-            }
             getHistoricProcessInstanceEntityManager().insert(historicProcessInstance, false);
 
             // Fire event
@@ -143,7 +136,9 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             getHistoricIdentityLinkEntityManager().deleteHistoricIdentityLinksByProcInstance(processInstanceId);
             getCommentEntityManager().deleteCommentsByProcessInstanceId(processInstanceId);
 
-            getHistoricProcessInstanceEntityManager().delete(historicProcessInstance, false);
+            if (historicProcessInstance != null) {
+                getHistoricProcessInstanceEntityManager().delete(historicProcessInstance, false);
+            }
 
             // Also delete any sub-processes that may be active (ACT-821)
 
@@ -255,9 +250,9 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     }
 
     @Override
-    public void recordTaskEnd(String taskId, String deleteReason) {
+    public void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskId);
+            HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(task.getId());
             if (historicTaskInstance != null) {
                 historicTaskInstance.markEnded(deleteReason);
             }

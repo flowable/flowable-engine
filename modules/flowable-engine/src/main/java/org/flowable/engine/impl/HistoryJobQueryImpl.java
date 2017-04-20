@@ -22,28 +22,20 @@ import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.runtime.HistoryJob;
 import org.flowable.engine.runtime.HistoryJobQuery;
-import org.flowable.engine.runtime.Job;
 
 /**
  * @author Joram Barrez
  * @author Tom Baeyens
  * @author Falko Menge
  */
-public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, Job> implements HistoryJobQuery, Serializable {
+public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJob> implements HistoryJobQuery, Serializable {
 
     private static final long serialVersionUID = 1L;
     protected String id;
-    protected String processInstanceId;
-    protected String executionId;
     protected String handlerType;
-    protected String processDefinitionId;
     protected boolean retriesLeft;
-    protected boolean executable;
-    protected Date duedateHigherThan;
-    protected Date duedateLowerThan;
-    protected Date duedateHigherThanOrEqual;
-    protected Date duedateLowerThanOrEqual;
     protected boolean withException;
     protected String exceptionMessage;
     protected String tenantId;
@@ -73,30 +65,6 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, Job> imp
         return this;
     }
 
-    public HistoryJobQueryImpl processInstanceId(String processInstanceId) {
-        if (processInstanceId == null) {
-            throw new FlowableIllegalArgumentException("Provided process instance id is null");
-        }
-        this.processInstanceId = processInstanceId;
-        return this;
-    }
-
-    public HistoryJobQueryImpl processDefinitionId(String processDefinitionId) {
-        if (processDefinitionId == null) {
-            throw new FlowableIllegalArgumentException("Provided process definition id is null");
-        }
-        this.processDefinitionId = processDefinitionId;
-        return this;
-    }
-
-    public HistoryJobQueryImpl executionId(String executionId) {
-        if (executionId == null) {
-            throw new FlowableIllegalArgumentException("Provided execution id is null");
-        }
-        this.executionId = executionId;
-        return this;
-    }
-
     public HistoryJobQueryImpl handlerType(String handlerType) {
         if (handlerType == null) {
             throw new FlowableIllegalArgumentException("Provided handlerType is null");
@@ -107,51 +75,6 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, Job> imp
 
     public HistoryJobQuery withRetriesLeft() {
         retriesLeft = true;
-        return this;
-    }
-
-    public HistoryJobQuery executable() {
-        executable = true;
-        return this;
-    }
-
-    public HistoryJobQuery duedateHigherThan(Date date) {
-        if (date == null) {
-            throw new FlowableIllegalArgumentException("Provided date is null");
-        }
-        this.duedateHigherThan = date;
-        return this;
-    }
-
-    public HistoryJobQuery duedateLowerThan(Date date) {
-        if (date == null) {
-            throw new FlowableIllegalArgumentException("Provided date is null");
-        }
-        this.duedateLowerThan = date;
-        return this;
-    }
-
-    public HistoryJobQuery duedateHigherThen(Date date) {
-        return duedateHigherThan(date);
-    }
-
-    public HistoryJobQuery duedateHigherThenOrEquals(Date date) {
-        if (date == null) {
-            throw new FlowableIllegalArgumentException("Provided date is null");
-        }
-        this.duedateHigherThanOrEqual = date;
-        return this;
-    }
-
-    public HistoryJobQuery duedateLowerThen(Date date) {
-        return duedateLowerThan(date);
-    }
-
-    public HistoryJobQuery duedateLowerThenOrEquals(Date date) {
-        if (date == null) {
-            throw new FlowableIllegalArgumentException("Provided date is null");
-        }
-        this.duedateLowerThanOrEqual = date;
         return this;
     }
 
@@ -239,23 +162,15 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, Job> imp
 
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getJobEntityManager().findJobCountByQueryCriteria(this);
+        return commandContext.getHistoryJobEntityManager().findHistoryJobCountByQueryCriteria(this);
     }
 
-    public List<Job> executeList(CommandContext commandContext, Page page) {
+    public List<HistoryJob> executeList(CommandContext commandContext, Page page) {
         checkQueryOk();
-        return commandContext.getJobEntityManager().findJobsByQueryCriteria(this, page);
+        return commandContext.getHistoryJobEntityManager().findHistoryJobsByQueryCriteria(this, page);
     }
 
     // getters //////////////////////////////////////////
-
-    public String getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public String getExecutionId() {
-        return executionId;
-    }
 
     public String getHandlerType() {
         return this.handlerType;
@@ -263,10 +178,6 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, Job> imp
 
     public boolean getRetriesLeft() {
         return retriesLeft;
-    }
-
-    public boolean getExecutable() {
-        return executable;
     }
 
     public Date getNow() {
@@ -299,26 +210,6 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, Job> imp
 
     public String getId() {
         return id;
-    }
-
-    public String getProcessDefinitionId() {
-        return processDefinitionId;
-    }
-
-    public Date getDuedateHigherThan() {
-        return duedateHigherThan;
-    }
-
-    public Date getDuedateLowerThan() {
-        return duedateLowerThan;
-    }
-
-    public Date getDuedateHigherThanOrEqual() {
-        return duedateHigherThanOrEqual;
-    }
-
-    public Date getDuedateLowerThanOrEqual() {
-        return duedateLowerThanOrEqual;
     }
 
     public boolean isNoRetriesLeft() {

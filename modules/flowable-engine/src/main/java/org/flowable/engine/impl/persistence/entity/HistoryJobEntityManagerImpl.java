@@ -22,7 +22,7 @@ import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.HistoryJobQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.data.HistoryJobDataManager;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.HistoryJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +76,7 @@ public class HistoryJobEntityManagerImpl extends AbstractEntityManager<HistoryJo
     }
 
     @Override
-    public List<Job> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl jobQuery, Page page) {
+    public List<HistoryJob> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl jobQuery, Page page) {
         return historyJobDataManager.findHistoryJobsByQueryCriteria(jobQuery, page);
     }
 

@@ -214,4 +214,13 @@ public class TransientVariableInstance implements VariableInstance {
         return null;
     }
 
+    @Override
+    public Object getOriginalPersistentState() {
+        return null;
+    }
+
+    @Override
+    public void setOriginalPersistentState(Object persistentState) {
+        
+    }
 }

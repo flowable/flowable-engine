@@ -127,7 +127,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertEquals(maxCount, CountingServiceTaskTestDelegate.CALL_COUNT.get());
         assertEquals(0, runtimeService.createExecutionQuery().count());
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration, 1800000)) {
             assertEquals(maxCount, historyService.createHistoricActivityInstanceQuery()
                     .processInstanceId(processInstance.getId()).activityId("serviceTask").count());
         }

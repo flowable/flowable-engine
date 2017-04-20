@@ -18,11 +18,11 @@ import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class TaskCreatedHistoryJsonTransformer extends AbstractNeedsUnfinishedHistoricActivityHistoryJsonTransformer {
+public class TaskCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
     public static final String TYPE = "task-created";
 
@@ -30,17 +30,23 @@ public class TaskCreatedHistoryJsonTransformer extends AbstractNeedsUnfinishedHi
     public String getType() {
         return TYPE;
     }
+    
+    @Override
+    public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
+        return true;
+    }
 
     @Override
-    public void transformJson(JobEntity job, ObjectNode historicalData, CommandContext commandContext) {
+    public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager = commandContext.getHistoricTaskInstanceEntityManager();
-        HistoricTaskInstanceEntity historicTaskInstance = historicTaskInstanceEntityManager.create();
 
         String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
+        String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
+        
+        HistoricTaskInstanceEntity historicTaskInstance = historicTaskInstanceEntityManager.create();
         historicTaskInstance.setId(taskId);
         historicTaskInstance.setProcessDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_ID));
         historicTaskInstance.setProcessInstanceId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID));
-        String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
         historicTaskInstance.setExecutionId(executionId);
         historicTaskInstance.setName(getStringFromJson(historicalData, HistoryJsonConstants.NAME));
         historicTaskInstance.setParentTaskId(getStringFromJson(historicalData, HistoryJsonConstants.PARENT_TASK_ID));
@@ -59,7 +65,7 @@ public class TaskCreatedHistoryJsonTransformer extends AbstractNeedsUnfinishedHi
         if (StringUtils.isNotEmpty(executionId)) {
             String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
             if (StringUtils.isNotEmpty(activityId)) {
-                HistoricActivityInstanceEntity historicActivityInstanceEntity = findUnfinishedHistoricActivityInstance(commandContext, executionId, activityId);
+                HistoricActivityInstanceEntity historicActivityInstanceEntity = findHistoricActivityInstance(commandContext, executionId, activityId);
                 if (historicActivityInstanceEntity != null) {
                     historicActivityInstanceEntity.setTaskId(taskId);
                 }

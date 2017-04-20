@@ -15,7 +15,6 @@ package org.flowable.engine.impl.history;
 import java.util.Date;
 import java.util.Map;
 
-import org.flowable.bpmn.model.FlowElement;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.IdentityLinkEntity;
@@ -38,12 +37,12 @@ public interface HistoryManager {
     /**
      * Record a process-instance ended. Updates the historic process instance if activity history is enabled.
      */
-    void recordProcessInstanceEnd(String processInstanceId, String deleteReason, String activityId);
+    void recordProcessInstanceEnd(ExecutionEntity processInstance, String deleteReason, String activityId);
 
     /**
      * Record a process-instance started and record start-event if activity history is enabled.
      */
-    void recordProcessInstanceStart(ExecutionEntity processInstance, FlowElement startElement);
+    void recordProcessInstanceStart(ExecutionEntity processInstance);
 
     /**
      * Record a process-instance name change.
@@ -53,7 +52,7 @@ public interface HistoryManager {
     /**
      * Record a sub-process-instance started and alters the calledProcessinstanceId on the current active activity's historic counterpart. Only effective when activity history is enabled.
      */
-    void recordSubProcessInstanceStart(ExecutionEntity parentExecution, ExecutionEntity subProcessInstance, FlowElement initialFlowElement);
+    void recordSubProcessInstanceStart(ExecutionEntity parentExecution, ExecutionEntity subProcessInstance);
     
     /**
      * Deletes a historic process instance and all historic data included
@@ -101,7 +100,7 @@ public interface HistoryManager {
     /**
      * Record task as ended, if audit history is enabled.
      */
-    void recordTaskEnd(String taskId, String deleteReason);
+    void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason);
 
     /**
      * Record task assignee change, if audit history is enabled.

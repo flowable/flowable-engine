@@ -24,7 +24,7 @@ import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoryJobDataManager;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.HistoryJob;
 
 /**
  * @author Tijs Rademakers
@@ -71,7 +71,7 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Job> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl jobQuery, Page page) {
+    public List<HistoryJob> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl jobQuery, Page page) {
         final String query = "selectHistoryJobByQueryCriteria";
         return getDbSqlSession().selectList(query, jobQuery, page);
     }

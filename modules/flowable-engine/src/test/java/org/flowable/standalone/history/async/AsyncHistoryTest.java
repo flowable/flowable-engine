@@ -24,8 +24,9 @@ import org.flowable.engine.impl.history.async.AsyncHistoryJobHandler;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.AbstractJobEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
+import org.flowable.engine.runtime.HistoryJob;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
@@ -54,14 +55,14 @@ public class AsyncHistoryTest extends ResourceFlowableTestCase {
       String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
       taskService.complete(taskService.createTaskQuery().singleResult().getId());
       
-      List<Job> jobs = managementService.createJobQuery().list();
+      List<HistoryJob> jobs = managementService.createHistoryJobQuery().list();
       assertEquals(2, jobs.size());
-      for (Job job : jobs) {
+      for (HistoryJob job : jobs) {
         assertEquals(AsyncHistoryJobHandler.JOB_TYPE, job.getJobHandlerType());
         assertNotNull(((AbstractJobEntity) job).getAdvancedJobHandlerConfigurationByteArrayRef());
       }
       
-      waitForJobExecutorToProcessAllJobs(5000L, 100L);
+      waitForJobExecutorToProcessAllHistoryJobs(5000L, 100L);
   
       HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
           .processInstanceId(processInstanceId).singleResult();
@@ -106,14 +107,14 @@ public class AsyncHistoryTest extends ResourceFlowableTestCase {
     String processInstanceId = runtimeService
         .startProcessInstanceByKey("testSimpleStraightThroughProcess", CollectionUtil.singletonMap("counter", 0)).getId();
     
-    final Job job = managementService.createJobQuery().singleResult();
+    final HistoryJob job = managementService.createHistoryJobQuery().singleResult();
     assertNotNull(job);
     
     // Special check to make sure we're over 4000 chars (the varchar column limit and the reason why going for a byte array)
     String jobConfig = managementService.executeCommand(new Command<String>() {
       public String execute(CommandContext commandContext) {
         try {
-          JobEntity jobEntity = commandContext.getJobEntityManager().findById(job.getId());
+          HistoryJobEntity jobEntity = commandContext.getHistoryJobEntityManager().findById(job.getId());
           return new String(jobEntity.getAdvancedJobHandlerConfigurationByteArrayRef().getBytes(), "UTF-8");
         } catch (Exception e) {
           return null;
@@ -123,8 +124,8 @@ public class AsyncHistoryTest extends ResourceFlowableTestCase {
     
     assertTrue("config length should be at least 4000, but was " + jobConfig.length(), jobConfig.length() > 4000);
     
-    waitForJobExecutorToProcessAllJobs(5000L, 100L);
-    assertNull(managementService.createJobQuery().singleResult());
+    waitForJobExecutorToProcessAllHistoryJobs(5000L, 100L);
+    assertNull(managementService.createHistoryJobQuery().singleResult());
     
     // 1002 -> (start, 1) + (end, 1) + (gateway, 1000), + (service task, 1000)
     assertEquals(2002, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).count());

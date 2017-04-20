@@ -18,7 +18,7 @@ import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.HistoryJobQueryImpl;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.HistoryJob;
 
 /**
  * @author Tijs Rademakers
@@ -33,7 +33,7 @@ public interface HistoryJobDataManager extends DataManager<HistoryJobEntity> {
 
     List<HistoryJobEntity> findExpiredHistoryJobs(Page page);
 
-    List<Job> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl jobQuery, Page page);
+    List<HistoryJob> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl jobQuery, Page page);
 
     long findHistoryJobCountByQueryCriteria(HistoryJobQueryImpl jobQuery);
 

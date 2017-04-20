@@ -13,10 +13,9 @@
 package org.flowable.engine.impl.history.async;
 
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
 
 public interface AsyncHistoryJobProducer {
 
-    JobEntity createAsyncHistoryJob(CommandContext commandContext);
+    void createAsyncHistoryJobs(CommandContext commandContext);
 
 }

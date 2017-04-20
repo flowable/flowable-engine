@@ -7,7 +7,7 @@
   <!-- EXECUTION INSERT -->
 
   <insert id="insertExecution" parameterType="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
-    insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_, TENANT_ID_, NAME_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_)
+    insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_, TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_)
     values (
       #{id ,jdbcType=VARCHAR},
       1,
@@ -26,6 +26,7 @@
       #{suspensionState, jdbcType=INTEGER},
       #{tenantId, jdbcType=VARCHAR},
       #{name, jdbcType=VARCHAR},
+      #{startActivityId, jdbcType=VARCHAR},
       #{startTime, jdbcType=TIMESTAMP},
       #{startUserId, jdbcType=VARCHAR},
       #{isCountEnabled, jdbcType=BOOLEAN},
@@ -41,7 +42,7 @@
   </insert>
 
   <insert id="bulkInsertExecution" parameterType="java.util.List">
-    insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_, TENANT_ID_, NAME_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_)
+    insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_, TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_)
     values 
       <foreach collection="list" item="execution" index="index" separator=",">
         (#{execution.id ,jdbcType=VARCHAR},
@@ -61,6 +62,7 @@
          #{execution.suspensionState, jdbcType=INTEGER},
          #{execution.tenantId, jdbcType=VARCHAR},
          #{execution.name, jdbcType=VARCHAR},
+         #{execution.startActivityId, jdbcType=TIMESTAMP},
          #{execution.startTime, jdbcType=TIMESTAMP},
          #{execution.startUserId, jdbcType=VARCHAR},
          #{execution.isCountEnabled, jdbcType=BOOLEAN},
@@ -79,7 +81,7 @@
     INSERT ALL 
       <foreach collection="list" item="execution" index="index">
         into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_,
-        IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_, TENANT_ID_, NAME_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_) VALUES
+        IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_, TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_) VALUES
             (#{execution.id ,jdbcType=VARCHAR},
              1,
              #{execution.processInstanceId, jdbcType=VARCHAR},
@@ -97,6 +99,7 @@
              #{execution.suspensionState, jdbcType=INTEGER},
              #{execution.tenantId, jdbcType=VARCHAR},
              #{execution.name, jdbcType=VARCHAR},
+             #{execution.startActivityId, jdbcType=TIMESTAMP},
              #{execution.startTime, jdbcType=TIMESTAMP},
              #{execution.startUserId, jdbcType=VARCHAR},
              #{execution.isCountEnabled, jdbcType=BOOLEAN},
@@ -229,6 +232,7 @@
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
     <result property="isCountEnabled" column="IS_COUNT_ENABLED_" jdbcType="BOOLEAN" />
@@ -268,6 +272,7 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="lockTime" column="LOCK_TIME_" jdbcType="TIMESTAMP" />
+    <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
     <result property="isCountEnabled" column="IS_COUNT_ENABLED_" jdbcType="BOOLEAN" />
@@ -299,6 +304,7 @@
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
     <result property="isCountEnabled" column="IS_COUNT_ENABLED_" jdbcType="BOOLEAN" />
@@ -349,6 +355,7 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="lockTime" column="LOCK_TIME_" jdbcType="TIMESTAMP" />
+    <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
     <result property="isCountEnabled" column="IS_COUNT_ENABLED_" jdbcType="BOOLEAN" />

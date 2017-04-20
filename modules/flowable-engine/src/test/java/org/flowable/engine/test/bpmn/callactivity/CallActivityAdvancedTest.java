@@ -173,17 +173,13 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
         // FIRST sub process calls simpleSubProcess
 
-        // one task in the subprocess should be active after starting the
-        // process
-        // instance
+        // one task in the subprocess should be active after starting the process instance
         TaskQuery taskQuery = taskService.createTaskQuery();
         Task taskBeforeSubProcess = taskQuery.singleResult();
         assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
 
         // Completing the task continues the process which leads to calling the
-        // subprocess. The sub process we want to call is passed in as a
-        // variable
-        // into this task
+        // subprocess. The sub process we want to call is passed in as a variable into this task
         taskService.setVariable(taskBeforeSubProcess.getId(), "simpleSubProcessExpression", "simpleSubProcess");
         taskService.complete(taskBeforeSubProcess.getId());
         Task taskInSubProcess = taskQuery.singleResult();
@@ -199,17 +195,13 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
         // SECOND sub process calls simpleSubProcess2
 
-        // one task in the subprocess should be active after starting the
-        // process
-        // instance
+        // one task in the subprocess should be active after starting the process instance
         taskQuery = taskService.createTaskQuery();
         taskBeforeSubProcess = taskQuery.singleResult();
         assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
 
         // Completing the task continues the process which leads to calling the
-        // subprocess. The sub process we want to call is passed in as a
-        // variable
-        // into this task
+        // subprocess. The sub process we want to call is passed in as a variable into this task
         taskService.setVariable(taskBeforeSubProcess.getId(), "simpleSubProcessExpression", "simpleSubProcess2");
         taskService.complete(taskBeforeSubProcess.getId());
         taskInSubProcess = taskQuery.singleResult();

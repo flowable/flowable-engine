@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.util.List;
+
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
@@ -27,8 +29,6 @@ import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
-
-import java.util.List;
 
 /**
  * @author Joram Barrez
@@ -64,7 +64,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         String deleteReason = createDeleteReason(execution.getCurrentActivityId());
         deleteExecutionEntities(executionEntityManager, rootExecutionEntity, execution.getCurrentFlowElement(), deleteReason);
         endAllHistoricActivities(rootExecutionEntity.getId(), deleteReason);
-        commandContext.getHistoryManager().recordProcessInstanceEnd(rootExecutionEntity.getId(),
+        commandContext.getHistoryManager().recordProcessInstanceEnd(rootExecutionEntity,
                 deleteReason, execution.getCurrentActivityId());
     }
 
@@ -84,7 +84,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
 
             endAllHistoricActivities(scopeExecutionEntity.getId(), deleteReason);
             deleteExecutionEntities(executionEntityManager, scopeExecutionEntity, execution.getCurrentFlowElement(), deleteReason);
-            commandContext.getHistoryManager().recordProcessInstanceEnd(scopeExecutionEntity.getId(), deleteReason, execution.getCurrentActivityId());
+            commandContext.getHistoryManager().recordProcessInstanceEnd(scopeExecutionEntity, deleteReason, execution.getCurrentActivityId());
 
         } else if (scopeExecutionEntity.getCurrentFlowElement() != null
                 && scopeExecutionEntity.getCurrentFlowElement() instanceof SubProcess) { // SubProcess

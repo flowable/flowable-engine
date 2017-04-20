@@ -151,11 +151,12 @@ public class ProcessInstanceHelper {
         }
 
         ExecutionEntity processInstance = commandContext.getExecutionEntityManager()
-                .createProcessInstanceExecution(processDefinition, businessKey, processDefinition.getTenantId(), initiatorVariableName);
+                .createProcessInstanceExecution(processDefinition, businessKey, processDefinition.getTenantId(), 
+                                initiatorVariableName, initialFlowElement.getId());
 
         processInstance.setName(processInstanceName);
 
-        commandContext.getHistoryManager().recordProcessInstanceStart(processInstance, initialFlowElement);
+        commandContext.getHistoryManager().recordProcessInstanceStart(processInstance);
 
         boolean eventDispatcherEnabled = Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled();
         if (eventDispatcherEnabled) {
