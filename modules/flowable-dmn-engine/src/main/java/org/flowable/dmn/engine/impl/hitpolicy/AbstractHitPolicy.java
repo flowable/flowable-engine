@@ -33,6 +33,7 @@ public abstract class AbstractHitPolicy implements ContinueEvaluatingBehavior, C
     /**
      * Default behavior for ContinueEvaluating behavior
      */
+
     @Override
     public boolean shouldContinueEvaluating(boolean ruleResult) {
         return true;

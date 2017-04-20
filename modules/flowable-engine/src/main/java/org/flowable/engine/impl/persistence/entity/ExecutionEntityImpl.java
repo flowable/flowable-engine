@@ -292,6 +292,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
     @Override
     public void addChildExecution(ExecutionEntity executionEntity) {
         ensureExecutionsInitialized();
+        executions.remove(executionEntity);
         executions.add((ExecutionEntityImpl) executionEntity);
     }
 

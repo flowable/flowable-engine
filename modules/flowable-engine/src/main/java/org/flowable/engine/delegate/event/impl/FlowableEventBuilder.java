@@ -26,9 +26,10 @@ import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableEntityWithVariablesEvent;
 import org.flowable.engine.delegate.event.FlowableErrorEvent;
+import org.flowable.engine.delegate.event.FlowableJobRescheduledEvent;
 import org.flowable.engine.delegate.event.FlowableMessageEvent;
 import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
-import org.flowable.engine.delegate.event.FlowableJobRescheduledEvent;
+import org.flowable.engine.delegate.event.FlowableProcessTerminatedEvent;
 import org.flowable.engine.delegate.event.FlowableSequenceFlowTakenEvent;
 import org.flowable.engine.delegate.event.FlowableSignalEvent;
 import org.flowable.engine.delegate.event.FlowableVariableEvent;
@@ -264,6 +265,10 @@ public class FlowableEventBuilder {
         newEvent.setProcessInstanceId(processInstanceId);
         newEvent.setCause(cause);
         return newEvent;
+    }
+
+    public static FlowableProcessTerminatedEvent createTerminateEvent(ExecutionEntity execution, Object cause) {
+        return new FlowableProcessTerminatedEventImpl(execution, cause);
     }
 
     public static FlowableSignalEvent createSignalEvent(FlowableEngineEventType type, String activityId, String signalName, Object signalData, String executionId, String processInstanceId,

@@ -189,7 +189,7 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
 
     public SuspendedJobQueryImpl jobTenantId(String tenantId) {
         if (tenantId == null) {
-            throw new FlowableIllegalArgumentException("job is null");
+            throw new FlowableIllegalArgumentException("Provided tenant id is null");
         }
         this.tenantId = tenantId;
         return this;
@@ -197,7 +197,7 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
 
     public SuspendedJobQueryImpl jobTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
-            throw new FlowableIllegalArgumentException("job is null");
+            throw new FlowableIllegalArgumentException("Provided tenant id is null");
         }
         this.tenantIdLike = tenantIdLike;
         return this;

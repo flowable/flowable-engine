@@ -189,7 +189,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
 
     public TimerJobQueryImpl jobTenantId(String tenantId) {
         if (tenantId == null) {
-            throw new FlowableIllegalArgumentException("job is null");
+            throw new FlowableIllegalArgumentException("Provided tentant id is null");
         }
         this.tenantId = tenantId;
         return this;
@@ -197,7 +197,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
 
     public TimerJobQueryImpl jobTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
-            throw new FlowableIllegalArgumentException("job is null");
+            throw new FlowableIllegalArgumentException("Provided tentant id is null");
         }
         this.tenantIdLike = tenantIdLike;
         return this;

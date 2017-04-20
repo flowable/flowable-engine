@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * @author Yvo Swillens
  */
-public class HitPolicyAny extends AbstractHitPolicy implements  ComposeDecisionResultBehavior {
+public class HitPolicyAny extends AbstractHitPolicy implements ComposeDecisionResultBehavior {
 
     @Override
     public String getHitPolicyName() {

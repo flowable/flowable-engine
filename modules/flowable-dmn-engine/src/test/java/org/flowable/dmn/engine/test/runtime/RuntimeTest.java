@@ -15,7 +15,6 @@ package org.flowable.dmn.engine.test.runtime;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.dmn.api.RuleEngineExecutionResult;
 import org.flowable.dmn.api.RuleEngineExecutionSingleResult;
 import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;

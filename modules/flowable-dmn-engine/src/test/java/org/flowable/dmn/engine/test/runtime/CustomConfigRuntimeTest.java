@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.api.DmnRuleService;
-import org.flowable.dmn.api.RuleEngineExecutionResult;
 import org.flowable.dmn.api.RuleEngineExecutionSingleResult;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
