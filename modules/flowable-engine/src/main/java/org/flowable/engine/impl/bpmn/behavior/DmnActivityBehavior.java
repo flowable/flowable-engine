@@ -12,10 +12,12 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.Task;
 import org.flowable.dmn.api.DmnRuleService;
-import org.flowable.dmn.api.RuleEngineExecutionResult;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -28,6 +30,9 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import java.util.List;
+import java.util.Map;
 
 public class DmnActivityBehavior extends TaskActivityBehavior {
 
@@ -82,11 +87,45 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(execution.getProcessDefinitionId());
 
         DmnRuleService ruleService = processEngineConfiguration.getDmnEngineRuleService();
-        RuleEngineExecutionResult executionResult = ruleService.executeDecisionByKeyParentDeploymentIdAndTenantId(finaldecisionTableKeyValue,
+
+        List<Map<String, Object>> executionResult = ruleService.executeDecisionByKeyParentDeploymentIdAndTenantId(finaldecisionTableKeyValue,
                 processDefinition.getDeploymentId(), execution.getVariables(), execution.getTenantId());
 
-        execution.setVariables(executionResult.getResultVariables());
+        setVariablesOnExecution(executionResult, finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
 
         leave(execution);
+    }
+
+    protected void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
+        if (executionResult == null || executionResult.isEmpty()) {
+            return;
+        }
+        //TODO: make pluggable
+
+        // multiple rule results
+        // put on execution as JSON array; each entry contains output id (key) and output value (value)
+        if (executionResult.size() > 1) {
+            ArrayNode ruleResultNode = objectMapper.createArrayNode();
+
+            for (Map<String, Object> ruleResult : executionResult) {
+                ObjectNode outputResultNode = objectMapper.createObjectNode();
+
+                for (Map.Entry<String, Object> outputResult : ruleResult.entrySet()) {
+                    outputResultNode.set(outputResult.getKey(), objectMapper.convertValue(outputResult.getValue(), JsonNode.class));
+                }
+
+                ruleResultNode.add(outputResultNode);
+            }
+
+            execution.setVariable(decisionKey, ruleResultNode);
+        } else {
+            // single rule result
+            // put on execution output id (key) and output value (value)
+            Map<String, Object> ruleResult = executionResult.get(0);
+
+            for (Map.Entry<String, Object> outputResult : ruleResult.entrySet()) {
+                execution.setVariable(outputResult.getKey(), outputResult.getValue());
+            }
+        }
     }
 }
