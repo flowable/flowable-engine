@@ -104,7 +104,7 @@ angular.module('flowableModeler')
       modalInstance.$scope.duplicateFormCallback = function(result) {
         $rootScope.editorHistory = [];
         //$location.path("/form-editor/" + result.id);
-        $window.location.href = 'rdsFormBuilder.jsp#?form=' + result.id; 
+        $window.location.href = 'rdsFormBuilder.jsp#?form=' + result.key; 
       };
     };
 
@@ -118,7 +118,7 @@ angular.module('flowableModeler')
     $scope.openEditor = function() {
       if ($scope.model.form) {
     	  //$location.path("/form-editor/" + $scope.model.form.id);
-        $window.location.href = 'rdsFormBuilder.jsp#?form='+$scope.model.form.id; 
+        $window.location.href = 'rdsFormBuilder.jsp#?form='+$scope.model.form.key; 
       }
     };
 

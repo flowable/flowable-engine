@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,9 +65,11 @@ public class FlowableFormService {
     return form;
   }
 
-  public String getRdsForm(String formId)
-  {
-    Model model = modelService.getModel(formId);
+  public String getRdsForm(String formKey)
+  {    
+    List<Model> models =  modelRepository.findByKeyAndType(formKey, AbstractModel.MODEL_TYPE_FORM_RDS);
+    Assert.isTrue(models.size()==1, "Should get 1 and only 1 rds_form by key, but now get " + models.size());
+    Model model = models.get(0);
     ObjectNode objectNode = objectMapper.createObjectNode();
     objectNode.put("key", model.getKey());
     objectNode.put("definition", model.getModelEditorJson());

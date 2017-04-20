@@ -113,7 +113,7 @@ angular.module('flowableModeler')
 	      $rootScope.currentKickstartModel = undefined;
 		  $scope.createFormCallback = function(result) {
 		      $rootScope.editorHistory = [];
-		      $window.location.href = 'rdsFormBuilder.jsp#?form='+result.id;  
+		      $window.location.href = 'rdsFormBuilder.jsp#?form='+result.key;  
 			  //$location.path("/form-editor/" + result.id);
 		  };
           _internalCreateModal({
@@ -132,7 +132,7 @@ angular.module('flowableModeler')
 	  $scope.editFormDetails = function(form) {
 		  if (form) {
 		      $rootScope.editorHistory = [];
-		      $window.location.href = 'rdsFormBuilder.jsp#?form='+form.id;
+		      $window.location.href = 'rdsFormBuilder.jsp#?form='+form.key;
 		      //$location.path("/form-editor/" + form.id);
 		  }
 	  };

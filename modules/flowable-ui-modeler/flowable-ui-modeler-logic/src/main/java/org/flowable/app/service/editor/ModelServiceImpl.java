@@ -83,6 +83,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import au.com.rds.schemaformbuilder.formdesignjson.FormDesignJsonService;
+
 @Service
 @Transactional
 public class ModelServiceImpl implements ModelService {
@@ -107,6 +109,9 @@ public class ModelServiceImpl implements ModelService {
 
   @Autowired
   protected ObjectMapper objectMapper;
+  
+  @Autowired
+  FormDesignJsonService formDesignJsonService;
 
   protected RDSBpmnJsonConverter bpmnJsonConverter = new RDSBpmnJsonConverter();
 
@@ -701,13 +706,9 @@ public class ModelServiceImpl implements ModelService {
   }
 
   private void addFormToProcess(Process process, String formKey, Map<String, String> processedForms)
-  {
-    List<Model> formModels = this.modelRepository.findByKeyAndType(formKey, Model.MODEL_TYPE_FORM_RDS);
-    
-    Assert.isTrue(formModels.size()==1, "Cannot find form design for " + formKey);
-    Model formModel = formModels.get(0);    
+  { 
+    String formContent = this.formDesignJsonService.getFormDesignJsonByKeyAndResolveReferenceIfAny(formKey);
 
-    String formContent = formModel.getModelEditorJson();
     ExtensionElement extensionElement = new ExtensionElement();
     extensionElement.setNamespace(BPMN_RDS_NAMESPACE);
     extensionElement.setNamespacePrefix(BPMN_RDS_NAMESPACE_PREFIX);
