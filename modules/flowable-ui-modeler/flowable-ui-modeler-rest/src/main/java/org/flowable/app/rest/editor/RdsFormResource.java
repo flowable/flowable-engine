@@ -21,10 +21,10 @@ public class RdsFormResource
 
   ObjectMapper objectMapper = new ObjectMapper();
 
-  @RequestMapping(value = "/{formId}", method = RequestMethod.GET, produces = "application/json")
-  public String getForm(@PathVariable String formId)
+  @RequestMapping(value = "/{formKey}", method = RequestMethod.GET, produces = "application/json")
+  public String getForm(@PathVariable String formKey)
   {
-    return formService.getRdsForm(formId);
+    return formService.getRdsForm(formKey);
   }
 
   @RequestMapping(value = "", method = RequestMethod.POST, produces = "application/json")

@@ -34,7 +34,8 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
     "org.flowable.app.service",
     "org.flowable.app.filter",
     "org.flowable.app.security",
-    "org.flowable.app.model.component"})
+    "org.flowable.app.model.component",
+    "au.com.rds.schemaformbuilder.util"})
 public class ApplicationConfiguration
 {
 

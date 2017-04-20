@@ -132,7 +132,7 @@ angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
                     $rootScope.addHistoryItem($scope.selectedShape.resourceId);
                     //$location.path('form-editor/' + $scope.selectedForm.id);
                     var returnurl = encodeURIComponent($location.absUrl())
-                    $window.location.href = 'rdsFormBuilder.jsp#?form=' + $scope.selectedForm.id + "&returnurl=" + returnurl;
+                    $window.location.href = 'rdsFormBuilder.jsp#?form=' + $scope.selectedForm.key + "&returnurl=" + returnurl;
                 })
                 .error(function (data, status, headers, config) {
                     
@@ -221,7 +221,7 @@ angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
                         $rootScope.addHistoryItem($scope.selectedShape.resourceId);
                         //$location.path('form-editor/' + newFormId);
                         var returnurl = encodeURIComponent($location.absUrl())
-                        $window.location.href = 'rdsFormBuilder.jsp#?form=' + newFormId + "&returnurl=" + returnurl; 
+                        $window.location.href = 'rdsFormBuilder.jsp#?form=' + $scope.model.form.key + "&returnurl=" + returnurl; 
                         
                     })
                     .error(function (data, status, headers, config) {
