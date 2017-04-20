@@ -12,11 +12,8 @@
     <link href="assets/styles/bootstrap.css" media="all" type="text/css" rel="stylesheet" />
     <link href="assets/styles/bootstrap-decorator.css" media="all" type="text/css" rel="stylesheet" />
     <link href="assets/styles/select.css" media="all" type="text/css" rel="stylesheet" />
-    <link href="assets/styles/ui-grid.css" media="all" type="text/css" rel="stylesheet" />
     <link href="assets/styles/bootstrap.vertical-tabs.css" media="all" type="text/css" rel="stylesheet" />
     <link href="assets/styles/schema-form-file.css" media="all" type="text/css" rel="stylesheet" />
-    <link href="assets/styles/rds-map.css" media="all" type="text/css" rel="stylesheet" />
-    <link href="assets/styles/ol.css" media="all" type="text/css" rel="stylesheet" />
     <link href="assets/styles/rds-schemaform-designer.css" media="all" type="text/css" rel="stylesheet" />
     <link href="assets/styles/rds-schemaform-designer-vendor.css" media="all" type="text/css" rel="stylesheet" />    
 </head>
