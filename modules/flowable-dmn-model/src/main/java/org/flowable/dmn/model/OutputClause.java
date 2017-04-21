@@ -17,11 +17,20 @@ package org.flowable.dmn.model;
  */
 public class OutputClause extends DmnElement {
 
+    protected UnaryTests outputValues;
     protected LiteralExpression defaultOutputEntry;
     protected String name;
     protected String typeRef;
 
     protected int outputNumber;
+
+    public UnaryTests getOutputValues() {
+        return outputValues;
+    }
+
+    public void setOutputValues(UnaryTests outputValues) {
+        this.outputValues = outputValues;
+    }
 
     public LiteralExpression getDefaultOutputEntry() {
         return defaultOutputEntry;

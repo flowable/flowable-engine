@@ -12,6 +12,7 @@
  */
 package org.flowable.dmn.api;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,16 +20,16 @@ import java.util.Map;
  */
 public class RuleEngineExecutionResult {
 
-    protected Map<String, Object> resultVariables;
+    protected List<Map<String, Object>> decisionResult;
     protected DecisionExecutionAuditContainer auditTrail;
 
-    public RuleEngineExecutionResult(Map<String, Object> resultVariables, DecisionExecutionAuditContainer auditTrail) {
-        this.resultVariables = resultVariables;
+    public RuleEngineExecutionResult(List<Map<String, Object>> decisionResult, DecisionExecutionAuditContainer auditTrail) {
+        this.decisionResult = decisionResult;
         this.auditTrail = auditTrail;
     }
 
-    public Map<String, Object> getResultVariables() {
-        return resultVariables;
+    public List<Map<String, Object>> getDecisionResult() {
+        return decisionResult;
     }
 
     public DecisionExecutionAuditContainer getAuditTrail() {
