@@ -49,16 +49,8 @@
 <div class="container-fluid content" ng-if="model.form" auto-height offset="40">
 	<div class="center-pane" style="overflow-x:hidden">
 		
-        <div class="content roweditor-canvas container-fluid" ng-controller="FormReadonlyViewController">
-            <div id="canvasSection" class="content-canvas-wrapper" ng-class="{'editing': editState.editing}">
-
-                <ul style="min-height:400px; width: 100%" class="form-canvas content-canvas">
-                     
-                    <li ng-repeat="field in formItems track by field._guid" class="form-field-wrapper">
-                        <div form-builder-element form-element="field" edit-state="editState" form-mode="formMode"></div>
-                    </li>
-                </ul>
-            </div>
+        <div class="content roweditor-canvas container-fluid" >
+        	<img ng-src="{{'app/rest/models/' + model.form.id + '/thumbnail'}}" />
         </div>
     </div>
 </div>
