@@ -125,8 +125,16 @@
     </div>
     
     <div ng-switch-when="expression" class="form-group" ng-show="field.isVisible">
-    	<div class="well well-sm">
-        	{{field.value && field.value || ('FORM.MESSAGE.EMPTY' | translate)}}
+    	<div class="well well-sm" ng-style="{'font-size': field.params.size + 'em'}">
+    		<div ng-show="!field.value && !field.expression">
+    			{{'FORM.MESSAGE.EMPTY' | translate}}
+    		</div>
+    		<div ng-show="!field.value">
+    			{{field.expression}}
+    		</div>
+    		<div ng-show="field.value">
+    			{{field.value}}
+    		</div>        	
         </div>
     </div>
 </div>
@@ -182,8 +190,16 @@
     </div>
     
     <div ng-switch-when="expression" ng-show="field.isVisible">
-        <div class="well well-sm">
-            {{field.value && field.value || ('FORM.MESSAGE.EMPTY' | translate)}}
+        <div class="well well-sm" ng-style="{'font-size': field.params.size + 'em'}">
+    		<div ng-show="!field.value && !field.expression">
+    			{{'FORM.MESSAGE.EMPTY' | translate}}
+    		</div>
+    		<div ng-show="!field.value">
+    			{{field.expression}}
+    		</div>
+    		<div ng-show="field.value">
+    			{{field.value}}
+    		</div>        	
         </div>
     </div>
 

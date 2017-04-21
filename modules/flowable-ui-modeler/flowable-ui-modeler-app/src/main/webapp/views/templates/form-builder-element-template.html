@@ -85,11 +85,11 @@
   </div>
 
   <div ng-switch-when="expression" class="form-group">
-    <div>
-      <div class="message" ng-show="formElement.expression && formElement.expression.length > 0">
+    <div class="message" ng-style="{'font-size': formElement.params.size + 'em'}">
+      <div ng-show="formElement.expression && formElement.expression.length > 0">
         {{formElement.expression}}
       </div>
-      <div class="message" ng-show="!formElement.expression || formElement.expression.length == 0">
+      <div ng-show="!formElement.expression || formElement.expression.length == 0">
       	{{'FORM-BUILDER.MESSAGE.EMPTY-EXPRESSION' | translate}}
       </div>
     </div>
