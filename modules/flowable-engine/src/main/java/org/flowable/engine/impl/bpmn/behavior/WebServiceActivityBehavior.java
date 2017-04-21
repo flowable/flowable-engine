@@ -262,14 +262,14 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
     }
 
     protected void fillImporterInfo(Import theImport, String sourceSystemId) {
-        if (!xmlImporterMap.containsKey(theImport.getImportType())) {
+        if (!xmlImporterMap.containsKey(theImport.getNamespace())) {
 
             if (theImport.getImportType().equals("http://schemas.xmlsoap.org/wsdl/")) {
                 Class<?> wsdlImporterClass;
                 try {
                     wsdlImporterClass = Class.forName("org.flowable.engine.impl.webservice.CxfWSDLImporter", true, Thread.currentThread().getContextClassLoader());
                     XMLImporter importerInstance = (XMLImporter) wsdlImporterClass.newInstance();
-                    xmlImporterMap.put(theImport.getImportType(), importerInstance);
+                    xmlImporterMap.put(theImport.getNamespace(), importerInstance);
                     importerInstance.importFrom(theImport, sourceSystemId);
 
                     structureDefinitionMap.putAll(importerInstance.getStructures());

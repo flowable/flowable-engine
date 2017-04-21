@@ -66,6 +66,7 @@ public class DmnEngineConfigurator extends AbstractProcessEngineConfigurator {
                 throw new FlowableException("A datasource is required for initializing the DMN engine ");
             }
 
+            dmnEngineConfiguration.setDatabaseType(processEngineConfiguration.getDatabaseType());
             dmnEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
             dmnEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
             dmnEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
