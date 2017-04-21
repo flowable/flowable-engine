@@ -33,8 +33,6 @@ import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
 import org.flowable.engine.impl.persistence.entity.VariableScopeImpl;
 
-import de.odysseus.el.ExpressionFactoryImpl;
-
 /**
  * <p>
  * Central manager for all expressions.
@@ -78,7 +76,7 @@ public class ExpressionManager {
     public ExpressionManager(DelegateInterceptor delegateInterceptor, Map<Object, Object> beans, boolean initFactory) {
         // Use the ExpressionFactoryImpl in flowable build in version of juel, with parametrised method expressions enabled
         this.delegateInterceptor = delegateInterceptor;
-        this.expressionFactory = new ExpressionFactoryImpl();
+        this.expressionFactory = ExpressionFactory.newInstance();
         this.beans = beans;
     }
 
