@@ -819,6 +819,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected List<Object> flowable5CustomDefaultBpmnParseHandlers;
     protected Set<Class<?>> flowable5CustomMybatisMappers;
     protected Set<String> flowable5CustomMybatisXMLMappers;
+    protected Object flowable5ExpressionManager;
 
     // buildProcessEngine
     // ///////////////////////////////////////////////////////
@@ -3637,6 +3638,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setFlowable5ActivityBehaviorFactory(Object flowable5ActivityBehaviorFactory) {
         this.flowable5ActivityBehaviorFactory = flowable5ActivityBehaviorFactory;
+        return this;
+    }
+
+    public Object getFlowable5ExpressionManager() {
+        return flowable5ExpressionManager;
+    }
+
+    public ProcessEngineConfigurationImpl setFlowable5ExpressionManager(Object flowable5ExpressionManager) {
+        this.flowable5ExpressionManager = flowable5ExpressionManager;
         return this;
     }
 
