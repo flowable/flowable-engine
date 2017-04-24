@@ -176,7 +176,7 @@ public class DefaultProcessEngineFactory {
     }
 
     protected void copyExpressionManager(ProcessEngineConfigurationImpl flowable6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl flowable5Configuration) {
-        if (flowable6Configuration.getExpressionManager() != null) {
+        if (flowable6Configuration.getFlowable5ExpressionManager() != null) {
             flowable5Configuration.setExpressionManager((ExpressionManager) flowable6Configuration.getFlowable5ExpressionManager());
         }
     }
