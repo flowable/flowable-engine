@@ -13,9 +13,6 @@
 
 package org.flowable.engine.test.bpmn.event.timer;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
