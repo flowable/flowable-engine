@@ -327,8 +327,8 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
                 }
             }
 
-            if (submittedNode.get("outcome") != null) {
-                JsonNode outcomeNode = submittedNode.get("outcome");
+            if (submittedNode.get("flowable_form_outcome") != null) {
+                JsonNode outcomeNode = submittedNode.get("flowable_form_outcome");
                 if (!outcomeNode.isNull() && StringUtils.isNotEmpty(outcomeNode.asText())) {
                     formInstanceModel.setSelectedOutcome(outcomeNode.asText());
                 }
