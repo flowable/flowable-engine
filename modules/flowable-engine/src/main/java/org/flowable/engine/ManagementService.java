@@ -145,6 +145,16 @@ public interface ManagementService {
      *             when there is no job with the given id.
      */
     void deleteTimerJob(String jobId);
+    
+    /**
+     * Delete the suspended job with the provided id.
+     * 
+     * @param jobId
+     *            id of the suspended job to delete, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no job with the given id.
+     */
+    void deleteSuspendedJob(String jobId);
 
     /**
      * Delete the dead letter job with the provided id.

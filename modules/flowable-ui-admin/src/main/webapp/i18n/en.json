@@ -438,6 +438,7 @@
         },
         "ACTIONS": {
             "EXECUTE": "Execute job",
+            "MOVE": "Move job",
             "DELETE": "Delete job"
         },
         "POPUP": {
@@ -460,6 +461,13 @@
         "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching jobs.",
         "LIST-MESSAGE-EMPTY": "No matching jobs.",
         "FILTER": {
+        	"JOBTYPE": {
+        		"LABEL": "Job type",
+        		"EXECUTABLE-JOB": "Executable jobs",
+        		"TIMER-JOB": "Timer jobs",
+        		"SUSPENDED-JOB": "Suspended jobs",
+        		"DEADLETTER-JOB": "Deadletter jobs"
+        	},
             "PROCESS-DEFINITION": "Process definition",
             "ALL-PROCESS-DEFINITIONS": "All process definitions",
             "PROCESS-INSTANCE-ID": "Process instance ID",
@@ -715,6 +723,7 @@
         },
         "JOB": {
             "DELETED": "Job '{{id}}' deleted successfully.",
+            "MOVED": "Job '{{id}}' moved successfully.",
             "EXECUTED": "Job '{{id}}' was executed successfully."
         },
         "EVENT-SUBSCRIPTION": {
