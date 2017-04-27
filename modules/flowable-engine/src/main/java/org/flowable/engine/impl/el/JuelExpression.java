@@ -35,6 +35,8 @@ import org.flowable.engine.impl.interceptor.DelegateInterceptor;
  */
 public class JuelExpression implements Expression {
 
+    private static final long serialVersionUID = 1L;
+    
     protected String expressionText;
     protected ValueExpression valueExpression;
     protected ExpressionManager expressionManager;
@@ -53,6 +55,7 @@ public class JuelExpression implements Expression {
             ExpressionGetInvocation invocation = new ExpressionGetInvocation(valueExpression, elContext);
             delegateInterceptor.handleInvocation(invocation);
             return invocation.getInvocationResult();
+            
         } catch (PropertyNotFoundException pnfe) {
             throw new FlowableException("Unknown property used in expression: " + expressionText, pnfe);
         } catch (MethodNotFoundException mnfe) {

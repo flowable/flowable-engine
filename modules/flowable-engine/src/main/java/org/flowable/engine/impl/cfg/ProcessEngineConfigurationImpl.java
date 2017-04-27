@@ -156,6 +156,7 @@ import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.impl.db.IbatisVariableTypeHandler;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
+import org.flowable.engine.impl.el.DefaultExpressionManager;
 import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.el.FlowableDateFunctionDelegate;
 import org.flowable.engine.impl.event.CompensationEventHandler;
@@ -1857,7 +1858,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initExpressionManager() {
         if (expressionManager == null) {
-            expressionManager = new ExpressionManager(delegateInterceptor, beans, true);
+            expressionManager = new DefaultExpressionManager(delegateInterceptor, beans, true);
         }
 
         expressionManager.setFunctionDelegates(flowableFunctionDelegates);

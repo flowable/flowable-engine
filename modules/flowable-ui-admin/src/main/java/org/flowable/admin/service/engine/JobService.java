@@ -42,29 +42,40 @@ public class JobService {
     protected FlowableClientService clientUtil;
 
     public JsonNode listJobs(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
-
+        String jobType = null;
+        String[] jobTypeParameter = parameterMap.get("jobType");
+        if (jobTypeParameter != null && jobTypeParameter.length > 0) {
+            jobType = jobTypeParameter[0];
+        }
+        
+        String jobUrl = getJobUrl(jobType);
         URIBuilder builder = null;
         try {
-            builder = new URIBuilder("management/jobs");
+            builder = new URIBuilder(jobUrl);
+            
         } catch (Exception e) {
             log.error("Error building uri", e);
             throw new FlowableServiceException("Error building uri", e);
         }
 
         for (String name : parameterMap.keySet()) {
-            builder.addParameter(name, parameterMap.get(name)[0]);
+            if (!"jobType".equals(name)) {
+                builder.addParameter(name, parameterMap.get(name)[0]);
+            }
         }
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder.toString()));
         return clientUtil.executeRequest(get, serverConfig);
     }
 
-    public JsonNode getJob(ServerConfig serverConfig, String jobId) {
-        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "management/jobs/" + jobId));
+    public JsonNode getJob(ServerConfig serverConfig, String jobId, String jobType) {
+        String jobUrl = getJobUrl(jobType);
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, jobUrl + jobId));
         return clientUtil.executeRequest(get, serverConfig);
     }
 
-    public String getJobStacktrace(ServerConfig serverConfig, String jobId) {
-        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "management/jobs/" + jobId + "/exception-stacktrace"));
+    public String getJobStacktrace(ServerConfig serverConfig, String jobId, String jobType) {
+        String jobUrl = getJobUrl(jobType);
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, jobUrl + jobId + "/exception-stacktrace"));
         return clientUtil.executeRequestAsString(get, serverConfig, HttpStatus.SC_OK);
     }
 
@@ -76,9 +87,35 @@ public class JobService {
 
         clientUtil.executeRequestNoResponseBody(post, serverConfig, HttpStatus.SC_NO_CONTENT);
     }
+    
+    public void moveJob(ServerConfig serverConfig, String jobId, String jobType) {
+        String jobUrl = getJobUrl(jobType);
+        HttpPost post = clientUtil.createPost(jobUrl + jobId, serverConfig);
+        ObjectNode node = JsonNodeFactory.instance.objectNode();
+        node.put("action", "move");
+        post.setEntity(clientUtil.createStringEntity(node));
 
-    public void deleteJob(ServerConfig serverConfig, String jobId) {
-        HttpDelete post = new HttpDelete(clientUtil.getServerUrl(serverConfig, "management/jobs/" + jobId));
         clientUtil.executeRequestNoResponseBody(post, serverConfig, HttpStatus.SC_NO_CONTENT);
+    }
+
+    public void deleteJob(ServerConfig serverConfig, String jobId, String jobType) {
+        String jobUrl = getJobUrl(jobType);
+        HttpDelete post = new HttpDelete(clientUtil.getServerUrl(serverConfig, jobUrl + jobId));
+        clientUtil.executeRequestNoResponseBody(post, serverConfig, HttpStatus.SC_NO_CONTENT);
+    }
+    
+    protected String getJobUrl(String jobType) {
+        String jobUrl = null;
+        if ("timerJob".equals(jobType)) {
+            jobUrl = "management/timer-jobs/";
+        } else if ("suspendedJob".equals(jobType)) {
+            jobUrl = "management/suspended-jobs/";
+        } else if ("deadletterJob".equals(jobType)) {
+            jobUrl = "management/deadletter-jobs/";
+        } else {
+            jobUrl = "management/jobs/";
+        }
+        
+        return jobUrl;
     }
 }

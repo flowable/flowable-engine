@@ -367,6 +367,13 @@
 				<include name="upgrade/**" />
 			</fileset>
 		</copy>
+		<copy todir="${target.distro.root}/database/idm">
+			<fileset dir="../modules/flowable-idm-engine/src/main/resources/org/flowable/idm/db">
+				<include name="create/**" />
+				<include name="drop/**" />
+				<include name="upgrade/**" />
+			</fileset>
+		</copy>
 	</target>
 
 </project>

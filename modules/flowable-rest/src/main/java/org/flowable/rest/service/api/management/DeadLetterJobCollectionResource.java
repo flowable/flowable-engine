@@ -13,14 +13,10 @@
 
 package org.flowable.rest.service.api.management;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.runtime.DeadLetterJobQuery;
@@ -33,8 +29,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Joram Barrez
@@ -49,7 +51,6 @@ public class DeadLetterJobCollectionResource {
     @Autowired
     protected ManagementService managementService;
 
-    // Fixme documentation & real parameters
     @ApiOperation(value = "Get a list of deadletter jobs", tags = { "Jobs" }, nickname = "listDeadLetterJobs")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return job with the given id", paramType = "query"),

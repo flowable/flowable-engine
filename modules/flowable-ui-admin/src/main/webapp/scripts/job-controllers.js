@@ -17,9 +17,12 @@
 flowableAdminApp.controller('JobController', ['$scope', '$rootScope', '$http', '$timeout','$location','$routeParams', '$modal', '$translate',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate) {
 		$rootScope.navigation = {main: 'process-engine', sub: 'jobs'};
+		$scope.jobType = {
+			param: $routeParams.jobType
+		}
 		
 		$scope.returnToList = function() {
-			$location.path("/jobs");
+			$location.path("/jobs").search({jobType: $scope.jobType.param});
 		};
 
 		$scope.openDefinition = function(definitionId) {
@@ -31,7 +34,18 @@ flowableAdminApp.controller('JobController', ['$scope', '$rootScope', '$http', '
 		$scope.executeJob = function() {
 			$http({method: 'POST', url: '/app/rest/admin/jobs/' + $scope.job.id}).
         	success(function(data, status, headers, config) {
-        	  $scope.addAlert($translate.instant('ALERT.JOB.EXECUTED', $scope.job), 'info');
+        	  	$scope.addAlert($translate.instant('ALERT.JOB.EXECUTED', $scope.job), 'info');
+        		$scope.returnToList();
+        	})
+        	.error(function(data, status, headers, config) {
+        		$scope.loadJob();
+        	});
+		};
+		
+		$scope.moveJob = function() {
+			$http({method: 'POST', url: '/app/rest/admin/move-jobs/' + $scope.job.id + '?jobType=' + $scope.jobType.param}).
+        	success(function(data, status, headers, config) {
+        	  	$scope.addAlert($translate.instant('ALERT.JOB.MOVED', $scope.job), 'info');
         		$scope.returnToList();
         	})
         	.error(function(data, status, headers, config) {
@@ -46,6 +60,9 @@ flowableAdminApp.controller('JobController', ['$scope', '$rootScope', '$http', '
 				resolve: {
 					job: function() {
 						return $scope.job;
+					},
+					jobType: function() {
+						return $scope.jobType;
 					}
 				}
 			});
@@ -72,13 +89,13 @@ flowableAdminApp.controller('JobController', ['$scope', '$rootScope', '$http', '
 
 		$scope.loadJob = function() {
 			$scope.job = {};
-			$http({method: 'GET', url: '/app/rest/admin/jobs/' + $routeParams.jobId}).
+			$http({method: 'GET', url: '/app/rest/admin/jobs/' + $routeParams.jobId + '?jobType=' + $scope.jobType.param}).
 	    	success(function(data, status, headers, config) {
 	            $scope.job = data;
 
-	            if($scope.job.exceptionMessage) {
+	            if ($scope.job.exceptionMessage) {
 	            	// Fetch the full stacktrace, associated with this job
-	            	$http({method: 'GET', url: '/app/rest/admin/jobs/' + $scope.job.id + "/stacktrace"}).
+	            	$http({method: 'GET', url: '/app/rest/admin/jobs/' + $scope.job.id + '/stacktrace?jobType=' + $scope.jobType.param}).
 	            	success(function(data, status, headers, config) {
 	    	            $scope.job.exceptionStack = data;
 	            	});
@@ -103,21 +120,22 @@ flowableAdminApp.controller('JobController', ['$scope', '$rootScope', '$http', '
 }]);
 
 flowableAdminApp.controller('DeleteModalInstanceCtrl',
-    ['$rootScope', '$scope', '$modalInstance', '$http', 'job', function ($rootScope, $scope, $modalInstance, $http, job) {
+    ['$rootScope', '$scope', '$modalInstance', '$http', 'job', 'jobType', function ($rootScope, $scope, $modalInstance, $http, job, jobType) {
 
 	  $scope.job = job;
+	  $scope.jobType = jobType;
 	  $scope.status = {loading: false};
 
 	  $scope.ok = function () {
 		  $scope.status.loading = true;
-		  $http({method: 'DELETE', url: '/app/rest/admin/jobs/' + $scope.job.id}).
+		  $http({method: 'DELETE', url: '/app/rest/admin/jobs/' + $scope.job.id + '?jobType=' + jobType.param}).
 	    	success(function(data, status, headers, config) {
 	    		$modalInstance.close(true);
 		  		$scope.status.loading = false;
 	        }).
 	        error(function(data, status, headers, config) {
 	        	$modalInstance.close(false);
-		    	 $scope.status.loading = false;
+		    	$scope.status.loading = false;
 	        });
 	  };
 
