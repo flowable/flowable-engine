@@ -34,6 +34,7 @@ public class TimeDurationImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Expression.class)
                 .instanceProvider(new ModelTypeInstanceProvider<TimeDuration>() {
+                    @Override
                     public TimeDuration newInstance(ModelTypeInstanceContext instanceContext) {
                         return new TimeDurationImpl(instanceContext);
                     }

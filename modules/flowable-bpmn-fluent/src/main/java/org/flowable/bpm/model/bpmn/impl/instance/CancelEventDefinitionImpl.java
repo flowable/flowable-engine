@@ -34,6 +34,7 @@ public class CancelEventDefinitionImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(EventDefinition.class)
                 .instanceProvider(new ModelTypeInstanceProvider<CancelEventDefinition>() {
+                    @Override
                     public CancelEventDefinition newInstance(ModelTypeInstanceContext instanceContext) {
                         return new CancelEventDefinitionImpl(instanceContext);
                     }

@@ -22,6 +22,7 @@ import java.util.Collections;
 public class ErrorEventDefinitionTest
         extends AbstractEventDefinitionTest {
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Collections.singletonList(
                 new AttributeAssumption("errorRef"));

@@ -51,6 +51,7 @@ public class CallableElementImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(RootElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<ModelElementInstance>() {
+                    @Override
                     public ModelElementInstance newInstance(ModelTypeInstanceContext instanceContext) {
                         return new CallableElementImpl(instanceContext);
                     }
@@ -78,26 +79,32 @@ public class CallableElementImpl
         super(instanceContext);
     }
 
+    @Override
     public String getName() {
         return nameAttribute.getValue(this);
     }
 
+    @Override
     public void setName(String name) {
         nameAttribute.setValue(this, name);
     }
 
+    @Override
     public Collection<Interface> getSupportedInterfaces() {
         return supportedInterfaceRefCollection.getReferenceTargetElements(this);
     }
 
+    @Override
     public IoSpecification getIoSpecification() {
         return ioSpecificationChild.getChild(this);
     }
 
+    @Override
     public void setIoSpecification(IoSpecification ioSpecification) {
         ioSpecificationChild.setChild(this, ioSpecification);
     }
 
+    @Override
     public Collection<IoBinding> getIoBindings() {
         return ioBindingCollection.get(this);
     }

@@ -20,6 +20,7 @@ import java.util.Collections;
 public class ParallelGatewayTest
         extends AbstractGatewayTest<ParallelGateway> {
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Collections.singletonList(
                 new AttributeAssumption(FLOWABLE_NS, "async", false, false, false));

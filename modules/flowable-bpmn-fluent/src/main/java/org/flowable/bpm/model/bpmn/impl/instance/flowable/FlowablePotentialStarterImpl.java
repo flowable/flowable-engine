@@ -38,6 +38,7 @@ public class FlowablePotentialStarterImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowablePotentialStarter.class, FLOWABLE_ELEMENT_POTENTIAL_STARTER)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowablePotentialStarter>() {
+                    @Override
                     public FlowablePotentialStarter newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowablePotentialStarterImpl(instanceContext);
                     }
@@ -55,10 +56,12 @@ public class FlowablePotentialStarterImpl
         super(instanceContext);
     }
 
+    @Override
     public ResourceAssignmentExpression getResourceAssignmentExpression() {
         return resourceAssignmentExpressionChild.getChild(this);
     }
 
+    @Override
     public void setResourceAssignmentExpression(ResourceAssignmentExpression resourceAssignmentExpression) {
         resourceAssignmentExpressionChild.setChild(this, resourceAssignmentExpression);
     }

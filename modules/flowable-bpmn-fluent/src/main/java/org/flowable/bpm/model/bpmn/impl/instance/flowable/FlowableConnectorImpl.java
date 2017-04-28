@@ -40,6 +40,7 @@ public class FlowableConnectorImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableConnector.class, FLOWABLE_ELEMENT_CONNECTOR)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableConnector>() {
+                    @Override
                     public FlowableConnector newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableConnectorImpl(instanceContext);
                     }
@@ -61,18 +62,22 @@ public class FlowableConnectorImpl
         super(instanceContext);
     }
 
+    @Override
     public FlowableConnectorId getFlowableConnectorId() {
         return flowableConnectorIdChild.getChild(this);
     }
 
+    @Override
     public void setFlowableConnectorId(FlowableConnectorId flowableConnectorId) {
         flowableConnectorIdChild.setChild(this, flowableConnectorId);
     }
 
+    @Override
     public FlowableInputOutput getFlowableInputOutput() {
         return flowableInputOutputChild.getChild(this);
     }
 
+    @Override
     public void setFlowableInputOutput(FlowableInputOutput flowableInputOutput) {
         flowableInputOutputChild.setChild(this, flowableInputOutput);
     }

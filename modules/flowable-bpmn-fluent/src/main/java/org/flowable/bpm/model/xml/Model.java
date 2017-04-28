@@ -12,10 +12,10 @@
  */
 package org.flowable.bpm.model.xml;
 
-import java.util.Collection;
-
 import org.flowable.bpm.model.xml.instance.ModelElementInstance;
 import org.flowable.bpm.model.xml.type.ModelElementType;
+
+import java.util.Collection;
 
 /**
  * A model contains all defined types and the relationship between them. See {@link ModelBuilder#createInstance} to create a new model.

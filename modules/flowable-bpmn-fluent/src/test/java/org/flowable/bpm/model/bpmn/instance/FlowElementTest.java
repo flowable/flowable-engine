@@ -22,10 +22,12 @@ import java.util.Collections;
 public class FlowElementTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(BaseElement.class, true);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Arrays.asList(
                 new ChildElementAssumption(Auditing.class, 0, 1),
@@ -33,6 +35,7 @@ public class FlowElementTest
                 new ChildElementAssumption(CategoryValueRef.class));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Collections.singletonList(
                 new AttributeAssumption("name"));

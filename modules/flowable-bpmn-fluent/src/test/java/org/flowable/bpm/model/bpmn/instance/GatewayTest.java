@@ -21,14 +21,17 @@ import java.util.Collections;
 public class GatewayTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(FlowNode.class, true);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return null;
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Collections.singletonList(
                 new AttributeAssumption("gatewayDirection", false, false, GatewayDirection.Unspecified));

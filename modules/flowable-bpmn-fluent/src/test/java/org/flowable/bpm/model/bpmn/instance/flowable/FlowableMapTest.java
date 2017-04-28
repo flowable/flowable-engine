@@ -22,15 +22,18 @@ import java.util.Collections;
 public class FlowableMapTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(FLOWABLE_NS, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Collections.singletonList(
                 new ChildElementAssumption(FLOWABLE_NS, FlowableEntry.class));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return null;
     }

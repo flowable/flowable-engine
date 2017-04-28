@@ -12,8 +12,6 @@
  */
 package org.flowable.bpm.model.xml.testmodel;
 
-import java.io.InputStream;
-
 import org.flowable.bpm.model.xml.ModelInstance;
 import org.flowable.bpm.model.xml.impl.parser.AbstractModelParser;
 import org.flowable.bpm.model.xml.testmodel.instance.Animal;
@@ -24,6 +22,8 @@ import org.flowable.bpm.model.xml.testmodel.instance.RelationshipDefinition;
 import org.junit.After;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import java.io.InputStream;
 
 @RunWith(Parameterized.class)
 public abstract class TestModelTest {

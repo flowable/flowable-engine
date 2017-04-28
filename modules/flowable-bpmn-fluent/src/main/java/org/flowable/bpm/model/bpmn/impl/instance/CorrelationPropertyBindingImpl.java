@@ -42,6 +42,7 @@ public class CorrelationPropertyBindingImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<CorrelationPropertyBinding>() {
+                    @Override
                     public CorrelationPropertyBinding newInstance(ModelTypeInstanceContext instanceContext) {
                         return new CorrelationPropertyBindingImpl(instanceContext);
                     }
@@ -65,18 +66,22 @@ public class CorrelationPropertyBindingImpl
         super(instanceContext);
     }
 
+    @Override
     public CorrelationProperty getCorrelationProperty() {
         return correlationPropertyRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setCorrelationProperty(CorrelationProperty correlationProperty) {
         correlationPropertyRefAttribute.setReferenceTargetElement(this, correlationProperty);
     }
 
+    @Override
     public DataPath getDataPath() {
         return dataPathChild.getChild(this);
     }
 
+    @Override
     public void setDataPath(DataPath dataPath) {
         dataPathChild.setChild(this, dataPath);
     }

@@ -21,14 +21,17 @@ import java.util.Collection;
 public class TransformationTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(FormalExpression.class, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return null;
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return null;
     }

@@ -30,6 +30,7 @@ public class Target
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Target.class, BPMN_ELEMENT_TARGET)
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<Target>() {
+                    @Override
                     public Target newInstance(ModelTypeInstanceContext instanceContext) {
                         return new Target(instanceContext);
                     }

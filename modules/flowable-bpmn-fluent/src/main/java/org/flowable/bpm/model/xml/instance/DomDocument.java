@@ -12,11 +12,11 @@
  */
 package org.flowable.bpm.model.xml.instance;
 
-import java.util.List;
+import org.w3c.dom.Document;
 
 import javax.xml.transform.dom.DOMSource;
 
-import org.w3c.dom.Document;
+import java.util.List;
 
 /**
  * Encapsulates a {@link Document}. Implementations of this interface must be thread-safe.

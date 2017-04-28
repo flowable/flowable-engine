@@ -12,11 +12,11 @@
  */
 package org.flowable.bpm.model.xml.type.attribute;
 
-import java.util.List;
-
 import org.flowable.bpm.model.xml.instance.ModelElementInstance;
 import org.flowable.bpm.model.xml.type.ModelElementType;
 import org.flowable.bpm.model.xml.type.reference.Reference;
+
+import java.util.List;
 
 /**
  * @param <T>

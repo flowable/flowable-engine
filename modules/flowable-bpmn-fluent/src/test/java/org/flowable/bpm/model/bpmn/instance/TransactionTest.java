@@ -14,6 +14,15 @@ package org.flowable.bpm.model.bpmn.instance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.Collections;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.flowable.bpm.model.bpmn.BpmnModelBuilder;
 import org.flowable.bpm.model.bpmn.BpmnModelInstance;
 import org.flowable.bpm.model.bpmn.TransactionMethod;
@@ -22,30 +31,21 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
 
 public class TransactionTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(SubProcess.class, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Collections.emptyList();
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Collections.singletonList(
                 new AttributeAssumption("method", false, false, TransactionMethod.Compensate));
@@ -63,7 +63,7 @@ public class TransactionTest
 
     @Test
     public void shouldWriteTransaction()
-        throws ParserConfigurationException, SAXException, IOException {
+            throws Exception {
         // given a model
         BpmnModelInstance newModel = BpmnModelBuilder.createProcess("process").done();
 

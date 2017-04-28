@@ -18,10 +18,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import org.flowable.bpm.model.xml.ModelInstance;
 import org.flowable.bpm.model.xml.impl.ModelImpl;
 import org.flowable.bpm.model.xml.impl.parser.AbstractModelParser;
@@ -36,6 +32,10 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class AlternativeNsTest
         extends TestModelTest {

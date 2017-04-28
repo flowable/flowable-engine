@@ -34,6 +34,7 @@ public class ActivationConditionImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Expression.class)
                 .instanceProvider(new ModelTypeInstanceProvider<ActivationCondition>() {
+                    @Override
                     public ActivationCondition newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ActivationConditionImpl(instanceContext);
                     }

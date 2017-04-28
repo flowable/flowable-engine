@@ -42,6 +42,7 @@ public class ErrorImpl
                 .namespaceUri(BpmnModelConstants.BPMN20_NS)
                 .extendsType(RootElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<Error>() {
+                    @Override
                     public Error newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ErrorImpl(instanceContext);
                     }
@@ -64,26 +65,32 @@ public class ErrorImpl
         super(context);
     }
 
+    @Override
     public String getName() {
         return nameAttribute.getValue(this);
     }
 
+    @Override
     public void setName(String name) {
         nameAttribute.setValue(this, name);
     }
 
+    @Override
     public String getErrorCode() {
         return errorCodeAttribute.getValue(this);
     }
 
+    @Override
     public void setErrorCode(String errorCode) {
         errorCodeAttribute.setValue(this, errorCode);
     }
 
+    @Override
     public ItemDefinition getStructure() {
         return structureRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setStructure(ItemDefinition structure) {
         structureRefAttribute.setReferenceTargetElement(this, structure);
     }

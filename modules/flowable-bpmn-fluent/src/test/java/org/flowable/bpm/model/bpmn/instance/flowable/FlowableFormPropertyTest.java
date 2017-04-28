@@ -23,15 +23,18 @@ import java.util.Collections;
 public class FlowableFormPropertyTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(FLOWABLE_NS, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Collections.singletonList(
                 new ChildElementAssumption(FLOWABLE_NS, FlowableValue.class));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Arrays.asList(
                 new AttributeAssumption(FLOWABLE_NS, "id"),

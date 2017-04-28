@@ -21,15 +21,18 @@ import java.util.Collections;
 
 public class FlowablePotentialStarterTest
         extends BpmnModelElementInstanceTest {
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(BpmnModelConstants.FLOWABLE_NS, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Collections.singletonList(
                 new ChildElementAssumption(ResourceAssignmentExpression.class, 0, 1));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return null;
     }

@@ -53,6 +53,7 @@ public class ParticipantImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<Participant>() {
+                    @Override
                     public Participant newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ParticipantImpl(instanceContext);
                     }
@@ -85,34 +86,42 @@ public class ParticipantImpl
         super(instanceContext);
     }
 
+    @Override
     public String getName() {
         return nameAttribute.getValue(this);
     }
 
+    @Override
     public void setName(String name) {
         nameAttribute.setValue(this, name);
     }
 
+    @Override
     public Process getProcess() {
         return processRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setProcess(Process process) {
         processRefAttribute.setReferenceTargetElement(this, process);
     }
 
+    @Override
     public Collection<Interface> getInterfaces() {
         return interfaceRefCollection.getReferenceTargetElements(this);
     }
 
+    @Override
     public Collection<EndPoint> getEndPoints() {
         return endPointRefCollection.getReferenceTargetElements(this);
     }
 
+    @Override
     public ParticipantMultiplicity getParticipantMultiplicity() {
         return participantMultiplicityChild.getChild(this);
     }
 
+    @Override
     public void setParticipantMultiplicity(ParticipantMultiplicity participantMultiplicity) {
         participantMultiplicityChild.setChild(this, participantMultiplicity);
     }

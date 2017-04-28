@@ -30,6 +30,7 @@ public class TargetRef
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(TargetRef.class, BPMN_ELEMENT_TARGET_REF)
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<TargetRef>() {
+                    @Override
                     public TargetRef newInstance(ModelTypeInstanceContext instanceContext) {
                         return new TargetRef(instanceContext);
                     }

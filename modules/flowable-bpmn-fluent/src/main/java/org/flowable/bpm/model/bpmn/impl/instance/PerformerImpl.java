@@ -33,6 +33,7 @@ public class PerformerImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(ResourceRole.class)
                 .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<Performer>() {
+                    @Override
                     public Performer newInstance(ModelTypeInstanceContext instanceContext) {
                         return new PerformerImpl(instanceContext);
                     }

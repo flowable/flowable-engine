@@ -34,6 +34,7 @@ public class TerminateEventDefinitionImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(EventDefinition.class)
                 .instanceProvider(new ModelTypeInstanceProvider<TerminateEventDefinition>() {
+                    @Override
                     public TerminateEventDefinition newInstance(ModelTypeInstanceContext instanceContext) {
                         return new TerminateEventDefinitionImpl(instanceContext);
                     }

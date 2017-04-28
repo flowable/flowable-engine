@@ -23,10 +23,12 @@ import java.util.Collections;
 public class ConversationNodeTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(BaseElement.class, true);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Arrays.asList(
                 new ChildElementAssumption(ParticipantRef.class),
@@ -34,6 +36,7 @@ public class ConversationNodeTest
                 new ChildElementAssumption(CorrelationKey.class));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Collections.singletonList(
                 new AttributeAssumption("name"));

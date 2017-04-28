@@ -53,7 +53,7 @@ public class AbstractFlowableFormFieldBuilder<P, B extends AbstractFlowableFormF
      *
      * @return the parent activity builder
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings("unchecked")
     public P flowableFormFieldDone() {
         return (P) parent.builder();
     }

@@ -46,6 +46,7 @@ public class DataObjectImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(FlowElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<DataObject>() {
+                    @Override
                     public DataObject newInstance(ModelTypeInstanceContext instanceContext) {
                         return new DataObjectImpl(instanceContext);
                     }

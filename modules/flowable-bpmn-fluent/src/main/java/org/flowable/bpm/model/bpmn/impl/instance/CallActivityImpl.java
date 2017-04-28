@@ -43,6 +43,7 @@ public class CallActivityImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Activity.class)
                 .instanceProvider(new ModelTypeInstanceProvider<CallActivity>() {
+                    @Override
                     public CallActivity newInstance(ModelTypeInstanceContext instanceContext) {
                         return new CallActivityImpl(instanceContext);
                     }
@@ -70,10 +71,12 @@ public class CallActivityImpl
         return new CallActivityBuilder((BpmnModelInstance) modelInstance, this);
     }
 
+    @Override
     public String getCalledElement() {
         return calledElementAttribute.getValue(this);
     }
 
+    @Override
     public void setCalledElement(String calledElement) {
         calledElementAttribute.setValue(this, calledElement);
     }

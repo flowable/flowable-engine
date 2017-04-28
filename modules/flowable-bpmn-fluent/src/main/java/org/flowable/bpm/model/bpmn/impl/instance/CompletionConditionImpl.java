@@ -35,6 +35,7 @@ public class CompletionConditionImpl
                 .extendsType(Expression.class)
                 .instanceProvider(
                         new ModelElementTypeBuilder.ModelTypeInstanceProvider<CompletionCondition>() {
+                            @Override
                             public CompletionCondition newInstance(ModelTypeInstanceContext instanceContext) {
                                 return new CompletionConditionImpl(instanceContext);
                             }

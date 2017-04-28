@@ -35,6 +35,7 @@ public class ComplexBehaviorDefinitionImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<ComplexBehaviorDefinition>() {
+                    @Override
                     public ComplexBehaviorDefinition newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ComplexBehaviorDefinitionImpl(instanceContext);
                     }

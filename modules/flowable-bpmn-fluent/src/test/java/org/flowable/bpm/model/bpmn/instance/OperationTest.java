@@ -23,10 +23,12 @@ import java.util.Collection;
 public class OperationTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(BaseElement.class, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Arrays.asList(
                 new ChildElementAssumption(InMessageRef.class, 1, 1),
@@ -34,6 +36,7 @@ public class OperationTest
                 new ChildElementAssumption(ErrorRef.class));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Arrays.asList(
                 new AttributeAssumption("name", false, true),

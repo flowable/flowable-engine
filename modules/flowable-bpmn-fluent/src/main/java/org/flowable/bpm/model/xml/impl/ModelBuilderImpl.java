@@ -14,9 +14,6 @@ package org.flowable.bpm.model.xml.impl;
 
 import static org.flowable.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.flowable.bpm.model.xml.Model;
 import org.flowable.bpm.model.xml.ModelBuilder;
 import org.flowable.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
@@ -25,6 +22,9 @@ import org.flowable.bpm.model.xml.impl.type.ModelElementTypeBuilderImpl;
 import org.flowable.bpm.model.xml.instance.ModelElementInstance;
 import org.flowable.bpm.model.xml.type.ModelElementType;
 import org.flowable.bpm.model.xml.type.ModelElementTypeBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This builder is used to define and create a new model.

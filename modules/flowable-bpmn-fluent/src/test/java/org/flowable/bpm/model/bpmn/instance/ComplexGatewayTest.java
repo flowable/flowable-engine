@@ -22,11 +22,13 @@ import java.util.Collections;
 public class ComplexGatewayTest
         extends AbstractGatewayTest<ComplexGateway> {
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Collections.singletonList(
                 new ChildElementAssumption(ActivationCondition.class, 0, 1));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Collections.singletonList(
                 new AttributeAssumption("default"));

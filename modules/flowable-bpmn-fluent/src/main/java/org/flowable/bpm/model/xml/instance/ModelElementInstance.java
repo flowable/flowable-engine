@@ -12,12 +12,12 @@
  */
 package org.flowable.bpm.model.xml.instance;
 
-import java.util.Collection;
-
 import org.flowable.bpm.model.xml.ModelException;
 import org.flowable.bpm.model.xml.ModelInstance;
 import org.flowable.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.flowable.bpm.model.xml.type.ModelElementType;
+
+import java.util.Collection;
 
 /**
  * An instance of a {@link ModelElementType}.

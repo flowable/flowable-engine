@@ -12,17 +12,17 @@
  */
 package org.flowable.bpm.model.xml.test.assertions;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import org.assertj.core.api.AbstractAssert;
 import org.flowable.bpm.model.xml.Model;
 import org.flowable.bpm.model.xml.impl.util.QName;
 import org.flowable.bpm.model.xml.instance.ModelElementInstance;
 import org.flowable.bpm.model.xml.type.ModelElementType;
 import org.flowable.bpm.model.xml.type.attribute.Attribute;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public class ModelElementTypeAssert
         extends AbstractAssert<ModelElementTypeAssert, ModelElementType> {

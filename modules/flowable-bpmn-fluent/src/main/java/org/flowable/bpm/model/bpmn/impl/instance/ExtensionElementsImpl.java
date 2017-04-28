@@ -39,6 +39,7 @@ public class ExtensionElementsImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ExtensionElements.class, BPMN_ELEMENT_EXTENSION_ELEMENTS)
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<ExtensionElements>() {
+                    @Override
                     public ExtensionElements newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ExtensionElementsImpl(instanceContext);
                     }
@@ -51,14 +52,17 @@ public class ExtensionElementsImpl
         super(context);
     }
 
+    @Override
     public Collection<ModelElementInstance> getElements() {
         return ModelUtil.getModelElementCollection(getDomElement().getChildElements(), modelInstance);
     }
 
+    @Override
     public Query<ModelElementInstance> getElementsQuery() {
         return new QueryImpl<>(getElements());
     }
 
+    @Override
     public ModelElementInstance addExtensionElement(String namespaceUri, String localName) {
         ModelElementType extensionElementType = modelInstance.registerGenericType(namespaceUri, localName);
         ModelElementInstance extensionElement = extensionElementType.newInstance(modelInstance);
@@ -66,6 +70,7 @@ public class ExtensionElementsImpl
         return extensionElement;
     }
 
+    @Override
     public <T extends ModelElementInstance> T addExtensionElement(Class<T> extensionElementClass) {
         ModelElementInstance extensionElement = modelInstance.newInstance(extensionElementClass);
         addChildElement(extensionElement);

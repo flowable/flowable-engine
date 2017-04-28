@@ -23,6 +23,7 @@ import java.util.Collection;
 public interface FlowNode
         extends FlowElement {
 
+    @Override
     @SuppressWarnings("rawtypes")
     AbstractFlowNodeBuilder builder();
 

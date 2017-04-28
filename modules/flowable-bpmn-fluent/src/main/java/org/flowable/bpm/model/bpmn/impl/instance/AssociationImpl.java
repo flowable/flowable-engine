@@ -23,7 +23,6 @@ import org.flowable.bpm.model.bpmn.AssociationDirection;
 import org.flowable.bpm.model.bpmn.instance.Artifact;
 import org.flowable.bpm.model.bpmn.instance.Association;
 import org.flowable.bpm.model.bpmn.instance.BaseElement;
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnEdge;
 import org.flowable.bpm.model.xml.ModelBuilder;
 import org.flowable.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.flowable.bpm.model.xml.type.ModelElementTypeBuilder;
@@ -43,6 +42,7 @@ public class AssociationImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Artifact.class)
                 .instanceProvider(new ModelTypeInstanceProvider<Association>() {
+                    @Override
                     public Association newInstance(ModelTypeInstanceContext instanceContext) {
                         return new AssociationImpl(instanceContext);
                     }
@@ -69,32 +69,33 @@ public class AssociationImpl
         super(instanceContext);
     }
 
+    @Override
     public BaseElement getSource() {
         return sourceRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setSource(BaseElement source) {
         sourceRefAttribute.setReferenceTargetElement(this, source);
     }
 
+    @Override
     public BaseElement getTarget() {
         return targetRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setTarget(BaseElement target) {
         targetRefAttribute.setReferenceTargetElement(this, target);
     }
 
+    @Override
     public AssociationDirection getAssociationDirection() {
         return associationDirectionAttribute.getValue(this);
     }
 
+    @Override
     public void setAssociationDirection(AssociationDirection associationDirection) {
         associationDirectionAttribute.setValue(this, associationDirection);
     }
-
-    public BpmnEdge getDiagramElement() {
-        return (BpmnEdge) super.getDiagramElement();
-    }
-
 }

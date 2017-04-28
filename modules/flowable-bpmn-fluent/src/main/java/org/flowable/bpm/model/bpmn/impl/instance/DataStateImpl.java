@@ -35,6 +35,7 @@ public class DataStateImpl
                 .namespaceUri(BpmnModelConstants.BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<DataState>() {
+                    @Override
                     public DataState newInstance(ModelTypeInstanceContext instanceContext) {
                         return new DataStateImpl(instanceContext);
                     }
@@ -50,10 +51,12 @@ public class DataStateImpl
         super(instanceContext);
     }
 
+    @Override
     public String getName() {
         return nameAttribute.getValue(this);
     }
 
+    @Override
     public void setName(String name) {
         nameAttribute.setValue(this, name);
     }

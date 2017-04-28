@@ -22,6 +22,7 @@ import java.util.Collections;
 public class InclusiveGatewayTest
         extends AbstractGatewayTest<InclusiveGateway> {
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Collections.singletonList(
                 new AttributeAssumption("default"));

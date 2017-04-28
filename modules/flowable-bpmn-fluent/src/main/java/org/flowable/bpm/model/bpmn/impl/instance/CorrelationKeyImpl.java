@@ -44,6 +44,7 @@ public class CorrelationKeyImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<CorrelationKey>() {
+                    @Override
                     public CorrelationKey newInstance(ModelTypeInstanceContext instanceContext) {
                         return new CorrelationKeyImpl(instanceContext);
                     }
@@ -66,14 +67,17 @@ public class CorrelationKeyImpl
         super(instanceContext);
     }
 
+    @Override
     public String getName() {
         return nameAttribute.getValue(this);
     }
 
+    @Override
     public void setName(String name) {
         nameAttribute.setValue(this, name);
     }
 
+    @Override
     public Collection<CorrelationProperty> getCorrelationProperties() {
         return correlationPropertyRefCollection.getReferenceTargetElements(this);
     }

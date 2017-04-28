@@ -12,19 +12,13 @@
  */
 package org.flowable.bpm.model.bpmn.instance;
 
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnShape;
-
 import java.util.Collection;
 
 /**
  * The BPMN event element.
- *
  */
 public interface Event
         extends FlowNode, InteractionNode {
 
     Collection<Property> getProperties();
-
-    BpmnShape getDiagramElement();
-
 }

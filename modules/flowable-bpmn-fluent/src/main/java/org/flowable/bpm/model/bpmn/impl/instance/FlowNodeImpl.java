@@ -89,11 +89,13 @@ public abstract class FlowNodeImpl
         super(context);
     }
 
+    @Override
     @SuppressWarnings("rawtypes")
     public AbstractFlowNodeBuilder builder() {
         throw new BpmnModelException("No builder implemented for type " + getElementType().getTypeNamespace() + ':' + getElementType().getTypeName());
     }
 
+    @Override
     @SuppressWarnings("rawtypes")
     public void updateAfterReplacement() {
         super.updateAfterReplacement();
@@ -115,14 +117,17 @@ public abstract class FlowNodeImpl
         }
     }
 
+    @Override
     public Collection<SequenceFlow> getIncoming() {
         return incomingCollection.getReferenceTargetElements(this);
     }
 
+    @Override
     public Collection<SequenceFlow> getOutgoing() {
         return outgoingCollection.getReferenceTargetElements(this);
     }
 
+    @Override
     public Query<FlowNode> getPreviousNodes() {
         Collection<FlowNode> previousNodes = new HashSet<>();
         for (SequenceFlow sequenceFlow : getIncoming()) {
@@ -131,6 +136,7 @@ public abstract class FlowNodeImpl
         return new QueryImpl<>(previousNodes);
     }
 
+    @Override
     public Query<FlowNode> getSucceedingNodes() {
         Collection<FlowNode> succeedingNodes = new HashSet<>();
         for (SequenceFlow sequenceFlow : getOutgoing()) {
@@ -141,18 +147,22 @@ public abstract class FlowNodeImpl
 
     /** Flowable Attributes */
 
+    @Override
     public boolean isFlowableAsync() {
         return flowableAsync.getValue(this);
     }
 
+    @Override
     public void setFlowableAsync(boolean isFlowableAsync) {
         flowableAsync.setValue(this, isFlowableAsync);
     }
 
+    @Override
     public boolean isFlowableExclusive() {
         return flowableExclusive.getValue(this);
     }
 
+    @Override
     public void setFlowableExclusive(boolean isFlowableExclusive) {
         flowableExclusive.setValue(this, isFlowableExclusive);
     }

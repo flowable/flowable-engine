@@ -29,6 +29,7 @@ public class EventDefinitionRef
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(EventDefinitionRef.class, BPMN_ELEMENT_EVENT_DEFINITION_REF)
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<EventDefinitionRef>() {
+                    @Override
                     public EventDefinitionRef newInstance(ModelTypeInstanceContext instanceContext) {
                         return new EventDefinitionRef(instanceContext);
                     }

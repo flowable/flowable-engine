@@ -34,6 +34,7 @@ public class TimeCycleImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Expression.class)
                 .instanceProvider(new ModelTypeInstanceProvider<TimeCycle>() {
+                    @Override
                     public TimeCycle newInstance(ModelTypeInstanceContext instanceContext) {
                         return new TimeCycleImpl(instanceContext);
                     }

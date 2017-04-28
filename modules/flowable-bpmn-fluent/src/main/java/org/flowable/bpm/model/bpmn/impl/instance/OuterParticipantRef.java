@@ -30,6 +30,7 @@ public class OuterParticipantRef
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(OuterParticipantRef.class, BPMN_ELEMENT_OUTER_PARTICIPANT_REF)
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<OuterParticipantRef>() {
+                    @Override
                     public OuterParticipantRef newInstance(ModelTypeInstanceContext instanceContext) {
                         return new OuterParticipantRef(instanceContext);
                     }

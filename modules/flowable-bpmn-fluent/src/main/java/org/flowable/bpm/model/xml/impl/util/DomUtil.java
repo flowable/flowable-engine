@@ -12,16 +12,6 @@
  */
 package org.flowable.bpm.model.xml.impl.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.flowable.bpm.model.xml.ModelParseException;
 import org.flowable.bpm.model.xml.impl.ModelInstanceImpl;
 import org.flowable.bpm.model.xml.impl.instance.DomDocumentImpl;
@@ -35,6 +25,16 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Helper methods which abstract some gruesome DOM specifics. It does not provide synchronization when invoked in parallel with the same objects.

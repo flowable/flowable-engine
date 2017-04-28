@@ -17,6 +17,7 @@ import java.util.Collection;
 public class PerformerTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(ResourceRole.class, false);
     }

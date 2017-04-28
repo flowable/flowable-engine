@@ -34,6 +34,7 @@ public class DataInputAssociationImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(DataAssociation.class)
                 .instanceProvider(new ModelTypeInstanceProvider<DataInputAssociation>() {
+                    @Override
                     public DataInputAssociation newInstance(ModelTypeInstanceContext instanceContext) {
                         return new DataInputAssociationImpl(instanceContext);
                     }

@@ -23,16 +23,19 @@ import java.util.Collection;
 public class FlowableExecutionListenerTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(FLOWABLE_NS, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Arrays.asList(
                 new ChildElementAssumption(FLOWABLE_NS, FlowableField.class),
                 new ChildElementAssumption(FLOWABLE_NS, FlowableScript.class, 0, 1));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Arrays.asList(
                 new AttributeAssumption(FLOWABLE_NS, "event"),

@@ -23,6 +23,7 @@ import java.util.Collections;
 public class ExclusiveGatewayTest
         extends AbstractGatewayTest<ExclusiveGateway> {
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Collections.singletonList(
                 new AttributeAssumption("default"));

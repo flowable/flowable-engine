@@ -30,6 +30,7 @@ public class OperationRef
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(OperationRef.class, BPMN_ELEMENT_OPERATION_REF)
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<OperationRef>() {
+                    @Override
                     public OperationRef newInstance(ModelTypeInstanceContext instanceContext) {
                         return new OperationRef(instanceContext);
                     }

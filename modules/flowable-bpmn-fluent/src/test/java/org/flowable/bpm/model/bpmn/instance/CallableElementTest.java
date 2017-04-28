@@ -22,10 +22,12 @@ import java.util.Collections;
 public class CallableElementTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(RootElement.class, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Arrays.asList(
                 new ChildElementAssumption(SupportedInterfaceRef.class),
@@ -33,6 +35,7 @@ public class CallableElementTest
                 new ChildElementAssumption(IoBinding.class));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Collections.singletonList(
                 new AttributeAssumption("name"));

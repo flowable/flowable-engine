@@ -30,6 +30,7 @@ public class SourceRef
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(SourceRef.class, BPMN_ELEMENT_SOURCE_REF)
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<SourceRef>() {
+                    @Override
                     public SourceRef newInstance(ModelTypeInstanceContext instanceContext) {
                         return new SourceRef(instanceContext);
                     }

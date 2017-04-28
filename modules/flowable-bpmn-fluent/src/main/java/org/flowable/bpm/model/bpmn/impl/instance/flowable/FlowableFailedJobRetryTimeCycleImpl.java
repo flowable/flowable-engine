@@ -33,6 +33,7 @@ public class FlowableFailedJobRetryTimeCycleImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableFailedJobRetryTimeCycle.class, FLOWABLE_ELEMENT_FAILED_JOB_RETRY_TIME_CYCLE)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableFailedJobRetryTimeCycle>() {
+                    @Override
                     public FlowableFailedJobRetryTimeCycle newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableFailedJobRetryTimeCycleImpl(instanceContext);
                     }

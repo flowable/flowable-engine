@@ -33,6 +33,7 @@ public class FlowableExpressionImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableExpression.class, FLOWABLE_ELEMENT_EXPRESSION)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableExpression>() {
+                    @Override
                     public FlowableExpression newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableExpressionImpl(instanceContext);
                     }

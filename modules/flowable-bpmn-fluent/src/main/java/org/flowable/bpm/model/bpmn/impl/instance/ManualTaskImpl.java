@@ -36,6 +36,7 @@ public class ManualTaskImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Task.class)
                 .instanceProvider(new ModelTypeInstanceProvider<ManualTask>() {
+                    @Override
                     public ManualTask newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ManualTaskImpl(instanceContext);
                     }
@@ -48,6 +49,7 @@ public class ManualTaskImpl
         super(context);
     }
 
+    @Override
     public ManualTaskBuilder builder() {
         return new ManualTaskBuilder((BpmnModelInstance) modelInstance, this);
     }

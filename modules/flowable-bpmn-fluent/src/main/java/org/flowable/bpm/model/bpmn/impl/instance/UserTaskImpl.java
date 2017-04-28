@@ -66,6 +66,7 @@ public class UserTaskImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Task.class)
                 .instanceProvider(new ModelTypeInstanceProvider<UserTask>() {
+                    @Override
                     public UserTask newInstance(ModelTypeInstanceContext instanceContext) {
                         return new UserTaskImpl(instanceContext);
                     }
@@ -122,92 +123,113 @@ public class UserTaskImpl
         return new UserTaskBuilder((BpmnModelInstance) modelInstance, this);
     }
 
+    @Override
     public String getImplementation() {
         return implementationAttribute.getValue(this);
     }
 
+    @Override
     public void setImplementation(String implementation) {
         implementationAttribute.setValue(this, implementation);
     }
 
+    @Override
     public Collection<Rendering> getRenderings() {
         return renderingCollection.get(this);
     }
 
     /* Flowable extensions */
 
+    @Override
     public String getFlowableAssignee() {
         return flowableAssigneeAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableAssignee(String flowableAssignee) {
         flowableAssigneeAttribute.setValue(this, flowableAssignee);
     }
 
+    @Override
     public String getFlowableCandidateGroups() {
         return flowableCandidateGroupsAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableCandidateGroups(String flowableCandidateGroups) {
         flowableCandidateGroupsAttribute.setValue(this, flowableCandidateGroups);
     }
 
+    @Override
     public List<String> getFlowableCandidateGroupsList() {
         String candidateGroups = flowableCandidateGroupsAttribute.getValue(this);
         return StringUtil.splitCommaSeparatedList(candidateGroups);
     }
 
+    @Override
     public void setFlowableCandidateGroupsList(List<String> flowableCandidateGroupsList) {
         String candidateGroups = StringUtil.joinCommaSeparatedList(flowableCandidateGroupsList);
         flowableCandidateGroupsAttribute.setValue(this, candidateGroups);
     }
 
+    @Override
     public String getFlowableCandidateUsers() {
         return flowableCandidateUsersAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableCandidateUsers(String flowableCandidateUsers) {
         flowableCandidateUsersAttribute.setValue(this, flowableCandidateUsers);
     }
 
+    @Override
     public List<String> getFlowableCandidateUsersList() {
         String candidateUsers = flowableCandidateUsersAttribute.getValue(this);
         return StringUtil.splitCommaSeparatedList(candidateUsers);
     }
 
+    @Override
     public void setFlowableCandidateUsersList(List<String> flowableCandidateUsersList) {
         String candidateUsers = StringUtil.joinCommaSeparatedList(flowableCandidateUsersList);
         flowableCandidateUsersAttribute.setValue(this, candidateUsers);
     }
 
+    @Override
     public String getFlowableDueDate() {
         return flowableDueDateAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableDueDate(String flowableDueDate) {
         flowableDueDateAttribute.setValue(this, flowableDueDate);
     }
 
+    @Override
     public String getFlowableFormHandlerClass() {
         return flowableFormHandlerClassAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableFormHandlerClass(String flowableFormHandlerClass) {
         flowableFormHandlerClassAttribute.setValue(this, flowableFormHandlerClass);
     }
 
+    @Override
     public String getFlowableFormKey() {
         return flowableFormKeyAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableFormKey(String flowableFormKey) {
         flowableFormKeyAttribute.setValue(this, flowableFormKey);
     }
 
+    @Override
     public String getFlowablePriority() {
         return flowablePriorityAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowablePriority(String flowablePriority) {
         flowablePriorityAttribute.setValue(this, flowablePriority);
     }

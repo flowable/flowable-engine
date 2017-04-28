@@ -30,6 +30,7 @@ public class InputSetRefs
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(InputSetRefs.class, BPMN_ELEMENT_INPUT_SET_REFS)
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<InputSetRefs>() {
+                    @Override
                     public InputSetRefs newInstance(ModelTypeInstanceContext instanceContext) {
                         return new InputSetRefs(instanceContext);
                     }

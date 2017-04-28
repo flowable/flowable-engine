@@ -29,6 +29,7 @@ public class FlowableEntryImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableEntry.class, FLOWABLE_ELEMENT_ENTRY)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableEntry>() {
+                    @Override
                     public FlowableEntry newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableEntryImpl(instanceContext);
                     }

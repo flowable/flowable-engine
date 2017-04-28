@@ -30,6 +30,7 @@ public class FlowNodeRef
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowNodeRef.class, BPMN_ELEMENT_FLOW_NODE_REF)
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowNodeRef>() {
+                    @Override
                     public FlowNodeRef newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowNodeRef(instanceContext);
                     }

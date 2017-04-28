@@ -12,13 +12,6 @@
  */
 package org.flowable.bpm.model.xml.impl.type;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.flowable.bpm.model.xml.Model;
 import org.flowable.bpm.model.xml.ModelException;
 import org.flowable.bpm.model.xml.ModelInstance;
@@ -34,6 +27,13 @@ import org.flowable.bpm.model.xml.type.ModelElementType;
 import org.flowable.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 import org.flowable.bpm.model.xml.type.attribute.Attribute;
 import org.flowable.bpm.model.xml.type.child.ChildElementCollection;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ModelElementTypeImpl
         implements ModelElementType {

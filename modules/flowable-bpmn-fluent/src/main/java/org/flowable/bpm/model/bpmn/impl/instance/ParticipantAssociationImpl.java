@@ -40,6 +40,7 @@ public class ParticipantAssociationImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<ParticipantAssociation>() {
+                    @Override
                     public ParticipantAssociation newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ParticipantAssociationImpl(instanceContext);
                     }
@@ -64,18 +65,22 @@ public class ParticipantAssociationImpl
         super(instanceContext);
     }
 
+    @Override
     public Participant getInnerParticipant() {
         return innerParticipantRefChild.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setInnerParticipant(Participant innerParticipant) {
         innerParticipantRefChild.setReferenceTargetElement(this, innerParticipant);
     }
 
+    @Override
     public Participant getOuterParticipant() {
         return outerParticipantRefChild.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setOuterParticipant(Participant outerParticipant) {
         outerParticipantRefChild.setReferenceTargetElement(this, outerParticipant);
     }

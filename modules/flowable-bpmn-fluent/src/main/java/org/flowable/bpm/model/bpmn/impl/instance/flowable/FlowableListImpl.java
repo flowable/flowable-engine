@@ -38,6 +38,7 @@ public class FlowableListImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableList.class, FLOWABLE_ELEMENT_LIST)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableList>() {
+                    @Override
                     public FlowableList newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableListImpl(instanceContext);
                     }
@@ -50,6 +51,7 @@ public class FlowableListImpl
         super(instanceContext);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T extends BpmnModelElementInstance> Collection<T> getValues() {
 
@@ -59,40 +61,49 @@ public class FlowableListImpl
                 return ModelUtil.getModelElementCollection(getDomElement().getChildElements(), getModelInstance());
             }
 
+            @Override
             public int size() {
                 return getElements().size();
             }
 
+            @Override
             public boolean isEmpty() {
                 return getElements().isEmpty();
             }
 
+            @Override
             public boolean contains(Object o) {
                 return getElements().contains(o);
             }
 
+            @Override
             public Iterator<T> iterator() {
                 return getElements().iterator();
             }
 
+            @Override
             public Object[] toArray() {
                 return getElements().toArray();
             }
 
+            @Override
             public <T1> T1[] toArray(T1[] a) {
                 return getElements().toArray(a);
             }
 
+            @Override
             public boolean add(T t) {
                 getDomElement().appendChild(t.getDomElement());
                 return true;
             }
 
+            @Override
             public boolean remove(Object o) {
                 ModelUtil.ensureInstanceOf(o, BpmnModelElementInstance.class);
                 return getDomElement().removeChild(((BpmnModelElementInstance) o).getDomElement());
             }
 
+            @Override
             public boolean containsAll(Collection<?> c) {
                 for (Object o : c) {
                     if (!contains(o)) {
@@ -102,6 +113,7 @@ public class FlowableListImpl
                 return true;
             }
 
+            @Override
             public boolean addAll(Collection<? extends T> c) {
                 for (T element : c) {
                     add(element);
@@ -109,6 +121,7 @@ public class FlowableListImpl
                 return true;
             }
 
+            @Override
             public boolean removeAll(Collection<?> c) {
                 boolean result = false;
                 for (Object o : c) {
@@ -117,10 +130,12 @@ public class FlowableListImpl
                 return result;
             }
 
+            @Override
             public boolean retainAll(Collection<?> c) {
                 throw new UnsupportedModelOperationException("retainAll()", "not implemented");
             }
 
+            @Override
             public void clear() {
                 DomElement domElement = getDomElement();
                 List<DomElement> childElements = domElement.getChildElements();

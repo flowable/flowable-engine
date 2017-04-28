@@ -40,6 +40,7 @@ public class FlowablePropertiesImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableProperties.class, FLOWABLE_ELEMENT_PROPERTIES)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableProperties>() {
+                    @Override
                     public FlowableProperties newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowablePropertiesImpl(instanceContext);
                     }
@@ -57,6 +58,7 @@ public class FlowablePropertiesImpl
         super(instanceContext);
     }
 
+    @Override
     public Collection<FlowableProperty> getFlowableProperties() {
         return flowablePropertyCollection.get(this);
     }

@@ -18,14 +18,17 @@ import java.util.Collection;
 public class ManualTaskTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(Task.class, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return null;
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return null;
     }

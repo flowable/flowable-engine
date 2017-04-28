@@ -34,6 +34,7 @@ public class DataOutputAssociationImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(DataAssociation.class)
                 .instanceProvider(new ModelTypeInstanceProvider<DataOutputAssociation>() {
+                    @Override
                     public DataOutputAssociation newInstance(ModelTypeInstanceContext instanceContext) {
                         return new DataOutputAssociationImpl(instanceContext);
                     }

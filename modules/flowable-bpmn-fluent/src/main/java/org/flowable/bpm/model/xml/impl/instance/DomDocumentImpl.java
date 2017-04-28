@@ -14,10 +14,6 @@ package org.flowable.bpm.model.xml.impl.instance;
 
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
 
-import java.util.List;
-
-import javax.xml.transform.dom.DOMSource;
-
 import org.flowable.bpm.model.xml.ModelException;
 import org.flowable.bpm.model.xml.impl.util.DomUtil;
 import org.flowable.bpm.model.xml.impl.util.XmlQName;
@@ -26,6 +22,10 @@ import org.flowable.bpm.model.xml.instance.DomElement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import javax.xml.transform.dom.DOMSource;
+
+import java.util.List;
 
 public class DomDocumentImpl
         implements DomDocument {

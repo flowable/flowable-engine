@@ -47,6 +47,7 @@ public class FlowableFieldImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableField.class, FLOWABLE_ELEMENT_FIELD)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableField>() {
+                    @Override
                     public FlowableField newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableFieldImpl(instanceContext);
                     }
@@ -79,42 +80,52 @@ public class FlowableFieldImpl
         super(instanceContext);
     }
 
+    @Override
     public String getFlowableName() {
         return flowableNameAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableName(String flowableName) {
         flowableNameAttribute.setValue(this, flowableName);
     }
 
+    @Override
     public String getFlowableExpression() {
         return flowableExpressionAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableExpression(String flowableExpression) {
         flowableExpressionAttribute.setValue(this, flowableExpression);
     }
 
+    @Override
     public String getFlowableStringValue() {
         return flowableStringValueAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableStringValue(String flowableStringValue) {
         flowableStringValueAttribute.setValue(this, flowableStringValue);
     }
 
+    @Override
     public FlowableString getFlowableString() {
         return flowableStringChild.getChild(this);
     }
 
+    @Override
     public void setFlowableString(FlowableString flowableString) {
         flowableStringChild.setChild(this, flowableString);
     }
 
+    @Override
     public FlowableExpression getFlowableExpressionChild() {
         return flowableExpressionChild.getChild(this);
     }
 
+    @Override
     public void setFlowableExpressionChild(FlowableExpression flowableExpression) {
         flowableExpressionChild.setChild(this, flowableExpression);
     }

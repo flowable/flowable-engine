@@ -32,6 +32,7 @@ public class Transformation
                 .namespaceUri(BPMN20_NS)
                 .extendsType(FormalExpression.class)
                 .instanceProvider(new ModelTypeInstanceProvider<Transformation>() {
+                    @Override
                     public Transformation newInstance(ModelTypeInstanceContext instanceContext) {
                         return new Transformation(instanceContext);
                     }

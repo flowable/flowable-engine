@@ -41,6 +41,7 @@ public class ParallelGatewayImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Gateway.class)
                 .instanceProvider(new ModelTypeInstanceProvider<ParallelGateway>() {
+                    @Override
                     public ParallelGateway newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ParallelGatewayImpl(instanceContext);
                     }

@@ -17,8 +17,6 @@ import static org.flowable.bpm.model.xml.testmodel.TestModelConstants.ELEMENT_NA
 import static org.flowable.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAME;
 import static org.flowable.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMESPACE;
 
-import java.util.Collection;
-
 import org.flowable.bpm.model.xml.testmodel.TestModel;
 import org.flowable.bpm.model.xml.testmodel.instance.Animal;
 import org.flowable.bpm.model.xml.testmodel.instance.Animals;
@@ -28,6 +26,8 @@ import org.flowable.bpm.model.xml.testmodel.instance.RelationshipDefinition;
 import org.flowable.bpm.model.xml.type.ModelElementType;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Collection;
 
 public class ModelTest {
 

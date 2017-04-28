@@ -20,6 +20,7 @@ import org.flowable.bpm.model.bpmn.builder.ServiceTaskBuilder;
 public interface ServiceTask
         extends Task {
 
+    @Override
     ServiceTaskBuilder builder();
 
     String getImplementation();

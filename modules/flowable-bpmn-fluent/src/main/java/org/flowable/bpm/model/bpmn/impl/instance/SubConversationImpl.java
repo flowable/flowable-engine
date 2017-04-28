@@ -40,6 +40,7 @@ public class SubConversationImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(ConversationNode.class)
                 .instanceProvider(new ModelTypeInstanceProvider<SubConversation>() {
+                    @Override
                     public SubConversation newInstance(ModelTypeInstanceContext instanceContext) {
                         return new SubConversationImpl(instanceContext);
                     }
@@ -57,6 +58,7 @@ public class SubConversationImpl
         super(instanceContext);
     }
 
+    @Override
     public Collection<ConversationNode> getConversationNodes() {
         return conversationNodeCollection.get(this);
     }

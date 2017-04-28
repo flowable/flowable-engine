@@ -57,6 +57,7 @@ public class FlowableFormPropertyImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableFormProperty.class, FLOWABLE_ELEMENT_FORM_PROPERTY)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableFormProperty>() {
+                    @Override
                     public FlowableFormProperty newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableFormPropertyImpl(instanceContext);
                     }
@@ -109,70 +110,87 @@ public class FlowableFormPropertyImpl
         super(instanceContext);
     }
 
+    @Override
     public String getFlowableId() {
         return flowableIdAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableId(String flowableId) {
         flowableIdAttribute.setValue(this, flowableId);
     }
 
+    @Override
     public String getFlowableName() {
         return flowableNameAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableName(String flowableName) {
         flowableNameAttribute.setValue(this, flowableName);
     }
 
+    @Override
     public String getFlowableType() {
         return flowableTypeAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableType(String flowableType) {
         flowableTypeAttribute.setValue(this, flowableType);
     }
 
+    @Override
     public boolean isFlowableRequired() {
         return flowableRequiredAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableRequired(boolean isFlowableRequired) {
         flowableRequiredAttribute.setValue(this, isFlowableRequired);
     }
 
+    @Override
     public boolean isFlowableReadable() {
         return flowableReadableAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableReadable(boolean isFlowableReadable) {
         flowableReadableAttribute.setValue(this, isFlowableReadable);
     }
 
+    @Override
     public boolean isFlowableWriteable() {
         return flowableWriteableAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableWriteable(boolean isFlowableWriteable) {
         flowableWriteableAttribute.setValue(this, isFlowableWriteable);
     }
 
+    @Override
     public String getFlowableVariable() {
         return flowableVariableAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableVariable(String flowableVariable) {
         flowableVariableAttribute.setValue(this, flowableVariable);
     }
 
+    @Override
     public String getFlowableExpression() {
         return flowableExpressionAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableExpression(String flowableExpression) {
         flowableExpressionAttribute.setValue(this, flowableExpression);
     }
 
+    @Override
     public Collection<FlowableValue> getFlowableValues() {
         return flowableValueCollection.get(this);
     }

@@ -40,6 +40,7 @@ public class FlowableMapImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableMap.class, BpmnModelConstants.FLOWABLE_ELEMENT_MAP)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableMap>() {
+                    @Override
                     public FlowableMap newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableMapImpl(instanceContext);
                     }
@@ -57,6 +58,7 @@ public class FlowableMapImpl
         super(instanceContext);
     }
 
+    @Override
     public Collection<FlowableEntry> getFlowableEntries() {
         return flowableEntryCollection.get(this);
     }

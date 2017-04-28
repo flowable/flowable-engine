@@ -30,6 +30,7 @@ public class ResourceRef
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ResourceRef.class, BPMN_ELEMENT_RESOURCE_REF)
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<ResourceRef>() {
+                    @Override
                     public ResourceRef newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ResourceRef(instanceContext);
                     }

@@ -12,9 +12,6 @@
  */
 package org.flowable.bpm.model.xml.impl.type.child;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.flowable.bpm.model.xml.Model;
 import org.flowable.bpm.model.xml.impl.ModelBuildOperation;
 import org.flowable.bpm.model.xml.impl.type.ModelElementTypeImpl;
@@ -22,6 +19,9 @@ import org.flowable.bpm.model.xml.instance.ModelElementInstance;
 import org.flowable.bpm.model.xml.type.child.ChildElementBuilder;
 import org.flowable.bpm.model.xml.type.child.ChildElementCollectionBuilder;
 import org.flowable.bpm.model.xml.type.child.SequenceBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SequenceBuilderImpl
         implements SequenceBuilder, ModelBuildOperation {

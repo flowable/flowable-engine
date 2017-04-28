@@ -13,7 +13,6 @@
 package org.flowable.bpm.model.bpmn.instance;
 
 import org.flowable.bpm.model.bpmn.builder.SequenceFlowBuilder;
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnEdge;
 
 /**
  * The BPMN sequenceFlow element.
@@ -21,6 +20,7 @@ import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnEdge;
 public interface SequenceFlow
         extends FlowElement {
 
+    @Override
     SequenceFlowBuilder builder();
 
     FlowNode getSource();
@@ -40,7 +40,4 @@ public interface SequenceFlow
     void setConditionExpression(ConditionExpression conditionExpression);
 
     void removeConditionExpression();
-
-    BpmnEdge getDiagramElement();
-
 }

@@ -42,6 +42,7 @@ public class ConditionExpressionImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(FormalExpression.class)
                 .instanceProvider(new ModelTypeInstanceProvider<ConditionExpression>() {
+                    @Override
                     public ConditionExpression newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ConditionExpressionImpl(instanceContext);
                     }
@@ -63,18 +64,22 @@ public class ConditionExpressionImpl
         super(instanceContext);
     }
 
+    @Override
     public String getType() {
         return typeAttribute.getValue(this);
     }
 
+    @Override
     public void setType(String type) {
         typeAttribute.setValue(this, type);
     }
 
+    @Override
     public String getFlowableResource() {
         return flowableResourceAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableResource(String flowableResource) {
         flowableResourceAttribute.setValue(this, flowableResource);
     }

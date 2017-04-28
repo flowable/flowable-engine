@@ -20,6 +20,7 @@ import org.flowable.bpm.model.bpmn.builder.ParallelGatewayBuilder;
 public interface ParallelGateway
         extends Gateway {
 
+    @Override
     ParallelGatewayBuilder builder();
 
 }

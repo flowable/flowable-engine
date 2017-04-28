@@ -30,14 +30,17 @@ public abstract class AbstractGatewayTest<G extends Gateway>
 
     protected G gateway;
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(Gateway.class, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return null;
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Collections.singletonList(
                 new AttributeAssumption(FLOWABLE_NS, "async", false, false, false));

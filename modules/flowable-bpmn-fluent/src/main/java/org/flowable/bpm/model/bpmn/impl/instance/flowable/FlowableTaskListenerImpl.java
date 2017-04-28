@@ -52,6 +52,7 @@ public class FlowableTaskListenerImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableTaskListener.class, FLOWABLE_ELEMENT_TASK_LISTENER)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableTaskListener>() {
+                    @Override
                     public FlowableTaskListener newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableTaskListenerImpl(instanceContext);
                     }
@@ -88,46 +89,57 @@ public class FlowableTaskListenerImpl
         super(instanceContext);
     }
 
+    @Override
     public String getFlowableEvent() {
         return flowableEventAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableEvent(String flowableEvent) {
         flowableEventAttribute.setValue(this, flowableEvent);
     }
 
+    @Override
     public String getFlowableClass() {
         return flowableClassAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableClass(String flowableClass) {
         flowableClassAttribute.setValue(this, flowableClass);
     }
 
+    @Override
     public String getFlowableExpression() {
         return flowableExpressionAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableExpression(String flowableExpression) {
         flowableExpressionAttribute.setValue(this, flowableExpression);
     }
 
+    @Override
     public String getFlowableDelegateExpression() {
         return flowableDelegateExpressionAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableDelegateExpression(String flowableDelegateExpression) {
         flowableDelegateExpressionAttribute.setValue(this, flowableDelegateExpression);
     }
 
+    @Override
     public Collection<FlowableField> getFlowableFields() {
         return flowableFieldCollection.get(this);
     }
 
+    @Override
     public FlowableScript getFlowableScript() {
         return flowableScriptChild.getChild(this);
     }
 
+    @Override
     public void setFlowableScript(FlowableScript flowableScript) {
         flowableScriptChild.setChild(this, flowableScript);
     }

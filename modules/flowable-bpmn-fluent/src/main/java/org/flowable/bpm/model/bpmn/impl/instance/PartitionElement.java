@@ -32,6 +32,7 @@ public class PartitionElement
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<PartitionElement>() {
+                    @Override
                     public PartitionElement newInstance(ModelTypeInstanceContext instanceContext) {
                         return new PartitionElement(instanceContext);
                     }

@@ -12,9 +12,9 @@
  */
 package org.flowable.bpm.model.xml.type.child;
 
-import java.util.Collection;
-
 import org.flowable.bpm.model.xml.instance.ModelElementInstance;
+
+import java.util.Collection;
 
 /**
  * A single child element (child Element collection where {@link ChildElementCollection#getMaxOccurs()} returns 1.

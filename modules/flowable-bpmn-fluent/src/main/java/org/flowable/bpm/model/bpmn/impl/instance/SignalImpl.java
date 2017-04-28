@@ -42,6 +42,7 @@ public class SignalImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(RootElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<Signal>() {
+                    @Override
                     public Signal newInstance(ModelTypeInstanceContext instanceContext) {
                         return new SignalImpl(instanceContext);
                     }
@@ -61,18 +62,22 @@ public class SignalImpl
         super(instanceContext);
     }
 
+    @Override
     public String getName() {
         return nameAttribute.getValue(this);
     }
 
+    @Override
     public void setName(String name) {
         nameAttribute.setValue(this, name);
     }
 
+    @Override
     public ItemDefinition getStructure() {
         return structureRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setStructure(ItemDefinition structure) {
         structureRefAttribute.setReferenceTargetElement(this, structure);
     }

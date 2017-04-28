@@ -12,11 +12,11 @@
  */
 package org.flowable.bpm.model.xml.validation;
 
-import java.io.StringWriter;
-import java.util.Formatter;
-
 import org.flowable.bpm.model.xml.instance.ModelElementInstance;
 import org.flowable.bpm.model.xml.testmodel.instance.FlyingAnimal;
+
+import java.io.StringWriter;
+import java.util.Formatter;
 
 @SuppressWarnings("resource")
 public class TestResultFormatter

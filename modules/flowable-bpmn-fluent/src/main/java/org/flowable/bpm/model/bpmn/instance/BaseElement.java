@@ -12,8 +12,6 @@
  */
 package org.flowable.bpm.model.bpmn.instance;
 
-import org.flowable.bpm.model.bpmn.instance.di.DiagramElement;
-
 import java.util.Collection;
 
 /**
@@ -31,7 +29,4 @@ public interface BaseElement
     ExtensionElements getExtensionElements();
 
     void setExtensionElements(ExtensionElements extensionElements);
-
-    DiagramElement getDiagramElement();
-
 }

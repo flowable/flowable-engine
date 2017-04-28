@@ -34,6 +34,7 @@ public class TimeDateImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Expression.class)
                 .instanceProvider(new ModelTypeInstanceProvider<TimeDate>() {
+                    @Override
                     public TimeDate newInstance(ModelTypeInstanceContext instanceContext) {
                         return new TimeDateImpl(instanceContext);
                     }

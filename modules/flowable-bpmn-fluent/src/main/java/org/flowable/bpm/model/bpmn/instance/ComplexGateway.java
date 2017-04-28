@@ -20,6 +20,7 @@ import org.flowable.bpm.model.bpmn.builder.ComplexGatewayBuilder;
 public interface ComplexGateway
         extends Gateway {
 
+    @Override
     ComplexGatewayBuilder builder();
 
     SequenceFlow getDefault();

@@ -19,10 +19,12 @@ import java.util.Collection;
 public class IoSpecificationTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(BaseElement.class, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Arrays.asList(
                 new ChildElementAssumption(DataInput.class),
@@ -31,6 +33,7 @@ public class IoSpecificationTest
                 new ChildElementAssumption(OutputSet.class, 1));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return null;
     }

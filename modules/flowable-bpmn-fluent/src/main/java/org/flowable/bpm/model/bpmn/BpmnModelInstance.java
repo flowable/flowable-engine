@@ -39,6 +39,7 @@ public interface BpmnModelInstance
      *
      * @return the new BPMN model instance
      */
+    @Override
     BpmnModelInstance clone();
 
 }

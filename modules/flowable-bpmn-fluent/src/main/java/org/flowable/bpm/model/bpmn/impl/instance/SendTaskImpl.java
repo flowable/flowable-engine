@@ -59,6 +59,7 @@ public class SendTaskImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Task.class)
                 .instanceProvider(new ModelTypeInstanceProvider<SendTask>() {
+                    @Override
                     public SendTask newInstance(ModelTypeInstanceContext instanceContext) {
                         return new SendTaskImpl(instanceContext);
                     }
@@ -105,72 +106,89 @@ public class SendTaskImpl
         super(context);
     }
 
+    @Override
     public SendTaskBuilder builder() {
         return new SendTaskBuilder((BpmnModelInstance) modelInstance, this);
     }
 
+    @Override
     public String getImplementation() {
         return implementationAttribute.getValue(this);
     }
 
+    @Override
     public void setImplementation(String implementation) {
         implementationAttribute.setValue(this, implementation);
     }
 
+    @Override
     public Message getMessage() {
         return messageRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setMessage(Message message) {
         messageRefAttribute.setReferenceTargetElement(this, message);
     }
 
+    @Override
     public Operation getOperation() {
         return operationRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setOperation(Operation operation) {
         operationRefAttribute.setReferenceTargetElement(this, operation);
     }
 
     /* Flowable extensions */
 
+    @Override
     public String getFlowableClass() {
         return flowableClassAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableClass(String flowableClass) {
         flowableClassAttribute.setValue(this, flowableClass);
     }
 
+    @Override
     public String getFlowableDelegateExpression() {
         return flowableDelegateExpressionAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableDelegateExpression(String flowableExpression) {
         flowableDelegateExpressionAttribute.setValue(this, flowableExpression);
     }
 
+    @Override
     public String getFlowableExpression() {
         return flowableExpressionAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableExpression(String flowableExpression) {
         flowableExpressionAttribute.setValue(this, flowableExpression);
     }
 
+    @Override
     public String getFlowableResultVariable() {
         return flowableResultVariableAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableResultVariable(String flowableResultVariable) {
         flowableResultVariableAttribute.setValue(this, flowableResultVariable);
     }
 
+    @Override
     public String getFlowableType() {
         return flowableTypeAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableType(String flowableType) {
         flowableTypeAttribute.setValue(this, flowableType);
     }

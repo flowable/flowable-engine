@@ -39,6 +39,7 @@ public class EscalationEventDefinitionImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(EventDefinition.class)
                 .instanceProvider(new ModelTypeInstanceProvider<EscalationEventDefinition>() {
+                    @Override
                     public EscalationEventDefinition newInstance(ModelTypeInstanceContext instanceContext) {
                         return new EscalationEventDefinitionImpl(instanceContext);
                     }
@@ -55,10 +56,12 @@ public class EscalationEventDefinitionImpl
         super(context);
     }
 
+    @Override
     public Escalation getEscalation() {
         return escalationRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setEscalation(Escalation escalation) {
         escalationRefAttribute.setReferenceTargetElement(this, escalation);
     }

@@ -27,15 +27,18 @@ public class TextAnnotationTest
 
     protected static BpmnModelInstance modelInstance;
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(Artifact.class, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Collections.singletonList(
                 new ChildElementAssumption(Text.class, 0, 1));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Collections.singletonList(
                 new AttributeAssumption("textFormat", false, false, "text/plain"));

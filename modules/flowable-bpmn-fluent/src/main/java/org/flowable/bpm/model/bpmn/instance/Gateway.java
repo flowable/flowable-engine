@@ -14,7 +14,6 @@ package org.flowable.bpm.model.bpmn.instance;
 
 import org.flowable.bpm.model.bpmn.GatewayDirection;
 import org.flowable.bpm.model.bpmn.builder.AbstractGatewayBuilder;
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 
 /**
  * The BPMN gateway element.
@@ -22,13 +21,11 @@ import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 public interface Gateway
         extends FlowNode {
 
+    @Override
     @SuppressWarnings("rawtypes")
     AbstractGatewayBuilder builder();
 
     GatewayDirection getGatewayDirection();
 
     void setGatewayDirection(GatewayDirection gatewayDirection);
-
-    BpmnShape getDiagramElement();
-
 }

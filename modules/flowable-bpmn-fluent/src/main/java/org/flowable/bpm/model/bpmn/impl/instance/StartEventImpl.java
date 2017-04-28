@@ -52,6 +52,7 @@ public class StartEventImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(CatchEvent.class)
                 .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<StartEvent>() {
+                    @Override
                     public StartEvent newInstance(ModelTypeInstanceContext instanceContext) {
                         return new StartEventImpl(instanceContext);
                     }
@@ -92,34 +93,42 @@ public class StartEventImpl
         return new StartEventBuilder((BpmnModelInstance) modelInstance, this);
     }
 
+    @Override
     public boolean isInterrupting() {
         return isInterruptingAttribute.getValue(this);
     }
 
+    @Override
     public void setInterrupting(boolean isInterrupting) {
         isInterruptingAttribute.setValue(this, isInterrupting);
     }
 
+    @Override
     public String getFlowableFormHandlerClass() {
         return flowableFormHandlerClassAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableFormHandlerClass(String flowableFormHandlerClass) {
         flowableFormHandlerClassAttribute.setValue(this, flowableFormHandlerClass);
     }
 
+    @Override
     public String getFlowableFormKey() {
         return flowableFormKeyAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableFormKey(String flowableFormKey) {
         flowableFormKeyAttribute.setValue(this, flowableFormKey);
     }
 
+    @Override
     public String getFlowableInitiator() {
         return flowableInitiatorAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableInitiator(String flowableInitiator) {
         flowableInitiatorAttribute.setValue(this, flowableInitiator);
     }

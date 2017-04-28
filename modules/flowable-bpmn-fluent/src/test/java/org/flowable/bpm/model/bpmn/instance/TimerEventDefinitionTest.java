@@ -23,6 +23,7 @@ import java.util.List;
 public class TimerEventDefinitionTest
         extends AbstractEventDefinitionTest {
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Arrays.asList(
                 new ChildElementAssumption(TimeDate.class, 0, 1),

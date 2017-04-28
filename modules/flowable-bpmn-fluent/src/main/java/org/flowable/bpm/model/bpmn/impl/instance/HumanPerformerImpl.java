@@ -33,6 +33,7 @@ public class HumanPerformerImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Performer.class)
                 .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<HumanPerformer>() {
+                    @Override
                     public HumanPerformer newInstance(ModelTypeInstanceContext instanceContext) {
                         return new HumanPerformerImpl(instanceContext);
                     }

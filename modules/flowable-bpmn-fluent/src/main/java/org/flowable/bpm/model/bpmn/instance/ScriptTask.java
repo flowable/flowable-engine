@@ -20,6 +20,7 @@ import org.flowable.bpm.model.bpmn.builder.ScriptTaskBuilder;
 public interface ScriptTask
         extends Task {
 
+    @Override
     ScriptTaskBuilder builder();
 
     Script getScript();

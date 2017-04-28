@@ -30,6 +30,7 @@ public class Source
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Source.class, BPMN_ELEMENT_SOURCE)
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<Source>() {
+                    @Override
                     public Source newInstance(ModelTypeInstanceContext instanceContext) {
                         return new Source(instanceContext);
                     }

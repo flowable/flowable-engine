@@ -43,6 +43,7 @@ public class EventBasedGatewayImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Gateway.class)
                 .instanceProvider(new ModelTypeInstanceProvider<EventBasedGateway>() {
+                    @Override
                     public EventBasedGateway newInstance(ModelTypeInstanceContext instanceContext) {
                         return new EventBasedGatewayImpl(instanceContext);
                     }
@@ -68,18 +69,22 @@ public class EventBasedGatewayImpl
         return new EventBasedGatewayBuilder((BpmnModelInstance) modelInstance, this);
     }
 
+    @Override
     public boolean isInstantiate() {
         return instantiateAttribute.getValue(this);
     }
 
+    @Override
     public void setInstantiate(boolean isInstantiate) {
         instantiateAttribute.setValue(this, isInstantiate);
     }
 
+    @Override
     public EventBasedGatewayType getEventGatewayType() {
         return eventGatewayTypeAttribute.getValue(this);
     }
 
+    @Override
     public void setEventGatewayType(EventBasedGatewayType eventGatewayType) {
         eventGatewayTypeAttribute.setValue(this, eventGatewayType);
     }

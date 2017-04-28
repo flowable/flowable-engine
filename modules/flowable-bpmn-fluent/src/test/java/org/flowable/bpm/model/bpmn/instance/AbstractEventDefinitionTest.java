@@ -26,14 +26,17 @@ public abstract class AbstractEventDefinitionTest
 
     protected Query<EventDefinition> eventDefinitionQuery;
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(EventDefinition.class, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return null;
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return null;
     }

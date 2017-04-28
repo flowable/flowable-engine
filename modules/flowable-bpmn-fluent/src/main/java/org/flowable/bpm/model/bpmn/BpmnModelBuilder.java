@@ -16,13 +16,6 @@ import static org.flowable.bpm.model.bpmn.impl.BpmnModelConstants.ACTIVITI_NS;
 import static org.flowable.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
 import static org.flowable.bpm.model.bpmn.impl.BpmnModelConstants.FLOWABLE_NS;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import org.flowable.bpm.model.bpmn.builder.ProcessBuilder;
 import org.flowable.bpm.model.bpmn.impl.BpmnParser;
 import org.flowable.bpm.model.bpmn.impl.instance.ActivationConditionImpl;
@@ -192,26 +185,6 @@ import org.flowable.bpm.model.bpmn.impl.instance.Transformation;
 import org.flowable.bpm.model.bpmn.impl.instance.UserTaskImpl;
 import org.flowable.bpm.model.bpmn.impl.instance.WhileExecutingInputRefs;
 import org.flowable.bpm.model.bpmn.impl.instance.WhileExecutingOutputRefs;
-import org.flowable.bpm.model.bpmn.impl.instance.bpmndi.BpmnDiagramImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.bpmndi.BpmnEdgeImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.bpmndi.BpmnLabelImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.bpmndi.BpmnLabelStyleImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.bpmndi.BpmnPlaneImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.bpmndi.BpmnShapeImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.dc.BoundsImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.dc.FontImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.dc.PointImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.di.DiagramElementImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.di.DiagramImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.di.EdgeImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.di.LabelImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.di.LabeledEdgeImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.di.LabeledShapeImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.di.NodeImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.di.PlaneImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.di.ShapeImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.di.StyleImpl;
-import org.flowable.bpm.model.bpmn.impl.instance.di.WaypointImpl;
 import org.flowable.bpm.model.bpmn.impl.instance.flowable.FlowableConnectorIdImpl;
 import org.flowable.bpm.model.bpmn.impl.instance.flowable.FlowableConnectorImpl;
 import org.flowable.bpm.model.bpmn.impl.instance.flowable.FlowableConstraintImpl;
@@ -240,8 +213,6 @@ import org.flowable.bpm.model.bpmn.impl.instance.flowable.FlowableValidationImpl
 import org.flowable.bpm.model.bpmn.impl.instance.flowable.FlowableValueImpl;
 import org.flowable.bpm.model.bpmn.instance.Definitions;
 import org.flowable.bpm.model.bpmn.instance.Process;
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnDiagram;
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnPlane;
 import org.flowable.bpm.model.xml.Model;
 import org.flowable.bpm.model.xml.ModelBuilder;
 import org.flowable.bpm.model.xml.ModelException;
@@ -249,6 +220,13 @@ import org.flowable.bpm.model.xml.ModelParseException;
 import org.flowable.bpm.model.xml.ModelValidationException;
 import org.flowable.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.flowable.bpm.model.xml.impl.util.IoUtil;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Provides access to the Flowable BPMN model api.
@@ -355,15 +333,6 @@ public class BpmnModelBuilder {
         modelInstance.setDefinitions(definitions);
         Process process = modelInstance.newInstance(Process.class);
         definitions.addChildElement(process);
-
-        BpmnDiagram bpmnDiagram = modelInstance.newInstance(BpmnDiagram.class);
-
-        BpmnPlane bpmnPlane = modelInstance.newInstance(BpmnPlane.class);
-        bpmnPlane.setBpmnElement(process);
-
-        bpmnDiagram.addChildElement(bpmnPlane);
-        definitions.addChildElement(bpmnDiagram);
-
         return process.builder();
     }
 
@@ -615,33 +584,6 @@ public class BpmnModelBuilder {
         UserTaskImpl.registerType(bpmnModelBuilder);
         WhileExecutingInputRefs.registerType(bpmnModelBuilder);
         WhileExecutingOutputRefs.registerType(bpmnModelBuilder);
-
-        /* DC */
-        FontImpl.registerType(bpmnModelBuilder);
-        PointImpl.registerType(bpmnModelBuilder);
-        BoundsImpl.registerType(bpmnModelBuilder);
-
-        /* DI */
-        DiagramImpl.registerType(bpmnModelBuilder);
-        DiagramElementImpl.registerType(bpmnModelBuilder);
-        EdgeImpl.registerType(bpmnModelBuilder);
-        org.flowable.bpm.model.bpmn.impl.instance.di.ExtensionImpl.registerType(bpmnModelBuilder);
-        LabelImpl.registerType(bpmnModelBuilder);
-        LabeledEdgeImpl.registerType(bpmnModelBuilder);
-        LabeledShapeImpl.registerType(bpmnModelBuilder);
-        NodeImpl.registerType(bpmnModelBuilder);
-        PlaneImpl.registerType(bpmnModelBuilder);
-        ShapeImpl.registerType(bpmnModelBuilder);
-        StyleImpl.registerType(bpmnModelBuilder);
-        WaypointImpl.registerType(bpmnModelBuilder);
-
-        /* BPMNDI */
-        BpmnDiagramImpl.registerType(bpmnModelBuilder);
-        BpmnEdgeImpl.registerType(bpmnModelBuilder);
-        BpmnLabelImpl.registerType(bpmnModelBuilder);
-        BpmnLabelStyleImpl.registerType(bpmnModelBuilder);
-        BpmnPlaneImpl.registerType(bpmnModelBuilder);
-        BpmnShapeImpl.registerType(bpmnModelBuilder);
 
         /* Flowable extensions */
         FlowableConnectorImpl.registerType(bpmnModelBuilder);

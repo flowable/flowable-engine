@@ -17,8 +17,6 @@ import static org.flowable.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ATTRIBUTE
 import static org.flowable.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ATTRIBUTE_START_QUANTITY;
 import static org.flowable.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_ACTIVITY;
 
-import java.util.Collection;
-
 import org.flowable.bpm.model.bpmn.impl.BpmnModelConstants;
 import org.flowable.bpm.model.bpmn.instance.Activity;
 import org.flowable.bpm.model.bpmn.instance.DataInputAssociation;
@@ -35,6 +33,8 @@ import org.flowable.bpm.model.xml.type.attribute.Attribute;
 import org.flowable.bpm.model.xml.type.child.ChildElement;
 import org.flowable.bpm.model.xml.type.child.ChildElementCollection;
 import org.flowable.bpm.model.xml.type.child.SequenceBuilder;
+
+import java.util.Collection;
 
 /**
  * The BPMN activity element.
@@ -98,58 +98,72 @@ public abstract class ActivityImpl
         super(context);
     }
 
+    @Override
     public boolean isForCompensation() {
         return isForCompensationAttribute.getValue(this);
     }
 
+    @Override
     public void setForCompensation(boolean isForCompensation) {
         isForCompensationAttribute.setValue(this, isForCompensation);
     }
 
+    @Override
     public int getStartQuantity() {
         return startQuantityAttribute.getValue(this);
     }
 
+    @Override
     public void setStartQuantity(int startQuantity) {
         startQuantityAttribute.setValue(this, startQuantity);
     }
 
+    @Override
     public int getCompletionQuantity() {
         return completionQuantityAttribute.getValue(this);
     }
 
+    @Override
     public void setCompletionQuantity(int completionQuantity) {
         completionQuantityAttribute.setValue(this, completionQuantity);
     }
 
+    @Override
     public IoSpecification getIoSpecification() {
         return ioSpecificationChild.getChild(this);
     }
 
+    @Override
     public void setIoSpecification(IoSpecification ioSpecification) {
         ioSpecificationChild.setChild(this, ioSpecification);
     }
 
+    @Override
     public Collection<Property> getProperties() {
         return propertyCollection.get(this);
     }
 
+    @Override
     public Collection<DataInputAssociation> getDataInputAssociations() {
         return dataInputAssociationCollection.get(this);
     }
 
+    @Override
     public Collection<DataOutputAssociation> getDataOutputAssociations() {
         return dataOutputAssociationCollection.get(this);
     }
 
+    @Override
     public Collection<ResourceRole> getResourceRoles() {
         return resourceRoleCollection.get(this);
     }
 
+    @Override
     public LoopCharacteristics getLoopCharacteristics() {
         return loopCharacteristicsChild.getChild(this);
     }
 
+    @Override
     public void setLoopCharacteristics(LoopCharacteristics loopCharacteristics) {
         loopCharacteristicsChild.setChild(this, loopCharacteristics);
     }

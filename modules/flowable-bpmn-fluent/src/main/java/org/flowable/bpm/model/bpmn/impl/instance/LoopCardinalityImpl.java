@@ -35,6 +35,7 @@ public class LoopCardinalityImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Expression.class)
                 .instanceProvider(new ModelTypeInstanceProvider<LoopCardinality>() {
+                    @Override
                     public LoopCardinality newInstance(ModelTypeInstanceContext instanceContext) {
                         return new LoopCardinalityImpl(instanceContext);
                     }

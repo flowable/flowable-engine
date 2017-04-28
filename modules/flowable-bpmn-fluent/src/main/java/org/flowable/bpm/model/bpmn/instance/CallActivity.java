@@ -20,6 +20,7 @@ import org.flowable.bpm.model.bpmn.builder.CallActivityBuilder;
 public interface CallActivity
         extends Activity {
 
+    @Override
     CallActivityBuilder builder();
 
     String getCalledElement();

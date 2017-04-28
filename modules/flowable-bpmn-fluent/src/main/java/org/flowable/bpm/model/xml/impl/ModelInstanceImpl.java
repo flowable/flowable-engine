@@ -12,10 +12,6 @@
  */
 package org.flowable.bpm.model.xml.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.flowable.bpm.model.xml.Model;
 import org.flowable.bpm.model.xml.ModelBuilder;
 import org.flowable.bpm.model.xml.ModelException;
@@ -29,6 +25,10 @@ import org.flowable.bpm.model.xml.instance.ModelElementInstance;
 import org.flowable.bpm.model.xml.type.ModelElementType;
 import org.flowable.bpm.model.xml.validation.ModelElementValidator;
 import org.flowable.bpm.model.xml.validation.ValidationResults;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * An instance of a model.

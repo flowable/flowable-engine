@@ -23,6 +23,7 @@ import java.util.List;
 public interface UserTask
         extends Task {
 
+    @Override
     UserTaskBuilder builder();
 
     String getImplementation();

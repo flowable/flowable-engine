@@ -36,7 +36,6 @@ import org.flowable.bpm.model.bpmn.instance.ServiceTask;
 import org.flowable.bpm.model.bpmn.instance.SubProcess;
 import org.flowable.bpm.model.bpmn.instance.Transaction;
 import org.flowable.bpm.model.bpmn.instance.UserTask;
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.flowable.bpm.model.bpmn.instance.flowable.FlowableExecutionListener;
 import org.flowable.bpm.model.bpmn.instance.flowable.FlowableFailedJobRetryTimeCycle;
 import org.flowable.bpm.model.xml.instance.ModelElementInstance;
@@ -70,9 +69,6 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
 
     protected void connectTarget(FlowNode target) {
         getCurrentSequenceFlowBuilder().from(element).to(target);
-
-        SequenceFlow sequenceFlow = getCurrentSequenceFlowBuilder().getElement();
-        createBpmnEdge(sequenceFlow);
         currentSequenceFlowBuilder = null;
     }
 
@@ -88,10 +84,7 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     protected <T extends FlowNode> T createTarget(Class<T> typeClass, String identifier) {
         T target = createSibling(typeClass, identifier);
 
-        BpmnShape targetBpmnShape = createBpmnShape(target);
-        setCoordinates(targetBpmnShape);
         connectTarget(target);
-        resizeSubProcess(targetBpmnShape);
         return target;
     }
 
@@ -274,13 +267,13 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
         ModelElementInstance target = modelInstance.getModelElementById(identifier);
         if (target == null) {
             throw new BpmnModelException("Unable to connect " + element.getId() + " to element " + identifier + " cause it not exists.");
-        } else if (!(target instanceof FlowNode)) {
-            throw new BpmnModelException("Unable to connect " + element.getId() + " to element " + identifier + " cause its not a flow node.");
-        } else {
-            FlowNode targetNode = (FlowNode) target;
-            connectTarget(targetNode);
-            return targetNode.builder();
         }
+        if (!(target instanceof FlowNode)) {
+            throw new BpmnModelException("Unable to connect " + element.getId() + " to element " + identifier + " cause its not a flow node.");
+        }
+        FlowNode targetNode = (FlowNode) target;
+        connectTarget(targetNode);
+        return targetNode.builder();
     }
 
     /**

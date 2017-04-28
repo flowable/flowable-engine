@@ -15,8 +15,6 @@ package org.flowable.bpm.model.bpmn.builder;
 import org.flowable.bpm.model.bpmn.BpmnModelInstance;
 import org.flowable.bpm.model.bpmn.instance.Process;
 import org.flowable.bpm.model.bpmn.instance.StartEvent;
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnShape;
-import org.flowable.bpm.model.bpmn.instance.dc.Bounds;
 
 public class ProcessBuilder
         extends AbstractProcessBuilder<ProcessBuilder> {
@@ -31,15 +29,6 @@ public class ProcessBuilder
 
     public StartEventBuilder startEvent(String id) {
         StartEvent start = createChild(StartEvent.class, id);
-        BpmnShape bpmnShape = createBpmnShape(start);
-        setCoordinates(bpmnShape);
         return start.builder();
-    }
-
-    @Override
-    protected void setCoordinates(BpmnShape targetBpmnShape) {
-        Bounds bounds = targetBpmnShape.getBounds();
-        bounds.setX(100);
-        bounds.setY(100);
     }
 }

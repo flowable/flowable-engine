@@ -13,7 +13,6 @@
 package org.flowable.bpm.model.bpmn.instance;
 
 import org.flowable.bpm.model.bpmn.AssociationDirection;
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnEdge;
 
 /**
  * The BPMN association element.
@@ -32,7 +31,4 @@ public interface Association
     AssociationDirection getAssociationDirection();
 
     void setAssociationDirection(AssociationDirection associationDirection);
-
-    BpmnEdge getDiagramElement();
-
 }

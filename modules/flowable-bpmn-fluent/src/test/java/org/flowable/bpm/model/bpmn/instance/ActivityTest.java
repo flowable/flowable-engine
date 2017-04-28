@@ -18,10 +18,12 @@ import java.util.Collection;
 public class ActivityTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(FlowNode.class, true);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Arrays.asList(
                 new ChildElementAssumption(IoSpecification.class, 0, 1),
@@ -32,6 +34,7 @@ public class ActivityTest
                 new ChildElementAssumption(LoopCharacteristics.class, 0, 1));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Arrays.asList(
                 new AttributeAssumption("isForCompensation", false, false, false),

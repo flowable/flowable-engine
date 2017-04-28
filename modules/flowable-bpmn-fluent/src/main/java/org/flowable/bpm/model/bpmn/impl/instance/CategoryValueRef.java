@@ -30,6 +30,7 @@ public class CategoryValueRef
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CategoryValueRef.class, BPMN_ELEMENT_CATEGORY_VALUE_REF)
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<CategoryValueRef>() {
+                    @Override
                     public CategoryValueRef newInstance(ModelTypeInstanceContext instanceContext) {
                         return new CategoryValueRef(instanceContext);
                     }

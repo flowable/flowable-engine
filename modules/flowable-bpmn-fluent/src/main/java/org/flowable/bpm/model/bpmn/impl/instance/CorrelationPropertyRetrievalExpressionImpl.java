@@ -43,6 +43,7 @@ public class CorrelationPropertyRetrievalExpressionImpl
                         .namespaceUri(BPMN20_NS)
                         .extendsType(BaseElement.class)
                         .instanceProvider(new ModelTypeInstanceProvider<CorrelationPropertyRetrievalExpression>() {
+                            @Override
                             public CorrelationPropertyRetrievalExpression newInstance(ModelTypeInstanceContext instanceContext) {
                                 return new CorrelationPropertyRetrievalExpressionImpl(instanceContext);
                             }
@@ -66,18 +67,22 @@ public class CorrelationPropertyRetrievalExpressionImpl
         super(instanceContext);
     }
 
+    @Override
     public Message getMessage() {
         return messageRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setMessage(Message message) {
         messageRefAttribute.setReferenceTargetElement(this, message);
     }
 
+    @Override
     public MessagePath getMessagePath() {
         return messagePathChild.getChild(this);
     }
 
+    @Override
     public void setMessagePath(MessagePath messagePath) {
         messagePathChild.setChild(this, messagePath);
     }

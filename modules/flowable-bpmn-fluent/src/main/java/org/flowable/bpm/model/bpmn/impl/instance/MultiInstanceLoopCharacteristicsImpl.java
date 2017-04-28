@@ -80,6 +80,7 @@ public class MultiInstanceLoopCharacteristicsImpl
                 .extendsType(LoopCharacteristics.class)
                 .instanceProvider(new ModelTypeInstanceProvider<MultiInstanceLoopCharacteristics>() {
 
+                    @Override
                     public MultiInstanceLoopCharacteristics newInstance(ModelTypeInstanceContext instanceContext) {
                         return new MultiInstanceLoopCharacteristicsImpl(instanceContext);
                     }
@@ -151,122 +152,152 @@ public class MultiInstanceLoopCharacteristicsImpl
         super(instanceContext);
     }
 
+    @Override
     public MultiInstanceLoopCharacteristicsBuilder builder() {
         return new MultiInstanceLoopCharacteristicsBuilder((BpmnModelInstance) modelInstance, this);
     }
 
+    @Override
     public LoopCardinality getLoopCardinality() {
         return loopCardinalityChild.getChild(this);
     }
 
+    @Override
     public void setLoopCardinality(LoopCardinality loopCardinality) {
         loopCardinalityChild.setChild(this, loopCardinality);
     }
 
+    @Override
     public DataInput getLoopDataInputRef() {
         return loopDataInputRefChild.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setLoopDataInputRef(DataInput loopDataInputRef) {
         loopDataInputRefChild.setReferenceTargetElement(this, loopDataInputRef);
     }
 
+    @Override
     public DataOutput getLoopDataOutputRef() {
         return loopDataOutputRefChild.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setLoopDataOutputRef(DataOutput loopDataOutputRef) {
         loopDataOutputRefChild.setReferenceTargetElement(this, loopDataOutputRef);
     }
 
+    @Override
     public InputDataItem getInputDataItem() {
         return inputDataItemChild.getChild(this);
     }
 
+    @Override
     public void setInputDataItem(InputDataItem inputDataItem) {
         inputDataItemChild.setChild(this, inputDataItem);
     }
 
+    @Override
     public OutputDataItem getOutputDataItem() {
         return outputDataItemChild.getChild(this);
     }
 
+    @Override
     public void setOutputDataItem(OutputDataItem outputDataItem) {
         outputDataItemChild.setChild(this, outputDataItem);
     }
 
+    @Override
     public Collection<ComplexBehaviorDefinition> getComplexBehaviorDefinitions() {
         return complexBehaviorDefinitionCollection.get(this);
     }
 
+    @Override
     public CompletionCondition getCompletionCondition() {
         return completionConditionChild.getChild(this);
     }
 
+    @Override
     public void setCompletionCondition(CompletionCondition completionCondition) {
         completionConditionChild.setChild(this, completionCondition);
     }
 
+    @Override
     public boolean isSequential() {
         return isSequentialAttribute.getValue(this);
     }
 
+    @Override
     public void setSequential(boolean sequential) {
         isSequentialAttribute.setValue(this, sequential);
     }
 
+    @Override
     public MultiInstanceFlowCondition getBehavior() {
         return behaviorAttribute.getValue(this);
     }
 
+    @Override
     public void setBehavior(MultiInstanceFlowCondition behavior) {
         behaviorAttribute.setValue(this, behavior);
     }
 
+    @Override
     public EventDefinition getOneBehaviorEventRef() {
         return oneBehaviorEventRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setOneBehaviorEventRef(EventDefinition oneBehaviorEventRef) {
         oneBehaviorEventRefAttribute.setReferenceTargetElement(this, oneBehaviorEventRef);
     }
 
+    @Override
     public EventDefinition getNoneBehaviorEventRef() {
         return noneBehaviorEventRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setNoneBehaviorEventRef(EventDefinition noneBehaviorEventRef) {
         noneBehaviorEventRefAttribute.setReferenceTargetElement(this, noneBehaviorEventRef);
     }
 
+    @Override
     public boolean isFlowableAsync() {
         return flowableAsync.getValue(this);
     }
 
+    @Override
     public void setFlowableAsync(boolean isFlowableAsync) {
         flowableAsync.setValue(this, isFlowableAsync);
     }
 
+    @Override
     public boolean isFlowableExclusive() {
         return flowableExclusive.getValue(this);
     }
 
+    @Override
     public void setFlowableExclusive(boolean isFlowableExclusive) {
         flowableExclusive.setValue(this, isFlowableExclusive);
     }
 
+    @Override
     public String getFlowableCollection() {
         return flowableCollection.getValue(this);
     }
 
+    @Override
     public void setFlowableCollection(String expression) {
         flowableCollection.setValue(this, expression);
     }
 
+    @Override
     public String getFlowableElementVariable() {
         return flowableElementVariable.getValue(this);
     }
 
+    @Override
     public void setFlowableElementVariable(String variableName) {
         flowableElementVariable.setValue(this, variableName);
     }

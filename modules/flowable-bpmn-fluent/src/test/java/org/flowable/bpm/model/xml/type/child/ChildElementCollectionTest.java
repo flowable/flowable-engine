@@ -16,10 +16,6 @@ import static org.flowable.bpm.model.xml.test.assertions.ModelAssertions.assertT
 import static org.junit.Assert.fail;
 import static org.junit.runners.Parameterized.Parameters;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-
 import org.flowable.bpm.model.xml.ModelInstance;
 import org.flowable.bpm.model.xml.UnsupportedModelOperationException;
 import org.flowable.bpm.model.xml.impl.parser.AbstractModelParser;
@@ -36,6 +32,10 @@ import org.flowable.bpm.model.xml.testmodel.instance.FlyingAnimal;
 import org.flowable.bpm.model.xml.type.ModelElementType;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 
 public class ChildElementCollectionTest
         extends TestModelTest {

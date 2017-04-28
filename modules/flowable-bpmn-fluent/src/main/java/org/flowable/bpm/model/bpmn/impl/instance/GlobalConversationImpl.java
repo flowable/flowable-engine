@@ -34,6 +34,7 @@ public class GlobalConversationImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Collaboration.class)
                 .instanceProvider(new ModelTypeInstanceProvider<GlobalConversation>() {
+                    @Override
                     public GlobalConversation newInstance(ModelTypeInstanceContext instanceContext) {
                         return new GlobalConversationImpl(instanceContext);
                     }

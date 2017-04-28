@@ -33,6 +33,7 @@ public class PotentialOwnerImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(HumanPerformer.class)
                 .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<PotentialOwner>() {
+                    @Override
                     public PotentialOwner newInstance(ModelTypeInstanceContext instanceContext) {
                         return new PotentialOwnerImpl(instanceContext);
                     }

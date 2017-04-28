@@ -22,16 +22,19 @@ import java.util.Collection;
 public class FlowableConnectorTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(FLOWABLE_NS, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Arrays.asList(
                 new ChildElementAssumption(FLOWABLE_NS, FlowableConnectorId.class, 1, 1),
                 new ChildElementAssumption(FLOWABLE_NS, FlowableInputOutput.class, 0, 1));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return null;
     }

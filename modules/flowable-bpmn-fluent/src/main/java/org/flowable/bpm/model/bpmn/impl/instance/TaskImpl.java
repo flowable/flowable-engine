@@ -21,7 +21,6 @@ import static org.flowable.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeI
 import org.flowable.bpm.model.bpmn.builder.AbstractTaskBuilder;
 import org.flowable.bpm.model.bpmn.instance.Activity;
 import org.flowable.bpm.model.bpmn.instance.Task;
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.flowable.bpm.model.xml.ModelBuilder;
 import org.flowable.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.flowable.bpm.model.xml.impl.util.ModelTypeException;
@@ -43,6 +42,7 @@ public class TaskImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Activity.class)
                 .instanceProvider(new ModelTypeInstanceProvider<Task>() {
+                    @Override
                     public Task newInstance(ModelTypeInstanceContext instanceContext) {
                         return new TaskImpl(instanceContext);
                     }
@@ -60,13 +60,9 @@ public class TaskImpl
         super(context);
     }
 
+    @Override
     @SuppressWarnings("rawtypes")
     public AbstractTaskBuilder builder() {
         throw new ModelTypeException("No builder implemented.");
     }
-
-    public BpmnShape getDiagramElement() {
-        return (BpmnShape) super.getDiagramElement();
-    }
-
 }

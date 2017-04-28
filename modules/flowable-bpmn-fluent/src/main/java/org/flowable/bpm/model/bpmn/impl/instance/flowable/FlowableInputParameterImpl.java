@@ -36,6 +36,7 @@ public class FlowableInputParameterImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableInputParameter.class, FLOWABLE_ELEMENT_INPUT_PARAMETER)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableInputParameter>() {
+                    @Override
                     public FlowableInputParameter newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableInputParameterImpl(instanceContext);
                     }
@@ -53,10 +54,12 @@ public class FlowableInputParameterImpl
         super(instanceContext);
     }
 
+    @Override
     public String getFlowableName() {
         return flowableNameAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableName(String flowableName) {
         flowableNameAttribute.setValue(this, flowableName);
     }

@@ -44,6 +44,7 @@ public class ConversationLinkImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<ConversationLink>() {
+                    @Override
                     public ConversationLink newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ConversationLinkImpl(instanceContext);
                     }
@@ -69,26 +70,32 @@ public class ConversationLinkImpl
         super(instanceContext);
     }
 
+    @Override
     public String getName() {
         return nameAttribute.getValue(this);
     }
 
+    @Override
     public void setName(String name) {
         nameAttribute.setValue(this, name);
     }
 
+    @Override
     public InteractionNode getSource() {
         return sourceRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setSource(InteractionNode source) {
         sourceRefAttribute.setReferenceTargetElement(this, source);
     }
 
+    @Override
     public InteractionNode getTarget() {
         return targetRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setTarget(InteractionNode target) {
         targetRefAttribute.setReferenceTargetElement(this, target);
     }

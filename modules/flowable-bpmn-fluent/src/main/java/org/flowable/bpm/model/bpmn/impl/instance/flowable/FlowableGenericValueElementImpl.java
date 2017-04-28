@@ -13,14 +13,14 @@
 
 package org.flowable.bpm.model.bpmn.impl.instance.flowable;
 
+import java.util.List;
+
 import org.flowable.bpm.model.bpmn.impl.instance.BpmnModelElementInstanceImpl;
 import org.flowable.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.flowable.bpm.model.bpmn.instance.flowable.FlowableGenericValueElement;
 import org.flowable.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.flowable.bpm.model.xml.impl.util.ModelUtil;
 import org.flowable.bpm.model.xml.instance.DomElement;
-
-import java.util.List;
 
 /**
  * A helper interface for Flowable extension elements which hold a generic child element like flowable:inputParameter, flowable:outputParameter and
@@ -34,16 +34,14 @@ public class FlowableGenericValueElementImpl
         super(instanceContext);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T extends BpmnModelElementInstance> T getValue() {
         List<DomElement> childElements = getDomElement().getChildElements();
-        if (childElements.isEmpty()) {
-            return null;
-        } else {
-            return (T) ModelUtil.getModelElement(childElements.get(0), modelInstance);
-        }
+        return childElements.isEmpty() ? null : (T) ModelUtil.getModelElement(childElements.get(0), modelInstance);
     }
 
+    @Override
     public void removeValue() {
         DomElement domElement = getDomElement();
         List<DomElement> childElements = domElement.getChildElements();
@@ -52,9 +50,9 @@ public class FlowableGenericValueElementImpl
         }
     }
 
+    @Override
     public <T extends BpmnModelElementInstance> void setValue(T value) {
         removeValue();
         getDomElement().appendChild(value.getDomElement());
     }
-
 }

@@ -41,6 +41,7 @@ public class ConversationAssociationImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<ConversationAssociation>() {
+                    @Override
                     public ConversationAssociation newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ConversationAssociationImpl(instanceContext);
                     }
@@ -63,18 +64,22 @@ public class ConversationAssociationImpl
         super(instanceContext);
     }
 
+    @Override
     public ConversationNode getInnerConversationNode() {
         return innerConversationNodeRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setInnerConversationNode(ConversationNode innerConversationNode) {
         innerConversationNodeRefAttribute.setReferenceTargetElement(this, innerConversationNode);
     }
 
+    @Override
     public ConversationNode getOuterConversationNode() {
         return outerConversationNodeRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setOuterConversationNode(ConversationNode outerConversationNode) {
         outerConversationNodeRefAttribute.setReferenceTargetElement(this, outerConversationNode);
     }

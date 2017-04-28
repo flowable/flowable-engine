@@ -40,6 +40,7 @@ public class ImportImpl
         ModelElementTypeBuilder typeBuilder = bpmnModelBuilder.defineType(Import.class, BPMN_ELEMENT_IMPORT)
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<Import>() {
+                    @Override
                     public Import newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ImportImpl(instanceContext);
                     }
@@ -64,26 +65,32 @@ public class ImportImpl
         super(context);
     }
 
+    @Override
     public String getNamespace() {
         return namespaceAttribute.getValue(this);
     }
 
+    @Override
     public void setNamespace(String namespace) {
         namespaceAttribute.setValue(this, namespace);
     }
 
+    @Override
     public String getLocation() {
         return locationAttribute.getValue(this);
     }
 
+    @Override
     public void setLocation(String location) {
         locationAttribute.setValue(this, location);
     }
 
+    @Override
     public String getImportType() {
         return importTypeAttribute.getValue(this);
     }
 
+    @Override
     public void setImportType(String importType) {
         importTypeAttribute.setValue(this, importType);
     }

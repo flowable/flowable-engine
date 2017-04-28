@@ -34,6 +34,7 @@ public class ConditionImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Expression.class)
                 .instanceProvider(new ModelTypeInstanceProvider<Condition>() {
+                    @Override
                     public Condition newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ConditionImpl(instanceContext);
                     }

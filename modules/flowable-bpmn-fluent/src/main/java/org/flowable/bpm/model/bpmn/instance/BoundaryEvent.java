@@ -28,6 +28,7 @@ public interface BoundaryEvent
 
     void setAttachedTo(Activity attachedTo);
 
+    @Override
     BoundaryEventBuilder builder();
 
 }

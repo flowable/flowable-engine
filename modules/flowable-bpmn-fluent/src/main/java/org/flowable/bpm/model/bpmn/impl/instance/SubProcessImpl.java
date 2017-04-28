@@ -55,6 +55,7 @@ public class SubProcessImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Activity.class)
                 .instanceProvider(new ModelTypeInstanceProvider<SubProcess>() {
+                    @Override
                     public SubProcess newInstance(ModelTypeInstanceContext instanceContext) {
                         return new SubProcessImpl(instanceContext);
                     }
@@ -89,26 +90,32 @@ public class SubProcessImpl
         super(context);
     }
 
+    @Override
     public SubProcessBuilder builder() {
         return new SubProcessBuilder((BpmnModelInstance) modelInstance, this);
     }
 
+    @Override
     public boolean triggeredByEvent() {
         return triggeredByEventAttribute.getValue(this);
     }
 
+    @Override
     public void setTriggeredByEvent(boolean triggeredByEvent) {
         triggeredByEventAttribute.setValue(this, triggeredByEvent);
     }
 
+    @Override
     public Collection<LaneSet> getLaneSets() {
         return laneSetCollection.get(this);
     }
 
+    @Override
     public Collection<FlowElement> getFlowElements() {
         return flowElementCollection.get(this);
     }
 
+    @Override
     public Collection<Artifact> getArtifacts() {
         return artifactCollection.get(this);
     }

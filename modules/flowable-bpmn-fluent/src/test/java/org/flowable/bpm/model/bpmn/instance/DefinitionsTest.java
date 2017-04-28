@@ -12,10 +12,6 @@
  */
 package org.flowable.bpm.model.bpmn.instance;
 
-import static org.flowable.bpm.model.bpmn.impl.BpmnModelConstants.BPMNDI_NS;
-
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnDiagram;
-
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -23,19 +19,21 @@ import java.util.Collection;
 public class DefinitionsTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Arrays.asList(
                 new ChildElementAssumption(Import.class),
                 new ChildElementAssumption(Extension.class),
                 new ChildElementAssumption(RootElement.class),
-                new ChildElementAssumption(BPMNDI_NS, BpmnDiagram.class),
                 new ChildElementAssumption(Relationship.class));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Arrays.asList(
                 new AttributeAssumption("id", true),

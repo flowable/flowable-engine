@@ -83,34 +83,42 @@ public abstract class CatchEventImpl
         super(context);
     }
 
+    @Override
     public boolean isParallelMultiple() {
         return parallelMultipleAttribute.getValue(this);
     }
 
+    @Override
     public void setParallelMultiple(boolean parallelMultiple) {
         parallelMultipleAttribute.setValue(this, parallelMultiple);
     }
 
+    @Override
     public Collection<DataOutput> getDataOutputs() {
         return dataOutputCollection.get(this);
     }
 
+    @Override
     public Collection<DataOutputAssociation> getDataOutputAssociations() {
         return dataOutputAssociationCollection.get(this);
     }
 
+    @Override
     public OutputSet getOutputSet() {
         return outputSetChild.getChild(this);
     }
 
+    @Override
     public void setOutputSet(OutputSet outputSet) {
         outputSetChild.setChild(this, outputSet);
     }
 
+    @Override
     public Collection<EventDefinition> getEventDefinitions() {
         return eventDefinitionCollection.get(this);
     }
 
+    @Override
     public Collection<EventDefinition> getEventDefinitionRefs() {
         return eventDefinitionRefCollection.getReferenceTargetElements(this);
     }

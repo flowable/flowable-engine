@@ -54,6 +54,7 @@ public class BusinessRuleTaskImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Task.class)
                 .instanceProvider(new ModelTypeInstanceProvider<BusinessRuleTask>() {
+                    @Override
                     public BusinessRuleTask newInstance(ModelTypeInstanceContext instanceContext) {
                         return new BusinessRuleTaskImpl(instanceContext);
                     }
@@ -97,52 +98,64 @@ public class BusinessRuleTaskImpl
         return new BusinessRuleTaskBuilder((BpmnModelInstance) modelInstance, this);
     }
 
+    @Override
     public String getImplementation() {
         return implementationAttribute.getValue(this);
     }
 
+    @Override
     public void setImplementation(String implementation) {
         implementationAttribute.setValue(this, implementation);
     }
 
     /* Flowable extensions */
 
+    @Override
     public String getFlowableClass() {
         return flowableClassAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableClass(String flowableClass) {
         flowableClassAttribute.setValue(this, flowableClass);
     }
 
+    @Override
     public String getFlowableDelegateExpression() {
         return flowableDelegateExpressionAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableDelegateExpression(String flowableExpression) {
         flowableDelegateExpressionAttribute.setValue(this, flowableExpression);
     }
 
+    @Override
     public String getFlowableExpression() {
         return flowableExpressionAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableExpression(String flowableExpression) {
         flowableExpressionAttribute.setValue(this, flowableExpression);
     }
 
+    @Override
     public String getFlowableResultVariable() {
         return flowableResultVariableAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableResultVariable(String flowableResultVariable) {
         flowableResultVariableAttribute.setValue(this, flowableResultVariable);
     }
 
+    @Override
     public String getFlowableType() {
         return flowableTypeAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableType(String flowableType) {
         flowableTypeAttribute.setValue(this, flowableType);
     }

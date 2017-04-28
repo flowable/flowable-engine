@@ -30,6 +30,7 @@ public class DataInputRefs
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(DataInputRefs.class, BPMN_ELEMENT_DATA_INPUT_REFS)
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<DataInputRefs>() {
+                    @Override
                     public DataInputRefs newInstance(ModelTypeInstanceContext instanceContext) {
                         return new DataInputRefs(instanceContext);
                     }

@@ -50,6 +50,7 @@ public class LaneImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<Lane>() {
+                    @Override
                     public Lane newInstance(ModelTypeInstanceContext instanceContext) {
                         return new LaneImpl(instanceContext);
                     }
@@ -82,38 +83,47 @@ public class LaneImpl
         super(instanceContext);
     }
 
+    @Override
     public String getName() {
         return nameAttribute.getValue(this);
     }
 
+    @Override
     public void setName(String name) {
         nameAttribute.setValue(this, name);
     }
 
+    @Override
     public PartitionElement getPartitionElement() {
         return partitionElementRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setPartitionElement(PartitionElement partitionElement) {
         partitionElementRefAttribute.setReferenceTargetElement(this, partitionElement);
     }
 
+    @Override
     public PartitionElement getPartitionElementChild() {
         return partitionElementChild.getChild(this);
     }
 
+    @Override
     public void setPartitionElementChild(PartitionElement partitionElement) {
         partitionElementChild.setChild(this, partitionElement);
     }
 
+    @Override
     public Collection<FlowNode> getFlowNodeRefs() {
         return flowNodeRefCollection.getReferenceTargetElements(this);
     }
 
+    @Override
     public ChildLaneSet getChildLaneSet() {
         return childLaneSetChild.getChild(this);
     }
 
+    @Override
     public void setChildLaneSet(ChildLaneSet childLaneSet) {
         childLaneSetChild.setChild(this, childLaneSet);
     }

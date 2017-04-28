@@ -30,6 +30,7 @@ public class Outgoing
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Outgoing.class, BPMN_ELEMENT_OUTGOING)
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<Outgoing>() {
+                    @Override
                     public Outgoing newInstance(ModelTypeInstanceContext instanceContext) {
                         return new Outgoing(instanceContext);
                     }

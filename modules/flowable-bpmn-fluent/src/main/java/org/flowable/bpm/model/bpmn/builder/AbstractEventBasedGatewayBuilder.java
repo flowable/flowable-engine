@@ -44,10 +44,12 @@ public class AbstractEventBasedGatewayBuilder<B extends AbstractEventBasedGatewa
         return myself;
     }
 
+    @Override
     public B flowableAsync() {
         throw new UnsupportedOperationException("'async' is not supported for 'Event Based Gateway'");
     }
 
+    @Override
     public B flowableAsync(boolean isFlowableAsync) {
         throw new UnsupportedOperationException("'async' is not supported for 'Event Based Gateway'");
     }

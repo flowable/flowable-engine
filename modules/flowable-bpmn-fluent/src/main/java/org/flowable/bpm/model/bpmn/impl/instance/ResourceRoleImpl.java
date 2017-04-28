@@ -50,6 +50,7 @@ public class ResourceRoleImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<ResourceRole>() {
+                    @Override
                     public ResourceRole newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ResourceRoleImpl(instanceContext);
                     }
@@ -77,26 +78,32 @@ public class ResourceRoleImpl
         super(instanceContext);
     }
 
+    @Override
     public String getName() {
         return nameAttribute.getValue(this);
     }
 
+    @Override
     public void setName(String name) {
         nameAttribute.setValue(this, name);
     }
 
+    @Override
     public Resource getResource() {
         return resourceRefChild.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setResource(Resource resource) {
         resourceRefChild.setReferenceTargetElement(this, resource);
     }
 
+    @Override
     public Collection<ResourceParameterBinding> getResourceParameterBinding() {
         return resourceParameterBindingCollection.get(this);
     }
 
+    @Override
     public ResourceAssignmentExpression getResourceAssignmentExpression() {
         return resourceAssignmentExpressionChild.getChild(this);
     }

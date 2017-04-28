@@ -36,6 +36,7 @@ public class IntermediateThrowEventImpl
                 .namespaceUri(BpmnModelConstants.BPMN20_NS)
                 .extendsType(ThrowEvent.class)
                 .instanceProvider(new ModelTypeInstanceProvider<IntermediateThrowEvent>() {
+                    @Override
                     public IntermediateThrowEvent newInstance(ModelTypeInstanceContext instanceContext) {
                         return new IntermediateThrowEventImpl(instanceContext);
                     }

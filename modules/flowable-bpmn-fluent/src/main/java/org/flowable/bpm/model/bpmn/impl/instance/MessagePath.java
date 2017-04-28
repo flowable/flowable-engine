@@ -32,6 +32,7 @@ public class MessagePath
                 .namespaceUri(BPMN20_NS)
                 .extendsType(FormalExpression.class)
                 .instanceProvider(new ModelTypeInstanceProvider<MessagePath>() {
+                    @Override
                     public MessagePath newInstance(ModelTypeInstanceContext instanceContext) {
                         return new MessagePath(instanceContext);
                     }

@@ -14,6 +14,8 @@ package org.flowable.bpm.model.bpmn;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collection;
+
 import org.flowable.bpm.model.bpmn.impl.BpmnModelConstants;
 import org.flowable.bpm.model.bpmn.instance.ConditionExpression;
 import org.flowable.bpm.model.bpmn.instance.EndEvent;
@@ -28,15 +30,12 @@ import org.flowable.bpm.model.bpmn.instance.SequenceFlow;
 import org.flowable.bpm.model.bpmn.instance.ServiceTask;
 import org.flowable.bpm.model.bpmn.instance.StartEvent;
 import org.flowable.bpm.model.bpmn.instance.UserTask;
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnPlane;
 import org.flowable.bpm.model.bpmn.instance.flowable.FlowableExecutionListener;
 import org.flowable.bpm.model.bpmn.instance.flowable.FlowableFormData;
 import org.flowable.bpm.model.bpmn.instance.flowable.FlowableFormField;
 import org.flowable.bpm.model.xml.instance.ModelElementInstance;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Collection;
 
 public class ParseBpmnTest {
 
@@ -197,15 +196,5 @@ public class ParseBpmnTest {
         assertThat(join.getSucceedingNodes().list()).hasSize(1)
                 .containsOnly(
                         modelInstance.<FlowNode>getModelElementById("scriptTask"));
-
-        // get the bpmn plane DI element by type
-        BpmnPlane bpmnPlane = modelInstance.getModelElementsByType(BpmnPlane.class).iterator().next();
-        // the process element is the bpmn element corresponding to the bpmn plane
-        assertThat(bpmnPlane.getBpmnElement()).isEqualTo(modelInstance.getModelElementById("testProcess"));
-
-        // get the service task
-        ServiceTask serviceTask = modelInstance.getModelElementById("serviceTask");
-        // use the reverse reference to get the corresponding BPMN DI element
-        assertThat(serviceTask.getDiagramElement()).isEqualTo(modelInstance.getModelElementById("_BPMNShape_ServiceTask_2"));
     }
 }

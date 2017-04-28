@@ -50,6 +50,7 @@ public class OperationImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<Operation>() {
+                    @Override
                     public Operation newInstance(ModelTypeInstanceContext instanceContext) {
                         return new OperationImpl(instanceContext);
                     }
@@ -84,38 +85,47 @@ public class OperationImpl
         super(instanceContext);
     }
 
+    @Override
     public String getName() {
         return nameAttribute.getValue(this);
     }
 
+    @Override
     public void setName(String name) {
         nameAttribute.setValue(this, name);
     }
 
+    @Override
     public String getImplementationRef() {
         return implementationRefAttribute.getValue(this);
     }
 
+    @Override
     public void setImplementationRef(String implementationRef) {
         implementationRefAttribute.setValue(this, implementationRef);
     }
 
+    @Override
     public Message getInMessage() {
         return inMessageRefChild.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setInMessage(Message message) {
         inMessageRefChild.setReferenceTargetElement(this, message);
     }
 
+    @Override
     public Message getOutMessage() {
         return outMessageRefChild.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setOutMessage(Message message) {
         outMessageRefChild.setReferenceTargetElement(this, message);
     }
 
+    @Override
     public Collection<Error> getErrors() {
         return errorRefCollection.getReferenceTargetElements(this);
     }

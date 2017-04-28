@@ -23,6 +23,7 @@ import java.util.Collection;
 public class SignalEventDefinitionTest
         extends AbstractEventDefinitionTest {
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Arrays.asList(
                 new AttributeAssumption("signalRef"),

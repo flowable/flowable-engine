@@ -31,6 +31,7 @@ public class From
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Expression.class)
                 .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<From>() {
+                    @Override
                     public From newInstance(ModelTypeInstanceContext instanceContext) {
                         return new From(instanceContext);
                     }

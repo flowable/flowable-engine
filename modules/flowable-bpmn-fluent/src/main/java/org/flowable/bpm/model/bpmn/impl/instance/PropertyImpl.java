@@ -37,6 +37,7 @@ public class PropertyImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(ItemAwareElement.class)
                 .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<Property>() {
+                    @Override
                     public Property newInstance(ModelTypeInstanceContext instanceContext) {
                         return new PropertyImpl(instanceContext);
                     }
@@ -52,10 +53,12 @@ public class PropertyImpl
         super(instanceContext);
     }
 
+    @Override
     public String getName() {
         return nameAttribute.getValue(this);
     }
 
+    @Override
     public void setName(String name) {
         nameAttribute.setValue(this, name);
     }

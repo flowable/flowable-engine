@@ -12,12 +12,12 @@
  */
 package org.flowable.bpm.model.xml.impl.validation;
 
-import java.util.Collection;
-
 import org.flowable.bpm.model.xml.impl.ModelInstanceImpl;
 import org.flowable.bpm.model.xml.instance.ModelElementInstance;
 import org.flowable.bpm.model.xml.validation.ModelElementValidator;
 import org.flowable.bpm.model.xml.validation.ValidationResults;
+
+import java.util.Collection;
 
 public class ModelInstanceValidator {
 

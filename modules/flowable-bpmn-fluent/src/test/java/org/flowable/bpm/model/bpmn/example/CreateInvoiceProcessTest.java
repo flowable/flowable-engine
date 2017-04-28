@@ -24,7 +24,7 @@ import org.junit.Test;
 /**
  * Create Invoice Process test.
  *
- * See <code>CreateProcessTest.png</code> in same directory for visual view of the process beging built.
+ * See {@code CreateProcessTest.png} in same directory for visual view of the process beging built.
  */
 public class CreateInvoiceProcessTest {
 

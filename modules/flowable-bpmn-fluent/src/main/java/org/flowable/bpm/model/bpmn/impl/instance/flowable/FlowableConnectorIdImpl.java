@@ -33,6 +33,7 @@ public class FlowableConnectorIdImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableConnectorId.class, FLOWABLE_ELEMENT_CONNECTOR_ID)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableConnectorId>() {
+                    @Override
                     public FlowableConnectorId newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableConnectorIdImpl(instanceContext);
                     }

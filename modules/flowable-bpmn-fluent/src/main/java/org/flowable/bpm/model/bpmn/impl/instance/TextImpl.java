@@ -32,6 +32,7 @@ public class TextImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Text.class, BPMN_ELEMENT_TEXT)
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<Text>() {
+                    @Override
                     public Text newInstance(ModelTypeInstanceContext instanceContext) {
                         return new TextImpl(instanceContext);
                     }

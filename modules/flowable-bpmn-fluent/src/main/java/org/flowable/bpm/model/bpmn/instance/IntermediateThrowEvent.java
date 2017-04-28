@@ -20,5 +20,6 @@ import org.flowable.bpm.model.bpmn.builder.IntermediateThrowEventBuilder;
 public interface IntermediateThrowEvent
         extends ThrowEvent {
 
+    @Override
     IntermediateThrowEventBuilder builder();
 }

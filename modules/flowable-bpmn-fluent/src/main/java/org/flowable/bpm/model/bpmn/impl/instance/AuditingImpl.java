@@ -34,6 +34,7 @@ public class AuditingImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<Auditing>() {
+                    @Override
                     public Auditing newInstance(ModelTypeInstanceContext instanceContext) {
                         return new AuditingImpl(instanceContext);
                     }

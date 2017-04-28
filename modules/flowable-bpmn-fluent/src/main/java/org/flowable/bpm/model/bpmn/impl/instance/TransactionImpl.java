@@ -36,6 +36,7 @@ public class TransactionImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(SubProcess.class)
                 .instanceProvider(new ModelTypeInstanceProvider<Transaction>() {
+                    @Override
                     public Transaction newInstance(ModelTypeInstanceContext instanceContext) {
                         return new TransactionImpl(instanceContext);
                     }

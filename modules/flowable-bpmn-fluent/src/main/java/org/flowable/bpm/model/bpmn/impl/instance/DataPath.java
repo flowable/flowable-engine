@@ -32,6 +32,7 @@ public class DataPath
                 .namespaceUri(BPMN20_NS)
                 .extendsType(FormalExpression.class)
                 .instanceProvider(new ModelTypeInstanceProvider<DataPath>() {
+                    @Override
                     public DataPath newInstance(ModelTypeInstanceContext instanceContext) {
                         return new DataPath(instanceContext);
                     }

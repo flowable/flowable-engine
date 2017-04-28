@@ -50,6 +50,7 @@ public class DataStoreImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(RootElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<DataStore>() {
+                    @Override
                     public DataStore newInstance(ModelTypeInstanceContext instanceContext) {
                         return new DataStoreImpl(instanceContext);
                     }

@@ -12,11 +12,7 @@
  */
 package org.flowable.bpm.model.bpmn.builder;
 
-import static org.flowable.bpm.model.bpmn.builder.AbstractBaseElementBuilder.SPACE;
-
 import org.flowable.bpm.model.bpmn.instance.StartEvent;
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnShape;
-import org.flowable.bpm.model.bpmn.instance.dc.Bounds;
 
 public class EmbeddedSubProcessBuilder
         extends AbstractEmbeddedSubProcessBuilder<EmbeddedSubProcessBuilder, AbstractSubProcessBuilder<?>> {
@@ -32,23 +28,6 @@ public class EmbeddedSubProcessBuilder
 
     public StartEventBuilder startEvent(String id) {
         StartEvent start = subProcessBuilder.createChild(StartEvent.class, id);
-
-        BpmnShape startShape = subProcessBuilder.createBpmnShape(start);
-        BpmnShape subProcessShape = subProcessBuilder.findBpmnShape(subProcessBuilder.getElement());
-
-        if (subProcessShape != null) {
-            Bounds subProcessBounds = subProcessShape.getBounds();
-            Bounds startBounds = startShape.getBounds();
-
-            double subProcessX = subProcessBounds.getX();
-            double subProcessY = subProcessBounds.getY();
-            double subProcessHeight = subProcessBounds.getHeight();
-            double startHeight = startBounds.getHeight();
-
-            startBounds.setX(subProcessX + SPACE);
-            startBounds.setY(subProcessY + subProcessHeight / 2 - startHeight / 2);
-        }
-
         return start.builder();
     }
 }

@@ -46,14 +46,17 @@ public class GetBpmnModelElementTypeRule
         modelElementType = model.getType(instanceClass);
     }
 
+    @Override
     public ModelInstance getModelInstance() {
         return modelInstance;
     }
 
+    @Override
     public Model getModel() {
         return model;
     }
 
+    @Override
     public ModelElementType getModelElementType() {
         return modelElementType;
     }

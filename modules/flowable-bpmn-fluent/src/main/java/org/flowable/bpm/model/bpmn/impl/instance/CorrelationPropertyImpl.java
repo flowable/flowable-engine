@@ -49,6 +49,7 @@ public class CorrelationPropertyImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(RootElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<CorrelationProperty>() {
+                    @Override
                     public CorrelationProperty newInstance(ModelTypeInstanceContext instanceContext) {
                         return new CorrelationPropertyImpl(instanceContext);
                     }
@@ -75,22 +76,27 @@ public class CorrelationPropertyImpl
         super(context);
     }
 
+    @Override
     public String getName() {
         return nameAttribute.getValue(this);
     }
 
+    @Override
     public void setName(String name) {
         nameAttribute.setValue(this, name);
     }
 
+    @Override
     public ItemDefinition getType() {
         return typeAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setType(ItemDefinition type) {
         typeAttribute.setReferenceTargetElement(this, type);
     }
 
+    @Override
     public Collection<CorrelationPropertyRetrievalExpression> getCorrelationPropertyRetrievalExpressions() {
         return correlationPropertyRetrievalExpressionCollection.get(this);
     }

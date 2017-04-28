@@ -76,26 +76,32 @@ public abstract class ThrowEventImpl
         super(context);
     }
 
+    @Override
     public Collection<DataInput> getDataInputs() {
         return dataInputCollection.get(this);
     }
 
+    @Override
     public Collection<DataInputAssociation> getDataInputAssociations() {
         return dataInputAssociationCollection.get(this);
     }
 
+    @Override
     public InputSet getInputSet() {
         return inputSetChild.getChild(this);
     }
 
+    @Override
     public void setInputSet(InputSet inputSet) {
         inputSetChild.setChild(this, inputSet);
     }
 
+    @Override
     public Collection<EventDefinition> getEventDefinitions() {
         return eventDefinitionCollection.get(this);
     }
 
+    @Override
     public Collection<EventDefinition> getEventDefinitionRefs() {
         return eventDefinitionRefCollection.getReferenceTargetElements(this);
     }

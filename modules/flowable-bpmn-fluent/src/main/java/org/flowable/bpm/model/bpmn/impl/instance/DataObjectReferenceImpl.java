@@ -42,6 +42,7 @@ public class DataObjectReferenceImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(FlowElement.class)
                 .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<DataObjectReference>() {
+                    @Override
                     public DataObjectReference newInstance(ModelTypeInstanceContext instanceContext) {
                         return new DataObjectReferenceImpl(instanceContext);
                     }
@@ -67,26 +68,32 @@ public class DataObjectReferenceImpl
         super(instanceContext);
     }
 
+    @Override
     public ItemDefinition getItemSubject() {
         return itemSubjectRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setItemSubject(ItemDefinition itemSubject) {
         itemSubjectRefAttribute.setReferenceTargetElement(this, itemSubject);
     }
 
+    @Override
     public DataState getDataState() {
         return dataStateChild.getChild(this);
     }
 
+    @Override
     public void setDataState(DataState dataState) {
         dataStateChild.setChild(this, dataState);
     }
 
+    @Override
     public DataObject getDataObject() {
         return dataObjectRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setDataObject(DataObject dataObject) {
         dataObjectRefAttribute.setReferenceTargetElement(this, dataObject);
     }

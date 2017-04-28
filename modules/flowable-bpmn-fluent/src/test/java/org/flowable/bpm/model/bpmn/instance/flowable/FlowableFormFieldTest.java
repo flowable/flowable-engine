@@ -22,10 +22,12 @@ import java.util.Collection;
 public class FlowableFormFieldTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(FLOWABLE_NS, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Arrays.asList(
                 new ChildElementAssumption(FLOWABLE_NS, FlowableProperties.class, 0, 1),
@@ -33,6 +35,7 @@ public class FlowableFormFieldTest
                 new ChildElementAssumption(FLOWABLE_NS, FlowableValue.class));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Arrays.asList(
                 new AttributeAssumption(FLOWABLE_NS, "id"),

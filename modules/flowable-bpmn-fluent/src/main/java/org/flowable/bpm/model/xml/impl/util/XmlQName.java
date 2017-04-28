@@ -14,11 +14,11 @@ package org.flowable.bpm.model.xml.impl.util;
 
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.flowable.bpm.model.xml.instance.DomDocument;
 import org.flowable.bpm.model.xml.instance.DomElement;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class XmlQName {
 

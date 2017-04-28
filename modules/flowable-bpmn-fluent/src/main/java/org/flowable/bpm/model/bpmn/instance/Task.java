@@ -12,14 +12,9 @@
  */
 package org.flowable.bpm.model.bpmn.instance;
 
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnShape;
-
 /**
  * The BPMN task element.
  */
 public interface Task
         extends Activity {
-
-    BpmnShape getDiagramElement();
-
 }

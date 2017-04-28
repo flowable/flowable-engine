@@ -20,7 +20,6 @@ import org.flowable.bpm.model.bpmn.GatewayDirection;
 import org.flowable.bpm.model.bpmn.builder.AbstractGatewayBuilder;
 import org.flowable.bpm.model.bpmn.instance.FlowNode;
 import org.flowable.bpm.model.bpmn.instance.Gateway;
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.flowable.bpm.model.xml.ModelBuilder;
 import org.flowable.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.flowable.bpm.model.xml.type.ModelElementTypeBuilder;
@@ -52,19 +51,17 @@ public abstract class GatewayImpl
         super(context);
     }
 
+    @Override
     @SuppressWarnings("rawtypes")
     public abstract AbstractGatewayBuilder builder();
 
+    @Override
     public GatewayDirection getGatewayDirection() {
         return gatewayDirectionAttribute.getValue(this);
     }
 
+    @Override
     public void setGatewayDirection(GatewayDirection gatewayDirection) {
         gatewayDirectionAttribute.setValue(this, gatewayDirection);
     }
-
-    public BpmnShape getDiagramElement() {
-        return (BpmnShape) super.getDiagramElement();
-    }
-
 }

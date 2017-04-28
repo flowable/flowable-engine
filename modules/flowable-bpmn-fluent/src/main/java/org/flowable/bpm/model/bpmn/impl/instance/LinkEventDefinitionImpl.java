@@ -45,6 +45,7 @@ public class LinkEventDefinitionImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(EventDefinition.class)
                 .instanceProvider(new ModelTypeInstanceProvider<LinkEventDefinition>() {
+                    @Override
                     public LinkEventDefinition newInstance(ModelTypeInstanceContext instanceContext) {
                         return new LinkEventDefinitionImpl(instanceContext);
                     }
@@ -71,22 +72,27 @@ public class LinkEventDefinitionImpl
         super(context);
     }
 
+    @Override
     public String getName() {
         return nameAttribute.getValue(this);
     }
 
+    @Override
     public void setName(String name) {
         nameAttribute.setValue(this, name);
     }
 
+    @Override
     public Collection<LinkEventDefinition> getSources() {
         return sourceCollection.getReferenceTargetElements(this);
     }
 
+    @Override
     public LinkEventDefinition getTarget() {
         return targetChild.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setTarget(LinkEventDefinition target) {
         targetChild.setReferenceTargetElement(this, target);
     }

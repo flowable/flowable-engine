@@ -40,6 +40,7 @@ public class DataInputImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(ItemAwareElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<DataInput>() {
+                    @Override
                     public DataInput newInstance(ModelTypeInstanceContext instanceContext) {
                         return new DataInputImpl(instanceContext);
                     }
@@ -59,18 +60,22 @@ public class DataInputImpl
         super(instanceContext);
     }
 
+    @Override
     public String getName() {
         return nameAttribute.getValue(this);
     }
 
+    @Override
     public void setName(String name) {
         nameAttribute.setValue(this, name);
     }
 
+    @Override
     public boolean isCollection() {
         return isCollectionAttribute.getValue(this);
     }
 
+    @Override
     public void setCollection(boolean isCollection) {
         isCollectionAttribute.setValue(this, isCollection);
     }

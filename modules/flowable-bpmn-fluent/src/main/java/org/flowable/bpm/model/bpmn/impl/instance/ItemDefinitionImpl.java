@@ -39,6 +39,7 @@ public class ItemDefinitionImpl
                 .namespaceUri(BpmnModelConstants.BPMN20_NS)
                 .extendsType(RootElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<ItemDefinition>() {
+                    @Override
                     public ItemDefinition newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ItemDefinitionImpl(instanceContext);
                     }
@@ -62,26 +63,32 @@ public class ItemDefinitionImpl
         super(context);
     }
 
+    @Override
     public String getStructureRef() {
         return structureRefAttribute.getValue(this);
     }
 
+    @Override
     public void setStructureRef(String structureRef) {
         structureRefAttribute.setValue(this, structureRef);
     }
 
+    @Override
     public boolean isCollection() {
         return isCollectionAttribute.getValue(this);
     }
 
+    @Override
     public void setCollection(boolean isCollection) {
         isCollectionAttribute.setValue(this, isCollection);
     }
 
+    @Override
     public ItemKind getItemKind() {
         return itemKindAttribute.getValue(this);
     }
 
+    @Override
     public void setItemKind(ItemKind itemKind) {
         itemKindAttribute.setValue(this, itemKind);
     }

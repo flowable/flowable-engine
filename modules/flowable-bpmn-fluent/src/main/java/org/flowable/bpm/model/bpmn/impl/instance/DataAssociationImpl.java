@@ -21,7 +21,6 @@ import org.flowable.bpm.model.bpmn.instance.BaseElement;
 import org.flowable.bpm.model.bpmn.instance.DataAssociation;
 import org.flowable.bpm.model.bpmn.instance.FormalExpression;
 import org.flowable.bpm.model.bpmn.instance.ItemAwareElement;
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnEdge;
 import org.flowable.bpm.model.xml.ModelBuilder;
 import org.flowable.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.flowable.bpm.model.xml.type.ModelElementTypeBuilder;
@@ -50,6 +49,7 @@ public class DataAssociationImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<DataAssociation>() {
+                    @Override
                     public DataAssociation newInstance(ModelTypeInstanceContext instanceContext) {
                         return new DataAssociationImpl(instanceContext);
                     }
@@ -79,31 +79,33 @@ public class DataAssociationImpl
         super(instanceContext);
     }
 
+    @Override
     public Collection<ItemAwareElement> getSources() {
         return sourceRefCollection.getReferenceTargetElements(this);
     }
 
+    @Override
     public ItemAwareElement getTarget() {
         return targetRefChild.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setTarget(ItemAwareElement target) {
         targetRefChild.setReferenceTargetElement(this, target);
     }
 
+    @Override
     public FormalExpression getTransformation() {
         return transformationChild.getChild(this);
     }
 
+    @Override
     public void setTransformation(Transformation transformation) {
         transformationChild.setChild(this, transformation);
     }
 
+    @Override
     public Collection<Assignment> getAssignments() {
         return assignmentCollection.get(this);
-    }
-
-    public BpmnEdge getDiagramElement() {
-        return (BpmnEdge) super.getDiagramElement();
     }
 }

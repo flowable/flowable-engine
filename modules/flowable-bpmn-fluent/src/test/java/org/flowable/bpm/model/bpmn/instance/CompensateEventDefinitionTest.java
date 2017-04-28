@@ -22,6 +22,7 @@ import java.util.Collection;
 public class CompensateEventDefinitionTest
         extends AbstractEventDefinitionTest {
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Arrays.asList(
                 new AttributeAssumption("waitForCompletion"),

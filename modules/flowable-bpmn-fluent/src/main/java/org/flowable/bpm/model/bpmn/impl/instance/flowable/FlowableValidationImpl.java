@@ -40,6 +40,7 @@ public class FlowableValidationImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableValidation.class, FLOWABLE_ELEMENT_VALIDATION)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableValidation>() {
+                    @Override
                     public FlowableValidation newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableValidationImpl(instanceContext);
                     }
@@ -57,6 +58,7 @@ public class FlowableValidationImpl
         super(instanceContext);
     }
 
+    @Override
     public Collection<FlowableConstraint> getFlowableConstraints() {
         return flowableConstraintCollection.get(this);
     }

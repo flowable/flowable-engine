@@ -31,6 +31,7 @@ public class LoopDataInputRef
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(
                         new ModelElementTypeBuilder.ModelTypeInstanceProvider<LoopDataInputRef>() {
+                            @Override
                             public LoopDataInputRef newInstance(ModelTypeInstanceContext instanceContext) {
                                 return new LoopDataInputRef(instanceContext);
                             }

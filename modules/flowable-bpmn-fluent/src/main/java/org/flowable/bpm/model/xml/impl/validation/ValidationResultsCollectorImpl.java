@@ -12,16 +12,16 @@
  */
 package org.flowable.bpm.model.xml.impl.validation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.flowable.bpm.model.xml.instance.ModelElementInstance;
 import org.flowable.bpm.model.xml.validation.ValidationResult;
 import org.flowable.bpm.model.xml.validation.ValidationResultCollector;
 import org.flowable.bpm.model.xml.validation.ValidationResultType;
 import org.flowable.bpm.model.xml.validation.ValidationResults;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ValidationResultsCollectorImpl
         implements ValidationResultCollector {

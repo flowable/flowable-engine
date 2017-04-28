@@ -18,7 +18,6 @@ import static org.flowable.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_E
 import org.flowable.bpm.model.bpmn.instance.Event;
 import org.flowable.bpm.model.bpmn.instance.FlowNode;
 import org.flowable.bpm.model.bpmn.instance.Property;
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.flowable.bpm.model.xml.ModelBuilder;
 import org.flowable.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.flowable.bpm.model.xml.type.ModelElementTypeBuilder;
@@ -54,12 +53,8 @@ public abstract class EventImpl
         super(context);
     }
 
+    @Override
     public Collection<Property> getProperties() {
         return propertyCollection.get(this);
     }
-
-    public BpmnShape getDiagramElement() {
-        return (BpmnShape) super.getDiagramElement();
-    }
-
 }

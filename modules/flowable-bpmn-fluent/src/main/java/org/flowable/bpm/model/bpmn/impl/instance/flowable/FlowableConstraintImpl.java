@@ -37,6 +37,7 @@ public class FlowableConstraintImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableConstraint.class, FLOWABLE_ELEMENT_CONSTRAINT)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableConstraint>() {
+                    @Override
                     public FlowableConstraint newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableConstraintImpl(instanceContext);
                     }
@@ -53,10 +54,12 @@ public class FlowableConstraintImpl
         super(instanceContext);
     }
 
+    @Override
     public String getFlowableName() {
         return flowableNameAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableName(String flowableName) {
         flowableNameAttribute.setValue(this, flowableName);
     }

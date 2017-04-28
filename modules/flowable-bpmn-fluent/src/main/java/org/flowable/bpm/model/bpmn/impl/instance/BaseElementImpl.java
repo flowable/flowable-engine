@@ -19,7 +19,6 @@ import static org.flowable.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_B
 import org.flowable.bpm.model.bpmn.instance.BaseElement;
 import org.flowable.bpm.model.bpmn.instance.Documentation;
 import org.flowable.bpm.model.bpmn.instance.ExtensionElements;
-import org.flowable.bpm.model.bpmn.instance.di.DiagramElement;
 import org.flowable.bpm.model.xml.ModelBuilder;
 import org.flowable.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.flowable.bpm.model.xml.instance.ModelElementInstance;
@@ -69,38 +68,29 @@ public abstract class BaseElementImpl
         super(instanceContext);
     }
 
+    @Override
     public String getId() {
         return idAttribute.getValue(this);
     }
 
+    @Override
     public void setId(String id) {
         idAttribute.setValue(this, id);
     }
 
+    @Override
     public Collection<Documentation> getDocumentations() {
         return documentationCollection.get(this);
     }
 
+    @Override
     public ExtensionElements getExtensionElements() {
         return extensionElementsChild.getChild(this);
     }
 
+    @Override
     public void setExtensionElements(ExtensionElements extensionElements) {
         extensionElementsChild.setChild(this, extensionElements);
-    }
-
-    @SuppressWarnings("rawtypes")
-    public DiagramElement getDiagramElement() {
-        Collection<Reference> incomingReferences = getIncomingReferencesByType(DiagramElement.class);
-        for (Reference<?> reference : incomingReferences) {
-            for (ModelElementInstance sourceElement : reference.findReferenceSourceElements(this)) {
-                String referenceIdentifier = reference.getReferenceIdentifier(sourceElement);
-                if (referenceIdentifier != null && referenceIdentifier.equals(getId())) {
-                    return (DiagramElement) sourceElement;
-                }
-            }
-        }
-        return null;
     }
 
     @SuppressWarnings("rawtypes")
@@ -119,5 +109,4 @@ public abstract class BaseElementImpl
         }
         return references;
     }
-
 }

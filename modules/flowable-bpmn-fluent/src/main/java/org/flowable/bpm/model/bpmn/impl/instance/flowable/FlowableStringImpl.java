@@ -33,6 +33,7 @@ public class FlowableStringImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableString.class, FLOWABLE_ELEMENT_STRING)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableString>() {
+                    @Override
                     public FlowableString newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableStringImpl(instanceContext);
                     }

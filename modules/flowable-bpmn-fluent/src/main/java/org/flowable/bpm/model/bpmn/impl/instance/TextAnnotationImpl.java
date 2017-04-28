@@ -42,6 +42,7 @@ public class TextAnnotationImpl
                 .defineType(TextAnnotation.class, BPMN_ELEMENT_TEXT_ANNOTATION).namespaceUri(BPMN20_NS)
                 .extendsType(Artifact.class)
                 .instanceProvider(new ModelTypeInstanceProvider<TextAnnotation>() {
+                    @Override
                     public TextAnnotation newInstance(ModelTypeInstanceContext context) {
                         return new TextAnnotationImpl(context);
                     }
@@ -63,18 +64,22 @@ public class TextAnnotationImpl
         super(context);
     }
 
+    @Override
     public String getTextFormat() {
         return textFormatAttribute.getValue(this);
     }
 
+    @Override
     public void setTextFormat(String textFormat) {
         textFormatAttribute.setValue(this, textFormat);
     }
 
+    @Override
     public Text getText() {
         return textChild.getChild(this);
     }
 
+    @Override
     public void setText(Text text) {
         textChild.setChild(this, text);
     }

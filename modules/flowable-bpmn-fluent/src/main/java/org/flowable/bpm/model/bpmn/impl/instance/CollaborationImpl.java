@@ -63,6 +63,7 @@ public class CollaborationImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(RootElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<Collaboration>() {
+                    @Override
                     public Collaboration newInstance(ModelTypeInstanceContext instanceContext) {
                         return new CollaborationImpl(instanceContext);
                     }
@@ -111,54 +112,67 @@ public class CollaborationImpl
         super(context);
     }
 
+    @Override
     public String getName() {
         return nameAttribute.getValue(this);
     }
 
+    @Override
     public void setName(String name) {
         nameAttribute.setValue(this, name);
     }
 
+    @Override
     public boolean isClosed() {
         return isClosedAttribute.getValue(this);
     }
 
+    @Override
     public void setClosed(boolean isClosed) {
         isClosedAttribute.setValue(this, isClosed);
     }
 
+    @Override
     public Collection<Participant> getParticipants() {
         return participantCollection.get(this);
     }
 
+    @Override
     public Collection<MessageFlow> getMessageFlows() {
         return messageFlowCollection.get(this);
     }
 
+    @Override
     public Collection<Artifact> getArtifacts() {
         return artifactCollection.get(this);
     }
 
+    @Override
     public Collection<ConversationNode> getConversationNodes() {
         return conversationNodeCollection.get(this);
     }
 
+    @Override
     public Collection<ConversationAssociation> getConversationAssociations() {
         return conversationAssociationCollection.get(this);
     }
 
+    @Override
     public Collection<ParticipantAssociation> getParticipantAssociations() {
         return participantAssociationCollection.get(this);
     }
 
+    @Override
     public Collection<MessageFlowAssociation> getMessageFlowAssociations() {
         return messageFlowAssociationCollection.get(this);
     }
 
+    @Override
     public Collection<CorrelationKey> getCorrelationKeys() {
         return correlationKeyCollection.get(this);
     }
 
+    @Override
     public Collection<ConversationLink> getConversationLinks() {
         return conversationLinkCollection.get(this);
     }

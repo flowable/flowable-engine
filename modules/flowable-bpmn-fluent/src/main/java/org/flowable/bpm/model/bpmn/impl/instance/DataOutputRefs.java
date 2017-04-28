@@ -30,6 +30,7 @@ public class DataOutputRefs
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(DataOutputRefs.class, BPMN_ELEMENT_DATA_OUTPUT_REFS)
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<DataOutputRefs>() {
+                    @Override
                     public DataOutputRefs newInstance(ModelTypeInstanceContext instanceContext) {
                         return new DataOutputRefs(instanceContext);
                     }

@@ -28,16 +28,19 @@ import java.util.Collection;
 public class FlowNodeTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(FlowElement.class, true);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Arrays.asList(
                 new ChildElementAssumption(Incoming.class),
                 new ChildElementAssumption(Outgoing.class));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Arrays.asList(
                 new AttributeAssumption(FLOWABLE_NS, "async", false, false, false),

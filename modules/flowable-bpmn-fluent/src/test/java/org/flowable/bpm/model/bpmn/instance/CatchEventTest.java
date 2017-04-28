@@ -22,10 +22,12 @@ import java.util.Collections;
 public class CatchEventTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(Event.class, true);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Arrays.asList(
                 new ChildElementAssumption(DataOutput.class),
@@ -35,6 +37,7 @@ public class CatchEventTest
                 new ChildElementAssumption(EventDefinitionRef.class));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Collections.singletonList(
                 new AttributeAssumption("parallelMultiple", false, false, false));

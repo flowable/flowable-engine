@@ -30,6 +30,7 @@ public class InterfaceRef
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(InterfaceRef.class, BPMN_ELEMENT_INTERFACE_REF)
                 .namespaceUri(BPMN20_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<InterfaceRef>() {
+                    @Override
                     public InterfaceRef newInstance(ModelTypeInstanceContext instanceContext) {
                         return new InterfaceRef(instanceContext);
                     }

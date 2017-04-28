@@ -34,6 +34,7 @@ public class MonitoringImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<Monitoring>() {
+                    @Override
                     public Monitoring newInstance(ModelTypeInstanceContext instanceContext) {
                         return new MonitoringImpl(instanceContext);
                     }

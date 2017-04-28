@@ -34,6 +34,7 @@ public class ConversationImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(ConversationNode.class)
                 .instanceProvider(new ModelTypeInstanceProvider<Conversation>() {
+                    @Override
                     public Conversation newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ConversationImpl(instanceContext);
                     }

@@ -41,6 +41,7 @@ public class FlowableInImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableIn.class, FLOWABLE_ELEMENT_IN)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableIn>() {
+                    @Override
                     public FlowableIn newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableInImpl(instanceContext);
                     }
@@ -65,26 +66,32 @@ public class FlowableInImpl
         super(instanceContext);
     }
 
+    @Override
     public String getFlowableSource() {
         return flowableSourceAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableSource(String flowableSource) {
         flowableSourceAttribute.setValue(this, flowableSource);
     }
 
+    @Override
     public String getFlowableSourceExpression() {
         return flowableSourceExpressionAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableSourceExpression(String flowableSourceExpression) {
         flowableSourceExpressionAttribute.setValue(this, flowableSourceExpression);
     }
 
+    @Override
     public String getFlowableTarget() {
         return flowableTargetAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableTarget(String flowableTarget) {
         flowableTargetAttribute.setValue(this, flowableTarget);
     }

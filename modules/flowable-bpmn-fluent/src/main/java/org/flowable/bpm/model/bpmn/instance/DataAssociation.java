@@ -13,7 +13,6 @@
 package org.flowable.bpm.model.bpmn.instance;
 
 import org.flowable.bpm.model.bpmn.impl.instance.Transformation;
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnEdge;
 
 import java.util.Collection;
 
@@ -34,7 +33,4 @@ public interface DataAssociation
     void setTransformation(Transformation transformation);
 
     Collection<Assignment> getAssignments();
-
-    BpmnEdge getDiagramElement();
-
 }

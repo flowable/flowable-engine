@@ -47,6 +47,7 @@ public class IoSpecificationImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<IoSpecification>() {
+                    @Override
                     public IoSpecification newInstance(ModelTypeInstanceContext instanceContext) {
                         return new IoSpecificationImpl(instanceContext);
                     }
@@ -75,18 +76,22 @@ public class IoSpecificationImpl
         super(instanceContext);
     }
 
+    @Override
     public Collection<DataInput> getDataInputs() {
         return dataInputCollection.get(this);
     }
 
+    @Override
     public Collection<DataOutput> getDataOutputs() {
         return dataOutputCollection.get(this);
     }
 
+    @Override
     public Collection<InputSet> getInputSets() {
         return inputSetCollection.get(this);
     }
 
+    @Override
     public Collection<OutputSet> getOutputSets() {
         return outputSetCollection.get(this);
     }

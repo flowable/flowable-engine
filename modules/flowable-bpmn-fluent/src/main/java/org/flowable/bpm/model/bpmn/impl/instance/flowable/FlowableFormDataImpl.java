@@ -40,6 +40,7 @@ public class FlowableFormDataImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableFormData.class, FLOWABLE_ELEMENT_FORM_DATA)
                 .namespaceUri(BpmnModelConstants.FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableFormData>() {
+                    @Override
                     public FlowableFormData newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableFormDataImpl(instanceContext);
                     }
@@ -57,6 +58,7 @@ public class FlowableFormDataImpl
         super(instanceContext);
     }
 
+    @Override
     public Collection<FlowableFormField> getFlowableFormFields() {
         return flowableFormFieldCollection.get(this);
     }

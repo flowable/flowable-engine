@@ -20,6 +20,7 @@ import org.flowable.bpm.model.bpmn.builder.ReceiveTaskBuilder;
 public interface ReceiveTask
         extends Task {
 
+    @Override
     ReceiveTaskBuilder builder();
 
     String getImplementation();

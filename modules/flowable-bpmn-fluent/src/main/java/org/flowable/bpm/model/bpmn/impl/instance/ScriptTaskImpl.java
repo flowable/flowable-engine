@@ -51,6 +51,7 @@ public class ScriptTaskImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(Task.class)
                 .instanceProvider(new ModelTypeInstanceProvider<ScriptTask>() {
+                    @Override
                     public ScriptTask newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ScriptTaskImpl(instanceContext);
                     }
@@ -82,20 +83,24 @@ public class ScriptTaskImpl
         return new ScriptTaskBuilder((BpmnModelInstance) modelInstance, this);
     }
 
+    @Override
     public Script getScript() {
         return scriptChild.getChild(this);
     }
 
+    @Override
     public void setScript(Script script) {
         scriptChild.setChild(this, script);
     }
 
     /* Flowable extensions */
 
+    @Override
     public String getFlowableResultVariable() {
         return flowableResultVariableAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableResultVariable(String flowableResultVariable) {
         flowableResultVariableAttribute.setValue(this, flowableResultVariable);
     }

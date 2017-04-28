@@ -44,6 +44,7 @@ public class IoBindingImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<IoBinding>() {
+                    @Override
                     public IoBinding newInstance(ModelTypeInstanceContext instanceContext) {
                         return new IoBindingImpl(instanceContext);
                     }
@@ -71,26 +72,32 @@ public class IoBindingImpl
         super(instanceContext);
     }
 
+    @Override
     public Operation getOperation() {
         return operationRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setOperation(Operation operation) {
         operationRefAttribute.setReferenceTargetElement(this, operation);
     }
 
+    @Override
     public DataInput getInputData() {
         return inputDataRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setInputData(DataInput inputData) {
         inputDataRefAttribute.setReferenceTargetElement(this, inputData);
     }
 
+    @Override
     public DataOutput getOutputData() {
         return outputDataRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setOutputData(DataOutput dataOutput) {
         outputDataRefAttribute.setReferenceTargetElement(this, dataOutput);
     }

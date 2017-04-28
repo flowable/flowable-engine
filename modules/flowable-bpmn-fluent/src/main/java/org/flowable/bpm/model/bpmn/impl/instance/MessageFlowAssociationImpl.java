@@ -41,6 +41,7 @@ public class MessageFlowAssociationImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<MessageFlowAssociation>() {
+                    @Override
                     public MessageFlowAssociation newInstance(ModelTypeInstanceContext instanceContext) {
                         return new MessageFlowAssociationImpl(instanceContext);
                     }
@@ -63,18 +64,22 @@ public class MessageFlowAssociationImpl
         super(instanceContext);
     }
 
+    @Override
     public MessageFlow getInnerMessageFlow() {
         return innerMessageFlowRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setInnerMessageFlow(MessageFlow innerMessageFlow) {
         innerMessageFlowRefAttribute.setReferenceTargetElement(this, innerMessageFlow);
     }
 
+    @Override
     public MessageFlow getOuterMessageFlow() {
         return outerMessageFlowRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setOuterMessageFlow(MessageFlow outerMessageFlow) {
         outerMessageFlowRefAttribute.setReferenceTargetElement(this, outerMessageFlow);
     }

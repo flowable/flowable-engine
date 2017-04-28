@@ -30,25 +30,23 @@ public abstract class BpmnModelElementInstanceImpl
         super(instanceContext);
     }
 
+    @Override
     @SuppressWarnings("rawtypes")
     public AbstractBaseElementBuilder builder() {
         throw new BpmnModelException("No builder implemented for " + this);
     }
 
+    @Override
     public boolean isScope() {
         return this instanceof org.flowable.bpm.model.bpmn.instance.Process || this instanceof SubProcess;
     }
 
+    @Override
     public BpmnModelElementInstance getScope() {
         BpmnModelElementInstance parentElement = (BpmnModelElementInstance) getParentElement();
         if (parentElement != null) {
-            if (parentElement.isScope()) {
-                return parentElement;
-            } else {
-                return parentElement.getScope();
-            }
-        } else {
-            return null;
+            return parentElement.isScope() ? parentElement : parentElement.getScope();
         }
+        return null;
     }
 }

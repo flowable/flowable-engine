@@ -20,6 +20,7 @@ import org.flowable.bpm.model.bpmn.builder.ManualTaskBuilder;
 public interface ManualTask
         extends Task {
 
+    @Override
     ManualTaskBuilder builder();
 
 }

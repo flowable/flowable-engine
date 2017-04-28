@@ -72,30 +72,37 @@ public abstract class FlowElementImpl
         super(context);
     }
 
+    @Override
     public String getName() {
         return nameAttribute.getValue(this);
     }
 
+    @Override
     public void setName(String name) {
         nameAttribute.setValue(this, name);
     }
 
+    @Override
     public Auditing getAuditing() {
         return auditingChild.getChild(this);
     }
 
+    @Override
     public void setAuditing(Auditing auditing) {
         auditingChild.setChild(this, auditing);
     }
 
+    @Override
     public Monitoring getMonitoring() {
         return monitoringChild.getChild(this);
     }
 
+    @Override
     public void setMonitoring(Monitoring monitoring) {
         monitoringChild.setChild(this, monitoring);
     }
 
+    @Override
     public Collection<CategoryValue> getCategoryValueRefs() {
         return categoryValueRefCollection.getReferenceTargetElements(this);
     }

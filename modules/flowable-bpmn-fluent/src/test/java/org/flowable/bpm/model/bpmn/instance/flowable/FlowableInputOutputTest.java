@@ -22,16 +22,19 @@ import java.util.Collection;
 public class FlowableInputOutputTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(FLOWABLE_NS, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Arrays.asList(
                 new ChildElementAssumption(FLOWABLE_NS, FlowableInputParameter.class),
                 new ChildElementAssumption(FLOWABLE_NS, FlowableOutputParameter.class));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return null;
     }

@@ -34,6 +34,7 @@ public class RenderingImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<Rendering>() {
+                    @Override
                     public Rendering newInstance(ModelTypeInstanceContext instanceContext) {
                         return new RenderingImpl(instanceContext);
                     }

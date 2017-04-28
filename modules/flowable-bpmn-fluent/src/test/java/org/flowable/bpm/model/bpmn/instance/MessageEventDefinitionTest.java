@@ -25,11 +25,13 @@ import java.util.Collections;
 public class MessageEventDefinitionTest
         extends AbstractEventDefinitionTest {
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Collections.singletonList(
                 new ChildElementAssumption(OperationRef.class, 0, 1));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Arrays.asList(
                 new AttributeAssumption("messageRef"),

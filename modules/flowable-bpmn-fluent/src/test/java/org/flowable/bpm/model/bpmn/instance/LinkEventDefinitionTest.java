@@ -25,12 +25,14 @@ import java.util.Collections;
 public class LinkEventDefinitionTest
         extends AbstractEventDefinitionTest {
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Arrays.asList(
                 new ChildElementAssumption(Source.class),
                 new ChildElementAssumption(Target.class, 0, 1));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Collections.singletonList(
                 new AttributeAssumption("name", false, true));

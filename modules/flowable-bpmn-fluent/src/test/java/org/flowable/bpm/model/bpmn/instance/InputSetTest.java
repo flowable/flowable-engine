@@ -25,10 +25,12 @@ import java.util.Collections;
 public class InputSetTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(BaseElement.class, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Arrays.asList(
                 new ChildElementAssumption(DataInputRefs.class),
@@ -37,6 +39,7 @@ public class InputSetTest
                 new ChildElementAssumption(OutputSetRefs.class));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Collections.singletonList(
                 new AttributeAssumption("name"));

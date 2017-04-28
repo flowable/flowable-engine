@@ -12,17 +12,6 @@
  */
 package org.flowable.bpm.model.xml.impl.parser;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
-
 import org.flowable.bpm.model.xml.ModelInstance;
 import org.flowable.bpm.model.xml.ModelValidationException;
 import org.flowable.bpm.model.xml.impl.util.DomUtil;
@@ -30,6 +19,17 @@ import org.flowable.bpm.model.xml.impl.util.ReflectUtil;
 import org.flowable.bpm.model.xml.instance.DomDocument;
 import org.flowable.bpm.model.xml.instance.DomElement;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class AbstractModelParser {
 

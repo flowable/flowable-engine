@@ -47,6 +47,7 @@ public class RelationshipImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<Relationship>() {
+                    @Override
                     public Relationship newInstance(ModelTypeInstanceContext instanceContext) {
                         return new RelationshipImpl(instanceContext);
                     }
@@ -76,26 +77,32 @@ public class RelationshipImpl
         super(instanceContext);
     }
 
+    @Override
     public String getType() {
         return typeAttribute.getValue(this);
     }
 
+    @Override
     public void setType(String type) {
         typeAttribute.setValue(this, type);
     }
 
+    @Override
     public RelationshipDirection getDirection() {
         return directionAttribute.getValue(this);
     }
 
+    @Override
     public void setDirection(RelationshipDirection direction) {
         directionAttribute.setValue(this, direction);
     }
 
+    @Override
     public Collection<Source> getSources() {
         return sourceCollection.get(this);
     }
 
+    @Override
     public Collection<Target> getTargets() {
         return targetCollection.get(this);
     }

@@ -19,10 +19,12 @@ import java.util.Collection;
 public class CollaborationTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(RootElement.class, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Arrays.asList(
                 new ChildElementAssumption(Participant.class),
@@ -36,6 +38,7 @@ public class CollaborationTest
                 new ChildElementAssumption(ConversationLink.class));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Arrays.asList(
                 new AttributeAssumption("name"),

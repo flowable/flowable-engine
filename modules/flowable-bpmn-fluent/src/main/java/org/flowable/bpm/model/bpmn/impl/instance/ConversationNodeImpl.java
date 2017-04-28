@@ -72,22 +72,27 @@ public abstract class ConversationNodeImpl
         super(instanceContext);
     }
 
+    @Override
     public String getName() {
         return nameAttribute.getValue(this);
     }
 
+    @Override
     public void setName(String name) {
         nameAttribute.setValue(this, name);
     }
 
+    @Override
     public Collection<Participant> getParticipants() {
         return participantRefCollection.getReferenceTargetElements(this);
     }
 
+    @Override
     public Collection<MessageFlow> getMessageFlows() {
         return messageFlowRefCollection.getReferenceTargetElements(this);
     }
 
+    @Override
     public Collection<CorrelationKey> getCorrelationKeys() {
         return correlationKeyCollection.get(this);
     }

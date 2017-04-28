@@ -14,22 +14,25 @@ package org.flowable.bpm.model.bpmn.instance.flowable;
 
 import static org.flowable.bpm.model.bpmn.impl.BpmnModelConstants.FLOWABLE_NS;
 
+import org.flowable.bpm.model.bpmn.instance.BpmnModelElementInstanceTest;
+
 import java.util.Collection;
 import java.util.Collections;
-
-import org.flowable.bpm.model.bpmn.instance.BpmnModelElementInstanceTest;
 
 public class FlowableScriptTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(FLOWABLE_NS, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return null;
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Collections.singletonList(
                 new AttributeAssumption("resource"));

@@ -39,6 +39,7 @@ public class ErrorEventDefinitionImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(EventDefinition.class)
                 .instanceProvider(new ModelTypeInstanceProvider<ErrorEventDefinition>() {
+                    @Override
                     public ErrorEventDefinition newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ErrorEventDefinitionImpl(instanceContext);
                     }
@@ -55,10 +56,12 @@ public class ErrorEventDefinitionImpl
         super(context);
     }
 
+    @Override
     public Error getError() {
         return errorRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setError(Error error) {
         errorRefAttribute.setReferenceTargetElement(this, error);
     }

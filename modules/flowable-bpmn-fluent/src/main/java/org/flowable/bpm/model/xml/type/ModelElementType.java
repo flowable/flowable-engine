@@ -12,13 +12,13 @@
  */
 package org.flowable.bpm.model.xml.type;
 
-import java.util.Collection;
-import java.util.List;
-
 import org.flowable.bpm.model.xml.Model;
 import org.flowable.bpm.model.xml.ModelInstance;
 import org.flowable.bpm.model.xml.instance.ModelElementInstance;
 import org.flowable.bpm.model.xml.type.attribute.Attribute;
+
+import java.util.Collection;
+import java.util.List;
 
 public interface ModelElementType {
 

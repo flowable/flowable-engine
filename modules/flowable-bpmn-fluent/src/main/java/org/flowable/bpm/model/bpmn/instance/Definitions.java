@@ -12,8 +12,6 @@
  */
 package org.flowable.bpm.model.bpmn.instance;
 
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnDiagram;
-
 import java.util.Collection;
 
 /**
@@ -56,8 +54,5 @@ public interface Definitions
 
     Collection<RootElement> getRootElements();
 
-    Collection<BpmnDiagram> getBpmDiagrams();
-
     Collection<Relationship> getRelationships();
-
 }

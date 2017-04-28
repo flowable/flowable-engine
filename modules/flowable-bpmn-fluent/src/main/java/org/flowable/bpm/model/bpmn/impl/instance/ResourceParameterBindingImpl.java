@@ -43,6 +43,7 @@ public class ResourceParameterBindingImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<ResourceParameterBinding>() {
+                    @Override
                     public ResourceParameterBinding newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ResourceParameterBindingImpl(instanceContext);
                     }
@@ -66,18 +67,22 @@ public class ResourceParameterBindingImpl
         super(instanceContext);
     }
 
+    @Override
     public ResourceParameter getParameter() {
         return parameterRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setParameter(ResourceParameter parameter) {
         parameterRefAttribute.setReferenceTargetElement(this, parameter);
     }
 
+    @Override
     public Expression getExpression() {
         return expressionChild.getChild(this);
     }
 
+    @Override
     public void setExpression(Expression expression) {
         expressionChild.setChild(this, expression);
     }

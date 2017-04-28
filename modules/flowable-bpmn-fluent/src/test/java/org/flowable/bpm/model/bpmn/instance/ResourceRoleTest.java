@@ -22,10 +22,12 @@ import java.util.Collections;
 public class ResourceRoleTest
         extends BpmnModelElementInstanceTest {
 
+    @Override
     public TypeAssumption getTypeAssumption() {
         return new TypeAssumption(BaseElement.class, false);
     }
 
+    @Override
     public Collection<ChildElementAssumption> getChildElementAssumptions() {
         return Arrays.asList(
                 new ChildElementAssumption(ResourceRef.class, 0, 1),
@@ -33,6 +35,7 @@ public class ResourceRoleTest
                 new ChildElementAssumption(ResourceAssignmentExpression.class, 0, 1));
     }
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Collections.singletonList(
                 new AttributeAssumption("name"));

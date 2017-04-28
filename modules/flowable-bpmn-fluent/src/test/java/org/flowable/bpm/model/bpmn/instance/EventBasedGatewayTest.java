@@ -24,6 +24,7 @@ import java.util.Collection;
 public class EventBasedGatewayTest
         extends AbstractGatewayTest<EventBasedGateway> {
 
+    @Override
     public Collection<AttributeAssumption> getAttributesAssumptions() {
         return Arrays.asList(
                 new AttributeAssumption("instantiate", false, false, false),

@@ -34,6 +34,7 @@ public class EndPointImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(RootElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<EndPoint>() {
+                    @Override
                     public EndPoint newInstance(ModelTypeInstanceContext instanceContext) {
                         return new EndPointImpl(instanceContext);
                     }

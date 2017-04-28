@@ -12,9 +12,6 @@
  */
 package org.flowable.bpm.model.xml.impl.type;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.flowable.bpm.model.xml.Model;
 import org.flowable.bpm.model.xml.ModelException;
 import org.flowable.bpm.model.xml.impl.ModelBuildOperation;
@@ -32,6 +29,9 @@ import org.flowable.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.flowable.bpm.model.xml.type.attribute.AttributeBuilder;
 import org.flowable.bpm.model.xml.type.attribute.StringAttributeBuilder;
 import org.flowable.bpm.model.xml.type.child.SequenceBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ModelElementTypeBuilderImpl
         implements ModelElementTypeBuilder, ModelBuildOperation {

@@ -34,6 +34,7 @@ public class ExpressionImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(BaseElement.class)
                 .instanceProvider(new ModelTypeInstanceProvider<Expression>() {
+                    @Override
                     public Expression newInstance(ModelTypeInstanceContext instanceContext) {
                         return new ExpressionImpl(instanceContext);
                     }

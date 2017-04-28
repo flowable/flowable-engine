@@ -42,6 +42,7 @@ public class FlowableInputOutputImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableInputOutput.class, FLOWABLE_ELEMENT_INPUT_OUTPUT)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableInputOutput>() {
+                    @Override
                     public FlowableInputOutput newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableInputOutputImpl(instanceContext);
                     }
@@ -62,10 +63,12 @@ public class FlowableInputOutputImpl
         super(instanceContext);
     }
 
+    @Override
     public Collection<FlowableInputParameter> getFlowableInputParameters() {
         return flowableInputParameterCollection.get(this);
     }
 
+    @Override
     public Collection<FlowableOutputParameter> getFlowableOutputParameters() {
         return flowableOutputParameterCollection.get(this);
     }

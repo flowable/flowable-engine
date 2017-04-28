@@ -44,6 +44,7 @@ public class BoundaryEventImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(CatchEvent.class)
                 .instanceProvider(new ModelTypeInstanceProvider<BoundaryEvent>() {
+                    @Override
                     public BoundaryEvent newInstance(ModelTypeInstanceContext instanceContext) {
                         return new BoundaryEventImpl(instanceContext);
                     }
@@ -70,18 +71,22 @@ public class BoundaryEventImpl
         return new BoundaryEventBuilder((BpmnModelInstance) modelInstance, this);
     }
 
+    @Override
     public boolean cancelActivity() {
         return cancelActivityAttribute.getValue(this);
     }
 
+    @Override
     public void setCancelActivity(boolean cancelActivity) {
         cancelActivityAttribute.setValue(this, cancelActivity);
     }
 
+    @Override
     public Activity getAttachedTo() {
         return attachedToRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setAttachedTo(Activity attachedTo) {
         attachedToRefAttribute.setReferenceTargetElement(this, attachedTo);
     }

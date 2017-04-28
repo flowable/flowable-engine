@@ -12,8 +12,6 @@
  */
 package org.flowable.bpm.model.bpmn.instance;
 
-import org.flowable.bpm.model.bpmn.instance.bpmndi.BpmnEdge;
-
 /**
  * The BPMN messageFlow element.
  */
@@ -35,7 +33,4 @@ public interface MessageFlow
     Message getMessage();
 
     void setMessage(Message message);
-
-    BpmnEdge getDiagramElement();
-
 }

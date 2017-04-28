@@ -16,9 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMESPACE;
 import static org.junit.runners.Parameterized.Parameters;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.flowable.bpm.model.xml.ModelInstance;
 import org.flowable.bpm.model.xml.impl.parser.AbstractModelParser;
 import org.flowable.bpm.model.xml.testmodel.Gender;
@@ -29,6 +26,9 @@ import org.flowable.bpm.model.xml.testmodel.instance.Bird;
 import org.flowable.bpm.model.xml.type.ModelElementType;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 public class ModelElementInstanceTest
         extends TestModelTest {

@@ -43,6 +43,7 @@ public class SignalEventDefinitionImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(EventDefinition.class)
                 .instanceProvider(new ModelTypeInstanceProvider<SignalEventDefinition>() {
+                    @Override
                     public SignalEventDefinition newInstance(ModelTypeInstanceContext instanceContext) {
                         return new SignalEventDefinitionImpl(instanceContext);
                     }
@@ -65,18 +66,22 @@ public class SignalEventDefinitionImpl
         super(context);
     }
 
+    @Override
     public Signal getSignal() {
         return signalRefAttribute.getReferenceTargetElement(this);
     }
 
+    @Override
     public void setSignal(Signal signal) {
         signalRefAttribute.setReferenceTargetElement(this, signal);
     }
 
+    @Override
     public boolean isFlowableAsync() {
         return flowableAsyncAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableAsync(boolean flowableAsync) {
         flowableAsyncAttribute.setValue(this, flowableAsync);
     }

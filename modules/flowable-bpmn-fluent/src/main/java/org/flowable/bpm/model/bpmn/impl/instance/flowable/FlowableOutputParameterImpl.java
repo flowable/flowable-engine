@@ -36,6 +36,7 @@ public class FlowableOutputParameterImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableOutputParameter.class, FLOWABLE_ELEMENT_OUTPUT_PARAMETER)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableOutputParameter>() {
+                    @Override
                     public FlowableOutputParameter newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableOutputParameterImpl(instanceContext);
                     }
@@ -53,10 +54,12 @@ public class FlowableOutputParameterImpl
         super(instanceContext);
     }
 
+    @Override
     public String getFlowableName() {
         return flowableNameAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableName(String flowableName) {
         flowableNameAttribute.setValue(this, flowableName);
     }

@@ -36,6 +36,7 @@ public class EndEventImpl
                 .namespaceUri(BPMN20_NS)
                 .extendsType(ThrowEvent.class)
                 .instanceProvider(new ModelTypeInstanceProvider<EndEvent>() {
+                    @Override
                     public EndEvent newInstance(ModelTypeInstanceContext instanceContext) {
                         return new EndEventImpl(instanceContext);
                     }

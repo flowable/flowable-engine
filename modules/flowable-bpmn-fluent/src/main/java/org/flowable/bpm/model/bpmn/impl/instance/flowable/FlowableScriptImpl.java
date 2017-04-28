@@ -37,6 +37,7 @@ public class FlowableScriptImpl
         ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowableScript.class, FLOWABLE_ELEMENT_SCRIPT)
                 .namespaceUri(FLOWABLE_NS)
                 .instanceProvider(new ModelTypeInstanceProvider<FlowableScript>() {
+                    @Override
                     public FlowableScript newInstance(ModelTypeInstanceContext instanceContext) {
                         return new FlowableScriptImpl(instanceContext);
                     }
@@ -52,10 +53,12 @@ public class FlowableScriptImpl
         super(instanceContext);
     }
 
+    @Override
     public String getFlowableResource() {
         return flowableResourceAttribute.getValue(this);
     }
 
+    @Override
     public void setFlowableResource(String flowableResource) {
         flowableResourceAttribute.setValue(this, flowableResource);
     }

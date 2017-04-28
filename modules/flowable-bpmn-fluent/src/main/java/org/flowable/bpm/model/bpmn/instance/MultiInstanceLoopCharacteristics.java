@@ -81,6 +81,7 @@ public interface MultiInstanceLoopCharacteristics
 
     void setFlowableExclusive(boolean isFlowableExclusive);
 
+    @Override
     MultiInstanceLoopCharacteristicsBuilder builder();
 
 }
