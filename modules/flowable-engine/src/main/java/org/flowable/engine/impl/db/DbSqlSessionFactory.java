@@ -27,12 +27,16 @@ import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
 public class DbSqlSessionFactory implements SessionFactory {
+    
+    private static Logger logger = LoggerFactory.getLogger(DbSqlSessionFactory.class);
 
     protected static final Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<String, Map<String, String>>();
 
@@ -182,13 +186,21 @@ public class DbSqlSessionFactory implements SessionFactory {
             bulkInsertableMap.put(clazz, Boolean.TRUE);
         }
 
+        logger.error("initBulkInsertEnabledMap: databaseType " + databaseType);
+        
         // Only Oracle is making a fuss in one specific case right now
         if ("oracle".equals(databaseType)) {
+            logger.error("initBulkInsertEnabledMap: set EventLogEntryEntityImpl to false for " + databaseType);
             bulkInsertableMap.put(EventLogEntryEntityImpl.class, Boolean.FALSE);
         }
     }
 
     public Boolean isBulkInsertable(Class<? extends Entity> entityClass) {
+        if (bulkInsertableMap != null) {
+            logger.error("isBulkInsertable: " + entityClass + " " + bulkInsertableMap.get(entityClass));
+        } else {
+            logger.error("isBulkInsertable empty insertable map");
+        }
         return bulkInsertableMap != null && bulkInsertableMap.containsKey(entityClass) && bulkInsertableMap.get(entityClass);
     }
 

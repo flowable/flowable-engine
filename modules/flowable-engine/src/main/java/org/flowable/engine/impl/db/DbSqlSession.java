@@ -537,13 +537,17 @@ public class DbSqlSession implements Session {
     }
 
     protected void flushInsertEntities(Class<? extends Entity> entityClass, Collection<Entity> entitiesToInsert) {
+        log.error("flushInsertEntities: " + entityClass + " " + entitiesToInsert);
         if (entitiesToInsert.size() == 1) {
+            log.error("flushInsertEntities size 1: " + entityClass);
             flushRegularInsert(entitiesToInsert.iterator().next(), entityClass);
         } else if (Boolean.FALSE.equals(dbSqlSessionFactory.isBulkInsertable(entityClass))) {
+            log.error("flushInsertEntities not in bulk: " + entityClass);
             for (Entity entity : entitiesToInsert) {
                 flushRegularInsert(entity, entityClass);
             }
         } else {
+            log.error("flushInsertEntities in bulk: " + entityClass);
             flushBulkInsert(entitiesToInsert, entityClass);
         }
     }
