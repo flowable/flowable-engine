@@ -82,6 +82,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         newDbSqlSessionFactory.setSqlSessionFactory(oldDbSqlSessionFactory.getSqlSessionFactory());
         newDbSqlSessionFactory.setIdGenerator(oldDbSqlSessionFactory.getIdGenerator());
         newDbSqlSessionFactory.setDbHistoryUsed(oldDbSqlSessionFactory.isDbHistoryUsed());
+        newDbSqlSessionFactory.setDatabaseSpecificStatements(oldDbSqlSessionFactory.getDatabaseSpecificStatements());
+        newDbSqlSessionFactory.setBulkInsertableMap(oldDbSqlSessionFactory.getBulkInsertableMap());
         processEngineConfiguration.addSessionFactory(newDbSqlSessionFactory);
     }
 

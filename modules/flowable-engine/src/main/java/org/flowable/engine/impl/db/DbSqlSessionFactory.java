@@ -25,8 +25,6 @@ import org.flowable.engine.common.impl.interceptor.AbstractCommandContext;
 import org.flowable.engine.common.impl.interceptor.Session;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityImpl;
 import org.slf4j.Logger;
@@ -40,12 +38,12 @@ public class DbSqlSessionFactory implements SessionFactory {
     
     private static Logger logger = LoggerFactory.getLogger(DbSqlSessionFactory.class);
 
-    protected static final Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<String, Map<String, String>>();
+    protected Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<String, Map<String, String>>();
 
     /**
      * A map {class, boolean}, to indicate whether or not a certain {@link Entity} class can be bulk inserted.
      */
-    protected static Map<Class<? extends Entity>, Boolean> bulkInsertableMap;
+    protected Map<Class<? extends Entity>, Boolean> bulkInsertableMap;
 
     protected String databaseType;
     protected String databaseTablePrefix = "";
@@ -149,7 +147,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     // db specific mappings
     // /////////////////////////////////////////////////////
 
-    protected static void addDatabaseSpecificStatement(String databaseType, String activitiStatement, String ibatisStatement) {
+    protected void addDatabaseSpecificStatement(String databaseType, String activitiStatement, String ibatisStatement) {
         Map<String, String> specificStatements = databaseSpecificStatements.get(databaseType);
         if (specificStatements == null) {
             specificStatements = new HashMap<String, String>();
@@ -188,23 +186,13 @@ public class DbSqlSessionFactory implements SessionFactory {
             bulkInsertableMap.put(clazz, Boolean.TRUE);
         }
 
-        logger.error("initBulkInsertEnabledMap: databaseType " + databaseType);
-        
         // Only Oracle is making a fuss in one specific case right now
         if ("oracle".equals(databaseType)) {
-            logger.error("initBulkInsertEnabledMap: set EventLogEntryEntityImpl to false for " + databaseType);
             bulkInsertableMap.put(EventLogEntryEntityImpl.class, Boolean.FALSE);
         }
     }
 
     public Boolean isBulkInsertable(Class<? extends Entity> entityClass) {
-        if (bulkInsertableMap != null) {
-            ProcessEngineConfigurationImpl processEngineConfiguration = Context.getCommandContext().getProcessEngineConfiguration();
-            logger.error(databaseType + " isBulkInsertable: " + entityClass + " " + bulkInsertableMap.get(entityClass) + " " + 
-                            processEngineConfiguration.getDatabaseType() + " " + processEngineConfiguration.getDatabaseSchema());
-        } else {
-            logger.error("isBulkInsertable empty insertable map");
-        }
         return bulkInsertableMap != null && bulkInsertableMap.containsKey(entityClass) && bulkInsertableMap.get(entityClass);
     }
 
@@ -228,6 +216,14 @@ public class DbSqlSessionFactory implements SessionFactory {
 
     public String getDatabaseType() {
         return databaseType;
+    }
+
+    public Map<String, Map<String, String>> getDatabaseSpecificStatements() {
+        return databaseSpecificStatements;
+    }
+
+    public void setDatabaseSpecificStatements(Map<String, Map<String, String>> databaseSpecificStatements) {
+        this.databaseSpecificStatements = databaseSpecificStatements;
     }
 
     public Map<String, String> getStatementMappings() {
@@ -276,6 +272,14 @@ public class DbSqlSessionFactory implements SessionFactory {
 
     public void setBulkDeleteStatements(Map<Class<?>, String> bulkDeleteStatements) {
         this.bulkDeleteStatements = bulkDeleteStatements;
+    }
+
+    public Map<Class<? extends Entity>, Boolean> getBulkInsertableMap() {
+        return bulkInsertableMap;
+    }
+
+    public void setBulkInsertableMap(Map<Class<? extends Entity>, Boolean> bulkInsertableMap) {
+        this.bulkInsertableMap = bulkInsertableMap;
     }
 
     public Map<Class<?>, String> getSelectStatements() {
