@@ -25,6 +25,8 @@ import org.flowable.engine.common.impl.interceptor.AbstractCommandContext;
 import org.flowable.engine.common.impl.interceptor.Session;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityImpl;
 import org.slf4j.Logger;
@@ -197,7 +199,9 @@ public class DbSqlSessionFactory implements SessionFactory {
 
     public Boolean isBulkInsertable(Class<? extends Entity> entityClass) {
         if (bulkInsertableMap != null) {
-            logger.error("isBulkInsertable: " + entityClass + " " + bulkInsertableMap.get(entityClass));
+            ProcessEngineConfigurationImpl processEngineConfiguration = Context.getCommandContext().getProcessEngineConfiguration();
+            logger.error(databaseType + " isBulkInsertable: " + entityClass + " " + bulkInsertableMap.get(entityClass) + " " + 
+                            processEngineConfiguration.getDatabaseType() + " " + processEngineConfiguration.getDatabaseSchema());
         } else {
             logger.error("isBulkInsertable empty insertable map");
         }
