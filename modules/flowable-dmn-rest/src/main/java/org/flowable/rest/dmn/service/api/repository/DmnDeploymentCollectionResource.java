@@ -124,7 +124,10 @@ public class DmnDeploymentCollectionResource {
             @ApiResponse(code = 200, message = "Indicates the deployment was created."),
             @ApiResponse(code = 400, message = "Indicates there was no content present in the request body or the content mime-type is not supported for deployment. The status-description contains additional information.")
     })
-    @RequestMapping(value = "/dmn-repository/deployments", method = RequestMethod.POST, produces = "application/json")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name="file", paramType = "form", dataType = "java.io.File")
+    })
+    @RequestMapping(value = "/dmn-repository/deployments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
     public DmnDeploymentResponse uploadDeployment(@ApiParam(name = "tenantId") @RequestParam(value = "tenantId", required = false) String tenantId, HttpServletRequest request, HttpServletResponse response) {
 
         if (!(request instanceof MultipartHttpServletRequest)) {
