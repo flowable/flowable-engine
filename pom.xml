@@ -224,6 +224,11 @@
 				<artifactId>flowable-bpmn-model</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-bpmn-fluent</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-bpmn-converter</artifactId>
@@ -849,6 +854,7 @@
 
 	<modules>
 		<module>modules/flowable-bpmn-model</module>
+        <module>modules/flowable-bpmn-fluent</module>
 		<module>modules/flowable-process-validation</module>
 		<module>modules/flowable-bpmn-layout</module>
 		<module>modules/flowable-image-generator</module>
@@ -981,6 +987,7 @@
 			<id>deploy</id>
 			<modules>
 				<module>modules/flowable-bpmn-model</module>
+                <module>modules/flowable-bpmn-fluent</module>
 				<module>modules/flowable-process-validation</module>
 				<module>modules/flowable-image-generator</module>
 				<module>modules/flowable-bpmn-converter</module>
@@ -1081,6 +1088,7 @@
 			<id>check</id>
 			<modules>
 				<module>modules/flowable-bpmn-model</module>
+                <module>modules/flowable-bpmn-fluent</module>
 				<module>modules/flowable-process-validation</module>
 				<module>modules/flowable-image-generator</module>
 				<module>modules/flowable-bpmn-converter</module>
@@ -1179,6 +1187,7 @@
 			<id>distro</id>
 			<modules>
 				<module>modules/flowable-bpmn-model</module>
+                <module>modules/flowable-bpmn-fluent</module>
 				<module>modules/flowable-process-validation</module>
 				<module>modules/flowable-image-generator</module>
 				<module>modules/flowable-bpmn-converter</module>

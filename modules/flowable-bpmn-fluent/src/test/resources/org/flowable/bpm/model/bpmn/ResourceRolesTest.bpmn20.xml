@@ -1,0 +1,42 @@
+<semantics:definitions
+        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+        xmlns:semantics='http://www.omg.org/spec/BPMN/20100524/MODEL'
+        xsi:schemaLocation='http://www.omg.org/spec/BPMN/20100524/MODEL http://bpmn.sourceforge.net/schemas/BPMN20.xsd'
+        targetNamespace='http://flowable.org/test' expressionLanguage='http://www.w3.org/1999/XPath'
+        typeLanguage='http://www.w3.org/2001/XMLSchema' id='_0' name='definitions'>
+    <semantics:resource id='_resource_user' name='user'></semantics:resource>
+    <semantics:resource id='_resource_Batman' name='Batman'></semantics:resource>
+    <semantics:process id='_1' name='process'>
+        <semantics:startEvent id='_2' name='StartEvent _2'>
+            <semantics:outgoing>_4</semantics:outgoing>
+        </semantics:startEvent>
+        <semantics:endEvent id='_5' name='EndEvent _5'>
+            <semantics:incoming>_6</semantics:incoming>
+        </semantics:endEvent>
+        <semantics:userTask id='_3' name='User Task _3' implementation="##unspecified">
+            <semantics:incoming>_4</semantics:incoming>
+            <semantics:outgoing>_6</semantics:outgoing>
+            <semantics:performer id="_p3" name="Task performer">
+                <semantics:resourceRef>_resource_user</semantics:resourceRef>
+            </semantics:performer>
+        </semantics:userTask>
+        <semantics:userTask id='_7' name='User Task _7' implementation="##unspecified">
+            <semantics:incoming>_6</semantics:incoming>
+            <semantics:outgoing>_8</semantics:outgoing>
+            <semantics:humanPerformer id="_hp7" name="Task human performer">
+                <semantics:resourceRef>_resource_user</semantics:resourceRef>
+            </semantics:humanPerformer>
+        </semantics:userTask>
+        <semantics:userTask id='_9' name='User Task _9' implementation="##unspecified">
+            <semantics:incoming>_8</semantics:incoming>
+            <semantics:outgoing>_10</semantics:outgoing>
+            <semantics:potentialOwner id="_po9" name="Task potential owner">
+                <semantics:resourceRef>_resource_Batman</semantics:resourceRef>
+            </semantics:potentialOwner>
+        </semantics:userTask>
+        <semantics:sequenceFlow id='_4' sourceRef='_2' targetRef='_3'></semantics:sequenceFlow>
+        <semantics:sequenceFlow id='_6' sourceRef='_3' targetRef='_7'></semantics:sequenceFlow>
+        <semantics:sequenceFlow id='_8' sourceRef='_7' targetRef='_9'></semantics:sequenceFlow>
+        <semantics:sequenceFlow id='_10' sourceRef='_9' targetRef='_5'></semantics:sequenceFlow>
+    </semantics:process>
+</semantics:definitions>

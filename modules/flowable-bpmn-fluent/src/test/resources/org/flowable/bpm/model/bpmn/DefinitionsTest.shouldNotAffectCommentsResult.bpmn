@@ -1,0 +1,7 @@
+  <!-- Comment for first import "here" -->
+  <import importType="example" location="here" namespace="Imports"/>
+  <import importType="example" location="there" namespace="Imports"/>
+  <!-- Comment for first process "some-process-id" -->
+  <process id="some-process-id" isClosed="false" processType="None"/>
+  <process id="another-process-id"/>
+</definitions>

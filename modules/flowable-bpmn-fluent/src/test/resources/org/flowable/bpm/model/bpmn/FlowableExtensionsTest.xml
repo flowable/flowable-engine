@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+        xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:flowable="http://flowable.org/bpmn"
+        targetNamespace="http://flowable.org/test">
+
+    <!-- NOTE: this document is not valid and is only used to test Flowable extensions -->
+
+    <process id="process"
+             flowable:candidateStarterGroups="group1, ${group2(a, b)}, group3"
+             flowable:candidateStarterUsers="user1, ${user2(a, b)}, user3"
+             flowable:priority="13">
+        <extensionElements>
+            <flowable:executionListener event="start" class="org.flowable.test.Test"/>
+        </extensionElements>
+
+        <startEvent id="startEvent"
+                    flowable:initiator="test"
+                    flowable:formHandlerClass="org.flowable.test.Test"
+                    flowable:formKey="test"
+                    flowable:async="true">
+            <extensionElements>
+                <flowable:executionListener event="start" expression="${test}"/>
+                <flowable:potentialStarter>
+                    <resourceAssignmentExpression>
+                        <formalExpression>group1, ${group2(a, b)}, group3</formalExpression>
+                    </resourceAssignmentExpression>
+                </flowable:potentialStarter>
+                <flowable:formProperty id="test" name="test" type="test" variable="test" expression="${test}" datePattern="test" default="test"/>
+            </extensionElements>
+            <errorEventDefinition/>
+        </startEvent>
+
+        <sequenceFlow id="sequenceFlow" sourceRef="startEvent" targetRef="userTask">
+            <extensionElements>
+                <flowable:executionListener>
+                    <flowable:script scriptFormat="groovy">println 'Hello World'</flowable:script>
+                </flowable:executionListener>
+            </extensionElements>
+        </sequenceFlow>
+
+        <userTask id="userTask"
+                  flowable:assignee="test"
+                  flowable:async="true"
+                  flowable:candidateGroups="group1, ${group2(a, b)}, group3"
+                  flowable:candidateUsers="user1, ${user2(a, b)}, user3"
+                  flowable:dueDate="2014-02-27"
+                  flowable:exclusive="false"
+                  flowable:formHandlerClass="org.flowable.test.Test"
+                  flowable:formKey="test"
+                  flowable:priority="12">
+            <extensionElements>
+                <flowable:taskListener event="create" class="org.flowable.test.Test" expression="${test}" delegateExpression="${org.flowable.test.Test}">
+                    <flowable:field name="test">
+                        <flowable:string>test</flowable:string>
+                    </flowable:field>
+                </flowable:taskListener>
+                <flowable:taskListener>
+                    <flowable:script scriptFormat="groovy" resource="test.groovy"/>
+                </flowable:taskListener>
+                <flowable:formData>
+                    <flowable:formField id="test" label="test" type="test" datePattern="test" defaultValue="test">
+                        <flowable:properties>
+                            <flowable:property id="test" value="test"/>
+                        </flowable:properties>
+                        <flowable:validation>
+                            <flowable:constraint name="test" config="test"/>
+                        </flowable:validation>
+                        <flowable:value id="test" name="test"/>
+                    </flowable:formField>
+                </flowable:formData>
+            </extensionElements>
+        </userTask>
+
+        <serviceTask id="serviceTask"
+                     flowable:expression="${test}"
+                     flowable:class="org.flowable.test.Test"
+                     flowable:delegateExpression="${org.flowable.test.Test}"
+                     flowable:resultVariable="test"
+                     flowable:type="mail"
+                     flowable:priority="${test}">
+            <extensionElements>
+                <flowable:executionListener event="start" delegateExpression="${org.flowable.test.Test}"/>
+                <flowable:connector>
+                    <flowable:connectorId>soap-http-connector</flowable:connectorId>
+                    <flowable:inputOutput>
+                        <flowable:inputParameter name="endpointUrl">http://example.com/webservice</flowable:inputParameter>
+                        <flowable:outputParameter name="result">output</flowable:outputParameter>
+                    </flowable:inputOutput>
+                </flowable:connector>
+                <flowable:inputOutput>
+                    <flowable:inputParameter name="shouldBeNull"/>
+                    <flowable:inputParameter name="shouldBeConstant">foo</flowable:inputParameter>
+                    <flowable:inputParameter name="shouldBeExpression">${1 + 1}</flowable:inputParameter>
+                    <flowable:inputParameter name="shouldBeList">
+                        <flowable:list>
+                            <flowable:value>a</flowable:value>
+                            <flowable:value>b</flowable:value>
+                            <flowable:value>c</flowable:value>
+                        </flowable:list>
+                    </flowable:inputParameter>
+                    <flowable:inputParameter name="shouldBeMap">
+                        <flowable:map>
+                            <flowable:entry key="foo">bar</flowable:entry>
+                            <flowable:entry key="hello">world</flowable:entry>
+                        </flowable:map>
+                    </flowable:inputParameter>
+                    <flowable:inputParameter name="shouldBeScript">
+                        <flowable:script scriptFormat="groovy">1 + 1</flowable:script>
+                    </flowable:inputParameter>
+                    <flowable:outputParameter name="nested">
+                        <flowable:list>
+                            <flowable:value>
+                                <flowable:list>
+                                    <flowable:value>list</flowable:value>
+                                    <flowable:value>list</flowable:value>
+                                </flowable:list>
+                            </flowable:value>
+                            <flowable:value>
+                                <flowable:map>
+                                    <flowable:entry key="list">
+                                        <flowable:list>
+                                            <flowable:value>map</flowable:value>
+                                            <flowable:value>map</flowable:value>
+                                            <flowable:value>map</flowable:value>
+                                        </flowable:list>
+                                    </flowable:entry>
+                                    <flowable:entry key="map">
+                                        <flowable:map>
+                                            <flowable:entry key="so">nested</flowable:entry>
+                                        </flowable:map>
+                                    </flowable:entry>
+                                </flowable:map>
+                            </flowable:value>
+                        </flowable:list>
+                    </flowable:outputParameter>
+                </flowable:inputOutput>
+            </extensionElements>
+        </serviceTask>
+
+        <sendTask id="sendTask">
+            <extensionElements>
+                <flowable:failedJobRetryTimeCycle>test</flowable:failedJobRetryTimeCycle>
+                <flowable:field name="test" stringValue="test" expression="${test}">
+                    <flowable:expression>${test}</flowable:expression>
+                    <flowable:string>test</flowable:string>
+                </flowable:field>
+            </extensionElements>
+        </sendTask>
+
+        <callActivity id="callActivity"
+                      flowable:exclusive="false">
+            <extensionElements>
+                <flowable:in source="test" sourceExpression="${test}" target="test"/>
+                <flowable:out source="test" sourceExpression="${test}" target="test"/>
+            </extensionElements>
+        </callActivity>
+
+        <businessRuleTask id="businessRuleTask"
+                          flowable:priority="test"/>
+
+        <endEvent id="endEvent"
+                  flowable:async="true">
+            <extensionElements>
+                <flowable:properties>
+                    <flowable:property name="name1" value="value1"/>
+                    <flowable:property name="name2" value="value2"/>
+                </flowable:properties>
+            </extensionElements>
+            <messageEventDefinition
+                    flowable:class="org.flowable.test.Test"
+                    flowable:expression="${test}"
+                    flowable:delegateExpression="${org.flowable.test.Test}"
+                    flowable:resultVariable="test"
+                    flowable:type="test" />
+        </endEvent>
+
+        <parallelGateway id="parallelGateway"
+                         flowable:async="true">
+        </parallelGateway>
+
+    </process>
+</definitions>

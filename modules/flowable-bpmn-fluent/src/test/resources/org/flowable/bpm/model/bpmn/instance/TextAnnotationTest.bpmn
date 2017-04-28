@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                   xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                   xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                   xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                   xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd"
+                   exporterVersion="2.6.0"
+                   targetNamespace="http://flowable.org/bpmn">
+  <bpmn2:process id="theProcess" isExecutable="false">
+    <bpmn2:startEvent id="theStart">
+      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:sequenceFlow id="SequenceFlow_1" name="" sourceRef="theStart" targetRef="userTask"/>
+    <bpmn2:userTask id="userTask" name="User Task">
+      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_2" name="" sourceRef="userTask" targetRef="theEnd"/>
+    <bpmn2:endEvent id="theEnd">
+      <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:textAnnotation id="textAnnotation1">
+      <bpmn2:text>Floating text annotation</bpmn2:text>
+    </bpmn2:textAnnotation>
+    <bpmn2:textAnnotation id="textAnnotation2">
+      <bpmn2:text>Attached text annotation</bpmn2:text>
+    </bpmn2:textAnnotation>
+    <bpmn2:association id="Association_1" sourceRef="textAnnotation2" targetRef="userTask"/>
+    <bpmn2:association id="Association_2" sourceRef="userTask" targetRef="textAnnotation1"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="theProcess">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_27" bpmnElement="theStart">
+        <dc:Bounds height="36.0" width="36.0" x="200.0" y="256.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_UserTask_2" bpmnElement="userTask">
+        <dc:Bounds height="80.0" width="100.0" x="324.0" y="234.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_27" targetElement="_BPMNShape_UserTask_2">
+        <di:waypoint xsi:type="dc:Point" x="236.0" y="274.0"/>
+        <di:waypoint xsi:type="dc:Point" x="324.0" y="274.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="6.0" width="6.0" x="285.0" y="274.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_29" bpmnElement="theEnd">
+        <dc:Bounds height="36.0" width="36.0" x="492.0" y="256.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="0.0" width="0.0" x="510.0" y="297.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="_BPMNShape_UserTask_2" targetElement="_BPMNShape_EndEvent_29">
+        <di:waypoint xsi:type="dc:Point" x="424.0" y="274.0"/>
+        <di:waypoint xsi:type="dc:Point" x="492.0" y="274.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="6.0" width="6.0" x="446.0" y="274.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_TextAnnotation_6" bpmnElement="textAnnotation1">
+        <dc:Bounds height="50.0" width="185.0" x="262.0" y="63.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_TextAnnotation_7" bpmnElement="textAnnotation2">
+        <dc:Bounds height="50.0" width="162.0" x="319.0" y="436.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_Association_1" bpmnElement="Association_1" sourceElement="_BPMNShape_TextAnnotation_7" targetElement="_BPMNShape_UserTask_2">
+        <di:waypoint xsi:type="dc:Point" x="397.0" y="436.0"/>
+        <di:waypoint xsi:type="dc:Point" x="380.0" y="314.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Association_2" bpmnElement="Association_2" sourceElement="_BPMNShape_UserTask_2" targetElement="_BPMNShape_TextAnnotation_6">
+        <di:waypoint xsi:type="dc:Point" x="370.0" y="234.0"/>
+        <di:waypoint xsi:type="dc:Point" x="357.0" y="113.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

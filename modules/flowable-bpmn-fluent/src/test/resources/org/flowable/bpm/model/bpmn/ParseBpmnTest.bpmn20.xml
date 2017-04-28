@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                   xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                   xmlns:flowable="http://flowable.org/bpmn"
+                   xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                   xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                   targetNamespace="http://flowable.org/test"
+                   xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+    <bpmn2:process id="testProcess" name="Test Process" isExecutable="true">
+        <bpmn2:startEvent id="startEvent" name="Start Process">
+            <bpmn2:extensionElements>
+                <flowable:formData>
+                    <flowable:formField id="name" label="Name" type="string" defaultValue="test"/>
+                    <flowable:formField id="age" label="Age" type="long" defaultValue="0"/>
+                </flowable:formData>
+            </bpmn2:extensionElements>
+            <bpmn2:outgoing>flow1</bpmn2:outgoing>
+        </bpmn2:startEvent>
+        <bpmn2:serviceTask id="serviceTask" name="Service Task" flowable:exclusive="false"
+                           flowable:expression="${execution.setVariable(&#39;foo&#39;, &#39;bar&#39;)}">
+            <bpmn2:incoming>flow1</bpmn2:incoming>
+            <bpmn2:outgoing>flow2</bpmn2:outgoing>
+        </bpmn2:serviceTask>
+        <bpmn2:sequenceFlow id="flow1" name="" sourceRef="startEvent" targetRef="serviceTask"/>
+        <bpmn2:exclusiveGateway id="gatewayFork" name="Fork">
+            <bpmn2:incoming>flow2</bpmn2:incoming>
+            <bpmn2:outgoing>flow3</bpmn2:outgoing>
+            <bpmn2:outgoing>flow4</bpmn2:outgoing>
+        </bpmn2:exclusiveGateway>
+        <bpmn2:sequenceFlow id="flow2" name="" sourceRef="serviceTask" targetRef="gatewayFork"/>
+        <bpmn2:sequenceFlow id="flow3" name="" sourceRef="gatewayFork" targetRef="userTaskA">
+            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression"><![CDATA[${foo != 'bar'}]]></bpmn2:conditionExpression>
+        </bpmn2:sequenceFlow>
+        <bpmn2:userTask id="userTaskA" name="User Task A" flowable:candidateGroups="management, accounting">
+            <bpmn2:incoming>flow3</bpmn2:incoming>
+            <bpmn2:outgoing>flow5</bpmn2:outgoing>
+        </bpmn2:userTask>
+        <bpmn2:sequenceFlow id="flow4" name="" sourceRef="gatewayFork" targetRef="userTaskB">
+            <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression"><![CDATA[${foo == 'bar'}]]></bpmn2:conditionExpression>
+        </bpmn2:sequenceFlow>
+        <bpmn2:userTask id="userTaskB" name="User Task B" flowable:assignee="demo">
+            <bpmn2:incoming>flow4</bpmn2:incoming>
+            <bpmn2:outgoing>flow6</bpmn2:outgoing>
+        </bpmn2:userTask>
+        <bpmn2:sequenceFlow id="flow6" name="" sourceRef="userTaskB" targetRef="gatewayJoin"/>
+        <bpmn2:exclusiveGateway id="gatewayJoin" name="Join">
+            <bpmn2:incoming>flow6</bpmn2:incoming>
+            <bpmn2:incoming>flow5</bpmn2:incoming>
+            <bpmn2:outgoing>flow7</bpmn2:outgoing>
+        </bpmn2:exclusiveGateway>
+        <bpmn2:sequenceFlow id="flow5" name="" sourceRef="userTaskA" targetRef="gatewayJoin"/>
+        <bpmn2:scriptTask id="scriptTask" name="Script Task" scriptFormat="groovy">
+            <bpmn2:incoming>flow7</bpmn2:incoming>
+            <bpmn2:outgoing>SequenceFlow_9</bpmn2:outgoing>
+            <bpmn2:script><![CDATA[println 'hello world']]></bpmn2:script>
+        </bpmn2:scriptTask>
+        <bpmn2:sequenceFlow id="flow7" name="" sourceRef="gatewayJoin" targetRef="scriptTask"/>
+        <bpmn2:endEvent id="endEvent" name="End Process">
+            <bpmn2:extensionElements>
+                <flowable:executionListener expression="${execution.setVariable(&#39;finished&#39;, true)}" event="start"/>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>SequenceFlow_9</bpmn2:incoming>
+        </bpmn2:endEvent>
+        <bpmn2:sequenceFlow id="SequenceFlow_9" name="" sourceRef="scriptTask" targetRef="endEvent"/>
+    </bpmn2:process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testProcess">
+            <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="startEvent">
+                <dc:Bounds x="536" y="251" width="36" height="36"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_2" bpmnElement="serviceTask">
+                <dc:Bounds x="622" y="229" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="flow1" sourceElement="_BPMNShape_StartEvent_2" targetElement="_BPMNShape_ServiceTask_2">
+                <di:waypoint xsi:type="dc:Point" x="572" y="269"/>
+                <di:waypoint xsi:type="dc:Point" x="622" y="269"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="_BPMNShape_ExclusiveGateway_2" bpmnElement="gatewayFork" isMarkerVisible="true">
+                <dc:Bounds x="772" y="244" width="50" height="50"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="828" y="259" width="32" height="22"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="flow2" sourceElement="_BPMNShape_ServiceTask_2"
+                             targetElement="_BPMNShape_ExclusiveGateway_2">
+                <di:waypoint xsi:type="dc:Point" x="722" y="269"/>
+                <di:waypoint xsi:type="dc:Point" x="772" y="269"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="_BPMNShape_UserTask_2" bpmnElement="userTaskA">
+                <dc:Bounds x="876" y="132" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="flow3" sourceElement="_BPMNShape_ExclusiveGateway_2"
+                             targetElement="_BPMNShape_UserTask_2">
+                <di:waypoint xsi:type="dc:Point" x="797" y="244"/>
+                <di:waypoint xsi:type="dc:Point" x="797" y="172"/>
+                <di:waypoint xsi:type="dc:Point" x="876" y="172"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="794" y="219" width="6" height="6"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="_BPMNShape_UserTask_3" bpmnElement="userTaskB">
+                <dc:Bounds x="876" y="324" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_4" bpmnElement="flow4" sourceElement="_BPMNShape_ExclusiveGateway_2"
+                             targetElement="_BPMNShape_UserTask_3">
+                <di:waypoint xsi:type="dc:Point" x="797" y="294"/>
+                <di:waypoint xsi:type="dc:Point" x="797" y="364"/>
+                <di:waypoint xsi:type="dc:Point" x="876" y="364"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="794" y="319" width="6" height="6"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="_BPMNShape_ExclusiveGateway_3" bpmnElement="gatewayJoin" isMarkerVisible="true">
+                <dc:Bounds x="1026" y="243" width="50" height="50"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="998" y="258" width="29" height="22"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_5" bpmnElement="flow6" sourceElement="_BPMNShape_UserTask_3"
+                             targetElement="_BPMNShape_ExclusiveGateway_3">
+                <di:waypoint xsi:type="dc:Point" x="976" y="364"/>
+                <di:waypoint xsi:type="dc:Point" x="1001" y="364"/>
+                <di:waypoint xsi:type="dc:Point" x="1051" y="364"/>
+                <di:waypoint xsi:type="dc:Point" x="1051" y="293"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="998" y="364" width="6" height="6"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_6" bpmnElement="flow5" sourceElement="_BPMNShape_UserTask_2"
+                             targetElement="_BPMNShape_ExclusiveGateway_3">
+                <di:waypoint xsi:type="dc:Point" x="976" y="172"/>
+                <di:waypoint xsi:type="dc:Point" x="1001" y="172"/>
+                <di:waypoint xsi:type="dc:Point" x="1051" y="172"/>
+                <di:waypoint xsi:type="dc:Point" x="1051" y="243"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="1046" y="172" width="6" height="6"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="_BPMNShape_ScriptTask_2" bpmnElement="scriptTask">
+                <dc:Bounds x="1126" y="228" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_8" bpmnElement="flow7" sourceElement="_BPMNShape_ExclusiveGateway_3"
+                             targetElement="_BPMNShape_ScriptTask_2">
+                <di:waypoint xsi:type="dc:Point" x="1076" y="268"/>
+                <di:waypoint xsi:type="dc:Point" x="1126" y="268"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="_BPMNShape_EndEvent_3" bpmnElement="endEvent">
+                <dc:Bounds x="1276" y="250" width="36" height="36"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_9" bpmnElement="SequenceFlow_9" sourceElement="_BPMNShape_ScriptTask_2"
+                             targetElement="_BPMNShape_EndEvent_3">
+                <di:waypoint xsi:type="dc:Point" x="1226" y="268"/>
+                <di:waypoint xsi:type="dc:Point" x="1276" y="268"/>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

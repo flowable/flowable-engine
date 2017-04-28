@@ -67,7 +67,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
     }
 
     private String deployTestProcessWithTestTenant(String tenantId) {
-        String id = repositoryService.createDeployment().addBpmnModel("testProcess.bpmn20.xml", createOneTaskTestProcess()).tenantId(tenantId).deploy().getId();
+        String id = repositoryService.createDeployment().addString("testProcess.bpmn20.xml", createOneTaskTestProcess()).tenantId(tenantId).deploy().getId();
 
         autoCleanedUpDeploymentIds.add(id);
 

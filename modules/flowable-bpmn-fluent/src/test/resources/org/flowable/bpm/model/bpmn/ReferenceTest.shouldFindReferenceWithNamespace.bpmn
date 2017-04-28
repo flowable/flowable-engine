@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<bpmn:definitions targetNamespace="Examples" xmlns:tns="Examples" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL">
+  <!-- Comment for first import "here" -->
+  <!-- Comment for first process "some-process-id" -->
+  <bpmn:message id="message-id"/>
+  <bpmn:process id="some-process-id">
+    <bpmn:startEvent id="start-event">
+      <bpmn:messageEventDefinition id="message-event-definition" messageRef="tns:message-id"/>
+      <bpmn:eventDefinitionRef>tns:message-event-definition</bpmn:eventDefinitionRef>
+    </bpmn:startEvent>
+  </bpmn:process>
+</bpmn:definitions>

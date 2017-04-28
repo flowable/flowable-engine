@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+        xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        targetNamespace="http://flowable.org/test">
+
+    <process id="process">
+        <parallelGateway gatewayDirection="Mixed"/>
+        <exclusiveGateway gatewayDirection="Mixed" default="flow"/>
+        <inclusiveGateway gatewayDirection="Mixed" default="flow"/>
+        <complexGateway gatewayDirection="Mixed" default="flow">
+            <activationCondition>${test}</activationCondition>
+        </complexGateway>
+        <eventBasedGateway gatewayDirection="Mixed" instantiate="true" eventGatewayType="Parallel"/>
+        <startEvent id="start"/>
+        <sequenceFlow id="flow" sourceRef="start" targetRef="end"/>
+        <endEvent id="end"/>
+    </process>
+
+</definitions>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<animals xmlns="http://flowable.org/animals"
+         xmlns:tns="http://flowable.org/animals"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://flowable.org/animals ../Testmodel.xsd ">
+
+    <bird id="tweety" gender="Female">
+        <flightInstructor>hedwig</flightInstructor>
+        <flightPartnerRef>hedwig</flightPartnerRef>
+        <flightPartnerRef>birdo</flightPartnerRef>
+        <flightPartnerRef>plucky</flightPartnerRef>
+        <flightPartnerRef>fiffy</flightPartnerRef>
+    </bird>
+    <bird id="hedwig" gender="Male"/>
+    <bird id="birdo" gender="Female"/>
+    <bird id="plucky" gender="Unknown"/>
+    <bird id="fiffy" gender="Female"/>
+    <bird id="timmy" gender="Male"/>
+    <bird id="daisy" gender="Female"/>
+</animals>
