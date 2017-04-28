@@ -171,7 +171,7 @@ public abstract class AbstractEngineConfiguration {
      */
     protected boolean tablePrefixIsSchema;
 
-    protected static Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
+    protected Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
 
     public static final String DATABASE_TYPE_H2 = "h2";
     public static final String DATABASE_TYPE_HSQL = "hsql";

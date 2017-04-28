@@ -9,7 +9,7 @@ alter table ACT_ID_PRIV_MAPPING
 
 drop index ACT_IDX_MEMB_GROUP;
 drop index ACT_IDX_MEMB_USER;
-drop index ACT_IDX_PRIV_NAME;
+drop index ACT_IDX_PRIV_MAPPING;
 
 drop table ACT_ID_PROPERTY;
 drop table ACT_ID_BYTEARRAY;
