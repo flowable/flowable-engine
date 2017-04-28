@@ -123,7 +123,10 @@ public class FormDeploymentCollectionResource {
             @ApiResponse(code = 200, message = "Indicates the form deployment was created."),
             @ApiResponse(code = 400, message = "Indicates there was no content present in the request body or the content mime-type is not supported for form deployment. The status-description contains additional information.")
     })
-    @RequestMapping(value = "/form-repository/deployments", method = RequestMethod.POST, produces = "application/json")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name="file", paramType = "form", dataType = "java.io.File")
+    })
+    @RequestMapping(value = "/form-repository/deployments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
     public FormDeploymentResponse uploadDeployment(@ApiParam(name = "tenantId") @RequestParam(value = "tenantId", required = false) String tenantId, HttpServletRequest request, HttpServletResponse response) {
 
         if (!(request instanceof MultipartHttpServletRequest)) {
