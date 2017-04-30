@@ -14,8 +14,8 @@ package org.flowable.app.rest.editor;
 
 import java.util.List;
 
+import org.activiti.editor.language.json.converter.RDSBpmnJsonConverter;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
 import org.flowable.validation.ValidationError;
@@ -37,7 +37,7 @@ public class ModelValidationRestResource {
 
     @RequestMapping(value = "/rest/model/validate",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
     public List<ValidationError> validate(@RequestBody JsonNode body){
-        BpmnModel bpmnModel = new BpmnJsonConverter().convertToBpmnModel(body);
+        BpmnModel bpmnModel = new RDSBpmnJsonConverter().convertToBpmnModel(body);
         ProcessValidator validator = new ProcessValidatorFactory().createDefaultProcessValidator();
         List<ValidationError> errors = validator.validate(bpmnModel);
         return errors;

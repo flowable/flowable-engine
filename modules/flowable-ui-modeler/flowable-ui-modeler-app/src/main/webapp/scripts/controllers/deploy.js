@@ -39,7 +39,7 @@ angular.module('flowableModeler')
             if (deployResponse.status == "401") {
               vm.errorMsg = "Wrong username or password! try again";
             } else if (deployResponse.status == "400") {
-              vm.errorMsg = deployResponse.data.error;
+              vm.errorMsg = deployResponse.data.errorMessage;
             } else {
               vm.errorMsg = "Something went wrong, please ask system administrator for help!";
             }
