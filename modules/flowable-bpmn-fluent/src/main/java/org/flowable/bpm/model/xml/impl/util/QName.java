@@ -17,10 +17,6 @@ public class QName {
     private final String qualifier;
     private final String localName;
 
-    public QName(String localName) {
-        this(null, localName);
-    }
-
     public QName(String qualifier, String localName) {
         this.localName = localName;
         this.qualifier = qualifier;
@@ -95,6 +91,4 @@ public class QName {
         }
         return true;
     }
-
-
 }

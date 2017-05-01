@@ -12,6 +12,13 @@
  */
 package org.flowable.bpm.model.xml.impl.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import org.flowable.bpm.model.xml.Model;
 import org.flowable.bpm.model.xml.ModelException;
 import org.flowable.bpm.model.xml.impl.ModelInstanceImpl;
@@ -22,13 +29,6 @@ import org.flowable.bpm.model.xml.instance.DomElement;
 import org.flowable.bpm.model.xml.instance.ModelElementInstance;
 import org.flowable.bpm.model.xml.type.ModelElementType;
 import org.flowable.bpm.model.xml.type.attribute.Attribute;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 /**
  * Some Helpers useful when handling model elements.
@@ -79,68 +79,12 @@ public final class ModelUtil {
         }
     }
 
-    // String to primitive type converters ////////////////////////////////////
-
     public static boolean valueAsBoolean(String rawValue) {
         return Boolean.parseBoolean(rawValue);
     }
 
-    public static int valueAsInteger(String rawValue) {
-        try {
-            return Integer.parseInt(rawValue);
-        }
-        catch (NumberFormatException e) {
-            throw new ModelTypeException(rawValue, Integer.class);
-        }
-    }
-
-    public static float valueAsFloat(String rawValue) {
-        try {
-            return Float.parseFloat(rawValue);
-        }
-        catch (NumberFormatException e) {
-            throw new ModelTypeException(rawValue, Float.class);
-        }
-    }
-
-    public static double valueAsDouble(String rawValue) {
-        try {
-            return Double.parseDouble(rawValue);
-        }
-        catch (NumberFormatException e) {
-            throw new ModelTypeException(rawValue, Double.class);
-        }
-    }
-
-    public static short valueAsShort(String rawValue) {
-        try {
-            return Short.parseShort(rawValue);
-        }
-        catch (NumberFormatException e) {
-            throw new ModelTypeException(rawValue, Short.class);
-        }
-    }
-
-    // primitive type to string converters //////////////////////////////////////
-
     public static String valueAsString(boolean booleanValue) {
         return Boolean.toString(booleanValue);
-    }
-
-    public static String valueAsString(int integerValue) {
-        return Integer.toString(integerValue);
-    }
-
-    public static String valueAsString(float floatValue) {
-        return Float.toString(floatValue);
-    }
-
-    public static String valueAsString(double doubleValue) {
-        return Double.toString(doubleValue);
-    }
-
-    public static String valueAsString(short shortValue) {
-        return Short.toString(shortValue);
     }
 
     /**
@@ -222,5 +166,4 @@ public final class ModelUtil {
     public static String getUniqueIdentifier(ModelElementType type) {
         return type.getTypeName() + '_' + UUID.randomUUID();
     }
-
 }
