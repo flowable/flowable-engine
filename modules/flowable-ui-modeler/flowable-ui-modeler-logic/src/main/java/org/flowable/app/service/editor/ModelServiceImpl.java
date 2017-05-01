@@ -77,7 +77,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -446,6 +445,29 @@ public class ModelServiceImpl implements ModelService {
     }
 
     return result;
+  }
+  
+  public BpmnModel convertToBpmnModelForValidation(JsonNode editorJsonNode) {
+    
+    String modelId = editorJsonNode.get("modelId").asText();
+    
+    Map<String, String> formMap = new HashMap<String, String>();
+    Map<String, String> decisionTableMap = new HashMap<String, String>();
+
+    List<Model> referencedModels = modelRepository.findByParentModelId(modelId);
+          for (Model childModel : referencedModels) {
+              if (Model.MODEL_TYPE_FORM_RDS == childModel.getModelType()) {
+        formMap.put(childModel.getId(), childModel.getKey());
+
+              } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
+        decisionTableMap.put(childModel.getId(), childModel.getKey());
+      }
+    }
+          
+    BpmnModel bpmnModel = bpmnJsonConverter.convertToBpmnModel(editorJsonNode, formMap, decisionTableMap);
+    
+    return bpmnModel;
+    
   }
 
   @Override
