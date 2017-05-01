@@ -23,15 +23,15 @@ import javax.el.ELResolver;
 import javax.el.PropertyNotWritableException;
 
 import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.el.ExpressionManager;
+import org.flowable.engine.impl.el.DefaultExpressionManager;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
 
 /**
- * {@link org.flowable.engine.impl.el.ExpressionManager} that exposes the simulation event in expressions
+ * {@link org.flowable.engine.impl.el.DefaultExpressionManager} that exposes the simulation event in expressions
  *
  * @author martin.grofcik
  */
-public class SimulationExpressionManager extends ExpressionManager {
+public class SimulationExpressionManager extends DefaultExpressionManager {
 
     public SimulationExpressionManager(DelegateInterceptor delegateInterceptor, Map<Object, Object> beans) {
         super(delegateInterceptor, beans, true);

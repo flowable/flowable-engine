@@ -72,6 +72,20 @@
                     </div>
                     <h2 translate="GENERAL.TITLE.FILTERS"></h2>
                 </div>
+                <div class="section">
+                    <div class="subtitle"><label for="filter-jobtype" translate="JOBS.FILTER.JOBTYPE.LABEL"></label> </div>
+                    <div>
+                        <select ui-select2
+                                ng-model="filter.jobType"
+                         		ng-change="jobTypeFilterChanged()"
+                         		style="min-width:250px">
+                            <option value="executableJob">{{'JOBS.FILTER.JOBTYPE.EXECUTABLE-JOB' | translate}}</option>
+                            <option value="timerJob">{{'JOBS.FILTER.JOBTYPE.TIMER-JOB' | translate}}</option>
+                            <option value="suspendedJob">{{'JOBS.FILTER.JOBTYPE.SUSPENDED-JOB' | translate}}</option>
+                            <option value="deadletterJob">{{'JOBS.FILTER.JOBTYPE.DEADLETTER-JOB' | translate}}</option>
+                         </select>
+                    </div>
+                </div>
 	            <div class="section">
                     <div class="subtitle"><label for="filter-processdefinition" translate="JOBS.FILTER.PROCESS-DEFINITION"></label> </div>
                     <div>

@@ -12,12 +12,11 @@
  */
 package org.flowable.standalone.event;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
-
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
 
 /**
  * Test getProcess on ProcessDefinition {@link FlowableEngineEventType#ENTITY_INITIALIZED} event

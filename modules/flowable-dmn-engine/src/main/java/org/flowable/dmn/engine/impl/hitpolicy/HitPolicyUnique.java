@@ -18,12 +18,16 @@ import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.engine.common.api.FlowableException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Yvo Swillens
  */
-public class HitPolicyUnique extends AbstractHitPolicy {
+public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleValidityBehavior, ComposeDecisionResultBehavior {
 
     @Override
     public String getHitPolicyName() {
@@ -32,6 +36,7 @@ public class HitPolicyUnique extends AbstractHitPolicy {
 
     @Override
     public void evaluateRuleValidity(int ruleNumber, MvelExecutionContext executionContext) {
+        //TODO: not on audit container
         for (Map.Entry<Integer, RuleExecutionAuditContainer> entry : executionContext.getAuditContainer().getRuleExecutions().entrySet()) {
             if (entry.getKey().equals(ruleNumber) == false && entry.getValue().isValid()) {
                 String hitPolicyViolatedMessage = String.format("HitPolicy UNIQUE violated: rule %d is valid but rule %d was already valid", ruleNumber, entry.getKey());
@@ -42,6 +47,27 @@ public class HitPolicyUnique extends AbstractHitPolicy {
                 }
             }
         }
+    }
 
+    public void composeDecisionResults(MvelExecutionContext executionContext) {
+        List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
+        List<Map<String, Object>> decisionResult;
+
+        if (Context.getDmnEngineConfiguration().isStrictMode() == false) {
+            Map<String, Object> lastResult = new HashMap<>();
+
+            for (Map<String, Object> ruleResult : ruleResults) {
+                for (Map.Entry<String, Object> entry : ruleResult.entrySet()) {
+                    if (entry.getValue() != null) {
+                        lastResult.put(entry.getKey(), entry.getValue());
+                    }
+                }
+            }
+            decisionResult = Arrays.asList(lastResult);
+        } else {
+            decisionResult = ruleResults;
+        }
+
+        executionContext.setDecisionResults(decisionResult);
     }
 }

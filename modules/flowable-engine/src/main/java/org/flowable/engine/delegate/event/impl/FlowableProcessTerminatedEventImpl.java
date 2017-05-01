@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.delegate.event.impl;
 
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableProcessTerminatedEvent;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -28,8 +29,9 @@ public class FlowableProcessTerminatedEventImpl extends FlowableEntityEventImpl 
     public FlowableProcessTerminatedEventImpl(ExecutionEntity execution, Object cause) {
         super(execution, FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
         if (!execution.isProcessInstanceType()) {
-            throw new RuntimeException("Execution '"+ execution +"' is not a processInstance");
+            throw new FlowableException("Execution '"+ execution +"' is not a processInstance");
         }
+        
         this.executionId = execution.getId();
         this.processInstanceId = execution.getProcessInstanceId();
         this.processDefinitionId = execution.getProcessDefinitionId();

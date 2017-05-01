@@ -27,8 +27,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
 import org.flowable.app.model.common.RemoteToken;
 import org.flowable.app.model.common.RemoteUser;
-import org.flowable.app.security.FlowableAppUser;
 import org.flowable.app.security.CookieConstants;
+import org.flowable.app.security.FlowableAppUser;
 import org.flowable.app.service.idm.RemoteIdmService;
 import org.flowable.engine.common.api.FlowableException;
 import org.slf4j.Logger;
@@ -63,6 +63,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
     protected FlowableCookieFilterCallback filterCallback;
 
     protected String idmAppUrl;
+    protected String redirectUrlOnAuthSuccess;
 
     protected Collection<String> requiredPrivileges;
 
@@ -87,6 +88,8 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
         if (!idmAppUrl.endsWith("/")) {
             idmAppUrl += "/";
         }
+        
+        redirectUrlOnAuthSuccess = env.getProperty("app.redirect.url.on.authsuccess");
     }
 
     protected void initTokenCache() {
@@ -246,7 +249,15 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
             if (userId != null) {
                 userCache.invalidate(userId);
             }
-            response.sendRedirect(idmAppUrl + "#/login?redirectOnAuthSuccess=true&redirectUrl=" + request.getRequestURL());
+            
+            String baseRedirectUrl = idmAppUrl + "#/login?redirectOnAuthSuccess=true&redirectUrl=";
+            if (redirectUrlOnAuthSuccess != null) {
+                response.sendRedirect(baseRedirectUrl + redirectUrlOnAuthSuccess);
+                
+            } else {
+                response.sendRedirect(baseRedirectUrl + request.getRequestURL());
+            }
+            
         } catch (IOException e) {
             logger.warn("Could not redirect to {}", idmAppUrl, e);
         }

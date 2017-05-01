@@ -42,6 +42,7 @@ public class OutputClauseXMLConverter extends BaseDmnXMLConverter {
         clause.setLabel(xtr.getAttributeValue(null, ATTRIBUTE_LABEL));
         clause.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
         clause.setTypeRef(xtr.getAttributeValue(null, ATTRIBUTE_TYPE_REF));
+        parseChildElements(getXMLElementName(), clause, decisionTable, xtr);
         return clause;
     }
 

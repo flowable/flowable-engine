@@ -27,6 +27,7 @@ import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.cmd.DeleteDeadLetterJobCmd;
 import org.flowable.engine.impl.cmd.DeleteEventLogEntry;
 import org.flowable.engine.impl.cmd.DeleteJobCmd;
+import org.flowable.engine.impl.cmd.DeleteSuspendedJobCmd;
 import org.flowable.engine.impl.cmd.DeleteTimerJobCmd;
 import org.flowable.engine.impl.cmd.ExecuteCustomSqlCmd;
 import org.flowable.engine.impl.cmd.ExecuteJobCmd;
@@ -109,6 +110,10 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
     public void deleteTimerJob(String jobId) {
         commandExecutor.execute(new DeleteTimerJobCmd(jobId));
+    }
+    
+    public void deleteSuspendedJob(String jobId) {
+        commandExecutor.execute(new DeleteSuspendedJobCmd(jobId));
     }
 
     public void deleteDeadLetterJob(String jobId) {

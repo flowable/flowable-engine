@@ -53,6 +53,7 @@ public class MvelExecutionContextBuilder {
 
         executionContext.setParserContext(parserContext);
 
+        // add property handlers to context
         if (propertyHandlers != null) {
             for (Class<?> variableClass : propertyHandlers.keySet()) {
                 executionContext.addPropertyHandler(variableClass, propertyHandlers.get(variableClass));
@@ -60,6 +61,21 @@ public class MvelExecutionContextBuilder {
         }
 
         DecisionTable decisionTable = (DecisionTable) decision.getExpression();
+
+        // add output values to context
+        if (decisionTable.getOutputs() != null) {
+            for (OutputClause outputClause : decisionTable.getOutputs()) {
+                if (outputClause.getOutputValues() != null && outputClause.getOutputValues().getTextValues() != null) {
+                    executionContext.addOutputValues(outputClause.getName(),
+                        ExecutionVariableFactory.getExecutionVariables(outputClause.getTypeRef(), outputClause.getOutputValues().getTextValues()));
+                }
+            }
+        }
+
+        // set aggregator
+        if (decisionTable.getAggregation() != null) {
+            executionContext.setAggregator(decisionTable.getAggregation());
+        }
 
         preProcessInputVariables(decisionTable, inputVariables);
 
@@ -79,9 +95,7 @@ public class MvelExecutionContextBuilder {
         // check if there are input expressions that refer to none existing input variables
         // that need special handling
         for (InputClause inputClause : decisionTable.getInputs()) {
-
             if (!inputVariables.containsKey(inputClause.getInputExpression().getText()) && "boolean".equals(inputClause.getInputExpression().getTypeRef())) {
-
                 inputVariables.put(inputClause.getInputExpression().getText(), Boolean.FALSE);
             }
         }
@@ -89,9 +103,7 @@ public class MvelExecutionContextBuilder {
         // check if there are output expressions that refer to none existing input variables
         // in that case create them with default values
         for (OutputClause outputClause : decisionTable.getOutputs()) {
-
             if (!inputVariables.containsKey(outputClause.getName()) || inputVariables.get(outputClause.getName()) == null) {
-
                 if ("number".equals(outputClause.getTypeRef())) {
                     inputVariables.put(outputClause.getName(), 0D);
                 } else if ("date".equals(outputClause.getTypeRef())) {

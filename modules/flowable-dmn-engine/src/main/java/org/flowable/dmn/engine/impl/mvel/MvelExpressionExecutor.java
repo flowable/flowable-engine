@@ -32,7 +32,6 @@ public class MvelExpressionExecutor {
     private static final Logger logger = LoggerFactory.getLogger(MvelExpressionExecutor.class);
 
     public static Boolean executeInputExpression(InputClause inputClause, UnaryTests inputEntry, MvelExecutionContext executionContext) {
-
         if (inputClause == null) {
             throw new IllegalArgumentException("input clause is required");
         }
@@ -41,6 +40,9 @@ public class MvelExpressionExecutor {
         }
         if (inputEntry == null) {
             throw new IllegalArgumentException("input entry is required");
+        }
+        if (executionContext == null) {
+            throw new IllegalArgumentException("execution context is required");
         }
 
         for (Class<?> variableClass : executionContext.getPropertyHandlers().keySet()) {
@@ -70,12 +72,14 @@ public class MvelExpressionExecutor {
     }
 
     public static Object executeOutputExpression(OutputClause outputClause, LiteralExpression outputEntry, MvelExecutionContext executionContext) {
-
         if (outputClause == null) {
             throw new IllegalArgumentException("output clause is required");
         }
         if (outputEntry == null) {
             throw new IllegalArgumentException("output entry is required");
+        }
+        if (executionContext == null) {
+            throw new IllegalArgumentException("execution context is required");
         }
 
         // compile MVEL expression

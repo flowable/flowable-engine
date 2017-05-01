@@ -451,6 +451,7 @@
       "DROPDOWN-DEFAULT-EMPTY-SELECTION":"Por favor, escolha uma...",
       "DROPDOWN-EMPTY-VALUE-HELP":"Esta é a opção 'valor vazio'. Selecionar isto em tempo de execução significa dizer 'sem valor' ou 'vazio'.  Isto é permitido para campos opcionais, mas não permitido para campos obrigatórios.",
       "REQUIRED":"Obrigatório",
+      "READONLY":"Somente leitura",
       "EXPRESSION":"Expressão",
       "ADD-OPTION":"+ Adicionar uma nova opção",
       "UPLOAD-ALLOW-MULTIPLE":"Permitir o upload de vários arquivos"

@@ -177,7 +177,7 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
 
     public DeadLetterJobQueryImpl jobTenantId(String tenantId) {
         if (tenantId == null) {
-            throw new FlowableIllegalArgumentException("job is null");
+            throw new FlowableIllegalArgumentException("Provided tentant id is null");
         }
         this.tenantId = tenantId;
         return this;
@@ -185,7 +185,7 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
 
     public DeadLetterJobQueryImpl jobTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
-            throw new FlowableIllegalArgumentException("job is null");
+            throw new FlowableIllegalArgumentException("Provided tentant id is null");
         }
         this.tenantIdLike = tenantIdLike;
         return this;

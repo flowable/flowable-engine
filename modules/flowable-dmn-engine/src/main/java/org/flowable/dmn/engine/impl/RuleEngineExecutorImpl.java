@@ -21,7 +21,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.api.RuleEngineExecutionResult;
 import org.flowable.dmn.engine.FlowableDmnExpressionException;
 import org.flowable.dmn.engine.RuleEngineExecutor;
-import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyBehavior;
+import org.flowable.dmn.engine.impl.hitpolicy.AbstractHitPolicy;
+import org.flowable.dmn.engine.impl.hitpolicy.ComposeDecisionResultBehavior;
+import org.flowable.dmn.engine.impl.hitpolicy.ComposeRuleResultBehavior;
+import org.flowable.dmn.engine.impl.hitpolicy.ContinueEvaluatingBehavior;
+import org.flowable.dmn.engine.impl.hitpolicy.EvaluateRuleValidityBehavior;
 import org.flowable.dmn.engine.impl.mvel.ExecutionVariableFactory;
 import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
 import org.flowable.dmn.engine.impl.mvel.MvelExecutionContextBuilder;
@@ -45,9 +49,9 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(RuleEngineExecutorImpl.class);
 
-    protected Map<String, HitPolicyBehavior> hitPolicyBehaviors;
+    protected Map<String, AbstractHitPolicy> hitPolicyBehaviors;
 
-    public RuleEngineExecutorImpl(Map<String, HitPolicyBehavior> hitPolicyBehaviors) {
+    public RuleEngineExecutorImpl(Map<String, AbstractHitPolicy> hitPolicyBehaviors) {
         this.hitPolicyBehaviors = hitPolicyBehaviors;
     }
 
@@ -75,19 +79,29 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         MvelExecutionContext executionContext = MvelExecutionContextBuilder.build(decision, inputVariables,
             customExpressionFunctions, propertyHandlers);
 
-        // evaluate decision table
-        Map<String, Object> resultVariables = evaluateDecisionTable(currentDecisionTable, executionContext);
+        List<Map<String, Object>> decisionResult = null;
+        RuleEngineExecutionResult executionResult;
+        try {
+            sanityCheckDecisionTable(currentDecisionTable);
 
-        // end audit trail
-        executionContext.getAuditContainer().stopAudit(resultVariables);
+            // evaluate decision table
+            decisionResult = evaluateDecisionTable(currentDecisionTable, executionContext);
+        } catch (FlowableException fe) {
+            logger.error("decision table execution sanity check failed", fe);
+            executionContext.getAuditContainer().setFailed();
+            executionContext.getAuditContainer().setExceptionMessage(getExceptionMessage(fe));
+        } finally {
+            // end audit trail
+            executionContext.getAuditContainer().stopAudit();
 
-        // create result container
-        RuleEngineExecutionResult executionResult = new RuleEngineExecutionResult(resultVariables, executionContext.getAuditContainer());
+            // create result container
+            executionResult = new RuleEngineExecutionResult(decisionResult, executionContext.getAuditContainer());
+        }
 
         return executionResult;
     }
 
-    protected Map<String, Object> evaluateDecisionTable(DecisionTable decisionTable, MvelExecutionContext executionContext) {
+    protected List<Map<String, Object>> evaluateDecisionTable(DecisionTable decisionTable, MvelExecutionContext executionContext) {
         logger.debug("Start table evaluation: {}", decisionTable.getId());
 
 
@@ -108,36 +122,43 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
 
                 if (ruleResult) {
                     // evaluate decision table hit policy validity
-                    getHitPolicyBehavior(decisionTable.getHitPolicy()).evaluateRuleValidity(rule.getRuleNumber(), executionContext);
+                    if (getHitPolicyBehavior(decisionTable.getHitPolicy()) instanceof EvaluateRuleValidityBehavior) {
+                        ((EvaluateRuleValidityBehavior) getHitPolicyBehavior(decisionTable.getHitPolicy())).evaluateRuleValidity(rule.getRuleNumber(), executionContext);
+                    }
 
                     // add valid rule output(s)
                     validRuleOutputEntries.put(rule.getRuleNumber(), rule.getOutputEntries());
                 }
 
-                if (!shouldContinueEvaluating(decisionTable.getHitPolicy(), ruleResult)) {
-                    logger.debug("Stopping execution; hit policy {} specific behaviour", decisionTable.getHitPolicy());
-                    break;
+                // should continue evaluating
+                if (getHitPolicyBehavior(decisionTable.getHitPolicy()) instanceof ContinueEvaluatingBehavior) {
+                    if (((ContinueEvaluatingBehavior) getHitPolicyBehavior(decisionTable.getHitPolicy())).shouldContinueEvaluating(ruleResult) == false) {
+                        logger.debug("Stopping execution; hit policy {} specific behaviour", decisionTable.getHitPolicy());
+                        break;
+                    }
                 }
             }
 
-            // evaluate rule conclusions
+            // compose rule conclusions
             for (Map.Entry<Integer, List<RuleOutputClauseContainer>> entry : validRuleOutputEntries.entrySet()) {
                 executeOutputEntryAction(entry.getKey(), entry.getValue(), decisionTable.getHitPolicy(), executionContext);
             }
 
+            // post rule conclusion actions
+            if (getHitPolicyBehavior(decisionTable.getHitPolicy()) instanceof ComposeDecisionResultBehavior) {
+                ((ComposeDecisionResultBehavior) getHitPolicyBehavior(decisionTable.getHitPolicy())).composeDecisionResults(executionContext);
+            }
+
         } catch (FlowableException ade) {
             logger.error("decision table execution failed", ade);
+            executionContext.getRuleResults().clear();
             executionContext.getAuditContainer().setFailed();
             executionContext.getAuditContainer().setExceptionMessage(getExceptionMessage(ade));
         }
 
         logger.debug("End table evaluation: {}", decisionTable.getId());
 
-        return executionContext.getResultVariables();
-    }
-
-    protected Boolean shouldContinueEvaluating(HitPolicy hitPolicy, Boolean ruleResult) {
-        return getHitPolicyBehavior(hitPolicy).shouldContinueEvaluating(ruleResult);
+        return executionContext.getDecisionResults();
     }
 
     protected Boolean executeRule(DecisionRule rule, MvelExecutionContext executionContext) {
@@ -233,11 +254,10 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 Object resultValue = MvelExpressionExecutor.executeOutputExpression(ruleClauseContainer.getOutputClause(), outputEntryExpression, executionContext);
                 executionVariable = ExecutionVariableFactory.getExecutionVariable(outputVariableType, resultValue);
 
-                // check validity
-                getHitPolicyBehavior(hitPolicy).evaluateRuleConclusionValidity(executionVariable, ruleNumber, ruleClauseContainer.getOutputClause().getOutputNumber(), executionContext);
-
                 // create result
-                getHitPolicyBehavior(hitPolicy).composeOutput(outputVariableId, executionVariable, executionContext);
+                if (getHitPolicyBehavior(hitPolicy) instanceof ComposeRuleResultBehavior) {
+                    ((ComposeRuleResultBehavior) getHitPolicyBehavior(hitPolicy)).composeRuleResult(ruleNumber, outputVariableId, executionVariable, executionContext);
+                }
 
                 // add audit entry
                 executionContext.getAuditContainer().addOutputEntry(ruleNumber, ruleClauseContainer.getOutputClause().getOutputNumber(), outputEntryExpression.getId(), executionVariable);
@@ -249,7 +269,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 }
             } catch (FlowableException ade) {
                 // clear result variables
-                executionContext.getResultVariables().clear();
+                executionContext.getRuleResults().clear();
 
                 // add failed audit entry and rethrow
                 executionContext.getAuditContainer().addOutputEntry(ruleNumber, ruleClauseContainer.getOutputClause().getOutputNumber(), outputEntryExpression.getId(), getExceptionMessage(ade), executionVariable);
@@ -257,7 +277,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
 
             } catch (Exception e) {
                 // clear result variables
-                executionContext.getResultVariables().clear();
+                executionContext.getRuleResults().clear();
 
                 // add failed audit entry and rethrow
                 executionContext.getAuditContainer().addOutputEntry(ruleNumber, ruleClauseContainer.getOutputClause().getOutputNumber(), outputEntryExpression.getId(), getExceptionMessage(e), executionVariable);
@@ -283,8 +303,8 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         return exceptionMessage;
     }
 
-    protected HitPolicyBehavior getHitPolicyBehavior(HitPolicy hitPolicy) {
-        HitPolicyBehavior hitPolicyBehavior = hitPolicyBehaviors.get(hitPolicy.getValue());
+    protected AbstractHitPolicy getHitPolicyBehavior(HitPolicy hitPolicy) {
+        AbstractHitPolicy hitPolicyBehavior = hitPolicyBehaviors.get(hitPolicy.getValue());
 
         if (hitPolicyBehavior == null) {
             String hitPolicyBehaviorNotFoundMessage = String.format("HitPolicy behavior: %s not configured", hitPolicy.getValue());
@@ -295,5 +315,16 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         }
 
         return hitPolicyBehavior;
+    }
+
+    protected void sanityCheckDecisionTable(DecisionTable decisionTable) {
+        if (decisionTable.getHitPolicy() == HitPolicy.COLLECT && decisionTable.getAggregation() != null && decisionTable.getOutputs() != null) {
+            if (decisionTable.getOutputs().size() > 1) {
+                throw new FlowableException(String.format("HitPolicy: %s has aggregation: %s and multiple outputs. This is not supported", decisionTable.getHitPolicy(), decisionTable.getAggregation()));
+            }
+            if (!"number".equals(decisionTable.getOutputs().get(0).getTypeRef())) {
+                throw new FlowableException(String.format("HitPolicy: %s has aggregation: %s needs output type number", decisionTable.getHitPolicy(), decisionTable.getAggregation()));
+            }
+        }
     }
 }

@@ -4,7 +4,7 @@
 
 	<property file="${user.home}/.flowable/build.properties" />
 
-	<property name="flowable.version" value="6.0.1-SNAPSHOT" />
+	<property name="flowable.version" value="6.1.0-SNAPSHOT" />
 	<property name="target.distro.root" value="target/zip/flowable-${flowable.version}" />
 	<property name="flowable.website" value="../../flowable-website" />
 
@@ -362,6 +362,13 @@
 		<!-- COPY SQL -->
 		<copy todir="${target.distro.root}/database">
 			<fileset dir="../modules/flowable-engine/src/main/resources/org/flowable/db">
+				<include name="create/**" />
+				<include name="drop/**" />
+				<include name="upgrade/**" />
+			</fileset>
+		</copy>
+		<copy todir="${target.distro.root}/database/idm">
+			<fileset dir="../modules/flowable-idm-engine/src/main/resources/org/flowable/idm/db">
 				<include name="create/**" />
 				<include name="drop/**" />
 				<include name="upgrade/**" />

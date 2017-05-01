@@ -14,12 +14,13 @@ package org.flowable.rest.dmn.service.api;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnDeployment;
-import org.flowable.dmn.api.RuleEngineExecutionResult;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.rest.dmn.service.api.decision.ExecuteDecisionResponse;
+import org.flowable.rest.dmn.service.api.decision.DmnRuleServiceResponse;
+import org.flowable.rest.dmn.service.api.decision.DmnRuleServiceSingleResponse;
 import org.flowable.rest.dmn.service.api.repository.DecisionTableResponse;
 import org.flowable.rest.dmn.service.api.repository.DmnDeploymentResponse;
 import org.flowable.rest.variable.BooleanRestVariableConverter;
@@ -86,20 +87,42 @@ public class DmnRestResponseFactory {
         return new DmnDeploymentResponse(deployment, urlBuilder.buildUrl(DmnRestUrls.URL_DEPLOYMENT, deployment.getId()));
     }
 
-    public ExecuteDecisionResponse createExecuteDecisionResponse(RuleEngineExecutionResult executionResult) {
-        return createExecuteDecisionResponse(executionResult, createUrlBuilder());
+    public DmnRuleServiceResponse createDmnRuleServiceResponse(List<Map<String, Object>> executionResults) {
+        return createDmnRuleServiceResponse(executionResults, createUrlBuilder());
     }
 
-    public ExecuteDecisionResponse createExecuteDecisionResponse(RuleEngineExecutionResult executionResult, DmnRestUrlBuilder urlBuilder) {
-        ExecuteDecisionResponse response = new ExecuteDecisionResponse();
+    public DmnRuleServiceSingleResponse createDmnRuleServiceResponse(Map<String, Object> executionResult) {
+        return createDmnRuleServiceResponse(executionResult, createUrlBuilder());
+    }
 
-        if (executionResult.getResultVariables() != null) {
-            for (String name : executionResult.getResultVariables().keySet()) {
-                response.addResultVariable(createRestVariable(name, executionResult.getResultVariables().get(name), false));
+    public DmnRuleServiceResponse createDmnRuleServiceResponse(List<Map<String, Object>> executionResults, DmnRestUrlBuilder urlBuilder) {
+        DmnRuleServiceResponse response = new DmnRuleServiceResponse();
+
+        if (executionResults != null && !executionResults.isEmpty()) {
+            for (Map<String, Object> executionResult : executionResults) {
+                List<EngineRestVariable> ruleResults = new ArrayList<>();
+                for (String name : executionResult.keySet()) {
+                    ruleResults.add(createRestVariable(name, executionResult.get(name), false));
+                }
+                response.addResultVariables(ruleResults);
             }
         }
 
-        response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_DECISION_EXECUTOR));
+        response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_RULE_SERVICE_EXECUTE));
+
+        return response;
+    }
+
+    public DmnRuleServiceSingleResponse createDmnRuleServiceResponse(Map<String, Object> executionResult, DmnRestUrlBuilder urlBuilder) {
+        DmnRuleServiceSingleResponse response = new DmnRuleServiceSingleResponse();
+
+        if (executionResult != null) {
+            for (String name : executionResult.keySet()) {
+                response.addResultVariable(createRestVariable(name, executionResult.get(name), false));
+            }
+        }
+
+        response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_RULE_SERVICE_EXECUTE));
 
         return response;
     }

@@ -15,8 +15,6 @@ package org.flowable.form.engine.impl.el;
 
 import javax.el.ExpressionFactory;
 
-import de.odysseus.el.ExpressionFactoryImpl;
-
 /**
  * Class used to get hold of a {@link ExpressionFactory}.
  * 
@@ -26,6 +24,6 @@ public abstract class ExpressionFactoryResolver {
 
     public static ExpressionFactory resolveExpressionFactory() {
         // Return instance of custom JUEL implementation
-        return new ExpressionFactoryImpl();
+        return ExpressionFactory.newInstance();
     }
 }

@@ -54,8 +54,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     protected int resetExpiredJobsInterval = 60 * 1000;
     protected int resetExpiredJobsPageSize = 3;
 
-    // Job queue used when async executor is not yet started and jobs are already
-    // added.
+    // Job queue used when async executor is not yet started and jobs are already added.
     // This is mainly used for testing purpose.
     protected LinkedList<Job> temporaryJobQueue = new LinkedList<Job>();
 

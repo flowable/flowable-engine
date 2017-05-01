@@ -13,8 +13,6 @@
 
 package org.flowable.engine.impl.cfg;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
@@ -158,6 +156,7 @@ import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.impl.db.IbatisVariableTypeHandler;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
+import org.flowable.engine.impl.el.DefaultExpressionManager;
 import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.el.FlowableDateFunctionDelegate;
 import org.flowable.engine.impl.event.CompensationEventHandler;
@@ -345,6 +344,8 @@ import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tom Baeyens
@@ -819,6 +820,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected List<Object> flowable5CustomDefaultBpmnParseHandlers;
     protected Set<Class<?>> flowable5CustomMybatisMappers;
     protected Set<String> flowable5CustomMybatisXMLMappers;
+    protected Object flowable5ExpressionManager;
 
     // buildProcessEngine
     // ///////////////////////////////////////////////////////
@@ -1660,6 +1662,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initAsyncExecutor() {
         if (asyncExecutor == null) {
             DefaultAsyncJobExecutor defaultAsyncExecutor = new DefaultAsyncJobExecutor();
+            if (asyncExecutorExecuteAsyncRunnableFactory != null) {
+                defaultAsyncExecutor.setExecuteAsyncRunnableFactory(asyncExecutorExecuteAsyncRunnableFactory);
+            }
 
             // Message queue mode
             defaultAsyncExecutor.setMessageQueueMode(asyncExecutorMessageQueueMode);
@@ -1853,7 +1858,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initExpressionManager() {
         if (expressionManager == null) {
-            expressionManager = new ExpressionManager(delegateInterceptor, beans, true);
+            expressionManager = new DefaultExpressionManager(delegateInterceptor, beans, true);
         }
 
         expressionManager.setFunctionDelegates(flowableFunctionDelegates);
@@ -3634,6 +3639,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setFlowable5ActivityBehaviorFactory(Object flowable5ActivityBehaviorFactory) {
         this.flowable5ActivityBehaviorFactory = flowable5ActivityBehaviorFactory;
+        return this;
+    }
+
+    public Object getFlowable5ExpressionManager() {
+        return flowable5ExpressionManager;
+    }
+
+    public ProcessEngineConfigurationImpl setFlowable5ExpressionManager(Object flowable5ExpressionManager) {
+        this.flowable5ExpressionManager = flowable5ExpressionManager;
         return this;
     }
 

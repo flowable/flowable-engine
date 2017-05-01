@@ -130,7 +130,10 @@ public class DeploymentCollectionResource {
             @ApiResponse(code = 200, message = "Indicates the deployment was created."),
             @ApiResponse(code = 400, message = "Indicates there was no content present in the request body or the content mime-type is not supported for deployment. The status-description contains additional information.")
     })
-    @RequestMapping(value = "/repository/deployments", method = RequestMethod.POST, produces = "application/json")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name="file", paramType = "form", dataType = "java.io.File")
+    })
+    @RequestMapping(value = "/repository/deployments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
     public DeploymentResponse uploadDeployment(@ApiParam(name = "deploymentKey") @RequestParam(value = "deploymentKey", required = false) String deploymentKey,
             @ApiParam(name = "deploymentName") @RequestParam(value = "deploymentName", required = false) String deploymentName,
             @ApiParam(name = "tenantId") @RequestParam(value = "tenantId", required = false) String tenantId,

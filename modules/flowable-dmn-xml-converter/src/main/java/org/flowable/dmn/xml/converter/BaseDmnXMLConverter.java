@@ -104,7 +104,7 @@ public abstract class BaseDmnXMLConverter implements DmnXMLConstants {
 
     protected void parseChildElements(String elementName, DmnElement parentElement, Map<String, BaseChildElementParser> additionalParsers, DecisionTable decisionTable, XMLStreamReader xtr) throws Exception {
 
-        Map<String, BaseChildElementParser> childParsers = new HashMap<String, BaseChildElementParser>();
+        Map<String, BaseChildElementParser> childParsers = new HashMap<>();
         if (additionalParsers != null) {
             childParsers.putAll(additionalParsers);
         }
