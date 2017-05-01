@@ -3599,6 +3599,21 @@ The HTTP task is configured by <<serviceTaskFieldInjection,field injection>>. Al
                        in following format. 'taskId'.'fieldName'. For example, requestUrl is saved as 'httpGet.requestUrl'
 |===============
 
+In addition to the provided fields, following will be set as execution variables on successful execution.
+
+[options="header"]
+|===============
+|Variable|Optional?|Description
+|responseStatusCode|No|HTTP Response Status code (Example - 200).
+|responseHeaders|No|Line separated HTTP response headers. Example - + 
+                  Content-Type: application/json + 
+                  Content-Length: 777
+|responseBody|Yes|Response body as string.
+|===============
+
+Remember all the above execution variable names are prefixed by evaluated value of 'variableNamePrefix'.
+For example response status code can be accessed in another activity as 'httpGet.responseStatusCode'.
+Here 'httpGet' is the 'id' of the service task. To override this behavior, set 'variableNamePrefix' as required.
 
 [[bpmnHTTPTaskExampleUsage]]
 
