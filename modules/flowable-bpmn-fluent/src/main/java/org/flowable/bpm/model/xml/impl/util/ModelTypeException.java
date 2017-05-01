@@ -14,8 +14,6 @@ package org.flowable.bpm.model.xml.impl.util;
 
 import org.flowable.bpm.model.xml.ModelException;
 
-import java.lang.reflect.Type;
-
 /**
  * Thrown in case a value cannot be converted to or from the requested type
  */
@@ -27,9 +25,4 @@ public class ModelTypeException
     public ModelTypeException(String message) {
         super(message);
     }
-
-    public ModelTypeException(String value, Type type) {
-        super("Illegal value " + value + " for type " + type);
-    }
-
 }
