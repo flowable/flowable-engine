@@ -3514,6 +3514,129 @@ The following XML snippet shows an example of using the Email Task.
 ----
 
 
+[[bpmnEmailTask]]
+
+
+==== HTTP Task
+
+The HTTP task allows you to make HTTP requests, enhancing the integration features of Flowable. Note that the HTTP task is *not* an 'official' task of the BPMN 2.0 spec (and doesn't have a dedicated icon as a consequence). Hence, in Flowable the HTTP task is implemented as a dedicated service task.
+
+
+[[bpmnHTTPTaskClientConfiguration]]
+
+
+===== HTTP Client configuration
+
+The Flowable engine makes HTTP requests through a configurable HTTP Client. The following properties can be set in the _flowable.cfg.xml_ configuration file:
+
+[source,xml,linenums]
+----
+  <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+    <!-- http client configurations -->
+    <property name="HTTPClientConfig" ref="HTTPClientConfig"/>
+  </bean>
+
+  <bean id="HTTPClientConfig" class="org.flowable.engine.cfg.HTTPClientConfig">
+    <property name="connectTimeout" value="5000"/>
+    <property name="socketTimeout" value="5000"/>
+    <property name="connectionRequestTimeout" value="5000"/>
+  </bean>
+----
+
+[options="header"]
+|===============
+|Property|Required?|Description
+|connectTimeout|no|Connection timeout in milliseconds. By default set to 5000.
+|socketTimeout|no|Socket timeout in milliseconds. By default set to 5000.
+|connectionRequestTimeout|no|Connection request timeout in milliseconds. By default set to 5000.
+
+|===============
+
+[[bpmnHTTPTaskUsage]]
+
+
+===== Defining an HTTP Task
+
+The HTTP task is implemented as a dedicated <<bpmnJavaServiceTask,Service Task>> and is defined by setting _'http'_ for the _type_ of the service task.
+
+[source,xml,linenums]
+----
+<serviceTask id="httpGet" flowable:type="http">
+----
+Also its possible to override default HTTP Task behavior by providing custom implementation.
+Custom implemention should extend org.flowable.http.HTTPActivityBehavior and override perform() method.
+Field 'httpActivityBehaviorClass' should be set in the task definition.
+Default value for this field is 'org.flowable.http.impl.HTTPActivityBehaviorDefaultImpl'.
+Currently 'HTTPActivityBehaviorDefaultImpl' is based on Apache HTTP Client.
+----
+<serviceTask id="httpGet" flowable:type="http">
+  <extensionElements>
+    <flowable:field name="httpActivityBehaviorClass">
+        <flowable:string>
+          <![CDATA[org.example.flowable.HTTPActivityBehaviorCustomImpl]]>
+        </flowable:string>
+    </flowable:field>
+  </extensionElements>
+</sericeTask>
+----
+
+The HTTP task is configured by <<serviceTaskFieldInjection,field injection>>. All the values for these properties can contain EL expression, which are resolved at runtime during process execution. The following properties can be set:
+
+[options="header"]
+|===============
+|Property|Required?|Description
+|requestMethod|yes|Request method (Example - GET,POST,PUT,DELETE etc).
+|requestUrl|yes|Request URL (Example - http://flowable.org).
+|requestHeaders|no|Line separated HTTP request headers. Example - + 
+                  Content-Type: application/json + 
+                  Authorization: Basic aGFRlc3Q=
+|requestBody|no|Request body (Example - ${sampleBody}).
+|requestTimeout|no|Timeout in milliseconds for the request (Example - 5000).
+|requestRetryLimit|no|Request retry limit (Example - 10).
+|retryStatusCodes|no|Comma separated list of HTTP response status codes to retry, Example - 400,5XX.
+|ignoreStatusCodes|no|Comma separated list of HTTP response status codes to ignore, Example - 404,3XX.
+|variableNamePrefix|no|Prefix for the execution variable names.If prefix is not given, variables will be saved with name
+                       in following format. 'taskId'.'fieldName'. For example, requestUrl is saved as 'httpGet.requestUrl'
+|===============
+
+
+[[bpmnHTTPTaskExampleUsage]]
+
+
+===== Example usage
+
+The following XML snippet shows an example of using the HTTP Task.
+
+[source,xml,linenums]
+----
+<serviceTask id="httpGet" flowable:type="http">
+  <extensionElements>
+    <flowable:field name="requestMethod" stringValue="GET" />
+    <flowable:field name="requestUrl" stringValue="http://flowable.org" />
+    <flowable:field name="requestHeaders">
+      <flowable:expression>
+        <![CDATA[
+          Accept: text/html
+          Cache-Control: no-cache
+        ]]>
+      </flowable:expression>
+    </flowable:field>
+    <flowable:field name="requestTimeout">
+      <flowable:expression>
+        <![CDATA[
+          ${requestTimeout}
+        ]]>
+      </flowable:expression>
+    </flowable:field>
+    <flowable:field name="variableNamePrefix">
+      <flowable:string>httpGet</flowable:string>
+    </flowable:field>
+  </extensionElements>
+</serviceTask>
+
+----
+
+
 [[bpmnMuleTask]]
 
 
