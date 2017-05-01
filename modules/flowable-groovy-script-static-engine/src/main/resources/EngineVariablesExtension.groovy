@@ -5,13 +5,111 @@
  * @author Filip Grochowski
  * Created by fgroch on 09.03.17.
  */
-import static org.flowable.engine.impl.scripting.GroovyStaticScriptEngine.*
-//import org.flowable.engine.delegate.VariableScope
+import groovy.transform.CompileStatic
+import org.codehaus.groovy.ast.ClassCodeVisitorSupport
+import org.codehaus.groovy.ast.ClassHelper
+import org.codehaus.groovy.ast.ClassNode
+import org.codehaus.groovy.ast.MethodNode
+import org.codehaus.groovy.ast.Parameter
+import org.codehaus.groovy.ast.expr.PropertyExpression
+import org.codehaus.groovy.control.SourceUnit
+import org.codehaus.groovy.transform.sc.StaticCompilationMetadataKeys
+import org.codehaus.groovy.transform.stc.ExtensionMethodNode
+import org.codehaus.groovy.transform.stc.GroovyTypeCheckingExtensionSupport
+import org.codehaus.groovy.transform.stc.StaticTypeCheckingSupport
 
-def typesOfVariables = COMPILE_OPTIONS.get()[VAR_TYPES]
+import static org.flowable.engine.impl.scripting.GroovyStaticScriptEngine.*
+import org.flowable.engine.delegate.VariableScope
+
+/*def typesOfVariables = COMPILE_OPTIONS.get()[VAR_TYPES]
 
 unresolvedVariable { var ->
     if (typesOfVariables[var.name]) {
+        storeType(var, typesOfVariables[var.name])
         return makeDynamic(var, typesOfVariables[var.name])
     }
+}*/
+
+class EngineVariabeExtension extends GroovyTypeCheckingExtensionSupport.TypeCheckingDSL {
+
+    @CompileStatic
+    private static String prettyPrint(ClassNode node) {
+        node.isArray()?"${prettyPrint(node.componentType)}[]":node.toString(false)
+    }
+
+    @CompileStatic
+    private static String toMethodDescriptor(MethodNode node) {
+        if (node instanceof ExtensionMethodNode) {
+            return toMethodDescriptor(node.getExtensionMethodNode())
+        }
+        def sb = new StringBuilder()
+        sb.append(node.declaringClass.toString(false))
+        sb.append("#")
+        sb.append(node.name)
+        sb.append('(')
+        sb.append(node.parameters.collect { Parameter it ->
+            prettyPrint(it.originType)
+        }.join(','))
+        sb.append(')')
+        sb
+    }
+
+    @Override
+    Object run() {
+
+        // Fetch white list of regular expressions of authorized method calls
+        //def whiteList = COMPILE_OPTIONS.get()[WHITELIST_PATTERNS]
+        def typesOfVariables = COMPILE_OPTIONS.get()[VAR_TYPES]
+
+        /*onMethodSelection { expr, MethodNode methodNode ->
+            def descr = toMethodDescriptor(methodNode)
+        }*/
+
+        unresolvedVariable { var ->
+            if (isDynamic(var) && typesOfVariables[var.name]) {
+                storeType(var, typesOfVariables[var.name])
+                handled = true
+            }
+        }
+
+        // handling properties (like foo.text) is harder because the type checking extension
+        // does not provide a specific hook for this. Harder, but not impossible!
+
+        /*afterVisitMethod { methodNode ->
+            def visitor = new PropertyExpressionChecker(context.source)
+            visitor.visitMethod(methodNode)
+        }*/
+    }
+
+    /*private class PropertyExpressionChecker extends ClassCodeVisitorSupport {
+        private final SourceUnit unit
+        //private final List<String> whiteList
+
+        PropertyExpressionChecker(final SourceUnit unit, final List<String> whiteList) {
+            this.unit = unit
+            //this.whiteList = whiteList
+        }
+
+        PropertyExpressionChecker(final SourceUnit unit) {
+            this.unit = unit
+        }
+
+        @Override
+        protected SourceUnit getSourceUnit() {
+            unit
+        }
+
+        @Override
+        void visitPropertyExpression(final PropertyExpression expression) {
+            super.visitPropertyExpression(expression)
+
+            ClassNode owner = expression.objectExpression.getNodeMetaData(StaticCompilationMetadataKeys.PROPERTY_OWNER)
+            if (owner) {
+                if (expression.spreadSafe && StaticTypeCheckingSupport.implementsInterfaceOrIsSubclassOf(owner, classNodeFor(Collection))) {
+                    owner = typeCheckingVisitor.inferComponentType(owner, ClassHelper.int_TYPE)
+                }
+                def descr = "${prettyPrint(owner)}#${expression.propertyAsString}"
+            }
+        }
+    }*/
 }

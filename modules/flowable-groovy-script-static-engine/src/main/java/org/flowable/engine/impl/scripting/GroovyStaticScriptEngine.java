@@ -86,14 +86,21 @@ public class GroovyStaticScriptEngine extends GroovyScriptEngineImpl {
             Class c = ctxtLoader.loadClass(Script.class.getName());
             clazz = ctxtLoader.loadClass("org.flowable.engine.delegate.VariableScope");
 
-           //if(c == Script.class) {
-            if(c != null && c.getName() == Script.class.getName()) {
+           if(c == Script.class) {
+            //if(c != null && c.getName() == Script.class.getName()) {
                 System.out.println("---------------Returning ctxtLoader-----------------------------");
                 return ctxtLoader;
             }
         } catch (ClassNotFoundException var2) {
             System.out.println("---------------ClassNotFoundException in getParentLoader-----------------------------");
             var2.printStackTrace();
+        }
+        try {
+            ctxtLoader = Script.class.getClassLoader();
+            clazz = ctxtLoader.loadClass("org.flowable.engine.delegate.VariableScope");
+        } catch (ClassNotFoundException e) {
+            System.out.println("---------------ClassNotFoundException in second trye in getParentLoader-----------------------------");
+            e.printStackTrace();
         }
         return Script.class.getClassLoader();
     }
