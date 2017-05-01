@@ -31,7 +31,8 @@ var flowableModeler = angular.module('flowableModeler', [
   'ngFileUpload',
   'angularSpectrumColorpicker',
   'duScroll',
-  'dndLists'
+  'dndLists',
+  'ngHandsontable'
 ]);
 
 var flowableModule = flowableModeler;
@@ -110,6 +111,10 @@ flowableModeler
         .when('/decision-table-editor/:modelId', {
             templateUrl: appResourceRoot + 'views/decision-table-editor.html',
             controller: 'DecisionTableEditorController'
+        })
+        .when('/decision-table-editor-new/:modelId', {
+            templateUrl: appResourceRoot + 'views/decision-table-editor-new.html',
+            controller: 'DecisionTableEditorNewController'
         })
         .when('/app-editor/:modelId', {
             templateUrl: appResourceRoot + 'views/app-definition-builder.html',

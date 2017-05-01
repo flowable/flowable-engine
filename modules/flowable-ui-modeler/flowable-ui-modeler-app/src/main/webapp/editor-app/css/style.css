@@ -757,6 +757,21 @@ li.x-menu-list-item.x-menu-item-active a {
 	margin-right: -10px;
 }
 
+
+
+
+#decision-table-hot	{
+	width: 600px;
+	height: 400px;
+	overflow: hidden;
+}
+
+
+
+
+
+
+
 .ui-grid .ui-grid-render-container-body .ui-grid-viewport {
 	overflow-x: auto !important;
 }
