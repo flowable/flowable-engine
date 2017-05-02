@@ -48,6 +48,7 @@ public interface StencilConstants {
     final String STENCIL_TASK_USER = "UserTask";
     final String STENCIL_TASK_CAMEL = "CamelTask";
     final String STENCIL_TASK_MULE = "MuleTask";
+    final String STENCIL_TASK_HTTP = "HttpTask";
     final String STENCIL_TASK_SHELL = "ShellTask";
     final String STENCIL_TASK_DECISION = "DecisionTask";
 
@@ -248,4 +249,14 @@ public interface StencilConstants {
     final String PROPERTY_DECISIONTABLE_REFERENCE_ID = "decisiontablereferenceid";
     final String PROPERTY_DECISIONTABLE_REFERENCE_NAME = "decisiontablereferencename";
     final String PROPERTY_DECISIONTABLE_REFERENCE_KEY = "decisionTableReferenceKey";
+
+    final String PROPERTY_HTTPTASK_REQ_METHOD = "httptaskrequestmethod";
+    final String PROPERTY_HTTPTASK_REQ_URL = "httptaskrequesturl";
+    final String PROPERTY_HTTPTASK_REQ_HEADERS = "httptaskrequestheaders";
+    final String PROPERTY_HTTPTASK_REQ_BODY  = "httptaskrequestbody";
+    final String PROPERTY_HTTPTASK_REQ_TIMEOUT= "httptaskrequesttimeout";
+    final String PROPERTY_HTTPTASK_REQ_RETRY_LIMIT = "httptaskrequestretrylimit";
+    final String PROPERTY_HTTPTASK_REQ_RETRY_STATUS_CODES = "httptaskretrystatuscodes";
+    final String PROPERTY_HTTPTASK_REQ_IGNORE_STATUS_CODES = "httptaskignorestatuscodes";
+    final String PROPERTY_HTTPTASK_VARIABLE_NAME_PREFIX = "httptaskvariablenameprefix";
 }

@@ -221,6 +221,7 @@
     <simpleType>
       <restriction base="string">
         <enumeration value="camel"/>
+        <enumeration value="http"/>
         <enumeration value="mail"/>
         <enumeration value="mule"/>
         <enumeration value="shell"/>
