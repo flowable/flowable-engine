@@ -14,7 +14,6 @@ package org.flowable.engine.impl.bpmn.behavior;
 
 import java.util.Collection;
 
-import org.flowable.bpmn.model.CallActivity;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -146,13 +145,11 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
         }
 
         String deleteReason = DeleteReason.BOUNDARY_EVENT_INTERRUPTING + " (" + notToDeleteExecution.getCurrentActivityId() + ")";
-        if (parentExecution.getCurrentFlowElement() instanceof CallActivity) {
-            ExecutionEntity subProcessExecution = executionEntityManager.findSubProcessInstanceBySuperExecutionId(parentExecution.getId());
-            if (subProcessExecution != null) {
-                executionEntityManager.deleteProcessInstanceExecutionEntity(subProcessExecution.getId(),
-                        subProcessExecution.getCurrentActivityId(), deleteReason, true, true);
-            }
-        }
+        ExecutionEntity subProcessExecution = executionEntityManager.findSubProcessInstanceBySuperExecutionId(parentExecution.getId());
+        if (subProcessExecution != null) {
+            executionEntityManager.deleteProcessInstanceExecutionEntity(subProcessExecution.getId(),
+                    subProcessExecution.getCurrentActivityId(), deleteReason, true, true);
+        }   
 
         executionEntityManager.deleteExecutionAndRelatedData(parentExecution, deleteReason, false);
     }
