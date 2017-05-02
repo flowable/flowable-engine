@@ -3541,6 +3541,7 @@ The Flowable engine makes HTTP requests through a configurable HTTP Client. The 
     <property name="connectTimeout" value="5000"/>
     <property name="socketTimeout" value="5000"/>
     <property name="connectionRequestTimeout" value="5000"/>
+    <property name="requestRetryLimit" value="5"/>
   </bean>
 ----
 
@@ -3550,6 +3551,7 @@ The Flowable engine makes HTTP requests through a configurable HTTP Client. The 
 |connectTimeout|no|Connection timeout in milliseconds. By default set to 5000.
 |socketTimeout|no|Socket timeout in milliseconds. By default set to 5000.
 |connectionRequestTimeout|no|Connection request timeout in milliseconds. By default set to 5000.
+|requestRetryLimit|no|Request retry limit (Example - 5, '0' means do not retry).By default set to 3.
 
 |===============
 
@@ -3593,7 +3595,6 @@ The HTTP task is configured by <<serviceTaskFieldInjection,field injection>>. Al
                   Authorization: Basic aGFRlc3Q=
 |requestBody|no|Request body (Example - ${sampleBody}).
 |requestTimeout|no|Timeout in milliseconds for the request (Example - 5000).
-|requestRetryLimit|no|Request retry limit (Example - 10).
 |retryStatusCodes|no|Comma separated list of HTTP response status codes to retry, Example - 400,5XX.
 |ignoreStatusCodes|no|Comma separated list of HTTP response status codes to ignore, Example - 404,3XX.
 |variableNamePrefix|no|Prefix for the execution variable names.If prefix is not given, variables will be saved with name
