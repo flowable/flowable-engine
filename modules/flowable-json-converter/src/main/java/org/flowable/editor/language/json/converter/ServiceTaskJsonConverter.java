@@ -93,7 +93,6 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
             setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_HEADERS, "requestHeaders", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_BODY, "requestBody", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_TIMEOUT, "requestTimeout", serviceTask, propertiesNode);
-            setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_RETRY_LIMIT, "requestRetryLimit", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_RETRY_STATUS_CODES, "retryStatusCodes", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_IGNORE_STATUS_CODES, "ignoreStatusCodes", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_VARIABLE_NAME_PREFIX, "variableNamePrefix", serviceTask, propertiesNode);
