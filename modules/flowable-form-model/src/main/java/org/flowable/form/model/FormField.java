@@ -41,6 +41,8 @@ public class FormField implements Serializable {
     protected boolean readOnly;
     protected boolean overrideId;
     protected String placeholder;
+    protected String minLength;
+    protected String maxLength;
     protected Map<String, Object> params;
 
     protected LayoutDefinition layout;
@@ -115,6 +117,22 @@ public class FormField implements Serializable {
 
     public void setLayout(LayoutDefinition layout) {
         this.layout = layout;
+    }
+    
+    public String getMinLength() {
+        return minLength;
+    }
+
+    public void setMinLength(String minLength) {
+        this.minLength = minLength;
+    }
+    
+    public String getMaxLength() {
+        return maxLength;
+    }
+
+    public void setMaxLength(String maxLength) {
+        this.maxLength = maxLength;
     }
 
     @JsonInclude(Include.NON_EMPTY)
