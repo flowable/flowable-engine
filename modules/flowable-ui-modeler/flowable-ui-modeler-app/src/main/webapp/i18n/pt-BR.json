@@ -421,7 +421,8 @@
     "TABS":{
       "GENERAL":"Geral",
       "OPTIONS":"Opções",
-      "UPLOAD-OPTIONS":"Opções de carregamento"
+      "UPLOAD-OPTIONS":"Opções de carregamento",
+      "ADVANCED-OPTIONS":"Avançado"
     },
     "VERSION":"Versão {{version}}",
     "LAST-UPDATED":"Última atualização feita por {{lastUpdatedBy}}, {{lastUpdated | dateformat}}",
@@ -454,7 +455,9 @@
       "READONLY":"Somente leitura",
       "EXPRESSION":"Expressão",
       "ADD-OPTION":"+ Adicionar uma nova opção",
-      "UPLOAD-ALLOW-MULTIPLE":"Permitir o upload de vários arquivos"
+      "UPLOAD-ALLOW-MULTIPLE":"Permitir o upload de vários arquivos",
+      "MAX-LENGTH":"Comprimento máximo:",
+      "MIN-LENGTH":"Comprimento mínimo:"
     },
     "OUTCOMES":{
       "DESCRIPTION":"Você pode definir várias saídas para esta tarefa. Quando concluir uma tarefa, os usuários seleciona uma das saídas disponíveis, que podem ser usados em, por exemplo, em uma condição futura no processo.",
