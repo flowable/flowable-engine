@@ -3531,12 +3531,13 @@ The Flowable engine makes HTTP requests through a configurable HTTP Client. The 
 
 [source,xml,linenums]
 ----
-  <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+  <bean id="processEngineConfiguration"
+        class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
     <!-- http client configurations -->
-    <property name="HTTPClientConfig" ref="HTTPClientConfig"/>
+    <property name="httpClientConfig" ref="httpClientConfig"/>
   </bean>
 
-  <bean id="HTTPClientConfig" class="org.flowable.engine.cfg.HTTPClientConfig">
+  <bean id="httpClientConfig" class="org.flowable.engine.cfg.HttpClientConfig">
     <property name="connectTimeout" value="5000"/>
     <property name="socketTimeout" value="5000"/>
     <property name="connectionRequestTimeout" value="5000"/>
@@ -3564,16 +3565,16 @@ The HTTP task is implemented as a dedicated <<bpmnJavaServiceTask,Service Task>>
 <serviceTask id="httpGet" flowable:type="http">
 ----
 Also its possible to override default HTTP Task behavior by providing custom implementation.
-Custom implemention should extend org.flowable.http.HTTPActivityBehavior and override perform() method.
+Custom implemention should extend org.flowable.http.HttpActivityBehavior and override perform() method.
 Field 'httpActivityBehaviorClass' should be set in the task definition.
-Default value for this field is 'org.flowable.http.impl.HTTPActivityBehaviorDefaultImpl'.
-Currently 'HTTPActivityBehaviorDefaultImpl' is based on Apache HTTP Client.
+Default value for this field is 'org.flowable.http.impl.HttpActivityBehaviorDefaultImpl'.
+Currently 'HttpActivityBehaviorDefaultImpl' is based on Apache HTTP Client.
 ----
 <serviceTask id="httpGet" flowable:type="http">
   <extensionElements>
     <flowable:field name="httpActivityBehaviorClass">
         <flowable:string>
-          <![CDATA[org.example.flowable.HTTPActivityBehaviorCustomImpl]]>
+          <![CDATA[org.example.flowable.HttpActivityBehaviorCustomImpl]]>
         </flowable:string>
     </flowable:field>
   </extensionElements>
@@ -3597,6 +3598,7 @@ The HTTP task is configured by <<serviceTaskFieldInjection,field injection>>. Al
 |ignoreStatusCodes|no|Comma separated list of HTTP response status codes to ignore, Example - 404,3XX.
 |variableNamePrefix|no|Prefix for the execution variable names.If prefix is not given, variables will be saved with name
                        in following format. 'taskId'.'fieldName'. For example, requestUrl is saved as 'httpGet.requestUrl'
+|httpActivityBehaviorClass|no|Full class name of custom extension  of org.flowable.http.HttpActivityBehavior.
 |===============
 
 In addition to the provided fields, following will be set as execution variables on successful execution.
