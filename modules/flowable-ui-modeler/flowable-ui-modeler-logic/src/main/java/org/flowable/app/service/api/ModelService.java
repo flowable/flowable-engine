@@ -25,6 +25,8 @@ import org.flowable.app.model.editor.ReviveModelResultRepresentation;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.idm.api.User;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public interface ModelService {
 
     Model getModel(String modelId);
@@ -40,6 +42,8 @@ public interface ModelService {
     Long getModelCountForUser(User user, int modelTypeApp);
 
     BpmnModel getBpmnModel(AbstractModel model);
+    
+    BpmnModel convertToBpmnModelForValidation(JsonNode jsonNode);
 
     byte[] getBpmnXML(BpmnModel bpmnMode);
 

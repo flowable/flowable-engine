@@ -15,10 +15,12 @@ package org.flowable.app.rest.editor;
 import java.util.List;
 
 import org.activiti.editor.language.json.converter.RDSBpmnJsonConverter;
+import org.flowable.app.service.api.ModelService;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
 import org.flowable.validation.ValidationError;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,10 +36,12 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 @RestController
 public class ModelValidationRestResource {
+    @Autowired
+    ModelService modelService;
 
     @RequestMapping(value = "/rest/model/validate",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
     public List<ValidationError> validate(@RequestBody JsonNode body){
-        BpmnModel bpmnModel = new RDSBpmnJsonConverter().convertToBpmnModel(body);
+        BpmnModel bpmnModel = this.modelService.convertToBpmnModelForValidation(body);
         ProcessValidator validator = new ProcessValidatorFactory().createDefaultProcessValidator();
         List<ValidationError> errors = validator.validate(bpmnModel);
         return errors;
