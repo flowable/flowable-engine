@@ -63,15 +63,22 @@ angular.module('flowableModeler')
             ];
 
             $rootScope.decisionTableChanges = false;
-            
-            var hitPolicies = ['FIRST','ANY'];
-            $scope.hitPolicies = [];
-            hitPolicies.forEach(function(id){
-                $scope.hitPolicies.push({
-                    id: id,
-                    label: 'DECISION-TABLE.HIT-POLICIES.' + id
+
+            var hitPolicies = ['UNIQUE', 'FIRST', 'PRIORITY', 'ANY', 'RULE ORDER', 'OUTPUT ORDER', 'COLLECT'];
+
+            var initHitPolicies = function () {
+                $scope.hitPolicies = [];
+
+                hitPolicies.forEach(function (id) {
+                    $scope.hitPolicies.push({
+                        id: id,
+                        label: 'DECISION-TABLE.HIT-POLICIES.' + id
+                    });
                 });
-            });
+            };
+
+            initHitPolicies();
+
 
             $rootScope.currentDecisionTableRules = [];
 
@@ -144,7 +151,7 @@ angular.module('flowableModeler')
                 $scope.model.selectedColumn = column;
                 var editTemplate = 'views/popup/decision-table-edit-output-expression.html';
 
-                $scope.currentDecisionTable.outputExpressions.forEach(function(outputExpression) {
+                $scope.currentDecisionTable.outputExpressions.forEach(function (outputExpression) {
                     if (outputExpression.id === column.name) {
                         $scope.model.selectedExpression = outputExpression;
                     }
@@ -158,13 +165,14 @@ angular.module('flowableModeler')
 
             $scope.addInputExpression = function (inputExpression, insertPos) {
 
-                if (!$scope.currentDecisionTable.inputExpressions) {
-                    $scope.currentDecisionTable.inputExpressions = [];
-                }
-
+                // add column def
                 var newInputExpression;
                 if (!inputExpression) {
-                    newInputExpression = {id: _generateColumnId()};
+                    newInputExpression = {
+                        id: _generateColumnId(),
+                        label: 'new input',
+                        expressionType: 'input'
+                    };
                 } else {
                     newInputExpression = {
                         id: _generateColumnId(),
@@ -172,40 +180,81 @@ angular.module('flowableModeler')
                         variableId: inputExpression.variableId,
                         type: inputExpression.type,
                         variableType: inputExpression.variableType,
-                        newVariable : inputExpression.newVariable
+                        newVariable: inputExpression.newVariable
                     };
                 }
 
-                // if no rules present add one
-                if ($rootScope.currentDecisionTableRules.length === 0) {
-                    $scope.addRule();
-                }
+                console.log('before');
+                console.log($rootScope.currentDecisionTable);
 
-                // add props to rule data
-                $rootScope.currentDecisionTableRules.forEach(function (rowObject) {
-                    rowObject[newInputExpression.id] = "";
-                });
-
-                // insert expression at position or just add
-                if (insertPos !== undefined && insertPos !== -1) {
-                    $scope.currentDecisionTable.inputExpressions.splice(insertPos, 0, newInputExpression);
-                } else {
-                    $scope.currentDecisionTable.inputExpressions.push(newInputExpression);
-                }
-
-                $scope.model.columnVariableIdMap[newInputExpression.id] = newInputExpression.variableId;
+                $scope.currentDecisionTable.inputExpressions.push(newInputExpression);
 
                 // update column definitions off the source model
                 $scope.getColumnDefinitions($scope.currentDecisionTable);
 
-                // refresh grid
-                // $scope.gridApi.core.notifyDataChange(uiGridConstants.dataChange.COLUMN);
+                // update hot
+                console.log('inserting at pos: '+$scope.currentDecisionTable.inputExpressions.length);
+                hot.alter('insert_col', $scope.currentDecisionTable.inputExpressions.length - 1);
+
+
+                console.log('after');
+                console.log($rootScope.currentDecisionTable);
+
                 if (hot) {
                     hot.render();
                 }
+                //
+                //
+                // if (!$scope.currentDecisionTable.inputExpressions) {
+                //     $scope.currentDecisionTable.inputExpressions = [];
+                // }
+                //
+                //
+                //
+                // var newInputExpression;
+                // if (!inputExpression) {
+                //     newInputExpression = {id: _generateColumnId()};
+                // } else {
+                //     newInputExpression = {
+                //         id: _generateColumnId(),
+                //         label: inputExpression.label,
+                //         variableId: inputExpression.variableId,
+                //         type: inputExpression.type,
+                //         variableType: inputExpression.variableType,
+                //         newVariable: inputExpression.newVariable
+                //     };
+                // }
+                //
+                // // if no rules present add one
+                // if ($rootScope.currentDecisionTableRules.length === 0) {
+                //     $scope.addRule();
+                // }
+                //
+                // // add props to rule data
+                // $rootScope.currentDecisionTableRules.forEach(function (rowObject) {
+                //     rowObject[newInputExpression.id] = "";
+                // });
+                //
+                // // insert expression at position or just add
+                // if (insertPos !== undefined && insertPos !== -1) {
+                //     $scope.currentDecisionTable.inputExpressions.splice(insertPos, 0, newInputExpression);
+                // } else {
+                //     $scope.currentDecisionTable.inputExpressions.push(newInputExpression);
+                // }
+                //
+                // $scope.model.columnVariableIdMap[newInputExpression.id] = newInputExpression.variableId;
+                //
+                // // update column definitions off the source model
+                // $scope.getColumnDefinitions($scope.currentDecisionTable);
+                //
+                // // refresh grid
+                // // $scope.gridApi.core.notifyDataChange(uiGridConstants.dataChange.COLUMN);
+                // if (hot) {
+                //     hot.render();
+                // }
             };
 
-            $scope.enableRemoveInputExpression = function(){
+            $scope.enableRemoveInputExpression = function () {
                 return $scope.currentDecisionTable && $scope.currentDecisionTable.inputExpressions && $scope.currentDecisionTable.inputExpressions.length > 1;
             };
 
@@ -231,7 +280,7 @@ angular.module('flowableModeler')
                         expressionPos = i;
                         break;
                     }
-                    
+
                 }
 
                 // set updated column definitions
@@ -250,12 +299,41 @@ angular.module('flowableModeler')
                 $scope.addInputExpression(newInputExpression, deletedColumnIndex);
             };
 
-            $scope.addOutputExpression = function (outputExpression, insertPos) {
+            $scope.addOutputExpression = function (outputExpression, insertPos, skipExecuteAlter) {
 
-                hot.alter('insert_col', 2);
+                // add column def
+                var newOutputExpression;
+                if (!outputExpression) {
+                    newOutputExpression = {
+                        id: _generateColumnId(),
+                        label: 'new',
+                        expressionType: 'output'
+                    };
+                } else {
+                    newOutputExpression = {
+                        id: _generateColumnId(),
+                        label: outputExpression.label,
+                        variableId: outputExpression.variableId,
+                        type: outputExpression.type,
+                        variableType: outputExpression.variableType,
+                        newVariable: outputExpression.newVariable
+                    };
+                }
 
                 console.log('before');
-                console.log($rootScope.currentDecisionTableRules);
+                console.log($rootScope.currentDecisionTable);
+
+                $scope.currentDecisionTable.outputExpressions.push(newOutputExpression);
+
+                // update column definitions off the source model
+                $scope.getColumnDefinitions($scope.currentDecisionTable);
+
+                // update hot
+                console.log('execute alter');
+
+                hot.alter('insert_col', $scope.currentDecisionTable.inputExpressions.length + $scope.currentDecisionTable.outputExpressions.length);
+
+
 
                 // if (!$scope.currentDecisionTable.outputExpressions) {
                 //     $scope.currentDecisionTable.outputExpressions = [];
@@ -300,14 +378,14 @@ angular.module('flowableModeler')
                 // // $scope.gridApi.core.notifyDataChange(uiGridConstants.dataChange.COLUMN);
 
                 console.log('after');
-                console.log($rootScope.currentDecisionTableRules);
+                console.log($rootScope.currentDecisionTable);
 
                 if (hot) {
                     hot.render();
                 }
             };
 
-            $scope.enableRemoveOutputExpression = function(){
+            $scope.enableRemoveOutputExpression = function () {
                 return $scope.currentDecisionTable && $scope.currentDecisionTable.outputExpressions && $scope.currentDecisionTable.outputExpressions.length > 1;
             };
 
@@ -364,7 +442,7 @@ angular.module('flowableModeler')
                     return;
                 }
 
-                var index =  $rootScope.currentDecisionTableRules.indexOf($scope.model.selectedRule);
+                var index = $rootScope.currentDecisionTableRules.indexOf($scope.model.selectedRule);
                 if (index > -1) {
                     $rootScope.currentDecisionTableRules.splice(index, 1);
                 }
@@ -377,7 +455,7 @@ angular.module('flowableModeler')
             };
 
             $scope.moveRuleUpwards = function () {
-                var index =  $rootScope.currentDecisionTableRules.indexOf($scope.model.selectedRule);
+                var index = $rootScope.currentDecisionTableRules.indexOf($scope.model.selectedRule);
                 if (index > -1) {
                     var row = $rootScope.currentDecisionTableRules[index];
                     $rootScope.currentDecisionTableRules.splice(index, 1);
@@ -390,7 +468,7 @@ angular.module('flowableModeler')
             };
 
             $scope.moveRuleDownwards = function () {
-                var index =  $rootScope.currentDecisionTableRules.indexOf($scope.model.selectedRule);
+                var index = $rootScope.currentDecisionTableRules.indexOf($scope.model.selectedRule);
                 if (index > -1) {
                     var row = $rootScope.currentDecisionTableRules[index];
                     $rootScope.currentDecisionTableRules.splice(index, 1);
@@ -415,14 +493,14 @@ angular.module('flowableModeler')
 
             var _loadDecisionTableDefinition = function (modelId) {
 
-                DecisionTableService.fetchDecisionTableDetails(modelId).then( function (decisionTable) {
+                DecisionTableService.fetchDecisionTableDetails(modelId).then(function (decisionTable) {
 
                     $rootScope.currentDecisionTable = decisionTable.decisionTableDefinition;
                     $rootScope.currentDecisionTable.id = decisionTable.id;
                     $rootScope.currentDecisionTable.key = decisionTable.decisionTableDefinition.key;
                     $rootScope.currentDecisionTable.name = decisionTable.name;
                     $rootScope.currentDecisionTable.description = decisionTable.description;
-                    
+
                     // decision table model to used in save dialog
                     $rootScope.currentDecisionTableModel = {
                         id: decisionTable.id,
@@ -448,15 +526,12 @@ angular.module('flowableModeler')
 
             var _initializeDecisionTableGrid = function (decisionTable) {
 
-                // initialize ui grid model
+                // initialize hot model
                 if (decisionTable.rules && decisionTable.rules.length > 0) {
-                    // Array.prototype.push.apply($rootScope.currentDecisionTableRules, decisionTable.rules);
-
-                    decisionTable.rules.forEach( function(rule) {
+                    decisionTable.rules.forEach(function (rule) {
                         $rootScope.currentDecisionTableRules.push(Object.values(rule));
                     });
                 }
-
 
 
                 // if no input condition present; add one
@@ -481,7 +556,7 @@ angular.module('flowableModeler')
                 // if no output conclusion present; add one
                 if (!decisionTable.outputExpressions || decisionTable.outputExpressions.length === 0) {
                     $scope.addOutputExpression();
-                    
+
                 } else {
                     // initialize map
                     // decisionTable.outputExpressions.forEach( function (outputExpression) {
@@ -499,35 +574,43 @@ angular.module('flowableModeler')
                 }
 
                 // get column definitions
-                $scope.getColumnDefinitions($scope.currentDecisionTableRules);
+                $scope.getColumnDefinitions(decisionTable);
 
                 // console.log($rootScope.currentDecisionTableRules);
-                console.log($scope.currentDecisionTable.rules)
+                console.log(decisionTable);
+                console.log($scope.currentDecisionTableRules);
+
+                console.log($scope.model.columnDefs);
 
                 // HOT
-                var isChecked;
                 var container = document.getElementById('decision-table-hot');
                 hot = Handsontable(container, {
                     data: $scope.currentDecisionTableRules,
                     allowInsertColumn: true,
                     rowHeaders: true,
                     contextMenu: ['col_left', 'col_right', 'row_above', 'row_below', 'remove_row'],
-                    colHeaders: function (col) {
+                    colHeaders: function (colIndex) {
                         var txt;
 
-                        switch (col) {
-                            case 0:
-                                return '<b>Bold</b> and <em>Beautiful</em>';
-
-                            case 1:
-                                txt = "Some <input type='checkbox' class='checker' ";
-                                txt += isChecked ? 'checked="checked"' : '';
-                                txt += "> checkbox";
-
-                                return txt;
+                        if ($scope.model.columnDefs[colIndex]) {
+                            txt = '<span class="' + $scope.model.columnDefs[colIndex].expressionType + '">';
+                            txt += $scope.model.columnDefs[colIndex].displayName;
+                            txt += '</span>';
+                        } else {
+                            txt = 'new';
                         }
+                        return txt;
                     }
                 });
+
+                var beforCreateColCallback = function(event) {
+                  console.log('CALL BACK TRIGGERED');
+                  console.log(event);
+
+                  $scope.addOutputExpression()
+                };
+
+                // Handsontable.hooks.add('beforeCreateCol', beforCreateColCallback, hot);
 
                 // function customRenderer(instance, td) {
                 //     Handsontable.renderers.TextRenderer.apply(this, arguments);
@@ -579,20 +662,21 @@ angular.module('flowableModeler')
                             field: inputExpression.id,
                             type: 'string',
                             headerCellClass: 'header-expression header-input-expression',
-                            headerCellTemplate: _getHeaderInputExpressionCellTemplate(),
+                            // headerCellTemplate: _getHeaderInputExpressionCellTemplate(),
                             cellClass: 'cell-expression cell-input-expression',
-                            cellTemplate: _getCellTemplate(inputExpression.type),
+                            // cellTemplate: _getCellTemplate(inputExpression.type),
                             enableHiding: false,
                             enableCellEditOnFocus: false,
                             minWidth: MIN_COLUMN_WIDTH,
-                            cellEditableCondition: function($scope){
+                            cellEditableCondition: function ($scope) {
                                 // check if column has been mapped to variable
                                 if ($scope.grid.appScope.model.columnVariableIdMap[inputExpression.id]) {
                                     return true;
                                 } else {
                                     return false;
                                 }
-                            }
+                            },
+                            expressionType: 'input'
                         });
 
                         expressionCounter++;
@@ -609,21 +693,22 @@ angular.module('flowableModeler')
                             displayName: outputExpression.label ? outputExpression.label : "",
                             field: outputExpression.id,
                             type: 'string',
-                            headerCellTemplate: _getHeaderOutputExpressionCellTemplate(),
+                            // headerCellTemplate: _getHeaderOutputExpressionCellTemplate(),
                             headerCellClass: 'header-expression header-output-expression',
                             cellClass: 'cell-expression cell-output-expression',
-                            cellTemplate: _getCellTemplate(outputExpression.type),
+                            // cellTemplate: _getCellTemplate(outputExpression.type),
                             enableHiding: false,
                             enableCellEditOnFocus: false,
                             minWidth: MIN_COLUMN_WIDTH,
-                            cellEditableCondition: function($scope){
+                            cellEditableCondition: function ($scope) {
                                 // check if column has been mapped to variable
                                 if ($scope.grid.appScope.model.columnVariableIdMap[outputExpression.id]) {
                                     return true;
                                 } else {
                                     return false;
                                 }
-                            }
+                            },
+                            expressionType: 'output'
                         });
 
                         expressionCounter++;
@@ -641,7 +726,7 @@ angular.module('flowableModeler')
             // fetch table from service and populate model
             _loadDecisionTableDefinition($routeParams.modelId);
 
-            $scope.changeDetector = function(){
+            $scope.changeDetector = function () {
                 $rootScope.decisionTableChanges = true;
             };
             $rootScope.$watch('currentDecisionTable', $scope.changeDetector, true);
@@ -737,15 +822,15 @@ angular.module('flowableModeler')
         var newVariableTypeCopy = angular.copy($scope.model.selectedExpressionNewVariableType);
 
         // Cancel button handler
-        $scope.cancel = function() {
+        $scope.cancel = function () {
             $scope.close();
         };
 
         // Saving the edited input
-        $scope.save = function() {
+        $scope.save = function () {
             $scope.model.selectedExpression.variableId = $scope.popup.selectedExpressionNewVariableId;
             $scope.model.selectedExpression.type = $scope.popup.selectedExpressionNewVariableType;
-            
+
             $scope.model.selectedExpression.newVariable = $scope.popup.selectedExpressionNewVariable;
             $scope.model.selectedExpression.label = $scope.popup.selectedExpressionLabel;
 
