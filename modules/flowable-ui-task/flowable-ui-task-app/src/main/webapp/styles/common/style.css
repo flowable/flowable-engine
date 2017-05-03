@@ -1736,7 +1736,7 @@ h3+div > .dropzone {
 
 .people-select {
     overflow: auto;
-    max-width: 300px;
+    max-width: 100%;
 }
 
 .popover .people-select {
