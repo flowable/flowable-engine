@@ -757,19 +757,19 @@ li.x-menu-list-item.x-menu-item-active a {
 	margin-right: -10px;
 }
 
-
-
-
 #decision-table-hot	{
-	width: 600px;
-	height: 400px;
+	width: 100%;
+	height: 500px;
 	overflow: hidden;
 }
 
+#decision-table-hot .column-header {
 
+}
 
-
-
+#decision-table-hot .column-header.label {
+	font-size: 14px;
+}
 
 
 .ui-grid .ui-grid-render-container-body .ui-grid-viewport {

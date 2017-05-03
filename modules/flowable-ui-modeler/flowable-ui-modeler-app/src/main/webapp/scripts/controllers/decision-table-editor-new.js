@@ -34,37 +34,13 @@ angular.module('flowableModeler')
 
             var hot;
 
-            $scope.db = {};
-            $scope.db.items = [
-                {
-                    "id": 1,
-                    "name": {
-                        "first": "John",
-                        "last": "Schmidt"
-                    },
-                    "address": "45024 France",
-                    "price": 760.41,
-                    "isActive": "Yes",
-                    "product": {
-                        "description": "Fried Potatoes",
-                        "options": [
-                            {
-                                "description": "Fried Potatoes",
-                                "image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/fries.png"
-                            },
-                            {
-                                "description": "Fried Onions",
-                                "image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/fries.png"
-                            }
-                        ]
-                    }
-                },
-                //more items go here
-            ];
+            $scope.alert = function() {
+                console.log('!!!ALERT!!!');
+            };
 
             $rootScope.decisionTableChanges = false;
 
-            var hitPolicies = ['UNIQUE', 'FIRST', 'PRIORITY', 'ANY', 'RULE ORDER', 'OUTPUT ORDER', 'COLLECT'];
+            var hitPolicies = ['UNIQUE', 'FIRST', 'PRIORITY', 'ANY', 'RULE_ORDER', 'OUTPUT_ORDER', 'COLLECT'];
 
             var initHitPolicies = function () {
                 $scope.hitPolicies = [];
@@ -582,25 +558,29 @@ angular.module('flowableModeler')
 
                 console.log($scope.model.columnDefs);
 
+                var createColHeaders = function(colIndex) {
+                    var txt;
+                    if ($scope.model.columnDefs[colIndex]) {
+                        txt = '<span class="column-header label ' + $scope.model.columnDefs[colIndex].expressionType + '" ng-click="alert();">';
+                        txt += $scope.model.columnDefs[colIndex].variableId;
+                        txt += '</span>';
+                    } else {
+                        txt = 'new';
+                    }
+                    return txt;
+                };
+
                 // HOT
                 var container = document.getElementById('decision-table-hot');
                 hot = Handsontable(container, {
                     data: $scope.currentDecisionTableRules,
                     allowInsertColumn: true,
                     rowHeaders: true,
-                    contextMenu: ['col_left', 'col_right', 'row_above', 'row_below', 'remove_row'],
+                    // contextMenu: ['col_left', 'col_right', 'row_above', 'row_below', 'remove_row'],
                     colHeaders: function (colIndex) {
-                        var txt;
-
-                        if ($scope.model.columnDefs[colIndex]) {
-                            txt = '<span class="' + $scope.model.columnDefs[colIndex].expressionType + '">';
-                            txt += $scope.model.columnDefs[colIndex].displayName;
-                            txt += '</span>';
-                        } else {
-                            txt = 'new';
-                        }
-                        return txt;
-                    }
+                        return createColHeaders(colIndex);
+                    },
+                    stretchH: 'all'
                 });
 
                 var beforCreateColCallback = function(event) {
@@ -676,7 +656,8 @@ angular.module('flowableModeler')
                                     return false;
                                 }
                             },
-                            expressionType: 'input'
+                            expressionType: 'input',
+                            variableId: inputExpression.variableId
                         });
 
                         expressionCounter++;
@@ -708,7 +689,8 @@ angular.module('flowableModeler')
                                     return false;
                                 }
                             },
-                            expressionType: 'output'
+                            expressionType: 'output',
+                            variableId: outputExpression.variableId
                         });
 
                         expressionCounter++;

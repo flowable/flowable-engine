@@ -311,8 +311,13 @@
             "CREATED-BY": "Created by {{createdBy}}"
         },
         "HIT-POLICIES": {
-            "FIRST": "First (Single pass)",
-            "ANY": "Any (Single pass)"
+            "FIRST": "First",
+            "ANY": "Any",
+            "UNIQUE": "Unique",
+            "PRIORITY": "Priority",
+            "RULE_ORDER": "Rule Order",
+            "OUTPUT_ORDER": "Output Order",
+            "COLLECT": "Collect"
         },
         "POPUP": {
             "CREATE-TITLE": "Create a new decision table",
