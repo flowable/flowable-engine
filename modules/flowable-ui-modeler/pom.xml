@@ -23,7 +23,7 @@
 		<!-- Web container version -->
 		<tomcat.version>7.0.53</tomcat.version>
 
-        <system.builder.version>1.0.0</system.builder.version>
+        <system-builder.version>1.0.0</system-builder.version>
         <flowable.version>6.0.0</flowable.version>
   </properties>
 
@@ -43,12 +43,12 @@
         <dependency>
             <groupId>au.com.rds.sb</groupId>
             <artifactId>workflow-builder</artifactId>
-            <version>${system.builder.version}</version>
+            <version>${system-builder.version}</version>
         </dependency>
         <dependency>
           <groupId>au.com.rds.sb</groupId>
           <artifactId>schemaform-builder-web-resources</artifactId>
-          <version>${system.builder.version}</version>
+          <version>${system-builder.version}</version>
         </dependency>
         <dependency>
             <groupId>au.com.rds.sb</groupId>
