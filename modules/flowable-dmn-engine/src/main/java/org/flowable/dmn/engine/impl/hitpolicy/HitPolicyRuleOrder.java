@@ -12,36 +12,16 @@
  */
 package org.flowable.dmn.engine.impl.hitpolicy;
 
-import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
 import org.flowable.dmn.model.HitPolicy;
-import org.flowable.engine.common.api.FlowableException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Yvo Swillens
  */
-public class HitPolicyRuleOrder extends AbstractHitPolicy {
+public class HitPolicyRuleOrder extends AbstractHitPolicy implements ComposeDecisionResultBehavior {
 
     @Override
     public String getHitPolicyName() {
         return HitPolicy.RULE_ORDER.getValue();
     }
 
-    @Override
-    public void composeOutput(String outputVariableId, Object executionVariable, MvelExecutionContext executionContext) {
-        Object resultVariable = executionContext.getResultVariables().get(outputVariableId);
-        if (resultVariable == null) {
-            resultVariable = new ArrayList<>();
-        }
-        if (resultVariable instanceof List) {
-            ((List) resultVariable).add(executionVariable);
-
-            // add result variable
-            executionContext.getResultVariables().put(outputVariableId, resultVariable);
-        } else {
-            throw new FlowableException("HitPolicy RULE ORDER has wrong output variable type");
-        }
-    }
 }

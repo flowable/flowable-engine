@@ -12,7 +12,9 @@
  */
 package org.flowable.dmn.engine.impl.mvel;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.api.FlowableException;
@@ -71,5 +73,18 @@ public class ExecutionVariableFactory {
         }
 
         return executionVariable;
+    }
+
+    public static List<Object> getExecutionVariables(String type, List<Object> expressionResults) {
+        if (type == null || expressionResults == null) {
+            return null;
+        }
+
+        List<Object> executionVariables = new ArrayList<>();
+        for (Object expressionResult : expressionResults) {
+            executionVariables.add(getExecutionVariable(type, expressionResult));
+        }
+
+        return executionVariables;
     }
 }

@@ -4,12 +4,10 @@
     <startEvent id="start" />
     <parallelGateway id="fork" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="fork"/>
-    <userTask id="preTask" />
-    <sequenceFlow id="flow5" sourceRef="fork" targetRef="preTask" />
     <endEvent id="terminateEndEvent">
       <terminateEventDefinition id="TerminateEventDefinition_1" flowable:terminateAll="true"/>
     </endEvent>
-    <sequenceFlow id="flow2" sourceRef="preTask" targetRef="terminateEndEvent" />
+    <sequenceFlow id="flow2" sourceRef="fork" targetRef="terminateEndEvent" />
     <userTask id="task" name="Task" />
     <sequenceFlow id="flow3" sourceRef="fork" targetRef="task"/>
     <endEvent id="end" />

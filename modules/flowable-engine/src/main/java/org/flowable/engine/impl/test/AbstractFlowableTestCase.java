@@ -111,9 +111,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     @Override
     public void runBare() throws Throwable {
         initializeProcessEngine();
-        if (repositoryService == null) {
-            initializeServices();
-        }
+        initializeServices();
 
         try {
 

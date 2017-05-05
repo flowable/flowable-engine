@@ -12,6 +12,8 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
@@ -45,11 +47,12 @@ public class JobClientResource extends AbstractClientResource {
      * GET /rest/admin/jobs/{jobId} -> return job data
      */
     @RequestMapping(value = "/rest/admin/jobs/{jobId}", method = RequestMethod.GET, produces = "application/json")
-    public JsonNode getJob(@PathVariable String jobId) throws BadRequestException {
+    public JsonNode getJob(@PathVariable String jobId, HttpServletRequest request) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        String jobType = request.getParameter("jobType");
         try {
-            return clientService.getJob(serverConfig, jobId);
+            return clientService.getJob(serverConfig, jobId, jobType);
         } catch (FlowableServiceException e) {
             logger.error("Error getting job {}", jobId, e);
             throw new BadRequestException(e.getMessage());
@@ -61,11 +64,12 @@ public class JobClientResource extends AbstractClientResource {
      */
     @RequestMapping(value = "/rest/admin/jobs/{jobId}", method = RequestMethod.DELETE, produces = "application/json")
     @ResponseStatus(value = HttpStatus.OK)
-    public void deleteJob(@PathVariable String jobId) throws BadRequestException {
+    public void deleteJob(@PathVariable String jobId, HttpServletRequest request) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        String jobType = request.getParameter("jobType");
         try {
-            clientService.deleteJob(serverConfig, jobId);
+            clientService.deleteJob(serverConfig, jobId, jobType);
         } catch (FlowableServiceException e) {
             logger.error("Error deleting job {}", jobId, e);
             throw new BadRequestException(e.getMessage());
@@ -87,16 +91,34 @@ public class JobClientResource extends AbstractClientResource {
             throw new BadRequestException(e.getMessage());
         }
     }
+    
+    /**
+     * POST /rest/admin/move-jobs/{jobId} -> move job
+     */
+    @RequestMapping(value = "/rest/admin/move-jobs/{jobId}", method = RequestMethod.POST, produces = "application/json")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void moveJob(@PathVariable String jobId, HttpServletRequest request) throws BadRequestException {
+
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        String jobType = request.getParameter("jobType");
+        try {
+            clientService.moveJob(serverConfig, jobId, jobType);
+        } catch (FlowableServiceException e) {
+            logger.error("Error executing job {}", jobId, e);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
 
     /**
      * GET /rest/admin/jobs/{jobId}/exception-stracktrace -> return job stacktrace
      */
     @RequestMapping(value = "/rest/admin/jobs/{jobId}/stacktrace", method = RequestMethod.GET, produces = "text/plain")
-    public String getJobStacktrace(@PathVariable String jobId) throws BadRequestException {
+    public String getJobStacktrace(@PathVariable String jobId, HttpServletRequest request) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        String jobType = request.getParameter("jobType");
         try {
-            String trace = clientService.getJobStacktrace(serverConfig, jobId);
+            String trace = clientService.getJobStacktrace(serverConfig, jobId, jobType);
             if (trace != null) {
                 trace = StringUtils.trim(trace);
             }

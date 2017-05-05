@@ -12,18 +12,38 @@
  */
 package org.flowable.dmn.model;
 
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Yvo Swillens
  */
 public enum BuiltinAggregator {
 
-    COLLECT, SUM, FIRST, MIN, MAX, ANY;
+    SUM("SUM"),
+    COUNT("COUNT"),
+    MIN("MIN"),
+    MAX("MAX");
 
-    public String value() {
-        return name();
+    private static final Map<String, BuiltinAggregator> lookup = new HashMap<>();
+
+    static {
+        for(BuiltinAggregator builtinAggregator : EnumSet.allOf(BuiltinAggregator.class))
+            lookup.put(builtinAggregator.getValue(), builtinAggregator);
     }
 
-    public static BuiltinAggregator fromValue(String value) {
-        return valueOf(value);
+    private final String value;
+
+    BuiltinAggregator(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public static BuiltinAggregator get(String value) {
+        return lookup.get(value);
     }
 }

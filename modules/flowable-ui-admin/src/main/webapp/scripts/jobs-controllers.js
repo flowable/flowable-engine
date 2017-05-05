@@ -16,9 +16,12 @@
 
 /* Controllers */
 
-flowableAdminApp.controller('JobsController', ['$scope', '$rootScope', '$http', '$timeout','$location','$translate', '$q', 'gridConstants',
-    function ($scope, $rootScope, $http, $timeout, $location, $translate, $q, gridConstants) {
+flowableAdminApp.controller('JobsController', ['$scope', '$rootScope', '$http', '$timeout','$location','$translate', '$q', 'gridConstants', '$routeParams',
+    function ($scope, $rootScope, $http, $timeout, $location, $translate, $q, gridConstants, $routeParams) {
 		$rootScope.navigation = {main: 'process-engine', sub: 'jobs'};
+		$scope.jobType = {
+			param: $routeParams.jobType
+		}
 		
 		$scope.jobData = {};
 	    $scope.selectedJobs = [];
@@ -27,12 +30,10 @@ flowableAdminApp.controller('JobsController', ['$scope', '$rootScope', '$http', 
 		    	url: '/app/rest/admin/jobs',
 		    	method: 'GET',
 		    	success: function(data, status, headers, config) {
-		    		if ($scope.definitionCacheLoaded)
-	                {
+		    		if ($scope.definitionCacheLoaded) {
 	                	$scope.processQueryResponse(data);
-	                }
-	                else
-	                {
+	                	
+	                } else {
 		                $rootScope.loadProcessDefinitionsCache().then(function(promise) {
   		        			$rootScope.processDefinitionsCache = promise.data;
   		        			$scope.definitionCacheLoaded = true;
@@ -88,12 +89,21 @@ flowableAdminApp.controller('JobsController', ['$scope', '$rootScope', '$http', 
 	    	}
 	    }
 	    
+	    if ($scope.jobType.param) {
+	    	$scope.filter.jobType = $scope.jobType.param;
+	    }
+	    
+	    if (!$scope.filter.jobType) {
+	    	$scope.filter.jobType = 'executableJob';
+	    }
+	    
+	    $scope.filter.properties.jobType = $scope.filter.jobType;
+	    
 	    $scope.jobSelected = function(job) {
 	    	if (job && job.getProperty('id')) {
-	    		$location.path('/job/' + job.getProperty('id'));
+	    		$location.path('/job/' + job.getProperty('id')).search({jobType: $scope.filter.jobType});
 	    	}
 	    };
-	    
 	    
 	    $q.all([$translate('JOBS.HEADER.ID'), 
 	            $translate('JOBS.HEADER.DUE-DATE'),
@@ -119,11 +129,10 @@ flowableAdminApp.controller('JobsController', ['$scope', '$rootScope', '$http', 
                   { field: 'exceptionMessage', displayName: headers[4], width: 150, cellTemplate: gridConstants.defaultTemplate}
               ]
           };
-	     });
+	    });
         
         $scope.processQueryResponse = function(jobsResponse) {
-        	for (var i = 0; i < jobsResponse.data.length; i++)
-            {
+        	for (var i = 0; i < jobsResponse.data.length; i++) {
         		jobsResponse.data[i].processDefinition = 
             		$rootScope.getProcessDefinitionFromCache(jobsResponse.data[i].processDefinitionId);
             	
@@ -131,25 +140,26 @@ flowableAdminApp.controller('JobsController', ['$scope', '$rootScope', '$http', 
         	$scope.jobData = jobsResponse;
         };
         
-        $scope.processDefinitionFilterChanged = function() 
-        {
-        	if ($scope.filter.processDefinition && $scope.filter.processDefinition !== '-1')
-        	{
+        $scope.jobTypeFilterChanged = function()  {
+        	$scope.filter.properties.jobType = $scope.filter.jobType;
+        	$scope.filter.refresh();
+        };
+        
+        $scope.processDefinitionFilterChanged = function()  {
+        	if ($scope.filter.processDefinition && $scope.filter.processDefinition !== '-1') {
         		$scope.filter.properties.processDefinitionId = $scope.filter.processDefinition;
         		$scope.filter.refresh();
-        	}
-        	else
-        	{
+        		
+        	} else {
         		var tempProcessDefinitionId = $scope.filter.properties.processDefinitionId;
         		$scope.filter.properties.processDefinitionId = null;
-        		if (tempProcessDefinitionId && tempProcessDefinitionId.length > 0)
-        		{
+        		if (tempProcessDefinitionId && tempProcessDefinitionId.length > 0) {
         			$scope.filter.refresh();
         		}
         	}
         };
         
         $scope.executeWhenReady(function() {
-          $scope.filter.refresh();
+          	$scope.filter.refresh();
         });
     }]);

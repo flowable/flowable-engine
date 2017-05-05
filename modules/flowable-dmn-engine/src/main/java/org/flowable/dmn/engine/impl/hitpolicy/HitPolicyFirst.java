@@ -17,7 +17,7 @@ import org.flowable.dmn.model.HitPolicy;
 /**
  * @author Yvo Swillens
  */
-public class HitPolicyFirst extends AbstractHitPolicy {
+public class HitPolicyFirst extends AbstractHitPolicy implements ContinueEvaluatingBehavior {
 
     @Override
     public String getHitPolicyName() {

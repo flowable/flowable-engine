@@ -12,39 +12,100 @@
  */
 package org.flowable.dmn.engine.impl;
 
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.api.RuleEngineExecutionResult;
-import org.flowable.dmn.engine.RuleEngineExecutor;
+import org.flowable.dmn.api.RuleEngineExecutionSingleResult;
 import org.flowable.dmn.engine.impl.cmd.ExecuteDecisionCmd;
+import org.flowable.dmn.engine.impl.cmd.ExecuteDecisionSingleResultCmd;
+import org.flowable.dmn.engine.impl.cmd.ExecuteDecisionSingleResultWithAuditTrailCmd;
+import org.flowable.dmn.engine.impl.cmd.ExecuteDecisionWithAuditTrailCmd;
 
 /**
  * @author Yvo Swillens
  */
 public class DmnRuleServiceImpl extends ServiceImpl implements DmnRuleService {
 
-    protected RuleEngineExecutor ruleEngineExecutor;
-
     @Override
-    public RuleEngineExecutionResult executeDecisionByKey(String decisionKey, Map<String, Object> variables) {
-        return commandExecutor.execute(new ExecuteDecisionCmd(decisionKey, variables));
+    public List<Map<String, Object>> executeDecisionByKey(String decisionKey, Map<String, Object> inputVariables) {
+        return commandExecutor.execute(new ExecuteDecisionCmd(decisionKey, inputVariables));
     }
 
     @Override
-    public RuleEngineExecutionResult executeDecisionByKeyAndTenantId(String decisionKey, Map<String, Object> variables, String tenantId) {
-        return commandExecutor.execute(new ExecuteDecisionCmd(decisionKey, null, variables, tenantId));
+    public Map<String, Object> executeDecisionByKeySingleResult(String decisionKey, Map<String, Object> inputVariables) {
+        return commandExecutor.execute(new ExecuteDecisionSingleResultCmd(decisionKey, inputVariables));
     }
 
     @Override
-    public RuleEngineExecutionResult executeDecisionByKeyAndParentDeploymentId(String decisionKey, String parentDeploymentId, Map<String, Object> variables) {
-        return commandExecutor.execute(new ExecuteDecisionCmd(decisionKey, parentDeploymentId, variables));
+    public RuleEngineExecutionResult executeDecisionByKeyWithAuditTrail(String decisionKey, Map<String, Object> inputVariables) {
+        return commandExecutor.execute(new ExecuteDecisionWithAuditTrailCmd(decisionKey, inputVariables));
     }
 
     @Override
-    public RuleEngineExecutionResult executeDecisionByKeyParentDeploymentIdAndTenantId(String decisionKey, String parentDeploymentId,
-            Map<String, Object> variables, String tenantId) {
+    public RuleEngineExecutionSingleResult executeDecisionByKeySingleResultWithAuditTrail(String decisionKey, Map<String, Object> inputVariables) {
+        return commandExecutor.execute(new ExecuteDecisionSingleResultWithAuditTrailCmd(decisionKey, inputVariables));
 
-        return commandExecutor.execute(new ExecuteDecisionCmd(decisionKey, parentDeploymentId, variables, tenantId));
+    }
+
+    @Override
+    public List<Map<String, Object>> executeDecisionByKeyAndTenantId(String decisionKey, Map<String, Object> inputVariables, String tenantId) {
+        return commandExecutor.execute(new ExecuteDecisionCmd(decisionKey, null, inputVariables, tenantId));
+    }
+
+    @Override
+    public Map<String, Object> executeDecisionByKeyAndTenantIdSingleResult(String decisionKey, Map<String, Object> inputVariables, String tenantId) {
+        return commandExecutor.execute(new ExecuteDecisionSingleResultCmd(decisionKey, null, inputVariables, tenantId));
+    }
+
+    @Override
+    public RuleEngineExecutionResult executeDecisionByKeyAndTenantIdWithAuditTrail(String decisionKey, Map<String, Object> inputVariables, String tenantId) {
+        return commandExecutor.execute(new ExecuteDecisionWithAuditTrailCmd(decisionKey, null, inputVariables, tenantId));
+    }
+
+    @Override
+    public RuleEngineExecutionSingleResult executeDecisionByKeyAndTenantIdWithAuditTrailSingleResult(String decisionKey, Map<String, Object> inputVariables, String tenantId) {
+        return commandExecutor.execute(new ExecuteDecisionSingleResultWithAuditTrailCmd(decisionKey, null, inputVariables, tenantId));
+    }
+
+    @Override
+    public List<Map<String, Object>> executeDecisionByKeyAndParentDeploymentId(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables) {
+        return commandExecutor.execute(new ExecuteDecisionCmd(decisionKey, parentDeploymentId, inputVariables));
+    }
+
+    @Override
+    public Map<String, Object> executeDecisionByKeyAndParentDeploymentIdSingleResult(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables) {
+        return commandExecutor.execute(new ExecuteDecisionSingleResultCmd(decisionKey, parentDeploymentId, inputVariables));
+    }
+
+    @Override
+    public RuleEngineExecutionResult executeDecisionByKeyAndParentDeploymentIdWithAuditTrail(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables, String tenantId) {
+        return commandExecutor.execute(new ExecuteDecisionWithAuditTrailCmd(decisionKey, parentDeploymentId, inputVariables, tenantId));
+    }
+
+    @Override
+    public RuleEngineExecutionSingleResult executeDecisionByKeyAndParentDeploymentIdWithAuditTrailSingleResult(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables, String tenantId) {
+        return commandExecutor.execute(new ExecuteDecisionSingleResultWithAuditTrailCmd(decisionKey, parentDeploymentId, inputVariables, tenantId));
+    }
+
+    @Override
+    public List<Map<String, Object>> executeDecisionByKeyParentDeploymentIdAndTenantId(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables, String tenantId) {
+        return commandExecutor.execute(new ExecuteDecisionCmd(decisionKey, parentDeploymentId, inputVariables, tenantId));
+    }
+
+    @Override
+    public Map<String, Object> executeDecisionByKeyParentDeploymentIdAndTenantIdSingleResult(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables, String tenantId) {
+        return commandExecutor.execute(new ExecuteDecisionSingleResultCmd(decisionKey, parentDeploymentId, inputVariables, tenantId));
+    }
+
+    @Override
+    public RuleEngineExecutionResult executeDecisionByKeyParentDeploymentIdAndTenantIdWithAuditTrail(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables, String tenantId) {
+        return commandExecutor.execute(new ExecuteDecisionWithAuditTrailCmd(decisionKey, parentDeploymentId, inputVariables, tenantId));
+    }
+
+    @Override
+    public RuleEngineExecutionSingleResult executeDecisionByKeyParentDeploymentIdAndTenantIdWithAuditTrailSingleResult(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables, String tenantId) {
+        return commandExecutor.execute(new ExecuteDecisionSingleResultWithAuditTrailCmd(decisionKey, parentDeploymentId, inputVariables, tenantId));
     }
 }

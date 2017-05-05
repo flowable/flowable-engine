@@ -22,13 +22,14 @@ import java.text.MessageFormat;
 public final class DmnRestUrls {
 
     public static final String SEGMENT_REPOSITORY_RESOURCES = "dmn-repository";
-    public static final String SEGMENT_RULES_RESOURCES = "rules";
+    public static final String SEGMENT_RULES_RESOURCES = "dmn-rule";
 
     public static final String SEGMENT_DEPLOYMENT_RESOURCE = "deployments";
     public static final String SEGMENT_DEPLOYMENT_ARTIFACT_RESOURCE_CONTENT = "resourcedata";
     public static final String SEGMENT_DECISION_TABLE_RESOURCE = "decision-tables";
     public static final String SEGMENT_DECISION_TABLE_MODEL = "model";
-    public static final String SEGMENT_DECISION_EXECUTOR_RESOURCE = "decision-executor";
+    public static final String SEGMENT_EXECUTE_RESOURCE = "execute";
+    public static final String SEGMENT_EXECUTE_SINGLE_RESULT_RESOURCE = "single-result";
 
     /**
      * URL template for a decision table collection: <i>/dmn-repository/decision-tables/{0:decisionTableId}</i>
@@ -66,9 +67,14 @@ public final class DmnRestUrls {
     public static final String[] URL_DEPLOYMENT_RESOURCE_CONTENT = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_DEPLOYMENT_RESOURCE, "{0}", SEGMENT_DEPLOYMENT_ARTIFACT_RESOURCE_CONTENT, "{1}" };
 
     /**
-     * URL template for a decision executor: <i>/rules/decision-executor</i>
+     * URL template for a decision executor: <i>/dmn-rule/execute</i>
      */
-    public static final String[] URL_DECISION_EXECUTOR = { SEGMENT_RULES_RESOURCES, SEGMENT_DECISION_EXECUTOR_RESOURCE };
+    public static final String[] URL_RULE_SERVICE_EXECUTE = { SEGMENT_RULES_RESOURCES, SEGMENT_EXECUTE_RESOURCE};
+
+    /**
+     * URL template for a decision executor: <i>/dmn-rule/execute/single-result</i>
+     */
+    public static final String[] URL_RULE_SERVICE_EXECUTE_SINGLE_RESULT = { SEGMENT_RULES_RESOURCES, SEGMENT_EXECUTE_RESOURCE, SEGMENT_EXECUTE_SINGLE_RESULT_RESOURCE};
 
     /**
      * Creates an url based on the passed fragments and replaces any placeholders with the given arguments. The placeholders are following the {@link MessageFormat} convention (eg. {0} is replaced by

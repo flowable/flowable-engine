@@ -253,6 +253,8 @@ public class BpmnDeployer implements Deployer {
                 processDefinition.setId(persistedProcessDefinition.getId());
                 processDefinition.setVersion(persistedProcessDefinition.getVersion());
                 processDefinition.setSuspensionState(persistedProcessDefinition.getSuspensionState());
+                processDefinition.setHasStartFormKey(persistedProcessDefinition.hasStartFormKey());
+                processDefinition.setGraphicalNotationDefined(persistedProcessDefinition.isGraphicalNotationDefined());
             }
         }
     }

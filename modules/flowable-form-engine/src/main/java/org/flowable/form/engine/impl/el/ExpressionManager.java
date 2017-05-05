@@ -26,8 +26,6 @@ import javax.el.ValueExpression;
 
 import org.flowable.form.engine.FormExpression;
 
-import de.odysseus.el.ExpressionFactoryImpl;
-
 /**
  * <p>
  * Central manager for all expressions.
@@ -58,7 +56,7 @@ public class ExpressionManager {
     }
 
     public ExpressionManager(Map<Object, Object> beans, boolean initFactory) {
-        expressionFactory = new ExpressionFactoryImpl();
+        expressionFactory = ExpressionFactory.newInstance();
         this.beans = beans;
     }
 

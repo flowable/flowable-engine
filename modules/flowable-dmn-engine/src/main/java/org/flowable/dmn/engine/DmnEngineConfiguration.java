@@ -45,9 +45,12 @@ import org.flowable.dmn.engine.impl.deployer.CachingAndArtifactsManager;
 import org.flowable.dmn.engine.impl.deployer.DmnDeployer;
 import org.flowable.dmn.engine.impl.deployer.DmnDeploymentHelper;
 import org.flowable.dmn.engine.impl.deployer.ParsedDeploymentBuilderFactory;
+import org.flowable.dmn.engine.impl.hitpolicy.AbstractHitPolicy;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyAny;
-import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyBehavior;
+import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyCollect;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyFirst;
+import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyOutputOrder;
+import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyPriority;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyRuleOrder;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyUnique;
 import org.flowable.dmn.engine.impl.interceptor.CommandContext;
@@ -172,8 +175,8 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     protected Map<Class<?>, PropertyHandler> customPropertyHandlers = new HashMap<Class<?>, PropertyHandler>();
 
     // HIT POLICIES
-    protected Map<String, HitPolicyBehavior> hitPolicyBehaviors;
-    protected Map<String, HitPolicyBehavior> customHitPolicyBehaviors;
+    protected Map<String, AbstractHitPolicy> hitPolicyBehaviors;
+    protected Map<String, AbstractHitPolicy> customHitPolicyBehaviors;
 
 
     /**
@@ -568,24 +571,36 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
         }
     }
 
-    public Map<String, HitPolicyBehavior> getDefaultHitPolicyBehaviors() {
-        Map<String, HitPolicyBehavior> defaultHitPolicyBehaviors = new HashMap<>();
+    public Map<String, AbstractHitPolicy> getDefaultHitPolicyBehaviors() {
+        Map<String, AbstractHitPolicy> defaultHitPolicyBehaviors = new HashMap<>();
 
         // UNIQUE
-        HitPolicyUnique hitPolicyUniqueBehavior = new HitPolicyUnique();
+        AbstractHitPolicy hitPolicyUniqueBehavior = new HitPolicyUnique();
         defaultHitPolicyBehaviors.put(hitPolicyUniqueBehavior.getHitPolicyName(), hitPolicyUniqueBehavior);
 
         // ANY
-        HitPolicyAny hitPolicyAnyBehavior = new HitPolicyAny();
+        AbstractHitPolicy hitPolicyAnyBehavior = new HitPolicyAny();
         defaultHitPolicyBehaviors.put(hitPolicyAnyBehavior.getHitPolicyName(), hitPolicyAnyBehavior);
 
         // FIRST
-        HitPolicyFirst hitPolicyFirstBehavior = new HitPolicyFirst();
+        AbstractHitPolicy hitPolicyFirstBehavior = new HitPolicyFirst();
         defaultHitPolicyBehaviors.put(hitPolicyFirstBehavior.getHitPolicyName(), hitPolicyFirstBehavior);
 
         // RULE ORDER
-        HitPolicyRuleOrder HitPolicyRuleOrderBehavior = new HitPolicyRuleOrder();
+        AbstractHitPolicy HitPolicyRuleOrderBehavior = new HitPolicyRuleOrder();
         defaultHitPolicyBehaviors.put(HitPolicyRuleOrderBehavior.getHitPolicyName(), HitPolicyRuleOrderBehavior);
+
+        // PRIORITY
+        AbstractHitPolicy HitPolicyPriorityBehavior = new HitPolicyPriority();
+        defaultHitPolicyBehaviors.put(HitPolicyPriorityBehavior.getHitPolicyName(), HitPolicyPriorityBehavior);
+
+        // OUTPUT ORDER
+        AbstractHitPolicy HitPolicyOutputOrderBehavior = new HitPolicyOutputOrder();
+        defaultHitPolicyBehaviors.put(HitPolicyOutputOrderBehavior.getHitPolicyName(), HitPolicyOutputOrderBehavior);
+
+        // COLLECT
+        AbstractHitPolicy HitPolicyCollectBehavior = new HitPolicyCollect();
+        defaultHitPolicyBehaviors.put(HitPolicyCollectBehavior.getHitPolicyName(), HitPolicyCollectBehavior);
 
         return defaultHitPolicyBehaviors;
     }
@@ -1033,19 +1048,19 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
-    public void setHitPolicyBehaviors(Map<String, HitPolicyBehavior> hitPolicyBehaviors) {
+    public void setHitPolicyBehaviors(Map<String, AbstractHitPolicy> hitPolicyBehaviors) {
         this.hitPolicyBehaviors = hitPolicyBehaviors;
     }
 
-    public Map<String, HitPolicyBehavior> getHitPolicyBehaviors() {
+    public Map<String, AbstractHitPolicy> getHitPolicyBehaviors() {
         return hitPolicyBehaviors;
     }
 
-    public void setCustomHitPolicyBehaviors(Map<String, HitPolicyBehavior> customHitPolicyBehaviors) {
+    public void setCustomHitPolicyBehaviors(Map<String, AbstractHitPolicy> customHitPolicyBehaviors) {
         this.customHitPolicyBehaviors = customHitPolicyBehaviors;
     }
 
-    public Map<String, HitPolicyBehavior> getCustomHitPolicyBehaviors() {
+    public Map<String, AbstractHitPolicy> getCustomHitPolicyBehaviors() {
         return customHitPolicyBehaviors;
     }
 }

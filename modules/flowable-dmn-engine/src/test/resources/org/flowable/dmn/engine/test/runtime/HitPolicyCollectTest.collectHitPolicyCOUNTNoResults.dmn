@@ -1,0 +1,44 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="full" name="Full" namespace="http://www.flowable.org/dmn">
+  <decision id="decision1" name="Full Decision">
+    <decisionTable id="decisionTable" hitPolicy="COLLECT" aggregation="COUNT">
+      <input>
+        <inputExpression id="inputVariable1" typeRef="double">
+          <text>inputVariable1</text>
+        </inputExpression>
+      </input>
+      <output id="output1" label="Output 1" name="outputVariable1" typeRef="number" />
+      <rule>
+        <inputEntry id="inputEntry1">
+          <text><![CDATA[< 10]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry1_1">
+          <text>10</text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry2">
+          <text><![CDATA[< 20]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry2_1">
+          <text>20</text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry3">
+          <text><![CDATA[< 30]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry3_1">
+          <text>30</text>
+        </outputEntry>
+      </rule>
+        <rule>
+          <inputEntry id="inputEntry4">
+            <text><![CDATA[< 40]]></text>
+          </inputEntry>
+          <outputEntry id="outputEntry4_1">
+            <text>30</text>
+          </outputEntry>
+        </rule>
+    </decisionTable>
+  </decision>
+</definitions>

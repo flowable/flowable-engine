@@ -13,20 +13,18 @@
 
 package org.flowable.engine.test.el;
 
+import static org.junit.Assert.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.el.NoExecutionVariableScope;
 import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.hamcrest.core.Is;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Frederik Heremans

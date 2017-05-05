@@ -189,6 +189,54 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
         assertProcessEnded(procId);
     }
+    
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.multipleErrorsCatch.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.multipleErrorsThrow.bpmn20.xml" })
+    public void testCatchMultipleErrorsOnCallActivity() {
+        String procId = runtimeService.startProcessInstanceByKey("catchError").getId();
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("specificErrorTask", task.getTaskDefinitionKey());
+        
+        taskService.complete(task.getId());
+        
+        assertProcessEnded(procId);
+    }
+    
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.multipleErrorsCatch.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.multipleErrorsThrow2.bpmn20.xml" })
+    public void testCatchMultipleErrorsOnCallActivityNoSpecificError() {
+        String procId = runtimeService.startProcessInstanceByKey("catchError").getId();
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("emptyErrorTask", task.getTaskDefinitionKey());
+        
+        taskService.complete(task.getId());
+        
+        assertProcessEnded(procId);
+    }
+    
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.callActivityWithErrorEndEventCatch.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.callActivityWithErrorEndEventThrow.bpmn20.xml" })
+    public void testCatchErrorEndEventOnCallActivity() {
+        String procId = runtimeService.startProcessInstanceByKey("catchError").getId();
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("specificErrorTask", task.getTaskDefinitionKey());
+        
+        taskService.complete(task.getId());
+        
+        assertProcessEnded(procId);
+    }
+    
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.callActivityWithErrorEndEventCatch.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.callActivityWithErrorEndEventThrow2.bpmn20.xml" })
+    public void testCatchErrorEndEventOnCallActivityNoSpecificError() {
+        String procId = runtimeService.startProcessInstanceByKey("catchError").getId();
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("emptyErrorTask", task.getTaskDefinitionKey());
+        
+        taskService.complete(task.getId());
+        
+        assertProcessEnded(procId);
+    }
 
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.subprocess.bpmn20.xml" })
     public void testUncaughtError() {

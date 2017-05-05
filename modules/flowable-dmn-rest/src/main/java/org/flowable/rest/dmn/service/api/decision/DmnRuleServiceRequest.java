@@ -19,10 +19,11 @@ import java.util.List;
 /**
  * @author Yvo Swillens
  */
-public class ExecuteDecisionRequest {
+public class DmnRuleServiceRequest {
 
     protected String decisionKey;
     protected String tenantId;
+    protected String parentDeploymentId;
     protected List<EngineRestVariable> inputVariables;
 
     public String getDecisionKey() {
@@ -41,6 +42,14 @@ public class ExecuteDecisionRequest {
         this.tenantId = tenantId;
     }
 
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
+    }
+
+    public void setParentDeploymentId(String parentDeploymentId) {
+        this.parentDeploymentId = parentDeploymentId;
+    }
+
     public List<EngineRestVariable> getInputVariables() {
         return inputVariables;
     }
@@ -48,5 +57,4 @@ public class ExecuteDecisionRequest {
     public void setInputVariables(List<EngineRestVariable> variables) {
         this.inputVariables = variables;
     }
-
 }

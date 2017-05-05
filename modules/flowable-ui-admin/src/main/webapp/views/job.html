@@ -58,10 +58,17 @@
 				<div class="title">
 					<h2 translate="GENERAL.TITLE.ACTIONS"></h2>
 				</div>
-				<ul class="list-group">
+				<ul class="list-group" ng-if="jobType.param == 'executableJob'">
 					  <li>
 					    <button type="button" class="btn btn-sm btn-default" ng-click="executeJob()">
 							<i class="glyphicon glyphicon-play"></i> {{'JOB.ACTIONS.EXECUTE' | translate}}
+					    </button>
+					  </li>
+				</ul>
+				<ul class="list-group" ng-if="jobType.param == 'timerJob' || jobType.param == 'deadletterJob'">
+					  <li>
+					    <button type="button" class="btn btn-sm btn-default" ng-click="moveJob()">
+							<i class="glyphicon glyphicon-play"></i> {{'JOB.ACTIONS.MOVE' | translate}}
 					    </button>
 					  </li>
 				</ul>

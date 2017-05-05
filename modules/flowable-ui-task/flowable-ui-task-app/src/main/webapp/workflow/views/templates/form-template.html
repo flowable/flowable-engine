@@ -28,6 +28,12 @@
                         ng-click="completeForm(outcome)">{{outcome.name}}</button>
             </div>
         </div>
+        
+        <div ng-if="formData.selectedOutcome && formData.selectedOutcome.length > 0" class="clearfix form-actions">
+        	<div class="pull-right">
+                <button id="form_complete_button" class="btn btn-default" ng-disabled="true">{{formData.selectedOutcome}}</button>
+            </div>
+        </div>
 
     </div>
 
