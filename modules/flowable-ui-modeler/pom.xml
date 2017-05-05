@@ -2,9 +2,11 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <name>Flowable Modeler UI</name>
-  <artifactId>flowable-ui-modeler</artifactId>
+  <name>rds designer</name>
+  <groupId>au.com.rds.sb</groupId>
+  <artifactId>rds-designer</artifactId>
   <packaging>pom</packaging>
+  <version>1.0.0</version>
   
   <parent>
     <groupId>org.flowable</groupId>
@@ -21,7 +23,8 @@
 		<!-- Web container version -->
 		<tomcat.version>7.0.53</tomcat.version>
 
-    <system.builder.version>1.0.0-SNAPSHOT</system.builder.version>
+        <system.builder.version>1.0.0</system.builder.version>
+        <flowable.version>6.0.0</flowable.version>
   </properties>
 
 	<prerequisites>
@@ -43,19 +46,287 @@
             <version>${system.builder.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.flowable</groupId>
+          <groupId>au.com.rds.sb</groupId>
+          <artifactId>schemaform-builder-web-resources</artifactId>
+          <version>${system.builder.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>au.com.rds.sb</groupId>
             <artifactId>flowable-ui-modeler-logic</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.flowable</groupId>
+            <groupId>au.com.rds.sb</groupId>
             <artifactId>flowable-ui-modeler-rest</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.flowable</groupId>
+            <groupId>au.com.rds.sb</groupId>
             <artifactId>flowable-ui-modeler-conf</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        
+        <!-- overrides what defined in parent due to project.version -->
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-engine</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-spring</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-bpmn-model</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-bpmn-converter</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-json-converter</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-engine-common-api</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-engine-common</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-explorer</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-simple-workflow</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-common-rest</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-rest</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-idm-api</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-idm-engine</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-idm-spring</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-dmn-api</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-dmn-engine</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-dmn-model</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-dmn-xml-converter</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-dmn-json-converter</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-dmn-rest</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-dmn-engine-configurator</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-dmn-spring</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-dmn-spring-configurator</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-form-model</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-form-api</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-form-json-converter</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-form-engine</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-form-engine-configurator</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-form-spring</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-form-spring-configurator</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-form-rest</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-content-api</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-content-engine</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-content-spring</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-content-engine-configurator</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-content-spring-configurator</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-content-rest</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-camel</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-mule</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-crystalball</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-app-rest</artifactId>
+          <type>war</type>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-cxf</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-ldap</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-bpmn-layout</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-process-validation</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-image-generator</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable5-engine</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable5-spring</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable5-compatibility</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable5-spring-compatibility</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.flowable</groupId>
+          <artifactId>flowable-jmx</artifactId>
+          <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-ui-common</artifactId>
+            <version>${flowable.version}</version>
         </dependency>
 	 </dependencies>
 	</dependencyManagement>

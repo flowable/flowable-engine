@@ -5,16 +5,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>flowable-ui-modeler-logic</artifactId>
 	<parent>
-		<groupId>org.flowable</groupId>
-    	<artifactId>flowable-ui-modeler</artifactId>
-    	<version>6.0.0</version>
+		<groupId>au.com.rds.sb</groupId>
+    	<artifactId>rds-designer</artifactId>
+    	<version>1.0.0</version>
 	</parent>
 	<packaging>jar</packaging>
 
 	<dependencies>
 	    <dependency>
             <groupId>au.com.rds.sb</groupId>
-            <artifactId>workflow-builder</artifactId>
+            <artifactId>workflow-builder</artifactId>            
         </dependency>
         <!-- Flowable -->
         <dependency>
