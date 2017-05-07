@@ -19,6 +19,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.cfg.MailServerInfo;
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
@@ -93,6 +94,9 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected String mailSessionJndi;
     protected Map<String, MailServerInfo> mailServers = new HashMap<String, MailServerInfo>();
     protected Map<String, String> mailSessionsJndi = new HashMap<String, String>();
+
+    // Set Http Client config defaults
+    protected HttpClientConfig httpClientConfig = new HttpClientConfig();
 
     protected boolean isDbHistoryUsed = true;
     protected HistoryLevel historyLevel;
@@ -312,6 +316,14 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     public ProcessEngineConfiguration setMailSessionsJndi(Map<String, String> mailSessionsJndi) {
         this.mailSessionsJndi.putAll(mailSessionsJndi);
         return this;
+    }
+
+    public HttpClientConfig getHttpClientConfig() {
+        return httpClientConfig;
+    }
+
+    public void setHttpClientConfig(HttpClientConfig httpClientConfig) {
+        this.httpClientConfig.merge(httpClientConfig);
     }
 
     public ProcessEngineConfiguration setDatabaseType(String databaseType) {
