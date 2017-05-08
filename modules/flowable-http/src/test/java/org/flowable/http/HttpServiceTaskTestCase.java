@@ -44,9 +44,9 @@ public abstract class HttpServiceTaskTestCase extends PluggableFlowableTestCase 
         try {
             ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
             contextHandler.setContextPath("/");
-            contextHandler.addServlet(new ServletHolder(new HttpServiceTaskTest()), "/api/*");
-            contextHandler.addServlet(new ServletHolder(new HttpServiceTaskAsyncTest()), "/api/async/*");
-            contextHandler.addServlet(new ServletHolder(new HttpServiceTaskExampleTest()), "/api/example/*");
+            contextHandler.addServlet(new ServletHolder(new HttpServiceTaskTestServlet()), "/api/*");
+            contextHandler.addServlet(new ServletHolder(new HttpServiceTaskAsyncTestServlet()), "/api/async/*");
+            contextHandler.addServlet(new ServletHolder(new HttpServiceTaskExampleTestServlet()), "/api/example/*");
             server.setHandler(contextHandler);
             server.start();
         } catch (Exception e) {
@@ -69,14 +69,14 @@ public abstract class HttpServiceTaskTestCase extends PluggableFlowableTestCase 
         });
     }
 
-    private static class HttpServiceTaskTest extends HttpServlet {
+    private static class HttpServiceTaskTestServlet extends HttpServlet {
 
         private String name = "test servlet";
 
-        public HttpServiceTaskTest() {
+        public HttpServiceTaskTestServlet() {
         }
 
-        public HttpServiceTaskTest(String name) {
+        public HttpServiceTaskTestServlet(String name) {
             this.name = name;
         }
 
@@ -109,14 +109,14 @@ public abstract class HttpServiceTaskTestCase extends PluggableFlowableTestCase 
         }
     }
 
-    private static class HttpServiceTaskAsyncTest extends HttpServlet {
+    private static class HttpServiceTaskAsyncTestServlet extends HttpServlet {
 
         private String name = "async test servlet";
 
-        public HttpServiceTaskAsyncTest() {
+        public HttpServiceTaskAsyncTestServlet() {
         }
 
-        public HttpServiceTaskAsyncTest(String name) {
+        public HttpServiceTaskAsyncTestServlet(String name) {
             this.name = name;
         }
 
@@ -149,14 +149,14 @@ public abstract class HttpServiceTaskTestCase extends PluggableFlowableTestCase 
         }
     }
 
-    private static class HttpServiceTaskExampleTest extends HttpServlet {
+    private static class HttpServiceTaskExampleTestServlet extends HttpServlet {
 
         private String name = "example test servlet";
 
-        public HttpServiceTaskExampleTest() {
+        public HttpServiceTaskExampleTestServlet() {
         }
 
-        public HttpServiceTaskExampleTest(String name) {
+        public HttpServiceTaskExampleTestServlet(String name) {
             this.name = name;
         }
 

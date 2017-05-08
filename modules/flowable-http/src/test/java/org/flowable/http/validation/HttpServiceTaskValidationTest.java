@@ -16,14 +16,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.flowable.http.HttpServiceTaskTestCase;
 import static org.flowable.http.HttpActivityBehavior.HTTP_TASK_REQUEST_METHOD_INVALID;
 
 /**
  * @author Harsha Teja Kanna
  */
-public class HttpServiceTaskValidationTest extends PluggableFlowableTestCase {
+public class HttpServiceTaskValidationTest extends HttpServiceTaskTestCase {
     @Deployment
     public void testInvalidProcess() throws Exception {
         Map<String, Object> variables = new HashMap<String, Object>();

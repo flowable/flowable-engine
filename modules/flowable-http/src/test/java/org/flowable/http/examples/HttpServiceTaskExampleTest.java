@@ -15,13 +15,13 @@ package org.flowable.http.examples;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.flowable.http.HttpServiceTaskTestCase;
 
 /**
  * @author Harsha Teja Kanna
  */
-public class HttpServiceTaskExampleTest extends PluggableFlowableTestCase {
+public class HttpServiceTaskExampleTest extends HttpServiceTaskTestCase {
     @Deployment
     public void testExampleUsage() throws Exception {
         Map<String, Object> variables = new HashMap<String, Object>();
