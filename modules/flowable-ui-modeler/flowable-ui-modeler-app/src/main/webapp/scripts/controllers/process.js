@@ -38,7 +38,10 @@ angular.module('flowableModeler')
           $scope.model.process = data;
           
           $scope.loadVersions();
-
+          
+          $scope.model.barDownloadUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $routeParams.modelId +
+          ($routeParams.modelHistoryId == undefined ? '' : '/history/' + $routeParams.modelHistoryId) + '/exportBarFile?version=' + Date.now();
+          
           $scope.model.bpmn20DownloadUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $routeParams.modelId +
     			($routeParams.modelHistoryId == undefined ? '' : '/history/' + $routeParams.modelHistoryId) + '/bpmn20?version=' + Date.now();
 

@@ -12,6 +12,8 @@
  */
 package org.flowable.app.rest.editor;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +26,9 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -328,6 +333,34 @@ public class ModelResource {
     result.put("diagram", diagramBase64String);
     result.put("name", model.getName());
     return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
+  }
+  
+  @RequestMapping(value = "/rest/models/{modelId}/exportBarFile")
+  public void exportBarFile(@PathVariable("modelId") String modelId, HttpServletResponse response)
+  {
+    Model model = modelService.getModel(modelId);
+    String name = model.getName().replace(" ", "");
+    byte[] bpmnBytes = modelService.getBpmnXML(model);
+    byte[] editorSourceExtra = model.getThumbnail();
+    
+    Map<String, byte[]> map = modelService.getDecisionTableDefinitionsForProcess(modelId);
+    map.put(name+".bpmn20.xml", bpmnBytes);
+    map.put(name+".png", editorSourceExtra);
+    
+    byte[] barBytes = createDeployZipArtifact(map);
+    
+    response.setHeader("Content-Disposition", "attachment; filename=" + name + ".bar");
+    try {
+      ServletOutputStream servletOutputStream = response.getOutputStream();
+      response.setContentType("application/octet-stream");
+          
+      BufferedInputStream in = new BufferedInputStream(new ByteArrayInputStream(barBytes));
+      IOUtils.copy(in, servletOutputStream);
+      response.flushBuffer();
+    } catch (IOException e) {
+      log.error("Could not generate bar file", e);
+      throw new InternalServerErrorException("Could not generate bar file ", e);
+    }    
   }
   
   @RequestMapping(value = "/rest/models/{modelId}/editorhints", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)

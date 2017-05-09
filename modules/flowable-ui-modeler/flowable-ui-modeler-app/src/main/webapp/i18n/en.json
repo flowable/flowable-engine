@@ -176,6 +176,7 @@
             "EDIT": "Modify model properties",
             "DUPLICATE": "Duplicate this model",
             "EXPORT_BPMN20": "Export to BPMN 2.0",
+            "EXPORT_BAR": "Export to Bar File",
             "DELETE": "Delete this model",
             "CREATE-CONFIRM": "Create new model",
             "DUPLICATE-CONFIRM": "Duplicate the model",

@@ -18,6 +18,11 @@
 	        <a href="{{model.bpmn20DownloadUrl}}" class="btn btn-default" title="{{'PROCESS.ACTION.EXPORT_BPMN20' | translate}}">
 	            <i class="glyphicon glyphicon-save"></i>
 	        </a>
+		</div>
+		<div class="btn-group pull-right">
+	        <a href="{{model.barDownloadUrl}}" class="btn btn-default" title="{{'PROCESS.ACTION.EXPORT_BAR' | translate}}">
+	            <i class="glyphicon glyphicon-save"></i>
+	        </a>
 		</div>		
 		<div class="btn-group pull-right">
 			<button type="button" class="btn btn-default" ng-click="editProcess()" ng-disabled="!model.process.latestVersion"
