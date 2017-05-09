@@ -108,9 +108,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     @Override
     public void runBare() throws Throwable {
         initializeProcessEngine();
-        if (repositoryService == null) {
-            initializeServices();
-        }
+        initializeServices();
 
         try {
 
@@ -439,15 +437,15 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     protected void assertHistoricActivitiesDeleteReason(ProcessInstance processInstance, String expectedDeleteReason, String... activityIds) {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             for (String activityId : activityIds) {
-                List<HistoricActivityInstance> historicActiviyInstances = historyService.createHistoricActivityInstanceQuery()
+                List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery()
                         .activityId(activityId).processInstanceId(processInstance.getId()).list();
-                assertTrue("Could not find historic activities", historicActiviyInstances.size() > 0);
-                for (HistoricActivityInstance historicActiviyInstance : historicActiviyInstances) {
-                    assertNotNull(historicActiviyInstance.getEndTime());
+                assertTrue("Could not find historic activities", historicActivityInstances.size() > 0);
+                for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
+                    assertNotNull(historicActivityInstance.getEndTime());
                     if (expectedDeleteReason == null) {
-                        assertNull(historicActiviyInstance.getDeleteReason());
+                        assertNull(historicActivityInstance.getDeleteReason());
                     } else {
-                        assertTrue(historicActiviyInstance.getDeleteReason().startsWith(expectedDeleteReason));
+                        assertTrue(historicActivityInstance.getDeleteReason().startsWith(expectedDeleteReason));
                     }
                 }
             }

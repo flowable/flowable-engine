@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,6 +24,7 @@ import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
 import org.activiti.engine.impl.bpmn.parser.factory.ListenerFactory;
+import org.activiti.engine.impl.el.ExpressionManager;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.parse.BpmnParseHandler;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -60,6 +61,7 @@ public class DefaultProcessEngineFactory {
         copyBeans(flowable6Configuration, flowable5Configuration);
         copyCaches(flowable6Configuration, flowable5Configuration);
         copyActivityBehaviorFactory(flowable6Configuration, flowable5Configuration);
+        copyExpressionManager(flowable6Configuration, flowable5Configuration);
         copyListenerFactory(flowable6Configuration, flowable5Configuration);
         convertParseHandlers(flowable6Configuration, flowable5Configuration);
         copyCustomMybatisMappers(flowable6Configuration, flowable5Configuration);
@@ -170,6 +172,12 @@ public class DefaultProcessEngineFactory {
     protected void copyActivityBehaviorFactory(ProcessEngineConfigurationImpl flowable6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl flowable5Configuration) {
         if (flowable6Configuration.getFlowable5ActivityBehaviorFactory() != null) {
             flowable5Configuration.setActivityBehaviorFactory((ActivityBehaviorFactory) flowable6Configuration.getFlowable5ActivityBehaviorFactory());
+        }
+    }
+
+    protected void copyExpressionManager(ProcessEngineConfigurationImpl flowable6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl flowable5Configuration) {
+        if (flowable6Configuration.getFlowable5ExpressionManager() != null) {
+            flowable5Configuration.setExpressionManager((ExpressionManager) flowable6Configuration.getFlowable5ExpressionManager());
         }
     }
 

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,13 +13,18 @@
 
 package org.flowable.engine.test.el;
 
+import static org.junit.Assert.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.impl.el.NoExecutionVariableScope;
 import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.hamcrest.core.Is;
 
 /**
  * @author Frederik Heremans
@@ -29,6 +34,12 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+    }
+
+    public void testExpressionEvaluationWithoutProcessContext() {
+        Expression expression = this.processEngineConfiguration.getExpressionManager().createExpression("#{1 == 1}");
+        Object value = expression.getValue(new NoExecutionVariableScope());
+        assertThat(value, Is.<Object>is(true));
     }
 
     @Deployment

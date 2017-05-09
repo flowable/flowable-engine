@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.impl.util.DefaultClockImpl;
@@ -171,7 +172,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         Job newTimerJob = (Job) ((FlowableEntityEvent) event).getEntity();
         checkEventContext(event, rescheduledJob);
         assertEquals(rescheduledJob.getId(), newTimerJob.getId());
-        assertEquals(rescheduledJob.getDuedate(), newTimerJob.getDuedate());
+        assertEquals(DateUtils.truncate(rescheduledJob.getDuedate(), Calendar.SECOND), DateUtils.truncate(newTimerJob.getDuedate(), Calendar.SECOND));
 
         event = (FlowableEngineEvent) listener.getEventsReceived().get(4);
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());

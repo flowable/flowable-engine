@@ -29,8 +29,8 @@ import org.junit.Test;
  * Created by Pardo David on 1/03/2017.
  */
 public class CollapsedSubWithSubSequenceFlowTest extends AbstractConverterTest {
-    private final static String EXPANED_SUBPROCESS_IN_CP = "sid-65F96E4B-9E0D-462D-AFD4-3FFAD5F7F9B6";
-    private final static String COLLAPSED_SUBPROCESS = "sid-44B96119-5A3B-4850-BDAC-2D4A2AECEA0A";
+    private static final String EXPANED_SUBPROCESS_IN_CP = "sid-65F96E4B-9E0D-462D-AFD4-3FFAD5F7F9B6";
+    private static final String COLLAPSED_SUBPROCESS = "sid-44B96119-5A3B-4850-BDAC-2D4A2AECEA0A";
     @Test
     public void oneWay() throws Exception{
         BpmnModel bpmnModel = readJsonFile();

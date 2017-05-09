@@ -45,6 +45,14 @@ import org.flowable.dmn.engine.impl.deployer.CachingAndArtifactsManager;
 import org.flowable.dmn.engine.impl.deployer.DmnDeployer;
 import org.flowable.dmn.engine.impl.deployer.DmnDeploymentHelper;
 import org.flowable.dmn.engine.impl.deployer.ParsedDeploymentBuilderFactory;
+import org.flowable.dmn.engine.impl.hitpolicy.AbstractHitPolicy;
+import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyAny;
+import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyCollect;
+import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyFirst;
+import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyOutputOrder;
+import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyPriority;
+import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyRuleOrder;
+import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyUnique;
 import org.flowable.dmn.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.engine.impl.interceptor.CommandContextFactory;
 import org.flowable.dmn.engine.impl.interceptor.CommandContextInterceptor;
@@ -123,7 +131,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     protected DmnManagementService dmnManagementService = new DmnManagementServiceImpl();
     protected DmnRepositoryService dmnRepositoryService = new DmnRepositoryServiceImpl();
     protected DmnRuleService ruleService = new DmnRuleServiceImpl();
-    protected RuleEngineExecutor ruleEngineExecutor = new RuleEngineExecutorImpl();
+    protected RuleEngineExecutor ruleEngineExecutor;
 
     // DATA MANAGERS ///////////////////////////////////////////////////
 
@@ -166,6 +174,11 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     protected Map<String, Method> customExpressionFunctions = new HashMap<String, Method>();
     protected Map<Class<?>, PropertyHandler> customPropertyHandlers = new HashMap<Class<?>, PropertyHandler>();
 
+    // HIT POLICIES
+    protected Map<String, AbstractHitPolicy> hitPolicyBehaviors;
+    protected Map<String, AbstractHitPolicy> customHitPolicyBehaviors;
+
+
     /**
      * Set this to true if you want to have extra checks on the BPMN xml that is parsed. See http://www.jorambarrez.be/blog/2013/02/19/uploading-a-funny-xml -can-bring-down-your-server/
      * 
@@ -173,6 +186,14 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
      * do enable it.
      */
     protected boolean enableSafeDmnXml;
+
+
+    /**
+     * Set this to false if you want to ignore the decision table hit policy validity checks to result in an failed decision table state.
+     *
+     * A result is that intermediate results created up to the point the validation error occurs are returned.
+     */
+    protected boolean strictMode = true;
 
     public static DmnEngineConfiguration createDmnEngineConfigurationFromResourceDefault() {
         return createDmnEngineConfigurationFromResource("flowable.dmn.cfg.xml", "dmnEngineConfiguration");
@@ -234,6 +255,8 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
         initDeployers();
         initClock();
         initCustomExpressionFunctions();
+        initHitPolicyBehaviors();
+        initRuleEngineExecutor();
     }
 
     // services
@@ -534,6 +557,60 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     public InputStream getMyBatisXmlConfigurationStream() {
         return getResourceAsStream(DEFAULT_MYBATIS_MAPPING_FILE);
     }
+
+
+    // hit policy behaviors
+    /////////////////////////////////////////////////////////
+    public void initHitPolicyBehaviors() {
+        if (hitPolicyBehaviors == null) {
+            hitPolicyBehaviors = getDefaultHitPolicyBehaviors();
+        }
+
+        if (customHitPolicyBehaviors != null) {
+            hitPolicyBehaviors.putAll(customHitPolicyBehaviors);
+        }
+    }
+
+    public Map<String, AbstractHitPolicy> getDefaultHitPolicyBehaviors() {
+        Map<String, AbstractHitPolicy> defaultHitPolicyBehaviors = new HashMap<>();
+
+        // UNIQUE
+        AbstractHitPolicy hitPolicyUniqueBehavior = new HitPolicyUnique();
+        defaultHitPolicyBehaviors.put(hitPolicyUniqueBehavior.getHitPolicyName(), hitPolicyUniqueBehavior);
+
+        // ANY
+        AbstractHitPolicy hitPolicyAnyBehavior = new HitPolicyAny();
+        defaultHitPolicyBehaviors.put(hitPolicyAnyBehavior.getHitPolicyName(), hitPolicyAnyBehavior);
+
+        // FIRST
+        AbstractHitPolicy hitPolicyFirstBehavior = new HitPolicyFirst();
+        defaultHitPolicyBehaviors.put(hitPolicyFirstBehavior.getHitPolicyName(), hitPolicyFirstBehavior);
+
+        // RULE ORDER
+        AbstractHitPolicy HitPolicyRuleOrderBehavior = new HitPolicyRuleOrder();
+        defaultHitPolicyBehaviors.put(HitPolicyRuleOrderBehavior.getHitPolicyName(), HitPolicyRuleOrderBehavior);
+
+        // PRIORITY
+        AbstractHitPolicy HitPolicyPriorityBehavior = new HitPolicyPriority();
+        defaultHitPolicyBehaviors.put(HitPolicyPriorityBehavior.getHitPolicyName(), HitPolicyPriorityBehavior);
+
+        // OUTPUT ORDER
+        AbstractHitPolicy HitPolicyOutputOrderBehavior = new HitPolicyOutputOrder();
+        defaultHitPolicyBehaviors.put(HitPolicyOutputOrderBehavior.getHitPolicyName(), HitPolicyOutputOrderBehavior);
+
+        // COLLECT
+        AbstractHitPolicy HitPolicyCollectBehavior = new HitPolicyCollect();
+        defaultHitPolicyBehaviors.put(HitPolicyCollectBehavior.getHitPolicyName(), HitPolicyCollectBehavior);
+
+        return defaultHitPolicyBehaviors;
+    }
+
+    // rule engine executor
+    /////////////////////////////////////////////////////////////
+    public void initRuleEngineExecutor() {
+        ruleEngineExecutor = new RuleEngineExecutorImpl(hitPolicyBehaviors);
+    }
+
 
     // getters and setters
     // //////////////////////////////////////////////////////
@@ -916,6 +993,15 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
+    public boolean isStrictMode() {
+        return strictMode;
+    }
+
+    public DmnEngineConfiguration setStrictMode(boolean strictMode) {
+        this.strictMode = strictMode;
+        return this;
+    }
+
     public DmnEngineConfiguration setClock(Clock clock) {
         this.clock = clock;
         return this;
@@ -960,5 +1046,21 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     public DmnEngineConfiguration setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
         this.databaseSchemaUpdate = databaseSchemaUpdate;
         return this;
+    }
+
+    public void setHitPolicyBehaviors(Map<String, AbstractHitPolicy> hitPolicyBehaviors) {
+        this.hitPolicyBehaviors = hitPolicyBehaviors;
+    }
+
+    public Map<String, AbstractHitPolicy> getHitPolicyBehaviors() {
+        return hitPolicyBehaviors;
+    }
+
+    public void setCustomHitPolicyBehaviors(Map<String, AbstractHitPolicy> customHitPolicyBehaviors) {
+        this.customHitPolicyBehaviors = customHitPolicyBehaviors;
+    }
+
+    public Map<String, AbstractHitPolicy> getCustomHitPolicyBehaviors() {
+        return customHitPolicyBehaviors;
     }
 }

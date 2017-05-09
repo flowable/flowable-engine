@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:flowable="http://flowable.org/bpmn" xmlns:typeLanguage="http://www.w3.org/2001/XMLSchema" xmlns:expressionLanguage="http://www.w3.org/1999/XPath" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.lbswest.de/LWSPlusMaster">
+  <process id="throwError" isExecutable="true">
+    <startEvent id="_7_0_2_2_601020a_1415776951657_459013_5919"></startEvent>
+    <endEvent id="errorendevent1" name="ErrorEnd">
+      <errorEventDefinition errorRef="myError"></errorEventDefinition>
+    </endEvent>
+    <sequenceFlow id="flow1" sourceRef="_7_0_2_2_601020a_1415776951657_459013_5919" targetRef="scripttask1"></sequenceFlow>
+    <scriptTask id="scripttask1" name="Script Task" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script><![CDATA[System.out.println "Hello";]]></script>
+    </scriptTask>
+    <boundaryEvent id="catchScriptError" name="Error" attachedToRef="scripttask1">
+      <errorEventDefinition></errorEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow2" sourceRef="scripttask1" targetRef="errorendevent1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow3" sourceRef="catchScriptError" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_throwError">
+    <bpmndi:BPMNPlane bpmnElement="throwError" id="BPMNPlane_throwError">
+      <bpmndi:BPMNShape bpmnElement="_7_0_2_2_601020a_1415776951657_459013_5919" id="BPMNShape__7_0_2_2_601020a_1415776951657_459013_5919">
+        <omgdc:Bounds height="35.0" width="35.0" x="50.0" y="29.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="errorendevent1" id="BPMNShape_errorendevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="350.0" y="29.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="150.0" y="19.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="catchScriptError" id="BPMNShape_catchScriptError">
+        <omgdc:Bounds height="30.0" width="30.0" x="195.0" y="59.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="350.0" y="100.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="85.0" y="46.0"></omgdi:waypoint>
+        <omgdi:waypoint x="150.0" y="46.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="255.0" y="46.0"></omgdi:waypoint>
+        <omgdi:waypoint x="350.0" y="46.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="210.0" y="89.0"></omgdi:waypoint>
+        <omgdi:waypoint x="209.0" y="117.0"></omgdi:waypoint>
+        <omgdi:waypoint x="350.0" y="117.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

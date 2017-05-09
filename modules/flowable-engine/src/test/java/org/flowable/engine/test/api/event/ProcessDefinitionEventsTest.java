@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,12 +19,13 @@ import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
 
 /**
  * Test case for all {@link FlowableEvent}s related to process definitions.
- * 
+ *
  * @author Frederik Heremans
  */
 public class ProcessDefinitionEventsTest extends PluggableFlowableTestCase {
@@ -135,7 +136,7 @@ public class ProcessDefinitionEventsTest extends PluggableFlowableTestCase {
     protected void initializeServices() {
         super.initializeServices();
 
-        listener = new TestMultipleFlowableEventListener();
+        listener = new ProcessDefinitionEventsListener();
         listener.setEventClasses(FlowableEntityEvent.class);
         listener.setEntityClasses(ProcessDefinition.class, TimerJobEntity.class);
 
@@ -151,4 +152,26 @@ public class ProcessDefinitionEventsTest extends PluggableFlowableTestCase {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
         }
     }
+
+    private static class ProcessDefinitionEventsListener extends TestMultipleFlowableEventListener {
+        @Override
+        public void onEvent(FlowableEvent event) {
+            super.onEvent(event);
+            if (event instanceof FlowableEntityEvent) {
+
+                Object entity = ((FlowableEntityEvent) event).getEntity();
+                switch ((FlowableEngineEventType) event.getType()) {
+                    case ENTITY_CREATED:
+                        if (entity instanceof ProcessDefinitionEntity) {
+                            // It is necessary to have process already present on the ProcessDefinitionEntity CREATE event
+                            ProcessDefinitionUtil.getProcess(((ProcessDefinitionEntity) entity).getId());
+
+                        }
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
 }

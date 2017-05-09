@@ -29,28 +29,34 @@ public class CommandInvoker extends AbstractCommandInterceptor {
     @SuppressWarnings("unchecked")
     public <T> T execute(final CommandConfig config, final Command<T> command) {
         final CommandContext commandContext = Context.getCommandContext();
+        
+        if (commandContext.isReused()) {
+            return (T) command.execute(commandContext);
+            
+        } else {
 
-        // Execute the command.
-        // This will produce operations that will be put on the agenda.
-        commandContext.getAgenda().planOperation(new Runnable() {
-
-            @Override
-            public void run() {
-                commandContext.setResult(command.execute(commandContext));
-            }
-        });
-
-        // Run loop for agenda
-        executeOperations(commandContext);
-
-        // At the end, call the execution tree change listeners.
-        // TODO: optimization: only do this when the tree has actually changed (ie check dbSqlSession).
-        if (commandContext.hasInvolvedExecutions()) {
-            commandContext.getAgenda().planExecuteInactiveBehaviorsOperation();
+            // Execute the command.
+            // This will produce operations that will be put on the agenda.
+            commandContext.getAgenda().planOperation(new Runnable() {
+    
+                @Override
+                public void run() {
+                    commandContext.setResult(command.execute(commandContext));
+                }
+            });
+    
+            // Run loop for agenda
             executeOperations(commandContext);
+    
+            // At the end, call the execution tree change listeners.
+            // TODO: optimization: only do this when the tree has actually changed (ie check dbSqlSession).
+            if (!commandContext.isReused() && commandContext.hasInvolvedExecutions()) {
+                commandContext.getAgenda().planExecuteInactiveBehaviorsOperation();
+                executeOperations(commandContext);
+            }
+    
+            return (T) commandContext.getResult();
         }
-
-        return (T) commandContext.getResult();
     }
 
     protected void executeOperations(final CommandContext commandContext) {

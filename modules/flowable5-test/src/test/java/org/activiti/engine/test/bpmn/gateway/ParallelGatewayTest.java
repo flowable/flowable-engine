@@ -66,7 +66,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
     public void testNestedForkJoin() {
         runtimeService.startProcessInstanceByKey("nestedForkJoin");
 
-        // After process startm, only task 0 should be active
+        // After process starts, only task 0 should be active
         TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
         List<Task> tasks = query.list();
         assertEquals(1, tasks.size());
@@ -104,7 +104,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
      * https://activiti.atlassian.net/browse/ACT-1222
      */
     @Deployment
-    public void testReceyclingExecutionWithCallActivity() {
+    public void testRecyclingExecutionWithCallActivity() {
         runtimeService.startProcessInstanceByKey("parent-process");
 
         // After process start we have two tasks, one from the parent and one from the sub process

@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.api.history;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,8 +38,6 @@ import org.flowable.engine.task.Task;
 import org.flowable.engine.task.TaskQuery;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.api.runtime.ProcessInstanceQueryTest;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Frederik Heremans
@@ -248,11 +248,10 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml", "org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
     public void testHistoricProcessInstanceQueryByDeploymentId() {
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
-        HashSet<String> processInstanceIds = new HashSet<String>();
         for (int i = 0; i < 4; i++) {
-            processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i)).getId());
+            runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i));
         }
-        processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1").getId());
+        runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1");
 
         HistoricProcessInstanceQuery processInstanceQuery = historyService.createHistoricProcessInstanceQuery().deploymentId(deployment.getId());
         assertEquals(5, processInstanceQuery.count());
@@ -269,11 +268,10 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml", "org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
     public void testHistoricProcessInstanceQueryByDeploymentIdIn() {
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
-        HashSet<String> processInstanceIds = new HashSet<String>();
         for (int i = 0; i < 4; i++) {
-            processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i)).getId());
+            runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i));
         }
-        processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1").getId());
+        runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1");
 
         List<String> deploymentIds = new ArrayList<String>();
         deploymentIds.add(deployment.getId());
@@ -294,11 +292,10 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml", "org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
     public void testHistoricTaskInstanceQueryByDeploymentId() {
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
-        HashSet<String> processInstanceIds = new HashSet<String>();
         for (int i = 0; i < 4; i++) {
-            processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i)).getId());
+            runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i));
         }
-        processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1").getId());
+        runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1");
 
         HistoricTaskInstanceQuery taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().deploymentId(deployment.getId());
         assertEquals(5, taskInstanceQuery.count());
@@ -314,11 +311,10 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml", "org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
     public void testHistoricTaskInstanceQueryByDeploymentIdIn() {
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
-        HashSet<String> processInstanceIds = new HashSet<String>();
         for (int i = 0; i < 4; i++) {
-            processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i)).getId());
+            runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i));
         }
-        processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1").getId());
+        runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1");
 
         List<String> deploymentIds = new ArrayList<String>();
         deploymentIds.add(deployment.getId());
@@ -342,11 +338,10 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml", "org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
     public void testHistoricTaskInstanceOrQueryByDeploymentId() {
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
-        HashSet<String> processInstanceIds = new HashSet<String>();
         for (int i = 0; i < 4; i++) {
-            processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i)).getId());
+            runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i));
         }
-        processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1").getId());
+        runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1");
 
         HistoricTaskInstanceQuery taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().or().deploymentId(deployment.getId()).endOr();
         assertEquals(5, taskInstanceQuery.count());
@@ -426,11 +421,10 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml", "org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
     public void testHistoricTaskInstanceOrQueryByDeploymentIdIn() {
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
-        HashSet<String> processInstanceIds = new HashSet<String>();
         for (int i = 0; i < 4; i++) {
-            processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i)).getId());
+            runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i));
         }
-        processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1").getId());
+        runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1");
 
         List<String> deploymentIds = new ArrayList<String>();
         deploymentIds.add(deployment.getId());

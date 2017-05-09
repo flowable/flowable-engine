@@ -13,15 +13,13 @@
 
 package org.flowable.rest.service.api.management;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.runtime.Job;
 import org.flowable.rest.service.api.RestActionRequest;
 import org.flowable.rest.service.api.RestResponseFactory;
@@ -33,24 +31,33 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
  * @author Joram Barrez
+ * @author Tijs Rademakers
  */
 @RestController
 @Api(tags = { "Jobs" }, description = "Manage Jobs", authorizations = { @Authorization(value = "basicAuth") })
 public class JobResource {
 
     private static final String EXECUTE_ACTION = "execute";
+    private static final String MOVE_ACTION = "move";
 
     @Autowired
     protected RestResponseFactory restResponseFactory;
 
     @Autowired
     protected ManagementService managementService;
+    
+    @Autowired
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
     @ApiOperation(value = "Get a single job", tags = { "Jobs" })
     @ApiResponses(value = {
@@ -147,6 +154,22 @@ public class JobResource {
         }
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }
+    
+    @ApiOperation(value = "Delete a suspended job", tags = { "Jobs" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the job was found and has been deleted. Response-body is intentionally empty."),
+            @ApiResponse(code = 404, message = "Indicates the requested job was not found.")
+    })
+    @RequestMapping(value = "/management/suspended-jobs/{jobId}", method = RequestMethod.DELETE)
+    public void deleteSuspendeJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
+        try {
+            managementService.deleteSuspendedJob(jobId);
+        } catch (FlowableObjectNotFoundException aonfe) {
+            // Re-throw to have consistent error-messaging across REST-api
+            throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
+        }
+        response.setStatus(HttpStatus.NO_CONTENT.value());
+    }
 
     @ApiOperation(value = "Delete a deadletter job", tags = { "Jobs" })
     @ApiResponses(value = {
@@ -181,6 +204,50 @@ public class JobResource {
         } catch (FlowableObjectNotFoundException aonfe) {
             // Re-throw to have consistent error-messaging across REST-api
             throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
+        }
+
+        response.setStatus(HttpStatus.NO_CONTENT.value());
+    }
+    
+    @ApiOperation(value = "Move a single timer job", tags = { "Jobs" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the timer job was moved. Response-body is intentionally empty."),
+            @ApiResponse(code = 404, message = "Indicates the requested job was not found."),
+            @ApiResponse(code = 500, message = "Indicates the an exception occurred while executing the job. The status-description contains additional detail about the error. The full error-stacktrace can be fetched later on if needed.")
+    })
+    @RequestMapping(value = "/management/timer-jobs/{jobId}", method = RequestMethod.POST)
+    public void executeTimerJobAction(@ApiParam(name = "jobId") @PathVariable String jobId, @RequestBody RestActionRequest actionRequest, HttpServletResponse response) {
+        if (actionRequest == null || !MOVE_ACTION.equals(actionRequest.getAction())) {
+            throw new FlowableIllegalArgumentException("Invalid action, only 'move' is supported.");
+        }
+
+        try {
+            managementService.moveTimerToExecutableJob(jobId);
+        } catch (FlowableObjectNotFoundException aonfe) {
+            // Re-throw to have consistent error-messaging across REST-api
+            throw new FlowableObjectNotFoundException("Could not find a timer job with id '" + jobId + "'.", Job.class);
+        }
+
+        response.setStatus(HttpStatus.NO_CONTENT.value());
+    }
+    
+    @ApiOperation(value = "Move a single deadletter job", tags = { "Jobs" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the dead letter job was moved. Response-body is intentionally empty."),
+            @ApiResponse(code = 404, message = "Indicates the requested job was not found."),
+            @ApiResponse(code = 500, message = "Indicates the an exception occurred while executing the job. The status-description contains additional detail about the error. The full error-stacktrace can be fetched later on if needed.")
+    })
+    @RequestMapping(value = "/management/deadletter-jobs/{jobId}", method = RequestMethod.POST)
+    public void executeDeadLetterJobAction(@ApiParam(name = "jobId") @PathVariable String jobId, @RequestBody RestActionRequest actionRequest, HttpServletResponse response) {
+        if (actionRequest == null || !MOVE_ACTION.equals(actionRequest.getAction())) {
+            throw new FlowableIllegalArgumentException("Invalid action, only 'move' is supported.");
+        }
+
+        try {
+            managementService.moveDeadLetterJobToExecutableJob(jobId, processEngineConfiguration.getAsyncExecutorNumberOfRetries());
+        } catch (FlowableObjectNotFoundException aonfe) {
+            // Re-throw to have consistent error-messaging across REST-api
+            throw new FlowableObjectNotFoundException("Could not find a dead letter job with id '" + jobId + "'.", Job.class);
         }
 
         response.setStatus(HttpStatus.NO_CONTENT.value());

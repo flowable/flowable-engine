@@ -26,9 +26,10 @@ import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableEntityWithVariablesEvent;
 import org.flowable.engine.delegate.event.FlowableErrorEvent;
+import org.flowable.engine.delegate.event.FlowableJobRescheduledEvent;
 import org.flowable.engine.delegate.event.FlowableMessageEvent;
 import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
-import org.flowable.engine.delegate.event.FlowableJobRescheduledEvent;
+import org.flowable.engine.delegate.event.FlowableProcessTerminatedEvent;
 import org.flowable.engine.delegate.event.FlowableSequenceFlowTakenEvent;
 import org.flowable.engine.delegate.event.FlowableSignalEvent;
 import org.flowable.engine.delegate.event.FlowableVariableEvent;
@@ -266,6 +267,10 @@ public class FlowableEventBuilder {
         return newEvent;
     }
 
+    public static FlowableProcessTerminatedEvent createTerminateEvent(ExecutionEntity execution, Object cause) {
+        return new FlowableProcessTerminatedEventImpl(execution, cause);
+    }
+
     public static FlowableSignalEvent createSignalEvent(FlowableEngineEventType type, String activityId, String signalName, Object signalData, String executionId, String processInstanceId,
             String processDefinitionId) {
         FlowableSignalEventImpl newEvent = new FlowableSignalEventImpl(type);
@@ -317,17 +322,17 @@ public class FlowableEventBuilder {
 
     protected static void populateEventWithCurrentContext(FlowableEventImpl event) {
         if (event instanceof FlowableEntityEvent) {
-            Object persistendObject = ((FlowableEntityEvent) event).getEntity();
-            if (persistendObject instanceof Job) {
-                event.setExecutionId(((Job) persistendObject).getExecutionId());
-                event.setProcessInstanceId(((Job) persistendObject).getProcessInstanceId());
-                event.setProcessDefinitionId(((Job) persistendObject).getProcessDefinitionId());
-            } else if (persistendObject instanceof DelegateExecution) {
-                event.setExecutionId(((DelegateExecution) persistendObject).getId());
-                event.setProcessInstanceId(((DelegateExecution) persistendObject).getProcessInstanceId());
-                event.setProcessDefinitionId(((DelegateExecution) persistendObject).getProcessDefinitionId());
-            } else if (persistendObject instanceof IdentityLinkEntity) {
-                IdentityLinkEntity idLink = (IdentityLinkEntity) persistendObject;
+            Object persistedObject = ((FlowableEntityEvent) event).getEntity();
+            if (persistedObject instanceof Job) {
+                event.setExecutionId(((Job) persistedObject).getExecutionId());
+                event.setProcessInstanceId(((Job) persistedObject).getProcessInstanceId());
+                event.setProcessDefinitionId(((Job) persistedObject).getProcessDefinitionId());
+            } else if (persistedObject instanceof DelegateExecution) {
+                event.setExecutionId(((DelegateExecution) persistedObject).getId());
+                event.setProcessInstanceId(((DelegateExecution) persistedObject).getProcessInstanceId());
+                event.setProcessDefinitionId(((DelegateExecution) persistedObject).getProcessDefinitionId());
+            } else if (persistedObject instanceof IdentityLinkEntity) {
+                IdentityLinkEntity idLink = (IdentityLinkEntity) persistedObject;
                 if (idLink.getProcessDefinitionId() != null) {
                     event.setProcessDefinitionId(idLink.getProcessDefId());
                 } else if (idLink.getProcessInstance() != null) {
@@ -339,12 +344,12 @@ public class FlowableEventBuilder {
                     event.setProcessInstanceId(idLink.getTask().getProcessInstanceId());
                     event.setExecutionId(idLink.getTask().getExecutionId());
                 }
-            } else if (persistendObject instanceof Task) {
-                event.setProcessInstanceId(((Task) persistendObject).getProcessInstanceId());
-                event.setExecutionId(((Task) persistendObject).getExecutionId());
-                event.setProcessDefinitionId(((Task) persistendObject).getProcessDefinitionId());
-            } else if (persistendObject instanceof ProcessDefinition) {
-                event.setProcessDefinitionId(((ProcessDefinition) persistendObject).getId());
+            } else if (persistedObject instanceof Task) {
+                event.setProcessInstanceId(((Task) persistedObject).getProcessInstanceId());
+                event.setExecutionId(((Task) persistedObject).getExecutionId());
+                event.setProcessDefinitionId(((Task) persistedObject).getProcessDefinitionId());
+            } else if (persistedObject instanceof ProcessDefinition) {
+                event.setProcessDefinitionId(((ProcessDefinition) persistedObject).getId());
             }
         }
     }

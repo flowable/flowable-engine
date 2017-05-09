@@ -107,7 +107,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
      * https://activiti.atlassian.net/browse/ACT-1222
      */
     @Deployment
-    public void testReceyclingExecutionWithCallActivity() {
+    public void testRecyclingExecutionWithCallActivity() {
         runtimeService.startProcessInstanceByKey("parent-process");
 
         // After process start we have two tasks, one from the parent and one

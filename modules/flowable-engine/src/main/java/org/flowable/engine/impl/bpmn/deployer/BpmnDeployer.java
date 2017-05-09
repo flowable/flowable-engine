@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -85,12 +85,15 @@ public class BpmnDeployer implements Deployer {
             setProcessDefinitionVersionsAndIds(parsedDeployment, mapOfNewProcessDefinitionToPreviousVersion);
             persistProcessDefinitionsAndAuthorizations(parsedDeployment);
             updateTimersAndEvents(parsedDeployment, mapOfNewProcessDefinitionToPreviousVersion);
-            dispatchProcessDefinitionEntityInitializedEvent(parsedDeployment);
         } else {
             makeProcessDefinitionsConsistentWithPersistedVersions(parsedDeployment);
         }
 
         cachingAndArtifactsManager.updateCachingAndArtifacts(parsedDeployment);
+
+        if (deployment.isNew()) {
+            dispatchProcessDefinitionEntityInitializedEvent(parsedDeployment);
+        }
 
         for (ProcessDefinitionEntity processDefinition : parsedDeployment.getAllProcessDefinitions()) {
             BpmnModel bpmnModel = parsedDeployment.getBpmnModelForProcessDefinition(processDefinition);
@@ -100,7 +103,7 @@ public class BpmnDeployer implements Deployer {
 
     /**
      * Creates new diagrams for process definitions if the deployment is new, the process definition in question supports it, and the engine is configured to make new diagrams.
-     * 
+     *
      * When this method creates a new diagram, it also persists it via the ResourceEntityManager and adds it to the resources of the deployment.
      */
     protected void createAndPersistNewDiagramsIfNeeded(ParsedDeployment parsedDeployment) {
@@ -181,6 +184,8 @@ public class BpmnDeployer implements Deployer {
                 }
             }
 
+            cachingAndArtifactsManager.updateProcessDefinitionCache(parsedDeployment);
+
             if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
                 commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition));
             }
@@ -222,7 +227,7 @@ public class BpmnDeployer implements Deployer {
 
     /**
      * Returns the ID to use for a new process definition; subclasses may override this to provide their own identification scheme.
-     * 
+     *
      * Process definition ids NEED to be unique across the whole engine!
      */
     protected String getIdForNewProcessDefinition(ProcessDefinitionEntity processDefinition) {
@@ -248,6 +253,8 @@ public class BpmnDeployer implements Deployer {
                 processDefinition.setId(persistedProcessDefinition.getId());
                 processDefinition.setVersion(persistedProcessDefinition.getVersion());
                 processDefinition.setSuspensionState(persistedProcessDefinition.getSuspensionState());
+                processDefinition.setHasStartFormKey(persistedProcessDefinition.hasStartFormKey());
+                processDefinition.setGraphicalNotationDefined(persistedProcessDefinition.isGraphicalNotationDefined());
             }
         }
     }

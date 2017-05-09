@@ -38,7 +38,7 @@ public interface DeadLetterJobQuery extends Query<DeadLetterJobQuery, Job> {
     DeadLetterJobQuery handlerType(String handlerType);
 
     /** Only select jobs which exist for the given process definition id */
-    DeadLetterJobQuery processDefinitionId(String processDefinitionid);
+    DeadLetterJobQuery processDefinitionId(String processDefinitionId);
 
     /**
      * Only select jobs which are executable, ie. duedate is null or duedate is in the past

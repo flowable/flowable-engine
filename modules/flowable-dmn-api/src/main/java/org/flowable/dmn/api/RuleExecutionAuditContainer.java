@@ -12,9 +12,11 @@
  */
 package org.flowable.dmn.api;
 
-import java.util.ArrayList;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Yvo Swillens
@@ -24,19 +26,26 @@ public class RuleExecutionAuditContainer {
     protected Date startTime;
     protected Date endTime;
 
-    protected List<ExpressionExecution> conditionResults = new ArrayList<ExpressionExecution>();
-    protected List<ExpressionExecution> conclusionResults = new ArrayList<ExpressionExecution>();
+    protected int ruleNumber;
+    protected Boolean valid = Boolean.FALSE;
 
-    public RuleExecutionAuditContainer() {
+    @JsonProperty("exception")
+    protected String exceptionMessage;
+
+    protected Map<Integer, ExpressionExecution> conditionResults = new HashMap<>();
+    protected Map<Integer, ExpressionExecution> conclusionResults = new HashMap<>();
+
+    public RuleExecutionAuditContainer(int ruleNumber) {
+        this.ruleNumber = ruleNumber;
         this.startTime = new Date();
     }
 
-    public void addConditionResult(ExpressionExecution expressionExecution) {
-        conditionResults.add(expressionExecution);
+    public void addConditionResult(int inputNumber, ExpressionExecution expressionExecution) {
+        conditionResults.put(inputNumber, expressionExecution);
     }
 
-    public void addConclusionResult(ExpressionExecution executionResult) {
-        conclusionResults.add(executionResult);
+    public void addConclusionResult(int outputNumber, ExpressionExecution executionResult) {
+        conclusionResults.put(outputNumber, executionResult);
     }
 
     public void markRuleEnd() {
@@ -59,19 +68,32 @@ public class RuleExecutionAuditContainer {
         this.endTime = endTime;
     }
 
-    public List<ExpressionExecution> getConditionResults() {
+    public int getRuleNumber() {
+        return ruleNumber;
+    }
+
+    public Boolean isValid() {
+        return valid;
+    }
+
+    public void setValid() {
+        this.valid = Boolean.TRUE;
+    }
+
+    public String getExceptionMessage() {
+        return exceptionMessage;
+    }
+
+    public void setExceptionMessage(String exceptionMessage) {
+        this.exceptionMessage = exceptionMessage;
+    }
+
+    public Map<Integer, ExpressionExecution> getConditionResults() {
         return conditionResults;
     }
 
-    public void setConditionResults(List<ExpressionExecution> conditionResults) {
-        this.conditionResults = conditionResults;
-    }
-
-    public List<ExpressionExecution> getConclusionResults() {
+    public Map<Integer, ExpressionExecution> getConclusionResults() {
         return conclusionResults;
     }
 
-    public void setConclusionResults(List<ExpressionExecution> conclusionResults) {
-        this.conclusionResults = conclusionResults;
-    }
 }

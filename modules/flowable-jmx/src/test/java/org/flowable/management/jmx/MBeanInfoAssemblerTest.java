@@ -62,7 +62,7 @@ public class MBeanInfoAssemblerTest {
     }
 
     @Test
-    public void testReadAtributeInfoHappyPath() throws JMException {
+    public void testReadAttributeInfoHappyPath() throws JMException {
         ModelMBeanInfo beanInfo = mbeanInfoAssembler.getMBeanInfo(testMbean, null, "someName");
         assertNotNull(beanInfo);
 
@@ -96,7 +96,7 @@ public class MBeanInfoAssemblerTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testAttributeGetterNameNotCaptial() throws JMException {
+    public void testAttributeGetterNameNotCapitial() throws JMException {
         mbeanInfoAssembler.getMBeanInfo(new BadAttributeGetterNameNotCapital(), null, "someName");
 
     }
@@ -107,7 +107,7 @@ public class MBeanInfoAssemblerTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testAttributeSetterNameNotCaptial() throws JMException {
+    public void testAttributeSetterNameNotCapitial() throws JMException {
         mbeanInfoAssembler.getMBeanInfo(new BadAttributeSetterNameNotCapital(), null, "someName");
     }
 

@@ -31,7 +31,7 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
     private static final String PROCESS_DEFINITION_KEY = "oneTaskProcess";
     private static final String PROCESS_DEFINITION_KEY_2 = "oneTaskProcess2";
     private static final String PROCESS_DEFINITION_NAME_2 = "oneTaskProcess2Name";
-    private static final String PROCESS_DEFINITION_CATEGORY_2 = "org.activiti.enginge.test.api.runtime.2Category";
+    private static final String PROCESS_DEFINITION_CATEGORY_2 = "org.activiti.engine.test.api.runtime.2Category";
     private static final String PROCESS_DEFINITION_KEY_3 = "oneTaskProcess3";
 
     private List<String> processInstanceIds;

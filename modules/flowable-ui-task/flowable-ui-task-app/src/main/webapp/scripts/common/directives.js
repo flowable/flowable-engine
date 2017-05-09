@@ -1306,3 +1306,50 @@ flowableModule.
             }
         };
     });
+
+
+flowableModule.
+directive('decimalNumberInputCheck', function() {
+
+    return {
+        require: 'ngModel',
+        link: function(scope, element, attrs, modelCtrl) {
+
+            modelCtrl.$parsers.push(function (inputValue) {
+
+            	var transformedInput = inputValue;
+                var negativeSign = '';                
+
+                if (transformedInput && transformedInput.indexOf('-') == 0) {
+                    negativeSign = '-';
+                    transformedInput = inputValue.substr(1);
+                }
+
+                if(transformedInput && transformedInput.indexOf('.') == 0 ){
+                    transformedInput = "0" + transformedInput;
+                }
+
+                if(transformedInput && transformedInput.indexOf('.') > -1){       
+                    var dotIndex = transformedInput.indexOf('.');             
+                    var left = transformedInput.substr(0, dotIndex);
+                    var right = transformedInput.substr(dotIndex+1);
+                    
+                    left = left.replace(/([^0-9])/g, '');
+                    right = right.replace(/([^0-9])/g, '');
+                    transformedInput = negativeSign + left + '.' + right;
+                }
+                else{
+                    transformedInput = negativeSign + transformedInput.replace(/([^0-9])/g, '');
+                }
+
+
+                if (transformedInput != inputValue) {
+                    modelCtrl.$setViewValue(transformedInput);
+                    modelCtrl.$render();
+                }
+
+                return transformedInput;
+            });
+        }
+    };
+});

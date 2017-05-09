@@ -17,6 +17,12 @@
         <span class="marker" ng-if="field.required">*</span>
         <input id="{{activitiFieldIdPrefix + field.id}}" type="text" name="{{field.id}}" class="form-control" placeholder="{{field.placeholder}}" ng-model="field.value" ng-change="onFieldValueChange(field)" ng-blur="onFieldBlur(field)" ng-focus="onFieldFocus(field)" number-input-check ng-required="field.required">
     </div>
+    
+    <div ng-switch-when="decimal" class="form-group" ng-show="field.isVisible" ng-class="{'has-error': field.required && isEmpty(field)}">
+        <label class="control-label">{{field.name}}</label>
+        <span class="marker" ng-if="field.required">*</span>
+        <input id="{{activitiFieldIdPrefix + field.id}}" type="text" name="{{field.id}}" class="form-control" placeholder="{{field.placeholder}}" ng-model="field.value" ng-change="onFieldValueChange(field)" ng-blur="onFieldBlur(field)" ng-focus="onFieldFocus(field)" decimal-number-input-check ng-required="field.required">
+    </div>
 
     <div ng-switch-when="date" class="form-group" ng-show="field.isVisible" ng-class="{'has-error': field.required && isEmpty(field)}">
         <label class="control-label"><i class="glyphicon glyphicon-calendar"></i> {{field.name}}</label>
@@ -119,8 +125,16 @@
     </div>
     
     <div ng-switch-when="expression" class="form-group" ng-show="field.isVisible">
-    	<div class="well well-sm">
-        	{{field.value && field.value || ('FORM.MESSAGE.EMPTY' | translate)}}
+    	<div class="well well-sm" ng-style="{'font-size': field.params.size + 'em'}">
+    		<div ng-show="!field.value && !field.expression">
+    			{{'FORM.MESSAGE.EMPTY' | translate}}
+    		</div>
+    		<div ng-show="!field.value">
+    			{{field.expression}}
+    		</div>
+    		<div ng-show="field.value">
+    			{{field.value}}
+    		</div>        	
         </div>
     </div>
 </div>
@@ -176,8 +190,16 @@
     </div>
     
     <div ng-switch-when="expression" ng-show="field.isVisible">
-        <div class="well well-sm">
-            {{field.value && field.value || ('FORM.MESSAGE.EMPTY' | translate)}}
+        <div class="well well-sm" ng-style="{'font-size': field.params.size + 'em'}">
+    		<div ng-show="!field.value && !field.expression">
+    			{{'FORM.MESSAGE.EMPTY' | translate}}
+    		</div>
+    		<div ng-show="!field.value">
+    			{{field.expression}}
+    		</div>
+    		<div ng-show="field.value">
+    			{{field.value}}
+    		</div>        	
         </div>
     </div>
 

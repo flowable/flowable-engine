@@ -157,7 +157,7 @@ public abstract class ProcessEngineConfiguration {
     /** define the default wait time for a failed async job in seconds */
     protected int asyncFailedJobWaitTime = 10;
 
-    /** process diagram generator. Default value is DefaulProcessDiagramGenerator */
+    /** process diagram generator. Default value is DefaultProcessDiagramGenerator */
     protected ProcessDiagramGenerator processDiagramGenerator;
 
     /**

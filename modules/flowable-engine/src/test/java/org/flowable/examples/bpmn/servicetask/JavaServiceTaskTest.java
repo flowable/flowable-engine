@@ -20,6 +20,7 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
@@ -62,6 +63,41 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         assertEquals("timrek .rM olleH", runtimeService.getVariable(execution.getId(), "var2"));
         assertEquals("elam :si redneg ruoY", runtimeService.getVariable(execution.getId(), "var1"));
     }
+    
+    @Deployment
+    public void testServiceTaskWithSkipExpression() {
+      Map<String, Object> vars = new HashMap<String, Object>();
+      vars.put("input", "test");
+      vars.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
+      vars.put("skip", true);
+      
+      ProcessInstance pi = runtimeService.startProcessInstanceByKey("serviceTask", vars);
+      
+      Execution waitExecution = runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).onlyChildExecutions().singleResult();
+      assertNotNull(waitExecution);
+      assertEquals("waitState", waitExecution.getActivityId());
+    }
+    
+    @Deployment
+    public void testAsyncServiceTaskWithSkipExpression() {
+      Map<String, Object> vars = new HashMap<String, Object>();
+      vars.put("input", "test");
+      
+      ProcessInstance pi = runtimeService.startProcessInstanceByKey("asyncServiceTask", vars);
+      Job job = managementService.createJobQuery().processInstanceId(pi.getProcessInstanceId()).singleResult();
+      assertNotNull(job);
+      
+      vars = new HashMap<String, Object>();
+      vars.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
+      vars.put("skip", true);
+      runtimeService.setVariables(pi.getProcessInstanceId(), vars);
+      
+      managementService.executeJob(job.getId());
+      
+      Execution waitExecution = runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).onlyChildExecutions().singleResult();
+      assertNotNull(waitExecution);
+      assertEquals("waitState", waitExecution.getActivityId());
+    }
 
     @Deployment
     public void testExpressionFieldInjectionWithSkipExpression() {
@@ -74,6 +110,8 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
 
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("expressionFieldInjectionWithSkipExpression", vars);
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(pi.getId()).activityId("waitState").singleResult();
+        
+        assertNotNull(execution);
 
         assertEquals("timrek .rM olleH", runtimeService.getVariable(execution.getId(), "var2"));
         assertEquals("elam :si redneg ruoY", runtimeService.getVariable(execution.getId(), "var1"));
@@ -88,7 +126,11 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("expressionFieldInjectionWithSkipExpression", vars2);
         Execution execution2 = runtimeService.createExecutionQuery().processInstanceId(pi2.getId()).activityId("waitState").singleResult();
 
-        assertNull(execution2);
+        assertNotNull(execution2);
+
+        Map<String, Object> pi2VarMap = runtimeService.getVariables(pi2.getProcessInstanceId());
+        assertFalse(pi2VarMap.containsKey("var1"));
+        assertFalse(pi2VarMap.containsKey("var2"));
     }
 
     @Deployment

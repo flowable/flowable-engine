@@ -27,19 +27,23 @@ import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
 public class DbSqlSessionFactory implements SessionFactory {
+    
+    private static Logger logger = LoggerFactory.getLogger(DbSqlSessionFactory.class);
 
-    protected static final Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<String, Map<String, String>>();
+    protected Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<String, Map<String, String>>();
 
     /**
      * A map {class, boolean}, to indicate whether or not a certain {@link Entity} class can be bulk inserted.
      */
-    protected static Map<Class<? extends Entity>, Boolean> bulkInsertableMap;
+    protected Map<Class<? extends Entity>, Boolean> bulkInsertableMap;
 
     protected String databaseType;
     protected String databaseTablePrefix = "";
@@ -143,7 +147,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     // db specific mappings
     // /////////////////////////////////////////////////////
 
-    protected static void addDatabaseSpecificStatement(String databaseType, String activitiStatement, String ibatisStatement) {
+    protected void addDatabaseSpecificStatement(String databaseType, String activitiStatement, String ibatisStatement) {
         Map<String, String> specificStatements = databaseSpecificStatements.get(databaseType);
         if (specificStatements == null) {
             specificStatements = new HashMap<String, String>();
@@ -214,6 +218,14 @@ public class DbSqlSessionFactory implements SessionFactory {
         return databaseType;
     }
 
+    public Map<String, Map<String, String>> getDatabaseSpecificStatements() {
+        return databaseSpecificStatements;
+    }
+
+    public void setDatabaseSpecificStatements(Map<String, Map<String, String>> databaseSpecificStatements) {
+        this.databaseSpecificStatements = databaseSpecificStatements;
+    }
+
     public Map<String, String> getStatementMappings() {
         return statementMappings;
     }
@@ -260,6 +272,14 @@ public class DbSqlSessionFactory implements SessionFactory {
 
     public void setBulkDeleteStatements(Map<Class<?>, String> bulkDeleteStatements) {
         this.bulkDeleteStatements = bulkDeleteStatements;
+    }
+
+    public Map<Class<? extends Entity>, Boolean> getBulkInsertableMap() {
+        return bulkInsertableMap;
+    }
+
+    public void setBulkInsertableMap(Map<Class<? extends Entity>, Boolean> bulkInsertableMap) {
+        this.bulkInsertableMap = bulkInsertableMap;
     }
 
     public Map<Class<?>, String> getSelectStatements() {

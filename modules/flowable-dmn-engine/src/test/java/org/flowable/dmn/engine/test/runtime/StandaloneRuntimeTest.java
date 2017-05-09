@@ -22,6 +22,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,8 +43,8 @@ public class StandaloneRuntimeTest {
         inputVariables.put("inputVariable1", 2);
         inputVariables.put("inputVariable2", "test2");
 
-        RuleEngineExecutionResult result = dmnRuleService.executeDecisionByKey("decision1", inputVariables);
+        Map<String, Object> result = dmnRuleService.executeDecisionByKeySingleResult("decision1", inputVariables);
 
-        Assert.assertEquals("result2", result.getResultVariables().get("outputVariable1"));
+        Assert.assertEquals("result2", result.get("outputVariable1"));
     }
 }

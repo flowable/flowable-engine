@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,12 +13,13 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.Expression;
@@ -27,11 +28,9 @@ import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * ActivityBehavior that evaluates an expression when executed. Optionally, it sets the result of the expression as a variable on the execution.
- * 
+ *
  * @author Tom Baeyens
  * @author Christian Stettler
  * @author Frederik Heremans
@@ -100,7 +99,7 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
             if (error != null) {
                 ErrorPropagation.propagateError(error, execution);
             } else {
-                throw new FlowableException("Could not execute service task expression", exc);
+                throw exc;
             }
         }
     }

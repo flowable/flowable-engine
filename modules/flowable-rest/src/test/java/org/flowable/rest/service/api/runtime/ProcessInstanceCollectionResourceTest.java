@@ -42,8 +42,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCase {
 
-    // check if process instance query with business key with and without
-    // includeProcess Variables
+    // check if process instance query with business key with and without includeProcess Variables
     // related to https://activiti.atlassian.net/browse/ACT-1992
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
     public void testGetProcessInstancesByBusinessKeyAndIncludeVariables() throws Exception {

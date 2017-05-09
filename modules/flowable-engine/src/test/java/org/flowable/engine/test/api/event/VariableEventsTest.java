@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,10 +12,12 @@
  */
 package org.flowable.engine.test.api.event;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventType;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableVariableEvent;
 import org.flowable.engine.impl.history.HistoryLevel;
@@ -25,10 +27,14 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.hamcrest.CoreMatchers;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * Test case for all {@link FlowableEvent}s related to variables.
- * 
+ *
  * @author Frederik Heremans
  */
 public class VariableEventsTest extends PluggableFlowableTestCase {
@@ -167,6 +173,33 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         // Execution and process-id should differ
         assertEquals(child.getId(), event.getExecutionId());
         assertEquals(processInstance.getId(), event.getProcessInstanceId());
+    }
+
+    @Deployment
+    public void testProcessInstanceVariableEventsOnCallActivity() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callVariableProcess",
+                Collections.<String, Object>singletonMap("parentVar1", "parentVar1Value"));
+        assertNotNull(processInstance);
+
+        assertEquals(6, listener.getEventsReceived().size());
+        FlowableVariableEvent event = (FlowableVariableEvent) listener.getEventsReceived().get(0);
+        assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_CREATED));
+        assertThat(event.getVariableName(), is("parentVar1"));
+        event = (FlowableVariableEvent) listener.getEventsReceived().get(1);
+        assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_CREATED));
+        assertThat(event.getVariableName(), is("subVar1"));
+        event = (FlowableVariableEvent) listener.getEventsReceived().get(2);
+        assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_CREATED));
+        assertThat(event.getVariableName(), is("parentVar2"));
+        event = (FlowableVariableEvent) listener.getEventsReceived().get(3);
+        assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_DELETED));
+        assertThat(event.getVariableName(), is("subVar1"));
+        event = (FlowableVariableEvent) listener.getEventsReceived().get(4);
+        assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_DELETED));
+        assertThat(event.getVariableName(), is("parentVar2"));
+        event = (FlowableVariableEvent) listener.getEventsReceived().get(5);
+        assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_DELETED));
+        assertThat(event.getVariableName(), is("parentVar1"));
     }
 
     /**

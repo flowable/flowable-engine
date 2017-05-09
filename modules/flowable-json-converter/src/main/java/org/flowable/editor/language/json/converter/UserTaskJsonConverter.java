@@ -12,6 +12,10 @@
  */
 package org.flowable.editor.language.json.converter;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,10 +28,6 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.editor.language.json.model.ModelInfo;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -138,9 +138,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
                         }
 
                     } else {
-                        for (String candidateUser : userTask.getCandidateUsers()) {
-                            candidateUserIds.add(candidateUser);
-                        }
+                        candidateUserIds.addAll(userTask.getCandidateUsers());
                     }
 
                     if (candidateUserIds.size() > 0) {
@@ -196,9 +194,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
                         }
 
                     } else {
-                        for (String candidateGroup : userTask.getCandidateGroups()) {
-                            candidateGroupIds.add(candidateGroup);
-                        }
+                        candidateGroupIds.addAll(userTask.getCandidateGroups());
                     }
 
                     if (candidateGroupIds.size() > 0) {

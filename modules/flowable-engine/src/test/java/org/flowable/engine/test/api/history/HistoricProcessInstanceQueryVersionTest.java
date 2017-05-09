@@ -1,8 +1,18 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.flowable.engine.test.api.history;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -16,7 +26,6 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
 
     private org.flowable.engine.repository.Deployment oldDeployment;
     private org.flowable.engine.repository.Deployment newDeployment;
-    private List<String> processInstanceIds;
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -24,11 +33,9 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
                 .addClasspathResource(DEPLOYMENT_FILE_PATH)
                 .deploy();
 
-        processInstanceIds = new ArrayList<String>();
-
         Map<String, Object> startMap = new HashMap<String, Object>();
         startMap.put("test", 123);
-        processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, startMap).getId());
+        runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, startMap);
 
         newDeployment = repositoryService.createDeployment()
                 .addClasspathResource(DEPLOYMENT_FILE_PATH)
@@ -36,7 +43,7 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
 
         startMap.clear();
         startMap.put("anothertest", 456);
-        processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, startMap).getId());
+        runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, startMap);
     }
 
     protected void tearDown() throws Exception {

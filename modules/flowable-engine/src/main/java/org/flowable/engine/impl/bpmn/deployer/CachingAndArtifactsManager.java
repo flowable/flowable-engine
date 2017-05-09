@@ -12,9 +12,6 @@
  */
 package org.flowable.engine.impl.bpmn.deployer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
 import org.flowable.engine.common.api.FlowableException;
@@ -29,6 +26,9 @@ import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Updates caches and artifacts for a deployment, its process definitions, and its process definition infos.
@@ -54,6 +54,21 @@ public class CachingAndArtifactsManager {
 
             // Add to deployment for further usage
             deployment.addDeployedArtifact(processDefinition);
+        }
+    }
+    
+    /**
+     * Ensures that the process definition is cached in the appropriate places.
+     */
+    public void updateProcessDefinitionCache(ParsedDeployment parsedDeployment) {
+        final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+        DeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache = processEngineConfiguration.getDeploymentManager().getProcessDefinitionCache();
+
+        for (ProcessDefinitionEntity processDefinition : parsedDeployment.getAllProcessDefinitions()) {
+            BpmnModel bpmnModel = parsedDeployment.getBpmnModelForProcessDefinition(processDefinition);
+            Process process = parsedDeployment.getProcessModelForProcessDefinition(processDefinition);
+            ProcessDefinitionCacheEntry cacheEntry = new ProcessDefinitionCacheEntry(processDefinition, bpmnModel, process);
+            processDefinitionCache.add(processDefinition.getId(), cacheEntry);
         }
     }
 

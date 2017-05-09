@@ -46,7 +46,7 @@ public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
         final org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) processEngineConfiguration.getFlowable5CompatibilityHandler()
                 .getRawProcessConfiguration();
 
-        Thread firstInstertThread = new Thread(new Runnable() {
+        Thread firstInsertThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -68,11 +68,11 @@ public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
             }
         });
 
-        firstInstertThread.start();
+        firstInsertThread.start();
         secondInsertThread.start();
 
         // Wait for threads to complete
-        firstInstertThread.join();
+        firstInsertThread.join();
         secondInsertThread.join();
 
         // One of the 2 threads should get an optimistic lock exception
@@ -102,7 +102,7 @@ public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
         final org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig = (org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl) processEngineConfiguration.getFlowable5CompatibilityHandler()
                 .getRawProcessConfiguration();
 
-        Thread firstInstertThread = new Thread(new Runnable() {
+        Thread firstInsertThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -124,11 +124,11 @@ public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
             }
         });
 
-        firstInstertThread.start();
+        firstInsertThread.start();
         secondInsertThread.start();
 
         // Wait for threads to complete
-        firstInstertThread.join();
+        firstInsertThread.join();
         secondInsertThread.join();
 
         // One of the 2 threads should get an optimistic lock exception

@@ -13,6 +13,8 @@
 
 package org.activiti.engine.impl.cfg;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -237,8 +239,6 @@ import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tom Baeyens
@@ -1006,9 +1006,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         // Configurators that are explicitly added to the config
         if (configurators != null) {
-            for (ProcessEngineConfigurator configurator : configurators) {
-                allConfigurators.add(configurator);
-            }
+            allConfigurators.addAll(configurators);
         }
 
         // Auto discovery through ServiceLoader
@@ -1249,9 +1247,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
 
         // History
-        for (BpmnParseHandler handler : getDefaultHistoryParseHandlers()) {
-            bpmnParserHandlers.add(handler);
-        }
+        bpmnParserHandlers.addAll(getDefaultHistoryParseHandlers());
 
         return bpmnParserHandlers;
     }

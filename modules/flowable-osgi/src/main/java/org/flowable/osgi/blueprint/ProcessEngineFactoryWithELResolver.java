@@ -12,13 +12,16 @@ import javax.el.MapELResolver;
 
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.el.ExpressionManager;
+import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
+import org.flowable.engine.impl.el.AbstractExpressionManager;
 import org.flowable.engine.impl.el.VariableScopeElResolver;
 import org.flowable.engine.impl.scripting.BeansResolverFactory;
 import org.flowable.engine.impl.scripting.ResolverFactory;
 import org.flowable.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.osgi.OsgiScriptingEngines;
+
+import de.odysseus.el.ExpressionFactoryImpl;
 
 public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
 
@@ -41,7 +44,12 @@ public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
         super.init();
     }
 
-    public class BlueprintExpressionManager extends ExpressionManager {
+    public class BlueprintExpressionManager extends AbstractExpressionManager {
+        
+        public BlueprintExpressionManager() {
+            this.delegateInterceptor = new DefaultDelegateInterceptor();
+            this.expressionFactory = new ExpressionFactoryImpl();
+        }
 
         @Override
         protected ELResolver createElResolver(VariableScope variableScope) {

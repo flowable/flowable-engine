@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -288,6 +288,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         inheritCommonProperties(superExecutionEntity, subProcessInstance);
         subProcessInstance.setProcessDefinitionId(processDefinition.getId());
         subProcessInstance.setProcessDefinitionKey(processDefinition.getKey());
+        subProcessInstance.setProcessDefinitionName(processDefinition.getName());
         subProcessInstance.setSuperExecution(superExecutionEntity);
         subProcessInstance.setRootProcessInstanceId(superExecutionEntity.getRootProcessInstanceId());
         subProcessInstance.setScope(true); // process instance is always a scope for all child executions
@@ -437,7 +438,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
 
         // Call activities
         for (ExecutionEntity subExecutionEntity : processInstanceEntity.getExecutions()) {
-            if (subExecutionEntity.getSubProcessInstance() != null) {
+            if (subExecutionEntity.getSubProcessInstance() != null &&  !subExecutionEntity.isEnded()) {
                 deleteProcessInstanceCascade(subExecutionEntity.getSubProcessInstance(), deleteReason, cascade);
             }
         }

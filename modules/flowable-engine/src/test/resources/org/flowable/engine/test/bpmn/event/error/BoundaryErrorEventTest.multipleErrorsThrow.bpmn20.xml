@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:flowable="http://flowable.org/bpmn" xmlns:typeLanguage="http://www.w3.org/2001/XMLSchema" xmlns:expressionLanguage="http://www.w3.org/1999/XPath" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.lbswest.de/LWSPlusMaster">
+  <process id="throwError" isExecutable="true">
+    <startEvent id="_7_0_2_2_601020a_1415776951657_459013_5919"></startEvent>
+    <endEvent id="errorendevent1" name="ErrorEnd">
+      <errorEventDefinition errorRef="myError"></errorEventDefinition>
+    </endEvent>
+    <sequenceFlow id="flow1" sourceRef="_7_0_2_2_601020a_1415776951657_459013_5919" targetRef="errorendevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_throwError">
+    <bpmndi:BPMNPlane bpmnElement="throwError" id="BPMNPlane_throwError">
+      <bpmndi:BPMNShape bpmnElement="_7_0_2_2_601020a_1415776951657_459013_5919" id="BPMNShape__7_0_2_2_601020a_1415776951657_459013_5919">
+        <omgdc:Bounds height="35.0" width="35.0" x="50.0" y="29.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="errorendevent1" id="BPMNShape_errorendevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="150.0" y="29.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="85.0" y="46.0"></omgdi:waypoint>
+        <omgdi:waypoint x="150.0" y="46.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

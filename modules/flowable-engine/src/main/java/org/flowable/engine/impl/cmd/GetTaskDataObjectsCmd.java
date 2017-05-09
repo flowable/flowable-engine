@@ -129,7 +129,9 @@ public class GetTaskDataObjectsCmd implements Command<Map<String, DataObject>>, 
                 }
 
                 if (foundDataObject != null) {
-                    dataObjects.put(variableEntity.getName(), new DataObjectImpl(variableEntity.getName(), variableEntity.getValue(),
+                    dataObjects.put(
+                            variableEntity.getName(), new DataObjectImpl(variableEntity.getId(), variableEntity.getProcessInstanceId(),
+                                    variableEntity.getExecutionId(), variableEntity.getName(), variableEntity.getValue(),
                             foundDataObject.getDocumentation(), foundDataObject.getType(), localizedName, localizedDescription, foundDataObject.getId()));
                 }
             }

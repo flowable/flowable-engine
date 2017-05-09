@@ -17,12 +17,15 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
+import org.flowable.dmn.model.BuiltinAggregator;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
+import org.flowable.dmn.model.HitPolicy;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.OutputClause;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class AdditionalConverterTest extends AbstractConverterTest {
@@ -51,12 +54,18 @@ public class AdditionalConverterTest extends AbstractConverterTest {
         DecisionTable decisionTable = (DecisionTable) decisions.get(0).getExpression();
         assertNotNull(decisionTable);
 
+        Assert.assertEquals(HitPolicy.COLLECT, decisionTable.getHitPolicy());
+        Assert.assertEquals(BuiltinAggregator.SUM, decisionTable.getAggregation());
+
         List<InputClause> inputClauses = decisionTable.getInputs();
         assertEquals(2, inputClauses.size());
 
         List<OutputClause> outputClauses = decisionTable.getOutputs();
         assertEquals(2, outputClauses.size());
 
+        assertEquals("\"result2\",\"result1\"", decisionTable.getOutputs().get(0).getOutputValues().getText());
+        assertEquals("\"2\",\"1\"", decisionTable.getOutputs().get(1).getOutputValues().getText());
+        
         List<DecisionRule> rules = decisionTable.getRules();
         assertEquals(2, rules.size());
 

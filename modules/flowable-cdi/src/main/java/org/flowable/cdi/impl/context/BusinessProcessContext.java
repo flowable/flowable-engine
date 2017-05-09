@@ -113,7 +113,7 @@ public class BusinessProcessContext implements Context {
     public boolean isActive() {
         // we assume the business process is always 'active'. If no
         // task/execution is
-        // associated, temporary instances of @BusinessProcesScoped beans are
+        // associated, temporary instances of @BusinessProcessScoped beans are
         // cached in the
         // conversation / request
         return true;

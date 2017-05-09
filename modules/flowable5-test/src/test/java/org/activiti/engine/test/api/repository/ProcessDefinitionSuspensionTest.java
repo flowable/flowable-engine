@@ -478,7 +478,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
         // Start process instance
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        // Suspend all process definitions with same key in 2 hourse from now
+        // Suspend all process definitions with same key in 2 hours from now
         repositoryService.suspendProcessDefinitionByKey("oneTaskProcess", true, new Date(startTime.getTime() + (2 * hourInMs)));
         assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().count());
         assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().active().count());

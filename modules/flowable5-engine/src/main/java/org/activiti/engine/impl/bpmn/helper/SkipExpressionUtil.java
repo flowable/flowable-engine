@@ -13,12 +13,12 @@
 package org.activiti.engine.impl.bpmn.helper;
 
 import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
+import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.Expression;
 
 public class SkipExpressionUtil {
 
-    public static boolean isSkipExpressionEnabled(ActivityExecution execution, Expression skipExpression) {
+    public static boolean isSkipExpressionEnabled(DelegateExecution execution, Expression skipExpression) {
 
         if (skipExpression == null) {
             return false;
@@ -38,7 +38,7 @@ public class SkipExpressionUtil {
         }
     }
 
-    public static boolean shouldSkipFlowElement(ActivityExecution execution, Expression skipExpression) {
+    public static boolean shouldSkipFlowElement(DelegateExecution execution, Expression skipExpression) {
         Object value = skipExpression.getValue(execution);
 
         if (value instanceof Boolean) {
