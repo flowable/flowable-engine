@@ -56,22 +56,13 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
     private static final Logger log = LoggerFactory.getLogger(HttpActivityBehaviorImpl.class);
 
     protected static final CloseableHttpClient client;
-    protected static final RequestConfig defaultRequestConfig;
 
     static {
-        // TODO: Assuming Context is available in static scope
         HttpClientConfig config = Context.getProcessEngineConfiguration().getHttpClientConfig();
         if (config == null) {
             config = new HttpClientConfig();
         }
-
-        // Create default request config
-        defaultRequestConfig = RequestConfig.custom()
-                .setSocketTimeout(config.getSocketTimeout())
-                .setConnectTimeout(config.getConnectTimeout())
-                .setConnectionRequestTimeout(config.getConnectionRequestTimeout())
-                .build();
-
+        
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
 
         // https settings
@@ -116,7 +107,7 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
     }
 
     protected void setConfig(HttpRequestBase base, HttpClientConfig config) {
-        base.setConfig(RequestConfig.copy(defaultRequestConfig)
+        base.setConfig(RequestConfig.custom()
                 .setSocketTimeout(config.getSocketTimeout())
                 .setConnectTimeout(config.getConnectTimeout())
                 .setConnectionRequestTimeout(config.getConnectionRequestTimeout())
