@@ -441,7 +441,8 @@
             "PEOPLE": "Personas",
             "GROUP-OF-PEOPLE": "Grupo de personas",
             "UPLOAD": "Upload",
-            "EXPRESSION": "Expresion"
+            "EXPRESSION": "Expresion",
+	    "HYPERLINK": "Hipervínculo"
         },
         "TABS": {
             "GENERAL": "General",
