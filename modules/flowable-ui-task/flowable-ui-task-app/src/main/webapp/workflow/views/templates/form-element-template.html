@@ -177,6 +177,13 @@
         <div class="clearfix"></div>
     </div>
 
+   <div ng-switch-when="hyperlink" class="form-group {{field.className}} readonly" ng-show="field.isVisible">
+         <label class="control-label">{{field.name}}</label>
+         <div>
+             <a ng-href="{{field.params.hyperlinkUrl}}" target="_blank">{{field.params.hyperlinkUrl}}</a>
+         </div>
+    </div>	
+	
     <div ng-switch-when="radio-buttons" class="form-group" ng-show="field.isVisible">
         <label class="control-label">{{field.name}}</label>
         <div class="well well-sm">
