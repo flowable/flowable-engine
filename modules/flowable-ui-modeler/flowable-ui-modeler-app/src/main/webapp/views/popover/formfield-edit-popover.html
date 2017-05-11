@@ -121,6 +121,13 @@
                     </div>
 				</div>
                 
+		<div ng-if="activeTab.id == 'advanced' && formElement.type === 'hyperlink'">
+		    <div class="form-group">
+			<label translate="FORM-BUILDER.COMPONENT.HYPERLINK-URL"></label> <input
+			type="text" class="form-control" ng-model="formElement.params.hyperlinkUrl">
+		    </div>
+		</div>	    
+		    
                 <div ng-if="activeTab.id == 'general' && formElement.type === 'expression'">
                     <div class="form-group">
                         <label translate="FORM-BUILDER.COMPONENT.EXPRESSION"></label>
