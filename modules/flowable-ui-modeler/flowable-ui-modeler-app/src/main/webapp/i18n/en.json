@@ -442,7 +442,8 @@
             "GROUP-OF-PEOPLE": "Group of people",
             "UPLOAD": "Upload",
             "EXPRESSION": "Expression",
-            "DECIMAL": "Decimal"
+            "DECIMAL": "Decimal",
+	    "HYPERLINK": "Hyperlink" 
         },
         "TABS": {
             "GENERAL": "General",
