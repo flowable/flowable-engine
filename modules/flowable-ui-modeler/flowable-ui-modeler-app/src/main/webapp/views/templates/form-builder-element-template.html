@@ -84,6 +84,11 @@
     </div>
   </div>
 
+  <div ng-switch-when="hyperlink" class="form-group">
+    <label class="control-label form-field-label">{{formElement.name}}<span class="marker" ng-if="formElement.required">*</span></label>
+    <div class="message" ng-show="formElement.params.hyperlinkUrl">{{formElement.params.hyperlinkUrl}}</div>
+  </div>
+
   <div ng-switch-when="expression" class="form-group">
     <div class="message" ng-style="{'font-size': formElement.params.size + 'em'}">
       <div ng-show="formElement.expression && formElement.expression.length > 0">
