@@ -416,7 +416,8 @@
       "GROUP-OF-PEOPLE":"Grupo de pessoas",
       "UPLOAD":"Carregar",
       "EXPRESSION":"Expressão",
-      "DECIMAL":"Decimal"
+      "DECIMAL":"Decimal",
+      "HYPERLINK":"Hiperlink"
     },
     "TABS":{
       "GENERAL":"Geral",
