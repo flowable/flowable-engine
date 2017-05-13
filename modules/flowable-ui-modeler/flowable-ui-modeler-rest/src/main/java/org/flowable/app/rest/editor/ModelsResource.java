@@ -96,7 +96,8 @@ public class ModelsResource {
     }
 
     @RequestMapping(value = "/rest/models", method = RequestMethod.POST, produces = "application/json")
-    public ModelRepresentation createModel(@RequestBody ModelRepresentation modelRepresentation) {
+    public ModelRepresentation createModel(@RequestBody ModelRepresentation modelRepresentation,
+                                           @RequestParam(required = false) String skeleton) {
         modelRepresentation.setKey(modelRepresentation.getKey().replaceAll(" ", ""));
 
         ModelKeyRepresentation modelKeyInfo = modelService.validateModelKey(null, modelRepresentation.getModelType(), modelRepresentation.getKey());
@@ -105,75 +106,8 @@ public class ModelsResource {
         }
 
         String json = null;
-        if (modelRepresentation.getModelType() != null && modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_FORM)) {
-            try {
-                json = objectMapper.writeValueAsString(new FormModel());
-            } catch (Exception e) {
-                logger.error("Error creating form model", e);
-                throw new InternalServerErrorException("Error creating form");
-            }
 
-        } else if (modelRepresentation.getModelType() != null && modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_DECISION_TABLE)) {
-            try {
-                DecisionTableDefinitionRepresentation decisionTableDefinition = new DecisionTableDefinitionRepresentation();
-
-                String decisionTableDefinitionKey = modelRepresentation.getName().replaceAll(" ", "");
-                decisionTableDefinition.setKey(decisionTableDefinitionKey);
-
-                json = objectMapper.writeValueAsString(decisionTableDefinition);
-            } catch (Exception e) {
-                logger.error("Error creating decision table model", e);
-                throw new InternalServerErrorException("Error creating decision table");
-            }
-
-        } else if (modelRepresentation.getModelType() != null && modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_APP)) {
-            try {
-                json = objectMapper.writeValueAsString(new AppDefinition());
-            } catch (Exception e) {
-                logger.error("Error creating app definition", e);
-                throw new InternalServerErrorException("Error creating app definition");
-            }
-
-        } else {
-            ObjectNode editorNode = objectMapper.createObjectNode();
-            editorNode.put("id", "canvas");
-            editorNode.put("resourceId", "canvas");
-            ObjectNode stencilSetNode = objectMapper.createObjectNode();
-            stencilSetNode.put("namespace", "http://b3mn.org/stencilset/bpmn2.0#");
-            editorNode.set("stencilset", stencilSetNode);
-            ObjectNode propertiesNode = objectMapper.createObjectNode();
-            propertiesNode.put("process_id", modelRepresentation.getKey());
-            propertiesNode.put("name", modelRepresentation.getName());
-            if (StringUtils.isNotEmpty(modelRepresentation.getDescription())) {
-                propertiesNode.put("documentation", modelRepresentation.getDescription());
-            }
-            editorNode.set("properties", propertiesNode);
-
-            ArrayNode childShapeArray = objectMapper.createArrayNode();
-            editorNode.set("childShapes", childShapeArray);
-            ObjectNode childNode = objectMapper.createObjectNode();
-            childShapeArray.add(childNode);
-            ObjectNode boundsNode = objectMapper.createObjectNode();
-            childNode.set("bounds", boundsNode);
-            ObjectNode lowerRightNode = objectMapper.createObjectNode();
-            boundsNode.set("lowerRight", lowerRightNode);
-            lowerRightNode.put("x", 130);
-            lowerRightNode.put("y", 193);
-            ObjectNode upperLeftNode = objectMapper.createObjectNode();
-            boundsNode.set("upperLeft", upperLeftNode);
-            upperLeftNode.put("x", 100);
-            upperLeftNode.put("y", 163);
-            childNode.set("childShapes", objectMapper.createArrayNode());
-            childNode.set("dockers", objectMapper.createArrayNode());
-            childNode.set("outgoing", objectMapper.createArrayNode());
-            childNode.put("resourceId", "startEvent1");
-            ObjectNode stencilNode = objectMapper.createObjectNode();
-            childNode.set("stencil", stencilNode);
-            stencilNode.put("id", "StartNoneEvent");
-            json = editorNode.toString();
-        }
-
-        Model newModel = modelService.createModel(modelRepresentation, json, SecurityUtils.getCurrentUserObject());
+        Model newModel = modelService.createModel(modelRepresentation, skeleton, SecurityUtils.getCurrentUserObject());
         return new ModelRepresentation(newModel);
     }
 

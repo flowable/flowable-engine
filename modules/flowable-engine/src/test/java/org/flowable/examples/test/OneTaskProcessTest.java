@@ -105,7 +105,7 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         assertTask.setScript(
                 "import org.flowable.engine.impl.context.Context;\n" +
                         "import static org.hamcrest.core.Is.is;\n" +
-                        "import static org.flowable.examples.test.MatcherAssert.assertThat;\n" +
+                        "import static org.flowable.engine.test.MatcherAssert.assertThat;\n" +
                         "\n" +
                         "assertThat(Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));"
         );
@@ -230,7 +230,7 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         assertTask.setScript(
                 "import org.flowable.engine.impl.context.Context;\n" +
                         "import static org.hamcrest.core.Is.is;\n" +
-                        "import static org.flowable.examples.test.MatcherAssert.assertThat;\n" +
+                        "import static org.flowable.engine.test.MatcherAssert.assertThat;\n" +
                         "\n" +
                         "assertThat(Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));"
         );

@@ -68,7 +68,7 @@ public class FlowableEngineConfiguration {
 
     @Autowired
     protected ProcessDebugger processDebugger;
-    
+
     @Autowired
     protected DataSource dataSource;
 
@@ -103,7 +103,8 @@ public class FlowableEngineConfiguration {
         processEngineConfiguration.setTransactionManager(transactionManager);
         processEngineConfiguration.setAsyncExecutorActivate(true);
         processEngineConfiguration.setAsyncExecutor(asyncExecutor());
-        
+        processEngineConfiguration.setEnableDatabaseEventLogging(true);
+
         if (environment.getProperty("debugger.enabled", Boolean.class, false)) {
             processEngineConfiguration.setAgendaFactory(agendaFactory());
             ArrayList<JobHandler> customJobHandlers = new ArrayList<>();

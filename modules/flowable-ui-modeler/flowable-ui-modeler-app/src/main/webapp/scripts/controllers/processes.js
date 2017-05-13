@@ -116,6 +116,12 @@ angular.module('flowableModeler')
 	    }, $modal, $scope);
 	  };
 
+	  $scope.createProcessTest = function(mode) {
+	    var modalInstance = _internalCreateModal({
+	        template: 'views/popup/process-test-create.html?version=' + Date.now()
+	    }, $modal, $scope);
+	  };
+
 	  $scope.importProcess = function () {
           _internalCreateModal({
               template: 'views/popup/process-import.html?version=' + Date.now()
@@ -162,13 +168,63 @@ angular.module('flowableModeler')
 
         if (!$scope.model.process.name || $scope.model.process.name.length == 0 ||
         	!$scope.model.process.key || $scope.model.process.key.length == 0) {
-        	
+
             return;
         }
 
         $scope.model.loading = true;
 
         $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models', data: $scope.model.process}).
+            success(function(data) {
+                $scope.$hide();
+
+                $scope.model.loading = false;
+                $rootScope.editorHistory = [];
+                $location.path("/editor/" + data.id);
+            }).
+            error(function(data, status, headers, config) {
+                $scope.model.loading = false;
+                $scope.model.errorMessage = data.message;
+            });
+    };
+
+    $scope.cancel = function () {
+        if(!$scope.model.loading) {
+            $scope.$hide();
+        }
+    };
+}]);
+
+angular.module('flowableModeler')
+.controller('CreateNewProcessTestModelCtrl', ['$rootScope', '$scope', '$modal', '$http', '$location',
+                                          function ($rootScope, $scope, $modal, $http, $location) {
+
+    $scope.model = {
+       loading: false,
+       skeleton: '',
+       process: {
+            name: '',
+            key: '',
+            description: '',
+           	modelType: 0,
+       }
+    };
+
+    if ($scope.initialModelType !== undefined) {
+        $scope.model.process.modelType = $scope.initialModelType;
+    }
+
+    $scope.ok = function () {
+
+        if (!$scope.model.process.name || $scope.model.process.name.length == 0 ||
+        	!$scope.model.process.key || $scope.model.process.key.length == 0) {
+
+            return;
+        }
+
+        $scope.model.loading = true;
+
+        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models?skeleton='+ $scope.model.skeleton, data: $scope.model.process}).
             success(function(data) {
                 $scope.$hide();
 
@@ -212,9 +268,9 @@ angular.module('flowableModeler')
 
     $scope.ok = function () {
 
-        if (!$scope.model.process.name || $scope.model.process.name.length == 0 || 
+        if (!$scope.model.process.name || $scope.model.process.name.length == 0 ||
         	!$scope.model.process.key || $scope.model.process.key.length == 0) {
-        	
+
             return;
         }
 

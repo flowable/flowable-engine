@@ -4,6 +4,7 @@
 		<div class="btn-group pull-right">
 			<button type="button" class="btn btn-default" ng-click="createProcess()" translate>PROCESS-LIST.ACTION.CREATE</button>
 			<button type="button" class="btn btn-default" ng-click="importProcess()" translate>PROCESS-LIST.ACTION.IMPORT</button>
+			<button type="button" class="btn btn-default" ng-click="createProcessTest()" translate>PROCESS-LIST.ACTION.CREATE_TEST</button>
 		</div>
 		<h2>{{'PROCESS-LIST.TITLE' | translate}}</h2>
 	</div>
@@ -61,6 +62,11 @@
 						<div class="help-entry" ng-click="importProcess()">
                             <span class="glyphicon glyphicon-plus-sign"></span>
                             <span translate="PROCESS-LIST.FILTER.PROCESSES-BPMN-IMPORT-HINT"></span>
+                            <br>
+                        </div>
+						<div class="help-entry" ng-click="createProcessTest()">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                            <span translate="PROCESS-LIST.FILTER.PROCESSES-BPMN-TEST-HINT"></span>
                             <br>
                         </div>
                     </div>

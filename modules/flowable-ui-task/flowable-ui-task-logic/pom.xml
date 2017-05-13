@@ -12,7 +12,7 @@
 	<packaging>jar</packaging>
 
 	<dependencies>
-	
+
 		<!-- Flowable -->
 		<dependency>
             <groupId>org.flowable</groupId>
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-bpmn-layout</artifactId>
-        </dependency>        
+        </dependency>
 		<dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-process-validation</artifactId>
@@ -80,7 +80,7 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
-        
+
 		<!-- JSON -->
 		<dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -131,11 +131,19 @@
 			<artifactId>joda-time</artifactId>
 		</dependency>
 
+		<!-- Testing -->
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-core</artifactId>
+			<version>1.3</version>
+			<scope>runtime</scope>
+		</dependency>
+
 	</dependencies>
 
 	<!-- BUILD -->
 	<build>
-	
+
 		<plugins>
 			<plugin>
 				<groupId>org.zeroturnaround</groupId>
@@ -151,7 +159,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
@@ -162,11 +170,10 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		
-		
+
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
+				<!--This plugin's configuration is used to store Eclipse m2e settings
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
@@ -201,7 +208,7 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-	
+
 	<profiles>
 		<profile>
 			<id>distro</id>

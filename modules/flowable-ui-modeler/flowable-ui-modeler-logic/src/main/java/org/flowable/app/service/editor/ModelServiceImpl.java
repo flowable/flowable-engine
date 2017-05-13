@@ -12,20 +12,10 @@
  */
 package org.flowable.app.service.editor;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.domain.editor.AppDefinition;
@@ -38,6 +28,7 @@ import org.flowable.app.model.editor.ModelKeyRepresentation;
 import org.flowable.app.model.editor.ModelRepresentation;
 import org.flowable.app.model.editor.ReviveModelResultRepresentation;
 import org.flowable.app.model.editor.ReviveModelResultRepresentation.UnresolveModelRepresentation;
+import org.flowable.app.model.editor.decisiontable.DecisionTableDefinitionRepresentation;
 import org.flowable.app.repository.editor.ModelHistoryRepository;
 import org.flowable.app.repository.editor.ModelRelationRepository;
 import org.flowable.app.repository.editor.ModelRepository;
@@ -56,21 +47,35 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.editor.language.json.converter.util.JsonConverterUtil;
+import org.flowable.engine.event.EventLogEntry;
+import org.flowable.form.model.FormModel;
 import org.flowable.idm.api.User;
+import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 @Transactional
 public class ModelServiceImpl implements ModelService {
 
+    private static final int CIRCLE_SIZE = 30;
     private final Logger log = LoggerFactory.getLogger(ModelServiceImpl.class);
 
     public static final String NAMESPACE = "http://flowable.org/modeler";
@@ -92,8 +97,10 @@ public class ModelServiceImpl implements ModelService {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
+    @Autowired
+    protected SqlSessionTemplate sqlSessionTemplate;
 
+    protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
     protected BpmnXMLConverter bpmnXMLConverter = new BpmnXMLConverter();
 
     @Override
@@ -183,7 +190,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public Model createModel(ModelRepresentation model, String editorJson, User createdBy) {
+    public Model createModel(ModelRepresentation model, String skeleton, User createdBy) {
         Model newModel = new Model();
         newModel.setVersion(1);
         newModel.setName(model.getName());
@@ -192,12 +199,238 @@ public class ModelServiceImpl implements ModelService {
         newModel.setCreated(Calendar.getInstance().getTime());
         newModel.setCreatedBy(createdBy.getId());
         newModel.setDescription(model.getDescription());
-        newModel.setModelEditorJson(editorJson);
+        newModel.setModelEditorJson(getInitialEditorModel(model, skeleton));
         newModel.setLastUpdated(Calendar.getInstance().getTime());
         newModel.setLastUpdatedBy(createdBy.getId());
 
         persistModel(newModel);
         return newModel;
+    }
+
+    protected String getInitialEditorModel(ModelRepresentation modelRepresentation, String skeleton) {
+        String json;
+        if (modelRepresentation.getModelType() != null && modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_FORM)) {
+            try {
+                json = objectMapper.writeValueAsString(new FormModel());
+            } catch (Exception e) {
+                log.error("Error creating form model", e);
+                throw new InternalServerErrorException("Error creating form");
+            }
+
+        } else if (modelRepresentation.getModelType() != null && modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_DECISION_TABLE)) {
+            try {
+                DecisionTableDefinitionRepresentation decisionTableDefinition = new DecisionTableDefinitionRepresentation();
+
+                String decisionTableDefinitionKey = modelRepresentation.getName().replaceAll(" ", "");
+                decisionTableDefinition.setKey(decisionTableDefinitionKey);
+
+                json = objectMapper.writeValueAsString(decisionTableDefinition);
+            } catch (Exception e) {
+                log.error("Error creating decision table model", e);
+                throw new InternalServerErrorException("Error creating decision table");
+            }
+
+        } else if (modelRepresentation.getModelType() != null && modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_APP)) {
+            try {
+                json = objectMapper.writeValueAsString(new AppDefinition());
+            } catch (Exception e) {
+                log.error("Error creating app definition", e);
+                throw new InternalServerErrorException("Error creating app definition");
+            }
+
+        } else {
+            json = getInitialProcessModelContent(modelRepresentation, skeleton);
+        }
+        return json;
+    }
+
+
+    protected String getInitialProcessModelContent(ModelRepresentation modelRepresentation, String skeleton) {
+        ObjectNode editorNode = createTestProcessModel(modelRepresentation);
+        ArrayNode childShapeArray = objectMapper.createArrayNode();
+        editorNode.set("childShapes", childShapeArray);
+        childShapeArray.add(
+                createStartEvent(0,"startEvent1")
+        );
+        childShapeArray.addAll(
+                addAssertion(
+                        createNodesFromEventLogEntries(
+                        getEventLogEntriesForProcessInstanceId(skeleton)
+                        )
+                )
+        );
+        addSequenceFlows(childShapeArray);
+        return editorNode.toString();
+    }
+
+    private List<ObjectNode> addAssertion(List<ObjectNode> nodes) {
+        nodes.add(nodes.size(), createScriptTask(nodes.size() + 1, "assertion", "assertThat",
+                "import org.flowable.engine.impl.context.Context;\n" +
+                        "import static org.hamcrest.core.Is.is;\n" +
+                        "import static org.flowable.engine.test.MatcherAssert.assertThat;\n" +
+                        "\n" +
+                        "assertThat(Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));")
+        );
+        nodes.add(nodes.size(), createEndEvent(nodes.size() + 1, "end"));
+        return nodes;
+    }
+
+    private ArrayNode addSequenceFlows(ArrayNode nodes) {
+        if (nodes.size() > 1) {
+            int taskLength = nodes.size();
+            for (int i =1; i< taskLength; i++) {
+                ObjectNode sourceNode = (ObjectNode) nodes.get(i - 1);
+                String sequenceFlowId = "sequenceFlow" + i;
+                ObjectNode targetNode = (ObjectNode) nodes.get(i);
+                List<String> targetId = targetNode.findValuesAsText("resourceId");
+
+                ArrayNode sourceOutgoing = objectMapper.createArrayNode();
+                sourceNode.set("outgoing", sourceOutgoing);
+                ObjectNode sequenceFlowResourceId = objectMapper.createObjectNode();
+                sequenceFlowResourceId.put("resourceId", sequenceFlowId);
+                sourceOutgoing.add(sequenceFlowResourceId);
+
+                ObjectNode sequenceFlow = createNode(130, 178, "SequenceFlow", sequenceFlowId, 120, 0, Collections.EMPTY_MAP);
+                ArrayNode dockers = objectMapper.createArrayNode();
+                sequenceFlow.set("dockers", dockers);
+                ObjectNode positionDockerSource = getDockersPosition(sourceNode);
+                dockers.add(positionDockerSource);
+                ObjectNode positionDockerDestination = getDockersPosition(targetNode);
+                dockers.add(positionDockerDestination);
+
+                ArrayNode sequenceFlowOutgoing = objectMapper.createArrayNode();
+                sequenceFlow.set("outgoing", sequenceFlowOutgoing);
+                ObjectNode targetResourceId = objectMapper.createObjectNode();
+                targetResourceId.put("resourceId", targetId.get(0));
+                sequenceFlowOutgoing.add(targetResourceId);
+
+                nodes.add(sequenceFlow);
+            }
+        }
+        return nodes;
+    }
+
+    private ObjectNode getDockersPosition(ObjectNode sourceNode) {
+        double leftX = sourceNode.get("bounds").get("upperLeft").get("x").asDouble();
+        double upperY = sourceNode.get("bounds").get("upperLeft").get("y").asDouble();
+        double rightX = sourceNode.get("bounds").get("lowerRight").get("x").asDouble();
+        double lowerY = sourceNode.get("bounds").get("lowerRight").get("y").asDouble();
+        ObjectNode position = objectMapper.createObjectNode();
+        position.put("x", (rightX - leftX)/2);
+        position.put("y", (lowerY - upperY) /2);
+        return position;
+    }
+
+    private List<EventLogEntry> getEventLogEntriesForProcessInstanceId(String processInstanceId) {
+        List<EventLogEntry> logEvents = Collections.emptyList();
+        if (StringUtils.isNotEmpty(processInstanceId)) {
+            Map<String, Object> params = new HashMap<String, Object>(2);
+            params.put("processInstanceId", processInstanceId);
+            logEvents = this.sqlSessionTemplate.selectList("org.flowable.app.domain.editor.Test.selectEventLogEntriesByProcessInstanceId", params);
+        }
+        return logEvents;
+    }
+
+    protected ObjectNode createTestProcessModel(ModelRepresentation modelRepresentation) {
+        ObjectNode editorNode = objectMapper.createObjectNode();
+        editorNode.put("id", "canvas");
+        editorNode.put("resourceId", "canvas");
+        ObjectNode stencilSetNode = objectMapper.createObjectNode();
+        stencilSetNode.put("namespace", "http://b3mn.org/stencilset/bpmn2.0#");
+        editorNode.set("stencilset", stencilSetNode);
+        ObjectNode propertiesNode = objectMapper.createObjectNode();
+        propertiesNode.put("process_id", modelRepresentation.getKey());
+        propertiesNode.put("name", modelRepresentation.getName());
+        if (StringUtils.isNotEmpty(modelRepresentation.getDescription())) {
+            propertiesNode.put("documentation", modelRepresentation.getDescription());
+        }
+        editorNode.set("properties", propertiesNode);
+        return editorNode;
+    }
+
+    private List<ObjectNode> createNodesFromEventLogEntries(List<EventLogEntry> eventLogEntries) {
+        List<ObjectNode> nodes = new ArrayList<>();
+        int position = 1;
+        for (EventLogEntry eventLogEntry : eventLogEntries) {
+            switch (eventLogEntry.getType()) {
+                case "PROCESSINSTANCE_START":
+                    String processDefinitionId = eventLogEntry.getProcessDefinitionId();
+                    String key = this.sqlSessionTemplate.selectOne(
+                            "org.flowable.app.domain.editor.Test.selectProcessDefinitionKeyById",
+                            processDefinitionId
+                    );
+                    nodes.add(createScriptTask(position++, "startProcess", "Start " + key + " process",
+                            "import org.flowable.engine.impl.context.Context;\n" +
+                                    "\n" +
+                                    "execution.setVariable('processInstanceId', Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceBuilder().processDefinitionKey('" +
+                                    key + "').start().getId());"
+                    ));
+                    break;
+                case "TASK_COMPLETED":
+                    nodes.add(createScriptTask(position, "completeTask"+position++, "Complete task "+ eventLogEntry.getTaskId(),
+                            "import org.flowable.engine.impl.context.Context;\n" +
+                                    "\n" +
+                                    "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();\n" +
+                                    "Context.getProcessEngineConfiguration().getTaskService().complete(taskId);"
+                    ));
+                    break;
+                default:
+                    break;
+            }
+
+
+        }
+        return nodes;
+    }
+
+    private ObjectNode createScriptTask(int position, String id, String name, String script) {
+        HashMap<String, String> properties = new HashMap<>();
+        properties.put("scriptformat", "groovy");
+        properties.put("scripttext", script);
+        properties.put("name", name);
+        properties.put("asynchronousdefinition", "true");
+        return createNode(100 + position *150, 148, "ScriptTask", id, 3 * CIRCLE_SIZE, 2 * CIRCLE_SIZE,
+                properties);
+    }
+
+    private ObjectNode createStartEvent(int position, String id) {
+        return createNoneEvent(position, id, "StartNoneEvent");
+    }
+
+    private ObjectNode createEndEvent(int position, String id) {
+        return createNoneEvent(position, id, "EndNoneEvent");
+    }
+
+    private ObjectNode createNoneEvent(int position, String id, String stencil) {
+        return createNode(100 + position * 150, 163, stencil, id, CIRCLE_SIZE, CIRCLE_SIZE, Collections.<String, String>emptyMap());
+    }
+
+    protected ObjectNode createNode(int upperLeftX, int upperLeftY, String stencil, String id, int sizeX, int sizeY,
+                                    Map<String, String> properties) {
+        ObjectNode childNode = objectMapper.createObjectNode();
+        ObjectNode boundsNode = objectMapper.createObjectNode();
+        childNode.set("bounds", boundsNode);
+        ObjectNode lowerRightNode = objectMapper.createObjectNode();
+        boundsNode.set("lowerRight", lowerRightNode);
+        lowerRightNode.put("x", upperLeftX + sizeX);
+        lowerRightNode.put("y", upperLeftY + sizeY);
+        ObjectNode upperLeftNode = objectMapper.createObjectNode();
+        boundsNode.set("upperLeft", upperLeftNode);
+        upperLeftNode.put("x", upperLeftX);
+        upperLeftNode.put("y", upperLeftY);
+        childNode.set("childShapes", objectMapper.createArrayNode());
+        childNode.set("dockers", objectMapper.createArrayNode());
+        childNode.set("outgoing", objectMapper.createArrayNode());
+        childNode.put("resourceId", id);
+        ObjectNode stencilNode = objectMapper.createObjectNode();
+        childNode.set("stencil", stencilNode);
+        stencilNode.put("id", stencil);
+        ObjectNode propertiesNode = objectMapper.createObjectNode();
+        for (Map.Entry<String, String> entry : properties.entrySet()) {
+            propertiesNode.put(entry.getKey(), entry.getValue());
+        }
+        childNode.set("properties", propertiesNode);
+        return childNode;
     }
 
     public ModelRepresentation importNewVersion(String modelId, String fileName, InputStream modelStream) {

@@ -58,7 +58,8 @@
         "SEARCH-PLACEHOLDER": "Search",
         "ACTION" : {
             "CREATE": "Create Process",
-            "IMPORT": "Import Process"
+            "IMPORT": "Import Process",
+            "CREATE_TEST": "Create Process Test"
         },
 
         "FILTER" : {
@@ -67,6 +68,7 @@
             "PROCESSES-ONE": "There is one process model",
             "PROCESSES-EMPTY": "There is no process model created yet. You can design process models, user forms and then bundle them up into a process app. The first step is to create a process model:",
             "PROCESSES-BPMN-HINT": "Create a BPMN model using the BPMN Visual Editor.",
+            "PROCESSES-BPMN-TEST-HINT": "Create a BPMN process test model using the BPMN Visual Editor.",
             "PROCESSES-BPMN-IMPORT-HINT": "You can also import existing BPMN models.",
             "FILTER-TEXT": ", matching \"{{filterText}}\"",
             "FILTER-TEXT-EMPTY": "There are no process models matching \"{{filterText}}\"",
@@ -170,6 +172,7 @@
       "NAME": "Model name",
       "KEY": "Model key",
       "DESCRIPTION": "Description",
+      "SKELETON": "Process skeleton",
       "VERSION-COMMENT": "Version comment",
       "ACTION": {
             "DETAILS": "Show details",

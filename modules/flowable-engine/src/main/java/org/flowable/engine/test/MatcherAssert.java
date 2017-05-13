@@ -1,4 +1,4 @@
-package org.flowable.examples.test;
+package org.flowable.engine.test;
 
 import org.flowable.engine.delegate.BpmnError;
 import org.hamcrest.Description;
