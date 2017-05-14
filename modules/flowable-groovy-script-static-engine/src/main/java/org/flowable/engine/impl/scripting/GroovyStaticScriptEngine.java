@@ -69,7 +69,7 @@ public class GroovyStaticScriptEngine extends GroovyScriptEngineImpl {
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
         ASTTransformationCustomizer astTransformationCustomizer = new ASTTransformationCustomizer(
                 Collections.singletonMap("extensions", Collections.singletonList("EngineVariablesExtension.groovy")),
-                CompileStatic.class);
+                CompileStatic.class, "org.codehaus.groovy.transform.sc.StaticCompileTransformation");
         ImportCustomizer imports = new ImportCustomizer();
         imports.addStaticStars("org.flowable.engine.delegate.VariableScope");
         //imports.addImports("org.flowable.engine.delegate.DelegateExecution","org.flowable.engine.delegate.VariableScope");
@@ -83,10 +83,12 @@ public class GroovyStaticScriptEngine extends GroovyScriptEngineImpl {
         System.out.println(String.format("---------------Groovy version: %s-----------------------------",v));
         ClassLoader ctxtLoader = Thread.currentThread().getContextClassLoader();
         try {
+            System.out.println("---------------Contex loader (1): " + ctxtLoader.getClass().getName() + "---------------");
             Class c = ctxtLoader.loadClass(Script.class.getName());
+            //clazz = Class.forName("org.flowable.engine.delegate.VariableScope", true, ctxtLoader);
             clazz = ctxtLoader.loadClass("org.flowable.engine.delegate.VariableScope");
 
-           if(c == Script.class) {
+            if(c == Script.class) {
             //if(c != null && c.getName() == Script.class.getName()) {
                 System.out.println("---------------Returning ctxtLoader-----------------------------");
                 return ctxtLoader;
@@ -97,9 +99,11 @@ public class GroovyStaticScriptEngine extends GroovyScriptEngineImpl {
         }
         try {
             ctxtLoader = Script.class.getClassLoader();
-            clazz = ctxtLoader.loadClass("org.flowable.engine.delegate.VariableScope");
+            System.out.println("--------------- Contex loader (2): " + ctxtLoader.getClass().getName() + "---------------");
+            clazz = Class.forName("org.flowable.engine.delegate.VariableScope", true, ctxtLoader);
+            //clazz = ctxtLoader.loadClass("org.flowable.engine.delegate.VariableScope");
         } catch (ClassNotFoundException e) {
-            System.out.println("---------------ClassNotFoundException in second trye in getParentLoader-----------------------------");
+            System.out.println("---------------ClassNotFoundException in second try in getParentLoader-----------------------------");
             e.printStackTrace();
         }
         return Script.class.getClassLoader();

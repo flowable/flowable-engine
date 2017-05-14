@@ -21,16 +21,16 @@ import org.codehaus.groovy.transform.stc.StaticTypeCheckingSupport
 import static org.flowable.engine.impl.scripting.GroovyStaticScriptEngine.*
 import org.flowable.engine.delegate.VariableScope
 
-/*def typesOfVariables = COMPILE_OPTIONS.get()[VAR_TYPES]
+def typesOfVariables = COMPILE_OPTIONS.get()[VAR_TYPES]
 
 unresolvedVariable { var ->
     if (typesOfVariables[var.name]) {
         storeType(var, typesOfVariables[var.name])
         return makeDynamic(var, typesOfVariables[var.name])
     }
-}*/
+}
 
-class EngineVariabeExtension extends GroovyTypeCheckingExtensionSupport.TypeCheckingDSL {
+/*class EngineVariabeExtension extends GroovyTypeCheckingExtensionSupport.TypeCheckingDSL {
 
     @CompileStatic
     private static String prettyPrint(ClassNode node) {
@@ -61,9 +61,6 @@ class EngineVariabeExtension extends GroovyTypeCheckingExtensionSupport.TypeChec
         //def whiteList = COMPILE_OPTIONS.get()[WHITELIST_PATTERNS]
         def typesOfVariables = COMPILE_OPTIONS.get()[VAR_TYPES]
 
-        /*onMethodSelection { expr, MethodNode methodNode ->
-            def descr = toMethodDescriptor(methodNode)
-        }*/
 
         unresolvedVariable { var ->
             if (isDynamic(var) && typesOfVariables[var.name]) {
@@ -71,45 +68,5 @@ class EngineVariabeExtension extends GroovyTypeCheckingExtensionSupport.TypeChec
                 handled = true
             }
         }
-
-        // handling properties (like foo.text) is harder because the type checking extension
-        // does not provide a specific hook for this. Harder, but not impossible!
-
-        /*afterVisitMethod { methodNode ->
-            def visitor = new PropertyExpressionChecker(context.source)
-            visitor.visitMethod(methodNode)
-        }*/
     }
-
-    /*private class PropertyExpressionChecker extends ClassCodeVisitorSupport {
-        private final SourceUnit unit
-        //private final List<String> whiteList
-
-        PropertyExpressionChecker(final SourceUnit unit, final List<String> whiteList) {
-            this.unit = unit
-            //this.whiteList = whiteList
-        }
-
-        PropertyExpressionChecker(final SourceUnit unit) {
-            this.unit = unit
-        }
-
-        @Override
-        protected SourceUnit getSourceUnit() {
-            unit
-        }
-
-        @Override
-        void visitPropertyExpression(final PropertyExpression expression) {
-            super.visitPropertyExpression(expression)
-
-            ClassNode owner = expression.objectExpression.getNodeMetaData(StaticCompilationMetadataKeys.PROPERTY_OWNER)
-            if (owner) {
-                if (expression.spreadSafe && StaticTypeCheckingSupport.implementsInterfaceOrIsSubclassOf(owner, classNodeFor(Collection))) {
-                    owner = typeCheckingVisitor.inferComponentType(owner, ClassHelper.int_TYPE)
-                }
-                def descr = "${prettyPrint(owner)}#${expression.propertyAsString}"
-            }
-        }
-    }*/
-}
+}*/
