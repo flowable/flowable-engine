@@ -11,6 +11,7 @@
     <property name="asyncHistoryEnabled" value="true" />
     <property name="databaseSchemaUpdate" value="true" />
     <property name="asyncExecutorActivate" value="false" />
+    <property name="asyncHistoryExecutorActivate" value="false" />
     <property name="asyncExecutorDefaultAsyncJobAcquireWaitTime" value="500" />
     
   </bean>

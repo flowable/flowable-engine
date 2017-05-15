@@ -37,6 +37,8 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testHistoricActivityInstanceNoop() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("noopProcess");
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("noop").singleResult();
 
@@ -52,6 +54,8 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testHistoricActivityInstanceReceive() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("receiveProcess");
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult();
 
@@ -65,6 +69,8 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
 
         Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().processInstanceId(processInstance.getId()).singleResult();
         runtimeService.trigger(execution.getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("receive").singleResult();
 
@@ -81,6 +87,8 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
     public void testHistoricActivityInstanceUnfinished() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         HistoricActivityInstanceQuery historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery();
 
@@ -94,6 +102,8 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testHistoricActivityInstanceQuery() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("noopProcess");
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("nonExistingActivityId").list().size());
         assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("noop").list().size());
@@ -150,6 +160,8 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals(1, taskService.createTaskQuery().count());
         runtimeService.signalEventReceived("signal");
         assertProcessEnded(pi.getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("noop").list().size());
         assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("userTask").list().size());
@@ -157,7 +169,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("start").list().size());
         assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("end").list().size());
 
-        // TODO: Discuss if boundary events will occur in the log!
+        // TODO: Discuss if boundary events will occur in the log! 
         // assertEquals(1,
         // historyService.createHistoricActivityInstanceQuery().activityId("boundaryEvent").list().size());
 
@@ -178,6 +190,8 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
     public void testHistoricActivityInstanceProperties() {
         // Start process instance
         runtimeService.startProcessInstanceByKey("taskAssigneeProcess");
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         // Get task list
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("theTask").singleResult();
@@ -190,6 +204,8 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/history/calledProcess.bpmn20.xml", "org/flowable/engine/test/history/HistoricActivityInstanceTest.testCallSimpleSubProcess.bpmn20.xml" })
     public void testHistoricActivityInstanceCalledProcessId() {
         runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("callSubProcess").singleResult();
 
@@ -277,9 +293,10 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
 
         assertEquals(0L, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
-        // Check if there is NO historic activity instance for a boundary-event
-        // that has not triggered
+        // Check if there is NO historic activity instance for a boundary-event that has not triggered
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("boundary").processInstanceId(processInstance.getId()).singleResult();
 
         assertNull(historicActivityInstance);
@@ -292,6 +309,8 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         Execution signalExecution = runtimeService.createExecutionQuery().signalEventSubscriptionName("alert").singleResult();
         runtimeService.signalEventReceived("alert", signalExecution.getId());
         assertEquals(0L, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("boundary").processInstanceId(processInstance.getId()).singleResult();
 
@@ -311,6 +330,8 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         runtimeService.signalEventReceived("alert", waitingExecution.getId());
 
         assertEquals(0L, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("eventBasedgateway").processInstanceId(processInstance.getId()).singleResult();
 
@@ -327,10 +348,11 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         List<Task> tasksToComplete = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(2, tasksToComplete.size());
 
-        // Complete both tasks, second task-complete should end the fork-gateway
-        // and set time
+        // Complete both tasks, second task-complete should end the fork-gateway and set time
         taskService.complete(tasksToComplete.get(0).getId());
         taskService.complete(tasksToComplete.get(1).getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         List<HistoricActivityInstance> historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("join").processInstanceId(processInstance.getId()).list();
 
@@ -358,6 +380,8 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
             taskService.complete(task.getId(), CollectionUtil.singletonMap("input", input + 1));
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         }
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         // Verify history
         List<HistoricActivityInstance> taskActivityInstances = historyService.createHistoricActivityInstanceQuery().activityType("userTask").list();

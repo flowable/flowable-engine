@@ -247,6 +247,10 @@
    </choose>
   </sql>
   
+  <select id="selectHistoricVariableInstance" resultMap="historicProcessVariableResultMap">
+    select * from ${prefix}ACT_HI_VARINST where ID_ = #{variableInstanceId}
+  </select>
+  
   <select id="selectHistoricVariableInstanceByVariableInstanceId" resultMap="historicProcessVariableResultMap">
     select * from ${prefix}ACT_HI_VARINST where ID_ = #{variableInstanceId}
   </select>

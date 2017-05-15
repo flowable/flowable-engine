@@ -135,12 +135,30 @@
   <!-- HISTORIC ACTIVITY INSTANCE UPDATE -->
   
   <update id="updateHistoricActivityInstance" parameterType="org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityImpl">
-    update ${prefix}ACT_HI_ACTINST set
-      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
-      ASSIGNEE_ = #{assignee, jdbcType=VARCHAR},
-      END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
-      DURATION_ = #{durationInMillis ,jdbcType=BIGINT},
-      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR}
+    update ${prefix}ACT_HI_ACTINST
+  	  <set>
+  	  	<if test="originalPersistentState.executionId != executionId">
+	      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+	    </if>
+	    <if test="originalPersistentState.taskId != taskId">
+	      TASK_ID_ = #{taskId, jdbcType=VARCHAR},
+	    </if>
+	    <if test="originalPersistentState.assignee != assignee">
+	      ASSIGNEE_ = #{assignee, jdbcType=VARCHAR},
+	    </if>
+	    <if test="originalPersistentState.endTime != endTime">
+	      END_TIME_ = #{endTime, jdbcType=VARCHAR},
+	    </if>
+	    <if test="originalPersistentState.durationInMillis != durationInMillis">
+	      DURATION_ = #{durationInMillis, jdbcType=VARCHAR},
+	    </if>
+	    <if test="originalPersistentState.deleteReason != deleteReason">
+	      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
+	    </if>
+	    <if test="originalPersistentState.calledProcessInstanceId != calledProcessInstanceId">
+	      CALL_PROC_INST_ID_ = #{calledProcessInstanceId, jdbcType=VARCHAR}
+	    </if>
+      </set>
     where ID_ = #{id}
   </update>
 

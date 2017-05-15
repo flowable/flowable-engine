@@ -380,7 +380,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         // complete outerTask
         task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("outerTask").singleResult();
         taskService.complete(task.getId());
-
+        
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
     }
@@ -631,6 +631,9 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertEquals("After call activity", task.getName());
 
         taskService.complete(task.getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        
         assertProcessEnded(processInstance.getId());
         assertHistoricProcessInstanceDetails(processInstance);
     }
@@ -665,6 +668,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertEquals("After call activity", task.getName());
 
         taskService.complete(task.getId());
+        
         assertProcessEnded(processInstance.getId());
         assertHistoricProcessInstanceDetails(processInstance);
 

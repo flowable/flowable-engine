@@ -467,6 +467,13 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             getHistoricIdentityLinkEntityManager().insert(historicIdentityLinkEntity, false);
         }
     }
+    
+    @Override
+    public void recordIdentityLinkDeleted(String identityLinkId) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
+            getHistoricIdentityLinkEntityManager().delete(identityLinkId);
+        }
+    }
 
     @Override
     public void updateProcessBusinessKeyInHistory(ExecutionEntity processInstance) {

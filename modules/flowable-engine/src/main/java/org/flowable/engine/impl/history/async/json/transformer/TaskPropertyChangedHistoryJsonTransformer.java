@@ -15,8 +15,11 @@ package org.flowable.engine.impl.history.async.json.transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntity;
+import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.engine.task.IdentityLinkType;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -53,7 +56,15 @@ public class TaskPropertyChangedHistoryJsonTransformer extends AbstractNeedsTask
                 historicTaskInstance.setAssignee(getStringFromJson(historicalData, HistoryJsonConstants.ASSIGNEE));
 
             } else if (PROPERTY_OWNER.equals(property)) {
-                historicTaskInstance.setOwner(getStringFromJson(historicalData, HistoryJsonConstants.OWNER));
+                String owner = getStringFromJson(historicalData, HistoryJsonConstants.OWNER);
+                historicTaskInstance.setOwner(owner);
+                HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager = commandContext.getProcessEngineConfiguration().getHistoricIdentityLinkEntityManager();
+                HistoricIdentityLinkEntity historicIdentityLinkEntity = historicIdentityLinkEntityManager.create();
+                historicIdentityLinkEntity.setTaskId(taskId);
+                historicIdentityLinkEntity.setType(IdentityLinkType.OWNER);
+                historicIdentityLinkEntity.setUserId(owner);
+                historicIdentityLinkEntity.setCreateTime(getDateFromJson(historicalData, HistoryJsonConstants.CREATE_TIME)); 
+                historicIdentityLinkEntityManager.insert(historicIdentityLinkEntity, false);
 
             } else if (PROPERTY_NAME.equals(property)) {
                 historicTaskInstance.setName(getStringFromJson(historicalData, HistoryJsonConstants.NAME));

@@ -51,6 +51,8 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryJobProducer {
     protected List<Pair<String, Map<String, String>>> filterHistoricData(List<Pair<String, Map<String, String>>> jobData) {
         List<Pair<String, Map<String, String>>> filteredJobs = new ArrayList<>();
         Map<String, List<Pair<String, Map<String, String>>>> activityStartMap = new HashMap<>();
+        Map<String, Pair<String, Map<String, String>>> variableUpdatedMap = new HashMap<>();
+        
         for (Pair<String, Map<String, String>> historicData : jobData) {
             if ("activity-start".equals(historicData.getKey())) {
                 
@@ -66,6 +68,9 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryJobProducer {
                 
                 activityHistoricData.add(historicData);
                 activityStartMap.put(activityKey, activityHistoricData);
+                
+            } else if ("variable-updated".equals(historicData.getKey())) {
+                variableUpdatedMap.put(historicData.getValue().get(HistoryJsonConstants.ID), historicData);
             
             } else if (!"activity-end".equals(historicData.getKey())) {
                 filteredJobs.add(historicData);
@@ -99,6 +104,10 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryJobProducer {
             for (Pair<String, Map<String, String>> historicData : activityHistoricData) {
                 filteredJobs.add(historicData);
             }
+        }
+        
+        for (Pair<String, Map<String, String>> variableUpdatedData : variableUpdatedMap.values()) {
+            filteredJobs.add(variableUpdatedData);
         }
         
         return filteredJobs;

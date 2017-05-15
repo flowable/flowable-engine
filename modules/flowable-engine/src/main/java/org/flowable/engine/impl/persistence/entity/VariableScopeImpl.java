@@ -656,8 +656,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
                 return;
             }
 
-            // We're as high as possible and the variable doesn't exist yet, so
-            // we're creating it
+            // We're as high as possible and the variable doesn't exist yet, so we're creating it
             if (sourceExecution != null) {
                 createVariableLocal(variableName, value, sourceExecution);
             } else {
@@ -833,10 +832,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     protected void updateVariableInstance(VariableInstanceEntity variableInstance, Object value, ExecutionEntity sourceActivityExecution) {
 
-        // Always check if the type should be altered. It's possible that the
-        // previous type is lower in the type
-        // checking chain (e.g. serializable) and will return true on
-        // isAbleToStore(), even though another type
+        // Always check if the type should be altered. It's possible that the previous type is lower in the type
+        // checking chain (e.g. serializable) and will return true on isAbleToStore(), even though another type
         // higher in the chain is eligible for storage.
 
         VariableTypes variableTypes = Context.getProcessEngineConfiguration().getVariableTypes();

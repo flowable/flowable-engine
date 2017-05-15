@@ -46,6 +46,7 @@ public class ProcessInstanceStartHistoryJsonTransformer extends AbstractHistoryJ
             historicProcessInstance = historicProcessInstanceEntityManager.create();
             historicProcessInstance.setId(getStringFromJson(historicalData, HistoryJsonConstants.ID));
             historicProcessInstance.setProcessInstanceId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID));
+            historicProcessInstance.setName(getStringFromJson(historicalData, HistoryJsonConstants.NAME));
             historicProcessInstance.setBusinessKey(getStringFromJson(historicalData, HistoryJsonConstants.BUSINESS_KEY));
             historicProcessInstance.setProcessDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_ID));
             historicProcessInstance.setProcessDefinitionKey(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_KEY));

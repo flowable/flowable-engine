@@ -352,6 +352,10 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     public void waitForJobExecutorToProcessAllHistoryJobs(long maxMillisToWait, long intervalMillis) {
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, maxMillisToWait, intervalMillis);
     }
+    
+    public void waitForHistoryJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, maxMillisToWait, intervalMillis);
+    }
 
     /**
      * Since the 'one task process' is used everywhere the actual process content doesn't matter, instead of copying around the BPMN 2.0 xml one could use this method which gives a {@link BpmnModel}

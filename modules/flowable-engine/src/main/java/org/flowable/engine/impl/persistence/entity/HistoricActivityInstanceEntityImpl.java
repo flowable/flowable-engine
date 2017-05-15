@@ -47,7 +47,9 @@ public class HistoricActivityInstanceEntityImpl extends HistoricScopeInstanceEnt
         persistentState.put("durationInMillis", durationInMillis);
         persistentState.put("deleteReason", deleteReason);
         persistentState.put("executionId", executionId);
+        persistentState.put("taskId", taskId);
         persistentState.put("assignee", assignee);
+        persistentState.put("calledProcessInstanceId", calledProcessInstanceId);
         return persistentState;
     }
 

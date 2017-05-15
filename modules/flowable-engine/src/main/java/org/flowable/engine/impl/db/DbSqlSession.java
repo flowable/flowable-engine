@@ -411,9 +411,14 @@ public class DbSqlSession implements Session {
             debugFlush();
         }
 
+        try {
         flushInserts();
         flushUpdates();
         flushDeletes();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     /**
@@ -704,11 +709,12 @@ public class DbSqlSession implements Session {
             }
 
             log.debug("updating: {}", updatedObject);
+            
             int updatedRecords = sqlSession.update(updateStatement, updatedObject);
             if (updatedRecords == 0) {
                 throw new FlowableOptimisticLockingException(updatedObject + " was updated by another transaction concurrently");
             }
-
+            
             // See https://activiti.atlassian.net/browse/ACT-1290
             if (updatedObject instanceof HasRevision) {
                 ((HasRevision) updatedObject).setRevision(((HasRevision) updatedObject).getRevisionNext());

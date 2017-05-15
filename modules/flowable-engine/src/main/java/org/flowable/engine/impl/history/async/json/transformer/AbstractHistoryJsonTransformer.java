@@ -44,7 +44,23 @@ public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTrans
         if (StringUtils.isNotEmpty(s)) {
             return Integer.valueOf(s);
         }
-        return 0;
+        return null;
+    }
+    
+    protected Double getDoubleFromJson(ObjectNode objectNode, String fieldName) {
+        String s = getStringFromJson(objectNode, fieldName);
+        if (StringUtils.isNotEmpty(s)) {
+            return Double.valueOf(s);
+        }
+        return null;
+    }
+    
+    protected Long getLongFromJson(ObjectNode objectNode, String fieldName) {
+        String s = getStringFromJson(objectNode, fieldName);
+        if (StringUtils.isNotEmpty(s)) {
+            return Long.valueOf(s);
+        }
+        return null;
     }
 
     protected void dispatchEvent(CommandContext commandContext, FlowableEvent event) {

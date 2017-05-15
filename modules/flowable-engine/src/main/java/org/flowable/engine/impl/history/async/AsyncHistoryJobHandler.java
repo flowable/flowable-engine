@@ -20,7 +20,11 @@ import java.util.Map;
 import org.flowable.engine.impl.history.async.json.transformer.ActivityEndHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ActivityFullHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ActivityStartHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.FormPropertiesSubmittedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.HistoricDetailVariableUpdateHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.HistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.IdentityLinkCreatedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.IdentityLinkDeletedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceDeleteHistoryByProcessDefinitionIdJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceDeleteHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceEndHistoryJsonTransformer;
@@ -31,6 +35,8 @@ import org.flowable.engine.impl.history.async.json.transformer.TaskAssigneeChang
 import org.flowable.engine.impl.history.async.json.transformer.TaskCreatedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskEndedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskPropertyChangedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.VariableCreatedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.VariableUpdatedHistoryJsonTransformer;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.slf4j.Logger;
@@ -73,6 +79,14 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
 
         addHistoryJsonTransformer(new TaskPropertyChangedHistoryJsonTransformer());
         addHistoryJsonTransformer(new TaskAssigneeChangedHistoryJsonTransformer());
+        
+        addHistoryJsonTransformer(new IdentityLinkCreatedHistoryJsonTransformer());
+        addHistoryJsonTransformer(new IdentityLinkDeletedHistoryJsonTransformer());
+        
+        addHistoryJsonTransformer(new VariableCreatedHistoryJsonTransformer());
+        addHistoryJsonTransformer(new VariableUpdatedHistoryJsonTransformer());
+        addHistoryJsonTransformer(new HistoricDetailVariableUpdateHistoryJsonTransformer());
+        addHistoryJsonTransformer(new FormPropertiesSubmittedHistoryJsonTransformer());
     }
 
     public void addHistoryJsonTransformer(HistoryJsonTransformer historyJsonTransformer) {

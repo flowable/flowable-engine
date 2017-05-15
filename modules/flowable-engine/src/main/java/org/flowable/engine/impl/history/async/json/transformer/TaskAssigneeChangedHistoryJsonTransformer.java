@@ -16,7 +16,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
+import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntity;
+import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.engine.task.IdentityLinkType;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -34,7 +37,7 @@ public class TaskAssigneeChangedHistoryJsonTransformer extends TaskPropertyChang
         String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
         if (StringUtils.isNotEmpty(executionId)) {
             return super.isApplicable(historicalData, commandContext)
-                            && historicActivityInstanceExistsForData(historicalData, commandContext);
+                            && historicActivityInstanceExistsForDataIncludingFinished(historicalData, commandContext);
 
         } else {
             return super.isApplicable(historicalData, commandContext);
@@ -47,14 +50,27 @@ public class TaskAssigneeChangedHistoryJsonTransformer extends TaskPropertyChang
         super.transformJson(job, historicalData, commandContext);
 
         String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
-        if (StringUtils.isNotEmpty(executionId)) {
-            String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
-            if (StringUtils.isNotEmpty(activityId)) {
-                HistoricActivityInstanceEntity historicActivityInstanceEntity = findUnfinishedHistoricActivityInstance(commandContext, executionId, activityId);
-                if (historicActivityInstanceEntity != null) {
-                    String assignee = getStringFromJson(historicalData, HistoryJsonConstants.ASSIGNEE);
-                    historicActivityInstanceEntity.setAssignee(assignee);
-                }
+        String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
+        if (StringUtils.isNotEmpty(executionId) && StringUtils.isNotEmpty(activityId)) {
+            HistoricActivityInstanceEntity historicActivityInstanceEntity = findHistoricActivityInstance(commandContext, executionId, activityId);
+            
+            if (historicActivityInstanceEntity == null) {
+                // activity instance not found, ignoring event
+                return;
+            }
+            
+            String assignee = getStringFromJson(historicalData, HistoryJsonConstants.ASSIGNEE);
+            historicActivityInstanceEntity.setAssignee(assignee);
+            
+            String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
+            if (StringUtils.isNotEmpty(taskId)) {
+                HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager = commandContext.getProcessEngineConfiguration().getHistoricIdentityLinkEntityManager();
+                HistoricIdentityLinkEntity historicIdentityLinkEntity = historicIdentityLinkEntityManager.create();
+                historicIdentityLinkEntity.setTaskId(taskId);
+                historicIdentityLinkEntity.setType(IdentityLinkType.ASSIGNEE);
+                historicIdentityLinkEntity.setUserId(assignee);
+                historicIdentityLinkEntity.setCreateTime(getDateFromJson(historicalData, HistoryJsonConstants.CREATE_TIME)); 
+                historicIdentityLinkEntityManager.insert(historicIdentityLinkEntity, false);
             }
         }
     }

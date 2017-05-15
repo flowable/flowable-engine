@@ -19,12 +19,18 @@ public interface HistoryJsonConstants {
     String NAME = "name";
 
     String DESCRIPTION = "description";
+    
+    String REVISION = "revision";
 
     String CATEGORY = "category";
 
     String EXECUTION_ID = "executionId";
+    
+    String SOURCE_EXECUTION_ID = "sourceExecutionId";
 
     String PROCESS_INSTANCE_ID = "processInstanceId";
+    
+    String TASK_ID = "taskId";
 
     String BUSINESS_KEY = "businessKey";
 
@@ -41,8 +47,12 @@ public interface HistoryJsonConstants {
     String START_TIME = "startTime";
 
     String END_TIME = "endTime";
+    
+    String CREATE_TIME = "createTime";
 
     String CLAIM_TIME = "claimTime";
+    
+    String LAST_UPDATED_TIME = "lastUpdatedTime";
 
     String START_USER_ID = "startUserId";
 
@@ -63,6 +73,8 @@ public interface HistoryJsonConstants {
     String ASSIGNEE = "assignee";
 
     String OWNER = "owner";
+    
+    String IDENTITY_LINK_TYPE = "identityLinkType";
 
     String TASK_DEFINITION_KEY = "taskDefinitionKey";
 
@@ -73,6 +85,26 @@ public interface HistoryJsonConstants {
     String DUE_DATE = "dueDate";
 
     String PROPERTY = "property";
+    
+    String VARIABLE_TYPE = "variableType";
+    
+    String VARIABLE_TEXT_VALUE = "variableTextValue";
+    
+    String VARIABLE_TEXT_VALUE2 = "variableTextValue2";
+    
+    String VARIABLE_DOUBLE_VALUE = "variableDoubleValue";
+    
+    String VARIABLE_LONG_VALUE = "variableLongValue";
+    
+    String VARIABLE_BYTES_VALUE = "variableBytesValue";
+    
+    String FORM_PROPERTY_ID = "formPropertyId";
+    
+    String FORM_PROPERTY_VALUE = "formPropertyValue";
+    
+    String USER_ID = "userId";
+    
+    String GROUP_ID = "groupId";
 
     String TENANT_ID = "tenantId";
 

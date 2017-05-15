@@ -14,6 +14,7 @@ package org.flowable.engine.impl.history.async.json.transformer;
 
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
@@ -34,6 +35,14 @@ public class SubProcessInstanceHistoryJsonTransformer extends AbstractHistoryJso
 
     @Override
     public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
+        String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
+        HistoricActivityInstance activityInstance = findHistoricActivityInstance(commandContext, 
+                getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID), activityId);
+            
+        if (activityInstance == null) {
+            return false;
+        }
+        
         return true;
     }
 
@@ -41,35 +50,40 @@ public class SubProcessInstanceHistoryJsonTransformer extends AbstractHistoryJso
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         HistoricProcessInstanceEntityManager historicProcessInstanceEntityManager = commandContext.getHistoricProcessInstanceEntityManager();
 
-        HistoricProcessInstanceEntity subProcessInstance = historicProcessInstanceEntityManager.create();
+        String id = getStringFromJson(historicalData, HistoryJsonConstants.ID);
+        String processInstanceId = getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID);
+        HistoricProcessInstanceEntity historicProcessInstance = historicProcessInstanceEntityManager.findById(id);
+        if (historicProcessInstance == null) {
+            HistoricProcessInstanceEntity subProcessInstance = historicProcessInstanceEntityManager.create();
 
-        subProcessInstance.setId(getStringFromJson(historicalData, HistoryJsonConstants.ID));
-        subProcessInstance.setProcessInstanceId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID));
-        subProcessInstance.setBusinessKey(getStringFromJson(historicalData, HistoryJsonConstants.BUSINESS_KEY));
-        subProcessInstance.setProcessDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_ID));
-        subProcessInstance.setProcessDefinitionKey(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_KEY));
-        subProcessInstance.setProcessDefinitionName(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_NAME));
-        String versionString = getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_VERSION);
-        subProcessInstance.setProcessDefinitionVersion(versionString != null ? Integer.valueOf(versionString) : 0);
-        subProcessInstance.setDeploymentId(getStringFromJson(historicalData, HistoryJsonConstants.DEPLOYMENT_ID));
-        subProcessInstance.setStartTime(getDateFromJson(historicalData, HistoryJsonConstants.START_TIME));
-        subProcessInstance.setStartUserId(getStringFromJson(historicalData, HistoryJsonConstants.START_USER_ID));
-        subProcessInstance.setStartActivityId(getStringFromJson(historicalData, HistoryJsonConstants.START_ACTIVITY_ID));
-        subProcessInstance.setSuperProcessInstanceId(getStringFromJson(historicalData, HistoryJsonConstants.SUPER_PROCESS_INSTANCE_ID));
-        subProcessInstance.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
+            subProcessInstance.setId(id);
+            subProcessInstance.setProcessInstanceId(processInstanceId);
+            subProcessInstance.setBusinessKey(getStringFromJson(historicalData, HistoryJsonConstants.BUSINESS_KEY));
+            subProcessInstance.setProcessDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_ID));
+            subProcessInstance.setProcessDefinitionKey(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_KEY));
+            subProcessInstance.setProcessDefinitionName(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_NAME));
+            String versionString = getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_VERSION);
+            subProcessInstance.setProcessDefinitionVersion(versionString != null ? Integer.valueOf(versionString) : 0);
+            subProcessInstance.setDeploymentId(getStringFromJson(historicalData, HistoryJsonConstants.DEPLOYMENT_ID));
+            subProcessInstance.setStartTime(getDateFromJson(historicalData, HistoryJsonConstants.START_TIME));
+            subProcessInstance.setStartUserId(getStringFromJson(historicalData, HistoryJsonConstants.START_USER_ID));
+            subProcessInstance.setStartActivityId(getStringFromJson(historicalData, HistoryJsonConstants.START_ACTIVITY_ID));
+            subProcessInstance.setSuperProcessInstanceId(getStringFromJson(historicalData, HistoryJsonConstants.SUPER_PROCESS_INSTANCE_ID));
+            subProcessInstance.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
+        
+            historicProcessInstanceEntityManager.insert(subProcessInstance, false);
     
-        historicProcessInstanceEntityManager.insert(subProcessInstance, false);
-
-        // Fire event
-        dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(
-                FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, subProcessInstance));
+            // Fire event
+            dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(
+                    FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, subProcessInstance));
+        }
         
         String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
         String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);
 
         HistoricActivityInstanceEntity activityInstance = findHistoricActivityInstance(commandContext, executionId, activityId);
         if (activityInstance != null) {
-            activityInstance.setCalledProcessInstanceId(subProcessInstance.getProcessInstanceId());
+            activityInstance.setCalledProcessInstanceId(processInstanceId);
         }
     }
 

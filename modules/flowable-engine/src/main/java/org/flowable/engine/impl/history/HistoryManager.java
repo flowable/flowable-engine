@@ -222,11 +222,15 @@ public interface HistoryManager {
      */
     void recordFormPropertiesSubmitted(ExecutionEntity processInstance, Map<String, String> properties, String taskId);
 
-    // Identity link related history
     /**
      * Record the creation of a new {@link IdentityLink}, if audit history is enabled.
      */
     void recordIdentityLinkCreated(IdentityLinkEntity identityLink);
+    
+    /**
+     * Record the deletion of a {@link IdentityLink}, if audit history is enabled
+     */
+    void recordIdentityLinkDeleted(String identityLinkId);
 
     void updateProcessBusinessKeyInHistory(ExecutionEntity processInstance);
 
