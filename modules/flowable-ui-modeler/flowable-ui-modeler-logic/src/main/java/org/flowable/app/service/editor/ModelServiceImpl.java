@@ -252,18 +252,29 @@ public class ModelServiceImpl implements ModelService {
         childShapeArray.add(
                 createStartEvent(0,"startEvent1")
         );
+        List<EventLogEntry> eventLogEntriesForProcessInstanceId = getEventLogEntriesForProcessInstanceId(skeleton);
+
         childShapeArray.addAll(
-                addAssertion(
-                        createNodesFromEventLogEntries(
-                        getEventLogEntriesForProcessInstanceId(skeleton)
+                eventLogEntriesForProcessInstanceId.isEmpty() ?
+                        addUserTask() :
+                        addAssertion(
+                                createNodesFromEventLogEntries(
+                                        eventLogEntriesForProcessInstanceId
+                                )
                         )
-                )
         );
         addSequenceFlows(childShapeArray);
         return editorNode.toString();
     }
 
-    private List<ObjectNode> addAssertion(List<ObjectNode> nodes) {
+    private List<ObjectNode> addUserTask() {
+        List<ObjectNode> nodes = new ArrayList<>();
+        nodes.add(createUserTask(1, "userTask", "User task"));
+        nodes.add(createEndEvent(2, "end"));
+        return nodes;
+    }
+
+    protected List<ObjectNode> addAssertion(List<ObjectNode> nodes) {
         nodes.add(nodes.size(), createScriptTask(nodes.size() + 1, "assertion", "assertThat",
                 "import org.flowable.engine.impl.context.Context;\n" +
                         "import static org.hamcrest.core.Is.is;\n" +
@@ -275,7 +286,7 @@ public class ModelServiceImpl implements ModelService {
         return nodes;
     }
 
-    private ArrayNode addSequenceFlows(ArrayNode nodes) {
+    protected ArrayNode addSequenceFlows(ArrayNode nodes) {
         if (nodes.size() > 1) {
             int taskLength = nodes.size();
             for (int i =1; i< taskLength; i++) {
@@ -310,7 +321,7 @@ public class ModelServiceImpl implements ModelService {
         return nodes;
     }
 
-    private ObjectNode getDockersPosition(ObjectNode sourceNode) {
+    protected ObjectNode getDockersPosition(ObjectNode sourceNode) {
         double leftX = sourceNode.get("bounds").get("upperLeft").get("x").asDouble();
         double upperY = sourceNode.get("bounds").get("upperLeft").get("y").asDouble();
         double rightX = sourceNode.get("bounds").get("lowerRight").get("x").asDouble();
@@ -321,7 +332,7 @@ public class ModelServiceImpl implements ModelService {
         return position;
     }
 
-    private List<EventLogEntry> getEventLogEntriesForProcessInstanceId(String processInstanceId) {
+    protected List<EventLogEntry> getEventLogEntriesForProcessInstanceId(String processInstanceId) {
         List<EventLogEntry> logEvents = Collections.emptyList();
         if (StringUtils.isNotEmpty(processInstanceId)) {
             Map<String, Object> params = new HashMap<String, Object>(2);
@@ -348,7 +359,7 @@ public class ModelServiceImpl implements ModelService {
         return editorNode;
     }
 
-    private List<ObjectNode> createNodesFromEventLogEntries(List<EventLogEntry> eventLogEntries) {
+    protected List<ObjectNode> createNodesFromEventLogEntries(List<EventLogEntry> eventLogEntries) {
         List<ObjectNode> nodes = new ArrayList<>();
         int position = 1;
         for (EventLogEntry eventLogEntry : eventLogEntries) {
@@ -391,7 +402,7 @@ public class ModelServiceImpl implements ModelService {
         return nodes;
     }
 
-    private ObjectNode createScriptTask(int position, String id, String name, String script) {
+    protected ObjectNode createScriptTask(int position, String id, String name, String script) {
         HashMap<String, String> properties = new HashMap<>();
         properties.put("scriptformat", "groovy");
         properties.put("scripttext", script);
@@ -401,15 +412,22 @@ public class ModelServiceImpl implements ModelService {
                 properties);
     }
 
-    private ObjectNode createStartEvent(int position, String id) {
+    protected ObjectNode createUserTask(int position, String id, String name) {
+        HashMap<String, String> properties = new HashMap<>();
+        properties.put("name", name);
+        return createNode(100 + position * 150, 148, "UserTask", id, 3 * CIRCLE_SIZE, 2 * CIRCLE_SIZE,
+                properties);
+    }
+
+    protected ObjectNode createStartEvent(int position, String id) {
         return createNoneEvent(position, id, "StartNoneEvent");
     }
 
-    private ObjectNode createEndEvent(int position, String id) {
+    protected ObjectNode createEndEvent(int position, String id) {
         return createNoneEvent(position, id, "EndNoneEvent");
     }
 
-    private ObjectNode createNoneEvent(int position, String id, String stencil) {
+    protected ObjectNode createNoneEvent(int position, String id, String stencil) {
         return createNode(100 + position * 150, 163, stencil, id, CIRCLE_SIZE, CIRCLE_SIZE, Collections.<String, String>emptyMap());
     }
 
