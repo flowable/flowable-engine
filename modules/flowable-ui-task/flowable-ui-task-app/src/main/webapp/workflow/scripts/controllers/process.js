@@ -179,6 +179,16 @@ angular.module('flowableApp')
         }, $modal, $scope);
 
     };
+
+    $scope.showCreateProcessTestDialog = function() {
+        $scope.model.skeleton = $scope.model.processInstance.id;
+        var modalInstance = _internalCreateModal({
+            template: appResourceRoot + 'views/modal/process-test-create.html',
+            scope: $scope,
+            show: true
+        }, $modal, $scope);
+
+    };
 }]);
 
 angular.module('flowableApp')
@@ -211,6 +221,58 @@ angular.module('flowableApp')
         }
     ]
 );
+
+angular.module('flowableApp')
+.controller('CreateNewProcessTestModelCtrl', ['$rootScope', '$scope', '$modal', '$http', '$location',
+    function ($rootScope, $scope, $modal, $http, $location) {
+
+        $scope.model = {
+            loading: false,
+            skeleton: $scope.model.processInstance.id,
+            process: {
+                name: 'processTest',
+                key: 'processTest',
+                description: '',
+                modelType: 0,
+            }
+        };
+
+        if ($scope.initialModelType !== undefined) {
+            $scope.model.process.modelType = $scope.initialModelType;
+        }
+
+        $scope.ok = function () {
+
+            if (!$scope.model.process.name || $scope.model.process.name.length == 0 ||
+                !$scope.model.process.key || $scope.model.process.key.length == 0) {
+
+                return;
+            }
+
+            $scope.model.loading = true;
+
+            $http({
+                method: 'POST',
+                url: 'http://localhost:8080/flowable-modeler/app/rest/models?skeleton=' + $scope.model.skeleton,
+                data: $scope.model.process
+            }).success(function (data) {
+                $scope.$hide();
+
+                $scope.model.loading = false;
+                var win = window.open("http://localhost:8080/flowable-modeler/#/editor/" + data.id, '_blank');
+                win.focus();
+            }).error(function (data, status, headers, config) {
+                $scope.model.loading = false;
+                $scope.model.errorMessage = data.message;
+            });
+        };
+
+        $scope.cancel = function () {
+            if (!$scope.model.loading) {
+                $scope.$hide();
+            }
+        };
+    }]);
 
 angular.module('flowableApp')
 .controller('CancelProcessCtrl', ['$scope', '$http', '$route', 'ProcessService', function ($scope, $http, $route, ProcessService) {

@@ -12,7 +12,7 @@
 	<packaging>jar</packaging>
 
 	<dependencies>
-	
+
         <!-- Flowable -->
         <dependency>
            <groupId>org.flowable</groupId>
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-bpmn-layout</artifactId>
-        </dependency>        
+        </dependency>
 		<dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-process-validation</artifactId>
@@ -58,13 +58,17 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-form-json-converter</artifactId>
         </dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-engine</artifactId>
+		</dependency>
 
 		<!-- LOGGING -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
-        
+
 		<!-- JSON -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
@@ -183,7 +187,7 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
 		</dependency>
-    
+
         <!-- Servlet -->
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -194,9 +198,9 @@
 
 	<!-- BUILD -->
 	<build>
-	
+
 		<plugins>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
@@ -208,7 +212,7 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<profiles>
 		<profile>
 			<id>distro</id>

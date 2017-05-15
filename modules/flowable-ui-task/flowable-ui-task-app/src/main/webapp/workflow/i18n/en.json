@@ -195,6 +195,17 @@
         }
     },
     "PROCESS": {
+        "TEST": {
+            "POPUP": {
+                "CREATE-TITLE": "Create a new business process model",
+                "CREATE-DESCRIPTION": "You need to give a name for the new model and you may want to add a description at the same time."
+            },
+            "NAME": "Model name",
+            "KEY": "Model key",
+            "DESCRIPTION": "Description",
+            "SKELETON": "Process skeleton",
+            "CREATE": "Create test"
+        },
         "ALERT": {
             "COMMENT-ADDED": "Comment was added",
             "STARTED": "A new  \"{{processDefinitionName}}\" process was started",
@@ -236,6 +247,7 @@
             "CREATE": "+ Start a process",
             "BACK-TO-LIST": "Back to process instances",
             "SHOW-DIAGRAM": "Show diagram",
+            "CREATE-TEST": "Create Process Test",
             "CANCEL": "Cancel process",
             "DELETE": "Delete process",
             "ADD-COMMENT": "+ Add comment",

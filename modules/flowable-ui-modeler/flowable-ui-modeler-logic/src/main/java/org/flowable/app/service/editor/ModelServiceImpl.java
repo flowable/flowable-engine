@@ -366,6 +366,14 @@ public class ModelServiceImpl implements ModelService {
                                     key + "').start().getId());"
                     ));
                     break;
+                case "TASK_ASSIGNED":
+                    nodes.add(createScriptTask(position, "claimTask" + position++, "Claim task " + eventLogEntry.getTaskId() + " to user "+ eventLogEntry.getUserId(),
+                            "import org.flowable.engine.impl.context.Context;\n" +
+                                    "\n" +
+                                    "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();\n" +
+                                    "Context.getProcessEngineConfiguration().getTaskService().claim(taskId, '"+ eventLogEntry.getUserId() +"');"
+                    ));
+                    break;
                 case "TASK_COMPLETED":
                     nodes.add(createScriptTask(position, "completeTask"+position++, "Complete task "+ eventLogEntry.getTaskId(),
                             "import org.flowable.engine.impl.context.Context;\n" +
