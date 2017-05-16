@@ -16,6 +16,15 @@
                 </div>
             </div>
             <div class="modal-footer">
+                <div class="form-group,pull-left">
+                    <label for="expression">{{'PROCESS.TITLE.EXPRESSION' | translate}}</label>
+                    <input type="text" class="form-control"
+                           id="expression" ng-model="model.expression" auto-focus editor-input-check>
+
+                    <button type="button" class="btn btn-sm btn-default" ng-click="$hide()">
+                        {{'PROCESS.ACTION.EXECUTE' | translate}}
+                    </button>
+                </div>
                 <div class="pull-right">
                     <button type="button" class="btn btn-sm btn-default" ng-click="$hide()">
                         {{'GENERAL.ACTION.CLOSE' | translate}}
