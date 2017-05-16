@@ -253,13 +253,13 @@ angular.module('flowableApp')
 
             $http({
                 method: 'POST',
-                url: 'http://localhost:8080/flowable-modeler/app/rest/models?skeleton=' + $scope.model.skeleton,
+                url: '/flowable-modeler/app/rest/models?skeleton=' + $scope.model.skeleton,
                 data: $scope.model.process
             }).success(function (data) {
                 $scope.$hide();
 
                 $scope.model.loading = false;
-                var win = window.open("http://localhost:8080/flowable-modeler/#/editor/" + data.id, '_blank');
+                var win = window.open("/flowable-modeler/#/editor/" + data.id, '_blank');
                 win.focus();
             }).error(function (data, status, headers, config) {
                 $scope.model.loading = false;
