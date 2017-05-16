@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.examples.test;
 package org.flowable.engine.test;
 
 import org.flowable.engine.delegate.BpmnError;
