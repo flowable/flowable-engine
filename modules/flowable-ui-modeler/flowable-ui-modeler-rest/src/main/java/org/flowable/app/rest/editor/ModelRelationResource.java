@@ -12,18 +12,25 @@
  */
 package org.flowable.app.rest.editor;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.util.Asserts;
+import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.domain.editor.Model;
 import org.flowable.app.domain.editor.ModelInformation;
+import org.flowable.app.repository.editor.ModelRepository;
 import org.flowable.app.service.api.ModelService;
 import org.flowable.app.service.editor.ModelRelationService;
 import org.flowable.app.service.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import au.com.rds.schemaformbuilder.formdesignjson.FormDesignJsonService;
 
 @RestController
 public class ModelRelationResource {
@@ -33,6 +40,12 @@ public class ModelRelationResource {
 
     @Autowired
     protected ModelRelationService modelRelationService;
+    
+    @Autowired
+    protected ModelRepository modelRepository;
+    
+    @Autowired
+    protected FormDesignJsonService formDesignJsonService;
 
     @RequestMapping(value = "/rest/models/{modelId}/parent-relations", method = RequestMethod.GET, produces = "application/json")
     public List<ModelInformation> getModelRelations(@PathVariable String modelId) {
@@ -40,7 +53,19 @@ public class ModelRelationResource {
         if (model == null) {
             throw new NotFoundException();
         }
-        return modelRelationService.findParentModels(modelId);
+        List<ModelInformation> referringForm = new ArrayList<ModelInformation>();
+        if(model.getModelType().intValue() == AbstractModel.MODEL_TYPE_FORM_RDS){
+          List<String> keys = this.formDesignJsonService.findFormKeysReferencingMe(model.getKey());
+          for(String key: keys) {
+            List<Model> models = modelRepository.findByKeyAndType(key, AbstractModel.MODEL_TYPE_FORM_RDS);
+            Assert.isTrue(models.size()==1, "Should return 1 and only 1 result for form key " + key);
+            Model referringModel = models.get(0);
+            ModelInformation modelInfo = new ModelInformation(referringModel.getId(),referringModel.getName(),referringModel.getModelType());
+            referringForm.add(modelInfo);
+          }
+        }
+        referringForm.addAll(modelRelationService.findParentModels(modelId));
+        return referringForm;
     }
 
 }
