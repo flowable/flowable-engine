@@ -1,18 +1,26 @@
 <definitions xmlns="http://www.omg.org/spec/DMN/20153011" id="full" name="Full">
   <decision id="decision" name="Full Decision">
-    <decisionTable id="decisionTable">
+    <decisionTable id="decisionTable" hitPolicy="COLLECT" aggregation="SUM">
         <input id="input1" label="Input 1">
             <inputExpression id="inputExpression1" typeRef="double">
               <text>inputVariable1</text>
             </inputExpression>
         </input>
         <input id="input2" label="Input 2">
-            <inputExpression id="inputExpression22" typeRef="string">
+            <inputExpression id="inputExpression22" typeRef="double">
               <text>inputVariable2</text>
             </inputExpression>
         </input>
-        <output id="output1" label="Output 1" name="outputVariable1" typeRef="string" />
-        <output id="output2" label="Output 2" name="outputVariable2" typeRef="string" />
+        <output id="output1" label="Output 1" name="outputVariable1" typeRef="string">
+            <outputValues>
+                <text>"result2","result1"</text>
+            </outputValues>
+        </output>
+        <output id="output2" label="Output 2" name="outputVariable2" typeRef="number">
+            <outputValues>
+                <text>2,1</text>
+            </outputValues>
+        </output>
         <rule id="rule1">
             <inputEntry id="inputEntry1">
                 <text><![CDATA[== 1]]></text>
@@ -24,7 +32,7 @@
                 <text><![CDATA[== 'result1']]></text>
             </outputEntry>
             <outputEntry id="outputEntry1_1">
-                <text><![CDATA[== 'result11']]></text>
+                <text>1</text>
             </outputEntry>
         </rule>
         <rule id="rule2">
@@ -38,7 +46,7 @@
                 <text><![CDATA[== 'result2']]></text>
             </outputEntry>
             <outputEntry id="outputEntry2_1">
-                <text><![CDATA[== 'result22']]></text>
+                <text>2</text>
             </outputEntry>
         </rule>
     </decisionTable>

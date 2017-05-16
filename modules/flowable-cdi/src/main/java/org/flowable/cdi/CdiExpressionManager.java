@@ -21,13 +21,13 @@ import javax.el.MapELResolver;
 
 import org.flowable.cdi.impl.el.CdiResolver;
 import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.el.ExpressionManager;
+import org.flowable.engine.impl.el.DefaultExpressionManager;
 import org.flowable.engine.impl.el.VariableScopeElResolver;
 
 /**
- * {@link ExpressionManager} for resolving Cdi-managed beans.
+ * {@link DefaultExpressionManager} for resolving Cdi-managed beans.
  * 
- * This {@link ExpressionManager} implementation performs lazy lookup of the Cdi-BeanManager and can thus be configured using the spring-based configuration of the process engine:
+ * This {@link DefaultExpressionManager} implementation performs lazy lookup of the Cdi-BeanManager and can thus be configured using the spring-based configuration of the process engine:
  * 
  * <pre>
  * &lt;property name="expressionManager"&gt;
@@ -37,7 +37,7 @@ import org.flowable.engine.impl.el.VariableScopeElResolver;
  * 
  * @author Daniel Meyer
  */
-public class CdiExpressionManager extends ExpressionManager {
+public class CdiExpressionManager extends DefaultExpressionManager {
 
     @Override
     protected ELResolver createElResolver(VariableScope variableScope) {

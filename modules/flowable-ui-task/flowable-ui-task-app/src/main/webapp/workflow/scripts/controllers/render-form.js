@@ -316,6 +316,7 @@ angular.module('flowableApp')
                             }
                             newUploadValue += field.value[j].id;
                         }
+                        field.value = newUploadValue;
 					}
                 }
             };

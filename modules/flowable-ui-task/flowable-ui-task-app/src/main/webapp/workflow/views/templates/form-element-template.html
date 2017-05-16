@@ -125,8 +125,16 @@
     </div>
     
     <div ng-switch-when="expression" class="form-group" ng-show="field.isVisible">
-    	<div class="well well-sm">
-        	{{field.value && field.value || ('FORM.MESSAGE.EMPTY' | translate)}}
+    	<div class="well well-sm" ng-style="{'font-size': field.params.size + 'em'}">
+    		<div ng-show="!field.value && !field.expression">
+    			{{'FORM.MESSAGE.EMPTY' | translate}}
+    		</div>
+    		<div ng-show="!field.value">
+    			{{field.expression}}
+    		</div>
+    		<div ng-show="field.value">
+    			{{field.value}}
+    		</div>        	
         </div>
     </div>
 </div>
@@ -162,7 +170,7 @@
         <label class="control-label">{{field.name}}</label>
         <span ng-if="!field.value || field.value.length == 0" translate="FORM.MESSAGE.EMPTY"></span>
         <ul class="simple-list selectable content-list">
-            <li ng-repeat="content in field.value" title="{{content.name}}">
+            <li ng-repeat="content in model.uploads[field.id]" title="{{content.name}}">
                 <document-preview content="content" editable="field.params.documentsEditable" read-only="true"></document-preview>
             </li>
         </ul>
@@ -182,8 +190,16 @@
     </div>
     
     <div ng-switch-when="expression" ng-show="field.isVisible">
-        <div class="well well-sm">
-            {{field.value && field.value || ('FORM.MESSAGE.EMPTY' | translate)}}
+        <div class="well well-sm" ng-style="{'font-size': field.params.size + 'em'}">
+    		<div ng-show="!field.value && !field.expression">
+    			{{'FORM.MESSAGE.EMPTY' | translate}}
+    		</div>
+    		<div ng-show="!field.value">
+    			{{field.expression}}
+    		</div>
+    		<div ng-show="field.value">
+    			{{field.value}}
+    		</div>        	
         </div>
     </div>
 

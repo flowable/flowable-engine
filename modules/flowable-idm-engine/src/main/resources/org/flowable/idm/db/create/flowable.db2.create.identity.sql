@@ -6,7 +6,7 @@ create table ACT_ID_PROPERTY (
 );
 
 insert into ACT_ID_PROPERTY
-values ('schema.version', '6.0.1.0', 1);
+values ('schema.version', '6.1.0.0', 1);
 
 create table ACT_ID_BYTEARRAY (
     ID_ varchar(64) not null,
@@ -96,4 +96,5 @@ alter table ACT_ID_PRIV_MAPPING
     
 create index ACT_IDX_PRIV_USER on ACT_ID_PRIV_MAPPING(USER_ID_);
 create index ACT_IDX_PRIV_GROUP on ACT_ID_PRIV_MAPPING(GROUP_ID_);    
+create index ACT_IDX_PRIV_MAPPING on ACT_ID_PRIV_MAPPING(PRIV_ID_);
   

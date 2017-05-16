@@ -21,7 +21,14 @@ import java.util.Map;
  */
 public enum HitPolicy {
 
-    UNIQUE("UNIQUE"), FIRST("FIRST"), PRIORITY("PRIORITY"), ANY("ANY"), UNORDERED("UNORDERED"), RULE_ORDER("RULE ORDER"), OUTPUT_ORDER("OUTPUT ORDER");
+    UNIQUE("UNIQUE"),
+    FIRST("FIRST"),
+    PRIORITY("PRIORITY"),
+    ANY("ANY"),
+    UNORDERED("UNORDERED"),
+    RULE_ORDER("RULE ORDER"),
+    OUTPUT_ORDER("OUTPUT ORDER"),
+    COLLECT("COLLECT");
 
     private static final Map<String, HitPolicy> lookup = new HashMap<>();
 

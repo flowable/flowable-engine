@@ -34,6 +34,7 @@ import javax.xml.validation.Validator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.converter.util.DmnXMLUtil;
+import org.flowable.dmn.model.BuiltinAggregator;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
@@ -46,6 +47,7 @@ import org.flowable.dmn.model.ItemDefinition;
 import org.flowable.dmn.model.OutputClause;
 import org.flowable.dmn.model.RuleInputClauseContainer;
 import org.flowable.dmn.model.RuleOutputClauseContainer;
+import org.flowable.dmn.model.UnaryTests;
 import org.flowable.dmn.xml.constants.DmnXMLConstants;
 import org.flowable.dmn.xml.exception.DmnXMLException;
 import org.flowable.engine.common.api.io.InputStreamProvider;
@@ -211,6 +213,10 @@ public class DmnXMLConverter implements DmnXMLConstants {
                         currentDecisionTable.setHitPolicy(HitPolicy.FIRST);
                     }
 
+                    if (xtr.getAttributeValue(null, ATTRIBUTE_AGGREGATION) != null) {
+                        currentDecisionTable.setAggregation(BuiltinAggregator.get(xtr.getAttributeValue(null, ATTRIBUTE_AGGREGATION)));
+                    }
+
                     model.getDecisions().get(model.getDecisions().size() - 1).setExpression(currentDecisionTable);
                     parentElement = currentDecisionTable;
                 } else if (ELEMENT_DESCRIPTION.equals(xtr.getLocalName())) {
@@ -305,6 +311,10 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     xtw.writeAttribute(ATTRIBUTE_HIT_POLICY, decisionTable.getHitPolicy().toString());
                 }
 
+                if (decisionTable.getAggregation() != null) {
+                    xtw.writeAttribute(ATTRIBUTE_AGGREGATION, decisionTable.getAggregation().toString());
+                }
+
                 DmnXMLUtil.writeElementDescription(decisionTable, xtw);
                 DmnXMLUtil.writeExtensionElements(decisionTable, xtw);
 
@@ -353,6 +363,14 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     }
                     if (StringUtils.isNotEmpty(clause.getTypeRef())) {
                         xtw.writeAttribute(ATTRIBUTE_TYPE_REF, clause.getTypeRef());
+                    }
+
+                    if (clause.getOutputValues() != null && StringUtils.isNotEmpty(clause.getOutputValues().getText())) {
+                        xtw.writeStartElement(ELEMENT_OUTPUT_VALUES);
+                        xtw.writeStartElement(ELEMENT_TEXT);
+                        xtw.writeCharacters(clause.getOutputValues().getText());
+                        xtw.writeEndElement();
+                        xtw.writeEndElement();
                     }
 
                     DmnXMLUtil.writeElementDescription(clause, xtw);

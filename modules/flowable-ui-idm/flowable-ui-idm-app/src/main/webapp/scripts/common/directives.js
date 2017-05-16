@@ -112,7 +112,7 @@ flowableModule
                     var offset = 0;
                     if($attrs['offset']) {
                         offset = parseInt($attrs['offset']);
-                        if(offset == NaN || offset == undefined) {
+                        if(isNaN(offset) || offset == undefined) {
                             offset = 0;
                         }
                     }
@@ -188,7 +188,7 @@ flowableModule
                             var offsetTop = $attrs['offsetTop'];
                             if(offsetTop) {
                                 offsetTop = parseInt(offsetTop);
-                                if(offsetTop == NaN) {
+                                if(isNaN(offsetTop)) {
                                     offsetTop = 0;
                                 }
                             }

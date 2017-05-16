@@ -12,32 +12,22 @@
  */
 package org.flowable.dmn.engine.impl.cmd;
 
-import java.io.Serializable;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.RuleEngineExecutionResult;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.interceptor.Command;
 import org.flowable.dmn.engine.impl.interceptor.CommandContext;
-import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
-import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.dmn.model.Decision;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
+ * @author Yvo Swillens
  */
-public class ExecuteDecisionCmd implements Command<RuleEngineExecutionResult>, Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    protected String decisionKey;
-    protected String parentDeploymentId;
-    protected Map<String, Object> variables;
-    protected String tenantId;
+public class ExecuteDecisionCmd extends AbstractExecuteDecisionCmd implements Command<List<Map<String, Object>>> {
 
     public ExecuteDecisionCmd(String decisionKey, Map<String, Object> variables) {
         this.decisionKey = decisionKey;
@@ -54,58 +44,23 @@ public class ExecuteDecisionCmd implements Command<RuleEngineExecutionResult>, S
         this.tenantId = tenantId;
     }
 
-    public RuleEngineExecutionResult execute(CommandContext commandContext) {
+    public List<Map<String, Object>> execute(CommandContext commandContext) {
         if (decisionKey == null) {
             throw new FlowableIllegalArgumentException("decisionKey is null");
         }
 
         DmnEngineConfiguration dmnEngineConfiguration = commandContext.getDmnEngineConfiguration();
-        DeploymentManager deploymentManager = dmnEngineConfiguration.getDeploymentManager();
-        DmnDecisionTable decisionTable = null;
-
-        if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(parentDeploymentId) && StringUtils.isNotEmpty(tenantId)) {
-            decisionTable = deploymentManager.findDeployedLatestDecisionByKeyParentDeploymentIdAndTenantId(decisionKey, parentDeploymentId, tenantId);
-            if (decisionTable == null) {
-                throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
-                        ", parent deployment id " + parentDeploymentId + " and tenant id: " + tenantId);
-            }
-
-        } else if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(parentDeploymentId)) {
-            decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndParentDeploymentId(decisionKey, parentDeploymentId);
-            if (decisionTable == null) {
-                throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
-                        " and parent deployment id " + parentDeploymentId);
-            }
-
-        } else if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(tenantId)) {
-            decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndTenantId(decisionKey, tenantId);
-            if (decisionTable == null) {
-                throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
-                        " and tenant id " + tenantId);
-            }
-
-        } else if (StringUtils.isNotEmpty(decisionKey)) {
-            decisionTable = deploymentManager.findDeployedLatestDecisionByKey(decisionKey);
-            if (decisionTable == null) {
-                throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey);
-            }
-
-        } else {
-            throw new IllegalArgumentException("decisionKey is null");
-        }
-
-        DecisionTableCacheEntry decisionTableCacheEntry = deploymentManager.resolveDecisionTable(decisionTable);
-        Decision decision = decisionTableCacheEntry.getDecision();
+        DmnDecisionTable decisionTable = resolveDecisionTable(dmnEngineConfiguration.getDeploymentManager());
+        Decision decision = resolveDecision(dmnEngineConfiguration.getDeploymentManager(), decisionTable);
 
         RuleEngineExecutionResult executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decision, variables,
                 dmnEngineConfiguration.getCustomExpressionFunctions(), dmnEngineConfiguration.getCustomPropertyHandlers());
 
-        if (executionResult != null && executionResult.getAuditTrail() != null) {
-            executionResult.getAuditTrail().setDmnDeploymentId(decisionTable.getDeploymentId());
+        if (executionResult != null) {
+            return executionResult.getDecisionResult();
+        } else {
+            return null;
         }
-
-        return executionResult;
-
     }
 
 }

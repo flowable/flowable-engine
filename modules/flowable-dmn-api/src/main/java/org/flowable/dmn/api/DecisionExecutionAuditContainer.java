@@ -14,7 +14,6 @@ package org.flowable.dmn.api;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.flowable.dmn.model.DecisionRule;
@@ -35,7 +34,6 @@ public class DecisionExecutionAuditContainer {
     protected Date endTime;
     protected Map<String, Object> inputVariables;
     protected Map<String, String> inputVariableTypes;
-    protected Map<String, Object> outputVariables;
     protected Map<Integer, RuleExecutionAuditContainer> ruleExecutions = new HashMap<>();
     protected Boolean failed = Boolean.FALSE;
     protected String exceptionMessage;
@@ -85,9 +83,8 @@ public class DecisionExecutionAuditContainer {
         return variablesTypesMap;
     }
 
-    public void stopAudit(Map<String, Object> result) {
+    public void stopAudit() {
         endTime = new Date();
-        outputVariables = result;
     }
 
     public void addRuleEntry(DecisionRule rule) {
@@ -140,10 +137,6 @@ public class DecisionExecutionAuditContainer {
 
     public Map<String, Object> getInputVariables() {
         return inputVariables;
-    }
-
-    public Map<String, Object> getOutputVariables() {
-        return outputVariables;
     }
 
     public Map<Integer, RuleExecutionAuditContainer> getRuleExecutions() {

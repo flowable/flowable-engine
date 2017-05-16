@@ -20,21 +20,21 @@ import org.flowable.rest.variable.EngineRestVariable;
 /**
  * @author Yvo Swillens
  */
-public class ExecuteDecisionResponse {
+public class DmnRuleServiceResponse {
 
-    protected List<EngineRestVariable> resultVariables = new ArrayList<>();
+    protected List<List<EngineRestVariable>> resultVariables = new ArrayList<>();
     protected String url;
 
-    public List<EngineRestVariable> getResultVariables() {
+    public List<List<EngineRestVariable>> getResultVariables() {
         return resultVariables;
     }
 
-    public void setResultVariables(List<EngineRestVariable> resultVariables) {
+    public void setResultVariables(List<List<EngineRestVariable>> resultVariables) {
         this.resultVariables = resultVariables;
     }
 
-    public void addResultVariable(EngineRestVariable variable) {
-        resultVariables.add(variable);
+    public void addResultVariables(List<EngineRestVariable> variables) {
+        resultVariables.add(variables);
     }
 
     public String getUrl() {

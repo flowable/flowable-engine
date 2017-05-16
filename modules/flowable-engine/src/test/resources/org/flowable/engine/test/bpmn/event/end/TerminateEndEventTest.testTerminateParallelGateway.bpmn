@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/bpmn" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" targetNamespace="http://flowable.org/bpmn">
+  <process id="terminateParallel">
+    <startEvent id="start" />
+    <parallelGateway id="fork" />
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="fork"/>
+    <endEvent id="terminateEndEvent">
+      <terminateEventDefinition id="TerminateEventDefinition_1" flowable:terminateAll="true"/>
+    </endEvent>
+    <sequenceFlow id="flow2" sourceRef="fork" targetRef="terminateEndEvent" />
+    <userTask id="task" name="Task" />
+    <sequenceFlow id="flow3" sourceRef="fork" targetRef="task"/>
+    <endEvent id="end" />
+    <sequenceFlow id="flow4" sourceRef="task" targetRef="end"/>
+  </process>
+</definitions>
