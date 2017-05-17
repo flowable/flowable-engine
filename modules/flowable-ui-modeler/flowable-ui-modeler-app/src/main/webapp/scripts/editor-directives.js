@@ -93,6 +93,11 @@ angular.module('flowableModeler').directive('formBuilderElement', ['$rootScope',
                     "id": "upload",
                     "name": $translate.instant('FORM-BUILDER.TABS.UPLOAD-OPTIONS'),
                     "show": ['upload']
+                },
+                {
+                    "id": "advanced",
+                    "name": $translate.instant('FORM-BUILDER.TABS.ADVANCED-OPTIONS'),
+                    "show": ['text', 'multi-line-text', 'integer', 'decimal']
                 }
             ];
 
