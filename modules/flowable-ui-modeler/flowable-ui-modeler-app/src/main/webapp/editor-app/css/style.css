@@ -723,6 +723,8 @@ li.x-menu-list-item.x-menu-item-active a {
 .decision-table .decision-table-grid-wrapper {
     position: relative;
     margin-top: 10px;
+	width: 100%;
+	height: 450px;
 }
 .decision-table .decision-table-grid-wrapper > span {
     display: none;
@@ -757,18 +759,113 @@ li.x-menu-list-item.x-menu-item-active a {
 	margin-right: -10px;
 }
 
-#decision-table-hot	{
-	width: 100%;
-	height: 500px;
+hot-table {
 	overflow: hidden;
 }
 
-#decision-table-hot .column-header {
+hot-table .column-header {
 
 }
 
-#decision-table-hot .column-header.label {
+hot-table .column-header.label {
 	font-size: 14px;
+}
+
+#decision-table-editor tr td.inputHeader, #decision-table-editor tr td.outputHeader {
+	font-size: 16px;
+}
+
+#decision-table-editor tr td.inputHeader .header-label, #decision-table-editor tr td.outputHeader .header-label {
+	font-size: 16px;
+	font-weight: bold;
+}
+
+#decision-table-editor tr td.inputHeader a, #decision-table-editor tr td.outputHeader a {
+	text-decoration: underline;
+}
+
+#decision-table-editor tr td.inputHeader .header-variable, #decision-table-editor tr td.outputHeader .header-variable {
+	font-size: 14px;
+	font-style: italic;
+}
+
+#decision-table-editor tr .header-center {
+	display: inline-block;
+	margin: 0 auto;
+	width: 100px;
+}
+
+#decision-table-editor tr .header-add-new-expression {
+	float: right;
+	position: relative;
+	top: 10px;
+}
+
+/*#decision-table-editor .input-operator-container {*/
+	/*display: inline-block;*/
+	/*margin: 0 auto;*/
+	/*width: 40px;*/
+/*}*/
+
+/*#decision-table-editor .input-expression-container {*/
+	/*float: right;*/
+	/*position: relative;*/
+/*}*/
+
+#decision-table-editor .input-operator-container {
+	width: 45px;
+	float:left;
+	border: 1px solid rgb(212, 212, 212);
+	padding: 1px;
+	margin-right: 5px;
+	text-align: center;
+}
+
+#decision-table-editor .input-expression-container {
+	overflow: hidden;
+	border: 1px solid rgb(212, 212, 212);
+	padding: 1px;
+}
+
+#decision-table-editor .input-expression-container {
+	overflow: hidden;
+	border: 1px solid rgb(212, 212, 212);
+	padding: 1px;
+	clear: right;
+}
+
+#decision-table-editor .input-expression-input {
+	overflow: hidden;
+	border: none;
+	width: 100%;
+}
+
+#decision-table-editor .input-container {
+	width: 100%;
+	margin: 0 auto;
+	overflow: hidden;
+	padding: 4px 0px 4px 0px;
+}
+
+#decision-table-editor .input-operator-select {
+	width: 45px;
+	border: none;
+	box-shadow: none;
+	background: transparent;
+	background-image: none;
+	-webkit-appearance: none;
+}
+
+#decision-table-editor .input-operator-select :focus {
+	outline: none;
+}
+
+#decision-table-editor .input-expression-input :focus {
+	outline: none;
+}
+
+#decision-table-editor .input-operator-select.editor :focus {
+	outline: none;
 }
 
 

@@ -45,7 +45,7 @@
 
     <span onClick="getScope('DecisionTableToolbarController');">CLICK</span>
 
-    <button type="button" class="btn btn-default" ng-click="testHotCall()" translate="DECISION-TABLE-EDITOR.BUTTON-ADD-INPUT-LABEL"></button>
+    <button type="button" class="btn btn-default" ng-click="dumpData()">dump data to console</button>
 
 
     <div class="decision-table-grid-wrapper">
@@ -93,17 +93,19 @@
         <!--</hot-table>-->
 
         <hot-table
-                hot-id="decision-table-editor"
                 settings="hotModel.settings"
-                columns="hotModel.columns"
-                col-headers="hotModel.columnHeaders"
-                row-headers="hotModel.rowHeaders"
-                datarows="currentDecisionTableRules"
-                stretch-h="'all'"
+                hot-id="decision-table-editor"
+                row-headers="rowHeaders"
+                datarows="rulesData"
                 merge-cells="true"
+                cells="customRenderer"
+                auto-row-size="'true'"
         >
         </hot-table>
 
+        <!--settings="hotModel.settings"-->
+        <!--columns="hotModel.columns"-->
+        <!--col-headers="hotModel.columnHeaders"-->
 
         <!--<hot-column data="id" title="'ID'"></hot-column>-->
             <!--<hot-column data="name.first" title="'First Name'" type="grayedOut" read-only></hot-column>-->

@@ -116,6 +116,10 @@ flowableModeler
             templateUrl: appResourceRoot + 'views/decision-table-editor-new.html',
             controller: 'DecisionTableEditorNewController'
         })
+        .when('/decision-table-editor-new2/:modelId', {
+            templateUrl: appResourceRoot + 'views/decision-table-editor-new2.html',
+            controller: 'DecisionTableEditorNewController2'
+        })
         .when('/app-editor/:modelId', {
             templateUrl: appResourceRoot + 'views/app-definition-builder.html',
             controller: 'AppDefinitionBuilderController'
