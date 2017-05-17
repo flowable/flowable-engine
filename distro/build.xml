@@ -63,6 +63,10 @@
 			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
 			<arg line="-Pdistro${usingJdk8OrHigher} -DskipTests clean install" />
 		</exec>
+		<exec executable="${mvn.executable}" dir="../modules/flowable-app-rest" failonerror="true">
+			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
+			<arg line="-Pdistro${usingJdk8OrHigher},swagger -DskipTests clean install" />
+		</exec>
 	</target>
 
 	<target name="copy.static.resources">
