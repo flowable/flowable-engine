@@ -215,9 +215,8 @@ angular.module('flowableModeler')
                     var containerElement2 = document.createElement('div');
                     containerElement2.className = 'input-expression-container';
 
-                    console.log(value.expression);
-
-                    var expressionInput = $compile('<input type="text" value="sfsfsfs'" ng-model="value.expression" class="input-expression-input">')($scope);
+                    var expressionInput = $compile('<input type="text" value="'+value.expression+'" class="input-expression-input">')($scope);
+                    // var expressionInput = $compile('<input type="text" ng-model="rulesData['+row+']['+col+'].expression" class="input-expression-input">')($scope);
                     //
                     //
                     // var expressionInput = document.createElement('input');
@@ -379,9 +378,16 @@ angular.module('flowableModeler')
                         for (var i = 0; i < Object.values(rule).length; i++) {
                             var cellValue;
                             if (i < $scope.model.startOutputExpression) {
+                                var expression;
+                                if (Object.values(rule)[i]) {
+                                    expression = Object.values(rule)[i].substring(3, Object.values(rule)[i].length);
+                                    expression = expression.replace(/"/g,"");
+                                } else {
+                                    expression = '-';
+                                }
                                 cellValue = {
                                     operator: '!=',
-                                    expression: Object.values(rule)[i] ? Object.values(rule)[i] : '-'
+                                    expression: expression
                                 }
                             } else {
                                 cellValue = Object.values(rule)[i];
