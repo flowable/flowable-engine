@@ -54,8 +54,11 @@ public class GroovyStaticScriptEngine extends GroovyScriptEngineImpl {
         for (Map.Entry<String,Object> entry : ctx.getBindings(ScriptContext.ENGINE_SCOPE).entrySet()) {
             variableTypes.put(entry.getKey(),
                     ClassHelper.make(entry.getValue().getClass()));
+            System.out.println(String.format("--------------- Bindings element: key: [%s], value: [%s] -----------------------------",
+                    entry.getKey(),
+                    entry.getValue() != null ? entry.getValue().toString() : "NULL"));
         }
-        System.out.println(String.format("---------------Loaded execution class : %s -----------------------------",clazz));
+        System.out.println(String.format("--------------- Loaded execution class : %s -----------------------------",clazz));
 
         variableTypes.put("execution",ClassHelper.make(clazz));
         Map<String,Object> options = new HashMap<String, Object>();
