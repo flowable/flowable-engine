@@ -442,12 +442,14 @@
             "GROUP-OF-PEOPLE": "Group of people",
             "UPLOAD": "Upload",
             "EXPRESSION": "Expression",
-            "DECIMAL": "Decimal"
+            "DECIMAL": "Decimal",
+	    "HYPERLINK": "Hyperlink" 
         },
         "TABS": {
             "GENERAL": "General",
             "OPTIONS": "Options",
-            "UPLOAD-OPTIONS": "Upload options"
+            "UPLOAD-OPTIONS": "Upload options",
+	    "ADVANCED-OPTIONS":"Advanced" 
         },
         "VERSION": "Version {{version}}",
         "LAST-UPDATED": "Last updated by {{lastUpdatedBy}}, {{lastUpdated | dateformat}}",
@@ -481,7 +483,9 @@
             "EXPRESSION": "Expression",
             "ADD-OPTION": "+ Add a new option",
             "UPLOAD-ALLOW-MULTIPLE": "Allow uploading multiple files",
-            "SIZE": "Size"
+            "SIZE": "Size",
+	    "MAX-LENGTH":"Maximum lenght:",
+            "MIN-LENGTH":"Minimum lenght:"
         },
         "OUTCOMES": {
             "DESCRIPTION": "You can define multiple outcomes for this task. When completing a task, the users selects one of the available outcomes, which can be used in eg. a condition further on in the process.",

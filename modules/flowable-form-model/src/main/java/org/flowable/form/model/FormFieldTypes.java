@@ -44,4 +44,6 @@ public interface FormFieldTypes {
     String FUNCTIONAL_GROUP = "functional-group";
 
     String CONTAINER = "container";
+    
+    String HYPERLINK = "hyperlink";
 }
