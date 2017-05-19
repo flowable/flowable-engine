@@ -485,7 +485,8 @@
             "UPLOAD-ALLOW-MULTIPLE": "Allow uploading multiple files",
             "SIZE": "Size",
 	    "MAX-LENGTH":"Maximum lenght:",
-            "MIN-LENGTH":"Minimum lenght:"
+            "MIN-LENGTH":"Minimum lenght:",
+	    "HYPERLINK-URL": "Hyperlink URL"
         },
         "OUTCOMES": {
             "DESCRIPTION": "You can define multiple outcomes for this task. When completing a task, the users selects one of the available outcomes, which can be used in eg. a condition further on in the process.",
