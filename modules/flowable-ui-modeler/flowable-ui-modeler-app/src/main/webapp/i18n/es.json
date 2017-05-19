@@ -482,7 +482,8 @@
             "ADD-OPTION": "+ Agregar nueva opcion",
             "UPLOAD-ALLOW-MULTIPLE": "Permitir subir varios archivos",
 	    "MAX-LENGTH":"Longitud máxima:",
-            "MIN-LENGTH":"Longitud mínima:"
+            "MIN-LENGTH":"Longitud mínima:",
+	    "HYPERLINK-URL": "URL hiperlink"
         },
         "OUTCOMES": {
             "DESCRIPTION": "Puedes definir multiples resultados para esta tarea. Cuando se este completando la tarea, el usuario selecciona uno de los resultados disponibles, que pueden ser utilizados por ejemplo eg. una condicion utilizada mas adelante en el proceso.",
