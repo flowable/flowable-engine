@@ -801,6 +801,12 @@ hot-table .column-header.label {
 	top: 10px;
 }
 
+#decision-table-editor tr th {
+	background-color: #87c1d0;
+}
+
+
+
 /*#decision-table-editor .input-operator-container {*/
 	/*display: inline-block;*/
 	/*margin: 0 auto;*/
