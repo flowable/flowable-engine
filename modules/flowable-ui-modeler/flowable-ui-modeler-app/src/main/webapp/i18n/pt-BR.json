@@ -458,7 +458,8 @@
       "ADD-OPTION":"+ Adicionar uma nova opção",
       "UPLOAD-ALLOW-MULTIPLE":"Permitir o upload de vários arquivos",
       "MAX-LENGTH":"Comprimento máximo:",
-      "MIN-LENGTH":"Comprimento mínimo:"
+      "MIN-LENGTH":"Comprimento mínimo:",
+      "HYPERLINK-URL": "URL de hiperlink"
     },
     "OUTCOMES":{
       "DESCRIPTION":"Você pode definir várias saídas para esta tarefa. Quando concluir uma tarefa, os usuários seleciona uma das saídas disponíveis, que podem ser usados em, por exemplo, em uma condição futura no processo.",
