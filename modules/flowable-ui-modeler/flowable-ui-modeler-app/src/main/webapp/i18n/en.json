@@ -484,8 +484,8 @@
             "ADD-OPTION": "+ Add a new option",
             "UPLOAD-ALLOW-MULTIPLE": "Allow uploading multiple files",
             "SIZE": "Size",
-	    "MAX-LENGTH":"Maximum lenght:",
-            "MIN-LENGTH":"Minimum lenght:",
+	    "MAX-LENGTH":"Maximum length:",
+            "MIN-LENGTH":"Minimum length:",
 	    "HYPERLINK-URL": "Hyperlink URL"
         },
         "OUTCOMES": {
