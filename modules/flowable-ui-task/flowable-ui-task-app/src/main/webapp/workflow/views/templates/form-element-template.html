@@ -124,6 +124,13 @@
              ng-show="field.params.multiple || (!field.params.multiple && model.uploads[field.id].length != 1)"></div>
     </div>
     
+    <div ng-switch-when="hyperlink" class="form-group {{field.className}}" ng-show="field.isVisible">
+        <label class="control-label">{{field.name}}</label>
+        <div>
+             <a id="{{activitiFieldIdPrefix + field.id}}" ng-href="{{field.params.hyperlinkUrl}}" target="_blank">{{field.params.hyperlinkUrl}}</a>
+        </div>
+    </div>
+
     <div ng-switch-when="expression" class="form-group" ng-show="field.isVisible">
     	<div class="well well-sm" ng-style="{'font-size': field.params.size + 'em'}">
     		<div ng-show="!field.value && !field.expression">
