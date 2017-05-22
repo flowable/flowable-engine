@@ -200,7 +200,7 @@
     <!-- BUILD -->
     <build>
 
-        <finalName>flowable-modeler</finalName>
+        <finalName>designer</finalName>
 
         <resources>
             <resource>

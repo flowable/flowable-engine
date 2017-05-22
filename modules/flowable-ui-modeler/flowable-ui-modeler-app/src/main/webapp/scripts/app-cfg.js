@@ -19,8 +19,8 @@ var FLOWABLE = FLOWABLE || {};
 
 FLOWABLE.CONFIG = {
 	'onPremise' : true,
-	'contextRoot' : '/flowable-modeler',
-	'webContextRoot' : '/flowable-modeler',
+	'contextRoot' : '/designer',
+	'webContextRoot' : '/designer',
 	'formType': 9, 
 	'deployUrls': [{
 	  "name": "localhost",

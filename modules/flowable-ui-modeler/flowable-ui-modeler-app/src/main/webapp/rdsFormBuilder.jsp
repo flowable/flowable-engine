@@ -8,7 +8,7 @@
     <meta content="0" http-equiv="Expires" />
     <title>RDS Designer</title>
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" />
-    <base href="/flowable-modeler/" />
+    <base href="<%=request.getContextPath()%>/" />
     <link href="assets/styles/bootstrap.css" media="all" type="text/css" rel="stylesheet" />
     <link href="assets/styles/bootstrap-decorator.css" media="all" type="text/css" rel="stylesheet" />
     <link href="assets/styles/select.css" media="all" type="text/css" rel="stylesheet" />
