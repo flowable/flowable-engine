@@ -487,8 +487,18 @@
 	    "MAX-LENGTH":"Maximum length:",
             "MIN-LENGTH":"Minimum length:",
 	    "HYPERLINK-URL": "Hyperlink URL",
-	    "REGEX-PATTERN":"Regex standard",       
-	    "MASK":"Input mask"
+	    "REGEX-PATTERN":"Regex standard",
+            "MASK":{
+              "TITLE":"Input mask",
+              "EXAMPLES":{
+                "TITLE":"Examples:",
+                "PHONE":"Phone",
+                "MIXED":"Mixed",
+                "NUMBERS-ONLY":"Only numbers",
+                "PERCENT":"Percentage",
+                "MONEY":"Money"
+               }
+           }
         },
         "OUTCOMES": {
             "DESCRIPTION": "You can define multiple outcomes for this task. When completing a task, the users selects one of the available outcomes, which can be used in eg. a condition further on in the process.",
