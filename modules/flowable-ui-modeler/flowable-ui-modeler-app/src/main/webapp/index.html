@@ -6,11 +6,11 @@
 <!--[if IE 8]>
 <html class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]><!-->
-<html class="no-js"> <!--<![endif]-->
+<html class="no-js" ng-app="flowableModeler"> <!--<![endif]-->
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Flowable Modeler</title>
+    <title ng-bind="config.appTitle">RDS Designer</title>
     <link rel="icon" type="image/ico" href="favicon.ico">
     <meta name="description" content="">
     <meta name="viewport"
@@ -44,13 +44,13 @@
     
 
 </head>
-<body ng-app="flowableModeler" ng-cloak>
+<body ng-cloak>
 
     <div class="navbar navbar-fixed-top navbar-inverse" role="navigation" id="main-header">
         <div class="fixed-container">
             <div class="navbar-header">
                 <a ng-click="backToLanding()" class="landing-logo" ng-if="account != null && account != undefined" title="{{'GENERAL.MAIN-TITLE' | translate}}">
-                    <img ng-src="{{appResourceRoot}}images/flowable-logo.png" ng-srcset="{{appResourceRoot}}images/flowable-logo.png 1x, {{appResourceRoot}}images/flowable-logo@2x.png 2x">
+                    <img ng-src="{{appResourceRoot}}images/rds-logo.png" ng-srcset="{{appResourceRoot}}images/rds-logo.png 1x, {{appResourceRoot}}images/rds-logo.png 2x">
                 </a>
                 <ul class="nav navbar-nav" id="main-nav" ng-show="authenticated">
                     <li ng-class="{'active' : item.id == mainPage.id}" ng-repeat="item in mainNavigation">
