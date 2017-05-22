@@ -120,10 +120,32 @@
 			         ng-model="formElement.params.maxLength">
                      </div>
 		     <div class="form-group">
-			  <label translate="FORM-BUILDER.COMPONENT.MASK"></label> <input
-			         type="text" class="form-control"
-			         ng-model="formElement.params.mask">
-                    </div>
+			  <label translate="FORM-BUILDER.COMPONENT.REGEX-PATTERN"></label>
+				<div class="input-group">
+			            <span class="input-group-addon">/^</span> <input type="text" class="form-control" ng-model="formElement.params.regexPattern">
+				    <span class="input-group-addon">$/</span>
+				</div>
+		    </div>
+                    <div class="row">
+			<div class="col-md-4">
+			    <div class="form-group">
+			        <label translate="FORM-BUILDER.COMPONENT.MASK"></label>
+			        <input type="text" class="form-control" ng-model="formElement.params.mask">
+			    </div>
+			</div>
+			<div class="col-md-4">
+			    <div class="form-group">
+			        <label translate>FORM-BUILDER.COMPONENT.MASKED-INPUT.EXAMPLES.TITLE</label>
+				<ul>
+			   	    <li><span translate>FORM-BUILDER.COMPONENT.MASK.EXAMPLES.PHONE</span> : (00) 0000-0000</li>
+				    <li><span translate>FORM-BUILDER.COMPONENT.MASK.EXAMPLES.MIXED</span> : AAA 000-S0S</li>
+				    <li><span translate>FORM-BUILDER.COMPONENT.MASK.EXAMPLES.NUMBERS-ONLY</span> : 0#</li>
+				    <li><span translate>FORM-BUILDER.COMPONENT.MASK.EXAMPLES.PERCENT</span> : ##0,00%</li>
+				    <li><span translate>FORM-BUILDER.COMPONENT.MASK.EXAMPLES.MONEY</span> : #.##0,00</li>
+				</ul>
+			   </div>
+			</div>
+		    </div>
 		</div>
                 
 		<div ng-if="activeTab.id == 'advanced' && formElement.type === 'hyperlink'">
