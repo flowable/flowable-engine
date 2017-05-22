@@ -484,8 +484,18 @@
 	    "MAX-LENGTH":"Longitud máxima:",
             "MIN-LENGTH":"Longitud mínima:",
 	    "HYPERLINK-URL": "URL hiperlink",
-	    "REGEX-PATTERN": "Estándar Regex", 
-	    "MASK": "Máscara de entrada"
+	    "REGEX-PATTERN":"Estándar  Regex",
+            "MASK":{
+              "TITLE":"Máscara de entrada",
+              "EXAMPLES":{
+                "TITLE":"Ejemplos:",
+                "PHONE":"Teléfono",
+                "MIXED":"Mezclado",
+                "NUMBERS-ONLY":"Sólo números",
+                "PERCENT":"Porcentaje",
+                "MONEY":"Dinero"
+	       }
+            }
         },
         "OUTCOMES": {
             "DESCRIPTION": "Puedes definir multiples resultados para esta tarea. Cuando se este completando la tarea, el usuario selecciona uno de los resultados disponibles, que pueden ser utilizados por ejemplo eg. una condicion utilizada mas adelante en el proceso.",
