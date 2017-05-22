@@ -461,7 +461,17 @@
       "MIN-LENGTH":"Comprimento mínimo:",
       "HYPERLINK-URL": "URL de hiperlink",
       "REGEX-PATTERN":"Padrão Regex",
-      "MASK":"Máscara de entrada"
+      "MASK":{
+        "TITLE":"Máscara de entrada",
+        "EXAMPLES":{
+          "TITLE":"Exemplos:",
+          "PHONE":"Telefone",
+          "MIXED":"Misto",
+          "NUMBERS-ONLY":"Somente números",
+          "PERCENT":"Percentual",
+          "MONEY":"Dinheiro"
+        }
+      }
     },
     "OUTCOMES":{
       "DESCRIPTION":"Você pode definir várias saídas para esta tarefa. Quando concluir uma tarefa, os usuários seleciona uma das saídas disponíveis, que podem ser usados em, por exemplo, em uma condição futura no processo.",
