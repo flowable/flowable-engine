@@ -486,7 +486,9 @@
             "SIZE": "Size",
 	    "MAX-LENGTH":"Maximum length:",
             "MIN-LENGTH":"Minimum length:",
-	    "HYPERLINK-URL": "Hyperlink URL"
+	    "HYPERLINK-URL": "Hyperlink URL",
+	    "REGEX-PATTERN":"Regex standard",       
+	    "MASK":"Input mask"
         },
         "OUTCOMES": {
             "DESCRIPTION": "You can define multiple outcomes for this task. When completing a task, the users selects one of the available outcomes, which can be used in eg. a condition further on in the process.",
