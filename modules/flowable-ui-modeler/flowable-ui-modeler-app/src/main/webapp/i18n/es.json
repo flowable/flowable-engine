@@ -481,10 +481,10 @@
             "EXPRESSION": "Expresion",
             "ADD-OPTION": "+ Agregar nueva opcion",
             "UPLOAD-ALLOW-MULTIPLE": "Permitir subir varios archivos",
-	    "MAX-LENGTH":"Longitud máxima:",
+	          "MAX-LENGTH":"Longitud máxima:",
             "MIN-LENGTH":"Longitud mínima:",
-	    "HYPERLINK-URL": "URL hiperlink",
-	    "REGEX-PATTERN":"Estándar  Regex",
+	          "HYPERLINK-URL": "URL hiperlink",
+	          "REGEX-PATTERN":"Estándar  Regex",
             "MASK":{
               "TITLE":"Máscara de entrada",
               "EXAMPLES":{
@@ -494,7 +494,7 @@
                 "NUMBERORLETTER":"Cualquier letra o número",
                 "OPTIONAL":"La máscara opcional (no valida)",
                 "PHONE":"Teléfono"
-	       }
+	              }
             }
         },
         "OUTCOMES": {

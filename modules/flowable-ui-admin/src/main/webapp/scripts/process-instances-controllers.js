@@ -121,7 +121,7 @@ flowableAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope
 
 	              if (variable.type.id == 'long' || variable.type.id == 'short' || variable.type.id == 'double' || variable.type.id == 'integer') {
 	                  varPayload.value = parseFloat(varPayload.value);
-	                  if (varPayload.value != NaN) {
+	                  if (!isNaN(varPayload.value)) {
 	                      // Return valid value for number
 	                      actualValue.push(varPayload);
 	                  }
