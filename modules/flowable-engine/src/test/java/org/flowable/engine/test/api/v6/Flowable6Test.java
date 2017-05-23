@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.bpm.model.bpmn.BpmnModelBuilder;
+import org.flowable.bpm.model.bpmn.BpmnModelInstance;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -47,6 +49,22 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         }
     }
 
+    public void testSimplestProcessPossibleFluent() {
+        BpmnModelInstance modelInstance = BpmnModelBuilder.createExecutableProcess("startToEnd")
+                .startEvent("theStart")
+                .endEvent("theEnd")
+                .done();
+        repositoryService.createDeployment().addString("simplestProcessPossibleFluent.bpmn20.xml", BpmnModelBuilder.convertToString(modelInstance)).deploy();
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
+        assertNotNull(processInstance);
+        assertTrue(processInstance.isEnded());
+        // Cleanup
+        for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+            repositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
     @org.flowable.engine.test.Deployment
     public void testOneTaskProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -60,6 +78,24 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
     }
 
+    public void testOneTaskProcessFluent() {
+        BpmnModelInstance modelInstance = BpmnModelBuilder.createProcess("oneTaskProcess")
+                .startEvent("theStart")
+                .userTask("theTask").name("The famous task").flowableAssignee("kermit")
+                .endEvent("theEnd")
+                .done();
+        Deployment deployment = repositoryService.createDeployment().addString("oneTaskProcessFluent.bpmn20.xml", BpmnModelBuilder.convertToString(modelInstance)).deploy();
+        deploymentIdsForAutoCleanup.add(deployment.getId());
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertNotNull(processInstance);
+        assertFalse(processInstance.isEnded());
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("The famous task", task.getName());
+        assertEquals("kermit", task.getAssignee());
+    }
+
     @org.flowable.engine.test.Deployment(resources = "org/flowable/engine/test/api/v6/Flowable6Test.testOneTaskProcess.bpmn20.xml")
     public void testOneTaskProcessCleanupInMiddleOfProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -71,8 +107,55 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertEquals("kermit", task.getAssignee());
     }
 
+    public void testOneTaskProcessCleanupInMiddleOfProcessFluent() {
+        BpmnModelInstance modelInstance = BpmnModelBuilder.createProcess("oneTaskProcess")
+                .startEvent("theStart")
+                .userTask("theTask").name("The famous task").flowableAssignee("kermit")
+                .endEvent("theEnd")
+                .done();
+        Deployment deployment = repositoryService.createDeployment().addString("oneTaskProcessFluent.bpmn20.xml", BpmnModelBuilder.convertToString(modelInstance)).deploy();
+        deploymentIdsForAutoCleanup.add(deployment.getId());
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertNotNull(processInstance);
+        assertFalse(processInstance.isEnded());
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("The famous task", task.getName());
+        assertEquals("kermit", task.getAssignee());
+    }
+
     @org.flowable.engine.test.Deployment
     public void testSimpleParallelGateway() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelGateway");
+        assertNotNull(processInstance);
+        assertFalse(processInstance.isEnded());
+
+        List<Task> tasks = taskService.createTaskQuery().processDefinitionKey("simpleParallelGateway").orderByTaskName().asc().list();
+        assertEquals(2, tasks.size());
+        assertEquals("Task a", tasks.get(0).getName());
+        assertEquals("Task b", tasks.get(1).getName());
+
+        for (Task task : tasks) {
+            taskService.complete(task.getId());
+        }
+
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+    }
+
+    public void testSimpleParallelGatewayFluent() {
+        BpmnModelInstance modelInstance = BpmnModelBuilder.createProcess("simpleParallelGateway")
+                .startEvent()
+                .parallelGateway("fork")
+                .userTask().id("taskA").name("Task a").flowableAssignee("kermit")
+                .parallelGateway("join")
+                .moveToNode("fork")
+                .userTask().id("taskB").name("Task b").flowableAssignee("fozzie")
+                .connectTo("join")
+                .endEvent()
+                .done();
+        Deployment deployment = repositoryService.createDeployment().addString("simpleParallelGatewayFluent.bpmn20.xml", BpmnModelBuilder.convertToString(modelInstance)).deploy();
+        deploymentIdsForAutoCleanup.add(deployment.getId());
+
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelGateway");
         assertNotNull(processInstance);
         assertFalse(processInstance.isEnded());
@@ -109,8 +192,49 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
 
+    public void testSimpleNestedParallelGatewayFluent() {
+        BpmnModelInstance modelInstance = BpmnModelBuilder.createProcess("simpleParallelGateway")
+                .startEvent().id("theStart")
+                .parallelGateway("fork")
+                    .userTask().id("taskA").name("Task a").flowableAssignee("kermit")
+                    .parallelGateway("join")
+                .moveToNode("fork")
+                    .userTask().id("taskC").name("Task c").flowableAssignee("fozzie")
+                    .connectTo("join")
+                .moveToNode("fork")
+                    .parallelGateway("nestedFork")
+                        .userTask("taskB1").name("Task b1").flowableAssignee("kermit")
+                        .parallelGateway("nestedJoin")
+                    .moveToNode("nestedFork")
+                        .userTask("taskB2").name("Task b2").flowableAssignee("kermit")
+                        .connectTo("nestedJoin")
+                    .connectTo("join")
+                .moveToNode("join")
+                .endEvent()
+                .done();
+        Deployment deployment = repositoryService.createDeployment().addString("simpleParallelGatewayFluent.bpmn20.xml", BpmnModelBuilder.convertToString(modelInstance)).deploy();
+        deploymentIdsForAutoCleanup.add(deployment.getId());
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelGateway");
+        assertNotNull(processInstance);
+        assertFalse(processInstance.isEnded());
+
+        List<Task> tasks = taskService.createTaskQuery().processDefinitionKey("simpleParallelGateway").orderByTaskName().asc().list();
+        assertEquals(4, tasks.size());
+        assertEquals("Task a", tasks.get(0).getName());
+        assertEquals("Task b1", tasks.get(1).getName());
+        assertEquals("Task b2", tasks.get(2).getName());
+        assertEquals("Task c", tasks.get(3).getName());
+
+        for (Task task : tasks) {
+            taskService.complete(task.getId());
+        }
+
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+    }
+
     /*
-     * This fails on Activiti 5
+     * This fails on Flowable 5
      */
     @org.flowable.engine.test.Deployment
     public void testLongServiceTaskLoop() {
