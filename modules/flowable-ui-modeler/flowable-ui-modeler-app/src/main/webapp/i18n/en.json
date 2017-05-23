@@ -492,11 +492,11 @@
               "TITLE":"Input mask",
               "EXAMPLES":{
                 "TITLE":"Examples:",
-                "PHONE":"Phone",
-                "MIXED":"Mixed",
-                "NUMBERS-ONLY":"Only numbers",
-                "PERCENT":"Percentage",
-                "MONEY":"Money"
+                "NUMBER":"Any number",
+                "LETTER":"Any letter",
+                "NUMBERORLETTER":"Any letter or number",
+                "OPTIONAL":"Make mask optional (not valid)",
+                "PHONE":"Phone"
                }
            }
         },
