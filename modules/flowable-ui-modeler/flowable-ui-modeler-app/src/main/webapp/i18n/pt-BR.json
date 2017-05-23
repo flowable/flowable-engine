@@ -465,11 +465,11 @@
         "TITLE":"Máscara de entrada",
         "EXAMPLES":{
           "TITLE":"Exemplos:",
-          "PHONE":"Telefone",
-          "MIXED":"Misto",
-          "NUMBERS-ONLY":"Somente números",
-          "PERCENT":"Percentual",
-          "MONEY":"Dinheiro"
+          "NUMBER":"Qualquer número",
+          "LETTER":"Qualquer letra",
+          "NUMBERSORLETTER":"Qualquer letra ou número",
+          "OPTIONAL":"Torna a máscara opcional (não valida)",
+          "PHONE":"Dinheiro"
         }
       }
     },
