@@ -467,7 +467,7 @@
           "TITLE":"Exemplos:",
           "NUMBER":"Qualquer número",
           "LETTER":"Qualquer letra",
-          "NUMBERSORLETTER":"Qualquer letra ou número",
+          "NUMBERORLETTER":"Qualquer letra ou número",
           "OPTIONAL":"Torna a máscara opcional (não valida)",
           "PHONE":"Dinheiro"
         }
