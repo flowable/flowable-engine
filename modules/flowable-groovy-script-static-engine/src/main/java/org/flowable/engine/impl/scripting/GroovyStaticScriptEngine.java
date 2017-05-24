@@ -1,7 +1,6 @@
 package org.flowable.engine.impl.scripting;
 
 import groovy.lang.GroovyClassLoader;
-import groovy.lang.GroovySystem;
 import groovy.lang.Script;
 import groovy.transform.CompileStatic;
 import org.codehaus.groovy.ast.ClassHelper;
@@ -54,11 +53,7 @@ public class GroovyStaticScriptEngine extends GroovyScriptEngineImpl {
         for (Map.Entry<String,Object> entry : ctx.getBindings(ScriptContext.ENGINE_SCOPE).entrySet()) {
             variableTypes.put(entry.getKey(),
                     ClassHelper.make(entry.getValue().getClass()));
-            System.out.println(String.format("--------------- Bindings element: key: [%s], value: [%s] -----------------------------",
-                    entry.getKey(),
-                    entry.getValue() != null ? entry.getValue().toString() : "NULL"));
         }
-        System.out.println(String.format("--------------- Loaded execution class : %s -----------------------------",clazz));
 
         variableTypes.put("execution",ClassHelper.make(clazz));
         Map<String,Object> options = new HashMap<String, Object>();
@@ -75,38 +70,27 @@ public class GroovyStaticScriptEngine extends GroovyScriptEngineImpl {
                 CompileStatic.class, "org.codehaus.groovy.transform.sc.StaticCompileTransformation");
         ImportCustomizer imports = new ImportCustomizer();
         imports.addStaticStars("org.flowable.engine.delegate.VariableScope");
-        //imports.addImports("org.flowable.engine.delegate.DelegateExecution","org.flowable.engine.delegate.VariableScope");
         compilerConfiguration.addCompilationCustomizers(astTransformationCustomizer);
         compilerConfiguration.addCompilationCustomizers(imports);
         return compilerConfiguration;
     }
 
     private static ClassLoader getParentLoader() {
-        String v = GroovySystem.getVersion();
-        System.out.println(String.format("---------------Groovy version: %s-----------------------------",v));
         ClassLoader ctxtLoader = Thread.currentThread().getContextClassLoader();
         try {
-            System.out.println("---------------Contex loader (1): " + ctxtLoader.getClass().getName() + "---------------");
-            Class c = ctxtLoader.loadClass(Script.class.getName());
-            //clazz = Class.forName("org.flowable.engine.delegate.VariableScope", true, ctxtLoader);
+            Class scriptClass = ctxtLoader.loadClass(Script.class.getName());
             clazz = ctxtLoader.loadClass("org.flowable.engine.delegate.VariableScope");
 
-            if(c == Script.class) {
-            //if(c != null && c.getName() == Script.class.getName()) {
-                System.out.println("---------------Returning ctxtLoader-----------------------------");
+            if(scriptClass == Script.class) {
                 return ctxtLoader;
             }
         } catch (ClassNotFoundException var2) {
-            System.out.println("---------------ClassNotFoundException in getParentLoader-----------------------------");
             var2.printStackTrace();
         }
         try {
             ctxtLoader = Script.class.getClassLoader();
-            System.out.println("--------------- Contex loader (2): " + ctxtLoader.getClass().getName() + "---------------");
             clazz = Class.forName("org.flowable.engine.delegate.VariableScope", true, ctxtLoader);
-            //clazz = ctxtLoader.loadClass("org.flowable.engine.delegate.VariableScope");
         } catch (ClassNotFoundException e) {
-            System.out.println("---------------ClassNotFoundException in second try in getParentLoader-----------------------------");
             e.printStackTrace();
         }
         return Script.class.getClassLoader();
