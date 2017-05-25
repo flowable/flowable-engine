@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.form.FormProperty;
 import org.flowable.engine.form.StartFormData;
@@ -55,6 +56,7 @@ import org.flowable.rest.service.api.engine.AttachmentResponse;
 import org.flowable.rest.service.api.engine.CommentResponse;
 import org.flowable.rest.service.api.engine.EventResponse;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
+import org.flowable.rest.service.api.management.EventLogEntryResponse;
 import org.flowable.rest.variable.BooleanRestVariableConverter;
 import org.flowable.rest.variable.DateRestVariableConverter;
 import org.flowable.rest.variable.DoubleRestVariableConverter;
@@ -94,11 +96,11 @@ import org.flowable.rest.service.api.runtime.task.TaskResponse;
 
 /**
  * Default implementation of a {@link RestResponseFactory}.
- * 
+ *
  * Added a new "createProcessInstanceResponse" method (with a different signature) to conditionally return the process variables that exist within the process instance when the first wait state is
  * encountered (or when the process instance completes). Also added the population of a "completed" flag - within both the original "createProcessInstanceResponse" method and the new one with the
  * different signature - to let the caller know whether the process instance has completed or not.
- * 
+ *
  * @author Frederik Heremans
  * @author Ryan Johnston (@rjfsu)
  */
@@ -1211,6 +1213,14 @@ public class RestResponseFactory {
         formDefinitionResponse.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION_FORM_DEFINITIONS_COLLECTION, processDefinitionId));
 
         return formDefinitionResponse;
+    }
+
+    public List<EventLogEntryResponse> createEventLogResponseList(List<EventLogEntry> eventLogEntries) {
+        ArrayList<EventLogEntryResponse> eventLogEntryResponses = new ArrayList<EventLogEntryResponse>(eventLogEntries.size());
+        for (EventLogEntry eventLogEntry : eventLogEntries) {
+            eventLogEntryResponses.add(new EventLogEntryResponse(eventLogEntry));
+        }
+        return eventLogEntryResponses;
     }
 
     /**
