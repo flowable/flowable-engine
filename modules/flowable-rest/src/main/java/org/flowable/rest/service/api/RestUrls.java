@@ -539,7 +539,7 @@ public final class RestUrls {
     public static final String[] URL_PROPERTIES_COLLECTION = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_PROPERTIES };
 
     /**
-     * URL template for the list of {@link EventLogEntryResponse}: <i>management/eventlog</i>
+     * URL template for managing event logs: <i>management/event-log</i>
      */
     public static final String[] URL_EVENT_LOG = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_EVENT_LOG };
 

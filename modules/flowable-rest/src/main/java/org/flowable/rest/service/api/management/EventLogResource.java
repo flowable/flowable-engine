@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +32,16 @@ public class EventLogResource extends EventLogBaseResource {
     @RequestMapping(value = "/management/event-log/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
     public List<EventLogEntryResponse> queryEventLogEntries(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
         return getQueryResponse(processInstanceId);
+    }
+
+    @ApiOperation(value = "Insert EventLog ", tags = {
+            "EventLog"}, notes = "All EventLogEntry attributes are inserted into log")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates request was successful and the log entry was inserted"),
+            @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information")})
+    @RequestMapping(value = "/management/event-log", method = RequestMethod.PUT, produces = "application/json")
+    public void insertEventLogEntry(@RequestBody EventLogInsertRequest eventLogInsertRequest, HttpServletRequest request) {
+        inserEventLogEntry(eventLogInsertRequest);
     }
 
 }
