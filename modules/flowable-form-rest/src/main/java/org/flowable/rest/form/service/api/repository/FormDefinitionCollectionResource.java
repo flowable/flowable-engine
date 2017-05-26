@@ -86,10 +86,10 @@ public class FormDefinitionCollectionResource {
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "key,category,id,version,name,deploymentId,tenantId", paramType = "query"),
     })
     @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Indicates request was successful and the form instances are returned"),
+            @ApiResponse(code = 204, message = "Indicates request was successful and the form definitions are returned"),
             @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
-    @RequestMapping(value = "/form-repository/forms", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/form-repository/form-definitions", method = RequestMethod.GET, produces = "application/json")
     public DataResponse getForms(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         FormDefinitionQuery formDefinitionQuery = formRepositoryService.createFormDefinitionQuery();
 

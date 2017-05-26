@@ -156,6 +156,7 @@ public class FlowableAppDefinitionService {
         AppModel appModel = repositoryService.getAppResourceModel(deployment.getId());
         resultAppDef.setTheme(appModel.getTheme());
         resultAppDef.setIcon(appModel.getIcon());
+        resultAppDef.setDescription(appModel.getDescription());
         if (StringUtils.isNotEmpty(appModel.getUsersAccess())) {
             resultAppDef.setUsersAccess(convertToList(appModel.getUsersAccess()));
         }
