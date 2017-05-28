@@ -27,6 +27,7 @@ public class HttpRequest {
     protected Set<String> failCodes;
     protected Set<String> handleCodes;
     protected boolean ignoreErrors;
+    protected boolean saveRequest;
     protected String prefix;
 
     public String getMethod() {
@@ -99,6 +100,14 @@ public class HttpRequest {
 
     public void setIgnoreErrors(boolean ignoreErrors) {
         this.ignoreErrors = ignoreErrors;
+    }
+
+    public boolean isSaveRequest() {
+        return saveRequest;
+    }
+
+    public void setSaveRequest(boolean saveRequest) {
+        this.saveRequest = saveRequest;
     }
 
     public String getPrefix() {

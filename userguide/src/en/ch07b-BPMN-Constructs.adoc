@@ -3616,6 +3616,7 @@ Http task is configured by <<serviceTaskFieldInjection,field injection>>. All th
                    Example: 400, 404, 500, 503 + 
                    Example: 3XX, 4XX, 5XX + 
 |ignoreException|no|Flag for ignoring the exceptions, catch and save the exception message as '<taskId>.errorMessage'.
+|saveRequestVariables|no|Flag to save request variables. By default, only response related variables are saved in execution.
 |resultVariablePrefix|no|Prefix for the execution variable names. If prefix is not set, variables will be saved with name
                        in following format. '<taskId>'.'fieldName'. For example, requestUrl is saved as 'task7.requestUrl' for task with id 'task7'.
 |httpActivityBehaviorClass|no|Full class name of custom extension of org.flowable.http.HttpActivityBehavior.

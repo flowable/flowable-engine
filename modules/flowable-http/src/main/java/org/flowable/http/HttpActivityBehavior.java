@@ -55,6 +55,8 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
     private Expression handleStatusCodes;
     // Flag to ignore exceptions (Optional)
     private Expression ignoreException;
+    // Flag to save request variables. default is false (Optional)
+    private Expression saveRequestVariables;
     // Prefix for the execution variable names (Optional)
     private Expression resultVariablePrefix;
     // Exception mapping
@@ -133,6 +135,7 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
             request.failCodes = getStringSetFromField(failStatusCodes, execution);
             request.handleCodes = getStringSetFromField(handleStatusCodes, execution);
             request.ignoreErrors = Boolean.parseBoolean(getStringFromField(ignoreException, execution));
+            request.saveRequest = Boolean.parseBoolean(getStringFromField(saveRequestVariables, execution));
             request.prefix = getStringFromField(resultVariablePrefix, execution);
 
         } catch (Exception e) {
@@ -146,13 +149,16 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
         }
 
         // Save request fields
-        execution.setVariable(request.prefix + ".requestMethod", request.method);
-        execution.setVariable(request.prefix + ".requestUrl", request.url);
-        execution.setVariable(request.prefix + ".requestHeaders", request.headers);
-        execution.setVariable(request.prefix + ".requestBody", request.body);
-        execution.setVariable(request.prefix + ".requestTimeout", request.timeout);
-        execution.setVariable(request.prefix + ".disallowRedirects", request.noRedirects);
-        execution.setVariable(request.prefix + ".ignoreException", request.ignoreErrors);
+        if (request.saveRequest) {
+            execution.setVariable(request.prefix + ".requestMethod", request.method);
+            execution.setVariable(request.prefix + ".requestUrl", request.url);
+            execution.setVariable(request.prefix + ".requestHeaders", request.headers);
+            execution.setVariable(request.prefix + ".requestBody", request.body);
+            execution.setVariable(request.prefix + ".requestTimeout", request.timeout);
+            execution.setVariable(request.prefix + ".disallowRedirects", request.noRedirects);
+            execution.setVariable(request.prefix + ".ignoreException", request.ignoreErrors);
+            execution.setVariable(request.prefix + ".saveRequestVariables", request.saveRequest);
+        }
 
         try {
             HttpResponse response = perform(request);
@@ -290,6 +296,14 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
 
     public void setIgnoreException(Expression ignoreException) {
         this.ignoreException = ignoreException;
+    }
+
+    public Expression getSaveRequestVariables() {
+        return saveRequestVariables;
+    }
+
+    public void setSaveRequestVariables(Expression saveRequestVariables) {
+        this.saveRequestVariables = saveRequestVariables;
     }
 
     public Expression getResultVariablePrefix() {
