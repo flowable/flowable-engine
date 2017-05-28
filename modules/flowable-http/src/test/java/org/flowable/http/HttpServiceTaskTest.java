@@ -28,6 +28,12 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     }
 
     @Deployment
+    public void testHttpsSelfSigned() throws Exception {
+        String procId = runtimeService.startProcessInstanceByKey("httpsSelfSigned").getId();
+        assertProcessEnded(procId);
+    }
+
+    @Deployment
     public void testFailStatusCodes() throws Exception {
         try {
             runtimeService.startProcessInstanceByKey("failStatusCodes");

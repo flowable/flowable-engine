@@ -19,10 +19,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,13 +42,37 @@ import org.slf4j.LoggerFactory;
 public abstract class HttpServiceTaskTestCase extends PluggableFlowableTestCase {
 
     private static Logger log = LoggerFactory.getLogger(HttpServiceTaskTestCase.class);
-    // This should be fixed and known as we use it in test process templates
+    // These should be fixed and known as we use it in test process templates
     protected static final int HTTP_PORT = 9798;
+    protected static final int HTTPS_PORT = 9799;
 
     protected static Server server;
 
     static {
-        server = new Server(HTTP_PORT);
+        server = new Server();
+
+        // http connector configuration
+        HttpConfiguration httpConfig = new HttpConfiguration();
+
+        ServerConnector httpConnector = new ServerConnector(server,
+                new HttpConnectionFactory(httpConfig));
+        httpConnector.setPort(HTTP_PORT);
+
+        // https connector configuration
+        // keytool -selfcert -alias Flowable -keystore keystore -genkey -keyalg RSA -sigalg SHA256withRSA -validity 36500
+        SslContextFactory sslContextFactory = new SslContextFactory();
+        sslContextFactory.setKeyStorePath(ReflectUtil.getResource("flowable.keystore").getFile());
+        sslContextFactory.setKeyStorePassword("Flowable");
+
+        HttpConfiguration httpsConfig = new HttpConfiguration();
+
+        ServerConnector httpsConnector = new ServerConnector(server,
+                new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
+                new HttpConnectionFactory(httpsConfig));
+        httpsConnector.setPort(HTTPS_PORT);
+
+        server.setConnectors(new Connector[]{httpConnector, httpsConnector});
+
         try {
             ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
             contextHandler.setContextPath("/");

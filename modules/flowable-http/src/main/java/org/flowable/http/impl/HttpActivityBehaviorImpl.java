@@ -59,24 +59,19 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
 
     static {
         HttpClientConfig config = Context.getProcessEngineConfiguration().getHttpClientConfig();
-        if (config == null) {
-            config = new HttpClientConfig();
-        }
-        
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
 
         // https settings
-        SSLConnectionSocketFactory sslsf = null;
-        try {
-            SSLContextBuilder builder = new SSLContextBuilder();
-            builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-            sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-        } catch (Exception e) {
-            log.error("Could not configure HTTP client to use SSL", e);
-        }
-
-        if (sslsf != null) {
-            httpClientBuilder.setSSLSocketFactory(sslsf);
+        if (config.isDisableCertVerify()) {
+            try {
+                SSLContextBuilder builder = new SSLContextBuilder();
+                builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+                httpClientBuilder.setSSLSocketFactory(
+                        new SSLConnectionSocketFactory(builder.build(),
+                                SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER));
+            } catch (Exception e) {
+                log.error("Could not configure HTTP client SSL self signed strategy", e);
+            }
         }
 
         // request retry settings
@@ -171,10 +166,7 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
                 }
             }
 
-            HttpClientConfig config = Context.getProcessEngineConfiguration().getHttpClientConfig();
-            if (config != null) {
-                setConfig(request, config);
-            }
+            setConfig(request, Context.getProcessEngineConfiguration().getHttpClientConfig());
 
             if (requestInfo.getHeaders() != null) {
                 setHeaders(request, requestInfo.getHeaders());

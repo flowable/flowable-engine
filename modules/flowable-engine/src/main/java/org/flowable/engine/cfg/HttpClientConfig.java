@@ -17,10 +17,13 @@ package org.flowable.engine.cfg;
  */
 public class HttpClientConfig {
 
+    // request settings
     protected int connectTimeout = 5000;
     protected int socketTimeout = 5000;
     protected int connectionRequestTimeout = 5000;
     protected int requestRetryLimit = 3;
+    // https settings
+    protected boolean disableCertVerify;
 
     public int getConnectTimeout() {
         return connectTimeout;
@@ -54,6 +57,14 @@ public class HttpClientConfig {
         this.requestRetryLimit = requestRetryLimit;
     }
 
+    public boolean isDisableCertVerify() {
+        return disableCertVerify;
+    }
+
+    public void setDisableCertVerify(boolean disableCertVerify) {
+        this.disableCertVerify = disableCertVerify;
+    }
+
     public void merge(HttpClientConfig other) {
         if (this.connectTimeout != other.getConnectTimeout()) {
             setConnectTimeout(other.getConnectTimeout());
@@ -69,6 +80,10 @@ public class HttpClientConfig {
 
         if (this.requestRetryLimit != other.getRequestRetryLimit()) {
             setRequestRetryLimit(other.getRequestRetryLimit());
+        }
+
+        if (this.disableCertVerify != other.isDisableCertVerify()) {
+            setDisableCertVerify(other.isDisableCertVerify());
         }
     }
 }

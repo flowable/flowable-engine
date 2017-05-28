@@ -3570,7 +3570,9 @@ Also its possible to override default Http Task behavior by providing custom imp
 Custom implemention should extend org.flowable.http.HttpActivityBehavior and override perform() method.
 Field 'httpActivityBehaviorClass' should be set in the task definition.
 Default value for this field is 'org.flowable.http.impl.HttpActivityBehaviorImpl'.
-Currently 'HttpActivityBehaviorImpl' is based on Apache Http Client.
+Currently 'HttpActivityBehaviorImpl' is based on Apache Http Client. As Apache Http Client can be customized in many ways, all possible options are not used in Http Client config.
+To create a custom client refer to link:$$http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/impl/client/HttpClientBuilder.html$$[Http Client builder]
+
 ----
 <serviceTask id="httpGet" flowable:type="http">
   <extensionElements>

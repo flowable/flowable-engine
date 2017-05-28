@@ -32,6 +32,9 @@
     <property name="connectTimeout" value="5000"/>
     <property name="socketTimeout" value="5000"/>
     <property name="connectionRequestTimeout" value="5000"/>
+    <property name="requestRetryLimit" value="5"/>
+    <!-- https configuration -->
+    <property name="disableCertVerify" value="true"/>
   </bean>
 
   <bean id="asyncExecutor" class="org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor">
