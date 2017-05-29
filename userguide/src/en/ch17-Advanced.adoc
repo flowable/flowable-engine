@@ -777,14 +777,15 @@ To enable the database logger:
 
 [source,java,linenums]
 ----
-processEngineConfiguration.setEnableDatabaseEventLogging(true);
+processEngineConfigurationImpl.setEnableDatabaseEventLogging(true);
 ----
 
 or at runtime:
 
-[source,xml,linenums]
+[source,java,linenums]
 ----
-databaseEventLogger = new EventLogger(processEngineConfiguration.getClock());
+databaseEventLogger = new EventLogger(processEngineConfiguration.getClock(),
+                                      processEngineConfiguration.getObjectMapper());
 runtimeService.addEventListener(databaseEventLogger);
 ----
 

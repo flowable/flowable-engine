@@ -116,7 +116,7 @@ public class FormField implements Serializable {
     public void setLayout(LayoutDefinition layout) {
         this.layout = layout;
     }
-
+    
     @JsonInclude(Include.NON_EMPTY)
     public Map<String, Object> getParams() {
         return params;
