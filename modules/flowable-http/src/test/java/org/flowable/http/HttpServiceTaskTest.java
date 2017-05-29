@@ -13,13 +13,16 @@
 package org.flowable.http;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.test.Deployment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Harsha Teja Kanna
  */
 public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
+
+    private static Logger log = LoggerFactory.getLogger(HttpServiceTaskTest.class);
 
     @Deployment
     public void testSimpleGetOnly() throws Exception {
