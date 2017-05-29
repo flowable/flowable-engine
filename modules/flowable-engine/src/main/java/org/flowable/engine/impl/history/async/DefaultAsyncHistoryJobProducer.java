@@ -23,6 +23,7 @@ import java.util.zip.GZIPOutputStream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntityManager;
@@ -40,6 +41,12 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryJobProducer {
     }
 
     protected void createJobsWithHistoricalData(CommandContext commandContext, AsyncHistorySession asyncHistorySession) {
+        System.out.println("!!!start!!!");
+        for (Pair<String, Map<String, String>> logData: asyncHistorySession.getJobData()) {
+            generateJson(commandContext, logData);
+        }
+        System.out.println("!!!end!!!");
+        
         List<Pair<String, Map<String, String>>> filteredJobs = filterHistoricData(asyncHistorySession.getJobData());
         for (Pair<String, Map<String, String>> historicData : filteredJobs) {
             HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession);
@@ -50,58 +57,49 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryJobProducer {
     
     protected List<Pair<String, Map<String, String>>> filterHistoricData(List<Pair<String, Map<String, String>>> jobData) {
         List<Pair<String, Map<String, String>>> filteredJobs = new ArrayList<>();
-        Map<String, List<Pair<String, Map<String, String>>>> activityStartMap = new HashMap<>();
         Map<String, Pair<String, Map<String, String>>> variableUpdatedMap = new HashMap<>();
         
-        for (Pair<String, Map<String, String>> historicData : jobData) {
+        List<Integer> matchedActvityEndIndexes = new ArrayList<>();
+        for (int i = 0; i < jobData.size(); i++) {
+            Pair<String, Map<String, String>> historicData = jobData.get(i);
             if ("activity-start".equals(historicData.getKey())) {
                 
                 String activityKey = historicData.getValue().get(HistoryJsonConstants.EXECUTION_ID) + "_" + 
                                 historicData.getValue().get(HistoryJsonConstants.ACTIVITY_ID);
                 
-                List<Pair<String, Map<String, String>>> activityHistoricData = null;
-                if (activityStartMap.containsKey(activityKey)) {
-                    activityHistoricData = activityStartMap.get(activityKey);
-                } else {
-                    activityHistoricData = new ArrayList<>();
+                Pair<String, Map<String, String>> matchedHistoricEndData = null;
+                for (int j = i; j < jobData.size(); j++) {
+                    Pair<String, Map<String, String>> historicEndData = jobData.get(j);
+                    if ("activity-end".equals(historicEndData.getKey()) && !matchedActvityEndIndexes.contains(j)) {
+                        
+                        String activityEndKey = historicEndData.getValue().get(HistoryJsonConstants.EXECUTION_ID) + "_" + 
+                                        historicEndData.getValue().get(HistoryJsonConstants.ACTIVITY_ID);
+                        
+                        if (activityEndKey.equals(activityKey)) {
+                            matchedHistoricEndData = historicEndData;
+                            matchedActvityEndIndexes.add(j);
+                            break;
+                        }
+                    }
                 }
                 
-                activityHistoricData.add(historicData);
-                activityStartMap.put(activityKey, activityHistoricData);
+                if (matchedHistoricEndData != null) {
+                    filteredJobs.add(Pair.of("activity-full", matchedHistoricEndData.getValue()));
+                } else {
+                    filteredJobs.add(historicData);
+                }
                 
             } else if ("variable-updated".equals(historicData.getKey())) {
                 variableUpdatedMap.put(historicData.getValue().get(HistoryJsonConstants.ID), historicData);
-            
+                
             } else if (!"activity-end".equals(historicData.getKey())) {
                 filteredJobs.add(historicData);
             }
         }
         
-        for (Pair<String, Map<String, String>> historicData : jobData) {
-            if ("activity-end".equals(historicData.getKey())) {
-                
-                String activityKey = historicData.getValue().get(HistoryJsonConstants.EXECUTION_ID) + "_" + 
-                                historicData.getValue().get(HistoryJsonConstants.ACTIVITY_ID);
-                
-                if (activityStartMap.containsKey(activityKey)) {
-                    List<Pair<String, Map<String, String>>> activityHistoricData = activityStartMap.get(activityKey);
-                    filteredJobs.add(Pair.of("activity-full", historicData.getValue()));
-                    activityHistoricData.remove(0);
-                    if (activityHistoricData.size() == 0) {
-                        activityStartMap.remove(activityKey);
-                    } else {
-                        activityStartMap.put(activityKey, activityHistoricData); 
-                    }
-                    
-                } else {
-                    filteredJobs.add(historicData);
-                } 
-            }
-        }
-        
-        for (String activityStartKey : activityStartMap.keySet()) {
-            List<Pair<String, Map<String, String>>> activityHistoricData = activityStartMap.get(activityStartKey);
-            for (Pair<String, Map<String, String>> historicData : activityHistoricData) {
+        for (int i = 0; i < jobData.size(); i++) {
+            Pair<String, Map<String, String>> historicData = jobData.get(i);
+            if ("activity-end".equals(historicData.getKey()) && !matchedActvityEndIndexes.contains(i)) {
                 filteredJobs.add(historicData);
             }
         }
@@ -126,7 +124,8 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryJobProducer {
     }
 
     protected ObjectNode generateJson(CommandContext commandContext, Pair<String, Map<String, String>> historicData) {
-        ObjectNode elementObjectNode = commandContext.getProcessEngineConfiguration().getObjectMapper().createObjectNode();
+        ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+        ObjectNode elementObjectNode = processEngineConfiguration.getObjectMapper().createObjectNode();
         elementObjectNode.put("type", historicData.getLeft());
 
         ObjectNode dataNode = elementObjectNode.putObject("data");
@@ -134,6 +133,9 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryJobProducer {
         for (String key : dataMap.keySet()) {
             dataNode.put(key, dataMap.get(key));
         }
+        
+        dataNode.put(HistoryJsonConstants.JOB_CREATE_TIME, AsyncHistoryDateUtil.formatDate(
+                        processEngineConfiguration.getClock().getCurrentTime()));
         
         System.out.println("!!!!!! generating history job with type " + historicData.getLeft() + " " + elementObjectNode);
         

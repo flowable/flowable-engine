@@ -166,6 +166,8 @@ public class StandaloneTaskTest extends PluggableFlowableTestCase {
             Map<String, Object> finishVariables = new HashMap<String, Object>();
             finishVariables.put("finishedAmount", 40);
             taskService.complete(task.getId(), finishVariables);
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             // 4. get completed variable
             List<HistoricVariableInstance> hisVarList = historyService.createHistoricVariableInstanceQuery().taskId(task.getId()).list();

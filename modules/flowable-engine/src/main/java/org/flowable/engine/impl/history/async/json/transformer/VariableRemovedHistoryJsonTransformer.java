@@ -12,24 +12,17 @@
  */
 package org.flowable.engine.impl.history.async.json.transformer;
 
-import java.util.Date;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
-import org.flowable.engine.impl.variable.VariableType;
-import org.flowable.engine.impl.variable.VariableTypes;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class VariableUpdatedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
+public class VariableRemovedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
-    public static final String TYPE = "variable-updated";
+    public static final String TYPE = "variable-removed";
 
     @Override
     public String getType() {
@@ -46,27 +39,9 @@ public class VariableUpdatedHistoryJsonTransformer extends AbstractHistoryJsonTr
         HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = commandContext.getProcessEngineConfiguration().getHistoricVariableInstanceEntityManager();
         HistoricVariableInstanceEntity historicVariable = historicVariableInstanceEntityManager.findById(getStringFromJson(historicalData, HistoryJsonConstants.ID));
         
-        Date time = getDateFromJson(historicalData, HistoryJsonConstants.LAST_UPDATED_TIME);
-        if (historicVariable.getLastUpdatedTime().after(time)) {
-            return;
+        if (historicVariable != null) {
+            historicVariableInstanceEntityManager.delete(historicVariable);
         }
-        
-        VariableTypes variableTypes = Context.getProcessEngineConfiguration().getVariableTypes();
-        VariableType variableType = variableTypes.getVariableType(getStringFromJson(historicalData, HistoryJsonConstants.VARIABLE_TYPE));
-        
-        historicVariable.setVariableType(variableType);
-
-        historicVariable.setTextValue(getStringFromJson(historicalData, HistoryJsonConstants.VARIABLE_TEXT_VALUE));
-        historicVariable.setTextValue2(getStringFromJson(historicalData, HistoryJsonConstants.VARIABLE_TEXT_VALUE2));
-        historicVariable.setDoubleValue(getDoubleFromJson(historicalData, HistoryJsonConstants.VARIABLE_DOUBLE_VALUE));
-        historicVariable.setLongValue(getLongFromJson(historicalData, HistoryJsonConstants.VARIABLE_LONG_VALUE));
-        
-        String variableBytes = getStringFromJson(historicalData, HistoryJsonConstants.VARIABLE_BYTES_VALUE);
-        if (StringUtils.isNotEmpty(variableBytes)) {
-            historicVariable.setBytes(Base64.decodeBase64(variableBytes));
-        }
-        
-        historicVariable.setLastUpdatedTime(time);
     }
 
 }

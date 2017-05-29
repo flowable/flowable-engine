@@ -408,9 +408,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
     }
 
     private void cleanup(String... deploymentIds) {
-        for (String deploymentId : deploymentIds) {
-            repositoryService.deleteDeployment(deploymentId, true);
-        }
+        deleteDeployments();
     }
 
     private List<EventSubscription> getAllEventSubscriptions() {

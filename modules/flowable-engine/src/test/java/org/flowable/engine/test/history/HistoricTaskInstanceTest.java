@@ -258,8 +258,11 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         anHourLater.add(Calendar.HOUR, 1);
 
         // Start date
-        assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskCreatedOn(start.getTime()).count());
-        assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskCreatedOn(anHourAgo.getTime()).count());
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskCreatedOn(start.getTime()).count());
+            assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskCreatedOn(anHourAgo.getTime()).count());
+        }
+        
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskCreatedAfter(anHourAgo.getTime()).count());
         assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskCreatedAfter(anHourLater.getTime()).count());
         assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskCreatedBefore(anHourAgo.getTime()).count());
@@ -626,8 +629,11 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         anHourLater.add(Calendar.HOUR, 1);
 
         // Start date
-        assertEquals(1, historyService.createHistoricTaskInstanceQuery().or().taskCreatedOn(start.getTime()).endOr().count());
-        assertEquals(0, historyService.createHistoricTaskInstanceQuery().or().taskCreatedOn(anHourAgo.getTime()).endOr().count());
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            assertEquals(1, historyService.createHistoricTaskInstanceQuery().or().taskCreatedOn(start.getTime()).endOr().count());
+            assertEquals(0, historyService.createHistoricTaskInstanceQuery().or().taskCreatedOn(anHourAgo.getTime()).endOr().count());
+        }
+        
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().or().taskCreatedAfter(anHourAgo.getTime()).endOr().count());
         assertEquals(0, historyService.createHistoricTaskInstanceQuery().or().taskCreatedAfter(anHourLater.getTime()).endOr().count());
         assertEquals(0, historyService.createHistoricTaskInstanceQuery().or().taskCreatedBefore(anHourAgo.getTime()).endOr().count());

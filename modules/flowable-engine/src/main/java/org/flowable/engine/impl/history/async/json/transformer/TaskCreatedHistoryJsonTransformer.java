@@ -72,7 +72,8 @@ public class TaskCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransf
             historicTaskInstance.setPriority(getIntegerFromJson(historicalData, HistoryJsonConstants.PRIORITY));
             historicTaskInstance.setDueDate(getDateFromJson(historicalData, HistoryJsonConstants.DUE_DATE));
             historicTaskInstance.setCategory(getStringFromJson(historicalData, HistoryJsonConstants.CATEGORY));
-            historicTaskInstance.setTenantId(getStringFromJson(historicalData, getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID)));
+            historicTaskInstance.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
+            historicTaskInstance.setLastUpdateTime(getDateFromJson(historicalData, HistoryJsonConstants.JOB_CREATE_TIME));
     
             historicTaskInstanceEntityManager.insert(historicTaskInstance);
         }

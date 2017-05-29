@@ -49,7 +49,7 @@
     </property>
     
     <property name="history" value="full" />
-    <property name="asyncHistoryEnabled" value="false" />
+    <property name="asyncHistoryEnabled" value="true" />
     
     <property name="enableProcessDefinitionInfoCache" value="true" />
   </bean>

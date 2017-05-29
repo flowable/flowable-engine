@@ -25,12 +25,9 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
     private static final String PROCESS_DEFINITION_KEY = "oneTaskProcess";
     private static final String DEPLOYMENT_FILE_PATH = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml";
 
-    private org.flowable.engine.repository.Deployment oldDeployment;
-    private org.flowable.engine.repository.Deployment newDeployment;
-
     protected void setUp() throws Exception {
         super.setUp();
-        oldDeployment = repositoryService.createDeployment()
+        repositoryService.createDeployment()
                 .addClasspathResource(DEPLOYMENT_FILE_PATH)
                 .deploy();
 
@@ -38,18 +35,19 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
         startMap.put("test", 123);
         runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, startMap);
 
-        newDeployment = repositoryService.createDeployment()
+        repositoryService.createDeployment()
                 .addClasspathResource(DEPLOYMENT_FILE_PATH)
                 .deploy();
 
         startMap.clear();
         startMap.put("anothertest", 456);
         runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, startMap);
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
     }
 
     protected void tearDown() throws Exception {
-        repositoryService.deleteDeployment(oldDeployment.getId(), true);
-        repositoryService.deleteDeployment(newDeployment.getId(), true);
+        deleteDeployments();
     }
 
     public void testHistoricProcessInstanceQueryByProcessDefinitionVersion() {

@@ -23,7 +23,7 @@ import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class ActivityEndHistoryJsonTransformer extends AbstractNeedsHistoricActivityHistoryJsonTransformer {
+public class ActivityEndHistoryJsonTransformer extends AbstractNeedsUnfinishedHistoricActivityHistoryJsonTransformer {
 
     public static final String TYPE = "activity-end";
 

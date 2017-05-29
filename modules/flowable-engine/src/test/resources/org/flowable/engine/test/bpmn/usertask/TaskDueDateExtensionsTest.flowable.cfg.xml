@@ -71,7 +71,7 @@
         </property>
 
         <property name="history" value="full"/>
-        <property name="asyncHistoryEnabled" value="true" />
+        <property name="asyncHistoryEnabled" value="false" />
     </bean>
 
     <bean id="asyncExecutor" class="org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor">

@@ -411,14 +411,9 @@ public class DbSqlSession implements Session {
             debugFlush();
         }
 
-        try {
         flushInserts();
         flushUpdates();
         flushDeletes();
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            throw e;
-        }
     }
 
     /**

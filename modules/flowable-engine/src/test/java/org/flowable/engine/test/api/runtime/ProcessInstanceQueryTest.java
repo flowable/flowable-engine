@@ -75,9 +75,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
     }
 
     protected void tearDown() throws Exception {
-        for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
-            repositoryService.deleteDeployment(deployment.getId(), true);
-        }
+        deleteDeployments();
         super.tearDown();
     }
 

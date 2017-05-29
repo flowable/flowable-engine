@@ -64,5 +64,9 @@ public class TaskBatchDeleteTest extends PluggableFlowableTestCase {
         // Process should have ended fine
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(processInstance);
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        
+        deleteDeployments();
     }
 }

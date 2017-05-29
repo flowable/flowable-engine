@@ -15,6 +15,7 @@ package org.flowable.engine.impl.history.async;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -32,17 +33,21 @@ import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceDe
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceEndHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstancePropertyChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceStartHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.SetProcessDefinitionHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.SubProcessInstanceHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskAssigneeChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskCreatedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskEndedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.TaskOwnerChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskPropertyChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.VariableCreatedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.VariableRemovedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.VariableUpdatedHistoryJsonTransformer;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.engine.repository.ProcessDefinition;
 
 public class AsyncHistoryManager extends AbstractHistoryManager {
 
@@ -96,9 +101,12 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.NAME, processInstance.getName());
             putIfNotNull(data, HistoryJsonConstants.BUSINESS_KEY, processInstance.getBusinessKey());
             putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, processInstance.getProcessDefinitionId());
-            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_KEY, processInstance.getProcessDefinitionKey());
-            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_NAME, processInstance.getProcessDefinitionName());
-            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_VERSION, processInstance.getProcessDefinitionVersion() != null ? Integer.toString(processInstance.getProcessDefinitionVersion()) : null);
+            
+            ProcessDefinition processDefinition = processEngineConfiguration.getDeploymentManager().findDeployedProcessDefinitionById(processInstance.getProcessDefinitionId());
+            
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_KEY, processDefinition.getKey());
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_NAME, processDefinition.getName());
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_VERSION, processDefinition.getVersion());
             putIfNotNull(data, HistoryJsonConstants.DEPLOYMENT_ID, processInstance.getDeploymentId());
             putIfNotNull(data, HistoryJsonConstants.START_TIME, processInstance.getStartTime());
             putIfNotNull(data, HistoryJsonConstants.START_USER_ID, processInstance.getStartUserId());
@@ -175,15 +183,14 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
     @Override
     public void recordActivityStart(ExecutionEntity executionEntity) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
-            String activityId = getActivityIdForExecution(executionEntity);
-            if (activityId != null && executionEntity.getCurrentFlowElement() != null && 
-                            !getAsyncHistorySession().isActivityStartPresentWithoutEnd(activityId, executionEntity.getId())) {
+            if (executionEntity.getActivityId() != null && executionEntity.getCurrentFlowElement() != null && 
+                    getAsyncHistorySession().getActivityStartWithoutEnd(executionEntity.getActivityId(), executionEntity.getId()) == null) {
 
                 Map<String, String> data = new HashMap<String, String>();
                 putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, executionEntity.getProcessDefinitionId());
                 putIfNotNull(data, HistoryJsonConstants.PROCESS_INSTANCE_ID, executionEntity.getProcessInstanceId());
                 putIfNotNull(data, HistoryJsonConstants.EXECUTION_ID, executionEntity.getId());
-                putIfNotNull(data, HistoryJsonConstants.ACTIVITY_ID, activityId);
+                putIfNotNull(data, HistoryJsonConstants.ACTIVITY_ID, executionEntity.getActivityId());
                 putIfNotNull(data, HistoryJsonConstants.START_TIME, getClock().getCurrentTime());
 
                 if (executionEntity.getCurrentFlowElement() != null) {
@@ -233,8 +240,11 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
 
     @Override
     public void recordProcessDefinitionChange(String processInstanceId, String processDefinitionId) {
-        // TODO Auto-generated method stub
-
+        Map<String, String> data = new HashMap<String, String>();
+        putIfNotNull(data, HistoryJsonConstants.PROCESS_INSTANCE_ID, processInstanceId);
+        putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, processDefinitionId);
+        
+        getAsyncHistorySession().addHistoricData(SetProcessDefinitionHistoryJsonTransformer.TYPE, data);
     }
 
     @Override
@@ -281,10 +291,11 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.START_TIME, getClock().getCurrentTime());
             putIfNotNull(data, HistoryJsonConstants.TASK_DEFINITION_KEY, task.getTaskDefinitionKey());
             putIfNotNull(data, HistoryJsonConstants.PRIORITY, task.getPriority());
-            if (task.getDueDate() != null) {
-                putIfNotNull(data, HistoryJsonConstants.DUE_DATE, task.getDueDate());
-            }
+            putIfNotNull(data, HistoryJsonConstants.DUE_DATE, task.getDueDate());
+            putIfNotNull(data, HistoryJsonConstants.FORM_KEY, task.getFormKey());
             putIfNotNull(data, HistoryJsonConstants.CATEGORY, task.getCategory());
+            putIfNotNull(data, HistoryJsonConstants.CLAIM_TIME, task.getClaimTime());
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, task.getProcessDefinitionId());
             putIfNotNull(data, HistoryJsonConstants.TENANT_ID, task.getTenantId());
 
             if (execution != null) {
@@ -301,147 +312,75 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void recordTaskClaim(TaskEntity task) {
+    public void recordTaskInfoChange(TaskEntity taskEntity) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             Map<String, String> data = new HashMap<String, String>();
-            putIfNotNull(data, HistoryJsonConstants.ID, task.getId());
-            putIfNotNull(data, HistoryJsonConstants.CLAIM_TIME, getClock().getCurrentTime());
-            putIfNotNull(data, HistoryJsonConstants.PROPERTY, TaskPropertyChangedHistoryJsonTransformer.PROPERTY_CLAIM_TIME);
+            putIfNotNull(data, HistoryJsonConstants.ID, taskEntity.getId());
+            putIfNotNull(data, HistoryJsonConstants.NAME, taskEntity.getName());
+            putIfNotNull(data, HistoryJsonConstants.DESCRIPTION, taskEntity.getDescription());
+            putIfNotNull(data, HistoryJsonConstants.ASSIGNEE, taskEntity.getAssignee());
+            putIfNotNull(data, HistoryJsonConstants.OWNER, taskEntity.getOwner());
+            putIfNotNull(data, HistoryJsonConstants.DUE_DATE, taskEntity.getDueDate());
+            putIfNotNull(data, HistoryJsonConstants.PRIORITY, taskEntity.getPriority());
+            putIfNotNull(data, HistoryJsonConstants.CATEGORY, taskEntity.getCategory());
+            putIfNotNull(data, HistoryJsonConstants.FORM_KEY, taskEntity.getFormKey());
+            putIfNotNull(data, HistoryJsonConstants.PARENT_TASK_ID, taskEntity.getParentTaskId());
+            putIfNotNull(data, HistoryJsonConstants.TASK_DEFINITION_KEY, taskEntity.getTaskDefinitionKey());
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, taskEntity.getProcessDefinitionId());
+            putIfNotNull(data, HistoryJsonConstants.CLAIM_TIME, taskEntity.getClaimTime());
             getAsyncHistorySession().addHistoricData(TaskPropertyChangedHistoryJsonTransformer.TYPE, data);
         }
+            
+        Map<String, Object> originalPersistentState = (Map<String, Object>) taskEntity.getOriginalPersistentState();
+        
+        if ((originalPersistentState == null && taskEntity.getAssignee() != null) || 
+                (originalPersistentState != null && !Objects.equals(originalPersistentState.get("assignee"), taskEntity.getAssignee()))) {
+            
+            handleTaskAssigneeChange(taskEntity);
+        }
+        
+        if ((originalPersistentState == null && taskEntity.getOwner() != null) ||
+                (originalPersistentState != null && !Objects.equals(originalPersistentState.get("owner"), taskEntity.getOwner()))) {
+            
+            handleTaskOwnerChange(taskEntity);
+        }
     }
-
-    @Override
-    public void recordTaskAssigneeChange(TaskEntity taskEntity, String assignee) {
+    
+    protected void handleTaskAssigneeChange(TaskEntity taskEntity) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
             Map<String, String> data = new HashMap<String, String>();
-            putIfNotNull(data, HistoryJsonConstants.ASSIGNEE, assignee);
+            putIfNotNull(data, HistoryJsonConstants.ASSIGNEE, taskEntity.getAssignee());
 
             ExecutionEntity executionEntity = taskEntity.getExecution();
             if (executionEntity != null) {
                 putIfNotNull(data, HistoryJsonConstants.EXECUTION_ID, executionEntity.getId());
-                putIfNotNull(data, HistoryJsonConstants.ACTIVITY_ID, getActivityIdForExecution(executionEntity));
+                String activityId = getActivityIdForExecution(executionEntity);
+                putIfNotNull(data, HistoryJsonConstants.ACTIVITY_ID, activityId);
+                Map<String, String> activityStartData = getAsyncHistorySession().getActivityStartWithoutEnd(activityId, executionEntity.getId());
+                if (activityStartData != null) {
+                    putIfNotNull(activityStartData, HistoryJsonConstants.ASSIGNEE, taskEntity.getAssignee());
+                    data.put(HistoryJsonConstants.ACTIVITY_ASSIGNEE_HANDLED, String.valueOf(true));
+                }
             }
 
             if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
                 putIfNotNull(data, HistoryJsonConstants.ID, taskEntity.getId());
-                putIfNotNull(data, HistoryJsonConstants.PROPERTY, TaskPropertyChangedHistoryJsonTransformer.PROPERTY_ASSIGNEE);
                 putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, getClock().getCurrentTime());
+                getAsyncHistorySession().addHistoricData(TaskAssigneeChangedHistoryJsonTransformer.TYPE, data);
             }
-
-            getAsyncHistorySession().addHistoricData(TaskAssigneeChangedHistoryJsonTransformer.TYPE, data);
         }
     }
-
-    @Override
-    public void recordTaskOwnerChange(String taskId, String owner) {
+    
+    protected void handleTaskOwnerChange(TaskEntity taskEntity) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             Map<String, String> data = new HashMap<String, String>();
-            putIfNotNull(data, HistoryJsonConstants.ID, taskId);
-            putIfNotNull(data, HistoryJsonConstants.OWNER, owner);
+            putIfNotNull(data, HistoryJsonConstants.ID, taskEntity.getId());
+            putIfNotNull(data, HistoryJsonConstants.OWNER, taskEntity.getOwner());
             putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, getClock().getCurrentTime());
-            putIfNotNull(data, HistoryJsonConstants.PROPERTY, TaskPropertyChangedHistoryJsonTransformer.PROPERTY_OWNER);
-            getAsyncHistorySession().addHistoricData(TaskPropertyChangedHistoryJsonTransformer.TYPE, data);
-        }
-    }
 
-    @Override
-    public void recordTaskNameChange(String taskId, String taskName) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            Map<String, String> data = new HashMap<String, String>();
-            putIfNotNull(data, HistoryJsonConstants.ID, taskId);
-            putIfNotNull(data, HistoryJsonConstants.NAME, taskName);
-            putIfNotNull(data, HistoryJsonConstants.PROPERTY, TaskPropertyChangedHistoryJsonTransformer.PROPERTY_NAME);
-            getAsyncHistorySession().addHistoricData(TaskPropertyChangedHistoryJsonTransformer.TYPE, data);
-        }
-    }
-
-    @Override
-    public void recordTaskDescriptionChange(String taskId, String description) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            Map<String, String> data = new HashMap<String, String>();
-            putIfNotNull(data, HistoryJsonConstants.ID, taskId);
-            putIfNotNull(data, HistoryJsonConstants.DESCRIPTION, description);
-            putIfNotNull(data, HistoryJsonConstants.PROPERTY, TaskPropertyChangedHistoryJsonTransformer.PROPERTY_DESCRIPTION);
-            getAsyncHistorySession().addHistoricData(TaskPropertyChangedHistoryJsonTransformer.TYPE, data);
-        }
-    }
-
-    @Override
-    public void recordTaskDueDateChange(String taskId, Date dueDate) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            Map<String, String> data = new HashMap<String, String>();
-            putIfNotNull(data, HistoryJsonConstants.ID, taskId);
-            putIfNotNull(data, HistoryJsonConstants.DUE_DATE, dueDate);
-            putIfNotNull(data, HistoryJsonConstants.PROPERTY, TaskPropertyChangedHistoryJsonTransformer.PROPERTY_DUE_DATE);
-            getAsyncHistorySession().addHistoricData(TaskPropertyChangedHistoryJsonTransformer.TYPE, data);
-        }
-    }
-
-    @Override
-    public void recordTaskPriorityChange(String taskId, int priority) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            Map<String, String> data = new HashMap<String, String>();
-            putIfNotNull(data, HistoryJsonConstants.ID, taskId);
-            putIfNotNull(data, HistoryJsonConstants.PRIORITY, priority);
-            putIfNotNull(data, HistoryJsonConstants.PROPERTY, TaskPropertyChangedHistoryJsonTransformer.PROPERTY_PRIORITY);
-            getAsyncHistorySession().addHistoricData(TaskPropertyChangedHistoryJsonTransformer.TYPE, data);
-        }
-    }
-
-    @Override
-    public void recordTaskCategoryChange(String taskId, String category) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            Map<String, String> data = new HashMap<String, String>();
-            putIfNotNull(data, HistoryJsonConstants.ID, taskId);
-            putIfNotNull(data, HistoryJsonConstants.CATEGORY, category);
-            putIfNotNull(data, HistoryJsonConstants.PROPERTY, TaskPropertyChangedHistoryJsonTransformer.PROPERTY_CATEGORY);
-            getAsyncHistorySession().addHistoricData(TaskPropertyChangedHistoryJsonTransformer.TYPE, data);
-        }
-    }
-
-    @Override
-    public void recordTaskFormKeyChange(String taskId, String formKey) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            Map<String, String> data = new HashMap<String, String>();
-            putIfNotNull(data, HistoryJsonConstants.ID, taskId);
-            putIfNotNull(data, HistoryJsonConstants.FORM_KEY, formKey);
-            putIfNotNull(data, HistoryJsonConstants.PROPERTY, TaskPropertyChangedHistoryJsonTransformer.PROPERTY_FORM_KEY);
-            getAsyncHistorySession().addHistoricData(TaskPropertyChangedHistoryJsonTransformer.TYPE, data);
-        }
-    }
-
-    @Override
-    public void recordTaskParentTaskIdChange(String taskId, String parentTaskId) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            Map<String, String> data = new HashMap<String, String>();
-            putIfNotNull(data, HistoryJsonConstants.ID, taskId);
-            putIfNotNull(data, HistoryJsonConstants.PARENT_TASK_ID, parentTaskId);
-            putIfNotNull(data, HistoryJsonConstants.PROPERTY, TaskPropertyChangedHistoryJsonTransformer.PROPERTY_PARENT_TASK_ID);
-            getAsyncHistorySession().addHistoricData(TaskPropertyChangedHistoryJsonTransformer.TYPE, data);
-        }
-    }
-
-    @Override
-    public void recordTaskDefinitionKeyChange(String taskId, String taskDefinitionKey) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            Map<String, String> data = new HashMap<String, String>();
-            putIfNotNull(data, HistoryJsonConstants.ID, taskId);
-            putIfNotNull(data, HistoryJsonConstants.TASK_DEFINITION_KEY, taskDefinitionKey);
-            putIfNotNull(data, HistoryJsonConstants.PROPERTY, TaskPropertyChangedHistoryJsonTransformer.PROPERTY_TASK_DEFINITION_KEY);
-            getAsyncHistorySession().addHistoricData(TaskPropertyChangedHistoryJsonTransformer.TYPE, data);
-        }
-    }
-
-    @Override
-    public void recordTaskProcessDefinitionChange(String taskId, String processDefinitionId) {
-        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
-            Map<String, String> data = new HashMap<String, String>();
-            putIfNotNull(data, HistoryJsonConstants.ID, taskId);
-            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, processDefinitionId);
-            putIfNotNull(data, HistoryJsonConstants.PROPERTY, TaskPropertyChangedHistoryJsonTransformer.PROPERTY_PROCESS_DEFINITION_ID);
-            getAsyncHistorySession().addHistoricData(TaskPropertyChangedHistoryJsonTransformer.TYPE, data);
+            getAsyncHistorySession().addHistoricData(TaskOwnerChangedHistoryJsonTransformer.TYPE, data);
         }
     }
 
@@ -497,11 +436,12 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
                 putIfNotNull(data, HistoryJsonConstants.VARIABLE_BYTES_VALUE, Base64.encodeBase64String(variable.getBytes()));
             }
             
-            String activityId = getActivityIdForExecution(sourceActivityExecution);
-            if (useActivityId && sourceActivityExecution != null && activityId != null) {
-                putIfNotNull(data, HistoryJsonConstants.ACTIVITY_ID, activityId);
-                putIfNotNull(data, HistoryJsonConstants.SOURCE_EXECUTION_ID, sourceActivityExecution.getId());
-   
+            if (useActivityId && sourceActivityExecution != null) {
+                String activityId = getActivityIdForExecution(sourceActivityExecution);
+                if (activityId != null) {
+                    putIfNotNull(data, HistoryJsonConstants.ACTIVITY_ID, activityId);
+                    putIfNotNull(data, HistoryJsonConstants.SOURCE_EXECUTION_ID, sourceActivityExecution.getId());
+                }
             }
             
             getAsyncHistorySession().addHistoricData(HistoricDetailVariableUpdateHistoryJsonTransformer.TYPE, data);
@@ -532,8 +472,12 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
 
     @Override
     public void recordVariableRemoved(VariableInstanceEntity variable) {
-        // TODO Auto-generated method stub
-
+        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
+            Map<String, String> data = new HashMap<String, String>();
+            putIfNotNull(data, HistoryJsonConstants.ID, variable.getId());
+            
+            getAsyncHistorySession().addHistoricData(VariableRemovedHistoryJsonTransformer.TYPE, data);
+        }
     }
 
     @Override
@@ -599,7 +543,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
     }
 
     /* Helper methods */
-
+    
     protected void putIfNotNull(Map<String, String> map, String key, String value) {
         if (value != null) {
             map.put(key, value);

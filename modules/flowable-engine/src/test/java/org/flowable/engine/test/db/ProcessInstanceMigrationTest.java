@@ -171,7 +171,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         ProcessDefinition newProcessDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionVersion(2).singleResult();
         pi = runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals(newProcessDefinition.getId(), pi.getProcessDefinitionId());
-
+        
         // check history
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance historicPI = historyService.createHistoricProcessInstanceQuery().processInstanceId(pi.getId()).singleResult();
@@ -186,8 +186,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             assertEquals(newProcessDefinition.getId(), historicActivities.get(0).getProcessDefinitionId());
         }
 
-        // undeploy "manually" deployed process definition
-        repositoryService.deleteDeployment(deployment.getId(), true);
+        deleteDeployments();
     }
 
     @Deployment(resources = { TEST_PROCESS_WITH_PARALLEL_GATEWAY })
@@ -279,8 +278,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
             assertProcessEnded(pi.getId());
 
-            // undeploy "manually" deployed process definition
-            repositoryService.deleteDeployment(deployment.getId(), true);
+            deleteDeployments();
+            
         } catch (Exception ex) {
             ex.printStackTrace();
         }

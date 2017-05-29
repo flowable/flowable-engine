@@ -57,36 +57,39 @@ public class HistoryTestHelper {
     public static void waitForJobExecutorToProcessAllHistoryJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService, long maxMillisToWait, long intervalMillis,
             boolean shutdownExecutorWhenFinished) {
 
-        AsyncHistoryExecutor asyncHistoryExecutor = processEngineConfiguration.getAsyncHistoryExecutor();
-        asyncHistoryExecutor.start();
-
-        try {
-            Timer timer = new Timer();
-            InterruptTask task = new InterruptTask(Thread.currentThread());
-            timer.schedule(task, maxMillisToWait);
-            boolean areJobsAvailable = true;
+        ProcessEngineConfigurationImpl processEngineConfigurationImpl = (ProcessEngineConfigurationImpl) processEngineConfiguration;
+        if (processEngineConfigurationImpl.isAsyncHistoryEnabled()) {
+            AsyncHistoryExecutor asyncHistoryExecutor = processEngineConfiguration.getAsyncHistoryExecutor();
+            asyncHistoryExecutor.start();
+    
             try {
-                while (areJobsAvailable && !task.isTimeLimitExceeded()) {
-                    Thread.sleep(intervalMillis);
-                    try {
-                        areJobsAvailable = areHistoryJobsAvailable(managementService);
-                    } catch (Throwable t) {
-                        // Ignore, possible that exception occurs due to locking/updating of table on MSSQL when
-                        // isolation level doesn't allow READ of the table
+                Timer timer = new Timer();
+                InterruptTask task = new InterruptTask(Thread.currentThread());
+                timer.schedule(task, maxMillisToWait);
+                boolean areJobsAvailable = true;
+                try {
+                    while (areJobsAvailable && !task.isTimeLimitExceeded()) {
+                        Thread.sleep(intervalMillis);
+                        try {
+                            areJobsAvailable = areHistoryJobsAvailable(managementService);
+                        } catch (Throwable t) {
+                            // Ignore, possible that exception occurs due to locking/updating of table on MSSQL when
+                            // isolation level doesn't allow READ of the table
+                        }
                     }
+                } catch (InterruptedException e) {
+                    // ignore
+                } finally {
+                    timer.cancel();
                 }
-            } catch (InterruptedException e) {
-                // ignore
+                if (areJobsAvailable) {
+                    throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded");
+                }
+    
             } finally {
-                timer.cancel();
-            }
-            if (areJobsAvailable) {
-                throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded");
-            }
-
-        } finally {
-            if (shutdownExecutorWhenFinished) {
-                asyncHistoryExecutor.shutdown();
+                if (shutdownExecutorWhenFinished) {
+                    asyncHistoryExecutor.shutdown();
+                }
             }
         }
     }

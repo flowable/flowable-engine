@@ -55,8 +55,9 @@ public class EmailServiceTaskTest extends EmailTestCase {
     public void testSimpleTextMailWhenMultiTenant() throws Exception {
         String tenantId = "myEmailTenant";
 
-        org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment()
-                .addClasspathResource("org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMail.bpmn20.xml").tenantId(tenantId).deploy();
+        repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMail.bpmn20.xml")
+                .tenantId(tenantId).deploy();
         String procId = runtimeService.startProcessInstanceByKeyAndTenantId("simpleTextOnly", tenantId).getId();
 
         List<WiserMessage> messages = wiser.getMessages();
@@ -67,14 +68,15 @@ public class EmailServiceTaskTest extends EmailTestCase {
                 "kermit@activiti.org"), null);
         assertProcessEnded(procId);
 
-        repositoryService.deleteDeployment(deployment.getId(), true);
+        deleteDeployments();
     }
 
     public void testSimpleTextMailForNonExistentTenant() throws Exception {
         String tenantId = "nonExistentTenant";
 
-        org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment()
-                .addClasspathResource("org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMail.bpmn20.xml").tenantId(tenantId).deploy();
+        repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMail.bpmn20.xml")
+                .tenantId(tenantId).deploy();
         String procId = runtimeService.startProcessInstanceByKeyAndTenantId("simpleTextOnly", tenantId).getId();
 
         List<WiserMessage> messages = wiser.getMessages();
@@ -85,7 +87,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
                 "kermit@activiti.org"), null);
         assertProcessEnded(procId);
 
-        repositoryService.deleteDeployment(deployment.getId(), true);
+        deleteDeployments();
     }
 
     @Deployment

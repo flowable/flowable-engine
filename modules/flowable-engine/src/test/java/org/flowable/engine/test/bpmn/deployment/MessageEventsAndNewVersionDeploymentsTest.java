@@ -450,9 +450,7 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
     }
 
     private void cleanup(String... deploymentIds) {
-        for (String deploymentId : deploymentIds) {
-            repositoryService.deleteDeployment(deploymentId, true);
-        }
+        deleteDeployments();
     }
 
     private List<String> getExecutionIdsForMessageEventSubscription(final String messageName) {

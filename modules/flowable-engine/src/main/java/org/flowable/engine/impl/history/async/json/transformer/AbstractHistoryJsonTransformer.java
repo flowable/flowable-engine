@@ -64,7 +64,6 @@ public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTrans
     }
 
     protected void dispatchEvent(CommandContext commandContext, FlowableEvent event) {
-        ;
         FlowableEventDispatcher eventDispatcher = commandContext.getProcessEngineConfiguration().getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(event);

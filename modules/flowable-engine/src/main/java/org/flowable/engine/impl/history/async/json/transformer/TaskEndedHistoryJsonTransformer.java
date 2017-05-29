@@ -21,10 +21,14 @@ import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntit
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
+    
+    private static final Logger logger = LoggerFactory.getLogger(TaskEndedHistoryJsonTransformer.class);
 
     public static final String TYPE = "task-ended";
 
@@ -45,13 +49,37 @@ public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransfor
         HistoricTaskInstanceEntity historicTaskInstance = historicTaskInstanceEntityManager.findById(taskId);
         
         if (historicTaskInstance != null) {
-            Date endTime = getDateFromJson(historicalData, HistoryJsonConstants.END_TIME);
-            historicTaskInstance.setEndTime(endTime);
-            historicTaskInstance.setDeleteReason(getStringFromJson(historicalData, HistoryJsonConstants.DELETE_REASON));
-    
-            Date startTime = historicTaskInstance.getStartTime();
-            if (startTime != null && endTime != null) {
-                historicTaskInstance.setDurationInMillis(endTime.getTime() - startTime.getTime());
+            Date lastUpdateTime = getDateFromJson(historicalData, HistoryJsonConstants.JOB_CREATE_TIME);
+            if (historicTaskInstance.getLastUpdateTime() == null || !historicTaskInstance.getLastUpdateTime().after(lastUpdateTime)) {
+                historicTaskInstance.setLastUpdateTime(lastUpdateTime);
+                
+                Date endTime = getDateFromJson(historicalData, HistoryJsonConstants.END_TIME);
+                historicTaskInstance.setEndTime(endTime);
+                historicTaskInstance.setDeleteReason(getStringFromJson(historicalData, HistoryJsonConstants.DELETE_REASON));
+        
+                Date startTime = historicTaskInstance.getStartTime();
+                if (startTime != null && endTime != null) {
+                    historicTaskInstance.setDurationInMillis(endTime.getTime() - startTime.getTime());
+                }
+                
+                historicTaskInstance.setName(getStringFromJson(historicalData, HistoryJsonConstants.NAME));
+                historicTaskInstance.setParentTaskId(getStringFromJson(historicalData, HistoryJsonConstants.PARENT_TASK_ID));
+                historicTaskInstance.setDescription(getStringFromJson(historicalData, HistoryJsonConstants.DESCRIPTION));
+                historicTaskInstance.setOwner(getStringFromJson(historicalData, HistoryJsonConstants.OWNER));
+                historicTaskInstance.setAssignee(getStringFromJson(historicalData, HistoryJsonConstants.ASSIGNEE));
+                historicTaskInstance.setStartTime(getDateFromJson(historicalData, HistoryJsonConstants.START_TIME));
+                historicTaskInstance.setTaskDefinitionKey(getStringFromJson(historicalData, HistoryJsonConstants.TASK_DEFINITION_KEY));
+                historicTaskInstance.setPriority(getIntegerFromJson(historicalData, HistoryJsonConstants.PRIORITY));
+                historicTaskInstance.setDueDate(getDateFromJson(historicalData, HistoryJsonConstants.DUE_DATE));
+                historicTaskInstance.setCategory(getStringFromJson(historicalData, HistoryJsonConstants.CATEGORY));
+                historicTaskInstance.setFormKey(getStringFromJson(historicalData, HistoryJsonConstants.FORM_KEY));
+                historicTaskInstance.setClaimTime(getDateFromJson(historicalData, HistoryJsonConstants.CLAIM_TIME));
+                historicTaskInstance.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
+                
+            } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("History job (id={}) has expired and will be ignored." + historicTaskInstance.getLastUpdateTime() + " " + lastUpdateTime, job.getId());
+                }
             }
             
         } else {
@@ -72,7 +100,10 @@ public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransfor
             historicTaskInstance.setPriority(getIntegerFromJson(historicalData, HistoryJsonConstants.PRIORITY));
             historicTaskInstance.setDueDate(getDateFromJson(historicalData, HistoryJsonConstants.DUE_DATE));
             historicTaskInstance.setCategory(getStringFromJson(historicalData, HistoryJsonConstants.CATEGORY));
-            historicTaskInstance.setTenantId(getStringFromJson(historicalData, getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID)));
+            historicTaskInstance.setFormKey(getStringFromJson(historicalData, HistoryJsonConstants.FORM_KEY));
+            historicTaskInstance.setClaimTime(getDateFromJson(historicalData, HistoryJsonConstants.CLAIM_TIME));
+            historicTaskInstance.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
+            historicTaskInstance.setLastUpdateTime(getDateFromJson(historicalData, HistoryJsonConstants.JOB_CREATE_TIME));
     
             Date endTime = getDateFromJson(historicalData, HistoryJsonConstants.END_TIME);
             historicTaskInstance.setEndTime(endTime);

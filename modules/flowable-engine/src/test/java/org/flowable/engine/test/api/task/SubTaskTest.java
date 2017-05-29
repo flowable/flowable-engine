@@ -111,6 +111,8 @@ public class SubTaskTest extends PluggableFlowableTestCase {
             assertEquals(3, historicTasks.size());
 
             historyService.deleteHistoricProcessInstance(processInstance.getId());
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             historicTasks = historyService.createHistoricTaskInstanceQuery().taskAssignee("test").list();
             assertEquals(0, historicTasks.size());

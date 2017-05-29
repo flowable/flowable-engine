@@ -71,6 +71,8 @@ public interface HistoryJsonConstants {
     String PARENT_TASK_ID = "parentTaskId";
 
     String ASSIGNEE = "assignee";
+    
+    String ACTIVITY_ASSIGNEE_HANDLED = "activityAssigneeHandled";
 
     String OWNER = "owner";
     
@@ -108,4 +110,5 @@ public interface HistoryJsonConstants {
 
     String TENANT_ID = "tenantId";
 
+    String JOB_CREATE_TIME = "jobCreateTime";
 }

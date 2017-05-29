@@ -30,12 +30,15 @@ import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceDe
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceEndHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstancePropertyChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceStartHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.SetProcessDefinitionHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.SubProcessInstanceHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskAssigneeChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskCreatedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskEndedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.TaskOwnerChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskPropertyChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.VariableCreatedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.VariableRemovedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.VariableUpdatedHistoryJsonTransformer;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
@@ -69,6 +72,7 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
         addHistoryJsonTransformer(new ProcessInstanceDeleteHistoryByProcessDefinitionIdJsonTransformer());
         addHistoryJsonTransformer(new ProcessInstancePropertyChangedHistoryJsonTransformer());
         addHistoryJsonTransformer(new SubProcessInstanceHistoryJsonTransformer());
+        addHistoryJsonTransformer(new SetProcessDefinitionHistoryJsonTransformer());
 
         addHistoryJsonTransformer(new ActivityStartHistoryJsonTransformer());
         addHistoryJsonTransformer(new ActivityEndHistoryJsonTransformer());
@@ -79,12 +83,14 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
 
         addHistoryJsonTransformer(new TaskPropertyChangedHistoryJsonTransformer());
         addHistoryJsonTransformer(new TaskAssigneeChangedHistoryJsonTransformer());
+        addHistoryJsonTransformer(new TaskOwnerChangedHistoryJsonTransformer());
         
         addHistoryJsonTransformer(new IdentityLinkCreatedHistoryJsonTransformer());
         addHistoryJsonTransformer(new IdentityLinkDeletedHistoryJsonTransformer());
         
         addHistoryJsonTransformer(new VariableCreatedHistoryJsonTransformer());
         addHistoryJsonTransformer(new VariableUpdatedHistoryJsonTransformer());
+        addHistoryJsonTransformer(new VariableRemovedHistoryJsonTransformer());
         addHistoryJsonTransformer(new HistoricDetailVariableUpdateHistoryJsonTransformer());
         addHistoryJsonTransformer(new FormPropertiesSubmittedHistoryJsonTransformer());
     }

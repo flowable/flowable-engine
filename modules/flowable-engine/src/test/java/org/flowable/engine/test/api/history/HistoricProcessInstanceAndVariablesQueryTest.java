@@ -69,9 +69,8 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
     }
 
     protected void tearDown() throws Exception {
-        for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
-            repositoryService.deleteDeployment(deployment.getId(), true);
-        }
+        deleteDeployments();
+        
         super.tearDown();
     }
 

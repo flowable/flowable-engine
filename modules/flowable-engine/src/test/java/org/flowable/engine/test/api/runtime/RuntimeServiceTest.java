@@ -991,6 +991,8 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             assertEquals(3, runtimeService.getVariables(processInstance.getId()).size());
             assertEquals(3, runtimeService.getVariables(processInstance.getId(), Arrays.asList("var1", "var2", "var3")).size());
             assertNotNull(runtimeService.getVariable(processInstance.getId(), "var2"));
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             // Verify history
             assertEquals(3, historyService.createHistoricVariableInstanceQuery().list().size());
@@ -998,6 +1000,8 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
             // Remove one variable
             runtimeService.removeVariable(processInstance.getId(), "var2");
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             // Verify runtime
             assertEquals(2, runtimeService.getVariables(processInstance.getId()).size());

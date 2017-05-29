@@ -53,7 +53,7 @@ public class AsyncHistoryTest extends ResourceFlowableTestCase {
       taskService.complete(taskService.createTaskQuery().singleResult().getId());
       
       List<HistoryJob> jobs = managementService.createHistoryJobQuery().list();
-      assertEquals(9, jobs.size());
+      assertEquals(11, jobs.size());
       for (HistoryJob job : jobs) {
         assertEquals(AsyncHistoryJobHandler.JOB_TYPE, job.getJobHandlerType());
         assertNotNull(((HistoryJobEntity) job).getAdvancedJobHandlerConfigurationByteArrayRef());

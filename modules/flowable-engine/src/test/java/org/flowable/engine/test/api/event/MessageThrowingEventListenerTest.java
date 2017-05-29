@@ -98,13 +98,15 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
             taskService.setAssignee(task.getId(), "kermit");
 
             // Boundary-event should have been messaged and a new task should be
-            // available, the already
-            // existing one should be removed, since the cancelActivity='true'
+            // available, the already existing one should be removed, since the cancelActivity='true'
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subTask").singleResult();
             assertNull(task);
 
             Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
             assertNotNull(boundaryTask);
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            
         } finally {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
         }

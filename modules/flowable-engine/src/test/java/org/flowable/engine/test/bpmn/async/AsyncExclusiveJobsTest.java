@@ -32,6 +32,8 @@ public class AsyncExclusiveJobsTest extends PluggableFlowableTestCase {
             // They should be executed with at least 6 seconds in between (as they both sleep for 6 seconds)
             runtimeService.startProcessInstanceByKey("testExclusiveJobs");
             waitForJobExecutorToProcessAllJobs(20000L, 500L);
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             HistoricActivityInstance scriptTaskAInstance = historyService.createHistoricActivityInstanceQuery().activityId("scriptTaskA").singleResult();
             HistoricActivityInstance scriptTaskBInstance = historyService.createHistoricActivityInstanceQuery().activityId("scriptTaskB").singleResult();

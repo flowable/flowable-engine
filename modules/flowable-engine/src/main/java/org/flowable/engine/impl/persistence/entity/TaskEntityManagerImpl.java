@@ -103,9 +103,6 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         }
 
         getHistoryManager().recordTaskCreated(taskEntity, execution);
-        if (taskEntity.getFormKey() != null) {
-            getHistoryManager().recordTaskFormKeyChange(taskEntity.getId(), taskEntity.getFormKey());
-        }
     }
 
     @Override
@@ -117,7 +114,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             fireAssignmentEvents(taskEntity);
 
             if (taskEntity.getId() != null) {
-                getHistoryManager().recordTaskAssigneeChange(taskEntity, taskEntity.getAssignee());
+                getHistoryManager().recordTaskInfoChange(taskEntity);
                 addAssigneeIdentityLinks(taskEntity);
                 update(taskEntity);
             }
@@ -132,7 +129,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             taskEntity.setOwner(owner);
 
             if (taskEntity.getId() != null) {
-                getHistoryManager().recordTaskOwnerChange(taskEntity.getId(), taskEntity.getOwner());
+                getHistoryManager().recordTaskInfoChange(taskEntity);
                 addOwnerIdentityLink(taskEntity, taskEntity.getOwner());
                 update(taskEntity);
             }

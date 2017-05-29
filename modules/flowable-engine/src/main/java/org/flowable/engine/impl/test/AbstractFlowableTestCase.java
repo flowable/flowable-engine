@@ -137,9 +137,11 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
             
             boolean isAsyncHistoryEnabled = processEngineConfiguration.isAsyncHistoryEnabled();
             
-            List<HistoryJob> jobs = managementService.createHistoryJobQuery().list();
-            for (HistoryJob job : jobs) {
-                managementService.deleteHistoryJob(job.getId());
+            if (isAsyncHistoryEnabled) {
+                List<HistoryJob> jobs = managementService.createHistoryJobQuery().list();
+                for (HistoryJob job : jobs) {
+                    managementService.deleteHistoryJob(job.getId());
+                }
             }
             
             HistoryManager asyncHistoryManager = null;
@@ -187,7 +189,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
                 assertNotNull("Historic process instance has no process definition id", historicProcessInstance.getProcessDefinitionId());
                 assertNotNull("Historic process instance has no process definition key", historicProcessInstance.getProcessDefinitionKey());
                 assertNotNull("Historic process instance has no process definition version", historicProcessInstance.getProcessDefinitionVersion());
-                assertNotNull("Historic process instance has no process definition key", historicProcessInstance.getDeploymentId());
+                assertNotNull("Historic process instance has no deployment id", historicProcessInstance.getDeploymentId());
                 assertNotNull("Historic process instance has no start activity id", historicProcessInstance.getStartActivityId());
                 assertNotNull("Historic process instance has no start time", historicProcessInstance.getStartTime());
                 assertNotNull("Historic process instance has no end time", historicProcessInstance.getEndTime());
@@ -453,6 +455,42 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     //
     // HELPERS
     //
+    
+    protected void deleteDeployments() {
+        boolean isAsyncHistoryEnabled = processEngineConfiguration.isAsyncHistoryEnabled();
+        HistoryManager asyncHistoryManager = null;
+        if (isAsyncHistoryEnabled) {
+            processEngineConfiguration.setAsyncHistoryEnabled(false);
+            asyncHistoryManager = processEngineConfiguration.getHistoryManager();
+            processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration, processEngineConfiguration.getHistoryLevel()));
+        }
+        
+        for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+            repositoryService.deleteDeployment(deployment.getId(), true);
+        }
+        
+        if (isAsyncHistoryEnabled) {
+            processEngineConfiguration.setAsyncHistoryEnabled(true);
+            processEngineConfiguration.setHistoryManager(asyncHistoryManager);
+        }
+    }
+    
+    protected void deleteDeployment(String deploymentId) {
+        boolean isAsyncHistoryEnabled = processEngineConfiguration.isAsyncHistoryEnabled();
+        HistoryManager asyncHistoryManager = null;
+        if (isAsyncHistoryEnabled) {
+            processEngineConfiguration.setAsyncHistoryEnabled(false);
+            asyncHistoryManager = processEngineConfiguration.getHistoryManager();
+            processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration, processEngineConfiguration.getHistoryLevel()));
+        }
+        
+        repositoryService.deleteDeployment(deploymentId, true);
+        
+        if (isAsyncHistoryEnabled) {
+            processEngineConfiguration.setAsyncHistoryEnabled(true);
+            processEngineConfiguration.setHistoryManager(asyncHistoryManager);
+        }
+    }
 
     protected void assertHistoricTasksDeleteReason(ProcessInstance processInstance, String expectedDeleteReason, String... taskNames) {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {

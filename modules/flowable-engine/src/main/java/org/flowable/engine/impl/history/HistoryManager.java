@@ -12,7 +12,6 @@
  */
 package org.flowable.engine.impl.history;
 
-import java.util.Date;
 import java.util.Map;
 
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -90,72 +89,14 @@ public interface HistoryManager {
     void recordTaskCreated(TaskEntity task, ExecutionEntity execution);
 
     /**
-     * record task instance claim time, if audit history is enabled
-     *
-     * @param task
-     */
-
-    void recordTaskClaim(TaskEntity task);
-
-    /**
      * Record task as ended, if audit history is enabled.
      */
     void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason);
 
     /**
-     * Record task assignee change, if audit history is enabled.
-     */
-    void recordTaskAssigneeChange(TaskEntity task, String assignee);
-
-    /**
-     * Record task owner change, if audit history is enabled.
-     */
-    void recordTaskOwnerChange(String taskId, String owner);
-
-    /**
      * Record task name change, if audit history is enabled.
      */
-    void recordTaskNameChange(String taskId, String taskName);
-
-    /**
-     * Record task description change, if audit history is enabled.
-     */
-    void recordTaskDescriptionChange(String taskId, String description);
-
-    /**
-     * Record task due date change, if audit history is enabled.
-     */
-    void recordTaskDueDateChange(String taskId, Date dueDate);
-
-    /**
-     * Record task priority change, if audit history is enabled.
-     */
-    void recordTaskPriorityChange(String taskId, int priority);
-
-    /**
-     * Record task category change, if audit history is enabled.
-     */
-    void recordTaskCategoryChange(String taskId, String category);
-
-    /**
-     * Record task form key change, if audit history is enabled.
-     */
-    void recordTaskFormKeyChange(String taskId, String formKey);
-
-    /**
-     * Record task parent task id change, if audit history is enabled.
-     */
-    void recordTaskParentTaskIdChange(String taskId, String parentTaskId);
-
-    /**
-     * Record task definition key change, if audit history is enabled.
-     */
-    void recordTaskDefinitionKeyChange(String taskId, String taskDefinitionKey);
-
-    /**
-     * Record a change of the process-definition id of a task instance, if activity history is enabled.
-     */
-    public abstract void recordTaskProcessDefinitionChange(String taskId, String processDefinitionId);
+    void recordTaskInfoChange(TaskEntity taskEntity);
 
     /**
      * Record a variable has been created, if audit history is enabled.

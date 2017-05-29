@@ -534,13 +534,20 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
             
             historyService.deleteHistoricProcessInstance(processInstance.getId());
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             // recheck variables
             // this is a bug: all variables was deleted after delete a history process instance
             count = historyService.createHistoricVariableInstanceQuery()
-                    .processInstanceId(processInstance.getId())
+                    .processInstanceId(processInstance2.getId())
                     .count();
             assertEquals(2, count);
+            
+            count = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .count();
+            assertEquals(0, count);
         }
 
     }

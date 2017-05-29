@@ -23,6 +23,7 @@
   <insert id="insertHistoricProcessInstance" parameterType="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
       insert into ${prefix}ACT_HI_PROCINST (
         ID_,
+        REV_,
         PROC_INST_ID_,
         BUSINESS_KEY_,
         PROC_DEF_ID_,
@@ -38,6 +39,7 @@
         NAME_
       ) values (
         #{id ,jdbcType=VARCHAR},
+        1,
         #{processInstanceId, jdbcType=VARCHAR},
         #{businessKey, jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
@@ -57,6 +59,7 @@
   <insert id="bulkInsertHistoricProcessInstance" parameterType="java.util.List">
       insert into ${prefix}ACT_HI_PROCINST (
         ID_,
+        REV_,
         PROC_INST_ID_,
         BUSINESS_KEY_,
         PROC_DEF_ID_,
@@ -73,6 +76,7 @@
       ) values 
         <foreach collection="list" item="historicProcessInstance" index="index" separator=",">
           (#{historicProcessInstance.id ,jdbcType=VARCHAR},
+           1,
            #{historicProcessInstance.processInstanceId, jdbcType=VARCHAR},
            #{historicProcessInstance.businessKey, jdbcType=VARCHAR},
            #{historicProcessInstance.processDefinitionId, jdbcType=VARCHAR},
@@ -94,6 +98,7 @@
         <foreach collection="list" item="historicProcessInstance" index="index">
           INTO ${prefix}ACT_HI_PROCINST (
             ID_,
+            REV_,
             PROC_INST_ID_,
             BUSINESS_KEY_,
             PROC_DEF_ID_,
@@ -109,6 +114,7 @@
             NAME_
           ) VALUES 
               (#{historicProcessInstance.id ,jdbcType=VARCHAR},
+               1,
                #{historicProcessInstance.processInstanceId, jdbcType=VARCHAR},
                #{historicProcessInstance.businessKey, jdbcType=VARCHAR},
                #{historicProcessInstance.processDefinitionId, jdbcType=VARCHAR},
@@ -131,6 +137,7 @@
   <update id="updateHistoricProcessInstance" parameterType="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
     update ${prefix}ACT_HI_PROCINST
       <set>
+      	REV_ = #{revisionNext, jdbcType=INTEGER},
       	<if test="originalPersistentState.processDefinitionId != processDefinitionId">
 	      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
 	    </if>
@@ -157,6 +164,7 @@
 	    </if>
       </set>
     where ID_ = #{id}
+    and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 
   <!-- HISTORIC PROCESS INSTANCE DELETE -->
@@ -176,6 +184,7 @@
   
   <resultMap id="historicProcessInstanceResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER"/>
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR"/>
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
@@ -197,6 +206,7 @@
   
   <resultMap id="historicProcessInstanceAndVariablesResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER"/>
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR"/>
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
@@ -296,6 +306,7 @@
    </if>
    <if test="_databaseId == 'db2' || _databaseId == 'mssql'">
     select distinct TEMPRES_ID_ as ID_,
+    TEMPRES_REV_ as REV_, 
     TEMPRES_BUSINESS_KEY_ as BUSINESS_KEY_, 
     TEMPRES_PROC_DEF_ID_ as PROC_DEF_ID_,
     TEMPRES_START_TIME_ as START_TIME_, 
@@ -327,6 +338,7 @@
     TEMPVAR_LONG_ as VAR_LONG_
     ${limitOuterJoinBetween}
     RES.ID_ as TEMPRES_ID_, 
+    RES.REV_ as TEMPRES_REV_, 
     RES.BUSINESS_KEY_ as TEMPRES_BUSINESS_KEY_,
     RES.PROC_DEF_ID_ as TEMPRES_PROC_DEF_ID_, 
     RES.PROC_INST_ID_ as TEMPRES_PROC_INST_ID_, 

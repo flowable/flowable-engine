@@ -22,7 +22,7 @@
     <property name="defaultFailedJobWaitTime" value="1" />
     <property name="asyncFailedJobWaitTime" value="1" />
     
-    <property name="asyncHistoryEnabled" value="true" />
+    <property name="asyncHistoryEnabled" value="false" />
 
     <!-- mail server configurations -->
     <property name="mailServerPort" value="5025" />

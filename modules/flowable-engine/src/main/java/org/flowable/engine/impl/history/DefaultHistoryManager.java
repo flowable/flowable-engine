@@ -16,6 +16,7 @@ package org.flowable.engine.impl.history;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -221,6 +222,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     public void recordTaskCreated(TaskEntity task, ExecutionEntity execution) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().create(task, execution);
+            historicTaskInstance.setLastUpdateTime(processEngineConfiguration.getClock().getCurrentTime());
 
             if (execution != null) {
                 historicTaskInstance.setExecutionId(execution.getId());
@@ -240,164 +242,69 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     }
 
     @Override
-    public void recordTaskClaim(TaskEntity task) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(task.getId());
-            if (historicTaskInstance != null) {
-                historicTaskInstance.setClaimTime(task.getClaimTime());
-            }
-        }
-    }
-
-    @Override
     public void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(task.getId());
             if (historicTaskInstance != null) {
                 historicTaskInstance.markEnded(deleteReason);
+                historicTaskInstance.setLastUpdateTime(processEngineConfiguration.getClock().getCurrentTime());
             }
         }
     }
 
     @Override
-    public void recordTaskAssigneeChange(TaskEntity task, String assignee) {
+    public void recordTaskInfoChange(TaskEntity taskEntity) {
+        boolean assigneeChanged = false;
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(task.getId());
+            HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskEntity.getId());
             if (historicTaskInstance != null) {
-                historicTaskInstance.setAssignee(assignee);
+                historicTaskInstance.setName(taskEntity.getName());
+                historicTaskInstance.setDescription(taskEntity.getDescription());
+                historicTaskInstance.setDueDate(taskEntity.getDueDate());
+                historicTaskInstance.setPriority(taskEntity.getPriority());
+                historicTaskInstance.setCategory(taskEntity.getCategory());
+                historicTaskInstance.setFormKey(taskEntity.getFormKey());
+                historicTaskInstance.setParentTaskId(taskEntity.getParentTaskId());
+                historicTaskInstance.setTaskDefinitionKey(taskEntity.getTaskDefinitionKey());
+                historicTaskInstance.setProcessDefinitionId(taskEntity.getProcessDefinitionId());
+                historicTaskInstance.setClaimTime(taskEntity.getClaimTime());
                 
-                HistoricIdentityLinkEntity historicIdentityLinkEntity = getHistoricIdentityLinkEntityManager().create();
-                historicIdentityLinkEntity.setTaskId(historicTaskInstance.getId());
-                historicIdentityLinkEntity.setType(IdentityLinkType.ASSIGNEE);
-                historicIdentityLinkEntity.setUserId(historicTaskInstance.getAssignee());
-                Date time = getClock().getCurrentTime();
-                historicIdentityLinkEntity.setCreateTime(time);
-                getHistoricIdentityLinkEntityManager().insert(historicIdentityLinkEntity, false);
+                if (!Objects.equals(historicTaskInstance.getAssignee(), taskEntity.getAssignee())) {
+                    historicTaskInstance.setAssignee(taskEntity.getAssignee());
+                    assigneeChanged = true;
+                    
+                    createHistoricIdentityLink(historicTaskInstance.getId(), IdentityLinkType.ASSIGNEE, historicTaskInstance.getAssignee());
+                }
+                
+                if (!Objects.equals(historicTaskInstance.getOwner(), taskEntity.getOwner())) {
+                    historicTaskInstance.setOwner(taskEntity.getOwner());
+                    
+                    createHistoricIdentityLink(historicTaskInstance.getId(), IdentityLinkType.OWNER, historicTaskInstance.getOwner());
+                }
+                
+                historicTaskInstance.setLastUpdateTime(processEngineConfiguration.getClock().getCurrentTime());
             }
         }
-
-        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
-            ExecutionEntity executionEntity = task.getExecution();
+        
+        if (assigneeChanged && isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
+            ExecutionEntity executionEntity = taskEntity.getExecution();
             if (executionEntity != null) {
                 HistoricActivityInstanceEntity historicActivityInstance = findActivityInstance(executionEntity, false, true);
                 if (historicActivityInstance != null) {
-                    historicActivityInstance.setAssignee(assignee);
+                    historicActivityInstance.setAssignee(taskEntity.getAssignee());
                 }
             }
         }
     }
-
-    @Override
-    public void recordTaskOwnerChange(String taskId, String owner) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskId);
-            if (historicTaskInstance != null) {
-                historicTaskInstance.setOwner(owner);
-                
-                HistoricIdentityLinkEntity historicIdentityLinkEntity = getHistoricIdentityLinkEntityManager().create();
-                historicIdentityLinkEntity.setTaskId(historicTaskInstance.getId());
-                historicIdentityLinkEntity.setType(IdentityLinkType.OWNER);
-                historicIdentityLinkEntity.setUserId(historicTaskInstance.getOwner());
-                Date time = getClock().getCurrentTime();
-                historicIdentityLinkEntity.setCreateTime(time);
-                getHistoricIdentityLinkEntityManager().insert(historicIdentityLinkEntity, false);
-            }
-        }
-    }
-
-    @Override
-    public void recordTaskNameChange(String taskId, String taskName) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskId);
-            if (historicTaskInstance != null) {
-                historicTaskInstance.setName(taskName);
-            }
-        }
-    }
-
-    @Override
-    public void recordTaskDescriptionChange(String taskId, String description) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskId);
-            if (historicTaskInstance != null) {
-                historicTaskInstance.setDescription(description);
-            }
-        }
-    }
-
-    @Override
-    public void recordTaskDueDateChange(String taskId, Date dueDate) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskId);
-            if (historicTaskInstance != null) {
-                historicTaskInstance.setDueDate(dueDate);
-            }
-        }
-    }
-
-    @Override
-    public void recordTaskPriorityChange(String taskId, int priority) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskId);
-            if (historicTaskInstance != null) {
-                historicTaskInstance.setPriority(priority);
-            }
-        }
-    }
-
-    @Override
-    public void recordTaskCategoryChange(String taskId, String category) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskId);
-            if (historicTaskInstance != null) {
-                historicTaskInstance.setCategory(category);
-            }
-        }
-    }
-
-    @Override
-    public void recordTaskFormKeyChange(String taskId, String formKey) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskId);
-            if (historicTaskInstance != null) {
-                historicTaskInstance.setFormKey(formKey);
-            }
-        }
-    }
-
-    @Override
-    public void recordTaskParentTaskIdChange(String taskId, String parentTaskId) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskId);
-            if (historicTaskInstance != null) {
-                historicTaskInstance.setParentTaskId(parentTaskId);
-            }
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface# recordTaskDefinitionKeyChange (org.flowable.engine.impl.persistence.entity.TaskEntity, java.lang.String)
-     */
-    @Override
-    public void recordTaskDefinitionKeyChange(String taskId, String taskDefinitionKey) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskId);
-            if (historicTaskInstance != null) {
-                historicTaskInstance.setTaskDefinitionKey(taskDefinitionKey);
-            }
-        }
-    }
-
-    @Override
-    public void recordTaskProcessDefinitionChange(String taskId, String processDefinitionId) {
-        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
-            HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskId);
-            if (historicTaskInstance != null) {
-                historicTaskInstance.setProcessDefinitionId(processDefinitionId);
-            }
-        }
+    
+    protected void createHistoricIdentityLink(String taskId, String type, String userId) {
+        HistoricIdentityLinkEntity historicIdentityLinkEntity = getHistoricIdentityLinkEntityManager().create();
+        historicIdentityLinkEntity.setTaskId(taskId);
+        historicIdentityLinkEntity.setType(type);
+        historicIdentityLinkEntity.setUserId(userId);
+        Date time = getClock().getCurrentTime();
+        historicIdentityLinkEntity.setCreateTime(time);
+        getHistoricIdentityLinkEntityManager().insert(historicIdentityLinkEntity, false);
     }
 
     // Variables related history

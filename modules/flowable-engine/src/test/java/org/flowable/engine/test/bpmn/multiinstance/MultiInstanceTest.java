@@ -1287,6 +1287,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
             vars.put("messages", Collections.EMPTY_LIST);
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelUserTaskMi", vars);
 
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
             assertEquals(1L, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).finished().count());
         }
     }
@@ -1295,6 +1296,8 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     public void testZeroLoopCardinalityOnParallelUserTask() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelUserTaskMi");
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
             assertEquals(1L, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).finished().count());
         }
     }
@@ -1306,6 +1309,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
             vars.put("messages", Collections.EMPTY_LIST);
             runtimeService.startProcessInstanceByKey("sequentialMiSubprocess", vars);
 
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
             assertEquals(1L, historyService.createHistoricProcessInstanceQuery().finished().count());
         }
     }
@@ -1316,6 +1320,8 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
             Map<String, Object> vars = new HashMap<String, Object>();
             vars.put("messages", Collections.EMPTY_LIST);
             runtimeService.startProcessInstanceByKey("parallelMiSubprocess", vars);
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             assertEquals(1L, historyService.createHistoricProcessInstanceQuery().finished().count());
         }
@@ -1380,6 +1386,8 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         assertEquals(2, tasks.size());
         assertEquals("User Task 1", tasks.get(0).getName());
         assertEquals("User Task 1", tasks.get(1).getName());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         // End time should not be set for the subprocess
         List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("subprocess1").list();
@@ -1391,6 +1399,9 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
 
         // Complete one of the user tasks. This should not trigger setting of end time of the subprocess, but due to a bug it did exactly that
         taskService.complete(tasks.get(0).getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        
         historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("subprocess1").list();
         assertEquals(2, historicActivityInstances.size());
         for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
@@ -1398,6 +1409,9 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         }
 
         taskService.complete(tasks.get(1).getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        
         historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("subprocess1").list();
         assertEquals(2, historicActivityInstances.size());
         for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
@@ -1408,6 +1422,9 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         assertEquals(2, tasks.size());
         for (Task task : tasks) {
             taskService.complete(task.getId());
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            
             historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("subprocess1").list();
             assertEquals(2, historicActivityInstances.size());
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
@@ -1421,6 +1438,8 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         for (Task task : tasks) {
             taskService.complete(task.getId());
         }
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("subprocess1").list();
         assertEquals(2, historicActivityInstances.size());

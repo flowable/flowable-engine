@@ -60,6 +60,8 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
         for (Task task : taskService.createTaskQuery().list()) {
             taskService.complete(task.getId());
         }
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
     }
 
     @Override
@@ -102,19 +104,24 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
         }
     }
 
-    public void testIncludeTasksandComments() {
+    public void testIncludeTasksAndComments() {
         ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeTasks().includeComments().singleResult();
         List<HistoricData> events = log.getHistoricData();
         assertEquals(5, events.size());
 
+        int taskCounter = 0;
+        int commentCounter = 0;
         for (int i = 0; i < 5; i++) {
             HistoricData event = events.get(i);
-            if (i < 2) { // tasks are created before comments
-                assertTrue(event instanceof HistoricTaskInstance);
-            } else {
-                assertTrue(event instanceof Comment);
+            if (event instanceof HistoricTaskInstance) {
+                taskCounter++;
+            } else if (event instanceof Comment) {
+                commentCounter++;
             }
         }
+        
+        assertEquals(2, taskCounter);
+        assertEquals(3, commentCounter);
     }
 
     public void testIncludeActivities() {

@@ -64,7 +64,6 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
         startActivityId = processInstance.getStartActivityId();
         startTime = processInstance.getStartTime();
         startUserId = processInstance.getStartUserId();
-        startActivityId = processInstance.getActivityId();
         superProcessInstanceId = processInstance.getSuperExecution() != null ? processInstance.getSuperExecution().getProcessInstanceId() : null;
 
         // Inherit tenant id (if applicable)

@@ -177,6 +177,8 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
         Job timerJob = managementService.createTimerJobQuery().singleResult();
         managementService.moveTimerToExecutableJob(timerJob.getId());
         managementService.executeJob(timerJob.getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         assertHistoricTasksDeleteReason(processInstance, null, "A");
         assertHistoricTasksDeleteReason(processInstance, DeleteReason.BOUNDARY_EVENT_INTERRUPTING, "B", "C", "D");
@@ -195,6 +197,8 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
         Job timerJob = managementService.createTimerJobQuery().singleResult();
         managementService.moveTimerToExecutableJob(timerJob.getId());
         managementService.executeJob(timerJob.getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         assertHistoricActivitiesDeleteReason(processInstance, null, "A");
         assertHistoricActivitiesDeleteReason(processInstance, DeleteReason.BOUNDARY_EVENT_INTERRUPTING, "B", "C", "theSubprocess");
