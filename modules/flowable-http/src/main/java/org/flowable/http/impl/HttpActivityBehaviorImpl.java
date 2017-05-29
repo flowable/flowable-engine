@@ -16,6 +16,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.http.Header;
 import org.apache.http.HttpMessage;
@@ -55,6 +57,7 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
     private static final long serialVersionUID = 1L;
     private static final Logger log = LoggerFactory.getLogger(HttpActivityBehaviorImpl.class);
 
+    protected static final Timer timer = new Timer(true);
     protected static final CloseableHttpClient client;
 
     static {
@@ -101,8 +104,9 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
         });
     }
 
-    protected void setConfig(HttpRequestBase base, HttpClientConfig config) {
+    protected void setConfig(HttpRequestBase base, HttpRequest requestInfo, HttpClientConfig config) {
         base.setConfig(RequestConfig.custom()
+                .setRedirectsEnabled(!requestInfo.isNoRedirects())
                 .setSocketTimeout(config.getSocketTimeout())
                 .setConnectTimeout(config.getConnectTimeout())
                 .setConnectionRequestTimeout(config.getConnectionRequestTimeout())
@@ -166,10 +170,14 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
                 }
             }
 
-            setConfig(request, Context.getProcessEngineConfiguration().getHttpClientConfig());
-
             if (requestInfo.getHeaders() != null) {
                 setHeaders(request, requestInfo.getHeaders());
+            }
+
+            setConfig(request, requestInfo, Context.getProcessEngineConfiguration().getHttpClientConfig());
+
+            if (requestInfo.getTimeout() > 0) {
+                timer.schedule(new TimeoutTask(request), requestInfo.getTimeout());
             }
 
             response = client.execute(request);
@@ -186,13 +194,13 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
 
             return responseInfo;
 
-        } catch (ClientProtocolException e) {
+        } catch (final ClientProtocolException e) {
             throw new FlowableException("HTTP exception occurred", e);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new FlowableException("IO exception occurred", e);
-        } catch (URISyntaxException e) {
+        } catch (final URISyntaxException e) {
             throw new FlowableException("Invalid URL exception occurred", e);
-        } catch (FlowableException e) {
+        } catch (final FlowableException e) {
             throw e;
         } finally {
             if (response != null) {
@@ -201,6 +209,21 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
                 } catch (Throwable e) {
                     log.error("Could not close http response", e);
                 }
+            }
+        }
+    }
+
+    private static class TimeoutTask extends TimerTask {
+        private HttpRequestBase request;
+
+        public TimeoutTask(HttpRequestBase request) {
+            this.request = request;
+        }
+
+        @Override
+        public void run() {
+            if (request != null) {
+                request.abort();
             }
         }
     }

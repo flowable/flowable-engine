@@ -13,12 +13,17 @@
 package org.flowable.http;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -76,8 +81,6 @@ public class HttpServiceTaskTestServer {
             ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
             contextHandler.setContextPath("/");
             contextHandler.addServlet(new ServletHolder(new HttpServiceTaskTestServlet()), "/api/*");
-            contextHandler.addServlet(new ServletHolder(new HttpServiceTaskAsyncTestServlet()), "/api/async/*");
-            contextHandler.addServlet(new ServletHolder(new HttpServiceTaskExampleTestServlet()), "/api/example/*");
             server.setHandler(contextHandler);
             server.start();
         } catch (Exception e) {
@@ -103,6 +106,7 @@ public class HttpServiceTaskTestServer {
     private static class HttpServiceTaskTestServlet extends HttpServlet {
 
         private String name = "test servlet";
+        private ObjectMapper mapper = new ObjectMapper();
 
         public HttpServiceTaskTestServlet() {
         }
@@ -113,89 +117,60 @@ public class HttpServiceTaskTestServer {
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            resp.setContentType("text/html");
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().println("<h1>" + name + "</h1>");
-        }
 
-        @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            resp.setContentType("application/json");
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().println("{\"name\": \"" + name + "\"");
-        }
+            int code = 0;
+            int delay = 0;
 
-        @Override
-        protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            resp.setContentType("application/json");
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().println("{\"name\": \"" + name + "\"");
-        }
+            HttpTestResponse data = new HttpTestResponse();
+            data.setOrigin(req.getRemoteAddr());
+            data.setUrl(req.getRequestURL().toString());
 
-        @Override
-        protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            resp.setContentType("application/json");
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().println("{\"status\": \"success\"");
-        }
-    }
+            Enumeration<String> parameterNames = req.getParameterNames();
+            while (parameterNames.hasMoreElements()) {
+                String paramName = parameterNames.nextElement();
+                String[] paramValues = req.getParameterValues(paramName);
+                switch (paramName) {
+                    case "code": {
+                        code = Integer.parseInt(paramValues[0]);
+                        data.setCode(code);
+                        break;
+                    }
+                    case "delay": {
+                        delay = Integer.parseInt(paramValues[0]);
+                        data.setDelay(delay);
+                        break;
+                    }
+                }
+                data.getArgs().put(paramName, paramValues);
+            }
+            Enumeration<String> headerNames = req.getHeaderNames();
+            while (headerNames.hasMoreElements()) {
+                String headerName = headerNames.nextElement();
+                Enumeration<String> headerValues = req.getHeaders(headerName);
+                List<String> headerList = new ArrayList<>();
+                while (headerValues.hasMoreElements()) {
+                    headerList.add(headerValues.nextElement());
+                }
+                data.getHeaders().put(headerName, headerList.toArray(new String[]{}));
+            }
 
-    private static class HttpServiceTaskAsyncTestServlet extends HttpServlet {
+            if (delay > 0) {
+                try {
+                    Thread.sleep(delay);
+                } catch (InterruptedException e) {
+                    //Ignore
+                }
+            }
 
-        private String name = "async test servlet";
+            resp.setStatus(code);
 
-        public HttpServiceTaskAsyncTestServlet() {
-        }
+            if (code >= 200 && code < 300) {
+                resp.setContentType("application/json");
+                resp.getWriter().println(mapper.convertValue(data, JsonNode.class));
 
-        public HttpServiceTaskAsyncTestServlet(String name) {
-            this.name = name;
-        }
-
-        @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            resp.setContentType("text/html");
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().println("<h1>" + name + "</h1>");
-        }
-
-        @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            resp.setContentType("application/json");
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().println("{\"name\": \"" + name + "\"");
-        }
-
-        @Override
-        protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            resp.setContentType("application/json");
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().println("{\"name\": \"" + name + "\"");
-        }
-
-        @Override
-        protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            resp.setContentType("application/json");
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().println("{\"status\": \"success\"");
-        }
-    }
-
-    private static class HttpServiceTaskExampleTestServlet extends HttpServlet {
-
-        private String name = "example test servlet";
-
-        public HttpServiceTaskExampleTestServlet() {
-        }
-
-        public HttpServiceTaskExampleTestServlet(String name) {
-            this.name = name;
-        }
-
-        @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            resp.setContentType("text/html");
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().println("<h1>" + name + "</h1>");
+            } else if (code >= 300 && code < 400) {
+                resp.sendRedirect("http://www.flowable.org");
+            }
         }
 
         @Override

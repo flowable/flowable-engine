@@ -12,6 +12,8 @@
  */
 package org.flowable.http;
 
+import java.net.SocketException;
+
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.test.Deployment;
 import org.slf4j.Logger;
@@ -34,6 +36,26 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     public void testHttpsSelfSigned() throws Exception {
         String procId = runtimeService.startProcessInstanceByKey("httpsSelfSigned").getId();
         assertProcessEnded(procId);
+    }
+
+    @Deployment
+    public void testRequestTimeout() throws Exception {
+        try {
+            runtimeService.startProcessInstanceByKey("requestTimeout");
+        } catch (final Exception e) {
+            assertEquals(true, e instanceof FlowableException);
+            assertEquals(true, e.getCause() instanceof SocketException);
+        }
+    }
+
+    @Deployment
+    public void testDisallowRedirects() throws Exception {
+        try {
+            runtimeService.startProcessInstanceByKey("disallowRedirects");
+        } catch (Exception e) {
+            assertEquals(true, e instanceof FlowableException);
+            assertEquals("HTTP302", ((FlowableException) e).getMessage());
+        }
     }
 
     @Deployment

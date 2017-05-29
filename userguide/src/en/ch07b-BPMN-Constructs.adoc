@@ -3551,7 +3551,8 @@ The Flowable engine makes Http requests through a configurable Http Client. The 
 |connectTimeout|no|Connection timeout in milliseconds. By default set to 5000.
 |socketTimeout|no|Socket timeout in milliseconds. By default set to 5000.
 |connectionRequestTimeout|no|Connection request timeout in milliseconds. By default set to 5000.
-|requestRetryLimit|no|Request retry limit ('0' means do not retry).By default set to 3.
+|requestRetryLimit|no|Request retry limit ('0' means do not retry). By default set to 3.
+|disableCertVerify|no|Flag to disable SSL certificate verification. By default set to false.
 
 |===============
 
@@ -3605,7 +3606,8 @@ Http task is configured by <<serviceTaskFieldInjection,field injection>>. All th
 |requestBody|no|Request body + 
                Example - ${sampleBody}
 |requestTimeout|no|Timeout in milliseconds for the request + 
-                  (Example - 5000).
+                  (Example - 5000). Default is '0', meaning no timeout.
+                  Please refer <<bpmnHttpTaskClientConfiguration>> for connection related timeouts.
 |disallowRedirects|no|Flag to disallow Http redirects. Default is false. (Example - true).
 |failStatusCodes|no|Comma separated list of Http response status codes to fail the request and error thrown as FlowableException. + 
                    Example: 400, 404, 500, 503 + 
