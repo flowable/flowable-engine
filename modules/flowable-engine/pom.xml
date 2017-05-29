@@ -58,11 +58,11 @@
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-content-api</artifactId>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-groovy-script-static-engine</artifactId>
 			<scope>provided</scope>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-email</artifactId>
