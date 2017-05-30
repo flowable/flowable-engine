@@ -124,9 +124,7 @@ public class FlowableClientService {
         FlowableServiceException exception = null;
         CloseableHttpClient client = getHttpClient(userName, password);
         try {
-            CloseableHttpResponse response = client.execute(request);
-
-            try {
+            try (CloseableHttpResponse response = client.execute(request)) {
                 InputStream responseContent = response.getEntity().getContent();
                 String strResponse = IOUtils.toString(responseContent);
 
@@ -147,10 +145,7 @@ public class FlowableClientService {
             } catch (Exception e) {
                 log.warn("Error consuming response from uri {}", request.getURI(), e);
                 exception = wrapException(e, request);
-            } finally {
-                response.close();
             }
-
         } catch (Exception e) {
             log.error("Error executing request to uri {}", request.getURI(), e);
             exception = wrapException(e, request);
@@ -182,8 +177,7 @@ public class FlowableClientService {
         FlowableServiceException exception = null;
         CloseableHttpClient client = getHttpClient(userName, password);
         try {
-            CloseableHttpResponse response = client.execute(request);
-            try {
+            try (CloseableHttpResponse response = client.execute(request)) {
                 boolean success = response.getStatusLine() != null && response.getStatusLine().getStatusCode() == expectedStatusCode;
                 if (success) {
                     httpResponse.setHeader("Content-Disposition", response.getHeaders("Content-Disposition")[0].getValue());
@@ -203,10 +197,7 @@ public class FlowableClientService {
             } catch (Exception e) {
                 log.warn("Error consuming response from uri {}", request.getURI(), e);
                 exception = wrapException(e, request);
-            } finally {
-                response.close();
             }
-
         } catch (Exception e) {
             log.error("Error executing request to uri {}", request.getURI(), e);
             exception = wrapException(e, request);
@@ -241,9 +232,7 @@ public class FlowableClientService {
         FlowableServiceException exception = null;
         CloseableHttpClient client = getHttpClient(userName, password);
         try {
-            CloseableHttpResponse response = client.execute(request);
-
-            try {
+            try (CloseableHttpResponse response = client.execute(request)) {
                 int statusCode = -1;
                 if (response.getStatusLine() != null) {
                     statusCode = response.getStatusLine().getStatusCode();
@@ -264,10 +253,7 @@ public class FlowableClientService {
             } catch (Exception e) {
                 log.warn("Error consuming response from uri {}", request.getURI(), e);
                 exception = wrapException(e, request);
-            } finally {
-                response.close();
             }
-
         } catch (Exception e) {
             log.error("Error executing request to uri {}", request.getURI(), e);
             exception = wrapException(e, request);
@@ -299,9 +285,7 @@ public class FlowableClientService {
         FlowableServiceException exception = null;
         CloseableHttpClient client = getHttpClient(userName, password);
         try {
-            CloseableHttpResponse response = client.execute(request);
-
-            try {
+            try (CloseableHttpResponse response = client.execute(request)) {
                 JsonNode bodyNode = readJsonContent(response.getEntity().getContent());
 
                 int statusCode = -1;
@@ -319,10 +303,7 @@ public class FlowableClientService {
             } catch (Exception e) {
                 log.warn("Error consuming response from uri {}", request.getURI(), e);
                 exception = wrapException(e, request);
-            } finally {
-                response.close();
             }
-
         } catch (Exception e) {
             log.error("Error executing request to uri {}", request.getURI(), e);
             exception = wrapException(e, request);
@@ -350,9 +331,7 @@ public class FlowableClientService {
         FlowableServiceException exception = null;
         CloseableHttpClient client = getHttpClient(userName, password);
         try {
-            CloseableHttpResponse response = client.execute(request);
-
-            try {
+            try (CloseableHttpResponse response = client.execute(request)) {
                 if (response.getStatusLine() != null && response.getStatusLine().getStatusCode() != HttpStatus.SC_UNAUTHORIZED) {
                     httpResponse.setStatus(response.getStatusLine().getStatusCode());
                     if (response.getEntity() != null && response.getEntity().getContentType() != null) {
@@ -365,10 +344,7 @@ public class FlowableClientService {
             } catch (Exception e) {
                 log.warn("Error consuming response from uri {}", request.getURI(), e);
                 exception = wrapException(e, request);
-            } finally {
-                response.close();
             }
-
         } catch (Exception e) {
             log.error("Error executing request to uri {}", request.getURI(), e);
             exception = wrapException(e, request);

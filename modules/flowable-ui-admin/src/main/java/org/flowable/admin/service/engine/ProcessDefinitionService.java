@@ -98,9 +98,7 @@ public class ProcessDefinitionService {
         FlowableServiceException exception = null;
         CloseableHttpClient client = clientUtil.getHttpClient(serverConfig);
         try {
-            CloseableHttpResponse response = client.execute(request);
-
-            try {
+            try (CloseableHttpResponse response = client.execute(request)) {
                 InputStream responseContent = response.getEntity().getContent();
                 XMLInputFactory xif = XMLInputFactory.newInstance();
                 InputStreamReader in = new InputStreamReader(responseContent, "UTF-8");
@@ -117,10 +115,7 @@ public class ProcessDefinitionService {
             } catch (Exception e) {
                 log.warn("Error consuming response from uri {}", request.getURI(), e);
                 exception = clientUtil.wrapException(e, request);
-            } finally {
-                response.close();
             }
-
         } catch (Exception e) {
             log.error("Error executing request to uri {}", request.getURI(), e);
             exception = clientUtil.wrapException(e, request);
