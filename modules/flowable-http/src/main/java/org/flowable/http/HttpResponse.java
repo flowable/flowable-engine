@@ -17,8 +17,13 @@ package org.flowable.http;
  */
 public class HttpResponse {
     protected int statusCode;
+    protected String protocol;
+    protected String reason;
     protected String headers;
     protected String body;
+
+    public HttpResponse() {
+    }
 
     public HttpResponse(int statusCode) {
         this(statusCode, null);
@@ -35,6 +40,22 @@ public class HttpResponse {
 
     public void setStatusCode(int statusCode) {
         this.statusCode = statusCode;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 
     public String getHeaders() {

@@ -17,7 +17,6 @@ import java.util.List;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.http.HttpExecutionListener;
 import org.flowable.http.HttpServiceTaskTestCase;
 
 /**
@@ -26,7 +25,7 @@ import org.flowable.http.HttpServiceTaskTestCase;
 public class HttpServiceTaskAsyncTest extends HttpServiceTaskTestCase {
 
     @Deployment
-    public void testAsyncSimpleGetOnly() throws Exception {
+    public void testAsyncSimpleGetOnly() {
         String procId = runtimeService.startProcessInstanceByKey("asyncSimpleGetOnly").getId();
 
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(20000L, 2000L);
@@ -36,7 +35,7 @@ public class HttpServiceTaskAsyncTest extends HttpServiceTaskTestCase {
     }
 
     @Deployment
-    public void testFailedJobRetryTimeCycle() throws Exception {
+    public void testFailedJobRetryTimeCycle() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncFailedJobRetryTimeCycle");
 
         List<Job> jobs = managementService.createJobQuery()
@@ -44,8 +43,7 @@ public class HttpServiceTaskAsyncTest extends HttpServiceTaskTestCase {
         assertEquals(1, jobs.size());
 
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(20000L, 3000L);
-
-        //assertEquals(4, HttpExecutionListener.runs);
+        
         assertEquals(0, managementService.createJobQuery().count());
     }
 

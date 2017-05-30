@@ -12,7 +12,7 @@
           <flowable:string><![CDATA[GET]]></flowable:string>
         </flowable:field>
         <flowable:field name="requestUrl">
-          <flowable:string><![CDATA[https://localhost:9799/api/]]></flowable:string>
+          <flowable:string><![CDATA[https://localhost:9799/api?code=200]]></flowable:string>
         </flowable:field>
         <flowable:field name="requestHeaders">
           <flowable:string><![CDATA[Accept: *]]></flowable:string>

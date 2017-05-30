@@ -104,7 +104,7 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
         });
     }
 
-    protected void setConfig(HttpRequestBase base, HttpRequest requestInfo, HttpClientConfig config) {
+    protected void setConfig(final HttpRequestBase base, final HttpRequest requestInfo, final HttpClientConfig config) {
         base.setConfig(RequestConfig.custom()
                 .setRedirectsEnabled(!requestInfo.isNoRedirects())
                 .setSocketTimeout(config.getSocketTimeout())
@@ -113,15 +113,15 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
                 .build());
     }
 
-    protected String getHeadersAsString(Header[] headers) {
+    protected String getHeadersAsString(final Header[] headers) {
         StringBuilder hb = new StringBuilder();
         for (Header header : headers) {
-            hb.append(header.getName()).append(":").append(header.getValue()).append("\n");
+            hb.append(header.getName()).append(": ").append(header.getValue()).append("\n");
         }
         return hb.toString();
     }
 
-    protected void setHeaders(HttpMessage base, String headers) throws IOException {
+    protected void setHeaders(final HttpMessage base, final String headers) throws IOException {
         try (BufferedReader reader = new BufferedReader(new StringReader(headers))) {
             String line = reader.readLine();
             while (line != null) {
@@ -130,14 +130,14 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
                     base.addHeader(header[0], header[1]);
                     line = reader.readLine();
                 } else {
-                    throw new FlowableException(String.format("RequestInfo header %s is invalid", line));
+                    throw new FlowableException(HTTP_TASK_REQUEST_HEADERS_INVALID);
                 }
             }
         }
     }
 
     @Override
-    public HttpResponse perform(HttpRequest requestInfo) {
+    public HttpResponse perform(final HttpRequest requestInfo) {
 
         HttpRequestBase request = null;
         CloseableHttpResponse response = null;
@@ -182,7 +182,13 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
 
             response = client.execute(request);
 
-            HttpResponse responseInfo = new HttpResponse(response.getStatusLine().getStatusCode());
+            HttpResponse responseInfo = new HttpResponse();
+
+            if (response.getStatusLine() != null) {
+                responseInfo.setStatusCode(response.getStatusLine().getStatusCode());
+                responseInfo.setProtocol(response.getStatusLine().getProtocolVersion().toString());
+                responseInfo.setReason(response.getStatusLine().getReasonPhrase());
+            }
 
             if (response.getAllHeaders() != null) {
                 responseInfo.setHeaders(getHeadersAsString(response.getAllHeaders()));

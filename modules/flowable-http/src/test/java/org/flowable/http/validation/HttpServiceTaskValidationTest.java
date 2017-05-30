@@ -18,6 +18,9 @@ import java.util.Map;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.test.Deployment;
 import org.flowable.http.HttpServiceTaskTestCase;
+
+import static org.flowable.http.HttpActivityBehavior.HTTP_TASK_REQUEST_FIELD_INVALID;
+import static org.flowable.http.HttpActivityBehavior.HTTP_TASK_REQUEST_HEADERS_INVALID;
 import static org.flowable.http.HttpActivityBehavior.HTTP_TASK_REQUEST_METHOD_INVALID;
 
 /**
@@ -25,14 +28,45 @@ import static org.flowable.http.HttpActivityBehavior.HTTP_TASK_REQUEST_METHOD_IN
  */
 public class HttpServiceTaskValidationTest extends HttpServiceTaskTestCase {
     @Deployment
-    public void testInvalidProcess() throws Exception {
-        Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put("requestTimeout", 10000);
+    public void testInvalidProcess() {
         try {
-            runtimeService.startProcessInstanceByKey("validateProcess", variables);
+            runtimeService.startProcessInstanceByKey("validateProcess");
         } catch (Exception e) {
             assertEquals(true, e instanceof FlowableException);
             assertEquals(HTTP_TASK_REQUEST_METHOD_INVALID, ((FlowableException) e).getMessage());
+        }
+    }
+
+    @Deployment
+    public void testInvalidHeaders() {
+        try {
+            runtimeService.startProcessInstanceByKey("invalidHeaders");
+        } catch (Exception e) {
+            assertEquals(true, e instanceof FlowableException);
+            assertEquals(HTTP_TASK_REQUEST_HEADERS_INVALID, ((FlowableException) e).getMessage());
+        }
+    }
+
+    @Deployment
+    public void testInvalidFlags() {
+        try {
+            runtimeService.startProcessInstanceByKey("invalidFlags");
+        } catch (Exception e) {
+            assertEquals(true, e instanceof FlowableException);
+            assertEquals(HTTP_TASK_REQUEST_FIELD_INVALID, ((FlowableException) e).getMessage());
+        }
+    }
+
+    @Deployment
+    public void testInvalidTimeout() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("requestTimeout", "invalid");
+
+        try {
+            runtimeService.startProcessInstanceByKey("invalidTimeout", variables);
+        } catch (Exception e) {
+            assertEquals(true, e instanceof FlowableException);
+            assertTextPresent(HTTP_TASK_REQUEST_FIELD_INVALID, ((FlowableException) e).getMessage());
         }
     }
 }

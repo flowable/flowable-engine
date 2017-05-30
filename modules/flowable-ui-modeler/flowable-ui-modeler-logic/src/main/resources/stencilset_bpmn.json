@@ -448,7 +448,7 @@
     "properties" : [ {
       "id" : "httptaskdisallowredirects",
       "type" : "String",
-      "title" : "Disallow HTTP redirects",
+      "title" : "Disallow redirects",
       "value" : "",
       "description" : "Flag to disallow HTTP redirects.",
       "popular" : true

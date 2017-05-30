@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @author Harsha Teja Kanna
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class HttpTestResponse {
+public class HttpTestData {
     private int code;
     private int delay;
     private String body;

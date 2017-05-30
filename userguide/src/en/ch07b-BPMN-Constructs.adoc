@@ -3631,12 +3631,15 @@ In addition to the provided fields, following will be set as variables on succes
 [options="header"]
 |===============
 |Variable|Optional?|Description
-|responseStatusCode|No|Http Response Status code (Example - 200).
-|responseHeaders|Yes|Line separated Http response headers. + 
+|responseProtocol|No|Http version
+|responseReason|Yes|Http response reason phrase.
+|responseStatusCode|No|Http response status code (Example - 200).
+|responseHeaders|No|Line separated Http response headers. + 
                   Example - + 
                   Content-Type: application/json + 
                   Content-Length: 777
 |responseBody|Yes|Response body as string.
+|errorMessage|Yes|Ignored error message if any.
 |===============
 
 ===== Result variables

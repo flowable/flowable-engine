@@ -21,7 +21,7 @@ import org.flowable.http.HttpServiceTaskTestCase;
 public class HttpServiceTaskCustomTest extends HttpServiceTaskTestCase {
 
     @Deployment
-    public void testCustomBehaviorImpl() throws Exception {
+    public void testCustomBehaviorImpl() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
         assertProcessEnded(procId);
     }

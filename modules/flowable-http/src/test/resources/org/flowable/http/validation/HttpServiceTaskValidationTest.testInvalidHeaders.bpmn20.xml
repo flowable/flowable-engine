@@ -4,18 +4,14 @@
              xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
              xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
              typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
-             targetNamespace="http://www.flowable.org/processdef">
-  <process id="httpsSelfSignedFail" name="HTTPS Self signed server process">
-    <serviceTask id="httpGet" name="HTTPS Get" flowable:type="http">
+             targetNamespace="Test">
+  <process id="invalidHeaders" name="Simple HTTP Get process">
+    <serviceTask id="httpGet" flowable:type="http">
       <extensionElements>
-        <flowable:field name="requestMethod">
-          <flowable:string><![CDATA[GET]]></flowable:string>
-        </flowable:field>
-        <flowable:field name="requestUrl">
-          <flowable:string><![CDATA[https://localhost:9799/api?code=200]]></flowable:string>
-        </flowable:field>
+        <flowable:field name="requestMethod" stringValue="GET"/>
+        <flowable:field name="requestUrl" stringValue="http://flowable.org"/>
         <flowable:field name="requestHeaders">
-          <flowable:string><![CDATA[Accept: *]]></flowable:string>
+          <flowable:string><![CDATA[Accept application/json]]></flowable:string>
         </flowable:field>
       </extensionElements>
     </serviceTask>
@@ -24,8 +20,8 @@
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="httpGet"></sequenceFlow>
     <sequenceFlow id="flow2" sourceRef="httpGet" targetRef="theEnd"></sequenceFlow>
   </process>
-  <bpmndi:BPMNDiagram id="BPMNDiagram_httpsSelfSignedFail">
-    <bpmndi:BPMNPlane bpmnElement="httpsSelfSignedFail" id="BPMNPlane_httpsSelfSignedFail">
+  <bpmndi:BPMNDiagram id="BPMNDiagram_invalidHeaders">
+    <bpmndi:BPMNPlane bpmnElement="invalidHeaders" id="BPMNPlane_invalidHeaders">
       <bpmndi:BPMNShape bpmnElement="httpGet" id="BPMNShape_httpGet">
         <omgdc:Bounds height="55.0" width="105.0" x="200.0" y="170.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>

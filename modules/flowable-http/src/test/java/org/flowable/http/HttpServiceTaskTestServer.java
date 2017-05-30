@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -117,11 +118,60 @@ public class HttpServiceTaskTestServer {
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            HttpTestData data = parseTestData(req, resp);
+            int code = data.getCode();
+            if (code >= 200 && code < 300) {
+                resp.setStatus(code);
+                resp.setContentType("application/json");
+                resp.getWriter().println(mapper.convertValue(data, JsonNode.class));
 
-            int code = 0;
-            int delay = 0;
+            } else if (code >= 300 && code < 400) {
+                resp.sendRedirect("http://www.flowable.org");
 
-            HttpTestResponse data = new HttpTestResponse();
+            } else if (code >= 400 && code < 500) {
+                resp.setStatus(code);
+
+            } else if (code >= 500 && code < 600) {
+                resp.sendError(code, "Server Error");
+            }
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+            HttpTestData data = parseTestData(req, resp);
+            int code = data.getCode();
+            if (code >= 200 && code < 300) {
+                resp.setStatus(code);
+                resp.setContentType("application/json");
+                resp.getWriter().println(mapper.convertValue(data, JsonNode.class));
+
+            } else if (code >= 300 && code < 400) {
+                resp.sendRedirect("http://www.flowable.org");
+
+            } else if (code >= 400 && code < 500) {
+                resp.sendError(code, "Bad Request");
+
+            } else if (code >= 500 && code < 600) {
+                resp.sendError(code, "Server Error");
+            }
+        }
+
+        @Override
+        protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            doPost(req, resp);
+        }
+
+        @Override
+        protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            doPost(req, resp);
+        }
+
+        // Parse test data query parameters, headers
+        private HttpTestData parseTestData(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+            HttpTestData data = new HttpTestData();
+            data.setCode(200);
             data.setOrigin(req.getRemoteAddr());
             data.setUrl(req.getRequestURL().toString());
 
@@ -131,13 +181,11 @@ public class HttpServiceTaskTestServer {
                 String[] paramValues = req.getParameterValues(paramName);
                 switch (paramName) {
                     case "code": {
-                        code = Integer.parseInt(paramValues[0]);
-                        data.setCode(code);
+                        data.setCode(Integer.parseInt(paramValues[0]));
                         break;
                     }
                     case "delay": {
-                        delay = Integer.parseInt(paramValues[0]);
-                        data.setDelay(delay);
+                        data.setDelay(Integer.parseInt(paramValues[0]));
                         break;
                     }
                 }
@@ -154,47 +202,21 @@ public class HttpServiceTaskTestServer {
                 data.getHeaders().put(headerName, headerList.toArray(new String[]{}));
             }
 
-            if (delay > 0) {
+            data.setBody(IOUtils.toString(req.getReader()));
+
+            if (data.getDelay() > 0) {
                 try {
-                    Thread.sleep(delay);
+                    Thread.sleep(data.getDelay());
                 } catch (InterruptedException e) {
                     //Ignore
                 }
             }
 
-            resp.setStatus(code);
-
-            if (code >= 200 && code < 300) {
-                resp.setContentType("application/json");
-                resp.getWriter().println(mapper.convertValue(data, JsonNode.class));
-
-            } else if (code >= 300 && code < 400) {
-                resp.sendRedirect("http://www.flowable.org");
-            }
-        }
-
-        @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            resp.setContentType("application/json");
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().println("{\"name\": \"" + name + "\"");
-        }
-
-        @Override
-        protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            resp.setContentType("application/json");
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().println("{\"name\": \"" + name + "\"");
-        }
-
-        @Override
-        protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            resp.setContentType("application/json");
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().println("{\"status\": \"success\"");
+            return data;
         }
     }
 
     public static void setUp() {
+        // No setup required
     }
 }

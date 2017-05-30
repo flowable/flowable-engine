@@ -39,7 +39,7 @@ public class HttpServiceTaskCfgTest extends HttpServiceTaskCfgTestCase {
     }
 
     @Deployment
-    public void testHttpsSelfSignedFail() throws Exception {
+    public void testHttpsSelfSignedFail() {
         try {
             String procId = runtimeService.startProcessInstanceByKey("httpsSelfSignedFail").getId();
         } catch (Exception e) {

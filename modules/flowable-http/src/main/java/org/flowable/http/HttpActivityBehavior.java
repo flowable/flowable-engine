@@ -67,6 +67,8 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
     public static final String HTTP_TASK_REQUEST_METHOD_INVALID = "requestMethod is invalid";
     public static final String HTTP_TASK_REQUEST_URL_REQUIRED = "requestUrl is required";
     public static final String HTTP_TASK_REQUEST_URL_INVALID = "requestUrl is invalid";
+    public static final String HTTP_TASK_REQUEST_HEADERS_INVALID = "requestHeaders are invalid";
+    public static final String HTTP_TASK_REQUEST_FIELD_INVALID = "request fields are invalid";
 
     private int getIntFromField(Expression expression, DelegateExecution execution) {
         if (expression != null) {
@@ -78,7 +80,17 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
         return 0;
     }
 
-    private String getStringFromField(Expression expression, DelegateExecution execution) {
+    private boolean getBooleanFromField(final Expression expression, final DelegateExecution execution) {
+        if (expression != null) {
+            Object value = expression.getValue(execution);
+            if (value != null) {
+                return Boolean.parseBoolean(value.toString());
+            }
+        }
+        return false;
+    }
+
+    private String getStringFromField(final Expression expression, final DelegateExecution execution) {
         if (expression != null) {
             Object value = expression.getValue(execution);
             if (value != null) {
@@ -88,15 +100,13 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
         return null;
     }
 
-    private Set<String> getStringSetFromField(Expression expression, DelegateExecution execution) {
-        if (expression != null) {
-            Object value = expression.getValue(execution);
-            if (value != null) {
-                String[] codes = value.toString().split(",");
-                return new HashSet<String>(Arrays.asList(codes));
-            }
+    private Set<String> getStringSetFromField(final String field) {
+        String[] codes = field.split(",");
+        Set<String> codeSet = new HashSet<>(Arrays.asList(codes));
+        for (String code : codes) {
+            codeSet.add(code);
         }
-        return null;
+        return codeSet;
     }
 
     // HttpRequest validation
@@ -131,40 +141,56 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
             request.headers = getStringFromField(requestHeaders, execution);
             request.body = getStringFromField(requestBody, execution);
             request.timeout = getIntFromField(requestTimeout, execution);
-            request.noRedirects = Boolean.parseBoolean(getStringFromField(disallowRedirects, execution));
-            request.failCodes = getStringSetFromField(failStatusCodes, execution);
-            request.handleCodes = getStringSetFromField(handleStatusCodes, execution);
-            request.ignoreErrors = Boolean.parseBoolean(getStringFromField(ignoreException, execution));
-            request.saveRequest = Boolean.parseBoolean(getStringFromField(saveRequestVariables, execution));
+            request.noRedirects = getBooleanFromField(disallowRedirects, execution);
+            request.ignoreErrors = getBooleanFromField(ignoreException, execution);
+            request.saveRequest = getBooleanFromField(saveRequestVariables, execution);
             request.prefix = getStringFromField(resultVariablePrefix, execution);
 
+            String failCodes = getStringFromField(failStatusCodes, execution);
+            String handleCodes = getStringFromField(handleStatusCodes, execution);
+
+            if (failCodes != null) {
+                request.failCodes = getStringSetFromField(failCodes);
+            }
+            if (handleCodes != null) {
+                request.handleCodes = getStringSetFromField(handleCodes);
+            }
+
+            validate(request);
+
+            if (request.prefix == null) {
+                request.prefix = execution.getCurrentFlowElement().getId();
+            }
+
+            // Save request fields
+            if (request.saveRequest) {
+                execution.setVariable(request.prefix + ".requestMethod", request.method);
+                execution.setVariable(request.prefix + ".requestUrl", request.url);
+                execution.setVariable(request.prefix + ".requestHeaders", request.headers);
+                execution.setVariable(request.prefix + ".requestBody", request.body);
+                execution.setVariable(request.prefix + ".requestTimeout", request.timeout);
+                execution.setVariable(request.prefix + ".disallowRedirects", request.noRedirects);
+                execution.setVariable(request.prefix + ".failStatusCodes", failCodes);
+                execution.setVariable(request.prefix + ".handleStatusCodes", handleCodes);
+                execution.setVariable(request.prefix + ".ignoreException", request.ignoreErrors);
+                execution.setVariable(request.prefix + ".saveRequestVariables", request.saveRequest);
+            }
+
         } catch (Exception e) {
-            throw new FlowableException("Invalid fields in execution " + execution.getId(), e);
-        }
-
-        validate(request);
-
-        if (request.prefix == null) {
-            request.prefix = execution.getCurrentFlowElement().getId();
-        }
-
-        // Save request fields
-        if (request.saveRequest) {
-            execution.setVariable(request.prefix + ".requestMethod", request.method);
-            execution.setVariable(request.prefix + ".requestUrl", request.url);
-            execution.setVariable(request.prefix + ".requestHeaders", request.headers);
-            execution.setVariable(request.prefix + ".requestBody", request.body);
-            execution.setVariable(request.prefix + ".requestTimeout", request.timeout);
-            execution.setVariable(request.prefix + ".disallowRedirects", request.noRedirects);
-            execution.setVariable(request.prefix + ".ignoreException", request.ignoreErrors);
-            execution.setVariable(request.prefix + ".saveRequestVariables", request.saveRequest);
+            if (e instanceof FlowableException) {
+                throw (FlowableException) e;
+            } else {
+                throw new FlowableException(HTTP_TASK_REQUEST_FIELD_INVALID + " in execution " + execution.getId(), e);
+            }
         }
 
         try {
             HttpResponse response = perform(request);
             // Save response fields
             if (response != null) {
+                execution.setVariable(request.prefix + ".responseProtocol", response.protocol);
                 execution.setVariable(request.prefix + ".responseStatusCode", response.statusCode);
+                execution.setVariable(request.prefix + ".responseReason", response.reason);
                 execution.setVariable(request.prefix + ".responseHeaders", response.headers);
                 execution.setVariable(request.prefix + ".responseBody", response.body);
 
@@ -176,9 +202,9 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
                     Set<String> handleCodes = request.handleCodes;
                     if (handleCodes != null && !handleCodes.isEmpty()) {
                         if (handleCodes.contains(code)
-                                || (code.startsWith("5") && (handleCodes.contains("5XX")))
-                                || (code.startsWith("4") && (handleCodes.contains("4XX")))
-                                || (code.startsWith("3") && (handleCodes.contains("3XX")))) {
+                                || (code.startsWith("5") && handleCodes.contains("5XX"))
+                                || (code.startsWith("4") && handleCodes.contains("4XX"))
+                                || (code.startsWith("3") && handleCodes.contains("3XX"))) {
                             ErrorPropagation.propagateError("HTTP" + code, execution);
                             return;
                         }
@@ -187,17 +213,16 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
                     Set<String> failCodes = request.failCodes;
                     if (failCodes != null && !failCodes.isEmpty()) {
                         if (failCodes.contains(code)
-                                || (code.startsWith("5") && (failCodes.contains("5XX")))
-                                || (code.startsWith("4") && (failCodes.contains("4XX")))
-                                || (code.startsWith("3") && (failCodes.contains("3XX")))) {
+                                || (code.startsWith("5") && failCodes.contains("5XX"))
+                                || (code.startsWith("4") && failCodes.contains("4XX"))
+                                || (code.startsWith("3") && failCodes.contains("3XX"))) {
                             throw new FlowableException("HTTP" + code);
                         }
                     }
                 }
             }
         } catch (Exception e) {
-            boolean ignore = Boolean.parseBoolean(getStringFromField(ignoreException, execution));
-            if (ignore) {
+            if (request.ignoreErrors) {
                 log.info("Error ignored while processing http task in execution " + execution.getId(), e);
                 execution.setVariable(request.prefix + ".errorMessage", e.getMessage());
             } else {
@@ -223,7 +248,7 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
      * @param request
      * @return
      */
-    protected abstract HttpResponse perform(HttpRequest request);
+    protected abstract HttpResponse perform(final HttpRequest request);
 
     // Setters and getters
     public Expression getRequestMethod() {
