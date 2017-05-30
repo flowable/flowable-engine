@@ -64,9 +64,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
 
     public void execute(DelegateExecution execution) {
         ActivityExecution activityExecution = (ActivityExecution) execution;
-        TaskEntity task = TaskEntity.createAndInsert(activityExecution);
-        task.setExecution(execution);
-
+        
         Expression activeNameExpression = null;
         Expression activeDescriptionExpression = null;
         Expression activeDueDateExpression = null;
@@ -117,6 +115,13 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             activeCandidateUserExpressions = taskDefinition.getCandidateUserIdExpressions();
             activeCandidateGroupExpressions = taskDefinition.getCandidateGroupIdExpressions();
         }
+        
+        Expression skipExpression = taskDefinition.getSkipExpression();
+        boolean skipUserTask = SkipExpressionUtil.isSkipExpressionEnabled(activityExecution, skipExpression) &&
+                SkipExpressionUtil.shouldSkipFlowElement(activityExecution, skipExpression);
+        
+        TaskEntity task = TaskEntity.createAndInsert(activityExecution, !skipUserTask);
+        task.setExecution(execution);
 
         task.setTaskDefinition(taskDefinition);
 
@@ -202,25 +207,21 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             }
         }
 
-        Expression skipExpression = taskDefinition.getSkipExpression();
-        boolean skipUserTask = SkipExpressionUtil.isSkipExpressionEnabled(activityExecution, skipExpression) &&
-                SkipExpressionUtil.shouldSkipFlowElement(activityExecution, skipExpression);
-
         if (!skipUserTask) {
             handleAssignments(activeAssigneeExpression, activeOwnerExpression, activeCandidateUserExpressions,
                     activeCandidateGroupExpressions, task, activityExecution);
-        }
+            
+            task.fireEvent(TaskListener.EVENTNAME_CREATE);
 
-        task.fireEvent(TaskListener.EVENTNAME_CREATE);
-
-        // All properties set, now firing 'create' events
-        if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
+            // All properties set, now firing 'create' events
+            if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+                Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
+            }
         }
 
         if (skipUserTask) {
-            task.complete(null, false);
+            task.complete(null, false, false);
         }
     }
 

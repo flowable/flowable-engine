@@ -42,7 +42,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         }
 
         if (task.getRevision() == 0) {
-            task.insert(null);
+            task.insert(null, true);
 
             // Need to to be done here, we can't make it generic for standalone tasks
             // and tasks from a process, as the order of setting properties is
