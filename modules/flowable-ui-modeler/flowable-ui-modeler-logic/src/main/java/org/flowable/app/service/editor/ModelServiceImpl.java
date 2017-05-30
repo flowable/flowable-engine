@@ -15,8 +15,20 @@ package org.flowable.app.service.editor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeCreator;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ValueNode;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.domain.editor.AppDefinition;
 import org.flowable.app.domain.editor.AppModelDefinition;
@@ -47,20 +59,24 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.editor.language.json.converter.util.JsonConverterUtil;
-import org.flowable.engine.event.EventLogEntry;
 import org.flowable.form.model.FormModel;
 import org.flowable.idm.api.User;
-import org.mybatis.spring.SqlSessionTemplate;
+import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -98,7 +114,7 @@ public class ModelServiceImpl implements ModelService {
     protected ObjectMapper objectMapper;
 
     @Autowired
-    protected SqlSessionTemplate sqlSessionTemplate;
+    protected Environment environment;
 
     protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
     protected BpmnXMLConverter bpmnXMLConverter = new BpmnXMLConverter();
@@ -252,10 +268,10 @@ public class ModelServiceImpl implements ModelService {
         childShapeArray.add(
                 createStartEvent(0,"startEvent1")
         );
-        List<EventLogEntry> eventLogEntriesForProcessInstanceId = getEventLogEntriesForProcessInstanceId(skeleton);
+        JsonNode eventLogEntriesForProcessInstanceId = getEventLogEntriesForProcessInstanceId(skeleton);
 
         childShapeArray.addAll(
-                eventLogEntriesForProcessInstanceId.isEmpty() ?
+                eventLogEntriesForProcessInstanceId.size() == 0 ?
                         addUserTask() :
                         addAssertion(
                                 createNodesFromEventLogEntries(
@@ -314,6 +330,7 @@ public class ModelServiceImpl implements ModelService {
                 ObjectNode targetResourceId = objectMapper.createObjectNode();
                 targetResourceId.put("resourceId", targetId.get(0));
                 sequenceFlowOutgoing.add(targetResourceId);
+                sequenceFlow.set("target", targetResourceId);
 
                 nodes.add(sequenceFlow);
             }
@@ -332,14 +349,58 @@ public class ModelServiceImpl implements ModelService {
         return position;
     }
 
-    protected List<EventLogEntry> getEventLogEntriesForProcessInstanceId(String processInstanceId) {
-        List<EventLogEntry> logEvents = Collections.emptyList();
-        if (StringUtils.isNotEmpty(processInstanceId)) {
-            Map<String, Object> params = new HashMap<String, Object>(2);
-            params.put("processInstanceId", processInstanceId);
-            logEvents = this.sqlSessionTemplate.selectList("org.flowable.app.domain.editor.Test.selectEventLogEntriesByProcessInstanceId", params);
+    protected JsonNode getEventLogEntriesForProcessInstanceId(String processInstanceId) {
+        if (processInstanceId != null) {
+            String eventLogApiUrl = environment.getRequiredProperty("deployment.api.url");
+            String basicAuthUser = environment.getRequiredProperty("idm.admin.user");
+            String basicAuthPassword = environment.getRequiredProperty("idm.admin.password");
+
+            if (!eventLogApiUrl.endsWith("/")) {
+                eventLogApiUrl = eventLogApiUrl.concat("/");
+            }
+            eventLogApiUrl = eventLogApiUrl.concat("management/event-log/" + processInstanceId);
+
+            HttpGet httpGet = new HttpGet(eventLogApiUrl);
+            httpGet.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
+                    Base64.encodeBase64((basicAuthUser + ":" + basicAuthPassword).getBytes(Charset.forName("UTF-8")))));
+
+            HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+            SSLConnectionSocketFactory sslsf = null;
+            try {
+                SSLContextBuilder builder = new SSLContextBuilder();
+                builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+                sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+                clientBuilder.setSSLSocketFactory(sslsf);
+            } catch (Exception e) {
+                log.error("Could not configure SSL for http client", e);
+                throw new InternalServerErrorException("Could not configure SSL for http client", e);
+            }
+
+            CloseableHttpClient client = clientBuilder.build();
+
+            try {
+                HttpResponse response = client.execute(httpGet);
+                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                    return objectMapper.readTree(response.getEntity().getContent());
+                } else {
+                    log.error("Invalid deploy result code: {}", response.getStatusLine());
+                    throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
+                }
+            } catch (IOException ioe) {
+                log.error("Error calling deploy endpoint", ioe);
+                throw new InternalServerErrorException("Error calling deploy endpoint: " + ioe.getMessage());
+            } finally {
+                if (client != null) {
+                    try {
+                        client.close();
+                    } catch (IOException e) {
+                        log.warn("Exception while closing http client", e);
+                    }
+                }
+            }
+        } else {
+            return objectMapper.createArrayNode();
         }
-        return logEvents;
     }
 
     protected ObjectNode createTestProcessModel(ModelRepresentation modelRepresentation) {
@@ -359,17 +420,14 @@ public class ModelServiceImpl implements ModelService {
         return editorNode;
     }
 
-    protected List<ObjectNode> createNodesFromEventLogEntries(List<EventLogEntry> eventLogEntries) {
+    protected List<ObjectNode> createNodesFromEventLogEntries(JsonNode eventLogEntries) {
         List<ObjectNode> nodes = new ArrayList<>();
         int position = 1;
-        for (EventLogEntry eventLogEntry : eventLogEntries) {
-            switch (eventLogEntry.getType()) {
+        for (JsonNode eventLogEntry : eventLogEntries) {
+            switch (eventLogEntry.get("type").textValue()) {
                 case "PROCESSINSTANCE_START":
-                    String processDefinitionId = eventLogEntry.getProcessDefinitionId();
-                    String key = this.sqlSessionTemplate.selectOne(
-                            "org.flowable.app.domain.editor.Test.selectProcessDefinitionKeyById",
-                            processDefinitionId
-                    );
+                    String processDefinitionId = eventLogEntry.get("processDefinitionId").textValue();
+                    String key = getProcessDefinitionKey(processDefinitionId);
                     nodes.add(createScriptTask(position++, "startProcess", "Start " + key + " process",
                             "import org.flowable.engine.impl.context.Context;\n" +
                                     "\n" +
@@ -378,15 +436,16 @@ public class ModelServiceImpl implements ModelService {
                     ));
                     break;
                 case "TASK_ASSIGNED":
-                    nodes.add(createScriptTask(position, "claimTask" + position++, "Claim task " + eventLogEntry.getTaskId() + " to user "+ eventLogEntry.getUserId(),
+                    nodes.add(createScriptTask(position, "claimTask" + position++, "Claim task " +
+                                    eventLogEntry.get("taskId").textValue() + " to user "+ eventLogEntry.get("userId"),
                             "import org.flowable.engine.impl.context.Context;\n" +
                                     "\n" +
                                     "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();\n" +
-                                    "Context.getProcessEngineConfiguration().getTaskService().claim(taskId, '"+ eventLogEntry.getUserId() +"');"
+                                    "Context.getProcessEngineConfiguration().getTaskService().claim(taskId, '"+ eventLogEntry.get("userId").textValue() +"');"
                     ));
                     break;
                 case "TASK_COMPLETED":
-                    nodes.add(createScriptTask(position, "completeTask"+position++, "Complete task "+ eventLogEntry.getTaskId(),
+                    nodes.add(createScriptTask(position, "completeTask"+position++, "Complete task "+ eventLogEntry.get("taskId").textValue(),
                             "import org.flowable.engine.impl.context.Context;\n" +
                                     "\n" +
                                     "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();\n" +
@@ -400,6 +459,58 @@ public class ModelServiceImpl implements ModelService {
 
         }
         return nodes;
+    }
+
+    private String getProcessDefinitionKey(String processDefinitionId) {
+        String eventLogApiUrl = environment.getRequiredProperty("deployment.api.url");
+        String basicAuthUser = environment.getRequiredProperty("idm.admin.user");
+        String basicAuthPassword = environment.getRequiredProperty("idm.admin.password");
+
+        if (!eventLogApiUrl.endsWith("/")) {
+            eventLogApiUrl = eventLogApiUrl.concat("/");
+        }
+        eventLogApiUrl = eventLogApiUrl.concat("repository/process-definitions/"+processDefinitionId);
+
+        HttpGet httpGet = new HttpGet(eventLogApiUrl);
+        httpGet.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
+                Base64.encodeBase64((basicAuthUser + ":" + basicAuthPassword).getBytes(Charset.forName("UTF-8")))));
+
+        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+        SSLConnectionSocketFactory sslsf = null;
+        try {
+            SSLContextBuilder builder = new SSLContextBuilder();
+            builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+            sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            clientBuilder.setSSLSocketFactory(sslsf);
+        } catch (Exception e) {
+            log.error("Could not configure SSL for http client", e);
+            throw new InternalServerErrorException("Could not configure SSL for http client", e);
+        }
+
+        CloseableHttpClient client = clientBuilder.build();
+
+        try {
+            HttpResponse response = client.execute(httpGet);
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                JsonNode jsonNode = objectMapper.readTree(response.getEntity().getContent());
+                return jsonNode.get("key").textValue();
+            } else {
+                log.error("Invalid deploy result code: {}", response.getStatusLine());
+                throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
+            }
+        } catch (IOException ioe) {
+            log.error("Error calling deploy endpoint", ioe);
+            throw new InternalServerErrorException("Error calling deploy endpoint: " + ioe.getMessage());
+        } finally {
+            if (client != null) {
+                try {
+                    client.close();
+                } catch (IOException e) {
+                    log.warn("Exception while closing http client", e);
+                }
+            }
+        }
+
     }
 
     protected ObjectNode createScriptTask(int position, String id, String name, String script) {

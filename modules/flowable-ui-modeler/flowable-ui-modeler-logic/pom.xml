@@ -58,10 +58,6 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-form-json-converter</artifactId>
         </dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-engine</artifactId>
-		</dependency>
 
 		<!-- LOGGING -->
 		<dependency>
