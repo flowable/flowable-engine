@@ -14,15 +14,9 @@ package org.flowable.dmn.engine.impl.cmd;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.dmn.api.RuleEngineExecutionResult;
-import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.interceptor.Command;
-import org.flowable.dmn.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.dmn.model.Decision;
-import org.flowable.dmn.model.DecisionTable;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 
 import java.io.Serializable;
