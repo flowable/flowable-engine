@@ -72,10 +72,6 @@
 			<groupId>de.odysseus.juel</groupId>
 			<artifactId>juel-impl</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>de.odysseus.juel</groupId>
-			<artifactId>juel-spi</artifactId>
-		</dependency>
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>

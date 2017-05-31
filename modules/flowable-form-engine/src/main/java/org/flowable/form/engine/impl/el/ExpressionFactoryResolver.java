@@ -24,6 +24,6 @@ public abstract class ExpressionFactoryResolver {
 
     public static ExpressionFactory resolveExpressionFactory() {
         // Return instance of custom JUEL implementation
-        return ExpressionFactory.newInstance();
+        return new de.odysseus.el.ExpressionFactoryImpl();
     }
 }
