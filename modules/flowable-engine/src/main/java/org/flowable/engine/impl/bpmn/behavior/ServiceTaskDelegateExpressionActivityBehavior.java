@@ -103,6 +103,7 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
                 } else {
                     throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did neither resolve to an implementation of " + ActivityBehavior.class + " nor " + JavaDelegate.class);
                 }
+                
             } else {
                 leave(execution);
             }

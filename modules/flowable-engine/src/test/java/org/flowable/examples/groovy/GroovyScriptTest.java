@@ -49,8 +49,6 @@ public class GroovyScriptTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testAsyncScript() {
-        // Set the clock fixed
-        Date startTime = new Date();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testAsyncScript");
 
         JobQuery jobQuery = managementService.createJobQuery().processInstanceId(processInstance.getId());

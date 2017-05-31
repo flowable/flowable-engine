@@ -76,7 +76,7 @@ public class DefaultExpressionManager implements ExpressionManager {
     
     public DefaultExpressionManager(DelegateInterceptor delegateInterceptor, Map<Object, Object> beans, boolean initFactory) {
         this.delegateInterceptor = delegateInterceptor;
-        this.expressionFactory = ExpressionFactory.newInstance();
+        this.expressionFactory = ExpressionFactoryResolver.resolveExpressionFactory();
         this.beans = beans;
     }
 

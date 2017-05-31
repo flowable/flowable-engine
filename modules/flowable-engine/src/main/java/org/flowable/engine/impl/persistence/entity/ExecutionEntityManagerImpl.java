@@ -586,7 +586,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
             TaskEntityManager taskEntityManager = getTaskEntityManager();
             Collection<TaskEntity> tasksForExecution = taskEntityManager.findTasksByExecutionId(executionEntity.getId());
             for (TaskEntity taskEntity : tasksForExecution) {
-                taskEntityManager.deleteTask(taskEntity, deleteReason, false, cancel);
+                taskEntityManager.deleteTask(taskEntity, deleteReason, false, cancel, true);
             }
         }
 

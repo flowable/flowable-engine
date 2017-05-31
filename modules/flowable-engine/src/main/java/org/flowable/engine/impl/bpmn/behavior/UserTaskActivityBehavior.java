@@ -193,31 +193,30 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             }
         }
 
-        taskEntityManager.insert(task, (ExecutionEntity) execution);
-
         boolean skipUserTask = false;
         if (StringUtils.isNotEmpty(activeTaskSkipExpression)) {
             Expression skipExpression = expressionManager.createExpression(activeTaskSkipExpression);
             skipUserTask = SkipExpressionUtil.isSkipExpressionEnabled(execution, skipExpression)
                     && SkipExpressionUtil.shouldSkipFlowElement(execution, skipExpression);
         }
+        
+        taskEntityManager.insert(task, (ExecutionEntity) execution, !skipUserTask);
 
         // Handling assignments need to be done after the task is inserted, to have an id
         if (!skipUserTask) {
             handleAssignments(taskEntityManager, activeTaskAssignee, activeTaskOwner,
                     activeTaskCandidateUsers, activeTaskCandidateGroups, task, expressionManager, execution);
-        }
+            
+            processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_CREATE);
 
-        processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_CREATE);
-
-        // All properties set, now firing 'create' events
-        if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
-        }
-
-        if (skipUserTask) {
-            taskEntityManager.deleteTask(task, null, false, false);
+            // All properties set, now firing 'create' events
+            if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+                Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
+            }
+            
+        } else {
+            taskEntityManager.deleteTask(task, null, false, false, false);
             leave(execution);
         }
     }

@@ -56,7 +56,7 @@ public class ExpressionManager {
     }
 
     public ExpressionManager(Map<Object, Object> beans, boolean initFactory) {
-        expressionFactory = ExpressionFactory.newInstance();
+        expressionFactory = ExpressionFactoryResolver.resolveExpressionFactory();
         this.beans = beans;
     }
 
