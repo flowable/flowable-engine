@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/test">
+  <process id="throwError" isExecutable="true">
+    <startEvent id="startThrowError"></startEvent>
+    <endEvent id="errorEndThrowError" name="ErrorEnd">
+      <errorEventDefinition errorRef="myError"></errorEventDefinition>
+    </endEvent>
+    <sequenceFlow id="flow1" sourceRef="startThrowError" targetRef="errorEndThrowError"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_throwError">
+    <bpmndi:BPMNPlane bpmnElement="throwError" id="BPMNPlane_throwError">
+      <bpmndi:BPMNShape bpmnElement="startThrowError" id="BPMNShape_startThrowError">
+        <omgdc:Bounds height="35.0" width="35.0" x="10.0" y="47.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="errorEndThrowError" id="BPMNShape_errorEndThrowError">
+        <omgdc:Bounds height="35.0" width="35.0" x="150.0" y="47.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="45.0" y="64.0"></omgdi:waypoint>
+        <omgdi:waypoint x="150.0" y="64.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
