@@ -43,8 +43,8 @@ public abstract class BaseDmnXMLConverter implements DmnXMLConstants {
 
     public void convertToDmnModel(XMLStreamReader xtr, DmnDefinition model, DecisionTable decisionTable) throws Exception {
 
-        String elementId = xtr.getAttributeValue(null, ATTRIBUTE_ID);
-        String elementName = xtr.getAttributeValue(null, ATTRIBUTE_NAME);
+        //String elementId = xtr.getAttributeValue(null, ATTRIBUTE_ID);
+        //String elementName = xtr.getAttributeValue(null, ATTRIBUTE_NAME);
 
         DmnElement parsedElement = convertXMLToElement(xtr, model, decisionTable);
         // parsedElement.setId(elementId);

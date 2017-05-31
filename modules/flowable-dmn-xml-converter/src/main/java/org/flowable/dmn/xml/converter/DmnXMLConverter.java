@@ -47,7 +47,6 @@ import org.flowable.dmn.model.ItemDefinition;
 import org.flowable.dmn.model.OutputClause;
 import org.flowable.dmn.model.RuleInputClauseContainer;
 import org.flowable.dmn.model.RuleOutputClauseContainer;
-import org.flowable.dmn.model.UnaryTests;
 import org.flowable.dmn.xml.constants.DmnXMLConstants;
 import org.flowable.dmn.xml.exception.DmnXMLException;
 import org.flowable.engine.common.api.io.InputStreamProvider;
