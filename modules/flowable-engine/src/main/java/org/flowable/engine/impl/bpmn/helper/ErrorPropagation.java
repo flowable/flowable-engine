@@ -163,7 +163,7 @@ public class ErrorPropagation {
                 // Delete
                 executionEntityManager.deleteProcessInstanceExecutionEntity(processInstanceEntity.getId(),
                                 currentExecution.getCurrentFlowElement() != null ? currentExecution.getCurrentFlowElement().getId() : null,
-                                                "ERROR_EVENT " + errorId, false, false);
+                                                "ERROR_EVENT " + errorId, false, false, true);
 
                 // Event
                 if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
