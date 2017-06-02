@@ -121,7 +121,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
         List<FormField> allFields = formInstanceModel.listAllFields();
         if (allFields != null) {
 
-            Map<String, JsonNode> formInstanceFieldMap = fillPreviousFormValues(formInstance, formEngineConfiguration);
+            Map<String, JsonNode> formInstanceFieldMap = new HashMap<String, JsonNode>();
             fillFormInstanceValues(formInstanceModel, formInstance, formInstanceFieldMap, formEngineConfiguration.getObjectMapper());
             fillVariablesWithFormValues(formInstanceFieldMap, allFields);
 
@@ -234,7 +234,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
             formInstanceQuery.processInstanceId(processInstanceId);
         }
 
-        List<FormInstance> formInstances = formInstanceQuery.list();
+        List<FormInstance> formInstances = formInstanceQuery.orderBySubmittedDate().desc().list();
 
         if (formInstances.size() == 0) {
             throw new FlowableException("No form instance could be found");
@@ -265,47 +265,6 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
         }
 
         return formInstance;
-    }
-
-    protected Map<String, JsonNode> fillPreviousFormValues(FormInstance formInstance, FormEngineConfiguration formEngineConfiguration) {
-        Map<String, JsonNode> formInstancesMap = new HashMap<String, JsonNode>();
-        if (taskId != null && processInstanceId != null) {
-            List<FormInstance> formInstances = formEngineConfiguration.getFormService().createFormInstanceQuery()
-                    .processInstanceId(processInstanceId)
-                    .submittedDateBefore(formInstance.getSubmittedDate())
-                    .orderBySubmittedDate()
-                    .desc()
-                    .list();
-
-            for (FormInstance otherFormInstance : formInstances) {
-                if (otherFormInstance.getId().equals(formInstance.getId())) {
-                    continue;
-                }
-
-                try {
-                    JsonNode submittedNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
-                    if (submittedNode == null || submittedNode.get("values") != null) {
-                        continue;
-                    }
-
-                    JsonNode valuesNode = submittedNode.get("values");
-                    Iterator<String> fieldIdIterator = valuesNode.fieldNames();
-                    while (fieldIdIterator.hasNext()) {
-                        String fieldId = fieldIdIterator.next();
-                        if (!formInstancesMap.containsKey(fieldId)) {
-
-                            JsonNode valueNode = valuesNode.get(fieldId);
-                            formInstancesMap.put(fieldId, valueNode);
-                        }
-                    }
-
-                } catch (Exception e) {
-                    throw new FlowableException("Error parsing form instance " + formInstance.getId());
-                }
-            }
-        }
-
-        return formInstancesMap;
     }
 
     protected void fillFormInstanceValues(FormInstanceModel formInstanceModel, FormInstance formInstance,
