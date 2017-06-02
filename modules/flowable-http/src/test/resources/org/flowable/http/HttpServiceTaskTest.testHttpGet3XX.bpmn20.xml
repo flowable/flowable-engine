@@ -15,6 +15,9 @@
         <flowable:field name="disallowRedirects">
           <flowable:string><![CDATA[true]]></flowable:string>
         </flowable:field>
+        <flowable:field name="saveResponseParameters">
+          <flowable:string><![CDATA[true]]></flowable:string>
+        </flowable:field>
       </extensionElements>
     </serviceTask>
     <startEvent id="theStart" name="Start"></startEvent>

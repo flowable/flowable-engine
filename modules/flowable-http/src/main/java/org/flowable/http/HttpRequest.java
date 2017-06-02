@@ -28,6 +28,7 @@ public class HttpRequest {
     protected Set<String> handleCodes;
     protected boolean ignoreErrors;
     protected boolean saveRequest;
+    protected boolean saveResponse;
     protected String prefix;
 
     public String getMethod() {
@@ -108,6 +109,14 @@ public class HttpRequest {
 
     public void setSaveRequest(boolean saveRequest) {
         this.saveRequest = saveRequest;
+    }
+
+    public boolean isSaveResponse() {
+        return saveResponse;
+    }
+
+    public void setSaveResponse(boolean saveResponse) {
+        this.saveResponse = saveResponse;
     }
 
     public String getPrefix() {

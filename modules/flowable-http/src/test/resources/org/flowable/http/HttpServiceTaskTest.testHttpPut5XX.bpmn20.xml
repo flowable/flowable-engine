@@ -32,6 +32,9 @@
         <flowable:field name="saveRequestVariables">
           <flowable:expression><![CDATA[${save}]]></flowable:expression>
         </flowable:field>
+        <flowable:field name="saveResponseParameters">
+          <flowable:expression><![CDATA[${response}]]></flowable:expression>
+        </flowable:field>
         <flowable:field name="resultVariablePrefix">
           <flowable:expression><![CDATA[${prefix}]]></flowable:expression>
         </flowable:field>

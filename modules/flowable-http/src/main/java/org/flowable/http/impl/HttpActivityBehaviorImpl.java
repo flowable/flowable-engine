@@ -57,10 +57,10 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
     private static final long serialVersionUID = 1L;
     private static final Logger log = LoggerFactory.getLogger(HttpActivityBehaviorImpl.class);
 
-    protected static final Timer timer = new Timer(true);
-    protected static final CloseableHttpClient client;
+    protected final Timer timer = new Timer(true);
+    protected final CloseableHttpClient client;
 
-    static {
+    public HttpActivityBehaviorImpl() {
         HttpClientConfig config = Context.getProcessEngineConfiguration().getHttpClientConfig();
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
 

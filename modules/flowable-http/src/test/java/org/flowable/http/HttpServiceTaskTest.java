@@ -238,6 +238,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         variables.put("ignore", true);
         variables.put("fail", "400, 404");
         variables.put("save", true);
+        variables.put("response", true);
         variables.put("prefix", "httpPost500");
 
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpPut5XX", variables);

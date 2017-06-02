@@ -21,6 +21,9 @@
         <flowable:field name="saveRequestVariables">
           <flowable:string><![CDATA[true]]></flowable:string>
         </flowable:field>
+        <flowable:field name="saveResponseParameters">
+          <flowable:string><![CDATA[true]]></flowable:string>
+        </flowable:field>
         <flowable:field name="resultVariablePrefix">
           <flowable:string><![CDATA[get500]]></flowable:string>
         </flowable:field>

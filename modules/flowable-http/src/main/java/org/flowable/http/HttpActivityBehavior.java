@@ -57,6 +57,8 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
     private Expression ignoreException;
     // Flag to save request variables. default is false (Optional)
     private Expression saveRequestVariables;
+    // Flag to save response variables. default is false (Optional)
+    private Expression saveResponseParameters;
     // Prefix for the execution variable names (Optional)
     private Expression resultVariablePrefix;
     // Exception mapping
@@ -144,6 +146,7 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
             request.noRedirects = getBooleanFromField(disallowRedirects, execution);
             request.ignoreErrors = getBooleanFromField(ignoreException, execution);
             request.saveRequest = getBooleanFromField(saveRequestVariables, execution);
+            request.saveResponse = getBooleanFromField(saveResponseParameters, execution);
             request.prefix = getStringFromField(resultVariablePrefix, execution);
 
             String failCodes = getStringFromField(failStatusCodes, execution);
@@ -174,6 +177,7 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
                 execution.setVariable(request.prefix + ".handleStatusCodes", handleCodes);
                 execution.setVariable(request.prefix + ".ignoreException", request.ignoreErrors);
                 execution.setVariable(request.prefix + ".saveRequestVariables", request.saveRequest);
+                execution.setVariable(request.prefix + ".saveResponseParameters", request.saveResponse);
             }
 
         } catch (Exception e) {
@@ -188,10 +192,13 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
             HttpResponse response = perform(request);
             // Save response fields
             if (response != null) {
-                execution.setVariable(request.prefix + ".responseProtocol", response.protocol);
-                execution.setVariable(request.prefix + ".responseStatusCode", response.statusCode);
-                execution.setVariable(request.prefix + ".responseReason", response.reason);
-                execution.setVariable(request.prefix + ".responseHeaders", response.headers);
+                // Save response body only by default
+                if (request.saveResponse) {
+                    execution.setVariable(request.prefix + ".responseProtocol", response.protocol);
+                    execution.setVariable(request.prefix + ".responseStatusCode", response.statusCode);
+                    execution.setVariable(request.prefix + ".responseReason", response.reason);
+                    execution.setVariable(request.prefix + ".responseHeaders", response.headers);
+                }
                 execution.setVariable(request.prefix + ".responseBody", response.body);
 
                 // Handle http status codes
@@ -329,6 +336,14 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
 
     public void setSaveRequestVariables(Expression saveRequestVariables) {
         this.saveRequestVariables = saveRequestVariables;
+    }
+
+    public Expression getSaveResponseParameters() {
+        return saveResponseParameters;
+    }
+
+    public void setSaveResponseParameters(Expression saveResponseParameters) {
+        this.saveResponseParameters = saveResponseParameters;
     }
 
     public Expression getResultVariablePrefix() {
