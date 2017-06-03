@@ -61,7 +61,7 @@ public class ProcessInstanceRepresentation extends AbstractRepresentation {
         this.processDefinitionId = processInstance.getProcessDefinitionId();
         this.tenantId = processInstance.getTenantId();
         this.graphicalNotationDefined = graphicalNotation;
-        this.startedBy = new UserRepresentation(startedBy);
+        this.startedBy = startedBy != null ? new UserRepresentation(startedBy) : null;
     }
 
     public ProcessInstanceRepresentation(HistoricProcessInstance processInstance, ProcessDefinition processDefinition, boolean graphicalNotation, User startedBy) {
@@ -78,7 +78,7 @@ public class ProcessInstanceRepresentation extends AbstractRepresentation {
         this.graphicalNotationDefined = graphicalNotation;
         this.started = processInstance.getStartTime();
         this.ended = processInstance.getEndTime();
-        this.startedBy = new UserRepresentation(startedBy);
+        this.startedBy = startedBy != null ? new UserRepresentation(startedBy) : null;
     }
 
     protected void mapProcessDefinition(ProcessDefinition processDefinition) {
