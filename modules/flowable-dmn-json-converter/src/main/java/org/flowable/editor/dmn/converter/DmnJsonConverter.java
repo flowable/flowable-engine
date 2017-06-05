@@ -12,10 +12,13 @@
  */
 package org.flowable.editor.dmn.converter;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
@@ -45,7 +48,6 @@ public class DmnJsonConverter {
     protected ObjectMapper objectMapper = new ObjectMapper();
 
     public DmnDefinition convertToDmn(JsonNode modelNode, String modelId, int modelVersion, Date lastUpdated) {
-
         DmnDefinition definition = new DmnDefinition();
 
         definition.setId("definition_" + modelId);
@@ -68,7 +70,7 @@ public class DmnJsonConverter {
         decisionTable.setId("decisionTable_" + DmnJsonConverterUtil.getValueAsString("id", modelNode));
 
         if (modelNode.has("hitIndicator")) {
-            decisionTable.setHitPolicy(HitPolicy.valueOf(DmnJsonConverterUtil.getValueAsString("hitIndicator", modelNode)));
+            decisionTable.setHitPolicy(HitPolicy.get(DmnJsonConverterUtil.getValueAsString("hitIndicator", modelNode)));
         } else {
             decisionTable.setHitPolicy(HitPolicy.FIRST);
         }
@@ -163,6 +165,11 @@ public class DmnJsonConverter {
             return;
         }
 
+        boolean isNewModelVersion = false;
+        if (modelNode.get("modelVersion") != null && !modelNode.get("modelVersion").isNull()) {
+            isNewModelVersion = true;
+        }
+
         Map<String, InputClause> ruleInputContainerMap = new LinkedHashMap<>();
         Map<String, OutputClause> ruleOutputContainerMap = new LinkedHashMap<>();
 
@@ -187,6 +194,19 @@ public class DmnJsonConverter {
                 // add to clause
                 inputClause.setInputExpression(inputExpression);
 
+                if (inputExpressionNode.get("entries") != null && !inputExpressionNode.get("entries").isNull()
+                    && inputExpressionNode.get("entries").isArray() && inputExpressionNode.get("entries").size() > 0) {
+                    UnaryTests inputValues = new UnaryTests();
+                    List<Object> inputEntries = new ArrayList<>();
+                    for (JsonNode entriesNode : inputExpressionNode.get("entries")) {
+                        inputEntries.add(entriesNode.asText());
+                    }
+                    inputValues.setTextValues(inputEntries);
+
+                    // add to clause
+                    inputClause.setInputValues(inputValues);
+                }
+
                 // add to map
                 ruleInputContainerMap.put(inputExpressionId, inputClause);
 
@@ -210,6 +230,19 @@ public class DmnJsonConverter {
                 outputClause.setName(DmnJsonConverterUtil.getValueAsString("variableId", outputExpressionNode));
                 outputClause.setTypeRef(DmnJsonConverterUtil.getValueAsString("type", outputExpressionNode));
 
+                if (outputExpressionNode.get("entries") != null && !outputExpressionNode.get("entries").isNull()
+                    && outputExpressionNode.get("entries").isArray() && outputExpressionNode.get("entries").size() > 0) {
+                    UnaryTests outputValues = new UnaryTests();
+                    List<Object> outputEntries = new ArrayList<>();
+                    for (JsonNode entriesNode : outputExpressionNode.get("entries")) {
+                        outputEntries.add(entriesNode.asText());
+                    }
+                    outputValues.setTextValues(outputEntries);
+
+                    // add to clause
+                    outputClause.setOutputValues(outputValues);
+                }
+
                 // add to map
                 ruleOutputContainerMap.put(outputExpressionId, outputClause);
 
@@ -229,7 +262,43 @@ public class DmnJsonConverter {
                 // in the input/output clauses
                 DecisionRule rule = new DecisionRule();
                 for (String id : ruleInputContainerMap.keySet()) {
-                    if (ruleNode.has(id)) {
+
+                    String operatorId = id + "_operator";
+                    String expressionId = id + "_expression";
+
+                    if (ruleNode.has(operatorId) && ruleNode.has(expressionId)) {
+                        RuleInputClauseContainer ruleInputClauseContainer = new RuleInputClauseContainer();
+                        ruleInputClauseContainer.setInputClause(ruleInputContainerMap.get(id));
+
+                        UnaryTests inputEntry = new UnaryTests();
+                        inputEntry.setId("inputEntry_" + id + "_" + ruleCounter);
+
+                        String operatorValue = ruleNode.get(operatorId).asText();
+                        String expressionValue = ruleNode.get(expressionId).asText();
+
+                        // don't add operator if it's ==
+                        StringBuilder stringBuilder = new StringBuilder();
+                        if (!"==".equals(operatorValue)) {
+                            stringBuilder = new StringBuilder(operatorValue);
+                        }
+
+                        // add quotes for string
+                        if ("string".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())) {
+                            if (stringBuilder.length() > 0) {
+                                stringBuilder.append(" \"");
+                            } else {
+                                stringBuilder.append("\"");
+                            }
+                            stringBuilder.append(expressionValue);
+                            stringBuilder.append("\"");
+                        } else {
+                            stringBuilder.append(expressionValue);
+                        }
+
+                        inputEntry.setText(stringBuilder.toString());
+                        ruleInputClauseContainer.setInputEntry(inputEntry);
+                        rule.addInputEntry(ruleInputClauseContainer);
+                    } else if (ruleNode.has(id)) {
                         RuleInputClauseContainer ruleInputClauseContainer = new RuleInputClauseContainer();
                         ruleInputClauseContainer.setInputClause(ruleInputContainerMap.get(id));
 

@@ -50,6 +50,7 @@ public class DmnJsonConverterTest {
     private static final String JSON_RESOURCE_3 = "org/flowable/editor/dmn/converter/decisiontable_2.json";
     private static final String JSON_RESOURCE_4 = "org/flowable/editor/dmn/converter/decisiontable_empty_expressions.json";
     private static final String JSON_RESOURCE_5 = "org/flowable/editor/dmn/converter/decisiontable_order.json";
+    private static final String JSON_RESOURCE_6 = "org/flowable/editor/dmn/converter/decisiontable_entries.json";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -263,6 +264,14 @@ public class DmnJsonConverterTest {
         Assert.assertEquals("outputExpression_14", rules.get(0).getOutputEntries().get(0).getOutputClause().getId());
         Assert.assertEquals("outputExpression_13", rules.get(0).getOutputEntries().get(1).getOutputClause().getId());
         Assert.assertEquals("outputExpression_15", rules.get(0).getOutputEntries().get(2).getOutputClause().getId());
+    }
+
+    @Test
+    public void testConvertJsonToDmn_Entries() throws Exception {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_6);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+
+        Assert.assertNotNull(dmnDefinition);
     }
 
     /* Helper methods */

@@ -27,7 +27,7 @@ public class DecisionTableExpressionRepresentation {
     protected String variableType;
     protected String type;
     protected String label;
-    protected List<Map<String, String>> entries;
+    protected List<String> entries;
     protected boolean newVariable;
 
     public boolean isNewVariable() {
@@ -78,11 +78,11 @@ public class DecisionTableExpressionRepresentation {
         this.label = label;
     }
 
-    public List<Map<String, String>> getEntries() {
+    public List<String> getEntries() {
         return entries;
     }
 
-    public void setEntries(List<Map<String, String>> entries) {
+    public void setEntries(List<String> entries) {
         this.entries = entries;
     }
 }
