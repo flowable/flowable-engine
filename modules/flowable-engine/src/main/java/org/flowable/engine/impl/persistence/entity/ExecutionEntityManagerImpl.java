@@ -424,7 +424,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
 
     @Override
     public void deleteProcessInstanceExecutionEntity(String processInstanceId,
-            String currentFlowElementId, String deleteReason, boolean cascade, boolean cancel) {
+            String currentFlowElementId, String deleteReason, boolean cascade, boolean cancel, boolean fireEvents) {
 
         ExecutionEntity processInstanceEntity = findById(processInstanceId);
 
@@ -453,7 +453,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         deleteChildExecutions(processInstanceEntity, deleteReason, cancel);
         deleteExecutionAndRelatedData(processInstanceEntity, deleteReason, cancel);
 
-        if (getEventDispatcher().isEnabled()) {
+        if (getEventDispatcher().isEnabled() && fireEvents) {
             if (!cancel) {
                 getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED, processInstanceEntity));
             } else {
