@@ -126,12 +126,12 @@
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
-				<version>4.3.5</version>
+				<version>4.5.3</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpmime</artifactId>
-				<version>4.3.5</version>
+				<version>4.5.3</version>
 			</dependency>
 			<dependency>
 				<groupId>com.oracle.jdbc</groupId>
@@ -184,11 +184,6 @@
 			<dependency>
 				<groupId>de.odysseus.juel</groupId>
 				<artifactId>juel-impl</artifactId>
-				<version>2.2.7</version>
-			</dependency>
-			<dependency>
-				<groupId>de.odysseus.juel</groupId>
-				<artifactId>juel-spi</artifactId>
 				<version>2.2.7</version>
 			</dependency>
 			<dependency>

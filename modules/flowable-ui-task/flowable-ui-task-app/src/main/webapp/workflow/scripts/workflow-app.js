@@ -27,7 +27,8 @@ var flowableApp = angular.module('flowableApp', [
     'ui.grid.selection',
     'ui.grid.autoResize',
     'angular-loading-bar',
-    'cfp.hotkeys'
+    'cfp.hotkeys',
+    'ui.mask'	 
 ]);
 
 var flowableModule = flowableApp;

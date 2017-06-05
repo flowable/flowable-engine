@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.MapExceptionEntry;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.delegate.BpmnError;
@@ -189,6 +190,10 @@ public interface Flowable5CompatibilityHandler {
     Object getRawProcessConfiguration();
 
     Object getRawCommandExecutor();
+    
+    ProcessEngineConfiguration getFlowable6ProcessEngineConfiguration();
+    
+    void setFlowable6ProcessEngineConfiguration(ProcessEngineConfiguration processEngineConfiguration);
 
     Object getCamelContextObject(String camelContextValue);
 }

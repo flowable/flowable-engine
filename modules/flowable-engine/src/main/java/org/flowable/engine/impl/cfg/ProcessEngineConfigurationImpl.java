@@ -2006,6 +2006,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
             if (flowable5CompatibilityHandler != null) {
                 log.info("Found compatibility handler instance : {}", flowable5CompatibilityHandler.getClass());
+                
+                flowable5CompatibilityHandler.setFlowable6ProcessEngineConfiguration(this);
             }
         }
 

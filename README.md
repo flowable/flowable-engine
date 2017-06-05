@@ -36,7 +36,7 @@ Contributing to Flowable: https://github.com/flowable/flowable-engine/wiki
 
 Every self-respecting developer should have read link on how to ask smart questions: http://www.catb.org/~esr/faqs/smart-questions.html.
 
-After you've done that you can post questions and comments on http://forums.flowable.org and create issues in https://github.com/flowable/flowable-engine/issues.
+After you've done that you can post questions and comments on http://forum.flowable.org and create issues in https://github.com/flowable/flowable-engine/issues.
 
 ### QA server
 

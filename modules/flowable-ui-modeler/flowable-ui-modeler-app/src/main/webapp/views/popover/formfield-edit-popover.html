@@ -108,6 +108,53 @@
                     </div>
                 </div>
 
+                <div ng-if="activeTab.id == 'advanced' && (formElement.type === 'text' || formElement.type === 'multi-line-text' || formElement.type === 'decimal' || formElement.type === 'integer')">
+		     <div class="form-group">
+			  <label translate="FORM-BUILDER.COMPONENT.MIN-LENGTH"></label> <input
+				 type="text" number-input-check maxlength="5" class="form-control"
+				 ng-model="formElement.params.minLength">
+		     </div>
+		     <div class="form-group">
+			  <label translate="FORM-BUILDER.COMPONENT.MAX-LENGTH"></label> <input
+			         type="text" number-input-check maxlength="5" class="form-control"
+			         ng-model="formElement.params.maxLength">
+                     </div>
+		     <div class="form-group">
+			  <label translate="FORM-BUILDER.COMPONENT.REGEX-PATTERN"></label>
+				<div class="input-group">
+			            <span class="input-group-addon">/^</span> <input type="text" class="form-control" ng-model="formElement.params.regexPattern">
+				    <span class="input-group-addon">$/</span>
+				</div>
+		    </div>
+                    <div class="row">
+			<div class="col-md-4">
+			    <div class="form-group">
+			        <label translate="FORM-BUILDER.COMPONENT.MASK.TITLE"></label>
+			        <input type="text" class="form-control" ng-model="formElement.params.mask">
+			    </div>
+			</div>
+			<div class="col-md-4">
+			    <div class="form-group">
+			        <label translate>FORM-BUILDER.COMPONENT.MASK.EXAMPLES.TITLE</label>
+				<ul>
+			   	    <li><span translate>FORM-BUILDER.COMPONENT.MASK.EXAMPLES.NUMBER</span>: <b>9</b></li>
+				    <li><span translate>FORM-BUILDER.COMPONENT.MASK.EXAMPLES.LETTER</span>: <b>A</b></li>
+				    <li><span translate>FORM-BUILDER.COMPONENT.MASK.EXAMPLES.NUMBERORLETTER</span>: <b>*</b></li>
+				    <li><span translate>FORM-BUILDER.COMPONENT.MASK.EXAMPLES.OPTIONAL</span>: <b>?</b></li>
+				    <li><span translate>FORM-BUILDER.COMPONENT.MASK.EXAMPLES.PHONE</span>: <b>(99) 9999-9999</b></li>
+				</ul>
+			   </div>
+			</div>
+		    </div>
+		</div>
+                
+		<div ng-if="activeTab.id == 'advanced' && formElement.type === 'hyperlink'">
+		    <div class="form-group">
+			<label translate="FORM-BUILDER.COMPONENT.HYPERLINK-URL"></label> <input
+			type="text" class="form-control" ng-model="formElement.params.hyperlinkUrl">
+		    </div>
+		</div>	    
+		    
                 <div ng-if="activeTab.id == 'general' && formElement.type === 'expression'">
                     <div class="form-group">
                         <label translate="FORM-BUILDER.COMPONENT.EXPRESSION"></label>

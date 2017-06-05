@@ -133,11 +133,11 @@
       <if test="lastNameLikeIgnoreCase != null">
         and lower(RES.LAST_) like #{lastNameLikeIgnoreCase}${wildcardEscapeClause}
       </if>
-      <if test="fullNameLike != null">
-        and (RES.FIRST_ like #{fullNameLike}${wildcardEscapeClause} or RES.LAST_ like #{fullNameLike}${wildcardEscapeClause})
+       <if test="fullNameLike != null">
+        and ((RES.FIRST_ ${concatOperator} ' ' ${concatOperator} RES.LAST_) like #{fullNameLike}${wildcardEscapeClause})
       </if>
       <if test="fullNameLikeIgnoreCase != null">
-        and (lower(RES.FIRST_) like #{fullNameLikeIgnoreCase}${wildcardEscapeClause} or lower(RES.LAST_) like #{fullNameLikeIgnoreCase}${wildcardEscapeClause})
+        and (lower(RES.FIRST_ ${concatOperator} ' ' ${concatOperator} RES.LAST_) like #{fullNameLikeIgnoreCase}${wildcardEscapeClause})
       </if>
       <if test="email != null">
         and RES.EMAIL_ = #{email}

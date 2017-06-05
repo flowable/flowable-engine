@@ -26,7 +26,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
  */
 public abstract class AbstractWebServiceTaskTest extends PluggableFlowableTestCase {
 
-    public final static String WEBSERVICE_MOCK_ADDRESS = "http://localhost:63081/webservicemock";
+    public static final String WEBSERVICE_MOCK_ADDRESS = "http://localhost:63081/webservicemock";
 
     protected WebServiceMock webServiceMock;
 

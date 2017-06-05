@@ -1,6 +1,6 @@
 {
   "COMMON":{
-    "SELECT-FOLDER":"Selecione a pasta..."
+    "SELECT-FOLDER":"Selecione uma pasta..."
   },
   "GENERAL":{
     "MAIN-TITLE":"Flowable - Minhas Tarefas",
@@ -9,14 +9,14 @@
       "UNKNOWN":"Desculpe, um erro ocorreu durante a execução da operação solicitada.",
       "BAD_REQUEST":"Um erro ocorreu durante a execução da operação solicitada",
       "NOT_FOUND":"O recurso que você está tentando acessar não existe",
-      "UNAUTHORIZED":"Você deveria assinar para executar a operação solicitada.",
+      "UNAUTHORIZED":"Você deve fazer login para executar a operação solicitada.",
       "FORBIDDEN":"Você não está autorizado a executar a operação solicitada",
       "INTERNAL_SERVER_ERROR":"Desculpe, um erro inesperado ocorreu durante a execução da operação solicitada."
     },
     "NAVIGATION":{
       "TASKS":"Tarefas",
       "PROCESSES":"Processos",
-      "DESIGN":"Design",
+      "DESIGN":"Desenho",
       "CREATE":"+ Criar",
       "LOGIN":"Entrar"
     },
@@ -32,7 +32,7 @@
     },
     "ACTION":{
       "LOGOUT":"Sair",
-      "ADD-COMMENT":"Adicionar Comentário",
+      "ADD-COMMENT":"Adicionar comentário",
       "SAVE":"Salvar",
       "CANCEL":"Cancelar",
       "CLOSE":"Fechar",
@@ -57,7 +57,7 @@
     },
     "ABOUT":{
       "TYPE":"Tipo",
-      "LICENSED-TO":"Licenciado A",
+      "LICENSED-TO":"Licenciado para",
       "EXPIRES":"Expira em",
       "COPYRIGHT":"&copyleft; Flowable. Todos os direitos reservados.",
       "LEGAL":"Jurídica e licença"
@@ -90,10 +90,10 @@
       "TEXT-SUMMARY":"Filtrado por: {{text}}",
       "PROCESS-DEFINITION":"Definição de processo",
       "PROCESS-DEFINITION-PLACEHOLDER":"Seleccione a definição de processo...",
-      "STATE":"Estado",
-      "STATE-OPEN":"abrir",
-      "STATE-COMPLETED":"concluído",
-      "ASSIGNMENT":"Atribuição",
+      "STATE":"Status",
+      "STATE-OPEN":"Aberto",
+      "STATE-COMPLETED":"Concluído",
+      "ASSIGNMENT":"Atribuído",
       "ASSIGNMENT-INVOLVED":"Tarefas em que estou envolvido",
       "ASSIGNMENT-ASSIGNEE":"Tarefas em que estou atribuído",
       "ASSIGNMENT-CANDIDATE":"Tarefas em que sou um dos candidatos",
@@ -127,7 +127,7 @@
       "DUE-TODAY":"Vence hoje",
       "CLEAR-DATE":"Limpar data",
       "DATE-TODAY":"Data de hoje",
-      "AUDIT-LOG":"Log de Auditoria"
+      "AUDIT-LOG":"Log de auditoria"
     },
     "TITLE":{
       "ASSIGN":"Selecione o responsável",
@@ -152,7 +152,7 @@
       "DESCRIPTION":"Descrição",
       "ASSIGNEE":"Responsável",
       "DUE":"Vencimento",
-      "PROCESS-INSTANCE":"Parte do processo",
+      "PROCESS-INSTANCE":"Processo",
       "ENDED":"Finalizado em",
       "DURATION":"Duração"
     },
@@ -176,7 +176,7 @@
       "NO-FILTER":"Mostrando as suas tarefas, nenhum filtro aplicado",
       "FILTERED":"Mostrando as suas tarefas, nenhum filtro aplicado",
       "NO-TASKS":"Não há tarefas correspondentes encontradas...",
-      "DURATION":"Pegou {{duration}}",
+      "DURATION":"Demorou {{duration}}",
       "CLAIM-TASK-FIRST":"Para ver e preencher o formulário para esta tarefa, você precisa reivindicar esta tarefa primeiro. Você pode fazer isso pressionando o botão azul no canto superior direito da página.",
       "NO-TASKS-HELP":"Bem, parece que não há tarefas para você! Para obter alguma iniciada, você pode:",
       "NO-SUCH-TASK-HELP":"A tarefa que você está procurando não foi encontrada! Se você quiser, você pode em vez disso:",
@@ -211,7 +211,7 @@
       "STATE":"Estado do processo",
       "STATE-RUNNING":"em execução",
       "STATE-COMPLETED":"concluído",
-      "STATE-ALL":"tudo"
+      "STATE-ALL":"Todos"
     },
     "MESSAGE":{
       "NO-DESCRIPTION":"Esta instância de processo não tem descrição",
@@ -220,7 +220,7 @@
       "NO-INSTANCES-HELP":"Não há nenhum processo executando agora. Se seus processos foram concluídos, você pode encontrá-los usando o filtro para a lista de processos. Para iniciar algum novo você pode:",
       "NO-INSTANCES-HELP-START":"Iniciar um novo processo e acompanhar o seu progresso",
       "NO-TASKS":"Não há tarefas ativas no momento...",
-      "NO-COMPLETED-TASKS":"Não há tarefas que foram concluídas ainda...",
+      "NO-COMPLETED-TASKS":"Não há tarefas concluídas ainda...",
       "NO-BUSINESS-KEY":"Nenhum conjunto de chave de negócios",
       "CATEGORY":"Categoria: {{processDefinitionCategory}}",
       "NEW-COMMENT-PLACEHOLDER":"Entre com o comentário a adicionar a este processo",
@@ -233,12 +233,12 @@
     },
     "ACTION":{
       "CREATE":"+ Iniciar um processo",
-      "BACK-TO-LIST":"Volta para instâncias de processo",
+      "BACK-TO-LIST":"Voltar para instâncias de processo",
       "SHOW-DIAGRAM":"Mostrar o diagrama",
       "CANCEL":"Cancelar o processo",
       "DELETE":"Excluir o processo",
       "ADD-COMMENT":"+ Adicionar comentário",
-      "ADD-COMMENT-CONFIRM":"Adicionar Comentário",
+      "ADD-COMMENT-CONFIRM":"Adicionar comentário",
       "AUDIT-LOG":"Log de auditoria"
     },
     "FIELD":{
@@ -268,7 +268,7 @@
   "INVOLVE-PEOPLE":{
     "NO-MATCHING-RESULTS":"Use a caixa de pesquisa acima para encontrar usuários",
     "SEARCH-PLACEHOLDER":"Procurar usuário",
-    "BACK-TO-SEARCH":"Volta para busca",
+    "BACK-TO-SEARCH":"Volta para pesquisa",
     "ACTION-SELECT":"Selecionar"
   },
   "INTEGRATION":{

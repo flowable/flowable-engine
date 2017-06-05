@@ -132,7 +132,6 @@ public class CancelCallActivityTest extends PluggableFlowableTestCase {
         executionEntity = (ExecutionEntity) entityEvent.getEntity();
         assertNull(executionEntity.getParentId());
         assertEquals(executionEntity.getId(), executionEntity.getProcessInstanceId());
-        String externalExecutionId = executionEntity.getId();
 
         // this is the task within the external subprocess
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(8);

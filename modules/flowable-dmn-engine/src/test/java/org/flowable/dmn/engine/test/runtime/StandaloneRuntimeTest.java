@@ -13,7 +13,6 @@
 package org.flowable.dmn.engine.test.runtime;
 
 import org.flowable.dmn.api.DmnRuleService;
-import org.flowable.dmn.api.RuleEngineExecutionResult;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
@@ -22,7 +21,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
