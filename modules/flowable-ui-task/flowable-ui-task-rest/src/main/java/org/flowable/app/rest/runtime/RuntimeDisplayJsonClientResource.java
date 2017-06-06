@@ -118,6 +118,15 @@ public class RuntimeDisplayJsonClientResource {
         propertyMappers.put("UserTask", new UserTaskInfoMapper());
     }
 
+    @RequestMapping(value = "/rest/process-instances/debugger/{processInstanceId}/model-json", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getDebuggerModelJSON(@PathVariable String processInstanceId) {
+        try {
+            return getModelJSON(processInstanceId);
+        } catch (BadRequestException e) {
+            return getModelHistoryJSON(processInstanceId);
+        }
+    }
+    
     @RequestMapping(value = "/rest/process-instances/{processInstanceId}/model-json", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getModelJSON(@PathVariable String processInstanceId) {
 

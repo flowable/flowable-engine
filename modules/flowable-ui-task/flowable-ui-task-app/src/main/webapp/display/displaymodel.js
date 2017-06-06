@@ -52,6 +52,7 @@ var modelId = modelDiv.attr('data-model-id');
 var historyModelId = modelDiv.attr('data-history-id');
 var processDefinitionId = modelDiv.attr('data-process-definition-id');
 var modelType = modelDiv.attr('data-model-type');
+var isDebuggerEnabled = angular.element(document.querySelector('#bpmnModel')).scope().model.isDebuggerEnabled;
 
 // Support for custom background colors for activities
 var customActivityColors = modelDiv.attr('data-activity-color-mapping');
@@ -195,7 +196,6 @@ function _addHoverLogic(element, type, defaultColor)
         paper.getById(element.id).attr({"stroke": _bpmnGetColor(element, defaultColor)});
     });
 
-    var isDebuggerEnabled = angular.element(document.querySelector('#bpmnModel')).scope().model.isDebuggerEnabled;
     if (isDebuggerEnabled) {
         if (element.current || element.brokenExecutions) {
             topBodyRect.click(function () {
@@ -341,6 +341,8 @@ var modelUrl;
 if (modelType == 'runtime') {
     if (historyModelId) {
         modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/history/' + historyModelId + '/model-json';
+    } else if (isDebuggerEnabled) {
+        modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/debugger/' + modelId + '/model-json';
     } else {
         modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/' + modelId + '/model-json';
     }
@@ -458,7 +460,6 @@ function _showProcessDiagram() {
 
         var modelElements = data.elements;
 
-        var isDebuggerEnabled = angular.element(document.querySelector('#bpmnModel')).scope().model.isDebuggerEnabled;
         for (var i = 0; i < modelElements.length; i++) {
             var element = modelElements[i];
 //            try {
@@ -489,14 +490,7 @@ function _showProcessDiagram() {
     });
 
     request.error(function (jqXHR, textStatus, errorThrown) {
-        if (modelType == 'runtime' && modelId) {
-                modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/history/' + modelId + '/model-json';
-                historyModelId = modelId;
-                modelId = null;
-                _showProcessDiagram();
-        } else {
-            alert(textStatus);
-        }
+        alert("error");
     });
 }
 
