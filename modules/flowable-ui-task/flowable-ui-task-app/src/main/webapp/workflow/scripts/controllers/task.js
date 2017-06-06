@@ -551,16 +551,9 @@ angular.module('flowableApp')
                     var taskData = {
                         name: newTask.name,
                         description: newTask.description,
-                        assignee: newTask.assignee ? newTask.assignee.id : null
-                    };
-
-                    if (newTask.taskScope) {
-                        taskData.parentTaskId = '' + $scope.model.task.id
-                    } else {
-                        taskData.scopeId = $scope.model.task.id;
-                        taskData.scopeType = 'cmmnAdhoc';
-                    }
-
+                        assignee: newTask.assignee ? newTask.assignee.id : null,
+                        parentTaskId: '' + $scope.model.task.id
+                };
                     if ($rootScope.activeAppDefinition) {
                         taskData.category = '' + $rootScope.activeAppDefinition.id;
                     }
