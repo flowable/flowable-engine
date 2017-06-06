@@ -9,13 +9,46 @@
                 <h3 class="modal-title">{{'PROCESS.TITLE.DIAGRAM' | translate}}</h3>
             </div>
             <div class="modal-body">
+                <div class="error-message" ng-if="model.errorMessage">
+                    <span>{{model.errorMessage}}</span>
+                </div>
                 <div class="popup-wrapper clearfix">
                     <div class="model-preview-wrapper">
-                        <div id="bpmnModel" />
+                        <div id="bpmnModel"/>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
+                <div class="pull-left" ng-if="model.result">
+                    <span>{{model.result}}</span>
+                </div>
+                <br/>
+                <div class="pull-left">
+                    <label for="expression">{{'PROCESS.TITLE.EXPRESSION' | translate}}</label>
+                    <input type="text" class="form-control"
+                           id="expression" ng-model="model.expression" auto-focus editor-input-check>
+
+                    <button type="button" class="btn btn-sm btn-default" ng-click="evaluateExpression()">
+                        {{'PROCESS.ACTION.EXECUTE' | translate}}
+                    </button>
+                    <button type="button" class="btn btn-sm btn-default" ng-click="logExpression()">
+                        {{'PROCESS.ACTION.LOG' | translate}}
+                    </button>
+                </div>
+                <span class="pull-left" style="display:block; width: 20px; height: 20px;"></span>
+                <div class="pull-left">
+                    <label for="expression">{{'PROCESS.TITLE.SCRIPT' | translate}}</label>
+                    <textarea rows=5 cols=100 type="text" class="form-control"
+                              id="script" ng-model="model.script" editor-input-check/>
+
+                    <button type="button" class="btn btn-sm btn-default" ng-click="evaluateScript()">
+                        {{'PROCESS.ACTION.EXECUTE' | translate}}
+                    </button>
+                    <button type="button" class="btn btn-sm btn-default" ng-click="logScript()">
+                        {{'PROCESS.ACTION.LOG' | translate}}
+                    </button>
+                </div>
+
                 <div class="pull-right">
                     <button type="button" class="btn btn-sm btn-default" ng-click="$hide()">
                         {{'GENERAL.ACTION.CLOSE' | translate}}

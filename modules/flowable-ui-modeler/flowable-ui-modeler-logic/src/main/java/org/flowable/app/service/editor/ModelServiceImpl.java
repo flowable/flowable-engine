@@ -452,6 +452,15 @@ public class ModelServiceImpl implements ModelService {
                                     "Context.getProcessEngineConfiguration().getTaskService().complete(taskId);"
                     ));
                     break;
+                case "DEBUG_LOG_SCRIPT":
+                    try {
+                        nodes.add(createScriptTask(position, "scriptLog" + position, "Script log " + position++,
+                                (String) objectMapper.readValue(eventLogEntry.get("data").binaryValue(), Map.class).get("script")
+                        ));
+                    } catch (IOException e) {
+                        throw new RuntimeException("eventLog entry [" + eventLogEntry + "] does not have a correct format", e);
+                    }
+                    break;
                 default:
                     break;
             }

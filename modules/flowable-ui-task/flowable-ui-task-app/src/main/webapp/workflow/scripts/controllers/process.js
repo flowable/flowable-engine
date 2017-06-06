@@ -192,8 +192,10 @@ angular.module('flowableApp')
 }]);
 
 angular.module('flowableApp')
-    .controller('ShowProcessDiagramCtrl', ['$scope', '$timeout', 'ResourceService', 'appResourceRoot',
-        function ($scope, $timeout, ResourceService, appResourceRoot) {
+    .controller('ShowProcessDiagramCtrl', ['$scope', '$http', '$timeout', 'ResourceService', 'appResourceRoot',
+        function ($scope, $http, $timeout, ResourceService, appResourceRoot) {
+
+            $scope.model.expression = '';
 
             $timeout(function() {
                 jQuery("#bpmnModel").attr('data-model-id', $scope.model.processInstance.id);
@@ -218,6 +220,83 @@ angular.module('flowableApp')
                     window.define = amdDefine;
                 });
             }, 100);
+
+            $scope.evaluateExpression = function() {
+                $scope.model.errorMessage='';
+
+                $http({
+                    method: 'POST',
+                    url: '../app/rest/debugger/evaluate/expression/'+ $scope.model.processInstance.id,
+                    data: $scope.model.expression
+                }).success(function (data) {
+                    $scope.model.result = data;
+                }).error(function (data, status, headers, config) {
+                    $scope.model.errorMessage = data;
+                });
+            }
+
+            $scope.evaluateScript = function () {
+                $scope.model.errorMessage = '';
+                $scope.model.result='';
+
+                $http({
+                    method: 'POST',
+                    url: '../app/rest/debugger/evaluate/script/' + $scope.model.processInstance.id,
+                    data: $scope.model.script
+                }).success(function (data) {
+                    $scope.model.result = "OK";
+                }).error(function (data, status, headers, config) {
+                    $scope.model.errorMessage = data;
+                });
+            }
+
+            $scope.logExpression = function() {
+                var eventLogRequest = {
+                    type : 'expressionDebuggerLog',
+                    processDefinitionId : $scope.model.processInstance.processDefinitionId,
+                    processInstanceId: $scope.model.processInstance.id,
+                    executionId : $scope.model.processInstance.executionId,
+                    data : {
+                        expression : $scope.model.expression
+                    }
+                };
+                $scope.model.errorMessage = '';
+                $scope.model.result = '';
+
+                $http({
+                    method: 'PUT',
+                    url: '../process-api/management/event-log',
+                    data: eventLogRequest
+                }).success(function (data) {
+                    $scope.model.result = data;
+                }).error(function (data, status, headers, config) {
+                    $scope.model.errorMessage = data;
+                });
+            }
+
+            $scope.logScript = function() {
+                var eventLogRequest = {
+                    type : 'DEBUG_LOG_SCRIPT',
+                    processDefinitionId : $scope.model.processInstance.processDefinitionId,
+                    processInstanceId: $scope.model.processInstance.id,
+                    executionId : $scope.model.processInstance.executionId,
+                    data : {
+                        script : $scope.model.script
+                    }
+                };
+                $scope.model.errorMessage = '';
+                $scope.model.result = '';
+
+                $http({
+                    method: 'PUT',
+                    url: '../process-api/management/event-log',
+                    data: eventLogRequest
+                }).success(function (data) {
+                    $scope.model.result = data;
+                }).error(function (data, status, headers, config) {
+                    $scope.model.errorMessage = data;
+                });
+            }
         }
     ]
 );

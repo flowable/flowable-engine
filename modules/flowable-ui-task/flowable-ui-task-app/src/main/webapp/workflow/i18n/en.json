@@ -212,7 +212,9 @@
             "START-PROCESS-CONTENT-ADD-FAILED": "Failed to add {{noOfFiles}} file(s) to the process"
         },
         "TITLE": {
-            "DIAGRAM": "Process diagram"
+            "DIAGRAM": "Process diagram",
+            "EXPRESSION": "Expression",
+            "SCRIPT": "Script"
         },
         "FILTER": {
             "CREATED-DESC": "Newest first",
@@ -247,6 +249,8 @@
             "CREATE": "+ Start a process",
             "BACK-TO-LIST": "Back to process instances",
             "SHOW-DIAGRAM": "Show diagram",
+            "EXECUTE": "Execute",
+            "LOG": "Log",
             "CREATE-TEST": "Create Process Test",
             "CANCEL": "Cancel process",
             "DELETE": "Delete process",
