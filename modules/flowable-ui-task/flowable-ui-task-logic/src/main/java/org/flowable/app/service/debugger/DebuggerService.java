@@ -3,6 +3,7 @@ package org.flowable.app.service.debugger;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.model.debugger.BreakpointRepresentation;
 import org.flowable.app.model.debugger.ExecutionRepresentation;
+import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.common.api.FlowableException;
@@ -111,6 +112,10 @@ public class DebuggerService implements ProcessDebugger, ApplicationContextAware
     protected RuntimeService getRuntimeService() {
         return this.applicationContext.getBean(RuntimeService.class);
     }
+   
+    protected HistoryService getHistoricService() {
+        return this.applicationContext.getBean(HistoryService.class);
+    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -118,6 +123,12 @@ public class DebuggerService implements ProcessDebugger, ApplicationContextAware
     }
 
     public List<DebuggerRestVariable> getExecutionVariables(String executionId) {
+        List<Execution> executions = getRuntimeService().createExecutionQuery().executionId(executionId).list();
+        if (executions.isEmpty()) {
+            return getHistoricService().createHistoricVariableInstanceQuery().executionId(executionId).list().stream().
+                    map(DebuggerRestVariable::new).
+                    collect(Collectors.toList());
+        }
         return getRuntimeService().getVariableInstances(executionId).values().stream().
                 map(DebuggerRestVariable::new).
                 collect(Collectors.toList());

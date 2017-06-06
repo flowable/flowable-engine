@@ -1,5 +1,6 @@
 package org.flowable.app.service.debugger;
 
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance; 
 
 /**
@@ -12,6 +13,15 @@ public class DebuggerRestVariable {
     protected String executionId;
     protected String taskId;
     protected String processId;
+
+    public DebuggerRestVariable(HistoricVariableInstance historicVariableInstance) {
+        type = historicVariableInstance.getVariableTypeName();
+        name = historicVariableInstance.getVariableName();
+        value = historicVariableInstance.getValue();
+        executionId = historicVariableInstance.getProcessInstanceId();
+        processId = historicVariableInstance.getProcessInstanceId();
+        taskId = historicVariableInstance.getTaskId();
+    }
 
     public DebuggerRestVariable(VariableInstance variableInstance) {
         type = variableInstance.getTypeName();

@@ -128,7 +128,7 @@ public class RuntimeDisplayJsonClientResource {
 
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         if (processInstance == null) {
-            throw new BadRequestException("No process instance found with id " + processInstanceId);
+            return getModelHistoryJSON(processInstanceId);
         }
 
         BpmnModel pojoModel = repositoryService.getBpmnModel(processInstance.getProcessDefinitionId());
