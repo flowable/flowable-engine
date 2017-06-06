@@ -195,9 +195,10 @@ function _addHoverLogic(element, type, defaultColor)
         paper.getById(element.id).attr({"stroke": _bpmnGetColor(element, defaultColor)});
     });
 
-    if (element.current) {
+    if (element.current  || element.brokenExecutions) {
         topBodyRect.click(function () {
             if (selectedElement != element.id) {
+                paper.getById(element.id).attr({"stroke": "green"});
                 selectedElement = element.id;
                 paper.getById(element.id).attr({"stroke": "red"});
                 _executionClicked(element.id);

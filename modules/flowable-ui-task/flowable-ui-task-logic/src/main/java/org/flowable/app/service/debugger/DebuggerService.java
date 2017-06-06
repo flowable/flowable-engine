@@ -16,6 +16,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessDebugger;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.springframework.beans.BeansException;
@@ -81,6 +82,13 @@ public class DebuggerService implements ProcessDebugger, ApplicationContextAware
         }
 
         getManagementService().moveDeadLetterJobToExecutableJob(job.getId(), 3);
+        try {
+            // wait until job is processed
+            while (getManagementService().createJobQuery().jobId(job.getId()).count() > 0) {
+                Thread.sleep(100);
+            }
+        } catch (InterruptedException e) {
+        }
     }
 
     @Override
