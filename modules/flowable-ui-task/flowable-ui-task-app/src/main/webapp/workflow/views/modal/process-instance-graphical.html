@@ -19,18 +19,60 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <div class="pull-left">
-                    <input id="displayVariables" type="checkbox" ng-model="model.displayVariables"/>
+                <div class="row">
+
+                    <div class="component">
+                        <div class="tabs-wrapper">
+                            <div class="tabs clearfix">
+                                <div class="tab" ng-repeat="tab in tabData.tabs"
+                                     ng-class="{'active': tabData.activeTab == tab.id}">
+                                    <a ng-click="tabData.activeTab = tab.id">
+                                        {{tab.name | translate:node}}&nbsp;
+                                        <span class="badge" ng-if="tab.info != undefined">{{tab.info}}</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="title"></div>
+
+                            <div class="grid-wrapper grid-wrapper-compact"
+                                 ng-if="gridVariables && tabData.activeTab == tabData.tabs[0].id">
+                                <div class="pull-left">
+                                    <label for="executionId">{{'PROCESS.TITLE.EXECUTION' | translate}}</label>
+                                    <span id="executionId"
+                                          ng-bind="model.selectedExecution">{{model.selectedExecution}}</span>
+                                </div>
+                                <div class="ui-grid-contents-wrapper" ng-show="model.displayVariables">
+                                    <label for="variablesUi">{{'PROCESS.TITLE.VARIABLES' | translate}}</label>
+                                    <div id="variablesUi" ui-grid="gridVariables" style="height: 200px; width: 100%"
+                                         ui-grid-auto-resize></div>
+                                </div>
+                            </div>
+
+                            <div class="grid-wrapper grid-wrapper-compact"
+                                 ng-if="gridExecutions && tabData.activeTab == tabData.tabs[1].id">
+                                <div class="ui-grid-contents-wrapper" ng-show="model.executions">
+                                    <div id="executionsUi" ui-grid="gridExecutions" style="height: 200px; width: 100%"
+                                         ui-grid-selection
+                                         ui-grid-auto-resize></div>
+                                </div>
+                            </div>
+
+                            <div class="grid-wrapper grid-wrapper-compact"
+                                 ng-if="gridLog && tabData.activeTab == tabData.tabs[2].id">
+                                <div class="ui-grid-contents-wrapper">
+                                    <div id="logUi" ui-grid="gridLog" style="height: 200px; width: 100%"
+                                         ui-grid-selection
+                                         ui-grid-auto-resize></div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="pull-left">
-                    <label for="executionId">{{'PROCESS.TITLE.EXECUTION' | translate}}</label>
-                    <span id="executionId" ng-bind="model.selectedExecution">{{model.selectedExecution}}</span>
-                </div>
-                <div class="ui-grid-contents-wrapper" ng-show="model.displayVariables">
-                    <label for="variablesUi">{{'PROCESS.TITLE.VARIABLES' | translate}}</label>
-                    <div id="variablesUi" ui-grid="gridVariables" style="height: 200px; width: 100%"
-                         ui-grid-auto-resize></div>
-                </div>
+
+                <!--<div class="pull-left">-->
+                    <!--<input id="displayVariables" type="checkbox" ng-model="model.displayVariables"/>-->
+                <!--</div>-->
                 <div class="pull-right">
                     <button type="button" class="btn btn-sm btn-default" ng-click="$hide()">
                         {{'GENERAL.ACTION.CLOSE' | translate}}

@@ -2934,6 +2934,65 @@ ul#strength > li:last-child {
     margin-left: -4px;
 }
 
+.tabs-wrapper {
+    margin-bottom: 20px;
+}
+
+.tabs-wrapper .badge {
+    background-color: #bfbfbf;
+    font-size: 10px;
+}
+
+.component .tabs-wrapper .title {
+    background: rgb(238, 241, 241);
+}
+
+.tabs {
+    padding: 0px;
+    margin-bottom: -1px;
+    margin-left: -1px;
+    margin-top: -1px;
+    z-index: 2000;
+}
+
+.tabs .tab {
+    float: left;
+    border-right: 1px solid #eef1f1;
+    border-bottom: 1px solid #eef1f1;
+    background-color: #f5f7f7;
+    margin-top: 0;
+}
+
+.tabs .tab a {
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration: none;
+    margin: 0;
+    padding: 8px 15px;
+    line-height: 39px;
+    color: #7b8a8a;
+    background-color: #f5f7f7;
+    cursor: pointer;
+}
+
+.tabs .tab.active {
+    border-bottom-color: #ffffff;
+    background-color: #ffffff;
+}
+
+.tabs .label {
+    margin-left: 5px;
+}
+
+.tabs .tab a:hover {
+    color: #384042;
+}
+
+.tabs .tab.active a, .tabs .tab.active a:hover {
+    background-color: #ffffff;
+    color: #000000;
+    cursor: pointer;
+}
 
 .tabs {
     list-style: none inside;
@@ -3274,5 +3333,5 @@ ul#strength > li:last-child {
 .control-label.ng-invalid {
     color: #a94442 !important;
     font-weight: bold;
-   
+
 }

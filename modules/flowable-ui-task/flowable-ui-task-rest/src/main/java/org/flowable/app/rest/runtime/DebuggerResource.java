@@ -14,6 +14,7 @@ package org.flowable.app.rest.runtime;
 
 import org.flowable.app.model.debugger.BreakpointRepresentation;
 import org.flowable.app.service.debugger.DebuggerService;
+import org.flowable.engine.event.EventLogEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * REST controller for managing a debugger requests.
@@ -52,6 +54,11 @@ public class DebuggerResource {
     @RequestMapping(value = "/rest/debugger/breakpoints", method = RequestMethod.DELETE)
     public void deleteBreakPoints(@RequestBody BreakpointRepresentation breakpointRepresentation) {
         debuggerService.removeBreakpoint(breakpointRepresentation);
+    }
+
+    @RequestMapping(value = "/rest/debugger/eventlog/{processInstanceId}", method = RequestMethod.GET)
+    public List<EventLogEntry> getEventLog(@PathVariable String processInstanceId) {
+        return debuggerService.getProcessInstanceEventLog(processInstanceId);
     }
 
 }

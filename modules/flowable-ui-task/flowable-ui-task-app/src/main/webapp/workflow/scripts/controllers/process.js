@@ -182,8 +182,8 @@ angular.module('flowableApp')
 }]);
 
 angular.module('flowableApp')
-    .controller('ShowProcessDiagramCtrl', ['$scope', '$http', '$timeout', '$translate', '$q', 'ResourceService', 'appResourceRoot',
-        function ($scope, $http, $timeout, $translate, $q, ResourceService, appResourceRoot) {
+    .controller('ShowProcessDiagramCtrl', ['$scope', '$http', '$interval', '$timeout', '$translate', '$q', 'ResourceService', 'appResourceRoot',
+        function ($scope, $http, $interval, $timeout, $translate, $q, ResourceService, appResourceRoot) {
 
             $scope.model.variables = [];
             $scope.model.executions = undefined;
@@ -191,6 +191,31 @@ angular.module('flowableApp')
             $scope.model.displayVariables = true;
 
             $scope.model.errorMessage = '';
+
+            // config for executions grid
+            $scope.gridExecutions = {
+                data: $scope.model.executions,
+                columnDefs: [
+                    {field: 'id', displayName: "Id", maxWidth: 10},
+                    {field: 'parentId', displayName: "Parent id", maxWidth: 10},
+                    {field: 'processInstanceId', displayName: "Process id", maxWidth: 90},
+                    {field: 'superExecutionId', displayName: "Super execution id", maxWidth: 90},
+                    {field: 'activityId', displayName: "Activity", maxWidth: 90},
+                    {field: 'suspended', displayName: "Suspended", maxWidth: 90},
+                    {field: 'tenantId', displayName: "Tenant id", maxWidth: 90}
+                ],
+                enableRowSelection: true,
+                multiSelect: false,
+                noUnselect: true,
+                enableRowHeaderSelection: false,
+                onRegisterApi: function (gridApi) {
+                    $scope.gridExecutionsApi = gridApi;
+                    $scope.gridExecutions.selectRow(0, true);
+                    $scope.gridExecutionsApi.selection.on.rowSelectionChanged($scope, function (row) {
+                        _executionClicked(row.entity.activityId);
+                    });
+                }
+            };
 
             $scope.getExecutions = function() {
                 $http({
@@ -201,6 +226,10 @@ angular.module('flowableApp')
                     }
                 }).success(function (data) {
                     $scope.model.executions = data.data;
+                    $scope.gridExecutions.data = data.data;
+                    if($scope.gridExecutionsApi) {
+                        $scope.gridExecutionsApi.selection.selectRow($scope.gridExecutions.data[0]);
+                    }
                     jQuery("#bpmnModel").data($scope.model.executions);
                 }).error(function (data, status, headers, config) {
                     $scope.model.errorMessage = data;
@@ -214,8 +243,28 @@ angular.module('flowableApp')
                 url: '../process-api/runtime/executions/' + $scope.model.processInstance.id + '/variables'
             }).success(function (data) {
                 $scope.gridVariables.data = data;
-                $scope.gridApi.core.refresh();
+                $scope.gridVariablesApi.core.refresh();
             });
+
+            $scope.getEventLog = function() {
+                $http({
+                    method: 'GET',
+                    url: '../app/rest/debugger/eventlog/' + $scope.model.processInstance.id
+                }).success(function (data) {
+                    $scope.gridLog.data = data;
+                    $scope.gridLogApi.core.refresh();
+                });
+            }
+            $scope.getEventLog();
+
+            $scope.tabData = {
+                tabs: [
+                    {id: 'variables', name: 'PROCESS.TITLE.VARIABLES'},
+                    {id: 'executions', name: 'PROCESS.TITLE.EXECUTIONS'},
+                    {id: 'log', name: 'PROCESS.TITLE.LOG'}
+                ],
+                activeTab: 'variables'
+            };
 
             $timeout(function() {
                 jQuery("#bpmnModel").attr('data-model-id', $scope.model.processInstance.id);
@@ -247,7 +296,9 @@ angular.module('flowableApp')
                 }).success(function (data, status, headers, config) {
                     $scope.model.variables = data;
                     $scope.gridVariables.data = data;
-                    $scope.gridApi.core.refresh();
+                    if ($scope.gridVariablesApi) {
+                        $scope.gridVariablesApi.core.refresh();
+                    }
                 });
             };
 
@@ -267,7 +318,25 @@ angular.module('flowableApp')
                         cellTemplate: '<div><div style="text-align: left" class="ngCellText">{{grid.getCellValue(row, col)}}</div></div>'}
                 ],
                 onRegisterApi: function (gridApi) {
-                    $scope.gridApi = gridApi;
+                    $scope.gridVariablesApi = gridApi;
+                }
+            };
+
+            // Config for variable grid
+            $scope.gridLog = {
+                columnDefs: [
+                    {field: 'id', displayName: "Id", maxWidth: 10},
+                    {field: 'type', displayName: "Type", maxWidth: 10},
+                    {field: 'timeStamp', displayName: "Time Stamp", maxWidth: 90},
+                    {field: 'executionId', displayName: "Execution", maxWidth: 90},
+                    {field: 'taskId', displayName: "Task id", maxWidth: 90}
+                ],
+                enableRowSelection: true,
+                multiSelect: false,
+                noUnselect: true,
+                enableRowHeaderSelection: false,
+                onRegisterApi: function (gridApi) {
+                    $scope.gridLogApi = gridApi;
                 }
             };
 

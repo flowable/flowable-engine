@@ -212,7 +212,9 @@
         "TITLE": {
             "DIAGRAM": "Process diagram",
             "EXECUTION": "Execution",
-            "VARIABLES": "Variables"
+            "VARIABLES": "Variables",
+            "EXECUTIONS": "Executions",
+            "LOG": "Log"
         },
         "FILTER": {
             "CREATED-DESC": "Newest first",

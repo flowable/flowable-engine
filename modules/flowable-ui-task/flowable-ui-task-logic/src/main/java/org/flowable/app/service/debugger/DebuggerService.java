@@ -5,20 +5,11 @@ import org.flowable.app.model.debugger.BreakpointRepresentation;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.impl.el.ExpressionManager;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
-import org.flowable.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessDebugger;
-import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
-import org.flowable.variable.api.delegate.VariableScope;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -73,6 +64,10 @@ public class DebuggerService implements ProcessDebugger, ApplicationContextAware
             }
         }
         return executions;
+    }
+
+    public List<EventLogEntry> getProcessInstanceEventLog(String processInstanceId) {
+        return getManagementService().getEventLogEntriesByProcessInstanceId(processInstanceId);
     }
 
     public void continueExecution(String executionId) {

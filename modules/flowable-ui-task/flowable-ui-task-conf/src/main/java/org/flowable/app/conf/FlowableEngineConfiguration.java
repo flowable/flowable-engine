@@ -80,7 +80,7 @@ public class FlowableEngineConfiguration {
 
     @Autowired
     protected ProcessDebugger processDebugger;
-    
+
     @Autowired
     protected DataSource dataSource;
 
@@ -96,7 +96,7 @@ public class FlowableEngineConfiguration {
         factoryBean.setProcessEngineConfiguration(processEngineConfiguration());
         return factoryBean;
     }
-    
+
     public ProcessEngine processEngine() {
         // Safe to call the getObject() on the @Bean annotated processEngineFactoryBean(), will be
         // the fully initialized object instanced from the factory and will NOT be created more than once
@@ -106,25 +106,25 @@ public class FlowableEngineConfiguration {
             throw new RuntimeException(e);
         }
     }
-    
+
     @Bean(name = "cmmnEngineConfiguration")
     public CmmnEngineConfigurationApi cmmnEngineConfiguration() {
         ProcessEngineConfiguration processEngineConfiguration = processEngine().getProcessEngineConfiguration();
         return EngineServiceUtil.getCmmnEngineConfiguration(processEngineConfiguration);
     }
-    
+
     @Bean(name = "dmnEngineConfiguration")
     public DmnEngineConfigurationApi dmnEngineConfiguration() {
         ProcessEngineConfiguration processEngineConfiguration = processEngine().getProcessEngineConfiguration();
         return EngineServiceUtil.getDmnEngineConfiguration(processEngineConfiguration);
     }
-    
+
     @Bean(name = "formEngineConfiguration")
     public FormEngineConfigurationApi formEngineConfiguration() {
         ProcessEngineConfiguration processEngineConfiguration = processEngine().getProcessEngineConfiguration();
         return EngineServiceUtil.getFormEngineConfiguration(processEngineConfiguration);
     }
-    
+
     @Bean(name = "contentEngineConfiguration")
     public ContentEngineConfigurationApi contentEngineConfiguration() {
         ProcessEngineConfiguration processEngineConfiguration = processEngine().getProcessEngineConfiguration();
@@ -139,12 +139,13 @@ public class FlowableEngineConfiguration {
         processEngineConfiguration.setTransactionManager(transactionManager);
         processEngineConfiguration.setAsyncExecutorActivate(true);
         processEngineConfiguration.setAsyncExecutor(asyncExecutor());
-        
+
         if (environment.getProperty("debugger.enabled", Boolean.class, false)) {
             processEngineConfiguration.setAgendaFactory(agendaFactory());
             ArrayList<JobHandler> customJobHandlers = new ArrayList<>();
             customJobHandlers.add(new BreakpointJobHandler());
             processEngineConfiguration.setCustomJobHandlers(customJobHandlers);
+            processEngineConfiguration.setEnableDatabaseEventLogging(true);
         }
 
         String emailHost = environment.getProperty("email.host");
@@ -157,12 +158,12 @@ public class FlowableEngineConfiguration {
                 processEngineConfiguration.setMailServerUsername(environment.getProperty("email.username"));
                 processEngineConfiguration.setMailServerPassword(environment.getProperty("email.password"));
             }
-            
+
             Boolean useSSL = environment.getProperty("email.useSSL", Boolean.class);
             if (Boolean.TRUE.equals(useSSL)) {
                 processEngineConfiguration.setMailServerUseSSL(true);
             }
-            
+
             Boolean useTLS = environment.getProperty("email.useTLS", Boolean.class);
             if (Boolean.TRUE.equals(useTLS)) {
                 processEngineConfiguration.setMailServerUseTLS(useTLS);
@@ -177,10 +178,10 @@ public class FlowableEngineConfiguration {
 
         processEngineConfiguration.setDisableIdmEngine(true);
         processEngineConfiguration.addConfigurator(new SpringFormEngineConfigurator());
-        
+
         SpringCmmnEngineConfigurator cmmnEngineConfigurator = new SpringCmmnEngineConfigurator();
         processEngineConfiguration.addConfigurator(cmmnEngineConfigurator);
-        
+
         SpringDmnEngineConfiguration dmnEngineConfiguration = new SpringDmnEngineConfiguration();
         dmnEngineConfiguration.setHistoryEnabled(true);
         SpringDmnEngineConfigurator dmnEngineConfigurator = new SpringDmnEngineConfigurator();
@@ -276,12 +277,12 @@ public class FlowableEngineConfiguration {
     public DmnRuleService dmnRuleService() {
         return dmnEngineConfiguration().getDmnRuleService();
     }
-    
+
     @Bean
     public DmnHistoryService dmnHistoryService() {
         return dmnEngineConfiguration().getDmnHistoryService();
     }
-    
+
     @Bean
     public CmmnRepositoryService cmmnRepositoryService() {
         return cmmnEngineConfiguration().getCmmnRepositoryService();
@@ -291,12 +292,12 @@ public class FlowableEngineConfiguration {
     public CmmnRuntimeService cmmnRuntimeService() {
         return cmmnEngineConfiguration().getCmmnRuntimeService();
     }
-    
+
     @Bean
     public CmmnTaskService cmmnTaskService() {
         return cmmnEngineConfiguration().getCmmnTaskService();
     }
-    
+
     @Bean
     public CmmnHistoryService cmmnHistoryService() {
         return cmmnEngineConfiguration().getCmmnHistoryService();

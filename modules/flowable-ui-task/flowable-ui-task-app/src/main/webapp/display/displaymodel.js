@@ -213,13 +213,25 @@ function _addHoverLogic(element, type, defaultColor)
         });
     }
 }
+
 function _executionClicked(activityId) {
-    var executions = angular.element(document.querySelector('#executionId')).scope().model.executions;
+    var executions = angular.element(document.querySelector('#executionsUi')).scope().model.executions;
     for (var i in executions) {
         if (executions[i]["activityId"] == activityId) {
+            var activityToUnselect = modelDiv.attr("selected-activity");
+            if (activityToUnselect) {
+                var rectangleToUnselect = paper.getById(activityToUnselect);
+                if (rectangleToUnselect) {
+                    rectangleToUnselect.attr({"stroke": "green"});
+                }
+            }
             modelDiv.attr("selected-execution", executions[i].id);
-            angular.element(document.querySelector('#executionId')).scope().model.selectedExecution = executions[i].id;
-            angular.element(document.querySelector('#variablesUi')).scope().loadVariables();
+            modelDiv.attr("selected-activity", activityId);
+            if (activityId) {
+                paper.getById(activityId).attr({"stroke": "red"});
+            }
+            angular.element(document.querySelector('#executionsUi')).scope().model.selectedExecution = executions[i].id;
+            angular.element(document.querySelector('#executionsUi')).scope().loadVariables();
             return;
         }
     }
@@ -235,10 +247,8 @@ function _breakpointRestCall(actionType, activityId) {
         }),
         success: function () {
             paper.clear();
+            angular.element(document.querySelector('#logUi')).scope().getEventLog();
             _showProcessDiagram();
-        },
-        error: function () {
-            alert("error");
         }
     })
 }
@@ -344,10 +354,11 @@ function _drawContinueExecution(x, y , executionId, activityId) {
                     paper.clear();
                     var processInstanceId = angular.element(document.querySelector('#executionId')).scope().model.processInstance.id;
                     modelDiv.attr("selected-execution", processInstanceId);
-                    angular.element(document.querySelector('#executionId')).scope().model.selectedExecution = processInstanceId;
-                    angular.element(document.querySelector('#executionId')).scope().getExecutions();
-                    angular.element(document.querySelector('#variablesUi')).scope().model.variables = undefined;
-                    angular.element(document.querySelector('#variablesUi')).scope().loadVariables();
+                    angular.element(document.querySelector('#bpmnModel')).scope().model.selectedExecution = processInstanceId;
+                    angular.element(document.querySelector('#bpmnModel')).scope().getExecutions();
+                    angular.element(document.querySelector('#bpmnModel')).scope().model.variables = undefined;
+                    angular.element(document.querySelector('#bpmnModel')).scope().loadVariables();
+                    angular.element(document.querySelector('#bpmnModel')).scope().getEventLog();
                     _showProcessDiagram();
                 },
                 error: function () {
