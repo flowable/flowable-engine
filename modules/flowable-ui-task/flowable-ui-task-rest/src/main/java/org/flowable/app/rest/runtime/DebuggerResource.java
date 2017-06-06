@@ -12,8 +12,6 @@
  */
 package org.flowable.app.rest.runtime;
 
-import java.util.Collection;
-
 import org.flowable.app.model.debugger.BreakpointRepresentation;
 import org.flowable.app.service.debugger.DebuggerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collection;
 
 /**
  * REST controller for managing a debugger requests.
@@ -52,6 +52,16 @@ public class DebuggerResource {
     @RequestMapping(value = "/rest/debugger/breakpoints", method = RequestMethod.DELETE)
     public void deleteBreakPoints(@RequestBody BreakpointRepresentation breakpointRepresentation) {
         debuggerService.removeBreakpoint(breakpointRepresentation);
+    }
+
+    @RequestMapping(value = "/rest/debugger/evaluate/expression/{executionId}", method = RequestMethod.POST, produces = "application/json")
+    public Object evaluateExpression(@PathVariable String executionId, @RequestBody String expression) {
+        return debuggerService.evaluateExpression(executionId, expression);
+    }
+
+    @RequestMapping(value = "/rest/debugger/evaluate/script/{executionId}", method = RequestMethod.POST)
+    public void evaluateScript(@PathVariable String executionId, @RequestBody String script) {
+        debuggerService.evaluateScript(executionId, script);
     }
 
 }

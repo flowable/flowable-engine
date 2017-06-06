@@ -15,7 +15,9 @@
 function _bpmnGetColor(element, defaultColor)
 {
     var strokeColor;
-    if(element.current) {
+    if (selectedElement && selectedElement === element.id) {
+        strokeColor = 'red';
+    } else if(element.current) {
         strokeColor = CURRENT_COLOR;
     } else if(element.completed) {
         strokeColor = COMPLETED_COLOR;

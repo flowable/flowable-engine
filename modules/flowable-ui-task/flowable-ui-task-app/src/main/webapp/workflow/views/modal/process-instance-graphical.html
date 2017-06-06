@@ -9,13 +9,28 @@
                 <h3 class="modal-title">{{'PROCESS.TITLE.DIAGRAM' | translate}}</h3>
             </div>
             <div class="modal-body">
+                <div class="error-message" ng-if="model.errorMessage">
+                    <span>{{model.errorMessage}}</span>
+                </div>
                 <div class="popup-wrapper clearfix">
                     <div class="model-preview-wrapper">
-                        <div id="bpmnModel" />
+                        <div id="bpmnModel"/>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
+                <div class="pull-left">
+                    <input id="displayVariables" type="checkbox" ng-model="model.displayVariables"/>
+                </div>
+                <div class="pull-left">
+                    <label for="executionId">{{'PROCESS.TITLE.EXECUTION' | translate}}</label>
+                    <span id="executionId" ng-bind="model.selectedExecution">{{model.selectedExecution}}</span>
+                </div>
+                <div class="ui-grid-contents-wrapper" ng-show="model.displayVariables">
+                    <label for="variablesUi">{{'PROCESS.TITLE.VARIABLES' | translate}}</label>
+                    <div id="variablesUi" ui-grid="gridVariables" style="height: 200px; width: 100%"
+                         ui-grid-auto-resize></div>
+                </div>
                 <div class="pull-right">
                     <button type="button" class="btn btn-sm btn-default" ng-click="$hide()">
                         {{'GENERAL.ACTION.CLOSE' | translate}}

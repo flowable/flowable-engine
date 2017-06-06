@@ -206,7 +206,9 @@
             "START-PROCESS-CONTENT-ADD-FAILED": "Failed to add {{noOfFiles}} file(s) to the process"
         },
         "TITLE": {
-            "DIAGRAM": "Process diagram"
+            "DIAGRAM": "Process diagram",
+            "EXECUTION": "Execution",
+            "VARIABLES": "Variables"
         },
         "FILTER": {
             "CREATED-DESC": "Newest first",

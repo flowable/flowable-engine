@@ -563,7 +563,7 @@ public class FlowableClientService {
             finalUrl += "/" + actualRestRoot;
         }
 
-        URIBuilder builder = createUriBuilder(finalUrl + "/" + uri);
+        URIBuilder builder = createUriBuilder(finalUrl + (uri.startsWith("/") ? "": "/") + uri);
 
         return builder.toString();
     }

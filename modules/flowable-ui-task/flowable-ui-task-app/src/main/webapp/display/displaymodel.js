@@ -71,6 +71,8 @@ var customActivityBackgroundOpacity = modelDiv.attr('data-activity-opacity');
 
 var elementsAdded = new Array();
 var elementsRemoved = new Array();
+var selectedElement = undefined;
+var executions = modelDiv.data();
 
 function _showTip(htmlNode, element)
 {
@@ -191,8 +193,35 @@ function _addHoverLogic(element, type, defaultColor)
     });
 
     topBodyRect.mouseout(function () {
-        paper.getById(element.id).attr({"stroke": strokeColor});
+        paper.getById(element.id).attr({"stroke": _bpmnGetColor(element, defaultColor)});
     });
+
+    if (element.current) {
+        topBodyRect.click(function () {
+            if (selectedElement != element.id) {
+                selectedElement = element.id;
+                paper.getById(element.id).attr({"stroke": "red"});
+                _executionClicked(element.id);
+            } else {
+                selectedElement = undefined;
+                paper.getById(element.id).attr({"stroke": "green"});
+                var scope = angular.element(document.querySelector('#executionId')).scope();
+                modelDiv.attr("selected-execution", scope.model.processInstance.id);
+                scope.model.selectedExecution = scope.model.processInstance.id;
+                angular.element(document.querySelector('#variablesUi')).scope().loadVariables();
+            }
+        });
+    }
+}
+function _executionClicked(activityId) {
+    for (var i in executions) {
+        if (executions[i]["activityId"] == activityId) {
+            modelDiv.attr("selected-execution", executions[i].id);
+            angular.element(document.querySelector('#executionId')).scope().model.selectedExecution = executions[i].id;
+            angular.element(document.querySelector('#variablesUi')).scope().loadVariables();
+            return;
+        }
+    }
 }
 
 function _breakpointRestCall(actionType, activityId) {
@@ -231,7 +260,7 @@ function _drawBreakpoint(element, breakpoints) {
         circle.click(function () {
             _breakpointRestCall("DELETE", element.id);
         });
-        
+
     } else {
         breakpointTipText = breakpointTipText + "<br/> Click to add breakpoint";
         circle.click(function () {
@@ -401,16 +430,16 @@ function _showProcessDiagram() {
 
         for (var i = 0; i < modelElements.length; i++) {
             var element = modelElements[i];
-            //try {
-            var drawFunction = eval("_draw" + element.type);
-            drawFunction(element);
-            //_drawBreakpoint(element);
-            /*if (element.brokenExecutions) {
-                for (var j = 0; j < element.brokenExecutions.length; j++) {
-                    _drawContinueExecution(element.x +25 + j * 10, element.y - 15, element.brokenExecutions[j], element.id);
+//            try {
+                var drawFunction = eval("_draw" + element.type);
+                drawFunction(element);
+                _drawBreakpoint(element);
+                if (element.brokenExecutions) {
+                    for (var j = 0; j < element.brokenExecutions.length; j++) {
+                        _drawContinueExecution(element.x +25 + j * 10, element.y - 15, element.brokenExecutions[j], element.id);
+                    }
                 }
-            }*/
-            //} catch(err) {console.log(err);}
+//            } catch(err) {console.log(err);}
         }
 
         if (data.flows) {

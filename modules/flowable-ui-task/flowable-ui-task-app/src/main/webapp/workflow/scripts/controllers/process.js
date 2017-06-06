@@ -182,8 +182,35 @@ angular.module('flowableApp')
 }]);
 
 angular.module('flowableApp')
-    .controller('ShowProcessDiagramCtrl', ['$scope', '$timeout', 'ResourceService', 'appResourceRoot',
-        function ($scope, $timeout, ResourceService, appResourceRoot) {
+    .controller('ShowProcessDiagramCtrl', ['$scope', '$http', '$timeout', '$translate', '$q', 'ResourceService', 'appResourceRoot',
+        function ($scope, $http, $timeout, $translate, $q, ResourceService, appResourceRoot) {
+
+            $scope.model.variables = [];
+            $scope.model.selectedExecution = $scope.model.processInstance.id;
+            $scope.model.displayVariables = true;
+
+            $scope.model.errorMessage = '';
+
+            $http({
+                method: 'POST',
+                url: '../process-api/query/executions/',
+                data : {
+                    processInstanceId: '' + $scope.model.processInstance.id
+                }
+            }).success(function (data) {
+                $scope.model.executions = data.data;
+                jQuery("#bpmnModel").data( $scope.model.executions);
+            }).error(function (data, status, headers, config) {
+                $scope.model.errorMessage = data;
+            });
+
+            $http({
+                method: 'GET',
+                url: '../process-api/runtime/executions/' + $scope.model.processInstance.id + '/variables'
+            }).success(function (data) {
+                $scope.gridVariables.data = data;
+                $scope.gridApi.core.refresh();
+            });
 
             $timeout(function() {
                 jQuery("#bpmnModel").attr('data-model-id', $scope.model.processInstance.id);
@@ -193,7 +220,7 @@ angular.module('flowableApp')
                 if ($scope.model.processInstance.ended) {
                     jQuery("#bpmnModel").attr('data-history-id', $scope.model.processInstance.id);
                 }
-                
+
                 var viewerUrl = appResourceRoot + "../display/displaymodel.html?version=" + Date.now();
 
                 // If Flowable has been deployed inside an AMD environment Raphael will fail to register
@@ -207,6 +234,37 @@ angular.module('flowableApp')
                     window.define = amdDefine;
                 });
             }, 100);
+
+            $scope.loadVariables = function () {
+                $http({
+                    method: 'GET',
+                    url: '../process-api/runtime/executions/' + jQuery("#bpmnModel").attr("selected-execution") + '/variables'
+                }).success(function (data, status, headers, config) {
+                    $scope.gridVariables.data = data;
+                    $scope.gridApi.core.refresh();
+                });
+            };
+
+            $scope.executionSelected = function () {
+                jQuery("#bpmnModel").attr("selectedElement", $scope.model.selectedExecution.activityId);
+                $scope.loadVariables();
+            }
+
+            // Config for variable grid
+            $scope.gridVariables = {
+                data: $scope.model.variables,
+                columnDefs: [
+                    {field: 'scope', displayName: "Scope", maxWidth: 10},
+                    {field: 'type', displayName: "Type", maxWidth: 10},
+                    {field: 'name', displayName: "Name", maxWidth: 90},
+                    {field: 'value', displayName: "Value",
+                        cellTemplate: '<div><div style="text-align: left" class="ngCellText">{{grid.getCellValue(row, col)}}</div></div>'}
+                ],
+                onRegisterApi: function (gridApi) {
+                    $scope.gridApi = gridApi;
+                }
+            };
+
         }
     ]
 );
