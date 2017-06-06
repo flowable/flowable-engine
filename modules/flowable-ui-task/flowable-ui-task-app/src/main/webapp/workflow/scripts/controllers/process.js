@@ -247,14 +247,11 @@ angular.module('flowableApp')
 
             $scope.getExecutions = function () {
                 $http({
-                    method: 'POST',
-                    url: '../process-api/query/executions/',
-                    data: {
-                        processInstanceId: '' + $scope.model.processInstance.id
-                    }
+                    method: 'GET',
+                    url: '../app/rest/debugger/executions/' + $scope.model.processInstance.id
                 }).success(function (data) {
-                    $scope.model.executions = data.data;
-                    $scope.gridExecutions.data = data.data;
+                    $scope.model.executions = data;
+                    $scope.gridExecutions.data = data;
                     if ($scope.gridExecutionsApi) {
                         $scope.gridExecutionsApi.grid.modifyRows($scope.gridExecutions.data);
                         for (var i = 0; i < $scope.gridExecutions.data.length; i++) {
@@ -274,7 +271,7 @@ angular.module('flowableApp')
 
             $http({
                 method: 'GET',
-                url: '../process-api/runtime/executions/' + $scope.model.processInstance.id + '/variables'
+                url: '../app/rest/debugger/variables/' + $scope.model.processInstance.id 
             }).success(function (data) {
                 $scope.gridVariables.data = data;
                 if ($scope.gridVariablesApi) {
@@ -307,7 +304,7 @@ angular.module('flowableApp')
             $scope.loadVariables = function () {
                 $http({
                     method: 'GET',
-                    url: '../process-api/runtime/executions/' + jQuery("#bpmnModel").attr("selected-execution") + '/variables'
+                    url: '../app/rest/debugger/variables/' + jQuery("#bpmnModel").attr("selected-execution")
                 }).success(function (data, status, headers, config) {
                     $scope.model.variables = data;
                     $scope.gridVariables.data = data;
@@ -327,7 +324,6 @@ angular.module('flowableApp')
                 data: $scope.model.variables,
                 columnDefs: [
                     {field: 'scope', displayName: "Scope", maxWidth: 10},
-                    {field: 'type', displayName: "Type", maxWidth: 10},
                     {field: 'name', displayName: "Name", maxWidth: 90},
                     {
                         field: 'value', displayName: "Value",

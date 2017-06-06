@@ -13,6 +13,8 @@
 package org.flowable.app.rest.runtime;
 
 import org.flowable.app.model.debugger.BreakpointRepresentation;
+import org.flowable.app.model.debugger.ExecutionRepresentation;
+import org.flowable.app.model.runtime.RestVariable;
 import org.flowable.app.service.debugger.DebuggerService;
 import org.flowable.engine.event.EventLogEntry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +65,16 @@ public class DebuggerResource {
     @RequestMapping(value = "/rest/debugger/eventlog/{processInstanceId}", method = RequestMethod.GET)
     public List<EventLogEntry> getEventLog(@PathVariable String processInstanceId) {
         return debuggerService.getProcessInstanceEventLog(processInstanceId);
+    }
+
+    @RequestMapping(value = "/rest/debugger/variables/{executionId}", method = RequestMethod.GET)
+    public List<RestVariable> getExecutionVariables(@PathVariable String executionId) {
+        return debuggerService.getExecutionVariables(executionId);
+    }
+
+    @RequestMapping(value = "/rest/debugger/executions/{processInstanceId}", method = RequestMethod.GET)
+    public List<ExecutionRepresentation> getExecutions(@PathVariable String processInstanceId) {
+        return debuggerService.getExecutions(processInstanceId);
     }
 
     @RequestMapping(value = "/rest/debugger", method = RequestMethod.GET)
