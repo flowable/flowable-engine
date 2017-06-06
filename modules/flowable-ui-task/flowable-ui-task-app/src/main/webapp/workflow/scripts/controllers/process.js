@@ -186,23 +186,28 @@ angular.module('flowableApp')
         function ($scope, $http, $timeout, $translate, $q, ResourceService, appResourceRoot) {
 
             $scope.model.variables = [];
+            $scope.model.executions = undefined;
             $scope.model.selectedExecution = $scope.model.processInstance.id;
             $scope.model.displayVariables = true;
 
             $scope.model.errorMessage = '';
 
-            $http({
-                method: 'POST',
-                url: '../process-api/query/executions/',
-                data : {
-                    processInstanceId: '' + $scope.model.processInstance.id
-                }
-            }).success(function (data) {
-                $scope.model.executions = data.data;
-                jQuery("#bpmnModel").data( $scope.model.executions);
-            }).error(function (data, status, headers, config) {
-                $scope.model.errorMessage = data;
-            });
+            $scope.getExecutions = function() {
+                $http({
+                    method: 'POST',
+                    url: '../process-api/query/executions/',
+                    data: {
+                        processInstanceId: '' + $scope.model.processInstance.id
+                    }
+                }).success(function (data) {
+                    $scope.model.executions = data.data;
+                    jQuery("#bpmnModel").data($scope.model.executions);
+                }).error(function (data, status, headers, config) {
+                    $scope.model.errorMessage = data;
+                });
+            }
+
+            $scope.getExecutions();
 
             $http({
                 method: 'GET',
@@ -240,6 +245,7 @@ angular.module('flowableApp')
                     method: 'GET',
                     url: '../process-api/runtime/executions/' + jQuery("#bpmnModel").attr("selected-execution") + '/variables'
                 }).success(function (data, status, headers, config) {
+                    $scope.model.variables = data;
                     $scope.gridVariables.data = data;
                     $scope.gridApi.core.refresh();
                 });

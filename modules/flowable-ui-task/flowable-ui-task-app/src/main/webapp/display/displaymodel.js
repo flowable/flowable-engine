@@ -72,7 +72,6 @@ var customActivityBackgroundOpacity = modelDiv.attr('data-activity-opacity');
 var elementsAdded = new Array();
 var elementsRemoved = new Array();
 var selectedElement = undefined;
-var executions = modelDiv.data();
 
 function _showTip(htmlNode, element)
 {
@@ -214,6 +213,7 @@ function _addHoverLogic(element, type, defaultColor)
     }
 }
 function _executionClicked(activityId) {
+    var executions = angular.element(document.querySelector('#executionId')).scope().model.executions;
     for (var i in executions) {
         if (executions[i]["activityId"] == activityId) {
             modelDiv.attr("selected-execution", executions[i].id);
@@ -341,6 +341,12 @@ function _drawContinueExecution(x, y , executionId, activityId) {
                 contentType: 'application/json; charset=utf-8',
                 success: function () {
                     paper.clear();
+                    var processInstanceId = angular.element(document.querySelector('#executionId')).scope().model.processInstance.id;
+                    modelDiv.attr("selected-execution", processInstanceId);
+                    angular.element(document.querySelector('#executionId')).scope().model.selectedExecution = processInstanceId;
+                    angular.element(document.querySelector('#executionId')).scope().getExecutions();
+                    angular.element(document.querySelector('#variablesUi')).scope().model.variables = undefined;
+                    angular.element(document.querySelector('#variablesUi')).scope().loadVariables();
                     _showProcessDiagram();
                 },
                 error: function () {

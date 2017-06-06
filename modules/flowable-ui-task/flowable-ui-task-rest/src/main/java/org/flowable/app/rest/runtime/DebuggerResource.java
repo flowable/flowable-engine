@@ -54,14 +54,4 @@ public class DebuggerResource {
         debuggerService.removeBreakpoint(breakpointRepresentation);
     }
 
-    @RequestMapping(value = "/rest/debugger/evaluate/expression/{executionId}", method = RequestMethod.POST, produces = "application/json")
-    public Object evaluateExpression(@PathVariable String executionId, @RequestBody String expression) {
-        return debuggerService.evaluateExpression(executionId, expression);
-    }
-
-    @RequestMapping(value = "/rest/debugger/evaluate/script/{executionId}", method = RequestMethod.POST)
-    public void evaluateScript(@PathVariable String executionId, @RequestBody String script) {
-        debuggerService.evaluateScript(executionId, script);
-    }
-
 }
