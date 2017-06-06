@@ -207,7 +207,7 @@ function _addHoverLogic(element, type, defaultColor)
                 } else {
                     selectedElement = undefined;
                     paper.getById(element.id).attr({"stroke": "green"});
-                    var scope = angular.element(document.querySelector('#executionId')).scope();
+                    var scope = angular.element(document.querySelector('#bpmnModel')).scope();
                     modelDiv.attr("selected-execution", scope.model.processInstance.id);
                     scope.model.selectedExecution = scope.model.processInstance.id;
                     angular.element(document.querySelector('#variablesUi')).scope().loadVariables();
@@ -364,7 +364,7 @@ function _drawContinueExecution(x, y , executionId, activityId) {
                 contentType: 'application/json; charset=utf-8',
                 success: function () {
                     paper.clear();
-                    var processInstanceId = angular.element(document.querySelector('#executionId')).scope().model.processInstance.id;
+                    var processInstanceId = angular.element(document.querySelector('#bpmnModel')).scope().model.processInstance.id;
                     modelDiv.attr("selected-execution", processInstanceId);
                     angular.element(document.querySelector('#bpmnModel')).scope().model.selectedExecution = processInstanceId;
                     angular.element(document.querySelector('#bpmnModel')).scope().getExecutions();
