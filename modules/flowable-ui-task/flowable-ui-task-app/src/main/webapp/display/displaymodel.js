@@ -489,7 +489,14 @@ function _showProcessDiagram() {
     });
 
     request.error(function (jqXHR, textStatus, errorThrown) {
-        alert("error");
+        if (modelType == 'runtime' && modelId) {
+                modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/history/' + modelId + '/model-json';
+                historyModelId = modelId;
+                modelId = null;
+                _showProcessDiagram();
+        } else {
+            alert(textStatus);
+        }
     });
 }
 
