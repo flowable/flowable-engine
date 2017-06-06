@@ -185,6 +185,16 @@ angular.module('flowableApp')
     .controller('ShowProcessDiagramCtrl', ['$scope', '$http', '$interval', '$timeout', '$translate', '$q', 'ResourceService', 'appResourceRoot',
         function ($scope, $http, $interval, $timeout, $translate, $q, ResourceService, appResourceRoot) {
 
+            $scope.model.isDebuggerEnabled = false;
+
+            $http({
+                method: 'GET',
+                url: '../app/rest/debugger/',
+                async: false
+            }).success(function (data) {
+                $scope.model.isDebuggerEnabled = data;
+            });
+
             $scope.model.variables = [];
             $scope.model.executions = undefined;
             $scope.model.selectedExecution = $scope.model.processInstance.id;
@@ -198,8 +208,18 @@ angular.module('flowableApp')
                 columnDefs: [
                     {field: 'id', displayName: "Id", name: 'id', maxWidth: 10},
                     {field: 'parentId', displayName: "Parent id", name: 'parentId', maxWidth: 10},
-                    {field: 'processInstanceId', displayName: "Process id", name: 'processInstanceId', maxWidth: 90},
-                    {field: 'superExecutionId', displayName: "Super execution id", name: 'superExecutionId', maxWidth: 90},
+                    {
+                        field: 'processInstanceId',
+                        displayName: "Process id",
+                        name: 'processInstanceId',
+                        maxWidth: 90
+                    },
+                    {
+                        field: 'superExecutionId',
+                        displayName: "Super execution id",
+                        name: 'superExecutionId',
+                        maxWidth: 90
+                    },
                     {field: 'activityId', displayName: "Activity", name: 'activityId', maxWidth: 90},
                     {field: 'suspended', displayName: "Suspended", name: 'suspended', maxWidth: 90},
                     {field: 'tenantId', displayName: "Tenant id", name: 'tenantId', maxWidth: 90}
@@ -225,7 +245,7 @@ angular.module('flowableApp')
                 }
             };
 
-            $scope.getExecutions = function() {
+            $scope.getExecutions = function () {
                 $http({
                     method: 'POST',
                     url: '../process-api/query/executions/',
@@ -235,9 +255,9 @@ angular.module('flowableApp')
                 }).success(function (data) {
                     $scope.model.executions = data.data;
                     $scope.gridExecutions.data = data.data;
-                    if($scope.gridExecutionsApi) {
+                    if ($scope.gridExecutionsApi) {
                         $scope.gridExecutionsApi.grid.modifyRows($scope.gridExecutions.data);
-                        for (var i = 0; i< $scope.gridExecutions.data.length; i++) {
+                        for (var i = 0; i < $scope.gridExecutions.data.length; i++) {
                             if ($scope.model.selectedExecution == $scope.gridExecutions.data[i].id) {
                                 $scope.gridExecutionsApi.selection.selectRow($scope.gridExecutions.data[i]);
                                 i = $scope.gridExecutions.data.length;
@@ -262,7 +282,7 @@ angular.module('flowableApp')
                 }
             });
 
-            $scope.getEventLog = function() {
+            $scope.getEventLog = function () {
                 $http({
                     method: 'GET',
                     url: '../app/rest/debugger/eventlog/' + $scope.model.processInstance.id
@@ -283,29 +303,6 @@ angular.module('flowableApp')
                 ],
                 activeTab: 'variables'
             };
-
-            $timeout(function() {
-                jQuery("#bpmnModel").attr('data-model-id', $scope.model.processInstance.id);
-                jQuery("#bpmnModel").attr('data-model-type', 'runtime');
-
-                // in case we want to show a historic model, include additional attribute on the div
-                if ($scope.model.processInstance.ended) {
-                    jQuery("#bpmnModel").attr('data-history-id', $scope.model.processInstance.id);
-                }
-
-                var viewerUrl = appResourceRoot + "../display/displaymodel.html?version=" + Date.now();
-
-                // If Flowable has been deployed inside an AMD environment Raphael will fail to register
-                // itself globally until displaymodel.js (which depends ona global Raphale variable) is running,
-                // therefore remove AMD's define method until we have loaded in Raphael and displaymodel.js
-                // and assume/hope its not used during.
-                var amdDefine = window.define;
-                window.define = undefined;
-                ResourceService.loadFromHtml(viewerUrl, function(){
-                    // Restore AMD's define method again
-                    window.define = amdDefine;
-                });
-            }, 100);
 
             $scope.loadVariables = function () {
                 $http({
@@ -332,8 +329,10 @@ angular.module('flowableApp')
                     {field: 'scope', displayName: "Scope", maxWidth: 10},
                     {field: 'type', displayName: "Type", maxWidth: 10},
                     {field: 'name', displayName: "Name", maxWidth: 90},
-                    {field: 'value', displayName: "Value",
-                        cellTemplate: '<div><div style="text-align: left" class="ngCellText">{{grid.getCellValue(row, col)}}</div></div>'}
+                    {
+                        field: 'value', displayName: "Value",
+                        cellTemplate: '<div><div style="text-align: left" class="ngCellText">{{grid.getCellValue(row, col)}}</div></div>'
+                    }
                 ],
                 onRegisterApi: function (gridApi) {
                     $scope.gridVariablesApi = gridApi;
@@ -358,9 +357,31 @@ angular.module('flowableApp')
                 }
             };
 
+            $timeout(function () {
+                jQuery("#bpmnModel").attr('data-model-id', $scope.model.processInstance.id);
+                jQuery("#bpmnModel").attr('data-model-type', 'runtime');
+
+                // in case we want to show a historic model, include additional attribute on the div
+                if ($scope.model.processInstance.ended) {
+                    jQuery("#bpmnModel").attr('data-history-id', $scope.model.processInstance.id);
+                }
+
+                var viewerUrl = appResourceRoot + "../display/displaymodel.html?version=" + Date.now();
+
+                // If Flowable has been deployed inside an AMD environment Raphael will fail to register
+                // itself globally until displaymodel.js (which depends ona global Raphale variable) is running,
+                // therefore remove AMD's define method until we have loaded in Raphael and displaymodel.js
+                // and assume/hope its not used during.
+                var amdDefine = window.define;
+                window.define = undefined;
+                ResourceService.loadFromHtml(viewerUrl, function () {
+                    // Restore AMD's define method again
+                    window.define = amdDefine;
+                });
+            }, 100);
         }
-    ]
-);
+        ]
+    );
 
 angular.module('flowableApp')
 .controller('CancelProcessCtrl', ['$scope', '$http', '$route', 'ProcessService', function ($scope, $http, $route, ProcessService) {

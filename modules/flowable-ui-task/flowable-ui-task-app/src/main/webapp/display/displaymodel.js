@@ -195,22 +195,25 @@ function _addHoverLogic(element, type, defaultColor)
         paper.getById(element.id).attr({"stroke": _bpmnGetColor(element, defaultColor)});
     });
 
-    if (element.current  || element.brokenExecutions) {
-        topBodyRect.click(function () {
-            if (selectedElement != element.id) {
-                paper.getById(element.id).attr({"stroke": "green"});
-                selectedElement = element.id;
-                paper.getById(element.id).attr({"stroke": "red"});
-                _executionClicked(element.id);
-            } else {
-                selectedElement = undefined;
-                paper.getById(element.id).attr({"stroke": "green"});
-                var scope = angular.element(document.querySelector('#executionId')).scope();
-                modelDiv.attr("selected-execution", scope.model.processInstance.id);
-                scope.model.selectedExecution = scope.model.processInstance.id;
-                angular.element(document.querySelector('#variablesUi')).scope().loadVariables();
-            }
-        });
+    var isDebuggerEnabled = angular.element(document.querySelector('#bpmnModel')).scope().model.isDebuggerEnabled;
+    if (isDebuggerEnabled) {
+        if (element.current || element.brokenExecutions) {
+            topBodyRect.click(function () {
+                if (selectedElement != element.id) {
+                    paper.getById(element.id).attr({"stroke": "green"});
+                    selectedElement = element.id;
+                    paper.getById(element.id).attr({"stroke": "red"});
+                    _executionClicked(element.id);
+                } else {
+                    selectedElement = undefined;
+                    paper.getById(element.id).attr({"stroke": "green"});
+                    var scope = angular.element(document.querySelector('#executionId')).scope();
+                    modelDiv.attr("selected-execution", scope.model.processInstance.id);
+                    scope.model.selectedExecution = scope.model.processInstance.id;
+                    angular.element(document.querySelector('#variablesUi')).scope().loadVariables();
+                }
+            });
+        }
     }
 }
 
@@ -455,17 +458,21 @@ function _showProcessDiagram() {
 
         var modelElements = data.elements;
 
+        var isDebuggerEnabled = angular.element(document.querySelector('#bpmnModel')).scope().model.isDebuggerEnabled;
         for (var i = 0; i < modelElements.length; i++) {
             var element = modelElements[i];
 //            try {
-                var drawFunction = eval("_draw" + element.type);
-                drawFunction(element);
+            var drawFunction = eval("_draw" + element.type);
+            drawFunction(element);
+            if (isDebuggerEnabled) {
                 _drawBreakpoint(element);
+
                 if (element.brokenExecutions) {
                     for (var j = 0; j < element.brokenExecutions.length; j++) {
-                        _drawContinueExecution(element.x +25 + j * 10, element.y - 15, element.brokenExecutions[j], element.id);
+                        _drawContinueExecution(element.x + 25 + j * 10, element.y - 15, element.brokenExecutions[j], element.id);
                     }
                 }
+            }
 //            } catch(err) {console.log(err);}
         }
 
