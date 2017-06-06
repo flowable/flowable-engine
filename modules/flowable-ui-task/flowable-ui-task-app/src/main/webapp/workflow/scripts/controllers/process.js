@@ -340,8 +340,11 @@ angular.module('flowableApp')
             $scope.gridVariables = {
                 data: $scope.model.variables,
                 columnDefs: [
-                    {field: 'scope', displayName: "Scope", maxWidth: 10},
-                    {field: 'name', displayName: "Name", maxWidth: 90},
+                    {field: 'processId', displayName: "Process", maxWidth: 10},
+                    {field: 'executionId', displayName: "Execution", maxWidth: 10},
+                    {field: 'taskId', displayName: "Task", maxWidth: 10},
+                    {field: 'type', displayName: "Type", maxWidth: 10},
+                    {field: 'name', displayName: "Name", maxWidth: 10},
                     {
                         field: 'value', displayName: "Value",
                         cellTemplate: '<div><div style="text-align: left" class="ngCellText">{{grid.getCellValue(row, col)}}</div></div>'
