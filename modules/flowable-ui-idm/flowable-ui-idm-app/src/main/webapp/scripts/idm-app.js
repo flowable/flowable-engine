@@ -144,7 +144,9 @@ flowableApp
             $translate.fallbackLanguage(['en']);
 
             // setting Moment-JS (global) locale
-            moment.locale($translate.proposedLanguage());
+            if (FLOWABLE.CONFIG.datesLocalization) {
+                moment.locale($translate.proposedLanguage());
+            }
 
             // Common model (eg selected tenant id)
             $rootScope.common = {};

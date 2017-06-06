@@ -318,7 +318,9 @@ flowableAdminApp
                 $translate.fallbackLanguage(['en']);
 
                 // setting Moment-JS (global) locale
-                moment.locale($translate.proposedLanguage());
+                if (FlowableAdmin.Config.localization.dates) {
+                    moment.locale($translate.proposedLanguage());
+                }
 
                 $rootScope.serverStatus = {
                 };

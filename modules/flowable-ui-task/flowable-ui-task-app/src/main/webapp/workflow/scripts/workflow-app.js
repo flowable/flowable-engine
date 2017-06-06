@@ -126,7 +126,9 @@ flowableApp
         $translate.fallbackLanguage(['en']);
 
         // setting Moment-JS (global) locale
-        moment.locale($translate.proposedLanguage());
+        if (FLOWABLE.CONFIG.datesLocalization) {
+            moment.locale($translate.proposedLanguage());
+        }
 
         $rootScope.restRootUrl = function() {
             return FLOWABLE.CONFIG.contextRoot;

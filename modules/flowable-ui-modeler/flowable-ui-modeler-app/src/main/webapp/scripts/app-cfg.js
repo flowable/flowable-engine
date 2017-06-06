@@ -20,5 +20,6 @@ var FLOWABLE = FLOWABLE || {};
 FLOWABLE.CONFIG = {
 	'onPremise' : true,
 	'contextRoot' : '/flowable-modeler',
-	'webContextRoot' : '/flowable-modeler'
+	'webContextRoot' : '/flowable-modeler',
+	'datesLocalization' : false
 };
