@@ -120,11 +120,10 @@ public class RuntimeDisplayJsonClientResource {
 
     @RequestMapping(value = "/rest/process-instances/debugger/{processInstanceId}/model-json", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getDebuggerModelJSON(@PathVariable String processInstanceId) {
-        try {
+        if (runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).count() > 0 ) {
             return getModelJSON(processInstanceId);
-        } catch (BadRequestException e) {
-            return getModelHistoryJSON(processInstanceId);
-        }
+        } 
+        return getModelHistoryJSON(processInstanceId);
     }
     
     @RequestMapping(value = "/rest/process-instances/{processInstanceId}/model-json", method = RequestMethod.GET, produces = "application/json")
