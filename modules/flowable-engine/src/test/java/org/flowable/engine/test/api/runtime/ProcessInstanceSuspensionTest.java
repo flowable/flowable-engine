@@ -592,4 +592,34 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
 
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/ProcessInstanceSuspensionTest.testJobNotExecutedAfterProcessInstanceSuspend.bpmn20.xml")
+    public void testJobActivationAfterProcessInstanceSuspend() {
+
+        Date now = new Date();
+        processEngineConfiguration.getClock().setCurrentTime(now);
+
+        // Suspending the process instance should also stop the execution of jobs for that process instance
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+        assertEquals(1, managementService.createTimerJobQuery().count());
+        runtimeService.suspendProcessInstanceById(processInstance.getId());
+        assertEquals(1, managementService.createSuspendedJobQuery().count());
+
+        // The jobs should not be executed now
+        processEngineConfiguration.getClock().setCurrentTime(new Date(now.getTime() + (60 * 60 * 1000))); // Timer is set to fire on 5 minutes
+        Job job = managementService.createTimerJobQuery().executable().singleResult();
+        assertNull(job);
+
+        Job suspendedJob = managementService.createSuspendedJobQuery().singleResult();
+        assertNotNull(suspendedJob);
+
+        // Activation of the suspended job instance should proceed process instance execution too
+        managementService.moveSuspendedJobToExecutableJob(suspendedJob.getId());
+        waitForJobExecutorToProcessAllJobs(1000L, 100L);
+        assertEquals(0, managementService.createJobQuery().count());
+        assertEquals(0, managementService.createTimerJobQuery().count());
+        assertEquals(0, managementService.createSuspendedJobQuery().count());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+    }
+
 }

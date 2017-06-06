@@ -54,7 +54,7 @@ public class DebuggerService implements ProcessDebugger, ApplicationContextAware
     }
 
     public Collection<String> getBrokenExecutions(String activityId, String processInstanceId) {
-        List<Job> brokenJobs = getManagementService().createDeadLetterJobQuery().
+        List<Job> brokenJobs = getManagementService().createSuspendedJobQuery().
                 processInstanceId(processInstanceId).
                 handlerType(HANDLER_TYPE_BREAK_POINT).
                 list();
@@ -74,12 +74,12 @@ public class DebuggerService implements ProcessDebugger, ApplicationContextAware
     }
 
     public void continueExecution(String executionId) {
-        Job job = getManagementService().createDeadLetterJobQuery().handlerType(HANDLER_TYPE_BREAK_POINT).executionId(executionId).singleResult();
+        Job job = getManagementService().createSuspendedJobQuery().handlerType(HANDLER_TYPE_BREAK_POINT).executionId(executionId).singleResult();
         if (job == null) {
             throw new FlowableException("No broken job found for execution '" + executionId + "'");
         }
 
-        getManagementService().moveDeadLetterJobToExecutableJob(job.getId(), 3);
+        getManagementService().moveSuspendedJobToExecutableJob(job.getId());
         try {
             // wait until job is processed
             while (getManagementService().createJobQuery().jobId(job.getId()).count() > 0) {

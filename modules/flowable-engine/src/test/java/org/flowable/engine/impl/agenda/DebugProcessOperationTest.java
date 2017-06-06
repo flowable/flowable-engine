@@ -55,10 +55,10 @@ public class DebugProcessOperationTest extends ResourceFlowableTestCase {
     }
 
     protected void triggerBreakPoint() {
-        Job job = managementService.createDeadLetterJobQuery().handlerType("breakpoint").singleResult();
+        Job job = managementService.createSuspendedJobQuery().handlerType("breakpoint").singleResult();
         assertNotNull(job);
-        Job deadLetterJob = managementService.moveDeadLetterJobToExecutableJob(job.getId(), 3);
-        managementService.executeJob(deadLetterJob.getId());
+        Job activatedJob = managementService.moveSuspendedJobToExecutableJob(job.getId());
+        managementService.executeJob(activatedJob.getId());
     }
 
     protected void assertProcessActivityId(String message, ProcessInstance process, String activityId) {
