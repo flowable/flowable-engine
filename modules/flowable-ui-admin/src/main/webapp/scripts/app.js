@@ -317,6 +317,9 @@ flowableAdminApp
                 // set angular translate fallback language
                 $translate.fallbackLanguage(['en']);
 
+                // setting Moment-JS (global) locale
+                moment.locale($translate.proposedLanguage());
+
                 $rootScope.serverStatus = {
                 };
 
