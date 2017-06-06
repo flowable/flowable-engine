@@ -196,13 +196,13 @@ angular.module('flowableApp')
             $scope.gridExecutions = {
                 data: $scope.model.executions,
                 columnDefs: [
-                    {field: 'id', displayName: "Id", maxWidth: 10},
-                    {field: 'parentId', displayName: "Parent id", maxWidth: 10},
-                    {field: 'processInstanceId', displayName: "Process id", maxWidth: 90},
-                    {field: 'superExecutionId', displayName: "Super execution id", maxWidth: 90},
-                    {field: 'activityId', displayName: "Activity", maxWidth: 90},
-                    {field: 'suspended', displayName: "Suspended", maxWidth: 90},
-                    {field: 'tenantId', displayName: "Tenant id", maxWidth: 90}
+                    {field: 'id', displayName: "Id", name: 'id', maxWidth: 10},
+                    {field: 'parentId', displayName: "Parent id", name: 'parentId', maxWidth: 10},
+                    {field: 'processInstanceId', displayName: "Process id", name: 'processInstanceId', maxWidth: 90},
+                    {field: 'superExecutionId', displayName: "Super execution id", name: 'superExecutionId', maxWidth: 90},
+                    {field: 'activityId', displayName: "Activity", name: 'activityId', maxWidth: 90},
+                    {field: 'suspended', displayName: "Suspended", name: 'suspended', maxWidth: 90},
+                    {field: 'tenantId', displayName: "Tenant id", name: 'tenantId', maxWidth: 90}
                 ],
                 enableRowSelection: true,
                 multiSelect: false,
@@ -210,7 +210,15 @@ angular.module('flowableApp')
                 enableRowHeaderSelection: false,
                 onRegisterApi: function (gridApi) {
                     $scope.gridExecutionsApi = gridApi;
-                    $scope.gridExecutions.selectRow(0, true);
+                    $scope.gridExecutionsApi.grid.modifyRows($scope.gridExecutions.data);
+                    if ($scope.gridExecutions.data) {
+                        for (var i = 0; i < $scope.gridExecutions.data.length; i++) {
+                            if ($scope.model.selectedExecution == $scope.gridExecutions.data[i].id) {
+                                $scope.gridExecutionsApi.selection.selectRow($scope.gridExecutions.data[i]);
+                                i = $scope.gridExecutions.data.length;
+                            }
+                        }
+                    }
                     $scope.gridExecutionsApi.selection.on.rowSelectionChanged($scope, function (row) {
                         _executionClicked(row.entity.activityId);
                     });
@@ -228,7 +236,13 @@ angular.module('flowableApp')
                     $scope.model.executions = data.data;
                     $scope.gridExecutions.data = data.data;
                     if($scope.gridExecutionsApi) {
-                        $scope.gridExecutionsApi.selection.selectRow($scope.gridExecutions.data[0]);
+                        $scope.gridExecutionsApi.grid.modifyRows($scope.gridExecutions.data);
+                        for (var i = 0; i< $scope.gridExecutions.data.length; i++) {
+                            if ($scope.model.selectedExecution == $scope.gridExecutions.data[i].id) {
+                                $scope.gridExecutionsApi.selection.selectRow($scope.gridExecutions.data[i]);
+                                i = $scope.gridExecutions.data.length;
+                            }
+                        }
                     }
                     jQuery("#bpmnModel").data($scope.model.executions);
                 }).error(function (data, status, headers, config) {
@@ -243,7 +257,9 @@ angular.module('flowableApp')
                 url: '../process-api/runtime/executions/' + $scope.model.processInstance.id + '/variables'
             }).success(function (data) {
                 $scope.gridVariables.data = data;
-                $scope.gridVariablesApi.core.refresh();
+                if ($scope.gridVariablesApi) {
+                    $scope.gridVariablesApi.core.refresh();
+                }
             });
 
             $scope.getEventLog = function() {
@@ -252,7 +268,9 @@ angular.module('flowableApp')
                     url: '../app/rest/debugger/eventlog/' + $scope.model.processInstance.id
                 }).success(function (data) {
                     $scope.gridLog.data = data;
-                    $scope.gridLogApi.core.refresh();
+                    if ($scope.gridLogApi) {
+                        $scope.gridLogApi.core.refresh();
+                    }
                 });
             }
             $scope.getEventLog();

@@ -215,7 +215,7 @@ function _addHoverLogic(element, type, defaultColor)
 }
 
 function _executionClicked(activityId) {
-    var executions = angular.element(document.querySelector('#executionsUi')).scope().model.executions;
+    var executions = angular.element(document.querySelector('#bpmnModel')).scope().model.executions;
     for (var i in executions) {
         if (executions[i]["activityId"] == activityId) {
             var activityToUnselect = modelDiv.attr("selected-activity");
@@ -230,8 +230,17 @@ function _executionClicked(activityId) {
             if (activityId) {
                 paper.getById(activityId).attr({"stroke": "red"});
             }
-            angular.element(document.querySelector('#executionsUi')).scope().model.selectedExecution = executions[i].id;
-            angular.element(document.querySelector('#executionsUi')).scope().loadVariables();
+
+            var scope = angular.element(document.querySelector('#bpmnModel')).scope();
+            if (scope.gridExecutions.data) {
+                for (var j = 0; j < scope.gridExecutions.data.length; j++) {
+                    if (executions[i].id == scope.gridExecutions.data[j].id) {
+                        scope.gridExecutionsApi.selection.selectRow(scope.gridExecutions.data[j]);
+                        j = scope.gridExecutions.data.length;
+                    }
+                }
+            }
+            scope.loadVariables();
             return;
         }
     }
@@ -247,7 +256,7 @@ function _breakpointRestCall(actionType, activityId) {
         }),
         success: function () {
             paper.clear();
-            angular.element(document.querySelector('#logUi')).scope().getEventLog();
+            angular.element(document.querySelector('#bpmnModel')).scope().getEventLog();
             _showProcessDiagram();
         }
     })
