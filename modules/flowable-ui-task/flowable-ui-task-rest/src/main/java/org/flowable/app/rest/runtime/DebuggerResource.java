@@ -80,7 +80,7 @@ public class DebuggerResource {
 
     @RequestMapping(value = "/rest/debugger", method = RequestMethod.GET)
     public boolean isDebuggerAllowed() {
-        return environment.getProperty("debugger.enabled", Boolean.class, false);
+        return environment.getProperty("flowable.experimental.debugger.enabled", Boolean.class, false);
     }
 
 }

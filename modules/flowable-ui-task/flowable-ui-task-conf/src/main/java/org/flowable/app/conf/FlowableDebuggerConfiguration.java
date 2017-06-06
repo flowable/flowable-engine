@@ -47,6 +47,7 @@ public class FlowableDebuggerConfiguration {
     public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> debuggerProcessEngineConfigurationConfigurer(
         FlowableEngineAgendaFactory agendaFactory) {
         return processEngineConfiguration -> {
+            processEngineConfiguration.setEnableDatabaseEventLogging(true);
             processEngineConfiguration.setAgendaFactory(agendaFactory);
             processEngineConfiguration.addCustomJobHandler(new BreakpointJobHandler());
         };
