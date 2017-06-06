@@ -119,7 +119,7 @@
             "ASSIGN": "Assign",
             "REASSIGN": "Reassign",
             "CREATE": "+ Create Task",
-            "CREATE-ADHOC-TASK": "Create AdHoc Task",
+            "CREATE-SUB-TASK": "Create Sub Task",
             "CREATE-CONFIRM": "Create",
             "INVOLVE": "+ Involve people",
             "ADD-COMMENT": "+ Add comment",
@@ -313,6 +313,7 @@
         },
         "ACTION" : {
             "CREATE": "+ Start a case",
+            "CREATE-CASE-SUB-TASK": "Create Sub Task",
             "BACK-TO-LIST": "Back to case instances",
             "SHOW-DIAGRAM": "Show diagram",
             "CANCEL": "Cancel case",

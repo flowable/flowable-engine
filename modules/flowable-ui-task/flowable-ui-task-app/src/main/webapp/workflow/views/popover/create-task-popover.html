@@ -17,11 +17,6 @@
             <label translate="TASK.FIELD.DESCRIPTION"></label>
             <textarea class="form-control" rows="3" id="add-comment-input" ng-model="newTask.description" ng-disabled="newTask.loading"></textarea>
         </div>
-        <div class="form-group" ng-show="newTask.taskScope">
-            <label translate="TASK.FIELD.SUBTASK"></label>
-            <input type="checkbox" class="form-field" ng-model="newTask.isSubTask"
-                   select-text="newTask.isSubTask" ng-disabled="newTask.loading"></input>
-        </div>
         <div class="form-group">
             <span class="glyphicon glyphicon-user"></span>
             <span ng-model="newTask.assignee"

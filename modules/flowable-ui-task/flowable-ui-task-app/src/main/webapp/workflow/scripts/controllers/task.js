@@ -517,7 +517,7 @@ angular.module('flowableApp')
                 $scope.newTask.assignee = user;
             };
 
-            $scope.createAdHocTask = function () {
+            $scope.createSubTask = function () {
                 // Create popover
                 if (!$scope.createTaskPopover) {
                     $scope.newTask = {
@@ -554,11 +554,11 @@ angular.module('flowableApp')
                         assignee: newTask.assignee ? newTask.assignee.id : null
                     };
 
-                    if (!newTask.isSubTask) {
-                        taskData.scopeId = $scope.model.task.id;
-                        taskData.scopeType = 'taskAdhoc';
-                    } else {
+                    if (newTask.taskScope) {
                         taskData.parentTaskId = '' + $scope.model.task.id
+                    } else {
+                        taskData.scopeId = $scope.model.task.id;
+                        taskData.scopeType = 'cmmnAdhoc';
                     }
 
                     if ($rootScope.activeAppDefinition) {
