@@ -117,6 +117,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     protected List<JobProcessor> jobProcessors;
     protected List<HistoryJobProcessor> historyJobProcessors;
+    protected InternalJobParentStateResolver jobParentStateResolver;
 
     // init
     // /////////////////////////////////////////////////////////////////////
@@ -494,4 +495,11 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
 
+    public void setJobParentStateResolver(InternalJobParentStateResolver jobParentStateResolver) {
+        this.jobParentStateResolver = jobParentStateResolver;
+    }
+
+    public InternalJobParentStateResolver getJobParentStateResolver() {
+        return jobParentStateResolver;
+    }
 }

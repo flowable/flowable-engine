@@ -17,6 +17,7 @@ import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobNotFoundException;
+import org.flowable.job.service.InternalJobParentStateResolver;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
@@ -30,8 +31,6 @@ import java.io.Serializable;
 public class MoveSuspendedJobToExecutableJobCmd implements Command<Job>, Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MoveSuspendedJobToExecutableJobCmd.class);
 
     protected String jobId;
 
@@ -50,12 +49,7 @@ public class MoveSuspendedJobToExecutableJobCmd implements Command<Job>, Seriali
         if (job == null) {
             throw new JobNotFoundException(jobId);
         }
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Moving suspended job to executable job table {} retries:{}", job.getId(), job.getRetries());
-        }
-
-        return CommandContextUtil.getJobManager(commandContext).activateSuspendedJob(job);
+        return CommandContextUtil.getJobServiceConfiguration().getJobService().activateSuspendedJob(job);
     }
 
     public String getJobId() {
