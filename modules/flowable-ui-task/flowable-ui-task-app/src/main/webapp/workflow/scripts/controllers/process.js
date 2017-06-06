@@ -240,7 +240,24 @@ angular.module('flowableApp')
                         }
                     }
                     $scope.gridExecutionsApi.selection.on.rowSelectionChanged($scope, function (row) {
-                        _executionClicked(row.entity.activityId);
+                        var activityToUnselect = modelDiv.attr("selected-activity");
+                        if (activityToUnselect) {
+                            var rectangleToUnselect = paper.getById(activityToUnselect);
+                            if (rectangleToUnselect) {
+                                rectangleToUnselect.attr({"stroke": "green"});
+                            }
+                        }
+                        modelDiv.attr("selected-execution", row.entity.id);
+                        $scope.model.selectedExecution = row.entity.id;
+                        modelDiv.attr("selected-activity", row.entity.activityId);
+                        if (row.entity.activityId) {
+                            var paperActivity = paper.getById(row.entity.activityId);
+                            if (paperActivity) {
+                                paperActivity.attr({"stroke": "red"});
+                            }
+                        }
+
+                        $scope.loadVariables();
                     });
                 }
             };
