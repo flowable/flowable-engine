@@ -4147,7 +4147,7 @@ image::images/bpmn.receive.task.png[align="center"]
 <receiveTask id="waitState" name="wait" />
 ----
 
-To continue a process instance that is currently waiting at such a Receive Task, the _runtimeService.signal(executionId)_ must be called using the ID of the execution that arrived in the Receive Task. The following code snippet shows how this works in practice:
+To continue a process instance that is currently waiting at such a Receive Task, the _runtimeService.trigger(executionId)_ must be called using the ID of the execution that arrived in the Receive Task. The following code snippet shows how this works in practice:
 
 [source,java,linenums]
 ----
@@ -4158,7 +4158,7 @@ Execution execution = runtimeService.createExecutionQuery()
   .singleResult();
 assertNotNull(execution);
 
-runtimeService.signal(execution.getId());
+runtimeService.trigger(execution.getId());
 ----
 
 
