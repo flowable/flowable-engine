@@ -18,6 +18,7 @@ import java.util.Set;
  * @author Harsha Teja Kanna.
  */
 public class HttpRequest {
+    
     protected String method;
     protected String url;
     protected String headers;

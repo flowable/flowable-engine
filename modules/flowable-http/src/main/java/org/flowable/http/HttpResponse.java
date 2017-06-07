@@ -16,11 +16,13 @@ package org.flowable.http;
  * @author Harsha Teja Kanna.
  */
 public class HttpResponse {
+    
     protected int statusCode;
     protected String protocol;
     protected String reason;
     protected String headers;
     protected String body;
+    protected boolean bodyResponseHandled;
 
     public HttpResponse() {
     }
@@ -72,5 +74,13 @@ public class HttpResponse {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public boolean isBodyResponseHandled() {
+        return bodyResponseHandled;
+    }
+
+    public void setBodyResponseHandled(boolean bodyResponseHandled) {
+        this.bodyResponseHandled = bodyResponseHandled;
     }
 }

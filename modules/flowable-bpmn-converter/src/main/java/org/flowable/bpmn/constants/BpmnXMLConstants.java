@@ -95,6 +95,9 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_LISTENER_CUSTOM_PROPERTIES_RESOLVER_EXPRESSION = "customPropertiesResolverExpression";
     public static final String ATTRIBUTE_LISTENER_CUSTOM_PROPERTIES_RESOLVER_DELEGATEEXPRESSION = "customPropertiesResolverDelegateExpression";
 
+    public static final String ELEMENT_HTTP_REQUEST_HANDLER = "httpRequestHandler";
+    public static final String ELEMENT_HTTP_RESPONSE_HANDLER = "httpResponseHandler";
+    
     public static final String ATTRIBUTE_LISTENER_THROW_EVENT_TYPE_SIGNAL = "signal";
     public static final String ATTRIBUTE_LISTENER_THROW_EVENT_TYPE_GLOBAL_SIGNAL = "globalSignal";
     public static final String ATTRIBUTE_LISTENER_THROW_EVENT_TYPE_MESSAGE = "message";

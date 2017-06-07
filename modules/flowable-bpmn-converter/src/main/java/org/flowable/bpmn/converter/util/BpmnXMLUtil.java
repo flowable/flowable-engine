@@ -41,6 +41,8 @@ import org.flowable.bpmn.converter.child.FieldExtensionParser;
 import org.flowable.bpmn.converter.child.FlowNodeRefParser;
 import org.flowable.bpmn.converter.child.FlowableEventListenerParser;
 import org.flowable.bpmn.converter.child.FlowableFailedjobRetryParser;
+import org.flowable.bpmn.converter.child.FlowableHttpRequestHandlerParser;
+import org.flowable.bpmn.converter.child.FlowableHttpResponseHandlerParser;
 import org.flowable.bpmn.converter.child.FlowableMapExceptionParser;
 import org.flowable.bpmn.converter.child.FormPropertyParser;
 import org.flowable.bpmn.converter.child.IOSpecificationParser;
@@ -64,7 +66,6 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
     private static Map<String, BaseChildElementParser> genericChildParserMap = new HashMap<String, BaseChildElementParser>();
 
     static {
-        addGenericParser(new FlowableEventListenerParser());
         addGenericParser(new CancelEventDefinitionParser());
         addGenericParser(new CompensateEventDefinitionParser());
         addGenericParser(new ConditionExpressionParser());
@@ -75,6 +76,9 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
         addGenericParser(new ErrorEventDefinitionParser());
         addGenericParser(new ExecutionListenerParser());
         addGenericParser(new FieldExtensionParser());
+        addGenericParser(new FlowableEventListenerParser());
+        addGenericParser(new FlowableHttpRequestHandlerParser());
+        addGenericParser(new FlowableHttpResponseHandlerParser());
         addGenericParser(new FormPropertyParser());
         addGenericParser(new IOSpecificationParser());
         addGenericParser(new MessageEventDefinitionParser());

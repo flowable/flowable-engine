@@ -303,7 +303,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
 
             List<FieldDeclaration> fieldDeclarations = createFieldDeclarations(serviceTask.getFieldExtensions());
             addExceptionMapAsFieldDeclaration(fieldDeclarations, serviceTask.getMapExceptions());
-            return (ActivityBehavior) ClassDelegate.defaultInstantiateDelegate(theClass, fieldDeclarations);
+            return (ActivityBehavior) ClassDelegate.defaultInstantiateDelegate(theClass, fieldDeclarations, serviceTask);
 
         } catch (ClassNotFoundException e) {
             throw new FlowableException("Could not find org.flowable.http.HttpActivityBehavior: ", e);

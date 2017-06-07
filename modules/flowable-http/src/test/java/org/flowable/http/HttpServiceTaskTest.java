@@ -15,17 +15,20 @@ package org.flowable.http;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Harsha Teja Kanna
@@ -39,6 +42,60 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     @Deployment
     public void testSimpleGetOnly() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
+        assertProcessEnded(procId);
+    }
+    
+    @Deployment
+    public void testGetWithVariableName() {
+        String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
+        assertEquals(1, variables.size());
+        assertEquals("test", variables.get(0).getVariableName());
+        String variableValue = variables.get(0).getValue().toString();
+        assertTrue(variableValue.contains("firstName") && variableValue.contains("John"));
+        assertProcessEnded(procId);
+    }
+    
+    @Deployment
+    public void testGetWithoutVariableName() {
+        String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
+        assertEquals(1, variables.size());
+        assertEquals("httpGet.responseBody", variables.get(0).getVariableName());
+        String variableValue = variables.get(0).getValue().toString();
+        assertTrue(variableValue.contains("firstName") && variableValue.contains("John"));
+        assertProcessEnded(procId);
+    }
+    
+    @Deployment
+    public void testGetWithResponseHandler() {
+        String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
+        assertEquals(2, variables.size());
+        String firstName = null;
+        String lastName = null;
+        
+        for (HistoricVariableInstance historicVariableInstance : variables) {
+            if ("firstName".equals(historicVariableInstance.getVariableName())) {
+                firstName = (String) historicVariableInstance.getValue();
+            } else if ("lastName".equals(historicVariableInstance.getVariableName())) {
+                lastName = (String) historicVariableInstance.getValue();
+            }
+        }
+        
+        assertEquals("John", firstName);
+        assertEquals("Doe", lastName);
+        assertProcessEnded(procId);
+    }
+    
+    @Deployment
+    public void testGetWithRequestHandler() {
+        String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
+        assertEquals(1, variables.size());
+        assertEquals("httpGet.responseBody", variables.get(0).getVariableName());
+        String variableValue = variables.get(0).getValue().toString();
+        assertTrue(variableValue.contains("firstName") && variableValue.contains("John"));
         assertProcessEnded(procId);
     }
 

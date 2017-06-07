@@ -22,8 +22,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.Connector;
@@ -38,6 +36,10 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.flowable.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Http Server and API to test HTTP Activity
@@ -82,6 +84,7 @@ public class HttpServiceTaskTestServer {
             ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
             contextHandler.setContextPath("/");
             contextHandler.addServlet(new ServletHolder(new HttpServiceTaskTestServlet()), "/api/*");
+            contextHandler.addServlet(new ServletHolder(new SimpleHttpServiceTaskTestServlet()), "/test");
             server.setHandler(contextHandler);
             server.start();
         } catch (Exception e) {
@@ -106,6 +109,8 @@ public class HttpServiceTaskTestServer {
 
     private static class HttpServiceTaskTestServlet extends HttpServlet {
 
+        private static final long serialVersionUID = 1L;
+                        
         private String name = "test servlet";
         private ObjectMapper mapper = new ObjectMapper();
 
@@ -213,6 +218,26 @@ public class HttpServiceTaskTestServer {
             }
 
             return data;
+        }
+    }
+    
+    private static class SimpleHttpServiceTaskTestServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+                        
+        private ObjectMapper objectMapper = new ObjectMapper();
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setStatus(200);
+            resp.setContentType("application/json");
+            
+            ObjectNode responseNode = objectMapper.createObjectNode();
+            ObjectNode nameNode = responseNode.putObject("name");
+            nameNode.put("firstName", "John");
+            nameNode.put("lastName", "Doe");
+            
+            resp.getWriter().println(responseNode.toString());
         }
     }
 
