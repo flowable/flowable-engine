@@ -2291,10 +2291,10 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertNotNull(task.getIdentityLinks());
         assertEquals(1, task.getIdentityLinks().size());
         IdentityLinkInfo identityLink = task.getIdentityLinks().get(0);
-        assertEquals(null, identityLink.getProcessInstanceId());
+        assertNull(identityLink.getProcessInstanceId());
         assertEquals("candidate", identityLink.getType());
         assertEquals("group1", identityLink.getGroupId());
-        assertEquals(null, identityLink.getUserId());
+        assertNull(identityLink.getUserId());
         assertEquals(task.getId(), identityLink.getTaskId());
 
         assertNotNull(task.getProcessVariables());

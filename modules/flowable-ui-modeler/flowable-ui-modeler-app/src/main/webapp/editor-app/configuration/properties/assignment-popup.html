@@ -151,7 +151,7 @@
                                 <label>{{'PROPERTY.ASSIGNMENT.ASSIGNEE' | translate}}</label>
                             </div>
                             <div class="col-xs-8">
-                                <label ng-if="!popup.assignmentObject.idm.assignee && !popup.assignmentObject.idm.assigneeField">None...</label>
+                                <label ng-if="!popup.assignmentObject.idm.assignee && !popup.assignmentObject.idm.assigneeField">{{'PROPERTY.ASSIGNMENT.NONE' | translate}}</label>
                                 <ul class="simple-list" ng-if="popup.assignmentObject.idm.assignee || popup.assignmentObject.idm.assigneeField">
                                     <li>
                                         <i class="icon icon-user"></i>
@@ -173,10 +173,10 @@
                          ng-if="popup.assignmentObject.type == 'idm' && (!popup.assignmentObject.assignmentSourceType || popup.assignmentObject.assignmentSourceType == 'search') && (assignmentOption.id == 'user' || assignmentOption.id == 'users')">
                         <div class="col-xs-12">
                             <div class="col-xs-4">
-                                <label>Search:</label>
+                                <label>{{'PROPERTY.ASSIGNMENT.SEARCH' | translate}}</label>
                             </div>
                             <div class="col-xs-8">
-                                <input class="form-control" type="text" id="people-select-input" placeholder="Search user" auto-focus custom-keys
+                                <input class="form-control" type="text" id="people-select-input" placeholder="{{'PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHUSER' | translate}}" auto-focus custom-keys
                                        up-pressed="previousUser()" down-pressed="nextUser()" enter-pressed="confirmUser()" delayed-model="popup.filter" delay="200"/>
                             </div>
                         </div>
@@ -211,10 +211,10 @@
                          ng-if="popup.assignmentObject.type == 'idm' && (!popup.assignmentObject.assignmentSourceType || popup.assignmentObject.assignmentSourceType == 'search') && assignmentOption.id == 'groups'">
                         <div class="col-xs-12">
                             <div class="col-xs-4">
-                                <label>Search:</label>
+                                <label>{{'PROPERTY.ASSIGNMENT.SEARCH' | translate}}</label>
                             </div>
                             <div class="col-xs-8">
-                                <input class="form-control" type="text" id="people-select-input" placeholder="Search group" auto-focus custom-keys
+                                <input class="form-control" type="text" id="people-select-input" placeholder="{{'PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHGROUP' | translate}}" auto-focus custom-keys
                                        up-pressed="previousGroup()" down-pressed="nextGroup()" enter-pressed="confirmGroup()" delayed-model="popup.groupFilter"
                                        delay="200"/>
                             </div>

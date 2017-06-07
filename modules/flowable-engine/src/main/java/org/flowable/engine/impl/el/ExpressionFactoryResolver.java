@@ -23,6 +23,6 @@ import javax.el.ExpressionFactory;
 public abstract class ExpressionFactoryResolver {
 
     public static ExpressionFactory resolveExpressionFactory() {
-        return ExpressionFactory.newInstance();
+        return new de.odysseus.el.ExpressionFactoryImpl();
     }
 }

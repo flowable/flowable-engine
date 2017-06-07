@@ -84,6 +84,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
 
     protected DefaultProcessEngineFactory processEngineFactory;
     protected volatile ProcessEngine processEngine;
+    protected volatile org.flowable.engine.ProcessEngineConfiguration flowable6ProcessEngineConfiguration;
 
     public ProcessDefinition getProcessDefinition(final String processDefinitionId) {
         final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
@@ -958,6 +959,14 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
 
     public void setProcessEngineFactory(DefaultProcessEngineFactory processEngineFactory) {
         this.processEngineFactory = processEngineFactory;
+    }
+
+    public org.flowable.engine.ProcessEngineConfiguration getFlowable6ProcessEngineConfiguration() {
+        return flowable6ProcessEngineConfiguration;
+    }
+
+    public void setFlowable6ProcessEngineConfiguration(org.flowable.engine.ProcessEngineConfiguration flowable6ProcessEngineConfiguration) {
+        this.flowable6ProcessEngineConfiguration = flowable6ProcessEngineConfiguration;
     }
 
     protected org.activiti.engine.impl.persistence.entity.TaskEntity convertToActiviti5TaskEntity(TaskEntity task) {
