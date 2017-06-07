@@ -15,9 +15,7 @@ package org.flowable.app.service.editor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeCreator;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.ValueNode;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
@@ -61,7 +59,6 @@ import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.editor.language.json.converter.util.JsonConverterUtil;
 import org.flowable.form.model.FormModel;
 import org.flowable.idm.api.User;
-import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,8 +71,6 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -428,12 +423,21 @@ public class ModelServiceImpl implements ModelService {
                 case "PROCESSINSTANCE_START":
                     String processDefinitionId = eventLogEntry.get("processDefinitionId").textValue();
                     String key = getProcessDefinitionKey(processDefinitionId);
-                    nodes.add(createScriptTask(position++, "startProcess", "Start " + key + " process",
-                            "import org.flowable.engine.impl.context.Context;\n" +
-                                    "\n" +
-                                    "execution.setVariable('processInstanceId', Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceBuilder().processDefinitionKey('" +
-                                    key + "').start().getId());"
-                    ));
+                    try {
+                        StringBuilder variablesScript = getVariablesScript(eventLogEntry);
+                        nodes.add(createScriptTask(position++, "startProcess", "Start " + key + " process",
+                                "import org.flowable.engine.impl.context.Context;\n" +
+                                        "\n" +
+                                        "processInstanceBuilder = Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceBuilder().processDefinitionKey('" +
+                                        key + "');\n" +
+                                        variablesScript +
+                                        "execution.setVariable('processInstanceId', processInstanceBuilder.start().getId());",
+                                false
+                        ));
+                    } catch (IOException e) {
+                        log.error("Unable to fetch variables from the start process instance event", e);
+                        throw new RuntimeException(e);
+                    }
                     break;
                 case "TASK_ASSIGNED":
                     nodes.add(createScriptTask(position, "claimTask" + position++, "Claim task " +
@@ -468,6 +472,24 @@ public class ModelServiceImpl implements ModelService {
 
         }
         return nodes;
+    }
+
+    private StringBuilder getVariablesScript(JsonNode eventLogEntry) throws IOException {
+        Map<String, Object> variables = (Map<String, Object>) objectMapper.readValue(eventLogEntry.get("data").binaryValue(), Map.class).get("variables");
+        StringBuilder setVariablesScript = new StringBuilder();
+        if (variables != null) {
+            for (Map.Entry<String, Object> variable : variables.entrySet()) {
+                setVariablesScript.append("processInstanceBuilder.variable(\"" + variable.getKey() + "\", " + getVariableValue(variable.getValue()) + ");\n");
+            }
+        }
+        return setVariablesScript;
+    }
+
+    private String getVariableValue(Object value) {
+        if (value instanceof String) {
+            return "\"" + value +"\"";
+        }
+        return value.toString();
     }
 
     private String getProcessDefinitionKey(String processDefinitionId) {
@@ -522,14 +544,18 @@ public class ModelServiceImpl implements ModelService {
 
     }
 
-    protected ObjectNode createScriptTask(int position, String id, String name, String script) {
+    protected ObjectNode createScriptTask(int position, String id, String name, String script, boolean isAsync) {
         HashMap<String, String> properties = new HashMap<>();
         properties.put("scriptformat", "groovy");
         properties.put("scripttext", script);
         properties.put("name", name);
-        properties.put("asynchronousdefinition", "true");
+        properties.put("asynchronousdefinition", Boolean.toString(isAsync));
         return createNode(100 + position *150, 148, "ScriptTask", id, 3 * CIRCLE_SIZE, 2 * CIRCLE_SIZE,
                 properties);
+    }
+
+    protected ObjectNode createScriptTask(int position, String id, String name, String script) {
+        return createScriptTask( position, id, name, script, true);
     }
 
     protected ObjectNode createUserTask(int position, String id, String name) {
