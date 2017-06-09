@@ -91,4 +91,33 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
         }
     }
 
+    protected void validateFieldDeclarationsForHttp(org.flowable.bpmn.model.Process process, TaskWithFieldExtensions task, List<FieldExtension> fieldExtensions, List<ValidationError> errors) {
+        boolean requestMethodDefined = false;
+        boolean requestUrlDefined = false;
+
+        for (FieldExtension fieldExtension : fieldExtensions) {
+
+            String fieldName = fieldExtension.getFieldName();
+            String fieldValue = fieldExtension.getStringValue();
+            String fieldExpression = fieldExtension.getExpression();
+
+            if (fieldName.equals("requestMethod") && ((fieldValue != null && fieldValue.length() > 0) || (fieldExpression != null && fieldExpression.length() > 0))) {
+                requestMethodDefined = true;
+            }
+
+            if (fieldName.equals("requestUrl") && ((fieldValue != null && fieldValue.length() > 0) || (fieldExpression != null && fieldExpression.length() > 0))) {
+                requestUrlDefined = true;
+            }
+        }
+
+        if (!requestMethodDefined) {
+            addError(errors, Problems.HTTP_TASK_NO_REQUEST_METHOD, process, task, "No request method is defined on the http activity");
+        }
+
+        if (!requestUrlDefined) {
+            addError(errors, Problems.HTTP_TASK_NO_REQUEST_URL, process, task, "No request url is defined on the http activity");
+        }
+
+    }
+
 }

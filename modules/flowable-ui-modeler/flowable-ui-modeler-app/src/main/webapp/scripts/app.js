@@ -150,6 +150,11 @@ flowableModeler
             // set angular translate fallback language
             $translate.fallbackLanguage(['en']);
 
+            // setting Moment-JS (global) locale
+            if (FLOWABLE.CONFIG.datesLocalization) {
+                moment.locale($translate.proposedLanguage());
+            }
+
             $rootScope.restRootUrl = function() {
                 return FLOWABLE.CONFIG.contextRoot;
             };
@@ -316,7 +321,7 @@ flowableModeler
                         $window.location.href = '/';
                         $window.location.reload();
                     });
-            }  	
+            };
         }
   ])
   .run(['$rootScope', '$location', '$translate', '$window', '$modal',
@@ -333,7 +338,7 @@ flowableModeler
                 }
                 $window.location.href = baseUrl;
             };
-    }])
+        }])
 
     // Moment-JS date-formatting filter
     .filter('dateformat', function() {

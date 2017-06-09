@@ -211,6 +211,9 @@
 			<fileset dir="../modules/flowable-mule/target">
 				<include name="flowable-mule-*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-http/target">
+				<include name="flowable-http-*.jar" />
+			</fileset>
 			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-actuator/target">
 				<include name="flowable-spring-boot-starter-actuator-*.jar" />
 			</fileset>

@@ -401,6 +401,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
+				<artifactId>flowable-http</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
 				<artifactId>flowable-crystalball</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -1015,6 +1020,7 @@
 				<module>modules/flowable-spring-boot</module>
 				<module>modules/flowable-cxf</module>
 				<module>modules/flowable-mule</module>
+				<module>modules/flowable-http</module>
 				<module>modules/flowable-camel</module>
 				<module>modules/flowable-cdi</module>
 				<module>modules/flowable-osgi</module>
@@ -1214,6 +1220,7 @@
 				<module>modules/flowable-osgi</module>
 				<module>modules/flowable-camel</module>
 				<module>modules/flowable-mule</module>
+				<module>modules/flowable-http</module>
 				<module>modules/flowable-cdi</module>
 				<module>modules/flowable-ldap</module>
 				<module>modules/flowable-ldap-configurator</module>

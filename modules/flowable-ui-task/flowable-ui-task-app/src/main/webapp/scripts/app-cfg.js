@@ -20,7 +20,8 @@ var FLOWABLE = FLOWABLE || {};
 FLOWABLE.CONFIG = {
 	'onPremise' : true,
 	'contextRoot' : '/flowable-task',
-	'webContextRoot' : '/flowable-task'
+	'webContextRoot' : '/flowable-task',
+    'datesLocalization' : false
 };
 
 //
