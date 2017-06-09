@@ -16,17 +16,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.codec.binary.Base64;
+import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.domain.editor.AppDefinition;
 import org.flowable.app.domain.editor.AppModelDefinition;
@@ -71,7 +64,6 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -81,6 +73,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.flowable.app.rest.HttpRequestHelper.executeHttpGet;
 
 @Service
 @Transactional
@@ -353,46 +347,23 @@ public class ModelServiceImpl implements ModelService {
             if (!eventLogApiUrl.endsWith("/")) {
                 eventLogApiUrl = eventLogApiUrl.concat("/");
             }
-            eventLogApiUrl = eventLogApiUrl.concat("management/event-log/" + processInstanceId);
-
-            HttpGet httpGet = new HttpGet(eventLogApiUrl);
-            httpGet.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
-                    Base64.encodeBase64((basicAuthUser + ":" + basicAuthPassword).getBytes(Charset.forName("UTF-8")))));
-
-            HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-            SSLConnectionSocketFactory sslsf = null;
-            try {
-                SSLContextBuilder builder = new SSLContextBuilder();
-                builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-                sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-                clientBuilder.setSSLSocketFactory(sslsf);
-            } catch (Exception e) {
-                log.error("Could not configure SSL for http client", e);
-                throw new InternalServerErrorException("Could not configure SSL for http client", e);
-            }
-
-            CloseableHttpClient client = clientBuilder.build();
-
-            try {
-                HttpResponse response = client.execute(httpGet);
-                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                    return objectMapper.readTree(response.getEntity().getContent());
-                } else {
-                    log.error("Invalid deploy result code: {}", response.getStatusLine());
-                    throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
-                }
-            } catch (IOException ioe) {
-                log.error("Error calling deploy endpoint", ioe);
-                throw new InternalServerErrorException("Error calling deploy endpoint: " + ioe.getMessage());
-            } finally {
-                if (client != null) {
-                    try {
-                        client.close();
-                    } catch (IOException e) {
-                        log.warn("Exception while closing http client", e);
-                    }
-                }
-            }
+            return executeHttpGet(eventLogApiUrl, basicAuthUser, basicAuthPassword,
+                    new Function<HttpResponse, JsonNode>() {
+                        @Override
+                        public JsonNode apply(HttpResponse response) {
+                            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                                try {
+                                    return objectMapper.readTree(response.getEntity().getContent());
+                                } catch (IOException ioe) {
+                                    log.error("Error calling deploy endpoint", ioe);
+                                    throw new InternalServerErrorException("Error calling deploy endpoint: " + ioe.getMessage());
+                                }
+                            } else {
+                                log.error("Invalid deploy result code: {}", response.getStatusLine());
+                                throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
+                            }
+                        }
+                    });
         } else {
             return objectMapper.createArrayNode();
         }
@@ -493,55 +464,34 @@ public class ModelServiceImpl implements ModelService {
     }
 
     private String getProcessDefinitionKey(String processDefinitionId) {
-        String eventLogApiUrl = environment.getRequiredProperty("deployment.api.url");
+        String definitionsApiUrl = environment.getRequiredProperty("deployment.api.url");
         String basicAuthUser = environment.getRequiredProperty("idm.admin.user");
         String basicAuthPassword = environment.getRequiredProperty("idm.admin.password");
 
-        if (!eventLogApiUrl.endsWith("/")) {
-            eventLogApiUrl = eventLogApiUrl.concat("/");
+        if (!definitionsApiUrl.endsWith("/")) {
+            definitionsApiUrl = definitionsApiUrl.concat("/");
         }
-        eventLogApiUrl = eventLogApiUrl.concat("repository/process-definitions/"+processDefinitionId);
+        definitionsApiUrl = definitionsApiUrl.concat("repository/process-definitions/"+processDefinitionId);
 
-        HttpGet httpGet = new HttpGet(eventLogApiUrl);
-        httpGet.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
-                Base64.encodeBase64((basicAuthUser + ":" + basicAuthPassword).getBytes(Charset.forName("UTF-8")))));
-
-        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-        SSLConnectionSocketFactory sslsf = null;
-        try {
-            SSLContextBuilder builder = new SSLContextBuilder();
-            builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-            sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-            clientBuilder.setSSLSocketFactory(sslsf);
-        } catch (Exception e) {
-            log.error("Could not configure SSL for http client", e);
-            throw new InternalServerErrorException("Could not configure SSL for http client", e);
-        }
-
-        CloseableHttpClient client = clientBuilder.build();
-
-        try {
-            HttpResponse response = client.execute(httpGet);
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                JsonNode jsonNode = objectMapper.readTree(response.getEntity().getContent());
-                return jsonNode.get("key").textValue();
-            } else {
-                log.error("Invalid deploy result code: {}", response.getStatusLine());
-                throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
-            }
-        } catch (IOException ioe) {
-            log.error("Error calling deploy endpoint", ioe);
-            throw new InternalServerErrorException("Error calling deploy endpoint: " + ioe.getMessage());
-        } finally {
-            if (client != null) {
-                try {
-                    client.close();
-                } catch (IOException e) {
-                    log.warn("Exception while closing http client", e);
+        return executeHttpGet(definitionsApiUrl, basicAuthUser, basicAuthPassword,
+                new Function<HttpResponse, String>() {
+                    @Override
+                    public String apply(HttpResponse response) {
+                        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                            try {
+                                JsonNode jsonNode = objectMapper.readTree(response.getEntity().getContent());
+                                return jsonNode.get("key").textValue();
+                            } catch (IOException ioe) {
+                                log.error("Error calling deploy endpoint", ioe);
+                                throw new InternalServerErrorException("Error calling deploy endpoint: " + ioe.getMessage());
+                            }
+                        } else {
+                            log.error("Invalid deploy result code: {}", response.getStatusLine());
+                            throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
+                        }
+                    }
                 }
-            }
-        }
-
+        );
     }
 
     protected ObjectNode createScriptTask(int position, String id, String name, String script, boolean isAsync) {

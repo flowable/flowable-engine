@@ -332,7 +332,7 @@ angular.module('flowableApp')
 
             $http({
                 method: 'POST',
-                url: '/flowable-modeler/app/rest/models?skeleton=' + $scope.model.skeleton,
+                url: '../app/rest/models?skeleton=' + $scope.model.skeleton,
                 data: $scope.model.process
             }).success(function (data) {
                 $scope.$hide();

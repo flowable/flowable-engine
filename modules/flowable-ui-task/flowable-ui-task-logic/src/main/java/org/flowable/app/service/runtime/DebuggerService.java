@@ -1,4 +1,4 @@
-package org.flowable.app.service.debugger;
+package org.flowable.app.service.runtime;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.model.debugger.BreakpointRepresentation;

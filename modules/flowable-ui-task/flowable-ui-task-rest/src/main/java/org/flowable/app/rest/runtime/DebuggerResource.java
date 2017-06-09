@@ -13,7 +13,7 @@
 package org.flowable.app.rest.runtime;
 
 import org.flowable.app.model.debugger.BreakpointRepresentation;
-import org.flowable.app.service.debugger.DebuggerService;
+import org.flowable.app.service.runtime.DebuggerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

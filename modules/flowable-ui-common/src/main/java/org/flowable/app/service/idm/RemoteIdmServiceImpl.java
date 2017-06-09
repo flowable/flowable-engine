@@ -14,22 +14,14 @@ package org.flowable.app.service.idm;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpHeaders;
+import com.google.common.base.Function;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.flowable.app.model.common.RemoteGroup;
 import org.flowable.app.model.common.RemoteToken;
 import org.flowable.app.model.common.RemoteUser;
@@ -42,6 +34,8 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+
+import static org.flowable.app.rest.HttpRequestHelper.executeHttpGet;
 
 @Service
 public class RemoteIdmServiceImpl implements RemoteIdmService {
@@ -108,7 +102,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         }
         return new ArrayList<RemoteUser>();
     }
-    
+
     @Override
     public List<RemoteUser> findUsersByGroup(String groupId) {
         JsonNode json = callRemoteIdmService(url + "/api/idm/groups/" + encode(groupId) + "/users", adminUser, adminPassword);
@@ -128,40 +122,19 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
     }
 
     protected JsonNode callRemoteIdmService(String url, String username, String password) {
-        HttpGet httpGet = new HttpGet(url);
-        httpGet.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
-                Base64.encodeBase64((username + ":" + password).getBytes(Charset.forName("UTF-8")))));
-
-        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-        SSLConnectionSocketFactory sslsf = null;
-        try {
-            SSLContextBuilder builder = new SSLContextBuilder();
-            builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-            sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-            clientBuilder.setSSLSocketFactory(sslsf);
-        } catch (Exception e) {
-            logger.warn("Could not configure SSL for http client", e);
-        }
-
-        CloseableHttpClient client = clientBuilder.build();
-
-        try {
-            HttpResponse response = client.execute(httpGet);
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                return objectMapper.readTree(response.getEntity().getContent());
-            }
-        } catch (Exception e) {
-            logger.warn("Exception while getting token", e);
-        } finally {
-            if (client != null) {
-                try {
-                    client.close();
-                } catch (IOException e) {
-                    logger.warn("Exception while closing http client", e);
+        return executeHttpGet(url, username, password, new Function<HttpResponse, JsonNode>() {
+            @Override
+            public JsonNode apply(HttpResponse httpResponse) {
+                if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                    try {
+                        return objectMapper.readTree(httpResponse.getEntity().getContent());
+                    } catch (IOException e) {
+                        logger.warn("Exception while getting token", e);
+                    }
                 }
+                return null;
             }
-        }
-        return null;
+        });
     }
 
     protected List<RemoteUser> parseUsersInfo(JsonNode json) {

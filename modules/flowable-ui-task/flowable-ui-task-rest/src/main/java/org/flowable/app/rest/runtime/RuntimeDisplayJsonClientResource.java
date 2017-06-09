@@ -24,7 +24,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.model.debugger.BreakpointRepresentation;
 import org.flowable.app.security.SecurityUtils;
-import org.flowable.app.service.debugger.DebuggerService;
+import org.flowable.app.service.runtime.DebuggerService;
 import org.flowable.app.service.editor.mapper.EventInfoMapper;
 import org.flowable.app.service.editor.mapper.InfoMapper;
 import org.flowable.app.service.editor.mapper.ReceiveTaskInfoMapper;
