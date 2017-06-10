@@ -12,14 +12,15 @@
  */
 package org.flowable.idm.engine.impl.cmd;
 
-import java.io.Serializable;
-
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.idm.api.PasswordEncoder;
 import org.flowable.idm.api.User;
 import org.flowable.idm.engine.impl.interceptor.Command;
 import org.flowable.idm.engine.impl.interceptor.CommandContext;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntity;
+
+import java.io.Serializable;
 
 /**
  * @author Joram Barrez
@@ -29,8 +30,10 @@ public class SaveUserCmd implements Command<Void>, Serializable {
     private static final long serialVersionUID = 1L;
     protected User user;
 
-    public SaveUserCmd(User user) {
+    public SaveUserCmd(User user, PasswordEncoder passwordEncoder) {
         this.user = user;
+        if (null != this.user.getPassword())
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
     }
 
     public Void execute(CommandContext commandContext) {

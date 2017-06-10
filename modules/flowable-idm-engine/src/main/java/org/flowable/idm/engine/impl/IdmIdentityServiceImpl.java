@@ -81,7 +81,7 @@ public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentitySe
     }
 
     public void saveUser(User user) {
-        commandExecutor.execute(new SaveUserCmd(user));
+        commandExecutor.execute(new SaveUserCmd(user, passwordEncoder));
     }
 
     public UserQuery createUserQuery() {

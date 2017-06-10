@@ -104,8 +104,7 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
             user = findById(userId);
         }
 
-        String encodedPassword = passwordEncoder.encode(password);
-        return (user != null) && (password != null) && (encodedPassword.equals(user.getPassword()));
+        return (user != null) && (password != null) && (passwordEncoder.isMatches(password, user.getPassword()));
     }
 
     public List<User> findUsersByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
