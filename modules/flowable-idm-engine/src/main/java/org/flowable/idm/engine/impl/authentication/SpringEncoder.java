@@ -13,9 +13,9 @@ public class SpringEncoder implements PasswordEncoder {
     }
 
     @Override
-    public String encode(CharSequence rawPassword) {
+    public String encode(CharSequence rawPassword, String salt) {
         try {
-            return encoderProviderContext.invoke(encoder, rawPassword, null);
+            return encoderProviderContext.invoke(encoder, rawPassword, salt);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -23,9 +23,9 @@ public class SpringEncoder implements PasswordEncoder {
     }
 
     @Override
-    public boolean isMatches(CharSequence rawPassword, String encodedPassword) {
+    public boolean isMatches(CharSequence rawPassword, String encodedPassword, String salt) {
         try {
-            return mathchingProviderContext.invoke(encoder, encodedPassword, rawPassword, null);
+            return mathchingProviderContext.invoke(encoder, encodedPassword, rawPassword, salt);
         } catch (Exception e) {
             e.printStackTrace();
         }

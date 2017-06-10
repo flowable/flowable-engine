@@ -30,10 +30,10 @@ public class SaveUserCmd implements Command<Void>, Serializable {
     private static final long serialVersionUID = 1L;
     protected User user;
 
-    public SaveUserCmd(User user, PasswordEncoder passwordEncoder) {
+    public SaveUserCmd(User user, PasswordEncoder passwordEncoder, String salt) {
         this.user = user;
         if (null != this.user.getPassword())
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setPassword(passwordEncoder.encode(user.getPassword(), salt));
     }
 
     public Void execute(CommandContext commandContext) {

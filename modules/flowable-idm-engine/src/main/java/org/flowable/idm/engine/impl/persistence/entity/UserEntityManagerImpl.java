@@ -97,14 +97,14 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
         return new UserQueryImpl(getCommandExecutor());
     }
 
-    public Boolean checkPassword(String userId, String password, PasswordEncoder passwordEncoder) {
+    public Boolean checkPassword(String userId, String password, PasswordEncoder passwordEncoder, String salt) {
         User user = null;
 
         if (userId != null) {
             user = findById(userId);
         }
 
-        return (user != null) && (password != null) && (passwordEncoder.isMatches(password, user.getPassword()));
+        return (user != null) && (password != null) && (passwordEncoder.isMatches(password, user.getPassword(), salt));
     }
 
     public List<User> findUsersByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {

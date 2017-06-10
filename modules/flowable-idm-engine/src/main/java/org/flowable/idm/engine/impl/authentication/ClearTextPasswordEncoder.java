@@ -13,11 +13,11 @@ public final class ClearTextPasswordEncoder implements PasswordEncoder {
         return INSTANCE;
     }
 
-    public String encode(CharSequence rawPassword) {
+    public String encode(CharSequence rawPassword, String salt) {
         return (null == rawPassword) ? null : rawPassword.toString();
     }
 
-    public boolean isMatches(CharSequence rawPassword, String encodedPassword) {
+    public boolean isMatches(CharSequence rawPassword, String encodedPassword, String salt) {
         return rawPassword.toString().equals(encodedPassword);
     }
 

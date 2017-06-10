@@ -19,6 +19,7 @@ import org.flowable.idm.api.NativeGroupQuery;
 import org.flowable.idm.api.NativeTokenQuery;
 import org.flowable.idm.api.NativeUserQuery;
 import org.flowable.idm.api.PasswordEncoder;
+import org.flowable.idm.api.PasswordSalt;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.PrivilegeMapping;
@@ -27,6 +28,7 @@ import org.flowable.idm.api.Token;
 import org.flowable.idm.api.TokenQuery;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
+import org.flowable.idm.engine.impl.authentication.BlankSalt;
 import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
 import org.flowable.idm.engine.impl.cmd.AddPrivilegeMappingCmd;
 import org.flowable.idm.engine.impl.cmd.CheckPassword;
@@ -59,6 +61,8 @@ import org.flowable.idm.engine.impl.cmd.SetUserInfoCmd;
 import org.flowable.idm.engine.impl.cmd.SetUserPictureCmd;
 import org.flowable.idm.engine.impl.persistence.entity.IdentityInfoEntity;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -67,6 +71,7 @@ import java.util.List;
 public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentityService {
 
     private PasswordEncoder passwordEncoder = ClearTextPasswordEncoder.getInstance();
+    private PasswordSalt passwordSalt = BlankSalt.getInstance();
 
     public Group newGroup(String groupId) {
         return commandExecutor.execute(new CreateGroupCmd(groupId));
@@ -81,7 +86,7 @@ public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentitySe
     }
 
     public void saveUser(User user) {
-        commandExecutor.execute(new SaveUserCmd(user, passwordEncoder));
+        commandExecutor.execute(new SaveUserCmd(user, passwordEncoder, getSalt()));
     }
 
     public UserQuery createUserQuery() {
@@ -115,7 +120,7 @@ public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentitySe
     }
 
     public boolean checkPassword(String userId, String password) {
-        return commandExecutor.execute(new CheckPassword(userId, password, passwordEncoder));
+        return commandExecutor.execute(new CheckPassword(userId, password, passwordEncoder, getSalt()));
     }
 
     public void deleteUser(String userId) {
@@ -224,5 +229,38 @@ public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentitySe
     @Override
     public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    public PasswordSalt getPasswordSalt() {
+        return passwordSalt;
+    }
+
+    @Override
+    public void setPasswordSalt(PasswordSalt passwordSalt) {
+        this.passwordSalt = passwordSalt;
+    }
+
+    private String getSalt() {
+        Object source = passwordSalt.getSource();
+        if (source instanceof String) return (String) source;
+        try {
+            Class<?> aClass = Class.forName("org.springframework.security.authentication.dao.SystemWideSaltSource");
+            Class<?> uClass = Class.forName("org.springframework.security.core.userdetails.UserDetails");
+            if (aClass.isInstance(source)) {
+                Method method = null;
+                method = aClass.getMethod("getSalt", uClass);
+                return (String) method.invoke(source, new Object[]{null});
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

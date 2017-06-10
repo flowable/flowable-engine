@@ -28,15 +28,17 @@ public class CheckPassword implements Command<Boolean>, Serializable {
     String userId;
     String password;
     PasswordEncoder passwordEncoder;
+    String salt;
 
-    public CheckPassword(String userId, String password, PasswordEncoder passwordEncoder) {
+    public CheckPassword(String userId, String password, PasswordEncoder passwordEncoder, String salt) {
         this.userId = userId;
         this.password = password;
         this.passwordEncoder = passwordEncoder;
+        this.salt = salt;
     }
 
     public Boolean execute(CommandContext commandContext) {
-        return commandContext.getUserEntityManager().checkPassword(userId, password, passwordEncoder);
+        return commandContext.getUserEntityManager().checkPassword(userId, password, passwordEncoder, salt);
     }
 
 }

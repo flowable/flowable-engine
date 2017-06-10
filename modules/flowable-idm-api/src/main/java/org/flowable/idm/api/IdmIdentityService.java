@@ -245,4 +245,8 @@ public interface IdmIdentityService {
 
     void setPasswordEncoder(PasswordEncoder passwordEncoder);
 
+    PasswordSalt getPasswordSalt();
+
+    void setPasswordSalt(PasswordSalt passwordSalt);
+
 }
