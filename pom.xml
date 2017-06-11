@@ -126,12 +126,12 @@
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
-				<version>4.3.5</version>
+				<version>4.5.3</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpmime</artifactId>
-				<version>4.3.5</version>
+				<version>4.5.3</version>
 			</dependency>
 			<dependency>
 				<groupId>com.oracle.jdbc</groupId>
@@ -184,11 +184,6 @@
 			<dependency>
 				<groupId>de.odysseus.juel</groupId>
 				<artifactId>juel-impl</artifactId>
-				<version>2.2.7</version>
-			</dependency>
-			<dependency>
-				<groupId>de.odysseus.juel</groupId>
-				<artifactId>juel-spi</artifactId>
 				<version>2.2.7</version>
 			</dependency>
 			<dependency>
@@ -402,6 +397,11 @@
 			<dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-mule</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
+				<artifactId>flowable-http</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -1026,6 +1026,7 @@
 				<module>modules/flowable-spring-boot</module>
 				<module>modules/flowable-cxf</module>
 				<module>modules/flowable-mule</module>
+				<module>modules/flowable-http</module>
 				<module>modules/flowable-camel</module>
 				<module>modules/flowable-cdi</module>
 				<module>modules/flowable-osgi</module>
@@ -1226,6 +1227,7 @@
 				<module>modules/flowable-osgi</module>
 				<module>modules/flowable-camel</module>
 				<module>modules/flowable-mule</module>
+				<module>modules/flowable-http</module>
 				<module>modules/flowable-cdi</module>
 				<module>modules/flowable-ldap</module>
 				<module>modules/flowable-ldap-configurator</module>

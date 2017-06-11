@@ -22,6 +22,7 @@ public class ServiceTask extends TaskWithFieldExtensions {
 
     public static final String DMN_TASK = "dmn";
     public static final String MAIL_TASK = "mail";
+    public static final String HTTP_TASK = "http";
 
     protected String implementation;
     protected String implementationType;

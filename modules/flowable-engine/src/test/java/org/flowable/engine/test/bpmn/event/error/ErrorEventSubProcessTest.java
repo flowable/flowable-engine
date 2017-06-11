@@ -34,7 +34,7 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
         String procId = runtimeService.startProcessInstanceByKey("CatchErrorInEmbeddedSubProcess").getId();
 
         // The process will throw an error event, which is caught and escalated by a User Task
-        assertEquals("No tasks found in task list.", 1, taskService.createTaskQuery().taskDefinitionKey("taskAfterErrorCatch2").count());
+        assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("taskAfterErrorCatch2").count());
         Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Escalated Task", task.getName());
 

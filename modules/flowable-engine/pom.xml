@@ -88,10 +88,6 @@
 			<artifactId>juel-impl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>de.odysseus.juel</groupId>
-			<artifactId>juel-spi</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>provided</scope>

@@ -13,9 +13,6 @@
 
 package org.flowable.engine.impl.bpmn.helper;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +43,6 @@ import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
 import org.flowable.engine.impl.delegate.invocation.ExecutionListenerInvocation;
 import org.flowable.engine.impl.delegate.invocation.TaskListenerInvocation;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.util.ReflectUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -60,25 +56,17 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Saeid Mirzaei
  * @author Yvo Swillens
  */
-public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskListener, ExecutionListener, TransactionDependentExecutionListener, TransactionDependentTaskListener, SubProcessActivityBehavior, CustomPropertiesResolver {
+public class ClassDelegate extends AbstractClassDelegate implements TaskListener, ExecutionListener, TransactionDependentExecutionListener, TransactionDependentTaskListener, SubProcessActivityBehavior, CustomPropertiesResolver {
 
     private static final long serialVersionUID = 1L;
 
-    protected String serviceTaskId;
-    protected String className;
-    protected List<FieldDeclaration> fieldDeclarations;
-    protected ExecutionListener executionListenerInstance;
-    protected TransactionDependentExecutionListener transactionDependentExecutionListenerInstance;
-    protected TaskListener taskListenerInstance;
-    protected TransactionDependentTaskListener transactionDependentTaskListenerInstance;
     protected ActivityBehavior activityBehaviorInstance;
     protected Expression skipExpression;
     protected List<MapExceptionEntry> mapExceptions;
     protected CustomPropertiesResolver customPropertiesResolverInstance;
 
     public ClassDelegate(String className, List<FieldDeclaration> fieldDeclarations, Expression skipExpression) {
-        this.className = className;
-        this.fieldDeclarations = fieldDeclarations;
+        super(className, fieldDeclarations);
         this.skipExpression = skipExpression;
     }
 
@@ -88,33 +76,29 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
         this.mapExceptions = mapExceptions;
     }
 
-    public ClassDelegate(String className, List<FieldDeclaration> fieldDeclarations) {
-        this(className, fieldDeclarations, null);
-    }
-
-    public ClassDelegate(Class<?> clazz, List<FieldDeclaration> fieldDeclarations) {
-        this(clazz.getName(), fieldDeclarations, null);
-    }
-
     public ClassDelegate(Class<?> clazz, List<FieldDeclaration> fieldDeclarations, Expression skipExpression) {
         this(clazz.getName(), fieldDeclarations, skipExpression);
+    }
+    
+    public ClassDelegate(String className, List<FieldDeclaration> fieldDeclarations) {
+        super(className, fieldDeclarations);
+    }
+    
+    public ClassDelegate(Class<?> clazz, List<FieldDeclaration> fieldDeclarations) {
+        super(clazz, fieldDeclarations);
     }
 
     // Execution listener
     @Override
     public void notify(DelegateExecution execution) {
-        if (executionListenerInstance == null) {
-            executionListenerInstance = getExecutionListenerInstance();
-        }
+        ExecutionListener executionListenerInstance = getExecutionListenerInstance();
         Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new ExecutionListenerInvocation(executionListenerInstance, execution));
     }
 
     // Transaction Dependent execution listener
     @Override
     public void notify(String processInstanceId, String executionId, FlowElement flowElement, Map<String, Object> executionVariables, Map<String, Object> customPropertiesMap) {
-        if (transactionDependentExecutionListenerInstance == null) {
-            transactionDependentExecutionListenerInstance = getTransactionDependentExecutionListenerInstance();
-        }
+        TransactionDependentExecutionListener transactionDependentExecutionListenerInstance = getTransactionDependentExecutionListenerInstance();
 
         // Note that we can't wrap it in the delegate interceptor like usual here due to being executed when the context is already removed.
         transactionDependentExecutionListenerInstance.notify(processInstanceId, executionId, flowElement, executionVariables, customPropertiesMap);
@@ -131,9 +115,8 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
     // Task listener
     @Override
     public void notify(DelegateTask delegateTask) {
-        if (taskListenerInstance == null) {
-            taskListenerInstance = getTaskListenerInstance();
-        }
+        TaskListener taskListenerInstance = getTaskListenerInstance();
+
         try {
             Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new TaskListenerInvocation(taskListenerInstance, delegateTask));
         } catch (Exception e) {
@@ -143,9 +126,7 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
 
     @Override
     public void notify(String processInstanceId, String executionId, Task task, Map<String, Object> executionVariables, Map<String, Object> customPropertiesMap) {
-        if (transactionDependentTaskListenerInstance == null) {
-            transactionDependentTaskListenerInstance = getTransactionDependentTaskListenerInstance();
-        }
+        TransactionDependentTaskListener transactionDependentTaskListenerInstance = getTransactionDependentTaskListenerInstance();
         transactionDependentTaskListenerInstance.notify(processInstanceId, executionId, task, executionVariables, customPropertiesMap);
     }
 
@@ -283,91 +264,6 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
             return multiInstanceActivityBehavior;
         }
         return delegateInstance;
-    }
-
-    protected Object instantiateDelegate(String className, List<FieldDeclaration> fieldDeclarations) {
-        return ClassDelegate.defaultInstantiateDelegate(className, fieldDeclarations);
-    }
-
-    // --HELPER METHODS (also usable by external classes)
-    // ----------------------------------------
-
-    public static Object defaultInstantiateDelegate(Class<?> clazz, List<FieldDeclaration> fieldDeclarations) {
-        return defaultInstantiateDelegate(clazz.getName(), fieldDeclarations);
-    }
-
-    public static Object defaultInstantiateDelegate(String className, List<FieldDeclaration> fieldDeclarations) {
-        Object object = ReflectUtil.instantiate(className);
-        applyFieldDeclaration(fieldDeclarations, object);
-        return object;
-    }
-
-    public static void applyFieldDeclaration(List<FieldDeclaration> fieldDeclarations, Object target) {
-        applyFieldDeclaration(fieldDeclarations, target, true);
-    }
-
-    public static void applyFieldDeclaration(List<FieldDeclaration> fieldDeclarations, Object target, boolean throwExceptionOnMissingField) {
-        if (fieldDeclarations != null) {
-            for (FieldDeclaration declaration : fieldDeclarations) {
-                applyFieldDeclaration(declaration, target, throwExceptionOnMissingField);
-            }
-        }
-    }
-
-    public static void applyFieldDeclaration(FieldDeclaration declaration, Object target) {
-        applyFieldDeclaration(declaration, target, true);
-    }
-
-    public static void applyFieldDeclaration(FieldDeclaration declaration, Object target, boolean throwExceptionOnMissingField) {
-        Method setterMethod = ReflectUtil.getSetter(declaration.getName(),
-                target.getClass(), declaration.getValue().getClass());
-
-        if (setterMethod != null) {
-            try {
-                setterMethod.invoke(target, declaration.getValue());
-            } catch (IllegalArgumentException e) {
-                throw new FlowableException("Error while invoking '" + declaration.getName() + "' on class " + target.getClass().getName(), e);
-            } catch (IllegalAccessException e) {
-                throw new FlowableException("Illegal access when calling '" + declaration.getName() + "' on class " + target.getClass().getName(), e);
-            } catch (InvocationTargetException e) {
-                throw new FlowableException("Exception while invoking '" + declaration.getName() + "' on class " + target.getClass().getName(), e);
-            }
-        } else {
-            Field field = ReflectUtil.getField(declaration.getName(), target);
-            if (field == null) {
-                if (throwExceptionOnMissingField) {
-                    throw new FlowableIllegalArgumentException("Field definition uses unexisting field '" + declaration.getName() + "' on class " + target.getClass().getName());
-                } else {
-                    return;
-                }
-            }
-
-            // Check if the delegate field's type is correct
-            if (!fieldTypeCompatible(declaration, field)) {
-                throw new FlowableIllegalArgumentException("Incompatible type set on field declaration '" + declaration.getName()
-                        + "' for class " + target.getClass().getName()
-                        + ". Declared value has type " + declaration.getValue().getClass().getName()
-                        + ", while expecting " + field.getType().getName());
-            }
-            ReflectUtil.setField(field, target, declaration.getValue());
-
-        }
-    }
-
-    public static boolean fieldTypeCompatible(FieldDeclaration declaration, Field field) {
-        if (declaration.getValue() != null) {
-            return field.getType().isAssignableFrom(declaration.getValue().getClass());
-        } else {
-            // Null can be set any field type
-            return true;
-        }
-    }
-
-    /**
-     * returns the class name this {@link ClassDelegate} is configured to. Comes in handy if you want to check which delegates you already have e.g. in a list of listeners
-     */
-    public String getClassName() {
-        return className;
     }
 
 }

@@ -29,7 +29,6 @@ import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.bpmn.data.ItemInstance;
-import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
 import org.flowable.engine.impl.persistence.entity.VariableScopeImpl;
 

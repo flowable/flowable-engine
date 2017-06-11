@@ -89,6 +89,21 @@
 		<sendTask id="sendTask3" name="sendTask3" implementation="##WebService"
 			operationRef="tns:invalid"></sendTask>
 
+		<!-- Http task w/o request method -->
+		<serviceTask id="httpTask1" name="httpTask1" activiti:type="http">
+			<extensionElements>
+				<activiti:field name="requestUrl" expression="${requestUrl}" />
+			</extensionElements>
+		</serviceTask>
+		<!-- Http task w/o request url -->
+		<serviceTask id="httpTask2" name="httpTask2" activiti:type="http">
+			<extensionElements>
+				<activiti:field name="requestMethod" stringValue="GET" />
+			</extensionElements>
+		</serviceTask>
+		<!-- Http task w/o request method and url-->
+		<serviceTask id="httpTask3" name="httpTask3" activiti:type="http"></serviceTask>
+
 		<!-- Mail task w/o recipient -->
 		<serviceTask activiti:type="mail" id="mailTask1" name="mailTask1"></serviceTask>
 		<sendTask activiti:type="mail" id="mailTask2" name="mailTask1"></sendTask>

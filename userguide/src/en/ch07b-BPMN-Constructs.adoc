@@ -3514,6 +3514,247 @@ The following XML snippet shows an example of using the Email Task.
 ----
 
 
+[[bpmnHttpTask]]
+
+
+==== Http Task
+
+Http task allows you to make HTTP requests, enhancing the integration features of Flowable. Note that Http task is *not* an 'official' task of the BPMN 2.0 spec (and doesn't have a dedicated icon as a consequence). Hence, in Flowable, Http task is implemented as a dedicated service task.
+
+
+[[bpmnHttpTaskClientConfiguration]]
+
+
+===== Http Client configuration
+
+The Flowable engine makes Http requests through a configurable Http Client. The following properties can be set in the _flowable.cfg.xml_ configuration file:
+
+[source,xml,linenums]
+----
+  <bean id="processEngineConfiguration"
+        class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+    <!-- http client configurations -->
+    <property name="httpClientConfig" ref="httpClientConfig"/>
+  </bean>
+
+  <bean id="httpClientConfig" class="org.flowable.engine.cfg.HttpClientConfig">
+    <property name="connectTimeout" value="5000"/>
+    <property name="socketTimeout" value="5000"/>
+    <property name="connectionRequestTimeout" value="5000"/>
+    <property name="requestRetryLimit" value="5"/>
+  </bean>
+----
+
+[options="header"]
+|===============
+|Property|Required?|Description
+|connectTimeout|no|Connection timeout in milliseconds. By default set to 5000.
+|socketTimeout|no|Socket timeout in milliseconds. By default set to 5000.
+|connectionRequestTimeout|no|Connection request timeout in milliseconds. By default set to 5000.
+|requestRetryLimit|no|Request retry limit ('0' means do not retry). By default set to 3.
+|disableCertVerify|no|Flag to disable SSL certificate verification. By default set to false.
+
+|===============
+
+[[bpmnHttpTaskUsage]]
+
+
+===== Defining Http Task
+
+Http task is implemented as a dedicated <<bpmnJavaServiceTask,Service Task>> and is defined by setting _'http'_ for the _type_ of the service task.
+
+[source,xml,linenums]
+----
+<serviceTask id="httpGet" flowable:type="http">
+----
+Also its possible to override default Http Task behavior by providing custom implementation.
+Custom implemention should extend org.flowable.http.HttpActivityBehavior and override perform() method.
+Field 'httpActivityBehaviorClass' should be set in the task definition.
+Default value for this field is 'org.flowable.http.impl.HttpActivityBehaviorImpl'.
+Currently 'HttpActivityBehaviorImpl' is based on Apache Http Client. As Apache Http Client can be customized in many ways, all possible options are not used in Http Client config.
+To create a custom client refer to link:$$http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/impl/client/HttpClientBuilder.html$$[Http Client builder]
+
+----
+<serviceTask id="httpGet" flowable:type="http">
+  <extensionElements>
+    <flowable:field name="httpActivityBehaviorClass">
+        <flowable:string>
+          <![CDATA[org.example.flowable.HttpActivityBehaviorCustomImpl]]>
+        </flowable:string>
+    </flowable:field>
+  </extensionElements>
+</sericeTask>
+----
+
+[[bpmnHttpTaskConfiguration]]
+
+
+=====  Http Task configuration
+Http task is configured by <<serviceTaskFieldInjection,field injection>>. All the values for these properties can contain EL expression, which are resolved at runtime during process execution. The following properties can be set:
+
+[options="header"]
+|===============
+|Property|Required?|Description
+|requestMethod|yes|Request method + 
+                  (GET,POST,PUT,DELETE).
+|requestUrl|yes|Request URL + 
+               (Example - http://flowable.org).
+|requestHeaders|no|Line separated Http request headers. + 
+                  Example - + 
+                  Content-Type: application/json + 
+                  Authorization: Basic aGFRlc3Q=
+|requestBody|no|Request body + 
+               Example - ${sampleBody}
+|requestTimeout|no|Timeout in milliseconds for the request + 
+                  (Example - 5000). Default is '0', meaning no timeout.
+                  Please refer <<bpmnHttpTaskClientConfiguration>> for connection related timeouts.
+|disallowRedirects|no|Flag to disallow Http redirects. Default is false. (Example - true).
+|failStatusCodes|no|Comma separated list of Http response status codes to fail the request and error thrown as FlowableException. + 
+                   Example: 400, 404, 500, 503 + 
+                   Example: 400, 5XX
+|handleStatusCodes|no|Comma separated list of status codes for which the task will throw BpmnError.
+                   The error code of the BpmnError is 'HTTP<statuscode>'.
+                   For example, 404 status code is set with error code 'HTTP404'. + 
+                   3XX status codes are thrown only if 'disallowRedirects' field is also set. + 
+                   Status codes in 'handleStatusCodes' override those in 'failStatusCodes' when they are set in both. + 
+                   Example: 400, 404, 500, 503 + 
+                   Example: 3XX, 4XX, 5XX + 
+|ignoreException|no|Flag for ignoring the exceptions, catch and save the exception message as '<taskId>.errorMessage'.
+|saveRequestVariables|no|Flag to save request variables. By default, only response related variables are saved in execution.
+|saveResponseParameters|no|Flag to save all response variables including HTTP status, headers etc. By default, only response body is saved in execution.
+|resultVariablePrefix|no|Prefix for the execution variable names. If prefix is not set, variables will be saved with name
+                       in following format. '<taskId>'.'fieldName'. For example, requestUrl is saved as 'task7.requestUrl' for task with id 'task7'.
+|httpActivityBehaviorClass|no|Full class name of custom extension of org.flowable.http.HttpActivityBehavior.
+|===============
+
+In addition to the provided fields, following will be set as variables on successful execution, based on 'saveResponseParameters' flag.
+
+[options="header"]
+|===============
+|Variable|Optional?|Description
+|responseProtocol|Yes|Http version
+|responseReason|Yes|Http response reason phrase.
+|responseStatusCode|Yes|Http response status code (Example - 200).
+|responseHeaders|Yes|Line separated Http response headers. + 
+                  Example - + 
+                  Content-Type: application/json + 
+                  Content-Length: 777
+|responseBody|Yes|Response body as string, if any.
+|errorMessage|Yes|Ignored error message, if any.
+|===============
+
+===== Result variables
+
+Remember all the above execution variable names are prefixed by evaluated value of 'resultVariablePrefix'.
+For example response status code can be accessed in another activity as 'task7.responseStatusCode'.
+Here 'task7' is the 'id' of the service task. To override this behavior, set 'resultVariablePrefix' as required.
+
+[[bpmnHttpTaskExampleUsage]]
+
+
+===== Example usage
+
+The following XML snippet shows an example of using the Http Task.
+
+[source,xml,linenums]
+----
+<serviceTask id="httpGet" flowable:type="http">
+  <extensionElements>
+    <flowable:field name="requestMethod" stringValue="GET" />
+    <flowable:field name="requestUrl" stringValue="http://flowable.org" />
+    <flowable:field name="requestHeaders">
+      <flowable:expression>
+        <![CDATA[
+          Accept: text/html
+          Cache-Control: no-cache
+        ]]>
+      </flowable:expression>
+    </flowable:field>
+    <flowable:field name="requestTimeout">
+      <flowable:expression>
+        <![CDATA[
+          ${requestTimeout}
+        ]]>
+      </flowable:expression>
+    </flowable:field>
+    <flowable:field name="resultVariablePrefix">
+      <flowable:string>task7</flowable:string>
+    </flowable:field>
+  </extensionElements>
+</serviceTask>
+----
+
+[[bpmnHttpTaskErrorHandling]]
+
+===== Error handling
+
+By default Http Task throws FlowableException when Connection, IO or any unhandled exceptions occur.
+But by default it does not handle any redirect/client/server error http status codes.
+We can configure the task to handle the exceptions and http status by setting 'failStatusCodes' and/or 'handleStatusCodes' fields. Refer <<bpmnHttpTaskConfiguration>>.
+BpmnError thrown by 'handleStatusCodes' should be handled exactly like a normal BPMN exception, by having a corresponding boundary error handler.
+Below are few examples for exception handling and retry for http task.
+
+====== Fail on '400' and 5XX, async http task and retry with failedJobRetryTimeCycle
+[source,xml,linenums]
+----
+<serviceTask id="failGet" name="Fail test" flowable:async="true" flowable:type="http">
+  <extensionElements>
+    <flowable:field name="requestMethod">
+      <flowable:string><![CDATA[GET]]></flowable:string>
+    </flowable:field>
+    <flowable:field name="requestUrl">
+      <flowable:string><![CDATA[http://localhost:9798/api/fail]]></flowable:string>
+    </flowable:field>
+    <flowable:field name="failStatusCodes">
+      <flowable:string><![CDATA[400, 5XX]]></flowable:string>
+    </flowable:field>
+    <flowable:failedJobRetryTimeCycle>R3/PT5S</flowable:failedJobRetryTimeCycle>
+  </extensionElements>
+</serviceTask>
+----
+
+====== Handle '400' as BmpnError
+[source,xml,linenums]
+----
+<serviceTask id="handleGet" name="HTTP Task" flowable:type="http">
+  <extensionElements>
+    <flowable:field name="requestMethod">
+      <flowable:string><![CDATA[GET]]></flowable:string>
+    </flowable:field>
+    <flowable:field name="requestUrl">
+      <flowable:string><![CDATA[http://localhost:9798/api/fail]]></flowable:string>
+    </flowable:field>
+    <flowable:field name="handleStatusCodes">
+      <flowable:string><![CDATA[4XX]]></flowable:string>
+    </flowable:field>
+  </extensionElements>
+</serviceTask>
+<boundaryEvent id="catch400" attachedToRef="handleGet">
+  <errorEventDefinition errorRef="HTTP400"></errorEventDefinition>
+</boundaryEvent>
+----
+
+====== Ignore exceptions.
+[source,xml,linenums]
+----
+<serviceTask id="ignoreTask" name="Fail test" flowable:type="http">
+  <extensionElements>
+    <flowable:field name="requestMethod">
+      <flowable:string><![CDATA[GET]]></flowable:string>
+    </flowable:field>
+    <flowable:field name="requestUrl">
+      <flowable:string><![CDATA[http://nohost:9798/api]]></flowable:string>
+    </flowable:field>
+    <flowable:field name="ignoreException">
+      <flowable:string><![CDATA[true]]></flowable:string>
+    </flowable:field>
+  </extensionElements>
+</serviceTask>
+----
+
+====== Exception mapping
+Refer <<exceptionMapping, Exception mapping>>
+
 [[bpmnMuleTask]]
 
 
@@ -3906,7 +4147,7 @@ image::images/bpmn.receive.task.png[align="center"]
 <receiveTask id="waitState" name="wait" />
 ----
 
-To continue a process instance that is currently waiting at such a Receive Task, the _runtimeService.signal(executionId)_ must be called using the ID of the execution that arrived in the Receive Task. The following code snippet shows how this works in practice:
+To continue a process instance that is currently waiting at such a Receive Task, the _runtimeService.trigger(executionId)_ must be called using the ID of the execution that arrived in the Receive Task. The following code snippet shows how this works in practice:
 
 [source,java,linenums]
 ----
@@ -3917,7 +4158,7 @@ Execution execution = runtimeService.createExecutionQuery()
   .singleResult();
 assertNotNull(execution);
 
-runtimeService.signal(execution.getId());
+runtimeService.trigger(execution.getId());
 ----
 
 

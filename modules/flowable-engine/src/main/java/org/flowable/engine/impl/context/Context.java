@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,7 +43,6 @@ public class Context {
     protected static ThreadLocal<Stack<ProcessEngineConfigurationImpl>> processEngineConfigurationStackThreadLocal = new ThreadLocal<Stack<ProcessEngineConfigurationImpl>>();
     protected static ThreadLocal<Map<String, ObjectNode>> bpmnOverrideContextThreadLocal = new ThreadLocal<Map<String, ObjectNode>>();
 
-    protected static ThreadLocal<Flowable5CompatibilityHandler> flowable5CompatibilityHandlerThreadLocal = new ThreadLocal<Flowable5CompatibilityHandler>();
     // Fallback handler is only set by the v5 CommandContextInterceptor
     protected static ThreadLocal<Flowable5CompatibilityHandler> fallbackFlowable5CompatibilityHandlerThreadLocal = new ThreadLocal<Flowable5CompatibilityHandler>();
 
@@ -174,15 +173,7 @@ public class Context {
     }
 
     public static Flowable5CompatibilityHandler getFlowable5CompatibilityHandler() {
-        return flowable5CompatibilityHandlerThreadLocal.get();
-    }
-
-    public static void setFlowable5CompatibilityHandler(Flowable5CompatibilityHandler flowable5CompatibilityHandler) {
-        flowable5CompatibilityHandlerThreadLocal.set(flowable5CompatibilityHandler);
-    }
-
-    public static void removeFlowable5CompatibilityHandler() {
-        flowable5CompatibilityHandlerThreadLocal.remove();
+        return processEngineConfigurationStackThreadLocal.get().peek().getFlowable5CompatibilityHandler();
     }
 
     public static Flowable5CompatibilityHandler getFallbackFlowable5CompatibilityHandler() {

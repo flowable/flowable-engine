@@ -112,13 +112,13 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     }
 
     /** creates and initializes a new persistent task. */
-    public static TaskEntity createAndInsert(ActivityExecution execution) {
+    public static TaskEntity createAndInsert(ActivityExecution execution, boolean fireEvents) {
         TaskEntity task = create(Context.getProcessEngineConfiguration().getClock().getCurrentTime());
-        task.insert((ExecutionEntity) execution);
+        task.insert((ExecutionEntity) execution, fireEvents);
         return task;
     }
 
-    public void insert(ExecutionEntity execution) {
+    public void insert(ExecutionEntity execution, boolean fireEvents) {
         CommandContext commandContext = Context.getCommandContext();
         DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
         dbSqlSession.insert(this);
@@ -133,8 +133,8 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         }
 
         commandContext.getHistoryManager().recordTaskCreated(this, execution);
-
-        if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+        
+        if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled() && fireEvents) {
             commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
                     ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, this));
             commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
@@ -177,19 +177,21 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     }
 
     @SuppressWarnings("rawtypes")
-    public void complete(Map variablesMap, boolean localScope) {
+    public void complete(Map variablesMap, boolean localScope, boolean fireEvents) {
 
         if (getDelegationState() != null && getDelegationState() == DelegationState.PENDING) {
             throw new ActivitiException("A delegated task cannot be completed, but should be resolved instead.");
         }
 
-        fireEvent(TaskListener.EVENTNAME_COMPLETE);
+        if (fireEvents) {
+            fireEvent(TaskListener.EVENTNAME_COMPLETE);
+        }
 
         if (Authentication.getAuthenticatedUserId() != null && processInstanceId != null) {
             getProcessInstance().involveUser(Authentication.getAuthenticatedUserId(), IdentityLinkType.PARTICIPANT);
         }
 
-        if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+        if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled() && fireEvents) {
             Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
                     ActivitiEventBuilder.createEntityWithVariablesEvent(FlowableEngineEventType.TASK_COMPLETED, this, variablesMap, localScope));
         }

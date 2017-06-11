@@ -217,9 +217,9 @@ function _drawServiceTask(element)
 	{
 		_drawMuleTaskIcon(paper, element.x + 4, element.y + 4);
 	}
-    else if (element.taskType === "rest_call")
+    else if (element.taskType === "http")
     {
-        _drawRestCallTaskIcon(paper, element.x + 4, element.y + 4);
+        _drawHttpTaskIcon(paper, element.x + 4, element.y + 4);
     }
 	else if (element.stencilIconId)
 	{

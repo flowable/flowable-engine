@@ -458,7 +458,20 @@
       "ADD-OPTION":"+ Adicionar uma nova opção",
       "UPLOAD-ALLOW-MULTIPLE":"Permitir o upload de vários arquivos",
       "MAX-LENGTH":"Comprimento máximo:",
-      "MIN-LENGTH":"Comprimento mínimo:"
+      "MIN-LENGTH":"Comprimento mínimo:",
+      "HYPERLINK-URL": "URL de hiperlink",
+      "REGEX-PATTERN":"Padrão Regex",
+      "MASK":{
+        "TITLE":"Máscara de entrada",
+        "EXAMPLES":{
+          "TITLE":"Exemplos:",
+          "NUMBER":"Qualquer número",
+          "LETTER":"Qualquer letra",
+          "NUMBERORLETTER":"Qualquer letra ou número",
+          "OPTIONAL":"Torna a máscara opcional (não valida)",
+          "PHONE":"Dinheiro"
+        }
+      }
     },
     "OUTCOMES":{
       "DESCRIPTION":"Você pode definir várias saídas para esta tarefa. Quando concluir uma tarefa, os usuários seleciona uma das saídas disponíveis, que podem ser usados em, por exemplo, em uma condição futura no processo.",
@@ -563,7 +576,7 @@
   "PROPERTY.FEEDBACK.TITLE":"Por favor, nos envie seu feedback",
   "PROPERTY.ASSIGNMENT.TITLE":"Atribuição",
   "PROPERTY.ASSIGNMENT.TYPE":"Tipo",
-  "PROPERTY.ASSIGNMENT.TYPE.IDENTITYSTORE":"Armazenamento de identidade",
+  "PROPERTY.ASSIGNMENT.TYPE.IDENTITYSTORE":"Identidades",
   "PROPERTY.ASSIGNMENT.TYPE.STATIC":"Valores fixos",
   "PROPERTY.ASSIGNMENT.ASSIGNEE":"Responsável",
   "PROPERTY.ASSIGNMENT.MATCHING":"Use &uparrow; e &downarrow; para selecionar e pressione Enter para confirmar ou use o mouse",
@@ -608,6 +621,10 @@
   "PROPERTY.EXECUTIONLISTENERS.FIELDS.EMPTY":"Nenhum campo selecionado",
   "PROPERTY.FIELDS":"{{length}} campos",
   "PROPERTY.FIELDS.EMPTY":"Nenhum campo selecionado",
+  "PROPERTY.ASSIGNMENT.NONE" : "Nenhum...",
+  "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHUSER": "Pesquisar usuário",
+  "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHGROUP": "Pesquisar grupo",
+  "PROPERTY.ASSIGNMENT.SEARCH": "Pesquisa: ",
   "PROPERTY.FIELDS.NAME":"Nome",
   "PROPERTY.FIELDS.NAME.PLACEHOLDER":"Digite um nome",
   "PROPERTY.FIELDS.EXPRESSION":"Expressão",
