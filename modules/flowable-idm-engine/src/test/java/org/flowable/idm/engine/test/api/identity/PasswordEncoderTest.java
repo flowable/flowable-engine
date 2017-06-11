@@ -2,11 +2,15 @@ package org.flowable.idm.engine.test.api.identity;
 
 import org.flowable.idm.api.PasswordEncoder;
 import org.flowable.idm.api.User;
+import org.flowable.idm.engine.impl.authentication.ApacheDigester;
 import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
+import org.flowable.idm.engine.impl.authentication.JasyptPasswordEncryptor;
 import org.flowable.idm.engine.impl.authentication.SpringEncoder;
 import org.flowable.idm.engine.impl.authentication.SpringSalt;
 import org.flowable.idm.engine.impl.authentication.StringSalt;
+import org.flowable.idm.engine.impl.authentication.jBCryptHashing;
 import org.flowable.idm.engine.test.PluggableFlowableIdmTestCase;
+import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.dao.SystemWideSaltSource;
@@ -53,6 +57,29 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
 
         idmIdentityService.setPasswordEncoder(new SpringEncoder(new StandardPasswordEncoder()));
         validatePassword();
+    }
+
+    public void testApacheDigesterdEncoderInstance() {
+
+        idmIdentityService.setPasswordEncoder(new ApacheDigester(ApacheDigester.Digester.MD5));
+        validatePassword();
+
+        idmIdentityService.setPasswordEncoder(new ApacheDigester(ApacheDigester.Digester.SHA512));
+        validatePassword();
+    }
+
+    public void testJasptEncoderInstance() {
+
+        idmIdentityService.setPasswordEncoder(new JasyptPasswordEncryptor(new StrongPasswordEncryptor()));
+        validatePassword();
+
+    }
+
+    public void testjBCrytpEncoderInstance() {
+
+        idmIdentityService.setPasswordEncoder(new jBCryptHashing());
+        validatePassword();
+
     }
 
     public void testSaltPasswordEncoderInstance() {
