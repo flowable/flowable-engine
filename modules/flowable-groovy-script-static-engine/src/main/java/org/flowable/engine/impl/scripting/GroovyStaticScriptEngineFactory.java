@@ -13,9 +13,7 @@ import java.util.List;
 public class GroovyStaticScriptEngineFactory extends GroovyScriptEngineFactory {
 
     /**
-     * Returns the full  name of the <code>ScriptEngine</code>.  For
-     * instance an implementation based on the Mozilla Rhino Javascript engine
-     * might return <i>Rhino Mozilla Javascript Engine</i>.
+     * Returns the full  name of the <code>ScriptEngine</code>. 
      *
      * @return The name of the engine implementation.
      */

@@ -68,10 +68,7 @@ public class GroovyStaticScriptEngine extends GroovyScriptEngineImpl {
         ASTTransformationCustomizer astTransformationCustomizer = new ASTTransformationCustomizer(
                 Collections.singletonMap("extensions", Collections.singletonList("EngineVariablesExtension.groovy")),
                 CompileStatic.class, "org.codehaus.groovy.transform.sc.StaticCompileTransformation");
-        ImportCustomizer imports = new ImportCustomizer();
-        imports.addStaticStars("org.flowable.engine.delegate.VariableScope");
         compilerConfiguration.addCompilationCustomizers(astTransformationCustomizer);
-        compilerConfiguration.addCompilationCustomizers(imports);
         return compilerConfiguration;
     }
 
@@ -86,12 +83,6 @@ public class GroovyStaticScriptEngine extends GroovyScriptEngineImpl {
             }
         } catch (ClassNotFoundException var2) {
             var2.printStackTrace();
-        }
-        try {
-            ctxtLoader = Script.class.getClassLoader();
-            clazz = Class.forName("org.flowable.engine.delegate.VariableScope", true, ctxtLoader);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
         return Script.class.getClassLoader();
     }
