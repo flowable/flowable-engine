@@ -190,6 +190,19 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
     }
 
     @Test
+    @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/outcome_expression_5.dmn")
+    public void executeDecision_outcome_variable_reference() {
+        Map<String, Object> processVariablesInput = new HashMap<>();
+
+        processVariablesInput.put("input1", "blablatest");
+        processVariablesInput.put("referenceVar1", 10D);
+        processVariablesInput.put("referenceVar2", 20D);
+        Map<String, Object> result = ruleService.executeDecisionByKeySingleResult("decision", processVariablesInput);
+
+        Assert.assertEquals(200D, result.get("output1"));
+    }
+
+    @Test
     @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/outcome_expression_2.dmn")
     public void executeDecision_failed_state_could_not_create_outcome() {
         Map<String, Object> processVariablesInput = new HashMap<>();

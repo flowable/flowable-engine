@@ -52,6 +52,7 @@ public class DmnJsonConverterTest {
     private static final String JSON_RESOURCE_5 = "org/flowable/editor/dmn/converter/decisiontable_order.json";
     private static final String JSON_RESOURCE_6 = "org/flowable/editor/dmn/converter/decisiontable_entries.json";
     private static final String JSON_RESOURCE_7 = "org/flowable/editor/dmn/converter/decisiontable_dates.json";
+    private static final String JSON_RESOURCE_8 = "org/flowable/editor/dmn/converter/decisiontable_empty_operator.json";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -272,7 +273,16 @@ public class DmnJsonConverterTest {
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_6);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
 
-        Assert.assertNotNull(dmnDefinition);
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+
+        Assert.assertEquals("\"AAA\",\"BBB\"", decisionTable.getInputs().get(0).getInputValues().getText());
+        Assert.assertEquals("AAA", decisionTable.getInputs().get(0).getInputValues().getTextValues().get(0));
+        Assert.assertEquals("BBB", decisionTable.getInputs().get(0).getInputValues().getTextValues().get(1));
+
+        Assert.assertEquals("\"THIRD\",\"FIRST\",\"SECOND\"", decisionTable.getOutputs().get(0).getOutputValues().getText());
+        Assert.assertEquals("THIRD", decisionTable.getOutputs().get(0).getOutputValues().getTextValues().get(0));
+        Assert.assertEquals("FIRST", decisionTable.getOutputs().get(0).getOutputValues().getTextValues().get(1));
+        Assert.assertEquals("SECOND", decisionTable.getOutputs().get(0).getOutputValues().getTextValues().get(2));
     }
 
     @Test
@@ -281,6 +291,29 @@ public class DmnJsonConverterTest {
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
 
         Assert.assertNotNull(dmnDefinition);
+    }
+
+    @Test
+    public void testConvertJsonToDmn_Empty_Operator() throws Exception {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_8);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+
+
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+        Assert.assertEquals("fn_date('2017-06-01')", decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
+        Assert.assertEquals("-", decisionTable.getRules().get(0).getInputEntries().get(1).getInputEntry().getText());
+        Assert.assertNotNull(decisionTable.getRules().get(0).getInputEntries().get(0).getInputClause());
+        Assert.assertNotNull(decisionTable.getRules().get(0).getInputEntries().get(1).getInputClause());
+
+        Assert.assertEquals("fn_date('2017-06-02')", decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
+        Assert.assertEquals("-", decisionTable.getRules().get(1).getInputEntries().get(1).getInputEntry().getText());
+        Assert.assertNotNull(decisionTable.getRules().get(1).getInputEntries().get(0).getInputClause());
+        Assert.assertNotNull(decisionTable.getRules().get(1).getInputEntries().get(1).getInputClause());
+
+        Assert.assertEquals("fn_date('2017-06-03')", decisionTable.getRules().get(0).getOutputEntries().get(0).getOutputEntry().getText());
+        Assert.assertEquals("", decisionTable.getRules().get(1).getOutputEntries().get(0).getOutputEntry().getText());
+        Assert.assertNotNull(decisionTable.getRules().get(0).getOutputEntries().get(0).getOutputClause());
+        Assert.assertNotNull(decisionTable.getRules().get(1).getOutputEntries().get(0).getOutputClause());
     }
 
     /* Helper methods */
