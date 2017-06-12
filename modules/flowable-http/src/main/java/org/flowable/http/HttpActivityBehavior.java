@@ -13,6 +13,7 @@
 package org.flowable.http;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -185,7 +186,7 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
             
         } catch (Exception e) {
             if (request.isIgnoreErrors()) {
-                log.info("Error ignored while processing http task in execution " + execution.getId(), e);
+                log.info("Error ignored while processing http task in execution {}", execution.getId(), e);
                 execution.setVariable(request.getPrefix() + ".errorMessage", e.getMessage());
                 
             } else {
@@ -247,9 +248,7 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
     protected Set<String> getStringSetFromField(final String field) {
         String[] codes = field.split(",");
         Set<String> codeSet = new HashSet<>(Arrays.asList(codes));
-        for (String code : codes) {
-            codeSet.add(code);
-        }
+        Collections.addAll(codeSet, codes);
         return codeSet;
     }
 

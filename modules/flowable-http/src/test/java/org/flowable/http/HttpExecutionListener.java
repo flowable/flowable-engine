@@ -29,9 +29,9 @@ public class HttpExecutionListener implements ExecutionListener {
     public void notify(DelegateExecution execution) {
         execution.setVariable("runs", ++runs);
         for (Map.Entry e : execution.getVariables().entrySet()) {
-            log.info("key: {}", e.getKey().toString());
+            log.info("key: {}", e.getKey());
             if (e.getValue() != null) {
-                log.info("Value: {}", e.getValue().toString());
+                log.info("Value: {}", e.getValue());
             }
         }
     }
