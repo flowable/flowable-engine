@@ -667,7 +667,7 @@ angular.module('flowableApp')
                             }
                             
                         } else if (field.type === 'date' && field.value) {
-                        	postData.values[field.id] = field.value.toISOString().slice(0, 10);
+                        	postData.values[field.id] = field.value.getFullYear() + '-' + (field.value.getMonth() + 1) + '-' + field.value.getDate();
 
                         } else {
                             postData.values[field.id] = field.value;
