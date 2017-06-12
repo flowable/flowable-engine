@@ -315,8 +315,8 @@
             "ANY": "Any",
             "UNIQUE": "Unique",
             "PRIORITY": "Priority",
-            "RULE_ORDER": "Rule Order",
-            "OUTPUT_ORDER": "Output Order",
+            "RULE ORDER": "Rule Order",
+            "OUTPUT ORDER": "Output Order",
             "COLLECT": "Collect"
         },
         "POPUP": {

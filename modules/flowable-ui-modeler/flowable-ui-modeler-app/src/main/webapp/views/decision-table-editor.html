@@ -37,7 +37,29 @@
         <h4>Decision Table Editor</h4>
     </div>
 
+    <div class="row">
+        <div class="col-xs-12 text-right">
+            <div class="dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" id="actionsMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    Actions
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="actionsMenu">
+                    <li><a href ng-click="addRule()">{{"DECISION-TABLE-EDITOR.BUTTON-ADD-RULE-LABEL" | translate}}</a></li>
+                    <li ng-if="model.selectedRow !== undefined && currentDecisionTableRules.length >= 2 && model.selectedRow >= 1"><a href ng-click="moveRuleUpwards()">{{"DECISION-TABLE-EDITOR.BUTTON-MOVE-RULE-UPWARDS-LABEL" | translate}}</a></li>
+                    <li ng-if="model.selectedRow !== undefined && model.selectedRow !== currentDecisionTableRules.length - 1"><a href ng-click="moveRuleDownwards()">{{"DECISION-TABLE-EDITOR.BUTTON-MOVE-RULE-DOWNWARDS-LABEL" | translate}}</a></li>
+                    <li class="danger" ng-if="model.selectedRow !== undefined && currentDecisionTableRules.length > 1"><a href ng-click="removeRule()">{{"DECISION-TABLE-EDITOR.BUTTON-REMOVE-RULE-LABEL" | translate}}</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <div class="decision-table-grid-wrapper" id="decisionTableGrid">
+        <div class="decision-name-container">
+            <div class="decision-name">
+                {{currentDecisionTable.name}}
+            </div>
+        </div>
         <hot-table
                 hot-id="decision-table-editor"
                 settings="hotModel.settings"
@@ -51,26 +73,26 @@
                 on-after-render=doAfterRender
                 on-after-on-cell-mouse-down=doAfterOnCellMouseDown
                 current-row-class-name="'currentRow'"
-                height="300">
+                height="500">
         </hot-table>
     </div>
 
-    <div class="center grid-controls">
-        <div ng-if="currentDecisionTable.inputExpressions.length > 0 || currentDecisionTable.outputExpressions.length > 0">
-            <button class="btn btn-default" ng-click="removeRule()"
-                    ng-disabled="model.selectedRow === undefined || rulesData.length < 2"
-                    translate="DECISION-TABLE-EDITOR.BUTTON-REMOVE-RULE-LABEL"></button>
-            <button class="btn btn-default" ng-click="moveRuleUpwards()"
-                    ng-disabled="!enableMoveUpwards(model.selectedRule) || readOnly"
-                    translate="DECISION-TABLE-EDITOR.BUTTON-MOVE-RULE-UPWARDS-LABEL"></button>
-            <button class="btn btn-default" ng-click="moveRuleDownwards()"
-                    ng-disabled="!enableMoveDownwards(model.selectedRule) || readOnly"
-                    translate="DECISION-TABLE-EDITOR.BUTTON-MOVE-RULE-DOWNWARDS-LABEL"></button>
-            <button class="btn btn-default" ng-click="addRule()" ng-disabled="readOnly"
-                    translate="DECISION-TABLE-EDITOR.BUTTON-ADD-RULE-LABEL"></button>
-            <button type="button" class="btn btn-default" ng-click="dumpData()">dump data to console</button>
-        </div>
-    </div>
+    <!--<div class="center grid-controls">-->
+        <!--<div ng-if="currentDecisionTable.inputExpressions.length > 0 || currentDecisionTable.outputExpressions.length > 0">-->
+            <!--&lt;!&ndash;<button class="btn btn-danger" ng-click="removeRule()"&ndash;&gt;-->
+                    <!--&lt;!&ndash;ng-disabled="model.selectedRow === undefined || currentDecisionTableRules.length < 2"&ndash;&gt;-->
+                    <!--&lt;!&ndash;translate="DECISION-TABLE-EDITOR.BUTTON-REMOVE-RULE-LABEL"></button>&ndash;&gt;-->
+            <!--&lt;!&ndash;<button class="btn btn-default" ng-click="moveRuleUpwards()"&ndash;&gt;-->
+                    <!--&lt;!&ndash;ng-disabled="model.selectedRow === undefined || currentDecisionTableRules.length < 2 || model.selectedRow < 1"&ndash;&gt;-->
+                    <!--&lt;!&ndash;translate="DECISION-TABLE-EDITOR.BUTTON-MOVE-RULE-UPWARDS-LABEL"></button>&ndash;&gt;-->
+            <!--&lt;!&ndash;<button class="btn btn-default" ng-click="moveRuleDownwards()"&ndash;&gt;-->
+                    <!--&lt;!&ndash;ng-disabled="model.selectedRow === undefined || model.selectedRow == currentDecisionTableRules.length - 1"&ndash;&gt;-->
+                    <!--&lt;!&ndash;translate="DECISION-TABLE-EDITOR.BUTTON-MOVE-RULE-DOWNWARDS-LABEL"></button>&ndash;&gt;-->
+            <!--&lt;!&ndash;<button class="btn btn-default" ng-click="addRule()" ng-disabled="readOnly"&ndash;&gt;-->
+                    <!--&lt;!&ndash;translate="DECISION-TABLE-EDITOR.BUTTON-ADD-RULE-LABEL"></button>&ndash;&gt;-->
+            <!--<button type="button" class="btn btn-default" ng-click="dumpData()">dump data to console</button>-->
+        <!--</div>-->
+    <!--</div>-->
 </div>
 
 

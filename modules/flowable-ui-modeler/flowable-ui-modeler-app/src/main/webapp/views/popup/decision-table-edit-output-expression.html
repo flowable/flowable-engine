@@ -49,8 +49,8 @@
                         <div class="clearfix form-group">
                             <div class="col-xs-4">
                                 <label>Output values
-                                    <span ng-if="popup.currentHitPolicy === 'PRIORITY' || popup.currentHitPolicy === 'OUTPUT_ORDER'">(drag rows for priority / output order):</span>
-                                    <span ng-if="popup.currentHitPolicy !== 'PRIORITY' && popup.currentHitPolicy !== 'OUTPUT_ORDER'">(optional):</span>
+                                    <span ng-if="popup.currentHitPolicy === 'PRIORITY' || popup.currentHitPolicy === 'OUTPUT ORDER'">(drag rows for priority / output order):</span>
+                                    <span ng-if="popup.currentHitPolicy !== 'PRIORITY' && popup.currentHitPolicy !== 'OUTPUT ORDER'">(optional):</span>
                                 </label>
                             </div>
                             <div class="col-xs-8">
@@ -80,10 +80,10 @@
                                 ng-disabled="!outputExpressionForm.$valid || readOnly">
                             {{'GENERAL.ACTION.SAVE' | translate}}
                         </button>
-                        <button type="button" class="btn btn-sm btn-default" ng-click="dumpData()"
-                                ng-disabled="!outputExpressionForm.$valid || readOnly">
-                            dump data
-                        </button>
+                        <!--<button type="button" class="btn btn-sm btn-default" ng-click="dumpData()"-->
+                                <!--ng-disabled="!outputExpressionForm.$valid || readOnly">-->
+                            <!--dump data-->
+                        <!--</button>-->
                     </div>
                     <div class="loading pull-right" ng-show="model.loading">
                         <div class="l1"></div>

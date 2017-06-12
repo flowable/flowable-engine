@@ -740,12 +740,20 @@ li.x-menu-list-item.x-menu-item-active a {
 
 .decision-table .decision-table-grid-wrapper {
     position: relative;
-    margin-top: 40px;
+    margin-top: 20px;
     width: 100%;
 }
 
 .decision-table .decision-table-grid-wrapper > span {
     display: none;
+}
+
+.decision-table .dropdown {
+    display: inherit !important;
+}
+
+.decision-table .dropdown-menu > li.danger > a:hover {
+    background: #d35f5f;
 }
 
 .decision-table .decision-table-grid-wrapper .ui-grid-header-cell .ui-grid-cell-contents .text-center {
@@ -793,6 +801,21 @@ hot-table .column-header.label {
     margin-top: 40px;
 }
 
+
+.decision-name-container {
+    width: 340px;
+    height: 50px;
+    border-left: 1px solid rgba(51, 51, 51, 0.3);
+    border-top: 1px solid rgba(51, 51, 51, 0.3);
+    border-right: 1px solid rgba(51, 51, 51, 0.3);
+}
+
+.decision-name-container .decision-name {
+    padding: 12px;
+    font-size: 15px;
+    font-weight: bold;
+}
+
 #decision-table-editor th .input-header {
     font-size: 16px;
     display: inline-block;
@@ -806,8 +829,8 @@ hot-table .column-header.label {
 }
 
 #decision-table-editor th .input-header .header-label, #decision-table-editor th .output-header .header-label {
-    font-size: 16px;
-    font-weight: bold;
+    font-size: 15px;
+    font-weight: 600;
 }
 
 #decision-table-editor th .input-header a, #decision-table-editor th .output-header a {
@@ -964,10 +987,16 @@ hot-table .column-header.label {
     background: none;
 }
 
+#decision-table-editor .hit-policy-container {
+}
+
 #decision-table-editor .hit-policy-header {
     margin-top: 5px;
     font-size: 15px;
-    cursor: hand;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    color: #428bca;
 }
 
 #decision-table-editor .handsontable.htRemoveRow th.htRemoveRow {
