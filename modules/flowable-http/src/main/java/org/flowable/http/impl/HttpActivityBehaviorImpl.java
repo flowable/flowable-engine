@@ -247,7 +247,7 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
     protected String getHeadersAsString(final Header[] headers) {
         StringBuilder hb = new StringBuilder();
         for (Header header : headers) {
-            hb.append(header.getName()).append(": ").append(header.getValue()).append("\n");
+            hb.append(header.getName()).append(": ").append(header.getValue()).append('\n');
         }
         return hb.toString();
     }
@@ -296,7 +296,7 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
     }
     
     protected List<FieldDeclaration> createFieldDeclarations(List<FieldExtension> fieldList, ProcessEngineConfigurationImpl processEngineConfiguration) {
-        List<FieldDeclaration> fieldDeclarations = new ArrayList<FieldDeclaration>();
+        List<FieldDeclaration> fieldDeclarations = new ArrayList<>();
 
         for (FieldExtension fieldExtension : fieldList) {
             FieldDeclaration fieldDeclaration = null;
