@@ -17,13 +17,26 @@ package org.flowable.dmn.engine.impl.mvel;
  */
 public class MvelConditionExpressionPreParser implements MvelExpressionPreParser {
 
-    public static String parse(String expression, String inputVariable) {
+    public static String parse(String expression, String inputVariable, String inputVariableType) {
 
         String parsedExpression = inputVariable;
-        if (expression.startsWith(".")) {
-            parsedExpression += expression;
+        if ("date".equals(inputVariableType)) {
+            if (!expression.startsWith("==") &&
+                !expression.startsWith("!=") &&
+                !expression.startsWith("<") &&
+                !expression.startsWith(">") &&
+                !expression.startsWith(">=") &&
+                !expression.startsWith("<=")) {
+                parsedExpression += " == " + expression;
+            } else {
+                parsedExpression += " " + expression;
+            }
         } else {
-            parsedExpression += " " + expression;
+            if (expression.startsWith(".")) {
+                parsedExpression += expression;
+            } else {
+                parsedExpression += " " + expression;
+            }
         }
         return parsedExpression;
     }

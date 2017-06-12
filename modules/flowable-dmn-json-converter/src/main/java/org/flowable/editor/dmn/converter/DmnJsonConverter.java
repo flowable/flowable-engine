@@ -266,15 +266,28 @@ public class DmnJsonConverter {
                     String operatorId = id + "_operator";
                     String expressionId = id + "_expression";
 
-                    if (ruleNode.has(operatorId) && ruleNode.has(expressionId)) {
+                    if (isNewModelVersion) {
                         RuleInputClauseContainer ruleInputClauseContainer = new RuleInputClauseContainer();
                         ruleInputClauseContainer.setInputClause(ruleInputContainerMap.get(id));
 
                         UnaryTests inputEntry = new UnaryTests();
                         inputEntry.setId("inputEntry_" + id + "_" + ruleCounter);
 
-                        String operatorValue = ruleNode.get(operatorId).asText();
-                        String expressionValue = ruleNode.get(expressionId).asText();
+                        JsonNode operatorValueNode = ruleNode.get(operatorId);
+                        String operatorValue;
+                        if (operatorValueNode == null || operatorValueNode.isNull()) {
+                            operatorValue = "==";
+                        } else {
+                            operatorValue = operatorValueNode.asText();
+                        }
+
+                        JsonNode expressionValueNode = ruleNode.get(expressionId);
+                        String expressionValue;
+                        if (expressionValueNode == null || expressionValueNode.isNull()) {
+                            expressionValue = "-";
+                        } else {
+                            expressionValue = expressionValueNode.asText();
+                        }
 
                         // don't add operator if it's ==
                         StringBuilder stringBuilder = new StringBuilder();
@@ -283,7 +296,8 @@ public class DmnJsonConverter {
                         }
 
                         // add quotes for string
-                        if ("string".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())) {
+                        if ("string".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
+                            && !"-".equals(expressionValue)) {
                             if (stringBuilder.length() > 0) {
                                 stringBuilder.append(" \"");
                             } else {
@@ -291,6 +305,12 @@ public class DmnJsonConverter {
                             }
                             stringBuilder.append(expressionValue);
                             stringBuilder.append("\"");
+                        } else if ("date".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
+                            && !"-".equals(expressionValue) && StringUtils.isNotEmpty(expressionValue)){
+                            // wrap in built in toDate function
+                            stringBuilder.append("fn_date('");
+                            stringBuilder.append(expressionValue);
+                            stringBuilder.append("')");
                         } else {
                             stringBuilder.append(expressionValue);
                         }
@@ -312,18 +332,36 @@ public class DmnJsonConverter {
                     }
                 }
                 for (String id : ruleOutputContainerMap.keySet()) {
+                    RuleOutputClauseContainer ruleOutputClauseContainer = new RuleOutputClauseContainer();
+                    ruleOutputClauseContainer.setOutputClause(ruleOutputContainerMap.get(id));
+
+                    LiteralExpression outputEntry = new LiteralExpression();
+                    outputEntry.setId("outputEntry_" + id + "_" + ruleCounter);
+
                     if (ruleNode.has(id)) {
-                        RuleOutputClauseContainer ruleOutputClauseContainer = new RuleOutputClauseContainer();
-                        ruleOutputClauseContainer.setOutputClause(ruleOutputContainerMap.get(id));
+                        JsonNode expressionValueNode = ruleNode.get(id);
+                        String expressionValue;
+                        if (expressionValueNode == null || expressionValueNode.isNull()) {
+                            expressionValue = "";
+                        } else {
+                            expressionValue = expressionValueNode.asText();
+                        }
 
-                        LiteralExpression outputEntry = new LiteralExpression();
-                        outputEntry.setId("outputEntry_" + id + "_" + ruleCounter);
-                        outputEntry.setText(ruleNode.get(id).asText());
+                        if ("string".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())) { // add quotes for string
+                            outputEntry.setText("\"" + expressionValue + "\"");
+                        } else if (isNewModelVersion && "date".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())
+                            && StringUtils.isNotEmpty(expressionValue)){ // wrap in built in toDate function
+                            outputEntry.setText("fn_date('" + expressionValue + "')");
+                        } else {
+                            outputEntry.setText(expressionValue);
+                        }
 
-                        ruleOutputClauseContainer.setOutputEntry(outputEntry);
-
-                        rule.addOutputEntry(ruleOutputClauseContainer);
+                    } else { // output entry not present in rule node
+                        outputEntry.setText("");
                     }
+
+                    ruleOutputClauseContainer.setOutputEntry(outputEntry);
+                    rule.addOutputEntry(ruleOutputClauseContainer);
                 }
                 ruleCounter++;
                 decisionTable.addRule(rule);

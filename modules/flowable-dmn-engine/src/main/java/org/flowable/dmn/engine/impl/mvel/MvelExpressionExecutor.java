@@ -53,7 +53,7 @@ public class MvelExpressionExecutor {
         executionContext.checkExecutionContext(inputClause.getInputExpression().getText());
 
         // pre parse expression
-        String parsedExpression = MvelConditionExpressionPreParser.parse(inputEntry.getText(), inputClause.getInputExpression().getText());
+        String parsedExpression = MvelConditionExpressionPreParser.parse(inputEntry.getText(), inputClause.getInputExpression().getText(), inputClause.getInputExpression().getTypeRef());
 
         // compile MVEL expression
         Serializable compiledExpression = MVEL.compileExpression(parsedExpression, executionContext.getParserContext());

@@ -18,7 +18,7 @@
           </rule>
           <rule>
             <inputEntry id="inputEntry2">
-              <text><![CDATA[!= fn_date('2015-01-01')]]></text>
+              <text><![CDATA[fn_date('2015-09-18')]]></text>
             </inputEntry>
             <outputEntry id="outputEntry2">
               <text>'test2'</text>
