@@ -38,6 +38,7 @@ angular.module('flowableModeler')
             $scope.model.hotSettings = {
                 stretchH: 'all',
                 outsideClickDeselects: false,
+                manualColumnResize: false,
                 readOnly: true,
                 disableVisualSelection: true
             };

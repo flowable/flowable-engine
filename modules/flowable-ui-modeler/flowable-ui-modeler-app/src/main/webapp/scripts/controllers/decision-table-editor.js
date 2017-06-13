@@ -135,7 +135,7 @@ angular.module('flowableModeler')
                         }
                     }
                 },
-                manualColumnResize: true,
+                manualColumnResize: false,
                 stretchH: 'all',
                 outsideClickDeselects: false
             };
