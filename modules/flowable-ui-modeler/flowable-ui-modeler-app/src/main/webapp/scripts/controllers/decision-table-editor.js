@@ -485,6 +485,11 @@ angular.module('flowableModeler')
                         type = 'text';
                 }
 
+                if (outputExpression.complexExpression) {
+                    console.log('disable validator for column: '+outputExpression.variableId);
+                    type = 'text';
+                }
+
                 var title = '';
                 var columnDefinition = {
                     data: outputExpression.id,
@@ -577,7 +582,9 @@ angular.module('flowableModeler')
                 // timeout needed for trigger hot update when removing column defs
                 $scope.model.columnDefs = columnDefinitions;
                 $timeout(function () {
-                    hotDecisionTableEditorInstance.render();
+                    if (hotDecisionTableEditorInstance) {
+                        hotDecisionTableEditorInstance.render();
+                    }
                 });
             };
 
@@ -856,7 +863,8 @@ angular.module('flowableModeler')
                 hotSettings: {
                     currentColClassName: 'currentCol',
                     stretchH: 'none'
-                }
+                },
+                complexExpression:  $scope.model.selectedExpression.complexExpression
             };
         } else {
             $scope.popup = {
@@ -877,7 +885,8 @@ angular.module('flowableModeler')
                 ],
                 hotSettings: {
                     stretchH: 'none'
-                }
+                },
+                complexExpression: false
             };
         }
 
@@ -893,7 +902,8 @@ angular.module('flowableModeler')
                     variableId: $scope.popup.selectedExpressionNewVariableId,
                     type: $scope.popup.selectedExpressionNewVariableType,
                     label: $scope.popup.selectedExpressionLabel,
-                    entries: getEntriesValues(hotInstance.getData())
+                    entries: getEntriesValues(hotInstance.getData()),
+                    complexExpression: $scope.popup.complexExpression
                 };
                 $scope.addNewOutputExpression(newOutputExpression, $scope.model.selectedColumn + 1);
             } else {
@@ -901,6 +911,7 @@ angular.module('flowableModeler')
                 $scope.model.selectedExpression.type = $scope.popup.selectedExpressionNewVariableType;
                 $scope.model.selectedExpression.label = $scope.popup.selectedExpressionLabel;
                 $scope.model.selectedExpression.entries = getEntriesValues(hotInstance.getData());
+                $scope.model.selectedExpression.complexExpression = $scope.popup.complexExpression;
                 $scope.evaluateDecisionHeaders($scope.currentDecisionTable);
             }
 

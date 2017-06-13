@@ -532,7 +532,8 @@
                 "EXPRESSION-VARIABLE-TYPE": "Variable type:",
                 "EXPRESSION-VARIABLE-NAME-PLACEHOLDER": "Enter a variable name",
                 "OUTPUT-NEW-VARIABLE-ID": "Variable ID:",
-                "OUTPUT-NEW-VARIABLE-TYPE": "Variable type:"
+                "OUTPUT-NEW-VARIABLE-TYPE": "Variable type:",
+                "COMPLEX-EXPRESSION-LABEL": "Complex expression:"
             }
         },
         "BUTTON-ADD-INPUT-LABEL": "Add input",

@@ -53,6 +53,7 @@ public class DmnJsonConverterTest {
     private static final String JSON_RESOURCE_6 = "org/flowable/editor/dmn/converter/decisiontable_entries.json";
     private static final String JSON_RESOURCE_7 = "org/flowable/editor/dmn/converter/decisiontable_dates.json";
     private static final String JSON_RESOURCE_8 = "org/flowable/editor/dmn/converter/decisiontable_empty_operator.json";
+    private static final String JSON_RESOURCE_9 = "org/flowable/editor/dmn/converter/decisiontable_complex_output_expression.json";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -298,7 +299,6 @@ public class DmnJsonConverterTest {
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_8);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
 
-
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
         Assert.assertEquals("fn_date('2017-06-01')", decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
         Assert.assertEquals("-", decisionTable.getRules().get(0).getInputEntries().get(1).getInputEntry().getText());
@@ -314,6 +314,15 @@ public class DmnJsonConverterTest {
         Assert.assertEquals("", decisionTable.getRules().get(1).getOutputEntries().get(0).getOutputEntry().getText());
         Assert.assertNotNull(decisionTable.getRules().get(0).getOutputEntries().get(0).getOutputClause());
         Assert.assertNotNull(decisionTable.getRules().get(1).getOutputEntries().get(0).getOutputClause());
+    }
+
+    @Test
+    public void testConvertJsonToDmn_Complex_Output_Expression() throws Exception {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_9);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+        Assert.assertEquals("refVar1 * refVar2", decisionTable.getRules().get(0).getOutputEntries().get(0).getOutputEntry().getText());
     }
 
     /* Helper methods */

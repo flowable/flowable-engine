@@ -172,6 +172,7 @@ public class DmnJsonConverter {
 
         Map<String, InputClause> ruleInputContainerMap = new LinkedHashMap<>();
         Map<String, OutputClause> ruleOutputContainerMap = new LinkedHashMap<>();
+        List<String> complexExpressionIds = new ArrayList<>();
 
         // input expressions
         JsonNode inputExpressions = modelNode.get("inputExpressions");
@@ -224,8 +225,9 @@ public class DmnJsonConverter {
                 OutputClause outputClause = new OutputClause();
 
                 String outputExpressionId = DmnJsonConverterUtil.getValueAsString("id", outputExpressionNode);
+                String outputClauseId = "outputExpression_" + outputExpressionId;
 
-                outputClause.setId("outputExpression_" + outputExpressionId);
+                outputClause.setId(outputClauseId);
                 outputClause.setLabel(DmnJsonConverterUtil.getValueAsString("label", outputExpressionNode));
                 outputClause.setName(DmnJsonConverterUtil.getValueAsString("variableId", outputExpressionNode));
                 outputClause.setTypeRef(DmnJsonConverterUtil.getValueAsString("type", outputExpressionNode));
@@ -241,6 +243,12 @@ public class DmnJsonConverter {
 
                     // add to clause
                     outputClause.setOutputValues(outputValues);
+                }
+
+                if (outputExpressionNode.get("complexExpression") != null && !outputExpressionNode.get("complexExpression").isNull()) {
+                    if (outputExpressionNode.get("complexExpression").asBoolean()) {
+                        complexExpressionIds.add(outputExpressionId);
+                    }
                 }
 
                 // add to map
@@ -347,13 +355,17 @@ public class DmnJsonConverter {
                             expressionValue = expressionValueNode.asText();
                         }
 
-                        if ("string".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())) { // add quotes for string
-                            outputEntry.setText("\"" + expressionValue + "\"");
-                        } else if (isNewModelVersion && "date".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())
-                            && StringUtils.isNotEmpty(expressionValue)){ // wrap in built in toDate function
-                            outputEntry.setText("fn_date('" + expressionValue + "')");
-                        } else {
+                        if (complexExpressionIds.contains(id)) {
                             outputEntry.setText(expressionValue);
+                        } else {
+                            if ("string".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())) { // add quotes for string
+                                outputEntry.setText("\"" + expressionValue + "\"");
+                            } else if (isNewModelVersion && "date".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())
+                                && StringUtils.isNotEmpty(expressionValue)) { // wrap in built in toDate function
+                                outputEntry.setText("fn_date('" + expressionValue + "')");
+                            } else {
+                                outputEntry.setText(expressionValue);
+                            }
                         }
 
                     } else { // output entry not present in rule node
