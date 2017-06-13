@@ -59,14 +59,13 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -74,14 +73,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.flowable.app.rest.HttpRequestHelper.executeHttpGet;
-
 @Service
 @Transactional
 public class ModelServiceImpl implements ModelService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModelServiceImpl.class);
     private static final int CIRCLE_SIZE = 30;
-    private final Logger log = LoggerFactory.getLogger(ModelServiceImpl.class);
 
     public static final String NAMESPACE = "http://flowable.org/modeler";
 
@@ -180,6 +177,80 @@ public class ModelServiceImpl implements ModelService {
         }
 
         return modelKeyResponse;
+    }
+
+    @Override
+    public String createModelJson(ModelRepresentation model) {
+        String json = null;
+        if (Integer.valueOf(AbstractModel.MODEL_TYPE_FORM).equals(model.getModelType())) {
+            try {
+                json = objectMapper.writeValueAsString(new FormModel());
+            } catch (Exception e) {
+                LOGGER.error("Error creating form model", e);
+                throw new InternalServerErrorException("Error creating form");
+            }
+
+        } else if (Integer.valueOf(AbstractModel.MODEL_TYPE_DECISION_TABLE).equals(model.getModelType())) {
+            try {
+                DecisionTableDefinitionRepresentation decisionTableDefinition = new DecisionTableDefinitionRepresentation();
+
+                String decisionTableDefinitionKey = model.getName().replaceAll(" ", "");
+                decisionTableDefinition.setKey(decisionTableDefinitionKey);
+
+                json = objectMapper.writeValueAsString(decisionTableDefinition);
+            } catch (Exception e) {
+                LOGGER.error("Error creating decision table model", e);
+                throw new InternalServerErrorException("Error creating decision table");
+            }
+
+        } else if (Integer.valueOf(AbstractModel.MODEL_TYPE_APP).equals(model.getModelType())) {
+            try {
+                json = objectMapper.writeValueAsString(new AppDefinition());
+            } catch (Exception e) {
+                LOGGER.error("Error creating app definition", e);
+                throw new InternalServerErrorException("Error creating app definition");
+            }
+
+        } else {
+            ObjectNode editorNode = objectMapper.createObjectNode();
+            editorNode.put("id", "canvas");
+            editorNode.put("resourceId", "canvas");
+            ObjectNode stencilSetNode = objectMapper.createObjectNode();
+            stencilSetNode.put("namespace", "http://b3mn.org/stencilset/bpmn2.0#");
+            editorNode.set("stencilset", stencilSetNode);
+            ObjectNode propertiesNode = objectMapper.createObjectNode();
+            propertiesNode.put("process_id", model.getKey());
+            propertiesNode.put("name", model.getName());
+            if (StringUtils.isNotEmpty(model.getDescription())) {
+                propertiesNode.put("documentation", model.getDescription());
+            }
+            editorNode.set("properties", propertiesNode);
+
+            ArrayNode childShapeArray = objectMapper.createArrayNode();
+            editorNode.set("childShapes", childShapeArray);
+            ObjectNode childNode = objectMapper.createObjectNode();
+            childShapeArray.add(childNode);
+            ObjectNode boundsNode = objectMapper.createObjectNode();
+            childNode.set("bounds", boundsNode);
+            ObjectNode lowerRightNode = objectMapper.createObjectNode();
+            boundsNode.set("lowerRight", lowerRightNode);
+            lowerRightNode.put("x", 130);
+            lowerRightNode.put("y", 193);
+            ObjectNode upperLeftNode = objectMapper.createObjectNode();
+            boundsNode.set("upperLeft", upperLeftNode);
+            upperLeftNode.put("x", 100);
+            upperLeftNode.put("y", 163);
+            childNode.set("childShapes", objectMapper.createArrayNode());
+            childNode.set("dockers", objectMapper.createArrayNode());
+            childNode.set("outgoing", objectMapper.createArrayNode());
+            childNode.put("resourceId", "startEvent1");
+            ObjectNode stencilNode = objectMapper.createObjectNode();
+            childNode.set("stencil", stencilNode);
+            stencilNode.put("id", "StartNoneEvent");
+            json = editorNode.toString();
+        }
+
+        return json;
     }
 
     @Override
@@ -750,7 +821,7 @@ public class ModelServiceImpl implements ModelService {
                         }
                     }
                 } catch (Exception e) {
-                    log.error("Could not deserialize app model json (id = {})", latestModel.getId(), e);
+                    LOGGER.error("Could not deserialize app model json (id = {})", latestModel.getId(), e);
                 }
             }
         }
@@ -778,7 +849,7 @@ public class ModelServiceImpl implements ModelService {
             bpmnModel = getBpmnModel(model, formMap, decisionTableMap);
 
         } catch (Exception e) {
-            log.error("Could not generate BPMN 2.0 model for {}", model.getId(), e);
+            LOGGER.error("Could not generate BPMN 2.0 model for {}", model.getId(), e);
             throw new InternalServerErrorException("Could not generate BPMN 2.0 model");
         }
 
@@ -802,7 +873,7 @@ public class ModelServiceImpl implements ModelService {
             return bpmnJsonConverter.convertToBpmnModel(editorJsonNode, formKeyMap, decisionTableKeyMap);
 
         } catch (Exception e) {
-            log.error("Could not generate BPMN 2.0 model for {}", model.getId(), e);
+            LOGGER.error("Could not generate BPMN 2.0 model for {}", model.getId(), e);
             throw new InternalServerErrorException("Could not generate BPMN 2.0 model");
         }
     }
@@ -840,7 +911,7 @@ public class ModelServiceImpl implements ModelService {
             try {
                 jsonNode = (ObjectNode) objectMapper.readTree(model.getModelEditorJson());
             } catch (Exception e) {
-                log.error("Could not deserialize json model", e);
+                LOGGER.error("Could not deserialize json model", e);
                 throw new InternalServerErrorException("Could not deserialize json model");
             }
 

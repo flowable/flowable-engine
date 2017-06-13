@@ -12,6 +12,10 @@
  */
 package org.flowable.http;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -36,10 +40,6 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.flowable.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Http Server and API to test HTTP Activity
@@ -237,7 +237,7 @@ public class HttpServiceTaskTestServer {
             nameNode.put("firstName", "John");
             nameNode.put("lastName", "Doe");
             
-            resp.getWriter().println(responseNode.toString());
+            resp.getWriter().println(responseNode);
         }
     }
 

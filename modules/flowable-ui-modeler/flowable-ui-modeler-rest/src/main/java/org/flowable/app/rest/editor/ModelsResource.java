@@ -18,18 +18,15 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.domain.editor.AbstractModel;
-import org.flowable.app.domain.editor.AppDefinition;
 import org.flowable.app.domain.editor.Model;
 import org.flowable.app.model.common.ResultListDataRepresentation;
 import org.flowable.app.model.editor.ModelKeyRepresentation;
 import org.flowable.app.model.editor.ModelRepresentation;
-import org.flowable.app.model.editor.decisiontable.DecisionTableDefinitionRepresentation;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.api.ModelService;
 import org.flowable.app.service.editor.FlowableModelQueryService;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.InternalServerErrorException;
-import org.flowable.form.model.FormModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,8 +101,6 @@ public class ModelsResource {
         if (modelKeyInfo.isKeyAlreadyExists()) {
             throw new BadRequestException("Provided model key already exists: " + modelRepresentation.getKey());
         }
-
-        String json = null;
 
         Model newModel = modelService.createModel(modelRepresentation, skeleton, SecurityUtils.getCurrentUserObject());
         return new ModelRepresentation(newModel);

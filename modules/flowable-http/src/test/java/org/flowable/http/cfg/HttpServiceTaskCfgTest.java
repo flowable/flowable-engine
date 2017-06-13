@@ -41,10 +41,10 @@ public class HttpServiceTaskCfgTest extends HttpServiceTaskCfgTestCase {
     @Deployment
     public void testHttpsSelfSignedFail() {
         try {
-            String procId = runtimeService.startProcessInstanceByKey("httpsSelfSignedFail").getId();
+            runtimeService.startProcessInstanceByKey("httpsSelfSignedFail").getId();
         } catch (Exception e) {
-            assertEquals(true, e instanceof FlowableException);
-            assertEquals(true, e.getCause() instanceof SSLHandshakeException);
+            assertTrue(e instanceof FlowableException);
+            assertTrue(e.getCause() instanceof SSLHandshakeException);
         }
     }
 }
