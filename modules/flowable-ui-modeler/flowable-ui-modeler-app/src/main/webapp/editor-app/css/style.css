@@ -797,7 +797,7 @@ hot-table .column-header.label {
     font-size: 14px;
 }
 
-.decision-table .grid-controls {
+#decisionTableGrid .grid-controls {
     margin-top: 40px;
 }
 
@@ -815,7 +815,7 @@ hot-table .column-header.label {
     font-weight: bold;
 }
 
-#decision-table-editor th .input-header {
+#decisionTableGrid th .input-header {
     font-size: 16px;
     display: inline-block;
     margin: 0 auto 0 -20%;
@@ -826,7 +826,7 @@ hot-table .column-header.label {
     text-overflow: ellipsis;
 }
 
-#decision-table-editor th .output-header {
+#decisionTableGrid  th .output-header {
     font-size: 16px;
     display: inline-block;
     margin: 0 auto;
@@ -837,29 +837,29 @@ hot-table .column-header.label {
     text-overflow: ellipsis;
 }
 
-#decision-table-editor th .input-header .header-label, #decision-table-editor th .output-header .header-label {
+#decisionTableGrid th .input-header .header-label, #decisionTableGrid th .output-header .header-label {
     font-size: 15px;
     font-weight: 600;
 }
 
-#decision-table-editor th .input-header a, #decision-table-editor th .output-header a {
+#decisionTableGrid th .input-header a, #decisionTableGrid th .output-header a {
     text-decoration: underline;
 }
 
-#decision-table-editor th .input-header .header-variable, #decision-table-editor th .output-header .header-variable {
+#decisionTableGrid th .input-header .header-variable, #decisionTableGrid th .output-header .header-variable {
     font-size: 14px;
     font-style: italic;
     text-align: center;
 }
 
-#decision-table-editor th .input-header .header-entries, #decision-table-editor th .output-header .header-entries {
+#decisionTableGrid th .input-header .header-entries, #decisionTableGrid th .output-header .header-entries {
     font-size: 12px;
     font-weight: lighter;
     font-style: normal;
     text-align: center;
 }
 
-#decision-table-editor th .header-add-new-expression {
+#decisionTableGrid th .header-add-new-expression {
     float: right;
     position: relative;
     padding-right: 15px;
@@ -867,7 +867,7 @@ hot-table .column-header.label {
     font-size: 15px;
 }
 
-#decision-table-editor th .header-remove-expression {
+#decisionTableGrid th .header-remove-expression {
     float: left;
     position: relative;
     top: 10px;
@@ -875,41 +875,25 @@ hot-table .column-header.label {
     padding-left: 15px;
 }
 
-#decision-table-editor tr .input-operator-cell {
+#decisionTableGrid tr .input-operator-cell {
     text-align: center;
     min-width: 50px; !important;
 }
 
-#decision-table-editor td.htInvalid {
+#decisionTableGrid td.htInvalid {
     background-color: rgba(255, 76, 66, 0.33) !important;
 }
 
-#decision-table-editor .selectedRow {
+#decisionTableGrid .selectedRow {
     background: rgb(0, 140, 186);
     color: rgb(250, 250, 250)
 }
 
-
-#decision-table-editor {
+#decision-table-editor, #read-only-decision-table-editor {
     background-color: rgba(243, 243, 243, 0.5);
 }
 
-/*#decision-table-editor tr th {*/
-/*background-color: #87c1d0;*/
-/*}*/
-
-/*#decision-table-editor .input-operator-container {*/
-/*display: inline-block;*/
-/*margin: 0 auto;*/
-/*width: 40px;*/
-/*}*/
-
-/*#decision-table-editor .input-expression-container {*/
-/*float: right;*/
-/*position: relative;*/
-/*}*/
-
-#decision-table-editor .input-operator-container {
+#decisionTableGrid .input-operator-container {
     width: 45px;
     float: left;
     border: 1px solid rgb(212, 212, 212);
@@ -918,88 +902,87 @@ hot-table .column-header.label {
     text-align: center;
 }
 
-#decision-table-editor .input-expression-container {
+#decisionTableGrid .input-expression-container {
     overflow: hidden;
     border: 1px solid rgb(212, 212, 212);
     padding: 1px;
 }
 
-#decision-table-editor .input-expression-container {
+#decisionTableGrid .input-expression-container {
     overflow: hidden;
     border: 1px solid rgb(212, 212, 212);
     padding: 1px;
     clear: right;
 }
 
-#decision-table-editor .input-expression-input {
+#decisionTableGrid .input-expression-input {
     overflow: hidden;
     border: none;
     width: 100%;
 }
 
-#decision-table-editor .input-container {
+#decisionTableGrid .input-container {
     width: 100%;
     margin: 0 auto;
     overflow: hidden;
     padding: 4px 0px 4px 0px;
 }
 
-#decision-table-editor .input-operator-select {
+#decisionTableGrid .input-operator-select {
     width: 45px;
     border: none;
     box-shadow: none;
-    background: transparent;
-    background-image: none;
+    background: transparent none;
     -webkit-appearance: none;
 }
 
-#decision-table-editor .input-operator-select :focus {
+#decisionTableGrid .input-operator-select :focus {
     outline: none;
 }
 
-#decision-table-editor .input-expression-input :focus {
+#decisionTableGrid .input-expression-input :focus {
     outline: none;
 }
 
-#decision-table-editor .input-operator-select.editor :focus {
+#decisionTableGrid .input-operator-select.editor :focus {
     outline: none;
 }
 
-#decision-table-editor th.input-expression-header, #decision-table-editor th.input-operator-header {
+#decisionTableGrid th.input-expression-header, #decisionTableGrid th.input-operator-header {
     background-color: rgba(54, 167, 196, 0.1);
     border-bottom: 4px double rgba(51, 51, 51, 0.7);
 }
 
-#decision-table-editor th.input-expression-header {
+#decisionTableGrid th.input-expression-header {
     /*border-left: 1px solid rgba(54, 167, 196, 0.1);*/
     border-left-style: hidden;
 }
 
-#decision-table-editor th.input-expression-header.last, #decision-table-editor td.last {
+#decisionTableGrid th.input-expression-header.last, #decision-table-editor td.last {
     border-right: 4px double rgba(51, 51, 51, 0.7);
 }
 
-#decision-table-editor th.output-header.first, #decision-table-editor td.first {
+#decisionTableGrid th.output-header.first, #decision-table-editor td.first {
     border-left: 4px double rgba(51, 51, 51, 0.7);
 }
 
-#decision-table-editor th.output-header {
+#decisionTableGrid th.output-header {
     background-color: rgba(243, 243, 243, 1);
     border-bottom: 4px double rgba(51, 51, 51, 0.7);
 }
 
-#decision-table-editor th.input-operator-header {
+#decisionTableGrid th.input-operator-header {
     border-right-style: hidden;
 }
 
-#decision-table-editor thead th:first-of-type {
+#decisionTableGrid thead th:first-of-type {
     background: none;
 }
 
-#decision-table-editor .hit-policy-container {
+#decisionTableGrid .hit-policy-container {
 }
 
-#decision-table-editor .hit-policy-header {
+#decisionTableGrid .hit-policy-header {
     margin-top: 5px;
     font-size: 15px;
     font-weight: 600;
@@ -1014,15 +997,15 @@ hot-table .column-header.label {
     border-right: 1px solid rgba(51, 51, 51, 0.3);
 }
 
-.decision-table-grid-wrapper .handsontable th:first-child {
+#decisionTableGrid .handsontable th:first-child {
     border-left: none;
 }
 
-#decision-table-editor .handsontable.htRemoveRow th.htRemoveRow {
+#decisionTableGrid .handsontable.htRemoveRow th.htRemoveRow {
     text-align: center;
 }
 
-#decision-table-editor .handsontable.htRemoveRow th.htRemoveRow .btn {
+#decisionTableGrid .handsontable.htRemoveRow th.htRemoveRow .btn {
     background-color: #898989;
     border-radius: 20px;
     padding: 2px 0 0;
@@ -1062,8 +1045,6 @@ hot-table .column-header.label {
     -webkit-box-shadow: none;
     box-shadow: none;
 }
-
-#decision-table-editor .htItemWrapper
 
 .handsontable.htRemoveRow th.htRemoveRow .btn:hover {
     background-color: #777;

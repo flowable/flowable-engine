@@ -66,19 +66,20 @@
 </div>
 <div class="container-fluid content decision-table read-only" ng-if="model.decisionTable" auto-height offset="40">
 
-    <div class="decision-table-grid-wrapper">
+    <div class="decision-table-grid-wrapper" id="decisionTableGrid">
         <div class="decision-name-container">
             <div class="decision-name">
                 {{currentDecisionTable.name}}
             </div>
         </div>
-        <hot-table
-                   hot-id="decision-table-editor"
+        <hot-table class="decision-table-editor" hot-auto-destroy
+                   hot-id="read-only-decision-table-editor"
                    settings="model.hotSettings"
                    columns="model.columnDefs"
                    row-headers="true"
                    datarows="model.rulesData"
                    auto-row-size="'true'"
+                   on-after-render=doAfterRender
                    on-after-get-col-header=doAfterGetColHeader
                    on-modify-col-width=doAfterModifyColWidth
                    height="500">

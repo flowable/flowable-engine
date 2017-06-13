@@ -24,7 +24,6 @@ angular.module('flowableModeler')
 
             extScope = $scope;
 
-            $scope.availableVariableTypes = ['string', 'number', 'boolean', 'date'];
             $rootScope.decisionTableChanges = false;
 
             var hotDecisionTableEditorInstance;
@@ -42,7 +41,8 @@ angular.module('flowableModeler')
                 columnDefs: [],
                 columnVariableIdMap: {},
                 startOutputExpression: 0,
-                selectedRow: undefined
+                selectedRow: undefined,
+                availableVariableTypes: ['string', 'number', 'boolean', 'date']
             };
 
             // Hot Model init

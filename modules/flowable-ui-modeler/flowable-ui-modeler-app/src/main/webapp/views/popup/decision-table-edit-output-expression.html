@@ -16,7 +16,7 @@
                         <div class="col-xs-8">
                             <input class="form-control" name="expressionLabel"
                                    placeholder="{{'DECISION-TABLE-EDITOR.POPUP.EXPRESSION-EDITOR.EXPRESSION-PLACEHOLDER' | translate}}"
-                                   type="text" ng-model="popup.selectedExpressionLabel"/>
+                                   type="text" ng-model="popup.selectedExpressionLabel" ng-disabled="model.readOnly"/>
                         </div>
                     </div>
 
@@ -28,7 +28,7 @@
                         </div>
                         <div class="col-xs-8">
                             <input class="form-control" name="variableId" placeholder="Enter variable id" type="text"
-                                   ng-model="popup.selectedExpressionNewVariableId" ng-required="true" variable-identifier/>
+                                   ng-model="popup.selectedExpressionNewVariableId" ng-required="true" variable-identifier ng-disabled="model.readOnly"/>
                         </div>
                     </div>
 
@@ -39,9 +39,9 @@
                                 translate}}</label>
                         </div>
                         <div class="col-xs-8">
-                            <select class="form-control" ng-options="type for type in availableVariableTypes"
+                            <select class="form-control" ng-options="type for type in model.availableVariableTypes"
                                     ng-model="popup.selectedExpressionNewVariableType" name="newVariable"
-                                    ng-required="true"/>
+                                    ng-required="true" ng-disabled="model.readOnly"/>
                         </div>
                     </div>
 
@@ -51,7 +51,7 @@
                                 translate}}</label>
                         </div>
                         <div class="col-xs-8">
-                            <input type="checkbox" ng-model="popup.complexExpression" />
+                            <input type="checkbox" ng-model="popup.complexExpression" ng-disabled="model.readOnly"/>
                         </div>
                     </div>
 
@@ -63,7 +63,7 @@
                                     <span ng-if="popup.currentHitPolicy !== 'PRIORITY' && popup.currentHitPolicy !== 'OUTPUT ORDER'">(optional):</span>
                                 </label>
                             </div>
-                            <div class="col-xs-8">
+                            <div ng-if="!model.readOnly" class="col-xs-8">
                                 <hot-table hot-auto-destroy
                                         hot-id="decision-table-allowed-values"
                                         settings="popup.hotSettings"
@@ -74,8 +74,12 @@
                                         row-heights="30"
                                         class-name="'htMiddle'"
                                         on-after-render=doAfterRender
-                                        min-spare-rows="1">
+                                        min-spare-rows="1"
+                                        read-only="model.readOnly">
                                 </hot-table>
+                            </div>
+                            <div ng-if="model.readOnly" class="col-xs-8">
+                                <div ng-repeat="allowedValue in popup.selectedExpressionOutputValues"><span style="font-size: 14px">{{allowedValue[0]}}</span><br></div>
                             </div>
                         </div>
                     </div>
@@ -87,7 +91,7 @@
                             {{'GENERAL.ACTION.CANCEL' | translate}}
                         </button>
                         <button type="button" class="btn btn-sm btn-default" ng-click="save()"
-                                ng-disabled="!outputExpressionForm.$valid || readOnly">
+                                ng-disabled="!outputExpressionForm.$valid || model.readOnly">
                             {{'GENERAL.ACTION.SAVE' | translate}}
                         </button>
                     </div>

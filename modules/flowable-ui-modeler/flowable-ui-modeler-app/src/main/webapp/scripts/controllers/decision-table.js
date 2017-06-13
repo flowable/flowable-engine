@@ -29,7 +29,9 @@ angular.module('flowableModeler')
                 // even when we're showing history
                 latestModelId: $routeParams.modelId,
                 columnDefs: [],
-                columnVariableIdMap: {}
+                columnVariableIdMap: {},
+                readOnly: true,
+                availableVariableTypes: ['string', 'number', 'boolean', 'date']
             };
 
             // Hot Model init
@@ -40,7 +42,7 @@ angular.module('flowableModeler')
                 disableVisualSelection: true
             };
 
-            var hotDecisionTableEditorInstance;
+            var hotReadOnlyDecisionTableEditorInstance;
             var hitPolicies = ['FIRST', 'ANY', 'UNIQUE', 'PRIORITY', 'RULE ORDER', 'OUTPUT ORDER', 'COLLECT'];
             var operators = ['==', '!=', '<', '>', '>=', '<='];
             var columnIdCounter = 0;
@@ -236,6 +238,23 @@ angular.module('flowableModeler')
                 return width;
             };
 
+            $scope.doAfterRender = function () {
+                var element = document.querySelector("thead > tr > th:first-of-type");
+                if (element) {
+                    var firstChild = element.firstChild;
+                    var newElement = angular.element('<div class="hit-policy-header">' + $scope.currentDecisionTable.hitIndicator.substring(0, 1) + '</div>');
+                    element.className = 'hit-policy-container';
+                    element.replaceChild(newElement[0], firstChild);
+                }
+
+                $timeout(function () {
+                    hotReadOnlyDecisionTableEditorInstance = hotRegisterer.getInstance('read-only-decision-table-editor');
+                    if (hotReadOnlyDecisionTableEditorInstance) {
+                        hotReadOnlyDecisionTableEditorInstance.validateCells();
+                    }
+                });
+            };
+
             var createNewInputExpression = function (inputExpression) {
                 var newInputExpression;
                 if (inputExpression) {
@@ -273,6 +292,24 @@ angular.module('flowableModeler')
                     } else {
                         $scope.model.selectedColumn = Math.floor(expressionPos / 2);
                     }
+                }
+
+                _internalCreateModal({
+                    template: editTemplate,
+                    scope: $scope
+                }, $modal, $scope);
+            };
+
+            $scope.openOutputExpressionEditor = function (expressionPos, newExpression) {
+                var editTemplate = 'views/popup/decision-table-edit-output-expression.html';
+
+                $scope.model.newExpression = !!newExpression;
+                $scope.model.hitPolicy = $scope.currentDecisionTable.hitIndicator;
+                $scope.model.selectedColumn = expressionPos;
+
+
+                if (!$scope.model.newExpression) {
+                    $scope.model.selectedExpression = $scope.currentDecisionTable.outputExpressions[expressionPos];
                 }
 
                 _internalCreateModal({
@@ -602,8 +639,8 @@ angular.module('flowableModeler')
                 // timeout needed for trigger hot update when removing column defs
                 $scope.model.columnDefs = columnDefinitions;
                 $timeout(function () {
-                    if (hotDecisionTableEditorInstance) {
-                        hotDecisionTableEditorInstance.render();
+                    if (hotReadOnlyDecisionTableEditorInstance) {
+                        hotReadOnlyDecisionTableEditorInstance.render();
                     }
                 });
             };

@@ -17,7 +17,7 @@
                         <div class="col-xs-8">
                             <input class="form-control" name="expressionLabel"
                                    placeholder="{{'DECISION-TABLE-EDITOR.POPUP.EXPRESSION-EDITOR.EXPRESSION-PLACEHOLDER' | translate}}"
-                                   type="text" ng-model="popup.selectedExpressionLabel"/>
+                                   type="text" ng-model="popup.selectedExpressionLabel" ng-disabled="model.readOnly"/>
                         </div>
                     </div>
 
@@ -33,7 +33,7 @@
                                     <input class="form-control"
                                            placeholder="{{'DECISION-TABLE-EDITOR.POPUP.EXPRESSION-EDITOR.EXPRESSION-VARIABLE-NAME-PLACEHOLDER' | translate}}"
                                            type="text" ng-required="true" name="variableId"
-                                           ng-model="popup.selectedExpressionVariableId"/>
+                                           ng-model="popup.selectedExpressionVariableId" ng-disabled="model.readOnly"/>
                                 </div>
                             </div>
                         </div>
@@ -46,9 +46,9 @@
                                 translate}}</label><span class="marker">*</span>
                         </div>
                         <div class="col-xs-8">
-                            <select class="form-control" ng-options="type for type in availableVariableTypes"
+                            <select class="form-control" ng-options="type for type in model.availableVariableTypes"
                                     ng-model="popup.selectedExpressionVariableType" name="variableType"
-                                    ng-required="true"/>
+                                    ng-required="true" ng-disabled="model.readOnly"/>
                         </div>
                     </div>
 
@@ -57,7 +57,7 @@
                             <div class="col-xs-4">
                                 <label>Allowed values (optional):</label>
                             </div>
-                            <div class="col-xs-8">
+                            <div ng-if="!model.readOnly" class="col-xs-8">
                                 <hot-table hot-auto-destroy
                                         hot-id="decision-table-allowed-values"
                                         settings="popup.hotSettings"
@@ -65,10 +65,13 @@
                                         columns="popup.columnDefs"
                                         row-heights="30"
                                         class-name="'htMiddle'"
-                                        min-spare-rows="1">
+                                        min-spare-rows="1"
+                                        read-only="model.readOnly">
                                 </hot-table>
                             </div>
-
+                            <div ng-if="model.readOnly" class="col-xs-8">
+                                <div ng-repeat="allowedValue in popup.selectedExpressionInputValues"><span style="font-size: 14px">{{allowedValue[0]}}</span><br></div>
+                            </div>
                         </div>
                     </div>
 
@@ -80,7 +83,7 @@
                             {{'GENERAL.ACTION.CANCEL' | translate}}
                         </button>
                         <button type="button" class="btn btn-sm btn-default" ng-click="save()"
-                                ng-disabled="!inputExpressionForm.$valid || readOnly">
+                                ng-disabled="!inputExpressionForm.$valid || model.readOnly">
                             {{'GENERAL.ACTION.SAVE' | translate}}
                         </button>
                     </div>
