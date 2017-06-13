@@ -58,11 +58,23 @@ angular.module('flowableModeler')
                         }
                     },
                     items: {
-                        "row_above": {
-                            name: 'Insert rule above'
+                        "insert_row_above": {
+                            name: 'Insert rule above',
+                            callback: function(key, options) {
+                                $scope.addRule(hotDecisionTableEditorInstance.getSelected()[0]);
+                            }
                         },
-                        "row_below": {
-                            name: 'Add rule below'
+                        "insert_row_below": {
+                            name: 'Add rule below',
+                            callback: function(key, options) {
+                                $scope.addRule(hotDecisionTableEditorInstance.getSelected()[0] + 1);
+                            }
+                        },
+                        "clear_row": {
+                            name: 'Clear rule',
+                            callback: function(key, options) {
+                                $scope.clearRule(hotDecisionTableEditorInstance.getSelected()[0]);
+                            }
                         },
                         "remove_row": {
                             name: 'Remove this rule',
@@ -76,39 +88,57 @@ angular.module('flowableModeler')
                             }
                         },
                         "hsep1": "---------",
-                        "add_input": {
-                            name: 'Add input',
-                            disabled: function () {
+                        "move_rule_up": {
+                            name: 'Move rule up',
+                            disabled: function() {
                                 if (hotDecisionTableEditorInstance.getSelected()) {
-                                    return ((hotDecisionTableEditorInstance.getSelected()[1]) >= $scope.model.startOutputExpression);
-                                } else {
-                                    return false;
+                                    return hotDecisionTableEditorInstance.getSelected()[0] === 0;
                                 }
                             },
+                            callback: function(key, options) {
+                                $scope.moveRuleUpwards();
+                            }
+                        },
+                        "move_rule_down": {
+                            name: 'Move rule down',
+                            disabled: function() {
+                                if (hotDecisionTableEditorInstance.getSelected()) {
+                                    return hotDecisionTableEditorInstance.getSelected()[0] + 1 === $scope.model.rulesData.length;
+                                }
+                            },
+                            callback: function(key, options) {
+                                $scope.moveRuleDownwards();
+                            }
+                        },
+                        "hsep2": "---------",
+                        "add_input": {
+                            name: 'Add input',
                             callback: function (key, options) {
-                                $scope.openInputExpressionEditor(Math.floor(hotDecisionTableEditorInstance.getSelected()[1] / 2), true);
+                                $scope.openInputExpressionEditor(hotDecisionTableEditorInstance.getSelected()[1], true);
                             }
                         },
                         "add_output": {
                             name: 'Add output',
-                            disabled: function () {
-                                if (hotDecisionTableEditorInstance.getSelected()) {
-                                    return ((hotDecisionTableEditorInstance.getSelected()[1]) < $scope.model.startOutputExpression);
-                                } else {
-                                    return false;
-                                }
-
-                            },
                             callback: function (key, options) {
-                                $scope.openOutputExpressionEditor((hotDecisionTableEditorInstance.getSelected()[1] - $scope.model.startOutputExpression), true);
+                                if (hotDecisionTableEditorInstance.getSelected()[1] < $scope.model.startOutputExpression) {
+                                    $scope.openOutputExpressionEditor($scope.currentDecisionTable.outputExpressions.length, true);
+                                } else {
+                                    $scope.openOutputExpressionEditor((hotDecisionTableEditorInstance.getSelected()[1] - $scope.model.startOutputExpression), true);
+                                }
                             }
+                        },
+                        "hsep3": "---------",
+                        "undo": {
+                            name: 'Undo'
+                        },
+                        "redo": {
+                            name: 'Redo'
                         }
                     }
                 },
                 manualColumnResize: true,
                 stretchH: 'all',
                 outsideClickDeselects: false
-
             };
 
 
@@ -120,23 +150,43 @@ angular.module('flowableModeler')
                 });
             });
 
-            $scope.addRule = function () {
-                $scope.model.rulesData.push(createDefaultRow());
+            $scope.addRule = function (rowNumber) {
+                if (rowNumber !== undefined) {
+                    $scope.model.rulesData.splice(rowNumber, 0, createDefaultRow());
+                } else {
+                    $scope.model.rulesData.push(createDefaultRow());
+                }
+                if (hotDecisionTableEditorInstance) {
+                    hotDecisionTableEditorInstance.render();
+                }
             };
 
             $scope.removeRule = function () {
                 $scope.model.rulesData.splice($scope.model.selectedRow, 1);
-                $scope.model.selectedRow = undefined;
+            };
+
+            $scope.clearRule = function (rowNumber) {
+                if (rowNumber === undefined) {
+                    return;
+                }
+                $scope.model.rulesData[rowNumber] = createDefaultRow();
+                if (hotDecisionTableEditorInstance) {
+                    hotDecisionTableEditorInstance.render();
+                }
             };
 
             $scope.moveRuleUpwards = function () {
                 $scope.model.rulesData.splice($scope.model.selectedRow - 1, 0, $scope.model.rulesData.splice($scope.model.selectedRow, 1)[0]);
-                $scope.model.selectedRow = undefined;
+                if (hotDecisionTableEditorInstance) {
+                    hotDecisionTableEditorInstance.render();
+                }
             };
 
             $scope.moveRuleDownwards = function () {
                 $scope.model.rulesData.splice($scope.model.selectedRow + 1, 0, $scope.model.rulesData.splice($scope.model.selectedRow, 1)[0]);
-                $scope.model.selectedRow = undefined;
+                if (hotDecisionTableEditorInstance) {
+                    hotDecisionTableEditorInstance.render();
+                }
             };
 
             $scope.doAfterGetColHeader = function (col, TH) {
@@ -170,17 +220,10 @@ angular.module('flowableModeler')
                 if (coords.row === 0 && coords.col === 0 && TD.className === '') {
                     $scope.openHitPolicyEditor();
                 } else {
-                    if (coords.col === -1) {
+                    if (coords && coords.row !== undefined) {
                         $timeout(function () {
                             $scope.model.selectedRow = coords.row;
                         });
-                    } else {
-                        console.log('cell selected');
-                        if ($scope.model.selectedRow !== undefined) {
-                            $timeout(function () {
-                                $scope.model.selectedRow = undefined;
-                            });
-                        }
                     }
                 }
             };
@@ -313,10 +356,15 @@ angular.module('flowableModeler')
                 var editTemplate = 'views/popup/decision-table-edit-input-expression.html';
 
                 $scope.model.newExpression = !!newExpression;
-                $scope.model.selectedColumn = expressionPos;
 
                 if (!$scope.model.newExpression) {
                     $scope.model.selectedExpression = $scope.currentDecisionTable.inputExpressions[expressionPos];
+                } else {
+                    if (expressionPos >= $scope.model.startOutputExpression) {
+                        $scope.model.selectedColumn = $scope.model.startOutputExpression - 1;
+                    } else {
+                        $scope.model.selectedColumn = Math.floor(expressionPos / 2);
+                    }
                 }
 
                 _internalCreateModal({
@@ -329,8 +377,9 @@ angular.module('flowableModeler')
                 var editTemplate = 'views/popup/decision-table-edit-output-expression.html';
 
                 $scope.model.newExpression = !!newExpression;
-                $scope.model.selectedColumn = expressionPos;
                 $scope.model.hitPolicy = $scope.currentDecisionTable.hitIndicator;
+                $scope.model.selectedColumn = expressionPos;
+
 
                 if (!$scope.model.newExpression) {
                     $scope.model.selectedExpression = $scope.currentDecisionTable.outputExpressions[expressionPos];
@@ -486,7 +535,6 @@ angular.module('flowableModeler')
                 }
 
                 if (outputExpression.complexExpression) {
-                    console.log('disable validator for column: '+outputExpression.variableId);
                     type = 'text';
                 }
 

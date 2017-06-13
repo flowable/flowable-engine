@@ -820,12 +820,22 @@ hot-table .column-header.label {
     font-size: 16px;
     display: inline-block;
     margin: 0 auto 0 -20%;
+
+    max-width: 60%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #decision-table-editor th .output-header {
     font-size: 16px;
     display: inline-block;
     margin: 0 auto;
+
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #decision-table-editor th .input-header .header-label, #decision-table-editor th .output-header .header-label {
@@ -1018,6 +1028,10 @@ hot-table .column-header.label {
     height: 18px;
 }
 
+#decision-table-allowed-values {
+    font-size: 14px;
+}
+
 #decision-table-allowed-values tr td:last-of-type {
     border: none;
     padding-left: 5px;
@@ -1039,6 +1053,8 @@ hot-table .column-header.label {
     -webkit-box-shadow: none;
     box-shadow: none;
 }
+
+#decision-table-editor .htItemWrapper
 
 .handsontable.htRemoveRow th.htRemoveRow .btn:hover {
     background-color: #777;
