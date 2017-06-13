@@ -975,10 +975,6 @@ hot-table .column-header.label {
     border-right-style: hidden;
 }
 
-#decisionTableGrid thead th:first-of-type {
-    /*background: none;*/
-}
-
 #decisionTableGrid .hit-policy-container {
     position:fixed;
     width: 50px;

@@ -766,7 +766,7 @@ angular.module('flowableModeler')
             $scope.popup = {
                 selectedExpressionLabel: $scope.model.selectedExpression.label ? $scope.model.selectedExpression.label : '',
                 selectedExpressionVariableId: $scope.model.selectedExpression.variableId,
-                selectedExpressionVariableType: $scope.model.selectedExpression.type ? $scope.model.selectedExpression.type : $scope.availableVariableTypes[0],
+                selectedExpressionVariableType: $scope.model.selectedExpression.type ? $scope.model.selectedExpression.type : $scope.model.availableVariableTypes[0],
                 selectedExpressionInputValues: $scope.model.selectedExpression.entries && $scope.model.selectedExpression.entries.length > 0 ? createEntriesValues($scope.model.selectedExpression.entries) : [['']],
                 columnDefs: [
                     {
@@ -786,7 +786,7 @@ angular.module('flowableModeler')
             $scope.popup = {
                 selectedExpressionLabel: '',
                 selectedExpressionVariableId: '',
-                selectedExpressionVariableType: $scope.availableVariableTypes[0],
+                selectedExpressionVariableType: $scope.model.availableVariableTypes[0],
                 selectedExpressionInputValues: [['']],
                 columnDefs: [
                     {
@@ -894,7 +894,7 @@ angular.module('flowableModeler')
             $scope.popup = {
                 selectedExpressionLabel: $scope.model.selectedExpression.label ? $scope.model.selectedExpression.label : '',
                 selectedExpressionNewVariableId: $scope.model.selectedExpression.variableId,
-                selectedExpressionNewVariableType: $scope.model.selectedExpression.type ? $scope.model.selectedExpression.type : $scope.availableVariableTypes[0],
+                selectedExpressionNewVariableType: $scope.model.selectedExpression.type ? $scope.model.selectedExpression.type : $scope.model.availableVariableTypes[0],
                 selectedExpressionOutputValues: $scope.model.selectedExpression.entries && $scope.model.selectedExpression.entries.length > 0 ? createEntriesValues($scope.model.selectedExpression.entries) : [['']],
                 currentHitPolicy: $scope.model.hitPolicy,
                 columnDefs: [
@@ -917,7 +917,7 @@ angular.module('flowableModeler')
             $scope.popup = {
                 selectedExpressionLabel: '',
                 selectedExpressionNewVariableId: '',
-                selectedExpressionNewVariableType: $scope.availableVariableTypes[0],
+                selectedExpressionNewVariableType: $scope.model.availableVariableTypes[0],
                 selectedExpressionOutputValues: [['']],
                 currentHitPolicy: $scope.model.hitPolicy,
                 columnDefs: [
