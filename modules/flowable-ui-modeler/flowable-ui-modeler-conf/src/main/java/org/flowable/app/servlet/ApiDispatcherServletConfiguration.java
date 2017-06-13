@@ -14,8 +14,6 @@ package org.flowable.app.servlet;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -24,27 +22,22 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.multipart.MultipartResolver;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
-@ComponentScan(value = { "org.flowable.app.rest.editor" })
+@ComponentScan(value = { "org.flowable.app.rest.api" })
 @EnableAsync
-public class AppDispatcherServletConfiguration extends WebMvcConfigurationSupport {
-
-    private final Logger log = LoggerFactory.getLogger(AppDispatcherServletConfiguration.class);
+public class ApiDispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
     @Autowired
-    private ObjectMapper objectMapper;
+    protected ObjectMapper objectMapper;
 
     @Autowired
-    private Environment environment;
+    protected Environment environment;
 
     @Bean
     public SessionLocaleResolver localeResolver() {
@@ -52,28 +45,11 @@ public class AppDispatcherServletConfiguration extends WebMvcConfigurationSuppor
     }
 
     @Bean
-    public LocaleChangeInterceptor localeChangeInterceptor() {
-        log.debug("Configuring localeChangeInterceptor");
-        LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
-        localeChangeInterceptor.setParamName("language");
-        return localeChangeInterceptor;
-    }
-
-    @Bean
-    public MultipartResolver multipartResolver() {
-        CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
-        multipartResolver.setMaxUploadSize(environment.getProperty("file.upload.max.size", Long.class));
-        return multipartResolver;
-    }
-
-    @Bean
     public RequestMappingHandlerMapping requestMappingHandlerMapping() {
-        log.debug("Creating requestMappingHandlerMapping");
         RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();
         requestMappingHandlerMapping.setUseSuffixPatternMatch(false);
         requestMappingHandlerMapping.setRemoveSemicolonContent(false);
-        Object[] interceptors = { localeChangeInterceptor() };
-        requestMappingHandlerMapping.setInterceptors(interceptors);
+        requestMappingHandlerMapping.setInterceptors(getInterceptors());
         return requestMappingHandlerMapping;
     }
 
