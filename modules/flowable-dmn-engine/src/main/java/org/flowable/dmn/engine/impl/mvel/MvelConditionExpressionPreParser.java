@@ -20,7 +20,7 @@ public class MvelConditionExpressionPreParser implements MvelExpressionPreParser
     public static String parse(String expression, String inputVariable, String inputVariableType) {
 
         String parsedExpression = inputVariable;
-        if ("date".equals(inputVariableType)) {
+        if ("date".equals(inputVariableType) || "number".equals(inputVariableType)) {
             if (!expression.startsWith("==") &&
                 !expression.startsWith("!=") &&
                 !expression.startsWith("<") &&

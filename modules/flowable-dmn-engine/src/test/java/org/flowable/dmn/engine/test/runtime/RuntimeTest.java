@@ -293,4 +293,18 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         Assert.assertEquals("NONE", ruleResult4.get("reviewlevel"));
     }
 
+    @Test
+    @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/numbers_1.dmn")
+    public void test_numbers_1() {
+        Map<String, Object> processVariablesInput = new HashMap<>();
+        processVariablesInput.put("count", 101L);
+        processVariablesInput.put("price", 100L);
+        processVariablesInput.put("status", "");
+
+        Map<String, Object> result = ruleService.executeDecisionByKeySingleResult("ad", processVariablesInput);
+
+        Assert.assertEquals(500D, result.get("total"));
+        Assert.assertEquals(0D, result.get("discount"));
+    }
+
 }
