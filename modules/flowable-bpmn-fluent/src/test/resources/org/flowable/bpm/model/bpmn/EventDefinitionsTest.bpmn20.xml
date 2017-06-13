@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://flowable.org/test">
+    <message id="message"/>
+    <error id="error"/>
+    <itemDefinition id="itemDef"/>
+    <signal id="signal" name="signal" structureRef="itemDef"/>
+    <escalation id="escalation" name="escalation" escalationCode="1337" structureRef="itemDef"/>
+    <process id="process">
+        <intermediateThrowEvent id="event">
+            <cancelEventDefinition/>
+            <compensateEventDefinition waitForCompletion="true" activityRef="task"/>
+            <conditionalEventDefinition>
+                <condition>${test}</condition>
+            </conditionalEventDefinition>
+            <escalationEventDefinition escalationRef="escalation"/>
+            <errorEventDefinition errorRef="error"/>
+            <linkEventDefinition id="link" name="link">
+                <source>link</source>
+                <target>link</target>
+            </linkEventDefinition>
+            <messageEventDefinition messageRef="message"/>
+            <signalEventDefinition signalRef="signal"/>
+            <terminateEventDefinition/>
+            <timerEventDefinition id="date">
+                <timeDate>${test}</timeDate>
+            </timerEventDefinition>
+            <timerEventDefinition id="duration">
+                <timeDuration>${test}</timeDuration>
+            </timerEventDefinition>
+            <timerEventDefinition id="cycle">
+                <timeCycle>${test}</timeCycle>
+            </timerEventDefinition>
+        </intermediateThrowEvent>
+        <userTask id="task"/>
+    </process>
+</definitions>

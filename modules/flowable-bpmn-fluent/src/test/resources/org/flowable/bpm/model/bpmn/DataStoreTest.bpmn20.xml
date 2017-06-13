@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
+    <bpmn:dataStore id="myDataStore" name="My Data Store" capacity="23" isUnlimited="false"/>
+    <bpmn:process id="Process_1" isExecutable="false">
+        <bpmn:dataStoreReference id="myDataStoreReference" name="My Data Store Reference" dataStoreRef="myDataStore"/>
+    </bpmn:process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+            <bpmndi:BPMNShape id="DataStoreReference_1rop2dr_di" bpmnElement="myDataStoreReference">
+                <dc:Bounds x="209" y="122" width="50" height="50"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="189" y="172" width="90" height="20"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</bpmn:definitions>

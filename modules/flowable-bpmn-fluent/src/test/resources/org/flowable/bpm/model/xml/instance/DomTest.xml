@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<animals xmlns="http://flowable.org/animals"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://flowable.org/animals ../testmodel/Testmodel.xsd ">
+    <description><![CDATA[CDATA <test>]]></description>
+</animals>

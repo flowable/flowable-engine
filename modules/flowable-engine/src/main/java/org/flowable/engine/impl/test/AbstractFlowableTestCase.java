@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.flowable.bpm.model.bpmn.BpmnModelBuilder;
+import org.flowable.bpm.model.bpmn.BpmnModelInstance;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.SequenceFlow;
@@ -325,31 +327,14 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
      * Since the 'one task process' is used everywhere the actual process content doesn't matter, instead of copying around the BPMN 2.0 xml one could use this method which gives a {@link BpmnModel}
      * version of the same process back.
      */
-    public BpmnModel createOneTaskTestProcess() {
-        BpmnModel model = new BpmnModel();
-        org.flowable.bpmn.model.Process process = new org.flowable.bpmn.model.Process();
-        model.addProcess(process);
-        process.setId("oneTaskProcess");
-        process.setName("The one task process");
-
-        StartEvent startEvent = new StartEvent();
-        startEvent.setId("start");
-        process.addFlowElement(startEvent);
-
-        UserTask userTask = new UserTask();
-        userTask.setName("The Task");
-        userTask.setId("theTask");
-        userTask.setAssignee("kermit");
-        process.addFlowElement(userTask);
-
-        EndEvent endEvent = new EndEvent();
-        endEvent.setId("theEnd");
-        process.addFlowElement(endEvent);
-
-        process.addFlowElement(new SequenceFlow("start", "theTask"));
-        process.addFlowElement(new SequenceFlow("theTask", "theEnd"));
-
-        return model;
+    public String createOneTaskTestProcess() {
+        BpmnModelInstance modelInstance = BpmnModelBuilder.createExecutableProcess("oneTaskProcess")
+                .name("The one task process")
+                .startEvent("start")
+                .userTask("theTask").name("The Task").flowableAssignee("kermit")
+                .endEvent("theEnd")
+                .done();
+        return BpmnModelBuilder.convertToString(modelInstance);
     }
 
     public BpmnModel createTwoTasksTestProcess() {
@@ -393,8 +378,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
      * @return The process definition id (NOT the process definition key) of deployed one task process.
      */
     public String deployOneTaskTestProcess() {
-        BpmnModel bpmnModel = createOneTaskTestProcess();
-        Deployment deployment = repositoryService.createDeployment().addBpmnModel("oneTasktest.bpmn20.xml", bpmnModel).deploy();
+        Deployment deployment = repositoryService.createDeployment().addString("oneTasktest.bpmn20.xml", createOneTaskTestProcess()).deploy();
 
         deploymentIdsForAutoCleanup.add(deployment.getId()); // For auto-cleanup
 

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<animals xmlns="http://flowable.org/animals"
+         xmlns:tns="http://flowable.org/animals"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://flowable.org/animals ../Testmodel.xsd ">
+
+    <bird id="tweety" gender="Female">
+        <egg id="egg1">
+            <mother href="#tweety"/>
+            <guardian href="#hedwig"/>
+            <guardian href="#timmy"/>
+        </egg>
+        <egg id="egg2">
+            <mother href="#tweety"/>
+            <guardian href="#hedwig"/>
+            <guardian href="#timmy"/>
+        </egg>
+        <egg id="egg3">
+            <guardian href="#timmy"/>
+        </egg>
+        <spouseRef>hedwig</spouseRef>
+    </bird>
+    <bird id="hedwig" gender="Male">
+        <guardEgg>egg1</guardEgg>
+        <guardEgg>egg2</guardEgg>
+    </bird>
+    <bird id="timmy" gender="Male">
+        <guardEgg>egg1 egg2</guardEgg>
+        <guardEgg>egg3</guardEgg>
+    </bird>
+</animals>

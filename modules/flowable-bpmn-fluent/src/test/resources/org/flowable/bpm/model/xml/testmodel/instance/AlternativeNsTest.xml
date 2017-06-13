@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<animals xmlns="http://flowable.org/animals"
+         xmlns:tns="http://flowable.org/animals"
+         xmlns:mechanical="http://flowable.org/mechanical"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://flowable.org/animals ../Testmodel.xsd ">
+
+    <bird id="hedwig" gender="Male">
+        <mechanical:wings>wusch</mechanical:wings>
+    </bird>
+    <bird id="birdo" gender="Female">
+        <mechanical:wings>zisch</mechanical:wings>
+    </bird>
+    <bird id="plucky" gender="Unknown" mechanical:canHazExtendedWings="false"/>
+</animals>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<animals xmlns="http://flowable.org/animals"
+         xmlns:tns="http://flowable.org/animals"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://flowable.org/animals ../Testmodel.xsd ">
+
+    <bird id="tweety" gender="Female" bestFriendRefs="birdo plucky">
+        <childRelationshipDefinition id="tweety-hedwig" animalRef="hedwig"/>
+        <childRelationshipDefinition id="tweety-birdo" animalRef="birdo"/>
+        <friendRelationshipDefinition id="tweety-plucky" animalRef="plucky"/>
+        <friendRelationshipDefinition id="tweety-fiffy" animalRef="fiffy"/>
+        <relationshipDefinitionRef>tweety-hedwig</relationshipDefinitionRef>
+        <relationshipDefinitionRef>tweety-birdo</relationshipDefinitionRef>
+        <relationshipDefinitionRef>tweety-plucky</relationshipDefinitionRef>
+        <relationshipDefinitionRef>tweety-fiffy</relationshipDefinitionRef>
+    </bird>
+    <bird id="hedwig" gender="Male"/>
+    <bird id="birdo" gender="Female"/>
+    <bird id="plucky" gender="Unknown"/>
+    <bird id="fiffy" gender="Female"/>
+    <bird id="timmy" gender="Male"/>
+    <bird id="daisy" gender="Female"/>
+</animals>

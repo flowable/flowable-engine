@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema elementFormDefault="qualified" attributeFormDefault="unqualified"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:tns="http://flowable.org/animals"
+        targetNamespace="http://flowable.org/animals">
+
+    <element name="animals" type="tns:tAnimals"/>
+    <complexType name="tAnimals">
+        <sequence>
+            <element name="description" type="string" minOccurs="0" maxOccurs="1"/>
+            <element ref="tns:animal" minOccurs="0" maxOccurs="unbounded"/>
+            <any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+
+    <element name="animal" type="tns:tAnimal"/>
+    <complexType name="tAnimal" abstract="true" mixed="true">
+        <sequence>
+            <element ref="tns:relationshipDefinition" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="relationshipDefinitionRef" type="QName" minOccurs="0" maxOccurs="unbounded"/>
+            <!-- for the alternative ns test we need the chance to have children from other namespaces -->
+            <any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="id" type="ID"/>
+        <attribute name="name" type="string"/>
+        <attribute name="father" type="QName"/>
+        <attribute name="mother" type="IDREF"/>
+        <attribute name="isEndangered" type="boolean" default="false"/>
+        <attribute name="gender" type="tns:tGender" use="required"/>
+        <attribute name="age" type="integer"/>
+        <attribute name="bestFriendRefs" type="IDREFS"/>
+        <anyAttribute namespace="##other" processContents="lax"/>
+    </complexType>
+
+    <element name="flyingAnimal" type="tns:tFlyingAnimal"/>
+    <complexType name="tFlyingAnimal" abstract="true" mixed="true">
+        <complexContent>
+            <extension base="tns:tAnimal">
+                <sequence>
+                    <element name="flightInstructor" type="IDREF" minOccurs="0" maxOccurs="1"/>
+                    <element name="flightPartnerRef" type="IDREF" minOccurs="0" maxOccurs="unbounded"/>
+                </sequence>
+                <attribute name="wingspan" type="double"/>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <element name="bird" type="tns:tBird" substitutionGroup="tns:animal"/>
+    <complexType name="tBird" mixed="true">
+        <complexContent>
+            <extension base="tns:tFlyingAnimal">
+                <sequence>
+                    <element ref="tns:egg" minOccurs="0" maxOccurs="6"/>
+                    <element name="spouseRef" type="QName" minOccurs="0" maxOccurs="1"/>
+                    <element name="guardEgg" type="IDREFS" minOccurs="0" maxOccurs="unbounded"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <element name="unknownAnimal" type="tns:tUnknownAnimal" substitutionGroup="tns:animal"/>
+    <complexType name="tUnknownAnimal" mixed="true">
+        <complexContent>
+            <extension base="tns:tAnimal">
+                <sequence>
+                    <element ref="tns:unknownAnimal" minOccurs="0" maxOccurs="unbounded"/>
+                </sequence>
+                <attribute name="species" type="string" use="required"/>
+                <attribute name="famous" type="boolean" default="false"/>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <simpleType name="tGender">
+        <restriction base="string">
+            <enumeration value="Unknown"/>
+            <enumeration value="Male"/>
+            <enumeration value="Female"/>
+        </restriction>
+    </simpleType>
+
+    <element name="relationshipDefinition" type="tns:tRelationshipDefinition"/>
+    <complexType name="tRelationshipDefinition" abstract="true">
+        <attribute name="id" type="ID"/>
+        <attribute name="animalRef" type="IDREF"/>
+    </complexType>
+
+    <element name="childRelationshipDefinition" type="tns:tChildRelationshipDefinition" substitutionGroup="tns:relationshipDefinition"/>
+    <complexType name="tChildRelationshipDefinition">
+        <complexContent>
+            <extension base="tns:tRelationshipDefinition"/>
+        </complexContent>
+    </complexType>
+
+    <element name="friendRelationshipDefinition" type="tns:tFriendRelationshipDefinition" substitutionGroup="tns:relationshipDefinition"/>
+    <complexType name="tFriendRelationshipDefinition">
+        <complexContent>
+            <extension base="tns:tRelationshipDefinition"/>
+        </complexContent>
+    </complexType>
+
+    <element name="egg" type="tns:tEgg"/>
+    <complexType name="tEgg">
+        <sequence>
+            <element name="mother" type="tns:tAnimalReference" minOccurs="0" maxOccurs="1"/>
+            <element name="guardian" type="tns:tAnimalReference" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="id" type="ID"/>
+    </complexType>
+
+    <complexType name="tAnimalReference">
+        <attribute name="href" type="anyURI" use="required"/>
+    </complexType>
+
+</schema>

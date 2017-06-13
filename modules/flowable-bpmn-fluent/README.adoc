@@ -1,0 +1,93 @@
+= Flowable BPMN Model Fluent API
+
+The Flowable BPMN Model Fluent API is a simple, lightweight Java library for parsing, creating and editing BPMN 2.0 XML files.
+
+== Features
+
+=== Fluent builder API
+
+To easily create simple BPMN 2.0 processes we provide the fluent builder API. It supports most BPMN 2.0
+elements and allows you to set attributes and add some child elements. The following process is deployable
+and can be executed by the Flowable BPM platform.
+
+[source,java]
+----
+BpmnModelInstance modelInstance = BpmnModelBuilder.createExecutableProcess("processId")
+  .startEvent()
+  .userTask()
+  .endEvent()
+  .done();
+----
+
+For more complex examples see the tests in link:src/test/java/org/flowable/bpm/model/bpmn/builder/ProcessBuilderTest.java[ProcessBuilderTest.java].
+
+=== Create an empty BPMN model
+
+You can easily create a new empty BPMN model.
+
+[source,java]
+----
+BpmnModelInstance modelInstance = BpmnModelBuilder.createEmptyModel();
+Definitions definitions = modelInstance.newInstance(Definitions.class);
+definitions.setTargetNamespace("http://flowable.org/examples");
+modelInstance.setDefinitions(definitions);
+----
+
+=== Validate a BPMN model
+
+At any time you can validate your model against the BPMN 2.0 specification.
+
+[source,java]
+----
+BpmnModelInstance modelInstance = [...]
+Bpmn.validateModel(modelInstance);
+----
+
+=== Creating a Process using the full API
+
+The fluent API is usually a good choice for creating a new BPMN process.
+However, not all elements supported by the model are exposed through fluent
+builders and the fluent API may not be the appropriate API style for all use cases.
+In such cases, the full API can be used for creating a process model.
+The following code creates a simple Process as a jUnit4 test using the full API:
+link:src/test/java/org/flowable/bpm/model/bpmn/CreateModelTest.java[CreateModelTest.java].
+
+=== Find elements inside the model
+
+[source,java]
+----
+// find element instance by ID
+ModelElementInstance elementInstance = modelInstance.getModelElementById("start");
+
+// find all elements of the type task
+ModelElementType taskType = modelInstance.getModel().getType(Task.class);
+Collection<ModelElementInstance> elementInstances = modelInstance.getModelElementsByType(taskType);
+----
+
+=== Save the BPMN model
+
+The model API allows you to save your model in several ways
+
+[source,java]
+----
+// create BPMN model
+BpmnModelInstance modelInstance = [...]
+
+// convert to string
+String xmlString = BpmnModelBuilder.convertToString(modelInstance);
+
+// write to output stream
+OutputStream outputStream = new OutputStream(...);
+Bpmn.writeModelToStream(outputStream, modelInstance);
+
+// write to file
+File file = new File(...);
+Bpmn.writeModelToFile(file, modelInstance);
+
+----
+
+=== Does this API support all BPMN 2.0 Elements?
+
+No, but support is already quite extensive. See
+link:src/main/java/org/flowable/bpm/model/bpmn/instance[org.flowable.bpm.model.bpmn.instance]
+for a list of currently supported elements.

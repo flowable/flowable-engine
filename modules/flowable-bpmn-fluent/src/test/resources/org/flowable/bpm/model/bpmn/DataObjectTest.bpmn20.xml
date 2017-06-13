@@ -1,0 +1,94 @@
+<semantics:definitions
+        xmlns:xsd='http://www.w3.org/2001/XMLSchema'
+        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+        xmlns:semantics='http://www.omg.org/spec/BPMN/20100524/MODEL'
+        xsi:schemaLocation='http://www.omg.org/spec/BPMN/20100524/MODEL http://bpmn.sourceforge.net/schemas/BPMN20.xsd'
+        targetNamespace='http://flowable.org/test' expressionLanguage='http://www.w3.org/1999/XPath'
+        typeLanguage='http://www.w3.org/2001/XMLSchema' id='_0' name='definitions'>
+    <semantics:itemDefinition id='_100' itemKind='Information' structureRef='xsd:int'
+                              isCollection='false'></semantics:itemDefinition>
+    <semantics:itemDefinition id='_101' itemKind='Information' structureRef='xsd:long'
+                              isCollection='false'></semantics:itemDefinition>
+    <semantics:itemDefinition id='_103' itemKind='Information' structureRef='xsd:float'
+                              isCollection='false'></semantics:itemDefinition>
+    <semantics:itemDefinition id='_104' itemKind='Information' structureRef='xsd:double'
+                              isCollection='false'></semantics:itemDefinition>
+    <semantics:itemDefinition id='_105' itemKind='Information' structureRef='xsd:boolean'
+                              isCollection='false'></semantics:itemDefinition>
+    <semantics:itemDefinition id='_106' itemKind='Information' structureRef='xsd:anyURI'
+                              isCollection='false'></semantics:itemDefinition>
+    <semantics:itemDefinition id='_107' itemKind='Information' structureRef='xsd:string'
+                              isCollection='false'></semantics:itemDefinition>
+    <semantics:resource id='_resource_user' name='user'></semantics:resource>
+    <semantics:resource id='_resource_Batman' name='Batman'></semantics:resource>
+    <semantics:process id='_1' name='process'>
+        <semantics:startEvent id='_2' name='StartEvent _2'>
+            <semantics:outgoing>_4</semantics:outgoing>
+        </semantics:startEvent>
+        <semantics:endEvent id='_5' name='EndEvent _5'>
+            <semantics:incoming>_6</semantics:incoming>
+        </semantics:endEvent>
+        <semantics:scriptTask id='_3' name='Script Task _3' scriptFormat='text/javascript'>
+            <semantics:incoming>_4</semantics:incoming>
+            <semantics:outgoing>_6</semantics:outgoing>
+            <semantics:ioSpecification id='_15'>
+                <semantics:dataInput id='_16' name='x' itemSubjectRef='_103' isCollection='false'>
+                </semantics:dataInput>
+                <semantics:dataInput id='_17' name='y' isCollection='false'></semantics:dataInput>
+                <semantics:dataInput id='_18' name='z' itemSubjectRef='_105' isCollection='false'></semantics:dataInput>
+                <semantics:dataOutput id='_19' name='a' isCollection='false'></semantics:dataOutput>
+                <semantics:dataOutput id='_20' name='b' isCollection='false'></semantics:dataOutput>
+                <semantics:inputSet>
+                    <semantics:dataInputRefs>_16</semantics:dataInputRefs>
+                    <semantics:dataInputRefs>_17</semantics:dataInputRefs>
+                    <semantics:dataInputRefs>_18</semantics:dataInputRefs>
+                </semantics:inputSet>
+                <semantics:outputSet>
+                    <semantics:dataOutputRefs>_19</semantics:dataOutputRefs>
+                    <semantics:dataOutputRefs>_20</semantics:dataOutputRefs>
+                </semantics:outputSet>
+            </semantics:ioSpecification>
+            <semantics:dataInputAssociation id='_13'>
+                <semantics:sourceRef>_dataRef_11</semantics:sourceRef>
+                <semantics:targetRef>_16</semantics:targetRef>
+            </semantics:dataInputAssociation>
+            <semantics:dataInputAssociation id='_14'>
+                <semantics:sourceRef>_dataRef_12</semantics:sourceRef>
+                <semantics:targetRef>_17</semantics:targetRef>
+            </semantics:dataInputAssociation>
+            <semantics:dataInputAssociation id='_22'>
+                <semantics:sourceRef>_dataRef_21</semantics:sourceRef>
+                <semantics:targetRef>_18</semantics:targetRef>
+            </semantics:dataInputAssociation>
+            <semantics:dataOutputAssociation id='_8'>
+                <semantics:sourceRef>_20</semantics:sourceRef>
+                <semantics:targetRef>_dataRef_7</semantics:targetRef>
+            </semantics:dataOutputAssociation>
+            <semantics:dataOutputAssociation id='_24'>
+                <semantics:sourceRef>_19</semantics:sourceRef>
+                <semantics:targetRef>_dataRef_23</semantics:targetRef>
+            </semantics:dataOutputAssociation>
+            <semantics:script>function foo(x,y,z){
+                var a = x + y;
+                var b = z + y;
+                }
+            </semantics:script>
+        </semantics:scriptTask>
+        <semantics:dataObject id='_7' name='DataObject _7' isCollection='false'>
+        </semantics:dataObject>
+        <semantics:dataObject id='_11' name='DataObject _11' itemSubjectRef='_101'
+                              isCollection='false'>
+        </semantics:dataObject>
+        <semantics:dataObject id='_12' name='DataObject _12' isCollection='false'></semantics:dataObject>
+        <semantics:dataObject id='_21' name='DataObject _21' itemSubjectRef='_100'
+                              isCollection='false'></semantics:dataObject>
+        <semantics:dataObject id='_23' name='DataObject _23' isCollection='false'></semantics:dataObject>
+        <semantics:sequenceFlow id='_4' sourceRef='_2' targetRef='_3'></semantics:sequenceFlow>
+        <semantics:sequenceFlow id='_6' sourceRef='_3' targetRef='_5'></semantics:sequenceFlow>
+        <semantics:dataObjectReference id='_dataRef_7' dataObjectRef='_7'></semantics:dataObjectReference>
+        <semantics:dataObjectReference id='_dataRef_11' dataObjectRef='_11'></semantics:dataObjectReference>
+        <semantics:dataObjectReference id='_dataRef_12' dataObjectRef='_12'></semantics:dataObjectReference>
+        <semantics:dataObjectReference id='_dataRef_21' dataObjectRef='_21'></semantics:dataObjectReference>
+        <semantics:dataObjectReference id='_dataRef_23' dataObjectRef='_23'></semantics:dataObjectReference>
+    </semantics:process>
+</semantics:definitions>
