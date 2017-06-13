@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.bpmn.model.FlowElement;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
@@ -376,11 +377,25 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
                 for (ExecutionEntity miExecutionEntity : subExecutionEntity.getExecutions()) {
                     if (miExecutionEntity.getSubProcessInstance() != null) {
                         deleteProcessInstanceCascade(miExecutionEntity.getSubProcessInstance(), deleteReason, deleteHistory);
+                        
+                        if (getEventDispatcher().isEnabled()) {
+                            FlowElement callActivityElement = miExecutionEntity.getCurrentFlowElement();
+                            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createActivityCancelledEvent(callActivityElement.getId(), 
+                                            callActivityElement.getName(), miExecutionEntity.getId(), miExecutionEntity.getProcessInstanceId(), 
+                                            miExecutionEntity.getProcessDefinitionId(), "callActivity", deleteReason));
+                        }
                     }
                 }
 
             } else if (subExecutionEntity.getSubProcessInstance() != null) {
                 deleteProcessInstanceCascade(subExecutionEntity.getSubProcessInstance(), deleteReason, deleteHistory);
+                
+                if (getEventDispatcher().isEnabled()) {
+                    FlowElement callActivityElement = subExecutionEntity.getCurrentFlowElement();
+                    getEventDispatcher().dispatchEvent(FlowableEventBuilder.createActivityCancelledEvent(callActivityElement.getId(), 
+                                    callActivityElement.getName(), subExecutionEntity.getId(), subExecutionEntity.getProcessInstanceId(), 
+                                    subExecutionEntity.getProcessDefinitionId(), "callActivity", deleteReason));
+                }
             }
         }
 
@@ -440,6 +455,13 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         for (ExecutionEntity subExecutionEntity : processInstanceEntity.getExecutions()) {
             if (subExecutionEntity.getSubProcessInstance() != null &&  !subExecutionEntity.isEnded()) {
                 deleteProcessInstanceCascade(subExecutionEntity.getSubProcessInstance(), deleteReason, cascade);
+                
+                if (getEventDispatcher().isEnabled() && fireEvents) {
+                    FlowElement callActivityElement = subExecutionEntity.getCurrentFlowElement();
+                    getEventDispatcher().dispatchEvent(FlowableEventBuilder.createActivityCancelledEvent(callActivityElement.getId(), 
+                                    callActivityElement.getName(), subExecutionEntity.getId(), processInstanceId, subExecutionEntity.getProcessDefinitionId(), 
+                                    "callActivity", deleteReason));
+                }
             }
         }
 

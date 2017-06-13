@@ -92,6 +92,16 @@ public class WebConfigurer implements ServletContextListener {
         ServletRegistration.Dynamic appDispatcherServlet = servletContext.addServlet("appDispatcher", new DispatcherServlet(appDispatcherServletConfiguration));
         appDispatcherServlet.addMapping("/app/*");
         appDispatcherServlet.setLoadOnStartup(1);
+        
+        log.debug("Configuring Spring Web application context");
+        AnnotationConfigWebApplicationContext apiDispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
+        apiDispatcherServletConfiguration.setParent(rootContext);
+        apiDispatcherServletConfiguration.register(ApiDispatcherServletConfiguration.class);
+
+        log.debug("Registering Spring MVC Servlet");
+        ServletRegistration.Dynamic apiDispatcherServlet = servletContext.addServlet("apiDispatcher", new DispatcherServlet(apiDispatcherServletConfiguration));
+        apiDispatcherServlet.addMapping("/api/*");
+        apiDispatcherServlet.setLoadOnStartup(1);
     }
 
     /**

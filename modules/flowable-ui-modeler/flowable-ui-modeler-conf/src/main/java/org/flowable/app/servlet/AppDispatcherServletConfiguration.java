@@ -34,7 +34,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
-@ComponentScan(value = { "org.flowable.app.rest" })
+@ComponentScan(value = { "org.flowable.app.rest.editor", "org.flowable.app.rest.idm.remote" })
 @EnableAsync
 public class AppDispatcherServletConfiguration extends WebMvcConfigurationSupport {
 

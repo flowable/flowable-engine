@@ -32,3 +32,7 @@ FlowableAdmin.Config.filter.resultSizes = [10, 25, 50, 100, 100000000];    // fa
 FlowableAdmin.Config.filter.defaultResultSize = 25;
 FlowableAdmin.Config.filter.defaultOrder = "asc";
 FlowableAdmin.Config.filter.delay = 400;
+
+// Localization
+FlowableAdmin.Config.localization = {};
+FlowableAdmin.Config.localization.dates = false;

@@ -21,7 +21,7 @@
 		<spring.framework.version>4.2.5.RELEASE</spring.framework.version>
 		<spring.security.version>4.0.4.RELEASE</spring.security.version>
 		<jackson.version>2.7.5</jackson.version>
-		<mule.version>3.5.0</mule.version>
+		<mule.version>3.8.0</mule.version>
 		<cxf.version>3.1.6</cxf.version>
 		<batik.version>1.7</batik.version>
 		<!-- JVM params for test execution -->
@@ -401,6 +401,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
+				<artifactId>flowable-http</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
 				<artifactId>flowable-crystalball</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -463,6 +468,11 @@
 			<dependency>
 			    <groupId>org.flowable</groupId>
 			    <artifactId>flowable-ui-common</artifactId>
+			    <version>${project.version}</version>
+			</dependency>
+            <dependency>
+			    <groupId>org.flowable</groupId>
+			    <artifactId>flowable-groovy-script-static-engine</artifactId>
 			    <version>${project.version}</version>
 			</dependency>
 			<!-- EMAIL -->
@@ -1015,6 +1025,7 @@
 				<module>modules/flowable-spring-boot</module>
 				<module>modules/flowable-cxf</module>
 				<module>modules/flowable-mule</module>
+				<module>modules/flowable-http</module>
 				<module>modules/flowable-camel</module>
 				<module>modules/flowable-cdi</module>
 				<module>modules/flowable-osgi</module>
@@ -1027,6 +1038,7 @@
 				<module>modules/flowable-ui-modeler</module>
 				<module>modules/flowable-ui-task</module>
 				<module>modules/flowable-ui-admin</module>
+				<module>modules/flowable-groovy-script-static-engine</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>
@@ -1214,6 +1226,7 @@
 				<module>modules/flowable-osgi</module>
 				<module>modules/flowable-camel</module>
 				<module>modules/flowable-mule</module>
+				<module>modules/flowable-http</module>
 				<module>modules/flowable-cdi</module>
 				<module>modules/flowable-ldap</module>
 				<module>modules/flowable-ldap-configurator</module>
@@ -1221,6 +1234,7 @@
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-crystalball</module>
 				<module>modules/flowable-ui-common</module>
+				<module>modules/flowable-groovy-script-static-engine</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 		</profile>
@@ -1374,6 +1388,7 @@
 				<module>modules/flowable-content-spring</module>
 				<module>modules/flowable-content-spring-configurator</module>
 				<module>modules/flowable-content-rest</module>
+				<module>modules/flowable-groovy-script-static-engine</module>
 			</modules>
 			<properties>
 				<skipTests>true</skipTests>

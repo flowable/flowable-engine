@@ -46,6 +46,8 @@ public interface ModelService {
     byte[] getBpmnXML(AbstractModel model);
 
     BpmnModel getBpmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap);
+    
+    String createModelJson(ModelRepresentation model);
 
     Model createModel(ModelRepresentation model, String editorJson, User createdBy);
 

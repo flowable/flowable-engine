@@ -205,6 +205,8 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                     processDiagramCanvas.drawCamelTask(serviceTask.getName(), graphicInfo, scaleFactor);
                 } else if ("mule".equalsIgnoreCase(serviceTask.getType())) {
                     processDiagramCanvas.drawMuleTask(serviceTask.getName(), graphicInfo, scaleFactor);
+                } else if ("http".equalsIgnoreCase(serviceTask.getType())) {
+                    processDiagramCanvas.drawHttpTask(serviceTask.getName(), graphicInfo, scaleFactor);
                 } else {
                     processDiagramCanvas.drawServiceTask(serviceTask.getName(), graphicInfo, scaleFactor);
                 }
