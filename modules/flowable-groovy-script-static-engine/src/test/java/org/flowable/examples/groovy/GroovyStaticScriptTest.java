@@ -30,10 +30,18 @@ public class GroovyStaticScriptTest extends PluggableFlowableTestCase {
 
         String result = (String) runtimeService.getVariable(pi.getId(), "a");
         Integer sum = (Integer) runtimeService.getVariable(pi.getId(), "sum");
-        Object array = runtimeService.getVariable(pi.getId(), "inputArray");
         assertEquals("ABC", result);
         assertEquals(15, sum.intValue());
     }
+    
+    @Deployment
+    public void testGroovyScriptEngine() {
+        int[] inputArray = new int[] { 1, 2, 3, 4, 5 };
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("groovyScriptEngine", CollectionUtil.singletonMap("inputArray", inputArray));
 
-
+        String result = (String) runtimeService.getVariable(pi.getId(), "a");
+        Integer sum = (Integer) runtimeService.getVariable(pi.getId(), "sum");
+        assertEquals("ABC", result);
+        assertEquals(15, sum.intValue());
+    }
 }

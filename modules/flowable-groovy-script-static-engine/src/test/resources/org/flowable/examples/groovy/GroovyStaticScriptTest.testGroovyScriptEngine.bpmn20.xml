@@ -4,13 +4,13 @@
   xmlns:flowable="http://flowable.org/bpmn"
   targetNamespace="Examples">
   
-  <process id="staticScriptEngine">
+  <process id="groovyScriptEngine">
   
     <startEvent id="theStart" />
     
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theScriptTask" />
     
-    <scriptTask id="theScriptTask" name="Execute script" scriptFormat="groovy-static" flowable:resultVariable="a">
+    <scriptTask id="theScriptTask" name="Execute script" scriptFormat="groovy" flowable:resultVariable="a">
       <script>
         int sum = 0
         for ( i in inputArray ) {

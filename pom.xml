@@ -868,7 +868,6 @@
 		<module>modules/flowable-dmn-api</module>
 		<module>modules/flowable-content-api</module>
 		<module>modules/flowable-engine</module>
-        <module>modules/flowable-groovy-script-static-engine</module>
 	</modules>
 
 	<build>

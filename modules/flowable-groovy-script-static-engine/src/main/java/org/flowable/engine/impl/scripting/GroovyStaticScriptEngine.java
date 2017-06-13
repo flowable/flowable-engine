@@ -1,18 +1,22 @@
 package org.flowable.engine.impl.scripting;
 
-import groovy.lang.GroovyClassLoader;
-import groovy.lang.Script;
-import groovy.transform.CompileStatic;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.script.ScriptContext;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptException;
+
 import org.codehaus.groovy.ast.ClassHelper;
 import org.codehaus.groovy.ast.ClassNode;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer;
-import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import org.codehaus.groovy.jsr223.GroovyScriptEngineImpl;
-import javax.script.*;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+
+import groovy.lang.GroovyClassLoader;
+import groovy.lang.Script;
+import groovy.transform.CompileStatic;
 
 /**
  * Created by fgroch on 15.03.17.
@@ -26,7 +30,7 @@ public class GroovyStaticScriptEngine extends GroovyScriptEngineImpl {
     // lazily initialized factory
     private volatile GroovyStaticScriptEngineFactory factory;
 
-    private static Class clazz;
+    private static Class<?> clazz;
 
     public GroovyStaticScriptEngine(GroovyStaticScriptEngineFactory factory) {
         this();
@@ -75,7 +79,7 @@ public class GroovyStaticScriptEngine extends GroovyScriptEngineImpl {
     private static ClassLoader getParentLoader() {
         ClassLoader ctxtLoader = Thread.currentThread().getContextClassLoader();
         try {
-            Class scriptClass = ctxtLoader.loadClass(Script.class.getName());
+            Class<?> scriptClass = ctxtLoader.loadClass(Script.class.getName());
             clazz = ctxtLoader.loadClass("org.flowable.engine.delegate.VariableScope");
 
             if(scriptClass == Script.class) {
