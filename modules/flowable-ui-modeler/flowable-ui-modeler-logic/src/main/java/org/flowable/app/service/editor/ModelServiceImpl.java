@@ -59,19 +59,22 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.flowable.app.rest.HttpRequestHelper.executeHttpGet;
 
 @Service
 @Transactional
@@ -289,7 +292,7 @@ public class ModelServiceImpl implements ModelService {
             try {
                 json = objectMapper.writeValueAsString(new FormModel());
             } catch (Exception e) {
-                log.error("Error creating form model", e);
+                LOGGER.error("Error creating form model", e);
                 throw new InternalServerErrorException("Error creating form");
             }
 
@@ -302,7 +305,7 @@ public class ModelServiceImpl implements ModelService {
 
                 json = objectMapper.writeValueAsString(decisionTableDefinition);
             } catch (Exception e) {
-                log.error("Error creating decision table model", e);
+                LOGGER.error("Error creating decision table model", e);
                 throw new InternalServerErrorException("Error creating decision table");
             }
 
@@ -310,7 +313,7 @@ public class ModelServiceImpl implements ModelService {
             try {
                 json = objectMapper.writeValueAsString(new AppDefinition());
             } catch (Exception e) {
-                log.error("Error creating app definition", e);
+                LOGGER.error("Error creating app definition", e);
                 throw new InternalServerErrorException("Error creating app definition");
             }
 
@@ -426,11 +429,11 @@ public class ModelServiceImpl implements ModelService {
                                 try {
                                     return objectMapper.readTree(response.getEntity().getContent());
                                 } catch (IOException ioe) {
-                                    log.error("Error calling deploy endpoint", ioe);
+                                    LOGGER.error("Error calling deploy endpoint", ioe);
                                     throw new InternalServerErrorException("Error calling deploy endpoint: " + ioe.getMessage());
                                 }
                             } else {
-                                log.error("Invalid deploy result code: {}", response.getStatusLine());
+                                LOGGER.error("Invalid deploy result code: {}", response.getStatusLine());
                                 throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
                             }
                         }
@@ -477,7 +480,7 @@ public class ModelServiceImpl implements ModelService {
                                 false
                         ));
                     } catch (IOException e) {
-                        log.error("Unable to fetch variables from the start process instance event", e);
+                        LOGGER.error("Unable to fetch variables from the start process instance event", e);
                         throw new RuntimeException(e);
                     }
                     break;
@@ -553,11 +556,11 @@ public class ModelServiceImpl implements ModelService {
                                 JsonNode jsonNode = objectMapper.readTree(response.getEntity().getContent());
                                 return jsonNode.get("key").textValue();
                             } catch (IOException ioe) {
-                                log.error("Error calling deploy endpoint", ioe);
+                                LOGGER.error("Error calling deploy endpoint", ioe);
                                 throw new InternalServerErrorException("Error calling deploy endpoint: " + ioe.getMessage());
                             }
                         } else {
-                            log.error("Invalid deploy result code: {}", response.getStatusLine());
+                            LOGGER.error("Invalid deploy result code: {}", response.getStatusLine());
                             throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
                         }
                     }
