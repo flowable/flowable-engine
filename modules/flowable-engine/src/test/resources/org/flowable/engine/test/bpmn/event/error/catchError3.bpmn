@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/test">
+  <process id="catchError3" isExecutable="true">
+    <startEvent id="startCatchErrorNested"></startEvent>
+    <subProcess id="subprocessCatchError" name="Sub process nested">
+      <startEvent id="startSubprocessNested"></startEvent>
+      <endEvent id="endSubprocessNested"></endEvent>
+      <callActivity id="callActivitySubprocessNested" name="Call activity nested" calledElement="throwError"></callActivity>
+      <sequenceFlow id="flow2Nested" sourceRef="startSubprocessNested" targetRef="callActivitySubprocessNested"></sequenceFlow>
+      <sequenceFlow id="flow3Nested" sourceRef="callActivitySubprocessNested" targetRef="endSubprocessNested"></sequenceFlow>
+    </subProcess>
+    <sequenceFlow id="flow1Nested" sourceRef="startCatchErrorNested" targetRef="subprocessCatchError"></sequenceFlow>
+    <endEvent id="endCatchErrorNested"></endEvent>
+    <sequenceFlow id="flow4Nested" sourceRef="subprocessCatchError" targetRef="endCatchErrorNested"></sequenceFlow>
+    <boundaryEvent id="catchOtherErrorsNested" name="otherErrorsNested" attachedToRef="subprocessCatchError">
+      <errorEventDefinition></errorEventDefinition>
+    </boundaryEvent>
+    <boundaryEvent id="boundaryCatchMyErrorNested" name="myErrorNested" attachedToRef="subprocessCatchError">
+      <errorEventDefinition errorRef="myError"></errorEventDefinition>
+    </boundaryEvent>
+    <userTask id="otherErrorsTaskNested" name="OtherErrorsTaskNested"></userTask>
+    <userTask id="myErrorTaskNested" name="MyErrorTaskNested"></userTask>
+    <sequenceFlow id="flow5Nested" sourceRef="boundaryCatchMyErrorNested" targetRef="myErrorTaskNested"></sequenceFlow>
+    <sequenceFlow id="flow6Nested" sourceRef="myErrorTaskNested" targetRef="endCatchErrorNested"></sequenceFlow>
+    <sequenceFlow id="flow7Nested" sourceRef="catchOtherErrorsNested" targetRef="otherErrorsTaskNested"></sequenceFlow>
+    <sequenceFlow id="flow8Nested" sourceRef="otherErrorsTaskNested" targetRef="endCatchErrorNested"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_catchError3">
+    <bpmndi:BPMNPlane bpmnElement="catchError3" id="BPMNPlane_catchError3">
+      <bpmndi:BPMNShape bpmnElement="startCatchErrorNested" id="BPMNShape_startCatchErrorNested">
+        <omgdc:Bounds height="35.0" width="35.0" x="145.0" y="285.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subprocessCatchError" id="BPMNShape_subprocessCatchError">
+        <omgdc:Bounds height="205.0" width="341.0" x="261.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startSubprocessNested" id="BPMNShape_startSubprocessNested">
+        <omgdc:Bounds height="35.0" width="35.0" x="291.0" y="287.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endSubprocessNested" id="BPMNShape_endSubprocessNested">
+        <omgdc:Bounds height="35.0" width="35.0" x="551.0" y="287.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="callActivitySubprocessNested" id="BPMNShape_callActivitySubprocessNested">
+        <omgdc:Bounds height="55.0" width="105.0" x="371.0" y="277.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="catchOtherErrorsNested" id="BPMNShape_catchOtherErrorsNested">
+        <omgdc:Bounds height="30.0" width="30.0" x="341.0" y="188.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundaryCatchMyErrorNested" id="BPMNShape_boundaryCatchMyErrorNested">
+        <omgdc:Bounds height="30.0" width="30.0" x="500.0" y="188.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endCatchErrorNested" id="BPMNShape_endCatchErrorNested">
+        <omgdc:Bounds height="35.0" width="35.0" x="721.0" y="285.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="otherErrorsTaskNested" id="BPMNShape_otherErrorsTaskNested">
+        <omgdc:Bounds height="55.0" width="105.0" x="617.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="myErrorTaskNested" id="BPMNShape_myErrorTaskNested">
+        <omgdc:Bounds height="55.0" width="105.0" x="611.0" y="133.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow2Nested" id="BPMNEdge_flow2Nested">
+        <omgdi:waypoint x="326.0" y="304.0"></omgdi:waypoint>
+        <omgdi:waypoint x="371.0" y="304.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3Nested" id="BPMNEdge_flow3Nested">
+        <omgdi:waypoint x="476.0" y="304.0"></omgdi:waypoint>
+        <omgdi:waypoint x="551.0" y="304.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1Nested" id="BPMNEdge_flow1Nested">
+        <omgdi:waypoint x="180.0" y="302.0"></omgdi:waypoint>
+        <omgdi:waypoint x="261.0" y="302.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4Nested" id="BPMNEdge_flow4Nested">
+        <omgdi:waypoint x="602.0" y="302.0"></omgdi:waypoint>
+        <omgdi:waypoint x="721.0" y="302.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5Nested" id="BPMNEdge_flow5Nested">
+        <omgdi:waypoint x="515.0" y="188.0"></omgdi:waypoint>
+        <omgdi:waypoint x="514.0" y="160.0"></omgdi:waypoint>
+        <omgdi:waypoint x="611.0" y="160.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6Nested" id="BPMNEdge_flow6Nested">
+        <omgdi:waypoint x="716.0" y="160.0"></omgdi:waypoint>
+        <omgdi:waypoint x="738.0" y="161.0"></omgdi:waypoint>
+        <omgdi:waypoint x="738.0" y="285.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7Nested" id="BPMNEdge_flow7Nested">
+        <omgdi:waypoint x="356.0" y="188.0"></omgdi:waypoint>
+        <omgdi:waypoint x="355.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="617.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8Nested" id="BPMNEdge_flow8Nested">
+        <omgdi:waypoint x="722.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="738.0" y="79.0"></omgdi:waypoint>
+        <omgdi:waypoint x="738.0" y="285.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

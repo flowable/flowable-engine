@@ -192,6 +192,11 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         query = idmIdentityService.createUserQuery().userFullNameLikeIgnoreCase("%E%");
         verifyQueryResults(query, 3);
     }
+    
+    public void testQueryByFirstAndLastNameCombinedLike() {
+        UserQuery query = idmIdentityService.createUserQuery().userFullNameLike("%ermit The%");
+        verifyQueryResults(query, 1);
+    }
 
     public void testQueryByInvalidLastNameLike() {
         UserQuery query = idmIdentityService.createUserQuery().userLastNameLike("%invalid%");

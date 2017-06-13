@@ -18,9 +18,11 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.converter.export.FieldExtensionExport;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
+import org.flowable.bpmn.model.AbstractFlowableHttpHandler;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CustomProperty;
+import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.ServiceTask;
 
@@ -40,7 +42,15 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
     @Override
     protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
-        ServiceTask serviceTask = new ServiceTask();
+        String serviceTaskType = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TYPE, xtr);
+        
+        ServiceTask serviceTask = null;
+        if (ServiceTask.HTTP_TASK.equals(serviceTaskType)) {
+            serviceTask = new HttpServiceTask();
+        } else {
+            serviceTask = new ServiceTask();
+        }
+        
         BpmnXMLUtil.addXMLLocation(serviceTask, xtr);
         if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_CLASS, xtr))) {
             serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
@@ -64,7 +74,7 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             serviceTask.setResultVariableName(BpmnXMLUtil.getAttributeValue("resultVariable", xtr));
         }
 
-        serviceTask.setType(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TYPE, xtr));
+        serviceTask.setType(serviceTaskType);
         serviceTask.setExtensionId(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_EXTENSIONID, xtr));
 
         if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, xtr))) {
@@ -130,6 +140,31 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
                 xtw.writeEndElement();
             }
         } else {
+            if (serviceTask instanceof HttpServiceTask) {
+                HttpServiceTask httpServiceTask = (HttpServiceTask) serviceTask;
+                if (httpServiceTask.getHttpRequestHandler() != null) {
+                    if (!didWriteExtensionStartElement) {
+                        xtw.writeStartElement(ELEMENT_EXTENSIONS);
+                        didWriteExtensionStartElement = true;
+                    }
+                    
+                    xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_HTTP_REQUEST_HANDLER, FLOWABLE_EXTENSIONS_NAMESPACE);
+                    writeHttpHandlerAttributes(httpServiceTask.getHttpRequestHandler(), xtw);
+                    xtw.writeEndElement();
+                }
+                
+                if (httpServiceTask.getHttpResponseHandler() != null) {
+                    if (!didWriteExtensionStartElement) {
+                        xtw.writeStartElement(ELEMENT_EXTENSIONS);
+                        didWriteExtensionStartElement = true;
+                    }
+                    
+                    xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_HTTP_RESPONSE_HANDLER, FLOWABLE_EXTENSIONS_NAMESPACE);
+                    writeHttpHandlerAttributes(httpServiceTask.getHttpResponseHandler(), xtw);
+                    xtw.writeEndElement();
+                }
+            }
+            
             didWriteExtensionStartElement = FieldExtensionExport.writeFieldExtensions(serviceTask.getFieldExtensions(), didWriteExtensionStartElement, xtw);
         }
 
@@ -153,5 +188,13 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             }
         }
         return result;
+    }
+    
+    protected void writeHttpHandlerAttributes(AbstractFlowableHttpHandler httpHandler, XMLStreamWriter xtw) throws Exception {
+        if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(httpHandler.getImplementationType())) {
+            xtw.writeAttribute(ATTRIBUTE_TASK_SERVICE_CLASS, httpHandler.getImplementation());
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(httpHandler.getImplementationType())) {
+            xtw.writeAttribute(ATTRIBUTE_TASK_SERVICE_DELEGATEEXPRESSION, httpHandler.getImplementation());
+        }
     }
 }

@@ -57,8 +57,8 @@
             model.processInstance.processDefinitionName}}</h2>
 
         <div class="detail">
-            <span class="label" ng-show="model.processInstance.startedBy">{{'PROCESS.FIELD.STARTED-BY' | translate}}: </span>
-            <span user-name="model.processInstance.startedBy" ng-show="model.processInstance.startedBy"></span>
+            <span class="label" ng-if="model.processInstance.startedBy">{{'PROCESS.FIELD.STARTED-BY' | translate}}: </span>
+            <span user-name="model.processInstance.startedBy" ng-if="model.processInstance.startedBy"></span>
             <span class="label">{{'PROCESS.FIELD.STARTED' | translate}}: </span>
             <span title="{{model.processInstance.started | dateformat}}">{{model.processInstance.started | dateformat:'fromNow'}}</span>
             <span class="label" ng-show="model.processInstance.ended">{{'PROCESS.FIELD.ENDED' | translate}}: </span>

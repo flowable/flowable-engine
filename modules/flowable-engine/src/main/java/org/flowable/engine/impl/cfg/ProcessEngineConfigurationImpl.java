@@ -121,6 +121,7 @@ import org.flowable.engine.impl.bpmn.parser.handler.ErrorEventDefinitionParseHan
 import org.flowable.engine.impl.bpmn.parser.handler.EventBasedGatewayParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.EventSubProcessParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.ExclusiveGatewayParseHandler;
+import org.flowable.engine.impl.bpmn.parser.handler.HttpServiceTaskParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.InclusiveGatewayParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.IntermediateCatchEventParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.IntermediateThrowEventParseHandler;
@@ -834,6 +835,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (flowable5CompatibilityEnabled && flowable5CompatibilityHandler != null) {
             Context.setProcessEngineConfiguration(processEngine.getProcessEngineConfiguration());
             flowable5CompatibilityHandler.getRawProcessEngine();
+            Context.removeProcessEngineConfiguration();
         }
 
         postProcessEngineInitialisation();
@@ -1577,6 +1579,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         bpmnParserHandlers.add(new SendTaskParseHandler());
         bpmnParserHandlers.add(new SequenceFlowParseHandler());
         bpmnParserHandlers.add(new ServiceTaskParseHandler());
+        bpmnParserHandlers.add(new HttpServiceTaskParseHandler());
         bpmnParserHandlers.add(new SignalEventDefinitionParseHandler());
         bpmnParserHandlers.add(new StartEventParseHandler());
         bpmnParserHandlers.add(new SubProcessParseHandler());
