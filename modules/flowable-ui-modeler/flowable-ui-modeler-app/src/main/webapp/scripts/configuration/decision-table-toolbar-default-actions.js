@@ -156,6 +156,8 @@ angular.module('flowableModeler')
                     comment: $scope.saveDialog.comment
                 };
 
+                $rootScope.currentDecisionTableRules = $scope.model.rulesData;
+
                 var saveCallback = function() {
                     $scope.$hide();
                     

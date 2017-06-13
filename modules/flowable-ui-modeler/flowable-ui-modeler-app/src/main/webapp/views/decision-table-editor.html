@@ -60,12 +60,12 @@
                 {{currentDecisionTable.name}}
             </div>
         </div>
-        <hot-table
+        <hot-table hot-auto-destroy
                 hot-id="decision-table-editor"
-                settings="hotModel.settings"
+                settings="model.hotSettings"
                 columns="model.columnDefs"
                 row-headers="true"
-                datarows="currentDecisionTableRules"
+                datarows="model.rulesData"
                 merge-cells="true"
                 auto-row-size="'true'"
                 on-after-get-col-header=doAfterGetColHeader

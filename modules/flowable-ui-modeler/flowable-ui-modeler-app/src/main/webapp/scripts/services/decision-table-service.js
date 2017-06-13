@@ -101,7 +101,7 @@ angular.module('flowableModeler').service('DecisionTableService', [ '$rootScope'
             data.decisionTableRepresentation.decisionTableDefinition = decisionTableDefinition;
             decisionTableDefinition.modelVersion = '2';
             decisionTableDefinition.key = key;
-            decisionTableDefinition.rules = $rootScope.currentDecisionTableRules;
+            decisionTableDefinition.rules = angular.copy($rootScope.currentDecisionTableRules);
 
 			html2canvas(jQuery('#decisionTableGrid'), {
                 onrendered: function (canvas) {
