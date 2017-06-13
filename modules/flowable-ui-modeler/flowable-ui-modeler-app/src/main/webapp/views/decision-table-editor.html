@@ -2,7 +2,7 @@
     <div class="fixed-container">
         <div class="btn-group">
             <div class="btn-toolbar pull-left" ng-controller="DecisionTableToolbarController" ng-cloak>
-                <button id="{{item.id}}"
+                <button id="{{item.id}}"dec
                         title="{{item.title | translate}}"
                         ng-repeat="item in items"
                         ng-switch on="item.type"
@@ -33,9 +33,6 @@
 <div class="container-fluid content decision-table" auto-height offset="40">
 
     <br/>
-    <div class="row">
-        <h4>Decision Table Editor</h4>
-    </div>
 
     <div class="row">
         <div class="col-xs-12 text-right">
@@ -94,7 +91,6 @@
         </div>
     </div>
 </div>
-
 
 <script>
     function triggerExpressionEditor(expressionType, expressionPos, newExpression) {

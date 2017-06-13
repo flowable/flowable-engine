@@ -801,7 +801,6 @@ hot-table .column-header.label {
     margin-top: 40px;
 }
 
-
 .decision-name-container {
     width: 340px;
     height: 50px;
@@ -1007,6 +1006,16 @@ hot-table .column-header.label {
     cursor: pointer;
     text-decoration: underline;
     color: #428bca;
+}
+
+.decision-table-grid-wrapper .handsontable-container {
+    border-left: 1px solid rgba(51, 51, 51, 0.3);
+    border-bottom: 1px solid rgba(51, 51, 51, 0.3);
+    border-right: 1px solid rgba(51, 51, 51, 0.3);
+}
+
+.decision-table-grid-wrapper .handsontable th:first-child {
+    border-left: none;
 }
 
 #decision-table-editor .handsontable.htRemoveRow th.htRemoveRow {

@@ -103,9 +103,8 @@ angular.module('flowableModeler').service('DecisionTableService', [ '$rootScope'
             decisionTableDefinition.key = key;
             decisionTableDefinition.rules = angular.copy($rootScope.currentDecisionTableRules);
 
-			html2canvas(jQuery('#decisionTableGrid'), {
+			html2canvas(jQuery('#decision-table-editor'), {
                 onrendered: function (canvas) {
-
                     var scale = canvas.width / 300.0;
 
                     var extra_canvas = document.createElement('canvas');
@@ -116,7 +115,7 @@ angular.module('flowableModeler').service('DecisionTableService', [ '$rootScope'
                     ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, 300, canvas.height / scale);
 
                     data.decisionTableImageBase64 = extra_canvas.toDataURL('image/png');
-                    
+
                     $http({
 	                    method: 'PUT',
 	                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/decision-table-models/' + $rootScope.currentDecisionTable.id,

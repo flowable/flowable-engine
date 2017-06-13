@@ -32,7 +32,6 @@ angular.module('flowableModeler')
             var operators = ['==', '!=', '<', '>', '>=', '<='];
             var columnIdCounter = 0;
 
-
             // Export name to grid's scope
             $scope.appResourceRoot = appResourceRoot;
 
