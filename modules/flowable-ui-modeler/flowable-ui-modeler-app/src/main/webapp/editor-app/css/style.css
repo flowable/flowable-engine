@@ -976,10 +976,14 @@ hot-table .column-header.label {
 }
 
 #decisionTableGrid thead th:first-of-type {
-    background: none;
+    /*background: none;*/
 }
 
 #decisionTableGrid .hit-policy-container {
+    position:fixed;
+    width: 50px;
+    background-color: #f9f9f9;
+    z-index: 1035;
 }
 
 #decisionTableGrid .hit-policy-header {

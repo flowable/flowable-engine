@@ -73,23 +73,6 @@
                 height="500">
         </hot-table>
     </div>
-
-    <div class="center grid-controls">
-        <div ng-if="currentDecisionTable.inputExpressions.length > 0 || currentDecisionTable.outputExpressions.length > 0">
-            <!--&lt;!&ndash;<button class="btn btn-danger" ng-click="removeRule()"&ndash;&gt;-->
-                    <!--&lt;!&ndash;ng-disabled="model.selectedRow === undefined || currentDecisionTableRules.length < 2"&ndash;&gt;-->
-                    <!--&lt;!&ndash;translate="DECISION-TABLE-EDITOR.BUTTON-REMOVE-RULE-LABEL"></button>&ndash;&gt;-->
-            <!--&lt;!&ndash;<button class="btn btn-default" ng-click="moveRuleUpwards()"&ndash;&gt;-->
-                    <!--&lt;!&ndash;ng-disabled="model.selectedRow === undefined || currentDecisionTableRules.length < 2 || model.selectedRow < 1"&ndash;&gt;-->
-                    <!--&lt;!&ndash;translate="DECISION-TABLE-EDITOR.BUTTON-MOVE-RULE-UPWARDS-LABEL"></button>&ndash;&gt;-->
-            <!--&lt;!&ndash;<button class="btn btn-default" ng-click="moveRuleDownwards()"&ndash;&gt;-->
-                    <!--&lt;!&ndash;ng-disabled="model.selectedRow === undefined || model.selectedRow == currentDecisionTableRules.length - 1"&ndash;&gt;-->
-                    <!--&lt;!&ndash;translate="DECISION-TABLE-EDITOR.BUTTON-MOVE-RULE-DOWNWARDS-LABEL"></button>&ndash;&gt;-->
-            <!--&lt;!&ndash;<button class="btn btn-default" ng-click="addRule()" ng-disabled="readOnly"&ndash;&gt;-->
-                    <!--&lt;!&ndash;translate="DECISION-TABLE-EDITOR.BUTTON-ADD-RULE-LABEL"></button>&ndash;&gt;-->
-            <button type="button" class="btn btn-default" ng-click="dumpData()">dump data to console</button>
-        </div>
-    </div>
 </div>
 
 <script>
@@ -107,5 +90,9 @@
         } else {
             extScope.removeOutputExpression(expressionPos);
         }
+    }
+
+    function triggerHitPolicyEditor() {
+        extScope.openHitPolicyEditor();
     }
 </script>
