@@ -45,7 +45,7 @@ public class TimerUtil {
 
     /**
      * The event definition on which the timer is based.
-     * 
+     *
      * Takes in an optional execution, if missing the {@link NoExecutionVariableScope} will be used (eg Timer start event)
      */
     public static TimerJobEntity createTimerEntityForTimerEventDefinition(TimerEventDefinition timerEventDefinition, boolean isInterruptingTimer,
@@ -116,24 +116,24 @@ public class TimerUtil {
         }
 
         TimerJobEntity timer = null;
+        timer = Context.getCommandContext().getTimerJobEntityManager().create();
+        timer.setJobType(JobEntity.JOB_TYPE_TIMER);
+        timer.setRevision(1);
+        timer.setJobHandlerType(jobHandlerType);
+        timer.setJobHandlerConfiguration(jobHandlerConfig);
+        timer.setExclusive(true);
+        timer.setRetries(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
         if (duedate != null) {
-            timer = Context.getCommandContext().getTimerJobEntityManager().create();
-            timer.setJobType(JobEntity.JOB_TYPE_TIMER);
-            timer.setRevision(1);
-            timer.setJobHandlerType(jobHandlerType);
-            timer.setJobHandlerConfiguration(jobHandlerConfig);
-            timer.setExclusive(true);
-            timer.setRetries(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
             timer.setDuedate(duedate);
-            if (executionEntity != null) {
-                timer.setExecution(executionEntity);
-                timer.setProcessDefinitionId(executionEntity.getProcessDefinitionId());
-                timer.setProcessInstanceId(executionEntity.getProcessInstanceId());
+        }
+        if (executionEntity != null) {
+            timer.setExecution(executionEntity);
+            timer.setProcessDefinitionId(executionEntity.getProcessDefinitionId());
+            timer.setProcessInstanceId(executionEntity.getProcessInstanceId());
 
-                // Inherit tenant identifier (if applicable)
-                if (executionEntity.getTenantId() != null) {
-                    timer.setTenantId(executionEntity.getTenantId());
-                }
+            // Inherit tenant identifier (if applicable)
+            if (executionEntity.getTenantId() != null) {
+                timer.setTenantId(executionEntity.getTenantId());
             }
         }
 
@@ -155,17 +155,15 @@ public class TimerUtil {
             }
         }
 
-        if (timer != null && executionEntity != null) {
-            timer.setExecution(executionEntity);
-            timer.setProcessDefinitionId(executionEntity.getProcessDefinitionId());
-
-            // Inherit tenant identifier (if applicable)
-            if (executionEntity.getTenantId() != null) {
-                timer.setTenantId(executionEntity.getTenantId());
-            }
-        }
+        assertValidTimer(timer);
 
         return timer;
+    }
+
+    protected static void assertValidTimer(TimerJobEntity timer) {
+        if (timer.getDuedate() == null && timer.getRepeat() == null) {
+            throw new RuntimeException("Timer must have repeat or due date set. "+ timer);
+        }
     }
 
     public static String prepareRepeat(String dueDate) {
