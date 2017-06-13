@@ -21,7 +21,7 @@
 		<spring.framework.version>4.2.5.RELEASE</spring.framework.version>
 		<spring.security.version>4.0.4.RELEASE</spring.security.version>
 		<jackson.version>2.7.5</jackson.version>
-		<mule.version>3.5.0</mule.version>
+		<mule.version>3.8.0</mule.version>
 		<cxf.version>3.1.6</cxf.version>
 		<batik.version>1.7</batik.version>
 		<!-- JVM params for test execution -->
