@@ -30,6 +30,7 @@ angular.module('flowableModeler')
             var hitPolicies = ['FIRST', 'ANY', 'UNIQUE', 'PRIORITY', 'RULE ORDER', 'OUTPUT ORDER', 'COLLECT'];
             var operators = ['==', '!=', '<', '>', '>=', '<='];
             var columnIdCounter = 0;
+            var hitPolicyHeaderElement;
 
             // Export name to grid's scope
             $scope.appResourceRoot = appResourceRoot;
@@ -48,31 +49,29 @@ angular.module('flowableModeler')
             // Hot Model init
             $scope.model.hotSettings = {
                 contextMenu: {
-                    callback: function (key, options) {
-                        if (key === 'about') {
-                            setTimeout(function () {
-                                // timeout is used to make sure the menu collapsed before alert is shown
-                                alert("This is a context menu with default and custom options mixed");
-                            }, 100);
-                        }
-                    },
                     items: {
                         "insert_row_above": {
                             name: 'Insert rule above',
                             callback: function(key, options) {
-                                $scope.addRule(hotDecisionTableEditorInstance.getSelected()[0]);
+                                if (hotDecisionTableEditorInstance.getSelected()) {
+                                    $scope.addRule(hotDecisionTableEditorInstance.getSelected()[0]);
+                                }
                             }
                         },
                         "insert_row_below": {
                             name: 'Add rule below',
                             callback: function(key, options) {
-                                $scope.addRule(hotDecisionTableEditorInstance.getSelected()[0] + 1);
+                                if (hotDecisionTableEditorInstance.getSelected()) {
+                                    $scope.addRule(hotDecisionTableEditorInstance.getSelected()[0] + 1);
+                                }
                             }
                         },
                         "clear_row": {
                             name: 'Clear rule',
                             callback: function(key, options) {
-                                $scope.clearRule(hotDecisionTableEditorInstance.getSelected()[0]);
+                                if (hotDecisionTableEditorInstance.getSelected()) {
+                                    $scope.clearRule(hotDecisionTableEditorInstance.getSelected()[0]);
+                                }
                             }
                         },
                         "remove_row": {
@@ -113,16 +112,20 @@ angular.module('flowableModeler')
                         "add_input": {
                             name: 'Add input',
                             callback: function (key, options) {
-                                $scope.openInputExpressionEditor(hotDecisionTableEditorInstance.getSelected()[1], true);
+                                if (hotDecisionTableEditorInstance.getSelected()) {
+                                    $scope.openInputExpressionEditor(hotDecisionTableEditorInstance.getSelected()[1], true);
+                                }
                             }
                         },
                         "add_output": {
                             name: 'Add output',
                             callback: function (key, options) {
-                                if (hotDecisionTableEditorInstance.getSelected()[1] < $scope.model.startOutputExpression) {
-                                    $scope.openOutputExpressionEditor($scope.currentDecisionTable.outputExpressions.length, true);
-                                } else {
-                                    $scope.openOutputExpressionEditor((hotDecisionTableEditorInstance.getSelected()[1] - $scope.model.startOutputExpression), true);
+                                if (hotDecisionTableEditorInstance.getSelected()) {
+                                    if (hotDecisionTableEditorInstance.getSelected()[1] < $scope.model.startOutputExpression) {
+                                        $scope.openOutputExpressionEditor($scope.currentDecisionTable.outputExpressions.length, true);
+                                    } else {
+                                        $scope.openOutputExpressionEditor((hotDecisionTableEditorInstance.getSelected()[1] - $scope.model.startOutputExpression), true);
+                                    }
                                 }
                             }
                         },
@@ -137,7 +140,8 @@ angular.module('flowableModeler')
                 },
                 manualColumnResize: false,
                 stretchH: 'all',
-                outsideClickDeselects: false
+                outsideClickDeselects: false,
+                viewportColumnRenderingOffset: $scope.model.columnDefs.length + 10
             };
 
 
@@ -227,21 +231,33 @@ angular.module('flowableModeler')
                 }
             };
 
-            $scope.doAfterRender = function () {
-                var element = document.querySelector("thead > tr > th:first-of-type");
-                if (element) {
-                    var firstChild = element.firstChild;
-                    var newElement = angular.element('<div class="hit-policy-header"><a onclick="triggerHitPolicyEditor()">' + $scope.currentDecisionTable.hitIndicator.substring(0, 1) + '</a></div>');
-                    element.className = 'hit-policy-container';
-                    element.replaceChild(newElement[0], firstChild);
+            $scope.doAfterScroll = function () {
+                if (hotDecisionTableEditorInstance) {
+                    hotDecisionTableEditorInstance.render();
+                }
+            };
+
+            var initialLoad = true;
+
+            $scope.doAfterRender = function (isForced) {
+
+                if (hitPolicyHeaderElement) {
+                    var element = document.querySelector("thead > tr > th:first-of-type");
+                    if (element) {
+                        var firstChild = element.firstChild;
+                        element.className = 'hit-policy-container';
+                        element.replaceChild(hitPolicyHeaderElement[0], firstChild);
+                    }
                 }
 
-                $timeout(function () {
-                    hotDecisionTableEditorInstance = hotRegisterer.getInstance('decision-table-editor');
-                    if (hotDecisionTableEditorInstance) {
+                if (hotDecisionTableEditorInstance === undefined) {
+                    $timeout(function () {
+                        hotDecisionTableEditorInstance = hotRegisterer.getInstance('decision-table-editor');
                         hotDecisionTableEditorInstance.validateCells();
-                    }
-                });
+                    });
+                } else {
+                    hotDecisionTableEditorInstance.validateCells();
+                }
             };
 
             $scope.dumpData = function () {
@@ -421,6 +437,8 @@ angular.module('flowableModeler')
                     if (!$rootScope.currentDecisionTable.hitIndicator) {
                         $rootScope.currentDecisionTable.hitIndicator = hitPolicies[0];
                     }
+
+                    hitPolicyHeaderElement = angular.element('<div class="hit-policy-header"><a onclick="triggerHitPolicyEditor()">' + $rootScope.currentDecisionTable.hitIndicator.substring(0, 1) + '</a></div>');
 
                     evaluateDecisionTableGrid($rootScope.currentDecisionTable);
 
