@@ -458,12 +458,6 @@ angular.module('flowableModeler')
                     source: operators
                 };
 
-                if ($scope.currentDecisionTable.inputExpressions.length !== 1) {
-                    columnDefinition.title = '<div class="header-remove-expression">' +
-                        '<a onclick="triggerRemoveExpression(\'input\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-minus-sign"></span></a>' +
-                        '</div>';
-                }
-
                 return columnDefinition;
             };
 
@@ -491,9 +485,6 @@ angular.module('flowableModeler')
                     title: '<div class="input-header">' +
                     '<a onclick="triggerExpressionEditor(\'input\',' + expressionPosition + ',false)"><span class="header-label">' + (inputExpression.label ? inputExpression.label : "New Input") + '</span></a>' +
                     '<br> <span class="header-variable">' + (inputExpression.variableId ? inputExpression.variableId : "none") + '</span>' +
-                    '</div>' +
-                    '<div class="header-add-new-expression">' +
-                    '<a onclick="triggerExpressionEditor(\'input\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-plus-sign"></span></a>' +
                     '</div>',
                     expressionType: 'input-expression',
                     expression: inputExpression,
@@ -513,9 +504,6 @@ angular.module('flowableModeler')
                         '<a onclick="triggerExpressionEditor(\'input\',' + expressionPosition + ',false)"><span class="header-label">' + (inputExpression.label ? inputExpression.label : "New Input") + '</span></a>' +
                         '<br> <span class="header-variable">' + (inputExpression.variableId ? inputExpression.variableId : "none") + '</span>' +
                         '<br> <span class="header-entries">' + inputExpression.entries.join() + '</span>' +
-                        '</div>' +
-                        '<div class="header-add-new-expression">' +
-                        '<a onclick="triggerExpressionEditor(\'input\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-plus-sign"></span></a>' +
                         '</div>';
                 }
 
@@ -558,12 +546,6 @@ angular.module('flowableModeler')
                     width: '270'
                 };
 
-                if ($scope.currentDecisionTable.outputExpressions.length !== 1) {
-                    title = '<div class="header-remove-expression">' +
-                        '<a onclick="triggerRemoveExpression(\'output\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-minus-sign"></span></a>' +
-                        '</div>';
-                }
-
                 if (outputExpression.entries && outputExpression.entries.length > 0) {
                     var entriesOptionValues = outputExpression.entries.slice(0, outputExpression.entries.length);
                     columnDefinition.type = 'dropdown';
@@ -574,18 +556,12 @@ angular.module('flowableModeler')
                         '<a onclick="triggerExpressionEditor(\'output\',' + expressionPosition + ',false)"><span class="header-label">' + (outputExpression.label ? outputExpression.label : "New Output") + '</span></a>' +
                         '<br> <span class="header-variable">' + (outputExpression.variableId ? outputExpression.variableId : "none") + '</span>' +
                         '<br> <span class="header-entries">' + outputExpression.entries.join() + '</span>' +
-                        '</div>' +
-                        '<div class="header-add-new-expression">' +
-                        '<a onclick="triggerExpressionEditor(\'output\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-plus-sign"></span></a>' +
                         '</div>';
                 } else {
                     title += '<div class="output-header">' +
                         '<a onclick="triggerExpressionEditor(\'output\',' + expressionPosition + ',false)"><span class="header-label">' + (outputExpression.label ? outputExpression.label : "New Output") + '</span></a>' +
                         '<br> <span class="header-variable">' + (outputExpression.variableId ? outputExpression.variableId : "none") + '</span>' +
-                        '</div>' +
-                        '<div class="header-add-new-expression">' +
-                        '<a onclick="triggerExpressionEditor(\'output\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-plus-sign"></span></a>' +
-                        '</div>';
+                        '</div>'
                 }
 
                 if (type === 'date') {
@@ -656,6 +632,5 @@ angular.module('flowableModeler')
 
             // Load model needed for favorites
             $scope.loadDecisionTable();
-
 
         }]);

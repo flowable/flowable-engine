@@ -426,6 +426,9 @@ angular.module('flowableModeler')
                     $rootScope.currentDecisionTable.name = decisionTable.name;
                     $rootScope.currentDecisionTable.description = decisionTable.description;
 
+                    $scope.model.lastUpdatedBy = decisionTable.lastUpdatedBy;
+                    $scope.model.createdBy = decisionTable.createdBy;
+
                     // decision table model to used in save dialog
                     $rootScope.currentDecisionTableModel = {
                         id: decisionTable.id,
@@ -758,8 +761,9 @@ angular.module('flowableModeler')
         };
 
         var createEntriesValues = function (entriesArray) {
+            var localCopy = entriesArray.slice(0);
             var entriesArrayOfArrays = [];
-            while (entriesArray.length) entriesArrayOfArrays.push(entriesArray.splice(0, 1));
+            while (localCopy.length) entriesArrayOfArrays.push(localCopy.splice(0, 1));
             return entriesArrayOfArrays;
         };
 

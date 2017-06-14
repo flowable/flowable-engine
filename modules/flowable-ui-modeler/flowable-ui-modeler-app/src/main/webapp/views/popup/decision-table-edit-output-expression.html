@@ -58,9 +58,12 @@
                     <div>
                         <div class="clearfix form-group">
                             <div class="col-xs-4">
-                                <label>Output values
-                                    <span ng-if="popup.currentHitPolicy === 'PRIORITY' || popup.currentHitPolicy === 'OUTPUT ORDER'">(drag rows for priority / output order):</span>
-                                    <span ng-if="popup.currentHitPolicy !== 'PRIORITY' && popup.currentHitPolicy !== 'OUTPUT ORDER'">(optional):</span>
+                                <label>{{'DECISION-TABLE-EDITOR.POPUP.EXPRESSION-EDITOR.OUTPUT-VALUES' |
+                                    translate}}
+                                    <span ng-if="popup.currentHitPolicy === 'PRIORITY' || popup.currentHitPolicy === 'OUTPUT ORDER'">{{'DECISION-TABLE-EDITOR.POPUP.EXPRESSION-EDITOR.OUTPUT-VALUES-NOT-OPTIONAL' |
+                                    translate}}</span>
+                                    <span ng-if="popup.currentHitPolicy !== 'PRIORITY' && popup.currentHitPolicy !== 'OUTPUT ORDER'">{{'DECISION-TABLE-EDITOR.POPUP.EXPRESSION-EDITOR.OUTPUT-VALUES-OPTIONAL' |
+                                    translate}}</span>
                                 </label>
                             </div>
                             <div ng-if="!model.readOnly" class="col-xs-8">
@@ -90,8 +93,8 @@
                         <button type="button" class="btn btn-sm btn-default" ng-click="cancel()">
                             {{'GENERAL.ACTION.CANCEL' | translate}}
                         </button>
-                        <button type="button" class="btn btn-sm btn-default" ng-click="save()"
-                                ng-disabled="!outputExpressionForm.$valid || model.readOnly">
+                        <button ng-if="!model.readOnly" type="button" class="btn btn-sm btn-default" ng-click="save()"
+                                ng-disabled="!outputExpressionForm.$valid">
                             {{'GENERAL.ACTION.SAVE' | translate}}
                         </button>
                     </div>

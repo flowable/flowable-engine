@@ -55,7 +55,8 @@
                     <div>
                         <div class="clearfix form-group">
                             <div class="col-xs-4">
-                                <label>Allowed values (optional):</label>
+                                <label>{{'DECISION-TABLE-EDITOR.POPUP.EXPRESSION-EDITOR.ALLOWED-VALUES' |
+                                    translate}}</label>
                             </div>
                             <div ng-if="!model.readOnly" class="col-xs-8">
                                 <hot-table hot-auto-destroy
@@ -82,8 +83,8 @@
                         <button type="button" class="btn btn-sm btn-default" ng-click="cancel()">
                             {{'GENERAL.ACTION.CANCEL' | translate}}
                         </button>
-                        <button type="button" class="btn btn-sm btn-default" ng-click="save()"
-                                ng-disabled="!inputExpressionForm.$valid || model.readOnly">
+                        <button ng-if="!model.readOnly" type="button" class="btn btn-sm btn-default" ng-click="save()"
+                                ng-disabled="!inputExpressionForm.$valid">
                             {{'GENERAL.ACTION.SAVE' | translate}}
                         </button>
                     </div>
