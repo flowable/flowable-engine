@@ -237,8 +237,6 @@ angular.module('flowableModeler')
                 }
             };
 
-            var initialLoad = true;
-
             $scope.doAfterRender = function (isForced) {
 
                 if (hitPolicyHeaderElement) {
