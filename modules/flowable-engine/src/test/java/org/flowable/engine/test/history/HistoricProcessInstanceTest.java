@@ -535,7 +535,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertEquals("Kermit", processInstanceVars.get("name"));
         assertEquals(60, processInstanceVars.get("age"));
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
 
         // Verify name and tenant id (didn't work on mssql and db2) on historic process instance
         List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().list();

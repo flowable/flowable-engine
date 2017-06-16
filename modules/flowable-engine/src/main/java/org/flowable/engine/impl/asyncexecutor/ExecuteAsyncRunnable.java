@@ -78,12 +78,12 @@ public class ExecuteAsyncRunnable implements Runnable {
             });
         }
         
+        if (isHandledByV5Engine()) {
+            return;
+        }
+        
         if (job instanceof AbstractRuntimeJobEntity) {
 
-            if (isHandledByV5Engine()) {
-                return;
-            }
-    
             boolean lockNotNeededOrSuccess = lockJobIfNeeded();
     
             if (lockNotNeededOrSuccess) {
@@ -91,7 +91,7 @@ public class ExecuteAsyncRunnable implements Runnable {
                 unlockJobIfNeeded();
             }
             
-        } else {
+        } else { // history jobs
             executeJob();
             
         }

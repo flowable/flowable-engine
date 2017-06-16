@@ -43,7 +43,7 @@
         DUE_DATE_,
         CATEGORY_,
         TENANT_ID_,
-        LAST_UPDATE_TIME_
+        LAST_UPDATED_TIME_
       ) values (
         #{id ,jdbcType=VARCHAR},
         1,
@@ -93,7 +93,7 @@
         DUE_DATE_,
         CATEGORY_,
         TENANT_ID_,
-        LAST_UPDATE_TIME_
+        LAST_UPDATED_TIME_
       ) values 
         <foreach collection="list" item="historicTask" index="index" separator=",">
           (#{historicTask.id ,jdbcType=VARCHAR},
@@ -146,7 +146,7 @@
             DUE_DATE_,
             CATEGORY_,
             TENANT_ID_,
-            LAST_UPDATE_TIME_
+            LAST_UPDATED_TIME_
           ) VALUES 
             (#{historicTask.id ,jdbcType=VARCHAR},
              1, 
@@ -229,7 +229,7 @@
 	      	CATEGORY_ = #{category, jdbcType=VARCHAR},
 	  	  </if>
 	  	  <if test="originalPersistentState.lastUpdateTime != lastUpdateTime">
-	      	LAST_UPDATE_TIME_ = #{lastUpdateTime, jdbcType=TIMESTAMP}
+	      	LAST_UPDATED_TIME_ = #{lastUpdateTime, jdbcType=TIMESTAMP}
 	      </if>
   	  </set>
     where ID_ = #{id}
@@ -273,7 +273,7 @@
     <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
     <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
-    <result property="lastUpdateTime" column="LAST_UPDATE_TIME_" jdbcType="TIMESTAMP" />
+    <result property="lastUpdateTime" column="LAST_UPDATED_TIME_" jdbcType="TIMESTAMP" />
   </resultMap>
   
   <resultMap id="historicTaskAndRelatedEntitiesResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityImpl">
@@ -298,7 +298,7 @@
     <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
     <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
-    <result property="lastUpdateTime" column="LAST_UPDATE_TIME_" jdbcType="TIMESTAMP" />
+    <result property="lastUpdateTime" column="LAST_UPDATED_TIME_" jdbcType="TIMESTAMP" />
     <collection property="queryVariables" column="TASK_ID_" javaType="ArrayList" ofType="org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityImpl">
       <id property="id" column="VAR_ID_"/>
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR" />
@@ -393,7 +393,7 @@
       TEMPRES_START_TIME_ as START_TIME_, TEMPRES_CLAIM_TIME_ as CLAIM_TIME_, TEMPRES_END_TIME_ as END_TIME_,
       TEMPRES_DURATION_ as DURATION_, TEMPRES_TASK_DEF_KEY_ as TASK_DEF_KEY_, TEMPRES_FORM_KEY_ as FORM_KEY_,
       TEMPRES_PRIORITY_ as PRIORITY_, TEMPRES_DUE_DATE_ as DUE_DATE_, TEMPRES_CATEGORY_ as CATEGORY_,
-      TEMPRES_DELETE_REASON_ as DELETE_REASON_, TEMPRES_TENANT_ID_ as TENANT_ID_, TEMPRES_LAST_UPDATE_TIME_ as LAST_UPDATE_TIME_
+      TEMPRES_DELETE_REASON_ as DELETE_REASON_, TEMPRES_TENANT_ID_ as TENANT_ID_, TEMPRES_LAST_UPDATED_TIME_ as LAST_UPDATED_TIME_
       <if test="includeTaskLocalVariables or includeProcessVariables">
         ,
         TEMPVAR_ID_ as VAR_ID_, TEMPVAR_NAME_ as VAR_NAME_, TEMPVAR_TYPE_ as VAR_TYPE_, TEMPVAR_REV_ as VAR_REV_,
@@ -415,7 +415,7 @@
       RES.DURATION_ as TEMPRES_DURATION_, RES.TASK_DEF_KEY_ as TEMPRES_TASK_DEF_KEY_,
       RES.FORM_KEY_ as TEMPRES_FORM_KEY_, RES.PRIORITY_ as TEMPRES_PRIORITY_,
       RES.DUE_DATE_ as TEMPRES_DUE_DATE_, RES.CATEGORY_ as TEMPRES_CATEGORY_, RES.DELETE_REASON_ as TEMPRES_DELETE_REASON_,
-      RES.TENANT_ID_ as TEMPRES_TENANT_ID_, RES.LAST_UPDATE_TIME_ as TEMPRES_LAST_UPDATE_TIME_
+      RES.TENANT_ID_ as TEMPRES_TENANT_ID_, RES.LAST_UPDATED_TIME_ as TEMPRES_LAST_UPDATED_TIME_
       <if test="includeTaskLocalVariables or includeProcessVariables">
         ,
         VAR.ID_ as TEMPVAR_ID_, VAR.NAME_ as TEMPVAR_NAME_, VAR.VAR_TYPE_ as TEMPVAR_TYPE_, VAR.REV_ as TEMPVAR_REV_,

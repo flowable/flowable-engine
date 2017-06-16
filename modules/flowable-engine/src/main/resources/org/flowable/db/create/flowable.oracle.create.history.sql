@@ -1,5 +1,6 @@
 create table ACT_HI_PROCINST (
     ID_ NVARCHAR2(64) not null,
+    REV_ INTEGER default 1,
     PROC_INST_ID_ NVARCHAR2(64) not null,
     BUSINESS_KEY_ NVARCHAR2(255),
     PROC_DEF_ID_ NVARCHAR2(64) not null,
@@ -19,6 +20,7 @@ create table ACT_HI_PROCINST (
 
 create table ACT_HI_ACTINST (
     ID_ NVARCHAR2(64) not null,
+    REV_ INTEGER default 1,
     PROC_DEF_ID_ NVARCHAR2(64) not null,
     PROC_INST_ID_ NVARCHAR2(64) not null,
     EXECUTION_ID_ NVARCHAR2(64) not null,
@@ -38,6 +40,7 @@ create table ACT_HI_ACTINST (
 
 create table ACT_HI_TASKINST (
     ID_ NVARCHAR2(64) not null,
+    REV_ INTEGER default 1,
     PROC_DEF_ID_ NVARCHAR2(64),
     TASK_DEF_KEY_ NVARCHAR2(255),
     PROC_INST_ID_ NVARCHAR2(64),
@@ -57,17 +60,18 @@ create table ACT_HI_TASKINST (
     FORM_KEY_ NVARCHAR2(255),
     CATEGORY_ NVARCHAR2(255),
     TENANT_ID_ NVARCHAR2(255) default '',
+    LAST_UPDATED_TIME_ TIMESTAMP(6),
     primary key (ID_)
 );
 
 create table ACT_HI_VARINST (
     ID_ NVARCHAR2(64) not null,
+    REV_ INTEGER default 1,
     PROC_INST_ID_ NVARCHAR2(64),
     EXECUTION_ID_ NVARCHAR2(64),
     TASK_ID_ NVARCHAR2(64),
     NAME_ NVARCHAR2(255) not null,
     VAR_TYPE_ NVARCHAR2(100),
-    REV_ INTEGER,
     BYTEARRAY_ID_ NVARCHAR2(64),
     DOUBLE_ NUMBER(*,10),
     LONG_ NUMBER(19,0),
