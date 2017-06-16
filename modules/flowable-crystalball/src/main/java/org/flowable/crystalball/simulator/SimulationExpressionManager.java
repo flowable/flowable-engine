@@ -17,11 +17,10 @@ import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.el.CompositeELResolver;
-import javax.el.ELContext;
-import javax.el.ELResolver;
-import javax.el.PropertyNotWritableException;
-
+import org.flowable.engine.common.impl.javax.el.CompositeELResolver;
+import org.flowable.engine.common.impl.javax.el.ELContext;
+import org.flowable.engine.common.impl.javax.el.ELResolver;
+import org.flowable.engine.common.impl.javax.el.PropertyNotWritableException;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.el.DefaultExpressionManager;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;

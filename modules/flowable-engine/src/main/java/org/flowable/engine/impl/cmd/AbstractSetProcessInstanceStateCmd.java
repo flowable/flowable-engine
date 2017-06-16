@@ -24,9 +24,9 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.engine.impl.persistence.entity.SuspensionState;
+import org.flowable.engine.impl.persistence.entity.SuspensionState.SuspensionStateUtil;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
-import org.flowable.engine.impl.persistence.entity.SuspensionState.SuspensionStateUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Execution;
 

@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.delegate.invocation;
 
-import javax.el.ValueExpression;
+import org.flowable.engine.common.impl.javax.el.ValueExpression;
 
 /**
  * Baseclass responsible for handling invocations of Expressions

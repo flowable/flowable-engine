@@ -15,13 +15,12 @@ package org.flowable.form.engine.impl.el;
 
 import java.util.Map;
 
-import javax.el.ELContext;
-import javax.el.ELException;
-import javax.el.MethodNotFoundException;
-import javax.el.PropertyNotFoundException;
-import javax.el.ValueExpression;
-
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.javax.el.ELContext;
+import org.flowable.engine.common.impl.javax.el.ELException;
+import org.flowable.engine.common.impl.javax.el.MethodNotFoundException;
+import org.flowable.engine.common.impl.javax.el.PropertyNotFoundException;
+import org.flowable.engine.common.impl.javax.el.ValueExpression;
 import org.flowable.form.engine.FormExpression;
 
 /**

@@ -12,11 +12,11 @@
  */
 package org.flowable.form.engine.impl.el;
 
-import javax.el.ELContext;
-import javax.el.ELResolver;
-import javax.el.ExpressionFactory;
-import javax.el.FunctionMapper;
-import javax.el.VariableMapper;
+import org.flowable.engine.common.impl.javax.el.ELContext;
+import org.flowable.engine.common.impl.javax.el.ELResolver;
+import org.flowable.engine.common.impl.javax.el.ExpressionFactory;
+import org.flowable.engine.common.impl.javax.el.FunctionMapper;
+import org.flowable.engine.common.impl.javax.el.VariableMapper;
 
 /**
  * Simple implementation of the {@link ELContext} used during parsings.

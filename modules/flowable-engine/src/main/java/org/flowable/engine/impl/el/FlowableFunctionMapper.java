@@ -16,8 +16,7 @@ package org.flowable.engine.impl.el;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import javax.el.FunctionMapper;
-
+import org.flowable.engine.common.impl.javax.el.FunctionMapper;
 import org.flowable.engine.delegate.FlowableFunctionDelegate;
 
 /**

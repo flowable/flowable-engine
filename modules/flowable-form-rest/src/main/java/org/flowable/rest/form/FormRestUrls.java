@@ -12,9 +12,9 @@
  */
 package org.flowable.rest.form;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.text.MessageFormat;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Yvo Swillens
