@@ -25,7 +25,7 @@ public class MvelConditionExpressionPreParser implements MvelExpressionPreParser
 
         String parsedExpression = inputVariable;
         if ("date".equals(inputVariableType) || "number".equals(inputVariableType)) {
-            parsedExpression += MvelConditionExpressionPreParser.parseSegmentWithOperator(expression);
+            parsedExpression += parseSegmentWithOperator(expression);
         } else {
             if (expression.startsWith(".")) {
                 parsedExpression += expression;
@@ -36,7 +36,7 @@ public class MvelConditionExpressionPreParser implements MvelExpressionPreParser
         return parsedExpression;
     }
 
-    private static String parseSegmentWithOperator(String expression) {
+    protected static String parseSegmentWithOperator(String expression) {
         String parsedExpressionSegment;
         if (expression.length() < 2 || !StringUtils.startsWithAny(expression, OPERATORS)) {
             parsedExpressionSegment = " == " + expression;
