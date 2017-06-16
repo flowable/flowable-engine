@@ -31,6 +31,7 @@ import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.engine.runtime.JobInfo;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.junit.Assert;
@@ -389,7 +390,7 @@ public class AsyncExecutorTest {
         private AtomicInteger counter = new AtomicInteger(0);
 
         @Override
-        public boolean executeAsyncJob(Job job) {
+        public boolean executeAsyncJob(JobInfo job) {
             logger.info("About to execute job {}", job.getId());
             counter.incrementAndGet();
             boolean success = super.executeAsyncJob(job);

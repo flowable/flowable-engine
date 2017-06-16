@@ -93,6 +93,8 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
     void deleteChildExecutions(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
 
     void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
+    
+    void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
 
     void updateProcessInstanceLockTime(String processInstanceId);
 

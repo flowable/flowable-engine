@@ -38,9 +38,9 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
     /**
      * Handles the sequential case of spawning the instances. Will only create one instance, since at most one instance can be active.
      */
-    protected int createInstances(DelegateExecution multiInstanceExecution) {
+    protected int createInstances(DelegateExecution multiInstanceRootExecution) {
 
-        int nrOfInstances = resolveNrOfInstances(multiInstanceExecution);
+        int nrOfInstances = resolveNrOfInstances(multiInstanceRootExecution);
         if (nrOfInstances == 0) {
             return nrOfInstances;
         } else if (nrOfInstances < 0) {
@@ -49,21 +49,14 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
 
         // Create child execution that will execute the inner behavior
         ExecutionEntity execution = Context.getCommandContext().getExecutionEntityManager()
-                .createChildExecution((ExecutionEntity) multiInstanceExecution);
-        execution.setCurrentFlowElement(multiInstanceExecution.getCurrentFlowElement());
-        multiInstanceExecution.setMultiInstanceRoot(true);
-        multiInstanceExecution.setActive(false);
+                .createChildExecution((ExecutionEntity) multiInstanceRootExecution);
+        execution.setCurrentFlowElement(multiInstanceRootExecution.getCurrentFlowElement());
 
         // Set Multi-instance variables
-        setLoopVariable(multiInstanceExecution, NUMBER_OF_INSTANCES, nrOfInstances);
-        setLoopVariable(multiInstanceExecution, NUMBER_OF_COMPLETED_INSTANCES, 0);
-        setLoopVariable(multiInstanceExecution, NUMBER_OF_ACTIVE_INSTANCES, 1);
-        setLoopVariable(multiInstanceExecution, getCollectionElementIndexVariable(), 0);
-        setLoopVariable(execution, NUMBER_OF_INSTANCES, nrOfInstances);
-        setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, 0);
-        setLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES, 1);
-        setLoopVariable(execution, getCollectionElementIndexVariable(), 0);
-        logLoopDetails(multiInstanceExecution, "initialized", 0, 0, 1, nrOfInstances);
+        setLoopVariable(multiInstanceRootExecution, NUMBER_OF_INSTANCES, nrOfInstances);
+        setLoopVariable(multiInstanceRootExecution, NUMBER_OF_COMPLETED_INSTANCES, 0);
+        setLoopVariable(multiInstanceRootExecution, NUMBER_OF_ACTIVE_INSTANCES, 1);
+        logLoopDetails(multiInstanceRootExecution, "initialized", 0, 0, 1, nrOfInstances);
 
         if (nrOfInstances > 0) {
             executeOriginalBehavior(execution, 0);
@@ -78,44 +71,32 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
      */
     public void leave(DelegateExecution execution) {
         DelegateExecution multiInstanceRootExecution = getMultiInstanceRootExecution(execution);
-        int nrOfInstances = getLoopVariable(execution, NUMBER_OF_INSTANCES);
-        int loopCounter = getLoopVariable(multiInstanceRootExecution, getCollectionElementIndexVariable()) + 1;
+        int loopCounter = getLoopVariable(execution, getCollectionElementIndexVariable()) + 1;
+        int nrOfInstances = getLoopVariable(multiInstanceRootExecution, NUMBER_OF_INSTANCES);
         int nrOfCompletedInstances = getLoopVariable(multiInstanceRootExecution, NUMBER_OF_COMPLETED_INSTANCES) + 1;
-        int nrOfActiveInstances = getLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES);
+        int nrOfActiveInstances = getLoopVariable(multiInstanceRootExecution, NUMBER_OF_ACTIVE_INSTANCES);
 
         setLoopVariable(multiInstanceRootExecution, NUMBER_OF_COMPLETED_INSTANCES, nrOfCompletedInstances);
-        setLoopVariable(multiInstanceRootExecution, getCollectionElementIndexVariable(), loopCounter);
-        setLoopVariable(execution, getCollectionElementIndexVariable(), loopCounter);
         logLoopDetails(execution, "instance completed", loopCounter, nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances);
 
-        Context.getCommandContext().getHistoryManager().recordActivityEnd((ExecutionEntity) execution, null);
         callActivityEndListeners(execution);
 
         // executeCompensationBoundaryEvents(execution.getCurrentFlowElement(), execution);
 
         if (loopCounter >= nrOfInstances || completionConditionSatisfied(multiInstanceRootExecution)) {
-            removeLocalLoopVariable(multiInstanceRootExecution, getCollectionElementIndexVariable());
-            removeLocalLoopVariable(execution, getCollectionElementIndexVariable());
-            multiInstanceRootExecution.setMultiInstanceRoot(false);
-            multiInstanceRootExecution.setScope(false);
-            multiInstanceRootExecution.setCurrentFlowElement(execution.getCurrentFlowElement());
-            Context.getCommandContext().getExecutionEntityManager().deleteChildExecutions((ExecutionEntity) multiInstanceRootExecution, "MI_END", false);
-            super.leave(multiInstanceRootExecution);
+            super.leave(execution);
 
         } else {
             try {
-
+                
                 if (execution.getCurrentFlowElement() instanceof SubProcess) {
                     ExecutionEntityManager executionEntityManager = Context.getCommandContext().getExecutionEntityManager();
                     ExecutionEntity executionToContinue = executionEntityManager.createChildExecution((ExecutionEntity) multiInstanceRootExecution);
                     executionToContinue.setCurrentFlowElement(execution.getCurrentFlowElement());
                     executionToContinue.setScope(true);
-                    setLoopVariable(executionToContinue, NUMBER_OF_INSTANCES, nrOfInstances);
-                    setLoopVariable(executionToContinue, NUMBER_OF_COMPLETED_INSTANCES, nrOfCompletedInstances);
-                    setLoopVariable(executionToContinue, NUMBER_OF_ACTIVE_INSTANCES, nrOfActiveInstances);
-                    setLoopVariable(executionToContinue, getCollectionElementIndexVariable(), loopCounter);
                     executeOriginalBehavior(executionToContinue, loopCounter);
                 } else {
+                    Context.getCommandContext().getHistoryManager().recordActivityEnd((ExecutionEntity) execution, null);
                     executeOriginalBehavior(execution, loopCounter);
                 }
 

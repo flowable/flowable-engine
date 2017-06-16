@@ -23,7 +23,7 @@ import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.JobInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +72,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
      */
     protected long secondsToWaitOnShutdown = 60L;
 
-    protected boolean executeAsyncJob(final Job job, Runnable runnable) {
+    protected boolean executeAsyncJob(final JobInfo job, Runnable runnable) {
         try {
             executorService.execute(runnable);
             return true;
@@ -113,7 +113,9 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
             startJobAcquisitionThread();
         }
 
-        startTimerAcquisitionThread();
+        if (timerRunnableNeeded) {
+            startTimerAcquisitionThread();
+        }
         startResetExpiredJobsThread();
     }
 

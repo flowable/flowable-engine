@@ -19,6 +19,7 @@ import java.util.List;
 import org.flowable.engine.impl.asyncexecutor.FindExpiredJobsCmd;
 import org.flowable.engine.impl.asyncexecutor.ResetExpiredJobsCmd;
 import org.flowable.engine.impl.cmd.AcquireJobsCmd;
+import org.flowable.engine.impl.persistence.entity.GenericExecutableJobEntity;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Job;
@@ -46,7 +47,7 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
 
         // Running the 'reset expired' logic should have no effect now
         int expiredJobsPagesSize = processEngineConfiguration.getAsyncExecutorResetExpiredJobsPageSize();
-        List<JobEntity> expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize));
+        List<? extends GenericExecutableJobEntity> expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, processEngineConfiguration.getJobEntityManager()));
         assertEquals(0, expiredJobs.size());
         assertJobDetails(false);
 
@@ -55,7 +56,7 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
         assertJobDetails(true);
 
         // Running the 'reset expired' logic should have no effect, the lock time is not yet passed
-        expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize));
+        expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, processEngineConfiguration.getJobEntityManager()));
         assertEquals(0, expiredJobs.size());
         assertJobDetails(true);
 
@@ -64,15 +65,15 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getClock().setCurrentTime(newDate);
 
         // Running the reset logic should now reset the lock
-        expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize));
+        expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize,  processEngineConfiguration.getJobEntityManager()));
         assertTrue(expiredJobs.size() > 0);
 
         List<String> jobIds = new ArrayList<String>();
-        for (JobEntity jobEntity : expiredJobs) {
+        for (GenericExecutableJobEntity jobEntity : expiredJobs) {
             jobIds.add(jobEntity.getId());
         }
 
-        managementService.executeCommand(new ResetExpiredJobsCmd(jobIds));
+        managementService.executeCommand(new ResetExpiredJobsCmd(jobIds, processEngineConfiguration.getJobEntityManager()));
         assertJobDetails(false);
 
         // And it can be re-acquired

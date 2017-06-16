@@ -18,49 +18,8 @@ import org.flowable.engine.common.impl.db.HasRevision;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.runtime.HistoryJob;
 
-/**
- * Represents an async history job: a piece of logic that needs to be executed asynchronously.
- * 
- * @author Tijs Rademakers
- * @author Joram Barrez
- */
-public interface HistoryJobEntity extends HistoryJob, Entity, HasRevision {
+public interface HistoryJobEntity extends GenericExecutableJobEntity, HistoryJob, Entity, HasRevision {
 
-    void setRetries(int retries);
-
-    String getJobHandlerType();
-
-    void setJobHandlerType(String jobHandlerType);
-
-    String getJobHandlerConfiguration();
-
-    void setJobHandlerConfiguration(String jobHandlerConfiguration);
-  
-    String getAdvancedJobHandlerConfiguration();
-
-    void setAdvancedJobHandlerConfiguration(String jobHandlerConfiguration);
-  
-    void setAdvancedJobHandlerConfigurationBytes(byte[] bytes);
-  
-    ByteArrayRef getAdvancedJobHandlerConfigurationByteArrayRef();
-
-    String getExceptionStacktrace();
-
-    void setExceptionStacktrace(String exception);
-
-    void setExceptionMessage(String exceptionMessage);
-
-    ByteArrayRef getExceptionByteArrayRef();
-
-    void setTenantId(String tenantId);
-    
     void setCreateTime(Date createTime);
     
-    String getLockOwner();
-
-    void setLockOwner(String claimedBy);
-
-    Date getLockExpirationTime();
-
-    void setLockExpirationTime(Date claimedUntil);
 }

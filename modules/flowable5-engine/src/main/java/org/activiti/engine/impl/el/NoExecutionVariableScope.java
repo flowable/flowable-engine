@@ -184,6 +184,12 @@ public class NoExecutionVariableScope implements VariableScope {
     public void setVariablesLocal(Map<String, ? extends Object> variables) {
         throw new UnsupportedOperationException("No execution active, no variables can be set");
     }
+    
+    @Override
+    public Object setVariableLocal(String variableName, Object value, org.flowable.engine.impl.persistence.entity.ExecutionEntity sourceActivityExecution, boolean fetchAllVariables) {
+        // This method is called from v6 only, v5 will never call this method.
+        throw new UnsupportedOperationException();
+    }
 
     public boolean hasVariables() {
         return false;

@@ -16,6 +16,8 @@ import java.util.Collection;
 
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.persistence.entity.GenericExecutableJobEntity;
+import org.flowable.engine.impl.persistence.entity.GenericExecutableJobEntityManager;
 import org.flowable.engine.runtime.Job;
 
 /**
@@ -24,9 +26,11 @@ import org.flowable.engine.runtime.Job;
 public class ResetExpiredJobsCmd implements Command<Void> {
 
     protected Collection<String> jobIds;
-
-    public ResetExpiredJobsCmd(Collection<String> jobsIds) {
+    protected GenericExecutableJobEntityManager<? extends GenericExecutableJobEntity> jobEntityManager;
+    
+    public ResetExpiredJobsCmd(Collection<String> jobsIds, GenericExecutableJobEntityManager<? extends GenericExecutableJobEntity> jobEntityManager) {
         this.jobIds = jobsIds;
+        this.jobEntityManager = jobEntityManager;
     }
 
     @Override
@@ -37,7 +41,7 @@ public class ResetExpiredJobsCmd implements Command<Void> {
                 Job job = commandContext.getJobEntityManager().findById(jobId);
                 commandContext.getJobManager().unacquire(job);
             } else {
-                commandContext.getJobEntityManager().resetExpiredJob(jobId);
+                jobEntityManager.resetExpiredJob(jobId);
             }
         }
         return null;

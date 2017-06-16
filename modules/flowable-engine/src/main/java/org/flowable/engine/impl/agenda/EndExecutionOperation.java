@@ -240,6 +240,7 @@ public class EndExecutionOperation extends AbstractOperation {
         // create a new execution to take the outgoing sequence flows
         executionToContinue = executionEntityManager.createChildExecution(parentExecution.getParent());
         executionToContinue.setCurrentFlowElement(subProcess);
+        executionToContinue.setActive(false);
 
         boolean hasCompensation = false;
         if (subProcess instanceof Transaction) {

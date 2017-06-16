@@ -173,8 +173,11 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelUserTasks.bpmn20.xml" })
     public void testParallelUserTasksHistory() {
         runtimeService.startProcessInstanceByKey("miParallelUserTasks");
-        for (Task task : taskService.createTaskQuery().list()) {
-            taskService.complete(task.getId());
+        List<Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+        assertEquals(3, tasks.size());
+        for (int i = 0; i < tasks.size(); i++) {
+            assertEquals("My Task " + i, tasks.get(i).getName());
+            taskService.complete(tasks.get(i).getId());
         }
 
         // Validate history

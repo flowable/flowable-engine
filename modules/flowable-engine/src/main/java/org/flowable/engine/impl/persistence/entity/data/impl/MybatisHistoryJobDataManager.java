@@ -47,24 +47,24 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<HistoryJobEntity> findHistoryJobsToExecute(Page page) {
+    public List<HistoryJobEntity> findJobsToExecute(Page page) {
         return getDbSqlSession().selectList("selectHistoryJobsToExecute", null, page);
     }
 
     @Override
-    public List<HistoryJobEntity> findHistoryJobsByExecutionId(final String executionId) {
+    public List<HistoryJobEntity> findJobsByExecutionId(final String executionId) {
         return getDbSqlSession().selectList("selectHistoryJobsByExecutionId", executionId);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<HistoryJobEntity> findHistoryJobsByProcessInstanceId(final String processInstanceId) {
+    public List<HistoryJobEntity> findJobsByProcessInstanceId(final String processInstanceId) {
         return getDbSqlSession().selectList("selectHistoryJobsByProcessInstanceId", processInstanceId);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<HistoryJobEntity> findExpiredHistoryJobs(Page page) {
+    public List<HistoryJobEntity> findExpiredJobs(Page page) {
         Date now = getClock().getCurrentTime();
         return getDbSqlSession().selectList("selectExpiredHistoryJobs", now, page);
     }
@@ -82,7 +82,7 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
     }
 
     @Override
-    public void updateHistoryJobTenantIdForDeployment(String deploymentId, String newTenantId) {
+    public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
@@ -90,7 +90,7 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
     }
 
     @Override
-    public void resetExpiredHistoryJob(String jobId) {
+    public void resetExpiredJob(String jobId) {
         Map<String, Object> params = new HashMap<String, Object>(2);
         params.put("id", jobId);
         getDbSqlSession().update("resetExpiredHistoryJob", params);

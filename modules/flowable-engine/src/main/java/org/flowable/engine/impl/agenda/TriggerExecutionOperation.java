@@ -15,6 +15,7 @@ package org.flowable.engine.impl.agenda;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
+import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
@@ -43,15 +44,12 @@ public class TriggerExecutionOperation extends AbstractOperation {
             ActivityBehavior activityBehavior = (ActivityBehavior) ((FlowNode) currentFlowElement).getBehavior();
             if (activityBehavior instanceof TriggerableActivityBehavior) {
 
-                if (currentFlowElement instanceof BoundaryEvent) {
+                if (currentFlowElement instanceof BoundaryEvent
+                        || currentFlowElement instanceof ServiceTask) { // custom service task with no automatic leave (will not have a activity-start history entry in ContinueProcessOperation)
                     commandContext.getHistoryManager().recordActivityStart(execution);
                 }
 
                 ((TriggerableActivityBehavior) activityBehavior).trigger(execution, null, null);
-
-                if (currentFlowElement instanceof BoundaryEvent) {
-                    commandContext.getHistoryManager().recordActivityEnd(execution, null);
-                }
 
             } else {
                 throw new FlowableException("Invalid behavior: " + activityBehavior + " should implement " + TriggerableActivityBehavior.class.getName());

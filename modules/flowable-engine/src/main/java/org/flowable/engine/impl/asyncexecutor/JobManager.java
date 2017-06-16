@@ -15,14 +15,13 @@ package org.flowable.engine.impl.asyncexecutor;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.entity.AbstractJobEntity;
+import org.flowable.engine.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
-import org.flowable.engine.runtime.HistoryJob;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.JobInfo;
 
 /**
  * Contains methods that are not tied to any specific job type (async, timer, suspended or deadletter), but which are generally applicable or are about going from one type to another.
@@ -35,33 +34,18 @@ public interface JobManager {
     /**
      * Execute a job, which means that the logic (async logic, timer that fires, etc) is executed, typically by a background thread of an executor.
      */
-    void execute(Job job);
-    
-    /**
-     * Execute a history job, which means that the logic is executed, typically by a background thread of an executor.
-     */
-    void execute(HistoryJob job);
-
-    /**
-     * Unacquires a job, meaning that this job was previously locked, and it is now freed to be acquired by other executor nodes.
-     */
-    void unacquire(Job job);
-    
-    /**
-     * Unacquires a history job, meaning that this history job was previously locked, and it is now freed to be acquired by other executor nodes.
-     */
-    void unacquire(HistoryJob job);
+    void execute(JobInfo job);
     
     /**
      * Unacquires a job, meaning that this job was previously locked, and it is now freed to be acquired by other executor nodes.
      */
-    void unacquireWithDecrementRetries(Job job);
+    void unacquire(JobInfo job);
     
     /**
-     * Unacquires a history job, meaning that this history job was previously locked, and it is now freed to be acquired by other executor nodes.
+     * Unacquires a job, meaning that this job was previously locked, and it is now freed to be acquired by other executor nodes.
      */
-    void unacquireWithDecrementRetries(HistoryJob job);
-
+    void unacquireWithDecrementRetries(JobInfo job);
+    
     /**
      * Creates an async job for the provided {@link ExecutionEntity}, so that it can be continued later in a background thread.
      */
@@ -95,26 +79,26 @@ public interface JobManager {
     JobEntity moveTimerJobToExecutableJob(TimerJobEntity timerJob);
 
     /**
-     * Moves an {@link AbstractJobEntity} to become a {@link TimerJobEntity}.
+     * Moves an {@link AbstractRuntimeJobEntity} to become a {@link TimerJobEntity}.
      * 
      * This happens for example when an async job is executed and fails. It then becomes a timer, as it needs to be retried later.
      */
-    TimerJobEntity moveJobToTimerJob(AbstractJobEntity job);
+    TimerJobEntity moveJobToTimerJob(AbstractRuntimeJobEntity job);
 
     /**
-     * Moves an {@link AbstractJobEntity} to become a {@link SuspendedJobEntity}, such that the {@link AsyncExecutor} won't pick it up anymore for execution.
+     * Moves an {@link AbstractRuntimeJobEntity} to become a {@link SuspendedJobEntity}, such that the {@link AsyncExecutor} won't pick it up anymore for execution.
      */
-    SuspendedJobEntity moveJobToSuspendedJob(AbstractJobEntity job);
+    SuspendedJobEntity moveJobToSuspendedJob(AbstractRuntimeJobEntity job);
 
     /**
-     * Transforms a {@link SuspendedJobEntity} back to an {@link AbstractJobEntity} (i.e. to what it was originally). The job will now again be able to picked up by the {@link AsyncExecutor}.
+     * Transforms a {@link SuspendedJobEntity} back to an {@link AbstractRuntimeJobEntity} (i.e. to what it was originally). The job will now again be able to picked up by the {@link AsyncExecutor}.
      */
-    AbstractJobEntity activateSuspendedJob(SuspendedJobEntity job);
+    AbstractRuntimeJobEntity activateSuspendedJob(SuspendedJobEntity job);
 
     /**
-     * Transforms an {@link AbstractJobEntity} to a {@link DeadLetterJobEntity}. This means that the job has been tried a configurable amount of times, but kept failing.
+     * Transforms an {@link AbstractRuntimeJobEntity} to a {@link DeadLetterJobEntity}. This means that the job has been tried a configurable amount of times, but kept failing.
      */
-    DeadLetterJobEntity moveJobToDeadLetterJob(AbstractJobEntity job);
+    DeadLetterJobEntity moveJobToDeadLetterJob(AbstractRuntimeJobEntity job);
 
     /**
      * Transforms a {@link DeadLetterJobEntity} to a {@link JobEntity}, thus making it executable again. Note that a 'retries' parameter needs to be passed, as the job got into the deadletter table

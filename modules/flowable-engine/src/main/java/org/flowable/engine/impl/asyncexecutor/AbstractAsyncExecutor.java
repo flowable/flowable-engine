@@ -17,7 +17,10 @@ import java.util.UUID;
 
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.UnacquireOwnedJobsCmd;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.persistence.entity.GenericExecutableJobEntity;
+import org.flowable.engine.impl.persistence.entity.GenericExecutableJobEntityManager;
+import org.flowable.engine.runtime.JobInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,11 +33,17 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     private static Logger log = LoggerFactory.getLogger(AbstractAsyncExecutor.class);
 
+    protected boolean timerRunnableNeeded = true; // default true for backwards compatibility (History Async executor came later)
     protected AcquireTimerJobsRunnable timerJobRunnable;
+    protected String acquireRunnableThreadName;
+    protected GenericExecutableJobEntityManager<? extends GenericExecutableJobEntity> jobEntityManager;
     protected AcquireAsyncJobsDueRunnable asyncJobsDueRunnable;
+    protected String resetExpiredRunnableName;
     protected ResetExpiredJobsRunnable resetExpiredJobsRunnable;
 
     protected ExecuteAsyncRunnableFactory executeAsyncRunnableFactory;
+    
+    protected AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler;
 
     protected boolean isAutoActivate;
     protected boolean isActive;
@@ -54,13 +63,14 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     protected int resetExpiredJobsInterval = 60 * 1000;
     protected int resetExpiredJobsPageSize = 3;
 
-    // Job queue used when async executor is not yet started and jobs are already added.
+    // Job queue used when async executor is not yet started and jobs are
+    // already added.
     // This is mainly used for testing purpose.
-    protected LinkedList<Job> temporaryJobQueue = new LinkedList<Job>();
+    protected LinkedList<JobInfo> temporaryJobQueue = new LinkedList<>();
 
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-    public boolean executeAsyncJob(final Job job) {
+    public boolean executeAsyncJob(final JobInfo job) {
         if (isMessageQueueMode) {
             // When running with a message queue based job executor,
             // the job is not executed here.
@@ -78,15 +88,15 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         return true;
     }
 
-    protected abstract boolean executeAsyncJob(final Job job, Runnable runnable);
+    protected abstract boolean executeAsyncJob(final JobInfo job, Runnable runnable);
 
     protected void unlockOwnedJobs() {
         processEngineConfiguration.getCommandExecutor().execute(new UnacquireOwnedJobsCmd(lockOwner, null));
     }
 
-    protected Runnable createRunnableForJob(final Job job) {
+    protected Runnable createRunnableForJob(final JobInfo job) {
         if (executeAsyncRunnableFactory == null) {
-            return new ExecuteAsyncRunnable(job, processEngineConfiguration);
+            return new ExecuteAsyncRunnable(job, processEngineConfiguration, jobEntityManager, asyncRunnableExecutionExceptionHandler);
         } else {
             return executeAsyncRunnableFactory.createExecuteAsyncRunnable(job, processEngineConfiguration);
         }
@@ -102,22 +112,34 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
         log.info("Starting up the async job executor [{}].", getClass().getName());
 
+        initializeJobEntityManager();
         initializeRunnables();
         startAdditionalComponents();
         executeTemporaryJobs();
     }
+    
+    protected void initializeJobEntityManager() {
+        if (jobEntityManager == null) {
+            jobEntityManager = processEngineConfiguration.getJobEntityManager();
+        }
+    }
 
     protected void initializeRunnables() {
-        if (timerJobRunnable == null) {
+        if (timerRunnableNeeded && timerJobRunnable == null) {
             timerJobRunnable = new AcquireTimerJobsRunnable(this, processEngineConfiguration.getJobManager());
         }
 
+        GenericExecutableJobEntityManager<? extends GenericExecutableJobEntity> jobEntityManagerToUse = jobEntityManager != null
+                ? jobEntityManager : Context.getProcessEngineConfiguration().getJobEntityManager();
+
         if (resetExpiredJobsRunnable == null) {
-            resetExpiredJobsRunnable = new ResetExpiredJobsRunnable(this);
+            String resetRunnableName = resetExpiredRunnableName != null ? resetExpiredRunnableName : "flowable-reset-expired-jobs";
+            resetExpiredJobsRunnable = new ResetExpiredJobsRunnable(resetRunnableName, this, jobEntityManagerToUse);
         }
 
         if (!isMessageQueueMode && asyncJobsDueRunnable == null) {
-            asyncJobsDueRunnable = new AcquireAsyncJobsDueRunnable(this);
+            String acquireJobsRunnableName = acquireRunnableThreadName != null ? acquireRunnableThreadName : "flowable-acquire-async-jobs";
+            asyncJobsDueRunnable = new AcquireAsyncJobsDueRunnable(acquireJobsRunnableName, this, jobEntityManagerToUse);
         }
     }
 
@@ -125,7 +147,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     protected void executeTemporaryJobs() {
         while (!temporaryJobQueue.isEmpty()) {
-            Job job = temporaryJobQueue.pop();
+            JobInfo job = temporaryJobQueue.pop();
             executeAsyncJob(job);
         }
     }
@@ -263,6 +285,22 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         this.asyncJobsDueRunnable = asyncJobsDueRunnable;
     }
 
+    public void setTimerRunnableNeeded(boolean timerRunnableNeeded) {
+        this.timerRunnableNeeded = timerRunnableNeeded;
+    }
+
+    public void setAcquireRunnableThreadName(String acquireRunnableThreadName) {
+        this.acquireRunnableThreadName = acquireRunnableThreadName;
+    }
+
+    public void setJobEntityManager(GenericExecutableJobEntityManager<? extends GenericExecutableJobEntity> jobEntityManager) {
+        this.jobEntityManager = jobEntityManager;
+    }
+    
+    public void setResetExpiredRunnableName(String resetExpiredRunnableName) {
+        this.resetExpiredRunnableName = resetExpiredRunnableName;
+    }
+
     public void setResetExpiredJobsRunnable(ResetExpiredJobsRunnable resetExpiredJobsRunnable) {
         this.resetExpiredJobsRunnable = resetExpiredJobsRunnable;
     }
@@ -299,4 +337,12 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         this.executeAsyncRunnableFactory = executeAsyncRunnableFactory;
     }
 
+    public AsyncRunnableExecutionExceptionHandler getAsyncRunnableExecutionExceptionHandler() {
+        return asyncRunnableExecutionExceptionHandler;
+    }
+
+    public void setAsyncRunnableExecutionExceptionHandler(AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler) {
+        this.asyncRunnableExecutionExceptionHandler = asyncRunnableExecutionExceptionHandler;
+    }
+    
 }

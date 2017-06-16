@@ -223,13 +223,13 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
                 if (historicActivityInstances != null && historicActivityInstances.size() > 0) {
                     for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
                         assertEquals(processInstanceId, historicActivityInstance.getProcessInstanceId());
-                        assertNotNull(historicActivityInstance.getId() + " Historic activity instance " + historicActivityInstance.getActivityId() + " has no activity id", historicActivityInstance.getActivityId());
-                        assertNotNull(historicActivityInstance.getId() + " Historic activity instance " + historicActivityInstance.getActivityId() + " has no activity type", historicActivityInstance.getActivityType());
-                        assertNotNull(historicActivityInstance.getId() + " Historic activity instance " + historicActivityInstance.getActivityId() + " has no process definition id", historicActivityInstance.getProcessDefinitionId());
-                        assertNotNull(historicActivityInstance.getId() + " Historic activity instance " + historicActivityInstance.getActivityId() + " has no process instance id", historicActivityInstance.getProcessInstanceId());
-                        assertNotNull(historicActivityInstance.getId() + " Historic activity instance " + historicActivityInstance.getActivityId() + " has no execution id", historicActivityInstance.getExecutionId());
-                        assertNotNull(historicActivityInstance.getId() + " Historic activity instance " + historicActivityInstance.getActivityId() + " has no start time", historicActivityInstance.getStartTime());
-                        assertNotNull(historicActivityInstance.getId() + " Historic activity instance " + historicActivityInstance.getActivityId() + " has no end time", historicActivityInstance.getEndTime());
+                        assertNotNull("Historic activity instance " + historicActivityInstance.getId() + " / " + historicActivityInstance.getActivityId() + " has no activity id", historicActivityInstance.getActivityId());
+                        assertNotNull("Historic activity instance " + historicActivityInstance.getId() + " / " + historicActivityInstance.getActivityId() + " has no activity type", historicActivityInstance.getActivityType());
+                        assertNotNull("Historic activity instance " + historicActivityInstance.getId() + " / " + historicActivityInstance.getActivityId() + " has no process definition id", historicActivityInstance.getProcessDefinitionId());
+                        assertNotNull("Historic activity instance " + historicActivityInstance.getId() + " / " + historicActivityInstance.getActivityId() + " has no process instance id", historicActivityInstance.getProcessInstanceId());
+                        assertNotNull("Historic activity instance " + historicActivityInstance.getId() + " / " + historicActivityInstance.getActivityId() + " has no execution id", historicActivityInstance.getExecutionId());
+                        assertNotNull("Historic activity instance " + historicActivityInstance.getId() + " / " + historicActivityInstance.getActivityId() + " has no start time", historicActivityInstance.getStartTime());
+                        assertNotNull("Historic activity instance " + historicActivityInstance.getId() + " / " + historicActivityInstance.getActivityId() + " has no end time", historicActivityInstance.getEndTime());
                     }
                 }
             }
@@ -328,8 +328,8 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
             if (historicActivityInstances != null && historicActivityInstances.size() > 0) {
                 for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
                     assertEquals(processInstanceId, historicActivityInstance.getProcessInstanceId());
-                    assertNotNull(historicActivityInstance.getId() + " Historic activity instance " + historicActivityInstance.getActivityId() + " has no start time", historicActivityInstance.getStartTime());
-                    assertNotNull(historicActivityInstance.getId() + " Historic activity instance " + historicActivityInstance.getActivityId() + " has no end time", historicActivityInstance.getEndTime());
+                    assertNotNull(historicActivityInstance.getId() + " Historic activity instance '" + historicActivityInstance.getActivityId() +"' has no start time", historicActivityInstance.getStartTime());
+                    assertNotNull(historicActivityInstance.getId() + " Historic activity instance '" + historicActivityInstance.getActivityId() + "' has no end time", historicActivityInstance.getEndTime());
                 }
             }
         }

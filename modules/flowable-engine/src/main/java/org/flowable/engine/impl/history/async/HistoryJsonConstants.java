@@ -27,6 +27,8 @@ public interface HistoryJsonConstants {
     String EXECUTION_ID = "executionId";
     
     String SOURCE_EXECUTION_ID = "sourceExecutionId";
+    
+    String IS_MULTI_INSTANCE_ROOT_EXECUTION = "isMiRootExecution";
 
     String PROCESS_INSTANCE_ID = "processInstanceId";
     

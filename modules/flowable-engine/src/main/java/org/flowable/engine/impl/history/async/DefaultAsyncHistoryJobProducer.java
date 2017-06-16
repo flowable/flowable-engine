@@ -41,12 +41,6 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryJobProducer {
     }
 
     protected void createJobsWithHistoricalData(CommandContext commandContext, AsyncHistorySession asyncHistorySession) {
-        System.out.println("!!!start!!!");
-        for (Pair<String, Map<String, String>> logData: asyncHistorySession.getJobData()) {
-            generateJson(commandContext, logData);
-        }
-        System.out.println("!!!end!!!");
-        
         List<Pair<String, Map<String, String>>> filteredJobs = filterHistoricData(asyncHistorySession.getJobData());
         for (Pair<String, Map<String, String>> historicData : filteredJobs) {
             HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession);
@@ -136,8 +130,6 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryJobProducer {
         
         dataNode.put(HistoryJsonConstants.JOB_CREATE_TIME, AsyncHistoryDateUtil.formatDate(
                         processEngineConfiguration.getClock().getCurrentTime()));
-        
-        System.out.println("!!!!!! generating history job with type " + historicData.getLeft() + " " + elementObjectNode);
         
         return elementObjectNode;
     }

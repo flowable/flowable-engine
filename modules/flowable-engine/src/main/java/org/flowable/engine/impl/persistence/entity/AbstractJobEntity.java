@@ -12,39 +12,18 @@
  */
 package org.flowable.engine.impl.persistence.entity;
 
-import java.util.Date;
-
 import org.flowable.engine.common.impl.db.HasRevision;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.engine.runtime.Job;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public interface AbstractJobEntity extends Job, Entity, HasRevision {
-
-    void setExecution(ExecutionEntity execution);
-
-    void setDuedate(Date duedate);
-
-    void setExecutionId(String executionId);
+public interface AbstractJobEntity extends Entity, HasRevision {
 
     void setRetries(int retries);
 
-    void setProcessInstanceId(String processInstanceId);
-
-    boolean isExclusive();
-
-    void setExclusive(boolean isExclusive);
-
-    void setProcessDefinitionId(String processDefinitionId);
-
-    String getJobHandlerType();
-
     void setJobHandlerType(String jobHandlerType);
-
-    String getJobHandlerConfiguration();
 
     void setJobHandlerConfiguration(String jobHandlerConfiguration);
   
@@ -55,22 +34,6 @@ public interface AbstractJobEntity extends Job, Entity, HasRevision {
     void setAdvancedJobHandlerConfigurationBytes(byte[] bytes);
   
     ByteArrayRef getAdvancedJobHandlerConfigurationByteArrayRef();
-
-    String getJobType();
-
-    void setJobType(String jobType);
-
-    String getRepeat();
-
-    void setRepeat(String repeat);
-
-    Date getEndDate();
-
-    void setEndDate(Date endDate);
-
-    int getMaxIterations();
-
-    void setMaxIterations(int maxIterations);
 
     String getExceptionStacktrace();
 

@@ -519,7 +519,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
                 return taskService.createTaskQuery().count() == 2;
             }
         });
-
+        
         // It is a repeating job, so it will come back.
         assertEquals(1L, jobQuery.count());
 

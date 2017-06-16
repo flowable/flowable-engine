@@ -128,7 +128,7 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
         }
     }
 
-    protected SuspendedJobEntity createSuspendedJob(AbstractJobEntity job) {
+    protected SuspendedJobEntity createSuspendedJob(AbstractRuntimeJobEntity job) {
         SuspendedJobEntity newSuspendedJobEntity = create();
         newSuspendedJobEntity.setJobHandlerConfiguration(job.getJobHandlerConfiguration());
         newSuspendedJobEntity.setJobHandlerType(job.getJobHandlerType());

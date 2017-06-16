@@ -30,14 +30,14 @@ import org.slf4j.LoggerFactory;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class HistoryJobEntityManagerImpl extends AbstractEntityManager<HistoryJobEntity> implements HistoryJobEntityManager {
+public class HistoryJobEntityManagerImpl extends GenericExecutableJobEntityManagerImpl<HistoryJobEntity> implements HistoryJobEntityManager {
 
     private static final Logger logger = LoggerFactory.getLogger(HistoryJobEntityManagerImpl.class);
 
     protected HistoryJobDataManager historyJobDataManager;
 
     public HistoryJobEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, HistoryJobDataManager historyJobDataManager) {
-        super(processEngineConfiguration);
+        super(processEngineConfiguration, historyJobDataManager);
         this.historyJobDataManager = historyJobDataManager;
     }
 
@@ -45,36 +45,7 @@ public class HistoryJobEntityManagerImpl extends AbstractEntityManager<HistoryJo
     protected DataManager<HistoryJobEntity> getDataManager() {
         return historyJobDataManager;
     }
-
-    @Override
-    public void insertHistoryJobEntity(HistoryJobEntity historyJobEntity) {
-        insert(historyJobEntity, true);
-    }
-
-    public List<HistoryJobEntity> findHistoryJobsToExecute(Page page) {
-        return historyJobDataManager.findHistoryJobsToExecute(page);
-    }
-
-    @Override
-    public List<HistoryJobEntity> findHistoryJobsByExecutionId(String executionId) {
-        return historyJobDataManager.findHistoryJobsByExecutionId(executionId);
-    }
-
-    @Override
-    public List<HistoryJobEntity> findHistoryJobsByProcessInstanceId(String processInstanceId) {
-        return historyJobDataManager.findHistoryJobsByProcessInstanceId(processInstanceId);
-    }
-
-    @Override
-    public List<HistoryJobEntity> findExpiredHistoryJobs(Page page) {
-        return historyJobDataManager.findExpiredHistoryJobs(page);
-    }
-
-    @Override
-    public void resetExpiredHistoryJob(String jobId) {
-        historyJobDataManager.resetExpiredHistoryJob(jobId);
-    }
-
+    
     @Override
     public List<HistoryJob> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl jobQuery, Page page) {
         return historyJobDataManager.findHistoryJobsByQueryCriteria(jobQuery, page);
@@ -84,12 +55,7 @@ public class HistoryJobEntityManagerImpl extends AbstractEntityManager<HistoryJo
     public long findHistoryJobCountByQueryCriteria(HistoryJobQueryImpl jobQuery) {
         return historyJobDataManager.findHistoryJobCountByQueryCriteria(jobQuery);
     }
-
-    @Override
-    public void updateHistoryJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-        historyJobDataManager.updateHistoryJobTenantIdForDeployment(deploymentId, newTenantId);
-    }
-
+    
     @Override
     public void delete(HistoryJobEntity jobEntity) {
         super.delete(jobEntity);

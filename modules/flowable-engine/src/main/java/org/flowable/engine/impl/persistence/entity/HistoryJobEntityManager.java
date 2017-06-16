@@ -17,8 +17,6 @@ import java.util.List;
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 import org.flowable.engine.impl.HistoryJobQueryImpl;
-import org.flowable.engine.impl.asyncexecutor.AcquireTimerJobsRunnable;
-import org.flowable.engine.impl.cmd.AcquireJobsCmd;
 import org.flowable.engine.runtime.HistoryJob;
 
 /**
@@ -26,35 +24,7 @@ import org.flowable.engine.runtime.HistoryJob;
  * 
  * @author Tijs Rademakers
  */
-public interface HistoryJobEntityManager extends EntityManager<HistoryJobEntity> {
-
-    /**
-     * Insert the {@link HistoryJobEntity}, similar to {@link #insert(HistoryJobEntity)}, but returns a boolean in case the insert did not go through. This could happen if the execution related to the
-     * {@link HistoryJobEntity} has been removed.
-     */
-    void insertHistoryJobEntity(HistoryJobEntity HistoryJobEntity);
-
-    /**
-     * Returns {@link HistoryJobEntity} that are eligible to be executed.
-     * 
-     * For example used by the default {@link AcquireJobsCmd} command used by the default {@link AcquireTimerJobsRunnable} implementation to get async jobs that can be executed.
-     */
-    List<HistoryJobEntity> findHistoryJobsToExecute(Page page);
-
-    /**
-     * Returns all {@link HistoryJobEntity} instances related to on {@link ExecutionEntity}.
-     */
-    List<HistoryJobEntity> findHistoryJobsByExecutionId(String executionId);
-
-    /**
-     * Returns all {@link HistoryJobEntity} instances related to one process instance {@link ExecutionEntity}.
-     */
-    List<HistoryJobEntity> findHistoryJobsByProcessInstanceId(String processInstanceId);
-
-    /**
-     * Returns all {@link HistoryJobEntity} instance which are expired, which means that the lock time of the {@link HistoryJobEntity} is past a certain configurable date and is deemed to be in error.
-     */
-    List<HistoryJobEntity> findExpiredHistoryJobs(Page page);
+public interface HistoryJobEntityManager extends EntityManager<HistoryJobEntity>, GenericExecutableJobEntityManager<HistoryJobEntity> {
 
     /**
      * Executes a {@link HistoryJobQueryImpl} and returns the matching {@link HistoryJobEntity} instances.
@@ -65,15 +35,5 @@ public interface HistoryJobEntityManager extends EntityManager<HistoryJobEntity>
      * Same as {@link #findHistoryJobsByQueryCriteria(HistoryJobQueryImpl, Page)}, but only returns a count and not the instances itself.
      */
     long findHistoryJobCountByQueryCriteria(HistoryJobQueryImpl jobQuery);
-
-    /**
-     * Resets an expired job. These are jobs that were locked, but not completed. Resetting these will make them available for being picked up by other executors.
-     */
-    void resetExpiredHistoryJob(String jobId);
-
-    /**
-     * Changes the tenantId for all jobs related to a given {@link DeploymentEntity}.
-     */
-    void updateHistoryJobTenantIdForDeployment(String deploymentId, String newTenantId);
 
 }

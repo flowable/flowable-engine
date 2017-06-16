@@ -32,7 +32,6 @@ import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.engine.impl.asyncexecutor.AsyncHistoryExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.TransactionListener;
 import org.flowable.engine.impl.interceptor.CommandContext;
@@ -65,7 +64,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     protected IdmIdentityService idmIdentityService;
     protected ContentService contentService;
     protected AsyncExecutor asyncExecutor;
-    protected AsyncHistoryExecutor asyncHistoryExecutor;
+    protected AsyncExecutor asyncHistoryExecutor;
     protected CommandExecutor commandExecutor;
     protected Map<Class<?>, SessionFactory> sessionFactories;
     protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
@@ -114,12 +113,18 @@ public class ProcessEngineImpl implements ProcessEngine {
         if (asyncExecutor != null && asyncExecutor.isAutoActivate()) {
             asyncExecutor.start();
         }
+        if (asyncHistoryExecutor != null && asyncHistoryExecutor.isAutoActivate()) {
+            asyncHistoryExecutor.start();
+        }
     }
 
     public void close() {
         ProcessEngines.unregister(this);
         if (asyncExecutor != null && asyncExecutor.isActive()) {
             asyncExecutor.shutdown();
+        }
+        if (asyncHistoryExecutor != null && asyncHistoryExecutor.isActive()) {
+            asyncHistoryExecutor.shutdown();
         }
 
         Runnable closeRunnable = processEngineConfiguration.getProcessEngineCloseRunnable();

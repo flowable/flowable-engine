@@ -24,7 +24,6 @@ import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.engine.impl.asyncexecutor.AsyncHistoryExecutor;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.engine.impl.history.HistoryLevel;
@@ -105,7 +104,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected boolean jpaCloseEntityManager;
 
     protected AsyncExecutor asyncExecutor;
-    protected AsyncHistoryExecutor asyncHistoryExecutor;
+    protected AsyncExecutor asyncHistoryExecutor;
     /**
      * Define the default lock time for an async job in seconds. The lock time is used when creating an async job and when it expires the async executor assumes that the job has failed. It will be
      * retried again.
@@ -591,11 +590,11 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         return this;
     }
     
-    public AsyncHistoryExecutor getAsyncHistoryExecutor() {
+    public AsyncExecutor getAsyncHistoryExecutor() {
         return asyncHistoryExecutor;
     }
 
-    public ProcessEngineConfiguration setAsyncHistoryExecutor(AsyncHistoryExecutor asyncHistoryExecutor) {
+    public ProcessEngineConfiguration setAsyncHistoryExecutor(AsyncExecutor asyncHistoryExecutor) {
         this.asyncHistoryExecutor = asyncHistoryExecutor;
         return this;
     }

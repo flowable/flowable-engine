@@ -13,10 +13,10 @@
 package org.flowable.engine.impl.asyncexecutor;
 
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.JobInfo;
 
 public interface AsyncRunnableExecutionExceptionHandler {
   
-  boolean handleException(ProcessEngineConfigurationImpl processEngineConfiguration, Job job, Throwable exception);
+  boolean handleException(ProcessEngineConfigurationImpl processEngineConfiguration, JobInfo job, Throwable exception);
 
 }

@@ -125,7 +125,7 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
         }
     }
 
-    protected DeadLetterJobEntity createDeadLetterJob(AbstractJobEntity job) {
+    protected DeadLetterJobEntity createDeadLetterJob(AbstractRuntimeJobEntity job) {
         DeadLetterJobEntity newJobEntity = create();
         newJobEntity.setJobHandlerConfiguration(job.getJobHandlerConfiguration());
         newJobEntity.setJobHandlerType(job.getJobHandlerType());

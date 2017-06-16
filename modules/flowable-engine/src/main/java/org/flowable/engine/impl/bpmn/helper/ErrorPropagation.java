@@ -213,7 +213,9 @@ public class ErrorPropagation {
             ExecutionEntity boundaryExecution = null;
             List<? extends ExecutionEntity> childExecutions = parentExecution.getExecutions();
             for (ExecutionEntity childExecution : childExecutions) {
-                if (childExecution.getActivityId().equals(event.getId())) {
+                if (childExecution != null
+                        && childExecution.getActivityId() != null
+                        && childExecution.getActivityId().equals(event.getId())) {
                     boundaryExecution = childExecution;
                 }
             }

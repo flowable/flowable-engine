@@ -15,49 +15,12 @@ package org.flowable.engine.runtime;
 
 import java.util.Date;
 
-import org.flowable.engine.ManagementService;
-
 /**
  * Represents one history job
  * 
  * @author Tijs Rademakers
  */
-public interface HistoryJob {
-
-    int MAX_EXCEPTION_MESSAGE_LENGTH = 255;
-
-    /**
-     * Returns the unique identifier for this job.
-     */
-    String getId();
-
-    /**
-     * Returns the number of retries this job has left. Whenever the jobexecutor fails to execute the job, this value is decremented. When it hits zero, the job is supposed to be dead and not retried
-     * again (ie a manual retry is required then).
-     */
-    int getRetries();
-
-    /**
-     * Returns the message of the exception that occurred, the last time the job was executed. Returns null when no exception occurred.
-     * 
-     * To get the full exception stacktrace, use {@link ManagementService#getJobExceptionStacktrace(String)}
-     */
-    String getExceptionMessage();
-
-    /**
-     * Get the tenant identifier for this job.
-     */
-    String getTenantId();
-
-    /**
-     * Get the job handler type.
-     */
-    String getJobHandlerType();
-
-    /**
-     * Get the job configuration.
-     */
-    String getJobHandlerConfiguration();
+public interface HistoryJob extends JobInfo {
     
     /**
      * Get the job create time.

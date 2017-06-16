@@ -18,6 +18,6 @@ package org.flowable.engine.impl.persistence.entity;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public interface SuspendedJobEntity extends AbstractJobEntity {
+public interface SuspendedJobEntity extends AbstractRuntimeJobEntity {
 
 }

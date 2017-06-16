@@ -231,14 +231,6 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
 
         }
 
-        /*
-         * 
-         * Not needed anymore in v6, due to correct execution matching.
-         * 
-         * if (execution.getParentId() != null) { HistoricActivityInstanceEntity historicActivityInstanceFromParent = findActivityInstance(execution.getParent(), activityId, false, endTimeMustBeNull);
-         * // always false for create, we only check if it can be found if (historicActivityInstanceFromParent != null) { return historicActivityInstanceFromParent; } }
-         */
-
         if (createOnNotFound
                         && ((execution.getCurrentFlowElement() != null && execution.getCurrentFlowElement() instanceof FlowNode) || execution.getCurrentFlowElement() == null)) {
             return createHistoricActivityInstanceEntity(execution);

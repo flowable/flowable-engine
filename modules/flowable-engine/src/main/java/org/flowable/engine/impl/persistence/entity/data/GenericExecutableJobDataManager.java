@@ -16,17 +16,20 @@ import java.util.List;
 
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
-import org.flowable.engine.impl.HistoryJobQueryImpl;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
-import org.flowable.engine.runtime.HistoryJob;
+import org.flowable.engine.impl.persistence.entity.GenericExecutableJobEntity;
 
-/**
- * @author Tijs Rademakers
- */
-public interface HistoryJobDataManager extends DataManager<HistoryJobEntity>, GenericExecutableJobDataManager<HistoryJobEntity> {
+public interface GenericExecutableJobDataManager<T extends GenericExecutableJobEntity> extends DataManager<T> {
 
-    List<HistoryJob> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl query, Page page);
+    List<T> findJobsToExecute(Page page);
 
-    long findHistoryJobCountByQueryCriteria(HistoryJobQueryImpl query);
-    
+    List<T> findJobsByExecutionId(final String executionId);
+
+    List<T> findJobsByProcessInstanceId(final String processInstanceId);
+
+    List<T> findExpiredJobs(Page page);
+
+    void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
+
+    void resetExpiredJob(String jobId);
+
 }

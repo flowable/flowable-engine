@@ -27,7 +27,7 @@ public interface FlowableEngineAgenda extends Agenda {
 
     void planContinueProcessInCompensation(ExecutionEntity execution);
 
-    void planContinueMultiInstanceOperation(ExecutionEntity execution);
+    void planContinueMultiInstanceOperation(ExecutionEntity execution, int loopCounter);
 
     void planTakeOutgoingSequenceFlowsOperation(ExecutionEntity execution, boolean evaluateConditions);
 

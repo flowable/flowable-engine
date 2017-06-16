@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
@@ -423,8 +424,13 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
 
     @Override
     public void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean cancel) {
-        getHistoryManager().recordActivityEnd(executionEntity, deleteReason);
-        deleteDataForExecution(executionEntity, deleteReason, cancel);
+        if (executionEntity.isActive()
+                && executionEntity.getCurrentFlowElement() != null 
+                && !executionEntity.isMultiInstanceRoot()
+                && !(executionEntity.getCurrentFlowElement() instanceof BoundaryEvent)) {  // Boundary events will handle the history themselves (see TriggerExecutionOperation for example)
+            getHistoryManager().recordActivityEnd(executionEntity, deleteReason);
+        }
+        deleteRelatedDataForExecution(executionEntity, deleteReason, cancel);
         delete(executionEntity);
     }
 
@@ -548,7 +554,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         return null;
     }
 
-    public void deleteDataForExecution(ExecutionEntity executionEntity, String deleteReason, boolean cancel) {
+    public void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason, boolean cancel) {
 
         // To start, deactivate the current incoming execution
         executionEntity.setEnded(true);

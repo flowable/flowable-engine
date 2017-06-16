@@ -192,12 +192,12 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
                 putIfNotNull(data, HistoryJsonConstants.EXECUTION_ID, executionEntity.getId());
                 putIfNotNull(data, HistoryJsonConstants.ACTIVITY_ID, executionEntity.getActivityId());
                 putIfNotNull(data, HistoryJsonConstants.START_TIME, getClock().getCurrentTime());
-
+                
                 if (executionEntity.getCurrentFlowElement() != null) {
                     putIfNotNull(data, HistoryJsonConstants.ACTIVITY_NAME, executionEntity.getCurrentFlowElement().getName());
                     putIfNotNull(data, HistoryJsonConstants.ACTIVITY_TYPE, parseActivityType(executionEntity.getCurrentFlowElement()));
                 }
-
+                
                 if (executionEntity.getTenantId() != null) {
                     putIfNotNull(data, HistoryJsonConstants.TENANT_ID, executionEntity.getTenantId());
                 }
@@ -423,6 +423,10 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.TASK_ID, variable.getTaskId());
             putIfNotNull(data, HistoryJsonConstants.REVISION, variable.getRevision());
             putIfNotNull(data, HistoryJsonConstants.NAME, variable.getName());
+            
+            if (sourceActivityExecution != null && sourceActivityExecution.isMultiInstanceRoot()) {
+                putIfNotNull(data, HistoryJsonConstants.IS_MULTI_INSTANCE_ROOT_EXECUTION, true);
+            }
            
             Date time = getClock().getCurrentTime();
             putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, time);
@@ -569,6 +573,12 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
     protected void putIfNotNull(Map<String, String> map, String key, Date value) {
         if (value != null) {
             map.put(key, AsyncHistoryDateUtil.formatDate(value));
+        }
+    }
+    
+    protected void putIfNotNull(Map<String, String> map, String key, Boolean value) {
+        if (value != null) {
+            map.put(key, Boolean.toString(value));
         }
     }
 

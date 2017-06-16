@@ -14,19 +14,38 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.util.Date;
 
+import org.flowable.engine.runtime.Job;
+
 /**
- * Stub of the common parts of a Job. You will normally work with a subclass of JobEntity, such as {@link TimerEntity} or {@link MessageEntity}.
- *
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public interface TimerJobEntity extends AbstractRuntimeJobEntity {
+public interface AbstractRuntimeJobEntity extends Job, AbstractJobEntity {
 
-    String getLockOwner();
+    void setExecution(ExecutionEntity execution);
 
-    void setLockOwner(String claimedBy);
+    void setExecutionId(String executionId);
 
-    Date getLockExpirationTime();
+    void setProcessInstanceId(String processInstanceId);
 
-    void setLockExpirationTime(Date claimedUntil);
+    void setProcessDefinitionId(String processDefinitionId);
+    
+    void setDuedate(Date duedate);
+    
+    void setExclusive(boolean isExclusive);
+    
+    String getRepeat();
+
+    void setRepeat(String repeat);
+
+    Date getEndDate();
+
+    void setEndDate(Date endDate);
+    
+    int getMaxIterations();
+
+    void setMaxIterations(int maxIterations);
+    
+    void setJobType(String jobType);
+
 }

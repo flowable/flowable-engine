@@ -67,6 +67,5 @@ public class TaskBatchDeleteTest extends PluggableFlowableTestCase {
         
         waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
         
-        deleteDeployments();
     }
 }

@@ -62,6 +62,19 @@ public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTrans
         }
         return null;
     }
+    
+    protected Boolean getBooleanFromJson(ObjectNode objectNode, String fieldName, Boolean defaultValue) {
+        Boolean value = getBooleanFromJson(objectNode, fieldName);
+        return value != null ? value : defaultValue;
+    }
+    
+    protected Boolean getBooleanFromJson(ObjectNode objectNode, String fieldName) {
+        String s = getStringFromJson(objectNode, fieldName);
+        if ((StringUtils.isNotEmpty(s))) {
+            return Boolean.valueOf(s);
+        }
+        return null;
+    }
 
     protected void dispatchEvent(CommandContext commandContext, FlowableEvent event) {
         FlowableEventDispatcher eventDispatcher = commandContext.getProcessEngineConfiguration().getEventDispatcher();

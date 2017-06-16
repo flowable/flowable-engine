@@ -23,22 +23,10 @@ import org.flowable.engine.runtime.Job;
 /**
  * @author Joram Barrez
  */
-public interface JobDataManager extends DataManager<JobEntity> {
-
-    List<JobEntity> findJobsToExecute(Page page);
-
-    List<JobEntity> findJobsByExecutionId(final String executionId);
-
-    List<JobEntity> findJobsByProcessInstanceId(final String processInstanceId);
-
-    List<JobEntity> findExpiredJobs(Page page);
+public interface JobDataManager extends DataManager<JobEntity>, GenericExecutableJobDataManager<JobEntity> {
 
     List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery, Page page);
 
     long findJobCountByQueryCriteria(JobQueryImpl jobQuery);
-
-    void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
-
-    void resetExpiredJob(String jobId);
 
 }

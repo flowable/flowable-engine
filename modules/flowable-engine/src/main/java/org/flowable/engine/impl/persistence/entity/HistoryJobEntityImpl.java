@@ -23,6 +23,7 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 import org.flowable.engine.impl.db.BulkDeleteable;
+import org.flowable.engine.runtime.JobInfo;
 
 /**
  * History Job entity.
@@ -59,9 +60,10 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
         if (exceptionByteArrayRef != null) {
             persistentState.put("exceptionByteArrayId", exceptionByteArrayRef.getId());
         }
-        
+
         if (advancedJobHandlerConfigurationByteArrayRef != null) {
-            persistentState.put("advancedJobHandlerConfigurationByteArrayRef", advancedJobHandlerConfigurationByteArrayRef.getId());
+            persistentState.put("advancedJobHandlerConfigurationByteArrayRef",
+                    advancedJobHandlerConfigurationByteArrayRef.getId());
         }
         persistentState.put("lockOwner", lockOwner);
         persistentState.put("lockExpirationTime", lockExpirationTime);
@@ -69,7 +71,8 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
         return persistentState;
     }
 
-    // getters and setters ////////////////////////////////////////////////////////
+    // getters and setters
+    // ////////////////////////////////////////////////////////
 
     public int getRetries() {
         return retries;
@@ -103,12 +106,12 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
         if (advancedJobHandlerConfigurationByteArrayRef == null) {
             return null;
         }
-        
+
         byte[] bytes = advancedJobHandlerConfigurationByteArrayRef.getBytes();
         if (bytes == null) {
             return null;
         }
-        
+
         try {
             return new String(bytes, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -122,7 +125,7 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
         }
         advancedJobHandlerConfigurationByteArrayRef.setValue("cfg", getUtf8Bytes(jobHandlerConfiguration));
     }
-    
+
     @Override
     public void setAdvancedJobHandlerConfigurationBytes(byte[] bytes) {
         if (advancedJobHandlerConfigurationByteArrayRef == null) {
@@ -164,7 +167,7 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
     }
 
     public void setExceptionMessage(String exceptionMessage) {
-        this.exceptionMessage = StringUtils.abbreviate(exceptionMessage, MAX_EXCEPTION_MESSAGE_LENGTH);
+        this.exceptionMessage = StringUtils.abbreviate(exceptionMessage, JobInfo.MAX_EXCEPTION_MESSAGE_LENGTH);
     }
 
     public String getTenantId() {
@@ -182,7 +185,7 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
-    
+
     public String getLockOwner() {
         return lockOwner;
     }
@@ -198,7 +201,7 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
     public void setLockExpirationTime(Date claimedUntil) {
         this.lockExpirationTime = claimedUntil;
     }
-    
+
     protected byte[] getUtf8Bytes(String str) {
         if (str == null) {
             return null;

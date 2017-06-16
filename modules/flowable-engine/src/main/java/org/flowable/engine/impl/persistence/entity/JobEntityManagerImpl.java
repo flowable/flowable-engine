@@ -24,22 +24,18 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.data.JobDataManager;
 import org.flowable.engine.runtime.Job;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
  * @author Joram Barrez
  */
-public class JobEntityManagerImpl extends AbstractEntityManager<JobEntity> implements JobEntityManager {
-
-    private static final Logger logger = LoggerFactory.getLogger(JobEntityManagerImpl.class);
+public class JobEntityManagerImpl extends GenericExecutableJobEntityManagerImpl<JobEntity> implements JobEntityManager {
 
     protected JobDataManager jobDataManager;
 
     public JobEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, JobDataManager jobDataManager) {
-        super(processEngineConfiguration);
+        super(processEngineConfiguration, jobDataManager);
         this.jobDataManager = jobDataManager;
     }
 
@@ -84,30 +80,6 @@ public class JobEntityManagerImpl extends AbstractEntityManager<JobEntity> imple
         return true;
     }
 
-    public List<JobEntity> findJobsToExecute(Page page) {
-        return jobDataManager.findJobsToExecute(page);
-    }
-
-    @Override
-    public List<JobEntity> findJobsByExecutionId(String executionId) {
-        return jobDataManager.findJobsByExecutionId(executionId);
-    }
-
-    @Override
-    public List<JobEntity> findJobsByProcessInstanceId(String processInstanceId) {
-        return jobDataManager.findJobsByProcessInstanceId(processInstanceId);
-    }
-
-    @Override
-    public List<JobEntity> findExpiredJobs(Page page) {
-        return jobDataManager.findExpiredJobs(page);
-    }
-
-    @Override
-    public void resetExpiredJob(String jobId) {
-        jobDataManager.resetExpiredJob(jobId);
-    }
-
     @Override
     public List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery, Page page) {
         return jobDataManager.findJobsByQueryCriteria(jobQuery, page);
@@ -116,11 +88,6 @@ public class JobEntityManagerImpl extends AbstractEntityManager<JobEntity> imple
     @Override
     public long findJobCountByQueryCriteria(JobQueryImpl jobQuery) {
         return jobDataManager.findJobCountByQueryCriteria(jobQuery);
-    }
-
-    @Override
-    public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-        jobDataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
     }
 
     @Override

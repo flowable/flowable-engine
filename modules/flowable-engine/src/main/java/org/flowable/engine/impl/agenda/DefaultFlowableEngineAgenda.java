@@ -100,8 +100,8 @@ public class DefaultFlowableEngineAgenda implements FlowableEngineAgenda {
         planOperation(new ContinueProcessOperation(commandContext, execution, false, true), execution);
     }
 
-    public void planContinueMultiInstanceOperation(ExecutionEntity execution) {
-        planOperation(new ContinueMultiInstanceOperation(commandContext, execution), execution);
+    public void planContinueMultiInstanceOperation(ExecutionEntity execution, int loopCounter) {
+        planOperation(new ContinueMultiInstanceOperation(commandContext, execution, loopCounter), execution);
     }
 
     public void planTakeOutgoingSequenceFlowsOperation(ExecutionEntity execution, boolean evaluateConditions) {

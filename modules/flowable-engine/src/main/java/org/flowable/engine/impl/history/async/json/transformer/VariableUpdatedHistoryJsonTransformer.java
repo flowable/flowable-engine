@@ -43,11 +43,15 @@ public class VariableUpdatedHistoryJsonTransformer extends AbstractHistoryJsonTr
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = commandContext.getProcessEngineConfiguration().getHistoricVariableInstanceEntityManager();
-        HistoricVariableInstanceEntity historicVariable = historicVariableInstanceEntityManager.findById(getStringFromJson(historicalData, HistoryJsonConstants.ID));
+        HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager 
+            = commandContext.getProcessEngineConfiguration().getHistoricVariableInstanceEntityManager();
+        HistoricVariableInstanceEntity historicVariable 
+            = historicVariableInstanceEntityManager.findById(getStringFromJson(historicalData, HistoryJsonConstants.ID));
         
         Date time = getDateFromJson(historicalData, HistoryJsonConstants.LAST_UPDATED_TIME);
         if (historicVariable.getLastUpdatedTime().after(time)) {
+            // If the historic variable already has a later time, we don't need to change its details
+            // to something that is already superseded by later data.
             return;
         }
         

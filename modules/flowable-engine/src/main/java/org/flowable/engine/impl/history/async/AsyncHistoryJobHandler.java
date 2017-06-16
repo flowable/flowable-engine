@@ -105,7 +105,6 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
 
     @Override
     protected void processHistoryJson(CommandContext commandContext, HistoryJobEntity job, JsonNode historyNode) {
-        System.out.println("!!!!!!! processHistoryJson id=" + job.getId() + " " + historyNode);
         
         String type = historyNode.get("type").asText();
         ObjectNode historicalJsonData = (ObjectNode) historyNode.get("data");

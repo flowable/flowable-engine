@@ -23,13 +23,14 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 import org.flowable.engine.impl.db.BulkDeleteable;
+import org.flowable.engine.runtime.JobInfo;
 
 /**
  * Abstract job entity class.
  *
  * @author Tijs Rademakers
  */
-public abstract class AbstractJobEntityImpl extends AbstractEntity implements AbstractJobEntity, BulkDeleteable, Serializable {
+public abstract class AbstractJobEntityImpl extends AbstractEntity implements AbstractRuntimeJobEntity, BulkDeleteable, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -252,7 +253,7 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
     }
 
     public void setExceptionMessage(String exceptionMessage) {
-        this.exceptionMessage = StringUtils.abbreviate(exceptionMessage, MAX_EXCEPTION_MESSAGE_LENGTH);
+        this.exceptionMessage = StringUtils.abbreviate(exceptionMessage, JobInfo.MAX_EXCEPTION_MESSAGE_LENGTH);
     }
 
     public ByteArrayRef getExceptionByteArrayRef() {

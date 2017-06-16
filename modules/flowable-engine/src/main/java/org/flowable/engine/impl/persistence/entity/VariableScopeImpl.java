@@ -736,7 +736,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             }
 
             if (variableInstance == null) {
-                createVariableLocal(variableName, value);
+                createVariableLocal(variableName, value, sourceActivityExecution);
             } else {
                 updateVariableInstance(variableInstance, value, sourceActivityExecution);
             }

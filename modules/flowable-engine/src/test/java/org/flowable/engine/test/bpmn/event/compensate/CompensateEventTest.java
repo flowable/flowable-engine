@@ -174,23 +174,6 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
 
     }
 
-    @Deployment
-    public void testCompensateMiSubprocessVariableSnapshots() {
-
-        // see referenced java delegates in the process definition.
-
-        SetVariablesDelegate.variablesMap.clear();
-
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
-
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
-        }
-
-        assertProcessEnded(processInstance.getId());
-
-    }
-
     public void testMultipleCompensationCatchEventsFails() {
         try {
             repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testMultipleCompensationCatchEventsFails.bpmn20.xml").deploy();
