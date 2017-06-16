@@ -400,7 +400,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                         xtw.writeAttribute(ATTRIBUTE_ID, container.getInputEntry().getId());
 
                         xtw.writeStartElement(ELEMENT_TEXT);
-                        xtw.writeCharacters(container.getInputEntry().getText());
+                        xtw.writeCData(container.getInputEntry().getText());
                         xtw.writeEndElement();
 
                         xtw.writeEndElement();
@@ -411,7 +411,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                         xtw.writeAttribute(ATTRIBUTE_ID, container.getOutputEntry().getId());
 
                         xtw.writeStartElement(ELEMENT_TEXT);
-                        xtw.writeCharacters(container.getOutputEntry().getText());
+                        xtw.writeCData(container.getOutputEntry().getText());
                         xtw.writeEndElement();
 
                         xtw.writeEndElement();
