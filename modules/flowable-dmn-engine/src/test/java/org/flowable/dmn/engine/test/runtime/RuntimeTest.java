@@ -307,4 +307,17 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         Assert.assertEquals(0D, result.get("discount"));
     }
 
+    @Test
+    @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/simple.dmn")
+    public void testEqualsStringImplicitOperator() {
+        Map<String, Object> processVariablesInput = new HashMap<>();
+        processVariablesInput.put("inputVariable1", 1D);
+        processVariablesInput.put("inputVariable2", "test2");
+
+        Map<String, Object> result = ruleService.executeDecisionByKeySingleResult("decision", processVariablesInput);
+
+        Assert.assertNotNull(result);
+
+    }
+
 }

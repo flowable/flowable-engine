@@ -12,32 +12,38 @@
  */
 package org.flowable.dmn.engine.impl.mvel;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author Yvo Swillens
  */
 public class MvelConditionExpressionPreParser implements MvelExpressionPreParser {
 
+    protected static String[] OPERATORS = new String[]{"==", "!=", "<", ">", ">=", "<="};
+
     public static String parse(String expression, String inputVariable, String inputVariableType) {
 
         String parsedExpression = inputVariable;
         if ("date".equals(inputVariableType) || "number".equals(inputVariableType)) {
-            if (!expression.startsWith("==") &&
-                !expression.startsWith("!=") &&
-                !expression.startsWith("<") &&
-                !expression.startsWith(">") &&
-                !expression.startsWith(">=") &&
-                !expression.startsWith("<=")) {
-                parsedExpression += " == " + expression;
-            } else {
-                parsedExpression += " " + expression;
-            }
+            parsedExpression += MvelConditionExpressionPreParser.parseSegmentWithOperator(expression);
         } else {
             if (expression.startsWith(".")) {
                 parsedExpression += expression;
             } else {
-                parsedExpression += " " + expression;
+                parsedExpression += MvelConditionExpressionPreParser.parseSegmentWithOperator(expression);
             }
         }
         return parsedExpression;
+    }
+
+    private static String parseSegmentWithOperator(String expression) {
+        String parsedExpressionSegment;
+        if (expression.length() < 2 || !StringUtils.startsWithAny(expression, OPERATORS)) {
+            parsedExpressionSegment = " == " + expression;
+        } else {
+            parsedExpressionSegment = " " + expression;
+        }
+
+        return parsedExpressionSegment;
     }
 }

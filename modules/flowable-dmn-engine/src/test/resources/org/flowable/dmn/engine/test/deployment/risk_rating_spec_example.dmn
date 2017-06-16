@@ -32,82 +32,82 @@
       <output id="outputExpression_6" label="Reason" name="reason" typeRef="string"></output>
       <rule>
         <inputEntry id="inputEntry_1_1">
-          <text>-</text>
+          <text><![CDATA[-]]></text>
         </inputEntry>
         <inputEntry id="inputEntry_3_1">
-          <text>-</text>
+          <text><![CDATA[-]]></text>
         </inputEntry>
         <inputEntry id="inputEntry_4_1">
-          <text>false</text>
+          <text><![CDATA[-]]></text>
         </inputEntry>
         <outputEntry id="outputEntry_2_1">
-          <text>"ACCEPT"</text>
+          <text><![CDATA["ACCEPT"]]></text>
         </outputEntry>
         <outputEntry id="outputEntry_5_1">
-          <text>"NONE"</text>
+          <text><![CDATA["NONE"]]></text>
         </outputEntry>
         <outputEntry id="outputEntry_6_1">
-          <text>"Acceptable"</text>
+          <text><![CDATA["Acceptable"]]></text>
         </outputEntry>
       </rule>
       <rule>
         <inputEntry id="inputEntry_1_2">
-          <text>&lt;18</text>
+          <text><![CDATA[<18]]></text>
         </inputEntry>
         <inputEntry id="inputEntry_3_2">
-          <text>-</text>
+          <text><![CDATA[-]]></text>
         </inputEntry>
         <inputEntry id="inputEntry_4_2">
-          <text>false</text>
+          <text><![CDATA[-]]></text>
         </inputEntry>
         <outputEntry id="outputEntry_2_2">
-          <text>"DECLINE"</text>
+          <text><![CDATA["DECLINE"]]></text>
         </outputEntry>
         <outputEntry id="outputEntry_5_2">
-          <text>"NONE"</text>
+          <text><![CDATA["NONE"]]></text>
         </outputEntry>
         <outputEntry id="outputEntry_6_2">
-          <text>"Applicant too young"</text>
+          <text><![CDATA["Applicant too young"]]></text>
         </outputEntry>
       </rule>
       <rule>
         <inputEntry id="inputEntry_1_3">
-          <text>-</text>
+          <text><![CDATA[-]]></text>
         </inputEntry>
         <inputEntry id="inputEntry_3_3">
-          <text>"HIGH"</text>
+          <text><![CDATA["HIGH"]]></text>
         </inputEntry>
         <inputEntry id="inputEntry_4_3">
-          <text>false</text>
+          <text><![CDATA[-]]></text>
         </inputEntry>
         <outputEntry id="outputEntry_2_3">
-          <text>"REFER"</text>
+          <text><![CDATA["REFER"]]></text>
         </outputEntry>
         <outputEntry id="outputEntry_5_3">
-          <text>"LEVEL 1"</text>
+          <text><![CDATA["LEVEL 1"]]></text>
         </outputEntry>
         <outputEntry id="outputEntry_6_3">
-          <text>"High risk application"</text>
+          <text><![CDATA["High risk application"]]></text>
         </outputEntry>
       </rule>
       <rule>
         <inputEntry id="inputEntry_1_4">
-          <text>-</text>
+          <text><![CDATA[-]]></text>
         </inputEntry>
         <inputEntry id="inputEntry_3_4">
-          <text>-</text>
+          <text><![CDATA[-]]></text>
         </inputEntry>
         <inputEntry id="inputEntry_4_4">
-          <text>true</text>
+          <text><![CDATA[true]]></text>
         </inputEntry>
         <outputEntry id="outputEntry_2_4">
-          <text>"REFER"</text>
+          <text><![CDATA["REFER"]]></text>
         </outputEntry>
         <outputEntry id="outputEntry_5_4">
-          <text>"LEVEL 2"</text>
+          <text><![CDATA["LEVEL 2"]]></text>
         </outputEntry>
         <outputEntry id="outputEntry_6_4">
-          <text>"Applicant under debt review"</text>
+          <text><![CDATA["Applicant under debt review"]]></text>
         </outputEntry>
       </rule>
     </decisionTable>
