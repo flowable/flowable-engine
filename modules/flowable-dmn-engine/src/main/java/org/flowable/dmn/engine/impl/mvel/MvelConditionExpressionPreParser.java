@@ -30,7 +30,7 @@ public class MvelConditionExpressionPreParser implements MvelExpressionPreParser
             if (expression.startsWith(".")) {
                 parsedExpression += expression;
             } else {
-                parsedExpression += MvelConditionExpressionPreParser.parseSegmentWithOperator(expression);
+                parsedExpression += parseSegmentWithOperator(expression);
             }
         }
         return parsedExpression;
