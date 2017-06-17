@@ -5,8 +5,8 @@ import org.flowable.idm.api.PasswordSalt;
 import org.flowable.idm.api.User;
 import org.flowable.idm.engine.impl.authentication.ApacheDigester;
 import org.flowable.idm.engine.impl.authentication.BlankSaltProvider;
-import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
 import org.flowable.idm.engine.impl.authentication.PasswordSaltImpl;
+import org.flowable.idm.engine.impl.authentication.SpringEncoder;
 import org.flowable.idm.engine.impl.authentication.SpringSaltProvider;
 import org.flowable.idm.engine.test.PluggableFlowableIdmTestCase;
 import org.flowable.idm.engine.test.api.identity.authentication.JasyptPasswordEncryptor;
@@ -40,15 +40,6 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
 
         idmIdentityService.deleteUser("johndoe");
 
-    }
-
-    public void testValidatePasswordEncoderInstance() {
-        PasswordEncoder passwordEncoder = idmIdentityService.getPasswordEncoder();
-        assertTrue(passwordEncoder instanceof ClearTextPasswordEncoder);
-
-        idmIdentityService.setPasswordEncoder(new CustomPasswordEncoder());
-        passwordEncoder = idmIdentityService.getPasswordEncoder();
-        assertTrue(passwordEncoder instanceof CustomPasswordEncoder);
     }
 
     public void testSpringPasswordEncoderInstance() {
@@ -133,6 +124,12 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
         idmIdentityService.deleteUser("johndoe1");
     }
 
+
+    public void testValidatePasswordEncoderInstance() {
+        idmIdentityService.setPasswordEncoder(new CustomPasswordEncoder());
+        PasswordEncoder passwordEncoder = idmIdentityService.getPasswordEncoder();
+        assertTrue(passwordEncoder instanceof CustomPasswordEncoder);
+    }
 
 
     class CustomPasswordEncoder implements PasswordEncoder {
