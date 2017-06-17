@@ -12,29 +12,31 @@
  */
 package org.flowable.idm.engine.impl.authentication;
 
-import org.flowable.idm.api.PasswordEncoder;
 import org.flowable.idm.api.PasswordSalt;
+import org.flowable.idm.api.PasswordSaltProvider;
 
 /**
  * @author faizal-manan
  */
-public final class ClearTextPasswordEncoder implements PasswordEncoder {
+public class PasswordSaltImpl implements PasswordSalt {
 
-    private static final PasswordEncoder INSTANCE = new ClearTextPasswordEncoder();
+    private PasswordSaltProvider saltProvider;
 
-    private ClearTextPasswordEncoder() {
+    public PasswordSaltImpl(PasswordSaltProvider salt) {
+        this.saltProvider = salt;
     }
 
-    public static PasswordEncoder getInstance() {
-        return INSTANCE;
+    public PasswordSaltImpl(String salt) {
+        this.saltProvider = new TextSaltProvider(salt);
     }
 
-    public String encode(CharSequence rawPassword, PasswordSalt passwordSalt) {
-        return (null == rawPassword) ? null : rawPassword.toString();
+    @Override
+    public PasswordSaltProvider getSource() {
+        return saltProvider;
     }
 
-    public boolean isMatches(CharSequence rawPassword, String encodedPassword, PasswordSalt salt) {
-        return rawPassword.toString().equals(encodedPassword);
+    @Override
+    public void setSource(PasswordSaltProvider source) {
+        this.saltProvider = source;
     }
-
 }

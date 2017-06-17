@@ -13,6 +13,7 @@
 package org.flowable.idm.engine.impl.cmd;
 
 import org.flowable.idm.api.PasswordEncoder;
+import org.flowable.idm.api.PasswordSalt;
 import org.flowable.idm.engine.impl.interceptor.Command;
 import org.flowable.idm.engine.impl.interceptor.CommandContext;
 
@@ -28,17 +29,17 @@ public class CheckPassword implements Command<Boolean>, Serializable {
     String userId;
     String password;
     PasswordEncoder passwordEncoder;
-    String salt;
+    PasswordSalt passwordSalt;
 
-    public CheckPassword(String userId, String password, PasswordEncoder passwordEncoder, String salt) {
+    public CheckPassword(String userId, String password, PasswordEncoder passwordEncoder, PasswordSalt passwordSalt) {
         this.userId = userId;
         this.password = password;
         this.passwordEncoder = passwordEncoder;
-        this.salt = salt;
+        this.passwordSalt = passwordSalt;
     }
 
     public Boolean execute(CommandContext commandContext) {
-        return commandContext.getUserEntityManager().checkPassword(userId, password, passwordEncoder, salt);
+        return commandContext.getUserEntityManager().checkPassword(userId, password, passwordEncoder, passwordSalt);
     }
 
 }

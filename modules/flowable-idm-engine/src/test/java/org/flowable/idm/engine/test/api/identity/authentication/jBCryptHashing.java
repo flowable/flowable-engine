@@ -1,6 +1,7 @@
-package org.flowable.idm.engine.impl.authentication;
+package org.flowable.idm.engine.test.api.identity.authentication;
 
 import org.flowable.idm.api.PasswordEncoder;
+import org.flowable.idm.api.PasswordSalt;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -8,7 +9,7 @@ import java.lang.reflect.Method;
 public class jBCryptHashing implements PasswordEncoder {
 
     @Override
-    public String encode(CharSequence rawPassword, String salt) {
+    public String encode(CharSequence rawPassword, PasswordSalt passwordSalt) {
         Method method = loadMethod("hashpw", String.class, String.class);
         try {
             return (String) method.invoke(null, rawPassword, gensalt());
@@ -20,7 +21,7 @@ public class jBCryptHashing implements PasswordEncoder {
     }
 
     @Override
-    public boolean isMatches(CharSequence rawPassword, String encodedPassword, String salt) {
+    public boolean isMatches(CharSequence rawPassword, String encodedPassword, PasswordSalt salt) {
         Method method = loadMethod("checkpw", String.class, String.class);
         try {
             return (Boolean) method.invoke(null, rawPassword, encodedPassword);

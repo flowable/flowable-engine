@@ -10,14 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.idm.api;
+package org.flowable.idm.engine.impl.authentication;
+
+import org.flowable.idm.api.PasswordSaltProvider;
 
 /**
  * @author faizal-manan
  */
-public interface PasswordSalt {
+public class TextSaltProvider implements PasswordSaltProvider {
 
-    PasswordSaltProvider getSource();
+    private String salt;
 
-    void setSource(PasswordSaltProvider source);
+    public TextSaltProvider(String salt) {
+        this.salt = salt;
+    }
+
+    @Override
+    public String getSalt() {
+        return salt;
+    }
 }

@@ -16,6 +16,7 @@ package org.flowable.idm.engine.impl.persistence.entity;
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.idm.api.PasswordEncoder;
+import org.flowable.idm.api.PasswordSalt;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
@@ -97,7 +98,7 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
         return new UserQueryImpl(getCommandExecutor());
     }
 
-    public Boolean checkPassword(String userId, String password, PasswordEncoder passwordEncoder, String salt) {
+    public Boolean checkPassword(String userId, String password, PasswordEncoder passwordEncoder, PasswordSalt salt) {
         User user = null;
 
         if (userId != null) {

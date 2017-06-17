@@ -1,15 +1,16 @@
 package org.flowable.idm.engine.test.api.identity;
 
 import org.flowable.idm.api.PasswordEncoder;
+import org.flowable.idm.api.PasswordSalt;
 import org.flowable.idm.api.User;
 import org.flowable.idm.engine.impl.authentication.ApacheDigester;
+import org.flowable.idm.engine.impl.authentication.BlankSaltProvider;
 import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
-import org.flowable.idm.engine.impl.authentication.JasyptPasswordEncryptor;
-import org.flowable.idm.engine.impl.authentication.SpringEncoder;
-import org.flowable.idm.engine.impl.authentication.SpringSalt;
-import org.flowable.idm.engine.impl.authentication.StringSalt;
-import org.flowable.idm.engine.impl.authentication.jBCryptHashing;
+import org.flowable.idm.engine.impl.authentication.PasswordSaltImpl;
+import org.flowable.idm.engine.impl.authentication.SpringSaltProvider;
 import org.flowable.idm.engine.test.PluggableFlowableIdmTestCase;
+import org.flowable.idm.engine.test.api.identity.authentication.JasyptPasswordEncryptor;
+import org.flowable.idm.engine.test.api.identity.authentication.jBCryptHashing;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +95,7 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
         assertTrue(idmIdentityService.checkPassword("johndoe", "xxx"));
         idmIdentityService.deleteUser("johndoe");
 
-        idmIdentityService.setPasswordSalt(new StringSalt(""));
+        idmIdentityService.setPasswordSalt(new PasswordSaltImpl(BlankSaltProvider.getInstance()));
         user = idmIdentityService.newUser("johndoe1");
         user.setPassword("xxx");
         idmIdentityService.saveUser(user);
@@ -120,7 +121,7 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
 
         SystemWideSaltSource saltSource = new SystemWideSaltSource();
         saltSource.setSystemWideSalt("salt");
-        idmIdentityService.setPasswordSalt(new SpringSalt(saltSource));
+        idmIdentityService.setPasswordSalt(new PasswordSaltImpl(new SpringSaltProvider(saltSource)));
         user = idmIdentityService.newUser("johndoe1");
         user.setPassword("xxx");
         idmIdentityService.saveUser(user);
@@ -136,11 +137,11 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
 
     class CustomPasswordEncoder implements PasswordEncoder {
 
-        public String encode(CharSequence rawPassword, String salt) {
+        public String encode(CharSequence rawPassword, PasswordSalt passwordSalt) {
             return null;
         }
 
-        public boolean isMatches(CharSequence rawPassword, String encodedPassword, String salt) {
+        public boolean isMatches(CharSequence rawPassword, String encodedPassword, PasswordSalt salt) {
             return false;
         }
     }

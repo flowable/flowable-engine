@@ -59,10 +59,9 @@ import org.flowable.idm.engine.impl.cmd.SaveTokenCmd;
 import org.flowable.idm.engine.impl.cmd.SaveUserCmd;
 import org.flowable.idm.engine.impl.cmd.SetUserInfoCmd;
 import org.flowable.idm.engine.impl.cmd.SetUserPictureCmd;
+import org.flowable.idm.engine.impl.cmd.UpdateUserPasswordCmd;
 import org.flowable.idm.engine.impl.persistence.entity.IdentityInfoEntity;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -86,7 +85,11 @@ public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentitySe
     }
 
     public void saveUser(User user) {
-        commandExecutor.execute(new SaveUserCmd(user, passwordEncoder, getSalt()));
+        commandExecutor.execute(new SaveUserCmd(user, passwordEncoder, passwordSalt));
+    }
+
+    public void updateUserPassword(User user) {
+        commandExecutor.execute(new UpdateUserPasswordCmd(user, passwordEncoder, passwordSalt));
     }
 
     public UserQuery createUserQuery() {
@@ -120,7 +123,7 @@ public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentitySe
     }
 
     public boolean checkPassword(String userId, String password) {
-        return commandExecutor.execute(new CheckPassword(userId, password, passwordEncoder, getSalt()));
+        return commandExecutor.execute(new CheckPassword(userId, password, passwordEncoder, passwordSalt));
     }
 
     public void deleteUser(String userId) {
@@ -241,26 +244,4 @@ public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentitySe
         this.passwordSalt = passwordSalt;
     }
 
-    private String getSalt() {
-        Object source = passwordSalt.getSource();
-        if (source instanceof String) return (String) source;
-        try {
-            Class<?> aClass = Class.forName("org.springframework.security.authentication.dao.SystemWideSaltSource");
-            Class<?> uClass = Class.forName("org.springframework.security.core.userdetails.UserDetails");
-            if (aClass.isInstance(source)) {
-                Method method = null;
-                method = aClass.getMethod("getSalt", uClass);
-                return (String) method.invoke(source, new Object[]{null});
-            }
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
 }

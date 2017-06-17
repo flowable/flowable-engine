@@ -10,14 +10,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.idm.api;
+package org.flowable.idm.engine.impl.authentication;
+
+import org.flowable.idm.api.PasswordSaltProvider;
+import org.springframework.security.authentication.dao.SystemWideSaltSource;
 
 /**
  * @author faizal-manan
  */
-public interface PasswordSalt {
+public class SpringSaltProvider implements PasswordSaltProvider {
 
-    PasswordSaltProvider getSource();
+    private SystemWideSaltSource salt;
 
-    void setSource(PasswordSaltProvider source);
+    public SpringSaltProvider(SystemWideSaltSource salt) {
+        this.salt = salt;
+    }
+
+    @Override
+    public String getSalt() {
+        return (String) salt.getSalt(null);
+    }
 }
