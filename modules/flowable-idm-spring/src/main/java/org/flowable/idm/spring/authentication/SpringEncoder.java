@@ -1,4 +1,4 @@
-package org.flowable.idm.engine.impl.authentication;
+package org.flowable.idm.spring.authentication;
 
 import org.flowable.idm.api.PasswordEncoder;
 import org.flowable.idm.api.PasswordSalt;
@@ -29,5 +29,9 @@ public class SpringEncoder implements PasswordEncoder {
             return cryptoPasswordEncoder.matches(rawPassword, encodedPassword);
         else
             return encodingPasswordEncoder.isPasswordValid(encodedPassword, rawPassword.toString(), passwordSalt);
+    }
+
+    public Object getSpringEncodingProvider() {
+        return (null == encodingPasswordEncoder) ? cryptoPasswordEncoder : encodingPasswordEncoder;
     }
 }

@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.idm.engine.impl.authentication;
+package org.flowable.idm.spring.authentication;
 
 import org.flowable.idm.api.PasswordSaltProvider;
 import org.springframework.security.authentication.dao.SystemWideSaltSource;

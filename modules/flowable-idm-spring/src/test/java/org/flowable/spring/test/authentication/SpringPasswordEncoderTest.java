@@ -1,0 +1,117 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.flowable.spring.test.authentication;
+
+import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.api.PasswordEncoder;
+import org.flowable.idm.api.User;
+import org.flowable.idm.engine.IdmEngines;
+import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
+import org.flowable.idm.engine.impl.authentication.PasswordSaltImpl;
+import org.flowable.idm.spring.authentication.SpringEncoder;
+import org.flowable.idm.spring.authentication.SpringSaltProvider;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.dao.SystemWideSaltSource;
+import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
+
+/**
+ * @author faizal-manan
+ */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("classpath:org/flowable/spring/test/engine/springIdmEngineWithPasswordEncoder-context.xml")
+public class SpringPasswordEncoderTest {
+
+    private static Logger log = LoggerFactory.getLogger(SpringPasswordEncoderTest.class);
+
+    @Autowired
+    private IdmIdentityService autoWiredIdmIdentityService;
+
+    @Test
+    public void testSpringPasswordEncoderInstance() {
+
+        autoWiredIdmIdentityService.setPasswordEncoder(new SpringEncoder(new Md5PasswordEncoder()));
+        validatePassword();
+
+        autoWiredIdmIdentityService.setPasswordEncoder(new SpringEncoder(new StandardPasswordEncoder()));
+        validatePassword();
+    }
+
+    @Test
+    public void testValidateSpringPasswordEncoder() {
+
+        PasswordEncoder passwordEncoder = autoWiredIdmIdentityService.getPasswordEncoder();
+        IdmIdentityService defaultIdmIdentityService = IdmEngines.getDefaultIdmEngine().getIdmIdentityService();
+
+        assertTrue(defaultIdmIdentityService.getPasswordEncoder() instanceof ClearTextPasswordEncoder);
+        assertTrue(passwordEncoder instanceof SpringEncoder);
+        assertTrue(null != ((SpringEncoder) passwordEncoder).getSpringEncodingProvider());
+        assertTrue(((SpringEncoder) passwordEncoder).getSpringEncodingProvider() instanceof org.springframework.security.authentication.encoding.PasswordEncoder ||
+                ((SpringEncoder) passwordEncoder).getSpringEncodingProvider() instanceof org.springframework.security.crypto.password.PasswordEncoder);
+
+    }
+
+    @Test
+    public void testSpringSaltPasswordEncoderInstance() {
+
+        autoWiredIdmIdentityService.setPasswordEncoder(new SpringEncoder(new BCryptPasswordEncoder()));
+
+        User user = autoWiredIdmIdentityService.newUser("johndoe");
+        user.setPassword("xxx");
+        autoWiredIdmIdentityService.saveUser(user);
+
+        String noSalt = autoWiredIdmIdentityService.createUserQuery().userId("johndoe").list().get(0).getPassword();
+        assertTrue(autoWiredIdmIdentityService.checkPassword("johndoe", "xxx"));
+        autoWiredIdmIdentityService.deleteUser("johndoe");
+
+        SystemWideSaltSource saltSource = new SystemWideSaltSource();
+        saltSource.setSystemWideSalt("salt");
+        autoWiredIdmIdentityService.setPasswordSalt(new PasswordSaltImpl(new SpringSaltProvider(saltSource)));
+        user = autoWiredIdmIdentityService.newUser("johndoe1");
+        user.setPassword("xxx");
+        autoWiredIdmIdentityService.saveUser(user);
+
+        String salt = autoWiredIdmIdentityService.createUserQuery().userId("johndoe1").list().get(0).getPassword();
+        assertTrue(autoWiredIdmIdentityService.checkPassword("johndoe1", "xxx"));
+
+        assertFalse(noSalt.equals(salt));
+        autoWiredIdmIdentityService.deleteUser("johndoe1");
+    }
+
+
+    private void validatePassword() {
+        User user = autoWiredIdmIdentityService.newUser("johndoe");
+        user.setPassword("xxx");
+        autoWiredIdmIdentityService.saveUser(user);
+
+        User johndoe = autoWiredIdmIdentityService.createUserQuery().userId("johndoe").list().get(0);
+        log.info("Hash Password = {} ", johndoe.getPassword());
+
+        assertFalse("xxx".equals(johndoe.getPassword()));
+        assertTrue(autoWiredIdmIdentityService.checkPassword("johndoe", "xxx"));
+        assertFalse(autoWiredIdmIdentityService.checkPassword("johndoe", "invalid pwd"));
+
+        autoWiredIdmIdentityService.deleteUser("johndoe");
+
+    }
+}
