@@ -49,6 +49,7 @@ import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.AbstractRuntimeJobEntity;
+import org.flowable.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
@@ -292,7 +293,7 @@ public class DefaultJobManager implements JobManager {
             newJobEntity.setLockExpirationTime(null);
             newJobEntity.setLockOwner(null);
             processEngineConfiguration.getHistoryJobEntityManager().insert(newJobEntity);
-            processEngineConfiguration.getHistoryJobEntityManager().delete(jobEntity.getId());
+            processEngineConfiguration.getHistoryJobEntityManager().deleteNoCascade(jobEntity);
             
         } else if (job instanceof JobEntity) {
             
@@ -343,7 +344,7 @@ public class DefaultJobManager implements JobManager {
                 //processEngineConfiguration.getDeadLetterJobEntityManager().insert(deadLetterJob);
             }
             
-            processEngineConfiguration.getHistoryJobEntityManager().delete(historyJobEntity.getId());
+            processEngineConfiguration.getHistoryJobEntityManager().deleteNoCascade(historyJobEntity);
             
         } else {
             JobEntity jobEntity = (JobEntity) job;
@@ -645,7 +646,12 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setId(copyFromJob.getId());
         copyToJob.setJobHandlerConfiguration(copyFromJob.getJobHandlerConfiguration());
         if (copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
-            copyToJob.setAdvancedJobHandlerConfigurationBytes(copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef().getBytes());
+            ByteArrayRef configurationByteArrayRefCopy = copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef().copy();
+            copyToJob.setAdvancedJobHandlerConfigurationByteArrayRef(configurationByteArrayRefCopy);
+        }
+        if (copyFromJob.getExceptionByteArrayRef() != null) {
+            ByteArrayRef exceptionByteArrayRefCopy = copyFromJob.getExceptionByteArrayRef();
+            copyToJob.setExceptionByteArrayRef(exceptionByteArrayRefCopy);
         }
         copyToJob.setJobHandlerType(copyFromJob.getJobHandlerType());
         copyToJob.setExceptionMessage(copyFromJob.getExceptionMessage());

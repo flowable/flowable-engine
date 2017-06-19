@@ -85,6 +85,14 @@ public class HistoryJobEntityManagerImpl extends JobInfoEntityManagerImpl<Histor
             configurationByteArrayRef.delete();
         }
     }
+    
+    @Override
+    public void deleteNoCascade(HistoryJobEntity historyJobEntity) {
+        super.delete(historyJobEntity);
+        if (getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        }
+    }
 
     public HistoryJobDataManager getHistoryJobDataManager() {
         return historyJobDataManager;

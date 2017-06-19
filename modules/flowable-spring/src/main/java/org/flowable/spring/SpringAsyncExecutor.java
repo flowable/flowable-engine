@@ -74,7 +74,7 @@ public class SpringAsyncExecutor extends DefaultAsyncJobExecutor {
     @Override
     public boolean executeAsyncJob(JobInfo job) {
         try {
-            taskExecutor.execute(new ExecuteAsyncRunnable(job, processEngineConfiguration, processEngineConfiguration.getJobEntityManager(), null));
+            taskExecutor.execute(new ExecuteAsyncRunnable(job, processEngineConfiguration, jobEntityManager, asyncRunnableExecutionExceptionHandler));
             return true;
         } catch (RejectedExecutionException e) {
             rejectedJobsHandler.jobRejected(this, job);

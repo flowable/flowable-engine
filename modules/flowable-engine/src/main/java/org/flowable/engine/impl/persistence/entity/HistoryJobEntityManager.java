@@ -36,4 +36,10 @@ public interface HistoryJobEntityManager extends EntityManager<HistoryJobEntity>
      */
     long findHistoryJobCountByQueryCriteria(HistoryJobQueryImpl jobQuery);
 
+    /**
+    * The default delete method will cascade to the references entities.
+    * This delete doesn't delete the referenced byte array entities (configuration and exception).
+    */
+    void deleteNoCascade(HistoryJobEntity historyJobEntity);
+
 }
