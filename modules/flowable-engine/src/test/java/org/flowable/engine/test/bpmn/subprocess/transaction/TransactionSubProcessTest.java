@@ -16,6 +16,7 @@ package org.flowable.engine.test.bpmn.subprocess.transaction;
 import java.util.List;
 
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.EventSubscriptionQuery;
@@ -109,7 +110,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
 
         // if we have history, we check that the invocation of the compensation
         // handlers is recorded in history.
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("undoBookFlight").count());
             assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
             assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("undoChargeCard").count());
@@ -153,7 +154,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         assertEquals(1, runtimeService.getVariable(processInstance.getId(), "undoBookFlight"));
 
         // if we have history, we check that the invocation of the compensation handlers is recorded in history.
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
             assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("undoBookFlight").count());
         }
@@ -203,7 +204,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         assertEquals(1, runtimeService.getVariable(processInstance.getId(), "innerTxundoBookFlight"));
 
         // if we have history, we check that the invocation of the compensation handlers is recorded in history.
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("innerTxundoBookHotel").count());
             assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("innerTxundoBookFlight").count());
         }

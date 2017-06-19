@@ -125,6 +125,11 @@ flowableApp
         // set angular translate fallback language
         $translate.fallbackLanguage(['en']);
 
+        // setting Moment-JS (global) locale
+        if (FLOWABLE.CONFIG.datesLocalization) {
+            moment.locale($translate.proposedLanguage());
+        }
+
         $rootScope.restRootUrl = function() {
             return FLOWABLE.CONFIG.contextRoot;
         };
@@ -323,7 +328,7 @@ flowableApp
                 baseUrl = baseUrl.substring(0, index) + '/';
             }
             $window.location.href = baseUrl;
-        }
+        };
     }])
 
     // Moment-JS date-formatting filter

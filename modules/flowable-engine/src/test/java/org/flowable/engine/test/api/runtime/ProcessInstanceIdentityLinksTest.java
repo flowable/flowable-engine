@@ -16,6 +16,7 @@ package org.flowable.engine.test.api.runtime;
 import java.util.List;
 
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Event;
 import org.flowable.engine.task.IdentityLink;
@@ -70,7 +71,7 @@ public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase 
 
         assertEquals(1, identityLinks.size());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             List<Event> processInstanceEvents = runtimeService.getProcessInstanceEvents(processInstanceId);
             assertEquals(1, processInstanceEvents.size());
             Event processInstanceEvent = processInstanceEvents.get(0);
@@ -83,7 +84,7 @@ public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase 
 
         runtimeService.deleteParticipantGroup(processInstanceId, "muppets");
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             List<Event> processInstanceEvents = runtimeService.getProcessInstanceEvents(processInstanceId);
             Event processIsntanceEvent = findProcessInstanceEvent(processInstanceEvents, Event.ACTION_DELETE_GROUP_LINK);
             assertEquals(Event.ACTION_DELETE_GROUP_LINK, processIsntanceEvent.getAction());

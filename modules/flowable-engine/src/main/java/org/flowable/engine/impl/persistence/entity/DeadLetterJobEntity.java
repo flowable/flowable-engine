@@ -18,6 +18,6 @@ package org.flowable.engine.impl.persistence.entity;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public interface DeadLetterJobEntity extends AbstractJobEntity {
+public interface DeadLetterJobEntity extends AbstractRuntimeJobEntity {
 
 }

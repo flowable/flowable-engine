@@ -16,12 +16,13 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.engine.common.impl.db.HasRevision;
 import org.flowable.engine.history.HistoricProcessInstance;
 
 /**
  * @author Joram Barrez
  */
-public interface HistoricProcessInstanceEntity extends HistoricScopeInstanceEntity, HistoricProcessInstance {
+public interface HistoricProcessInstanceEntity extends HistoricScopeInstanceEntity, HistoricProcessInstance, HasRevision {
 
     void setEndActivityId(String endActivityId);
 

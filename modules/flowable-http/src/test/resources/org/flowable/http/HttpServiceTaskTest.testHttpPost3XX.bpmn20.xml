@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.flowable.org/processdef">
+  <process id="testHttpPost3XX" name="HTTP Post process" isExecutable="true">
+    <serviceTask id="httpPost" name="HTTP Post 3XX" flowable:type="http">
+      <extensionElements>
+        <flowable:field name="requestMethod">
+          <flowable:string><![CDATA[POST]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="requestUrl">
+          <flowable:string><![CDATA[https://localhost:9799/api?code=300]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="requestHeaders">
+          <flowable:string><![CDATA[Content-Type: application/json]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="requestBody">
+          <flowable:string><![CDATA[{"test":"sample","result":true}]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="saveResponseParameters">
+          <flowable:string><![CDATA[true]]></flowable:string>
+        </flowable:field>
+      </extensionElements>
+    </serviceTask>
+    <startEvent id="theStart" name="Start"></startEvent>
+    <endEvent id="theEnd" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="httpPost"></sequenceFlow>
+    <receiveTask id="wait" name="Wait"></receiveTask>
+    <sequenceFlow id="sid-62E5CF14-207F-40C8-B00D-8571FEBA3947" sourceRef="wait" targetRef="theEnd"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="httpPost" targetRef="wait"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_testHttpPost3XX">
+    <bpmndi:BPMNPlane bpmnElement="testHttpPost3XX" id="BPMNPlane_testHttpPost3XX">
+      <bpmndi:BPMNShape bpmnElement="httpPost" id="BPMNShape_httpPost">
+        <omgdc:Bounds height="55.0" width="105.0" x="200.0" y="166.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="theStart" id="BPMNShape_theStart">
+        <omgdc:Bounds height="30.0" width="30.0" x="100.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="theEnd" id="BPMNShape_theEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="540.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="wait" id="BPMNShape_wait">
+        <omgdc:Bounds height="57.0" width="97.0" x="375.0" y="165.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="129.99960332152105" y="194.8909119758435"></omgdi:waypoint>
+        <omgdi:waypoint x="200.0" y="194.38181818181818"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="305.0" y="193.78739774844092"></omgdi:waypoint>
+        <omgdi:waypoint x="375.0" y="193.50392807969547"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-62E5CF14-207F-40C8-B00D-8571FEBA3947"
+                       id="BPMNEdge_sid-62E5CF14-207F-40C8-B00D-8571FEBA3947">
+        <omgdi:waypoint x="472.0" y="193.68582375478928"></omgdi:waypoint>
+        <omgdi:waypoint x="540.0001027571958" y="193.94636054696244"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

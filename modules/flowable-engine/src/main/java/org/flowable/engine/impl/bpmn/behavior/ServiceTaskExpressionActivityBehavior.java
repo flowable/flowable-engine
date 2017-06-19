@@ -13,8 +13,6 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +25,8 @@ import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * ActivityBehavior that evaluates an expression when executed. Optionally, it sets the result of the expression as a variable on the execution.

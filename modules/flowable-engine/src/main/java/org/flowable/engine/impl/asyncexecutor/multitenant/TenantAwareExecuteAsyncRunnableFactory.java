@@ -17,7 +17,7 @@ import org.flowable.engine.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.JobInfo;
 
 /**
  * Factory that produces a {@link Runnable} that executes a {@link JobEntity}. Can be used to create special implementations for specific tenants.
@@ -34,7 +34,7 @@ public class TenantAwareExecuteAsyncRunnableFactory implements ExecuteAsyncRunna
         this.tenantId = tenantId;
     }
 
-    public Runnable createExecuteAsyncRunnable(Job job, ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public Runnable createExecuteAsyncRunnable(JobInfo job, ProcessEngineConfigurationImpl processEngineConfiguration) {
         return new TenantAwareExecuteAsyncRunnable(job, processEngineConfiguration, tenantInfoHolder, tenantId);
     }
 

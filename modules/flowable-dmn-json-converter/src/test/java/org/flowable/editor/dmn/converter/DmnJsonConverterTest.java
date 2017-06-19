@@ -50,6 +50,11 @@ public class DmnJsonConverterTest {
     private static final String JSON_RESOURCE_3 = "org/flowable/editor/dmn/converter/decisiontable_2.json";
     private static final String JSON_RESOURCE_4 = "org/flowable/editor/dmn/converter/decisiontable_empty_expressions.json";
     private static final String JSON_RESOURCE_5 = "org/flowable/editor/dmn/converter/decisiontable_order.json";
+    private static final String JSON_RESOURCE_6 = "org/flowable/editor/dmn/converter/decisiontable_entries.json";
+    private static final String JSON_RESOURCE_7 = "org/flowable/editor/dmn/converter/decisiontable_dates.json";
+    private static final String JSON_RESOURCE_8 = "org/flowable/editor/dmn/converter/decisiontable_empty_operator.json";
+    private static final String JSON_RESOURCE_9 = "org/flowable/editor/dmn/converter/decisiontable_complex_output_expression.json";
+    private static final String JSON_RESOURCE_10 = "org/flowable/editor/dmn/converter/decisiontable_regression_model_v1.json";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -132,7 +137,7 @@ public class DmnJsonConverterTest {
         RuleInputClauseContainer ruleClauseContainer12 = rules.get(0).getInputEntries().get(1);
         UnaryTests inputEntry12 = ruleClauseContainer12.getInputEntry();
         Assert.assertNotNull(inputEntry12);
-        Assert.assertEquals("<= 18-09-1977", inputEntry12.getText());
+        Assert.assertEquals("<= fn_date('1977-09-18')", inputEntry12.getText());
         Assert.assertSame(condition2, ruleClauseContainer12.getInputClause());
 
         // output expression 1
@@ -154,7 +159,7 @@ public class DmnJsonConverterTest {
         RuleInputClauseContainer ruleClauseContainer22 = rules.get(1).getInputEntries().get(1);
         UnaryTests inputEntry22 = ruleClauseContainer22.getInputEntry();
         Assert.assertNotNull(inputEntry22);
-        Assert.assertEquals("> 18-09-1977", inputEntry22.getText());
+        Assert.assertEquals("> fn_date('1977-09-18')", inputEntry22.getText());
         Assert.assertSame(condition2, ruleClauseContainer22.getInputClause());
 
         // output expression 1
@@ -263,6 +268,97 @@ public class DmnJsonConverterTest {
         Assert.assertEquals("outputExpression_14", rules.get(0).getOutputEntries().get(0).getOutputClause().getId());
         Assert.assertEquals("outputExpression_13", rules.get(0).getOutputEntries().get(1).getOutputClause().getId());
         Assert.assertEquals("outputExpression_15", rules.get(0).getOutputEntries().get(2).getOutputClause().getId());
+    }
+
+    @Test
+    public void testConvertJsonToDmn_Entries() throws Exception {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_6);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+
+        Assert.assertEquals("\"AAA\",\"BBB\"", decisionTable.getInputs().get(0).getInputValues().getText());
+        Assert.assertEquals("AAA", decisionTable.getInputs().get(0).getInputValues().getTextValues().get(0));
+        Assert.assertEquals("BBB", decisionTable.getInputs().get(0).getInputValues().getTextValues().get(1));
+
+        Assert.assertEquals("\"THIRD\",\"FIRST\",\"SECOND\"", decisionTable.getOutputs().get(0).getOutputValues().getText());
+        Assert.assertEquals("THIRD", decisionTable.getOutputs().get(0).getOutputValues().getTextValues().get(0));
+        Assert.assertEquals("FIRST", decisionTable.getOutputs().get(0).getOutputValues().getTextValues().get(1));
+        Assert.assertEquals("SECOND", decisionTable.getOutputs().get(0).getOutputValues().getTextValues().get(2));
+    }
+
+    @Test
+    public void testConvertJsonToDmn_Dates() throws Exception {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_7);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+
+        Assert.assertNotNull(dmnDefinition);
+    }
+
+    @Test
+    public void testConvertJsonToDmn_Empty_Operator() throws Exception {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_8);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+        Assert.assertEquals("fn_date('2017-06-01')", decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
+        Assert.assertEquals("-", decisionTable.getRules().get(0).getInputEntries().get(1).getInputEntry().getText());
+        Assert.assertNotNull(decisionTable.getRules().get(0).getInputEntries().get(0).getInputClause());
+        Assert.assertNotNull(decisionTable.getRules().get(0).getInputEntries().get(1).getInputClause());
+
+        Assert.assertEquals("fn_date('2017-06-02')", decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
+        Assert.assertEquals("-", decisionTable.getRules().get(1).getInputEntries().get(1).getInputEntry().getText());
+        Assert.assertNotNull(decisionTable.getRules().get(1).getInputEntries().get(0).getInputClause());
+        Assert.assertNotNull(decisionTable.getRules().get(1).getInputEntries().get(1).getInputClause());
+
+        Assert.assertEquals("fn_date('2017-06-03')", decisionTable.getRules().get(0).getOutputEntries().get(0).getOutputEntry().getText());
+        Assert.assertEquals("", decisionTable.getRules().get(1).getOutputEntries().get(0).getOutputEntry().getText());
+        Assert.assertNotNull(decisionTable.getRules().get(0).getOutputEntries().get(0).getOutputClause());
+        Assert.assertNotNull(decisionTable.getRules().get(1).getOutputEntries().get(0).getOutputClause());
+    }
+
+    @Test
+    public void testConvertJsonToDmn_Complex_Output_Expression() throws Exception {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_9);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+        Assert.assertEquals("refVar1 * refVar2", decisionTable.getRules().get(0).getOutputEntries().get(0).getOutputEntry().getText());
+    }
+
+    @Test
+    public void testConvertJsonToDmn_Regression_model_v1() throws Exception {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_10);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+        Assert.assertEquals(4, decisionTable.getInputs().size());
+        Assert.assertEquals(4, decisionTable.getOutputs().size());
+        Assert.assertEquals(4, decisionTable.getRules().get(0).getInputEntries().size());
+        Assert.assertEquals(4, decisionTable.getRules().get(0).getOutputEntries().size());
+
+        DecisionRule rule1 = decisionTable.getRules().get(0);
+        DecisionRule rule2 = decisionTable.getRules().get(1);
+
+        Assert.assertEquals("\"TEST\"", rule1.getInputEntries().get(0).getInputEntry().getText());
+        Assert.assertEquals("100", rule1.getInputEntries().get(1).getInputEntry().getText());
+        Assert.assertEquals("true", rule1.getInputEntries().get(2).getInputEntry().getText());
+        Assert.assertEquals("fn_date('2017-06-01')", rule1.getInputEntries().get(3).getInputEntry().getText());
+
+        Assert.assertEquals("\"WAS TEST\"", rule1.getOutputEntries().get(0).getOutputEntry().getText());
+        Assert.assertEquals("100", rule1.getOutputEntries().get(1).getOutputEntry().getText());
+        Assert.assertEquals("true", rule1.getOutputEntries().get(2).getOutputEntry().getText());
+        Assert.assertEquals("fn_date('2017-06-01')", rule1.getOutputEntries().get(3).getOutputEntry().getText());
+
+        Assert.assertEquals("!= \"TEST\"", rule2.getInputEntries().get(0).getInputEntry().getText());
+        Assert.assertEquals("!= 100", rule2.getInputEntries().get(1).getInputEntry().getText());
+        Assert.assertEquals("false", rule2.getInputEntries().get(2).getInputEntry().getText());
+        Assert.assertEquals("!= fn_date('2017-06-01')", rule2.getInputEntries().get(3).getInputEntry().getText());
+
+        Assert.assertEquals("\"WASN'T TEST\"", rule2.getOutputEntries().get(0).getOutputEntry().getText());
+        Assert.assertEquals("1", rule2.getOutputEntries().get(1).getOutputEntry().getText());
+        Assert.assertEquals("false", rule2.getOutputEntries().get(2).getOutputEntry().getText());
+        Assert.assertEquals("fn_date('2016-06-01')", rule2.getOutputEntries().get(3).getOutputEntry().getText());
     }
 
     /* Helper methods */

@@ -126,6 +126,7 @@ drop table if exists ACT_RU_JOB;
 drop table if exists ACT_RU_TIMER_JOB;
 drop table if exists ACT_RU_SUSPENDED_JOB;
 drop table if exists ACT_RU_DEADLETTER_JOB;
+drop table if exists ACT_RU_HISTORY_JOB;
 drop table if exists ACT_RU_EVENT_SUBSCR;
 drop table if exists ACT_EVT_LOG;
 drop table if exists ACT_PROCDEF_INFO;

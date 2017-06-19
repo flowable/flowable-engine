@@ -19,6 +19,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.cfg.MailServerInfo;
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
@@ -82,6 +83,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected int idBlockSize = 2500;
     protected String history = HistoryLevel.AUDIT.getKey();
     protected boolean asyncExecutorActivate;
+    protected boolean asyncHistoryExecutorActivate;
 
     protected String mailServerHost = "localhost";
     protected String mailServerUsername; // by default no name and password are provided, which
@@ -94,6 +96,9 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected Map<String, MailServerInfo> mailServers = new HashMap<String, MailServerInfo>();
     protected Map<String, String> mailSessionsJndi = new HashMap<String, String>();
 
+    // Set Http Client config defaults
+    protected HttpClientConfig httpClientConfig = new HttpClientConfig();
+
     protected boolean isDbHistoryUsed = true;
     protected HistoryLevel historyLevel;
 
@@ -103,6 +108,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected boolean jpaCloseEntityManager;
 
     protected AsyncExecutor asyncExecutor;
+    protected AsyncExecutor asyncHistoryExecutor;
     /**
      * Define the default lock time for an async job in seconds. The lock time is used when creating an async job and when it expires the async executor assumes that the job has failed. It will be
      * retried again.
@@ -314,6 +320,14 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         return this;
     }
 
+    public HttpClientConfig getHttpClientConfig() {
+        return httpClientConfig;
+    }
+
+    public void setHttpClientConfig(HttpClientConfig httpClientConfig) {
+        this.httpClientConfig.merge(httpClientConfig);
+    }
+
     public ProcessEngineConfiguration setDatabaseType(String databaseType) {
         this.databaseType = databaseType;
         return this;
@@ -418,6 +432,15 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setAsyncExecutorActivate(boolean asyncExecutorActivate) {
         this.asyncExecutorActivate = asyncExecutorActivate;
+        return this;
+    }
+    
+    public boolean isAsyncHistoryExecutorActivate() {
+        return asyncHistoryExecutorActivate;
+    }
+
+    public ProcessEngineConfiguration setAsyncHistoryExecutorActivate(boolean asyncHistoryExecutorActivate) {
+        this.asyncHistoryExecutorActivate = asyncHistoryExecutorActivate;
         return this;
     }
 
@@ -576,6 +599,15 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setAsyncExecutor(AsyncExecutor asyncExecutor) {
         this.asyncExecutor = asyncExecutor;
+        return this;
+    }
+    
+    public AsyncExecutor getAsyncHistoryExecutor() {
+        return asyncHistoryExecutor;
+    }
+
+    public ProcessEngineConfiguration setAsyncHistoryExecutor(AsyncExecutor asyncHistoryExecutor) {
+        this.asyncHistoryExecutor = asyncHistoryExecutor;
         return this;
     }
 

@@ -57,6 +57,7 @@ public class ModelEntityImpl extends AbstractEntity implements ModelEntity, Seri
         persistentState.put("deploymentId", deploymentId);
         persistentState.put("editorSourceValueId", this.editorSourceValueId);
         persistentState.put("editorSourceExtraValueId", this.editorSourceExtraValueId);
+        persistentState.put("tenantId", this.tenantId);
         return persistentState;
     }
 

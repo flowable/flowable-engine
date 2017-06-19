@@ -90,7 +90,7 @@
     ${limitAfter}
   </select>
   
-   <select id="selectUserCountByQueryCriteria" parameterType="org.flowable.idm.engine.impl.UserQueryImpl" resultType="long">
+  <select id="selectUserCountByQueryCriteria" parameterType="org.flowable.idm.engine.impl.UserQueryImpl" resultType="long">
     select count(RES.ID_)
     <include refid="selectUserByQueryCriteriaSql" />
   </select>
@@ -134,10 +134,10 @@
         and lower(RES.LAST_) like #{lastNameLikeIgnoreCase}${wildcardEscapeClause}
       </if>
       <if test="fullNameLike != null">
-        and (RES.FIRST_ like #{fullNameLike}${wildcardEscapeClause} or RES.LAST_ like #{fullNameLike}${wildcardEscapeClause})
+        and (CONCAT(CONCAT(RES.FIRST_, ' '), RES.LAST_) like #{fullNameLike}${wildcardEscapeClause})
       </if>
       <if test="fullNameLikeIgnoreCase != null">
-        and (lower(RES.FIRST_) like #{fullNameLikeIgnoreCase}${wildcardEscapeClause} or lower(RES.LAST_) like #{fullNameLikeIgnoreCase}${wildcardEscapeClause})
+        and (lower(CONCAT(CONCAT(RES.FIRST_ , ' '), RES.LAST_)) like #{fullNameLikeIgnoreCase}${wildcardEscapeClause})
       </if>
       <if test="email != null">
         and RES.EMAIL_ = #{email}

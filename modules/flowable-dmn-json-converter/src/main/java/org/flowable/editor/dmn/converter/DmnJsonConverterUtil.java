@@ -12,13 +12,21 @@
  */
 package org.flowable.editor.dmn.converter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 /**
- * Created by yvoswillens on 27/08/15.
+ * @author Yvo Swillens
  */
 public class DmnJsonConverterUtil {
 
@@ -31,5 +39,109 @@ public class DmnJsonConverterUtil {
             propertyValue = jsonNode.asText();
         }
         return propertyValue;
+    }
+
+    public static JsonNode migrateModel(JsonNode decisionTableNode, ObjectMapper objectMapper) {
+
+        // check if model is version 1
+        if (decisionTableNode.get("modelVersion") == null || decisionTableNode.get("modelVersion").isNull()) {
+            // split input rule nodes into operator and expression nodes
+            //
+            // determine input node ids
+            JsonNode inputExpressionNodes = decisionTableNode.get("inputExpressions");
+            List<String> inputExpressionIds = new ArrayList<>();
+
+            if (inputExpressionNodes != null && !inputExpressionNodes.isNull()) {
+                for (JsonNode inputExpressionNode : inputExpressionNodes) {
+                    if (inputExpressionNode.get("id") != null && !inputExpressionNode.get("id").isNull()) {
+                        String inputId = inputExpressionNode.get("id").asText();
+                        inputExpressionIds.add(inputId);
+                    }
+                }
+            }
+            // split input rule nodes
+            JsonNode ruleNodes = decisionTableNode.get("rules");
+            ArrayNode newRuleNodes = objectMapper.createArrayNode();
+
+            if (ruleNodes != null && !ruleNodes.isNull()) {
+                for (JsonNode ruleNode : ruleNodes) {
+                    ObjectNode newRuleNode = objectMapper.createObjectNode();
+
+                    for (String inputExpressionId : inputExpressionIds) {
+                        if (ruleNode.has(inputExpressionId)) {
+                            String operatorId = inputExpressionId + "_operator";
+                            String expressionId = inputExpressionId + "_expression";
+                            String operatorValue = null;
+                            String expressionValue = null;
+
+                            if (ruleNode.get(inputExpressionId) != null && !ruleNode.get(inputExpressionId).isNull()) {
+                                String oldExpression = ruleNode.get(inputExpressionId).asText();
+
+                                if (StringUtils.isNotEmpty(oldExpression)) {
+                                    if (oldExpression.indexOf(' ') != -1) {
+                                        operatorValue = oldExpression.substring(0, oldExpression.indexOf(' '));
+                                        expressionValue = oldExpression.substring(oldExpression.indexOf(' ') + 1);
+                                    } else { // no prefixed operator
+                                        expressionValue = oldExpression;
+                                    }
+
+                                    // remove outer escape quotes
+                                    if (expressionValue.startsWith("\"") && expressionValue.endsWith("\"")) {
+                                        expressionValue = expressionValue.substring(1, expressionValue.length() - 1);
+                                    }
+
+                                    // if build in date function
+                                    if (expressionValue.startsWith("fn_date(")) {
+                                        expressionValue = expressionValue.substring(9, expressionValue.lastIndexOf("'"));
+                                    }
+                                }
+                            }
+
+                            // add new operator kv
+                            if (StringUtils.isNotEmpty(operatorValue)) {
+                                newRuleNode.put(operatorId, operatorValue);
+                            } else { // default value
+                                newRuleNode.put(operatorId, "==");
+                            }
+
+                            // add new expression kv
+                            if (StringUtils.isNotEmpty(expressionValue)) {
+                                newRuleNode.put(expressionId, expressionValue);
+                            } else { // default value
+                                newRuleNode.put(expressionId, "-");
+                            }
+                        }
+                    }
+
+                    Iterator<String> ruleProperty = ruleNode.fieldNames();
+                    while (ruleProperty.hasNext()) {
+                        String outputExpressionId = ruleProperty.next();
+                        if (!inputExpressionIds.contains(outputExpressionId)) { // is output expression
+                            String outputExpressionValue = ruleNode.get(outputExpressionId).asText();
+
+                            // remove outer escape quotes
+                            if (StringUtils.isNotEmpty(outputExpressionValue) && outputExpressionValue.startsWith("\"") && outputExpressionValue.endsWith("\"")) {
+                                outputExpressionValue = outputExpressionValue.substring(1, outputExpressionValue.length() - 1);
+                            }
+
+                            // if build in date function
+                            if (outputExpressionValue.startsWith("fn_date(")) {
+                                outputExpressionValue = outputExpressionValue.substring(9, outputExpressionValue.lastIndexOf("'"));
+                            }
+
+                            newRuleNode.put(outputExpressionId, outputExpressionValue);
+                        }
+                    }
+
+                    newRuleNodes.add(newRuleNode);
+                }
+
+                // replace rules node
+                ObjectNode decisionTableObjectNode = (ObjectNode) decisionTableNode;
+                decisionTableObjectNode.replace("rules", newRuleNodes);
+            }
+        }
+
+        return decisionTableNode;
     }
 }

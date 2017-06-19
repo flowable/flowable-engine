@@ -1,0 +1,57 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="definition_7c145a47-476f-11e7-8d39-a26608126000" name="dhfdhdfh34444" namespace="http://www.flowable.org/dmn">
+  <decision id="decision" name="decision">
+    <decisionTable id="decisionTable_7c145a47-476f-11e7-8d39-a26608126000" hitPolicy="OUTPUT ORDER">
+      <input label="Input One">
+        <inputExpression id="inputExpression_1" typeRef="string">
+          <text>input1</text>
+        </inputExpression>
+        <inputValues>
+          <text>"AAA","BBB"</text>
+        </inputValues>
+      </input>
+      <input label="Input Two">
+        <inputExpression id="inputExpression_3" typeRef="string">
+          <text>input2</text>
+        </inputExpression>
+      </input>
+      <output id="outputExpression_2" label="Output One" name="output1" typeRef="string">
+        <outputValues>
+          <text>"THIRD","FIRST","SECOND"</text>
+        </outputValues>
+      </output>
+      <rule>
+        <inputEntry id="inputEntry_1_1">
+          <text>"AAA"</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_3_1">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_1">
+          <text>"FIRST"</text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_2">
+          <text>"AAA"</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_3_2">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_2">
+          <text>"SECOND"</text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_3">
+          <text>"AAA"</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_3_3">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_3">
+          <text>"THIRD"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

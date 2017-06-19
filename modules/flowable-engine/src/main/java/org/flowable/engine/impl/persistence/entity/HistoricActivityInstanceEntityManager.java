@@ -26,6 +26,8 @@ import org.flowable.engine.impl.HistoricActivityInstanceQueryImpl;
 public interface HistoricActivityInstanceEntityManager extends EntityManager<HistoricActivityInstanceEntity> {
 
     List<HistoricActivityInstanceEntity> findUnfinishedHistoricActivityInstancesByExecutionAndActivityId(String executionId, String activityId);
+    
+    List<HistoricActivityInstanceEntity> findHistoricActivityInstancesByExecutionAndActivityId(String executionId, String activityId);
 
     List<HistoricActivityInstanceEntity> findUnfinishedHistoricActivityInstancesByProcessInstanceId(String processInstanceId);
 

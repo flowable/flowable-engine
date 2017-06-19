@@ -51,6 +51,8 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().taskName("afterSignal").singleResult();
         assertNotNull(task);
         taskService.complete(task.getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         assertHistoricActivitiesDeleteReason(pi1, DeleteReason.EVENT_BASED_GATEWAY_CANCEL, "timerEvent");
     }
@@ -79,6 +81,8 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
         assertNotNull(task);
 
         taskService.complete(task.getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         assertHistoricActivitiesDeleteReason(processInstance, DeleteReason.EVENT_BASED_GATEWAY_CANCEL, "signalEvent");
     }
@@ -114,6 +118,8 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().taskName("afterMessage").singleResult();
         assertNotNull(task);
         taskService.complete(task.getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         assertHistoricActivitiesDeleteReason(processInstance, DeleteReason.EVENT_BASED_GATEWAY_CANCEL, "signalEvent");
         assertHistoricActivitiesDeleteReason(processInstance, DeleteReason.EVENT_BASED_GATEWAY_CANCEL, "timerEvent");

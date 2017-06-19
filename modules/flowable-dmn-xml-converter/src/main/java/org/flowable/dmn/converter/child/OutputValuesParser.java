@@ -15,16 +15,12 @@ package org.flowable.dmn.converter.child;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnElement;
-import org.flowable.dmn.model.InputClause;
-import org.flowable.dmn.model.LiteralExpression;
 import org.flowable.dmn.model.OutputClause;
 import org.flowable.dmn.model.UnaryTests;
 
 import javax.xml.stream.XMLStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author Yvo Swillens

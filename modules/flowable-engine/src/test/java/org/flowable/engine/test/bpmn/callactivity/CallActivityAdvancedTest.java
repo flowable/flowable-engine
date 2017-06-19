@@ -26,6 +26,7 @@ import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -66,7 +67,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
 
         // Validate subprocess history
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // Subprocess should have initial activity set
             HistoricProcessInstance historicProcess = historyService.createHistoricProcessInstanceQuery().processInstanceId(taskInSubProcess.getProcessInstanceId()).singleResult();
             assertNotNull(historicProcess);
@@ -172,17 +173,13 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
         // FIRST sub process calls simpleSubProcess
 
-        // one task in the subprocess should be active after starting the
-        // process
-        // instance
+        // one task in the subprocess should be active after starting the process instance
         TaskQuery taskQuery = taskService.createTaskQuery();
         Task taskBeforeSubProcess = taskQuery.singleResult();
         assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
 
         // Completing the task continues the process which leads to calling the
-        // subprocess. The sub process we want to call is passed in as a
-        // variable
-        // into this task
+        // subprocess. The sub process we want to call is passed in as a variable into this task
         taskService.setVariable(taskBeforeSubProcess.getId(), "simpleSubProcessExpression", "simpleSubProcess");
         taskService.complete(taskBeforeSubProcess.getId());
         Task taskInSubProcess = taskQuery.singleResult();
@@ -198,17 +195,13 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
         // SECOND sub process calls simpleSubProcess2
 
-        // one task in the subprocess should be active after starting the
-        // process
-        // instance
+        // one task in the subprocess should be active after starting the process instance
         taskQuery = taskService.createTaskQuery();
         taskBeforeSubProcess = taskQuery.singleResult();
         assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
 
         // Completing the task continues the process which leads to calling the
-        // subprocess. The sub process we want to call is passed in as a
-        // variable
-        // into this task
+        // subprocess. The sub process we want to call is passed in as a variable into this task
         taskService.setVariable(taskBeforeSubProcess.getId(), "simpleSubProcessExpression", "simpleSubProcess2");
         taskService.complete(taskBeforeSubProcess.getId());
         taskInSubProcess = taskQuery.singleResult();
@@ -247,7 +240,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         taskService.complete(escalatedTask.getId());
         assertEquals(0, runtimeService.createExecutionQuery().list().size());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             assertTrue(historyService.createHistoricProcessInstanceQuery().processInstanceId(pi2.getId()).singleResult()
                     .getDeleteReason().startsWith(DeleteReason.BOUNDARY_EVENT_INTERRUPTING));
             assertHistoricTasksDeleteReason(pi2, DeleteReason.BOUNDARY_EVENT_INTERRUPTING, "Task in subprocess");
@@ -367,7 +360,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Final task", task.getName());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
                     .superProcessInstanceId(processInstance.getId()).list();
             assertEquals(3, historicProcessInstances.size());

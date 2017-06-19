@@ -29,11 +29,13 @@ import org.flowable.engine.runtime.ProcessInstance;
  */
 public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
 
-    ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String businessKey, String tenantId, String initiatorVariableName);
+    ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String businessKey, String tenantId, 
+                    String initiatorVariableName, String startActivityId);
 
     ExecutionEntity createChildExecution(ExecutionEntity parentExecutionEntity);
 
-    ExecutionEntity createSubprocessInstance(ProcessDefinition processDefinition, ExecutionEntity superExecutionEntity, String businessKey);
+    ExecutionEntity createSubprocessInstance(ProcessDefinition processDefinition, ExecutionEntity superExecutionEntity, 
+                    String businessKey, String startActivityId);
 
     /**
      * Finds the {@link ExecutionEntity} for the given root process instance id. All children will have been fetched and initialized.
@@ -86,11 +88,13 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
     void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade);
 
     void deleteProcessInstanceExecutionEntity(String processInstanceId, String currentFlowElementId,
-            String deleteReason, boolean cascade, boolean cancel);
+            String deleteReason, boolean cascade, boolean cancel, boolean fireEvents);
 
     void deleteChildExecutions(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
 
     void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
+    
+    void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
 
     void updateProcessInstanceLockTime(String processInstanceId);
 

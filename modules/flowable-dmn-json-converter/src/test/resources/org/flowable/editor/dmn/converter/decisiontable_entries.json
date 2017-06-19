@@ -1,0 +1,68 @@
+{
+  "id": "7c145a47-476f-11e7-8d39-a26608126000",
+  "modelVersion": "2",
+  "name": "dhfdhdfh34444",
+  "key": "dhfdhdfh34444",
+  "hitIndicator": "OUTPUT ORDER",
+  "inputExpressions": [
+    {
+      "id": "1",
+      "variableId": "input1",
+      "variableType": null,
+      "type": "string",
+      "label": "Input One",
+      "entries": [
+        "AAA",
+        "BBB"
+      ],
+      "newVariable": false
+    },
+    {
+      "id": "3",
+      "variableId": "input2",
+      "variableType": null,
+      "type": "string",
+      "label": "Input Two",
+      "entries": [],
+      "newVariable": false
+    }
+  ],
+  "outputExpressions": [
+    {
+      "id": "2",
+      "variableId": "output1",
+      "variableType": null,
+      "type": "string",
+      "label": "Output One",
+      "entries": [
+        "THIRD",
+        "FIRST",
+        "SECOND"
+      ],
+      "newVariable": false
+    }
+  ],
+  "rules": [
+    {
+      "2": "FIRST",
+      "1_operator": "==",
+      "1_expression": "AAA",
+      "3_operator": "==",
+      "3_expression": "-"
+    },
+    {
+      "2": "SECOND",
+      "1_operator": "==",
+      "1_expression": "AAA",
+      "3_operator": "==",
+      "3_expression": "-"
+    },
+    {
+      "2": "THIRD",
+      "1_operator": "==",
+      "1_expression": "AAA",
+      "3_operator": "==",
+      "3_expression": "-"
+    }
+  ]
+}

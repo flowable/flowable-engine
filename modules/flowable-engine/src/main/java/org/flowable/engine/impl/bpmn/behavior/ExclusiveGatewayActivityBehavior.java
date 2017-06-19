@@ -22,7 +22,6 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.condition.ConditionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,9 +88,6 @@ public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
             }
 
         }
-
-        // We have to record the end here, or else we're already past it
-        Context.getCommandContext().getHistoryManager().recordActivityEnd((ExecutionEntity) execution, null);
 
         // Leave the gateway
         if (outgoingSequenceFlow != null) {

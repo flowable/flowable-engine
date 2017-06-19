@@ -43,10 +43,18 @@
   <!-- DEPLOYMENT UPDATE -->
   
   <update id="updateDeployment" parameterType="org.flowable.engine.impl.persistence.entity.DeploymentEntityImpl">
-    update ${prefix}ACT_RE_DEPLOYMENT set
-      CATEGORY_ = #{category, jdbcType=VARCHAR},
-      KEY_ = #{key, jdbcType=VARCHAR},
-      TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+    update ${prefix}ACT_RE_DEPLOYMENT
+      <set>
+          <if test="originalPersistentState.category != category">
+              CATEGORY_ = #{category, jdbcType=VARCHAR},
+          </if>
+          <if test="originalPersistentState.key != key">
+              KEY_ = #{key, jdbcType=VARCHAR},
+          </if>
+          <if test="originalPersistentState.tenantId != tenantId">
+              TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+          </if>
+      </set>
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
   

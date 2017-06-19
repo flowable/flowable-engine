@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.api.event;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,15 +25,13 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableVariableEvent;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.hamcrest.CoreMatchers;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * Test case for all {@link FlowableEvent}s related to variables.
@@ -377,7 +378,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
             // success/failure
             if (newTask.getId() != null) {
                 taskService.deleteTask(newTask.getId());
-                if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+                if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
                     historyService.deleteHistoricTaskInstance(newTask.getId());
                 }
             }
