@@ -498,6 +498,149 @@
 				</plugins>
 			</build>
 		</profile>
+		
+		<profile>
+            <id>databaseasynchistory</id>
+            <activation>
+                <property>
+                    <name>databaseasynchistory</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <!-- only worked with this version, there might be a bug with antrun 
+                            see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="updating flowable configuration to db ${databaseasynchistory}" />
+                                        <copy file="${basedir}/../../qa/asynchistory/flowable.cfg.xml"
+                                            todir="target/test-classes" overwrite="true">
+                                            <filterset
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databaseasynchistory}.properties" />
+                                        </copy>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="dropping schema in ${databaseasynchistory}" />
+                                        <java classname="org.flowable.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>databasewithschemaasynchistory</id>
+            <activation>
+                <property>
+                    <name>databasewithschemaasynchistory</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <!-- only worked with this version, there might be a bug with antrun 
+                            see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating flowable configuration to db ${databasewithschemaasynchistory}" />
+                                        <copy file="${basedir}/../../qa/asynchistory/schema/flowable.cfg.xml"
+                                            todir="target/test-classes" overwrite="true">
+                                            <filterset
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschemaasynchistory}.properties" />
+                                        </copy>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="dropping schema in ${databasewithschemaasynchistory}" />
+                                        <java classname="org.flowable.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>databasemssqlasynchistory</id>
+            <activation>
+                <property>
+                    <name>databasemssqlasynchistory</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <!-- only worked with this version, there might be a bug with antrun 
+                            see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="updating flowable configuration to db ${databasemssqlasynchistory}" />
+                                        <copy file="${basedir}/../../qa/asynchistory/mssql/flowable.cfg.xml"
+                                            todir="target/test-classes" overwrite="true">
+                                            <filterset
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasemssqlasynchistory}.properties" />
+                                        </copy>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
 		<!-- Config qa profile -->
 		<profile>
