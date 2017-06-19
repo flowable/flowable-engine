@@ -118,6 +118,11 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
             throw new FlowableException("UTF-8 is not a supported encoding");
         }
     }
+    
+    @Override
+    public void setAdvancedJobHandlerConfigurationByteArrayRef(ByteArrayRef configurationByteArrayRef) {
+         this.advancedJobHandlerConfigurationByteArrayRef = configurationByteArrayRef;
+    }
 
     public void setAdvancedJobHandlerConfiguration(String jobHandlerConfiguration) {
         if (advancedJobHandlerConfigurationByteArrayRef == null) {
@@ -132,6 +137,11 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
             advancedJobHandlerConfigurationByteArrayRef = new ByteArrayRef();
         }
         advancedJobHandlerConfigurationByteArrayRef.setValue("cfg", bytes);
+    }
+    
+    @Override
+    public void setExceptionByteArrayRef(ByteArrayRef exceptionByteArrayRef) {
+        this.exceptionByteArrayRef = exceptionByteArrayRef;
     }
 
     public ByteArrayRef getExceptionByteArrayRef() {

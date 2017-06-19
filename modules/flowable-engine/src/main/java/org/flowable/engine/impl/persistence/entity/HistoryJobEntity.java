@@ -27,7 +27,11 @@ public interface HistoryJobEntity extends JobInfoEntity, HistoryJob, Entity, Has
     void setAdvancedJobHandlerConfigurationBytes(byte[] bytes);
   
     ByteArrayRef getAdvancedJobHandlerConfigurationByteArrayRef();
-    
+
     void setCreateTime(Date createTime);
-    
+
+    void setAdvancedJobHandlerConfigurationByteArrayRef(ByteArrayRef configurationByteArrayRef);
+
+    void setExceptionByteArrayRef(ByteArrayRef exceptionByteArrayRef);
+
 }
