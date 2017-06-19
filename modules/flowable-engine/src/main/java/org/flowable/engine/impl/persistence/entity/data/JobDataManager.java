@@ -23,7 +23,7 @@ import org.flowable.engine.runtime.Job;
 /**
  * @author Joram Barrez
  */
-public interface JobDataManager extends DataManager<JobEntity>, GenericExecutableJobDataManager<JobEntity> {
+public interface JobDataManager extends DataManager<JobEntity>, JobInfoDataManager<JobEntity> {
 
     List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery, Page page);
 

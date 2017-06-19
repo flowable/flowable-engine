@@ -17,24 +17,24 @@ import java.util.List;
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.GenericExecutableJobEntity;
-import org.flowable.engine.impl.persistence.entity.GenericExecutableJobEntityManager;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntityManager;
 
 /**
  * @author Joram Barrez
  */
-public class FindExpiredJobsCmd implements Command<List<? extends GenericExecutableJobEntity>> {
+public class FindExpiredJobsCmd implements Command<List<? extends JobInfoEntity>> {
 
     protected int pageSize;
-    protected GenericExecutableJobEntityManager<? extends GenericExecutableJobEntity> jobEntityManager;
+    protected JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager;
 
-    public FindExpiredJobsCmd(int pageSize, GenericExecutableJobEntityManager<? extends GenericExecutableJobEntity> jobEntityManager) {
+    public FindExpiredJobsCmd(int pageSize, JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager) {
         this.pageSize = pageSize;
         this.jobEntityManager = jobEntityManager;
     }
 
     @Override
-    public List<? extends GenericExecutableJobEntity> execute(CommandContext commandContext) {
+    public List<? extends JobInfoEntity> execute(CommandContext commandContext) {
         return jobEntityManager.findExpiredJobs(new Page(0, pageSize));
     }
 

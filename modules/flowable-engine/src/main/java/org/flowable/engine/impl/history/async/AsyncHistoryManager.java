@@ -12,13 +12,16 @@
  */
 package org.flowable.engine.impl.history.async;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.AbstractHistoryManager;
 import org.flowable.engine.impl.history.HistoryLevel;
@@ -184,7 +187,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
     public void recordActivityStart(ExecutionEntity executionEntity) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
             if (executionEntity.getActivityId() != null && executionEntity.getCurrentFlowElement() != null && 
-                    getAsyncHistorySession().getActivityStartWithoutEnd(executionEntity.getActivityId(), executionEntity.getId()) == null) {
+                    getActivityStartWithoutEnd(executionEntity.getActivityId(), executionEntity.getId()) == null) {
 
                 Map<String, String> data = new HashMap<String, String>();
                 putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, executionEntity.getProcessDefinitionId());
@@ -358,7 +361,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
                 putIfNotNull(data, HistoryJsonConstants.EXECUTION_ID, executionEntity.getId());
                 String activityId = getActivityIdForExecution(executionEntity);
                 putIfNotNull(data, HistoryJsonConstants.ACTIVITY_ID, activityId);
-                Map<String, String> activityStartData = getAsyncHistorySession().getActivityStartWithoutEnd(activityId, executionEntity.getId());
+                Map<String, String> activityStartData = getActivityStartWithoutEnd(activityId, executionEntity.getId());
                 if (activityStartData != null) {
                     putIfNotNull(activityStartData, HistoryJsonConstants.ASSIGNEE, taskEntity.getAssignee());
                     data.put(HistoryJsonConstants.ACTIVITY_ASSIGNEE_HANDLED, String.valueOf(true));
@@ -547,6 +550,42 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
     }
 
     /* Helper methods */
+    
+    protected Map<String, String> getActivityStartWithoutEnd(String activityId, String executionId) {
+        List<Pair<String, Map<String, String>>> jobData = getAsyncHistorySession().getJobData();
+        Map<String, String> activityStartData = null;
+        if (jobData != null) {
+            List<Integer> matchedActvityEndIndexes = new ArrayList<>();
+            for (int i = 0; i < jobData.size(); i++) {
+                Pair<String, Map<String, String>> historicData = jobData.get(i);
+                if (ActivityStartHistoryJsonTransformer.TYPE.equals(historicData.getKey()) && 
+                                activityId.equals(historicData.getValue().get(HistoryJsonConstants.ACTIVITY_ID)) && 
+                                executionId.equals(historicData.getValue().get(HistoryJsonConstants.EXECUTION_ID))) {
+                    
+                    activityStartData = historicData.getValue();
+                    
+                    String activityKey = historicData.getValue().get(HistoryJsonConstants.EXECUTION_ID) + "_" + 
+                                    historicData.getValue().get(HistoryJsonConstants.ACTIVITY_ID);
+                    
+                    for (int j = i; j < jobData.size(); j++) {
+                        Pair<String, Map<String, String>> historicEndData = jobData.get(j);
+                        if (ActivityEndHistoryJsonTransformer.TYPE.equals(historicEndData.getKey()) && !matchedActvityEndIndexes.contains(j)) {
+                            
+                            String activityEndKey = historicEndData.getValue().get(HistoryJsonConstants.EXECUTION_ID) + "_" + 
+                                            historicEndData.getValue().get(HistoryJsonConstants.ACTIVITY_ID);
+                            
+                            if (activityEndKey.equals(activityKey)) {
+                                matchedActvityEndIndexes.add(j);
+                                activityStartData = null;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return activityStartData;
+    }
     
     protected void putIfNotNull(Map<String, String> map, String key, String value) {
         if (value != null) {

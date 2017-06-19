@@ -19,7 +19,7 @@ import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 import org.flowable.engine.impl.asyncexecutor.AcquireTimerJobsRunnable;
 import org.flowable.engine.impl.cmd.AcquireJobsCmd;
 
-public interface GenericExecutableJobEntityManager <T extends GenericExecutableJobEntity> extends EntityManager<T> {
+public interface JobInfoEntityManager <T extends JobInfoEntity> extends EntityManager<T> {
 
     /**
      * Returns {@link JobEntity} that are eligible to be executed.

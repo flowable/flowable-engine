@@ -18,7 +18,7 @@ import org.flowable.engine.common.impl.db.HasRevision;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.runtime.HistoryJob;
 
-public interface HistoryJobEntity extends GenericExecutableJobEntity, HistoryJob, Entity, HasRevision {
+public interface HistoryJobEntity extends JobInfoEntity, HistoryJob, Entity, HasRevision {
 
     void setCreateTime(Date createTime);
     

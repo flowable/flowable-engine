@@ -19,8 +19,8 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.GenericExecutableJobEntity;
-import org.flowable.engine.impl.persistence.entity.GenericExecutableJobEntityManager;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,13 +35,13 @@ public class ExecuteAsyncJobCmd implements Command<Object>, Serializable {
     private static Logger log = LoggerFactory.getLogger(ExecuteAsyncJobCmd.class);
 
     protected String jobId;
-    protected GenericExecutableJobEntityManager<? extends GenericExecutableJobEntity> jobEntityManager;
+    protected JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager;
 
     public ExecuteAsyncJobCmd(String jobId) {
         this.jobId = jobId;
     }
     
-    public ExecuteAsyncJobCmd(String jobId, GenericExecutableJobEntityManager<? extends GenericExecutableJobEntity> jobEntityManager) {
+    public ExecuteAsyncJobCmd(String jobId, JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager) {
         this.jobId = jobId;
         this.jobEntityManager = jobEntityManager;
     }
@@ -62,7 +62,7 @@ public class ExecuteAsyncJobCmd implements Command<Object>, Serializable {
         // However, the async task jobs could already have been fetched and put in the queue.... while in reality they have been deleted.
         // A refetch is thus needed here to be sure that it exists for this transaction.
 
-        GenericExecutableJobEntity job = jobEntityManager.findById(jobId);
+        JobInfoEntity job = jobEntityManager.findById(jobId);
         if (job == null) {
             log.debug("Job does not exist anymore and will not be executed. It has most likely been deleted "
                     + "as part of another concurrent part of the process instance.");

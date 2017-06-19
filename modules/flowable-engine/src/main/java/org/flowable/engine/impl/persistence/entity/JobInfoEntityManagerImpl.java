@@ -18,18 +18,18 @@ import java.util.List;
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.entity.data.GenericExecutableJobDataManager;
+import org.flowable.engine.impl.persistence.entity.data.JobInfoDataManager;
 
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
  * @author Joram Barrez
  */
-public abstract class GenericExecutableJobEntityManagerImpl<T extends GenericExecutableJobEntity> extends AbstractEntityManager<T> implements GenericExecutableJobEntityManager<T> {
+public abstract class JobInfoEntityManagerImpl<T extends JobInfoEntity> extends AbstractEntityManager<T> implements JobInfoEntityManager<T> {
 
-    protected GenericExecutableJobDataManager<T> jobDataManager;
+    protected JobInfoDataManager<T> jobDataManager;
 
-    public GenericExecutableJobEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, GenericExecutableJobDataManager<T> jobDataManager) {
+    public JobInfoEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, JobInfoDataManager<T> jobDataManager) {
         super(processEngineConfiguration);
         this.jobDataManager = jobDataManager;
     }
@@ -68,11 +68,11 @@ public abstract class GenericExecutableJobEntityManagerImpl<T extends GenericExe
         jobDataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
     }
 
-    public GenericExecutableJobDataManager<T> getJobDataManager() {
+    public JobInfoDataManager<T> getJobDataManager() {
         return jobDataManager;
     }
 
-    public void setJobDataManager(GenericExecutableJobDataManager<T> jobDataManager) {
+    public void setJobDataManager(JobInfoDataManager<T> jobDataManager) {
         this.jobDataManager = jobDataManager;
     }
 

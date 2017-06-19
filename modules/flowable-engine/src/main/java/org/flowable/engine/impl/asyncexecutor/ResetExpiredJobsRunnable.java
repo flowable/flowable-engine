@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
-import org.flowable.engine.impl.persistence.entity.GenericExecutableJobEntity;
-import org.flowable.engine.impl.persistence.entity.GenericExecutableJobEntityManager;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntityManager;
 import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,14 +38,14 @@ public class ResetExpiredJobsRunnable implements Runnable {
 
     protected final String name;
     protected final AsyncExecutor asyncExecutor;
-    protected final GenericExecutableJobEntityManager<? extends GenericExecutableJobEntity> jobEntityManager;
+    protected final JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager;
 
     protected volatile boolean isInterrupted;
     protected final Object MONITOR = new Object();
     protected final AtomicBoolean isWaiting = new AtomicBoolean(false);
 
     public ResetExpiredJobsRunnable(String name, AsyncExecutor asyncExecutor,
-            GenericExecutableJobEntityManager<? extends GenericExecutableJobEntity> jobEntityManager) {
+            JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager) {
         this.name = name;
         this.asyncExecutor = asyncExecutor;
         this.jobEntityManager = jobEntityManager;
@@ -59,11 +59,11 @@ public class ResetExpiredJobsRunnable implements Runnable {
 
             try {
 
-                List<? extends GenericExecutableJobEntity> expiredJobs = asyncExecutor.getProcessEngineConfiguration().getCommandExecutor()
+                List<? extends JobInfoEntity> expiredJobs = asyncExecutor.getProcessEngineConfiguration().getCommandExecutor()
                         .execute(new FindExpiredJobsCmd(asyncExecutor.getResetExpiredJobsPageSize(), jobEntityManager));
 
                 List<String> expiredJobIds = new ArrayList<String>(expiredJobs.size());
-                for (GenericExecutableJobEntity expiredJob : expiredJobs) {
+                for (JobInfoEntity expiredJob : expiredJobs) {
                     expiredJobIds.add(expiredJob.getId());
                 }
 

@@ -74,42 +74,6 @@ public class AsyncHistorySession implements Session {
         jobData.add(Pair.of(type, data));
     }
     
-    public Map<String, String> getActivityStartWithoutEnd(String activityId, String executionId) {
-        Map<String, String> activityStartData = null;
-        if (jobData != null) {
-            List<Integer> matchedActvityEndIndexes = new ArrayList<>();
-            for (int i = 0; i < jobData.size(); i++) {
-                Pair<String, Map<String, String>> historicData = jobData.get(i);
-                if ("activity-start".equals(historicData.getKey()) && 
-                                activityId.equals(historicData.getValue().get(HistoryJsonConstants.ACTIVITY_ID)) && 
-                                executionId.equals(historicData.getValue().get(HistoryJsonConstants.EXECUTION_ID))) {
-                    
-                    activityStartData = historicData.getValue();
-                    
-                    String activityKey = historicData.getValue().get(HistoryJsonConstants.EXECUTION_ID) + "_" + 
-                                    historicData.getValue().get(HistoryJsonConstants.ACTIVITY_ID);
-                    
-                    for (int j = i; j < jobData.size(); j++) {
-                        Pair<String, Map<String, String>> historicEndData = jobData.get(j);
-                        if ("activity-end".equals(historicEndData.getKey()) && !matchedActvityEndIndexes.contains(j)) {
-                            
-                            String activityEndKey = historicEndData.getValue().get(HistoryJsonConstants.EXECUTION_ID) + "_" + 
-                                            historicEndData.getValue().get(HistoryJsonConstants.ACTIVITY_ID);
-                            
-                            if (activityEndKey.equals(activityKey)) {
-                                matchedActvityEndIndexes.add(j);
-                                activityStartData = null;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-        return activityStartData;
-    }
-
     @Override
     public void flush() {
 

@@ -30,7 +30,7 @@ import org.flowable.engine.runtime.Job;
  * @author Daniel Meyer
  * @author Joram Barrez
  */
-public class JobEntityManagerImpl extends GenericExecutableJobEntityManagerImpl<JobEntity> implements JobEntityManager {
+public class JobEntityManagerImpl extends JobInfoEntityManagerImpl<JobEntity> implements JobEntityManager {
 
     protected JobDataManager jobDataManager;
 

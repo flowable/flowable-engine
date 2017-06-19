@@ -19,7 +19,7 @@ import java.util.List;
 import org.flowable.engine.impl.asyncexecutor.FindExpiredJobsCmd;
 import org.flowable.engine.impl.asyncexecutor.ResetExpiredJobsCmd;
 import org.flowable.engine.impl.cmd.AcquireJobsCmd;
-import org.flowable.engine.impl.persistence.entity.GenericExecutableJobEntity;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Job;
@@ -47,7 +47,7 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
 
         // Running the 'reset expired' logic should have no effect now
         int expiredJobsPagesSize = processEngineConfiguration.getAsyncExecutorResetExpiredJobsPageSize();
-        List<? extends GenericExecutableJobEntity> expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, processEngineConfiguration.getJobEntityManager()));
+        List<? extends JobInfoEntity> expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, processEngineConfiguration.getJobEntityManager()));
         assertEquals(0, expiredJobs.size());
         assertJobDetails(false);
 
@@ -69,7 +69,7 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
         assertTrue(expiredJobs.size() > 0);
 
         List<String> jobIds = new ArrayList<String>();
-        for (GenericExecutableJobEntity jobEntity : expiredJobs) {
+        for (JobInfoEntity jobEntity : expiredJobs) {
             jobIds.add(jobEntity.getId());
         }
 

@@ -23,7 +23,7 @@ import org.flowable.engine.runtime.HistoryJob;
 /**
  * @author Tijs Rademakers
  */
-public interface HistoryJobDataManager extends DataManager<HistoryJobEntity>, GenericExecutableJobDataManager<HistoryJobEntity> {
+public interface HistoryJobDataManager extends DataManager<HistoryJobEntity>, JobInfoDataManager<HistoryJobEntity> {
 
     List<HistoryJob> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl query, Page page);
 

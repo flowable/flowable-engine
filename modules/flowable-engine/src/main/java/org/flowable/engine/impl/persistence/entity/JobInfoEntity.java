@@ -18,7 +18,7 @@ import org.flowable.engine.common.impl.db.HasRevision;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.runtime.JobInfo;
 
-public interface GenericExecutableJobEntity extends JobInfo, AbstractJobEntity, Entity, HasRevision {
+public interface JobInfoEntity extends JobInfo, AbstractJobEntity, Entity, HasRevision {
 
     String getLockOwner();
 

@@ -24,7 +24,7 @@ import org.flowable.engine.runtime.Job;
  * 
  * @author Joram Barrez
  */
-public interface JobEntityManager extends EntityManager<JobEntity>, GenericExecutableJobEntityManager<JobEntity> {
+public interface JobEntityManager extends EntityManager<JobEntity>, JobInfoEntityManager<JobEntity> {
     
     /**
      * Insert the {@link JobEntity}, similar to {@link #insert(JobEntity)}, but returns a boolean in case the insert did not go through. This could happen if the execution related to the

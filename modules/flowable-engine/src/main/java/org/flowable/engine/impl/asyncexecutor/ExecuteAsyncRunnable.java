@@ -26,8 +26,8 @@ import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.jobexecutor.FailedJobCommandFactory;
 import org.flowable.engine.impl.persistence.entity.AbstractRuntimeJobEntity;
-import org.flowable.engine.impl.persistence.entity.GenericExecutableJobEntity;
-import org.flowable.engine.impl.persistence.entity.GenericExecutableJobEntityManager;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntityManager;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.JobInfo;
 import org.flowable.engine.runtime.Job;
@@ -45,11 +45,11 @@ public class ExecuteAsyncRunnable implements Runnable {
     protected String jobId;
     protected JobInfo job;
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
-    protected GenericExecutableJobEntityManager<? extends GenericExecutableJobEntity> jobEntityManager;
+    protected JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager;
     protected AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler;
 
     public ExecuteAsyncRunnable(String jobId, ProcessEngineConfigurationImpl processEngineConfiguration, 
-            GenericExecutableJobEntityManager<? extends GenericExecutableJobEntity> jobEntityManager,
+            JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager,
             AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler) {
         this.jobId = jobId;
         this.processEngineConfiguration = processEngineConfiguration;
@@ -58,7 +58,7 @@ public class ExecuteAsyncRunnable implements Runnable {
     }
 
     public ExecuteAsyncRunnable(JobInfo job, ProcessEngineConfigurationImpl processEngineConfiguration, 
-            GenericExecutableJobEntityManager<? extends GenericExecutableJobEntity> jobEntityManager,
+            JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager,
             AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler) {
         this.job = job;
         this.jobId = job.getId();
@@ -70,9 +70,9 @@ public class ExecuteAsyncRunnable implements Runnable {
     public void run() {
 
         if (job == null) {
-            job = processEngineConfiguration.getCommandExecutor().execute(new Command<GenericExecutableJobEntity>() {
+            job = processEngineConfiguration.getCommandExecutor().execute(new Command<JobInfoEntity>() {
                 @Override
-                public GenericExecutableJobEntity execute(CommandContext commandContext) {
+                public JobInfoEntity execute(CommandContext commandContext) {
                     return jobEntityManager.findById(jobId);
                 }
             });

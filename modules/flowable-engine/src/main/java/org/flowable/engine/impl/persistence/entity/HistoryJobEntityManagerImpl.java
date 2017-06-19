@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class HistoryJobEntityManagerImpl extends GenericExecutableJobEntityManagerImpl<HistoryJobEntity> implements HistoryJobEntityManager {
+public class HistoryJobEntityManagerImpl extends JobInfoEntityManagerImpl<HistoryJobEntity> implements HistoryJobEntityManager {
 
     private static final Logger logger = LoggerFactory.getLogger(HistoryJobEntityManagerImpl.class);
 

@@ -16,9 +16,9 @@ import java.util.List;
 
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
-import org.flowable.engine.impl.persistence.entity.GenericExecutableJobEntity;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
 
-public interface GenericExecutableJobDataManager<T extends GenericExecutableJobEntity> extends DataManager<T> {
+public interface JobInfoDataManager<T extends JobInfoEntity> extends DataManager<T> {
 
     List<T> findJobsToExecute(Page page);
 

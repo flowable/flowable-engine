@@ -126,10 +126,6 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
         }
     }
     
-    protected boolean hasNoLoopCharacteristics(FlowNode flowNode) {
-        return !(flowNode instanceof Activity) || ((Activity) flowNode).getLoopCharacteristics() == null;
-    }
-    
     protected void leaveFlowNode(FlowNode flowNode) {
 
         logger.debug("Leaving flow node {} with id '{}' by following it's {} outgoing sequenceflow",

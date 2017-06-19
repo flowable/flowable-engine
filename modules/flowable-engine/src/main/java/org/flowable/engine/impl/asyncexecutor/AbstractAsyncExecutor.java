@@ -18,8 +18,8 @@ import java.util.UUID;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.UnacquireOwnedJobsCmd;
 import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.persistence.entity.GenericExecutableJobEntity;
-import org.flowable.engine.impl.persistence.entity.GenericExecutableJobEntityManager;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntityManager;
 import org.flowable.engine.runtime.JobInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     protected boolean timerRunnableNeeded = true; // default true for backwards compatibility (History Async executor came later)
     protected AcquireTimerJobsRunnable timerJobRunnable;
     protected String acquireRunnableThreadName;
-    protected GenericExecutableJobEntityManager<? extends GenericExecutableJobEntity> jobEntityManager;
+    protected JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager;
     protected AcquireAsyncJobsDueRunnable asyncJobsDueRunnable;
     protected String resetExpiredRunnableName;
     protected ResetExpiredJobsRunnable resetExpiredJobsRunnable;
@@ -129,7 +129,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
             timerJobRunnable = new AcquireTimerJobsRunnable(this, processEngineConfiguration.getJobManager());
         }
 
-        GenericExecutableJobEntityManager<? extends GenericExecutableJobEntity> jobEntityManagerToUse = jobEntityManager != null
+        JobInfoEntityManager<? extends JobInfoEntity> jobEntityManagerToUse = jobEntityManager != null
                 ? jobEntityManager : Context.getProcessEngineConfiguration().getJobEntityManager();
 
         if (resetExpiredJobsRunnable == null) {
@@ -293,7 +293,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         this.acquireRunnableThreadName = acquireRunnableThreadName;
     }
 
-    public void setJobEntityManager(GenericExecutableJobEntityManager<? extends GenericExecutableJobEntity> jobEntityManager) {
+    public void setJobEntityManager(JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager) {
         this.jobEntityManager = jobEntityManager;
     }
     

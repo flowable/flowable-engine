@@ -24,7 +24,7 @@ import org.flowable.engine.runtime.HistoryJob;
  * 
  * @author Tijs Rademakers
  */
-public interface HistoryJobEntityManager extends EntityManager<HistoryJobEntity>, GenericExecutableJobEntityManager<HistoryJobEntity> {
+public interface HistoryJobEntityManager extends EntityManager<HistoryJobEntity>, JobInfoEntityManager<HistoryJobEntity> {
 
     /**
      * Executes a {@link HistoryJobQueryImpl} and returns the matching {@link HistoryJobEntity} instances.
