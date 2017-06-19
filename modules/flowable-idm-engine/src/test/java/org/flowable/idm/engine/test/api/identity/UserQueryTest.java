@@ -305,6 +305,7 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         assertEquals(countExpected, query.list().size());
         assertEquals(countExpected, query.count());
 
+        List<User> users = query.list();
         if (countExpected == 1) {
             assertNotNull(query.singleResult());
         } else if (countExpected > 1) {
