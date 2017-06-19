@@ -5,7 +5,7 @@ alter table ACT_RU_EXECUTION add column START_ACT_ID_ nvarchar(255);
 create table ACT_RU_HISTORY_JOB (
     ID_ nvarchar(64) NOT NULL,
     REV_ int,
-    LOCK_EXP_TIME_ datetime,
+    LOCK_EXP_TIME_ datetime NULL,
     LOCK_OWNER_ nvarchar(255),
     RETRIES_ int,
     EXCEPTION_STACK_ID_ nvarchar(64),
@@ -14,6 +14,6 @@ create table ACT_RU_HISTORY_JOB (
     HANDLER_CFG_ nvarchar(4000),
     ADV_HANDLER_CFG_ID_ nvarchar(64),
     TENANT_ID_ nvarchar(255) default '',
-    CREATE_TIME_ datetime,
+    CREATE_TIME_ datetime NULL,
     primary key (ID_)
 );
