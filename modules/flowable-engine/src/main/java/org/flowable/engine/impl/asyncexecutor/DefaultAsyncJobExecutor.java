@@ -112,6 +112,10 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
             initAsyncJobExecutionThreadPool();
             startJobAcquisitionThread();
         }
+        
+        if (unlockOwnedJobs) {
+            unlockOwnedJobs();
+        }
 
         if (timerRunnableNeeded) {
             startTimerAcquisitionThread();
@@ -138,10 +142,6 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
             BasicThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("flowable-async-job-executor-thread-%d").build();
             executorService = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, threadPoolQueue, threadFactory);
-        }
-
-        if (unlockOwnedJobs) {
-            unlockOwnedJobs();
         }
     }
 
