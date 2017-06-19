@@ -522,11 +522,11 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <echo message="updating flowable configuration to db ${database}" />
+                                        <echo message="updating flowable configuration to db ${databaseasynchistory}" />
                                         <copy file="${basedir}/../../qa/asynchistory/flowable.cfg.xml"
                                             todir="target/test-classes" overwrite="true">
                                             <filterset
-                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${database}.properties" />
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databaseasynchistory}.properties" />
                                         </copy>
                                     </tasks>
                                 </configuration>
@@ -539,7 +539,7 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <echo message="dropping schema in ${database}" />
+                                        <echo message="dropping schema in ${databaseasynchistory}" />
                                         <java classname="org.flowable.engine.impl.db.DbSchemaDrop"
                                             classpathref="maven.test.classpath" />
                                     </tasks>
@@ -575,11 +575,11 @@
                                 <configuration>
                                     <tasks>
                                         <echo
-                                            message="updating flowable configuration to db ${databasewithschema}" />
+                                            message="updating flowable configuration to db ${databasewithschemaasynchistory}" />
                                         <copy file="${basedir}/../../qa/asynchistory/schema/flowable.cfg.xml"
                                             todir="target/test-classes" overwrite="true">
                                             <filterset
-                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschema}.properties" />
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschemaasynchistory}.properties" />
                                         </copy>
                                     </tasks>
                                 </configuration>
@@ -592,7 +592,7 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <echo message="dropping schema in ${databasewithschema}" />
+                                        <echo message="dropping schema in ${databasewithschemaasynchistory}" />
                                         <java classname="org.flowable.engine.impl.db.DbSchemaDrop"
                                             classpathref="maven.test.classpath" />
                                     </tasks>
@@ -627,11 +627,11 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <echo message="updating flowable configuration to db ${databasemssql}" />
+                                        <echo message="updating flowable configuration to db ${databasemssqlasynchistory}" />
                                         <copy file="${basedir}/../../qa/asynchistory/mssql/flowable.cfg.xml"
                                             todir="target/test-classes" overwrite="true">
                                             <filterset
-                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasemssql}.properties" />
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasemssqlasynchistory}.properties" />
                                         </copy>
                                     </tasks>
                                 </configuration>
