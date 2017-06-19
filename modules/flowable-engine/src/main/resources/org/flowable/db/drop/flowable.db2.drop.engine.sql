@@ -125,6 +125,7 @@ drop table ACT_RU_JOB;
 drop table ACT_RU_TIMER_JOB;
 drop table ACT_RU_SUSPENDED_JOB;
 drop table ACT_RU_DEADLETTER_JOB;
+drop table ACT_RU_HISTORY_JOB;
 drop table ACT_RU_EVENT_SUBSCR;
 drop table ACT_EVT_LOG;
 drop table ACT_PROCDEF_INFO;
