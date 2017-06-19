@@ -144,7 +144,6 @@ create table ACT_RU_SUSPENDED_JOB (
     REPEAT_ varchar(255),
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
-    ADV_HANDLER_CFG_ID_ varchar(64),
     TENANT_ID_ varchar(255) default '',
     primary key (ID_)
 );
