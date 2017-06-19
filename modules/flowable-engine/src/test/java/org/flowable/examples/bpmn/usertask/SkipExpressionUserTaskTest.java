@@ -23,6 +23,7 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -106,7 +107,7 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
         tasks = taskService.createTaskQuery().list();
         assertEquals(0, tasks.size());
         
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             HistoricActivityInstance skipActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(skipPi.getId())
                     .activityId("userTask1")
                     .singleResult();

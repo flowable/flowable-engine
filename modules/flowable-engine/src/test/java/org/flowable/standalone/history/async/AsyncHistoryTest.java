@@ -305,12 +305,9 @@ public class AsyncHistoryTest extends ResourceFlowableTestCase {
     finishOneTaskProcess(task);
   }
   
-  /* TODO: currently no history for standalone tasks
-   * 
   public void testSetTaskParentId() {
     Task parentTask1 = taskService.newTask();
     parentTask1.setName("Parent task 1");
-    taskService.saveTask(parentTask1);
     taskService.saveTask(parentTask1);
     
     Task parentTask2 = taskService.newTask();
@@ -324,8 +321,10 @@ public class AsyncHistoryTest extends ResourceFlowableTestCase {
     assertEquals(1, taskService.getSubTasks(parentTask1.getId()).size());
     assertEquals(0, taskService.getSubTasks(parentTask2.getId()).size());
     
+    waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+    
     HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(childTask.getId()).singleResult();
-    assertEquals(parentTask2.getId(), historicTaskInstance.getParentTaskId());
+    assertEquals(parentTask1.getId(), historicTaskInstance.getParentTaskId());
     
     childTask = taskService.createTaskQuery().taskId(childTask.getId()).singleResult();
     childTask.setParentTaskId(parentTask2.getId());
@@ -333,10 +332,14 @@ public class AsyncHistoryTest extends ResourceFlowableTestCase {
     assertEquals(0, taskService.getSubTasks(parentTask1.getId()).size());
     assertEquals(1, taskService.getSubTasks(parentTask2.getId()).size());
     
+    waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+    
     historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(childTask.getId()).singleResult();
-    assertEquals(parentTask1.getId(), historicTaskInstance.getParentTaskId());
+    assertEquals(parentTask2.getId(), historicTaskInstance.getParentTaskId());
+    
+    taskService.deleteTask(parentTask1.getId(), true);
+    taskService.deleteTask(parentTask2.getId(), true);
   }
-  */
   
   protected Task startOneTaskprocess() {
     deployOneTaskTestProcess();
