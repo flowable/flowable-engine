@@ -481,9 +481,21 @@
             "EXPRESSION": "Expresion",
             "ADD-OPTION": "+ Agregar nueva opcion",
             "UPLOAD-ALLOW-MULTIPLE": "Permitir subir varios archivos",
-	    "MAX-LENGTH":"Longitud máxima:",
+	          "MAX-LENGTH":"Longitud máxima:",
             "MIN-LENGTH":"Longitud mínima:",
-	    "HYPERLINK-URL": "URL hiperlink"
+	          "HYPERLINK-URL": "URL hiperlink",
+	          "REGEX-PATTERN":"Estándar  Regex",
+            "MASK":{
+              "TITLE":"Máscara de entrada",
+              "EXAMPLES":{
+                "TITLE":"Ejemplos:",
+                "NUMBER":"Cualquier número",
+                "LETTER":"Cualquier letra",
+                "NUMBERORLETTER":"Cualquier letra o número",
+                "OPTIONAL":"La máscara opcional (no valida)",
+                "PHONE":"Teléfono"
+	              }
+            }
         },
         "OUTCOMES": {
             "DESCRIPTION": "Puedes definir multiples resultados para esta tarea. Cuando se este completando la tarea, el usuario selecciona uno de los resultados disponibles, que pueden ser utilizados por ejemplo eg. una condicion utilizada mas adelante en el proceso.",
@@ -606,6 +618,10 @@
     "PROPERTY.ASSIGNMENT.MATCHING" : "Usa &uparrow; y &downarrow; para seleccionar y presiona Enter para confirmar o usa el mouse",
     "PROPERTY.ASSIGNMENT.ASSIGNEE_PLACEHOLDER" : "Introduce un asignado",
     "PROPERTY.ASSIGNMENT.EMPTY" : "No hay asignacion seleccionada",
+    "PROPERTY.ASSIGNMENT.NONE" : "Ninguno ...",
+    "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHUSER": "Buscar usuario",
+    "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHGROUP": "Buscar grupo",
+    "PROPERTY.ASSIGNMENT.SEARCH": "Buscar: ",
     "PROPERTY.ASSIGNMENT.ASSIGNEE_DISPLAY" : "Assignado {{assignee}}",
     "PROPERTY.ASSIGNMENT.CANDIDATE_USERS_DISPLAY" : "{{length}} Usuarios candidatos",
     "PROPERTY.ASSIGNMENT.CANDIDATE_USERS" : "Usuarios candidatos",

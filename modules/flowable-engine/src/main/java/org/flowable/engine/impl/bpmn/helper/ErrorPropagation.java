@@ -97,7 +97,7 @@ public class ErrorPropagation {
         ExecutionEntity currentExecution = (ExecutionEntity) delegateExecution;
         ExecutionEntity parentExecution = null;
 
-        if (eventMap.containsKey(currentExecution.getActivityId())) {
+        if (eventMap.containsKey(currentExecution.getActivityId() + "#" + currentExecution.getProcessDefinitionId())) {
             // Check for multi instance
             if (currentExecution.getParentId() != null && currentExecution.getParent().isMultiInstanceRoot()) {
                 parentExecution = currentExecution.getParent();
@@ -105,7 +105,8 @@ public class ErrorPropagation {
                 parentExecution = currentExecution;
             }
             
-            matchingEvent = getCatchEventFromList(eventMap.get(currentExecution.getActivityId()), parentExecution);
+            matchingEvent = getCatchEventFromList(eventMap.get(currentExecution.getActivityId() + 
+                            "#" + currentExecution.getProcessDefinitionId()), parentExecution);
 
         } else {
             parentExecution = currentExecution.getParent();
@@ -123,21 +124,30 @@ public class ErrorPropagation {
                     for (String refId : eventMap.keySet()) {
                         List<Event> events = eventMap.get(refId);
                         if (CollectionUtil.isNotEmpty(events) && events.get(0) instanceof StartEvent) {
-                            if (currentContainer.getFlowElement(refId) != null) {
+                            String refActivityId = refId.substring(0, refId.indexOf("#"));
+                            String refProcessDefinitionId = refId.substring(refId.indexOf("#") + 1);
+                            if (parentExecution.getProcessDefinitionId().equals(refProcessDefinitionId) && 
+                                            currentContainer.getFlowElement(refActivityId) != null) {
+                                
                                 matchingEvent = getCatchEventFromList(events, parentExecution);
+                                String errorCode = getErrorCodeFromErrorEventDefinition(matchingEvent);
+                                if (StringUtils.isNotEmpty(errorCode)) {
+                                    break;
+                                }
                             }
                         }
                     }
                 }
 
                 if (matchingEvent == null) {
-                    if (eventMap.containsKey(parentExecution.getActivityId())) {
+                    if (eventMap.containsKey(parentExecution.getActivityId() + "#" + parentExecution.getProcessDefinitionId())) {
                         // Check for multi instance
                         if (parentExecution.getParentId() != null && parentExecution.getParent().isMultiInstanceRoot()) {
                             parentExecution = parentExecution.getParent();
                         }
                         
-                        matchingEvent = getCatchEventFromList(eventMap.get(parentExecution.getActivityId()), parentExecution);
+                        matchingEvent = getCatchEventFromList(eventMap.get(parentExecution.getActivityId() + 
+                                        "#" + parentExecution.getProcessDefinitionId()), parentExecution);
 
                     } else if (StringUtils.isNotEmpty(parentExecution.getParentId())) {
                         parentExecution = parentExecution.getParent();
@@ -163,7 +173,7 @@ public class ErrorPropagation {
                 // Delete
                 executionEntityManager.deleteProcessInstanceExecutionEntity(processInstanceEntity.getId(),
                                 currentExecution.getCurrentFlowElement() != null ? currentExecution.getCurrentFlowElement().getId() : null,
-                                                "ERROR_EVENT " + errorId, false, false);
+                                                "ERROR_EVENT " + errorId, false, false, false);
 
                 // Event
                 if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
@@ -173,6 +183,7 @@ public class ErrorPropagation {
             }
             
             executeEventHandler(matchingEvent, parentExecution, currentExecution, errorId);
+            
         } else {
             throw new FlowableException("No matching parent execution for error code " + errorId + " found");
         }
@@ -243,7 +254,7 @@ public class ErrorPropagation {
                         if (eventErrorCode == null || compareErrorCode == null || eventErrorCode.equals(compareErrorCode)) {
                             List<Event> startEvents = new ArrayList<Event>();
                             startEvents.add(startEvent);
-                            eventMap.put(eventSubProcess.getId(), startEvents);
+                            eventMap.put(eventSubProcess.getId() + "#" + processDefinitionId, startEvents);
                         }
                     }
                 }
@@ -259,11 +270,11 @@ public class ErrorPropagation {
 
                 if (eventErrorCode == null || compareErrorCode == null || eventErrorCode.equals(compareErrorCode)) {
                     List<Event> elementBoundaryEvents = null;
-                    if (!eventMap.containsKey(boundaryEvent.getAttachedToRefId())) {
+                    if (!eventMap.containsKey(boundaryEvent.getAttachedToRefId() + "#" + processDefinitionId)) {
                         elementBoundaryEvents = new ArrayList<Event>();
-                        eventMap.put(boundaryEvent.getAttachedToRefId(), elementBoundaryEvents);
+                        eventMap.put(boundaryEvent.getAttachedToRefId() + "#" + processDefinitionId, elementBoundaryEvents);
                     } else {
-                        elementBoundaryEvents = eventMap.get(boundaryEvent.getAttachedToRefId());
+                        elementBoundaryEvents = eventMap.get(boundaryEvent.getAttachedToRefId() + "#" + processDefinitionId);
                     }
                     elementBoundaryEvents.add(boundaryEvent);
                 }

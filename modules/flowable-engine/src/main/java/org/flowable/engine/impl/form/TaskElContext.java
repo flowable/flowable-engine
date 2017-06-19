@@ -12,11 +12,9 @@
  */
 package org.flowable.engine.impl.form;
 
-import javax.el.VariableMapper;
-
+import org.flowable.engine.common.impl.de.odysseus.el.util.SimpleContext;
+import org.flowable.engine.common.impl.javax.el.VariableMapper;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
-
-import de.odysseus.el.util.SimpleContext;
 
 /**
  * @author Tom Baeyens

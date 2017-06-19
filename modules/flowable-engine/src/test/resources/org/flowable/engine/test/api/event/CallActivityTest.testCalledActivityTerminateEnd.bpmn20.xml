@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="edoras vis" exporterVersion="DEVELOPER"
+             targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+  <process id="calledProcessIdTerminateEnd" isExecutable="true" name="External process">
+      <startEvent id="startevent2"/>
+      <dataObject id="dataObject1" name="FullName" itemSubjectRef="xsd:string">
+        <extensionElements>
+          <flowable:value>Joe Smith</flowable:value>
+        </extensionElements>
+      </dataObject>
+      <sequenceFlow id="flow5"  sourceRef="startevent2" targetRef="calledtask1"/>
+      <userTask id="calledtask1" name="User Task2 in External with Terminate End Event"/>
+      <sequenceFlow id="flow6" sourceRef="calledtask1" targetRef="terminateEnd2"/>
+      <endEvent id="terminateEnd2">
+        <terminateEventDefinition></terminateEventDefinition>
+      </endEvent>
+  </process>
+</definitions>

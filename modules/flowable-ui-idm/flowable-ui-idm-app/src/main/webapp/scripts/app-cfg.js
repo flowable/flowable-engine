@@ -20,7 +20,8 @@ var FLOWABLE = FLOWABLE || {};
 FLOWABLE.CONFIG = {
 	'onPremise' : true,
 	'contextRoot' : '/flowable-idm',
-	'webContextRoot' : '/flowable-idm'
+	'webContextRoot' : '/flowable-idm',
+    'datesLocalization' : false
 };
 
 //

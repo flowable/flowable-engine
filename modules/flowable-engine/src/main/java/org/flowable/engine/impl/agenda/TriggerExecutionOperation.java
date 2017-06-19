@@ -48,15 +48,25 @@ public class TriggerExecutionOperation extends AbstractOperation {
                         || currentFlowElement instanceof ServiceTask) { // custom service task with no automatic leave (will not have a activity-start history entry in ContinueProcessOperation)
                     commandContext.getHistoryManager().recordActivityStart(execution);
                 }
-
+                
                 ((TriggerableActivityBehavior) activityBehavior).trigger(execution, null, null);
 
             } else {
-                throw new FlowableException("Invalid behavior: " + activityBehavior + " should implement " + TriggerableActivityBehavior.class.getName());
+                throw new FlowableException("Cannot trigger execution with id " + execution.getId()
+                    + " : the activityBehavior " + activityBehavior.getClass() + " does not implement the " 
+                    + TriggerableActivityBehavior.class.getName() + " interface");
+        
             }
 
+        } else if (currentFlowElement == null) {
+            throw new FlowableException("Cannot trigger execution with id " + execution.getId()
+                    + " : no current flow element found. Check the execution id that is being passed "
+                    + "(it should not be a process instance execution, but a child execution currently referencing a flow element).");
+            
         } else {
-            throw new FlowableException("Programmatic error: no current flow element found or invalid type: " + currentFlowElement + ". Halting.");
+            throw new FlowableException("Programmatic error: cannot trigger execution, invalid flowelement type found: " 
+                    + currentFlowElement.getClass().getName() + ".");
+            
         }
     }
 

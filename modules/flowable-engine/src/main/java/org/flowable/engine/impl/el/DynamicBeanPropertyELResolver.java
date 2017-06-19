@@ -15,10 +15,9 @@ package org.flowable.engine.impl.el;
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
-import javax.el.ELContext;
-import javax.el.ELException;
-import javax.el.ELResolver;
-
+import org.flowable.engine.common.impl.javax.el.ELContext;
+import org.flowable.engine.common.impl.javax.el.ELException;
+import org.flowable.engine.common.impl.javax.el.ELResolver;
 import org.flowable.engine.impl.util.ReflectUtil;
 
 /**

@@ -57,7 +57,7 @@ public class DmnXMLUtil implements DmnXMLConstants {
     }
 
     public static void addXMLLocation(DmnElement element, XMLStreamReader xtr) {
-        Location location = xtr.getLocation();
+        // Location location = xtr.getLocation();
         // element.setXmlRowNumber(location.getLineNumber());
         // element.setXmlColumnNumber(location.getColumnNumber());
     }

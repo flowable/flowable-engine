@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by yvoswillens on 14/08/15.
+ * Created by Yvo Swillens
  */
 public class DecisionTableExpressionRepresentation {
 
@@ -27,16 +27,9 @@ public class DecisionTableExpressionRepresentation {
     protected String variableType;
     protected String type;
     protected String label;
-    protected List<Map<String, String>> entries;
+    protected List<String> entries;
     protected boolean newVariable;
-
-    public boolean isNewVariable() {
-        return newVariable;
-    }
-
-    public void setNewVariable(boolean newVariable) {
-        this.newVariable = newVariable;
-    }
+    protected boolean complexExpression;
 
     public String getId() {
         return id;
@@ -78,11 +71,27 @@ public class DecisionTableExpressionRepresentation {
         this.label = label;
     }
 
-    public List<Map<String, String>> getEntries() {
+    public List<String> getEntries() {
         return entries;
     }
 
-    public void setEntries(List<Map<String, String>> entries) {
+    public void setEntries(List<String> entries) {
         this.entries = entries;
+    }
+
+    public boolean isNewVariable() {
+        return newVariable;
+    }
+
+    public void setNewVariable(boolean newVariable) {
+        this.newVariable = newVariable;
+    }
+
+    public boolean isComplexExpression() {
+        return complexExpression;
+    }
+
+    public void setComplexExpression(boolean complexExpression) {
+        this.complexExpression = complexExpression;
     }
 }

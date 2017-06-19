@@ -14,16 +14,15 @@ package org.flowable.form.engine.impl.el;
 
 import java.util.Map;
 
-import javax.el.ArrayELResolver;
-import javax.el.BeanELResolver;
-import javax.el.CompositeELResolver;
-import javax.el.ELContext;
-import javax.el.ELResolver;
-import javax.el.ExpressionFactory;
-import javax.el.ListELResolver;
-import javax.el.MapELResolver;
-import javax.el.ValueExpression;
-
+import org.flowable.engine.common.impl.javax.el.ArrayELResolver;
+import org.flowable.engine.common.impl.javax.el.BeanELResolver;
+import org.flowable.engine.common.impl.javax.el.CompositeELResolver;
+import org.flowable.engine.common.impl.javax.el.ELContext;
+import org.flowable.engine.common.impl.javax.el.ELResolver;
+import org.flowable.engine.common.impl.javax.el.ExpressionFactory;
+import org.flowable.engine.common.impl.javax.el.ListELResolver;
+import org.flowable.engine.common.impl.javax.el.MapELResolver;
+import org.flowable.engine.common.impl.javax.el.ValueExpression;
 import org.flowable.form.engine.FormExpression;
 
 /**
@@ -56,7 +55,7 @@ public class ExpressionManager {
     }
 
     public ExpressionManager(Map<Object, Object> beans, boolean initFactory) {
-        expressionFactory = ExpressionFactory.newInstance();
+        expressionFactory = ExpressionFactoryResolver.resolveExpressionFactory();
         this.beans = beans;
     }
 

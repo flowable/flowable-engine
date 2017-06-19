@@ -311,8 +311,13 @@
             "CREATED-BY": "Created by {{createdBy}}"
         },
         "HIT-POLICIES": {
-            "FIRST": "First (Single pass)",
-            "ANY": "Any (Single pass)"
+            "FIRST": "First",
+            "ANY": "Any",
+            "UNIQUE": "Unique",
+            "PRIORITY": "Priority",
+            "RULE ORDER": "Rule Order",
+            "OUTPUT ORDER": "Output Order",
+            "COLLECT": "Collect"
         },
         "POPUP": {
             "CREATE-TITLE": "Create a new decision table",
@@ -479,14 +484,26 @@
             "DROPDOWN-DEFAULT-EMPTY-SELECTION": "Please choose one...",
             "DROPDOWN-EMPTY-VALUE-HELP": "This is the 'empty value' option. Selecting this at runtime is the taken to mean 'no value' or 'empty'.  This is allowed for optional fields, but not allowed for required fields.",
             "REQUIRED": "Required",
-	    "READONLY": "Read-only",
+	          "READONLY": "Read-only",
             "EXPRESSION": "Expression",
             "ADD-OPTION": "+ Add a new option",
             "UPLOAD-ALLOW-MULTIPLE": "Allow uploading multiple files",
             "SIZE": "Size",
-	    "MAX-LENGTH":"Maximum length:",
+	          "MAX-LENGTH":"Maximum length:",
             "MIN-LENGTH":"Minimum length:",
-	    "HYPERLINK-URL": "Hyperlink URL"
+	          "HYPERLINK-URL": "Hyperlink URL",
+	          "REGEX-PATTERN":"Regex standard",
+            "MASK":{
+              "TITLE":"Input mask",
+              "EXAMPLES":{
+                "TITLE":"Examples:",
+                "NUMBER":"Any number",
+                "LETTER":"Any letter",
+                "NUMBERORLETTER":"Any letter or number",
+                "OPTIONAL":"Make mask optional (not valid)",
+                "PHONE":"Phone"
+               }
+           }
         },
         "OUTCOMES": {
             "DESCRIPTION": "You can define multiple outcomes for this task. When completing a task, the users selects one of the available outcomes, which can be used in eg. a condition further on in the process.",
@@ -512,11 +529,18 @@
                 "EXPRESSION-LABEL": "Column label:",
                 "EXPRESSION-PLACEHOLDER": "Enter an optional label",
                 "EXPRESSION-VARIABLE-NAME": "Variable name:",
+                "EXPRESSION-VARIABLE-TYPE": "Variable type:",
                 "EXPRESSION-VARIABLE-NAME-PLACEHOLDER": "Enter a variable name",
                 "OUTPUT-NEW-VARIABLE-ID": "Variable ID:",
-                "OUTPUT-NEW-VARIABLE-TYPE": "Variable type:"
+                "OUTPUT-NEW-VARIABLE-TYPE": "Variable type:",
+                "COMPLEX-EXPRESSION-LABEL": "Complex expression:",
+                "ALLOWED-VALUES": "Allowed values (optional):",
+                "OUTPUT-VALUES": "Output values ",
+                "OUTPUT-VALUES-OPTIONAL": "(optional):",
+                "OUTPUT-VALUES-NOT-OPTIONAL": "(drag rows for priority / output order):"
             }
         },
+        "BUTTON-ACTIONS-LABEL": "Actions",
         "BUTTON-ADD-INPUT-LABEL": "Add input",
         "BUTTON-ADD-OUTPUT-LABEL": "Add output",
         "BUTTON-ADD-RULE-LABEL": "Add rule",
@@ -609,6 +633,10 @@
     "PROPERTY.ASSIGNMENT.MATCHING" : "Use &uparrow; and &downarrow; to select and press Enter to confirm or use the mouse",
     "PROPERTY.ASSIGNMENT.ASSIGNEE_PLACEHOLDER" : "Enter an assignee",
     "PROPERTY.ASSIGNMENT.EMPTY" : "No assignment selected",
+    "PROPERTY.ASSIGNMENT.NONE" : "None ...",
+    "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHUSER": "Search user",
+    "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHGROUP": "Search group",
+    "PROPERTY.ASSIGNMENT.SEARCH": "Search: ",
     "PROPERTY.ASSIGNMENT.ASSIGNEE_DISPLAY" : "Assignee {{assignee}}",
     "PROPERTY.ASSIGNMENT.CANDIDATE_USERS_DISPLAY" : "{{length}} Candidate users",
     "PROPERTY.ASSIGNMENT.CANDIDATE_USERS" : "Candidate users",

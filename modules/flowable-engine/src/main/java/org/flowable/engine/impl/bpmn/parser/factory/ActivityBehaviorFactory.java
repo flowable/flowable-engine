@@ -148,6 +148,8 @@ public interface ActivityBehaviorFactory {
 
     public abstract ActivityBehavior createDmnActivityBehavior(SendTask sendTask);
 
+    public abstract ActivityBehavior createHttpActivityBehavior(ServiceTask serviceTask);
+
     public abstract ShellActivityBehavior createShellActivityBehavior(ServiceTask serviceTask);
 
     public abstract ActivityBehavior createBusinessRuleTaskActivityBehavior(BusinessRuleTask businessRuleTask);

@@ -180,8 +180,8 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
             conditionResult = Boolean.FALSE;
 
             try {
-                // if condition is empty condition result is TRUE
-                if (StringUtils.isEmpty(conditionContainer.getInputEntry().getText())) {
+                // if condition is empty condition or has dash symbol result is TRUE
+                if (StringUtils.isEmpty(conditionContainer.getInputEntry().getText()) || "-".equals(conditionContainer.getInputEntry().getText())) {
                     conditionResult = Boolean.TRUE;
                 } else {
                     conditionResult = executeInputExpressionEvaluation(conditionContainer, executionContext);

@@ -18,19 +18,6 @@ import java.io.Reader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import javax.el.ArrayELResolver;
-import javax.el.BeanELResolver;
-import javax.el.CompositeELResolver;
-import javax.el.ELContext;
-import javax.el.ELException;
-import javax.el.ELResolver;
-import javax.el.ExpressionFactory;
-import javax.el.FunctionMapper;
-import javax.el.ListELResolver;
-import javax.el.MapELResolver;
-import javax.el.ResourceBundleELResolver;
-import javax.el.ValueExpression;
-import javax.el.VariableMapper;
 import javax.script.AbstractScriptEngine;
 import javax.script.Bindings;
 import javax.script.Compilable;
@@ -42,13 +29,25 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.de.odysseus.el.util.SimpleResolver;
+import org.flowable.engine.common.impl.javax.el.ArrayELResolver;
+import org.flowable.engine.common.impl.javax.el.BeanELResolver;
+import org.flowable.engine.common.impl.javax.el.CompositeELResolver;
+import org.flowable.engine.common.impl.javax.el.ELContext;
+import org.flowable.engine.common.impl.javax.el.ELException;
+import org.flowable.engine.common.impl.javax.el.ELResolver;
+import org.flowable.engine.common.impl.javax.el.ExpressionFactory;
+import org.flowable.engine.common.impl.javax.el.FunctionMapper;
+import org.flowable.engine.common.impl.javax.el.ListELResolver;
+import org.flowable.engine.common.impl.javax.el.MapELResolver;
+import org.flowable.engine.common.impl.javax.el.ResourceBundleELResolver;
+import org.flowable.engine.common.impl.javax.el.ValueExpression;
+import org.flowable.engine.common.impl.javax.el.VariableMapper;
 import org.flowable.engine.impl.bpmn.data.ItemInstance;
 import org.flowable.engine.impl.el.DynamicBeanPropertyELResolver;
 import org.flowable.engine.impl.el.ExpressionFactoryResolver;
 import org.flowable.engine.impl.el.JsonNodeELResolver;
 import org.flowable.engine.impl.util.ReflectUtil;
-
-import de.odysseus.el.util.SimpleResolver;
 
 /**
  * ScriptEngine that used JUEL for script evaluation and compilation (JSR-223).

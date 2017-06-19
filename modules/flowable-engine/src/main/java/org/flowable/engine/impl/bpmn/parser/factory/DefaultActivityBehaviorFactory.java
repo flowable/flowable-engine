@@ -282,6 +282,36 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
                 ShellActivityBehavior.class, fieldDeclarations);
     }
 
+    public ActivityBehavior createHttpActivityBehavior(ServiceTask serviceTask) {
+        try {
+            Class<?> theClass = null;
+            FieldExtension behaviorExtension = null;
+            for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
+                if ("httpActivityBehaviorClass".equals(fieldExtension.getFieldName()) && StringUtils.isNotEmpty(fieldExtension.getStringValue())) {
+                    theClass = Class.forName(fieldExtension.getStringValue());
+                    behaviorExtension = fieldExtension;
+                    break;
+                }
+            }
+
+            if (behaviorExtension != null) {
+                serviceTask.getFieldExtensions().remove(behaviorExtension);
+            }
+
+            if (theClass == null) {
+                // Default Http behavior class
+                theClass = Class.forName("org.flowable.http.impl.HttpActivityBehaviorImpl");
+            }
+
+            List<FieldDeclaration> fieldDeclarations = createFieldDeclarations(serviceTask.getFieldExtensions());
+            addExceptionMapAsFieldDeclaration(fieldDeclarations, serviceTask.getMapExceptions());
+            return (ActivityBehavior) ClassDelegate.defaultInstantiateDelegate(theClass, fieldDeclarations, serviceTask);
+
+        } catch (ClassNotFoundException e) {
+            throw new FlowableException("Could not find org.flowable.http.HttpActivityBehavior: ", e);
+        }
+    }
+
     public ActivityBehavior createBusinessRuleTaskActivityBehavior(BusinessRuleTask businessRuleTask) {
         BusinessRuleTaskDelegate ruleActivity = null;
         if (StringUtils.isNotEmpty(businessRuleTask.getClassName())) {

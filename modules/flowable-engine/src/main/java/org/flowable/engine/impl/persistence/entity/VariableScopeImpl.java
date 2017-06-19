@@ -22,9 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.el.ELContext;
-
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.javax.el.ELContext;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.context.Context;

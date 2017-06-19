@@ -20,8 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.el.PropertyNotFoundException;
-
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.impl.asyncexecutor.AsyncJobUtil;
@@ -50,6 +48,7 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.impl.javax.el.PropertyNotFoundException;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.BpmnError;
@@ -84,6 +83,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
 
     protected DefaultProcessEngineFactory processEngineFactory;
     protected volatile ProcessEngine processEngine;
+    protected volatile org.flowable.engine.ProcessEngineConfiguration flowable6ProcessEngineConfiguration;
 
     public ProcessDefinition getProcessDefinition(final String processDefinitionId) {
         final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
@@ -958,6 +958,14 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
 
     public void setProcessEngineFactory(DefaultProcessEngineFactory processEngineFactory) {
         this.processEngineFactory = processEngineFactory;
+    }
+
+    public org.flowable.engine.ProcessEngineConfiguration getFlowable6ProcessEngineConfiguration() {
+        return flowable6ProcessEngineConfiguration;
+    }
+
+    public void setFlowable6ProcessEngineConfiguration(org.flowable.engine.ProcessEngineConfiguration flowable6ProcessEngineConfiguration) {
+        this.flowable6ProcessEngineConfiguration = flowable6ProcessEngineConfiguration;
     }
 
     protected org.activiti.engine.impl.persistence.entity.TaskEntity convertToActiviti5TaskEntity(TaskEntity task) {

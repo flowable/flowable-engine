@@ -15,9 +15,8 @@ package org.flowable.engine.impl.el;
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
-import javax.el.ELContext;
-import javax.el.ELResolver;
-
+import org.flowable.engine.common.impl.javax.el.ELContext;
+import org.flowable.engine.common.impl.javax.el.ELResolver;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;

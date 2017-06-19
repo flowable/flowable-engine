@@ -58,6 +58,9 @@ public interface Problems {
 
     String DMN_TASK_NO_KEY = "flowable-dmntask-no-decision-table-key";
 
+    String HTTP_TASK_NO_REQUEST_URL = "flowable-httptask-no-request-url";
+    String HTTP_TASK_NO_REQUEST_METHOD = "flowable-httptask-no-request-method";
+
     String EXCLUSIVE_GATEWAY_NO_OUTGOING_SEQ_FLOW = "flowable-exclusive-gateway-no-outgoing-seq-flow";
     String EXCLUSIVE_GATEWAY_CONDITION_NOT_ALLOWED_ON_SINGLE_SEQ_FLOW = "flowable-exclusive-gateway-condition-not-allowed-on-single-seq-flow";
     String EXCLUSIVE_GATEWAY_CONDITION_ON_DEFAULT_SEQ_FLOW = "flowable-exclusive-gateway-condition-on-seq-flow";

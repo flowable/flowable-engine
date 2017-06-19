@@ -54,7 +54,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         }
 
         if (task.getRevision() == 0) {
-            commandContext.getTaskEntityManager().insert(task, null);
+            commandContext.getTaskEntityManager().insert(task, null, true);
 
             if (commandContext.getEventDispatcher().isEnabled()) {
                 commandContext.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
