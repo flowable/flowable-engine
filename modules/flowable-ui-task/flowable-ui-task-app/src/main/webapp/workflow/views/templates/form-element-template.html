@@ -123,6 +123,27 @@
              on-upload-in-progress="uploadInProgress(status)"
              ng-show="field.params.multiple || (!field.params.multiple && model.uploads[field.id].length != 1)"></div>
     </div>
+
+   <div ng-switch-when="group" class="form-group {{field.className}}" ng-show="field.isVisible">
+        <h3 ng-if="!field.params.allowCollapse">{{field.name}}</h3>
+        <h3 ng-if="field.params.allowCollapse"
+            class="group-allow-collapse"
+            ng-click="model.collapsedGroups[field.id] = !model.collapsedGroups[field.id]"
+            ng-class="{'group-expanded': !model.collapsedGroups[field.id] }">
+            <span class="glyphicon glyphicon-play"></span>
+            {{field.name}}
+        </h3>
+        <hr style="width:100%; height: 1px; background-color: black" />
+        <div class="container-control row" ng-show="!field.params.allowCollapse || !model.collapsedGroups[field.id]">
+            <div ng-class="{'col-sm-12': field.numberOfColumns === 1, 'col-sm-6': !field.numberOfColumns || field.numberOfColumns === 2, 'col-sm-4': field.numberOfColumns === 3, 'col-sm-3': field.numberOfColumns === 4, 'col-sm-2': field.numberOfColumns === 6, 'col-sm-1': field.numberOfColumns === 12}" ng-repeat="(colName, colItems) in field.fields">
+                <div ng-repeat="item in colItems">
+                   <form-element field="item" task-id="taskId" custom-field-templates="customFieldTemplates" task-form="taskForm" control-callbacks="controlCallbacks" model="model"></form-element>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
     
     <div ng-switch-when="hyperlink" class="form-group {{field.className}}" ng-show="field.isVisible">
         <label class="control-label">{{field.name}}</label>
@@ -189,6 +210,18 @@
          <div>
              <a ng-href="{{field.params.hyperlinkUrl}}" target="_blank">{{field.params.hyperlinkUrl}}</a>
          </div>
+    </div>
+	
+    <div ng-switch-when="group" ng-show="field.isVisible" class="{{field.className}} readonly">
+        <label class="control-label"><h3>{{field.name}}</h3</label>
+	<hr style="width:100%; height: 1px; background-color: black" />
+	<hr style="width:100%; height: 1px; background-color: black" />
+              <ul class="simple-list" ng-if="field.value">
+                  <li>
+                     <div class="ng-binding" ng-if="field.value !== undefined && field.value !== null && field.value !== ''">{{field.value.name}}</div>
+                     <div class="ng-binding" ng-if="field.value === undefined || field.value === null || field.value === ''">{{'FORM.MESSAGE.EMPTY' | translate}}</div>
+                  </li>
+              </ul>
     </div>	
 	
     <div ng-switch-when="radio-buttons" class="form-group" ng-show="field.isVisible">

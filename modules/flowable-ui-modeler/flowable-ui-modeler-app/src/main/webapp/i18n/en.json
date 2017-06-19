@@ -448,7 +448,8 @@
             "UPLOAD": "Upload",
             "EXPRESSION": "Expression",
             "DECIMAL": "Decimal",
-	    "HYPERLINK": "Hyperlink" 
+	    "HYPERLINK": "Hyperlink",
+	    "GROUP": "Header" 	
         },
         "TABS": {
             "GENERAL": "General",
