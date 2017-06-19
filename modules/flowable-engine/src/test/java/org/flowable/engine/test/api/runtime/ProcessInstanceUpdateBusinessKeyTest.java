@@ -18,6 +18,7 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -31,7 +32,7 @@ public class ProcessInstanceUpdateBusinessKeyTest extends PluggableFlowableTestC
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
         assertEquals("bzKey", processInstance.getBusinessKey());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
             assertEquals("bzKey", historicProcessInstance.getBusinessKey());
         }
@@ -44,7 +45,7 @@ public class ProcessInstanceUpdateBusinessKeyTest extends PluggableFlowableTestC
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
         assertEquals("testKey", processInstance.getBusinessKey());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
             assertEquals("testKey", historicProcessInstance.getBusinessKey());
         }
@@ -54,7 +55,7 @@ public class ProcessInstanceUpdateBusinessKeyTest extends PluggableFlowableTestC
         processInstance = runtimeService.createProcessInstanceQuery().singleResult();
         assertEquals("newKey", processInstance.getBusinessKey());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
             assertEquals("newKey", historicProcessInstance.getBusinessKey());
         }

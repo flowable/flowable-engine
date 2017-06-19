@@ -67,7 +67,7 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
     public void deleteIdentityLink(IdentityLinkEntity identityLink, boolean cascadeHistory) {
         delete(identityLink, false);
         if (cascadeHistory) {
-            getHistoryManager().deleteHistoricIdentityLink(identityLink.getId());
+            getHistoryManager().recordIdentityLinkDeleted(identityLink.getId());
         }
 
         if (identityLink.getTask() != null && isTaskRelatedEntityCountEnabledGlobally()) {
@@ -75,6 +75,7 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
             if (isTaskRelatedEntityCountEnabled(countingTaskEntity)) {
                 countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() - 1);
             }
+            
         } else if (identityLink.getProcessInstanceId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
             CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(identityLink.getProcessInstanceId());
             if (isExecutionRelatedEntityCountEnabled(executionEntity)) {

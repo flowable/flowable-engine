@@ -90,7 +90,7 @@
     ${limitAfter}
   </select>
   
-   <select id="selectUserCountByQueryCriteria" parameterType="org.flowable.idm.engine.impl.UserQueryImpl" resultType="long">
+  <select id="selectUserCountByQueryCriteria" parameterType="org.flowable.idm.engine.impl.UserQueryImpl" resultType="long">
     select count(RES.ID_)
     <include refid="selectUserByQueryCriteriaSql" />
   </select>

@@ -57,7 +57,7 @@ public class MybatisHistoricProcessInstanceDataManager extends AbstractDataManag
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<HistoricProcessInstanceEntity> findHistoricProcessInstancesBySuperProcessInstanceId(String superProcessInstanceId) {
+    public List<HistoricProcessInstance> findHistoricProcessInstancesBySuperProcessInstanceId(String superProcessInstanceId) {
         return getDbSqlSession().selectList("selectHistoricProcessInstanceIdsBySuperProcessInstanceId", superProcessInstanceId);
     }
 

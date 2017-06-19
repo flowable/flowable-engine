@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.identity.Authentication;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
@@ -66,7 +67,7 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
             // Check there are no processes active anymore
             assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
-            if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
                 // Check if all processes and tasks are complete
                 assertEquals(numberOfProcessesPerThread * numberOfThreads, historyService.createHistoricProcessInstanceQuery().finished().count());
                 assertEquals(totalNumberOfTasks, historyService.createHistoricTaskInstanceQuery().finished().count());

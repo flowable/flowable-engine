@@ -32,6 +32,7 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -542,7 +543,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     }
 
     private void checkHistoricVariableUpdateEntity(String variableName, String processInstanceId) {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             boolean deletedVariableUpdateFound = false;
 
             List<HistoricDetail> resultSet = historyService.createHistoricDetailQuery().processInstanceId(processInstanceId).list();

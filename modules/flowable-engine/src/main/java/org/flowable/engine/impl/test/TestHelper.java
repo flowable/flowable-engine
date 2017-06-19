@@ -110,6 +110,7 @@ public abstract class TestHelper {
         if (deploymentId != null) {
             try {
                 processEngine.getRepositoryService().deleteDeployment(deploymentId, true);
+            
             } catch (FlowableObjectNotFoundException e) {
                 // Deployment was already deleted by the test case. Ignore.
             }

@@ -110,8 +110,8 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         }
 
         ExecutionEntity subProcessInstance = Context.getCommandContext().getExecutionEntityManager().createSubprocessInstance(
-                processDefinition, executionEntity, businessKey);
-        Context.getCommandContext().getHistoryManager().recordSubProcessInstanceStart(executionEntity, subProcessInstance, initialFlowElement);
+                processDefinition, executionEntity, businessKey, initialFlowElement.getId());
+        Context.getCommandContext().getHistoryManager().recordSubProcessInstanceStart(executionEntity, subProcessInstance);
 
         boolean eventDispatcherEnabled = Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled();
         if (eventDispatcherEnabled) {

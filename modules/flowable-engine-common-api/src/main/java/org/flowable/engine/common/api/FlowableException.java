@@ -20,12 +20,23 @@ package org.flowable.engine.common.api;
 public class FlowableException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
+  
+    protected boolean isLogged;
 
     public FlowableException(String message, Throwable cause) {
         super(message, cause);
     }
-
+    
     public FlowableException(String message) {
         super(message);
     }
+
+    public boolean isLogged() {
+        return isLogged;
+    }
+
+    public void setLogged(boolean isLogged) {
+        this.isLogged = isLogged;
+    }
+ 
 }

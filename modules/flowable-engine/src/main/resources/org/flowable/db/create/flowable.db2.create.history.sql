@@ -1,5 +1,6 @@
 create table ACT_HI_PROCINST (
     ID_ varchar(64) not null,
+    REV_ integer default 1,
     PROC_INST_ID_ varchar(64) not null,
     BUSINESS_KEY_ varchar(255),
     PROC_DEF_ID_ varchar(64) not null,
@@ -20,6 +21,7 @@ alter table ACT_HI_PROCINST add constraint PROC_INST_ID_ unique(PROC_INST_ID_);
 
 create table ACT_HI_ACTINST (
     ID_ varchar(64) not null,
+    REV_ integer default 1,
     PROC_DEF_ID_ varchar(64) not null,
     PROC_INST_ID_ varchar(64) not null,
     EXECUTION_ID_ varchar(64) not null,
@@ -40,6 +42,7 @@ create table ACT_HI_ACTINST (
 
 create table ACT_HI_TASKINST (
     ID_ varchar(64) not null,
+    REV_ integer default 1,
     PROC_DEF_ID_ varchar(64),
     TASK_DEF_KEY_ varchar(255),
     PROC_INST_ID_ varchar(64),
@@ -59,17 +62,18 @@ create table ACT_HI_TASKINST (
     FORM_KEY_ varchar(255),
     CATEGORY_ varchar(255),
     TENANT_ID_ varchar(255) default '',
+    LAST_UPDATED_TIME_ timestamp,
     primary key (ID_)
 );
 
 create table ACT_HI_VARINST (
     ID_ varchar(64) not null,
+    REV_ integer default 1,
     PROC_INST_ID_ varchar(64),
     EXECUTION_ID_ varchar(64),
     TASK_ID_ varchar(64),
     NAME_ varchar(255) not null,
     VAR_TYPE_ varchar(100),
-    REV_ integer,
     BYTEARRAY_ID_ varchar(64),
     DOUBLE_ double precision,
     LONG_ bigint,

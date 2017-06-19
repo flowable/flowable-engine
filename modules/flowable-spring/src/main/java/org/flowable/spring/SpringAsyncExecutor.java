@@ -17,6 +17,7 @@ import java.util.concurrent.RejectedExecutionException;
 import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.engine.impl.asyncexecutor.ExecuteAsyncRunnable;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.runtime.JobInfo;
 import org.flowable.engine.runtime.Job;
 import org.springframework.core.task.TaskExecutor;
 
@@ -71,9 +72,9 @@ public class SpringAsyncExecutor extends DefaultAsyncJobExecutor {
     }
 
     @Override
-    public boolean executeAsyncJob(Job job) {
+    public boolean executeAsyncJob(JobInfo job) {
         try {
-            taskExecutor.execute(new ExecuteAsyncRunnable((JobEntity) job, processEngineConfiguration));
+            taskExecutor.execute(new ExecuteAsyncRunnable(job, processEngineConfiguration, jobEntityManager, asyncRunnableExecutionExceptionHandler));
             return true;
         } catch (RejectedExecutionException e) {
             rejectedJobsHandler.jobRejected(this, job);

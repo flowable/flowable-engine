@@ -19,7 +19,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
 import org.flowable.engine.impl.cmd.AcquireJobsCmd;
 import org.flowable.engine.impl.interceptor.CommandExecutor;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,19 +32,24 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
     private static Logger log = LoggerFactory.getLogger(AcquireAsyncJobsDueRunnable.class);
 
+    protected String name;
     protected final AsyncExecutor asyncExecutor;
+    protected final JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager;
 
     protected volatile boolean isInterrupted;
     protected final Object MONITOR = new Object();
     protected final AtomicBoolean isWaiting = new AtomicBoolean(false);
 
-    public AcquireAsyncJobsDueRunnable(AsyncExecutor asyncExecutor) {
+    public AcquireAsyncJobsDueRunnable(String name, AsyncExecutor asyncExecutor, 
+            JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager) {
+        this.name = name;
         this.asyncExecutor = asyncExecutor;
+        this.jobEntityManager = jobEntityManager;
     }
 
     public synchronized void run() {
         log.info("starting to acquire async jobs due");
-        Thread.currentThread().setName("flowable-acquire-async-jobs");
+        Thread.currentThread().setName(name);
 
         CommandExecutor commandExecutor = asyncExecutor.getProcessEngineConfiguration().getCommandExecutor();
 
@@ -74,9 +80,9 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
     protected long acquireAndExecuteJobs(CommandExecutor commandExecutor, int remainingCapacity) {
         try {
-            AcquiredJobEntities acquiredJobs = commandExecutor.execute(new AcquireJobsCmd(asyncExecutor, remainingCapacity));
+            AcquiredJobEntities acquiredJobs = commandExecutor.execute(new AcquireJobsCmd(asyncExecutor, remainingCapacity, jobEntityManager));
 
-            List<JobEntity> rejectedJobs = offerJobs(acquiredJobs);
+            List<JobInfoEntity> rejectedJobs = offerJobs(acquiredJobs);
 
             log.debug("Jobs acquired: {}, rejected: {}", acquiredJobs.size(), rejectedJobs.size());
             if (rejectedJobs.size() > 0) {
@@ -103,9 +109,9 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
         return asyncExecutor.getDefaultAsyncJobAcquireWaitTimeInMillis();
     }
 
-    protected List<JobEntity> offerJobs(AcquiredJobEntities acquiredJobs) {
-        List<JobEntity> rejected = new ArrayList<JobEntity>();
-        for (JobEntity job : acquiredJobs.getJobs()) {
+    protected List<JobInfoEntity> offerJobs(AcquiredJobEntities acquiredJobs) {
+        List<JobInfoEntity> rejected = new ArrayList<JobInfoEntity>();
+        for (JobInfoEntity job : acquiredJobs.getJobs()) {
             boolean jobSuccessFullyOffered = asyncExecutor.executeAsyncJob(job);
             if (!jobSuccessFullyOffered) {
                 rejected.add(job);

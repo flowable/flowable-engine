@@ -86,8 +86,6 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             taskEntity.setExecutionId(execution.getId());
             taskEntity.setProcessInstanceId(execution.getProcessInstanceId());
             taskEntity.setProcessDefinitionId(execution.getProcessDefinitionId());
-
-            getHistoryManager().recordTaskExecutionIdChange(taskEntity.getId(), taskEntity.getExecutionId());
         }
 
         insert(taskEntity, true);
@@ -105,21 +103,18 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         }
 
         getHistoryManager().recordTaskCreated(taskEntity, execution);
-        getHistoryManager().recordTaskId(taskEntity);
-        if (taskEntity.getFormKey() != null) {
-            getHistoryManager().recordTaskFormKeyChange(taskEntity.getId(), taskEntity.getFormKey());
-        }
     }
 
     @Override
     public void changeTaskAssignee(TaskEntity taskEntity, String assignee) {
         if ((taskEntity.getAssignee() != null && !taskEntity.getAssignee().equals(assignee))
                 || (taskEntity.getAssignee() == null && assignee != null)) {
+            
             taskEntity.setAssignee(assignee);
             fireAssignmentEvents(taskEntity);
 
             if (taskEntity.getId() != null) {
-                getHistoryManager().recordTaskAssigneeChange(taskEntity.getId(), taskEntity.getAssignee());
+                getHistoryManager().recordTaskInfoChange(taskEntity);
                 addAssigneeIdentityLinks(taskEntity);
                 update(taskEntity);
             }
@@ -130,10 +125,11 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     public void changeTaskOwner(TaskEntity taskEntity, String owner) {
         if ((taskEntity.getOwner() != null && !taskEntity.getOwner().equals(owner))
                 || (taskEntity.getOwner() == null && owner != null)) {
+            
             taskEntity.setOwner(owner);
 
             if (taskEntity.getId() != null) {
-                getHistoryManager().recordTaskOwnerChange(taskEntity.getId(), taskEntity.getOwner());
+                getHistoryManager().recordTaskInfoChange(taskEntity);
                 addOwnerIdentityLink(taskEntity, taskEntity.getOwner());
                 update(taskEntity);
             }
@@ -143,7 +139,6 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     protected void fireAssignmentEvents(TaskEntity taskEntity) {
         getProcessEngineConfiguration().getListenerNotificationHelper()
                 .executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
-        getHistoryManager().recordTaskAssignment(taskEntity);
 
         if (getEventDispatcher().isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, taskEntity));
@@ -151,7 +146,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
 
     }
 
-    private void addAssigneeIdentityLinks(TaskEntity taskEntity) {
+    protected void addAssigneeIdentityLinks(TaskEntity taskEntity) {
         if (taskEntity.getAssignee() != null && taskEntity.getProcessInstance() != null) {
             getIdentityLinkEntityManager().involveUser(taskEntity.getProcessInstance(), taskEntity.getAssignee(), IdentityLinkType.PARTICIPANT);
         }
@@ -195,6 +190,10 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             task.setDeleted(true);
 
             String taskId = task.getId();
+            ExecutionEntity execution = null;
+            if (task.getExecutionId() != null) {
+                execution = task.getExecution();
+            }
 
             List<Task> subTasks = findTasksByParentTaskId(taskId);
             for (Task subTask : subTasks) {
@@ -214,7 +213,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             if (cascade) {
                 getHistoricTaskInstanceEntityManager().delete(taskId);
             } else {
-                getHistoryManager().recordTaskEnd(taskId, deleteReason);
+                getHistoryManager().recordTaskEnd(task, execution, deleteReason);
             }
 
             delete(task, false);

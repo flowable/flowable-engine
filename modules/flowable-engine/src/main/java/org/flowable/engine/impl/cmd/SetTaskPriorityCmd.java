@@ -39,7 +39,7 @@ public class SetTaskPriorityCmd extends NeedsActiveTaskCmd<Void> {
         }
 
         task.setPriority(priority);
-        commandContext.getHistoryManager().recordTaskPriorityChange(task.getId(), task.getPriority());
+        commandContext.getHistoryManager().recordTaskInfoChange(task);
         commandContext.getTaskEntityManager().update(task);
         return null;
     }

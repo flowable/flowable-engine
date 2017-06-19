@@ -19,9 +19,12 @@ import java.util.List;
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.impl.asyncexecutor.AcquiredJobEntities;
 import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntityManager;
 
 /**
  * @author Tijs Rademakers
@@ -30,24 +33,27 @@ public class AcquireJobsCmd implements Command<AcquiredJobEntities> {
 
     private final AsyncExecutor asyncExecutor;
     private final int remainingCapacity;
-
+    private final JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager;
+    
     public AcquireJobsCmd(AsyncExecutor asyncExecutor) {
-        this(asyncExecutor, Integer.MAX_VALUE);
+        this.asyncExecutor = asyncExecutor;
+        this.remainingCapacity = Integer.MAX_VALUE;
+        this.jobEntityManager = asyncExecutor.getProcessEngineConfiguration().getJobEntityManager(); // backwards compatibility
     }
 
-    public AcquireJobsCmd(AsyncExecutor asyncExecutor, int remainingCapacity) {
+    public AcquireJobsCmd(AsyncExecutor asyncExecutor, int remainingCapacity, JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager) {
         this.asyncExecutor = asyncExecutor;
         this.remainingCapacity = remainingCapacity;
+        this.jobEntityManager = jobEntityManager;
     }
 
     public AcquiredJobEntities execute(CommandContext commandContext) {
         int maxResults = Math.min(remainingCapacity, asyncExecutor.getMaxAsyncJobsDuePerAcquisition());
 
-        List<JobEntity> jobs = commandContext.getJobEntityManager()
-                .findJobsToExecute(new Page(0, maxResults));
+        List<? extends JobInfoEntity> jobs = jobEntityManager.findJobsToExecute(new Page(0, maxResults)); 
         AcquiredJobEntities acquiredJobs = new AcquiredJobEntities();
 
-        for (JobEntity job : jobs) {
+        for (JobInfoEntity job : jobs) {
             lockJob(commandContext, job, asyncExecutor.getAsyncJobLockTimeInMillis());
             acquiredJobs.addJob(job);
         }
@@ -55,7 +61,7 @@ public class AcquireJobsCmd implements Command<AcquiredJobEntities> {
         return acquiredJobs;
     }
 
-    protected void lockJob(CommandContext commandContext, JobEntity job, int lockTimeInMillis) {
+    protected void lockJob(CommandContext commandContext, JobInfoEntity job, int lockTimeInMillis) {
         GregorianCalendar gregorianCalendar = new GregorianCalendar();
         gregorianCalendar.setTime(commandContext.getProcessEngineConfiguration().getClock().getCurrentTime());
         gregorianCalendar.add(Calendar.MILLISECOND, lockTimeInMillis);

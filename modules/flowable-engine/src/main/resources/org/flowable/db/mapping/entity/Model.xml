@@ -67,18 +67,40 @@
 
   <!-- MODEL UPDATE -->
   <update id="updateModel" parameterType="org.flowable.engine.impl.persistence.entity.ModelEntityImpl">
-    update ${prefix}ACT_RE_MODEL set
-      REV_ = #{revisionNext, jdbcType=INTEGER},
-      NAME_ = #{name, jdbcType=VARCHAR},
-      KEY_ = #{key, jdbcType=VARCHAR},
-      CATEGORY_ = #{category, jdbcType=VARCHAR},
-      LAST_UPDATE_TIME_ = #{lastUpdateTime, jdbcType=VARCHAR},
-      VERSION_ = #{version, jdbcType=INTEGER},
-      META_INFO_ = #{metaInfo, jdbcType=VARCHAR},
-      DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR},
-      EDITOR_SOURCE_VALUE_ID_ = #{editorSourceValueId, jdbcType=VARCHAR},
-      EDITOR_SOURCE_EXTRA_VALUE_ID_ = #{editorSourceExtraValueId, jdbcType=VARCHAR},
-      TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+    update ${prefix}ACT_RE_MODEL
+      <set>
+          REV_ = #{revisionNext, jdbcType=INTEGER},
+          <if test="originalPersistentState.name != name">
+              NAME_ = #{name, jdbcType=VARCHAR},
+          </if>
+          <if test="originalPersistentState.key != key">
+              KEY_ = #{key, jdbcType=VARCHAR},
+          </if>
+          <if test="originalPersistentState.category != category">
+              CATEGORY_ = #{category, jdbcType=VARCHAR},
+          </if>
+          <if test="originalPersistentState.lastUpdateTime != lastUpdateTime">
+              LAST_UPDATE_TIME_ = #{lastUpdateTime, jdbcType=VARCHAR},
+          </if>
+          <if test="originalPersistentState.version != version">
+              VERSION_ = #{version, jdbcType=INTEGER},
+          </if>
+          <if test="originalPersistentState.metaInfo != metaInfo">
+              META_INFO_ = #{metaInfo, jdbcType=VARCHAR},
+          </if>
+          <if test="originalPersistentState.deploymentId != deploymentId">
+              DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR},
+          </if>
+          <if test="originalPersistentState.editrSourceValueId != editorSourceValueId">
+              EDITOR_SOURCE_VALUE_ID_ = #{editorSourceValueId, jdbcType=VARCHAR},
+          </if>
+          <if test="originalPersistentState.editorSourceExtraValueId != editorSourceExtraValueId">
+              EDITOR_SOURCE_EXTRA_VALUE_ID_ = #{editorSourceExtraValueId, jdbcType=VARCHAR},
+          </if>
+          <if test="originalPersistentState.tenantId != tenantId">
+              TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+          </if>
+      </set>
     where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 

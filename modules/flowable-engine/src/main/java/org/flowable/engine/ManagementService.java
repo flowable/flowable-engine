@@ -28,6 +28,7 @@ import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.engine.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.runtime.DeadLetterJobQuery;
+import org.flowable.engine.runtime.HistoryJobQuery;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.JobQuery;
 import org.flowable.engine.runtime.SuspendedJobQuery;
@@ -83,6 +84,11 @@ public interface ManagementService {
      * Returns a new DeadLetterJobQuery implementation, that can be used to dynamically query the dead letter jobs.
      */
     DeadLetterJobQuery createDeadLetterJobQuery();
+    
+    /**
+     * Returns a new HistoryJobQuery implementation, that can be used to dynamically query the history jobs.
+     */
+    HistoryJobQuery createHistoryJobQuery();
 
     /**
      * Forced synchronous execution of a job (eg. for administration or testing) The job will be executed, even if the process definition and/or the process instance is in suspended state.
@@ -165,6 +171,16 @@ public interface ManagementService {
      *             when there is no job with the given id.
      */
     void deleteDeadLetterJob(String jobId);
+    
+    /**
+     * Delete the history job with the provided id.
+     * 
+     * @param jobId
+     *            id of the history job to delete, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no job with the given id.
+     */
+    void deleteHistoryJob(String jobId);
 
     /**
      * Sets the number of retries that a job has left.

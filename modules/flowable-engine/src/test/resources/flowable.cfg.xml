@@ -23,7 +23,9 @@
 
     <!-- job executor configurations -->
     <property name="asyncExecutor" ref="asyncExecutor" />
+    <property name="asyncHistoryExecutor" ref="asyncHistoryExecutor" />
     <property name="asyncExecutorActivate" value="false" />
+    <property name="asyncHistoryExecutorActivate" value="false" />
     
     <property name="asyncFailedJobWaitTime" value="1" />
 
@@ -47,6 +49,8 @@
     </property>
     
     <property name="history" value="full" />
+    <property name="asyncHistoryEnabled" value="true" />
+    <property name="asyncHistoryExecutorNumberOfRetries" value="99999999" />
     
     <property name="enableProcessDefinitionInfoCache" value="true" />
   </bean>
@@ -54,6 +58,10 @@
   <bean id="asyncExecutor" class="org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor">
     <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
     <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
+  </bean>
+  
+  <bean id="asyncHistoryExecutor" class="org.flowable.engine.impl.history.async.DefaultAsyncHistoryJobExecutor">
+    <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
   </bean>
   
   <bean id="throwCustomExceptionBean" class="org.flowable.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionBean" />
