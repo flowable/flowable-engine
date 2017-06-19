@@ -59,9 +59,9 @@ import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntityManager;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.TimerUtil;
-import org.flowable.engine.runtime.JobInfo;
 import org.flowable.engine.runtime.HistoryJob;
 import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.JobInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -626,9 +626,6 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setExecutionId(copyFromJob.getExecutionId());
         copyToJob.setId(copyFromJob.getId());
         copyToJob.setJobHandlerConfiguration(copyFromJob.getJobHandlerConfiguration());
-        if (copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
-            copyToJob.setAdvancedJobHandlerConfigurationBytes(copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef().getBytes());
-        }
         copyToJob.setJobHandlerType(copyFromJob.getJobHandlerType());
         copyToJob.setJobType(copyFromJob.getJobType());
         copyToJob.setExceptionMessage(copyFromJob.getExceptionMessage());

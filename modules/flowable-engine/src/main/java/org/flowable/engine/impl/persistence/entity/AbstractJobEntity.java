@@ -26,14 +26,6 @@ public interface AbstractJobEntity extends Entity, HasRevision {
     void setJobHandlerType(String jobHandlerType);
 
     void setJobHandlerConfiguration(String jobHandlerConfiguration);
-  
-    String getAdvancedJobHandlerConfiguration();
-
-    void setAdvancedJobHandlerConfiguration(String jobHandlerConfiguration);
-  
-    void setAdvancedJobHandlerConfigurationBytes(byte[] bytes);
-  
-    ByteArrayRef getAdvancedJobHandlerConfigurationByteArrayRef();
 
     String getExceptionStacktrace();
 

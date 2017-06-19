@@ -93,7 +93,6 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
         super.delete(jobEntity);
 
         deleteExceptionByteArrayRef(jobEntity);
-        deleteAdvancedJobHandlerConfigurationByteArrayRef(jobEntity);
 
         if (jobEntity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
             CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(jobEntity.getExecutionId());
@@ -115,13 +114,6 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
         ByteArrayRef exceptionByteArrayRef = jobEntity.getExceptionByteArrayRef();
         if (exceptionByteArrayRef != null) {
             exceptionByteArrayRef.delete();
-        }
-    }
-    
-    protected void deleteAdvancedJobHandlerConfigurationByteArrayRef(DeadLetterJobEntity jobEntity) {
-        ByteArrayRef configurationByteArrayRef = jobEntity.getAdvancedJobHandlerConfigurationByteArrayRef();
-        if (configurationByteArrayRef != null) {
-            configurationByteArrayRef.delete();
         }
     }
 

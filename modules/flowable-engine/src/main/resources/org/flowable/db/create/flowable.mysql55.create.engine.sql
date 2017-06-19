@@ -103,7 +103,6 @@ create table ACT_RU_JOB (
     REPEAT_ varchar(255),
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
-    ADV_HANDLER_CFG_ID_ varchar(64),
     TENANT_ID_ varchar(255) default '',
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
@@ -125,7 +124,6 @@ create table ACT_RU_TIMER_JOB (
     REPEAT_ varchar(255),
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
-    ADV_HANDLER_CFG_ID_ varchar(64),
     TENANT_ID_ varchar(255) default '',
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
@@ -145,7 +143,6 @@ create table ACT_RU_SUSPENDED_JOB (
     REPEAT_ varchar(255),
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
-    ADV_HANDLER_CFG_ID_ varchar(64),
     TENANT_ID_ varchar(255) default '',
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
@@ -164,8 +161,23 @@ create table ACT_RU_DEADLETTER_JOB (
     REPEAT_ varchar(255),
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
+    TENANT_ID_ varchar(255) default '',
+    primary key (ID_)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+
+create table ACT_RU_HISTORY_JOB (
+    ID_ varchar(64) NOT NULL,
+    REV_ integer,
+    LOCK_EXP_TIME_ timestamp,
+    LOCK_OWNER_ varchar(255),
+    RETRIES_ integer,
+    EXCEPTION_STACK_ID_ varchar(64),
+    EXCEPTION_MSG_ varchar(4000),
+    HANDLER_TYPE_ varchar(255),
+    HANDLER_CFG_ varchar(4000),
     ADV_HANDLER_CFG_ID_ varchar(64),
     TENANT_ID_ varchar(255) default '',
+    CREATE_TIME_ timestamp,
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

@@ -20,6 +20,14 @@ import org.flowable.engine.runtime.HistoryJob;
 
 public interface HistoryJobEntity extends JobInfoEntity, HistoryJob, Entity, HasRevision {
 
+    String getAdvancedJobHandlerConfiguration();
+
+    void setAdvancedJobHandlerConfiguration(String jobHandlerConfiguration);
+  
+    void setAdvancedJobHandlerConfigurationBytes(byte[] bytes);
+  
+    ByteArrayRef getAdvancedJobHandlerConfigurationByteArrayRef();
+    
     void setCreateTime(Date createTime);
     
 }

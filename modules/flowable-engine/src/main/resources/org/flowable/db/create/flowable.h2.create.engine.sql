@@ -104,7 +104,6 @@ create table ACT_RU_JOB (
     REPEAT_ varchar(255),
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
-    ADV_HANDLER_CFG_ID_ varchar(64),
     TENANT_ID_ varchar(255) default '',
     primary key (ID_)
 );
@@ -126,7 +125,6 @@ create table ACT_RU_TIMER_JOB (
     REPEAT_ varchar(255),
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
-    ADV_HANDLER_CFG_ID_ varchar(64),
     TENANT_ID_ varchar(255) default '',
     primary key (ID_)
 );
@@ -165,7 +163,6 @@ create table ACT_RU_DEADLETTER_JOB (
     REPEAT_ varchar(255),
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
-    ADV_HANDLER_CFG_ID_ varchar(64),
     TENANT_ID_ varchar(255) default '',
     primary key (ID_)
 );

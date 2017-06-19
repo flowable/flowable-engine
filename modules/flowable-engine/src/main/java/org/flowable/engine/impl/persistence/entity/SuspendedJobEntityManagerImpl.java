@@ -96,7 +96,6 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
         super.delete(jobEntity);
 
         deleteExceptionByteArrayRef(jobEntity);
-        deleteAdvancedJobHandlerConfigurationByteArrayRef(jobEntity);
 
         if (jobEntity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
             CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(jobEntity.getExecutionId());
@@ -118,13 +117,6 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
         ByteArrayRef exceptionByteArrayRef = jobEntity.getExceptionByteArrayRef();
         if (exceptionByteArrayRef != null) {
             exceptionByteArrayRef.delete();
-        }
-    }
-    
-    protected void deleteAdvancedJobHandlerConfigurationByteArrayRef(SuspendedJobEntity jobEntity) {
-        ByteArrayRef configurationByteArrayRef = jobEntity.getAdvancedJobHandlerConfigurationByteArrayRef();
-        if (configurationByteArrayRef != null) {
-            configurationByteArrayRef.delete();
         }
     }
 
