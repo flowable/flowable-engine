@@ -27,7 +27,6 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.EnableVerboseExecutionTreeLogging;
-import org.flowable.engine.test.bpmn.event.compensate.helper.SetVariablesDelegate;
 
 /**
  * @author Tijs Rademakers

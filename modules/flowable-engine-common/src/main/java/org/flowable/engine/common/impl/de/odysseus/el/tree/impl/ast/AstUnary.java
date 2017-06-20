@@ -26,7 +26,7 @@ public class AstUnary extends AstRightValue {
 	public interface Operator {
 		public Object eval(Bindings bindings, ELContext context, AstNode node);		
 	}
-	public static abstract class SimpleOperator implements Operator {
+	public abstract static class SimpleOperator implements Operator {
 		public Object eval(Bindings bindings, ELContext context, AstNode node) {
 			return apply(bindings, node.eval(bindings, context));
 		}

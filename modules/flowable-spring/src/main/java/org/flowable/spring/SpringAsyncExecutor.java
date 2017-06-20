@@ -16,9 +16,7 @@ import java.util.concurrent.RejectedExecutionException;
 
 import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.engine.impl.asyncexecutor.ExecuteAsyncRunnable;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.runtime.JobInfo;
-import org.flowable.engine.runtime.Job;
 import org.springframework.core.task.TaskExecutor;
 
 /**
