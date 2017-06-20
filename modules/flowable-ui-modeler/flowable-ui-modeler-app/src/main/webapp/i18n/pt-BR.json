@@ -417,7 +417,8 @@
       "UPLOAD":"Carregar",
       "EXPRESSION":"Expressão",
       "DECIMAL":"Decimal",
-      "HYPERLINK":"Hiperlink"
+      "HYPERLINK":"Hiperlink",
+      "GROUP": "Cabeçalho"
     },
     "TABS":{
       "GENERAL":"Geral",

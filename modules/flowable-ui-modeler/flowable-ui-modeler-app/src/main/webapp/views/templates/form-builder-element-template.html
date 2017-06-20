@@ -100,4 +100,39 @@
     </div>
     <div class="clearfix"></div>
   </div>
+
+  <div ng-switch-when="group" ng-class="{'has-error' : formElement.hasValidationError}">
+    <h3>{{formElement.name}} <a ng-if="formElement.hasValidationError" ng-click="showValidationErrors(formElement)"><img src="editor-app/images/bpmn-error.png"/></a> </h3>
+    <hr style="width:100%; height: 1px; background-color: black"/>
+      <table class="container-control"  ng-if="(!formMode || formMode != 'read')">
+          <tr>
+              <td class="container-control-cell" ng-repeat="colItems in toFormFieldColumnArray(formElement.fields) track by $index" colspan="{{colItems[0].colspan}}">
+                  <ul dnd-list="colItems"
+                      dnd-allowed-types="['width-1']"
+                      dnd-drop="drop({ item: item, list: colItems, event: event })">
+                      <li ng-repeat="item in colItems track by item._guid"
+                          dnd-draggable="item"
+                          dnd-effect-allowed="move"
+                          dnd-moved="moved({ item: item, list: colItems })"
+                          dnd-type="'width-' + item._width">
+                          <div draggable="true" form-builder-element form-element="item" stencil-set="stencilSet" edit-state="editState" file-source-options="fileSourceOptions" class="canvas-element"></div>
+                      </li>
+                  </ul>
+              </td>
+          </tr>
+      </table>
+
+      <table class="container-control" ng-if="formMode && formMode === 'read'">
+          <tr>
+              <td class="container-control-cell" ng-repeat="(colName, colItems) in formElement.fields">
+                  <ul>
+                      <li ng-repeat="item in colItems track by item._guid">
+                          <div form-builder-element form-element="item" stencil-set="stencilSet" edit-state="editState" form-mode="formMode" file-source-options="fileSourceOptions"></div>
+                      </li>
+                  </ul>
+              </td>
+          </tr>
+      </table>
+  </div>
+
 </div>
