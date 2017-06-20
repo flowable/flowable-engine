@@ -342,6 +342,9 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
 
             taskService.setVariable(newTask.getId(), "testVariable", 123);
             taskService.setVariable(newTask.getId(), "testVariable", 456);
+            
+            waitForJobExecutorToProcessAllHistoryJobs(5000, 200);
+            
             taskService.removeVariable(newTask.getId(), "testVariable");
 
             assertEquals(3, listener.getEventsReceived().size());
@@ -374,8 +377,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
             assertNull(event.getVariableValue());
         } finally {
 
-            // Cleanup task and history to ensure a clean DB after test
-            // success/failure
+            // Cleanup task and history to ensure a clean DB after test success/failure
             if (newTask.getId() != null) {
                 taskService.deleteTask(newTask.getId());
                 if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {

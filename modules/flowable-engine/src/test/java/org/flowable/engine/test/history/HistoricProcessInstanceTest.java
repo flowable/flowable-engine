@@ -550,11 +550,11 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertEquals(2, historicProcessInstanceVars.size());
         assertEquals("Kermit", historicProcessInstanceVars.get("name"));
         assertEquals(60, historicProcessInstanceVars.get("age"));
+        
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
 
         // cleanup
-        repositoryService.deleteDeployment(deploymentId, true);
-        
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        deleteDeployment(deploymentId);
     }
 
 }
