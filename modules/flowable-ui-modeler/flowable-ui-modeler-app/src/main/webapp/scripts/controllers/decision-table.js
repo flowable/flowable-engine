@@ -243,7 +243,7 @@ angular.module('flowableModeler')
                 var element = document.querySelector("thead > tr > th:first-of-type");
                 if (element) {
                     var firstChild = element.firstChild;
-                    var newElement = angular.element('<div class="hit-policy-header">' + $scope.currentDecisionTable.hitIndicator.substring(0, 1) + '</div>');
+                    var newElement = angular.element('<div class="hit-policy-header"><a onclick="triggerHitPolicyEditor()">' + $scope.currentDecisionTable.hitIndicator.substring(0, 1) + '</a></div>');
                     element.className = 'hit-policy-container';
                     element.replaceChild(newElement[0], firstChild);
                 }
@@ -278,6 +278,17 @@ angular.module('flowableModeler')
                     };
                 }
                 return newInputExpression;
+            };
+
+            $scope.openHitPolicyEditor = function () {
+                var editTemplate = 'views/popup/decision-table-edit-hit-policy.html';
+
+                $scope.model.hitPolicy = $scope.currentDecisionTable.hitIndicator;
+
+                _internalCreateModal({
+                    template: editTemplate,
+                    scope: $scope
+                }, $modal, $scope);
             };
 
             $scope.openInputExpressionEditor = function (expressionPos, newExpression) {

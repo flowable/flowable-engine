@@ -11,13 +11,16 @@
                         <div class="col-xs-4">
                             <label>Hit Policy</label>
                         </div>
-                        <div class="col-xs-8">
+                        <div ng-if="!model.readOnly"  class="col-xs-8">
                             <select name="hitPolicy" id="hitPolicy" ng-model="popup.currentHitPolicy">
                                 <option ng-selected="{{option.id == popup.currentHitPolicy}}"
                                         ng-repeat="option in popup.availableHitPolicies" value="{{option.id}}">
                                     {{option.label | translate}}
                                 </option>
                             </select>
+                        </div>
+                        <div ng-if="model.readOnly"  class="col-xs-8">
+                            <div>{{popup.currentHitPolicy}}</div>
                         </div>
                     </div>
                 </div>
@@ -27,7 +30,7 @@
                         <button type="button" class="btn btn-sm btn-default" ng-click="cancel()">
                             {{'GENERAL.ACTION.CANCEL' | translate}}
                         </button>
-                        <button type="button" class="btn btn-sm btn-default" ng-click="save()"
+                        <button ng-if="!model.readOnly" type="button" class="btn btn-sm btn-default" ng-click="save()"
                                 ng-disabled="!inputExpressionForm.$valid || readOnly">
                             {{'GENERAL.ACTION.SAVE' | translate}}
                         </button>
