@@ -13,15 +13,17 @@
 
 package org.flowable.idm.engine.impl.persistence.entity;
 
-import java.util.List;
-import java.util.Map;
-
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.idm.api.PasswordEncoder;
+import org.flowable.idm.api.PasswordSalt;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 import org.flowable.idm.engine.impl.UserQueryImpl;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -38,7 +40,7 @@ public interface UserEntityManager extends EntityManager<UserEntity> {
 
     UserQuery createNewUserQuery();
 
-    Boolean checkPassword(String userId, String password);
+    Boolean checkPassword(String userId, String password, PasswordEncoder passwordEncoder, PasswordSalt passwordSalt);
 
     List<User> findUsersByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
 

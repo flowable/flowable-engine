@@ -12,14 +12,16 @@
  */
 package org.flowable.idm.engine.impl.cmd;
 
-import java.io.Serializable;
-
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.idm.api.PasswordEncoder;
+import org.flowable.idm.api.PasswordSalt;
 import org.flowable.idm.api.User;
 import org.flowable.idm.engine.impl.interceptor.Command;
 import org.flowable.idm.engine.impl.interceptor.CommandContext;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntity;
+
+import java.io.Serializable;
 
 /**
  * @author Joram Barrez
@@ -27,10 +29,14 @@ import org.flowable.idm.engine.impl.persistence.entity.UserEntity;
 public class SaveUserCmd implements Command<Void>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    private final PasswordSalt passwordSalt;
+    private final PasswordEncoder passwordEncoder;
     protected User user;
 
-    public SaveUserCmd(User user) {
+    public SaveUserCmd(User user, PasswordEncoder passwordEncoder, PasswordSalt passwordSalt) {
         this.user = user;
+        this.passwordEncoder = passwordEncoder;
+        this.passwordSalt = passwordSalt;
     }
 
     public Void execute(CommandContext commandContext) {
@@ -38,6 +44,9 @@ public class SaveUserCmd implements Command<Void>, Serializable {
             throw new FlowableIllegalArgumentException("user is null");
         }
         if (commandContext.getUserEntityManager().isNewUser(user)) {
+            if (null != this.user.getPassword() && null != passwordEncoder) {
+                user.setPassword(passwordEncoder.encode(user.getPassword(), passwordSalt));
+            }
             if (user instanceof UserEntity) {
                 commandContext.getUserEntityManager().insert((UserEntity) user, true);
             } else {

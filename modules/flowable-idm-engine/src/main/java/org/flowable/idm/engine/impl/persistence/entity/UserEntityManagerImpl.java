@@ -13,17 +13,19 @@
 
 package org.flowable.idm.engine.impl.persistence.entity;
 
-import java.util.List;
-import java.util.Map;
-
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.idm.api.PasswordEncoder;
+import org.flowable.idm.api.PasswordSalt;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.UserQueryImpl;
 import org.flowable.idm.engine.impl.persistence.entity.data.UserDataManager;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -96,14 +98,14 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
         return new UserQueryImpl(getCommandExecutor());
     }
 
-    public Boolean checkPassword(String userId, String password) {
+    public Boolean checkPassword(String userId, String password, PasswordEncoder passwordEncoder, PasswordSalt salt) {
         User user = null;
 
         if (userId != null) {
             user = findById(userId);
         }
 
-        return (user != null) && (password != null) && (password.equals(user.getPassword()));
+        return (user != null) && (password != null) && (passwordEncoder.isMatches(password, user.getPassword(), salt));
     }
 
     public List<User> findUsersByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
