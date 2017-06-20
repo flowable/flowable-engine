@@ -14,8 +14,6 @@ package org.flowable.engine.impl.history.async;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -91,72 +89,6 @@ public class AsyncHistorySessionCommandContextCloseListener implements CommandCo
             objectNodes.add(historyJson);
         }
         jobData.remove(type);
-    }
-    
-    protected Map<String, List<Map<String, String>>> filterHistoricData(Map<String, List<Map<String, String>>> jobData) {
-        if (jobData == null || jobData.isEmpty()) {
-            return Collections.emptyMap();
-        }
-        matchCorrespondingActivityStartAndEndPairs(jobData);
-        return jobData;
-    }
-
-    protected void matchCorrespondingActivityStartAndEndPairs(Map<String, List<Map<String, String>>> jobData) {
-
-        // Try to match activity-start with corresponding activity-end and make them an activity-full
-
-        List<Map<String, String>> activityFullDataList = null;
-        if (jobData.containsKey(HistoryJsonConstants.TYPE_ACTIVITY_START)) {
-            List<Map<String, String>> activityStartDataList = jobData.get(HistoryJsonConstants.TYPE_ACTIVITY_START);
-
-            if (jobData.containsKey(HistoryJsonConstants.TYPE_ACTIVITY_END)) {
-                Iterator<Map<String, String>> activityStartDataIterator = activityStartDataList.iterator();
-                while (activityStartDataIterator.hasNext()) {
-
-                    Map<String, String> activityStartData = activityStartDataIterator.next();
-                    String activityStartKey = createActivityKey(activityStartData);
-
-                    List<Map<String, String>> activityEndDataList = jobData.get(HistoryJsonConstants.TYPE_ACTIVITY_END);
-                    Iterator<Map<String, String>> activityEndDataIterator = activityEndDataList.iterator();
-                    while (activityEndDataIterator.hasNext()) {
-                        
-                        Map<String, String> activityEndData = activityEndDataIterator.next();
-                        String activityEndKey = createActivityKey(activityEndData);
-                        if (activityEndKey.equals(activityStartKey)) {
-                            if (!jobData.containsKey(HistoryJsonConstants.TYPE_ACTIVITY_FULL)) {
-                                jobData.put(HistoryJsonConstants.TYPE_ACTIVITY_FULL, new ArrayList<Map<String, String>>());
-                            }
-                            activityEndData.put(HistoryJsonConstants.START_TIME, activityStartData.get(HistoryJsonConstants.START_TIME));
-                            
-                            // Can't add and remove from same map in one loop ... 
-                            if (activityFullDataList == null) {
-                                activityFullDataList = new ArrayList<>();
-                            }
-                            activityFullDataList.add(activityEndData);
-                            
-                            activityStartDataIterator.remove();
-                            activityEndDataIterator.remove();
-                            
-                        }
-                        
-                    }
-
-                }
-            }
-        }
-        
-        if (activityFullDataList != null) {
-            if (jobData.containsKey(HistoryJsonConstants.TYPE_ACTIVITY_FULL)) {
-                jobData.put(HistoryJsonConstants.TYPE_ACTIVITY_FULL, new ArrayList<Map<String, String>>());
-            }
-            for (Map<String, String> activityFullData : activityFullDataList) {
-                jobData.get(HistoryJsonConstants.TYPE_ACTIVITY_FULL).add(activityFullData);
-            }
-        }
-    }
-
-    protected String createActivityKey(Map<String, String> historicData) {
-        return historicData.get(HistoryJsonConstants.EXECUTION_ID) + "_" + historicData.get(HistoryJsonConstants.ACTIVITY_ID);
     }
     
     protected ObjectNode generateJson(CommandContext commandContext, String type, Map<String, String> historicData) {
