@@ -36,34 +36,37 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
 
     }
 
-
-
     public void testApacheDigesterdEncoderInstance() {
+        PasswordEncoder passwordEncoder = idmEngineConfiguration.getPasswordEncoder();
 
-        idmIdentityService.setPasswordEncoder(new ApacheDigester(ApacheDigester.Digester.MD5));
+        idmEngineConfiguration.setPasswordEncoder(new ApacheDigester(ApacheDigester.Digester.MD5));
         validatePassword();
 
-        idmIdentityService.setPasswordEncoder(new ApacheDigester(ApacheDigester.Digester.SHA512));
+        idmEngineConfiguration.setPasswordEncoder(new ApacheDigester(ApacheDigester.Digester.SHA512));
         validatePassword();
+        
+        idmEngineConfiguration.setPasswordEncoder(passwordEncoder);
     }
 
     public void testJasptEncoderInstance() {
-
-        idmIdentityService.setPasswordEncoder(new JasyptPasswordEncryptor(new StrongPasswordEncryptor()));
+        PasswordEncoder passwordEncoder = idmEngineConfiguration.getPasswordEncoder();
+        idmEngineConfiguration.setPasswordEncoder(new JasyptPasswordEncryptor(new StrongPasswordEncryptor()));
         validatePassword();
 
+        idmEngineConfiguration.setPasswordEncoder(passwordEncoder);
     }
 
     public void testjBCrytpEncoderInstance() {
-
-        idmIdentityService.setPasswordEncoder(new jBCryptHashing());
+        PasswordEncoder passwordEncoder = idmEngineConfiguration.getPasswordEncoder();
+        idmEngineConfiguration.setPasswordEncoder(new jBCryptHashing());
         validatePassword();
 
+        idmEngineConfiguration.setPasswordEncoder(passwordEncoder);
     }
 
     public void testSaltPasswordEncoderInstance() {
-
-        idmIdentityService.setPasswordEncoder(new ApacheDigester(Digester.MD5));
+        PasswordEncoder passwordEncoder = idmEngineConfiguration.getPasswordEncoder();
+        idmEngineConfiguration.setPasswordEncoder(new ApacheDigester(Digester.MD5));
 
         User user = idmIdentityService.newUser("johndoe");
         user.setPassword("xxx");
@@ -73,7 +76,7 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
         assertTrue(idmIdentityService.checkPassword("johndoe", "xxx"));
         idmIdentityService.deleteUser("johndoe");
 
-        idmIdentityService.setPasswordSalt(new PasswordSaltImpl("salt"));
+        idmEngineConfiguration.setPasswordSalt(new PasswordSaltImpl("salt"));
         user = idmIdentityService.newUser("johndoe1");
         user.setPassword("xxx");
         idmIdentityService.saveUser(user);
@@ -83,14 +86,19 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
 
         assertFalse(noSalt.equals(salt));
         idmIdentityService.deleteUser("johndoe1");
+        
+        idmEngineConfiguration.setPasswordEncoder(passwordEncoder);
     }
 
 
 
     public void testValidatePasswordEncoderInstance() {
-        idmIdentityService.setPasswordEncoder(new CustomPasswordEncoder());
-        PasswordEncoder passwordEncoder = idmIdentityService.getPasswordEncoder();
-        assertTrue(passwordEncoder instanceof CustomPasswordEncoder);
+        PasswordEncoder passwordEncoder = idmEngineConfiguration.getPasswordEncoder();
+        idmEngineConfiguration.setPasswordEncoder(new CustomPasswordEncoder());
+        PasswordEncoder customPasswordEncoder = idmEngineConfiguration.getPasswordEncoder();
+        assertTrue(customPasswordEncoder instanceof CustomPasswordEncoder);
+        
+        idmEngineConfiguration.setPasswordEncoder(passwordEncoder);
     }
 
 

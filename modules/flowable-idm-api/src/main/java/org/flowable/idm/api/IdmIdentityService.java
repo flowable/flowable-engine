@@ -12,9 +12,9 @@
  */
 package org.flowable.idm.api;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-
 import java.util.List;
+
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 
 /**
  * Service to manage {@link User}s and {@link Group}s.
@@ -240,13 +240,5 @@ public interface IdmIdentityService {
      * Creates a {@link PrivilegeQuery} that allows to programmatically query privileges.
      */
     PrivilegeQuery createPrivilegeQuery();
-
-    PasswordEncoder getPasswordEncoder();
-
-    void setPasswordEncoder(PasswordEncoder passwordEncoder);
-
-    PasswordSalt getPasswordSalt();
-
-    void setPasswordSalt(PasswordSalt passwordSalt);
 
 }

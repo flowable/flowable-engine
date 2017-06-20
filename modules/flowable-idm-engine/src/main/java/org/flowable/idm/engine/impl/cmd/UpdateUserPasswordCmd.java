@@ -12,42 +12,33 @@
  */
 package org.flowable.idm.engine.impl.cmd;
 
+import java.io.Serializable;
+
 import org.flowable.idm.api.PasswordEncoder;
 import org.flowable.idm.api.PasswordSalt;
 import org.flowable.idm.api.User;
-import org.flowable.idm.engine.impl.authentication.BlankSalt;
-import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
 import org.flowable.idm.engine.impl.interceptor.Command;
 import org.flowable.idm.engine.impl.interceptor.CommandContext;
-
-import java.io.Serializable;
 
 /**
  * @author faizal-manan
  */
 public class UpdateUserPasswordCmd implements Command<User>, Serializable {
 
+    private static final long serialVersionUID = 1L;
+    
     private User user;
-    private PasswordEncoder passwordEncoder;
-    private PasswordSalt passwordSalt;
-
-    public UpdateUserPasswordCmd(User user, PasswordEncoder passwordEncoder, PasswordSalt passwordSalt) {
-        this.user = user;
-        this.passwordEncoder = passwordEncoder;
-        this.passwordSalt = passwordSalt;
-    }
-
-    public UpdateUserPasswordCmd(User user, PasswordEncoder passwordEncoder) {
-        this(user, passwordEncoder, BlankSalt.getInstance());
-    }
 
     public UpdateUserPasswordCmd(User user) {
-        this(user, ClearTextPasswordEncoder.getInstance());
+        this.user = user;
     }
 
     @Override
     public User execute(CommandContext commandContext) {
         if (!commandContext.getUserEntityManager().isNewUser(user)) {
+            PasswordEncoder passwordEncoder = commandContext.getIdmEngineConfiguration().getPasswordEncoder();
+            PasswordSalt passwordSalt = commandContext.getIdmEngineConfiguration().getPasswordSalt();
+            
             user.setPassword(passwordEncoder.encode(user.getPassword(), passwordSalt));
             commandContext.getUserEntityManager().updateUser(user);
         }
