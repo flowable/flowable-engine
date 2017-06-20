@@ -14,97 +14,48 @@ package org.flowable.engine.impl.history.async;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntityManager;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class DefaultAsyncHistoryJobProducer implements AsyncHistoryJobProducer {
+public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
 
     protected boolean isJsonGzipCompressionEnabled;
-
+    protected boolean isAsyncHistoryJsonGroupingEnabled;
+    
     @Override
-    public void createAsyncHistoryJobs(CommandContext commandContext) {
-        createJobsWithHistoricalData(commandContext, commandContext.getSession(AsyncHistorySession.class));
+    public void historyDataGenerated(List<ObjectNode> historyObjectNodes) {
+        createJobsWithHistoricalData(historyObjectNodes, Context.getCommandContext());
     }
 
-    protected void createJobsWithHistoricalData(CommandContext commandContext, AsyncHistorySession asyncHistorySession) {
-        List<Pair<String, Map<String, String>>> filteredJobs = filterHistoricData(asyncHistorySession.getJobData());
-        for (Pair<String, Map<String, String>> historicData : filteredJobs) {
+    protected void createJobsWithHistoricalData(List<ObjectNode> historyObjectNodes, CommandContext commandContext) {
+        AsyncHistorySession asyncHistorySession = commandContext.getSession(AsyncHistorySession.class);
+        if (isAsyncHistoryJsonGroupingEnabled) {
             HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession);
-            ObjectNode historyJson = generateJson(commandContext, historicData);
-            addJsonToJob(commandContext, jobEntity, historyJson);
+            ArrayNode arrayNode = commandContext.getProcessEngineConfiguration().getObjectMapper().createArrayNode();
+            for (ObjectNode historyJsonNode : historyObjectNodes) {
+                arrayNode.add(historyJsonNode);
+            }
+            addJsonToJob(commandContext, jobEntity, arrayNode);
+        } else {
+            for (ObjectNode historyJsonNode : historyObjectNodes) {
+                HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession);
+                addJsonToJob(commandContext, jobEntity, historyJsonNode);
+            }
         }
     }
     
-    protected List<Pair<String, Map<String, String>>> filterHistoricData(List<Pair<String, Map<String, String>>> jobData) {
-        List<Pair<String, Map<String, String>>> filteredJobs = new ArrayList<>();
-        Map<String, Pair<String, Map<String, String>>> variableUpdatedMap = new HashMap<>();
-        
-        List<Integer> matchedActvityEndIndexes = new ArrayList<>();
-        for (int i = 0; i < jobData.size(); i++) {
-            Pair<String, Map<String, String>> historicData = jobData.get(i);
-            if ("activity-start".equals(historicData.getKey())) {
-                
-                String activityKey = historicData.getValue().get(HistoryJsonConstants.EXECUTION_ID) + "_" + 
-                                historicData.getValue().get(HistoryJsonConstants.ACTIVITY_ID);
-                
-                Pair<String, Map<String, String>> matchedHistoricEndData = null;
-                for (int j = i; j < jobData.size(); j++) {
-                    Pair<String, Map<String, String>> historicEndData = jobData.get(j);
-                    if ("activity-end".equals(historicEndData.getKey()) && !matchedActvityEndIndexes.contains(j)) {
-                        
-                        String activityEndKey = historicEndData.getValue().get(HistoryJsonConstants.EXECUTION_ID) + "_" + 
-                                        historicEndData.getValue().get(HistoryJsonConstants.ACTIVITY_ID);
-                        
-                        if (activityEndKey.equals(activityKey)) {
-                            matchedHistoricEndData = historicEndData;
-                            matchedActvityEndIndexes.add(j);
-                            break;
-                        }
-                    }
-                }
-                
-                if (matchedHistoricEndData != null) {
-                    filteredJobs.add(Pair.of("activity-full", matchedHistoricEndData.getValue()));
-                } else {
-                    filteredJobs.add(historicData);
-                }
-                
-            } else if ("variable-updated".equals(historicData.getKey())) {
-                variableUpdatedMap.put(historicData.getValue().get(HistoryJsonConstants.ID), historicData);
-                
-            } else if (!"activity-end".equals(historicData.getKey())) {
-                filteredJobs.add(historicData);
-            }
-        }
-        
-        for (int i = 0; i < jobData.size(); i++) {
-            Pair<String, Map<String, String>> historicData = jobData.get(i);
-            if ("activity-end".equals(historicData.getKey()) && !matchedActvityEndIndexes.contains(i)) {
-                filteredJobs.add(historicData);
-            }
-        }
-        
-        for (Pair<String, Map<String, String>> variableUpdatedData : variableUpdatedMap.values()) {
-            filteredJobs.add(variableUpdatedData);
-        }
-        
-        return filteredJobs;
-    }
-
     protected HistoryJobEntity createAndInsertJobEntity(CommandContext commandContext, AsyncHistorySession asyncHistorySession) {
         ProcessEngineConfiguration processEngineConfiguration = commandContext.getProcessEngineConfiguration();
         HistoryJobEntityManager historyJobEntityManager = commandContext.getHistoryJobEntityManager();
@@ -117,24 +68,7 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryJobProducer {
         return currentJobEntity;
     }
 
-    protected ObjectNode generateJson(CommandContext commandContext, Pair<String, Map<String, String>> historicData) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-        ObjectNode elementObjectNode = processEngineConfiguration.getObjectMapper().createObjectNode();
-        elementObjectNode.put("type", historicData.getLeft());
-
-        ObjectNode dataNode = elementObjectNode.putObject("data");
-        Map<String, String> dataMap = historicData.getRight();
-        for (String key : dataMap.keySet()) {
-            dataNode.put(key, dataMap.get(key));
-        }
-        
-        dataNode.put(HistoryJsonConstants.JOB_CREATE_TIME, AsyncHistoryDateUtil.formatDate(
-                        processEngineConfiguration.getClock().getCurrentTime()));
-        
-        return elementObjectNode;
-    }
-
-    protected void addJsonToJob(CommandContext commandContext, HistoryJobEntity jobEntity, ObjectNode rootObjectNode) {
+    protected void addJsonToJob(CommandContext commandContext, HistoryJobEntity jobEntity, JsonNode rootObjectNode) {
         try {
             byte[] bytes = commandContext.getProcessEngineConfiguration().getObjectMapper().writeValueAsBytes(rootObjectNode);
             if (isJsonGzipCompressionEnabled) {
@@ -165,4 +99,12 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryJobProducer {
         this.isJsonGzipCompressionEnabled = isJsonGzipCompressionEnabled;
     }
 
+    public boolean isAsyncHistoryJsonGroupingEnabled() {
+        return isAsyncHistoryJsonGroupingEnabled;
+    }
+
+    public void setAsyncHistoryJsonGroupingEnabled(boolean isAsyncHistoryJsonGroupingEnabled) {
+        this.isAsyncHistoryJsonGroupingEnabled = isAsyncHistoryJsonGroupingEnabled;
+    }
+    
 }

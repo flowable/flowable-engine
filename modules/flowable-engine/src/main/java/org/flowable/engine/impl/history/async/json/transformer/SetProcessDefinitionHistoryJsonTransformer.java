@@ -21,11 +21,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class SetProcessDefinitionHistoryJsonTransformer extends AbstractNeedsHistoricActivityHistoryJsonTransformer {
 
-    public static final String TYPE = "set-process-definition";
-
     @Override
     public String getType() {
-        return TYPE;
+        return HistoryJsonConstants.TYPE_SET_PROCESS_DEFINITION;
     }
     
     @Override

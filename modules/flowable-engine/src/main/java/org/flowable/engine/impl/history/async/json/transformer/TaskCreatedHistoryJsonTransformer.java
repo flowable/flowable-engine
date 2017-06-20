@@ -24,11 +24,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TaskCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
-    public static final String TYPE = "task-created";
-
     @Override
     public String getType() {
-        return TYPE;
+        return HistoryJsonConstants.TYPE_TASK_CREATED;
     }
     
     @Override
@@ -73,7 +71,7 @@ public class TaskCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransf
             historicTaskInstance.setDueDate(getDateFromJson(historicalData, HistoryJsonConstants.DUE_DATE));
             historicTaskInstance.setCategory(getStringFromJson(historicalData, HistoryJsonConstants.CATEGORY));
             historicTaskInstance.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
-            historicTaskInstance.setLastUpdateTime(getDateFromJson(historicalData, HistoryJsonConstants.JOB_CREATE_TIME));
+            historicTaskInstance.setLastUpdateTime(getDateFromJson(historicalData, HistoryJsonConstants.TIMESTAMP));
     
             historicTaskInstanceEntityManager.insert(historicTaskInstance);
         }

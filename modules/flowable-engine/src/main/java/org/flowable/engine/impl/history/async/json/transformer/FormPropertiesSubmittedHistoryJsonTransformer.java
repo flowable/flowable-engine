@@ -25,11 +25,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class FormPropertiesSubmittedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
-    public static final String TYPE = "form-properties-submitted";
-
     @Override
     public String getType() {
-        return TYPE;
+        return HistoryJsonConstants.TYPE_FORM_PROPERTIES_SUBMITTED;
     }
 
     @Override

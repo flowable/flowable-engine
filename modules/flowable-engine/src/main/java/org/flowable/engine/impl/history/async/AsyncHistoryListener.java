@@ -12,10 +12,12 @@
  */
 package org.flowable.engine.impl.history.async;
 
-import org.flowable.engine.impl.interceptor.CommandContext;
+import java.util.List;
 
-public interface AsyncHistoryJobProducer {
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-    void createAsyncHistoryJobs(CommandContext commandContext);
+public interface AsyncHistoryListener {
+
+    void historyDataGenerated(List<ObjectNode> historyObjectNodes);
 
 }

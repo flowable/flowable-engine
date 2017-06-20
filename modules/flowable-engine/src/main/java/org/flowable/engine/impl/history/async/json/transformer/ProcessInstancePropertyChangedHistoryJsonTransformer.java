@@ -22,14 +22,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ProcessInstancePropertyChangedHistoryJsonTransformer extends AbstractNeedsProcessInstanceHistoryJsonTransformer {
 
-    public static final String TYPE = "process-instance-property-changed";
-
     public static final String PROPERTY_NAME = "name";
     public static final String PROPERTY_BUSINESS_KEY = "businessKey";
 
     @Override
     public String getType() {
-        return TYPE;
+        return HistoryJsonConstants.TYPE_PROCESS_INSTANCE_PROPERTY_CHANGED;
     }
 
     @Override

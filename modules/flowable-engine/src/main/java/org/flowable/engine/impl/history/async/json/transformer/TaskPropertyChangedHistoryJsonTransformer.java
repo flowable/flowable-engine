@@ -28,11 +28,9 @@ public class TaskPropertyChangedHistoryJsonTransformer extends AbstractNeedsTask
     
     private static final Logger logger = LoggerFactory.getLogger(TaskPropertyChangedHistoryJsonTransformer.class);
 
-    public static final String TYPE = "task-property-changed";
-
     @Override
     public String getType() {
-        return TYPE;
+        return HistoryJsonConstants.TYPE_TASK_PROPERTY_CHANGED;
     }
 
     @Override
@@ -41,7 +39,7 @@ public class TaskPropertyChangedHistoryJsonTransformer extends AbstractNeedsTask
         if (StringUtils.isNotEmpty(taskId)) {
             HistoricTaskInstanceEntity historicTaskInstance = commandContext.getHistoricTaskInstanceEntityManager().findById(taskId);
 
-            Date lastUpdateTime = getDateFromJson(historicalData, HistoryJsonConstants.JOB_CREATE_TIME);
+            Date lastUpdateTime = getDateFromJson(historicalData, HistoryJsonConstants.TIMESTAMP);
             if (historicTaskInstance.getLastUpdateTime() == null || !historicTaskInstance.getLastUpdateTime().after(lastUpdateTime)) {
                 historicTaskInstance.setName(getStringFromJson(historicalData, HistoryJsonConstants.NAME));
                 historicTaskInstance.setDescription(getStringFromJson(historicalData, HistoryJsonConstants.DESCRIPTION));

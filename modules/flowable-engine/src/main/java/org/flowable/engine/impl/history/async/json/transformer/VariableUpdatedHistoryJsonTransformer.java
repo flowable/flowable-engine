@@ -29,11 +29,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class VariableUpdatedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
-    public static final String TYPE = "variable-updated";
-
     @Override
     public String getType() {
-        return TYPE;
+        return HistoryJsonConstants.TYPE_VARIABLE_UPDATED;
     }
 
     @Override

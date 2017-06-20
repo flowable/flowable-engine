@@ -56,16 +56,12 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
 
     protected Map<String, List<HistoryJsonTransformer>> historyJsonTransformers = new HashMap<String, List<HistoryJsonTransformer>>();
 
-    public AsyncHistoryJobHandler() {
-        initDefaultTransformers();
-    }
-
     @Override
     public String getType() {
         return JOB_TYPE;
     }
 
-    protected void initDefaultTransformers() {
+    public void initDefaultTransformers() {
         addHistoryJsonTransformer(new ProcessInstanceStartHistoryJsonTransformer());
         addHistoryJsonTransformer(new ProcessInstanceEndHistoryJsonTransformer());
         addHistoryJsonTransformer(new ProcessInstanceDeleteHistoryJsonTransformer());
@@ -106,8 +102,8 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
     @Override
     protected void processHistoryJson(CommandContext commandContext, HistoryJobEntity job, JsonNode historyNode) {
         
-        String type = historyNode.get("type").asText();
-        ObjectNode historicalJsonData = (ObjectNode) historyNode.get("data");
+        String type = historyNode.get(HistoryJsonConstants.TYPE).asText();
+        ObjectNode historicalJsonData = (ObjectNode) historyNode.get(HistoryJsonConstants.DATA);
 
         if (logger.isDebugEnabled()) {
             logger.debug("Handling async history job (id={}, type={})", job.getId(), type);

@@ -19,7 +19,7 @@ import org.flowable.engine.impl.interceptor.CommandContext;
 
 public class AsyncHistorySessionFactory implements SessionFactory {
 
-    protected AsyncHistoryJobProducer asyncHistoryJobProducer;
+    protected AsyncHistoryListener asyncHistoryListener;
 
     @Override
     public Class<?> getSessionType() {
@@ -28,15 +28,15 @@ public class AsyncHistorySessionFactory implements SessionFactory {
 
     @Override
     public Session openSession(AbstractCommandContext commandContext) {
-        return new AsyncHistorySession((CommandContext) commandContext, asyncHistoryJobProducer);
+        return new AsyncHistorySession((CommandContext) commandContext, asyncHistoryListener);
+    }
+    
+    public AsyncHistoryListener getAsyncHistoryListener() {
+        return asyncHistoryListener;
     }
 
-    public AsyncHistoryJobProducer getAsyncHistoryJobProducer() {
-        return asyncHistoryJobProducer;
-    }
-
-    public void setAsyncHistoryJobProducer(AsyncHistoryJobProducer asyncHistoryJobProducer) {
-        this.asyncHistoryJobProducer = asyncHistoryJobProducer;
+    public void setAsyncHistoryListener(AsyncHistoryListener asyncHistoryListener) {
+        this.asyncHistoryListener = asyncHistoryListener;
     }
 
 }

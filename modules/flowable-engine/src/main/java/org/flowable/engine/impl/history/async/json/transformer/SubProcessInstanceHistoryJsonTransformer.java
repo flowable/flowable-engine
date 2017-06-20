@@ -26,11 +26,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class SubProcessInstanceHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
-    public static final String TYPE = "subprocess-instance-start";
-
     @Override
     public String getType() {
-        return TYPE;
+        return HistoryJsonConstants.TYPE_SUBPROCESS_INSTANCE_START;
     }
 
     @Override

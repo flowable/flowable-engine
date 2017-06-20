@@ -24,11 +24,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ActivityStartHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
-    public static final String TYPE = "activity-start";
-
     @Override
     public String getType() {
-        return TYPE;
+        return HistoryJsonConstants.TYPE_ACTIVITY_START;
     }
 
     @Override

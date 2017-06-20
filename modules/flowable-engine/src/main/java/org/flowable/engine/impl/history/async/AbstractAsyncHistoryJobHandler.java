@@ -24,10 +24,12 @@ import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandler {
 
     protected boolean isJsonGzipCompressionEnabled;
+    protected boolean isAsyncHistoryJsonGroupingEnabled;
 
     @Override
     public void execute(HistoryJobEntity job, String configuration, CommandContext commandContext) {
@@ -40,7 +42,14 @@ public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandle
                     bytes = decompress(bytes);
                 }
                 JsonNode historyNode = objectMapper.readTree(bytes);
-                processHistoryJson(commandContext, job, historyNode);
+                if (isAsyncHistoryJsonGroupingEnabled() && historyNode.isArray()) {
+                    ArrayNode arrayNode = (ArrayNode) historyNode;
+                    for (JsonNode jsonNode : arrayNode) {
+                        processHistoryJson(commandContext, job, jsonNode);
+                    }
+                } else {
+                    processHistoryJson(commandContext, job, historyNode);
+                }
                 
             } catch (AsyncHistoryJobNotApplicableException e) {
                 throw e;
@@ -73,4 +82,12 @@ public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandle
         this.isJsonGzipCompressionEnabled = isJsonGzipCompressionEnabled;
     }
 
+    public boolean isAsyncHistoryJsonGroupingEnabled() {
+        return isAsyncHistoryJsonGroupingEnabled;
+    }
+
+    public void setAsyncHistoryJsonGroupingEnabled(boolean isAsyncHistoryJsonGroupingEnabled) {
+        this.isAsyncHistoryJsonGroupingEnabled = isAsyncHistoryJsonGroupingEnabled;
+    }
+    
 }

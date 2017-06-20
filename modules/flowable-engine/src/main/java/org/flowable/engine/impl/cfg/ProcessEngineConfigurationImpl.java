@@ -178,7 +178,7 @@ import org.flowable.engine.impl.history.DefaultHistoryManager;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.history.async.AsyncHistoryJobHandler;
-import org.flowable.engine.impl.history.async.AsyncHistoryJobProducer;
+import org.flowable.engine.impl.history.async.AsyncHistoryListener;
 import org.flowable.engine.impl.history.async.AsyncHistoryManager;
 import org.flowable.engine.impl.history.async.AsyncHistorySession;
 import org.flowable.engine.impl.history.async.AsyncHistorySessionFactory;
@@ -489,8 +489,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected HistoryManager historyManager;
     
     protected boolean isAsyncHistoryEnabled;
-    protected boolean isAsyncHistoryJsonGzipCompressionEnabled = false;
-    protected AsyncHistoryJobProducer asyncHistoryJobProducer;
+    protected boolean isAsyncHistoryJsonGzipCompressionEnabled;
+    protected boolean isAsyncHistoryJsonGroupingEnabled;
+    protected AsyncHistoryListener asyncHistoryListener;
 
     // Job Manager
 
@@ -1336,17 +1337,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     
     public void initAsyncHistorySessionFactory() {
         AsyncHistorySessionFactory asyncHistorySessionFactory = new AsyncHistorySessionFactory();
-        if (asyncHistoryJobProducer == null) {
-            initDefaultAsyncHistoryJobProducer();
+        if (asyncHistoryListener == null) {
+            initDefaultAsyncHistoryListener();
         }
-        asyncHistorySessionFactory.setAsyncHistoryJobProducer(asyncHistoryJobProducer);
+        asyncHistorySessionFactory.setAsyncHistoryListener(asyncHistoryListener);
         sessionFactories.put(AsyncHistorySession.class, asyncHistorySessionFactory);
     }
 
-    protected void initDefaultAsyncHistoryJobProducer() {
-        DefaultAsyncHistoryJobProducer producer = new DefaultAsyncHistoryJobProducer();
-        producer.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
-        asyncHistoryJobProducer = producer;
+    protected void initDefaultAsyncHistoryListener() {
+        DefaultAsyncHistoryJobProducer asyncHistoryJobProducer = new DefaultAsyncHistoryJobProducer();
+        asyncHistoryJobProducer.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
+        asyncHistoryJobProducer.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
+        asyncHistoryListener = asyncHistoryJobProducer;
     }
 
     public void initConfigurators() {
@@ -1720,7 +1722,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             historyJobHandlers = new HashMap<String, HistoryJobHandler>();
             
             AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler();
+            asyncHistoryJobHandler.initDefaultTransformers();
             asyncHistoryJobHandler.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
+            asyncHistoryJobHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
             historyJobHandlers.put(asyncHistoryJobHandler.getType(), asyncHistoryJobHandler);
     
             if (getCustomHistoryJobHandlers() != null) {
@@ -3721,13 +3725,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.isAsyncHistoryJsonGzipCompressionEnabled = isAsyncHistoryJsonGzipCompressionEnabled;
         return this;
     }
-
-    public AsyncHistoryJobProducer getAsyncHistoryJobProducer() {
-        return asyncHistoryJobProducer;
+    
+    public boolean isAsyncHistoryJsonGroupingEnabled() {
+        return isAsyncHistoryJsonGroupingEnabled;
     }
 
-    public ProcessEngineConfigurationImpl setAsyncHistoryJobProducer(AsyncHistoryJobProducer asyncHistoryJobProducer) {
-        this.asyncHistoryJobProducer = asyncHistoryJobProducer;
+    public ProcessEngineConfigurationImpl setAsyncHistoryJsonGroupingEnabled(boolean isAsyncHistoryJsonGroupingEnabled) {
+        this.isAsyncHistoryJsonGroupingEnabled = isAsyncHistoryJsonGroupingEnabled;
+        return this;
+    }
+
+    public AsyncHistoryListener getAsyncHistoryListener() {
+        return asyncHistoryListener;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryListener(AsyncHistoryListener asyncHistoryListener) {
+        this.asyncHistoryListener = asyncHistoryListener;
         return this;
     }
 

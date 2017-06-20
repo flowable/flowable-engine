@@ -22,11 +22,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class IdentityLinkCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
-    public static final String TYPE = "identitylink-created";
-
     @Override
     public String getType() {
-        return TYPE;
+        return HistoryJsonConstants.TYPE_IDENTITY_LINK_CREATED;
     }
 
     @Override

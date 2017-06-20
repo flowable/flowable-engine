@@ -31,11 +31,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class HistoricDetailVariableUpdateHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
-    public static final String TYPE = "historic-detail-variable-update";
-
     @Override
     public String getType() {
-        return TYPE;
+        return HistoryJsonConstants.TYPE_HISTORIC_DETAIL_VARIABLE_UPDATE;
     }
 
     @Override

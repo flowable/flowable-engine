@@ -13,6 +13,33 @@
 package org.flowable.engine.impl.history.async;
 
 public interface HistoryJsonConstants {
+    
+    String TYPE = "type";
+    
+    String TYPE_PROCESS_INSTANCE_START = "process-instance-start";
+    String TYPE_SUBPROCESS_INSTANCE_START = "subprocess-instance-start";
+    String TYPE_PROCESS_INSTANCE_PROPERTY_CHANGED = "process-instance-property-changed";
+    String TYPE_SET_PROCESS_DEFINITION = "set-process-definition";
+    String TYPE_ACTIVITY_START = "activity-start";
+    String TYPE_ACTIVITY_END = "activity-end";
+    String TYPE_ACTIVITY_FULL = "activity-full";
+    String TYPE_FORM_PROPERTIES_SUBMITTED = "form-properties-submitted";
+    String TYPE_HISTORIC_DETAIL_VARIABLE_UPDATE = "historic-detail-variable-update";
+    String TYPE_IDENTITY_LINK_CREATED = "identitylink-created";
+    String TYPE_IDENTITY_LINK_DELETED = "identitylink-deleted";
+    String TYPE_TASK_CREATED = "task-created";
+    String TYPE_TASK_ASSIGNEE_CHANGED = "task-assignee-changed";
+    String TYPE_TASK_OWNER_CHANGED = "task-owner-changed";
+    String TYPE_TASK_PROPERTY_CHANGED = "task-property-changed";
+    String TYPE_TASK_ENDED = "task-ended";
+    String TYPE_VARIABLE_CREATED = "variable-created";
+    String TYPE_VARIABLE_UPDATED = "variable-updated";
+    String TYPE_VARIABLE_REMOVED = "variable-removed";
+    String TYPE_PROCESS_INSTANCE_END = "process-instance-end";
+    String TYPE_PROCESS_INSTANCE_DELETED = "process-instance-deleted";
+    String TYPE_PROCESS_INSTANCE_DELETED_BY_PROCDEF_ID = "process-instance-deleted-by-process-definition-id";
+    
+    String DATA = "data";
 
     String ID = "id";
 
@@ -112,5 +139,6 @@ public interface HistoryJsonConstants {
 
     String TENANT_ID = "tenantId";
 
-    String JOB_CREATE_TIME = "jobCreateTime";
+    String TIMESTAMP = "__timeStamp"; // Two underscores to avoid clashes with other fields
+    
 }

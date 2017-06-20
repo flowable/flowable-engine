@@ -23,11 +23,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TaskOwnerChangedHistoryJsonTransformer extends AbstractNeedsTaskHistoryJsonTransformer {
 
-    public static final String TYPE = "task-owner-changed";
-
     @Override
     public String getType() {
-        return TYPE;
+        return HistoryJsonConstants.TYPE_TASK_OWNER_CHANGED;
     }
 
     @Override

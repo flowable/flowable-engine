@@ -22,11 +22,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ProcessInstanceDeleteHistoryByProcessDefinitionIdJsonTransformer extends AbstractProcessInstanceDeleteHistoryTransformer {
 
-    public static final String TYPE = "process-instance-delete-by-process-definition-id";
-
     @Override
     public String getType() {
-        return TYPE;
+        return HistoryJsonConstants.TYPE_PROCESS_INSTANCE_DELETED_BY_PROCDEF_ID;
     }
 
     @Override

@@ -13,10 +13,10 @@
 package org.flowable.engine.impl.history.async;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.engine.common.impl.interceptor.Session;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.interceptor.CommandContextCloseListener;
@@ -24,39 +24,20 @@ import org.flowable.engine.impl.interceptor.CommandContextCloseListener;
 public class AsyncHistorySession implements Session {
 
     protected CommandContext commandContext;
-    protected AsyncHistoryJobProducer asyncHistoryJobProducer;
+    protected AsyncHistoryListener asyncHistoryListener;
     protected CommandContextCloseListener commandContextCloseListener;
 
     protected String tenantId;
-    protected List<Pair<String, Map<String, String>>> jobData;
+    protected Map<String, List<Map<String, String>>> jobData;
 
-    public AsyncHistorySession(CommandContext commandContext, AsyncHistoryJobProducer asyncHistoryJobProducer) {
+    public AsyncHistorySession(CommandContext commandContext, AsyncHistoryListener asyncHistoryJobListener) {
         this.commandContext = commandContext;
-        this.asyncHistoryJobProducer = asyncHistoryJobProducer;
+        this.asyncHistoryListener = asyncHistoryJobListener;
         initCommandContextCloseListener();
     }
 
     protected void initCommandContextCloseListener() {
-        this.commandContextCloseListener = new CommandContextCloseListener() {
-
-            @Override
-            public void closing(CommandContext commandContext) {
-                asyncHistoryJobProducer.createAsyncHistoryJobs(commandContext);
-            }
-
-            @Override
-            public void closed(CommandContext commandContext) {
-            }
-
-            @Override
-            public void closeFailure(CommandContext commandContext) {
-            }
-
-            @Override
-            public void afterSessionsFlush(CommandContext commandContext) {
-            }
-
-        };
+        this.commandContextCloseListener = new AsyncHistorySessionCommandContextCloseListener(this, asyncHistoryListener); 
     }
 
     public void addHistoricData(String type, Map<String, String> data) {
@@ -65,13 +46,17 @@ public class AsyncHistorySession implements Session {
 
     public void addHistoricData(String type, Map<String, String> data, String tenantId) {
         if (jobData == null) {
-            jobData = new ArrayList<Pair<String, Map<String, String>>>();
+            jobData = new LinkedHashMap<>(); // linked: insertion order is important
             commandContext.addCloseListener(commandContextCloseListener);
         }
         if (tenantId != null) {
             this.tenantId = tenantId;
         }
-        jobData.add(Pair.of(type, data));
+        
+        if (!jobData.containsKey(type)) {
+            jobData.put(type, new ArrayList<Map<String, String>>(1));
+        }
+        jobData.get(type).add(data);
     }
     
     @Override
@@ -92,12 +77,12 @@ public class AsyncHistorySession implements Session {
         this.tenantId = tenantId;
     }
 
-    public List<Pair<String, Map<String, String>>> getJobData() {
+    public Map<String, List<Map<String, String>>> getJobData() {
         return jobData;
     }
 
-    public void setJobData(List<Pair<String, Map<String, String>>> jobData) {
+    public void setJobData(Map<String, List<Map<String, String>>> jobData) {
         this.jobData = jobData;
     }
-
+    
 }

@@ -24,11 +24,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ProcessInstanceStartHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
-    public static final String TYPE = "process-instance-start";
-
     @Override
     public String getType() {
-        return TYPE;
+        return HistoryJsonConstants.TYPE_PROCESS_INSTANCE_START;
     }
 
     @Override

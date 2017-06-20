@@ -30,11 +30,9 @@ public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransfor
     
     private static final Logger logger = LoggerFactory.getLogger(TaskEndedHistoryJsonTransformer.class);
 
-    public static final String TYPE = "task-ended";
-
     @Override
     public String getType() {
-        return TYPE;
+        return HistoryJsonConstants.TYPE_TASK_ENDED;
     }
     
     @Override
@@ -49,7 +47,7 @@ public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransfor
         HistoricTaskInstanceEntity historicTaskInstance = historicTaskInstanceEntityManager.findById(taskId);
         
         if (historicTaskInstance != null) {
-            Date lastUpdateTime = getDateFromJson(historicalData, HistoryJsonConstants.JOB_CREATE_TIME);
+            Date lastUpdateTime = getDateFromJson(historicalData, HistoryJsonConstants.TIMESTAMP);
             if (historicTaskInstance.getLastUpdateTime() == null || !historicTaskInstance.getLastUpdateTime().after(lastUpdateTime)) {
                 historicTaskInstance.setLastUpdateTime(lastUpdateTime);
                 
@@ -103,7 +101,7 @@ public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransfor
             historicTaskInstance.setFormKey(getStringFromJson(historicalData, HistoryJsonConstants.FORM_KEY));
             historicTaskInstance.setClaimTime(getDateFromJson(historicalData, HistoryJsonConstants.CLAIM_TIME));
             historicTaskInstance.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
-            historicTaskInstance.setLastUpdateTime(getDateFromJson(historicalData, HistoryJsonConstants.JOB_CREATE_TIME));
+            historicTaskInstance.setLastUpdateTime(getDateFromJson(historicalData, HistoryJsonConstants.TIMESTAMP));
     
             Date endTime = getDateFromJson(historicalData, HistoryJsonConstants.END_TIME);
             historicTaskInstance.setEndTime(endTime);
