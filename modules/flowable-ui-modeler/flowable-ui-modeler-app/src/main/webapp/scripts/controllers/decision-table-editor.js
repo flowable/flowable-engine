@@ -31,6 +31,7 @@ angular.module('flowableModeler')
             var operators = ['==', '!=', '<', '>', '>=', '<='];
             var columnIdCounter = 0;
             var hitPolicyHeaderElement;
+            var dateFormat = 'YYYY-MM-DD';
 
             // Export name to grid's scope
             $scope.appResourceRoot = appResourceRoot;
@@ -498,7 +499,8 @@ angular.module('flowableModeler')
                     type: type,
                     title: '<div class="input-header">' +
                     '<a onclick="triggerExpressionEditor(\'input\',' + expressionPosition + ',false)"><span class="header-label">' + (inputExpression.label ? inputExpression.label : "New Input") + '</span></a>' +
-                    '<br> <span class="header-variable">' + (inputExpression.variableId ? inputExpression.variableId : "none") + '</span>' +
+                    '<br><span class="header-variable">' + (inputExpression.variableId ? inputExpression.variableId : "none") + '</span>' +
+                    '<br/><span class="header-variable-type">' + (inputExpression.type ? inputExpression.type : "") + '</brspan>' +
                     '</div>' +
                     '<div class="header-add-new-expression">' +
                     '<a onclick="triggerExpressionEditor(\'input\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-plus-sign"></span></a>' +
@@ -519,8 +521,9 @@ angular.module('flowableModeler')
 
                     columnDefinition.title = '<div class="input-header">' +
                         '<a onclick="triggerExpressionEditor(\'input\',' + expressionPosition + ',false)"><span class="header-label">' + (inputExpression.label ? inputExpression.label : "New Input") + '</span></a>' +
-                        '<br> <span class="header-variable">' + (inputExpression.variableId ? inputExpression.variableId : "none") + '</span>' +
-                        '<br> <span class="header-entries">' + inputExpression.entries.join() + '</span>' +
+                        '<br><span class="header-variable">' + (inputExpression.variableId ? inputExpression.variableId : "none") + '</span>' +
+                        '<br/><span class="header-variable-type">' + (inputExpression.type ? inputExpression.type : "") + '</span>' +
+                        '<br><span class="header-entries">' + inputExpression.entries.join() + '</span>' +
                         '</div>' +
                         '<div class="header-add-new-expression">' +
                         '<a onclick="triggerExpressionEditor(\'input\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-plus-sign"></span></a>' +
@@ -528,7 +531,7 @@ angular.module('flowableModeler')
                 }
 
                 if (type === 'date') {
-                    columnDefinition.dateFormat = 'YYYY-MM-DD';
+                    columnDefinition.dateFormat = dateFormat;
                 }
 
                 return columnDefinition;
@@ -580,8 +583,9 @@ angular.module('flowableModeler')
 
                     title += '<div class="output-header">' +
                         '<a onclick="triggerExpressionEditor(\'output\',' + expressionPosition + ',false)"><span class="header-label">' + (outputExpression.label ? outputExpression.label : "New Output") + '</span></a>' +
-                        '<br> <span class="header-variable">' + (outputExpression.variableId ? outputExpression.variableId : "none") + '</span>' +
-                        '<br> <span class="header-entries">' + outputExpression.entries.join() + '</span>' +
+                        '<br><span class="header-variable">' + (outputExpression.variableId ? outputExpression.variableId : "none") + '</span>' +
+                        '<br/><span class="header-variable-type">' + (outputExpression.type ? outputExpression.type : "") + '</span>' +
+                        '<br><span class="header-entries">' + outputExpression.entries.join() + '</span>' +
                         '</div>' +
                         '<div class="header-add-new-expression">' +
                         '<a onclick="triggerExpressionEditor(\'output\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-plus-sign"></span></a>' +
@@ -589,7 +593,8 @@ angular.module('flowableModeler')
                 } else {
                     title += '<div class="output-header">' +
                         '<a onclick="triggerExpressionEditor(\'output\',' + expressionPosition + ',false)"><span class="header-label">' + (outputExpression.label ? outputExpression.label : "New Output") + '</span></a>' +
-                        '<br> <span class="header-variable">' + (outputExpression.variableId ? outputExpression.variableId : "none") + '</span>' +
+                        '<br><span class="header-variable">' + (outputExpression.variableId ? outputExpression.variableId : "none") + '</span>' +
+                        '<br/><span class="header-variable-type">' + (outputExpression.type ? outputExpression.type : "") + '</span>' +
                         '</div>' +
                         '<div class="header-add-new-expression">' +
                         '<a onclick="triggerExpressionEditor(\'output\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-plus-sign"></span></a>' +
@@ -597,7 +602,7 @@ angular.module('flowableModeler')
                 }
 
                 if (type === 'date') {
-                    columnDefinition.dateFormat = 'YYYY-MM-DD';
+                    columnDefinition.dateFormat = dateFormat;
                 }
 
                 columnDefinition.title = title;
