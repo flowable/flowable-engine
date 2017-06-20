@@ -42,7 +42,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
             public Void execute(CommandContext commandContext) {
                 List<PropertyEntity> properties = commandContext.getProcessEngineConfiguration().getPropertyEntityManager().findAll();
                 for (PropertyEntity propertyEntity : properties) {
-                    log.info("!!!Property " + propertyEntity.getName() + " " + propertyEntity.getValue());
+                    log.info("!!!Property {} {}", propertyEntity.getName(), propertyEntity.getValue());
                 }
                 return null;
             }

@@ -90,10 +90,10 @@ public class HistoricActivityEventsTest extends PluggableFlowableTestCase {
 
             // Process instance start
             for (FlowableEvent flowableEvent : events) {
-                if (FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED.equals(flowableEvent.getType())) {
+                if (FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED == flowableEvent.getType()) {
                     processInstanceCreated++;
                 
-                } else if (FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED.equals(flowableEvent.getType())) {
+                } else if (FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED == flowableEvent.getType()) {
                     FlowableEntityEvent flowableEntityEvent = (FlowableEntityEvent) flowableEvent;
                     HistoricActivityInstance historicActivityInstance = (HistoricActivityInstance) flowableEntityEvent.getEntity();
                     if ("mainStart".equals(historicActivityInstance.getActivityId())) {
@@ -118,7 +118,7 @@ public class HistoricActivityEventsTest extends PluggableFlowableTestCase {
                         mainEndActivityStarted++;
                     }
                     
-                } else if (FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED.equals(flowableEvent.getType())) {
+                } else if (FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED == flowableEvent.getType()) {
                     FlowableEntityEvent flowableEntityEvent = (FlowableEntityEvent) flowableEvent;
                     HistoricActivityInstance historicActivityInstance = (HistoricActivityInstance) flowableEntityEvent.getEntity();
                     if ("mainStart".equals(historicActivityInstance.getActivityId())) {
@@ -150,7 +150,7 @@ public class HistoricActivityEventsTest extends PluggableFlowableTestCase {
                         mainEndActivityEnded++;
                     }
                     
-                } else if (FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED.equals(flowableEvent.getType())) {
+                } else if (FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED == flowableEvent.getType()) {
                     processInstanceEnded++;
                 }
             }

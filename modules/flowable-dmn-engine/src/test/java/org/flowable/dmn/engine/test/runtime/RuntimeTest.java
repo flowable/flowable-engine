@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.RuleEngineExecutionSingleResult;
 import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
@@ -25,8 +24,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.Assert;
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Yvo Swillens

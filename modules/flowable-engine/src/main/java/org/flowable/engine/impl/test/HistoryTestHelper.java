@@ -13,7 +13,6 @@
 
 package org.flowable.engine.impl.test;
 
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -23,10 +22,6 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.HistoryLevel;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntityImpl;
-import org.flowable.engine.runtime.HistoryJob;
 import org.flowable.engine.test.FlowableRule;
 
 /**

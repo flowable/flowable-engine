@@ -24,7 +24,6 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.runtime.JobInfo;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.junit.Assert;
 import org.junit.Test;

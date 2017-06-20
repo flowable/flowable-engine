@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.history.async.json.transformer;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,8 +25,6 @@ import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityMan
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
     
@@ -76,7 +76,7 @@ public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransfor
                 
             } else {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("History job (id={}) has expired and will be ignored." + historicTaskInstance.getLastUpdateTime() + " " + lastUpdateTime, job.getId());
+                    logger.debug("History job (id={}) has expired and will be ignored.{} {}", job.getId(), historicTaskInstance.getLastUpdateTime(), lastUpdateTime);
                 }
             }
             
