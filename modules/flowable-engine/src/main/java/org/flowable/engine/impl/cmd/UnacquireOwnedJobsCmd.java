@@ -34,7 +34,7 @@ public class UnacquireOwnedJobsCmd implements Command<Void> {
         JobQueryImpl jobQuery = new JobQueryImpl(commandContext);
         jobQuery.lockOwner(lockOwner);
         jobQuery.jobTenantId(tenantId);
-        List<Job> jobs = commandContext.getJobEntityManager().findJobsByQueryCriteria(jobQuery, null);
+        List<Job> jobs = commandContext.getJobEntityManager().findJobsByQueryCriteria(jobQuery);
         for (Job job : jobs) {
             commandContext.getJobManager().unacquire(job);
         }

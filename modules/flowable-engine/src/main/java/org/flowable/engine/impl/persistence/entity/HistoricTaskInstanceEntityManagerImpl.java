@@ -116,8 +116,8 @@ public class HistoricTaskInstanceEntityManagerImpl extends AbstractEntityManager
     }
 
     @Override
-    public List<HistoricTaskInstance> findHistoricTaskInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return historicTaskInstanceDataManager.findHistoricTaskInstancesByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<HistoricTaskInstance> findHistoricTaskInstancesByNativeQuery(Map<String, Object> parameterMap) {
+        return historicTaskInstanceDataManager.findHistoricTaskInstancesByNativeQuery(parameterMap);
     }
 
     @Override

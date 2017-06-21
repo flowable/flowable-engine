@@ -20,7 +20,6 @@ import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DecisionTableQueryImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DecisionTableDataManager;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
@@ -69,8 +68,8 @@ public class DecisionTableEntityManagerImpl extends AbstractEntityManager<Decisi
     }
 
     @Override
-    public List<DmnDecisionTable> findDecisionTablesByQueryCriteria(DecisionTableQueryImpl decisionTableQuery, Page page) {
-        return decisionTableDataManager.findDecisionTablesByQueryCriteria(decisionTableQuery, page);
+    public List<DmnDecisionTable> findDecisionTablesByQueryCriteria(DecisionTableQueryImpl decisionTableQuery) {
+        return decisionTableDataManager.findDecisionTablesByQueryCriteria(decisionTableQuery);
     }
 
     @Override
@@ -98,8 +97,8 @@ public class DecisionTableEntityManagerImpl extends AbstractEntityManager<Decisi
     }
 
     @Override
-    public List<DmnDecisionTable> findDecisionTablesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return decisionTableDataManager.findDecisionTablesByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<DmnDecisionTable> findDecisionTablesByNativeQuery(Map<String, Object> parameterMap) {
+        return decisionTableDataManager.findDecisionTablesByNativeQuery(parameterMap);
     }
 
     @Override

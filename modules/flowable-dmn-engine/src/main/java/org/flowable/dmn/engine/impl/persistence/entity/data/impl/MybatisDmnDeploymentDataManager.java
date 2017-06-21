@@ -22,7 +22,6 @@ import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.data.AbstractDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DmnDeploymentDataManager;
-import org.flowable.engine.common.impl.Page;
 
 /**
  * @author Joram Barrez
@@ -60,9 +59,8 @@ public class MybatisDmnDeploymentDataManager extends AbstractDataManager<DmnDepl
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<DmnDeployment> findDeploymentsByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery, Page page) {
-        final String query = "selectDeploymentsByQueryCriteria";
-        return getDbSqlSession().selectList(query, deploymentQuery, page);
+    public List<DmnDeployment> findDeploymentsByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery) {
+        return getDbSqlSession().selectList("selectDeploymentsByQueryCriteria", deploymentQuery);
     }
 
     @Override
@@ -72,8 +70,8 @@ public class MybatisDmnDeploymentDataManager extends AbstractDataManager<DmnDepl
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<DmnDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return getDbSqlSession().selectListWithRawParameter("selectDeploymentByNativeQuery", parameterMap, firstResult, maxResults);
+    public List<DmnDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap) {
+        return getDbSqlSession().selectListWithRawParameter("selectDeploymentByNativeQuery", parameterMap);
     }
 
     @Override

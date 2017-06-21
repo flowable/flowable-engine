@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDefinitionQuery;
 import org.flowable.form.engine.impl.interceptor.CommandContext;
@@ -282,9 +281,9 @@ public class FormDefinitionQueryImpl extends AbstractQuery<FormDefinitionQuery, 
         return commandContext.getFormDefinitionEntityManager().findFormDefinitionCountByQueryCriteria(this);
     }
 
-    public List<FormDefinition> executeList(CommandContext commandContext, Page page) {
+    public List<FormDefinition> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getFormDefinitionEntityManager().findFormDefinitionsByQueryCriteria(this, page);
+        return commandContext.getFormDefinitionEntityManager().findFormDefinitionsByQueryCriteria(this);
     }
 
     public void checkQueryOk() {

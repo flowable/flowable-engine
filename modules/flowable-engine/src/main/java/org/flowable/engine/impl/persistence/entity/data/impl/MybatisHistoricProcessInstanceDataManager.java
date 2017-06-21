@@ -77,9 +77,6 @@ public class MybatisHistoricProcessInstanceDataManager extends AbstractDataManag
     public List<HistoricProcessInstance> findHistoricProcessInstancesAndVariablesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
         // paging doesn't work for combining process instances and variables
         // due to an outer join, so doing it in-memory
-        if (historicProcessInstanceQuery.getFirstResult() < 0 || historicProcessInstanceQuery.getMaxResults() <= 0) {
-            return Collections.EMPTY_LIST;
-        }
 
         int firstResult = historicProcessInstanceQuery.getFirstResult();
         int maxResults = historicProcessInstanceQuery.getMaxResults();
@@ -92,8 +89,7 @@ public class MybatisHistoricProcessInstanceDataManager extends AbstractDataManag
         }
         historicProcessInstanceQuery.setFirstResult(0);
 
-        List<HistoricProcessInstance> instanceList = getDbSqlSession().selectListWithRawParameterWithoutFilter("selectHistoricProcessInstancesWithVariablesByQueryCriteria", historicProcessInstanceQuery,
-                historicProcessInstanceQuery.getFirstResult(), historicProcessInstanceQuery.getMaxResults());
+        List<HistoricProcessInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheCheck("selectHistoricProcessInstancesWithVariablesByQueryCriteria", historicProcessInstanceQuery);
 
         if (instanceList != null && !instanceList.isEmpty()) {
             if (firstResult > 0) {
@@ -114,8 +110,8 @@ public class MybatisHistoricProcessInstanceDataManager extends AbstractDataManag
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<HistoricProcessInstance> findHistoricProcessInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return getDbSqlSession().selectListWithRawParameter("selectHistoricProcessInstanceByNativeQuery", parameterMap, firstResult, maxResults);
+    public List<HistoricProcessInstance> findHistoricProcessInstancesByNativeQuery(Map<String, Object> parameterMap) {
+        return getDbSqlSession().selectListWithRawParameter("selectHistoricProcessInstanceByNativeQuery", parameterMap);
     }
 
     @Override

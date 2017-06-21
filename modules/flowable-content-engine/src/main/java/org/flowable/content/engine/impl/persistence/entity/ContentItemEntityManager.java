@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.engine.impl.ContentItemQueryImpl;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 
 /**
@@ -24,7 +23,7 @@ import org.flowable.engine.common.impl.persistence.entity.EntityManager;
  */
 public interface ContentItemEntityManager extends EntityManager<ContentItemEntity> {
 
-    List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl formInstanceQuery, Page page);
+    List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl formInstanceQuery);
 
     long findContentItemCountByQueryCriteria(ContentItemQueryImpl contentItemQuery);
 

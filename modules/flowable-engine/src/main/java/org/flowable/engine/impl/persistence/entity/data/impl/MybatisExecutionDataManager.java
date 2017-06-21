@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.PerformanceSettings;
@@ -216,7 +215,7 @@ public class MybatisExecutionDataManager extends AbstractDataManager<ExecutionEn
     @SuppressWarnings("unchecked")
     @Override
     public List<String> findProcessInstanceIdsByProcessDefinitionId(String processDefinitionId) {
-        return getDbSqlSession().selectList("selectProcessInstanceIdsByProcessDefinitionId", processDefinitionId, false);
+        return getDbSqlSession().selectListNoCacheCheck("selectProcessInstanceIdsByProcessDefinitionId", processDefinitionId);
     }
 
     @Override
@@ -226,10 +225,14 @@ public class MybatisExecutionDataManager extends AbstractDataManager<ExecutionEn
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery, Page page) {
-        return getDbSqlSession().selectList("selectExecutionsByQueryCriteria", executionQuery, page, !performanceSettings.isEnableEagerExecutionTreeFetching()); // False -> executions should not be
-                                                                                                                                                                 // cached if using
-                                                                                                                                                                 // executionTreeFetching
+    public List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery) {
+        // False -> executions should not be cached if using executionTreeFetching
+        boolean useCache = !performanceSettings.isEnableEagerExecutionTreeFetching();
+        if (useCache) {
+            return getDbSqlSession().selectList("selectExecutionsByQueryCriteria", executionQuery);
+        } else {
+            return getDbSqlSession().selectListNoCacheCheck("selectExecutionsByQueryCriteria", executionQuery);
+        }
     }
 
     @Override
@@ -240,8 +243,13 @@ public class MybatisExecutionDataManager extends AbstractDataManager<ExecutionEn
     @Override
     @SuppressWarnings("unchecked")
     public List<ProcessInstance> findProcessInstanceByQueryCriteria(ProcessInstanceQueryImpl executionQuery) {
-        return getDbSqlSession().selectList("selectProcessInstanceByQueryCriteria", executionQuery, !performanceSettings.isEnableEagerExecutionTreeFetching()); // False -> executions should not be
-                                                                                                                                                                // cached if using executionTreeFetching
+        // False -> executions should not be cached if using executionTreeFetching
+        boolean useCache = !performanceSettings.isEnableEagerExecutionTreeFetching();
+        if (useCache) {
+            return getDbSqlSession().selectList("selectProcessInstanceByQueryCriteria", executionQuery);
+        } else {
+            return getDbSqlSession().selectListNoCacheCheck("selectProcessInstanceByQueryCriteria", executionQuery);
+        }
     }
 
     @Override
@@ -249,9 +257,6 @@ public class MybatisExecutionDataManager extends AbstractDataManager<ExecutionEn
     public List<ProcessInstance> findProcessInstanceAndVariablesByQueryCriteria(ProcessInstanceQueryImpl executionQuery) {
         // paging doesn't work for combining process instances and variables due
         // to an outer join, so doing it in-memory
-        if (executionQuery.getFirstResult() < 0 || executionQuery.getMaxResults() <= 0) {
-            return Collections.EMPTY_LIST;
-        }
 
         int firstResult = executionQuery.getFirstResult();
         int maxResults = executionQuery.getMaxResults();
@@ -264,8 +269,7 @@ public class MybatisExecutionDataManager extends AbstractDataManager<ExecutionEn
         }
         executionQuery.setFirstResult(0);
 
-        List<ProcessInstance> instanceList = getDbSqlSession().selectListWithRawParameterWithoutFilter("selectProcessInstanceWithVariablesByQueryCriteria", executionQuery,
-                executionQuery.getFirstResult(), executionQuery.getMaxResults());
+        List<ProcessInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheCheck("selectProcessInstanceWithVariablesByQueryCriteria", executionQuery);
 
         if (instanceList != null && !instanceList.isEmpty()) {
             if (firstResult > 0) {
@@ -285,14 +289,14 @@ public class MybatisExecutionDataManager extends AbstractDataManager<ExecutionEn
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Execution> findExecutionsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return getDbSqlSession().selectListWithRawParameter("selectExecutionByNativeQuery", parameterMap, firstResult, maxResults);
+    public List<Execution> findExecutionsByNativeQuery(Map<String, Object> parameterMap) {
+        return getDbSqlSession().selectListWithRawParameter("selectExecutionByNativeQuery", parameterMap);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<ProcessInstance> findProcessInstanceByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return getDbSqlSession().selectListWithRawParameter("selectExecutionByNativeQuery", parameterMap, firstResult, maxResults);
+    public List<ProcessInstance> findProcessInstanceByNativeQuery(Map<String, Object> parameterMap) {
+        return getDbSqlSession().selectListWithRawParameter("selectExecutionByNativeQuery", parameterMap);
     }
 
     @Override

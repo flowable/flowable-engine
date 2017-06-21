@@ -49,9 +49,9 @@ public class MybatisDeadLetterJobDataManager extends AbstractDataManager<DeadLet
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery, Page page) {
+    public List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery) {
         String query = "selectDeadLetterJobByQueryCriteria";
-        return getDbSqlSession().selectList(query, jobQuery, page);
+        return getDbSqlSession().selectList(query, jobQuery);
     }
 
     @Override

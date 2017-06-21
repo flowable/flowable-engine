@@ -273,8 +273,8 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     }
 
     @Override
-    public List<Task> findTasksByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return taskDataManager.findTasksByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<Task> findTasksByNativeQuery(Map<String, Object> parameterMap) {
+        return taskDataManager.findTasksByNativeQuery(parameterMap);
     }
 
     @Override

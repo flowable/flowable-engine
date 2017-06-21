@@ -105,7 +105,7 @@
   </sql>
     
   <select id="selectDeploymentsByName" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="deploymentResultMap">
-    select * from ${prefix}ACT_DMN_DEPLOYMENT D where NAME_=#{parameter} order by D.DEPLOY_TIME_ desc
+    ${limitBefore} select RES.* ${limitBetween} from ${prefix}ACT_DMN_DEPLOYMENT D where NAME_=#{parameter} order by D.DEPLOY_TIME_ desc ${limitAfter}
   </select>
   
   <select id="selectDmnDeployment" parameterType="string" resultMap="deploymentResultMap">

@@ -15,7 +15,6 @@ package org.flowable.engine.impl.persistence.entity.data.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.impl.DeploymentQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
@@ -59,9 +58,9 @@ public class MybatisDeploymentDataManager extends AbstractDataManager<Deployment
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery, Page page) {
+    public List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery) {
         final String query = "selectDeploymentsByQueryCriteria";
-        return getDbSqlSession().selectList(query, deploymentQuery, page);
+        return getDbSqlSession().selectList(query, deploymentQuery);
     }
 
     @Override
@@ -71,8 +70,8 @@ public class MybatisDeploymentDataManager extends AbstractDataManager<Deployment
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Deployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return getDbSqlSession().selectListWithRawParameter("selectDeploymentByNativeQuery", parameterMap, firstResult, maxResults);
+    public List<Deployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap) {
+        return getDbSqlSession().selectListWithRawParameter("selectDeploymentByNativeQuery", parameterMap);
     }
 
     @Override

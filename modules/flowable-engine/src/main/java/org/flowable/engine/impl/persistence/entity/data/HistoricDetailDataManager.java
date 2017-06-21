@@ -15,7 +15,6 @@ package org.flowable.engine.impl.persistence.entity.data;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.impl.HistoricDetailQueryImpl;
@@ -44,9 +43,9 @@ public interface HistoricDetailDataManager extends DataManager<HistoricDetailEnt
 
     long findHistoricDetailCountByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery);
 
-    List<HistoricDetail> findHistoricDetailsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery, Page page);
+    List<HistoricDetail> findHistoricDetailsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery);
 
-    List<HistoricDetail> findHistoricDetailsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<HistoricDetail> findHistoricDetailsByNativeQuery(Map<String, Object> parameterMap);
 
     long findHistoricDetailCountByNativeQuery(Map<String, Object> parameterMap);
 

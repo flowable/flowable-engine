@@ -14,7 +14,6 @@ package org.flowable.form.engine.impl.persistence.entity.data.impl;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.FormInstanceQueryImpl;
@@ -49,8 +48,7 @@ public class MybatisFormInstanceDataManager extends AbstractDataManager<FormInst
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<FormInstance> findFormInstancesByQueryCriteria(FormInstanceQueryImpl formInstanceQuery, Page page) {
-        final String query = "selectFormInstancesByQueryCriteria";
-        return getDbSqlSession().selectList(query, formInstanceQuery, page);
+    public List<FormInstance> findFormInstancesByQueryCriteria(FormInstanceQueryImpl formInstanceQuery) {
+        return getDbSqlSession().selectList("selectFormInstancesByQueryCriteria", formInstanceQuery);
     }
 }

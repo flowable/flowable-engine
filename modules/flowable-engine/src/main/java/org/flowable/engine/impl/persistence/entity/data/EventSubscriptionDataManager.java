@@ -14,7 +14,6 @@ package org.flowable.engine.impl.persistence.entity.data;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
@@ -36,7 +35,7 @@ public interface EventSubscriptionDataManager extends DataManager<EventSubscript
 
     long findEventSubscriptionCountByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl);
 
-    List<EventSubscription> findEventSubscriptionsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl, Page page);
+    List<EventSubscription> findEventSubscriptionsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl);
 
     List<MessageEventSubscriptionEntity> findMessageEventSubscriptionsByProcessInstanceAndEventName(final String processInstanceId, final String eventName);
 

@@ -105,8 +105,8 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
     }
 
     @Override
-    public List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery, Page page) {
-        return executionDataManager.findExecutionsByQueryCriteria(executionQuery, page);
+    public List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery) {
+        return executionDataManager.findExecutionsByQueryCriteria(executionQuery);
     }
 
     @Override
@@ -189,13 +189,13 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
     }
 
     @Override
-    public List<Execution> findExecutionsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return executionDataManager.findExecutionsByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<Execution> findExecutionsByNativeQuery(Map<String, Object> parameterMap) {
+        return executionDataManager.findExecutionsByNativeQuery(parameterMap);
     }
 
     @Override
-    public List<ProcessInstance> findProcessInstanceByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return executionDataManager.findProcessInstanceByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<ProcessInstance> findProcessInstanceByNativeQuery(Map<String, Object> parameterMap) {
+        return executionDataManager.findProcessInstanceByNativeQuery(parameterMap);
     }
 
     @Override

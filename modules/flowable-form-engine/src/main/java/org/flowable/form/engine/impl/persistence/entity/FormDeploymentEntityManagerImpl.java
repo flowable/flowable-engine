@@ -16,7 +16,6 @@ package org.flowable.form.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDeployment;
@@ -89,8 +88,8 @@ public class FormDeploymentEntityManagerImpl extends AbstractEntityManager<FormD
     }
 
     @Override
-    public List<FormDeployment> findDeploymentsByQueryCriteria(FormDeploymentQueryImpl deploymentQuery, Page page) {
-        return deploymentDataManager.findDeploymentsByQueryCriteria(deploymentQuery, page);
+    public List<FormDeployment> findDeploymentsByQueryCriteria(FormDeploymentQueryImpl deploymentQuery) {
+        return deploymentDataManager.findDeploymentsByQueryCriteria(deploymentQuery);
     }
 
     @Override
@@ -99,8 +98,8 @@ public class FormDeploymentEntityManagerImpl extends AbstractEntityManager<FormD
     }
 
     @Override
-    public List<FormDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return deploymentDataManager.findDeploymentsByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<FormDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap) {
+        return deploymentDataManager.findDeploymentsByNativeQuery(parameterMap);
     }
 
     @Override

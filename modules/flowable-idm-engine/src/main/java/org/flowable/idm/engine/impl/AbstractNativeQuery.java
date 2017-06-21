@@ -89,7 +89,7 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> implem
         if (commandExecutor != null) {
             return (List<U>) commandExecutor.execute(this);
         }
-        return executeList(Context.getCommandContext(), getParameterMap(), 0, Integer.MAX_VALUE);
+        return executeList(Context.getCommandContext(), getParameterMap());
     }
 
     @SuppressWarnings("unchecked")
@@ -100,7 +100,7 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> implem
         if (commandExecutor != null) {
             return (List<U>) commandExecutor.execute(this);
         }
-        return executeList(Context.getCommandContext(), getParameterMap(), firstResult, maxResults);
+        return executeList(Context.getCommandContext(), getParameterMap());
     }
 
     public long count() {
@@ -113,7 +113,7 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> implem
 
     public Object execute(CommandContext commandContext) {
         if (resultType == ResultType.LIST) {
-            return executeList(commandContext, getParameterMap(), 0, Integer.MAX_VALUE);
+            return executeList(commandContext, getParameterMap());
         } else if (resultType == ResultType.LIST_PAGE) {
             Map<String, Object> parameterMap = getParameterMap();
             parameterMap.put("resultType", "LIST_PAGE");
@@ -134,7 +134,7 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> implem
                 lastRow = firstResult + maxResults + 1;
             }
             parameterMap.put("lastRow", lastRow);
-            return executeList(commandContext, parameterMap, firstResult, maxResults);
+            return executeList(commandContext, parameterMap);
         } else if (resultType == ResultType.SINGLE_RESULT) {
             return executeSingleResult(commandContext);
         } else {
@@ -151,10 +151,10 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> implem
      * @param firstResult
      *
      */
-    public abstract List<U> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults);
+    public abstract List<U> executeList(CommandContext commandContext, Map<String, Object> parameterMap);
 
     public U executeSingleResult(CommandContext commandContext) {
-        List<U> results = executeList(commandContext, getParameterMap(), 0, Integer.MAX_VALUE);
+        List<U> results = executeList(commandContext, getParameterMap());
         if (results.size() == 1) {
             return results.get(0);
         } else if (results.size() > 1) {

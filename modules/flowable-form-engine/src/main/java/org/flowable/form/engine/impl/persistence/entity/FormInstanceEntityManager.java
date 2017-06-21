@@ -14,7 +14,6 @@ package org.flowable.form.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.engine.impl.FormInstanceQueryImpl;
@@ -24,7 +23,7 @@ import org.flowable.form.engine.impl.FormInstanceQueryImpl;
  */
 public interface FormInstanceEntityManager extends EntityManager<FormInstanceEntity> {
 
-    List<FormInstance> findFormInstancesByQueryCriteria(FormInstanceQueryImpl formInstanceQuery, Page page);
+    List<FormInstance> findFormInstancesByQueryCriteria(FormInstanceQueryImpl formInstanceQuery);
 
     long findFormInstanceCountByQueryCriteria(FormInstanceQueryImpl formInstanceQuery);
 }

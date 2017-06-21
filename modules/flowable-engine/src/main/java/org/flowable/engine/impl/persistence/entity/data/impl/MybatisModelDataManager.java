@@ -15,7 +15,6 @@ package org.flowable.engine.impl.persistence.entity.data.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.impl.ModelQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ModelEntity;
@@ -45,8 +44,8 @@ public class MybatisModelDataManager extends AbstractDataManager<ModelEntity> im
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Model> findModelsByQueryCriteria(ModelQueryImpl query, Page page) {
-        return getDbSqlSession().selectList("selectModelsByQueryCriteria", query, page);
+    public List<Model> findModelsByQueryCriteria(ModelQueryImpl query) {
+        return getDbSqlSession().selectList("selectModelsByQueryCriteria", query);
     }
 
     @Override
@@ -56,8 +55,8 @@ public class MybatisModelDataManager extends AbstractDataManager<ModelEntity> im
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Model> findModelsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return getDbSqlSession().selectListWithRawParameter("selectModelByNativeQuery", parameterMap, firstResult, maxResults);
+    public List<Model> findModelsByNativeQuery(Map<String, Object> parameterMap) {
+        return getDbSqlSession().selectListWithRawParameter("selectModelByNativeQuery", parameterMap);
     }
 
     @Override

@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.idm.api.Token;
 import org.flowable.idm.api.TokenQuery;
 import org.flowable.idm.api.TokenQueryProperty;
@@ -185,9 +184,9 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
         return commandContext.getTokenEntityManager().findTokenCountByQueryCriteria(this);
     }
 
-    public List<Token> executeList(CommandContext commandContext, Page page) {
+    public List<Token> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getTokenEntityManager().findTokenByQueryCriteria(this, page);
+        return commandContext.getTokenEntityManager().findTokenByQueryCriteria(this);
     }
 
     // getters //////////////////////////////////////////////////////////

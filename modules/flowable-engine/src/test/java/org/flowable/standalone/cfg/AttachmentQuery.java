@@ -16,7 +16,6 @@ package org.flowable.standalone.cfg;
 import java.util.List;
 
 import org.flowable.engine.ManagementService;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.impl.AbstractQuery;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.task.Attachment;
@@ -88,7 +87,7 @@ public class AttachmentQuery extends AbstractQuery<AttachmentQuery, Attachment> 
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Attachment> executeList(CommandContext commandContext, Page page) {
+    public List<Attachment> executeList(CommandContext commandContext) {
         return commandContext.getDbSqlSession().selectList("selectAttachmentByQueryCriteria", this);
     }
 

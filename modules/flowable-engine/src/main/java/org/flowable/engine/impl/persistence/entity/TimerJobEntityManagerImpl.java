@@ -96,8 +96,8 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
     }
 
     @Override
-    public List<Job> findJobsByQueryCriteria(TimerJobQueryImpl jobQuery, Page page) {
-        return jobDataManager.findJobsByQueryCriteria(jobQuery, page);
+    public List<Job> findJobsByQueryCriteria(TimerJobQueryImpl jobQuery) {
+        return jobDataManager.findJobsByQueryCriteria(jobQuery);
     }
 
     @Override

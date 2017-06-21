@@ -87,7 +87,7 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
         }
         taskQuery.setFirstResult(0);
 
-        List<Task> instanceList = getDbSqlSession().selectListWithRawParameterWithoutFilter(query, taskQuery, taskQuery.getFirstResult(), taskQuery.getMaxResults());
+        List<Task> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheCheck(query, taskQuery);
 
         if (instanceList != null && !instanceList.isEmpty()) {
             if (firstResult > 0) {
@@ -112,8 +112,8 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Task> findTasksByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return getDbSqlSession().selectListWithRawParameter("selectTaskByNativeQuery", parameterMap, firstResult, maxResults);
+    public List<Task> findTasksByNativeQuery(Map<String, Object> parameterMap) {
+        return getDbSqlSession().selectListWithRawParameter("selectTaskByNativeQuery", parameterMap);
     }
 
     @Override
