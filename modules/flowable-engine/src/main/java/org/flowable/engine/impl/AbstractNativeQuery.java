@@ -12,13 +12,12 @@
  */
 package org.flowable.engine.impl;
 
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.common.BaseNativeQuery;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.query.NativeQuery;
 import org.flowable.engine.impl.context.Context;
@@ -31,23 +30,12 @@ import org.flowable.engine.impl.interceptor.CommandExecutor;
  * 
  * @author Bernd Ruecker (camunda)
  */
-public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> implements Command<Object>, NativeQuery<T, U>, Serializable {
+public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> extends BaseNativeQuery<T, U> implements Command<Object> {
 
     private static final long serialVersionUID = 1L;
 
-    private static enum ResultType {
-        LIST, LIST_PAGE, SINGLE_RESULT, COUNT
-    }
-
     protected transient CommandExecutor commandExecutor;
     protected transient CommandContext commandContext;
-
-    protected int maxResults = Integer.MAX_VALUE;
-    protected int firstResult = 0;
-    protected ResultType resultType;
-
-    private Map<String, Object> parameters = new HashMap<String, Object>();
-    private String sqlStatement;
 
     protected AbstractNativeQuery(CommandExecutor commandExecutor) {
         this.commandExecutor = commandExecutor;
@@ -161,17 +149,6 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> implem
             throw new FlowableException("Query return " + results.size() + " results instead of max 1");
         }
         return null;
-    }
-
-    private Map<String, Object> getParameterMap() {
-        HashMap<String, Object> parameterMap = new HashMap<String, Object>();
-        parameterMap.put("sql", sqlStatement);
-        parameterMap.putAll(parameters);
-        return parameterMap;
-    }
-
-    public Map<String, Object> getParameters() {
-        return parameters;
     }
 
 }

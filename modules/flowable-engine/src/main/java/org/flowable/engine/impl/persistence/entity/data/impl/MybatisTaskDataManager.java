@@ -98,7 +98,7 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
                     return Collections.EMPTY_LIST;
                 }
             } else {
-                int toIndex = Math.min(maxResults, instanceList.size());
+                int toIndex = maxResults > 0 ?  Math.min(maxResults, instanceList.size()) : instanceList.size();
                 return instanceList.subList(0, toIndex);
             }
         }

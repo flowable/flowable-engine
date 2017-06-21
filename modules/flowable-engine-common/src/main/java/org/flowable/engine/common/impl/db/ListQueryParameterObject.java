@@ -30,7 +30,7 @@ public class ListQueryParameterObject {
     public static final String SORTORDER_ASC = "asc";
     public static final String SORTORDER_DESC = "desc";
 
-    protected int firstResult = 0;
+    protected int firstResult;
     protected int maxResults = Integer.MAX_VALUE;
     protected Object parameter;
     protected String orderBy;
