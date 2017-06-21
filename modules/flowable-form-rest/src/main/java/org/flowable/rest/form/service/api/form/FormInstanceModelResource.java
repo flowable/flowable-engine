@@ -67,6 +67,7 @@ public class FormInstanceModelResource {
                     formRequest.getProcessInstanceId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
+            
         } else if (formRequest.getFormDefinitionKey() != null) {
             formInstanceModel = formService.getFormInstanceModelByKey(
                     formRequest.getFormDefinitionKey(),
@@ -74,6 +75,7 @@ public class FormInstanceModelResource {
                     formRequest.getProcessInstanceId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
+            
         } else if (formRequest.getFormDefinitionId() != null) {
             formInstanceModel = formService.getFormInstanceModelById(
                     formRequest.getFormDefinitionId(),
@@ -81,6 +83,7 @@ public class FormInstanceModelResource {
                     formRequest.getProcessInstanceId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
+            
         } else {
             throw new FlowableIllegalArgumentException("Either parent deployment key, form definition key or form definition id must be provided in the request");
         }

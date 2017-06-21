@@ -12,32 +12,42 @@
  */
 package org.flowable.form.engine.impl.cmd;
 
-import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
+import org.flowable.form.api.FormInstance;
+import org.flowable.form.api.FormInstanceQuery;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntity;
 import org.flowable.form.model.FormModel;
 
-/**
- * @author Tijs Rademakers
- */
-public class CreateFormInstanceCmd extends AbstractSaveFormInstanceCmd implements Serializable {
+public class SaveFormInstanceCmd extends AbstractSaveFormInstanceCmd {
 
     private static final long serialVersionUID = 1L;
 
-    public CreateFormInstanceCmd(FormModel formModel, Map<String, Object> variables, String taskId, String processInstanceId) {
+    public SaveFormInstanceCmd(FormModel formModel, Map<String, Object> variables, String taskId, String processInstanceId) {
         super(formModel, variables, taskId, processInstanceId);
     }
-    
-    public CreateFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId) {
+
+    public SaveFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId) {
         super(formModelId, variables, taskId, processInstanceId);
     }
 
-    @Override
     protected FormInstanceEntity findExistingFormInstance(FormEngineConfiguration formEngineConfiguration) {
-        // We always want to create a formInstance.
+
+        if (taskId == null) {
+            // Only update formInstances related to a task - cannot save a process start form as no processInstance exists
+            return null;
+        }
+
+        FormInstanceQuery formInstanceQuery =
+                formEngineConfiguration.getFormService().createFormInstanceQuery().formDefinitionId(formModel.getId()).taskId(taskId);
+
+        List<FormInstance> formInstances = formInstanceQuery.orderBySubmittedDate().desc().list();
+
+        if (formInstances.size() > 0 && formInstances.get(0) instanceof FormInstanceEntity) {
+            return (FormInstanceEntity) formInstances.get(0);
+        }
         return null;
     }
-
 }

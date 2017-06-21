@@ -305,6 +305,12 @@ angular.module('flowableApp')
                                 break;
                             }
                         }
+                        
+                    } else if (field.type == 'date' && field.value && !field.readOnly) {
+                        var dateArray = field.value.split('-');
+                        if (dateArray && dateArray.length == 3) {
+                            field.value = new Date(dateArray[0],dateArray[1],dateArray[2]);
+                        }
 
                     } else if (field.type == 'upload' && field.value) {
                         $scope.model.uploads[field.id] = [];
@@ -524,6 +530,31 @@ angular.module('flowableApp')
                 }
             };
 
+            $scope.saveForm = function () {
+
+                $scope.model.loading = true;
+                $scope.model.completeButtonDisabled = true;
+
+                // Prep data
+                var postData = $scope.createPostData();
+                postData.formId = $scope.formData.id;
+
+                 FormService.saveTaskForm($scope.taskId, postData).then(
+                     function (data) {
+                         $rootScope.addAlertPromise($translate('TASK.ALERT.SAVED'));
+                         $scope.model.completeButtonDisabled = false;
+                         $scope.model.loading = false;
+                     },
+                     function (errorResponse) {
+                         $scope.model.completeButtonDisabled = false;
+                         $scope.model.loading = false;
+                         $scope.$emit('task-save-error', {
+                             taskId: $scope.taskId,
+                             error: errorResponse
+                         });
+                     });
+            };
+
             $scope.completeForm = function (outcome) {
 
                 $scope.model.loading = true;
@@ -667,7 +698,7 @@ angular.module('flowableApp')
                             }
                             
                         } else if (field.type === 'date' && field.value) {
-                        	postData.values[field.id] = field.value.getFullYear() + '-' + (field.value.getMonth() + 1) + '-' + field.value.getDate();
+                            postData.values[field.id] = field.value.getFullYear() + '-' + (field.value.getMonth() + 1) + '-' + field.value.getDate();
 
                         } else {
                             postData.values[field.id] = field.value;

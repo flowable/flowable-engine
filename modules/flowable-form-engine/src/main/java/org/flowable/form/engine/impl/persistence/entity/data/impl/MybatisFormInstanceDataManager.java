@@ -43,7 +43,7 @@ public class MybatisFormInstanceDataManager extends AbstractDataManager<FormInst
 
     @Override
     public long findFormInstanceCountByQueryCriteria(FormInstanceQueryImpl formInstanceQuery) {
-        return (Long) getDbSqlSession().selectOne("selectFormInstanceCountByQueryCriteria", formInstanceQuery);
+        return (Long) getDbSqlSession().selectOne("selectFormInstancesCountByQueryCriteria", formInstanceQuery);
     }
 
     @Override

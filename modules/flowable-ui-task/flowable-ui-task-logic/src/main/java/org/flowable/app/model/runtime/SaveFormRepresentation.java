@@ -12,20 +12,27 @@
  */
 package org.flowable.app.model.runtime;
 
-/**
- * @author Joram Barrez
- * @author Tijs Rademakers
- */
-public class CompleteFormRepresentation extends SaveFormRepresentation {
+import java.util.Map;
 
-    protected String outcome;
+public class SaveFormRepresentation {
 
-    public String getOutcome() {
-        return outcome;
+    protected String formId;
+    protected Map<String, Object> values;
+
+    public String getFormId() {
+        return formId;
     }
 
-    public void setOutcome(String outcome) {
-        this.outcome = outcome;
+    public void setFormId(String formId) {
+        this.formId = formId;
+    }
+
+    public Map<String, Object> getValues() {
+        return values;
+    }
+
+    public void setValues(Map<String, Object> values) {
+        this.values = values;
     }
 
 }

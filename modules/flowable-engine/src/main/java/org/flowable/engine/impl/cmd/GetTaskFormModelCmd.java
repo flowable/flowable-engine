@@ -87,7 +87,7 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
         } else {
             formModel = processEngineConfiguration.getFormEngineFormService()
                     .getFormModelWithVariablesByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
-                            task.getProcessInstanceId(), variables, task.getTenantId());
+                            task.getProcessInstanceId(), taskId, variables, task.getTenantId());
         }
 
         // If form does not exists, we don't want to leak out this info to just anyone
