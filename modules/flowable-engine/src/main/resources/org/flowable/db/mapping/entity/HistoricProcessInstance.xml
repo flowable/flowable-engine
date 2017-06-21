@@ -396,9 +396,6 @@
         left outer join ${prefix}ACT_HI_VARINST A_OR${orIndex} on RES.PROC_INST_ID_ = A_OR${orIndex}.PROC_INST_ID_
       </if>
     </foreach>
-    <if test="deploymentId != null || (deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0)">
-      left outer join ${prefix}ACT_RE_PROCDEF DEPLOY_P ON RES.PROC_DEF_ID_ = DEPLOY_P.ID_
-    </if>
     <if test="withJobException">
       left outer join ${prefix}ACT_RU_TIMER_JOB JOB ON RES.PROC_INST_ID_ = JOB.PROCESS_INSTANCE_ID_
     </if>
@@ -438,10 +435,10 @@
         and RES.BUSINESS_KEY_ = #{businessKey}
       </if>
       <if test="deploymentId != null">
-        and DEPLOY_P.DEPLOYMENT_ID_ = #{deploymentId}
+        and DEF.DEPLOYMENT_ID_ = #{deploymentId}
       </if>
       <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
-        and DEPLOY_P.DEPLOYMENT_ID_ IN
+        and DEF.DEPLOYMENT_ID_ IN
         <foreach item="deployment" index="index" collection="deploymentIds" 
                  open="(" separator="," close=")">
           #{deployment}

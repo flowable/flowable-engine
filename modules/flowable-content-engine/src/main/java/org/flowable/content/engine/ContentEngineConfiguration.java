@@ -397,11 +397,6 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration {
     // ////////////////////////////////////////////////
 
     @Override
-    public String pathToEngineDbProperties() {
-        return "org/flowable/content/db/properties/" + databaseType + ".properties";
-    }
-
-    @Override
     public InputStream getMyBatisXmlConfigurationStream() {
         return getResourceAsStream(DEFAULT_MYBATIS_MAPPING_FILE);
     }
