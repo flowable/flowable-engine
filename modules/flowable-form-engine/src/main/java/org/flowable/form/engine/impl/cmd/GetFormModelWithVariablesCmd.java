@@ -13,12 +13,13 @@
 package org.flowable.form.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.editor.form.converter.FormJsonConverter;
 import org.flowable.engine.common.api.FlowableException;
@@ -40,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
@@ -49,6 +51,8 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
     private static Logger logger = LoggerFactory.getLogger(GetFormModelWithVariablesCmd.class);
 
     private static final long serialVersionUID = 1L;
+    
+    protected static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-M-d");
 
     protected String formDefinitionKey;
     protected String parentDeploymentId;
@@ -105,8 +109,10 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
         if (allFields != null) {
 
             Map<String, JsonNode> formInstanceFieldMap = new HashMap<String, JsonNode>();
-            fillFormInstanceValues(formInstance, formInstanceFieldMap, formEngineConfiguration.getObjectMapper());
-            fillVariablesWithFormInstanceValues(formInstanceFieldMap, allFields);
+            if (formInstance != null) {
+                fillFormInstanceValues(formInstance, formInstanceFieldMap, formEngineConfiguration.getObjectMapper());
+                fillVariablesWithFormInstanceValues(formInstanceFieldMap, allFields);
+            }
 
             for (FormField field : allFields) {
                 if (field instanceof ExpressionFormField) {
@@ -119,7 +125,21 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
                     }
 
                 } else {
-                    field.setValue(variables.get(field.getId()));
+                    Object variableValue = variables.get(field.getId());
+                    
+                    if (variableValue != null) {
+                        if (variableValue instanceof LocalDate) {
+                            LocalDate dateVariable = (LocalDate) variableValue;
+                            field.setValue(dateVariable.toString("yyyy-M-d"));
+                            
+                        } else if (variableValue instanceof Date) {
+                            Date dateVariable = (Date) variableValue;
+                            field.setValue(DATE_FORMAT.format(dateVariable));
+                            
+                        } else {
+                            field.setValue(variableValue);
+                        }
+                    }
                 }
             }
         }
@@ -179,7 +199,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
     protected void fillFormInstanceValues(
             FormInstance formInstance, Map<String, JsonNode> formInstanceFieldMap, ObjectMapper objectMapper) {
 
-        if(formInstance == null) {
+        if (formInstance == null) {
             return;
         }
 
@@ -220,8 +240,9 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
                 try {
                     if (StringUtils.isNotEmpty(fieldValue)) {
                         LocalDate dateValue = LocalDate.parse(fieldValue);
-                        variables.put(field.getId(), dateValue);
+                        variables.put(field.getId(), dateValue.toString("yyyy-M-d"));
                     }
+                    
                 } catch (Exception e) {
                     logger.error("Error parsing form date value for process instance {} with value {}", processInstanceId, fieldValue, e);
                 }
@@ -233,13 +254,18 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
     }
 
     protected FormInstance resolveFormInstance(FormDefinitionCacheEntry formCacheEntry, CommandContext commandContext) {
-        if(taskId == null) {
+        if (taskId == null) {
             return null;
         }
+        
         List<FormInstance> formInstances = commandContext.getFormEngineConfiguration().getFormService()
-                .createFormInstanceQuery().formDefinitionId(formCacheEntry.getFormDefinitionEntity().getId()).taskId(taskId).orderBySubmittedDate().desc().list();
+                .createFormInstanceQuery().formDefinitionId(formCacheEntry.getFormDefinitionEntity().getId())
+                .taskId(taskId)
+                .orderBySubmittedDate()
+                .desc()
+                .list();
 
-        if(formInstances.size() > 0) {
+        if (formInstances.size() > 0) {
             return formInstances.get(0);
         }
 

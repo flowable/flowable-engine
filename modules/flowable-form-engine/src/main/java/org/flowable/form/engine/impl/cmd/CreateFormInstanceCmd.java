@@ -22,12 +22,16 @@ import org.flowable.form.model.FormModel;
 /**
  * @author Tijs Rademakers
  */
-public class CreateFormInstanceCmd extends SaveFormInstanceCmd implements Serializable {
+public class CreateFormInstanceCmd extends AbstractSaveFormInstanceCmd implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     public CreateFormInstanceCmd(FormModel formModel, Map<String, Object> variables, String taskId, String processInstanceId) {
         super(formModel, variables, taskId, processInstanceId);
+    }
+    
+    public CreateFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId) {
+        super(formModelId, variables, taskId, processInstanceId);
     }
 
     @Override

@@ -52,29 +52,14 @@ public interface FormService {
 
     FormInstance saveFormInstanceByFormModelId(Map<String, Object> variables, String formModelId, String taskId, String processInstanceId);
 
-    FormModel getFormModelWithVariablesById(String formDefinitionId, String processInstanceId, Map<String, Object> variables);
-
-    FormModel getFormModelWithVariablesById(String formDefinitionId, String processInstanceId, Map<String, Object> variables, String tenantId);
-
     FormModel getFormModelWithVariablesById(String formDefinitionId, String processInstanceId, String taskId, Map<String, Object> variables);
 
     FormModel getFormModelWithVariablesById(String formDefinitionId, String processInstanceId, String taskId, Map<String, Object> variables, String tenantId);
-
-    FormModel getFormModelWithVariablesByKey(String formDefinitionKey, String processInstanceId, Map<String, Object> variables);
-
-    FormModel getFormModelWithVariablesByKey(String formDefinitionKey, String processInstanceId,
-            Map<String, Object> variables, String tenantId);
 
     FormModel getFormModelWithVariablesByKey(String formDefinitionKey, String processInstanceId, String taskId, Map<String, Object> variables);
 
     FormModel getFormModelWithVariablesByKey(String formDefinitionKey, String processInstanceId, String taskId,
                                              Map<String, Object> variables, String tenantId);
-
-    FormModel getFormModelWithVariablesByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId,
-            String processInstanceId, Map<String, Object> variables);
-
-    FormModel getFormModelWithVariablesByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String processInstanceId,
-            Map<String, Object> variables, String tenantId);
 
     FormModel getFormModelWithVariablesByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String processInstanceId,
                                                                   String taskId, Map<String, Object> variables);

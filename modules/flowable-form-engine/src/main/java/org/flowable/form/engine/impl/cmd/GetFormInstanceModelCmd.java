@@ -122,8 +122,10 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
         if (allFields != null) {
 
             Map<String, JsonNode> formInstanceFieldMap = new HashMap<String, JsonNode>();
-            fillFormInstanceValues(formInstanceModel, formInstance, formInstanceFieldMap, formEngineConfiguration.getObjectMapper());
-            fillVariablesWithFormValues(formInstanceFieldMap, allFields);
+            if (formInstance != null) {
+                fillFormInstanceValues(formInstanceModel, formInstance, formInstanceFieldMap, formEngineConfiguration.getObjectMapper());
+                fillVariablesWithFormValues(formInstanceFieldMap, allFields);
+            }
 
             for (FormField field : allFields) {
                 if (field instanceof ExpressionFormField) {
@@ -229,40 +231,12 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
 
         } else if (taskId != null) {
             formInstanceQuery.taskId(taskId);
-
+        
         } else {
-            formInstanceQuery.processInstanceId(processInstanceId);
+            return null;
         }
 
-        List<FormInstance> formInstances = formInstanceQuery.orderBySubmittedDate().desc().list();
-
-        if (formInstances.size() == 0) {
-            throw new FlowableException("No form instance could be found");
-        }
-
-        FormInstance formInstance = null;
-        if (formInstanceId != null) {
-            formInstance = formInstances.get(0);
-
-        } else if (taskId != null) {
-            if (formInstances.size() > 1) {
-                throw new FlowableException("Multiple form instances are found for the same task");
-            }
-
-            formInstance = formInstances.get(0);
-
-        } else {
-            for (FormInstance formInstanceEntity : formInstances) {
-                if (formInstanceEntity.getTaskId() == null) {
-                    formInstance = formInstanceEntity;
-                    break;
-                }
-            }
-        }
-
-        if (formInstance == null) {
-            throw new FlowableException("No form instance could be found");
-        }
+        FormInstance formInstance = formInstanceQuery.singleResult();
 
         return formInstance;
     }
