@@ -37,6 +37,13 @@
   
   <!-- RESOURCE UPDATE -->
 
+  <update id="updateResource" parameterType="org.flowable.form.engine.impl.persistence.entity.ResourceEntityImpl">
+    update ${prefix}ACT_FO_FORM_RESOURCE
+    set
+      RESOURCE_BYTES_ = #{bytes, jdbcType=${blobType}}
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+
   <!-- RESOURCE DELETE -->
 
   <delete id="deleteResourcesByDeploymentId" parameterType="string">

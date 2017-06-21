@@ -524,6 +524,31 @@ angular.module('flowableApp')
                 }
             };
 
+            $scope.saveForm = function () {
+
+                $scope.model.loading = true;
+                $scope.model.completeButtonDisabled = true;
+
+                // Prep data
+                var postData = $scope.createPostData();
+                postData.formId = $scope.formData.id;
+
+                 FormService.saveTaskForm($scope.taskId, postData).then(
+                     function (data) {
+                         $rootScope.addAlertPromise($translate('TASK.ALERT.SAVED'));
+                         $scope.model.completeButtonDisabled = false;
+                         $scope.model.loading = false;
+                     },
+                     function (errorResponse) {
+                         $scope.model.completeButtonDisabled = false;
+                         $scope.model.loading = false;
+                         $scope.$emit('task-save-error', {
+                             taskId: $scope.taskId,
+                             error: errorResponse
+                         });
+                     });
+            };
+
             $scope.completeForm = function (outcome) {
 
                 $scope.model.loading = true;

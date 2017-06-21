@@ -60,6 +60,7 @@ public class ResourceRef implements Serializable {
         } else {
             ensureInitialized();
             entity.setBytes(bytes);
+            Context.getCommandContext().getResourceEntityManager().update(entity);
         }
     }
 
