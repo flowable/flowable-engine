@@ -26,8 +26,8 @@ public abstract class BaseNativeQuery<T extends NativeQuery<?, ?>, U> implements
         LIST, LIST_PAGE, SINGLE_RESULT, COUNT
     }
 
-    protected int maxResults = Integer.MAX_VALUE;
-    protected int firstResult;
+    protected int maxResults = -1;
+    protected int firstResult = -1;
     protected ResultType resultType;
 
     protected Map<String, Object> parameters = new HashMap<String, Object>();

@@ -24,11 +24,11 @@
   </select>
   
   <select id="selectAttachmentByQueryCriteria" parameterType="org.flowable.standalone.cfg.AttachmentQuery" resultMap="org.flowable.engine.impl.persistence.entity.AttachmentEntityImpl.attachmentResultMap">
-    ${limitBefore}
-    select distinct RES.* ${limitBetween}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectAttachmentByQueryCriteriaSql"/> 
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
   <sql id="selectAttachmentByQueryCriteriaSql">

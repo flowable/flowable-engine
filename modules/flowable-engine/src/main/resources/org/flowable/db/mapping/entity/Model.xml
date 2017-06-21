@@ -132,11 +132,11 @@
   <!-- MODEL SELECT -->
 
   <select id="selectModelsByQueryCriteria" parameterType="org.flowable.engine.impl.ModelQueryImpl" resultMap="modelResultMap">
-  	${limitBefore}
-    select distinct RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectModelsByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
   <select id="selectModelCountByQueryCriteria" parameterType="org.flowable.engine.impl.ModelQueryImpl" resultType="long">

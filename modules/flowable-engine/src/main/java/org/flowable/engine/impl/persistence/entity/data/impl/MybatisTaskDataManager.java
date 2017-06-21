@@ -72,9 +72,6 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
         final String query = "selectTasksWithRelatedEntitiesByQueryCriteria";
         // paging doesn't work for combining task instances and variables due to
         // an outer join, so doing it in-memory
-        if (taskQuery.getFirstResult() < 0 || taskQuery.getMaxResults() <= 0) {
-            return Collections.EMPTY_LIST;
-        }
 
         int firstResult = taskQuery.getFirstResult();
         int maxResults = taskQuery.getMaxResults();

@@ -341,11 +341,11 @@
   </select>
 
   <select id="selectHistoricTaskInstancesByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricTaskInstanceQueryImpl" resultMap="historicTaskInstanceResultMap">
-  	${limitBefore}
-    select distinct RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectHistoricTaskInstancesByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
   <select id="selectHistoricTaskInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricTaskInstanceQueryImpl" resultType="long">
@@ -362,11 +362,11 @@
     <include refid="selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteriaColumns"/>
     <include refid="selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
   <sql id="selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteriaColumns">
-    ${limitBefore}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
     <if test="_databaseId != 'db2' and _databaseId != 'mssql'">
       select distinct RES.*,
       <if test="includeTaskLocalVariables or includeProcessVariables">
@@ -383,7 +383,7 @@
         ILINK.GROUP_ID_ as ILINK_GROUP_ID_, ILINK.TASK_ID_ as ILINK_TASK_ID_,
         ILINK.PROC_INST_ID_ as ILINK_PROC_INST_ID_, ILINK.CREATE_TIME_ as ILINK_CREATE_TIME_
       </if>
-      ${limitBetween}
+      <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     </if>
     <if test="_databaseId == 'db2' || _databaseId == 'mssql'">
       select distinct TEMPRES_ID_ as ID_, TEMPRES_REV_ as REV_, 
@@ -407,7 +407,7 @@
         TEMPILINK_GROUP_ID_ as ILINK_GROUP_ID_, TEMPILINK_TASK_ID_ as ILINK_TASK_ID_,
         TEMPILINK_PROC_INST_ID_ as ILINK_PROC_INST_ID_, TEMPILINK_CREATE_TIME_ as ILINK_CREATE_TIME_
       </if>
-      ${limitOuterJoinBetween}
+      <if test="firstResult != null and firstResult &gt;= 0">${limitOuterJoinBetween}</if>
       RES.ID_ as TEMPRES_ID_, RES.REV_ as TEMPRES_REV_, RES.PROC_DEF_ID_ as TEMPRES_PROC_DEF_ID_, RES.PROC_INST_ID_ as TEMPRES_PROC_INST_ID_,
       RES.EXECUTION_ID_ as TEMPRES_EXECUTION_ID_, RES.NAME_ as TEMPRES_NAME_ , RES.PARENT_TASK_ID_ as TEMPRES_PARENT_TASK_ID_,
       RES.DESCRIPTION_ as TEMPRES_DESCRIPTION_, RES.OWNER_ as TEMPRES_OWNER_, RES.ASSIGNEE_ as TEMPRES_ASSIGNEE_,

@@ -28,22 +28,22 @@
     </select>
 
     <select id="selectHistoryJobsToExecute" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
-        ${limitBefore}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select
-        RES.* ${limitBetween}
+        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         from ${prefix}ACT_RU_HISTORY_JOB RES
         where LOCK_EXP_TIME_ is null
         order by CREATE_TIME_ ASC
-        ${limitAfter}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
     <select id="selectExpiredHistoryJobs" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
-        ${limitBefore}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select
-        RES.* ${limitBetween}
+        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         from ${prefix}ACT_RU_HISTORY_JOB RES
         where LOCK_EXP_TIME_ is not null and LOCK_EXP_TIME_ &lt; #{parameter, jdbcType=TIMESTAMP}
-        ${limitAfter}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
     <select id="selectHistoryJobsByConfiguration" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
@@ -53,11 +53,11 @@
     </select>
 
     <select id="selectHistoryJobByQueryCriteria" parameterType="org.flowable.engine.impl.HistoryJobQueryImpl" resultMap="historyJobResultMap">
-        ${limitBefore}
-        select RES.* ${limitBetween}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+        select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         <include refid="selectHistoryJobByQueryCriteriaSql" />
         ${orderBy}
-        ${limitAfter}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
     <select id="selectHistoryJobCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoryJobQueryImpl" resultType="long">
