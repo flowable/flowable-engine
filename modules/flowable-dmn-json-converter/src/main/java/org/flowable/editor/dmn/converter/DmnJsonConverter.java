@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
@@ -399,10 +400,10 @@ public class DmnJsonConverter {
         String expressionType = null;
         if (!"-".equals(expressionValue)) {
             expressionType = "string";
-            try {
+            if (NumberUtils.isNumber(expressionValue)) {
                 Double.valueOf(expressionValue);
                 expressionType = "number";
-            } catch (NumberFormatException nfe) {
+            } else {
                 try {
                     new SimpleDateFormat("yyyy-MM-dd").parse(expressionValue);
                     expressionType = "date";
