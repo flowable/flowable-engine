@@ -14,7 +14,6 @@ package org.flowable.engine.impl.persistence.entity.data;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.JobQueryImpl;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
@@ -25,7 +24,7 @@ import org.flowable.engine.runtime.Job;
  */
 public interface JobDataManager extends DataManager<JobEntity>, JobInfoDataManager<JobEntity> {
 
-    List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery, Page page);
+    List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery);
 
     long findJobCountByQueryCriteria(JobQueryImpl jobQuery);
 

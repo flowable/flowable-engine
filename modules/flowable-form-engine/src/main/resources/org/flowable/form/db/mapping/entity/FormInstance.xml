@@ -60,11 +60,11 @@
   </select>
   
   <select id="selectFormInstancesByQueryCriteria" parameterType="org.flowable.form.engine.impl.FormInstanceQueryImpl" resultMap="formInstanceResultMap">
-  	${limitBefore}
-    select RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectFormInstancesByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
   <select id="selectFormInstancesCountByQueryCriteria" parameterType="org.flowable.form.engine.impl.FormInstanceQueryImpl" resultType="long">
@@ -137,11 +137,11 @@
     
   <!-- mysql specific sql -->
   <select id="selectFormInstancesByQueryCriteria" databaseId="mysql" parameterType="org.flowable.form.engine.impl.FormInstanceQueryImpl" resultMap="formInstanceResultMap">
-  	${limitBefore}
-    select distinct RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectFormInstancesByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
   <!-- mysql specific sql -->

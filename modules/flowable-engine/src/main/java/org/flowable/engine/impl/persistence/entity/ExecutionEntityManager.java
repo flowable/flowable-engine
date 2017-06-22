@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
@@ -52,7 +51,7 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
 
     long findExecutionCountByQueryCriteria(ExecutionQueryImpl executionQuery);
 
-    List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery, Page page);
+    List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery);
 
     long findProcessInstanceCountByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
 
@@ -64,9 +63,9 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
 
     Collection<ExecutionEntity> findInactiveExecutionsByActivityIdAndProcessInstanceId(String activityId, String processInstanceId);
 
-    List<Execution> findExecutionsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<Execution> findExecutionsByNativeQuery(Map<String, Object> parameterMap);
 
-    List<ProcessInstance> findProcessInstanceByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<ProcessInstance> findProcessInstanceByNativeQuery(Map<String, Object> parameterMap);
 
     long findExecutionCountByNativeQuery(Map<String, Object> parameterMap);
 

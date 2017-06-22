@@ -73,8 +73,8 @@ public class HistoricProcessInstanceEntityManagerImpl extends AbstractEntityMana
     }
 
     @Override
-    public List<HistoricProcessInstance> findHistoricProcessInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return historicProcessInstanceDataManager.findHistoricProcessInstancesByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<HistoricProcessInstance> findHistoricProcessInstancesByNativeQuery(Map<String, Object> parameterMap) {
+        return historicProcessInstanceDataManager.findHistoricProcessInstancesByNativeQuery(parameterMap);
     }
     
     @Override

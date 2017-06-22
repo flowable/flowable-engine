@@ -34,7 +34,7 @@ public class UnacquireOwnedHistoryJobsCmd implements Command<Void> {
         HistoryJobQueryImpl jobQuery = new HistoryJobQueryImpl(commandContext);
         jobQuery.lockOwner(lockOwner);
         jobQuery.jobTenantId(tenantId);
-        List<HistoryJob> jobs = commandContext.getHistoryJobEntityManager().findHistoryJobsByQueryCriteria(jobQuery, null);
+        List<HistoryJob> jobs = commandContext.getHistoryJobEntityManager().findHistoryJobsByQueryCriteria(jobQuery);
         for (HistoryJob job : jobs) {
             commandContext.getJobManager().unacquire(job);
         }

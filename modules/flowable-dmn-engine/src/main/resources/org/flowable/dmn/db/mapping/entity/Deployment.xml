@@ -47,11 +47,11 @@
   <!-- DEPLOYMENT SELECT -->
 
   <select id="selectDeploymentsByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl" resultMap="deploymentResultMap">
-  	${limitBefore}
-    select distinct RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
   <select id="selectDeploymentCountByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl" resultType="long">
@@ -105,7 +105,9 @@
   </sql>
     
   <select id="selectDeploymentsByName" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="deploymentResultMap">
-    select * from ${prefix}ACT_DMN_DEPLOYMENT D where NAME_=#{parameter} order by D.DEPLOY_TIME_ desc
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if> select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if> 
+    from ${prefix}ACT_DMN_DEPLOYMENT RES where RES.NAME_=#{parameter} 
+    order by RES.DEPLOY_TIME_ desc <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
   <select id="selectDmnDeployment" parameterType="string" resultMap="deploymentResultMap">
@@ -114,11 +116,11 @@
 
   <!-- mysql specific -->
   <select id="selectDeploymentsByQueryCriteria" databaseId="mysql" parameterType="org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl" resultMap="deploymentResultMap">
-  	${limitBefore}
-    select distinct RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
    	${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
   <!-- mysql specific -->

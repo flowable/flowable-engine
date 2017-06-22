@@ -13,7 +13,9 @@
 
 package org.flowable.idm.engine.impl.persistence.entity;
 
-import org.flowable.engine.common.impl.Page;
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 import org.flowable.idm.api.PasswordEncoder;
 import org.flowable.idm.api.PasswordSalt;
@@ -21,9 +23,6 @@ import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 import org.flowable.idm.engine.impl.UserQueryImpl;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -34,7 +33,7 @@ public interface UserEntityManager extends EntityManager<UserEntity> {
 
     void updateUser(User updatedUser);
 
-    List<User> findUserByQueryCriteria(UserQueryImpl query, Page page);
+    List<User> findUserByQueryCriteria(UserQueryImpl query);
 
     long findUserCountByQueryCriteria(UserQueryImpl query);
 
@@ -42,7 +41,7 @@ public interface UserEntityManager extends EntityManager<UserEntity> {
 
     Boolean checkPassword(String userId, String password, PasswordEncoder passwordEncoder, PasswordSalt passwordSalt);
 
-    List<User> findUsersByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<User> findUsersByNativeQuery(Map<String, Object> parameterMap);
 
     long findUserCountByNativeQuery(Map<String, Object> parameterMap);
 

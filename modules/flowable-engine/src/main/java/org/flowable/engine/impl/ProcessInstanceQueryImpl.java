@@ -632,7 +632,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         return commandContext.getExecutionEntityManager().findProcessInstanceCountByQueryCriteria(this);
     }
 
-    public List<ProcessInstance> executeList(CommandContext commandContext, Page page) {
+    public List<ProcessInstance> executeList(CommandContext commandContext) {
         checkQueryOk();
         ensureVariablesInitialized();
         List<ProcessInstance> processInstances = null;

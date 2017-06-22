@@ -33,21 +33,21 @@
     </select>
 
     <select id="selectJobsToExecute" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-        ${limitBefore}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select
-        RES.* ${limitBetween}
+        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         from ${prefix}ACT_RU_JOB RES
         where LOCK_EXP_TIME_ is null
-        ${limitAfter}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
     <select id="selectExpiredJobs" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-        ${limitBefore}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select
-        RES.* ${limitBetween}
+        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         from ${prefix}ACT_RU_JOB RES
         where LOCK_EXP_TIME_ is not null and LOCK_EXP_TIME_ &lt; #{parameter, jdbcType=TIMESTAMP}
-        ${limitAfter}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
     <select id="selectJobsByTypeAndProcessDefinitionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
@@ -75,11 +75,11 @@
     </select>
 
     <select id="selectJobByQueryCriteria" parameterType="org.flowable.engine.impl.JobQueryImpl" resultMap="jobResultMap">
-        ${limitBefore}
-        select RES.* ${limitBetween}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+        select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         <include refid="selectJobByQueryCriteriaSql" />
         ${orderBy}
-        ${limitAfter}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
     <select id="selectJobCountByQueryCriteria" parameterType="org.flowable.engine.impl.JobQueryImpl" resultType="long">

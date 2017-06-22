@@ -67,11 +67,11 @@
   </select>
 
   <select id="selectDecisionTablesByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.DecisionTableQueryImpl" resultMap="decisionTableResultMap">
-  	${limitBefore}
-    select RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectDecisionTablesByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
   <select id="selectDecisionTableCountByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.DecisionTableQueryImpl" resultType="long">
@@ -249,11 +249,11 @@
   
   <!-- mysql specific sql -->
   <select id="selectDecisionTablesByQueryCriteria" databaseId="mysql" parameterType="org.flowable.dmn.engine.impl.DecisionTableQueryImpl" resultMap="decisionTableResultMap">
-  	${limitBefore}
-    select distinct RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectDecisionTablesByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
   <!-- mysql specific sql -->

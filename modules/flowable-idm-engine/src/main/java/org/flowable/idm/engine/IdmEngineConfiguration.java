@@ -341,10 +341,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         return new DbSqlSessionFactory();
     }
 
-    public String pathToEngineDbProperties() {
-        return "org/flowable/idm/db/properties/" + databaseType + ".properties";
-    }
-    
     public void initPasswordEncoder() {
         if (passwordEncoder == null) {
             passwordEncoder = ClearTextPasswordEncoder.getInstance();

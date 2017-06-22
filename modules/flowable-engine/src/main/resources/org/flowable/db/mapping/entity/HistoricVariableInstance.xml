@@ -150,11 +150,11 @@
   <!-- HISTORIC VARIABLE SELECT -->
 
   <select id="selectHistoricVariableInstanceByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricVariableInstanceQueryImpl" resultMap="historicProcessVariableResultMap">
-  	${limitBefore}
-    select RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectHistoricVariableInstanceByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
   <select id="selectHistoricVariableInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricVariableInstanceQueryImpl" resultType="long">

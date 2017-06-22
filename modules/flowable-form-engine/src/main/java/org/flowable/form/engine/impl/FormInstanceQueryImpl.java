@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.api.FormInstanceQuery;
 import org.flowable.form.engine.impl.interceptor.CommandContext;
@@ -177,9 +176,9 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
     }
 
     @Override
-    public List<FormInstance> executeList(CommandContext commandContext, Page page) {
+    public List<FormInstance> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getFormInstanceEntityManager().findFormInstancesByQueryCriteria(this, page);
+        return commandContext.getFormInstanceEntityManager().findFormInstancesByQueryCriteria(this);
     }
 
     // getters ////////////////////////////////////////////////////////

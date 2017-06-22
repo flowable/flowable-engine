@@ -38,7 +38,7 @@ public interface HistoricProcessInstanceDataManager extends DataManager<Historic
 
     List<HistoricProcessInstance> findHistoricProcessInstancesAndVariablesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery);
 
-    List<HistoricProcessInstance> findHistoricProcessInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<HistoricProcessInstance> findHistoricProcessInstancesByNativeQuery(Map<String, Object> parameterMap);
 
     long findHistoricProcessInstanceCountByNativeQuery(Map<String, Object> parameterMap);
 

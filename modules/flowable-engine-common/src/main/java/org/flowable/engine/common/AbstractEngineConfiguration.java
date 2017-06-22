@@ -388,7 +388,6 @@ public abstract class AbstractEngineConfiguration {
                 properties.put("limitBetween", "");
                 properties.put("limitOuterJoinBetween", "");
                 properties.put("limitBeforeNativeQuery", "");
-                properties.put("orderBy", "order by ${orderByColumns}");
                 properties.put("blobType", "BLOB");
                 properties.put("boolValue", "TRUE");
 
@@ -407,7 +406,9 @@ public abstract class AbstractEngineConfiguration {
         }
     }
 
-    public abstract String pathToEngineDbProperties();
+    public String pathToEngineDbProperties() {
+        return "org/flowable/db/properties/" + databaseType + ".properties";
+    }
 
     public Configuration initMybatisConfiguration(Environment environment, Reader reader, Properties properties) {
         XMLConfigBuilder parser = new XMLConfigBuilder(reader, "", properties);
