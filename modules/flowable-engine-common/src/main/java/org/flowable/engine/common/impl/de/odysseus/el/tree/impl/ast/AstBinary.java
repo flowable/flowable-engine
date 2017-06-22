@@ -92,8 +92,7 @@ public class AstBinary extends AstRightValue {
 	};
 
 	private final Operator operator;
-	private final AstNode left;
-    private final AstNode right;
+	private final AstNode left, right;
 
 	public AstBinary(AstNode left, AstNode right, Operator operator) {
 		this.left = left;

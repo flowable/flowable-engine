@@ -20,9 +20,7 @@ import org.flowable.engine.common.impl.javax.el.ELContext;
 import org.flowable.engine.common.impl.javax.el.ELException;
 
 public class AstChoice extends AstRightValue {
-	private final AstNode question;
-    private final AstNode yes;
-    private final AstNode no;
+	private final AstNode question, yes, no;
 	
 	public AstChoice(AstNode question, AstNode yes, AstNode no) {
 		this.question = question;
