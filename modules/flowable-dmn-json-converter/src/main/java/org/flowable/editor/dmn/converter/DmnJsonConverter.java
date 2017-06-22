@@ -401,7 +401,6 @@ public class DmnJsonConverter {
         if (!"-".equals(expressionValue)) {
             expressionType = "string";
             if (NumberUtils.isNumber(expressionValue)) {
-                Double.valueOf(expressionValue);
                 expressionType = "number";
             } else {
                 try {
