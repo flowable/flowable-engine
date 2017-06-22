@@ -488,7 +488,7 @@ angular.module('flowableModeler')
                         type = 'numeric';
                         break;
                     case 'boolean':
-                        type = 'checkbox';
+                        type = 'dropdown';
                         break;
                     default:
                         type = 'text';
@@ -532,6 +532,8 @@ angular.module('flowableModeler')
 
                 if (type === 'date') {
                     columnDefinition.dateFormat = dateFormat;
+                } else if (type === 'dropdown') {
+                    columnDefinition.source = ['true', 'false', '-'];
                 }
 
                 return columnDefinition;
@@ -549,7 +551,7 @@ angular.module('flowableModeler')
                         type = 'numeric';
                         break;
                     case 'boolean':
-                        type = 'checkbox';
+                        type = 'dropdown';
                         break;
                     default:
                         type = 'text';
@@ -603,7 +605,10 @@ angular.module('flowableModeler')
 
                 if (type === 'date') {
                     columnDefinition.dateFormat = dateFormat;
+                } else if (type === 'dropdown') {
+                    columnDefinition.source = ['true', 'false', '-'];
                 }
+
 
                 columnDefinition.title = title;
 
