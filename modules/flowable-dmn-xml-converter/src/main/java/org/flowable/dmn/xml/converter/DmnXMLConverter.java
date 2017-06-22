@@ -307,7 +307,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                 xtw.writeAttribute(ATTRIBUTE_ID, decisionTable.getId());
 
                 if (decisionTable.getHitPolicy() != null) {
-                    xtw.writeAttribute(ATTRIBUTE_HIT_POLICY, decisionTable.getHitPolicy().getValue().toString());
+                    xtw.writeAttribute(ATTRIBUTE_HIT_POLICY, decisionTable.getHitPolicy().getValue());
                 }
 
                 if (decisionTable.getAggregation() != null) {
