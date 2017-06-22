@@ -20,6 +20,7 @@ import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.utils.URIBuilder;
 import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.domain.editor.AppDefinition;
 import org.flowable.app.domain.editor.AppModelDefinition;
@@ -64,6 +65,7 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -482,6 +484,22 @@ public class ModelServiceImpl implements ModelService {
                     } catch (IOException e) {
                         LOGGER.error("Unable to fetch variables from the start process instance event", e);
                         throw new RuntimeException(e);
+                    }
+                    break;
+                case "ACTIVITY_MESSAGE_RECEIVED":
+                    try {
+                        Object messageName = objectMapper.readValue(eventLogEntry.get("data").binaryValue(), Map.class).get("messageName");
+                        nodes.add(createScriptTask(position, "sendMessage" + position++, "Send message " + messageName,
+
+                        "import org.flowable.engine.impl.context.Context;\n" +
+                                "\n" +
+                                "runtimeService = Context.getProcessEngineConfiguration().getRuntimeService()\n" +
+                                "subscription= runtimeService.createEventSubscriptionQuery().processInstanceId(processInstanceId)" +
+                                ".eventName(\""+ messageName +"\").singleResult();\n" +
+                                "runtimeService.messageEventReceived(\"" + messageName + "\", subscription.getExecutionId());"
+                        ));
+                    } catch (IOException e) {
+                        throw new RuntimeException("eventLog entry [" + eventLogEntry + "] does not have a correct format", e);
                     }
                     break;
                 case "TASK_ASSIGNED":
