@@ -16,7 +16,6 @@ package org.flowable.idm.engine.impl;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 import org.flowable.idm.api.UserQueryProperty;

@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.flowable.bpmn.model.Signal;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;

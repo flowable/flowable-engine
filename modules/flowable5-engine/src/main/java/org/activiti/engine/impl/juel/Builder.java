@@ -67,9 +67,7 @@ public class Builder implements TreeBuilder {
             this.features = EnumSet.of(features[0]);
         } else {
             Feature[] rest = new Feature[features.length - 1];
-            for (int i = 1; i < features.length; i++) {
-                rest[i - 1] = features[i];
-            }
+            System.arraycopy(features, 1, rest, 0, features.length - 1);
             this.features = EnumSet.of(features[0], rest);
         }
     }

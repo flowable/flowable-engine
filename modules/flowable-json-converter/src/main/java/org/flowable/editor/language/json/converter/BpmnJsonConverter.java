@@ -12,9 +12,15 @@
  */
 package org.flowable.editor.language.json.converter;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -53,11 +59,6 @@ import org.flowable.editor.language.json.converter.util.JsonConverterUtil;
 import org.flowable.editor.language.json.model.ModelInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import math.geom2d.Point2D;
 import math.geom2d.conic.Circle2D;
@@ -559,10 +560,8 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
             if (StringUtils.isNotEmpty(userStarterValue)) {
                 List<String> userStarters = new ArrayList<>();
                 String userStartArray[] = userStarterValue.split(",");
-                
-                for (String user : userStartArray) {
-                    userStarters.add(user);
-                }
+
+                userStarters.addAll(Arrays.asList(userStartArray));
                 
                 process.setCandidateStarterUsers(userStarters);
             }
@@ -570,10 +569,8 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
             if (StringUtils.isNotEmpty(groupStarterValue)) {
                 List<String> groupStarters = new ArrayList<>();
                 String groupStarterArray[] = groupStarterValue.split(",");
-    
-                for (String group : groupStarterArray) {
-                    groupStarters.add(group);
-                }
+
+                groupStarters.addAll(Arrays.asList(groupStarterArray));
                 
                 process.setCandidateStarterGroups(groupStarters);
             }
