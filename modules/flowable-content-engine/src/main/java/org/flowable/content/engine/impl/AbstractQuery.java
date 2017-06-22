@@ -38,11 +38,11 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
     protected transient CommandExecutor commandExecutor;
     protected transient CommandContext commandContext;
 
-    protected AbstractQuery() {
+    public AbstractQuery() {
         parameter = this;
     }
 
-    protected AbstractQuery(CommandExecutor commandExecutor) {
+    public AbstractQuery(CommandExecutor commandExecutor) {
         this.commandExecutor = commandExecutor;
     }
 

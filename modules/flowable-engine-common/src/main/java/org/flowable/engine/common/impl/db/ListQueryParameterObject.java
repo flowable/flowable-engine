@@ -33,13 +33,14 @@ public class ListQueryParameterObject {
     protected int firstResult = -1;
     protected int maxResults = -1;
     protected Object parameter;
-    protected String orderBy;
+    protected String orderByColumns;
     protected QueryProperty orderProperty;
     protected NullHandlingOnOrder nullHandlingOnOrder;
     protected ResultType resultType;
     protected String databaseType;
-
+    
     public ListQueryParameterObject() {
+        
     }
 
     public ListQueryParameterObject(Object parameter, int firstResult, int maxResults) {
@@ -50,10 +51,10 @@ public class ListQueryParameterObject {
     
     protected void addOrder(String column, String sortOrder, NullHandlingOnOrder nullHandlingOnOrder) {
 
-        if (orderBy == null) {
-            orderBy = "";
+        if (orderByColumns == null) {
+            orderByColumns = "";
         } else {
-            orderBy = orderBy + ", ";
+            orderByColumns = orderByColumns + ", ";
         }
 
         String defaultOrderByClause = column + " " + sortOrder;
@@ -66,13 +67,13 @@ public class ListQueryParameterObject {
                         || AbstractEngineConfiguration.DATABASE_TYPE_HSQL.equals(databaseType)
                         || AbstractEngineConfiguration.DATABASE_TYPE_POSTGRES.equals(databaseType) 
                         || AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)) {
-                    orderBy = orderBy + defaultOrderByClause + " NULLS FIRST";
+                    orderByColumns = orderByColumns + defaultOrderByClause + " NULLS FIRST";
                 } else if (AbstractEngineConfiguration.DATABASE_TYPE_MYSQL.equals(databaseType)) {
-                    orderBy = orderBy + "isnull(" + column + ") desc," + defaultOrderByClause;
+                    orderByColumns = orderByColumns + "isnull(" + column + ") desc," + defaultOrderByClause;
                 } else if (AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType) || AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)) {
-                    orderBy = orderBy + "case when " + column + " is null then 0 else 1 end," + defaultOrderByClause;
+                    orderByColumns = orderByColumns + "case when " + column + " is null then 0 else 1 end," + defaultOrderByClause;
                 } else {
-                    orderBy = orderBy + defaultOrderByClause;
+                    orderByColumns = orderByColumns + defaultOrderByClause;
                 }
 
             } else if (nullHandlingOnOrder == NullHandlingOnOrder.NULLS_LAST) {
@@ -81,19 +82,19 @@ public class ListQueryParameterObject {
                         || AbstractEngineConfiguration.DATABASE_TYPE_HSQL.equals(databaseType)
                         || AbstractEngineConfiguration.DATABASE_TYPE_POSTGRES.equals(databaseType) 
                         || AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)) {
-                    orderBy = orderBy + column + " " + sortOrder + " NULLS LAST";
+                    orderByColumns = orderByColumns + column + " " + sortOrder + " NULLS LAST";
                 } else if (AbstractEngineConfiguration.DATABASE_TYPE_MYSQL.equals(databaseType)) {
-                    orderBy = orderBy + "isnull(" + column + ") asc," + defaultOrderByClause;
+                    orderByColumns = orderByColumns + "isnull(" + column + ") asc," + defaultOrderByClause;
                 } else if (AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType) || AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)) {
-                    orderBy = orderBy + "case when " + column + " is null then 1 else 0 end," + defaultOrderByClause;
+                    orderByColumns = orderByColumns + "case when " + column + " is null then 1 else 0 end," + defaultOrderByClause;
                 } else {
-                    orderBy = orderBy + defaultOrderByClause;
+                    orderByColumns = orderByColumns + defaultOrderByClause;
                 }
 
             }
 
         } else {
-            orderBy = orderBy + defaultOrderByClause;
+            orderByColumns = orderByColumns + defaultOrderByClause;
         }
 
     }
@@ -134,22 +135,25 @@ public class ListQueryParameterObject {
     }
     
     public String getOrderBy() {
-        if (orderBy == null) {
-            // the default order column
-            return "RES.ID_ asc";
+        // For db2 and sqlserver, when there is paging needed, the limitBefore and limitBetween is used.
+        // For those databases, the regular orderBy needs to be empty, 
+        // the order will be added in the 'limitBetween' (see mssql/db2.properties). 
+        if (firstResult >= 0 
+                && (AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType) || AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)) ) {
+            return "";
         } else {
-            return orderBy;
+            return "order by " + getOrderByColumns();
         }
     }
 
     public String getOrderByColumns() {
-        return getOrderBy();
+        if (orderByColumns != null) {
+            return orderByColumns;
+        } else {
+            return "RES.ID_ asc";
+        }
     }
     
-    public boolean isLimitActive() {
-        return resultType == ResultType.LIST_PAGE;
-    }
-
     public void setDatabaseType(String databaseType) {
         this.databaseType = databaseType;
     }

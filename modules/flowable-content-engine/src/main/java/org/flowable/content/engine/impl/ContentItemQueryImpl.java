@@ -65,9 +65,6 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
     protected String tenantIdLike;
     protected boolean withoutTenantId;
 
-    public ContentItemQueryImpl() {
-    }
-
     public ContentItemQueryImpl(CommandContext commandContext) {
         super(commandContext);
     }

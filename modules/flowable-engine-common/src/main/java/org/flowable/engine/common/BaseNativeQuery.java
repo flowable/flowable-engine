@@ -44,8 +44,34 @@ public abstract class BaseNativeQuery<T extends NativeQuery<?, ?>, U> implements
         parameters.put(name, value);
         return (T) this;
     }
+    
+    protected Map<String, Object> generateParameterMap() {
+        Map<String, Object> parameterMap = new HashMap<>();
+        parameterMap.putAll(parameters);
+        parameterMap.put("sql", sqlStatement);
+        parameterMap.put("resultType", resultType.toString());
+        parameterMap.put("firstResult", firstResult);
+        parameterMap.put("maxResults", maxResults);
+        String orderBy = (String) parameterMap.get("orderBy");
+        if (orderBy != null && !"".equals(orderBy)) {
+            parameterMap.put("orderBy", "RES." + orderBy);
+        } else {
+            parameterMap.put("orderBy", "order by RES.ID_ asc");
+        }
 
-    protected Map<String, Object> getParameterMap() {
+        int firstRow = firstResult + 1;
+        parameterMap.put("firstRow", firstRow);
+        int lastRow = 0;
+        if (maxResults == Integer.MAX_VALUE) {
+            lastRow = maxResults;
+        } else {
+            lastRow = firstResult + maxResults + 1;
+        }
+        parameterMap.put("lastRow", lastRow);
+        return parameterMap;
+    }
+
+    protected Map<String, Object> __generateParameterMap() {
         HashMap<String, Object> parameterMap = new HashMap<String, Object>();
         parameterMap.put("sql", sqlStatement);
         parameterMap.putAll(parameters);

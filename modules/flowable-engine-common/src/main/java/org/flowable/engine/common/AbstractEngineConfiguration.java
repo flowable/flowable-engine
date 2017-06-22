@@ -388,7 +388,6 @@ public abstract class AbstractEngineConfiguration {
                 properties.put("limitBetween", "");
                 properties.put("limitOuterJoinBetween", "");
                 properties.put("limitBeforeNativeQuery", "");
-                properties.put("orderBy", "order by ${orderByColumns}");
                 properties.put("blobType", "BLOB");
                 properties.put("boolValue", "TRUE");
 

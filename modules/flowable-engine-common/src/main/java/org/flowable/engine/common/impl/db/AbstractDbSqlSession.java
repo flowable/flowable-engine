@@ -65,6 +65,7 @@ public abstract class AbstractDbSqlSession implements Session {
     
     @SuppressWarnings("rawtypes")
     public List selectList(String statement, ListQueryParameterObject parameter) {
+        parameter.setDatabaseType(dbSqlSessionFactory.getDatabaseType());
         return selectListWithRawParameter(statement, parameter);
     }
     
