@@ -350,6 +350,11 @@ public class DmnJsonConverter {
                             expressionValue = expressionValueNode.asText();
                         }
 
+                        // regression: if expression type is empty try to determine it based on the expression value
+                        if (StringUtils.isEmpty(ruleOutputClauseContainer.getOutputClause().getTypeRef())) {
+                            ruleOutputClauseContainer.getOutputClause().setTypeRef(determineExpressionType(expressionValue));
+                        }
+
                         if (complexExpressionIds.contains(id)) {
                             outputEntry.setText(expressionValue);
                         } else {
@@ -372,6 +377,20 @@ public class DmnJsonConverter {
                 }
                 ruleCounter++;
                 decisionTable.addRule(rule);
+            }
+        }
+
+        // regression check for empty expression types
+        for (InputClause inputClause : decisionTable.getInputs()) {
+            if (StringUtils.isEmpty(inputClause.getInputExpression().getTypeRef())) {
+                // default to string
+                inputClause.getInputExpression().setTypeRef("string");
+            }
+        }
+        for (OutputClause outputClause : decisionTable.getOutputs()) {
+            if (StringUtils.isEmpty(outputClause.getTypeRef())) {
+                // default to string
+                outputClause.setTypeRef("string");
             }
         }
     }

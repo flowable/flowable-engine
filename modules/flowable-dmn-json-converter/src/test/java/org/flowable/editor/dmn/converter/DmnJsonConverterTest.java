@@ -57,6 +57,7 @@ public class DmnJsonConverterTest {
     private static final String JSON_RESOURCE_10 = "org/flowable/editor/dmn/converter/decisiontable_regression_model_v1.json";
     private static final String JSON_RESOURCE_11 = "org/flowable/editor/dmn/converter/decisiontable_regression_model_v1_no_type.json";
     private static final String JSON_RESOURCE_12 = "org/flowable/editor/dmn/converter/decisiontable_regression_model_v1_no_type2.json";
+    private static final String JSON_RESOURCE_13 = "org/flowable/editor/dmn/converter/decisiontable_regression_model_v1_no_type3.json";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -373,6 +374,7 @@ public class DmnJsonConverterTest {
         Assert.assertEquals("number", decisionTable.getInputs().get(1).getInputExpression().getTypeRef());
         Assert.assertEquals("boolean", decisionTable.getInputs().get(2).getInputExpression().getTypeRef());
         Assert.assertEquals("date", decisionTable.getInputs().get(3).getInputExpression().getTypeRef());
+        Assert.assertEquals("string", decisionTable.getOutputs().get(0).getTypeRef());
     }
 
     @Test
@@ -385,6 +387,17 @@ public class DmnJsonConverterTest {
         Assert.assertEquals("number", decisionTable.getInputs().get(1).getInputExpression().getTypeRef());
         Assert.assertEquals("boolean", decisionTable.getInputs().get(2).getInputExpression().getTypeRef());
         Assert.assertEquals("date", decisionTable.getInputs().get(3).getInputExpression().getTypeRef());
+        Assert.assertEquals("string", decisionTable.getOutputs().get(0).getTypeRef());
+    }
+
+    @Test
+    public void testConvertJsonToDmn_Regression_model_v1_no_type3() throws Exception {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_13);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+
+        Assert.assertEquals("string", decisionTable.getInputs().get(0).getInputExpression().getTypeRef());
+        Assert.assertEquals("string", decisionTable.getOutputs().get(0).getTypeRef());
     }
 
     /* Helper methods */

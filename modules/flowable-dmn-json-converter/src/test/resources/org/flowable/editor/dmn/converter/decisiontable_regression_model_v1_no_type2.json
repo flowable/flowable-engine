@@ -46,7 +46,7 @@
       "id": "13",
       "variableId": "output1",
       "variableType": null,
-      "type": "string",
+      "type": null,
       "label": "Output One",
       "entries": null,
       "newVariable": false
@@ -58,7 +58,7 @@
       "5": "",
       "7": "",
       "9": "",
-      "13": "\"SOMETHING ELSE\""
+      "13": ""
     },
     {
       "3": "== \"TEST\"",
