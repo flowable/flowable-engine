@@ -25,8 +25,6 @@ import org.flowable.engine.repository.Deployment;
  */
 public interface DeploymentDataManager extends DataManager<DeploymentEntity> {
 
-    DeploymentEntity findLatestDeploymentByName(String deploymentName);
-
     long findDeploymentCountByQueryCriteria(DeploymentQueryImpl deploymentQuery);
 
     List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery);

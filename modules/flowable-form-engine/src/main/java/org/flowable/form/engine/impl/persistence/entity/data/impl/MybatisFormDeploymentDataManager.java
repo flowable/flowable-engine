@@ -44,15 +44,6 @@ public class MybatisFormDeploymentDataManager extends AbstractDataManager<FormDe
     }
 
     @Override
-    public FormDeploymentEntity findLatestDeploymentByName(String deploymentName) {
-        List<?> list = getDbSqlSession().selectList("selectDeploymentsByName", deploymentName, 0, 1);
-        if (list != null && !list.isEmpty()) {
-            return (FormDeploymentEntity) list.get(0);
-        }
-        return null;
-    }
-
-    @Override
     public long findDeploymentCountByQueryCriteria(FormDeploymentQueryImpl deploymentQuery) {
         return (Long) getDbSqlSession().selectOne("selectDeploymentCountByQueryCriteria", deploymentQuery);
     }

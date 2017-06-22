@@ -282,11 +282,6 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
     }
 
     @Override
-    public DeploymentEntity findLatestDeploymentByName(String deploymentName) {
-        return deploymentDataManager.findLatestDeploymentByName(deploymentName);
-    }
-
-    @Override
     public long findDeploymentCountByQueryCriteria(DeploymentQueryImpl deploymentQuery) {
         return deploymentDataManager.findDeploymentCountByQueryCriteria(deploymentQuery);
     }

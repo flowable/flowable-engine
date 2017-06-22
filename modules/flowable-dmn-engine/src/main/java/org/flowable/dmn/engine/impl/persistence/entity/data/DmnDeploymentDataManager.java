@@ -25,8 +25,6 @@ import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
  */
 public interface DmnDeploymentDataManager extends DataManager<DmnDeploymentEntity> {
 
-    DmnDeploymentEntity findLatestDeploymentByName(String deploymentName);
-
     long findDeploymentCountByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery);
 
     List<DmnDeployment> findDeploymentsByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery);

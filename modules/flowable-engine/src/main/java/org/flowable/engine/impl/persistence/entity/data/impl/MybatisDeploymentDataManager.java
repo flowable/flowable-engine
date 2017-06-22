@@ -43,15 +43,6 @@ public class MybatisDeploymentDataManager extends AbstractDataManager<Deployment
     }
 
     @Override
-    public DeploymentEntity findLatestDeploymentByName(String deploymentName) {
-        List<?> list = getDbSqlSession().selectList("selectDeploymentsByName", deploymentName, 0, 1);
-        if (list != null && !list.isEmpty()) {
-            return (DeploymentEntity) list.get(0);
-        }
-        return null;
-    }
-
-    @Override
     public long findDeploymentCountByQueryCriteria(DeploymentQueryImpl deploymentQuery) {
         return (Long) getDbSqlSession().selectOne("selectDeploymentCountByQueryCriteria", deploymentQuery);
     }

@@ -78,11 +78,6 @@ public class FormDeploymentEntityManagerImpl extends AbstractEntityManager<FormD
     }
 
     @Override
-    public FormDeploymentEntity findLatestDeploymentByName(String deploymentName) {
-        return deploymentDataManager.findLatestDeploymentByName(deploymentName);
-    }
-
-    @Override
     public long findDeploymentCountByQueryCriteria(FormDeploymentQueryImpl deploymentQuery) {
         return deploymentDataManager.findDeploymentCountByQueryCriteria(deploymentQuery);
     }
