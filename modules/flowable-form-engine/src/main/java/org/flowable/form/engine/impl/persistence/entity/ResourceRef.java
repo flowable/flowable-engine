@@ -48,9 +48,9 @@ public class ResourceRef implements Serializable {
     }
 
     private void setBytes(byte[] bytes) {
+        ResourceEntityManager resourceEntityManager = Context.getCommandContext().getResourceEntityManager();
         if (id == null) {
             if (bytes != null) {
-                ResourceEntityManager resourceEntityManager = Context.getCommandContext().getResourceEntityManager();
                 entity = resourceEntityManager.create();
                 entity.setName(name);
                 entity.setBytes(bytes);
@@ -60,6 +60,7 @@ public class ResourceRef implements Serializable {
         } else {
             ensureInitialized();
             entity.setBytes(bytes);
+            resourceEntityManager.update(entity);
         }
     }
 

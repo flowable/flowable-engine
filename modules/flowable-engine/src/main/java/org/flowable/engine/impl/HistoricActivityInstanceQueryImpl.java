@@ -16,7 +16,6 @@ package org.flowable.engine.impl;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.impl.interceptor.CommandContext;
@@ -62,9 +61,9 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     }
 
     @Override
-    public List<HistoricActivityInstance> executeList(CommandContext commandContext, Page page) {
+    public List<HistoricActivityInstance> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getHistoricActivityInstanceEntityManager().findHistoricActivityInstancesByQueryCriteria(this, page);
+        return commandContext.getHistoricActivityInstanceEntityManager().findHistoricActivityInstancesByQueryCriteria(this);
     }
 
     public HistoricActivityInstanceQueryImpl processInstanceId(String processInstanceId) {

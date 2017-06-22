@@ -80,6 +80,7 @@ public class GetStartFormModelCmd implements Command<FormModel>, Serializable {
         return formModel;
     }
 
+    @SuppressWarnings("unchecked")
     protected void fetchRelatedContentInfoIfNeeded(FormModel formModel, ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (!processEngineConfiguration.isContentEngineInitialized()) {
             return;

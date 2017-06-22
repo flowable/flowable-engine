@@ -1048,11 +1048,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     @Override
-    public String pathToEngineDbProperties() {
-        return "org/flowable/db/properties/" + databaseType + ".properties";
-    }
-
-    @Override
     public Configuration initMybatisConfiguration(Environment environment, Reader reader, Properties properties) {
         XMLConfigBuilder parser = new XMLConfigBuilder(reader, "", properties);
         Configuration configuration = parser.getConfiguration();

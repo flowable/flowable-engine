@@ -15,7 +15,6 @@ package org.flowable.content.engine.impl;
 import java.io.Serializable;
 import java.util.List;
 
-import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.context.Context;
 import org.flowable.content.engine.impl.interceptor.Command;
 import org.flowable.content.engine.impl.interceptor.CommandContext;
@@ -25,7 +24,6 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.query.Query;
 import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.engine.common.impl.Direction;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.db.ListQueryParameterObject;
 
 /**
@@ -37,25 +35,8 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
 
     private static final long serialVersionUID = 1L;
 
-    public static final String SORTORDER_ASC = "asc";
-    public static final String SORTORDER_DESC = "desc";
-
-    private static enum ResultType {
-        LIST, LIST_PAGE, SINGLE_RESULT, COUNT
-    }
-
     protected transient CommandExecutor commandExecutor;
     protected transient CommandContext commandContext;
-
-    protected String databaseType;
-
-    protected String orderBy;
-
-    protected ResultType resultType;
-
-    protected QueryProperty orderProperty;
-
-    protected NullHandlingOnOrder nullHandlingOnOrder;
 
     protected AbstractQuery() {
         parameter = this;
@@ -125,7 +106,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         if (commandExecutor != null) {
             return (List<U>) commandExecutor.execute(this);
         }
-        return executeList(Context.getCommandContext(), null);
+        return executeList(Context.getCommandContext());
     }
 
     @SuppressWarnings("unchecked")
@@ -136,7 +117,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         if (commandExecutor != null) {
             return (List<U>) commandExecutor.execute(this);
         }
-        return executeList(Context.getCommandContext(), new Page(firstResult, maxResults));
+        return executeList(Context.getCommandContext());
     }
 
     public long count() {
@@ -149,11 +130,11 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
 
     public Object execute(CommandContext commandContext) {
         if (resultType == ResultType.LIST) {
-            return executeList(commandContext, null);
+            return executeList(commandContext);
         } else if (resultType == ResultType.SINGLE_RESULT) {
             return executeSingleResult(commandContext);
         } else if (resultType == ResultType.LIST_PAGE) {
-            return executeList(commandContext, null);
+            return executeList(commandContext);
         } else {
             return executeCount(commandContext);
         }
@@ -163,86 +144,17 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
 
     /**
      * Executes the actual query to retrieve the list of results.
-     * 
-     * @param page
-     *            used if the results must be paged. If null, no paging will be applied.
      */
-    public abstract List<U> executeList(CommandContext commandContext, Page page);
+    public abstract List<U> executeList(CommandContext commandContext);
 
     public U executeSingleResult(CommandContext commandContext) {
-        List<U> results = executeList(commandContext, null);
+        List<U> results = executeList(commandContext);
         if (results.size() == 1) {
             return results.get(0);
         } else if (results.size() > 1) {
             throw new FlowableException("Query return " + results.size() + " results instead of max 1");
         }
         return null;
-    }
-
-    protected void addOrder(String column, String sortOrder, NullHandlingOnOrder nullHandlingOnOrder) {
-
-        if (orderBy == null) {
-            orderBy = "";
-        } else {
-            orderBy = orderBy + ", ";
-        }
-
-        String defaultOrderByClause = column + " " + sortOrder;
-
-        if (nullHandlingOnOrder != null) {
-
-            if (nullHandlingOnOrder == NullHandlingOnOrder.NULLS_FIRST) {
-
-                if (ContentEngineConfiguration.DATABASE_TYPE_H2.equals(databaseType) || ContentEngineConfiguration.DATABASE_TYPE_HSQL.equals(databaseType)
-                        || ContentEngineConfiguration.DATABASE_TYPE_POSTGRES.equals(databaseType) || ContentEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)) {
-                    orderBy = orderBy + defaultOrderByClause + " NULLS FIRST";
-                } else if (ContentEngineConfiguration.DATABASE_TYPE_MYSQL.equals(databaseType)) {
-                    orderBy = orderBy + "isnull(" + column + ") desc," + defaultOrderByClause;
-                } else if (ContentEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType) || ContentEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)) {
-                    orderBy = orderBy + "case when " + column + " is null then 0 else 1 end," + defaultOrderByClause;
-                } else {
-                    orderBy = orderBy + defaultOrderByClause;
-                }
-
-            } else if (nullHandlingOnOrder == NullHandlingOnOrder.NULLS_LAST) {
-
-                if (ContentEngineConfiguration.DATABASE_TYPE_H2.equals(databaseType) || ContentEngineConfiguration.DATABASE_TYPE_HSQL.equals(databaseType)
-                        || ContentEngineConfiguration.DATABASE_TYPE_POSTGRES.equals(databaseType) || ContentEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)) {
-                    orderBy = orderBy + column + " " + sortOrder + " NULLS LAST";
-                } else if (ContentEngineConfiguration.DATABASE_TYPE_MYSQL.equals(databaseType)) {
-                    orderBy = orderBy + "isnull(" + column + ") asc," + defaultOrderByClause;
-                } else if (ContentEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType) || ContentEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)) {
-                    orderBy = orderBy + "case when " + column + " is null then 1 else 0 end," + defaultOrderByClause;
-                } else {
-                    orderBy = orderBy + defaultOrderByClause;
-                }
-
-            }
-
-        } else {
-            orderBy = orderBy + defaultOrderByClause;
-        }
-
-    }
-
-    public String getOrderBy() {
-        if (orderBy == null) {
-            return super.getOrderBy();
-        } else {
-            return orderBy;
-        }
-    }
-
-    public String getOrderByColumns() {
-        return getOrderBy();
-    }
-
-    public String getDatabaseType() {
-        return databaseType;
-    }
-
-    public void setDatabaseType(String databaseType) {
-        this.databaseType = databaseType;
     }
 
 }

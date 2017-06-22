@@ -29,7 +29,7 @@ public interface HistoryJobEntityManager extends EntityManager<HistoryJobEntity>
     /**
      * Executes a {@link HistoryJobQueryImpl} and returns the matching {@link HistoryJobEntity} instances.
      */
-    List<HistoryJob> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl jobQuery, Page page);
+    List<HistoryJob> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl jobQuery);
 
     /**
      * Same as {@link #findHistoryJobsByQueryCriteria(HistoryJobQueryImpl, Page)}, but only returns a count and not the instances itself.

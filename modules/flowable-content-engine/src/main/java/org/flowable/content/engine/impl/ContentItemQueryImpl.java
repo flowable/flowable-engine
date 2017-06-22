@@ -23,7 +23,6 @@ import org.flowable.content.api.ContentItemQuery;
 import org.flowable.content.engine.impl.interceptor.CommandContext;
 import org.flowable.content.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.Page;
 
 /**
  * @author Tijs Rademakers
@@ -267,9 +266,9 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
     }
 
     @Override
-    public List<ContentItem> executeList(CommandContext commandContext, Page page) {
+    public List<ContentItem> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getContentItemEntityManager().findContentItemsByQueryCriteria(this, page);
+        return commandContext.getContentItemEntityManager().findContentItemsByQueryCriteria(this);
     }
 
     // getters ////////////////////////////////////////////////////////

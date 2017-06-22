@@ -33,11 +33,11 @@
     </select>
 
     <select id="selectTimerJobByQueryCriteria" parameterType="org.flowable.engine.impl.TimerJobQueryImpl" resultMap="jobResultMap">
-        ${limitBefore}
-        select RES.* ${limitBetween}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+        select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         <include refid="selectTimerJobByQueryCriteriaSql" />
         ${orderBy}
-        ${limitAfter}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
     <select id="selectTimerJobCountByQueryCriteria" parameterType="org.flowable.engine.impl.TimerJobQueryImpl" resultType="long">
@@ -100,13 +100,13 @@
     </sql>
 
     <select id="selectTimerJobsToExecute" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-        ${limitBefore}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select
-        RES.* ${limitBetween}
+        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         from ${prefix}ACT_RU_TIMER_JOB RES
         where DUEDATE_ &lt;= #{parameter, jdbcType=TIMESTAMP}
         and LOCK_OWNER_ is null
-        ${limitAfter}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
     <!-- TIMER INSERT -->

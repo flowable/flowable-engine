@@ -131,12 +131,14 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
             formModel = formService.getFormModelWithVariablesByKey(
                     formRequest.getFormDefinitionKey(),
                     formRequest.getProcessInstanceId(),
+                    formRequest.getTaskId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
         } else if (formRequest.getFormDefinitionId() != null) {
             formModel = formService.getFormModelWithVariablesById(
                     formRequest.getFormDefinitionId(),
                     formRequest.getProcessInstanceId(),
+                    formRequest.getTaskId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
         } else {

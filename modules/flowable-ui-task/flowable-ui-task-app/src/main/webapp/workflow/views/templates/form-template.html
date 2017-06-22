@@ -15,6 +15,8 @@
         
         <div ng-if="!formData.outcomes || formData.outcomes.length === 0" class="clearfix form-actions">
             <div class="pull-right" ng-if="(hideButtons == undefined || hideButtons == null || hideButtons == false) && (disableForm == undefined || disableForm == null || disableForm == false)">
+                <button id="form_save_button" class="btn btn-default" ng-disabled="model.completeButtonDisabled || !model.valid || (disableOutcomes != undefined && disableOutcomes != null && disableOutcomes) || model.uploadInProgress"
+                        ng-click="saveForm()" ng-show="!processDefinitionId" translate="FORM.ACTION.SAVE"></button>
                 <button id="form_complete_button" class="btn btn-default" ng-disabled="model.completeButtonDisabled || !model.valid || (disableOutcomes != undefined && disableOutcomes != null && disableOutcomes) || model.uploadInProgress"
                         ng-click="completeForm('complete')">{{getDefaultCompleteButtonText()}}</button>
             </div>
@@ -22,6 +24,9 @@
 
         <div ng-if="formData.outcomes && formData.outcomes.length > 0" class="clearfix form-actions">
             <div class="pull-right" ng-if="(hideButtons == undefined || hideButtons == null || hideButtons == false) && (disableForm == undefined || disableForm == null || disableForm == false)">
+                <button id="form_save_button" class="btn btn-default"
+                        ng-disabled="!model.valid || model.completeButtonDisabled || model.uploadInProgress"
+                        ng-click="saveForm()" ng-show="!processDefinitionId" translate="FORM.ACTION.SAVE"></button>
                 <button id="form_complete_button" class="btn btn-default"
                         ng-disabled="!model.valid || model.completeButtonDisabled || model.uploadInProgress"
                         ng-repeat="outcome in formData.outcomes"

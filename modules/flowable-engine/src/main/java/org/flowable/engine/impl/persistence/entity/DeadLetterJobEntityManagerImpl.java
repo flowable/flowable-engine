@@ -15,7 +15,6 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.DeadLetterJobQueryImpl;
@@ -46,8 +45,8 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
     }
 
     @Override
-    public List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery, Page page) {
-        return jobDataManager.findJobsByQueryCriteria(jobQuery, page);
+    public List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery) {
+        return jobDataManager.findJobsByQueryCriteria(jobQuery);
     }
 
     @Override

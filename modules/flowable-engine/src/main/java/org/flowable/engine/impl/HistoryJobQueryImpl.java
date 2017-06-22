@@ -18,7 +18,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.interceptor.CommandExecutor;
@@ -165,9 +164,9 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         return commandContext.getHistoryJobEntityManager().findHistoryJobCountByQueryCriteria(this);
     }
 
-    public List<HistoryJob> executeList(CommandContext commandContext, Page page) {
+    public List<HistoryJob> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getHistoryJobEntityManager().findHistoryJobsByQueryCriteria(this, page);
+        return commandContext.getHistoryJobEntityManager().findHistoryJobsByQueryCriteria(this);
     }
 
     // getters //////////////////////////////////////////

@@ -19,8 +19,6 @@ import java.util.List;
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.impl.asyncexecutor.AcquiredJobEntities;
 import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.JobInfoEntity;

@@ -14,7 +14,6 @@ package org.flowable.engine.impl.persistence.entity.data;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.HistoryJobQueryImpl;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
@@ -25,7 +24,7 @@ import org.flowable.engine.runtime.HistoryJob;
  */
 public interface HistoryJobDataManager extends DataManager<HistoryJobEntity>, JobInfoDataManager<HistoryJobEntity> {
 
-    List<HistoryJob> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl query, Page page);
+    List<HistoryJob> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl query);
 
     long findHistoryJobCountByQueryCriteria(HistoryJobQueryImpl query);
     

@@ -39,7 +39,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
@@ -63,6 +62,9 @@ public class SecurityConfiguration {
     
     @Autowired
     protected IdmIdentityService identityService;
+    
+    @Autowired
+    protected PasswordEncoder passwordEncoder;
 
     @Autowired
     protected Environment env;
@@ -95,16 +97,11 @@ public class SecurityConfiguration {
         return userDetailsService;
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-    }
-
     @Bean(name = "dbAuthenticationProvider")
     public AuthenticationProvider dbAuthenticationProvider() {
         CustomDaoAuthenticationProvider daoAuthenticationProvider = new CustomDaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(userDetailsService());
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
         return daoAuthenticationProvider;
     }
     

@@ -21,7 +21,6 @@ import org.flowable.dmn.api.DmnDeploymentQuery;
 import org.flowable.dmn.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.Page;
 
 /**
  * @author Tijs Rademakers
@@ -174,9 +173,9 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
     }
 
     @Override
-    public List<DmnDeployment> executeList(CommandContext commandContext, Page page) {
+    public List<DmnDeployment> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getDeploymentEntityManager().findDeploymentsByQueryCriteria(this, page);
+        return commandContext.getDeploymentEntityManager().findDeploymentsByQueryCriteria(this);
     }
 
     // getters ////////////////////////////////////////////////////////

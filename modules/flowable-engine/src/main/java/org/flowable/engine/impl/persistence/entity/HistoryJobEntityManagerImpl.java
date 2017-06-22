@@ -15,7 +15,6 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
@@ -47,8 +46,8 @@ public class HistoryJobEntityManagerImpl extends JobInfoEntityManagerImpl<Histor
     }
     
     @Override
-    public List<HistoryJob> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl jobQuery, Page page) {
-        return historyJobDataManager.findHistoryJobsByQueryCriteria(jobQuery, page);
+    public List<HistoryJob> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl jobQuery) {
+        return historyJobDataManager.findHistoryJobsByQueryCriteria(jobQuery);
     }
 
     @Override

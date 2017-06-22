@@ -1284,7 +1284,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     // results ////////////////////////////////////////////////////////////////
 
-    public List<Task> executeList(CommandContext commandContext, Page page) {
+    public List<Task> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
         checkQueryOk();
         List<Task> tasks = null;

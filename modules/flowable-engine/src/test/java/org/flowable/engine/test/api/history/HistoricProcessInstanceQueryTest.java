@@ -84,4 +84,15 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
             assertEquals("Historic Process Description 'en'", process.getDescription());
         }
     }
+    
+    public void testQueryByDeploymentId() {
+        deployOneTaskTestProcess();
+        String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            assertNotNull(historyService.createHistoricProcessInstanceQuery().deploymentId(deploymentId).singleResult());
+            assertEquals(1, historyService.createHistoricProcessInstanceQuery().deploymentId(deploymentId).count());
+        }
+    }
+    
 }

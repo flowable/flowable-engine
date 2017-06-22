@@ -16,7 +16,6 @@ package org.flowable.form.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.engine.FormEngineConfiguration;
@@ -67,8 +66,8 @@ public class FormDefinitionEntityManagerImpl extends AbstractEntityManager<FormD
     }
 
     @Override
-    public List<FormDefinition> findFormDefinitionsByQueryCriteria(FormDefinitionQueryImpl formQuery, Page page) {
-        return formDefinitionDataManager.findFormDefinitionsByQueryCriteria(formQuery, page);
+    public List<FormDefinition> findFormDefinitionsByQueryCriteria(FormDefinitionQueryImpl formQuery) {
+        return formDefinitionDataManager.findFormDefinitionsByQueryCriteria(formQuery);
     }
 
     @Override
@@ -96,8 +95,8 @@ public class FormDefinitionEntityManagerImpl extends AbstractEntityManager<FormD
     }
 
     @Override
-    public List<FormDefinition> findFormDefinitionsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return formDefinitionDataManager.findFormDefinitionsByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<FormDefinition> findFormDefinitionsByNativeQuery(Map<String, Object> parameterMap) {
+        return formDefinitionDataManager.findFormDefinitionsByNativeQuery(parameterMap);
     }
 
     @Override

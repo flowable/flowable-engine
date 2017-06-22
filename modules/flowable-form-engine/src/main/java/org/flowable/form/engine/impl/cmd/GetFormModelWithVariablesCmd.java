@@ -13,6 +13,8 @@
 package org.flowable.form.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -39,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
@@ -48,36 +51,43 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
     private static Logger logger = LoggerFactory.getLogger(GetFormModelWithVariablesCmd.class);
 
     private static final long serialVersionUID = 1L;
+    
+    protected static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-M-d");
 
     protected String formDefinitionKey;
     protected String parentDeploymentId;
     protected String formDefinitionId;
     protected String processInstanceId;
+    protected String taskId;
     protected String tenantId;
     protected Map<String, Object> variables;
 
-    public GetFormModelWithVariablesCmd(String formDefinitionKey, String formDefinitionId, String processInstanceId, Map<String, Object> variables) {
+    public GetFormModelWithVariablesCmd(String formDefinitionKey, String formDefinitionId, String processInstanceId, String taskId, Map<String, Object> variables) {
         initializeValues(formDefinitionKey, formDefinitionId, null, variables);
         this.processInstanceId = processInstanceId;
+        this.taskId = taskId;
     }
 
-    public GetFormModelWithVariablesCmd(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String processInstanceId, Map<String, Object> variables) {
+    public GetFormModelWithVariablesCmd(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String processInstanceId, String taskId, Map<String, Object> variables) {
         initializeValues(formDefinitionKey, formDefinitionId, null, variables);
         this.parentDeploymentId = parentDeploymentId;
         this.processInstanceId = processInstanceId;
+        this.taskId = taskId;
     }
 
-    public GetFormModelWithVariablesCmd(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String processInstanceId, String tenantId, Map<String, Object> variables) {
+    public GetFormModelWithVariablesCmd(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String processInstanceId, String taskId, String tenantId, Map<String, Object> variables) {
         initializeValues(formDefinitionKey, formDefinitionId, null, variables);
         this.parentDeploymentId = parentDeploymentId;
         this.processInstanceId = processInstanceId;
+        this.taskId = taskId;
         this.tenantId = tenantId;
     }
 
     public FormModel execute(CommandContext commandContext) {
         FormDefinitionCacheEntry formCacheEntry = resolveFormDefinition(commandContext);
+        FormInstance formInstance = resolveFormInstance(formCacheEntry, commandContext);
         FormModel formModel = resolveFormModel(formCacheEntry, commandContext);
-        fillFormFieldValues(formModel, commandContext);
+        fillFormFieldValues(formInstance, formModel, commandContext);
         return formModel;
     }
 
@@ -92,14 +102,17 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
         }
     }
 
-    protected void fillFormFieldValues(FormModel formDefinition, CommandContext commandContext) {
+    protected void fillFormFieldValues(FormInstance formInstance, FormModel formDefinition, CommandContext commandContext) {
 
         FormEngineConfiguration formEngineConfiguration = commandContext.getFormEngineConfiguration();
         List<FormField> allFields = formDefinition.listAllFields();
         if (allFields != null) {
 
-            Map<String, JsonNode> formInstanceFieldMap = fillPreviousFormInstanceValues(formEngineConfiguration);
-            fillVariablesWithFormInstanceValues(formInstanceFieldMap, allFields);
+            Map<String, JsonNode> formInstanceFieldMap = new HashMap<String, JsonNode>();
+            if (formInstance != null) {
+                fillFormInstanceValues(formInstance, formInstanceFieldMap, formEngineConfiguration.getObjectMapper());
+                fillVariablesWithFormInstanceValues(formInstanceFieldMap, allFields);
+            }
 
             for (FormField field : allFields) {
                 if (field instanceof ExpressionFormField) {
@@ -112,7 +125,21 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
                     }
 
                 } else {
-                    field.setValue(variables.get(field.getId()));
+                    Object variableValue = variables.get(field.getId());
+                    
+                    if (variableValue != null) {
+                        if (variableValue instanceof LocalDate) {
+                            LocalDate dateVariable = (LocalDate) variableValue;
+                            field.setValue(dateVariable.toString("yyyy-M-d"));
+                            
+                        } else if (variableValue instanceof Date) {
+                            Date dateVariable = (Date) variableValue;
+                            field.setValue(DATE_FORMAT.format(dateVariable));
+                            
+                        } else {
+                            field.setValue(variableValue);
+                        }
+                    }
                 }
             }
         }
@@ -169,40 +196,32 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
         return formCacheEntry;
     }
 
-    protected Map<String, JsonNode> fillPreviousFormInstanceValues(FormEngineConfiguration formEngineConfiguration) {
-        Map<String, JsonNode> formInstanceMap = new HashMap<String, JsonNode>();
-        if (processInstanceId != null) {
-            List<FormInstance> formInstances = formEngineConfiguration.getFormService().createFormInstanceQuery()
-                    .processInstanceId(processInstanceId)
-                    .orderBySubmittedDate()
-                    .desc()
-                    .list();
+    protected void fillFormInstanceValues(
+            FormInstance formInstance, Map<String, JsonNode> formInstanceFieldMap, ObjectMapper objectMapper) {
 
-            for (FormInstance otherFormInstance : formInstances) {
-                try {
-                    JsonNode submittedNode = formEngineConfiguration.getObjectMapper().readTree(otherFormInstance.getFormValueBytes());
-                    if (submittedNode == null || submittedNode.get("values") != null) {
-                        continue;
-                    }
-
-                    JsonNode valuesNode = submittedNode.get("values");
-                    Iterator<String> fieldIdIterator = valuesNode.fieldNames();
-                    while (fieldIdIterator.hasNext()) {
-                        String fieldId = fieldIdIterator.next();
-                        if (!formInstanceMap.containsKey(fieldId)) {
-
-                            JsonNode valueNode = valuesNode.get(fieldId);
-                            formInstanceMap.put(fieldId, valueNode);
-                        }
-                    }
-
-                } catch (Exception e) {
-                    throw new FlowableException("Error parsing form instance " + otherFormInstance.getId());
-                }
-            }
+        if (formInstance == null) {
+            return;
         }
 
-        return formInstanceMap;
+        try {
+            JsonNode submittedNode = objectMapper.readTree(formInstance.getFormValueBytes());
+            if (submittedNode == null) {
+                return;
+            }
+
+            if (submittedNode.get("values") != null) {
+                JsonNode valuesNode = submittedNode.get("values");
+                Iterator<String> fieldIdIterator = valuesNode.fieldNames();
+                while (fieldIdIterator.hasNext()) {
+                    String fieldId = fieldIdIterator.next();
+                    JsonNode valueNode = valuesNode.get(fieldId);
+                    formInstanceFieldMap.put(fieldId, valueNode);
+                }
+            }
+
+        } catch (Exception e) {
+            throw new FlowableException("Error parsing form instance " + formInstance.getId(), e);
+        }
     }
 
     public void fillVariablesWithFormInstanceValues(Map<String, JsonNode> formInstanceFieldMap, List<FormField> allFields) {
@@ -221,8 +240,9 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
                 try {
                     if (StringUtils.isNotEmpty(fieldValue)) {
                         LocalDate dateValue = LocalDate.parse(fieldValue);
-                        variables.put(field.getId(), dateValue);
+                        variables.put(field.getId(), dateValue.toString("yyyy-M-d"));
                     }
+                    
                 } catch (Exception e) {
                     logger.error("Error parsing form date value for process instance {} with value {}", processInstanceId, fieldValue, e);
                 }
@@ -231,6 +251,25 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
                 variables.put(field.getId(), fieldValue);
             }
         }
+    }
+
+    protected FormInstance resolveFormInstance(FormDefinitionCacheEntry formCacheEntry, CommandContext commandContext) {
+        if (taskId == null) {
+            return null;
+        }
+        
+        List<FormInstance> formInstances = commandContext.getFormEngineConfiguration().getFormService()
+                .createFormInstanceQuery().formDefinitionId(formCacheEntry.getFormDefinitionEntity().getId())
+                .taskId(taskId)
+                .orderBySubmittedDate()
+                .desc()
+                .list();
+
+        if (formInstances.size() > 0) {
+            return formInstances.get(0);
+        }
+
+        return null;
     }
 
     protected FormModel resolveFormModel(FormDefinitionCacheEntry formCacheEntry, CommandContext commandContext) {

@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.impl.history.async;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,9 +47,6 @@ import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
 
@@ -117,8 +117,7 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
 
                 } else {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Could not handle history job (id={}) for transformer {}. as it is not applicable. Unacquiring. " + historicalJsonData, 
-                                job.getId(), transformer.getType());
+                        logger.debug("Could not handle history job (id={}) for transformer {}. as it is not applicable. Unacquiring. {}", job.getId(), transformer.getType(), historicalJsonData);
                     }
                     throw new AsyncHistoryJobNotApplicableException();
 

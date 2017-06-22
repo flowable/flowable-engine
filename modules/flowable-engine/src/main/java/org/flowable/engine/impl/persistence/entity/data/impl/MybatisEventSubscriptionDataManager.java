@@ -114,9 +114,9 @@ public class MybatisEventSubscriptionDataManager extends AbstractDataManager<Eve
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<EventSubscription> findEventSubscriptionsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl, Page page) {
+    public List<EventSubscription> findEventSubscriptionsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl) {
         final String query = "selectEventSubscriptionByQueryCriteria";
-        return getDbSqlSession().selectList(query, eventSubscriptionQueryImpl, page);
+        return getDbSqlSession().selectList(query, eventSubscriptionQueryImpl);
     }
 
     @Override

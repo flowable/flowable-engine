@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://flowable.org/test">
+
+    <process id="test-timers" name="Test timers process">
+
+        <startEvent id="start" name="Start Process" />
+
+        <sequenceFlow id="flow1" sourceRef="start" targetRef="review-document"/>
+
+        <userTask id="review-document" name="Review Document"
+                  flowable:owner="#{initiator}"
+                  flowable:assignee="#{userId}"
+                  flowable:dueDate="#{dueDate}">
+        </userTask>
+
+        <boundaryEvent id="remind-reviewer-event" name="Remind Reviewer" cancelActivity="false" attachedToRef="review-document">
+            <timerEventDefinition>
+                <timeCycle flowable:endDate="${dueDate}">${reminderTimeCycle}</timeCycle>
+            </timerEventDefinition>
+        </boundaryEvent>
+
+        <sequenceFlow id="flow2" name="Reminder" sourceRef="remind-reviewer-event" targetRef="notify-reviewer"/>
+
+        <scriptTask id="notify-reviewer" name="Notify Reviewer by email" scriptFormat="groovy">
+            <script>
+                out:println "Notify '" + initiator + "' by email";
+            </script>
+        </scriptTask>
+
+        <sequenceFlow id="flow3" sourceRef="review-document" targetRef="end"/>
+
+        <endEvent id="end" name="End Process"/>
+
+    </process>
+
+</definitions>

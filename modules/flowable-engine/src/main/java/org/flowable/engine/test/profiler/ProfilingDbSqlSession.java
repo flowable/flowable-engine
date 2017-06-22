@@ -83,19 +83,19 @@ public class ProfilingDbSqlSession extends DbSqlSession {
     // SELECT LIST
 
     @Override
-    public List selectListWithRawParameter(String statement, Object parameter, int firstResult, int maxResults, boolean useCache) {
+    public List selectListWithRawParameter(String statement, Object parameter, boolean useCache) {
         if (getCurrentCommandExecution() != null) {
             getCurrentCommandExecution().addDbSelect(statement);
         }
-        return super.selectListWithRawParameter(statement, parameter, firstResult, maxResults, useCache);
+        return super.selectListWithRawParameter(statement, parameter, useCache);
     }
 
     @Override
-    public List selectListWithRawParameterWithoutFilter(String statement, Object parameter, int firstResult, int maxResults) {
+    public List selectListWithRawParameterNoCacheCheck(String statement, Object parameter) {
         if (getCurrentCommandExecution() != null) {
             getCurrentCommandExecution().addDbSelect(statement);
         }
-        return super.selectListWithRawParameterWithoutFilter(statement, parameter, firstResult, maxResults);
+        return super.selectListWithRawParameterNoCacheCheck(statement, parameter);
     }
 
     // INSERTS

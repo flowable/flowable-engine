@@ -76,4 +76,47 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         assertEquals("2017-01-01", valuesNode.get("date2").asText());
         assertEquals("date", formNode.get("flowable_form_outcome").asText());
     }
+
+    @Test
+    @FormDeploymentAnnotation(resources = "org/flowable/form/engine/test/deployment/simple.form")
+    public void saveSimpleForm() throws Exception {
+        String taskId = "123456";
+        FormModel formModel = repositoryService.getFormModelByKey("form1");
+
+        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        valuesMap.put("input1", "test");
+        Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formModel, valuesMap, "default");
+
+        FormInstance formInstance = formService.saveFormInstance(formValues, formModel, taskId, null);
+        assertEquals(formModel.getId(), formInstance.getFormDefinitionId());
+        JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
+        assertEquals("test", formNode.get("values").get("input1").asText());
+        assertEquals("default", formNode.get("flowable_form_outcome").asText());
+
+        FormInstanceModel formInstanceModel = formService.getFormInstanceModelById(formInstance.getId(), null);
+        assertEquals("form1", formInstanceModel.getKey());
+        assertEquals(1, formInstanceModel.getFields().size());
+        FormField formField = formInstanceModel.getFields().get(0);
+        assertEquals("input1", formField.getId());
+        assertEquals("test", formField.getValue());
+
+        valuesMap = new HashMap<String, Object>();
+        valuesMap.put("input1", "updatedValue");
+        formValues = formService.getVariablesFromFormSubmission(formModel, valuesMap, "updatedOutcome");
+
+        formInstance = formService.saveFormInstance(formValues, formModel, taskId, null);
+        assertEquals(formModel.getId(), formInstance.getFormDefinitionId());
+        formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
+        assertEquals("updatedValue", formNode.get("values").get("input1").asText());
+        assertEquals("updatedOutcome", formNode.get("flowable_form_outcome").asText());
+
+        formInstanceModel = formService.getFormInstanceModelById(formInstance.getId(), null);
+        assertEquals("form1", formInstanceModel.getKey());
+        assertEquals(1, formInstanceModel.getFields().size());
+        formField = formInstanceModel.getFields().get(0);
+        assertEquals("input1", formField.getId());
+        assertEquals("updatedValue", formField.getValue());
+
+        assertEquals(1, formService.createFormInstanceQuery().formDefinitionId(formModel.getId()).count());
+    }
 }
