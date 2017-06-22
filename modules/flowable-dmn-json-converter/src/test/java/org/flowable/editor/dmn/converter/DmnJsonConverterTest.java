@@ -280,6 +280,8 @@ public class DmnJsonConverterTest {
 
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
 
+        Assert.assertEquals("OUTPUT ORDER", decisionTable.getHitPolicy().getValue());
+
         Assert.assertEquals("\"AAA\",\"BBB\"", decisionTable.getInputs().get(0).getInputValues().getText());
         Assert.assertEquals("AAA", decisionTable.getInputs().get(0).getInputValues().getTextValues().get(0));
         Assert.assertEquals("BBB", decisionTable.getInputs().get(0).getInputValues().getTextValues().get(1));
