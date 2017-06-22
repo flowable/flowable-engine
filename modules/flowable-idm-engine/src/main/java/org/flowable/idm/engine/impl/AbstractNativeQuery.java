@@ -12,13 +12,9 @@
  */
 package org.flowable.idm.engine.impl;
 
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.BaseNativeQuery;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.query.NativeQuery;
