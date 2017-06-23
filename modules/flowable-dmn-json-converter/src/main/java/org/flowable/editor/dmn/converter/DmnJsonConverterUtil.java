@@ -16,14 +16,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Yvo Swillens
@@ -49,13 +54,19 @@ public class DmnJsonConverterUtil {
             //
             // determine input node ids
             JsonNode inputExpressionNodes = decisionTableNode.get("inputExpressions");
-            List<String> inputExpressionIds = new ArrayList<>();
+            Map<String, String> inputExpressionIds = new HashMap<>();
 
             if (inputExpressionNodes != null && !inputExpressionNodes.isNull()) {
                 for (JsonNode inputExpressionNode : inputExpressionNodes) {
                     if (inputExpressionNode.get("id") != null && !inputExpressionNode.get("id").isNull()) {
                         String inputId = inputExpressionNode.get("id").asText();
-                        inputExpressionIds.add(inputId);
+
+                        String inputType = null;
+                        if (inputExpressionNode.get("type") != null && !inputExpressionNode.get("type").isNull()) {
+                            inputType = inputExpressionNode.get("type").asText();
+                        }
+
+                        inputExpressionIds.put(inputId, inputType);
                     }
                 }
             }
@@ -67,7 +78,7 @@ public class DmnJsonConverterUtil {
                 for (JsonNode ruleNode : ruleNodes) {
                     ObjectNode newRuleNode = objectMapper.createObjectNode();
 
-                    for (String inputExpressionId : inputExpressionIds) {
+                    for (String inputExpressionId : inputExpressionIds.keySet()) {
                         if (ruleNode.has(inputExpressionId)) {
                             String operatorId = inputExpressionId + "_operator";
                             String expressionId = inputExpressionId + "_expression";
@@ -94,6 +105,12 @@ public class DmnJsonConverterUtil {
                                     if (expressionValue.startsWith("fn_date(")) {
                                         expressionValue = expressionValue.substring(9, expressionValue.lastIndexOf("'"));
                                     }
+
+                                    // determine type is null
+                                    if (StringUtils.isEmpty(inputExpressionIds.get(inputExpressionId))) {
+                                        String expressionType = determineExpressionType(expressionValue);
+                                        inputExpressionIds.put(inputExpressionId, expressionType);
+                                    }
                                 }
                             }
 
@@ -116,7 +133,7 @@ public class DmnJsonConverterUtil {
                     Iterator<String> ruleProperty = ruleNode.fieldNames();
                     while (ruleProperty.hasNext()) {
                         String outputExpressionId = ruleProperty.next();
-                        if (!inputExpressionIds.contains(outputExpressionId)) { // is output expression
+                        if (!inputExpressionIds.containsKey(outputExpressionId)) { // is output expression
                             String outputExpressionValue = ruleNode.get(outputExpressionId).asText();
 
                             // remove outer escape quotes
@@ -136,6 +153,16 @@ public class DmnJsonConverterUtil {
                     newRuleNodes.add(newRuleNode);
                 }
 
+                // set input expression nodes types
+                if (inputExpressionNodes != null && !inputExpressionNodes.isNull()) {
+                    for (JsonNode inputExpressionNode : inputExpressionNodes) {
+                        if (inputExpressionNode.get("id") != null && !inputExpressionNode.get("id").isNull()) {
+                            String inputId = inputExpressionNode.get("id").asText();
+                            ((ObjectNode) inputExpressionNode).put("type", inputExpressionIds.get(inputId));
+                        }
+                    }
+                }
+
                 // replace rules node
                 ObjectNode decisionTableObjectNode = (ObjectNode) decisionTableNode;
                 decisionTableObjectNode.replace("rules", newRuleNodes);
@@ -143,5 +170,25 @@ public class DmnJsonConverterUtil {
         }
 
         return decisionTableNode;
+    }
+
+    public static String determineExpressionType(String expressionValue) {
+        String expressionType = null;
+        if (!"-".equals(expressionValue)) {
+            expressionType = "string";
+            if (NumberUtils.isNumber(expressionValue)) {
+                expressionType = "number";
+            } else {
+                try {
+                    new SimpleDateFormat("yyyy-MM-dd").parse(expressionValue);
+                    expressionType = "date";
+                } catch (ParseException pe) {
+                    if ("true".equalsIgnoreCase(expressionValue) || "false".equalsIgnoreCase(expressionType)) {
+                        expressionType = "boolean";
+                    }
+                }
+            }
+        }
+        return expressionType;
     }
 }

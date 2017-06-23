@@ -296,11 +296,6 @@ public class DmnJsonConverter {
                         expressionValue = expressionValueNode.asText();
                     }
 
-                    // regression: if expression type is empty try to determine it based on the expression value
-                    if (StringUtils.isEmpty(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())) {
-                        ruleInputClauseContainer.getInputClause().getInputExpression().setTypeRef(determineExpressionType(expressionValue));
-                    }
-
                     // don't add operator if it's ==
                     StringBuilder stringBuilder = new StringBuilder();
                     if (StringUtils.isNotEmpty(operatorValue)) {
@@ -351,11 +346,6 @@ public class DmnJsonConverter {
                             expressionValue = expressionValueNode.asText();
                         }
 
-                        // regression: if expression type is empty try to determine it based on the expression value
-                        if (StringUtils.isEmpty(ruleOutputClauseContainer.getOutputClause().getTypeRef())) {
-                            ruleOutputClauseContainer.getOutputClause().setTypeRef(determineExpressionType(expressionValue));
-                        }
-
                         if (complexExpressionIds.contains(id)) {
                             outputEntry.setText(expressionValue);
                         } else {
@@ -394,25 +384,5 @@ public class DmnJsonConverter {
                 outputClause.setTypeRef("string");
             }
         }
-    }
-
-    protected String determineExpressionType(String expressionValue) {
-        String expressionType = null;
-        if (!"-".equals(expressionValue)) {
-            expressionType = "string";
-            if (NumberUtils.isNumber(expressionValue)) {
-                expressionType = "number";
-            } else {
-                try {
-                    new SimpleDateFormat("yyyy-MM-dd").parse(expressionValue);
-                    expressionType = "date";
-                } catch (ParseException pe) {
-                    if ("true".equalsIgnoreCase(expressionValue) || "false".equalsIgnoreCase(expressionType)) {
-                        expressionType = "boolean";
-                    }
-                }
-            }
-        }
-        return expressionType;
     }
 }
