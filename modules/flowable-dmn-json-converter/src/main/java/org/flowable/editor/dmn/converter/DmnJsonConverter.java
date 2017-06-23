@@ -173,6 +173,28 @@ public class DmnJsonConverter {
         Map<String, OutputClause> ruleOutputContainerMap = new LinkedHashMap<>();
         List<String> complexExpressionIds = new ArrayList<>();
 
+        processInputExpressions(modelNode, ruleInputContainerMap, decisionTable);
+
+        processOutputExpressions(modelNode, ruleOutputContainerMap, complexExpressionIds, decisionTable);
+
+        processRules(modelNode, ruleInputContainerMap, ruleOutputContainerMap, complexExpressionIds, decisionTable);
+
+        // regression check for empty expression types
+        for (InputClause inputClause : decisionTable.getInputs()) {
+            if (StringUtils.isEmpty(inputClause.getInputExpression().getTypeRef())) {
+                // default to string
+                inputClause.getInputExpression().setTypeRef("string");
+            }
+        }
+        for (OutputClause outputClause : decisionTable.getOutputs()) {
+            if (StringUtils.isEmpty(outputClause.getTypeRef())) {
+                // default to string
+                outputClause.setTypeRef("string");
+            }
+        }
+    }
+    
+    protected void processInputExpressions(JsonNode modelNode, Map<String, InputClause> ruleInputContainerMap, DecisionTable decisionTable) {
         // input expressions
         JsonNode inputExpressions = modelNode.get("inputExpressions");
 
@@ -213,7 +235,11 @@ public class DmnJsonConverter {
                 decisionTable.addInput(inputClause);
             }
         }
-
+    }
+    
+    protected void processOutputExpressions(JsonNode modelNode, Map<String, OutputClause> ruleOutputContainerMap, 
+                    List<String> complexExpressionIds, DecisionTable decisionTable) {
+        
         // output expressions
         JsonNode outputExpressions = modelNode.get("outputExpressions");
 
@@ -256,7 +282,10 @@ public class DmnJsonConverter {
                 decisionTable.addOutput(outputClause);
             }
         }
-
+    }
+    
+    protected void processRules(JsonNode modelNode, Map<String, InputClause> ruleInputContainerMap, Map<String, OutputClause> ruleOutputContainerMap, 
+                    List<String> complexExpressionIds, DecisionTable decisionTable) {
         // rules
         JsonNode rules = modelNode.get("rules");
 

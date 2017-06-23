@@ -47,6 +47,7 @@ angular.module('flowableModeler')
             var hitPolicies = ['FIRST', 'ANY', 'UNIQUE', 'PRIORITY', 'RULE ORDER', 'OUTPUT ORDER', 'COLLECT'];
             var operators = ['==', '!=', '<', '>', '>=', '<='];
             var columnIdCounter = 0;
+            var dateFormat = 'YYYY-MM-DD';
 
             var variableUndefined = $translate.instant('DECISION-TABLE-EDITOR.EMPTY-MESSAGES.NO-VARIABLE-SELECTED');
             // helper for looking up variable id by col id
@@ -243,7 +244,7 @@ angular.module('flowableModeler')
                 var element = document.querySelector("thead > tr > th:first-of-type");
                 if (element) {
                     var firstChild = element.firstChild;
-                    var newElement = angular.element('<div class="hit-policy-header">' + $scope.currentDecisionTable.hitIndicator.substring(0, 1) + '</div>');
+                    var newElement = angular.element('<div class="hit-policy-header"><a onclick="triggerHitPolicyEditor()">' + $scope.currentDecisionTable.hitIndicator.substring(0, 1) + '</a></div>');
                     element.className = 'hit-policy-container';
                     element.replaceChild(newElement[0], firstChild);
                 }
@@ -278,6 +279,17 @@ angular.module('flowableModeler')
                     };
                 }
                 return newInputExpression;
+            };
+
+            $scope.openHitPolicyEditor = function () {
+                var editTemplate = 'views/popup/decision-table-edit-hit-policy.html';
+
+                $scope.model.hitPolicy = $scope.currentDecisionTable.hitIndicator;
+
+                _internalCreateModal({
+                    template: editTemplate,
+                    scope: $scope
+                }, $modal, $scope);
             };
 
             $scope.openInputExpressionEditor = function (expressionPos, newExpression) {
@@ -473,7 +485,7 @@ angular.module('flowableModeler')
                         type = 'numeric';
                         break;
                     case 'boolean':
-                        type = 'checkbox';
+                        type = 'dropdown';
                         break;
                     default:
                         type = 'text';
@@ -484,7 +496,8 @@ angular.module('flowableModeler')
                     type: type,
                     title: '<div class="input-header">' +
                     '<a onclick="triggerExpressionEditor(\'input\',' + expressionPosition + ',false)"><span class="header-label">' + (inputExpression.label ? inputExpression.label : "New Input") + '</span></a>' +
-                    '<br> <span class="header-variable">' + (inputExpression.variableId ? inputExpression.variableId : "none") + '</span>' +
+                    '<br><span class="header-variable">' + (inputExpression.variableId ? inputExpression.variableId : "none") + '</span>' +
+                    '<br/><span class="header-variable-type">' + (inputExpression.type ? inputExpression.type : "") + '</brspan>' +
                     '</div>',
                     expressionType: 'input-expression',
                     expression: inputExpression,
@@ -502,13 +515,16 @@ angular.module('flowableModeler')
 
                     columnDefinition.title = '<div class="input-header">' +
                         '<a onclick="triggerExpressionEditor(\'input\',' + expressionPosition + ',false)"><span class="header-label">' + (inputExpression.label ? inputExpression.label : "New Input") + '</span></a>' +
-                        '<br> <span class="header-variable">' + (inputExpression.variableId ? inputExpression.variableId : "none") + '</span>' +
-                        '<br> <span class="header-entries">' + inputExpression.entries.join() + '</span>' +
+                        '<br><span class="header-variable">' + (inputExpression.variableId ? inputExpression.variableId : "none") + '</span>' +
+                        '<br/><span class="header-variable-type">' + (inputExpression.type ? inputExpression.type : "") + '</span>' +
+                        '<br><span class="header-entries">[' + inputExpression.entries.join() + ']</span>' +
                         '</div>';
                 }
 
                 if (type === 'date') {
-                    columnDefinition.dateFormat = 'YYYY-MM-DD';
+                    columnDefinition.dateFormat = dateFormat;
+                } else if (type === 'dropdown') {
+                    columnDefinition.source = ['true', 'false', '-'];
                 }
 
                 return columnDefinition;
@@ -526,7 +542,7 @@ angular.module('flowableModeler')
                         type = 'numeric';
                         break;
                     case 'boolean':
-                        type = 'checkbox';
+                        type = 'dropdown';
                         break;
                     default:
                         type = 'text';
@@ -554,18 +570,22 @@ angular.module('flowableModeler')
 
                     title += '<div class="output-header">' +
                         '<a onclick="triggerExpressionEditor(\'output\',' + expressionPosition + ',false)"><span class="header-label">' + (outputExpression.label ? outputExpression.label : "New Output") + '</span></a>' +
-                        '<br> <span class="header-variable">' + (outputExpression.variableId ? outputExpression.variableId : "none") + '</span>' +
-                        '<br> <span class="header-entries">' + outputExpression.entries.join() + '</span>' +
+                        '<br><span class="header-variable">' + (outputExpression.variableId ? outputExpression.variableId : "none") + '</span>' +
+                        '<br/><span class="header-variable-type">' + (outputExpression.type ? outputExpression.type : "") + '</span>' +
+                        '<br><span class="header-entries">[' + outputExpression.entries.join() + ']</span>' +
                         '</div>';
                 } else {
                     title += '<div class="output-header">' +
                         '<a onclick="triggerExpressionEditor(\'output\',' + expressionPosition + ',false)"><span class="header-label">' + (outputExpression.label ? outputExpression.label : "New Output") + '</span></a>' +
-                        '<br> <span class="header-variable">' + (outputExpression.variableId ? outputExpression.variableId : "none") + '</span>' +
+                        '<br><span class="header-variable">' + (outputExpression.variableId ? outputExpression.variableId : "none") + '</span>' +
+                        '<br/><span class="header-variable-type">' + (outputExpression.type ? outputExpression.type : "") + '</span>' +
                         '</div>'
                 }
 
                 if (type === 'date') {
-                    columnDefinition.dateFormat = 'YYYY-MM-DD';
+                    columnDefinition.dateFormat = dateFormat;
+                } else if (type === 'dropdown') {
+                    columnDefinition.source = ['true', 'false', '-'];
                 }
 
                 columnDefinition.title = title;

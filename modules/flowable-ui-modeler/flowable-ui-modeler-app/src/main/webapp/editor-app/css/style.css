@@ -848,6 +848,11 @@ hot-table .column-header.label {
 
 #decisionTableGrid th .input-header .header-variable, #decisionTableGrid th .output-header .header-variable {
     font-size: 14px;
+    text-align: center;
+}
+
+#decisionTableGrid th .input-header .header-variable-type, #decisionTableGrid th .output-header .header-variable-type {
+    font-size: 13px;
     font-style: italic;
     text-align: center;
 }
