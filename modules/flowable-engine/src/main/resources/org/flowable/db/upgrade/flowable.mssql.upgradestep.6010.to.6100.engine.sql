@@ -14,6 +14,6 @@ create table ACT_RU_HISTORY_JOB (
     HANDLER_CFG_ nvarchar(4000),
     ADV_HANDLER_CFG_ID_ nvarchar(64),
     TENANT_ID_ nvarchar(255) default '',
-    CREATE_TIME_ datetime NULL,
+    CREATE_TIME_ datetime2 NULL,
     primary key (ID_)
 );

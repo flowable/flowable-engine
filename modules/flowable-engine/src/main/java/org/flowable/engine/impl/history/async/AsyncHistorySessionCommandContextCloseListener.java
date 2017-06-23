@@ -100,8 +100,6 @@ public class AsyncHistorySessionCommandContextCloseListener implements CommandCo
         for (String key : historicData.keySet()) {
             dataNode.put(key, historicData.get(key));
         }
-        dataNode.put(HistoryJsonConstants.TIMESTAMP, AsyncHistoryDateUtil.formatDate(processEngineConfiguration.getClock().getCurrentTime()));
-        
         return elementObjectNode;
     }
 
