@@ -160,6 +160,10 @@ public class ListQueryParameterObject {
             return "order by " + getOrderByColumns();
         }
     }
+    
+    public void setOrderByColumns(String orderByColumns) {
+        this.orderByColumns = orderByColumns;
+    }
 
     public String getOrderByColumns() {
         if (orderByColumns != null) {

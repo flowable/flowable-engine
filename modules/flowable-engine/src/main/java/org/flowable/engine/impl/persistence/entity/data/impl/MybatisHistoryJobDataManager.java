@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.impl.Page;
+import org.flowable.engine.common.impl.db.ListQueryParameterObject;
 import org.flowable.engine.impl.HistoryJobQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
@@ -48,7 +49,12 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoryJobEntity> findJobsToExecute(Page page) {
-        return getDbSqlSession().selectList("selectHistoryJobsToExecute", null, page);
+        // Needed for db2/sqlserver (see limitBetween in mssql.properties), otherwise ordering will be incorrect
+        ListQueryParameterObject params = new ListQueryParameterObject();
+        params.setFirstResult(page.getFirstResult());
+        params.setMaxResults(page.getMaxResults());
+        params.setOrderByColumns("CREATE_TIME_ ASC");
+        return getDbSqlSession().selectList("selectHistoryJobsToExecute", params);
     }
 
     @Override
