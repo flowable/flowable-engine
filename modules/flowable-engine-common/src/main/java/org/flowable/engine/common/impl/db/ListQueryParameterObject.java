@@ -35,6 +35,7 @@ public class ListQueryParameterObject {
     protected Object parameter;
     protected String orderByColumns;
     protected QueryProperty orderProperty;
+    protected String nullHandlingColumn;
     protected NullHandlingOnOrder nullHandlingOnOrder;
     protected ResultType resultType;
     protected String databaseType;
@@ -71,7 +72,14 @@ public class ListQueryParameterObject {
                 } else if (AbstractEngineConfiguration.DATABASE_TYPE_MYSQL.equals(databaseType)) {
                     orderByColumns = orderByColumns + "isnull(" + column + ") desc," + defaultOrderByClause;
                 } else if (AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType) || AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)) {
-                    orderByColumns = orderByColumns + "case when " + column + " is null then 0 else 1 end," + defaultOrderByClause;
+                    if (nullHandlingColumn == null) {
+                        nullHandlingColumn = "";
+                    } else {
+                        nullHandlingColumn = nullHandlingColumn + ", ";
+                    }
+                    String columnName = column.replace("RES.", "") + "_order_null";
+                    nullHandlingColumn = nullHandlingColumn + "case when " + column + " is null then 0 else 1 end " + columnName;
+                    orderByColumns = orderByColumns + columnName + "," + defaultOrderByClause;
                 } else {
                     orderByColumns = orderByColumns + defaultOrderByClause;
                 }
@@ -86,7 +94,14 @@ public class ListQueryParameterObject {
                 } else if (AbstractEngineConfiguration.DATABASE_TYPE_MYSQL.equals(databaseType)) {
                     orderByColumns = orderByColumns + "isnull(" + column + ") asc," + defaultOrderByClause;
                 } else if (AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType) || AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)) {
-                    orderByColumns = orderByColumns + "case when " + column + " is null then 1 else 0 end," + defaultOrderByClause;
+                    if (nullHandlingColumn == null) {
+                        nullHandlingColumn = "";
+                    } else {
+                        nullHandlingColumn = nullHandlingColumn + ", ";
+                    }
+                    String columnName = column.replace("RES.", "") + "_order_null";
+                    nullHandlingColumn = nullHandlingColumn + "case when " + column + " is null then 1 else 0 end " + columnName;
+                    orderByColumns = orderByColumns + columnName + "," + defaultOrderByClause;
                 } else {
                     orderByColumns = orderByColumns + defaultOrderByClause;
                 }
@@ -145,6 +160,10 @@ public class ListQueryParameterObject {
             return "order by " + getOrderByColumns();
         }
     }
+    
+    public void setOrderByColumns(String orderByColumns) {
+        this.orderByColumns = orderByColumns;
+    }
 
     public String getOrderByColumns() {
         if (orderByColumns != null) {
@@ -162,4 +181,12 @@ public class ListQueryParameterObject {
         return databaseType;
     }
 
+    public String getNullHandlingColumn() {
+        return nullHandlingColumn;
+    }
+
+    public void setNullHandlingColumn(String nullHandlingColumn) {
+        this.nullHandlingColumn = nullHandlingColumn;
+    }
+    
 }

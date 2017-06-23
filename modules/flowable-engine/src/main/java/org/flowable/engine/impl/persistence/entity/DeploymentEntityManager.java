@@ -24,8 +24,6 @@ import org.flowable.engine.repository.Deployment;
  */
 public interface DeploymentEntityManager extends EntityManager<DeploymentEntity> {
 
-    DeploymentEntity findLatestDeploymentByName(String deploymentName);
-
     List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery);
 
     List<String> getDeploymentResourceNames(String deploymentId);

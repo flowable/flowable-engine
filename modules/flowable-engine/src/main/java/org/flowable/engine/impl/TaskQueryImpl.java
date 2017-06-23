@@ -1274,7 +1274,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     public String getMssqlOrDB2OrderBy() {
-        String specialOrderBy = super.getOrderBy();
+        String specialOrderBy = super.getOrderByColumns();
         if (specialOrderBy != null && specialOrderBy.length() > 0) {
             specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
         }

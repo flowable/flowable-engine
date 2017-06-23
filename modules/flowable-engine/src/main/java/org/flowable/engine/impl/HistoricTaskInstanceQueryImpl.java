@@ -1260,7 +1260,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     public String getMssqlOrDB2OrderBy() {
-        String specialOrderBy = super.getOrderBy();
+        String specialOrderBy = super.getOrderByColumns();
         if (specialOrderBy != null && specialOrderBy.length() > 0) {
             specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
             specialOrderBy = specialOrderBy.replace("VAR.", "TEMPVAR_");

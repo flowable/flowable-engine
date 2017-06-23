@@ -25,8 +25,6 @@ import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntity;
  */
 public interface FormDeploymentDataManager extends DataManager<FormDeploymentEntity> {
 
-    FormDeploymentEntity findLatestDeploymentByName(String deploymentName);
-
     long findDeploymentCountByQueryCriteria(FormDeploymentQueryImpl deploymentQuery);
 
     List<FormDeployment> findDeploymentsByQueryCriteria(FormDeploymentQueryImpl deploymentQuery);

@@ -104,12 +104,6 @@
     </where>
   </sql>
     
-  <select id="selectDeploymentsByName" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="deploymentResultMap">
-    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if> select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if> 
-    from ${prefix}ACT_DMN_DEPLOYMENT RES where RES.NAME_=#{parameter} 
-    order by RES.DEPLOY_TIME_ desc <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
-  </select>
-  
   <select id="selectDmnDeployment" parameterType="string" resultMap="deploymentResultMap">
     select * from ${prefix}ACT_DMN_DEPLOYMENT where ID_ = #{id, jdbcType=VARCHAR}
   </select>

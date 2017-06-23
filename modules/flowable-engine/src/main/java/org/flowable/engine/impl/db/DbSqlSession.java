@@ -221,6 +221,12 @@ public class DbSqlSession extends AbstractDbSqlSession {
         return selectListWithRawParameter(statement, parameter, false);
     }
     
+    @SuppressWarnings({ "rawtypes" })
+    public List selectListWithRawParameterNoCacheCheck(String statement, ListQueryParameterObject parameter) {
+        parameter.setDatabaseType(dbSqlSessionFactory.getDatabaseType());
+        return selectListWithRawParameter(statement, parameter, false);
+    }
+    
     @SuppressWarnings("rawtypes")
     public List selectListNoCacheCheck(String statement, ListQueryParameterObject parameter) {
         ListQueryParameterObject parameterToUse = parameter;

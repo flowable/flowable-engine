@@ -89,7 +89,7 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
         deployOneTaskTestProcess();
         String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertNotNull(historyService.createHistoricProcessInstanceQuery().deploymentId(deploymentId).singleResult());
             assertEquals(1, historyService.createHistoricProcessInstanceQuery().deploymentId(deploymentId).count());
         }

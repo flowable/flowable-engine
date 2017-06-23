@@ -24,8 +24,6 @@ import org.flowable.form.engine.impl.FormDeploymentQueryImpl;
  */
 public interface FormDeploymentEntityManager extends EntityManager<FormDeploymentEntity> {
 
-    FormDeploymentEntity findLatestDeploymentByName(String deploymentName);
-
     List<FormDeployment> findDeploymentsByQueryCriteria(FormDeploymentQueryImpl deploymentQuery);
 
     List<String> getDeploymentResourceNames(String deploymentId);

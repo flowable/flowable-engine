@@ -74,11 +74,6 @@ public class DmnDeploymentEntityManagerImpl extends AbstractEntityManager<DmnDep
     }
 
     @Override
-    public DmnDeploymentEntity findLatestDeploymentByName(String deploymentName) {
-        return deploymentDataManager.findLatestDeploymentByName(deploymentName);
-    }
-
-    @Override
     public long findDeploymentCountByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery) {
         return deploymentDataManager.findDeploymentCountByQueryCriteria(deploymentQuery);
     }

@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.engine.FormEngineConfiguration;
+import org.flowable.form.engine.impl.FormDeploymentQueryImpl;
 import org.flowable.form.engine.impl.interceptor.Command;
 import org.flowable.form.engine.impl.interceptor.CommandContext;
 import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntity;
@@ -50,9 +51,9 @@ public class DeployCmd<T> implements Command<FormDeployment>, Serializable {
 
             List<FormDeployment> existingDeployments = new ArrayList<FormDeployment>();
             if (deployment.getTenantId() == null || FormEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
-                FormDeploymentEntity existingDeployment = commandContext.getDeploymentEntityManager().findLatestDeploymentByName(deployment.getName());
-                if (existingDeployment != null) {
-                    existingDeployments.add(existingDeployment);
+                List<FormDeployment> deploymentEntities = new FormDeploymentQueryImpl(commandContext.getFormEngineConfiguration().getCommandExecutor()).deploymentName(deployment.getName()).listPage(0, 1);
+                if (!deploymentEntities.isEmpty()) {
+                    existingDeployments.add(deploymentEntities.get(0));
                 }
             } else {
                 List<FormDeployment> deploymentList = commandContext.getFormEngineConfiguration().getFormRepositoryService().createDeploymentQuery().deploymentName(deployment.getName())
