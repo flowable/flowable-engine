@@ -12,6 +12,8 @@
  */
 package org.flowable.editor.dmn.converter;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
@@ -293,6 +296,11 @@ public class DmnJsonConverter {
                         expressionValue = expressionValueNode.asText();
                     }
 
+                    // regression: if expression type is empty try to determine it based on the expression value
+                    if (StringUtils.isEmpty(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())) {
+                        ruleInputClauseContainer.getInputClause().getInputExpression().setTypeRef(determineExpressionType(expressionValue));
+                    }
+
                     // don't add operator if it's ==
                     StringBuilder stringBuilder = new StringBuilder();
                     if (StringUtils.isNotEmpty(operatorValue)) {
@@ -343,6 +351,11 @@ public class DmnJsonConverter {
                             expressionValue = expressionValueNode.asText();
                         }
 
+                        // regression: if expression type is empty try to determine it based on the expression value
+                        if (StringUtils.isEmpty(ruleOutputClauseContainer.getOutputClause().getTypeRef())) {
+                            ruleOutputClauseContainer.getOutputClause().setTypeRef(determineExpressionType(expressionValue));
+                        }
+
                         if (complexExpressionIds.contains(id)) {
                             outputEntry.setText(expressionValue);
                         } else {
@@ -367,5 +380,39 @@ public class DmnJsonConverter {
                 decisionTable.addRule(rule);
             }
         }
+
+        // regression check for empty expression types
+        for (InputClause inputClause : decisionTable.getInputs()) {
+            if (StringUtils.isEmpty(inputClause.getInputExpression().getTypeRef())) {
+                // default to string
+                inputClause.getInputExpression().setTypeRef("string");
+            }
+        }
+        for (OutputClause outputClause : decisionTable.getOutputs()) {
+            if (StringUtils.isEmpty(outputClause.getTypeRef())) {
+                // default to string
+                outputClause.setTypeRef("string");
+            }
+        }
+    }
+
+    protected String determineExpressionType(String expressionValue) {
+        String expressionType = null;
+        if (!"-".equals(expressionValue)) {
+            expressionType = "string";
+            if (NumberUtils.isNumber(expressionValue)) {
+                expressionType = "number";
+            } else {
+                try {
+                    new SimpleDateFormat("yyyy-MM-dd").parse(expressionValue);
+                    expressionType = "date";
+                } catch (ParseException pe) {
+                    if ("true".equalsIgnoreCase(expressionValue) || "false".equalsIgnoreCase(expressionType)) {
+                        expressionType = "boolean";
+                    }
+                }
+            }
+        }
+        return expressionType;
     }
 }
