@@ -415,8 +415,8 @@ public class DmnJsonConverterTest {
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
 
-        Assert.assertEquals("number", decisionTable.getInputs().get(0).getInputExpression().getTypeRef());
-        Assert.assertEquals("boolean", decisionTable.getOutputs().get(0).getTypeRef());
+        assertEquals("number", decisionTable.getInputs().get(0).getInputExpression().getTypeRef());
+        assertEquals("boolean", decisionTable.getOutputs().get(0).getTypeRef());
     }
 
     /* Helper methods */
