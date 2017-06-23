@@ -108,7 +108,7 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
         final List<HistoryJob> jobs = managementService.createHistoryJobQuery().list();
         assertTrue(jobs.size() > 0);
 
-        waitForHistoryJobExecutorToProcessAllJobs(30000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(50000L, 100L);
         assertNull(managementService.createHistoryJobQuery().singleResult());
 
         // 1002 -> (start, 1) + (end, 1) + (gateway, 1000), + (service task, 1000)

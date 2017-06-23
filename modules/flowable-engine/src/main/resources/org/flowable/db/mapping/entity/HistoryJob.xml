@@ -33,7 +33,7 @@
         RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         from ${prefix}ACT_RU_HISTORY_JOB RES
         where LOCK_EXP_TIME_ is null
-        order by CREATE_TIME_ ASC
+        ${orderBy}
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 

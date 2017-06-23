@@ -45,6 +45,9 @@ public class AsyncHistorySession implements Session {
     }
 
     public void addHistoricData(String type, Map<String, String> data, String tenantId) {
+        
+        data.put(HistoryJsonConstants.TIMESTAMP, AsyncHistoryDateUtil.formatDate(commandContext.getProcessEngineConfiguration().getClock().getCurrentTime()));
+        
         if (jobData == null) {
             jobData = new LinkedHashMap<>(); // linked: insertion order is important
             commandContext.addCloseListener(commandContextCloseListener);

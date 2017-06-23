@@ -51,15 +51,6 @@ public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransfor
             if (historicTaskInstance.getLastUpdateTime() == null || !historicTaskInstance.getLastUpdateTime().after(lastUpdateTime)) {
                 historicTaskInstance.setLastUpdateTime(lastUpdateTime);
                 
-                Date endTime = getDateFromJson(historicalData, HistoryJsonConstants.END_TIME);
-                historicTaskInstance.setEndTime(endTime);
-                historicTaskInstance.setDeleteReason(getStringFromJson(historicalData, HistoryJsonConstants.DELETE_REASON));
-        
-                Date startTime = historicTaskInstance.getStartTime();
-                if (startTime != null && endTime != null) {
-                    historicTaskInstance.setDurationInMillis(endTime.getTime() - startTime.getTime());
-                }
-                
                 historicTaskInstance.setName(getStringFromJson(historicalData, HistoryJsonConstants.NAME));
                 historicTaskInstance.setParentTaskId(getStringFromJson(historicalData, HistoryJsonConstants.PARENT_TASK_ID));
                 historicTaskInstance.setDescription(getStringFromJson(historicalData, HistoryJsonConstants.DESCRIPTION));
@@ -74,10 +65,15 @@ public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransfor
                 historicTaskInstance.setClaimTime(getDateFromJson(historicalData, HistoryJsonConstants.CLAIM_TIME));
                 historicTaskInstance.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
                 
-            } else {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("History job (id={}) has expired and will be ignored.{} {}", job.getId(), historicTaskInstance.getLastUpdateTime(), lastUpdateTime);
-                }
+            }
+            
+            Date endTime = getDateFromJson(historicalData, HistoryJsonConstants.END_TIME);
+            historicTaskInstance.setEndTime(endTime);
+            historicTaskInstance.setDeleteReason(getStringFromJson(historicalData, HistoryJsonConstants.DELETE_REASON));
+    
+            Date startTime = historicTaskInstance.getStartTime();
+            if (startTime != null && endTime != null) {
+                historicTaskInstance.setDurationInMillis(endTime.getTime() - startTime.getTime());
             }
             
         } else {
