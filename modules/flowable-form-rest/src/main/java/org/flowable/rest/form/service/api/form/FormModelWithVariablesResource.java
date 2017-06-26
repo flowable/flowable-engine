@@ -51,7 +51,7 @@ public class FormModelWithVariablesResource {
             @ApiResponse(code = 404, message = "Indicates the requested form model was not found.")
     })
     @RequestMapping(value = "/form/model", method = RequestMethod.POST, produces = "application/json")
-    public FormModelResponse getRuntimeFormDefinition(@RequestBody FormRequest formRequest, HttpServletRequest request) {
+    public FormModelResponse getFormModel(@RequestBody FormRequest formRequest, HttpServletRequest request) {
 
         FormModel formModel;
 
@@ -63,6 +63,7 @@ public class FormModelWithVariablesResource {
                     formRequest.getTaskId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
+            
         } else if (formRequest.getFormDefinitionKey() != null) {
             formModel = formService.getFormModelWithVariablesByKey(
                     formRequest.getFormDefinitionKey(),
@@ -70,6 +71,7 @@ public class FormModelWithVariablesResource {
                     formRequest.getTaskId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId()); 
+            
         } else if (formRequest.getFormDefinitionId() != null) {
             formModel = formService.getFormModelWithVariablesById(
                     formRequest.getFormDefinitionId(),
@@ -77,6 +79,7 @@ public class FormModelWithVariablesResource {
                     formRequest.getTaskId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
+            
         } else {
             throw new FlowableIllegalArgumentException("Either parent deployment key, form definition key or form definition id must be provided in the request");
         }

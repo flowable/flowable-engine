@@ -40,7 +40,7 @@ public class FormRestResponseFactory {
 
     public FormModelResponse createFormModelResponse(FormModel formModel, FormRestUrlBuilder urlBuilder) {
         FormModelResponse response = new FormModelResponse(formModel);
-        response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_RUNTIME_TASK_FORM));
+        response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_FORM_MODEL));
 
         return response;
     }
@@ -82,7 +82,7 @@ public class FormRestResponseFactory {
 
     public FormInstanceModelResponse createFormInstanceModelResponse(FormInstanceModel formInstanceModel, FormRestUrlBuilder urlBuilder) {
         FormInstanceModelResponse response = new FormInstanceModelResponse(formInstanceModel);
-        response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_COMPLETED_TASK_FORM));
+        response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_FORM_INSTANCE_MODEL));
 
         return response;
     }
@@ -93,7 +93,7 @@ public class FormRestResponseFactory {
 
     public FormDefinitionResponse createFormDefinitionResponse(FormDefinition formDefinition, FormRestUrlBuilder urlBuilder) {
         FormDefinitionResponse response = new FormDefinitionResponse(formDefinition);
-        response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_FORM, formDefinition.getId()));
+        response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_FORM_DEFINITION, formDefinition.getId()));
 
         return response;
     }
