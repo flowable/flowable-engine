@@ -489,8 +489,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected HistoryManager historyManager;
     
     protected boolean isAsyncHistoryEnabled;
-    protected boolean isAsyncHistoryJsonGzipCompressionEnabled;
-    protected boolean isAsyncHistoryJsonGroupingEnabled;
+    //protected boolean isAsyncHistoryJsonGzipCompressionEnabled;
+    //protected boolean isAsyncHistoryJsonGroupingEnabled;
     protected AsyncHistoryListener asyncHistoryListener;
 
     // Job Manager
@@ -1341,8 +1341,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected void initDefaultAsyncHistoryListener() {
         DefaultAsyncHistoryJobProducer asyncHistoryJobProducer = new DefaultAsyncHistoryJobProducer();
-        asyncHistoryJobProducer.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
-        asyncHistoryJobProducer.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
+        //asyncHistoryJobProducer.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
+        //asyncHistoryJobProducer.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
         asyncHistoryListener = asyncHistoryJobProducer;
     }
 
@@ -1718,8 +1718,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             
             AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler();
             asyncHistoryJobHandler.initDefaultTransformers();
-            asyncHistoryJobHandler.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
-            asyncHistoryJobHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
+            //asyncHistoryJobHandler.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
+            //asyncHistoryJobHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
             historyJobHandlers.put(asyncHistoryJobHandler.getType(), asyncHistoryJobHandler);
     
             if (getCustomHistoryJobHandlers() != null) {
@@ -3712,7 +3712,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public boolean isAsyncHistoryJsonGzipCompressionEnabled() {
+    /*public boolean isAsyncHistoryJsonGzipCompressionEnabled() {
         return isAsyncHistoryJsonGzipCompressionEnabled;
     }
 
@@ -3728,7 +3728,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public ProcessEngineConfigurationImpl setAsyncHistoryJsonGroupingEnabled(boolean isAsyncHistoryJsonGroupingEnabled) {
         this.isAsyncHistoryJsonGroupingEnabled = isAsyncHistoryJsonGroupingEnabled;
         return this;
-    }
+    }*/
 
     public AsyncHistoryListener getAsyncHistoryListener() {
         return asyncHistoryListener;
