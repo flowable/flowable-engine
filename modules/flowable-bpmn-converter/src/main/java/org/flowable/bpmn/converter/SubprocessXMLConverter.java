@@ -116,7 +116,9 @@ public class SubprocessXMLConverter extends BpmnXMLConverter {
         List<BpmnModel> subModels = new ArrayList<BpmnModel>();
 
         // find all subprocesses
-        Collection<FlowElement> flowElements = model.getMainProcess().getFlowElements();
+        Process main = model.getMainProcess();
+        Collection<FlowElement> flowElements = main.getFlowElements();
+        Collection<Artifact> artifacts = main.getArtifacts();
         Map<String, GraphicInfo> locations = new HashMap<String, GraphicInfo>();
         Map<String, List<GraphicInfo>> flowLocations = new HashMap<String, List<GraphicInfo>>();
         Map<String, GraphicInfo> labelLocations = new HashMap<String, GraphicInfo>();
@@ -154,6 +156,15 @@ public class SubprocessXMLConverter extends BpmnXMLConverter {
                 mainModel.getLabelLocationMap().put(elementId, labelLocations.get(elementId));
             }
         }
+
+        // check for artifacts
+        for (Artifact element : artifacts) {
+            elementId = element.getId();
+            if (null != locations.get(elementId)) {
+            	mainModel.getLocationMap().put(elementId, locations.get(elementId));
+            }
+        }
+        
         // add main process model to list
         subModels.add(mainModel);
 
@@ -198,6 +209,14 @@ public class SubprocessXMLConverter extends BpmnXMLConverter {
                 subModel.getLabelLocationMap().put(elementId, labelLocations.get(elementId));
             }
         }
+        // check for artifacts
+        for (Artifact element : newMainProcess.getArtifacts()) {
+            elementId = element.getId();
+            if (null != locations.get(elementId)) {
+            	subModel.getLocationMap().put(elementId, locations.get(elementId));
+            }
+        }
+
         subModels.add(subModel);
 
         return subModels;
