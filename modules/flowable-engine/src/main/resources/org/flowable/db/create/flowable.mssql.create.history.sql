@@ -60,7 +60,7 @@ create table ACT_HI_TASKINST (
     FORM_KEY_ nvarchar(255),
     CATEGORY_ nvarchar(255),
     TENANT_ID_ nvarchar(255) default '',
-    LAST_UPDATED_TIME_ datetime,
+    LAST_UPDATED_TIME_ datetime2,
     primary key (ID_)
 );
 
@@ -78,7 +78,7 @@ create table ACT_HI_VARINST (
     TEXT_ nvarchar(4000),
     TEXT2_ nvarchar(4000),
     CREATE_TIME_ datetime,
-    LAST_UPDATED_TIME_ datetime,
+    LAST_UPDATED_TIME_ datetime2,
     primary key (ID_)
 );
 
