@@ -1,6 +1,6 @@
 update ACT_GE_PROPERTY set VALUE_ = '6.1.0.0' where NAME_ = 'schema.version';
 
-alter table ACT_RU_EXECUTION add column START_ACT_ID_ nvarchar(255);
+alter table ACT_RU_EXECUTION add START_ACT_ID_ nvarchar(255);
 
 create table ACT_RU_HISTORY_JOB (
     ID_ nvarchar(64) NOT NULL,
