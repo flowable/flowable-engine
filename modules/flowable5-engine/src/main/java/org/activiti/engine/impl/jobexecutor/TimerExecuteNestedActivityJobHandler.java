@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TimerExecuteNestedActivityJobHandler extends TimerEventHandler implements JobHandler {
 
-    private static Logger log = LoggerFactory.getLogger(TimerExecuteNestedActivityJobHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimerExecuteNestedActivityJobHandler.class);
 
     public static final String TYPE = "timer-transition";
     public static final String PROPERTYNAME_TIMER_ACTIVITY_ID = "activityId";
@@ -61,11 +61,11 @@ public class TimerExecuteNestedActivityJobHandler extends TimerEventHandler impl
                     .getActivityBehavior()
                     .execute(execution);
         } catch (RuntimeException e) {
-            log.error("exception during timer execution", e);
+            LOGGER.error("exception during timer execution", e);
             throw e;
 
         } catch (Exception e) {
-            log.error("exception during timer execution", e);
+            LOGGER.error("exception during timer execution", e);
             throw new ActivitiException("exception during timer execution: " + e.getMessage(), e);
         }
     }

@@ -30,7 +30,7 @@ public class MoveDeadLetterJobToExecutableJobCmd implements Command<JobEntity>, 
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(MoveDeadLetterJobToExecutableJobCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MoveDeadLetterJobToExecutableJobCmd.class);
 
     protected String jobId;
     protected int retries;
@@ -51,8 +51,8 @@ public class MoveDeadLetterJobToExecutableJobCmd implements Command<JobEntity>, 
             throw new JobNotFoundException(jobId);
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Moving deadletter job to executable job table {}", job.getId());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Moving deadletter job to executable job table {}", job.getId());
         }
 
         return commandContext.getJobManager().moveDeadLetterJobToExecutableJob(job, retries);

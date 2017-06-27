@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class ContentTestHelper {
 
-    private static Logger log = LoggerFactory.getLogger(ContentTestHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContentTestHelper.class);
 
     public static final String EMPTY_LINE = "\n";
 
@@ -41,11 +41,11 @@ public abstract class ContentTestHelper {
     public static ContentEngine getContentEngine(String configurationResource) {
         ContentEngine contentEngine = contentEngines.get(configurationResource);
         if (contentEngine == null) {
-            log.debug("==== BUILDING CONTENT ENGINE ========================================================================");
+            LOGGER.debug("==== BUILDING CONTENT ENGINE ========================================================================");
             contentEngine = ContentEngineConfiguration.createContentEngineConfigurationFromResource(configurationResource)
                     .setDatabaseSchemaUpdate(ContentEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE)
                     .buildContentEngine();
-            log.debug("==== CONTENT ENGINE CREATED =========================================================================");
+            LOGGER.debug("==== CONTENT ENGINE CREATED =========================================================================");
             contentEngines.put(configurationResource, contentEngine);
         }
         return contentEngine;
@@ -63,7 +63,7 @@ public abstract class ContentTestHelper {
      * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
      */
     public static void assertAndEnsureCleanDb(ContentEngine contentEngine) {
-        log.debug("verifying that db is clean after test");
+        LOGGER.debug("verifying that db is clean after test");
         ContentService contentService = contentEngine.getContentEngineConfiguration().getContentService();
         List<ContentItem> items = contentService.createContentItemQuery().list();
         if (items != null && !items.isEmpty()) {

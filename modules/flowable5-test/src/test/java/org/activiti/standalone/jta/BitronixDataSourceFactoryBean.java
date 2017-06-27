@@ -14,7 +14,7 @@ import bitronix.tm.resource.jdbc.PoolingDataSource;
  * @author Marcus Klimstra (CGI)
  */
 public class BitronixDataSourceFactoryBean extends ResourceBean implements FactoryBean<PoolingDataSource>, DisposableBean {
-    private static final Logger LOG = LoggerFactory.getLogger(BitronixDataSourceFactoryBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BitronixDataSourceFactoryBean.class);
 
     private PoolingDataSource ds;
 
@@ -49,7 +49,7 @@ public class BitronixDataSourceFactoryBean extends ResourceBean implements Facto
             ds.setIgnoreRecoveryFailures(getIgnoreRecoveryFailures());
             ds.setDriverProperties(getDriverProperties());
 
-            LOG.debug("Initializing PoolingDataSource with id {}", ds.getUniqueName());
+            LOGGER.debug("Initializing PoolingDataSource with id {}", ds.getUniqueName());
             ds.init();
         }
         return ds;
@@ -57,7 +57,7 @@ public class BitronixDataSourceFactoryBean extends ResourceBean implements Facto
 
     @Override
     public void destroy() throws Exception {
-        LOG.debug("Closing PoolingDataSource with id {}", ds.getUniqueName());
+        LOGGER.debug("Closing PoolingDataSource with id {}", ds.getUniqueName());
         ds.close();
         ds = null;
     }

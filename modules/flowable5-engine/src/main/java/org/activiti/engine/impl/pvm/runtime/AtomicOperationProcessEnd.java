@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AtomicOperationProcessEnd extends AbstractEventAtomicOperation {
 
-    private static Logger log = LoggerFactory.getLogger(AtomicOperationProcessEnd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AtomicOperationProcessEnd.class);
 
     @Override
     protected ScopeImpl getScope(InterpretableExecution execution) {
@@ -49,10 +49,10 @@ public class AtomicOperationProcessEnd extends AbstractEventAtomicOperation {
             try {
                 subProcessActivityBehavior.completing(superExecution, execution);
             } catch (RuntimeException e) {
-                log.error("Error while completing sub process of execution {}", execution, e);
+                LOGGER.error("Error while completing sub process of execution {}", execution, e);
                 throw e;
             } catch (Exception e) {
-                log.error("Error while completing sub process of execution {}", execution, e);
+                LOGGER.error("Error while completing sub process of execution {}", execution, e);
                 throw new ActivitiException("Error while completing sub process of execution " + execution, e);
             }
         }
@@ -66,10 +66,10 @@ public class AtomicOperationProcessEnd extends AbstractEventAtomicOperation {
             try {
                 subProcessActivityBehavior.completed(superExecution);
             } catch (RuntimeException e) {
-                log.error("Error while completing sub process of execution {}", execution, e);
+                LOGGER.error("Error while completing sub process of execution {}", execution, e);
                 throw e;
             } catch (Exception e) {
-                log.error("Error while completing sub process of execution {}", execution, e);
+                LOGGER.error("Error while completing sub process of execution {}", execution, e);
                 throw new ActivitiException("Error while completing sub process of execution " + execution, e);
             }
         }

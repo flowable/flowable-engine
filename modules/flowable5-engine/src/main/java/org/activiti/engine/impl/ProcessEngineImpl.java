@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ProcessEngineImpl implements ProcessEngine {
 
-    private static Logger log = LoggerFactory.getLogger(ProcessEngineImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessEngineImpl.class);
 
     protected String name;
     protected RepositoryService repositoryService;
@@ -73,9 +73,9 @@ public class ProcessEngineImpl implements ProcessEngine {
         this.transactionContextFactory = processEngineConfiguration.getTransactionContextFactory();
 
         if (name == null) {
-            log.info("default activiti ProcessEngine created");
+            LOGGER.info("default activiti ProcessEngine created");
         } else {
-            log.info("ProcessEngine {} created", name);
+            LOGGER.info("ProcessEngine {} created", name);
         }
 
         ProcessEngines.registerProcessEngine(this);

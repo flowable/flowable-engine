@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ReplayUserTaskCompleteEventHandler implements SimulationEventHandler {
 
-    private static Logger log = LoggerFactory.getLogger(ReplayUserTaskCompleteEventHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReplayUserTaskCompleteEventHandler.class);
 
     @Override
     public void handle(SimulationEvent event) {
@@ -54,10 +54,10 @@ public class ReplayUserTaskCompleteEventHandler implements SimulationEventHandle
             } else {
                 SimulationRunContext.getTaskService().complete(task.getId(), variables);
             }
-            log.debug("completed {}, {}, {}", task, task.getName(), variables);
+            LOGGER.debug("completed {}, {}, {}", task, task.getName(), variables);
         } else {
             SimulationRunContext.getTaskService().complete(task.getId());
-            log.debug("completed {}, {}", task, task.getName());
+            LOGGER.debug("completed {}, {}", task, task.getName());
         }
     }
 

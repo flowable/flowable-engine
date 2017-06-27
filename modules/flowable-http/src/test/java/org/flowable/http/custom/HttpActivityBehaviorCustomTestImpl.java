@@ -28,7 +28,7 @@ public class HttpActivityBehaviorCustomTestImpl extends HttpActivityBehavior {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = LoggerFactory.getLogger(HttpActivityBehaviorCustomTestImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpActivityBehaviorCustomTestImpl.class);
 
     @Override
     protected HttpResponse perform(DelegateExecution execution, HttpRequest request) {

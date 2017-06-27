@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class HttpServiceTaskTestCase extends PluggableFlowableTestCase {
 
-    private static Logger log = LoggerFactory.getLogger(HttpServiceTaskTestCase.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServiceTaskTestCase.class);
 
     @Override
     protected void setUp() throws Exception {

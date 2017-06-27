@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BpmnURLHandler extends AbstractURLStreamHandlerService {
 
-    private static Logger logger = LoggerFactory.getLogger(BpmnURLHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BpmnURLHandler.class);
 
     private static String SYNTAX = "bpmn: bpmn-xml-uri";
 
@@ -53,7 +53,7 @@ public class BpmnURLHandler extends AbstractURLStreamHandlerService {
         }
         bpmnXmlURL = new URL(url.getPath());
 
-        logger.debug("BPMN xml URL is: [{}]", bpmnXmlURL);
+        LOGGER.debug("BPMN xml URL is: [{}]", bpmnXmlURL);
         return new Connection(url);
     }
 
@@ -79,7 +79,7 @@ public class BpmnURLHandler extends AbstractURLStreamHandlerService {
                 os.close();
                 return new ByteArrayInputStream(os.toByteArray());
             } catch (Exception e) {
-                logger.error("Error opening spring xml url", e);
+                LOGGER.error("Error opening spring xml url", e);
                 throw (IOException) new IOException("Error opening spring xml url").initCause(e);
             }
         }

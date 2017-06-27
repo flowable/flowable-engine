@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 public class GetDeploymentProcessDiagramCmd implements Command<InputStream>, Serializable {
 
     private static final long serialVersionUID = 1L;
-    private static Logger log = LoggerFactory.getLogger(GetDeploymentProcessDiagramCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GetDeploymentProcessDiagramCmd.class);
 
     protected String processDefinitionId;
 
@@ -50,7 +50,7 @@ public class GetDeploymentProcessDiagramCmd implements Command<InputStream>, Ser
         String deploymentId = processDefinition.getDeploymentId();
         String resourceName = processDefinition.getDiagramResourceName();
         if (resourceName == null) {
-            log.info("Resource name is null! No process diagram stream exists.");
+            LOGGER.info("Resource name is null! No process diagram stream exists.");
             return null;
         } else {
             InputStream processDiagramStream = new GetDeploymentResourceCmd(deploymentId, resourceName)

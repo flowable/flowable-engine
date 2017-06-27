@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultHistoryManager extends AbstractManager implements HistoryManager {
 
-    private static Logger log = LoggerFactory.getLogger(DefaultHistoryManager.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultHistoryManager.class.getName());
 
     private HistoryLevel historyLevel;
 
@@ -69,8 +69,8 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
      */
     @Override
     public boolean isHistoryLevelAtLeast(HistoryLevel level) {
-        if (log.isDebugEnabled()) {
-            log.debug("Current history level: {}, level required: {}", historyLevel, level);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Current history level: {}, level required: {}", historyLevel, level);
         }
         // Comparing enums actually compares the location of values declared in the enum
         return historyLevel.isAtLeast(level);
@@ -83,8 +83,8 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
      */
     @Override
     public boolean isHistoryEnabled() {
-        if (log.isDebugEnabled()) {
-            log.debug("Current history level: {}", historyLevel);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Current history level: {}", historyLevel);
         }
         return historyLevel != HistoryLevel.NONE;
     }
@@ -942,8 +942,8 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
     @Override
     public void updateProcessBusinessKeyInHistory(ExecutionEntity processInstance) {
         if (isHistoryEnabled()) {
-            if (log.isDebugEnabled()) {
-                log.debug("updateProcessBusinessKeyInHistory : {}", processInstance.getId());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("updateProcessBusinessKeyInHistory : {}", processInstance.getId());
             }
             if (processInstance != null) {
                 HistoricProcessInstanceEntity historicProcessInstance = getDbSqlSession().selectById(HistoricProcessInstanceEntity.class, processInstance.getId());

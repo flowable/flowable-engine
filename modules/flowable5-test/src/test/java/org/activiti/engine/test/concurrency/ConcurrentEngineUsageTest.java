@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
 
-    private static Logger log = LoggerFactory.getLogger(ConcurrentEngineUsageTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConcurrentEngineUsageTest.class);
     private static final int MAX_RETRIES = 5;
 
     @Deployment
@@ -56,7 +56,7 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
             executor.shutdown();
             boolean isEnded = executor.awaitTermination(20000, TimeUnit.MILLISECONDS);
             if (!isEnded) {
-                log.error("Executor was not shut down after timeout, not al tasks have been executed");
+                LOGGER.error("Executor was not shut down after timeout, not al tasks have been executed");
                 executor.shutdownNow();
 
             }
@@ -85,7 +85,7 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
                 success = true;
             } catch (PersistenceException pe) {
                 retries = retries - 1;
-                log.debug("Retrying process start - {}", (MAX_RETRIES - retries));
+                LOGGER.debug("Retrying process start - {}", (MAX_RETRIES - retries));
                 try {
                     Thread.sleep(timeout);
                 } catch (InterruptedException ignore) {
@@ -94,7 +94,7 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
             }
         }
         if (!success) {
-            log.debug("Retrying process start FAILED {} times", MAX_RETRIES);
+            LOGGER.debug("Retrying process start FAILED {} times", MAX_RETRIES);
         }
     }
 
@@ -108,7 +108,7 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
                 success = true;
             } catch (PersistenceException pe) {
                 retries = retries - 1;
-                log.debug("Retrying task completion - {}", (MAX_RETRIES - retries));
+                LOGGER.debug("Retrying task completion - {}", (MAX_RETRIES - retries));
                 try {
                     Thread.sleep(timeout);
                 } catch (InterruptedException ignore) {
@@ -118,7 +118,7 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
         }
 
         if (!success) {
-            log.debug("Retrying task completion FAILED {} times", MAX_RETRIES);
+            LOGGER.debug("Retrying task completion FAILED {} times", MAX_RETRIES);
         }
     }
 

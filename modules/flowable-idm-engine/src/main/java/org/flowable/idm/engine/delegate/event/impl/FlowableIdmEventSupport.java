@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FlowableIdmEventSupport {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FlowableIdmEventSupport.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowableIdmEventSupport.class);
 
     protected List<FlowableEventListener> eventListeners;
     protected Map<FlowableEventType, List<FlowableEventListener>> typedListeners;
@@ -108,7 +108,7 @@ public class FlowableIdmEventSupport {
             } else {
                 // Ignore the exception and continue notifying remaining listeners. The listener
                 // explicitly states that the exception should not bubble up
-                LOG.warn("Exception while executing event-listener, which was ignored", t);
+                LOGGER.warn("Exception while executing event-listener, which was ignored", t);
             }
         }
     }

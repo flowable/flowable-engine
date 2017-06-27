@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DbSqlSession extends AbstractNonCachingDbSqlSession {
 
-    private static final Logger log = LoggerFactory.getLogger(DbSqlSession.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DbSqlSession.class);
 
     protected static final List<FlowableIdmVersion> FLOWABLE_IDM_VERSIONS = new ArrayList<FlowableIdmVersion>();
 
@@ -101,7 +101,7 @@ public class DbSqlSession extends AbstractNonCachingDbSqlSession {
             }
         }
 
-        log.debug("flowable idm db schema check successful");
+        LOGGER.debug("flowable idm db schema check successful");
     }
 
     protected String addMissingComponent(String missingComponents, String component) {
@@ -258,7 +258,7 @@ public class DbSqlSession extends AbstractNonCachingDbSqlSession {
                 try {
                     tables.close();
                 } catch (Exception e) {
-                    log.error("Error closing meta data tables", e);
+                    LOGGER.error("Error closing meta data tables", e);
                 }
             }
 
@@ -286,7 +286,7 @@ public class DbSqlSession extends AbstractNonCachingDbSqlSession {
             throw new FlowableException("Version of idm database (" + versionInDatabase + ") is more recent than the engine (" + IdmEngine.VERSION + ")");
         } else if (cleanDbVersion.compareTo(cleanEngineVersion) == 0) {
             // Versions don't match exactly, possibly snapshot is being used
-            log.warn("IDM Engine-version is the same, but not an exact match: {} vs. {}. Not performing database-upgrade.", versionInDatabase, IdmEngine.VERSION);
+            LOGGER.warn("IDM Engine-version is the same, but not an exact match: {} vs. {}. Not performing database-upgrade.", versionInDatabase, IdmEngine.VERSION);
             return false;
         }
         return true;
@@ -315,7 +315,7 @@ public class DbSqlSession extends AbstractNonCachingDbSqlSession {
     protected void dbSchemaUpgrade(final String component, final int currentDatabaseVersionsIndex) {
         FlowableIdmVersion flowableVersion = FLOWABLE_IDM_VERSIONS.get(currentDatabaseVersionsIndex);
         String dbVersion = flowableVersion.getMainVersion();
-        log.info("upgrading {} schema from {} to {}", component, dbVersion, IdmEngine.VERSION);
+        LOGGER.info("upgrading {} schema from {} to {}", component, dbVersion, IdmEngine.VERSION);
 
         // Actual execution of schema DDL SQL
         for (int i = currentDatabaseVersionsIndex + 1; i < FLOWABLE_IDM_VERSIONS.size(); i++) {
@@ -328,7 +328,7 @@ public class DbSqlSession extends AbstractNonCachingDbSqlSession {
 
             dbVersion = dbVersion.replace(".", "");
             nextVersion = nextVersion.replace(".", "");
-            log.info("Upgrade needed: {} -> {}. Looking for schema update resource for component '{}'", dbVersion, nextVersion, component);
+            LOGGER.info("Upgrade needed: {} -> {}. Looking for schema update resource for component '{}'", dbVersion, nextVersion, component);
             executeSchemaResource("upgrade", component, getResourceForDbOperation("upgrade", "upgradestep." + dbVersion + ".to." + nextVersion, component), true);
             dbVersion = nextVersion;
         }
@@ -345,7 +345,7 @@ public class DbSqlSession extends AbstractNonCachingDbSqlSession {
             inputStream = ReflectUtil.getResourceAsStream(resourceName);
             if (inputStream == null) {
                 if (isOptional) {
-                    log.info("no schema resource {} for {}", resourceName, operation);
+                    LOGGER.info("no schema resource {} for {}", resourceName, operation);
                 } else {
                     throw new FlowableException("resource '" + resourceName + "' is not available");
                 }
@@ -359,7 +359,7 @@ public class DbSqlSession extends AbstractNonCachingDbSqlSession {
     }
 
     private void executeSchemaResource(String operation, String component, String resourceName, InputStream inputStream) {
-        log.info("performing {} on {} with resource {}", operation, component, resourceName);
+        LOGGER.info("performing {} on {} with resource {}", operation, component, resourceName);
         String sqlStatement = null;
         String exceptionSqlStatement = null;
         try {
@@ -374,7 +374,7 @@ public class DbSqlSession extends AbstractNonCachingDbSqlSession {
                     DatabaseMetaData databaseMetaData = connection.getMetaData();
                     int majorVersion = databaseMetaData.getDatabaseMajorVersion();
                     int minorVersion = databaseMetaData.getDatabaseMinorVersion();
-                    log.info("Found MySQL: majorVersion={} minorVersion={}", majorVersion, minorVersion);
+                    LOGGER.info("Found MySQL: majorVersion={} minorVersion={}", majorVersion, minorVersion);
 
                     // Special care for MySQL < 5.6
                     if (majorVersion <= 5 && minorVersion < 6) {
@@ -382,7 +382,7 @@ public class DbSqlSession extends AbstractNonCachingDbSqlSession {
                     }
                 }
             } catch (Exception e) {
-                log.info("Could not get database metadata", e);
+                LOGGER.info("Could not get database metadata", e);
             }
 
             BufferedReader reader = new BufferedReader(new StringReader(ddlStatements));
@@ -390,10 +390,10 @@ public class DbSqlSession extends AbstractNonCachingDbSqlSession {
             boolean inOraclePlsqlBlock = false;
             while (line != null) {
                 if (line.startsWith("# ")) {
-                    log.debug(line.substring(2));
+                    LOGGER.debug(line.substring(2));
 
                 } else if (line.startsWith("-- ")) {
-                    log.debug(line.substring(3));
+                    LOGGER.debug(line.substring(3));
 
                 } else if (line.startsWith("execute java ")) {
                     String upgradestepClassName = line.substring(13).trim();
@@ -404,7 +404,7 @@ public class DbSqlSession extends AbstractNonCachingDbSqlSession {
                         throw new FlowableException("database update java class '" + upgradestepClassName + "' can't be instantiated: " + e.getMessage(), e);
                     }
                     try {
-                        log.debug("executing upgrade step java class {}", upgradestepClassName);
+                        LOGGER.debug("executing upgrade step java class {}", upgradestepClassName);
                         dbUpgradeStep.execute(this);
                     } catch (Exception e) {
                         throw new FlowableException("error while executing database update java class '" + upgradestepClassName + "': " + e.getMessage(), e);
@@ -427,7 +427,7 @@ public class DbSqlSession extends AbstractNonCachingDbSqlSession {
                         Statement jdbcStatement = connection.createStatement();
                         try {
                             // no logging needed as the connection will log it
-                            log.debug("SQL: {}", sqlStatement);
+                            LOGGER.debug("SQL: {}", sqlStatement);
                             jdbcStatement.execute(sqlStatement);
                             jdbcStatement.close();
                         } catch (Exception e) {
@@ -435,7 +435,7 @@ public class DbSqlSession extends AbstractNonCachingDbSqlSession {
                                 exception = e;
                                 exceptionSqlStatement = sqlStatement;
                             }
-                            log.error("problem during schema {}, statement {}", operation, sqlStatement, e);
+                            LOGGER.error("problem during schema {}, statement {}", operation, sqlStatement, e);
                         } finally {
                             sqlStatement = null;
                         }
@@ -451,7 +451,7 @@ public class DbSqlSession extends AbstractNonCachingDbSqlSession {
                 throw exception;
             }
 
-            log.debug("flowable db schema {} for component {} successful", operation, component);
+            LOGGER.debug("flowable db schema {} for component {} successful", operation, component);
 
         } catch (Exception e) {
             throw new FlowableException("couldn't " + operation + " db schema: " + exceptionSqlStatement, e);
@@ -514,7 +514,7 @@ public class DbSqlSession extends AbstractNonCachingDbSqlSession {
 
     public void performSchemaOperationsIdmEngineBuild() {
         String databaseSchemaUpdate = Context.getIdmEngineConfiguration().getDatabaseSchemaUpdate();
-        log.debug("Executing performSchemaOperationsProcessEngineBuild with setting {}", databaseSchemaUpdate);
+        LOGGER.debug("Executing performSchemaOperationsProcessEngineBuild with setting {}", databaseSchemaUpdate);
         if (IdmEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
             try {
                 dbSchemaDrop();

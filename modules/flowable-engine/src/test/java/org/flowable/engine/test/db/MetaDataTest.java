@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MetaDataTest extends PluggableFlowableTestCase {
 
-    private static Logger log = LoggerFactory.getLogger(MetaDataTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataTest.class);
 
     public void testMetaData() {
         ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutor().execute(new Command<Object>() {
@@ -45,9 +45,9 @@ public class MetaDataTest extends PluggableFlowableTestCase {
                         ResultSetMetaData resultSetMetaData = tables.getMetaData();
                         int columnCount = resultSetMetaData.getColumnCount();
                         for (int i = 1; i <= columnCount; i++) {
-                            log.info("result set column {}|{}|{}|{}", i, resultSetMetaData.getColumnName(i), resultSetMetaData.getColumnLabel(i), tables.getString(i));
+                            LOGGER.info("result set column {}|{}|{}|{}", i, resultSetMetaData.getColumnName(i), resultSetMetaData.getColumnLabel(i), tables.getString(i));
                         }
-                        log.info("-------------------------------------------------------");
+                        LOGGER.info("-------------------------------------------------------");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultHistoryManager extends AbstractHistoryManager {
 
-    private static Logger log = LoggerFactory.getLogger(DefaultHistoryManager.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultHistoryManager.class.getName());
 
     public DefaultHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration, HistoryLevel historyLevel) {
         super(processEngineConfiguration, historyLevel);
@@ -385,8 +385,8 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     @Override
     public void updateProcessBusinessKeyInHistory(ExecutionEntity processInstance) {
         if (isHistoryEnabled()) {
-            if (log.isDebugEnabled()) {
-                log.debug("updateProcessBusinessKeyInHistory : {}", processInstance.getId());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("updateProcessBusinessKeyInHistory : {}", processInstance.getId());
             }
             if (processInstance != null) {
                 HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstance.getId());

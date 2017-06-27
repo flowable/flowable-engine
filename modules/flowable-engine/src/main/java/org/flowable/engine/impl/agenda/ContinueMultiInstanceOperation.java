@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ContinueMultiInstanceOperation extends AbstractOperation {
 
-    private static Logger logger = LoggerFactory.getLogger(ContinueMultiInstanceOperation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContinueMultiInstanceOperation.class);
     
     protected int loopCounter;
 
@@ -78,7 +78,7 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
         
         // Execute actual behavior
         ActivityBehavior activityBehavior = (ActivityBehavior) flowNode.getBehavior();
-        logger.debug("Executing activityBehavior {} on activity '{}' with execution {}", activityBehavior.getClass(), flowNode.getId(), execution.getId());
+        LOGGER.debug("Executing activityBehavior {} on activity '{}' with execution {}", activityBehavior.getClass(), flowNode.getId(), execution.getId());
 
         if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(

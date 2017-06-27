@@ -68,7 +68,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CommandContext extends AbstractCommandContext {
 
-    private static Logger log = LoggerFactory.getLogger(CommandContext.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommandContext.class);
 
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
     protected FailedJobCommandFactory failedJobCommandFactory;
@@ -89,7 +89,7 @@ public class CommandContext extends AbstractCommandContext {
     protected void logException() {
         if (exception instanceof JobNotFoundException || exception instanceof FlowableTaskAlreadyClaimedException) {
             // reduce log level, because this may have been caused because of job deletion due to cancelActiviti="true"
-            log.info("Error while closing command context", exception);
+            LOGGER.info("Error while closing command context", exception);
         } else {
             if (hideAsyncHistoryExceptions) {
                 return;

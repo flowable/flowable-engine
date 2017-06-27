@@ -30,7 +30,7 @@ public class ExecuteAsyncJobCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(ExecuteAsyncJobCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteAsyncJobCmd.class);
 
     protected JobEntity job;
 
@@ -52,13 +52,13 @@ public class ExecuteAsyncJobCmd implements Command<Object>, Serializable {
 
         JobEntity refetchedJob = commandContext.getJobEntityManager().findJobById(job.getId());
         if (refetchedJob == null) {
-            log.debug("Job does not exist anymore and will not be executed. It has most likely been deleted "
+            LOGGER.debug("Job does not exist anymore and will not be executed. It has most likely been deleted "
                     + "as part of another concurrent part of the process instance.");
             return null;
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Executing async job {}", refetchedJob.getId());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Executing async job {}", refetchedJob.getId());
         }
 
         refetchedJob.execute(commandContext);

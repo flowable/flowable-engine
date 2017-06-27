@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
-    private static Logger log = LoggerFactory.getLogger(DefaultAsyncJobExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAsyncJobExecutor.class);
 
     protected Thread timerJobAcquisitionThread;
     protected Thread asyncJobAcquisitionThread;
@@ -133,12 +133,12 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
     protected void initAsyncJobExecutionThreadPool() {
         if (threadPoolQueue == null) {
-            log.info("Creating thread pool queue of size {}", queueSize);
+            LOGGER.info("Creating thread pool queue of size {}", queueSize);
             threadPoolQueue = new ArrayBlockingQueue<Runnable>(queueSize);
         }
 
         if (executorService == null) {
-            log.info("Creating executor service with corePoolSize {}, maxPoolSize {} and keepAliveTime {}", corePoolSize, maxPoolSize, keepAliveTime);
+            LOGGER.info("Creating executor service with corePoolSize {}, maxPoolSize {} and keepAliveTime {}", corePoolSize, maxPoolSize, keepAliveTime);
 
             BasicThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("flowable-async-job-executor-thread-%d").build();
             executorService = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, threadPoolQueue, threadFactory);
@@ -154,10 +154,10 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
             // Waits for 1 minute to finish all currently executing jobs
             try {
                 if (!executorService.awaitTermination(secondsToWaitOnShutdown, TimeUnit.SECONDS)) {
-                    log.warn("Timeout during shutdown of async job executor. The current running jobs could not end within {} seconds after shutdown operation.", secondsToWaitOnShutdown);
+                    LOGGER.warn("Timeout during shutdown of async job executor. The current running jobs could not end within {} seconds after shutdown operation.", secondsToWaitOnShutdown);
                 }
             } catch (InterruptedException e) {
-                log.warn("Interrupted while shutting down the async job executor. ", e);
+                LOGGER.warn("Interrupted while shutting down the async job executor. ", e);
             }
 
             executorService = null;
@@ -185,7 +185,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
             try {
                 asyncJobAcquisitionThread.join();
             } catch (InterruptedException e) {
-                log.warn("Interrupted while waiting for the async job acquisition thread to terminate", e);
+                LOGGER.warn("Interrupted while waiting for the async job acquisition thread to terminate", e);
             }
             asyncJobAcquisitionThread = null;
         }
@@ -196,7 +196,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
             try {
                 timerJobAcquisitionThread.join();
             } catch (InterruptedException e) {
-                log.warn("Interrupted while waiting for the timer job acquisition thread to terminate", e);
+                LOGGER.warn("Interrupted while waiting for the timer job acquisition thread to terminate", e);
             }
             timerJobAcquisitionThread = null;
         }
@@ -216,7 +216,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
             try {
                 resetExpiredJobThread.join();
             } catch (InterruptedException e) {
-                log.warn("Interrupted while waiting for the reset expired jobs thread to terminate", e);
+                LOGGER.warn("Interrupted while waiting for the reset expired jobs thread to terminate", e);
             }
 
             resetExpiredJobThread = null;

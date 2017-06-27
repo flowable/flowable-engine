@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DbSqlSession extends AbstractDbSqlSession {
 
-    private static final Logger log = LoggerFactory.getLogger(DbSqlSession.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DbSqlSession.class);
 
     protected static final String LAST_V5_VERSION = "5.99.0.0";
 
@@ -331,7 +331,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
         determineUpdatedObjects(); // Needs to be done before the removeUnnecessaryOperations, as removeUnnecessaryOperations will remove stuff from the cache
         removeUnnecessaryOperations();
 
-        if (log.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             debugFlush();
         }
 
@@ -397,34 +397,34 @@ public class DbSqlSession extends AbstractDbSqlSession {
     }
 
     protected void debugFlush() {
-        log.debug("Flushing dbSqlSession");
+        LOGGER.debug("Flushing dbSqlSession");
         int nrOfInserts = 0;
         int nrOfUpdates = 0;
         int nrOfDeletes = 0;
         for (Map<String, Entity> insertedObjectMap : insertedObjects.values()) {
             for (Entity insertedObject : insertedObjectMap.values()) {
-                log.debug("  insert {}", insertedObject);
+                LOGGER.debug("  insert {}", insertedObject);
                 nrOfInserts++;
             }
         }
         for (Entity updatedObject : updatedObjects) {
-            log.debug("  update {}", updatedObject);
+            LOGGER.debug("  update {}", updatedObject);
             nrOfUpdates++;
         }
         for (Map<String, Entity> deletedObjectMap : deletedObjects.values()) {
             for (Entity deletedObject : deletedObjectMap.values()) {
-                log.debug("  delete {} with id {}", deletedObject, deletedObject.getId());
+                LOGGER.debug("  delete {} with id {}", deletedObject, deletedObject.getId());
                 nrOfDeletes++;
             }
         }
         for (Collection<BulkDeleteOperation> bulkDeleteOperationList : bulkDeleteOperations.values()) {
             for (BulkDeleteOperation bulkDeleteOperation : bulkDeleteOperationList) {
-                log.debug("  {}", bulkDeleteOperation);
+                LOGGER.debug("  {}", bulkDeleteOperation);
                 nrOfDeletes++;
             }
         }
-        log.debug("flush summary: {} insert, {} update, {} delete.", nrOfInserts, nrOfUpdates, nrOfDeletes);
-        log.debug("now executing flush...");
+        LOGGER.debug("flush summary: {} insert, {} update, {} delete.", nrOfInserts, nrOfUpdates, nrOfDeletes);
+        LOGGER.debug("now executing flush...");
     }
 
     public boolean isEntityInserted(Entity entity) {
@@ -567,7 +567,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
             throw new FlowableException("no insert statement for " + entity.getClass() + " in the ibatis mapping files");
         }
 
-        log.debug("inserting: {}", entity);
+        LOGGER.debug("inserting: {}", entity);
         sqlSession.insert(insertStatement, entity);
 
         // See https://activiti.atlassian.net/browse/ACT-1290
@@ -627,7 +627,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
                 throw new FlowableException("no update statement for " + updatedObject.getClass() + " in the ibatis mapping files");
             }
 
-            log.debug("updating: {}", updatedObject);
+            LOGGER.debug("updating: {}", updatedObject);
             
             int updatedRecords = sqlSession.update(updateStatement, updatedObject);
             if (updatedRecords == 0) {
@@ -735,7 +735,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
             }
         }
 
-        log.debug("flowable db schema check successful");
+        LOGGER.debug("flowable db schema check successful");
     }
 
     protected String addMissingComponent(String missingComponents, String component) {
@@ -923,7 +923,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
                 try {
                     tables.close();
                 } catch (Exception e) {
-                    log.error("Error closing meta data tables", e);
+                    LOGGER.error("Error closing meta data tables", e);
                 }
             }
 
@@ -951,7 +951,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
             throw new FlowableException("Version of flowable database (" + versionInDatabase + ") is more recent than the engine (" + ProcessEngine.VERSION + ")");
         } else if (cleanDbVersion.compareTo(cleanEngineVersion) == 0) {
             // Versions don't match exactly, possibly snapshot is being used
-            log.warn("Engine-version is the same, but not an exact match: {} vs. {}. Not performing database-upgrade.", versionInDatabase, ProcessEngine.VERSION);
+            LOGGER.warn("Engine-version is the same, but not an exact match: {} vs. {}. Not performing database-upgrade.", versionInDatabase, ProcessEngine.VERSION);
             return false;
         }
         return true;
@@ -980,7 +980,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
     protected void dbSchemaUpgrade(final String component, final int currentDatabaseVersionsIndex) {
         FlowableVersion version = FLOWABLE_VERSIONS.get(currentDatabaseVersionsIndex);
         String dbVersion = version.getMainVersion();
-        log.info("upgrading flowable {} schema from {} to {}", component, dbVersion, ProcessEngine.VERSION);
+        LOGGER.info("upgrading flowable {} schema from {} to {}", component, dbVersion, ProcessEngine.VERSION);
 
         // Actual execution of schema DDL SQL
         for (int i = currentDatabaseVersionsIndex + 1; i < FLOWABLE_VERSIONS.size(); i++) {
@@ -993,7 +993,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
 
             dbVersion = dbVersion.replace(".", "");
             nextVersion = nextVersion.replace(".", "");
-            log.info("Upgrade needed: {} -> {}. Looking for schema update resource for component '{}'", dbVersion, nextVersion, component);
+            LOGGER.info("Upgrade needed: {} -> {}. Looking for schema update resource for component '{}'", dbVersion, nextVersion, component);
             executeSchemaResource("upgrade", component, getResourceForDbOperation("upgrade", "upgradestep." + dbVersion + ".to." + nextVersion, component), true);
             dbVersion = nextVersion;
         }
@@ -1010,7 +1010,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
             inputStream = ReflectUtil.getResourceAsStream(resourceName);
             if (inputStream == null) {
                 if (isOptional) {
-                    log.info("no schema resource {} for {}", resourceName, operation);
+                    LOGGER.info("no schema resource {} for {}", resourceName, operation);
                 } else {
                     throw new FlowableException("resource '" + resourceName + "' is not available");
                 }
@@ -1024,7 +1024,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
     }
 
     private void executeSchemaResource(String operation, String component, String resourceName, InputStream inputStream) {
-        log.info("performing {} on {} with resource {}", operation, component, resourceName);
+        LOGGER.info("performing {} on {} with resource {}", operation, component, resourceName);
         String sqlStatement = null;
         String exceptionSqlStatement = null;
         try {
@@ -1039,7 +1039,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
                     DatabaseMetaData databaseMetaData = connection.getMetaData();
                     int majorVersion = databaseMetaData.getDatabaseMajorVersion();
                     int minorVersion = databaseMetaData.getDatabaseMinorVersion();
-                    log.info("Found MySQL: majorVersion={} minorVersion={}", majorVersion, minorVersion);
+                    LOGGER.info("Found MySQL: majorVersion={} minorVersion={}", majorVersion, minorVersion);
 
                     // Special care for MySQL < 5.6
                     if (majorVersion <= 5 && minorVersion < 6) {
@@ -1047,7 +1047,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
                     }
                 }
             } catch (Exception e) {
-                log.info("Could not get database metadata", e);
+                LOGGER.info("Could not get database metadata", e);
             }
 
             BufferedReader reader = new BufferedReader(new StringReader(ddlStatements));
@@ -1055,10 +1055,10 @@ public class DbSqlSession extends AbstractDbSqlSession {
             boolean inOraclePlsqlBlock = false;
             while (line != null) {
                 if (line.startsWith("# ")) {
-                    log.debug(line.substring(2));
+                    LOGGER.debug(line.substring(2));
 
                 } else if (line.startsWith("-- ")) {
-                    log.debug(line.substring(3));
+                    LOGGER.debug(line.substring(3));
 
                 } else if (line.startsWith("execute java ")) {
                     String upgradestepClassName = line.substring(13).trim();
@@ -1069,7 +1069,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
                         throw new FlowableException("database update java class '" + upgradestepClassName + "' can't be instantiated: " + e.getMessage(), e);
                     }
                     try {
-                        log.debug("executing upgrade step java class {}", upgradestepClassName);
+                        LOGGER.debug("executing upgrade step java class {}", upgradestepClassName);
                         dbUpgradeStep.execute(this);
                     } catch (Exception e) {
                         throw new FlowableException("error while executing database update java class '" + upgradestepClassName + "': " + e.getMessage(), e);
@@ -1092,7 +1092,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
                         Statement jdbcStatement = connection.createStatement();
                         try {
                             // no logging needed as the connection will log it
-                            log.debug("SQL: {}", sqlStatement);
+                            LOGGER.debug("SQL: {}", sqlStatement);
                             jdbcStatement.execute(sqlStatement);
                             jdbcStatement.close();
                             
@@ -1101,7 +1101,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
                                 exception = e;
                                 exceptionSqlStatement = sqlStatement;
                             }
-                            log.error("problem during schema {}, statement {}", operation, sqlStatement, e);
+                            LOGGER.error("problem during schema {}, statement {}", operation, sqlStatement, e);
                             
                         } finally {
                             sqlStatement = null;
@@ -1119,7 +1119,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
                 throw exception;
             }
 
-            log.debug("flowable db schema {} for component {} successful", operation, component);
+            LOGGER.debug("flowable db schema {} for component {} successful", operation, component);
 
         } catch (Exception e) {
             throw new FlowableException("couldn't " + operation + " db schema: " + exceptionSqlStatement, e);
@@ -1182,7 +1182,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
 
     public void performSchemaOperationsProcessEngineBuild() {
         String databaseSchemaUpdate = Context.getProcessEngineConfiguration().getDatabaseSchemaUpdate();
-        log.debug("Executing performSchemaOperationsProcessEngineBuild with setting {}", databaseSchemaUpdate);
+        LOGGER.debug("Executing performSchemaOperationsProcessEngineBuild with setting {}", databaseSchemaUpdate);
         if (ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
             try {
                 dbSchemaDrop();

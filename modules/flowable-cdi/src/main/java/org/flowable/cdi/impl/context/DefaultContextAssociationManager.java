@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("serial")
 public class DefaultContextAssociationManager implements ContextAssociationManager, Serializable {
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultContextAssociationManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultContextAssociationManager.class);
 
     protected static class ScopedAssociation {
 
@@ -117,7 +117,7 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
                 beanManager.getContext(scopeAnnotation.annotationType());
                 return scopeType;
             } catch (ContextNotActiveException e) {
-                log.trace("Context {} not active.", scopeAnnotation.annotationType());
+                LOGGER.trace("Context {} not active.", scopeAnnotation.annotationType());
             }
         }
         throw new FlowableException("Could not determine an active context to associate the current process instance / task instance with.");
@@ -155,8 +155,8 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
             throw new FlowableCdiException("Cannot associate " + execution + ", already associated with " + associatedExecution + ". Disassociate first!");
         }
 
-        if (log.isTraceEnabled()) {
-            log.trace("Associating {} (@{})", execution, scopedAssociation.getClass().getAnnotations()[0].annotationType().getSimpleName());
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Associating {} (@{})", execution, scopedAssociation.getClass().getAnnotations()[0].annotationType().getSimpleName());
         }
         scopedAssociation.setExecution(execution);
     }
@@ -170,8 +170,8 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
         if (scopedAssociation.getExecution() == null) {
             throw new FlowableException("Cannot disassociate execution, no " + scopedAssociation.getClass().getAnnotations()[0].annotationType().getSimpleName() + " execution associated. ");
         }
-        if (log.isTraceEnabled()) {
-            log.trace("Disassociating");
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Disassociating");
         }
         scopedAssociation.setExecution(null);
         scopedAssociation.setTask(null);

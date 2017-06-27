@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TableDataManager extends AbstractManager {
 
-    private static Logger log = LoggerFactory.getLogger(TableDataManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TableDataManager.class);
 
     public static Map<Class<?>, String> apiTypeToTableNameMap = new HashMap<Class<?>, String>();
     public static Map<Class<? extends PersistentObject>, String> persistentObjectToTableNameMap = new HashMap<Class<? extends PersistentObject>, String>();
@@ -124,7 +124,7 @@ public class TableDataManager extends AbstractManager {
             for (String tableName : getTablesPresentInDatabase()) {
                 tableCount.put(tableName, getTableCount(tableName));
             }
-            log.debug("Number of rows per activiti table: {}", tableCount);
+            LOGGER.debug("Number of rows per activiti table: {}", tableCount);
         } catch (Exception e) {
             throw new ActivitiException("couldn't get table counts", e);
         }
@@ -139,7 +139,7 @@ public class TableDataManager extends AbstractManager {
             DatabaseMetaData databaseMetaData = connection.getMetaData();
             ResultSet tables = null;
             try {
-                log.debug("retrieving activiti tables from jdbc metadata");
+                LOGGER.debug("retrieving activiti tables from jdbc metadata");
                 String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
                 String tableNameFilter = databaseTablePrefix + "ACT_%";
                 if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
@@ -164,7 +164,7 @@ public class TableDataManager extends AbstractManager {
                     String tableName = tables.getString("TABLE_NAME");
                     tableName = tableName.toUpperCase();
                     tableNames.add(tableName);
-                    log.debug("  retrieved activiti table name {}", tableName);
+                    LOGGER.debug("  retrieved activiti table name {}", tableName);
                 }
             } finally {
                 tables.close();
@@ -176,7 +176,7 @@ public class TableDataManager extends AbstractManager {
     }
 
     protected long getTableCount(String tableName) {
-        log.debug("selecting table count for {}", tableName);
+        LOGGER.debug("selecting table count for {}", tableName);
         Long count = (Long) getDbSqlSession().selectOne("selectTableCount",
                 Collections.singletonMap("tableName", tableName));
         return count;

@@ -47,7 +47,7 @@ public class BpmnActivityBehavior implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(BpmnActivityBehavior.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BpmnActivityBehavior.class);
 
     /**
      * Performs the default outgoing BPMN 2.0 behavior, which is having parallel paths of executions for the outgoing sequence flow.
@@ -110,8 +110,8 @@ public class BpmnActivityBehavior implements Serializable {
     protected void performOutgoingBehavior(ActivityExecution execution,
             boolean checkConditions, boolean throwExceptionIfExecutionStuck, List<ActivityExecution> reusableExecutions) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Leaving activity '{}'", execution.getActivity().getId());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Leaving activity '{}'", execution.getActivity().getId());
         }
 
         String defaultSequenceFlow = (String) execution.getActivity().getProperty("default");
@@ -169,8 +169,8 @@ public class BpmnActivityBehavior implements Serializable {
 
                 } else {
 
-                    if (log.isDebugEnabled()) {
-                        log.debug("No outgoing sequence flow found for {}. Ending execution.", execution.getActivity().getId());
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("No outgoing sequence flow found for {}. Ending execution.", execution.getActivity().getId());
                     }
                     execution.end();
 

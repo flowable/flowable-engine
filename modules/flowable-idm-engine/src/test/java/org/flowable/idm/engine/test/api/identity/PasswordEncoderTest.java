@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
 
-    private static Logger log = LoggerFactory.getLogger(PasswordEncoderTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PasswordEncoderTest.class);
 
     private void validatePassword() {
         User user = idmIdentityService.newUser("johndoe");
@@ -26,7 +26,7 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
         idmIdentityService.saveUser(user);
 
         User johndoe = idmIdentityService.createUserQuery().userId("johndoe").list().get(0);
-        log.info("Hash Password = {} ", johndoe.getPassword());
+        LOGGER.info("Hash Password = {} ", johndoe.getPassword());
 
         assertFalse("xxx".equals(johndoe.getPassword()));
         assertTrue(idmIdentityService.checkPassword("johndoe", "xxx"));

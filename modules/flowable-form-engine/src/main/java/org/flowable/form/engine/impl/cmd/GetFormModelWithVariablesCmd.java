@@ -12,6 +12,9 @@
  */
 package org.flowable.form.engine.impl.cmd;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -40,15 +43,12 @@ import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Tijs Rademakers
  */
 public class GetFormModelWithVariablesCmd implements Command<FormModel>, Serializable {
 
-    private static Logger logger = LoggerFactory.getLogger(GetFormModelWithVariablesCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GetFormModelWithVariablesCmd.class);
 
     private static final long serialVersionUID = 1L;
     
@@ -121,7 +121,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
                     try {
                         field.setValue(formExpression.getValue(variables));
                     } catch (Exception e) {
-                        logger.error("Error getting value for expression {} {}", expressionField.getExpression(), e.getMessage(), e);
+                        LOGGER.error("Error getting value for expression {} {}", expressionField.getExpression(), e.getMessage(), e);
                     }
 
                 } else {
@@ -244,7 +244,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
                     }
                     
                 } catch (Exception e) {
-                    logger.error("Error parsing form date value for process instance {} with value {}", processInstanceId, fieldValue, e);
+                    LOGGER.error("Error parsing form date value for process instance {} with value {}", processInstanceId, fieldValue, e);
                 }
 
             } else {
