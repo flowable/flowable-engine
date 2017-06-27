@@ -134,6 +134,7 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
                     formRequest.getTaskId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
+            
         } else if (formRequest.getFormDefinitionId() != null) {
             formModel = formService.getFormModelWithVariablesById(
                     formRequest.getFormDefinitionId(),
@@ -141,6 +142,7 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
                     formRequest.getTaskId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
+            
         } else {
             throw new FlowableIllegalArgumentException("Either form definition key or form definition id must be provided in the request");
         }

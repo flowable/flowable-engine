@@ -13,8 +13,10 @@
 package org.flowable.form.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -54,6 +56,8 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
     private static Logger logger = LoggerFactory.getLogger(GetFormInstanceModelCmd.class);
 
     private static final long serialVersionUID = 1L;
+    
+    protected static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d-M-yyyy");
 
     protected String formInstanceId;
     protected String formDefinitionKey;
@@ -151,7 +155,17 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
                     }
 
                 } else {
-                    field.setValue(variables.get(field.getId()));
+                    Object variableValue = variables.get(field.getId());
+                    if (variableValue != null) {
+                        
+                        if (variableValue instanceof LocalDate) {
+                            field.setValue(((LocalDate) variableValue).toString("d-M-yyyy"));
+                        } else if (variableValue instanceof Date) {
+                            field.setValue((DATE_FORMAT.format((Date) variableValue)));
+                        } else {
+                            field.setValue(variableValue);
+                        }
+                    }
                 }
 
                 field.setReadOnly(true);
@@ -231,14 +245,20 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
 
         } else if (taskId != null) {
             formInstanceQuery.taskId(taskId);
+            
+        } else if (processInstanceId != null) {
+            formInstanceQuery.processInstanceId(processInstanceId);
         
         } else {
             return null;
         }
 
-        FormInstance formInstance = formInstanceQuery.singleResult();
+        List<FormInstance> formInstances = formInstanceQuery.orderBySubmittedDate().asc().list();
+        if (!formInstances.isEmpty()) {
+            return formInstances.get(0);
+        }
 
-        return formInstance;
+        return null;
     }
 
     protected void fillFormInstanceValues(FormInstanceModel formInstanceModel, FormInstance formInstance,
