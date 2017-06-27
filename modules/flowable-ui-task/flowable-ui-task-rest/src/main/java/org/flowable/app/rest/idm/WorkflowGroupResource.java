@@ -14,34 +14,31 @@ package org.flowable.app.rest.idm;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.app.model.common.UserRepresentation;
+import org.flowable.app.model.common.GroupRepresentation;
 import org.flowable.app.service.exception.NotFoundException;
 import org.flowable.app.service.idm.RemoteIdmService;
-import org.flowable.idm.api.User;
+import org.flowable.idm.api.Group;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * REST controller for managing users.
- */
 @RestController
-public class UserResource {
+public class WorkflowGroupResource {
 
     @Autowired
-    protected RemoteIdmService remoteIdmService;
+    private RemoteIdmService remoteIdmService;
 
-    @RequestMapping(value = "/rest/users/{userId}", method = RequestMethod.GET, produces = "application/json")
-    public UserRepresentation getUser(@PathVariable String userId, HttpServletResponse response) {
-        User user = remoteIdmService.getUser(userId);
+    @RequestMapping(value = "/rest/workflow-groups/{groupId}", method = RequestMethod.GET)
+    public GroupRepresentation getGroup(@PathVariable String groupId, HttpServletResponse response) {
+        Group group = remoteIdmService.getGroup(groupId);
 
-        if (user == null) {
-            throw new NotFoundException("User with id: " + userId + " does not exist or is inactive");
+        if (group == null) {
+            throw new NotFoundException("Group with id: " + groupId + " does not exist or is inactive");
         }
 
-        return new UserRepresentation(user);
+        return new GroupRepresentation(group);
     }
 
 }
