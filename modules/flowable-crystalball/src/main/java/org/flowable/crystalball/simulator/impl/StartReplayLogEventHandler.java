@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 public class StartReplayLogEventHandler implements SimulationEventHandler {
 
-    private static Logger log = LoggerFactory.getLogger(StartReplayLogEventHandler.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(StartReplayLogEventHandler.class.getName());
 
     /** variable name where original process instance ID is stored - only for internal replay purposes */
     public static final String PROCESS_INSTANCE_ID = "_replay.processInstanceId";
@@ -71,7 +71,7 @@ public class StartReplayLogEventHandler implements SimulationEventHandler {
         } else {
             startBusinessKey = this.businessKey;
         }
-        log.debug("Starting new processDefId[{}] businessKey[{}] with variables[{}]", processDefinitionId, startBusinessKey, variables);
+        LOGGER.debug("Starting new processDefId[{}] businessKey[{}] with variables[{}]", processDefinitionId, startBusinessKey, variables);
         SimulationRunContext.getRuntimeService().startProcessInstanceById(processDefinitionId, startBusinessKey, variables);
     }
 }

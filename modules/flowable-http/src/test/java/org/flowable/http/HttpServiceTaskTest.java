@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
 
-    private static Logger log = LoggerFactory.getLogger(HttpServiceTaskTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServiceTaskTest.class);
 
     private ObjectMapper mapper = new ObjectMapper();
 

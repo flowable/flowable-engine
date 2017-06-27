@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class FormTestHelper {
 
-    private static Logger log = LoggerFactory.getLogger(FormTestHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FormTestHelper.class);
 
     public static final String EMPTY_LINE = "\n";
 
@@ -48,12 +48,12 @@ public abstract class FormTestHelper {
         try {
             method = testClass.getMethod(methodName, (Class<?>[]) null);
         } catch (Exception e) {
-            log.warn("Could not get method by reflection. This could happen if you are using @Parameters in combination with annotations.", e);
+            LOGGER.warn("Could not get method by reflection. This could happen if you are using @Parameters in combination with annotations.", e);
             return null;
         }
         FormDeploymentAnnotation deploymentAnnotation = method.getAnnotation(FormDeploymentAnnotation.class);
         if (deploymentAnnotation != null) {
-            log.debug("annotation @Deployment creates deployment for {}.{}", testClass.getSimpleName(), methodName);
+            LOGGER.debug("annotation @Deployment creates deployment for {}.{}", testClass.getSimpleName(), methodName);
             String[] resources = deploymentAnnotation.resources();
             if (resources.length == 0) {
                 String name = method.getName();
@@ -74,7 +74,7 @@ public abstract class FormTestHelper {
     }
 
     public static void annotationDeploymentTearDown(FormEngine formEngine, String deploymentId, Class<?> testClass, String methodName) {
-        log.debug("annotation @Deployment deletes deployment for {}.{}", testClass.getSimpleName(), methodName);
+        LOGGER.debug("annotation @Deployment deletes deployment for {}.{}", testClass.getSimpleName(), methodName);
         if (deploymentId != null) {
             try {
                 formEngine.getFormRepositoryService().deleteDeployment(deploymentId);
@@ -107,11 +107,11 @@ public abstract class FormTestHelper {
     public static FormEngine getFormEngine(String configurationResource) {
         FormEngine formEngine = formEngines.get(configurationResource);
         if (formEngine == null) {
-            log.debug("==== BUILDING FORM ENGINE ========================================================================");
+            LOGGER.debug("==== BUILDING FORM ENGINE ========================================================================");
             formEngine = FormEngineConfiguration.createFormEngineConfigurationFromResource(configurationResource)
                     .setDatabaseSchemaUpdate(FormEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE)
                     .buildFormEngine();
-            log.debug("==== FORM ENGINE CREATED =========================================================================");
+            LOGGER.debug("==== FORM ENGINE CREATED =========================================================================");
             formEngines.put(configurationResource, formEngine);
         }
         return formEngine;
@@ -129,7 +129,7 @@ public abstract class FormTestHelper {
      * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
      */
     public static void assertAndEnsureCleanDb(FormEngine formEngine) {
-        log.debug("verifying that db is clean after test");
+        LOGGER.debug("verifying that db is clean after test");
         FormRepositoryService repositoryService = formEngine.getFormEngineConfiguration().getFormRepositoryService();
         List<FormDeployment> deployments = repositoryService.createDeploymentQuery().list();
         if (deployments != null && !deployments.isEmpty()) {

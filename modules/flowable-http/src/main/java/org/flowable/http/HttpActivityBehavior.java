@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior {
 
-    private static final Logger log = LoggerFactory.getLogger(HttpActivityBehavior.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpActivityBehavior.class);
     
     private static final long serialVersionUID = 1L;
     
@@ -186,7 +186,7 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
             
         } catch (Exception e) {
             if (request.isIgnoreErrors()) {
-                log.info("Error ignored while processing http task in execution {}", execution.getId(), e);
+                LOGGER.info("Error ignored while processing http task in execution {}", execution.getId(), e);
                 execution.setVariable(request.getPrefix() + ".errorMessage", e.getMessage());
                 
             } else {

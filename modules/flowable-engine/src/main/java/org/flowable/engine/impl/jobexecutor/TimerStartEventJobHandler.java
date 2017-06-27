@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 public class TimerStartEventJobHandler extends TimerEventHandler implements JobHandler {
 
-    private static Logger log = LoggerFactory.getLogger(TimerStartEventJobHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimerStartEventJobHandler.class);
 
     public static final String TYPE = "timer-start-event";
 
@@ -66,13 +66,13 @@ public class TimerStartEventJobHandler extends TimerEventHandler implements JobH
                 }
 
             } else {
-                log.debug("ignoring timer of suspended process definition {}", processDefinitionEntity.getName());
+                LOGGER.debug("ignoring timer of suspended process definition {}", processDefinitionEntity.getName());
             }
         } catch (RuntimeException e) {
-            log.error("exception during timer execution", e);
+            LOGGER.error("exception during timer execution", e);
             throw e;
         } catch (Exception e) {
-            log.error("exception during timer execution", e);
+            LOGGER.error("exception during timer execution", e);
             throw new FlowableException("exception during timer execution: " + e.getMessage(), e);
         }
     }

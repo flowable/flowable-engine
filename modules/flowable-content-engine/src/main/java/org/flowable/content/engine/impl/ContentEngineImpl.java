@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ContentEngineImpl implements ContentEngine {
 
-    private static Logger log = LoggerFactory.getLogger(ContentEngineImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContentEngineImpl.class);
 
     protected String name;
     protected ContentManagementService managementService;
@@ -39,9 +39,9 @@ public class ContentEngineImpl implements ContentEngine {
         this.contentService = engineConfiguration.getContentService();
 
         if (name == null) {
-            log.info("default flowable ContentEngine created");
+            LOGGER.info("default flowable ContentEngine created");
         } else {
-            log.info("ContentEngine {} created", name);
+            LOGGER.info("ContentEngine {} created", name);
         }
 
         ContentEngines.registerContentEngine(this);

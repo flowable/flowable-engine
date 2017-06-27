@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class ProcessEngines {
 
-    private static Logger log = LoggerFactory.getLogger(ProcessEngines.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessEngines.class);
 
     public static final String NAME_DEFAULT = "default";
 
@@ -92,7 +92,7 @@ public abstract class ProcessEngines {
             }
             for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
                 URL resource = iterator.next();
-                log.info("Initializing process engine using configuration '{}'", resource.toString());
+                LOGGER.info("Initializing process engine using configuration '{}'", resource.toString());
                 initProcessEngineFromResource(resource);
             }
 
@@ -103,13 +103,13 @@ public abstract class ProcessEngines {
             }
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
-                log.info("Initializing process engine using Spring configuration '{}'", resource.toString());
+                LOGGER.info("Initializing process engine using Spring configuration '{}'", resource.toString());
                 initProcessEngineFromSpringResource(resource);
             }
 
             setInitialized(true);
         } else {
-            log.info("Process engines already initialized");
+            LOGGER.info("Process engines already initialized");
         }
     }
 
@@ -160,15 +160,15 @@ public abstract class ProcessEngines {
 
         String resourceUrlString = resourceUrl.toString();
         try {
-            log.info("initializing process engine for resource {}", resourceUrl);
+            LOGGER.info("initializing process engine for resource {}", resourceUrl);
             ProcessEngine processEngine = buildProcessEngine(resourceUrl);
             String processEngineName = processEngine.getName();
-            log.info("initialised process engine {}", processEngineName);
+            LOGGER.info("initialised process engine {}", processEngineName);
             processEngineInfo = new EngineInfo(processEngineName, resourceUrlString, null);
             processEngines.put(processEngineName, processEngine);
             processEngineInfosByName.put(processEngineName, processEngineInfo);
         } catch (Throwable e) {
-            log.error("Exception while initializing process engine: {}", e.getMessage(), e);
+            LOGGER.error("Exception while initializing process engine: {}", e.getMessage(), e);
             processEngineInfo = new EngineInfo(null, resourceUrlString, getExceptionString(e));
         }
         processEngineInfosByResourceUrl.put(resourceUrlString, processEngineInfo);
@@ -231,7 +231,7 @@ public abstract class ProcessEngines {
      * retries to initialize a process engine that previously failed.
      */
     public static EngineInfo retry(String resourceUrl) {
-        log.debug("retying initializing of resource {}", resourceUrl);
+        LOGGER.debug("retying initializing of resource {}", resourceUrl);
         try {
             return initProcessEngineFromResource(new URL(resourceUrl));
         } catch (MalformedURLException e) {
@@ -259,7 +259,7 @@ public abstract class ProcessEngines {
                 try {
                     processEngine.close();
                 } catch (Exception e) {
-                    log.error("exception while closing {}", (processEngineName == null ? "the default process engine" : "process engine " + processEngineName), e);
+                    LOGGER.error("exception while closing {}", (processEngineName == null ? "the default process engine" : "process engine " + processEngineName), e);
                 }
             }
 

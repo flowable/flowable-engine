@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 
 public class MBeanInfoAssembler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MBeanInfoAssembler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MBeanInfoAssembler.class);
 
     protected final WeakHashMap<Class<?>, MBeanAttributesAndOperations> cache = new WeakHashMap<Class<?>, MBeanAttributesAndOperations>(10);
 
@@ -58,7 +58,7 @@ public class MBeanInfoAssembler {
             return null;
         // skip proxy classes
         if (defaultManagedBean != null && Proxy.isProxyClass(defaultManagedBean.getClass())) {
-            LOG.trace("Skip creating ModelMBeanInfo due proxy class {}", defaultManagedBean.getClass());
+            LOGGER.trace("Skip creating ModelMBeanInfo due proxy class {}", defaultManagedBean.getClass());
             return null;
         }
 
@@ -93,7 +93,7 @@ public class MBeanInfoAssembler {
         ModelMBeanNotificationInfo[] arrayNotifications = mBeanNotifications.toArray(new ModelMBeanNotificationInfo[mBeanNotifications.size()]);
 
         ModelMBeanInfo info = new ModelMBeanInfoSupport(name, description, arrayAttributes, null, arrayOperations, arrayNotifications);
-        LOG.trace("Created ModelMBeanInfo {}", info);
+        LOGGER.trace("Created ModelMBeanInfo {}", info);
         return info;
     }
 
@@ -126,7 +126,7 @@ public class MBeanInfoAssembler {
             Class<?> clazz = managedClass.getSuperclass();
             // skip any JDK classes
             if (!clazz.getName().startsWith("java")) {
-                LOG.trace("Extracting attributes and operations from sub class: {}", clazz);
+                LOGGER.trace("Extracting attributes and operations from sub class: {}", clazz);
                 doExtractAttributesAndOperations(clazz, attributes, operations);
             }
         }
@@ -140,7 +140,7 @@ public class MBeanInfoAssembler {
                     // skip any JDK classes
                     continue;
                 }
-                LOG.trace("Extracting attributes and operations from implemented interface: {}", clazz);
+                LOGGER.trace("Extracting attributes and operations from implemented interface: {}", clazz);
                 doExtractAttributesAndOperations(clazz, attributes, operations);
             }
         }
@@ -162,7 +162,7 @@ public class MBeanInfoAssembler {
     }
 
     private void doDoExtractAttributesAndOperations(Class<?> managedClass, Map<String, ManagedAttributeInfo> attributes, Set<ManagedOperationInfo> operations) {
-        LOG.trace("Extracting attributes and operations from class: {}", managedClass);
+        LOGGER.trace("Extracting attributes and operations from class: {}", managedClass);
 
         for (Method method : managedClass.getMethods()) {
             // must be from declaring class
@@ -170,7 +170,7 @@ public class MBeanInfoAssembler {
                 continue;
             }
 
-            LOG.trace("Extracting attributes and operations from method: {}", method);
+            LOGGER.trace("Extracting attributes and operations from method: {}", method);
             ManagedAttribute ma = method.getAnnotation(ManagedAttribute.class);
             if (ma != null) {
                 String key;
@@ -244,7 +244,7 @@ public class MBeanInfoAssembler {
             mbeanAttribute.setDescriptor(desc);
 
             mBeanAttributes.add(mbeanAttribute);
-            LOG.trace("Assembled attribute: {}", mbeanAttribute);
+            LOGGER.trace("Assembled attribute: {}", mbeanAttribute);
         }
     }
 
@@ -254,7 +254,7 @@ public class MBeanInfoAssembler {
             Descriptor opDesc = mbean.getDescriptor();
             mbean.setDescriptor(opDesc);
             mBeanOperations.add(mbean);
-            LOG.trace("Assembled operation: {}", mbean);
+            LOGGER.trace("Assembled operation: {}", mbean);
         }
     }
 
@@ -264,7 +264,7 @@ public class MBeanInfoAssembler {
             for (ManagedNotification notification : notifications.value()) {
                 ModelMBeanNotificationInfo info = new ModelMBeanNotificationInfo(notification.notificationTypes(), notification.name(), notification.description());
                 mBeanNotifications.add(info);
-                LOG.trace("Assembled notification: {}", info);
+                LOGGER.trace("Assembled notification: {}", info);
             }
         }
     }

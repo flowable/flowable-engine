@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 public class DeleteHistoryJobCmd implements Command<Object>, Serializable {
 
-    private static final Logger log = LoggerFactory.getLogger(DeleteHistoryJobCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeleteHistoryJobCmd.class);
     private static final long serialVersionUID = 1L;
 
     protected String historyJobId;
@@ -60,8 +60,8 @@ public class DeleteHistoryJobCmd implements Command<Object>, Serializable {
         if (historyJobId == null) {
             throw new FlowableIllegalArgumentException("jobId is null");
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Deleting job {}", historyJobId);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Deleting job {}", historyJobId);
         }
 
         HistoryJobEntity job = commandContext.getHistoryJobEntityManager().findById(historyJobId);

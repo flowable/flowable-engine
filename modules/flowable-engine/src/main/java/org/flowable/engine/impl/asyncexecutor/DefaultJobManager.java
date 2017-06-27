@@ -68,7 +68,7 @@ import org.slf4j.LoggerFactory;
 
 public class DefaultJobManager implements JobManager {
 
-    private static Logger logger = LoggerFactory.getLogger(DefaultJobManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultJobManager.class);
 
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
@@ -403,8 +403,8 @@ public class DefaultJobManager implements JobManager {
         restoreExtraData(timerEntity, variableScope);
 
         if (timerEntity.getDuedate() != null && !isValidTime(timerEntity, timerEntity.getDuedate(), variableScope)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Timer {} fired. but the dueDate is after the endDate.  Deleting timer.", timerEntity.getId());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Timer {} fired. but the dueDate is after the endDate.  Deleting timer.", timerEntity.getId());
             }
             processEngineConfiguration.getJobEntityManager().delete(timerEntity);
             return;
@@ -413,8 +413,8 @@ public class DefaultJobManager implements JobManager {
         executeJobHandler(timerEntity);
         processEngineConfiguration.getJobEntityManager().delete(timerEntity);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Timer {} fired. Deleting timer.", timerEntity.getId());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Timer {} fired. Deleting timer.", timerEntity.getId());
         }
 
         if (timerEntity.getRepeat() != null) {

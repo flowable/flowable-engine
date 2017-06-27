@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
-    private static Logger log = LoggerFactory.getLogger(AbstractAsyncExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAsyncExecutor.class);
 
     protected boolean timerRunnableNeeded = true; // default true for backwards compatibility (History Async executor came later)
     protected AcquireTimerJobsRunnable timerJobRunnable;
@@ -110,7 +110,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
         isActive = true;
 
-        log.info("Starting up the async job executor [{}].", getClass().getName());
+        LOGGER.info("Starting up the async job executor [{}].", getClass().getName());
 
         initializeJobEntityManager();
         initializeRunnables();
@@ -157,7 +157,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         if (!isActive) {
             return;
         }
-        log.info("Shutting down the async job executor [{}].", getClass().getName());
+        LOGGER.info("Shutting down the async job executor [{}].", getClass().getName());
 
         stopRunnables();
         shutdownAdditionalComponents();

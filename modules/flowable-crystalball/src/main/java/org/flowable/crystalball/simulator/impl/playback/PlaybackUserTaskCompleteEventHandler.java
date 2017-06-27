@@ -12,14 +12,14 @@
  */
 package org.flowable.crystalball.simulator.impl.playback;
 
+import java.util.Map;
+
 import org.flowable.crystalball.simulator.SimulationEvent;
 import org.flowable.crystalball.simulator.SimulationEventHandler;
 import org.flowable.crystalball.simulator.SimulationRunContext;
 import org.flowable.engine.task.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 /**
  * complete user task handler for playback purposes
@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class PlaybackUserTaskCompleteEventHandler implements SimulationEventHandler {
 
-    private static Logger log = LoggerFactory.getLogger(PlaybackUserTaskCompleteEventHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlaybackUserTaskCompleteEventHandler.class);
 
     @Override
     public void handle(SimulationEvent event) {
@@ -40,7 +40,7 @@ public class PlaybackUserTaskCompleteEventHandler implements SimulationEventHand
         Map<String, Object> variables = (Map<String, Object>) event.getProperty("variables");
 
         SimulationRunContext.getTaskService().complete(taskId, variables);
-        log.debug("completed {}, {}, {}, {}", task, task.getName(), assignee, variables);
+        LOGGER.debug("completed {}, {}, {}, {}", task, task.getName(), assignee, variables);
     }
 
     @Override

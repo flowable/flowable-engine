@@ -48,7 +48,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(MailActivityBehavior.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MailActivityBehavior.class);
 
     private static final Class<?>[] ALLOWED_ATT_TYPES = new Class<?>[] {
             File.class, File[].class, String.class, String[].class, DataSource.class, DataSource[].class
@@ -400,7 +400,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
 
     protected void handleException(DelegateExecution execution, String msg, Exception e, boolean doIgnoreException, String exceptionVariable) {
         if (doIgnoreException) {
-            LOG.info("Ignoring email send error: {}", msg, e);
+            LOGGER.info("Ignoring email send error: {}", msg, e);
             if (exceptionVariable != null && exceptionVariable.length() > 0) {
                 execution.setVariable(exceptionVariable, msg);
             }

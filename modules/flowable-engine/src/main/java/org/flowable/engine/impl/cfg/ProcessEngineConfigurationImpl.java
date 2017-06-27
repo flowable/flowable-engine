@@ -367,7 +367,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfiguration {
 
-    private static Logger log = LoggerFactory.getLogger(ProcessEngineConfigurationImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessEngineConfigurationImpl.class);
 
     public static final String DEFAULT_WS_SYNC_FACTORY = "org.flowable.engine.impl.webservice.CxfWebServiceClientFactory";
 
@@ -1378,7 +1378,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             }
 
             if (nrOfServiceLoadedConfigurators > 0) {
-                log.info("Found {} auto-discoverable Process Engine Configurator{}", nrOfServiceLoadedConfigurators++, nrOfServiceLoadedConfigurators > 1 ? "s" : "");
+                LOGGER.info("Found {} auto-discoverable Process Engine Configurator{}", nrOfServiceLoadedConfigurators++, nrOfServiceLoadedConfigurators > 1 ? "s" : "");
             }
 
             if (!allConfigurators.isEmpty()) {
@@ -1401,9 +1401,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 });
 
                 // Execute the configurators
-                log.info("Found {} Process Engine Configurators in total:", allConfigurators.size());
+                LOGGER.info("Found {} Process Engine Configurators in total:", allConfigurators.size());
                 for (ProcessEngineConfigurator configurator : allConfigurators) {
-                    log.info("{} (priority:{})", configurator.getClass(), configurator.getPriority());
+                    LOGGER.info("{} (priority:{})", configurator.getClass(), configurator.getPriority());
                 }
 
             }
@@ -1413,14 +1413,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void configuratorsBeforeInit() {
         for (ProcessEngineConfigurator configurator : allConfigurators) {
-            log.info("Executing beforeInit() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
+            LOGGER.info("Executing beforeInit() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
             configurator.beforeInit(this);
         }
     }
 
     public void configuratorsAfterInit() {
         for (ProcessEngineConfigurator configurator : allConfigurators) {
-            log.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
+            LOGGER.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
             configurator.configure(this);
         }
     }
@@ -1667,7 +1667,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                     Class<?> handledType = defaultBpmnParseHandler.getHandledTypes().iterator().next();
                     if (customParseHandlerMap.containsKey(handledType)) {
                         BpmnParseHandler newBpmnParseHandler = customParseHandlerMap.get(handledType);
-                        log.info("Replacing default BpmnParseHandler {} with {}", defaultBpmnParseHandler.getClass().getName(), newBpmnParseHandler.getClass().getName());
+                        LOGGER.info("Replacing default BpmnParseHandler {} with {}", defaultBpmnParseHandler.getClass().getName(), newBpmnParseHandler.getClass().getName());
                         bpmnParserHandlers.set(i, newBpmnParseHandler);
                     }
                 }
@@ -2123,7 +2123,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             flowable5CompatibilityHandler = flowable5CompatibilityHandlerFactory.createFlowable5CompatibilityHandler();
 
             if (flowable5CompatibilityHandler != null) {
-                log.info("Found compatibility handler instance : {}", flowable5CompatibilityHandler.getClass());
+                LOGGER.info("Found compatibility handler instance : {}", flowable5CompatibilityHandler.getClass());
                 
                 flowable5CompatibilityHandler.setFlowable6ProcessEngineConfiguration(this);
             }

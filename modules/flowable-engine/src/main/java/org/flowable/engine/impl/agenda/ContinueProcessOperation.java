@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ContinueProcessOperation extends AbstractOperation {
 
-    private static Logger logger = LoggerFactory.getLogger(ContinueProcessOperation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContinueProcessOperation.class);
 
     protected boolean forceSynchronousOperation;
     protected boolean inCompensation;
@@ -152,7 +152,7 @@ public class ContinueProcessOperation extends AbstractOperation {
             executeActivityBehavior(activityBehavior, flowNode);
 
         } else {
-            logger.debug("No activityBehavior on activity '{}' with execution {}", flowNode.getId(), execution.getId());
+            LOGGER.debug("No activityBehavior on activity '{}' with execution {}", flowNode.getId(), execution.getId());
             Context.getAgenda().planTakeOutgoingSequenceFlowsOperation(execution, true);
         }
     }
@@ -219,7 +219,7 @@ public class ContinueProcessOperation extends AbstractOperation {
     }
 
     protected void executeActivityBehavior(ActivityBehavior activityBehavior, FlowNode flowNode) {
-        logger.debug("Executing activityBehavior {} on activity '{}' with execution {}", activityBehavior.getClass(), flowNode.getId(), execution.getId());
+        LOGGER.debug("Executing activityBehavior {} on activity '{}' with execution {}", activityBehavior.getClass(), flowNode.getId(), execution.getId());
 
         if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
@@ -268,7 +268,7 @@ public class ContinueProcessOperation extends AbstractOperation {
         FlowElement targetFlowElement = sequenceFlow.getTargetFlowElement();
         execution.setCurrentFlowElement(targetFlowElement);
 
-        logger.debug("Sequence flow '{}' encountered. Continuing process by following it using execution {}", sequenceFlow.getId(), execution.getId());
+        LOGGER.debug("Sequence flow '{}' encountered. Continuing process by following it using execution {}", sequenceFlow.getId(), execution.getId());
         
         execution.setActive(false);
         //agenda.planContinueProcessOperation(execution);
@@ -297,7 +297,7 @@ public class ContinueProcessOperation extends AbstractOperation {
             childExecutionEntity.setScope(false);
 
             ActivityBehavior boundaryEventBehavior = ((ActivityBehavior) boundaryEvent.getBehavior());
-            logger.debug("Executing boundary event activityBehavior {} with execution {}", boundaryEventBehavior.getClass(), childExecutionEntity.getId());
+            LOGGER.debug("Executing boundary event activityBehavior {} with execution {}", boundaryEventBehavior.getClass(), childExecutionEntity.getId());
             boundaryEventBehavior.execute(childExecutionEntity);
         }
     }

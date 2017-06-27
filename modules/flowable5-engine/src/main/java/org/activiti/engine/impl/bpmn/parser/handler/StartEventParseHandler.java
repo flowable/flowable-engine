@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<StartEvent> {
 
-    private static Logger logger = LoggerFactory.getLogger(StartEventParseHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StartEventParseHandler.class);
 
     public static final String PROPERTYNAME_INITIATOR_VARIABLE_NAME = "initiatorVariableName";
     public static final String PROPERTYNAME_INITIAL = "initial";
@@ -102,7 +102,7 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
                     || eventDefinition instanceof SignalEventDefinition) {
                 bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
             } else {
-                logger.warn("Unsupported event definition on start event {}", eventDefinition);
+                LOGGER.warn("Unsupported event definition on start event {}", eventDefinition);
             }
         }
     }
@@ -127,20 +127,20 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
                         || eventDefinition instanceof SignalEventDefinition) {
                     bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
                 } else {
-                    logger.warn("start event of event subprocess must be of type 'error', 'message' or 'signal' for start event {}", startEvent.getId());
+                    LOGGER.warn("start event of event subprocess must be of type 'error', 'message' or 'signal' for start event {}", startEvent.getId());
                 }
             }
 
         } else { // "regular" subprocess
 
             if (!startEvent.getEventDefinitions().isEmpty()) {
-                logger.warn("event definitions only allowed on start event if subprocess is an event subprocess {}", bpmnParse.getCurrentSubProcess().getId());
+                LOGGER.warn("event definitions only allowed on start event if subprocess is an event subprocess {}", bpmnParse.getCurrentSubProcess().getId());
             }
             if (scope.getProperty(PROPERTYNAME_INITIAL) == null) {
                 scope.setProperty(PROPERTYNAME_INITIAL, startEventActivity);
                 startEventActivity.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createNoneStartEventActivityBehavior(startEvent));
             } else {
-                logger.warn("multiple start events not supported for subprocess {}", bpmnParse.getCurrentSubProcess().getId());
+                LOGGER.warn("multiple start events not supported for subprocess {}", bpmnParse.getCurrentSubProcess().getId());
             }
         }
 

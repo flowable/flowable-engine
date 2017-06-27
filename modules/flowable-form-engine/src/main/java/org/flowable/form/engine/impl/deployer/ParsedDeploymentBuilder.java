@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 public class ParsedDeploymentBuilder {
 
-    private static final Logger log = LoggerFactory.getLogger(ParsedDeploymentBuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParsedDeploymentBuilder.class);
 
     public static final String[] FORM_RESOURCE_SUFFIXES = new String[] { "form" };
 
@@ -48,7 +48,7 @@ public class ParsedDeploymentBuilder {
 
         for (ResourceEntity resource : deployment.getResources().values()) {
             if (isFormResource(resource.getName())) {
-                log.debug("Processing Form definition resource {}", resource.getName());
+                LOGGER.debug("Processing Form definition resource {}", resource.getName());
                 FormDefinitionParse parse = createFormParseFromResource(resource);
                 for (FormDefinitionEntity formDefinition : parse.getFormDefinitions()) {
                     formDefinitions.add(formDefinition);

@@ -13,19 +13,15 @@
 package org.flowable.bpmn.converter.child;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.HasExecutionListeners;
 import org.flowable.bpmn.model.SequenceFlow;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Tijs Rademakers
  */
 public class ExecutionListenerParser extends FlowableListenerParser {
-
-    private static Logger logger = LoggerFactory.getLogger(ExecutionListenerParser.class);
 
     public String getElementName() {
         return ELEMENT_EXECUTION_LISTENER;

@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 public class DeleteDeadLetterJobCmd implements Command<Object>, Serializable {
 
-    private static final Logger log = LoggerFactory.getLogger(DeleteDeadLetterJobCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeleteDeadLetterJobCmd.class);
     private static final long serialVersionUID = 1L;
 
     protected String timerJobId;
@@ -60,8 +60,8 @@ public class DeleteDeadLetterJobCmd implements Command<Object>, Serializable {
         if (timerJobId == null) {
             throw new FlowableIllegalArgumentException("jobId is null");
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Deleting job {}", timerJobId);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Deleting job {}", timerJobId);
         }
 
         DeadLetterJobEntity job = commandContext.getDeadLetterJobEntityManager().findById(timerJobId);

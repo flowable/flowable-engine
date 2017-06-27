@@ -12,13 +12,13 @@
  */
 package org.flowable.crystalball.simulator.impl;
 
+import java.util.Map;
+
 import org.flowable.crystalball.simulator.SimulationEvent;
 import org.flowable.crystalball.simulator.SimulationEventHandler;
 import org.flowable.crystalball.simulator.SimulationRunContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 /**
  * Start new process event handler for playback purposes
@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public class StartProcessByIdEventHandler implements SimulationEventHandler {
 
-    private static Logger log = LoggerFactory.getLogger(StartProcessByIdEventHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StartProcessByIdEventHandler.class);
 
     /** process to start key */
     protected String processToStartIdKey;
@@ -52,7 +52,7 @@ public class StartProcessByIdEventHandler implements SimulationEventHandler {
         @SuppressWarnings("unchecked")
         Map<String, Object> variables = (Map<String, Object>) event.getProperty(variablesKey);
 
-        log.debug("Starting new processDefId[{}] businessKey[{}] with variables[{}]", processDefinitionId, businessKey, variables);
+        LOGGER.debug("Starting new processDefId[{}] businessKey[{}] with variables[{}]", processDefinitionId, businessKey, variables);
         SimulationRunContext.getRuntimeService().startProcessInstanceById(processDefinitionId, businessKey, variables);
     }
 

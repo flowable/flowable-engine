@@ -41,7 +41,7 @@ public class ProcessDeployer {
     public static final String PROCESS_ELEMENT_NAME = "process";
     public static final String PROCESS_ATTR_RESOURCE = "resource";
 
-    private static Logger logger = LoggerFactory.getLogger(ProcessDeployer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessDeployer.class);
 
     protected final ProcessEngine processEngine;
 
@@ -55,13 +55,13 @@ public class ProcessDeployer {
      * @return the processDefinitionId of the deployed process as returned by {@link ProcessDefinition#getId()}
      */
     public String deployProcess(String resourceName) {
-        logger.debug("Start deploying single process.");
+        LOGGER.debug("Start deploying single process.");
         // deploy processes as one deployment
         DeploymentBuilder deploymentBuilder = processEngine.getRepositoryService().createDeployment();
         deploymentBuilder.addClasspathResource(resourceName);
         // deploy the processes
         Deployment deployment = deploymentBuilder.deploy();
-        logger.debug("Process deployed");
+        LOGGER.debug("Process deployed");
         // retrieve the processDefinitionId for this process
         return processEngine.getRepositoryService().createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult().getId();
     }
@@ -73,25 +73,25 @@ public class ProcessDeployer {
         // build a single deployment containing all discovered processes
         Set<String> resourceNames = getResourceNames();
         if (resourceNames.isEmpty()) {
-            logger.debug("Not creating a deployment");
+            LOGGER.debug("Not creating a deployment");
             return;
         }
-        logger.debug("Start deploying processes.");
+        LOGGER.debug("Start deploying processes.");
         DeploymentBuilder deploymentBuilder = processEngine.getRepositoryService().createDeployment();
         for (String string : resourceNames) {
-            logger.info("Adding '{}' to deployment.", string);
+            LOGGER.info("Adding '{}' to deployment.", string);
             deploymentBuilder.addClasspathResource(string);
         }
         // deploy the processes
         deploymentBuilder.deploy();
-        logger.debug("Done deploying processes.");
+        LOGGER.debug("Done deploying processes.");
     }
 
     public Set<String> getResourceNames() {
         Set<String> result = new HashSet<String>();
         URL processFileUrl = getClass().getClassLoader().getResource(PROCESSES_FILE_NAME);
         if (processFileUrl == null) {
-            logger.debug("No '{}'-file provided.", PROCESSES_FILE_NAME);
+            LOGGER.debug("No '{}'-file provided.", PROCESSES_FILE_NAME);
             // return empty set
             return result;
         }
@@ -111,7 +111,7 @@ public class ProcessDeployer {
                 result.add(resourceName);
             }
         } catch (Exception e) {
-            logger.error("could not parse file '{}'. {}", PROCESSES_FILE_NAME, e.getMessage(), e);
+            LOGGER.error("could not parse file '{}'. {}", PROCESSES_FILE_NAME, e.getMessage(), e);
         }
         return result;
     }

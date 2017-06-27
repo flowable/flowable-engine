@@ -12,6 +12,12 @@
  */
 package org.flowable.rest.content.service.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -59,17 +65,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-
 import junit.framework.AssertionFailedError;
 
 public abstract class BaseSpringContentRestTestCase extends AbstractContentTestCase {
 
-    private static Logger log = LoggerFactory.getLogger(BaseSpringContentRestTestCase.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseSpringContentRestTestCase.class);
 
     protected static String SERVER_URL_PREFIX;
     protected static ContentRestUrlBuilder URL_BUILDER;
@@ -119,7 +119,7 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
                     try {
                         client.close();
                     } catch (IOException e) {
-                        log.error("Could not close http client", e);
+                        LOGGER.error("Could not close http client", e);
                     }
                 }
 
@@ -127,7 +127,7 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
                     try {
                         server.stop();
                     } catch (Exception e) {
-                        log.error("Error stopping server", e);
+                        LOGGER.error("Error stopping server", e);
                     }
                 }
             }
@@ -140,14 +140,14 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
             super.runBare();
 
         } catch (AssertionFailedError e) {
-            log.error(EMPTY_LINE);
-            log.error("ASSERTION FAILED: {}", e, e);
+            LOGGER.error(EMPTY_LINE);
+            LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;
             throw e;
 
         } catch (Throwable e) {
-            log.error(EMPTY_LINE);
-            log.error("EXCEPTION: {}", e, e);
+            LOGGER.error(EMPTY_LINE);
+            LOGGER.error("EXCEPTION: {}", e, e);
             exception = e;
             throw e;
 
@@ -184,8 +184,8 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
 
             int responseStatusCode = response.getStatusLine().getStatusCode();
             if (expectedStatusCode != responseStatusCode) {
-                log.info("Wrong status code : {}, but should be {}", responseStatusCode, expectedStatusCode);
-                log.info("Response body: {}", IOUtils.toString(response.getEntity().getContent()));
+                LOGGER.info("Wrong status code : {}, but should be {}", responseStatusCode, expectedStatusCode);
+                LOGGER.info("Response body: {}", IOUtils.toString(response.getEntity().getContent()));
             }
 
             Assert.assertEquals(expectedStatusCode, responseStatusCode);
@@ -216,7 +216,7 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
                 try {
                     response.close();
                 } catch (IOException e) {
-                    log.error("Could not close http connection", e);
+                    LOGGER.error("Could not close http connection", e);
                 }
             }
         }

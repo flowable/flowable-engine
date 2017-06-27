@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AsyncJobAddedNotification implements CommandContextCloseListener {
 
-    private static Logger log = LoggerFactory.getLogger(AsyncJobAddedNotification.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncJobAddedNotification.class);
 
     protected JobEntity job;
     protected AsyncExecutor asyncExecutor;
@@ -44,8 +44,8 @@ public class AsyncJobAddedNotification implements CommandContextCloseListener {
         CommandConfig commandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
         commandExecutor.execute(commandConfig, new Command<Void>() {
             public Void execute(CommandContext commandContext) {
-                if (log.isTraceEnabled()) {
-                    log.trace("notifying job executor of new job");
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace("notifying job executor of new job");
                 }
                 asyncExecutor.executeAsyncJob(job);
                 return null;

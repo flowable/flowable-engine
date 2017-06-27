@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MockEmailTransport extends Transport {
 
-    private static Logger logger = LoggerFactory.getLogger(MockEmailTransport.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MockEmailTransport.class);
 
     public MockEmailTransport(Session smtpSession, URLName urlName) {
         super(smtpSession, urlName);
@@ -26,9 +26,9 @@ public class MockEmailTransport extends Transport {
     @Override
     public void sendMessage(Message message, Address[] addresses) throws MessagingException {
         try {
-            logger.info(message.getContent().toString());
+            LOGGER.info(message.getContent().toString());
         } catch (IOException ex) {
-            logger.error("Error occurred while sending email", ex);
+            LOGGER.error("Error occurred while sending email", ex);
         }
     }
 

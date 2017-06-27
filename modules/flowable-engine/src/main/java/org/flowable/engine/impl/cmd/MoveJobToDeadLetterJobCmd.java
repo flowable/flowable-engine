@@ -30,7 +30,7 @@ public class MoveJobToDeadLetterJobCmd implements Command<DeadLetterJobEntity>, 
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(MoveJobToDeadLetterJobCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MoveJobToDeadLetterJobCmd.class);
 
     protected String jobId;
 
@@ -53,8 +53,8 @@ public class MoveJobToDeadLetterJobCmd implements Command<DeadLetterJobEntity>, 
             throw new JobNotFoundException(jobId);
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Moving job to deadletter job table {}", job.getId());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Moving job to deadletter job table {}", job.getId());
         }
 
         DeadLetterJobEntity deadLetterJob = commandContext.getJobManager().moveJobToDeadLetterJob(job);

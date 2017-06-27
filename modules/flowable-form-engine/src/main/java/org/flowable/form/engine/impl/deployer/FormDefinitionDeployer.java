@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FormDefinitionDeployer implements Deployer {
 
-    private static final Logger log = LoggerFactory.getLogger(FormDefinitionDeployer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FormDefinitionDeployer.class);
 
     protected IdGenerator idGenerator;
     protected ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory;
@@ -39,7 +39,7 @@ public class FormDefinitionDeployer implements Deployer {
     protected CachingAndArtifactsManager cachingAndArtifactsManager;
 
     public void deploy(FormDeploymentEntity deployment) {
-        log.debug("Processing deployment {}", deployment.getName());
+        LOGGER.debug("Processing deployment {}", deployment.getName());
 
         // The ParsedDeployment represents the deployment, the forms, and the form
         // resource, parse, and model associated with each form.

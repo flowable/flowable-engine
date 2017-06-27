@@ -30,7 +30,7 @@ public class UnlockExclusiveJobCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(UnlockExclusiveJobCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnlockExclusiveJobCmd.class);
 
     protected JobEntity job;
 
@@ -44,8 +44,8 @@ public class UnlockExclusiveJobCmd implements Command<Object>, Serializable {
             throw new ActivitiIllegalArgumentException("job is null");
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Unlocking exclusive job {}", job.getId());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Unlocking exclusive job {}", job.getId());
         }
 
         if (job.isExclusive()) {

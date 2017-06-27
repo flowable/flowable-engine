@@ -34,7 +34,7 @@ import liquibase.resource.ClassLoaderResourceAccessor;
  */
 public class DbSqlSession extends AbstractNonCachingDbSqlSession {
 
-    private static final Logger log = LoggerFactory.getLogger(DbSqlSession.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DbSqlSession.class);
 
     public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory) {
         super(dbSqlSessionFactory);
@@ -48,7 +48,7 @@ public class DbSqlSession extends AbstractNonCachingDbSqlSession {
     // ////////////////////////////////////////////////////////
 
     public void dbSchemaCheckVersion() {
-        log.debug("flowable content db schema check successful");
+        LOGGER.debug("flowable content db schema check successful");
     }
 
     public void dbSchemaCreate() {

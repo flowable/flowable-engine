@@ -36,7 +36,7 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior im
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger logger = LoggerFactory.getLogger(InclusiveGatewayActivityBehavior.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(InclusiveGatewayActivityBehavior.class.getName());
 
     @Override
     public void execute(DelegateExecution execution) {
@@ -82,7 +82,7 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior im
         // If no execution can reach the gateway, the gateway activates and executes fork behavior
         if (!oneExecutionCanReachGateway) {
 
-            logger.debug("Inclusive gateway cannot be reached by any execution and is activated");
+            LOGGER.debug("Inclusive gateway cannot be reached by any execution and is activated");
 
             // Kill all executions here (except the incoming)
             Collection<ExecutionEntity> executionsInGateway = executionEntityManager

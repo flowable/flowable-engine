@@ -29,10 +29,10 @@ import org.springframework.core.io.UrlResource;
  */
 public class SpringContentConfigurationHelper {
 
-    private static Logger log = LoggerFactory.getLogger(SpringContentConfigurationHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringContentConfigurationHelper.class);
 
     public static ContentEngine buildContentEngine(URL resource) {
-        log.debug("==== BUILDING SPRING APPLICATION CONTEXT AND CONTENT ENGINE =========================================");
+        LOGGER.debug("==== BUILDING SPRING APPLICATION CONTEXT AND CONTENT ENGINE =========================================");
 
         ApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource));
         Map<String, ContentEngine> beansOfType = applicationContext.getBeansOfType(ContentEngine.class);
@@ -42,7 +42,7 @@ public class SpringContentConfigurationHelper {
 
         ContentEngine contentEngine = beansOfType.values().iterator().next();
 
-        log.debug("==== SPRING CONTENT ENGINE CREATED ==================================================================");
+        LOGGER.debug("==== SPRING CONTENT ENGINE CREATED ==================================================================");
         return contentEngine;
     }
 

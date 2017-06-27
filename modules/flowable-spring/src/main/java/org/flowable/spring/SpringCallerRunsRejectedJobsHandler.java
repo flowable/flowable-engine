@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SpringCallerRunsRejectedJobsHandler implements SpringRejectedJobsHandler {
 
-    private static Logger log = LoggerFactory.getLogger(SpringCallerRunsRejectedJobsHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringCallerRunsRejectedJobsHandler.class);
 
     public void jobRejected(AsyncExecutor asyncExecutor, JobInfo job) {
         try {
@@ -34,7 +34,7 @@ public class SpringCallerRunsRejectedJobsHandler implements SpringRejectedJobsHa
             new ExecuteAsyncRunnable(job, asyncExecutor.getProcessEngineConfiguration(), 
                     asyncExecutor.getProcessEngineConfiguration().getJobEntityManager(), null).run();
         } catch (Exception e) {
-            log.error("Failed to execute rejected job {}", job.getId(), e);
+            LOGGER.error("Failed to execute rejected job {}", job.getId(), e);
         }
     }
 

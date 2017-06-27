@@ -29,7 +29,7 @@ public class ParallelGateway implements ActivityBehavior {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(ParallelGateway.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParallelGateway.class);
 
     public void execute(DelegateExecution execution) {
         ActivityExecution activityExecution = (ActivityExecution) execution;
@@ -45,11 +45,11 @@ public class ParallelGateway implements ActivityBehavior {
         int nbrOfExecutionsJoined = joinedExecutions.size();
 
         if (nbrOfExecutionsJoined == nbrOfExecutionsToJoin) {
-            log.debug("parallel gateway '{}' activates: {} of {} joined", activity.getId(), nbrOfExecutionsJoined, nbrOfExecutionsToJoin);
+            LOGGER.debug("parallel gateway '{}' activates: {} of {} joined", activity.getId(), nbrOfExecutionsJoined, nbrOfExecutionsToJoin);
             activityExecution.takeAll(outgoingTransitions, joinedExecutions);
 
-        } else if (log.isDebugEnabled()) {
-            log.debug("parallel gateway '{}' does not activate: {} of {} joined", activity.getId(), nbrOfExecutionsJoined, nbrOfExecutionsToJoin);
+        } else if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("parallel gateway '{}' does not activate: {} of {} joined", activity.getId(), nbrOfExecutionsJoined, nbrOfExecutionsToJoin);
         }
     }
 }
