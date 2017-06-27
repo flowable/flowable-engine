@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 
@@ -79,7 +80,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryByNameLike() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // nameLike
             Task task = taskService.createTaskQuery().taskNameLike("%\\%%").singleResult();
             assertNotNull(task);
@@ -101,7 +102,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryByNameLikeIgnoreCase() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // nameLikeIgnoreCase
             Task task = taskService.createTaskQuery().taskNameLikeIgnoreCase("%\\%%").singleResult();
             assertNotNull(task);
@@ -123,7 +124,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryByDescriptionLike() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // descriptionLike
             Task task = taskService.createTaskQuery().taskDescriptionLike("%\\%%").singleResult();
             assertNotNull(task);
@@ -145,7 +146,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryByDescriptionLikeIgnoreCase() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // descriptionLikeIgnoreCase
             Task task = taskService.createTaskQuery().taskDescriptionLikeIgnoreCase("%\\%%").singleResult();
             assertNotNull(task);
@@ -167,7 +168,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryByAssigneeLike() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // assigneeLike
             Task task = taskService.createTaskQuery().taskAssigneeLike("%\\%%").singleResult();
             assertNotNull(task);
@@ -187,7 +188,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryByAssigneeLikeIgnoreCase() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // assigneeLikeIgnoreCase
             Task task = taskService.createTaskQuery().taskAssigneeLike("%\\%%").singleResult();
             assertNotNull(task);
@@ -207,7 +208,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryByOwnerLike() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // taskOwnerLike
             Task task = taskService.createTaskQuery().taskOwnerLike("%\\%%").singleResult();
             assertNotNull(task);
@@ -229,7 +230,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryByOwnerLikeIgnoreCase() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // taskOwnerLikeIgnoreCase
             Task task = taskService.createTaskQuery().taskOwnerLikeIgnoreCase("%\\%%").singleResult();
             assertNotNull(task);
@@ -251,7 +252,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryByProcessInstanceBusinessKeyLike() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processInstanceBusinessKeyLike
             Task task = taskService.createTaskQuery().processInstanceBusinessKeyLike("%\\%%").singleResult();
             assertNotNull(task);
@@ -273,7 +274,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryByProcessInstanceBusinessKeyLikeIgnoreCase() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processInstanceBusinessKeyLike
             Task task = taskService.createTaskQuery().processInstanceBusinessKeyLikeIgnoreCase("%\\%%").singleResult();
             assertNotNull(task);
@@ -295,7 +296,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryByKeyLike() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // taskDefinitionKeyLike
             Task task = taskService.createTaskQuery().taskDefinitionKeyLike("%\\%%").singleResult();
             assertNull(task);
@@ -313,7 +314,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryByProcessDefinitionKeyLike() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processDefinitionKeyLike
             Task task = taskService.createTaskQuery().processDefinitionKeyLike("%\\%%").singleResult();
             assertNull(task);
@@ -331,7 +332,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryByProcessDefinitionKeyLikeIgnoreCase() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processDefinitionKeyLikeIgnoreCase
             Task task = taskService.createTaskQuery().processDefinitionKeyLikeIgnoreCase("%\\%%").singleResult();
             assertNull(task);
@@ -349,7 +350,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryByProcessDefinitionNameLike() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processDefinitionNameLike
             List<Task> list = taskService.createTaskQuery().processDefinitionNameLike("%\\%%").orderByTaskCreateTime().asc().list();
             // only check for existence and assume that the SQL processing has ordered the values correctly
@@ -374,7 +375,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryLikeByQueryVariableValue() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // taskVariableValueLike
             Task task = taskService.createTaskQuery().taskVariableValueLike("var1", "%\\%%").singleResult();
             assertNotNull(task);
@@ -396,7 +397,7 @@ public class TaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryLikeIgnoreCaseByQueryVariableValue() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // taskVariableValueLikeIgnoreCase
             Task task = taskService.createTaskQuery().taskVariableValueLikeIgnoreCase("var1", "%\\%%").singleResult();
             assertNotNull(task);

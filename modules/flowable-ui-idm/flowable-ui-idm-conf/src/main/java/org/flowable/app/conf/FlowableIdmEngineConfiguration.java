@@ -21,6 +21,7 @@ import org.flowable.idm.api.IdmManagementService;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
+import org.flowable.idm.spring.authentication.SpringEncoder;
 import org.flowable.ldap.LDAPConfiguration;
 import org.flowable.ldap.LDAPGroupCache;
 import org.flowable.ldap.LDAPGroupCache.LDAPGroupCacheListener;
@@ -31,6 +32,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.env.Environment;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
@@ -66,6 +70,8 @@ public class FlowableIdmEngineConfiguration {
         
         if (environment.getProperty("ldap.enabled", Boolean.class, false)) {
             initializeLdap(idmEngineConfiguration);
+        } else {
+            idmEngineConfiguration.setPasswordEncoder(new SpringEncoder(passwordEncoder()));
         }
 
         return idmEngineConfiguration;
@@ -124,5 +130,15 @@ public class FlowableIdmEngineConfiguration {
     @Bean
     public IdmManagementService idmManagementService() {
         return idmEngine().getIdmManagementService();
+    }
+    
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        String encoderConfig = environment.getProperty("security.passwordencoder", String.class, "");
+        if ("spring_bcrypt".equalsIgnoreCase(encoderConfig)) {
+            return new BCryptPasswordEncoder();
+        } else {
+            return NoOpPasswordEncoder.getInstance();
+        }
     }
 }

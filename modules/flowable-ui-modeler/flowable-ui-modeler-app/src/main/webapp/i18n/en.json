@@ -314,8 +314,13 @@
             "CREATED-BY": "Created by {{createdBy}}"
         },
         "HIT-POLICIES": {
-            "FIRST": "First (Single pass)",
-            "ANY": "Any (Single pass)"
+            "FIRST": "First",
+            "ANY": "Any",
+            "UNIQUE": "Unique",
+            "PRIORITY": "Priority",
+            "RULE ORDER": "Rule Order",
+            "OUTPUT ORDER": "Output Order",
+            "COLLECT": "Collect"
         },
         "POPUP": {
             "CREATE-TITLE": "Create a new decision table",
@@ -527,11 +532,18 @@
                 "EXPRESSION-LABEL": "Column label:",
                 "EXPRESSION-PLACEHOLDER": "Enter an optional label",
                 "EXPRESSION-VARIABLE-NAME": "Variable name:",
+                "EXPRESSION-VARIABLE-TYPE": "Variable type:",
                 "EXPRESSION-VARIABLE-NAME-PLACEHOLDER": "Enter a variable name",
                 "OUTPUT-NEW-VARIABLE-ID": "Variable ID:",
-                "OUTPUT-NEW-VARIABLE-TYPE": "Variable type:"
+                "OUTPUT-NEW-VARIABLE-TYPE": "Variable type:",
+                "COMPLEX-EXPRESSION-LABEL": "Complex expression:",
+                "ALLOWED-VALUES": "Allowed values (optional):",
+                "OUTPUT-VALUES": "Output values ",
+                "OUTPUT-VALUES-OPTIONAL": "(optional):",
+                "OUTPUT-VALUES-NOT-OPTIONAL": "(drag rows for priority / output order):"
             }
         },
+        "BUTTON-ACTIONS-LABEL": "Actions",
         "BUTTON-ADD-INPUT-LABEL": "Add input",
         "BUTTON-ADD-OUTPUT-LABEL": "Add output",
         "BUTTON-ADD-RULE-LABEL": "Add rule",

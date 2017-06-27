@@ -70,7 +70,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         String deleteReason = createDeleteReason(execution.getCurrentActivityId());
         deleteExecutionEntities(executionEntityManager, rootExecutionEntity, execution.getCurrentFlowElement(), deleteReason);
         endAllHistoricActivities(rootExecutionEntity.getId(), deleteReason);
-        commandContext.getHistoryManager().recordProcessInstanceEnd(rootExecutionEntity.getId(),
+        commandContext.getHistoryManager().recordProcessInstanceEnd(rootExecutionEntity,
                 deleteReason, execution.getCurrentActivityId());
     }
 
@@ -90,7 +90,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
 
             endAllHistoricActivities(scopeExecutionEntity.getId(), deleteReason);
             deleteExecutionEntities(executionEntityManager, scopeExecutionEntity, execution.getCurrentFlowElement(), deleteReason);
-            commandContext.getHistoryManager().recordProcessInstanceEnd(scopeExecutionEntity.getId(), deleteReason, execution.getCurrentActivityId());
+            commandContext.getHistoryManager().recordProcessInstanceEnd(scopeExecutionEntity, deleteReason, execution.getCurrentActivityId());
 
         } else if (scopeExecutionEntity.getCurrentFlowElement() != null
                 && scopeExecutionEntity.getCurrentFlowElement() instanceof SubProcess) { // SubProcess

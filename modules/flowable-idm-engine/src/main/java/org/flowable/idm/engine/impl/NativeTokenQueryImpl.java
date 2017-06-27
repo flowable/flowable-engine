@@ -34,8 +34,8 @@ public class NativeTokenQueryImpl extends AbstractNativeQuery<NativeTokenQuery, 
 
     // results ////////////////////////////////////////////////////////////////
 
-    public List<Token> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return commandContext.getTokenEntityManager().findTokensByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<Token> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
+        return commandContext.getTokenEntityManager().findTokensByNativeQuery(parameterMap);
     }
 
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {

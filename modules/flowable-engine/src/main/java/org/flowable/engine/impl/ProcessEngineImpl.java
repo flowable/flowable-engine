@@ -64,6 +64,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     protected IdmIdentityService idmIdentityService;
     protected ContentService contentService;
     protected AsyncExecutor asyncExecutor;
+    protected AsyncExecutor asyncHistoryExecutor;
     protected CommandExecutor commandExecutor;
     protected Map<Class<?>, SessionFactory> sessionFactories;
     protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
@@ -81,6 +82,7 @@ public class ProcessEngineImpl implements ProcessEngine {
         this.managementService = processEngineConfiguration.getManagementService();
         this.dynamicBpmnService = processEngineConfiguration.getDynamicBpmnService();
         this.asyncExecutor = processEngineConfiguration.getAsyncExecutor();
+        this.asyncHistoryExecutor = processEngineConfiguration.getAsyncHistoryExecutor();
         this.commandExecutor = processEngineConfiguration.getCommandExecutor();
         this.sessionFactories = processEngineConfiguration.getSessionFactories();
         this.transactionContextFactory = processEngineConfiguration.getTransactionContextFactory();
@@ -112,12 +114,18 @@ public class ProcessEngineImpl implements ProcessEngine {
         if (asyncExecutor != null && asyncExecutor.isAutoActivate()) {
             asyncExecutor.start();
         }
+        if (asyncHistoryExecutor != null && asyncHistoryExecutor.isAutoActivate()) {
+            asyncHistoryExecutor.start();
+        }
     }
 
     public void close() {
         ProcessEngines.unregister(this);
         if (asyncExecutor != null && asyncExecutor.isActive()) {
             asyncExecutor.shutdown();
+        }
+        if (asyncHistoryExecutor != null && asyncHistoryExecutor.isActive()) {
+            asyncHistoryExecutor.shutdown();
         }
 
         Runnable closeRunnable = processEngineConfiguration.getProcessEngineCloseRunnable();

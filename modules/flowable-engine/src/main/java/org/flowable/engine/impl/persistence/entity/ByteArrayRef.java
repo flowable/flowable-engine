@@ -104,6 +104,20 @@ public class ByteArrayRef implements Serializable {
     public boolean isDeleted() {
         return deleted;
     }
+    
+    /**
+     * This makes a copy of this {@link ByteArrayRef}: a new
+     * {@link ByteArrayRef} instance will be created, however with the same id,
+     * name and {@link ByteArrayEntity} instances.
+     */
+    public ByteArrayRef copy() {
+        ByteArrayRef copy = new ByteArrayRef();
+        copy.id = id;
+        copy.name = name;
+        copy.entity = entity;
+        copy.deleted = deleted;
+        return copy;
+    }
 
     @Override
     public String toString() {

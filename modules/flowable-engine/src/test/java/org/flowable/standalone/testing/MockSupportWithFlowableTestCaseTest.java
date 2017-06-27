@@ -12,8 +12,8 @@
  */
 package org.flowable.standalone.testing;
 
-import org.flowable.engine.test.FlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.flowable.engine.test.FlowableTestCase;
 import org.flowable.engine.test.mock.MockServiceTask;
 import org.flowable.engine.test.mock.MockServiceTasks;
 import org.flowable.engine.test.mock.NoOpServiceTasks;

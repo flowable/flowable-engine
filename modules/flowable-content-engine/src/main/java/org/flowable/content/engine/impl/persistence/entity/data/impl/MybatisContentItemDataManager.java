@@ -21,7 +21,6 @@ import org.flowable.content.engine.impl.persistence.entity.ContentItemEntity;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntityImpl;
 import org.flowable.content.engine.impl.persistence.entity.data.AbstractDataManager;
 import org.flowable.content.engine.impl.persistence.entity.data.ContentItemDataManager;
-import org.flowable.engine.common.impl.Page;
 
 /**
  * @author Tijs Rademakers
@@ -49,9 +48,9 @@ public class MybatisContentItemDataManager extends AbstractDataManager<ContentIt
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl contentItemQuery, Page page) {
+    public List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl contentItemQuery) {
         final String query = "selectContentItemsByQueryCriteria";
-        return getDbSqlSession().selectList(query, contentItemQuery, page);
+        return getDbSqlSession().selectList(query, contentItemQuery);
     }
 
     @Override

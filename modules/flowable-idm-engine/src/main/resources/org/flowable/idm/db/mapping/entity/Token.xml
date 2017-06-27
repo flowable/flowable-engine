@@ -69,11 +69,11 @@
   </select>
   
   <select id="selectTokenByQueryCriteria" parameterType="org.flowable.idm.engine.impl.TokenQueryImpl" resultMap="tokenResultMap">
-  	${limitBefore}
-    select RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectTokenByQueryCriteriaSql" />
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
    <select id="selectTokenCountByQueryCriteria" parameterType="org.flowable.idm.engine.impl.TokenQueryImpl" resultType="long">

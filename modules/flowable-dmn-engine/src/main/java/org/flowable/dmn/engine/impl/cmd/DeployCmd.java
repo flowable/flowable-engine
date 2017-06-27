@@ -22,6 +22,7 @@ import java.util.Map;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DeploymentSettings;
+import org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl;
 import org.flowable.dmn.engine.impl.interceptor.Command;
 import org.flowable.dmn.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
@@ -51,9 +52,9 @@ public class DeployCmd<T> implements Command<DmnDeployment>, Serializable {
 
             List<DmnDeployment> existingDeployments = new ArrayList<DmnDeployment>();
             if (deployment.getTenantId() == null || DmnEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
-                DmnDeploymentEntity existingDeployment = commandContext.getDeploymentEntityManager().findLatestDeploymentByName(deployment.getName());
-                if (existingDeployment != null) {
-                    existingDeployments.add(existingDeployment);
+                List<DmnDeployment> deploymentEntities = new DmnDeploymentQueryImpl(commandContext.getDmnEngineConfiguration().getCommandExecutor()).deploymentName(deployment.getName()).listPage(0, 1);
+                if (!deploymentEntities.isEmpty()) {
+                    existingDeployments.add(deploymentEntities.get(0));
                 }
             } else {
                 List<DmnDeployment> deploymentList = commandContext.getDmnEngineConfiguration().getDmnRepositoryService().createDeploymentQuery()

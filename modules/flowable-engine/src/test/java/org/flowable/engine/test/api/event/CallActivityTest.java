@@ -6,7 +6,9 @@ import java.util.List;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
+import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
@@ -242,6 +244,128 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.PROCESS_COMPLETED, entityEvent.getType());
 
         assertEquals(26, mylistener.getEventsReceived().size());
+    }
+    
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivity.bpmn20.xml" })
+    public void testDeleteParentWhenCallActivityCalledHasNoneEndEvent() throws Exception {
+
+        CallActivityEventListener mylistener = new CallActivityEventListener();
+        processEngineConfiguration.getEventDispatcher().addEventListener(mylistener);
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callActivity");
+        assertNotNull(processInstance);
+
+        // no task should be active in parent process
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNull(task);
+
+        // only active task should be the one defined in the external subprocess
+        task = taskService.createTaskQuery().active().singleResult();
+        assertNotNull(task);
+        assertEquals("User Task2 in External", task.getName());
+
+        ExecutionEntity subprocessInstance = (ExecutionEntity) runtimeService.createExecutionQuery()
+                .rootProcessInstanceId(processInstance.getId())
+                .onlySubProcessExecutions()
+                .singleResult();
+        assertNotNull(subprocessInstance);
+
+        assertEquals("Default name", runtimeService.getVariable(processInstance.getId(), "Name"));
+        assertEquals("Default name", runtimeService.getVariable(subprocessInstance.getId(), "FullName"));
+        
+        runtimeService.deleteProcessInstance(processInstance.getId(), null);  
+
+        FlowableEntityEvent entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(0);
+        assertEquals(FlowableEngineEventType.ENTITY_CREATED, entityEvent.getType());
+        ExecutionEntity executionEntity = (ExecutionEntity) entityEvent.getEntity();
+
+        // this is the root process so parent null
+        assertNull(executionEntity.getParentId());
+        String processExecutionId = executionEntity.getId();
+
+        entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(1);
+        assertEquals(FlowableEngineEventType.ENTITY_CREATED, entityEvent.getType());
+        executionEntity = (ExecutionEntity) entityEvent.getEntity();
+        assertNotNull(executionEntity.getParentId());
+        assertEquals(processExecutionId, executionEntity.getParentId());
+
+        FlowableEvent activitiEvent = mylistener.getEventsReceived().get(2);
+        assertEquals(FlowableEngineEventType.PROCESS_STARTED, activitiEvent.getType());
+
+        FlowableActivityEvent activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(3);
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
+        assertEquals("startEvent", activityEvent.getActivityType());
+
+        activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(4);
+        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
+        assertEquals("startEvent", activityEvent.getActivityType());
+
+        activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(5);
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
+        assertEquals("callActivity1", activityEvent.getActivityId());
+
+        entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(6);
+        assertEquals(FlowableEngineEventType.ENTITY_CREATED, entityEvent.getType());
+        executionEntity = (ExecutionEntity) entityEvent.getEntity();
+        assertNull(executionEntity.getParentId());
+        assertEquals(executionEntity.getId(), executionEntity.getProcessInstanceId());
+
+        // user task within the external subprocess
+        entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(7);
+        assertEquals(FlowableEngineEventType.ENTITY_CREATED, entityEvent.getType());
+        executionEntity = (ExecutionEntity) entityEvent.getEntity();
+        assertEquals("calledtask1", executionEntity.getActivityId());
+
+        // external subprocess
+        activitiEvent = mylistener.getEventsReceived().get(8);
+        assertEquals(FlowableEngineEventType.PROCESS_STARTED, activitiEvent.getType());
+
+        // start event in external subprocess
+        activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(9);
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
+        assertEquals("startEvent", activityEvent.getActivityType());
+        assertEquals("startevent2", activityEvent.getActivityId());
+
+        activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(10);
+        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
+        assertEquals("startEvent", activityEvent.getActivityType());
+        assertEquals("startevent2", activityEvent.getActivityId());
+
+        // user task within external subprocess
+        activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(11);
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
+        assertEquals("calledtask1", activityEvent.getActivityId());
+        assertEquals("userTask", activityEvent.getActivityType());
+
+        entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(12);
+        assertEquals(FlowableEngineEventType.TASK_CREATED, entityEvent.getType());
+        TaskEntity taskEntity = (TaskEntity) entityEvent.getEntity();
+        assertEquals("User Task2 in External", taskEntity.getName());
+
+        // user task within external subprocess cancelled
+        FlowableActivityCancelledEvent activityCancelledEvent = (FlowableActivityCancelledEvent) mylistener.getEventsReceived().get(13);
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityCancelledEvent.getType());       
+        assertEquals("User Task2 in External", activityCancelledEvent.getActivityName());
+        assertEquals("userTask", activityCancelledEvent.getActivityType());
+   
+        // external subprocess cancelled
+        FlowableCancelledEvent processCancelledEvent = (FlowableCancelledEvent) mylistener.getEventsReceived().get(14);
+        assertEquals(FlowableEngineEventType.PROCESS_CANCELLED, processCancelledEvent.getType());       
+        assertEquals(subprocessInstance.getId(), processCancelledEvent.getProcessInstanceId());
+        
+        // expecting cancelled event for Call Activity
+        activityCancelledEvent = (FlowableActivityCancelledEvent) mylistener.getEventsReceived().get(15);
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityCancelledEvent.getType());       
+        assertEquals("callActivity", activityCancelledEvent.getActivityType());
+        
+        // parent process cancelled
+        processCancelledEvent = (FlowableCancelledEvent) mylistener.getEventsReceived().get(16);
+        assertEquals(FlowableEngineEventType.PROCESS_CANCELLED, processCancelledEvent.getType());       
+        assertEquals(processInstance.getId(), processCancelledEvent.getProcessInstanceId());
+
+        assertEquals(17, mylistener.getEventsReceived().size());
     }
 
     @Deployment(resources = {

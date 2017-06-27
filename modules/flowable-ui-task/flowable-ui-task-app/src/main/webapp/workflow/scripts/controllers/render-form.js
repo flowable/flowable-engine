@@ -245,7 +245,7 @@ angular.module('flowableApp')
                 jQuery("#" + $rootScope.activitiFieldIdPrefix + field.id).blur();
             };
 
-            $scope.combineFormVariables = function (processInstanceVariables) {
+            $scope.combineFormVariables = function () {
 
                 var fields = $scope.allFormFields;
                 var localVariables = [];
@@ -257,11 +257,7 @@ angular.module('flowableApp')
                     }
                 }
 
-                if (processInstanceVariables && processInstanceVariables.length > 0) {
-                    $scope.currentAndHistoricFormFields = processInstanceVariables.concat(localVariables);
-                } else {
-                    $scope.currentAndHistoricFormFields = localVariables;
-                }
+                $scope.currentAndHistoricFormFields = localVariables;
             };
 
             /**
@@ -304,6 +300,12 @@ angular.module('flowableApp')
                                 field.value = field.options[j];
                                 break;
                             }
+                        }
+                        
+                    } else if (field.type == 'date' && field.value && !field.readOnly) {
+                        var dateArray = field.value.split('-');
+                        if (dateArray && dateArray.length == 3) {
+                            field.value = new Date(dateArray[0],dateArray[1],dateArray[2]);
                         }
 
                     } else if (field.type == 'upload' && field.value) {
@@ -452,16 +454,8 @@ angular.module('flowableApp')
 
                     if ($scope.model.outcomesOnly !== true) {
 
-                        if ($scope.taskId) {
-                            TaskService.getProcessInstanceVariables($scope.taskId).then(function (instanceVariables) {
-                                $scope.combineFormVariables(instanceVariables);
-                                $scope.model.loading = false;
-                            });
-
-                        } else {
-                            $scope.combineFormVariables(undefined);
-                            $scope.model.loading = false;
-                        }
+                        $scope.combineFormVariables();
+                        $scope.model.loading = false;
                     }
 
                     $scope.model.loading = false;
@@ -474,14 +468,8 @@ angular.module('flowableApp')
                         prepareFormFields($scope.formData); // Prepare the form fields to allow for layouting
 
                         if ($scope.model.outcomesOnly !== true) {
-
+                            $scope.combineFormVariables();
                             $scope.model.loading = false;
-
-                            TaskService.getProcessInstanceVariables($scope.taskId).then(function (instanceVariables) {
-                                $scope.combineFormVariables(instanceVariables);
-
-                                $scope.model.loading = false;
-                            });
 
                         }
 
@@ -496,7 +484,7 @@ angular.module('flowableApp')
                         prepareFormFields($scope.formData);// Prepare the form fields to allow for layouting
                         $scope.model.loading = false;
 
-                        $scope.combineFormVariables(undefined);
+                        $scope.combineFormVariables();
                     });
                 }
             };
@@ -522,6 +510,31 @@ angular.module('flowableApp')
                 } else {
                     return $translate.instant('FORM.DEFAULT-OUTCOME.COMPLETE');
                 }
+            };
+
+            $scope.saveForm = function () {
+
+                $scope.model.loading = true;
+                $scope.model.completeButtonDisabled = true;
+
+                // Prep data
+                var postData = $scope.createPostData();
+                postData.formId = $scope.formData.id;
+
+                 FormService.saveTaskForm($scope.taskId, postData).then(
+                     function (data) {
+                         $rootScope.addAlertPromise($translate('TASK.ALERT.SAVED'));
+                         $scope.model.completeButtonDisabled = false;
+                         $scope.model.loading = false;
+                     },
+                     function (errorResponse) {
+                         $scope.model.completeButtonDisabled = false;
+                         $scope.model.loading = false;
+                         $scope.$emit('task-save-error', {
+                             taskId: $scope.taskId,
+                             error: errorResponse
+                         });
+                     });
             };
 
             $scope.completeForm = function (outcome) {
@@ -653,7 +666,7 @@ angular.module('flowableApp')
                         field.value = false;
                     }
 
-                    if (field && field.type !== 'expression') {
+                    if (field && field.type !== 'expression' && !field.readOnly) {
                         
                         if (field.type === 'dropdown' && field.hasEmptyValue !== null && field.hasEmptyValue !== undefined && field.hasEmptyValue === true) {
 
@@ -667,7 +680,7 @@ angular.module('flowableApp')
                             }
                             
                         } else if (field.type === 'date' && field.value) {
-                        	postData.values[field.id] = field.value.toISOString().slice(0, 10);
+                            postData.values[field.id] = field.value.getFullYear() + '-' + (field.value.getMonth() + 1) + '-' + field.value.getDate();
 
                         } else {
                             postData.values[field.id] = field.value;

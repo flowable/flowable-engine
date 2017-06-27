@@ -19,7 +19,6 @@ import java.util.Set;
 
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.interceptor.CommandExecutor;
@@ -384,10 +383,10 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     }
 
     @SuppressWarnings({ "unchecked" })
-    public List<Execution> executeList(CommandContext commandContext, Page page) {
+    public List<Execution> executeList(CommandContext commandContext) {
         checkQueryOk();
         ensureVariablesInitialized();
-        List<?> executions = commandContext.getExecutionEntityManager().findExecutionsByQueryCriteria(this, page);
+        List<?> executions = commandContext.getExecutionEntityManager().findExecutionsByQueryCriteria(this);
 
         if (Context.getProcessEngineConfiguration().getPerformanceSettings().isEnableLocalization()) {
             for (ExecutionEntity execution : (List<ExecutionEntity>) executions) {

@@ -115,14 +115,14 @@ public class ProcessInstanceHistoryLogQueryImpl implements ProcessInstanceHistor
         // Activities
         if (includeActivities) {
             List<HistoricActivityInstance> activities = commandContext.getHistoricActivityInstanceEntityManager().findHistoricActivityInstancesByQueryCriteria(
-                    new HistoricActivityInstanceQueryImpl(commandExecutor).processInstanceId(processInstanceId), null);
+                    new HistoricActivityInstanceQueryImpl(commandExecutor).processInstanceId(processInstanceId));
             processInstanceHistoryLog.addHistoricData(activities);
         }
 
         // Variables
         if (includeVariables) {
             List<HistoricVariableInstance> variables = commandContext.getHistoricVariableInstanceEntityManager().findHistoricVariableInstancesByQueryCriteria(
-                    new HistoricVariableInstanceQueryImpl(commandExecutor).processInstanceId(processInstanceId), null);
+                    new HistoricVariableInstanceQueryImpl(commandExecutor).processInstanceId(processInstanceId));
 
             // Make sure all variables values are fetched (similar to the HistoricVariableInstance query)
             for (HistoricVariableInstance historicVariableInstance : variables) {
@@ -147,7 +147,7 @@ public class ProcessInstanceHistoryLogQueryImpl implements ProcessInstanceHistor
         // Details: variables
         if (includeVariableUpdates) {
             List<? extends HistoricData> variableUpdates = commandContext.getHistoricDetailEntityManager().findHistoricDetailsByQueryCriteria(
-                    new HistoricDetailQueryImpl(commandExecutor).variableUpdates(), null);
+                    new HistoricDetailQueryImpl(commandExecutor).variableUpdates());
 
             // Make sure all variables values are fetched (similar to the HistoricVariableInstance query)
             for (HistoricData historicData : variableUpdates) {
@@ -161,7 +161,7 @@ public class ProcessInstanceHistoryLogQueryImpl implements ProcessInstanceHistor
         // Details: form properties
         if (includeFormProperties) {
             List<? extends HistoricData> formProperties = commandContext.getHistoricDetailEntityManager().findHistoricDetailsByQueryCriteria(
-                    new HistoricDetailQueryImpl(commandExecutor).formProperties(), null);
+                    new HistoricDetailQueryImpl(commandExecutor).formProperties());
             processInstanceHistoryLog.addHistoricData(formProperties);
         }
 

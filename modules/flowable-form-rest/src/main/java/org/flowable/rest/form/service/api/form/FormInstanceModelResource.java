@@ -14,12 +14,6 @@ package org.flowable.rest.form.service.api.form;
 
 import javax.servlet.http.HttpServletRequest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormService;
@@ -30,6 +24,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Yvo Swillens
@@ -66,6 +67,7 @@ public class FormInstanceModelResource {
                     formRequest.getProcessInstanceId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
+            
         } else if (formRequest.getFormDefinitionKey() != null) {
             formInstanceModel = formService.getFormInstanceModelByKey(
                     formRequest.getFormDefinitionKey(),
@@ -73,6 +75,7 @@ public class FormInstanceModelResource {
                     formRequest.getProcessInstanceId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
+            
         } else if (formRequest.getFormDefinitionId() != null) {
             formInstanceModel = formService.getFormInstanceModelById(
                     formRequest.getFormDefinitionId(),
@@ -80,6 +83,7 @@ public class FormInstanceModelResource {
                     formRequest.getProcessInstanceId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
+            
         } else {
             throw new FlowableIllegalArgumentException("Either parent deployment key, form definition key or form definition id must be provided in the request");
         }

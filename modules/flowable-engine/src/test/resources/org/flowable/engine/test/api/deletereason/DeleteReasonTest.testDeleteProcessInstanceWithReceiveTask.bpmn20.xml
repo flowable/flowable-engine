@@ -19,12 +19,12 @@
       <sequenceFlow id="sid-8FA76628-F787-4977-8307-70DB909E07AE" sourceRef="sid-192F9D4E-FEF8-403F-8A4A-750BC0664F53" targetRef="sid-29105CA7-C242-4075-96AF-33F849394894"/>
     </subProcess>
     <sequenceFlow id="sid-FD4FB00E-31DF-471A-834B-214C42865B61" sourceRef="A" targetRef="sid-D52331D1-9850-479A-B3EE-517A3D630B8F"/>
-    <boundaryEvent id="sid-667AAA94-BFFD-4DF2-8826-94DCAF9A6054" attachedToRef="sid-D52331D1-9850-479A-B3EE-517A3D630B8F" cancelActivity="true">
+    <boundaryEvent id="boundaryTimer" attachedToRef="sid-D52331D1-9850-479A-B3EE-517A3D630B8F" cancelActivity="true">
       <timerEventDefinition>
         <timeDuration>PT10M</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
-    <sequenceFlow id="sid-3DED3235-0C82-4C80-B7EA-F9B61B371473" sourceRef="sid-667AAA94-BFFD-4DF2-8826-94DCAF9A6054" targetRef="D"/>
+    <sequenceFlow id="sid-3DED3235-0C82-4C80-B7EA-F9B61B371473" sourceRef="boundaryTimer" targetRef="D"/>
     <endEvent id="sid-9448C7EE-B0D4-4AF5-8CF2-3AE520DF3E7C"/>
     <sequenceFlow id="sid-FCD10170-7BDC-4AC6-8D91-0BD0C58FC5FB" sourceRef="D" targetRef="sid-9448C7EE-B0D4-4AF5-8CF2-3AE520DF3E7C"/>
     <receiveTask id="D" name="D"/>
@@ -60,7 +60,7 @@
       <bpmndi:BPMNShape bpmnElement="sid-29105CA7-C242-4075-96AF-33F849394894" id="BPMNShape_sid-29105CA7-C242-4075-96AF-33F849394894">
         <omgdc:Bounds height="28.0" width="28.0" x="794.125" y="164.25"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-667AAA94-BFFD-4DF2-8826-94DCAF9A6054" id="BPMNShape_sid-667AAA94-BFFD-4DF2-8826-94DCAF9A6054">
+      <bpmndi:BPMNShape bpmnElement="boundaryTimer" id="BPMNShape_boundaryTimer">
         <omgdc:Bounds height="31.0" width="31.0" x="649.3170123682848" y="292.6085113000464"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="sid-9448C7EE-B0D4-4AF5-8CF2-3AE520DF3E7C" id="BPMNShape_sid-9448C7EE-B0D4-4AF5-8CF2-3AE520DF3E7C">

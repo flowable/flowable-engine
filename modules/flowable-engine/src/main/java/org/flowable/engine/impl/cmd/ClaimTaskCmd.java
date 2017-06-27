@@ -45,13 +45,15 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
             if (task.getAssignee() != null) {
                 if (!task.getAssignee().equals(userId)) {
                     // When the task is already claimed by another user, throw
-                    // exception. Otherwise, ignore
-                    // this, post-conditions of method already met.
+                    // exception. Otherwise, ignore this, post-conditions of method already met.
                     throw new FlowableTaskAlreadyClaimedException(task.getId(), task.getAssignee());
                 }
+                commandContext.getHistoryManager().recordTaskInfoChange(task);
+                
             } else {
                 commandContext.getTaskEntityManager().changeTaskAssignee(task, userId);
             }
+            
         } else {
             // Task claim time should be null
             task.setClaimTime(null);
@@ -59,9 +61,6 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
             // Task should be assigned to no one
             commandContext.getTaskEntityManager().changeTaskAssignee(task, null);
         }
-
-        // Add claim time to historic task instance
-        commandContext.getHistoryManager().recordTaskClaim(task);
 
         return null;
     }

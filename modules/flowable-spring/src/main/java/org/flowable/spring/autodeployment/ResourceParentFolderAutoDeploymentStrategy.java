@@ -13,11 +13,6 @@
 
 package org.flowable.spring.autodeployment;
 
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.repository.DeploymentBuilder;
-import org.springframework.core.io.Resource;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,6 +20,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.zip.ZipInputStream;
+
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.repository.DeploymentBuilder;
+import org.springframework.core.io.Resource;
 
 /**
  * Implementation of {@link AutoDeploymentStrategy} that performs a separate deployment for each set of {@link Resource}s that share the same parent folder. The namehint is used to prefix the names of

@@ -14,14 +14,22 @@ package org.flowable.engine.impl.bpmn.parser.handler;
 
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.EventSubProcess;
+import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 
 /**
  * @author Joram Barrez
  */
-public class EventSubProcessParseHandler extends SubProcessParseHandler {
+public class EventSubProcessParseHandler extends AbstractActivityBpmnParseHandler<EventSubProcess> {
 
     protected Class<? extends BaseElement> getHandledType() {
         return EventSubProcess.class;
+    }
+
+    @Override
+    protected void executeParse(BpmnParse bpmnParse, EventSubProcess eventSubProcess) {
+        eventSubProcess.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubprocessActivityBehavior(eventSubProcess));
+        bpmnParse.processFlowElements(eventSubProcess.getFlowElements());
+        processArtifacts(bpmnParse, eventSubProcess.getArtifacts());
     }
 
 }

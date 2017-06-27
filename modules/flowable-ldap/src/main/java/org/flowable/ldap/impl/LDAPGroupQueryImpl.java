@@ -22,7 +22,6 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.engine.impl.GroupQueryImpl;
 import org.flowable.idm.engine.impl.interceptor.CommandContext;
@@ -51,7 +50,7 @@ public class LDAPGroupQueryImpl extends GroupQueryImpl {
     }
 
     @Override
-    public List<Group> executeList(CommandContext commandContext, Page page) {
+    public List<Group> executeList(CommandContext commandContext) {
         return executeQuery();
     }
 

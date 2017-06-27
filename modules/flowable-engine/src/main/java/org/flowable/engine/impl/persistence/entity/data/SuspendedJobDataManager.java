@@ -14,7 +14,6 @@ package org.flowable.engine.impl.persistence.entity.data;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.SuspendedJobQueryImpl;
 import org.flowable.engine.impl.persistence.entity.SuspendedJobEntity;
@@ -29,7 +28,7 @@ public interface SuspendedJobDataManager extends DataManager<SuspendedJobEntity>
 
     List<SuspendedJobEntity> findJobsByProcessInstanceId(String processInstanceId);
 
-    List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery, Page page);
+    List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery);
 
     long findJobCountByQueryCriteria(SuspendedJobQueryImpl jobQuery);
 

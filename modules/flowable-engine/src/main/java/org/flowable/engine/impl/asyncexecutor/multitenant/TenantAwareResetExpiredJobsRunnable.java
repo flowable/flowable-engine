@@ -25,7 +25,7 @@ public class TenantAwareResetExpiredJobsRunnable extends ResetExpiredJobsRunnabl
     protected String tenantId;
 
     public TenantAwareResetExpiredJobsRunnable(final AsyncExecutor asyncExecutor, TenantInfoHolder tenantInfoHolder, String tenantId) {
-        super(asyncExecutor);
+        super("flowable-tenant-" + tenantId + "-reset-expired-jobs", asyncExecutor, asyncExecutor.getProcessEngineConfiguration().getJobEntityManager());
         this.tenantInfoHolder = tenantInfoHolder;
         this.tenantId = tenantId;
     }

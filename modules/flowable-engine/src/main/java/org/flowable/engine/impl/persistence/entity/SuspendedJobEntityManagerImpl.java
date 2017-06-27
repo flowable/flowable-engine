@@ -15,7 +15,6 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.SuspendedJobQueryImpl;
@@ -51,8 +50,8 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
     }
 
     @Override
-    public List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery, Page page) {
-        return jobDataManager.findJobsByQueryCriteria(jobQuery, page);
+    public List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery) {
+        return jobDataManager.findJobsByQueryCriteria(jobQuery);
     }
 
     @Override
@@ -120,7 +119,7 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
         }
     }
 
-    protected SuspendedJobEntity createSuspendedJob(AbstractJobEntity job) {
+    protected SuspendedJobEntity createSuspendedJob(AbstractRuntimeJobEntity job) {
         SuspendedJobEntity newSuspendedJobEntity = create();
         newSuspendedJobEntity.setJobHandlerConfiguration(job.getJobHandlerConfiguration());
         newSuspendedJobEntity.setJobHandlerType(job.getJobHandlerType());

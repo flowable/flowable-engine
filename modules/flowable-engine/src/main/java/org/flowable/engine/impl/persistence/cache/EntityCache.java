@@ -63,5 +63,4 @@ public interface EntityCache extends Session {
      * Removes the {@link Entity} of the given type with the given id from the cache.
      */
     void cacheRemove(Class<?> entityClass, String entityId);
-
 }

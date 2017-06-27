@@ -15,7 +15,6 @@ package org.flowable.engine.impl.persistence.entity.data;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.ModelQueryImpl;
 import org.flowable.engine.impl.persistence.entity.ModelEntity;
@@ -26,11 +25,11 @@ import org.flowable.engine.repository.Model;
  */
 public interface ModelDataManager extends DataManager<ModelEntity> {
 
-    List<Model> findModelsByQueryCriteria(ModelQueryImpl query, Page page);
+    List<Model> findModelsByQueryCriteria(ModelQueryImpl query);
 
     long findModelCountByQueryCriteria(ModelQueryImpl query);
 
-    List<Model> findModelsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<Model> findModelsByNativeQuery(Map<String, Object> parameterMap);
 
     long findModelCountByNativeQuery(Map<String, Object> parameterMap);
 

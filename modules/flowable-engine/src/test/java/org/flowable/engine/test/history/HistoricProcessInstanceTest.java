@@ -27,6 +27,7 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.history.HistoricIdentityLink;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
@@ -54,6 +55,8 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
 
         processEngineConfiguration.getClock().setCurrentTime(noon);
         final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", "myBusinessKey");
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().unfinished().count());
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().finished().count());
@@ -71,12 +74,13 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
 
         assertEquals(1, tasks.size());
 
-        // in this test scenario we assume that 25 seconds after the process
-        // start, the
+        // in this test scenario we assume that 25 seconds after the process start, the
         // user completes the task (yes! he must be almost as fast as me)
         Date twentyFiveSecsAfterNoon = new Date(noon.getTime() + 25 * 1000);
         processEngineConfiguration.getClock().setCurrentTime(twentyFiveSecsAfterNoon);
         taskService.complete(tasks.get(0).getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
 
@@ -98,6 +102,9 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
 
         // delete process instance should not delete the history
         runtimeService.deleteProcessInstance(processInstance.getId(), "cancel");
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(historicProcessInstance.getEndTime());
     }
@@ -125,6 +132,8 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         hourAgo.add(Calendar.HOUR_OF_DAY, -1);
         Calendar hourFromNow = Calendar.getInstance();
         hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         // Name and name like
         assertEquals("The name", historyService.createHistoricProcessInstanceQuery().processInstanceName("The name").singleResult().getName());
@@ -136,6 +145,9 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
 
         // Query after update name
         runtimeService.setProcessInstanceName(processInstance.getId(), "New name");
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        
         assertEquals("New name", historyService.createHistoricProcessInstanceQuery().processInstanceName("New name").singleResult().getName());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().processInstanceName("New name").count());
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().processInstanceName("The name").count());
@@ -173,6 +185,9 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
 
         // After finishing process
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().finishedBefore(hourAgo.getTime()).count());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().finishedBefore(hourFromNow.getTime()).count());
@@ -196,6 +211,8 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         hourAgo.add(Calendar.HOUR_OF_DAY, -1);
         Calendar hourFromNow = Calendar.getInstance();
         hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         // Name and name like
         assertEquals("The name", historyService.createHistoricProcessInstanceQuery().or().processInstanceName("The name").processDefinitionId("undefined").endOr().singleResult().getName());
@@ -229,6 +246,9 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
 
         // Query after update name
         runtimeService.setProcessInstanceName(processInstance.getId(), "New name");
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        
         assertEquals("New name", historyService.createHistoricProcessInstanceQuery().or().processInstanceName("New name").processDefinitionId("undefined").endOr().singleResult().getName());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().processInstanceName("New name").processDefinitionId("undefined").endOr().count());
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().or().processInstanceName("The name").processDefinitionId("undefined").endOr().count());
@@ -265,6 +285,9 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
 
         // After finishing process
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().finished().processDefinitionId("undefined").endOr().count());
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().or().finishedBefore(hourAgo.getTime()).processDefinitionId("undefined").endOr().count());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().finishedBefore(hourFromNow.getTime()).processDefinitionId("undefined").endOr().count());
@@ -279,6 +302,8 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testHistoricProcessInstanceSorting() {
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().orderByProcessInstanceId().asc().list().size());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().orderByProcessInstanceStartTime().asc().list().size());
@@ -319,6 +344,8 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         for (Task task : taskService.createTaskQuery().processInstanceId(processInstance1.getId()).list()) {
             taskService.complete(task.getId());
         }
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         assertEquals(2, historyService.createHistoricProcessInstanceQuery().orderByProcessInstanceId().asc().list().size());
         assertEquals(2, historyService.createHistoricProcessInstanceQuery().orderByProcessInstanceStartTime().asc().list().size());
@@ -393,10 +420,13 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     // ACT-1098
     public void testDeleteReason() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             final String deleteReason = "some delete reason";
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess");
             runtimeService.deleteProcessInstance(pi.getId(), deleteReason);
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            
             HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().processInstanceId(pi.getId()).singleResult();
             assertEquals(deleteReason, hpi.getDeleteReason());
         }
@@ -404,9 +434,11 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testHistoricIdentityLinksOnProcessInstance() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess");
             runtimeService.addUserIdentityLink(pi.getId(), "kermit", "myType");
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             // Check historic links
             List<HistoricIdentityLink> historicLinks = historyService.getHistoricIdentityLinksForProcessInstance(pi.getId());
@@ -420,11 +452,16 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
             // When process is ended, link should remain
             taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
             assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             assertEquals(1, historyService.getHistoricIdentityLinksForProcessInstance(pi.getId()).size());
 
             // When process is deleted, identitylinks shouldn't exist anymore
             historyService.deleteHistoricProcessInstance(pi.getId());
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            
             assertEquals(0, historyService.getHistoricIdentityLinksForProcessInstance(pi.getId()).size());
         }
     }
@@ -435,16 +472,21 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/history/HistoricProcessInstanceTest.testDeleteHistoricProcessInstanceWithCallActivity.bpmn20.xml",
             "org/flowable/engine/test/history/HistoricProcessInstanceTest.testDeleteHistoricProcessInstanceWithCallActivity-subprocess.bpmn20.xml" })
     public void testDeleteHistoricProcessInstanceWithCallActivity() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
 
             runtimeService.deleteProcessInstance(pi.getId(), "testing");
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             // The parent and child process should be present in history
             assertEquals(2L, historyService.createHistoricProcessInstanceQuery().count());
 
             // Deleting the parent process should cascade the child-process
             historyService.deleteHistoricProcessInstance(pi.getId());
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            
             assertEquals(0L, historyService.createHistoricProcessInstanceQuery().count());
         }
     }
@@ -456,6 +498,8 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         builder.processDefinitionKey("oneTaskProcess");
         builder.name(piName);
         ProcessInstance processInstance1 = builder.start();
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance1.getProcessInstanceId()).singleResult();
         assertEquals(piName, historicProcessInstance.getName());
@@ -478,8 +522,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", vars, tenantId);
         runtimeService.setProcessInstanceName(processInstance.getId(), processInstanceName);
 
-        // Verify name and tenant id (didn't work on mssql and db2) on process
-        // instance
+        // Verify name and tenant id (didn't work on mssql and db2) on process instance
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().includeProcessVariables().list();
         assertEquals(1, processInstances.size());
         processInstance = processInstances.get(0);
@@ -491,15 +534,15 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertEquals(2, processInstanceVars.size());
         assertEquals("Kermit", processInstanceVars.get("name"));
         assertEquals(60, processInstanceVars.get("age"));
+        
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
 
-        // Verify name and tenant id (didn't work on mssql and db2) on historic
-        // process instance
+        // Verify name and tenant id (didn't work on mssql and db2) on historic process instance
         List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().list();
         assertEquals(1, historicProcessInstances.size());
         HistoricProcessInstance historicProcessInstance = historicProcessInstances.get(0);
 
-        // Verify name and tenant id (didn't work on mssql and db2) on process
-        // instance
+        // Verify name and tenant id (didn't work on mssql and db2) on process instance
         assertEquals(processInstanceName, historicProcessInstance.getName());
         assertEquals(tenantId, historicProcessInstance.getTenantId());
 
@@ -507,9 +550,11 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertEquals(2, historicProcessInstanceVars.size());
         assertEquals("Kermit", historicProcessInstanceVars.get("name"));
         assertEquals(60, historicProcessInstanceVars.get("age"));
+        
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
 
         // cleanup
-        repositoryService.deleteDeployment(deploymentId, true);
+        deleteDeployment(deploymentId);
     }
 
 }

@@ -362,6 +362,20 @@ Customizing the configuration of history storage is optional. This allows you to
 ----
 
 
+[[asyncHistoryConfiguration]]
+
+
+=== Async history configuration
+
+[Experimental] Since Flowable 6.1.0 the async history feature has been added. When async history is enabled, the historic data will be persisted by a history job executor, instead of synchronous persistence as part of the runtime execution persistence. 
+See <<asyncHistoryConfig,async history configuration>> for more details.
+
+[source,xml,linenums]
+----
+<property name="asyncHistoryEnabled" value="true" />
+----
+
+
 [[exposingConfigurationBeans]]
 
 

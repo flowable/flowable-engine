@@ -13,7 +13,7 @@
 
 package org.flowable.engine.impl.el;
 
-import javax.el.ExpressionFactory;
+import org.flowable.engine.common.impl.javax.el.ExpressionFactory;
 
 /**
  * Class used to get hold of a {@link ExpressionFactory}.
@@ -23,6 +23,6 @@ import javax.el.ExpressionFactory;
 public abstract class ExpressionFactoryResolver {
 
     public static ExpressionFactory resolveExpressionFactory() {
-        return new de.odysseus.el.ExpressionFactoryImpl();
+        return new org.flowable.engine.common.impl.de.odysseus.el.ExpressionFactoryImpl();
     }
 }

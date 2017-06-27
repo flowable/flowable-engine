@@ -15,7 +15,6 @@ package org.flowable.idm.engine.impl.persistence.entity.data.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.idm.api.User;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.UserQueryImpl;
@@ -44,8 +43,8 @@ public class MybatisUserDataManager extends AbstractDataManager<UserEntity> impl
     }
 
     @SuppressWarnings("unchecked")
-    public List<User> findUserByQueryCriteria(UserQueryImpl query, Page page) {
-        return getDbSqlSession().selectList("selectUserByQueryCriteria", query, page);
+    public List<User> findUserByQueryCriteria(UserQueryImpl query) {
+        return getDbSqlSession().selectList("selectUserByQueryCriteria", query);
     }
 
     public long findUserCountByQueryCriteria(UserQueryImpl query) {
@@ -59,8 +58,8 @@ public class MybatisUserDataManager extends AbstractDataManager<UserEntity> impl
     }
 
     @SuppressWarnings("unchecked")
-    public List<User> findUsersByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return getDbSqlSession().selectListWithRawParameter("selectUserByNativeQuery", parameterMap, firstResult, maxResults);
+    public List<User> findUsersByNativeQuery(Map<String, Object> parameterMap) {
+        return getDbSqlSession().selectListWithRawParameter("selectUserByNativeQuery", parameterMap);
     }
 
     public long findUserCountByNativeQuery(Map<String, Object> parameterMap) {

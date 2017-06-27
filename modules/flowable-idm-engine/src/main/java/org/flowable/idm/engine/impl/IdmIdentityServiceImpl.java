@@ -57,6 +57,7 @@ import org.flowable.idm.engine.impl.cmd.SaveTokenCmd;
 import org.flowable.idm.engine.impl.cmd.SaveUserCmd;
 import org.flowable.idm.engine.impl.cmd.SetUserInfoCmd;
 import org.flowable.idm.engine.impl.cmd.SetUserPictureCmd;
+import org.flowable.idm.engine.impl.cmd.UpdateUserPasswordCmd;
 import org.flowable.idm.engine.impl.persistence.entity.IdentityInfoEntity;
 
 /**
@@ -78,6 +79,10 @@ public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentitySe
 
     public void saveUser(User user) {
         commandExecutor.execute(new SaveUserCmd(user));
+    }
+
+    public void updateUserPassword(User user) {
+        commandExecutor.execute(new UpdateUserPasswordCmd(user));
     }
 
     public UserQuery createUserQuery() {
@@ -211,5 +216,4 @@ public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentitySe
     public List<User> getUsersWithPrivilege(String name) {
         return commandExecutor.execute(new GetUsersWithPrivilegeCmd(name));
     }
-
 }

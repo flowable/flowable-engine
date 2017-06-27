@@ -27,15 +27,6 @@
 package org.flowable.engine.test.api.runtime;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.ExecutionQuery;
-import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.test.Deployment;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,6 +42,8 @@ import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez

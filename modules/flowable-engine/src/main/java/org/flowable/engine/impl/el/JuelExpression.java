@@ -13,13 +13,12 @@
 
 package org.flowable.engine.impl.el;
 
-import javax.el.ELContext;
-import javax.el.ELException;
-import javax.el.MethodNotFoundException;
-import javax.el.PropertyNotFoundException;
-import javax.el.ValueExpression;
-
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.javax.el.ELContext;
+import org.flowable.engine.common.impl.javax.el.ELException;
+import org.flowable.engine.common.impl.javax.el.MethodNotFoundException;
+import org.flowable.engine.common.impl.javax.el.PropertyNotFoundException;
+import org.flowable.engine.common.impl.javax.el.ValueExpression;
 import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.context.Context;

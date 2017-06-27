@@ -17,7 +17,6 @@ import java.util.List;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.engine.impl.ContentItemQueryImpl;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntity;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
@@ -27,7 +26,7 @@ public interface ContentItemDataManager extends DataManager<ContentItemEntity> {
 
     long findContentItemCountByQueryCriteria(ContentItemQueryImpl contentItemQuery);
 
-    List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl contentItemQuery, Page page);
+    List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl contentItemQuery);
 
     void deleteContentItemsByTaskId(String taskId);
 

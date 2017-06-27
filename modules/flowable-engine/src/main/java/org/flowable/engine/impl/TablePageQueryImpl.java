@@ -16,6 +16,7 @@ import java.io.Serializable;
 
 import org.flowable.engine.common.api.management.TablePage;
 import org.flowable.engine.common.api.management.TablePageQuery;
+import org.flowable.engine.common.impl.db.ListQueryParameterObject;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.interceptor.CommandExecutor;
@@ -48,12 +49,12 @@ public class TablePageQueryImpl implements TablePageQuery, Command<TablePage>, S
     }
 
     public TablePageQueryImpl orderAsc(String column) {
-        addOrder(column, AbstractQuery.SORTORDER_ASC);
+        addOrder(column, ListQueryParameterObject.SORTORDER_ASC);
         return this;
     }
 
     public TablePageQueryImpl orderDesc(String column) {
-        addOrder(column, AbstractQuery.SORTORDER_DESC);
+        addOrder(column, ListQueryParameterObject.SORTORDER_DESC);
         return this;
     }
 

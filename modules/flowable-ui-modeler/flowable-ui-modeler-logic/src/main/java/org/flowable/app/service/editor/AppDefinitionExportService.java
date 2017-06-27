@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.web.util.UriUtils;
 
 @Service
 @Transactional
@@ -65,8 +66,9 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
     }
 
     protected void createAppDefinitionZip(HttpServletResponse response, Model appModel, AppDefinitionRepresentation appDefinition) {
-        response.setHeader("Content-Disposition", "attachment; filename=" + appDefinition.getName() + ".zip");
         try {
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + appDefinition.getName() + ".zip\"; filename*=utf-8''" + UriUtils.encode(appDefinition.getName() + ".zip", "utf-8"));
+
             ServletOutputStream servletOutputStream = response.getOutputStream();
             response.setContentType("application/zip");
 
@@ -139,9 +141,10 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
     }
 
     public void createAppDefinitionBar(HttpServletResponse response, Model appModel, AppDefinitionRepresentation appDefinition) {
-        response.setHeader("Content-Disposition", "attachment; filename=" + appDefinition.getName() + ".bar");
 
         try {
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + appDefinition.getName() + ".bar\"; filename*=utf-8''" + UriUtils.encode(appDefinition.getName() + ".bar", "utf-8"));
+
             byte[] deployZipArtifact = createDeployableZipArtifact(appModel, appDefinition.getDefinition());
 
             ServletOutputStream servletOutputStream = response.getOutputStream();

@@ -16,6 +16,7 @@ package org.flowable.engine.test.api.task;
 import java.util.List;
 
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Event;
 import org.flowable.engine.task.IdentityLink;
@@ -72,7 +73,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         assertEquals(1, identityLinks.size());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             List<Event> taskEvents = taskService.getTaskEvents(taskId);
             assertEquals(1, taskEvents.size());
             Event taskEvent = taskEvents.get(0);
@@ -85,7 +86,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         taskService.deleteCandidateGroup(taskId, "muppets");
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             List<Event> taskEvents = taskService.getTaskEvents(taskId);
             Event taskEvent = findTaskEvent(taskEvents, Event.ACTION_DELETE_GROUP_LINK);
             assertEquals(Event.ACTION_DELETE_GROUP_LINK, taskEvent.getAction());

@@ -35,7 +35,7 @@ public class JobMessageListener implements javax.jms.MessageListener {
                 TextMessage textMessage = (TextMessage) message;
                 String jobId = textMessage.getText();
 
-                ExecuteAsyncRunnable executeAsyncRunnable = new ExecuteAsyncRunnable(jobId, processEngineConfiguration);
+                ExecuteAsyncRunnable executeAsyncRunnable = new ExecuteAsyncRunnable(jobId, processEngineConfiguration, processEngineConfiguration.getJobEntityManager(), null);
                 executeAsyncRunnable.run();
 
             }

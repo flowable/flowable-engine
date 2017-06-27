@@ -16,7 +16,7 @@ package org.flowable.engine.impl.asyncexecutor.multitenant;
 import org.flowable.engine.impl.asyncexecutor.ExecuteAsyncRunnable;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.multitenant.TenantInfoHolder;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.JobInfo;
 
 /**
  * Extends the default {@link ExecuteAsyncRunnable} by setting the 'tenant' context before executing.
@@ -28,8 +28,8 @@ public class TenantAwareExecuteAsyncRunnable extends ExecuteAsyncRunnable {
     protected TenantInfoHolder tenantInfoHolder;
     protected String tenantId;
 
-    public TenantAwareExecuteAsyncRunnable(Job job, ProcessEngineConfigurationImpl processEngineConfiguration, TenantInfoHolder tenantInfoHolder, String tenantId) {
-        super(job, processEngineConfiguration);
+    public TenantAwareExecuteAsyncRunnable(JobInfo job, ProcessEngineConfigurationImpl processEngineConfiguration, TenantInfoHolder tenantInfoHolder, String tenantId) {
+        super(job, processEngineConfiguration, processEngineConfiguration.getJobEntityManager(), null);
         this.tenantInfoHolder = tenantInfoHolder;
         this.tenantId = tenantId;
     }

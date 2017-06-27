@@ -38,6 +38,9 @@ public class HistoricTaskInstanceUpdateTest extends PluggableFlowableTestCase {
         taskService.saveTask(task);
 
         taskService.complete(task.getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().count());
 
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
@@ -46,8 +49,7 @@ public class HistoricTaskInstanceUpdateTest extends PluggableFlowableTestCase {
         assertEquals("gonzo", historicTaskInstance.getAssignee());
         assertEquals("task", historicTaskInstance.getTaskDefinitionKey());
 
-        // Validate fix of ACT-1923: updating assignee to null should be
-        // reflected in history
+        // Validate fix of ACT-1923: updating assignee to null should be reflected in history
         ProcessInstance secondInstance = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest");
 
         task = taskService.createTaskQuery().singleResult();
@@ -58,6 +60,9 @@ public class HistoricTaskInstanceUpdateTest extends PluggableFlowableTestCase {
         taskService.saveTask(task);
 
         taskService.complete(task.getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().processInstanceId(secondInstance.getId()).count());
 
         historicTaskInstance = historyService.createHistoricTaskInstanceQuery().processInstanceId(secondInstance.getId()).singleResult();

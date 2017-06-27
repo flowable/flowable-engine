@@ -76,9 +76,9 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery, Page page) {
+    public List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery) {
         final String query = "selectJobByQueryCriteria";
-        return getDbSqlSession().selectList(query, jobQuery, page);
+        return getDbSqlSession().selectList(query, jobQuery);
     }
 
     @Override

@@ -13,8 +13,10 @@
 package org.flowable.form.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -54,6 +56,8 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
     private static Logger logger = LoggerFactory.getLogger(GetFormInstanceModelCmd.class);
 
     private static final long serialVersionUID = 1L;
+    
+    protected static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d-M-yyyy");
 
     protected String formInstanceId;
     protected String formDefinitionKey;
@@ -121,9 +125,11 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
         List<FormField> allFields = formInstanceModel.listAllFields();
         if (allFields != null) {
 
-            Map<String, JsonNode> formInstanceFieldMap = fillPreviousFormValues(formInstance, formEngineConfiguration);
-            fillFormInstanceValues(formInstanceModel, formInstance, formInstanceFieldMap, formEngineConfiguration.getObjectMapper());
-            fillVariablesWithFormValues(formInstanceFieldMap, allFields);
+            Map<String, JsonNode> formInstanceFieldMap = new HashMap<String, JsonNode>();
+            if (formInstance != null) {
+                fillFormInstanceValues(formInstanceModel, formInstance, formInstanceFieldMap, formEngineConfiguration.getObjectMapper());
+                fillVariablesWithFormValues(formInstanceFieldMap, allFields);
+            }
 
             for (FormField field : allFields) {
                 if (field instanceof ExpressionFormField) {
@@ -149,7 +155,17 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
                     }
 
                 } else {
-                    field.setValue(variables.get(field.getId()));
+                    Object variableValue = variables.get(field.getId());
+                    if (variableValue != null) {
+                        
+                        if (variableValue instanceof LocalDate) {
+                            field.setValue(((LocalDate) variableValue).toString("d-M-yyyy"));
+                        } else if (variableValue instanceof Date) {
+                            field.setValue((DATE_FORMAT.format((Date) variableValue)));
+                        } else {
+                            field.setValue(variableValue);
+                        }
+                    }
                 }
 
                 field.setReadOnly(true);
@@ -229,83 +245,20 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
 
         } else if (taskId != null) {
             formInstanceQuery.taskId(taskId);
-
-        } else {
+            
+        } else if (processInstanceId != null) {
             formInstanceQuery.processInstanceId(processInstanceId);
-        }
-
-        List<FormInstance> formInstances = formInstanceQuery.list();
-
-        if (formInstances.size() == 0) {
-            throw new FlowableException("No form instance could be found");
-        }
-
-        FormInstance formInstance = null;
-        if (formInstanceId != null) {
-            formInstance = formInstances.get(0);
-
-        } else if (taskId != null) {
-            if (formInstances.size() > 1) {
-                throw new FlowableException("Multiple form instances are found for the same task");
-            }
-
-            formInstance = formInstances.get(0);
-
+        
         } else {
-            for (FormInstance formInstanceEntity : formInstances) {
-                if (formInstanceEntity.getTaskId() == null) {
-                    formInstance = formInstanceEntity;
-                    break;
-                }
-            }
+            return null;
         }
 
-        if (formInstance == null) {
-            throw new FlowableException("No form instance could be found");
+        List<FormInstance> formInstances = formInstanceQuery.orderBySubmittedDate().asc().list();
+        if (!formInstances.isEmpty()) {
+            return formInstances.get(0);
         }
 
-        return formInstance;
-    }
-
-    protected Map<String, JsonNode> fillPreviousFormValues(FormInstance formInstance, FormEngineConfiguration formEngineConfiguration) {
-        Map<String, JsonNode> formInstancesMap = new HashMap<String, JsonNode>();
-        if (taskId != null && processInstanceId != null) {
-            List<FormInstance> formInstances = formEngineConfiguration.getFormService().createFormInstanceQuery()
-                    .processInstanceId(processInstanceId)
-                    .submittedDateBefore(formInstance.getSubmittedDate())
-                    .orderBySubmittedDate()
-                    .desc()
-                    .list();
-
-            for (FormInstance otherFormInstance : formInstances) {
-                if (otherFormInstance.getId().equals(formInstance.getId())) {
-                    continue;
-                }
-
-                try {
-                    JsonNode submittedNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
-                    if (submittedNode == null || submittedNode.get("values") != null) {
-                        continue;
-                    }
-
-                    JsonNode valuesNode = submittedNode.get("values");
-                    Iterator<String> fieldIdIterator = valuesNode.fieldNames();
-                    while (fieldIdIterator.hasNext()) {
-                        String fieldId = fieldIdIterator.next();
-                        if (!formInstancesMap.containsKey(fieldId)) {
-
-                            JsonNode valueNode = valuesNode.get(fieldId);
-                            formInstancesMap.put(fieldId, valueNode);
-                        }
-                    }
-
-                } catch (Exception e) {
-                    throw new FlowableException("Error parsing form instance " + formInstance.getId());
-                }
-            }
-        }
-
-        return formInstancesMap;
+        return null;
     }
 
     protected void fillFormInstanceValues(FormInstanceModel formInstanceModel, FormInstance formInstance,
@@ -380,12 +333,14 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
         formInstanceModel.setKey(formDefinitionEntity.getKey());
         formInstanceModel.setTenantId(formDefinitionEntity.getTenantId());
 
-        formInstanceModel.setFormInstanceId(formInstance.getId());
-        formInstanceModel.setTaskId(formInstance.getTaskId());
-        formInstanceModel.setProcessInstanceId(formInstance.getProcessInstanceId());
-        formInstanceModel.setProcessDefinitionId(formInstance.getProcessDefinitionId());
-        formInstanceModel.setSubmittedBy(formInstance.getSubmittedBy());
-        formInstanceModel.setSubmittedDate(formInstance.getSubmittedDate());
+        if (formInstance != null) {
+            formInstanceModel.setFormInstanceId(formInstance.getId());
+            formInstanceModel.setTaskId(formInstance.getTaskId());
+            formInstanceModel.setProcessInstanceId(formInstance.getProcessInstanceId());
+            formInstanceModel.setProcessDefinitionId(formInstance.getProcessDefinitionId());
+            formInstanceModel.setSubmittedBy(formInstance.getSubmittedBy());
+            formInstanceModel.setSubmittedDate(formInstance.getSubmittedDate());
+        }
 
         return formInstanceModel;
     }

@@ -60,15 +60,19 @@ This means that usages of _ActivityImpl_, _ProcessDefinitionImpl_, _ExecutionImp
 
 Most of the usage of these classes in v5 came down to getting information that was contained in the process definition. In V6, all the process definition information can be found through the _BpmnModel_, which is a Java representation of the BPMN 2.0 XML of the process definition (enhanced to make certain operations and searches easier).
 
-The quickest way to get the _BpmnModel_ for a process definition is to use the org.flowable.engine.impl.util.ProcessDefinitionUtil class:
+The quickest way to get the _BpmnModel_ for a process definition is to use the org.flowable.engine.RepositoryService service:
 
 ----
-// The whole model
-ProcessDefinitionUtil.getBpmnModel(String processDefinitionId);
-
-// Only the specific process definition
-ProcessDefinitionUtil.getProcess(String processDefinitionId);
+BpmnModel bpmnModel = repositoryService.getBpmnModel(myProcessDefinitionId);
 ----
+
+To get the _RepositoryService_ a JavaDelegate or ActivityBehavior implementation class, use the org.flowable.engine.impl.context.Context class:
+
+----
+RepositoryService repositoryService = Context.getProcessEngineConfiguration().getRepositoryService();
+----
+
+(Note that this only works when a context is active, like in a JavaDelegate or ActivityBehavior)
 
 === ActivityExecution is replaced by DelegateExecution
 

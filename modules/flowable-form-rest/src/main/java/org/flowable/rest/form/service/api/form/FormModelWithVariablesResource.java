@@ -14,11 +14,6 @@ package org.flowable.rest.form.service.api.form;
 
 import javax.servlet.http.HttpServletRequest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormService;
@@ -29,6 +24,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Yvo Swillens
@@ -50,7 +51,7 @@ public class FormModelWithVariablesResource {
             @ApiResponse(code = 404, message = "Indicates the requested form model was not found.")
     })
     @RequestMapping(value = "/form/model", method = RequestMethod.POST, produces = "application/json")
-    public FormModelResponse getRuntimeFormDefinition(@RequestBody FormRequest formRequest, HttpServletRequest request) {
+    public FormModelResponse getFormModel(@RequestBody FormRequest formRequest, HttpServletRequest request) {
 
         FormModel formModel;
 
@@ -59,20 +60,26 @@ public class FormModelWithVariablesResource {
                     formRequest.getParentDeploymentId(),
                     formRequest.getFormDefinitionKey(),
                     formRequest.getProcessInstanceId(),
+                    formRequest.getTaskId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
+            
         } else if (formRequest.getFormDefinitionKey() != null) {
             formModel = formService.getFormModelWithVariablesByKey(
                     formRequest.getFormDefinitionKey(),
                     formRequest.getProcessInstanceId(),
+                    formRequest.getTaskId(),
                     formRequest.getVariables(),
-                    formRequest.getTenantId());
+                    formRequest.getTenantId()); 
+            
         } else if (formRequest.getFormDefinitionId() != null) {
             formModel = formService.getFormModelWithVariablesById(
                     formRequest.getFormDefinitionId(),
                     formRequest.getProcessInstanceId(),
+                    formRequest.getTaskId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
+            
         } else {
             throw new FlowableIllegalArgumentException("Either parent deployment key, form definition key or form definition id must be provided in the request");
         }

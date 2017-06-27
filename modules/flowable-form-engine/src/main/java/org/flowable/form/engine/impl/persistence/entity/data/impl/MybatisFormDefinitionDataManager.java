@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.FormDefinitionQueryImpl;
@@ -82,8 +81,8 @@ public class MybatisFormDefinitionDataManager extends AbstractDataManager<FormDe
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<FormDefinition> findFormDefinitionsByQueryCriteria(FormDefinitionQueryImpl formQuery, Page page) {
-        return getDbSqlSession().selectList("selectFormDefinitionsByQueryCriteria", formQuery, page);
+    public List<FormDefinition> findFormDefinitionsByQueryCriteria(FormDefinitionQueryImpl formQuery) {
+        return getDbSqlSession().selectList("selectFormDefinitionsByQueryCriteria", formQuery);
     }
 
     @Override
@@ -140,8 +139,8 @@ public class MybatisFormDefinitionDataManager extends AbstractDataManager<FormDe
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<FormDefinition> findFormDefinitionsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return getDbSqlSession().selectListWithRawParameter("selectFormDefinitionByNativeQuery", parameterMap, firstResult, maxResults);
+    public List<FormDefinition> findFormDefinitionsByNativeQuery(Map<String, Object> parameterMap) {
+        return getDbSqlSession().selectListWithRawParameter("selectFormDefinitionByNativeQuery", parameterMap);
     }
 
     @Override

@@ -197,11 +197,11 @@
   </select>
 
   <select id="selectHistoricDetailsByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricDetailQueryImpl" resultMap="historicDetailResultMap">
-  	${limitBefore}
-    select RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectHistoricDetailsByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
   <select id="selectHistoricDetailCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricDetailQueryImpl" resultType="long">

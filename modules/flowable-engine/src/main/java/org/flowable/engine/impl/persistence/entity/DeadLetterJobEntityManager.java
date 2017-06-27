@@ -33,7 +33,7 @@ public interface DeadLetterJobEntityManager extends EntityManager<DeadLetterJobE
     /**
      * Executes a {@link JobQueryImpl} and returns the matching {@link DeadLetterJobEntity} instances.
      */
-    List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery, Page page);
+    List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery);
 
     /**
      * Same as {@link #findJobsByQueryCriteria(DeadLetterJobQueryImpl, Page)}, but only returns a count and not the instances itself.

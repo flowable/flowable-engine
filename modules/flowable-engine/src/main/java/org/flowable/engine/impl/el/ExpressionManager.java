@@ -15,8 +15,7 @@ package org.flowable.engine.impl.el;
 import java.util.List;
 import java.util.Map;
 
-import javax.el.ELContext;
-
+import org.flowable.engine.common.impl.javax.el.ELContext;
 import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.delegate.VariableScope;

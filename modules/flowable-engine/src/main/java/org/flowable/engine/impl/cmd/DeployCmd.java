@@ -24,6 +24,7 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.DeploymentQueryImpl;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
@@ -75,9 +76,9 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
             List<Deployment> existingDeployments = new ArrayList<Deployment>();
             if (deployment.getTenantId() == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
-                DeploymentEntity existingDeployment = commandContext.getDeploymentEntityManager().findLatestDeploymentByName(deployment.getName());
-                if (existingDeployment != null) {
-                    existingDeployments.add(existingDeployment);
+                List<Deployment> deploymentEntities = new DeploymentQueryImpl(commandContext.getProcessEngineConfiguration().getCommandExecutor()).deploymentName(deployment.getName()).listPage(0, 1);
+                if (!deploymentEntities.isEmpty()) {
+                    existingDeployments.add(deploymentEntities.get(0));
                 }
             } else {
                 List<Deployment> deploymentList = commandContext.getProcessEngineConfiguration().getRepositoryService().createDeploymentQuery().deploymentName(deployment.getName())

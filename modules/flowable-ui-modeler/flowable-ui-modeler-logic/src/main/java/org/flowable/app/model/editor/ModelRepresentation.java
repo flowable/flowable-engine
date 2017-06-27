@@ -167,5 +167,6 @@ public class ModelRepresentation extends AbstractRepresentation {
     public void updateModel(Model model) {
         model.setDescription(this.description);
         model.setName(this.name);
+        model.setKey(this.key);
     }
 }

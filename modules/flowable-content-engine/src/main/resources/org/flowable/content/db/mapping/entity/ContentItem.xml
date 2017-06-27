@@ -85,11 +85,11 @@
     </select>
 
 	<select id="selectContentItemsByQueryCriteria" parameterType="org.flowable.content.engine.impl.ContentItemQueryImpl" resultMap="contentItemResultMap">
-	  	${limitBefore}
-	    select RES.* ${limitBetween}
+	  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+	    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
 	    <include refid="selectContentItemsByQueryCriteriaSql"/>
 	    ${orderBy}
-	    ${limitAfter}
+	    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 	
 	<select id="selectContentItemCountByQueryCriteria" parameterType="org.flowable.content.engine.impl.ContentItemQueryImpl" resultType="long">
@@ -207,11 +207,11 @@
 	    
 	<!-- mysql specific sql -->
 	<select id="selectContentItemsByQueryCriteria" databaseId="mysql" parameterType="org.flowable.content.engine.impl.persistence.entity.ContentItemEntityImpl" resultMap="contentItemResultMap">
-	  	${limitBefore}
-	    select distinct RES.* ${limitBetween}
+	  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+	    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
 	    <include refid="selectContentItemsByQueryCriteriaSql"/>
 	    ${orderBy}
-	    ${limitAfter}
+	    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
 	</select>
 	
 	<!-- mysql specific sql -->
