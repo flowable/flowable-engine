@@ -276,6 +276,7 @@ angular.module('flowableModeler')
                         newVariable: inputExpression.newVariable,
                         entries: inputExpression.entries
                     };
+                    
                 } else {
                     newInputExpression = {
                         id: _generateColumnId(),
@@ -296,10 +297,11 @@ angular.module('flowableModeler')
                         id: _generateColumnId(),
                         label: outputExpression.label,
                         variableId: outputExpression.variableId,
-                        type: outputExpression.variableType,
+                        type: outputExpression.type,
                         newVariable: outputExpression.newVariable,
                         entries: outputExpression.entries
                     };
+                    
                 } else {
                     newOutputExpression = {
                         id: _generateColumnId(),
@@ -848,6 +850,7 @@ angular.module('flowableModeler')
                 };
 
                 $scope.addNewInputExpression(newInputExpression, $scope.model.selectedColumn + 1);
+                
             } else {
                 $scope.model.selectedExpression.variableId = $scope.popup.selectedExpressionVariableId;
                 $scope.model.selectedExpression.type = $scope.popup.selectedExpressionVariableType;
@@ -950,6 +953,7 @@ angular.module('flowableModeler')
                 },
                 complexExpression:  $scope.model.selectedExpression.complexExpression
             };
+            
         } else {
             $scope.popup = {
                 selectedExpressionLabel: '',
@@ -990,6 +994,7 @@ angular.module('flowableModeler')
                     complexExpression: $scope.popup.complexExpression
                 };
                 $scope.addNewOutputExpression(newOutputExpression, $scope.model.selectedColumn + 1);
+                
             } else {
                 $scope.model.selectedExpression.variableId = $scope.popup.selectedExpressionNewVariableId;
                 $scope.model.selectedExpression.type = $scope.popup.selectedExpressionNewVariableType;
