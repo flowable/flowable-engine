@@ -594,6 +594,7 @@ angular.module('flowableModeler')
                         '<div class="header-add-new-expression">' +
                         '<a onclick="triggerExpressionEditor(\'output\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-plus-sign"></span></a>' +
                         '</div>';
+                        
                 } else {
                     title += '<div class="output-header">' +
                         '<a onclick="triggerExpressionEditor(\'output\',' + expressionPosition + ',false)"><span class="header-label">' + (outputExpression.label ? outputExpression.label : "New Output") + '</span></a>' +
@@ -611,13 +612,18 @@ angular.module('flowableModeler')
                     columnDefinition.source = ['true', 'false', '-'];
                 }
 
-
                 columnDefinition.title = title;
 
                 return columnDefinition;
             };
 
             $scope.evaluateDecisionHeaders = function (decisionTable) {
+            
+                var element = document.querySelector("thead > tr > th:first-of-type > div > a");
+                if (element) {
+                    element.innerHTML = decisionTable.hitIndicator.substring(0, 1);
+                }
+            
                 var columnDefinitions = [];
                 var inputExpressionCounter = 0;
                 if (decisionTable.inputExpressions && decisionTable.inputExpressions.length > 0) {
@@ -632,6 +638,7 @@ angular.module('flowableModeler')
 
                         inputExpressionCounter += 2;
                     });
+                    
                 } else { // create default input expression
                     decisionTable.inputExpressions = [];
                     var inputExpression = createNewInputExpression();
@@ -648,6 +655,7 @@ angular.module('flowableModeler')
                     decisionTable.outputExpressions.forEach(function (outputExpression) {
                         columnDefinitions.push(composeOutputColumnDefinition(outputExpression));
                     });
+                    
                 } else { // create default output expression
                     decisionTable.outputExpressions = [];
                     var outputExpression = createNewOutputExpression();

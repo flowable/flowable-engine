@@ -12,7 +12,7 @@
                             <label>Hit Policy</label>
                         </div>
                         <div ng-if="!model.readOnly"  class="col-xs-8">
-                            <select name="hitPolicy" id="hitPolicy" ng-model="popup.currentHitPolicy">
+                            <select class="form-control" name="hitPolicy" id="hitPolicy" ng-model="popup.currentHitPolicy">
                                 <option ng-selected="{{option.id == popup.currentHitPolicy}}"
                                         ng-repeat="option in popup.availableHitPolicies" value="{{option.id}}">
                                     {{option.label | translate}}
