@@ -12,10 +12,6 @@
  */
 package org.flowable.app.conf;
 
-import java.util.ArrayList;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
@@ -53,6 +49,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import javax.sql.DataSource;
+import java.util.ArrayList;
 
 @Configuration
 @ComponentScan(basePackages = {

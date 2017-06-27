@@ -423,6 +423,8 @@ public class ModelServiceImpl implements ModelService {
             if (!eventLogApiUrl.endsWith("/")) {
                 eventLogApiUrl = eventLogApiUrl.concat("/");
             }
+            eventLogApiUrl = eventLogApiUrl.concat("management/event-log/"+processInstanceId);
+            eventLogApiUrl = eventLogApiUrl.concat("?includeSubProcesses=true");
             return executeHttpGet(eventLogApiUrl, basicAuthUser, basicAuthPassword,
                     new Function<HttpResponse, JsonNode>() {
                         @Override
@@ -431,12 +433,12 @@ public class ModelServiceImpl implements ModelService {
                                 try {
                                     return objectMapper.readTree(response.getEntity().getContent());
                                 } catch (IOException ioe) {
-                                    LOGGER.error("Error calling deploy endpoint", ioe);
+                                    LOGGER.error("Error calling event log endpoint", ioe);
                                     throw new InternalServerErrorException("Error calling deploy endpoint: " + ioe.getMessage());
                                 }
                             } else {
-                                LOGGER.error("Invalid deploy result code: {}", response.getStatusLine());
-                                throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
+                                LOGGER.error("Invalid event log result code: {}", response.getStatusLine());
+                                throw new InternalServerErrorException("Invalid event log result code: " + response.getStatusLine());
                             }
                         }
                     });
@@ -496,6 +498,9 @@ public class ModelServiceImpl implements ModelService {
                                 "runtimeService = Context.getProcessEngineConfiguration().getRuntimeService()\n" +
                                 "subscription= runtimeService.createEventSubscriptionQuery().processInstanceId(processInstanceId)" +
                                 ".eventName(\""+ messageName +"\").singleResult();\n" +
+                                "if (subscription == null) {\n" +
+                                "   throw new RuntimeException('subscription for "+messageName+" was not found');\n" +
+                                "}\n" +
                                 "runtimeService.messageEventReceived(\"" + messageName + "\", subscription.getExecutionId());"
                         ));
                     } catch (IOException e) {
@@ -507,15 +512,31 @@ public class ModelServiceImpl implements ModelService {
                                     eventLogEntry.get("taskId").textValue() + " to user "+ eventLogEntry.get("userId"),
                             "import org.flowable.engine.impl.context.Context;\n" +
                                     "\n" +
-                                    "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();\n" +
+                                    "processInstanceIds = testHelper.getSubProcessInstanceIds(processInstanceId)\n" +
+                                    "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceIdIn(processInstanceIds).singleResult().getId();\n" +
                                     "Context.getProcessEngineConfiguration().getTaskService().claim(taskId, '"+ eventLogEntry.get("userId").textValue() +"');"
+                    ));
+                    break;
+                case "TIMER_FIRED":
+                    nodes.add(createScriptTask(position, "fireAllTimers" + position++, "Fire all timers",
+                            "import org.flowable.engine.impl.context.Context;\n" +
+                                    "\n" +
+                                    "processInstanceIds = testHelper.getSubProcessInstanceIds(processInstanceId)\n" +
+                                    "managementService = Context.getProcessEngineConfiguration().getManagementService();\n" +
+                                    "for( String processInstanceId : processInstanceIds) {\n" +
+                                    "    timers = managementService.createTimerJobQuery().processInstanceId(processInstanceId).timers.list();\n" +
+                                    "    for( org.flowable.engine.runtime.Job timer : timers) {\n" +
+                                    "        managementService.executeJob(timer.getId());\n" +
+                                    "    }" +
+                                    "}\n"
                     ));
                     break;
                 case "TASK_COMPLETED":
                     nodes.add(createScriptTask(position, "completeTask"+position++, "Complete task "+ eventLogEntry.get("taskId").textValue(),
                             "import org.flowable.engine.impl.context.Context;\n" +
                                     "\n" +
-                                    "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();\n" +
+                                    "processInstanceIds = testHelper.getSubProcessInstanceIds(processInstanceId)\n" +
+                                    "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceIdIn(processInstanceIds).singleResult().getId();\n" +
                                     "Context.getProcessEngineConfiguration().getTaskService().complete(taskId);"
                     ));
                     break;

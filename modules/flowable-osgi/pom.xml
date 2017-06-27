@@ -29,7 +29,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
         <executions>
-          <!-- This execution makes sure that the manifest is available when 
+          <!-- This execution makes sure that the manifest is available when
             the tests are executed -->
           <execution>
             <goals>

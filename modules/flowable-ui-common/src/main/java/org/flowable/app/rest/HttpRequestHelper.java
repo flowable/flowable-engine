@@ -23,8 +23,8 @@ import java.nio.charset.Charset;
 public class HttpRequestHelper {
     private static final Logger log = LoggerFactory.getLogger(HttpRequestHelper.class);
 
-    public static <T> T executeHttpGet(String eventLogApiUrl, String basicAuthUser, String basicAuthPassword, Function<HttpResponse, T> handler) {
-        HttpGet httpGet = new HttpGet(eventLogApiUrl);
+    public static <T> T executeHttpGet(String apiUrl, String basicAuthUser, String basicAuthPassword, Function<HttpResponse, T> handler) {
+        HttpGet httpGet = new HttpGet(apiUrl);
         httpGet.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
                 Base64.encodeBase64((basicAuthUser + ":" + basicAuthPassword).getBytes(Charset.forName("UTF-8")))));
 
