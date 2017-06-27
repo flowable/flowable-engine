@@ -53,6 +53,7 @@ public class DbSqlSession extends AbstractNonCachingDbSqlSession {
         FLOWABLE_IDM_VERSIONS.add(new FlowableIdmVersion("0"));
         FLOWABLE_IDM_VERSIONS.add(new FlowableIdmVersion("6.0.0.0"));
         FLOWABLE_IDM_VERSIONS.add(new FlowableIdmVersion("6.0.1.0"));
+        FLOWABLE_IDM_VERSIONS.add(new FlowableIdmVersion("6.1.0.0"));
 
         /* Current */
         FLOWABLE_IDM_VERSIONS.add(new FlowableIdmVersion(IdmEngine.VERSION));

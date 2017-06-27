@@ -123,6 +123,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.0.0.4"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.0.0.5"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.0.1.0"));
+        FLOWABLE_VERSIONS.add(new FlowableVersion("6.1.0.0"));
 
         /* Current */
         FLOWABLE_VERSIONS.add(new FlowableVersion(ProcessEngine.VERSION));
