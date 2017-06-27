@@ -313,12 +313,14 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
         formInstanceModel.setKey(formDefinitionEntity.getKey());
         formInstanceModel.setTenantId(formDefinitionEntity.getTenantId());
 
-        formInstanceModel.setFormInstanceId(formInstance.getId());
-        formInstanceModel.setTaskId(formInstance.getTaskId());
-        formInstanceModel.setProcessInstanceId(formInstance.getProcessInstanceId());
-        formInstanceModel.setProcessDefinitionId(formInstance.getProcessDefinitionId());
-        formInstanceModel.setSubmittedBy(formInstance.getSubmittedBy());
-        formInstanceModel.setSubmittedDate(formInstance.getSubmittedDate());
+        if (formInstance != null) {
+            formInstanceModel.setFormInstanceId(formInstance.getId());
+            formInstanceModel.setTaskId(formInstance.getTaskId());
+            formInstanceModel.setProcessInstanceId(formInstance.getProcessInstanceId());
+            formInstanceModel.setProcessDefinitionId(formInstance.getProcessDefinitionId());
+            formInstanceModel.setSubmittedBy(formInstance.getSubmittedBy());
+            formInstanceModel.setSubmittedDate(formInstance.getSubmittedDate());
+        }
 
         return formInstanceModel;
     }

@@ -771,7 +771,10 @@ angular.module('flowableModeler')
         var createEntriesValues = function (entriesArray) {
             var localCopy = entriesArray.slice(0);
             var entriesArrayOfArrays = [];
-            while (localCopy.length) entriesArrayOfArrays.push(localCopy.splice(0, 1));
+            while (localCopy.length) {
+                entriesArrayOfArrays.push(localCopy.splice(0, 1));
+            }
+            
             return entriesArrayOfArrays;
         };
 
@@ -895,8 +898,12 @@ angular.module('flowableModeler')
         };
 
         var createEntriesValues = function (entriesArray) {
+            var localCopy = entriesArray.slice(0);
             var entriesArrayOfArrays = [];
-            while (entriesArray.length) entriesArrayOfArrays.push(entriesArray.splice(0, 1));
+            while (localCopy.length) {
+                entriesArrayOfArrays.push(localCopy.splice(0, 1));
+            }
+            
             return entriesArrayOfArrays;
         };
 
