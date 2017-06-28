@@ -12,6 +12,11 @@
  */
 package org.flowable.admin.service.engine;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,18 +36,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * Service for invoking Flowable REST services.
  */
 @Service
 public class ProcessInstanceService {
 
-    private final Logger log = LoggerFactory.getLogger(ProcessInstanceService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessInstanceService.class);
 
     public static final String HISTORIC_PROCESS_INSTANCE_URL = "history/historic-process-instances/{0}";
     public static final String HISTORIC_TASK_LIST_URL = "history/historic-task-instances";

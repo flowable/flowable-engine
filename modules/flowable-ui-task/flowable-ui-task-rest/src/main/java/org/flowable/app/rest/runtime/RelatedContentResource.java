@@ -12,6 +12,8 @@
  */
 package org.flowable.app.rest.runtime;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.app.model.common.ResultListDataRepresentation;
@@ -27,15 +29,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Frederik Heremans
  */
 @RestController
 public class RelatedContentResource extends AbstractRelatedContentResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractRelatedContentResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RelatedContentResource.class);
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
@@ -64,7 +64,7 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
         try {
             contentItemJson = objectMapper.writeValueAsString(contentItem);
         } catch (Exception e) {
-            logger.error("Error while processing ContentItem representation json", e);
+            LOGGER.error("Error while processing ContentItem representation json", e);
             throw new InternalServerErrorException("ContentItem on task could not be saved");
         }
 
@@ -97,7 +97,7 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
         try {
             contentItemJson = objectMapper.writeValueAsString(contentItem);
         } catch (Exception e) {
-            logger.error("Error while processing ContentItem representation json", e);
+            LOGGER.error("Error while processing ContentItem representation json", e);
             throw new InternalServerErrorException("ContentItem on process instance could not be saved");
         }
 
@@ -119,7 +119,7 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
         try {
             contentItemJson = objectMapper.writeValueAsString(contentItem);
         } catch (Exception e) {
-            logger.error("Error while processing ContentItem representation json", e);
+            LOGGER.error("Error while processing ContentItem representation json", e);
             throw new InternalServerErrorException("ContentItem could not be saved");
         }
 

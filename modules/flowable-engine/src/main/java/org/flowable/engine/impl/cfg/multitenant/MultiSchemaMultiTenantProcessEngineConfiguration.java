@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEngineConfigurationImpl {
 
-    private static final Logger logger = LoggerFactory.getLogger(MultiSchemaMultiTenantProcessEngineConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MultiSchemaMultiTenantProcessEngineConfiguration.class);
 
     protected TenantInfoHolder tenantInfoHolder;
     protected boolean booted;
@@ -145,7 +145,7 @@ public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEng
     }
 
     protected void createTenantSchema(String tenantId) {
-        logger.info("creating/validating database schema for tenant {}", tenantId);
+        LOGGER.info("creating/validating database schema for tenant {}", tenantId);
         tenantInfoHolder.setCurrentTenantId(tenantId);
         getCommandExecutor().execute(getSchemaCommandConfig(), new ExecuteSchemaOperationCommand(databaseSchemaUpdate));
         tenantInfoHolder.clearCurrentTenantId();

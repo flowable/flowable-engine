@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ProcessExecutionLogger {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProcessExecutionLogger.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessExecutionLogger.class);
 
     protected Map<String, List<DebugInfo>> debugInfoMap = new HashMap<String, List<DebugInfo>>();
 
@@ -118,22 +118,22 @@ public class ProcessExecutionLogger {
 
     public void logDebugInfo(boolean clearAfterLogging) {
 
-        logger.info("--------------------------------");
-        logger.info("CommandInvoker debug information");
-        logger.info("--------------------------------");
+        LOGGER.info("--------------------------------");
+        LOGGER.info("CommandInvoker debug information");
+        LOGGER.info("--------------------------------");
         for (String threadName : debugInfoMap.keySet()) {
 
-            logger.info("");
-            logger.info("Thread '{}':", threadName);
-            logger.info("");
+            LOGGER.info("");
+            LOGGER.info("Thread '{}':", threadName);
+            LOGGER.info("");
 
             for (DebugInfo debugInfo : debugInfoMap.get(threadName)) {
-                debugInfo.printOut(logger);
+                debugInfo.printOut(LOGGER);
             }
 
         }
 
-        logger.info("");
+        LOGGER.info("");
 
         if (clearAfterLogging) {
             clear();

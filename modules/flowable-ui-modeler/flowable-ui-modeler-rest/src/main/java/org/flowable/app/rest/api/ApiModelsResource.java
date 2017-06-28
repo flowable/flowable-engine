@@ -12,6 +12,8 @@
  */
 package org.flowable.app.rest.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.app.domain.editor.Model;
@@ -32,12 +34,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @RestController
 public class ApiModelsResource {
 
-    private final Logger logger = LoggerFactory.getLogger(ApiModelsResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApiModelsResource.class);
 
     @Autowired
     protected FlowableModelQueryService modelQueryService;

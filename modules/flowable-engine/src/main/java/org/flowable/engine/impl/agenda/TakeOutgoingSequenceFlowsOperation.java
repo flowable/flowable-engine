@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
 
-    private static final Logger logger = LoggerFactory.getLogger(TakeOutgoingSequenceFlowsOperation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TakeOutgoingSequenceFlowsOperation.class);
 
     protected boolean evaluateConditions;
 
@@ -128,7 +128,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
     
     protected void leaveFlowNode(FlowNode flowNode) {
 
-        logger.debug("Leaving flow node {} with id '{}' by following it's {} outgoing sequenceflow",
+        LOGGER.debug("Leaving flow node {} with id '{}' by following it's {} outgoing sequenceflow",
                 flowNode.getClass(), flowNode.getId(), flowNode.getOutgoingFlows().size());
 
         // Get default sequence flow (if set)
@@ -172,7 +172,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
         // No outgoing found. Ending the execution
         if (outgoingSequenceFlows.size() == 0) {
             if (flowNode.getOutgoingFlows() == null || flowNode.getOutgoingFlows().size() == 0) {
-                logger.debug("No outgoing sequence flow found for flow node '{}'.", flowNode.getId());
+                LOGGER.debug("No outgoing sequence flow found for flow node '{}'.", flowNode.getId());
                 agenda.planEndExecutionOperation(execution);
 
             } else {

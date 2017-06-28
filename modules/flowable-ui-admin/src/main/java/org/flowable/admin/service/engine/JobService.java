@@ -12,6 +12,10 @@
  */
 package org.flowable.admin.service.engine;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.Map;
 
 import org.apache.http.HttpStatus;
@@ -26,17 +30,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * Service for invoking Flowable REST services.
  */
 @Service
 public class JobService {
 
-    private final Logger log = LoggerFactory.getLogger(JobService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobService.class);
 
     @Autowired
     protected FlowableClientService clientUtil;
@@ -47,14 +47,14 @@ public class JobService {
         if (jobTypeParameter != null && jobTypeParameter.length > 0) {
             jobType = jobTypeParameter[0];
         }
-        
+
         String jobUrl = getJobUrl(jobType);
         URIBuilder builder = null;
         try {
             builder = new URIBuilder(jobUrl);
-            
+
         } catch (Exception e) {
-            log.error("Error building uri", e);
+            LOGGER.error("Error building uri", e);
             throw new FlowableServiceException("Error building uri", e);
         }
 
@@ -87,7 +87,7 @@ public class JobService {
 
         clientUtil.executeRequestNoResponseBody(post, serverConfig, HttpStatus.SC_NO_CONTENT);
     }
-    
+
     public void moveJob(ServerConfig serverConfig, String jobId, String jobType) {
         String jobUrl = getJobUrl(jobType);
         HttpPost post = clientUtil.createPost(jobUrl + jobId, serverConfig);
@@ -103,7 +103,7 @@ public class JobService {
         HttpDelete post = new HttpDelete(clientUtil.getServerUrl(serverConfig, jobUrl + jobId));
         clientUtil.executeRequestNoResponseBody(post, serverConfig, HttpStatus.SC_NO_CONTENT);
     }
-    
+
     protected String getJobUrl(String jobType) {
         String jobUrl = null;
         if ("timerJob".equals(jobType)) {
@@ -115,7 +115,7 @@ public class JobService {
         } else {
             jobUrl = "management/jobs/";
         }
-        
+
         return jobUrl;
     }
 }

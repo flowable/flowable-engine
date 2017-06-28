@@ -1,5 +1,8 @@
 package org.flowable.app.service.editor;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -11,7 +14,6 @@ import java.util.zip.ZipOutputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.domain.editor.AppDefinition;
 import org.flowable.app.domain.editor.AppModelDefinition;
@@ -29,15 +31,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.web.util.UriUtils;
 
 @Service
 @Transactional
 public class AppDefinitionExportService extends BaseAppDefinitionService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AppDefinitionExportService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppDefinitionExportService.class);
 
     protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
 
@@ -135,7 +135,7 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
             servletOutputStream.close();
 
         } catch (Exception e) {
-            logger.error("Could not generate app definition zip archive", e);
+            LOGGER.error("Could not generate app definition zip archive", e);
             throw new InternalServerErrorException("Could not generate app definition zip archive");
         }
     }
@@ -156,7 +156,7 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
             servletOutputStream.close();
 
         } catch (Exception e) {
-            logger.error("Could not generate app definition bar archive", e);
+            LOGGER.error("Could not generate app definition bar archive", e);
             throw new InternalServerErrorException("Could not generate app definition bar archive");
         }
     }
@@ -180,7 +180,7 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
         try {
             modelJson.set("editorJson", objectMapper.readTree(model.getModelEditorJson()));
         } catch (Exception e) {
-            logger.error("Error exporting model json for id {}", model.getId(), e);
+            LOGGER.error("Error exporting model json for id {}", model.getId(), e);
             throw new InternalServerErrorException("Error exporting model json for id " + model.getId());
         }
 
@@ -192,7 +192,7 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
         try {
             appDefinition = objectMapper.readValue(model.getModelEditorJson(), AppDefinition.class);
         } catch (Exception e) {
-            logger.error("Error deserializing app {}", model.getId(), e);
+            LOGGER.error("Error deserializing app {}", model.getId(), e);
             throw new InternalServerErrorException("Could not deserialize app definition");
         }
         AppDefinitionRepresentation result = new AppDefinitionRepresentation(model);

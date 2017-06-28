@@ -12,6 +12,9 @@
  */
 package org.activiti.engine.impl.event.logger.handler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,15 +35,12 @@ import org.flowable.engine.impl.variable.VariableType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Joram Barrez
  */
 public abstract class VariableEventHandler extends AbstractDatabaseEventLoggerEventHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(VariableEventHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VariableEventHandler.class);
 
     public static final String TYPE_BOOLEAN = "boolean";
     public static final String TYPE_STRING = "string";
@@ -148,7 +148,7 @@ public abstract class VariableEventHandler extends AbstractDatabaseEventLoggerEv
                 putInMapIfNotNull(data, Fields.VALUE, value);
             } catch (JsonProcessingException e) {
                 // Nothing to do about it
-                logger.debug("Could not serialize variable value {}", variableEvent.getVariableValue());
+                LOGGER.debug("Could not serialize variable value {}", variableEvent.getVariableValue());
             }
 
         }

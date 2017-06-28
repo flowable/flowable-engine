@@ -12,6 +12,8 @@
  */
 package org.flowable.app.rest.editor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,8 +38,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Tijs Rademakers
  */
@@ -45,7 +45,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RequestMapping("/rest/form-models")
 public class FormsResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(FormsResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FormsResource.class);
 
     private static final int MIN_FILTER_LENGTH = 2;
 

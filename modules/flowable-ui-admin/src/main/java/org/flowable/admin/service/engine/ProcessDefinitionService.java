@@ -12,6 +12,10 @@
  */
 package org.flowable.admin.service.engine;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
@@ -35,17 +39,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * Service for invoking Flowable REST services.
  */
 @Service
 public class ProcessDefinitionService {
 
-    private final Logger log = LoggerFactory.getLogger(ProcessDefinitionService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessDefinitionService.class);
 
     @Autowired
     protected FlowableClientService clientUtil;
@@ -60,7 +60,7 @@ public class ProcessDefinitionService {
         try {
             builder = new URIBuilder("repository/process-definitions");
         } catch (Exception e) {
-            log.error("Error building uri", e);
+            LOGGER.error("Error building uri", e);
             throw new FlowableServiceException("Error building uri", e);
         }
 
@@ -113,18 +113,18 @@ public class ProcessDefinitionService {
                     exception = new FlowableServiceException("An error occurred while calling Flowable: " + response.getStatusLine());
                 }
             } catch (Exception e) {
-                log.warn("Error consuming response from uri {}", request.getURI(), e);
+                LOGGER.warn("Error consuming response from uri {}", request.getURI(), e);
                 exception = clientUtil.wrapException(e, request);
             }
         } catch (Exception e) {
-            log.error("Error executing request to uri {}", request.getURI(), e);
+            LOGGER.error("Error executing request to uri {}", request.getURI(), e);
             exception = clientUtil.wrapException(e, request);
 
         } finally {
             try {
                 client.close();
             } catch (Exception e) {
-                log.warn("Error closing http client instance", e);
+                LOGGER.warn("Error closing http client instance", e);
             }
         }
 

@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
     
-    private static final Logger logger = LoggerFactory.getLogger(TaskEndedHistoryJsonTransformer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskEndedHistoryJsonTransformer.class);
 
     @Override
     public String getType() {

@@ -12,6 +12,8 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,12 +30,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 @RestController
 public class ProcessDefinitionsClientResource extends AbstractClientResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionsClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessDefinitionsClientResource.class);
 
     @Autowired
     protected ProcessDefinitionService clientService;
@@ -43,7 +43,7 @@ public class ProcessDefinitionsClientResource extends AbstractClientResource {
      */
     @RequestMapping(value = "/rest/admin/process-definitions", method = RequestMethod.GET, produces = "application/json")
     public JsonNode listProcessDefinitions(HttpServletRequest request) {
-        logger.debug("REST request to get a list of process definitions");
+        LOGGER.debug("REST request to get a list of process definitions");
 
         JsonNode resultNode = null;
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -53,7 +53,7 @@ public class ProcessDefinitionsClientResource extends AbstractClientResource {
             resultNode = clientService.listProcesDefinitions(serverConfig, parameterMap, true);
 
         } catch (FlowableServiceException e) {
-            logger.error("Error getting process definitions", e);
+            LOGGER.error("Error getting process definitions", e);
             throw new BadRequestException(e.getMessage());
         }
 

@@ -43,7 +43,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  */
 public abstract class AbstractProcessEngineConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractProcessEngineConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractProcessEngineConfiguration.class);
 
     public ProcessEngineFactoryBean springProcessEngineBean(SpringProcessEngineConfiguration configuration) {
         ProcessEngineFactoryBean processEngineFactoryBean = new ProcessEngineFactoryBean();
@@ -84,7 +84,7 @@ public abstract class AbstractProcessEngineConfiguration {
             }
 
             if (result.isEmpty()) {
-                logger.info("No process definitions were found for autodeployment");
+                LOGGER.info("No process definitions were found for autodeployment");
             }
 
             return result;

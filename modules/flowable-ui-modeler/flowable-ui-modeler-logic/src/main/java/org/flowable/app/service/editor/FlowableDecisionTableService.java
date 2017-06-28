@@ -12,6 +12,10 @@
  */
 package org.flowable.app.service.editor;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
@@ -54,10 +58,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * @author erikwinlof
  */
@@ -65,7 +65,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Transactional
 public class FlowableDecisionTableService extends BaseFlowableModelService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FlowableDecisionTableService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowableDecisionTableService.class);
 
     protected static final int MIN_FILTER_LENGTH = 1;
 
@@ -161,7 +161,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
             servletOutputStream.close();
 
         } catch (Exception e) {
-            logger.error("Could not export decision table model", e);
+            LOGGER.error("Could not export decision table model", e);
             throw new InternalServerErrorException("Could not export decision table model");
         }
     }
@@ -196,7 +196,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
                 return new ModelRepresentation(model);
 
             } catch (Exception e) {
-                logger.error("Could not import decision table model", e);
+                LOGGER.error("Could not import decision table model", e);
                 throw new InternalServerErrorException("Could not import decision table model");
             }
         } else {
@@ -250,7 +250,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
         try {
             decisionTableDefinitionRepresentation = objectMapper.readValue(model.getModelEditorJson(), DecisionTableDefinitionRepresentation.class);
         } catch (Exception e) {
-            logger.error("Error deserializing decision table", e);
+            LOGGER.error("Error deserializing decision table", e);
             throw new InternalServerErrorException("Could not deserialize decision table definition");
         }
         DecisionTableRepresentation result = new DecisionTableRepresentation(model);
@@ -277,7 +277,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
         try {
             editorJson = objectMapper.writeValueAsString(saveRepresentation.getDecisionTableRepresentation().getDecisionTableDefinition());
         } catch (Exception e) {
-            logger.error("Error while processing decision table json", e);
+            LOGGER.error("Error while processing decision table json", e);
             throw new InternalServerErrorException("Decision table could not be saved " + decisionTableId);
         }
 

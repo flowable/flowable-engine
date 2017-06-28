@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
 
 public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(AsyncHistoryJobHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncHistoryJobHandler.class);
 
     public static final String JOB_TYPE = "async-history";
 
@@ -105,8 +105,8 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
         String type = historyNode.get(HistoryJsonConstants.TYPE).asText();
         ObjectNode historicalJsonData = (ObjectNode) historyNode.get(HistoryJsonConstants.DATA);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Handling async history job (id={}, type={})", job.getId(), type);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Handling async history job (id={}, type={})", job.getId(), type);
         }
 
         List<HistoryJsonTransformer> transformers = historyJsonTransformers.get(type);
@@ -116,15 +116,15 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
                     transformer.transformJson(job, historicalJsonData, commandContext);
 
                 } else {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Could not handle history job (id={}) for transformer {}. as it is not applicable. Unacquiring. {}", job.getId(), transformer.getType(), historicalJsonData);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Could not handle history job (id={}) for transformer {}. as it is not applicable. Unacquiring. {}", job.getId(), transformer.getType(), historicalJsonData);
                     }
                     throw new AsyncHistoryJobNotApplicableException();
 
                 }
             }
         } else {
-            logger.debug("Cannot transform history json: no transformers found for type {}", type);
+            LOGGER.debug("Cannot transform history json: no transformers found for type {}", type);
         }
     }
 

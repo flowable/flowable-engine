@@ -12,6 +12,15 @@
  */
 package org.flowable.rest.content;
 
+import java.util.EnumSet;
+
+import javax.servlet.DispatcherType;
+import javax.servlet.FilterRegistration;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.ServletRegistration;
+
 import org.flowable.rest.content.conf.ApplicationConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,20 +30,12 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.FilterRegistration;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.ServletRegistration;
-import java.util.EnumSet;
-
 /**
  * Configuration of web application with Servlet 3.0 APIs.
  */
 public class WebConfigurer implements ServletContextListener {
 
-    private final Logger log = LoggerFactory.getLogger(WebConfigurer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebConfigurer.class);
 
     public AnnotationConfigWebApplicationContext context;
 
@@ -46,7 +47,7 @@ public class WebConfigurer implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext servletContext = sce.getServletContext();
 
-        log.debug("Configuring Spring root application context");
+        LOGGER.debug("Configuring Spring root application context");
 
         AnnotationConfigWebApplicationContext rootContext = null;
 
@@ -65,19 +66,19 @@ public class WebConfigurer implements ServletContextListener {
         initSpring(servletContext, rootContext);
         initSpringSecurity(servletContext, disps);
 
-        log.debug("Web application fully configured");
+        LOGGER.debug("Web application fully configured");
     }
 
     /**
      * Initializes Spring and Spring MVC.
      */
     private ServletRegistration.Dynamic initSpring(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
-        log.debug("Configuring Spring Web application context");
+        LOGGER.debug("Configuring Spring Web application context");
         AnnotationConfigWebApplicationContext dispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
         dispatcherServletConfiguration.setParent(rootContext);
         dispatcherServletConfiguration.register(DispatcherServletConfiguration.class);
 
-        log.debug("Registering Spring MVC Servlet");
+        LOGGER.debug("Registering Spring MVC Servlet");
         ServletRegistration.Dynamic dispatcherServlet = servletContext.addServlet("dispatcher", new DispatcherServlet(dispatcherServletConfiguration));
         dispatcherServlet.addMapping("/service/*");
         dispatcherServlet.setLoadOnStartup(1);
@@ -90,7 +91,7 @@ public class WebConfigurer implements ServletContextListener {
      * Initializes Spring Security.
      */
     private void initSpringSecurity(ServletContext servletContext, EnumSet<DispatcherType> disps) {
-        log.debug("Registering Spring Security Filter");
+        LOGGER.debug("Registering Spring Security Filter");
         FilterRegistration.Dynamic springSecurityFilter = servletContext.addFilter("springSecurityFilterChain", new DelegatingFilterProxy());
 
         springSecurityFilter.addMappingForUrlPatterns(disps, false, "/*");
@@ -98,10 +99,10 @@ public class WebConfigurer implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        log.info("Destroying Web application");
+        LOGGER.info("Destroying Web application");
         WebApplicationContext ac = WebApplicationContextUtils.getRequiredWebApplicationContext(sce.getServletContext());
         AnnotationConfigWebApplicationContext gwac = (AnnotationConfigWebApplicationContext) ac;
         gwac.close();
-        log.debug("Web application destroyed");
+        LOGGER.debug("Web application destroyed");
     }
 }

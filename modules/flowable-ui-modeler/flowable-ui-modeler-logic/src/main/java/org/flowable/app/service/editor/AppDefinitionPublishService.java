@@ -52,7 +52,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AppDefinitionPublishService extends BaseAppDefinitionService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AppDefinitionPublishService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppDefinitionPublishService.class);
 
     @Autowired
     protected Environment environment;
@@ -68,7 +68,7 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
         try {
             appDefinition = resolveAppDefinition(appDefinitionModel);
         } catch (Exception e) {
-            logger.error("Error deserializing app {}", appDefinitionModel.getId(), e);
+            LOGGER.error("Error deserializing app {}", appDefinitionModel.getId(), e);
             throw new InternalServerErrorException("Could not deserialize app definition");
         }
 
@@ -111,7 +111,7 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
             sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
             clientBuilder.setSSLSocketFactory(sslsf);
         } catch (Exception e) {
-            logger.error("Could not configure SSL for http client", e);
+            LOGGER.error("Could not configure SSL for http client", e);
             throw new InternalServerErrorException("Could not configure SSL for http client", e);
         }
 
@@ -122,18 +122,18 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
                 return;
             } else {
-                logger.error("Invalid deploy result code: {}", response.getStatusLine());
+                LOGGER.error("Invalid deploy result code: {}", response.getStatusLine());
                 throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
             }
         } catch (IOException ioe) {
-            logger.error("Error calling deploy endpoint", ioe);
+            LOGGER.error("Error calling deploy endpoint", ioe);
             throw new InternalServerErrorException("Error calling deploy endpoint: " + ioe.getMessage());
         } finally {
             if (client != null) {
                 try {
                     client.close();
                 } catch (IOException e) {
-                    logger.warn("Exception while closing http client", e);
+                    LOGGER.warn("Exception while closing http client", e);
                 }
             }
         }

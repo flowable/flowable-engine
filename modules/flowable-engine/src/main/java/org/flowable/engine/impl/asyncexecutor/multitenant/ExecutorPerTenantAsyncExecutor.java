@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExecutorPerTenantAsyncExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorPerTenantAsyncExecutor.class);
 
     protected TenantInfoHolder tenantInfoHolder;
     protected TenantAwareAsyncExecutorFactory tenantAwareAyncExecutorFactory;
@@ -155,7 +155,7 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
     }
 
     protected void shutdownTenantExecutor(String tenantId) {
-        logger.info("Shutting down async executor for tenant {}", tenantId);
+        LOGGER.info("Shutting down async executor for tenant {}", tenantId);
         tenantExecutors.get(tenantId).shutdown();
     }
 

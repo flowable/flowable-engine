@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SendTaskParseHandler extends AbstractActivityBpmnParseHandler<SendTask> {
 
-    private static final Logger logger = LoggerFactory.getLogger(SendTaskParseHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SendTaskParseHandler.class);
 
     public Class<? extends BaseElement> getHandledType() {
         return SendTask.class;
@@ -52,7 +52,7 @@ public class SendTaskParseHandler extends AbstractActivityBpmnParseHandler<SendT
             sendTask.setBehavior(webServiceActivityBehavior);
 
         } else {
-            logger.warn("One of the attributes 'type' or 'operation' is mandatory on sendTask {}", sendTask.getId());
+            LOGGER.warn("One of the attributes 'type' or 'operation' is mandatory on sendTask {}", sendTask.getId());
         }
     }
 

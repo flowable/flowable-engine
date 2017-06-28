@@ -23,6 +23,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 public class ContentDispatcherServletConfiguration extends BaseDispatcherServletConfiguration {
 
-    protected final Logger log = LoggerFactory.getLogger(ContentDispatcherServletConfiguration.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(ContentDispatcherServletConfiguration.class);
 
 }

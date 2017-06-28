@@ -25,12 +25,12 @@ import org.slf4j.LoggerFactory;
 
 public class Main {
 
-    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) throws Exception {
-        logger.info("Booting up v5 Process Engine");
+        LOGGER.info("Booting up v5 Process Engine");
         ProcessEngine processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("v5.cfg.xml").buildProcessEngine();
-        logger.info("Starting test data generation.");
+        LOGGER.info("Starting test data generation.");
         List<String> executedGenerators = new ArrayList<String>();
         Reflections reflections = new Reflections("org.flowable.compatibility.testdata.generator");
         Set<Class<? extends Flowable5TestDataGenerator>> generatorClasses = reflections.getSubTypesOf(Flowable5TestDataGenerator.class);
@@ -40,9 +40,9 @@ public class Main {
             executedGenerators.add(testDataGenerator.getClass().getCanonicalName());
         }
 
-        logger.info("Test data generation completed.");
+        LOGGER.info("Test data generation completed.");
         for (String generatorClass : executedGenerators) {
-            logger.info("Executed test data generator {}", generatorClass);
+            LOGGER.info("Executed test data generator {}", generatorClass);
         }
     }
 

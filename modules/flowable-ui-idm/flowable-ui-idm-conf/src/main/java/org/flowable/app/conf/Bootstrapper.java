@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> {
 
-    private final Logger log = LoggerFactory.getLogger(Bootstrapper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrapper.class);
 
     @Autowired
     private IdmIdentityService identityService;
@@ -60,7 +60,7 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
 
     protected void createDefaultAdmin() {
         if (identityService.createUserQuery().count() == 0) {
-            log.info("No users found, initializing default entities");
+            LOGGER.info("No users found, initializing default entities");
             User user = initializeSuperUser();
             initializeDefaultPrivileges(user.getId());
         }

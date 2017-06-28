@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SpringFlowable5CompatibilityHandlerFactory implements Flowable5CompatibilityHandlerFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(SpringFlowable5CompatibilityHandlerFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringFlowable5CompatibilityHandlerFactory.class);
 
     protected String compatibilityHandlerClassName;
 
@@ -34,7 +34,7 @@ public class SpringFlowable5CompatibilityHandlerFactory implements Flowable5Comp
                 Flowable5CompatibilityHandler handler = (Flowable5CompatibilityHandler) Class.forName(compatibilityHandlerClassName).newInstance();
                 return handler;
             } catch (Exception e) {
-                logger.info("Flowable 5 compatibility handler implementation not found or error during instantiation : {}. Flowable 5 backwards compatibility disabled.",
+                LOGGER.info("Flowable 5 compatibility handler implementation not found or error during instantiation : {}. Flowable 5 backwards compatibility disabled.",
                         e.getMessage());
             }
 

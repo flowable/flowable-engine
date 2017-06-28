@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ScriptTaskParseHandler extends AbstractActivityBpmnParseHandler<ScriptTask> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ScriptTaskParseHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptTaskParseHandler.class);
 
     public Class<? extends BaseElement> getHandledType() {
         return ScriptTask.class;
@@ -35,7 +35,7 @@ public class ScriptTaskParseHandler extends AbstractActivityBpmnParseHandler<Scr
     protected void executeParse(BpmnParse bpmnParse, ScriptTask scriptTask) {
 
         if (StringUtils.isEmpty(scriptTask.getScript())) {
-            logger.warn("No script provided for scriptTask {}", scriptTask.getId());
+            LOGGER.warn("No script provided for scriptTask {}", scriptTask.getId());
         }
 
         ActivityImpl activity = createActivityOnCurrentScope(bpmnParse, scriptTask, BpmnXMLConstants.ELEMENT_TASK_SCRIPT);

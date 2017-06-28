@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultDeploymentCache<T> implements DeploymentCache<T> {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultDeploymentCache.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDeploymentCache.class);
 
     protected Map<String, T> cache;
 
@@ -47,8 +47,8 @@ public class DefaultDeploymentCache<T> implements DeploymentCache<T> {
 
             protected boolean removeEldestEntry(Map.Entry<String, T> eldest) {
                 boolean removeEldest = size() > limit;
-                if (removeEldest && logger.isTraceEnabled()) {
-                    logger.trace("Cache limit is reached, {} will be evicted", eldest.getKey());
+                if (removeEldest && LOGGER.isTraceEnabled()) {
+                    LOGGER.trace("Cache limit is reached, {} will be evicted", eldest.getKey());
                 }
                 return removeEldest;
             }

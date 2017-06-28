@@ -14,6 +14,10 @@ package org.flowable.admin.service.engine;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
@@ -24,16 +28,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
-
 /**
  * Service for invoking Flowable REST services.
  */
 @Service
 public class DecisionTableDeploymentService {
 
-    private final Logger log = LoggerFactory.getLogger(DecisionTableDeploymentService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DecisionTableDeploymentService.class);
 
     @Autowired
     protected FlowableClientService clientUtil;
@@ -44,7 +45,7 @@ public class DecisionTableDeploymentService {
         try {
             builder = new URIBuilder("dmn-repository/deployments");
         } catch (Exception e) {
-            log.error("Error building uri", e);
+            LOGGER.error("Error building uri", e);
             throw new FlowableServiceException("Error building uri", e);
         }
 

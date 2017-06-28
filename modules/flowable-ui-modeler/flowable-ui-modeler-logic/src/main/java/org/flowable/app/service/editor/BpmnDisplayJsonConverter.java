@@ -12,6 +12,11 @@
  */
 package org.flowable.app.service.editor;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -52,15 +57,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 @Component
 public class BpmnDisplayJsonConverter {
 
-    private final Logger log = LoggerFactory.getLogger(BpmnDisplayJsonConverter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BpmnDisplayJsonConverter.class);
 
     protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
 
@@ -93,7 +93,7 @@ public class BpmnDisplayJsonConverter {
                 JsonNode modelNode = objectMapper.readTree(processModel.getModelEditorJson());
                 pojoModel = bpmnJsonConverter.convertToBpmnModel(modelNode);
             } catch (Exception e) {
-                log.error("Error transforming json to pojo {}", processModel.getId(), e);
+                LOGGER.error("Error transforming json to pojo {}", processModel.getId(), e);
             }
         }
 
