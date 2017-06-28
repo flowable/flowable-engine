@@ -102,7 +102,7 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class DmnEngineConfiguration extends AbstractEngineConfiguration {
 
-    protected static final Logger logger = LoggerFactory.getLogger(DmnEngineConfiguration.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(DmnEngineConfiguration.class);
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/dmn/db/mapping/mappings.xml";
 
@@ -327,14 +327,14 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
             Liquibase liquibase = new Liquibase("org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
 
             if (DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
-                logger.debug("Dropping and creating schema DMN");
+                LOGGER.debug("Dropping and creating schema DMN");
                 liquibase.dropAll();
                 liquibase.update("dmn");
             } else if (DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
-                logger.debug("Updating schema DMN");
+                LOGGER.debug("Updating schema DMN");
                 liquibase.update("dmn");
             } else if (DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
-                logger.debug("Validating schema DMN");
+                LOGGER.debug("Validating schema DMN");
                 liquibase.validate();
             }
         } catch (Exception e) {

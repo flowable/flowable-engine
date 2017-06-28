@@ -26,7 +26,7 @@ public abstract class PvmTestCase extends TestCase {
 
     protected static final String EMPTY_LINE = "\n";
 
-    protected static Logger log = LoggerFactory.getLogger(PvmTestCase.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(PvmTestCase.class);
 
     protected boolean isEmptyLinesEnabled = true;
 
@@ -48,11 +48,11 @@ public abstract class PvmTestCase extends TestCase {
 
     @Override
     protected void runTest() throws Throwable {
-        if (log.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             if (isEmptyLinesEnabled) {
-                log.debug(EMPTY_LINE);
+                LOGGER.debug(EMPTY_LINE);
             }
-            log.debug("#### START {}.{} ###########################################################", this.getClass().getSimpleName(), getName());
+            LOGGER.debug("#### START {}.{} ###########################################################", this.getClass().getSimpleName(), getName());
         }
 
         try {
@@ -60,17 +60,17 @@ public abstract class PvmTestCase extends TestCase {
             super.runTest();
 
         } catch (AssertionFailedError e) {
-            log.error(EMPTY_LINE);
-            log.error("ASSERTION FAILED: {}", e, e);
+            LOGGER.error(EMPTY_LINE);
+            LOGGER.error("ASSERTION FAILED: {}", e, e);
             throw e;
 
         } catch (Throwable e) {
-            log.error(EMPTY_LINE);
-            log.error("EXCEPTION: {}", e, e);
+            LOGGER.error(EMPTY_LINE);
+            LOGGER.error("EXCEPTION: {}", e, e);
             throw e;
 
         } finally {
-            log.debug("#### END {}.{} #############################################################", this.getClass().getSimpleName(), getName());
+            LOGGER.debug("#### END {}.{} #############################################################", this.getClass().getSimpleName(), getName());
         }
     }
 

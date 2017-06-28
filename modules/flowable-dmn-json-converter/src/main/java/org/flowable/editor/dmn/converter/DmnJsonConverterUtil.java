@@ -12,6 +12,11 @@
  */
 package org.flowable.editor.dmn.converter;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -23,17 +28,12 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * @author Yvo Swillens
  */
 public class DmnJsonConverterUtil {
 
-    protected static final Logger logger = LoggerFactory.getLogger(DmnJsonConverterUtil.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(DmnJsonConverterUtil.class);
 
     public static String getValueAsString(String name, JsonNode objectNode) {
         String propertyValue = null;

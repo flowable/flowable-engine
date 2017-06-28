@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractEngineConfiguration {
 
-    protected static final Logger logger = LoggerFactory.getLogger(AbstractEngineConfiguration.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractEngineConfiguration.class);
 
     /** The tenant id indicating 'no tenant' */
     public static final String NO_TENANT_ID = "";
@@ -236,13 +236,13 @@ public abstract class AbstractEngineConfiguration {
                     throw new FlowableException("DataSource or JDBC properties have to be specified in a process engine configuration");
                 }
 
-                logger.debug("initializing datasource to db: {}", jdbcUrl);
+                LOGGER.debug("initializing datasource to db: {}", jdbcUrl);
 
-                if (logger.isInfoEnabled()) {
-                    logger.info("Configuring Datasource with following properties (omitted password for security)");
-                    logger.info("datasource driver : {}", jdbcDriver);
-                    logger.info("datasource url : {}", jdbcUrl);
-                    logger.info("datasource user name : {}", jdbcUsername);
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Configuring Datasource with following properties (omitted password for security)");
+                    LOGGER.info("datasource driver : {}", jdbcDriver);
+                    LOGGER.info("datasource url : {}", jdbcUrl);
+                    LOGGER.info("datasource user name : {}", jdbcUsername);
                 }
 
                 PooledDataSource pooledDataSource = new PooledDataSource(this.getClass().getClassLoader(), jdbcDriver, jdbcUrl, jdbcUsername, jdbcPassword);
@@ -290,22 +290,22 @@ public abstract class AbstractEngineConfiguration {
             connection = dataSource.getConnection();
             DatabaseMetaData databaseMetaData = connection.getMetaData();
             String databaseProductName = databaseMetaData.getDatabaseProductName();
-            logger.debug("database product name: '{}'", databaseProductName);
+            LOGGER.debug("database product name: '{}'", databaseProductName);
             databaseType = databaseTypeMappings.getProperty(databaseProductName);
             if (databaseType == null) {
                 throw new FlowableException("couldn't deduct database type from database product name '" + databaseProductName + "'");
             }
-            logger.debug("using database type: {}", databaseType);
+            LOGGER.debug("using database type: {}", databaseType);
 
         } catch (SQLException e) {
-            logger.error("Exception while initializing Database connection", e);
+            LOGGER.error("Exception while initializing Database connection", e);
         } finally {
             try {
                 if (connection != null) {
                     connection.close();
                 }
             } catch (SQLException e) {
-                logger.error("Exception while closing the Database connection", e);
+                LOGGER.error("Exception while closing the Database connection", e);
             }
         }
     }

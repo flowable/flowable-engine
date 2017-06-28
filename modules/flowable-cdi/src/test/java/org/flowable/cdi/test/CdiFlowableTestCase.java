@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
 @RunWith(Arquillian.class)
 public abstract class CdiFlowableTestCase {
 
-    protected Logger logger = LoggerFactory.getLogger(getClass().getName());
+    protected static final Logger LOGGER = LoggerFactory.getLogger(CdiFlowableTestCase.class);
 
     @Deployment
     public static JavaArchive createDeployment() {

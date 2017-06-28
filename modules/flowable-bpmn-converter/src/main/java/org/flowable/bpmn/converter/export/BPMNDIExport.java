@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 public class BPMNDIExport implements BpmnXMLConstants {
     
-    private static final Logger logger = LoggerFactory.getLogger(BPMNDIExport.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BPMNDIExport.class);
 
     public static void writeBPMNDI(BpmnModel model, XMLStreamWriter xtw) throws Exception {
         // BPMN DI information
@@ -99,7 +99,7 @@ public class BPMNDIExport implements BpmnXMLConstants {
 
             //if the element is a child of an collapsed subprocess we don't add its info here.
             if (collapsedSubProcessChildren.get(elementId) != null){
-                logger.debug("{} belongs to collapsed subprocess {}", elementId, collapsedSubProcessChildren.get(elementId));
+                LOGGER.debug("{} belongs to collapsed subprocess {}", elementId, collapsedSubProcessChildren.get(elementId));
                 continue;
             }
       
@@ -113,7 +113,7 @@ public class BPMNDIExport implements BpmnXMLConstants {
         for (String elementId : model.getFlowLocationMap().keySet()) {
 
             if (collapsedSubProcessChildren.get(elementId) != null) {
-                logger.info("{} belongs to collapsed subprocess {}", elementId, collapsedSubProcessChildren.get(elementId));
+                LOGGER.info("{} belongs to collapsed subprocess {}", elementId, collapsedSubProcessChildren.get(elementId));
                 continue;
             }
 

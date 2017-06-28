@@ -27,12 +27,12 @@ import org.slf4j.LoggerFactory;
  */
 public class ExecutionVariableFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExecutionVariableFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionVariableFactory.class);
 
     public static Object getExecutionVariable(String type, Object expressionResult) {
 
         if (type == null || expressionResult == null) {
-            logger.error("could not create result variable: type {} expression result {}", type, expressionResult);
+            LOGGER.error("could not create result variable: type {} expression result {}", type, expressionResult);
             throw new FlowableException("could not create result variable");
         }
 
@@ -64,11 +64,11 @@ public class ExecutionVariableFactory {
                     executionVariable = new DateTime(expressionResult.toString()).toDate();
                 }
             } else {
-                logger.error("could not create result variable: unrecognized mapping type");
+                LOGGER.error("could not create result variable: unrecognized mapping type");
                 throw new FlowableException("could not create result variable: unrecognized mapping type");
             }
         } catch (Exception e) {
-            logger.error("could not create result variable", e);
+            LOGGER.error("could not create result variable", e);
             throw new FlowableException("Could not create execution variable", e);
         }
 
