@@ -61,7 +61,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 })
 public class FlowableEngineConfiguration {
 
-    private final Logger logger = LoggerFactory.getLogger(FlowableEngineConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowableEngineConfiguration.class);
 
     protected static final String PROP_FS_ROOT = "contentstorage.fs.rootFolder";
     protected static final String PROP_FS_CREATE_ROOT = "contentstorage.fs.createRoot";

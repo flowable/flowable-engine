@@ -12,6 +12,8 @@
  */
 package org.flowable.app.service.editor;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,13 +37,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 @Service
 @Transactional
 public class ModelImageService {
 
-    private final Logger log = LoggerFactory.getLogger(ModelImageService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModelImageService.class);
 
     private static float THUMBNAIL_WIDTH = 300f;
 
@@ -64,7 +64,7 @@ public class ModelImageService {
                 return ImageGenerator.createByteArrayForImage(modelImage, "png");
             }
         } catch (Exception e) {
-            log.error("Error creating thumbnail image {}", model.getId(), e);
+            LOGGER.error("Error creating thumbnail image {}", model.getId(), e);
         }
         return null;
     }

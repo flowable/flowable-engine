@@ -31,7 +31,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 public class FlowableEngineConfiguration {
 
-    private final Logger log = LoggerFactory.getLogger(FlowableEngineConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowableEngineConfiguration.class);
 
     @Autowired
     protected DataSource dataSource;

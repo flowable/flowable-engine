@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultFlowableEngineAgenda implements FlowableEngineAgenda {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultFlowableEngineAgenda.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFlowableEngineAgenda.class);
 
     protected CommandContext commandContext;
 
@@ -79,7 +79,7 @@ public class DefaultFlowableEngineAgenda implements FlowableEngineAgenda {
      */
     public void planOperation(Runnable operation, ExecutionEntity executionEntity) {
         operations.add(operation);
-        logger.debug("Operation {} added to agenda", operation.getClass());
+        LOGGER.debug("Operation {} added to agenda", operation.getClass());
 
         if (executionEntity != null) {
             commandContext.addInvolvedExecution(executionEntity);

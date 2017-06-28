@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEntity> implements TimerJobEntityManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(TimerJobEntityManagerImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimerJobEntityManagerImpl.class);
 
     protected TimerJobDataManager jobDataManager;
 

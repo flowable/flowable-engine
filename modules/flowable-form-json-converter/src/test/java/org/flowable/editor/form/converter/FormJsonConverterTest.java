@@ -17,6 +17,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -27,15 +30,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Tijs Rademakers
  */
 public class FormJsonConverterTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(FormJsonConverterTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FormJsonConverterTest.class);
 
     private static final String JSON_RESOURCE_1 = "org/flowable/editor/form/converter/form_1.json";
 

@@ -385,16 +385,16 @@ public class AsyncExecutorTest {
 
     static class CountingAsyncExecutor extends DefaultAsyncJobExecutor {
 
-        private static final Logger logger = LoggerFactory.getLogger(CountingAsyncExecutor.class);
+        private static final Logger LOGGER = LoggerFactory.getLogger(CountingAsyncExecutor.class);
 
         private AtomicInteger counter = new AtomicInteger(0);
 
         @Override
         public boolean executeAsyncJob(JobInfo job) {
-            logger.info("About to execute job {}", job.getId());
+            LOGGER.info("About to execute job {}", job.getId());
             counter.incrementAndGet();
             boolean success = super.executeAsyncJob(job);
-            logger.info("Handed off job {} to async executor (retries={})", job.getId(), job.getRetries());
+            LOGGER.info("Handed off job {} to async executor (retries={})", job.getId(), job.getRetries());
             return success;
         }
 

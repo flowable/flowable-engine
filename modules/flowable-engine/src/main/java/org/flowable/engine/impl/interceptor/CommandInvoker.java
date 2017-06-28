@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CommandInvoker extends AbstractCommandInterceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(CommandInvoker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommandInvoker.class);
 
     @Override
     @SuppressWarnings("unchecked")
@@ -74,8 +74,8 @@ public class CommandInvoker extends AbstractCommandInterceptor {
             // or the operation has an execution and it is not ended
             if (operation.getExecution() == null || !operation.getExecution().isEnded()) {
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Executing operation {} ", operation.getClass());
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Executing operation {} ", operation.getClass());
                 }
 
                 runnable.run();

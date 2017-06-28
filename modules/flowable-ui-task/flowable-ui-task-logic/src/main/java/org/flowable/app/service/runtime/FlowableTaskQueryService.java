@@ -12,6 +12,10 @@
  */
 package org.flowable.app.service.runtime;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -49,10 +53,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-
 /**
  * @author Tijs Rademakers
  */
@@ -60,7 +60,7 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 @Transactional
 public class FlowableTaskQueryService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FlowableTaskQueryService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowableTaskQueryService.class);
 
     private static final String SORT_CREATED_ASC = "created-asc";
     private static final String SORT_CREATED_DESC = "created-desc";
@@ -247,7 +247,7 @@ public class FlowableTaskQueryService {
             taskInfoQueryWrapper.getTaskInfoQuery().taskDueBefore(d);
 
         } catch (Exception e) {
-            logger.error("Error parsing due before date {}, ignoring it", date);
+            LOGGER.error("Error parsing due before date {}, ignoring it", date);
         }
     }
 
@@ -258,7 +258,7 @@ public class FlowableTaskQueryService {
             taskInfoQueryWrapper.getTaskInfoQuery().taskDueAfter(d);
 
         } catch (Exception e) {
-            logger.error("Error parsing due after date {}, ignoring it", date);
+            LOGGER.error("Error parsing due after date {}, ignoring it", date);
         }
     }
 

@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class ResourceFlowableIdmTestCase extends AbstractFlowableIdmTestCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(ResourceFlowableIdmTestCase.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResourceFlowableIdmTestCase.class);
 
     protected String idmConfigurationResource;
     protected String idmEngineName;
@@ -49,7 +49,7 @@ public abstract class ResourceFlowableIdmTestCase extends AbstractFlowableIdmTes
     protected void initializeIdmEngine() {
         IdmEngineConfiguration config = IdmEngineConfiguration.createIdmEngineConfigurationFromResource(idmConfigurationResource);
         if (idmEngineName != null) {
-            logger.info("Initializing idm engine with name '{}'", idmEngineName);
+            LOGGER.info("Initializing idm engine with name '{}'", idmEngineName);
             config.setEngineName(idmEngineName);
         }
         additionalConfiguration(config);

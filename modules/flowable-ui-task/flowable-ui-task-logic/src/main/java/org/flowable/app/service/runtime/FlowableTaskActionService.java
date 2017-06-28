@@ -12,6 +12,8 @@
  */
 package org.flowable.app.service.runtime;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,8 +36,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * @author Tijs Rademakers
  */
@@ -43,7 +43,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Transactional
 public class FlowableTaskActionService extends FlowableAbstractTaskService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FlowableTaskActionService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowableTaskActionService.class);
 
     public void completeTask(String taskId) {
         User currentUser = SecurityUtils.getCurrentUserObject();
@@ -62,7 +62,7 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
         try {
             taskService.complete(task.getId());
         } catch (FlowableException e) {
-            logger.error("Error completing task {}", taskId, e);
+            LOGGER.error("Error completing task {}", taskId, e);
             throw new BadRequestException("Task " + taskId + " can't be completed", e);
         }
     }

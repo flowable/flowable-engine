@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JobMessageListener implements javax.jms.MessageListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(JobMessageListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobMessageListener.class);
 
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
@@ -40,7 +40,7 @@ public class JobMessageListener implements javax.jms.MessageListener {
 
             }
         } catch (Exception e) {
-            logger.error("Exception when handling message from job queue", e);
+            LOGGER.error("Exception when handling message from job queue", e);
         }
     }
 

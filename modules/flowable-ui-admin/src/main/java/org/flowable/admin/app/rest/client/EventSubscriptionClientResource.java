@@ -12,6 +12,9 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.EventSubscriptionService;
@@ -28,16 +31,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * REST controller for managing an event subscription.
  */
 @RestController
 public class EventSubscriptionClientResource extends AbstractClientResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(EventSubscriptionClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventSubscriptionClientResource.class);
 
     @Autowired
     protected EventSubscriptionService eventSubscriptionService;
@@ -53,7 +53,7 @@ public class EventSubscriptionClientResource extends AbstractClientResource {
             return eventSubscriptionService.getEventSubscription(serverConfig, eventSubscriptionId);
 
         } catch (FlowableServiceException e) {
-            logger.error("Error getting event subscription {}", eventSubscriptionId, e);
+            LOGGER.error("Error getting event subscription {}", eventSubscriptionId, e);
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -75,7 +75,7 @@ public class EventSubscriptionClientResource extends AbstractClientResource {
                         eventBody.get("executionId").asText());
 
             } catch (FlowableServiceException e) {
-                logger.error("Error triggering execution event for event subscription {}", eventSubscriptionId, e);
+                LOGGER.error("Error triggering execution event for event subscription {}", eventSubscriptionId, e);
                 throw new BadRequestException(e.getMessage());
             }
 
@@ -88,7 +88,7 @@ public class EventSubscriptionClientResource extends AbstractClientResource {
                 eventSubscriptionService.triggerMessageEvent(serverConfig, eventName, tenantId);
 
             } catch (FlowableServiceException e) {
-                logger.error("Error triggering message event for event subscription {}", eventSubscriptionId, e);
+                LOGGER.error("Error triggering message event for event subscription {}", eventSubscriptionId, e);
                 throw new BadRequestException(e.getMessage());
             }
 
@@ -97,7 +97,7 @@ public class EventSubscriptionClientResource extends AbstractClientResource {
                 eventSubscriptionService.triggerSignalEvent(serverConfig, eventName);
 
             } catch (FlowableServiceException e) {
-                logger.error("Error triggering signal event for event subscription {}", eventSubscriptionId, e);
+                LOGGER.error("Error triggering signal event for event subscription {}", eventSubscriptionId, e);
                 throw new BadRequestException(e.getMessage());
             }
 

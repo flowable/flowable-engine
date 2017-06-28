@@ -12,6 +12,8 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,8 +30,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 /**
  * @author Yvo Swillens
  */
@@ -37,7 +37,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RequestMapping("/rest/admin/decision-table-deployments")
 public class DecisionTableDeploymentsClientResource extends AbstractClientResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(DecisionTableDeploymentsClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DecisionTableDeploymentsClientResource.class);
 
     @Autowired
     protected DecisionTableDeploymentService clientService;
@@ -47,7 +47,7 @@ public class DecisionTableDeploymentsClientResource extends AbstractClientResour
      */
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
     public JsonNode listDeployments(HttpServletRequest request) {
-        logger.debug("REST request to get a list of decision table deployments");
+        LOGGER.debug("REST request to get a list of decision table deployments");
 
         JsonNode resultNode = null;
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
@@ -57,7 +57,7 @@ public class DecisionTableDeploymentsClientResource extends AbstractClientResour
             resultNode = clientService.listDeployments(serverConfig, parameterMap);
 
         } catch (FlowableServiceException e) {
-            logger.error("Error getting deployments", e);
+            LOGGER.error("Error getting deployments", e);
             throw new BadRequestException(e.getMessage());
         }
 

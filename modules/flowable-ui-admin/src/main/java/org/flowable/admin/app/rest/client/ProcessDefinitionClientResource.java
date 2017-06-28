@@ -12,6 +12,10 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.Collections;
 
 import org.flowable.admin.domain.EndpointType;
@@ -30,17 +34,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * REST controller for managing the current user's account.
  */
 @RestController
 public class ProcessDefinitionClientResource extends AbstractClientResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(ModelsClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModelsClientResource.class);
 
     @Autowired
     protected ProcessDefinitionService clientService;
@@ -63,7 +63,7 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
         try {
             return clientService.getProcessDefinition(serverConfig, definitionId);
         } catch (FlowableServiceException e) {
-            logger.error("Error getting process definition {}", definitionId, e);
+            LOGGER.error("Error getting process definition {}", definitionId, e);
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -81,12 +81,12 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
                 }
                 return clientService.updateProcessDefinitionCategory(serverConfig, definitionId, category);
             } catch (FlowableServiceException e) {
-                logger.error("Error updating process definition category {}", definitionId, e);
+                LOGGER.error("Error updating process definition category {}", definitionId, e);
                 throw new BadRequestException(e.getMessage());
             }
 
         } else {
-            logger.error("No required category found in request body");
+            LOGGER.error("No required category found in request body");
             throw new BadRequestException("Category is required in body");
         }
     }
@@ -100,7 +100,7 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
             return processInstanceService.listProcesInstancesForProcessDefinition(bodyNode, serverConfig);
 
         } catch (FlowableServiceException e) {
-            logger.error("Error getting process instances for process definition {}", definitionId, e);
+            LOGGER.error("Error getting process instances for process definition {}", definitionId, e);
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -112,7 +112,7 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
             return jobService.listJobs(serverConfig, Collections.singletonMap("processDefinitionId", new String[] { definitionId }));
 
         } catch (FlowableServiceException e) {
-            logger.error("Error getting jobs for process definition {}", definitionId, e);
+            LOGGER.error("Error getting jobs for process definition {}", definitionId, e);
             throw new BadRequestException(e.getMessage());
         }
     }

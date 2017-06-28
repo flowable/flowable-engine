@@ -36,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class AbstractModelBpmnResource {
 
-    private final Logger log = LoggerFactory.getLogger(AbstractModelBpmnResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelBpmnResource.class);
 
     @Autowired
     protected ModelService modelService;
@@ -90,7 +90,7 @@ public class AbstractModelBpmnResource {
                 throw e;
 
             } catch (Exception e) {
-                log.error("Could not generate BPMN 2.0 XML", e);
+                LOGGER.error("Could not generate BPMN 2.0 XML", e);
                 throw new InternalServerErrorException("Could not generate BPMN 2.0 xml");
             }
         }

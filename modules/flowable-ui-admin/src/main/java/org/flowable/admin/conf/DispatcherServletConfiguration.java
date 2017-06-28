@@ -46,7 +46,7 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 @EnableWebMvc
 public class DispatcherServletConfiguration extends WebMvcConfigurerAdapter {
 
-    private final Logger log = LoggerFactory.getLogger(DispatcherServletConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletConfiguration.class);
 
     // 10 Mb max file size
     private static final int MAX_UPLOAD_SIZE = 10 * 1000 * 1000;
@@ -56,7 +56,7 @@ public class DispatcherServletConfiguration extends WebMvcConfigurerAdapter {
 
     @Bean
     public ViewResolver contentNegotiatingViewResolver() {
-        log.debug("Configuring the ContentNegotiatingViewResolver");
+        LOGGER.debug("Configuring the ContentNegotiatingViewResolver");
         ContentNegotiatingViewResolver viewResolver = new ContentNegotiatingViewResolver();
         List<ViewResolver> viewResolvers = new ArrayList<ViewResolver>();
 
@@ -82,7 +82,7 @@ public class DispatcherServletConfiguration extends WebMvcConfigurerAdapter {
 
     @Bean
     public LocaleChangeInterceptor localeChangeInterceptor() {
-        log.debug("Configuring localeChangeInterceptor");
+        LOGGER.debug("Configuring localeChangeInterceptor");
         LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
         localeChangeInterceptor.setParamName("language");
         return localeChangeInterceptor;
@@ -90,7 +90,7 @@ public class DispatcherServletConfiguration extends WebMvcConfigurerAdapter {
 
     @Bean
     public MessageSource messageSource() {
-        log.debug("Loading MessageSources");
+        LOGGER.debug("Loading MessageSources");
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("/WEB-INF/messages/messages");
         messageSource.setDefaultEncoding(CharEncoding.UTF_8);
@@ -109,7 +109,7 @@ public class DispatcherServletConfiguration extends WebMvcConfigurerAdapter {
 
     @Bean
     public RequestMappingHandlerMapping requestMappingHandlerMapping() {
-        log.debug("Creating requestMappingHandlerMapping");
+        LOGGER.debug("Creating requestMappingHandlerMapping");
         RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();
         requestMappingHandlerMapping.setUseSuffixPatternMatch(false);
         Object[] interceptors = { localeChangeInterceptor() };

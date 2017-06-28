@@ -12,6 +12,8 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,12 +30,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 @RestController
 public class EventSubscriptionsClientResource extends AbstractClientResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(EventSubscriptionsClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventSubscriptionsClientResource.class);
 
     @Autowired
     protected EventSubscriptionService eventSubscriptionService;
@@ -43,14 +43,14 @@ public class EventSubscriptionsClientResource extends AbstractClientResource {
      */
     @RequestMapping(value = "/rest/admin/event-subscriptions", method = RequestMethod.GET, produces = "application/json")
     public JsonNode listEventSubscriptions(HttpServletRequest request) {
-        logger.debug("REST request to get a list of event subscriptions");
+        LOGGER.debug("REST request to get a list of event subscriptions");
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
 
         try {
             return eventSubscriptionService.listEventSubscriptions(serverConfig, parameterMap);
         } catch (FlowableServiceException e) {
-            logger.error("Error getting event subscriptions");
+            LOGGER.error("Error getting event subscriptions");
             throw new BadRequestException(e.getMessage());
         }
     }

@@ -12,6 +12,9 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.TaskService;
@@ -25,16 +28,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * REST controller for managing the current user's account.
  */
 @RestController
 public class TasksClientResource extends AbstractClientResource {
 
-    private final Logger logger = LoggerFactory.getLogger(TasksClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TasksClientResource.class);
 
     @Autowired
     protected TaskService clientService;
@@ -49,7 +49,7 @@ public class TasksClientResource extends AbstractClientResource {
         try {
             resultNode = clientService.listTasks(serverConfig, requestNode);
         } catch (FlowableServiceException e) {
-            logger.error("Error getting tasks", e);
+            LOGGER.error("Error getting tasks", e);
             throw new BadRequestException(e.getMessage());
         }
 

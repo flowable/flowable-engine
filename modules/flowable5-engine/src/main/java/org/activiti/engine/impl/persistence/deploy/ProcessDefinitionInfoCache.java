@@ -12,6 +12,9 @@
  */
 package org.activiti.engine.impl.persistence.deploy;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -26,9 +29,6 @@ import org.activiti.engine.impl.persistence.entity.ProcessDefinitionInfoEntityMa
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * Default cache: keep everything in memory, unless a limit is set.
  * 
@@ -36,7 +36,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class ProcessDefinitionInfoCache {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionInfoCache.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessDefinitionInfoCache.class);
 
     protected Map<String, ProcessDefinitionInfoCacheObject> cache;
     protected CommandExecutor commandExecutor;
@@ -59,7 +59,7 @@ public class ProcessDefinitionInfoCache {
             protected boolean removeEldestEntry(Map.Entry<String, ProcessDefinitionInfoCacheObject> eldest) {
                 boolean removeEldest = size() > limit;
                 if (removeEldest) {
-                    logger.trace("Cache limit is reached, {} will be evicted", eldest.getKey());
+                    LOGGER.trace("Cache limit is reached, {} will be evicted", eldest.getKey());
                 }
                 return removeEldest;
             }

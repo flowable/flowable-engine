@@ -12,6 +12,10 @@
  */
 package org.flowable.app.filter;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,13 +47,9 @@ import org.springframework.security.web.authentication.rememberme.InvalidCookieE
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-
 public class FlowableCookieFilter extends OncePerRequestFilter {
 
-    private final Logger logger = LoggerFactory.getLogger(FlowableCookieFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowableCookieFilter.class);
 
     protected static final String DELIMITER = ":";
 
@@ -182,7 +182,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
                         break; // We're only interested in one particular cookie
 
                     } catch (Exception e) {
-                        logger.trace("Could not get token", e);
+                        LOGGER.trace("Could not get token", e);
                         return null;
                     }
                 }
@@ -200,7 +200,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
                     appUser, appUser.getAuthorities()));
 
         } catch (Exception e) {
-            logger.trace("Could not set necessary threadlocals for token", e);
+            LOGGER.trace("Could not set necessary threadlocals for token", e);
             redirectOrSendNotPermitted(request, response, token.getUserId());
         }
     }
@@ -259,7 +259,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
             }
             
         } catch (IOException e) {
-            logger.warn("Could not redirect to {}", idmAppUrl, e);
+            LOGGER.warn("Could not redirect to {}", idmAppUrl, e);
         }
     }
 

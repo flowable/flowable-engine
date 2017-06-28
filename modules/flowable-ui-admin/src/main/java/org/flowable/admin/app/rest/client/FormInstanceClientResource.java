@@ -12,6 +12,10 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.admin.domain.EndpointType;
@@ -27,17 +31,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * @author Yvo Swillens
  */
 @RestController
 public class FormInstanceClientResource extends AbstractClientResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(FormInstanceClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FormInstanceClientResource.class);
 
     @Autowired
     protected FormInstanceService clientService;
@@ -62,7 +62,7 @@ public class FormInstanceClientResource extends AbstractClientResource {
             return clientService.getFormInstances(serverConfig, bodyNode);
 
         } catch (FlowableServiceException e) {
-            logger.error("Error getting form instance for task id {}", taskId, e);
+            LOGGER.error("Error getting form instance for task id {}", taskId, e);
             throw new BadRequestException(e.getMessage());
         }
     }

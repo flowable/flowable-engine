@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior {
     
-    private static final Logger logger = LoggerFactory.getLogger(TerminateEndEventActivityBehavior.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TerminateEndEventActivityBehavior.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -125,10 +125,10 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
             try {
                 subProcessActivityBehavior.completing(callActivityExecution, scopeExecutionEntity);
             } catch (RuntimeException e) {
-                logger.error("Error while completing sub process of execution {}", scopeExecutionEntity, e);
+                LOGGER.error("Error while completing sub process of execution {}", scopeExecutionEntity, e);
                 throw e;
             } catch (Exception e) {
-                logger.error("Error while completing sub process of execution {}", scopeExecutionEntity, e);
+                LOGGER.error("Error while completing sub process of execution {}", scopeExecutionEntity, e);
                 throw new FlowableException("Error while completing sub process of execution " + scopeExecutionEntity, e);
             }
 

@@ -12,6 +12,8 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.admin.domain.EndpointType;
@@ -27,15 +29,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 /**
  * REST controller for managing the current user's account.
  */
 @RestController
 public class DeploymentClientResource extends AbstractClientResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(DeploymentClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeploymentClientResource.class);
 
     @Autowired
     protected DeploymentService clientService;
@@ -50,7 +50,7 @@ public class DeploymentClientResource extends AbstractClientResource {
         try {
             return clientService.getDeployment(serverConfig, deploymentId);
         } catch (FlowableServiceException e) {
-            logger.error("Error getting deployment {}", deploymentId, e);
+            LOGGER.error("Error getting deployment {}", deploymentId, e);
             throw new BadRequestException(e.getMessage());
         }
     }

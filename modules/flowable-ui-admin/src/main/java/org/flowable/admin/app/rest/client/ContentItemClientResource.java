@@ -12,6 +12,8 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.ContentItemService;
@@ -25,15 +27,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 /**
  * @author Yvo Swillens
  */
 @RestController
 public class ContentItemClientResource extends AbstractClientResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(ContentItemClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContentItemClientResource.class);
 
     @Autowired
     protected ContentItemService clientService;
@@ -45,7 +45,7 @@ public class ContentItemClientResource extends AbstractClientResource {
         try {
             return clientService.getContentItem(serverConfig, contentItemId);
         } catch (FlowableServiceException e) {
-            logger.error("Error getting content item {}", contentItemId, e);
+            LOGGER.error("Error getting content item {}", contentItemId, e);
             throw new BadRequestException(e.getMessage());
         }
     }

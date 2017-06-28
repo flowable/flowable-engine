@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public class EndEventParseHandler extends AbstractActivityBpmnParseHandler<EndEvent> {
 
-    private static final Logger logger = LoggerFactory.getLogger(EndEventParseHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EndEventParseHandler.class);
 
     public Class<? extends BaseElement> getHandledType() {
         return EndEvent.class;
@@ -47,7 +47,7 @@ public class EndEventParseHandler extends AbstractActivityBpmnParseHandler<EndEv
                 if (bpmnParse.getBpmnModel().containsErrorRef(errorDefinition.getErrorCode())) {
                     String errorCode = bpmnParse.getBpmnModel().getErrors().get(errorDefinition.getErrorCode());
                     if (StringUtils.isEmpty(errorCode)) {
-                        logger.warn("errorCode is required for an error event {}", endEvent.getId());
+                        LOGGER.warn("errorCode is required for an error event {}", endEvent.getId());
                     }
                 }
                 endEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createErrorEndEventActivityBehavior(endEvent, errorDefinition));
