@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class PluggableFlowableTestCase extends AbstractFlowableTestCase {
 
-    private static Logger pluggableActivitiTestCaseLogger = LoggerFactory.getLogger(PluggableFlowableTestCase.class);
+    private static final Logger pluggableActivitiTestCaseLogger = LoggerFactory.getLogger(PluggableFlowableTestCase.class);
 
     protected static ProcessEngine cachedProcessEngine;
 

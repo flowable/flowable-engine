@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractMuleTest extends FunctionalTestCase {
 
-    protected static Logger log = LoggerFactory.getLogger(AbstractMuleTest.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractMuleTest.class);
 
     protected static final String EMPTY_LINE = "                                                                                           ";
     private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList("ACT_GE_PROPERTY", "ACT_ID_PROPERTY");
@@ -28,7 +28,7 @@ public abstract class AbstractMuleTest extends FunctionalTestCase {
      * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
      */
     protected void assertAndEnsureCleanDb(ProcessEngine processEngine) throws Exception {
-        log.debug("verifying that db is clean after test");
+        LOGGER.debug("verifying that db is clean after test");
         Map<String, Long> tableCounts = processEngine.getManagementService().getTableCount();
         StringBuilder outputMessage = new StringBuilder();
         for (String tableName : tableCounts.keySet()) {
@@ -42,10 +42,10 @@ public abstract class AbstractMuleTest extends FunctionalTestCase {
         }
         if (outputMessage.length() > 0) {
             outputMessage.insert(0, "DB NOT CLEAN: \n");
-            log.error(EMPTY_LINE);
-            log.error(outputMessage.toString());
+            LOGGER.error(EMPTY_LINE);
+            LOGGER.error(outputMessage.toString());
 
-            log.info("dropping and recreating db");
+            LOGGER.info("dropping and recreating db");
 
             CommandExecutor commandExecutor = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutor();
             CommandConfig config = new CommandConfig().transactionNotSupported();
@@ -61,7 +61,7 @@ public abstract class AbstractMuleTest extends FunctionalTestCase {
             Assert.fail(outputMessage.toString());
 
         } else {
-            log.info("database was clean");
+            LOGGER.info("database was clean");
         }
     }
 

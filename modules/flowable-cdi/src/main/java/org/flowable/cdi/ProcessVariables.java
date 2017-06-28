@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ProcessVariables {
 
-    private Logger logger = LoggerFactory.getLogger(ProcessVariables.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessVariables.class);
 
     @Inject
     private BusinessProcess businessProcess;
@@ -51,8 +51,8 @@ public class ProcessVariables {
     protected Object getProcessVariable(InjectionPoint ip) {
         String processVariableName = getVariableName(ip);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Getting process variable '{}' from ProcessInstance[{}].", processVariableName, businessProcess.getProcessInstanceId());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Getting process variable '{}' from ProcessInstance[{}].", processVariableName, businessProcess.getProcessInstanceId());
         }
 
         return businessProcess.getVariable(processVariableName);

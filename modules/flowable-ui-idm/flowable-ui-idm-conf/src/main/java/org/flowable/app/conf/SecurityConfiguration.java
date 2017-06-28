@@ -54,7 +54,7 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
 @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true)
 public class SecurityConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityConfiguration.class);
 
     //
     // GLOBAL CONFIG
@@ -77,7 +77,7 @@ public class SecurityConfiguration {
             try {
                 auth.authenticationProvider(ldapAuthenticationProvider());
             } catch (Exception e) {
-                logger.error("Could not configure ldap authentication mechanism:", e);
+                LOGGER.error("Could not configure ldap authentication mechanism:", e);
             }
             
         } else {
@@ -85,7 +85,7 @@ public class SecurityConfiguration {
             try {
                 auth.authenticationProvider(dbAuthenticationProvider());
             } catch (Exception e) {
-                logger.error("Could not configure authentication mechanism:", e);
+                LOGGER.error("Could not configure authentication mechanism:", e);
             }
         }
     }

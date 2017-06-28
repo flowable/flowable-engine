@@ -75,14 +75,14 @@ public abstract class AbstractFlowableTestCase extends AbstractContentTestCase {
             super.runBare();
 
         } catch (AssertionFailedError e) {
-            log.error(EMPTY_LINE);
-            log.error("ASSERTION FAILED: {}", e, e);
+            LOGGER.error(EMPTY_LINE);
+            LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;
             throw e;
 
         } catch (Throwable e) {
-            log.error(EMPTY_LINE);
-            log.error("EXCEPTION: {}", e, e);
+            LOGGER.error(EMPTY_LINE);
+            LOGGER.error("EXCEPTION: {}", e, e);
             exception = e;
             throw e;
 
@@ -101,7 +101,7 @@ public abstract class AbstractFlowableTestCase extends AbstractContentTestCase {
      * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
      */
     protected void assertAndEnsureCleanDb() throws Throwable {
-        log.debug("verifying that db is clean after test");
+        LOGGER.debug("verifying that db is clean after test");
         Map<String, Long> tableCounts = managementService.getTableCount();
         StringBuilder outputMessage = new StringBuilder();
         for (String tableName : tableCounts.keySet()) {
@@ -116,10 +116,10 @@ public abstract class AbstractFlowableTestCase extends AbstractContentTestCase {
 
         if (outputMessage.length() > 0) {
             outputMessage.insert(0, "DB NOT CLEAN: \n");
-            log.error(EMPTY_LINE);
-            log.error(outputMessage.toString());
+            LOGGER.error(EMPTY_LINE);
+            LOGGER.error(outputMessage.toString());
 
-            log.info("dropping and recreating db");
+            LOGGER.info("dropping and recreating db");
 
             CommandExecutor commandExecutor = contentEngine.getContentEngineConfiguration().getCommandExecutor();
             CommandConfig config = new CommandConfig().transactionNotSupported();
@@ -138,7 +138,7 @@ public abstract class AbstractFlowableTestCase extends AbstractContentTestCase {
                 Assert.fail(outputMessage.toString());
             }
         } else {
-            log.info("database was clean");
+            LOGGER.info("database was clean");
         }
     }
 

@@ -17,6 +17,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
@@ -39,15 +42,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Yvo Swillens
  */
 public class DmnJsonConverterTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(DmnJsonConverterTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DmnJsonConverterTest.class);
 
     private static final String JSON_RESOURCE_1 = "org/flowable/editor/dmn/converter/decisiontable_1.json";
     private static final String JSON_RESOURCE_2 = "org/flowable/editor/dmn/converter/decisiontable_no_rules.json";

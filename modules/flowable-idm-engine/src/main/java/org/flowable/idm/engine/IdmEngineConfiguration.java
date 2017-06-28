@@ -104,7 +104,7 @@ import org.slf4j.LoggerFactory;
 
 public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
-    protected static final Logger logger = LoggerFactory.getLogger(IdmEngineConfiguration.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(IdmEngineConfiguration.class);
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/idm/db/mapping/mappings.xml";
 
