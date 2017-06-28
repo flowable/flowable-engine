@@ -12,11 +12,6 @@
  */
 package org.flowable.app.idm.service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.idm.model.UserInformation;
 import org.flowable.app.service.exception.BadRequestException;
@@ -28,6 +23,11 @@ import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Joram Barrez
@@ -84,7 +84,7 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
             User user = identityService.createUserQuery().userId(userId).singleResult();
             if (user != null) {
                 user.setPassword(newPassword);
-                identityService.saveUser(user);
+                identityService.updateUserPassword(user);
             }
         }
     }
@@ -115,12 +115,15 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
             throw new ConflictingRequestException("User already registered", "ACCOUNT.SIGNUP.ERROR.ALREADY-REGISTERED");
         }
 
-        User user = identityService.newUser(id != null ? id : email);
+        User user = identityService.newUser(id);
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setEmail(email);
-        user.setPassword(password);
         identityService.saveUser(user);
+
+        User savedUser = identityService.createUserQuery().userEmail(email).singleResult();
+        savedUser.setPassword(password);
+        identityService.updateUserPassword(user);
 
         return user;
     }
