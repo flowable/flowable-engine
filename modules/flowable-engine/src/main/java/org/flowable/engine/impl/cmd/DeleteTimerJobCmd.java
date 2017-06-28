@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 public class DeleteTimerJobCmd implements Command<Object>, Serializable {
 
-    private static final Logger log = LoggerFactory.getLogger(DeleteTimerJobCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeleteTimerJobCmd.class);
     private static final long serialVersionUID = 1L;
 
     protected String timerJobId;
@@ -61,8 +61,8 @@ public class DeleteTimerJobCmd implements Command<Object>, Serializable {
         if (timerJobId == null) {
             throw new FlowableIllegalArgumentException("jobId is null");
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Deleting job {}", timerJobId);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Deleting job {}", timerJobId);
         }
 
         TimerJobEntity job = commandContext.getTimerJobEntityManager().findById(timerJobId);

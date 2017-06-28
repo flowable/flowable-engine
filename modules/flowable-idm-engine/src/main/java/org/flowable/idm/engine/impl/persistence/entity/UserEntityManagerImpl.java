@@ -13,7 +13,9 @@
 
 package org.flowable.idm.engine.impl.persistence.entity;
 
-import org.flowable.engine.common.impl.Page;
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.idm.api.PasswordEncoder;
 import org.flowable.idm.api.PasswordSalt;
@@ -23,9 +25,6 @@ import org.flowable.idm.api.UserQuery;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.UserQueryImpl;
 import org.flowable.idm.engine.impl.persistence.entity.data.UserDataManager;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -86,8 +85,8 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
         }
     }
 
-    public List<User> findUserByQueryCriteria(UserQueryImpl query, Page page) {
-        return userDataManager.findUserByQueryCriteria(query, page);
+    public List<User> findUserByQueryCriteria(UserQueryImpl query) {
+        return userDataManager.findUserByQueryCriteria(query);
     }
 
     public long findUserCountByQueryCriteria(UserQueryImpl query) {
@@ -108,8 +107,8 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
         return (user != null) && (password != null) && (passwordEncoder.isMatches(password, user.getPassword(), salt));
     }
 
-    public List<User> findUsersByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return userDataManager.findUsersByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<User> findUsersByNativeQuery(Map<String, Object> parameterMap) {
+        return userDataManager.findUsersByNativeQuery(parameterMap);
     }
 
     public long findUserCountByNativeQuery(Map<String, Object> parameterMap) {

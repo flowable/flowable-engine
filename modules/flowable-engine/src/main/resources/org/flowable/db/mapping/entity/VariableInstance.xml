@@ -76,15 +76,30 @@
   <update id="updateVariableInstance"
     parameterType="org.flowable.engine.impl.persistence.entity.VariableInstanceEntityImpl">
     update ${prefix}ACT_RU_VARIABLE
-    set
-    REV_ = #{revisionNext, jdbcType=INTEGER},
-    EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
-    BYTEARRAY_ID_ = #{byteArrayRef, typeHandler=ByteArrayRefTypeHandler},
-    TYPE_ =  #{type, jdbcType=VARCHAR },
-    DOUBLE_ = #{doubleValue, jdbcType=DOUBLE},
-    LONG_ = #{longValue, jdbcType=BIGINT},
-    TEXT_ = #{textValue, jdbcType=VARCHAR},
-    TEXT2_ = #{textValue2, jdbcType=VARCHAR}
+    <set>
+        REV_ = #{revisionNext, jdbcType=INTEGER},
+        <if test="originalPersistentState.executionId != executionId">
+            EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+        </if>
+        <if test="(byteArrayRef != null and originalPersistentState.byteArrayRef == null) or (byteArrayRef == null and originalPersistentState.byteArrayRef != null) or (originalPersistentState.byteArrayRef != byteArrayRef.id)">
+            BYTEARRAY_ID_ = #{byteArrayRef, typeHandler=ByteArrayRefTypeHandler},
+        </if>
+        <if test="originalPersistentState.type != type">
+            TYPE_ =  #{type, jdbcType=VARCHAR },
+        </if>
+        <if test="originalPersistentState.doubleValue != doubleValue">
+            DOUBLE_ = #{doubleValue, jdbcType=DOUBLE},
+        </if>
+        <if test="originalPersistentState.longValue != longValue">
+            LONG_ = #{longValue, jdbcType=BIGINT},
+        </if>
+        <if test="originalPersistentState.textValue != textValue">
+            TEXT_ = #{textValue, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.textValue2 != textValue2">
+            TEXT2_ = #{textValue2, jdbcType=VARCHAR}
+        </if>
+    </set>
     where ID_ = #{id, jdbcType=VARCHAR}
     and REV_ = #{revision, jdbcType=INTEGER}
   </update>

@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ScriptEventHandler implements SimulationEventHandler {
 
-    private static Logger log = LoggerFactory.getLogger(ScriptEventHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptEventHandler.class);
 
     protected String scriptPropertyName;
     protected String language;
@@ -53,7 +53,7 @@ public class ScriptEventHandler implements SimulationEventHandler {
             scriptingEngines.evaluate((String) event.getProperty(this.scriptPropertyName), language, execution, false);
 
         } catch (FlowableException e) {
-            log.warn("Exception while executing simulation event {} scriptPropertyName :{}\n script: {}\n exception is:{}", event, this.scriptPropertyName, event.getProperty(this.scriptPropertyName), e.getMessage());
+            LOGGER.warn("Exception while executing simulation event {} scriptPropertyName :{}\n script: {}\n exception is:{}", event, this.scriptPropertyName, event.getProperty(this.scriptPropertyName), e.getMessage());
             throw e;
         }
     }

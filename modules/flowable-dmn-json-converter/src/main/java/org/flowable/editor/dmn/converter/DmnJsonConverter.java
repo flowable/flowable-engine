@@ -12,10 +12,13 @@
  */
 package org.flowable.editor.dmn.converter;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
@@ -46,6 +49,9 @@ public class DmnJsonConverter {
 
     public DmnDefinition convertToDmn(JsonNode modelNode, String modelId, int modelVersion, Date lastUpdated) {
 
+        // check and migrate model
+        modelNode = DmnJsonConverterUtil.migrateModel(modelNode, objectMapper);
+
         DmnDefinition definition = new DmnDefinition();
 
         definition.setId("definition_" + modelId);
@@ -68,7 +74,7 @@ public class DmnJsonConverter {
         decisionTable.setId("decisionTable_" + DmnJsonConverterUtil.getValueAsString("id", modelNode));
 
         if (modelNode.has("hitIndicator")) {
-            decisionTable.setHitPolicy(HitPolicy.valueOf(DmnJsonConverterUtil.getValueAsString("hitIndicator", modelNode)));
+            decisionTable.setHitPolicy(HitPolicy.get(DmnJsonConverterUtil.getValueAsString("hitIndicator", modelNode)));
         } else {
             decisionTable.setHitPolicy(HitPolicy.FIRST);
         }
@@ -165,7 +171,30 @@ public class DmnJsonConverter {
 
         Map<String, InputClause> ruleInputContainerMap = new LinkedHashMap<>();
         Map<String, OutputClause> ruleOutputContainerMap = new LinkedHashMap<>();
+        List<String> complexExpressionIds = new ArrayList<>();
 
+        processInputExpressions(modelNode, ruleInputContainerMap, decisionTable);
+
+        processOutputExpressions(modelNode, ruleOutputContainerMap, complexExpressionIds, decisionTable);
+
+        processRules(modelNode, ruleInputContainerMap, ruleOutputContainerMap, complexExpressionIds, decisionTable);
+
+        // regression check for empty expression types
+        for (InputClause inputClause : decisionTable.getInputs()) {
+            if (StringUtils.isEmpty(inputClause.getInputExpression().getTypeRef())) {
+                // default to string
+                inputClause.getInputExpression().setTypeRef("string");
+            }
+        }
+        for (OutputClause outputClause : decisionTable.getOutputs()) {
+            if (StringUtils.isEmpty(outputClause.getTypeRef())) {
+                // default to string
+                outputClause.setTypeRef("string");
+            }
+        }
+    }
+    
+    protected void processInputExpressions(JsonNode modelNode, Map<String, InputClause> ruleInputContainerMap, DecisionTable decisionTable) {
         // input expressions
         JsonNode inputExpressions = modelNode.get("inputExpressions");
 
@@ -187,13 +216,30 @@ public class DmnJsonConverter {
                 // add to clause
                 inputClause.setInputExpression(inputExpression);
 
+                if (inputExpressionNode.get("entries") != null && !inputExpressionNode.get("entries").isNull()
+                    && inputExpressionNode.get("entries").isArray() && inputExpressionNode.get("entries").size() > 0) {
+                    UnaryTests inputValues = new UnaryTests();
+                    List<Object> inputEntries = new ArrayList<>();
+                    for (JsonNode entriesNode : inputExpressionNode.get("entries")) {
+                        inputEntries.add(entriesNode.asText());
+                    }
+                    inputValues.setTextValues(inputEntries);
+
+                    // add to clause
+                    inputClause.setInputValues(inputValues);
+                }
+
                 // add to map
                 ruleInputContainerMap.put(inputExpressionId, inputClause);
 
                 decisionTable.addInput(inputClause);
             }
         }
-
+    }
+    
+    protected void processOutputExpressions(JsonNode modelNode, Map<String, OutputClause> ruleOutputContainerMap, 
+                    List<String> complexExpressionIds, DecisionTable decisionTable) {
+        
         // output expressions
         JsonNode outputExpressions = modelNode.get("outputExpressions");
 
@@ -204,11 +250,31 @@ public class DmnJsonConverter {
                 OutputClause outputClause = new OutputClause();
 
                 String outputExpressionId = DmnJsonConverterUtil.getValueAsString("id", outputExpressionNode);
+                String outputClauseId = "outputExpression_" + outputExpressionId;
 
-                outputClause.setId("outputExpression_" + outputExpressionId);
+                outputClause.setId(outputClauseId);
                 outputClause.setLabel(DmnJsonConverterUtil.getValueAsString("label", outputExpressionNode));
                 outputClause.setName(DmnJsonConverterUtil.getValueAsString("variableId", outputExpressionNode));
                 outputClause.setTypeRef(DmnJsonConverterUtil.getValueAsString("type", outputExpressionNode));
+
+                if (outputExpressionNode.get("entries") != null && !outputExpressionNode.get("entries").isNull()
+                    && outputExpressionNode.get("entries").isArray() && outputExpressionNode.get("entries").size() > 0) {
+                    UnaryTests outputValues = new UnaryTests();
+                    List<Object> outputEntries = new ArrayList<>();
+                    for (JsonNode entriesNode : outputExpressionNode.get("entries")) {
+                        outputEntries.add(entriesNode.asText());
+                    }
+                    outputValues.setTextValues(outputEntries);
+
+                    // add to clause
+                    outputClause.setOutputValues(outputValues);
+                }
+
+                if (outputExpressionNode.get("complexExpression") != null && !outputExpressionNode.get("complexExpression").isNull()) {
+                    if (outputExpressionNode.get("complexExpression").asBoolean()) {
+                        complexExpressionIds.add(outputExpressionId);
+                    }
+                }
 
                 // add to map
                 ruleOutputContainerMap.put(outputExpressionId, outputClause);
@@ -216,7 +282,10 @@ public class DmnJsonConverter {
                 decisionTable.addOutput(outputClause);
             }
         }
-
+    }
+    
+    protected void processRules(JsonNode modelNode, Map<String, InputClause> ruleInputContainerMap, Map<String, OutputClause> ruleOutputContainerMap, 
+                    List<String> complexExpressionIds, DecisionTable decisionTable) {
         // rules
         JsonNode rules = modelNode.get("rules");
 
@@ -229,32 +298,99 @@ public class DmnJsonConverter {
                 // in the input/output clauses
                 DecisionRule rule = new DecisionRule();
                 for (String id : ruleInputContainerMap.keySet()) {
-                    if (ruleNode.has(id)) {
-                        RuleInputClauseContainer ruleInputClauseContainer = new RuleInputClauseContainer();
-                        ruleInputClauseContainer.setInputClause(ruleInputContainerMap.get(id));
 
-                        UnaryTests inputEntry = new UnaryTests();
-                        inputEntry.setId("inputEntry_" + id + "_" + ruleCounter);
-                        inputEntry.setText(ruleNode.get(id).asText());
+                    String operatorId = id + "_operator";
+                    String expressionId = id + "_expression";
 
-                        ruleInputClauseContainer.setInputEntry(inputEntry);
+                    RuleInputClauseContainer ruleInputClauseContainer = new RuleInputClauseContainer();
+                    ruleInputClauseContainer.setInputClause(ruleInputContainerMap.get(id));
 
-                        rule.addInputEntry(ruleInputClauseContainer);
+                    UnaryTests inputEntry = new UnaryTests();
+                    inputEntry.setId("inputEntry_" + id + "_" + ruleCounter);
+
+                    JsonNode operatorValueNode = ruleNode.get(operatorId);
+                    String operatorValue = null;
+                    if (operatorValueNode != null && !operatorValueNode.isNull()) {
+                        operatorValue = operatorValueNode.asText();
                     }
+
+                    JsonNode expressionValueNode = ruleNode.get(expressionId);
+                    String expressionValue;
+                    if (expressionValueNode == null || expressionValueNode.isNull()) {
+                        expressionValue = "-";
+                    } else {
+                        expressionValue = expressionValueNode.asText();
+                    }
+
+                    // don't add operator if it's ==
+                    StringBuilder stringBuilder = new StringBuilder();
+                    if (StringUtils.isNotEmpty(operatorValue)) {
+                        if (!"==".equals(operatorValue)) {
+                            stringBuilder = new StringBuilder(operatorValue);
+                            stringBuilder.append(" ");
+                        }
+                    }
+
+                    // add quotes for string
+                    if ("string".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
+                        && !"-".equals(expressionValue)) {
+                        if (stringBuilder.length() > 0) {
+                            stringBuilder.append("\"");
+                        } else {
+                            stringBuilder.append("\"");
+                        }
+                        stringBuilder.append(expressionValue);
+                        stringBuilder.append("\"");
+                    } else if ("date".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
+                        && !"-".equals(expressionValue) && StringUtils.isNotEmpty(expressionValue)){
+                        // wrap in built in toDate function
+                        stringBuilder.append("fn_date('");
+                        stringBuilder.append(expressionValue);
+                        stringBuilder.append("')");
+                    } else {
+                        stringBuilder.append(expressionValue);
+                    }
+
+                    inputEntry.setText(stringBuilder.toString());
+                    ruleInputClauseContainer.setInputEntry(inputEntry);
+                    rule.addInputEntry(ruleInputClauseContainer);
+
                 }
                 for (String id : ruleOutputContainerMap.keySet()) {
+                    RuleOutputClauseContainer ruleOutputClauseContainer = new RuleOutputClauseContainer();
+                    ruleOutputClauseContainer.setOutputClause(ruleOutputContainerMap.get(id));
+
+                    LiteralExpression outputEntry = new LiteralExpression();
+                    outputEntry.setId("outputEntry_" + id + "_" + ruleCounter);
+
                     if (ruleNode.has(id)) {
-                        RuleOutputClauseContainer ruleOutputClauseContainer = new RuleOutputClauseContainer();
-                        ruleOutputClauseContainer.setOutputClause(ruleOutputContainerMap.get(id));
+                        JsonNode expressionValueNode = ruleNode.get(id);
+                        String expressionValue;
+                        if (expressionValueNode == null || expressionValueNode.isNull()) {
+                            expressionValue = "";
+                        } else {
+                            expressionValue = expressionValueNode.asText();
+                        }
 
-                        LiteralExpression outputEntry = new LiteralExpression();
-                        outputEntry.setId("outputEntry_" + id + "_" + ruleCounter);
-                        outputEntry.setText(ruleNode.get(id).asText());
+                        if (complexExpressionIds.contains(id)) {
+                            outputEntry.setText(expressionValue);
+                        } else {
+                            if ("string".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())) { // add quotes for string
+                                outputEntry.setText("\"" + expressionValue + "\"");
+                            } else if ("date".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())
+                                && StringUtils.isNotEmpty(expressionValue)) { // wrap in built in toDate function
+                                outputEntry.setText("fn_date('" + expressionValue + "')");
+                            } else {
+                                outputEntry.setText(expressionValue);
+                            }
+                        }
 
-                        ruleOutputClauseContainer.setOutputEntry(outputEntry);
-
-                        rule.addOutputEntry(ruleOutputClauseContainer);
+                    } else { // output entry not present in rule node
+                        outputEntry.setText("");
                     }
+
+                    ruleOutputClauseContainer.setOutputEntry(outputEntry);
+                    rule.addOutputEntry(ruleOutputClauseContainer);
                 }
                 ruleCounter++;
                 decisionTable.addRule(rule);

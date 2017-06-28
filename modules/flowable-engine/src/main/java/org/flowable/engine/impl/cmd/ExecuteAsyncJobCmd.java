@@ -19,7 +19,8 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,15 +32,25 @@ public class ExecuteAsyncJobCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(ExecuteAsyncJobCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteAsyncJobCmd.class);
 
     protected String jobId;
+    protected JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager;
 
     public ExecuteAsyncJobCmd(String jobId) {
         this.jobId = jobId;
     }
+    
+    public ExecuteAsyncJobCmd(String jobId, JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager) {
+        this.jobId = jobId;
+        this.jobEntityManager = jobEntityManager;
+    }
 
     public Object execute(CommandContext commandContext) {
+        
+        if (jobEntityManager == null) {
+            jobEntityManager = commandContext.getJobEntityManager(); // Backwards compatibility
+        }
 
         if (jobId == null) {
             throw new FlowableIllegalArgumentException("jobId is null");
@@ -51,15 +62,15 @@ public class ExecuteAsyncJobCmd implements Command<Object>, Serializable {
         // However, the async task jobs could already have been fetched and put in the queue.... while in reality they have been deleted.
         // A refetch is thus needed here to be sure that it exists for this transaction.
 
-        Job job = commandContext.getJobEntityManager().findById(jobId);
+        JobInfoEntity job = jobEntityManager.findById(jobId);
         if (job == null) {
-            log.debug("Job does not exist anymore and will not be executed. It has most likely been deleted "
+            LOGGER.debug("Job does not exist anymore and will not be executed. It has most likely been deleted "
                     + "as part of another concurrent part of the process instance.");
             return null;
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Executing async job {}", job.getId());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Executing async job {}", job.getId());
         }
 
         commandContext.getJobManager().execute(job);

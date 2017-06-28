@@ -34,8 +34,8 @@ public class NativeFormDeploymentQueryImpl extends AbstractNativeQuery<NativeFor
 
     // results ////////////////////////////////////////////////////////////////
 
-    public List<FormDeployment> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return commandContext.getDeploymentEntityManager().findDeploymentsByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<FormDeployment> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
+        return commandContext.getDeploymentEntityManager().findDeploymentsByNativeQuery(parameterMap);
     }
 
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {

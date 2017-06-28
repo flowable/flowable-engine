@@ -104,7 +104,9 @@ public class DestroyScopeOperation extends AbstractOperation {
             variableInstanceEntityManager.delete(variable);
         }
 
-        commandContext.getHistoryManager().recordActivityEnd(scopeExecution, scopeExecution.getDeleteReason());
+        if (scopeExecution.isActive()) {
+            commandContext.getHistoryManager().recordActivityEnd(scopeExecution, scopeExecution.getDeleteReason());
+        }
         executionEntityManager.delete(scopeExecution);
     }
 

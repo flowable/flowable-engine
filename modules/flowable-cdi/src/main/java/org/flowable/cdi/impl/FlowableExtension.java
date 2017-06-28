@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FlowableExtension implements Extension {
 
-    private static Logger logger = LoggerFactory.getLogger(FlowableExtension.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowableExtension.class);
     private ProcessEngineLookup processEngineLookup;
 
     public void beforeBeanDiscovery(@Observes final BeforeBeanDiscovery event) {
@@ -61,7 +61,7 @@ public class FlowableExtension implements Extension {
 
     public void afterDeploymentValidation(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
         try {
-            logger.info("Initializing flowable-cdi.");
+            LOGGER.info("Initializing flowable-cdi.");
             // initialize the process engine
             ProcessEngine processEngine = lookupProcessEngine(beanManager);
             // deploy the processes if engine was set up correctly
@@ -93,10 +93,10 @@ public class FlowableExtension implements Extension {
             processEngine = processEngineLookup.getProcessEngine();
             if (processEngine != null) {
                 this.processEngineLookup = processEngineLookup;
-                logger.debug("ProcessEngineLookup service {} returned process engine.", processEngineLookup.getClass());
+                LOGGER.debug("ProcessEngineLookup service {} returned process engine.", processEngineLookup.getClass());
                 break;
             } else {
-                logger.debug("ProcessEngineLookup service {} returned 'null' value.", processEngineLookup.getClass());
+                LOGGER.debug("ProcessEngineLookup service {} returned 'null' value.", processEngineLookup.getClass());
             }
         }
 
@@ -119,7 +119,7 @@ public class FlowableExtension implements Extension {
             processEngineLookup.ungetProcessEngine();
             processEngineLookup = null;
         }
-        logger.info("Shutting down flowable-cdi");
+        LOGGER.info("Shutting down flowable-cdi");
     }
 
 }

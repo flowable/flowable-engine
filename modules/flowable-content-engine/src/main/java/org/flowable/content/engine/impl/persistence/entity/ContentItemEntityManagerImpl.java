@@ -19,7 +19,6 @@ import org.flowable.content.api.ContentItem;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.ContentItemQueryImpl;
 import org.flowable.content.engine.impl.persistence.entity.data.ContentItemDataManager;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
@@ -41,8 +40,8 @@ public class ContentItemEntityManagerImpl extends AbstractEntityManager<ContentI
     }
 
     @Override
-    public List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl contentItemQuery, Page page) {
-        return contentItemDataManager.findContentItemsByQueryCriteria(contentItemQuery, page);
+    public List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl contentItemQuery) {
+        return contentItemDataManager.findContentItemsByQueryCriteria(contentItemQuery);
     }
 
     @Override

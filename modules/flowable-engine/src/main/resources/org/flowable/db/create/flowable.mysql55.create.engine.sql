@@ -6,10 +6,10 @@ create table ACT_GE_PROPERTY (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.1.0.0', 1);
+values ('schema.version', '6.1.1.0', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.1.0.0)', 1);
+values ('schema.history', 'create(6.1.1.0)', 1);
 
 insert into ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);
@@ -162,6 +162,22 @@ create table ACT_RU_DEADLETTER_JOB (
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
     TENANT_ID_ varchar(255) default '',
+    primary key (ID_)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+
+create table ACT_RU_HISTORY_JOB (
+    ID_ varchar(64) NOT NULL,
+    REV_ integer,
+    LOCK_EXP_TIME_ timestamp NULL,
+    LOCK_OWNER_ varchar(255),
+    RETRIES_ integer,
+    EXCEPTION_STACK_ID_ varchar(64),
+    EXCEPTION_MSG_ varchar(4000),
+    HANDLER_TYPE_ varchar(255),
+    HANDLER_CFG_ varchar(4000),
+    ADV_HANDLER_CFG_ID_ varchar(64),
+    TENANT_ID_ varchar(255) default '',
+    CREATE_TIME_ timestamp NULL,
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

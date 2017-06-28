@@ -12,20 +12,20 @@
 		</if>
 		${sql}
 		<if test="resultType == 'LIST_PAGE'">
-			${limitAfter}
+			<if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
 		</if>
 	</sql>
 	
 	<sql id="limitBeforeNativeQuerySql">
-			${limitBefore}
+			<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
 	</sql>
 	
 	<sql id="limitBeforeNativeQuerySql" databaseId="db2">
-			${limitBeforeNativeQuery}
+			<if test="firstResult != null and firstResult &gt;= 0">${limitBeforeNativeQuery}</if>
 	</sql>
 	
 	<sql id="limitBeforeNativeQuerySql" databaseId="mssql">
-			${limitBeforeNativeQuery}
+			<if test="firstResult != null and firstResult &gt;= 0">${limitBeforeNativeQuery}</if>
 	</sql>
 	
 

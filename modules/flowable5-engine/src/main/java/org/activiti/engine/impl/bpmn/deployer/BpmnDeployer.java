@@ -12,6 +12,10 @@
  */
 package org.activiti.engine.impl.bpmn.deployer;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -74,17 +78,13 @@ import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
 public class BpmnDeployer implements Deployer {
 
-    private static final Logger log = LoggerFactory.getLogger(BpmnDeployer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BpmnDeployer.class);
 
     public static final String[] BPMN_RESOURCE_SUFFIXES = new String[] { "bpmn20.xml", "bpmn" };
     public static final String[] DIAGRAM_SUFFIXES = new String[] { "png", "jpg", "gif", "svg" };
@@ -94,7 +94,7 @@ public class BpmnDeployer implements Deployer {
     protected IdGenerator idGenerator;
 
     public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
-        log.debug("Processing deployment {}", deployment.getName());
+        LOGGER.debug("Processing deployment {}", deployment.getName());
 
         List<ProcessDefinitionEntity> processDefinitions = new ArrayList<ProcessDefinitionEntity>();
         Map<String, ResourceEntity> resources = deployment.getResources();
@@ -103,7 +103,7 @@ public class BpmnDeployer implements Deployer {
         final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
         for (String resourceName : resources.keySet()) {
 
-            log.info("Processing resource {}", resourceName);
+            LOGGER.info("Processing resource {}", resourceName);
             if (isBpmnResource(resourceName)) {
                 ResourceEntity resource = resources.get(resourceName);
                 byte[] bytes = resource.getBytes();
@@ -160,7 +160,7 @@ public class BpmnDeployer implements Deployer {
                                 createResource(diagramResourceName, diagramBytes, deployment);
 
                             } catch (Throwable t) { // if anything goes wrong, we don't store the image (the process will still be executable).
-                                log.warn("Error while generating process diagram, image will not be stored in repository", t);
+                                LOGGER.warn("Error while generating process diagram, image will not be stored in repository", t);
                             }
                         }
                     }

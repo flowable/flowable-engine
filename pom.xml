@@ -14,14 +14,14 @@
 	</parent>
 
 	<packaging>pom</packaging>
-	<version>6.1.0-SNAPSHOT</version>
+	<version>6.1.1-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.7</jdk.version>
-		<spring.framework.version>4.2.5.RELEASE</spring.framework.version>
-		<spring.security.version>4.0.4.RELEASE</spring.security.version>
+		<spring.framework.version>4.3.9.RELEASE</spring.framework.version>
+		<spring.security.version>4.2.3.RELEASE</spring.security.version>
 		<jackson.version>2.7.5</jackson.version>
-		<mule.version>3.5.0</mule.version>
+		<mule.version>3.8.0</mule.version>
 		<cxf.version>3.1.6</cxf.version>
 		<batik.version>1.7</batik.version>
 		<!-- JVM params for test execution -->
@@ -177,19 +177,9 @@
 				<version>2.2.11</version>
 			</dependency>
 			<dependency>
-				<groupId>de.odysseus.juel</groupId>
-				<artifactId>juel-api</artifactId>
-				<version>2.2.7</version>
-			</dependency>
-			<dependency>
-				<groupId>de.odysseus.juel</groupId>
-				<artifactId>juel-impl</artifactId>
-				<version>2.2.7</version>
-			</dependency>
-			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
-				<version>4.11</version>
+				<version>4.12</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -468,6 +458,11 @@
 			<dependency>
 			    <groupId>org.flowable</groupId>
 			    <artifactId>flowable-ui-common</artifactId>
+			    <version>${project.version}</version>
+			</dependency>
+            <dependency>
+			    <groupId>org.flowable</groupId>
+			    <artifactId>flowable-groovy-script-static-engine</artifactId>
 			    <version>${project.version}</version>
 			</dependency>
 			<!-- EMAIL -->
@@ -1033,6 +1028,7 @@
 				<module>modules/flowable-ui-modeler</module>
 				<module>modules/flowable-ui-task</module>
 				<module>modules/flowable-ui-admin</module>
+				<module>modules/flowable-groovy-script-static-engine</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>
@@ -1228,6 +1224,7 @@
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-crystalball</module>
 				<module>modules/flowable-ui-common</module>
+				<module>modules/flowable-groovy-script-static-engine</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 		</profile>
@@ -1381,6 +1378,7 @@
 				<module>modules/flowable-content-spring</module>
 				<module>modules/flowable-content-spring-configurator</module>
 				<module>modules/flowable-content-rest</module>
+				<module>modules/flowable-groovy-script-static-engine</module>
 			</modules>
 			<properties>
 				<skipTests>true</skipTests>

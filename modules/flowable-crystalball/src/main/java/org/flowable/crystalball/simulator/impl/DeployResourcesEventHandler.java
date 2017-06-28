@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DeployResourcesEventHandler implements SimulationEventHandler {
 
-    private static Logger log = LoggerFactory.getLogger(DeployResourcesEventHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeployResourcesEventHandler.class);
 
     /** process to start key */
     protected String resourcesKey;
@@ -59,7 +59,7 @@ public class DeployResourcesEventHandler implements SimulationEventHandler {
             DeploymentBuilder deploymentBuilder = SimulationRunContext.getRepositoryService().createDeployment();
 
             for (ResourceEntity resource : resources.values()) {
-                log.debug("adding resource [{}] to deployment", resource.getName());
+                LOGGER.debug("adding resource [{}] to deployment", resource.getName());
                 InputStream is = new ByteArrayInputStream(resource.getBytes());
                 deploymentBuilder.addInputStream(resource.getName(), is);
                 inputStreams.add(is);
@@ -71,7 +71,7 @@ public class DeployResourcesEventHandler implements SimulationEventHandler {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    log.error("Unable to close resource input stream {}", is);
+                    LOGGER.error("Unable to close resource input stream {}", is);
                 }
             }
         }

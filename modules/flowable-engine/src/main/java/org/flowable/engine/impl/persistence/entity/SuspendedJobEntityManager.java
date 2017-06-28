@@ -38,7 +38,7 @@ public interface SuspendedJobEntityManager extends EntityManager<SuspendedJobEnt
     /**
      * Executes a {@link JobQueryImpl} and returns the matching {@link SuspendedJobEntity} instances.
      */
-    List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery, Page page);
+    List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery);
 
     /**
      * Same as {@link #findJobsByQueryCriteria(SuspendedJobQueryImpl, Page)}, but only returns a count and not the instances itself.

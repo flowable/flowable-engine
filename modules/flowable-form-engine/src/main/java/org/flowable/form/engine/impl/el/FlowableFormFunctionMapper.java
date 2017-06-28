@@ -15,7 +15,7 @@ package org.flowable.form.engine.impl.el;
 
 import java.lang.reflect.Method;
 
-import javax.el.FunctionMapper;
+import org.flowable.engine.common.impl.javax.el.FunctionMapper;
 
 /**
  * Default implementation of a {@link FunctionMapper}.

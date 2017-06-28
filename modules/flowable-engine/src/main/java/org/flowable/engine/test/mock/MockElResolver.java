@@ -16,8 +16,8 @@ package org.flowable.engine.test.mock;
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
-import javax.el.ELContext;
-import javax.el.ELResolver;
+import org.flowable.engine.common.impl.javax.el.ELContext;
+import org.flowable.engine.common.impl.javax.el.ELResolver;
 
 public class MockElResolver extends ELResolver {
 

@@ -24,7 +24,6 @@ import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.data.AbstractDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DecisionTableDataManager;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.Page;
 
 /**
  * @author Joram Barrez
@@ -82,8 +81,8 @@ public class MybatisDecisionTableDataManager extends AbstractDataManager<Decisio
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<DmnDecisionTable> findDecisionTablesByQueryCriteria(DecisionTableQueryImpl decisionTableQuery, Page page) {
-        return getDbSqlSession().selectList("selectDecisionTablesByQueryCriteria", decisionTableQuery, page);
+    public List<DmnDecisionTable> findDecisionTablesByQueryCriteria(DecisionTableQueryImpl decisionTableQuery) {
+        return getDbSqlSession().selectList("selectDecisionTablesByQueryCriteria", decisionTableQuery);
     }
 
     @Override
@@ -140,8 +139,8 @@ public class MybatisDecisionTableDataManager extends AbstractDataManager<Decisio
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<DmnDecisionTable> findDecisionTablesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return getDbSqlSession().selectListWithRawParameter("selectDecisionTableByNativeQuery", parameterMap, firstResult, maxResults);
+    public List<DmnDecisionTable> findDecisionTablesByNativeQuery(Map<String, Object> parameterMap) {
+        return getDbSqlSession().selectListWithRawParameter("selectDecisionTableByNativeQuery", parameterMap);
     }
 
     @Override

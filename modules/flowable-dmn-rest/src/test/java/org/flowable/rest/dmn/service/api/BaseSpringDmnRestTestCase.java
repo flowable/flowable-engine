@@ -12,6 +12,11 @@
  */
 package org.flowable.rest.dmn.service.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -55,16 +60,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import junit.framework.AssertionFailedError;
 
 public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
 
-    private static Logger log = LoggerFactory.getLogger(BaseSpringDmnRestTestCase.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseSpringDmnRestTestCase.class);
 
     protected static String SERVER_URL_PREFIX;
     protected static DmnRestUrlBuilder URL_BUILDER;
@@ -115,7 +115,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
                     try {
                         client.close();
                     } catch (IOException e) {
-                        log.error("Could not close http client", e);
+                        LOGGER.error("Could not close http client", e);
                     }
                 }
 
@@ -123,7 +123,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
                     try {
                         server.stop();
                     } catch (Exception e) {
-                        log.error("Error stopping server", e);
+                        LOGGER.error("Error stopping server", e);
                     }
                 }
             }
@@ -137,14 +137,14 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
 
             super.runBare();
         } catch (AssertionFailedError e) {
-            log.error(EMPTY_LINE);
-            log.error("ASSERTION FAILED: {}", e, e);
+            LOGGER.error(EMPTY_LINE);
+            LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;
             throw e;
 
         } catch (Throwable e) {
-            log.error(EMPTY_LINE);
-            log.error("EXCEPTION: {}", e, e);
+            LOGGER.error(EMPTY_LINE);
+            LOGGER.error("EXCEPTION: {}", e, e);
             exception = e;
             throw e;
 
@@ -182,8 +182,8 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
 
             int responseStatusCode = response.getStatusLine().getStatusCode();
             if (expectedStatusCode != responseStatusCode) {
-                log.info("Wrong status code : {}, but should be {}", responseStatusCode, expectedStatusCode);
-                log.info("Response body: {}", IOUtils.toString(response.getEntity().getContent()));
+                LOGGER.info("Wrong status code : {}, but should be {}", responseStatusCode, expectedStatusCode);
+                LOGGER.info("Response body: {}", IOUtils.toString(response.getEntity().getContent()));
             }
 
             Assert.assertEquals(expectedStatusCode, responseStatusCode);
@@ -214,7 +214,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
                 try {
                     response.close();
                 } catch (IOException e) {
-                    log.error("Could not close http connection", e);
+                    LOGGER.error("Could not close http connection", e);
                 }
             }
         }

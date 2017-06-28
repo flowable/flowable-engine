@@ -72,9 +72,6 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
         final String query = "selectTasksWithRelatedEntitiesByQueryCriteria";
         // paging doesn't work for combining task instances and variables due to
         // an outer join, so doing it in-memory
-        if (taskQuery.getFirstResult() < 0 || taskQuery.getMaxResults() <= 0) {
-            return Collections.EMPTY_LIST;
-        }
 
         int firstResult = taskQuery.getFirstResult();
         int maxResults = taskQuery.getMaxResults();
@@ -87,7 +84,7 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
         }
         taskQuery.setFirstResult(0);
 
-        List<Task> instanceList = getDbSqlSession().selectListWithRawParameterWithoutFilter(query, taskQuery, taskQuery.getFirstResult(), taskQuery.getMaxResults());
+        List<Task> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheCheck(query, taskQuery);
 
         if (instanceList != null && !instanceList.isEmpty()) {
             if (firstResult > 0) {
@@ -98,7 +95,7 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
                     return Collections.EMPTY_LIST;
                 }
             } else {
-                int toIndex = Math.min(maxResults, instanceList.size());
+                int toIndex = maxResults > 0 ?  Math.min(maxResults, instanceList.size()) : instanceList.size();
                 return instanceList.subList(0, toIndex);
             }
         }
@@ -112,8 +109,8 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Task> findTasksByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return getDbSqlSession().selectListWithRawParameter("selectTaskByNativeQuery", parameterMap, firstResult, maxResults);
+    public List<Task> findTasksByNativeQuery(Map<String, Object> parameterMap) {
+        return getDbSqlSession().selectListWithRawParameter("selectTaskByNativeQuery", parameterMap);
     }
 
     @Override

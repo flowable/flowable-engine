@@ -37,6 +37,7 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
@@ -379,7 +380,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         // complete outerTask
         task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("outerTask").singleResult();
         taskService.complete(task.getId());
-
+        
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
     }
@@ -630,6 +631,9 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertEquals("After call activity", task.getName());
 
         taskService.complete(task.getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        
         assertProcessEnded(processInstance.getId());
         assertHistoricProcessInstanceDetails(processInstance);
     }
@@ -664,6 +668,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertEquals("After call activity", task.getName());
 
         taskService.complete(task.getId());
+        
         assertProcessEnded(processInstance.getId());
         assertHistoricProcessInstanceDetails(processInstance);
 
@@ -995,7 +1000,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
     }
 
     protected void assertHistoricProcessInstanceDetails(String processInstanceId) {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
                     .processInstanceId(processInstanceId).singleResult();
 
@@ -1006,7 +1011,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
     }
 
     protected void assertHistoricProcessInstanceDeleteReason(ProcessInstance processInstance, String expectedDeleteReason) {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
                     .processInstanceId(processInstance.getId()).singleResult();
             if (expectedDeleteReason == null) {
@@ -1018,7 +1023,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
     }
 
     protected void assertHistoricTasksDeleteReason(ProcessInstance processInstance, String expectedDeleteReason, String... taskNames) {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             for (String taskName : taskNames) {
                 List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery()
                         .processInstanceId(processInstance.getId()).taskName(taskName).list();
@@ -1036,7 +1041,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
     }
 
     protected void assertHistoricActivitiesDeleteReason(ProcessInstance processInstance, String expectedDeleteReason, String... activityIds) {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             for (String activityId : activityIds) {
                 List<HistoricActivityInstance> historicActiviyInstances = historyService.createHistoricActivityInstanceQuery()
                         .activityId(activityId).processInstanceId(processInstance.getId()).list();

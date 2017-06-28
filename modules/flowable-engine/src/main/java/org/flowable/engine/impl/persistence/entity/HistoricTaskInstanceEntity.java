@@ -16,14 +16,14 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.engine.common.impl.db.HasRevision;
 import org.flowable.engine.history.HistoricTaskInstance;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public interface HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity, HistoricTaskInstance, Entity {
+public interface HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity, HistoricTaskInstance, HasRevision {
 
     void setExecutionId(String executionId);
 
@@ -56,6 +56,10 @@ public interface HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity,
     void setClaimTime(Date claimTime);
 
     void setTenantId(String tenantId);
+    
+    Date getLastUpdateTime();
+    
+    void setLastUpdateTime(Date lastUpdateTime);
 
     List<HistoricVariableInstanceEntity> getQueryVariables();
 

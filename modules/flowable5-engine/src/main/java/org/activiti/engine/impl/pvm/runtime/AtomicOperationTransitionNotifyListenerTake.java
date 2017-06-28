@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AtomicOperationTransitionNotifyListenerTake implements AtomicOperation {
 
-    private static Logger log = LoggerFactory.getLogger(AtomicOperationTransitionNotifyListenerTake.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AtomicOperationTransitionNotifyListenerTake.class);
 
     public boolean isAsync(InterpretableExecution execution) {
         return false;
@@ -57,8 +57,8 @@ public class AtomicOperationTransitionNotifyListenerTake implements AtomicOperat
             execution.performOperation(this);
 
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug("{} takes transition {}", execution, transition);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("{} takes transition {}", execution, transition);
             }
             execution.setExecutionListenerIndex(0);
             execution.setEventName(null);

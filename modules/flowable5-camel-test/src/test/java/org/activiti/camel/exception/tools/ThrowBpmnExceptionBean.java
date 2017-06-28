@@ -33,11 +33,11 @@ public class ThrowBpmnExceptionBean {
         ThrowBpmnExceptionBean.exceptionType = exceptionType;
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(ThrowBpmnExceptionBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThrowBpmnExceptionBean.class);
 
     @Handler
     public void throwNonBpmnException() throws Exception {
-        LOG.debug("throwing non bpmn bug");
+        LOGGER.debug("throwing non bpmn bug");
 
         switch (getExceptionType()) {
         case NO_EXCEPTION:

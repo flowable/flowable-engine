@@ -89,11 +89,11 @@
   </select>
   
   <select id="selectGroupByQueryCriteria" parameterType="org.flowable.idm.engine.impl.GroupQueryImpl" resultMap="groupResultMap">
-  	${limitBefore}
-    select RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectGroupByQueryCriteriaSql" />
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
    <select id="selectGroupCountByQueryCriteria" parameterType="org.flowable.idm.engine.impl.GroupQueryImpl" resultType="long">

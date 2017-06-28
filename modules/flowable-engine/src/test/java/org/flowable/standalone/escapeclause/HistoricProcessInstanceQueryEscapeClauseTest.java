@@ -20,6 +20,7 @@ import java.util.Map;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 
@@ -76,7 +77,7 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
     }
 
     public void testQueryByProcessKeyNotIn() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processKeyNotIn
             List<String> processDefinitionKeyNotIn1 = new ArrayList<String>();
             processDefinitionKeyNotIn1.add("%\\%%");
@@ -126,7 +127,7 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
     }
 
     public void testQueryByTenantIdLike() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // tenantIdLike
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceTenantIdLike("%\\%%").singleResult();
             assertNotNull(historicProcessInstance);
@@ -148,7 +149,7 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
     }
 
     public void testQueryByProcessInstanceNameLike() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processInstanceNameLike
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceNameLike("%\\%%").singleResult();
             assertNotNull(historicProcessInstance);
@@ -170,7 +171,7 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
     }
 
     public void testQueryByProcessInstanceNameLikeIgnoreCase() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processInstanceNameLike
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceNameLikeIgnoreCase("%\\%%").singleResult();
             assertNotNull(historicProcessInstance);
@@ -192,7 +193,7 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
     }
 
     public void testQueryLikeByQueryVariableValue() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // queryVariableValue
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().variableValueLike("var1", "%\\%%").singleResult();
             assertNotNull(historicProcessInstance);
@@ -214,7 +215,7 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
     }
 
     public void testQueryLikeIgnoreCaseByQueryVariableValue() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // queryVariableValueIgnoreCase
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().variableValueLikeIgnoreCase("var1", "%\\%%").singleResult();
             assertNotNull(historicProcessInstance);

@@ -42,28 +42,33 @@ import org.flowable.engine.impl.el.NoExecutionVariableScope;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.jobexecutor.AsyncJobAddedNotification;
+import org.flowable.engine.impl.jobexecutor.HistoryJobHandler;
 import org.flowable.engine.impl.jobexecutor.JobAddedTransactionListener;
 import org.flowable.engine.impl.jobexecutor.JobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
-import org.flowable.engine.impl.persistence.entity.AbstractJobEntity;
+import org.flowable.engine.impl.persistence.entity.AbstractRuntimeJobEntity;
+import org.flowable.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntityManager;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.TimerUtil;
+import org.flowable.engine.runtime.HistoryJob;
 import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.JobInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DefaultJobManager implements JobManager {
 
-    private static Logger logger = LoggerFactory.getLogger(DefaultJobManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultJobManager.class);
 
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
@@ -181,7 +186,7 @@ public class DefaultJobManager implements JobManager {
     }
 
     @Override
-    public TimerJobEntity moveJobToTimerJob(AbstractJobEntity job) {
+    public TimerJobEntity moveJobToTimerJob(AbstractRuntimeJobEntity job) {
         TimerJobEntity timerJob = createTimerJobFromOtherJob(job);
         boolean insertSuccessful = processEngineConfiguration.getTimerJobEntityManager().insertTimerJobEntity(timerJob);
         if (insertSuccessful) {
@@ -197,7 +202,7 @@ public class DefaultJobManager implements JobManager {
     }
 
     @Override
-    public SuspendedJobEntity moveJobToSuspendedJob(AbstractJobEntity job) {
+    public SuspendedJobEntity moveJobToSuspendedJob(AbstractRuntimeJobEntity job) {
         SuspendedJobEntity suspendedJob = createSuspendedJobFromOtherJob(job);
         processEngineConfiguration.getSuspendedJobEntityManager().insert(suspendedJob);
         if (job instanceof TimerJobEntity) {
@@ -211,8 +216,8 @@ public class DefaultJobManager implements JobManager {
     }
 
     @Override
-    public AbstractJobEntity activateSuspendedJob(SuspendedJobEntity job) {
-        AbstractJobEntity activatedJob = null;
+    public AbstractRuntimeJobEntity activateSuspendedJob(SuspendedJobEntity job) {
+        AbstractRuntimeJobEntity activatedJob = null;
         if (Job.JOB_TYPE_TIMER.equals(job.getJobType())) {
             activatedJob = createTimerJobFromOtherJob(job);
             processEngineConfiguration.getTimerJobEntityManager().insert((TimerJobEntity) activatedJob);
@@ -229,7 +234,7 @@ public class DefaultJobManager implements JobManager {
     }
 
     @Override
-    public DeadLetterJobEntity moveJobToDeadLetterJob(AbstractJobEntity job) {
+    public DeadLetterJobEntity moveJobToDeadLetterJob(AbstractRuntimeJobEntity job) {
         DeadLetterJobEntity deadLetterJob = createDeadLetterJobFromOtherJob(job);
         processEngineConfiguration.getDeadLetterJobEntityManager().insert(deadLetterJob);
         if (job instanceof TimerJobEntity) {
@@ -260,11 +265,13 @@ public class DefaultJobManager implements JobManager {
     }
 
     @Override
-    public void execute(Job job) {
-        if (job instanceof JobEntity) {
-            if (Job.JOB_TYPE_MESSAGE.equals(job.getJobType())) {
+    public void execute(JobInfo job) {
+        if (job instanceof HistoryJobEntity) {
+            executeHistoryJob((HistoryJobEntity) job);
+        } else if (job instanceof JobEntity) {
+            if (Job.JOB_TYPE_MESSAGE.equals(((Job) job).getJobType())) {
                 executeMessageJob((JobEntity) job);
-            } else if (Job.JOB_TYPE_TIMER.equals(job.getJobType())) {
+            } else if (Job.JOB_TYPE_TIMER.equals(((Job) job).getJobType())) {
                 executeTimerJob((JobEntity) job);
             }
 
@@ -272,16 +279,29 @@ public class DefaultJobManager implements JobManager {
             throw new FlowableException("Only jobs with type JobEntity are supported to be executed");
         }
     }
-
+    
     @Override
-    public void unacquire(Job job) {
+    public void unacquire(JobInfo job) {
+        
+        if (job instanceof HistoryJob) {
+            
+            HistoryJobEntity jobEntity = (HistoryJobEntity) job;
 
-        // Deleting the old job and inserting it again with another id,
-        // will avoid that the job is immediately is picked up again (for example
-        // when doing lots of exclusive jobs for the same process instance)
-        if (job instanceof JobEntity) {
+            HistoryJobEntity newJobEntity = processEngineConfiguration.getHistoryJobEntityManager().create();
+            copyHistoryJobInfo(newJobEntity, jobEntity);
+            newJobEntity.setId(null); // We want a new id to be assigned to this job
+            newJobEntity.setLockExpirationTime(null);
+            newJobEntity.setLockOwner(null);
+            processEngineConfiguration.getHistoryJobEntityManager().insert(newJobEntity);
+            processEngineConfiguration.getHistoryJobEntityManager().deleteNoCascade(jobEntity);
+            
+        } else if (job instanceof JobEntity) {
+            
+            // Deleting the old job and inserting it again with another id,
+            // will avoid that the job is immediately is picked up again (for example
+            // when doing lots of exclusive jobs for the same process instance)
+            
             JobEntity jobEntity = (JobEntity) job;
-            processEngineConfiguration.getJobEntityManager().delete(jobEntity.getId());
 
             JobEntity newJobEntity = processEngineConfiguration.getJobEntityManager().create();
             copyJobInfo(newJobEntity, jobEntity);
@@ -289,6 +309,7 @@ public class DefaultJobManager implements JobManager {
             newJobEntity.setLockExpirationTime(null);
             newJobEntity.setLockOwner(null);
             processEngineConfiguration.getJobEntityManager().insert(newJobEntity);
+            processEngineConfiguration.getJobEntityManager().delete(jobEntity.getId());
 
             // We're not calling triggerExecutorIfNeeded here after the insert. The unacquire happened
             // for a reason (eg queue full or exclusive lock failure). No need to try it immediately again,
@@ -300,11 +321,69 @@ public class DefaultJobManager implements JobManager {
         }
 
     }
-
+    
+    @Override
+    public void unacquireWithDecrementRetries(JobInfo job) {
+        if (job instanceof HistoryJob) {
+            HistoryJobEntity historyJobEntity = (HistoryJobEntity) job;
+            
+            if (historyJobEntity.getRetries() > 0) {
+                HistoryJobEntity newHistoryJobEntity = processEngineConfiguration.getHistoryJobEntityManager().create();
+                copyHistoryJobInfo(newHistoryJobEntity, historyJobEntity);
+                newHistoryJobEntity.setId(null); // We want a new id to be assigned to this job
+                newHistoryJobEntity.setLockExpirationTime(null);
+                newHistoryJobEntity.setLockOwner(null);
+                newHistoryJobEntity.setCreateTime(processEngineConfiguration.getClock().getCurrentTime());
+            
+                newHistoryJobEntity.setRetries(newHistoryJobEntity.getRetries() - 1);
+                processEngineConfiguration.getHistoryJobEntityManager().insert(newHistoryJobEntity);
+                
+            } else {
+                // delete the job, because the history info could not be written
+                //DeadLetterJobEntity deadLetterJob = createDeadLetterJobFromOtherJob(newHistoryJobEntity);
+                //processEngineConfiguration.getDeadLetterJobEntityManager().insert(deadLetterJob);
+            }
+            
+            processEngineConfiguration.getHistoryJobEntityManager().deleteNoCascade(historyJobEntity);
+            
+        } else {
+            JobEntity jobEntity = (JobEntity) job;
+            
+            JobEntity newJobEntity = processEngineConfiguration.getJobEntityManager().create();
+            copyJobInfo(newJobEntity, jobEntity);
+            newJobEntity.setId(null); // We want a new id to be assigned to this job
+            newJobEntity.setLockExpirationTime(null);
+            newJobEntity.setLockOwner(null);
+            
+            if (newJobEntity.getRetries() > 0) {
+                newJobEntity.setRetries(newJobEntity.getRetries() - 1);
+                processEngineConfiguration.getJobEntityManager().insert(newJobEntity);
+                
+            } else {
+                DeadLetterJobEntity deadLetterJob = createDeadLetterJobFromOtherJob(newJobEntity);
+                processEngineConfiguration.getDeadLetterJobEntityManager().insert(deadLetterJob);
+            }
+            
+            processEngineConfiguration.getJobEntityManager().delete(jobEntity.getId());
+    
+            // We're not calling triggerExecutorIfNeeded here after the insert. The unacquire happened
+            // for a reason (eg queue full or exclusive lock failure). No need to try it immediately again,
+            // as the chance of failure will be high.
+            
+        }
+    }
+    
     protected void executeMessageJob(JobEntity jobEntity) {
         executeJobHandler(jobEntity);
         if (jobEntity.getId() != null) {
             Context.getCommandContext().getJobEntityManager().delete(jobEntity);
+        }
+    }
+    
+    protected void executeHistoryJob(HistoryJobEntity historyJobEntity) {
+        executeHistoryJobHandler(historyJobEntity);
+        if (historyJobEntity.getId() != null) {
+            Context.getCommandContext().getHistoryJobEntityManager().delete(historyJobEntity);
         }
     }
 
@@ -324,8 +403,8 @@ public class DefaultJobManager implements JobManager {
         restoreExtraData(timerEntity, variableScope);
 
         if (timerEntity.getDuedate() != null && !isValidTime(timerEntity, timerEntity.getDuedate(), variableScope)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Timer {} fired. but the dueDate is after the endDate.  Deleting timer.", timerEntity.getId());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Timer {} fired. but the dueDate is after the endDate.  Deleting timer.", timerEntity.getId());
             }
             processEngineConfiguration.getJobEntityManager().delete(timerEntity);
             return;
@@ -334,8 +413,8 @@ public class DefaultJobManager implements JobManager {
         executeJobHandler(timerEntity);
         processEngineConfiguration.getJobEntityManager().delete(timerEntity);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Timer {} fired. Deleting timer.", timerEntity.getId());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Timer {} fired. Deleting timer.", timerEntity.getId());
         }
 
         if (timerEntity.getRepeat() != null) {
@@ -355,6 +434,12 @@ public class DefaultJobManager implements JobManager {
         Map<String, JobHandler> jobHandlers = processEngineConfiguration.getJobHandlers();
         JobHandler jobHandler = jobHandlers.get(jobEntity.getJobHandlerType());
         jobHandler.execute(jobEntity, jobEntity.getJobHandlerConfiguration(), execution, getCommandContext());
+    }
+    
+    protected void executeHistoryJobHandler(HistoryJobEntity historyJobEntity) {
+        Map<String, HistoryJobHandler> jobHandlers = processEngineConfiguration.getHistoryJobHandlers();
+        HistoryJobHandler jobHandler = jobHandlers.get(historyJobEntity.getJobHandlerType());
+        jobHandler.execute(historyJobEntity, historyJobEntity.getJobHandlerConfiguration(), getCommandContext());
     }
 
     protected void restoreExtraData(JobEntity timerEntity, VariableScope variableScope) {
@@ -438,6 +523,7 @@ public class DefaultJobManager implements JobManager {
                 times = Integer.parseInt(expression.get(0).substring(1));
             }
         }
+        
         return times;
     }
 
@@ -501,7 +587,7 @@ public class DefaultJobManager implements JobManager {
         }
     }
 
-    protected JobEntity createExecutableJobFromOtherJob(AbstractJobEntity job) {
+    protected JobEntity createExecutableJobFromOtherJob(AbstractRuntimeJobEntity job) {
         JobEntity executableJob = processEngineConfiguration.getJobEntityManager().create();
         copyJobInfo(executableJob, job);
 
@@ -516,25 +602,25 @@ public class DefaultJobManager implements JobManager {
         return executableJob;
     }
 
-    protected TimerJobEntity createTimerJobFromOtherJob(AbstractJobEntity otherJob) {
+    protected TimerJobEntity createTimerJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
         TimerJobEntity timerJob = processEngineConfiguration.getTimerJobEntityManager().create();
         copyJobInfo(timerJob, otherJob);
         return timerJob;
     }
 
-    protected SuspendedJobEntity createSuspendedJobFromOtherJob(AbstractJobEntity otherJob) {
+    protected SuspendedJobEntity createSuspendedJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
         SuspendedJobEntity suspendedJob = processEngineConfiguration.getSuspendedJobEntityManager().create();
         copyJobInfo(suspendedJob, otherJob);
         return suspendedJob;
     }
 
-    protected DeadLetterJobEntity createDeadLetterJobFromOtherJob(AbstractJobEntity otherJob) {
+    protected DeadLetterJobEntity createDeadLetterJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
         DeadLetterJobEntity deadLetterJob = processEngineConfiguration.getDeadLetterJobEntityManager().create();
         copyJobInfo(deadLetterJob, otherJob);
         return deadLetterJob;
     }
 
-    protected AbstractJobEntity copyJobInfo(AbstractJobEntity copyToJob, AbstractJobEntity copyFromJob) {
+    protected AbstractRuntimeJobEntity copyJobInfo(AbstractRuntimeJobEntity copyToJob, AbstractRuntimeJobEntity copyFromJob) {
         copyToJob.setDuedate(copyFromJob.getDuedate());
         copyToJob.setEndDate(copyFromJob.getEndDate());
         copyToJob.setExclusive(copyFromJob.isExclusive());
@@ -549,6 +635,27 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setProcessDefinitionId(copyFromJob.getProcessDefinitionId());
         copyToJob.setProcessInstanceId(copyFromJob.getProcessInstanceId());
         copyToJob.setRepeat(copyFromJob.getRepeat());
+        copyToJob.setRetries(copyFromJob.getRetries());
+        copyToJob.setRevision(copyFromJob.getRevision());
+        copyToJob.setTenantId(copyFromJob.getTenantId());
+
+        return copyToJob;
+    }
+    
+    protected HistoryJobEntity copyHistoryJobInfo(HistoryJobEntity copyToJob, HistoryJobEntity copyFromJob) {
+        copyToJob.setId(copyFromJob.getId());
+        copyToJob.setJobHandlerConfiguration(copyFromJob.getJobHandlerConfiguration());
+        if (copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
+            ByteArrayRef configurationByteArrayRefCopy = copyFromJob.getAdvancedJobHandlerConfigurationByteArrayRef().copy();
+            copyToJob.setAdvancedJobHandlerConfigurationByteArrayRef(configurationByteArrayRefCopy);
+        }
+        if (copyFromJob.getExceptionByteArrayRef() != null) {
+            ByteArrayRef exceptionByteArrayRefCopy = copyFromJob.getExceptionByteArrayRef();
+            copyToJob.setExceptionByteArrayRef(exceptionByteArrayRefCopy);
+        }
+        copyToJob.setJobHandlerType(copyFromJob.getJobHandlerType());
+        copyToJob.setExceptionMessage(copyFromJob.getExceptionMessage());
+        copyToJob.setExceptionStacktrace(copyFromJob.getExceptionStacktrace());
         copyToJob.setRetries(copyFromJob.getRetries());
         copyToJob.setRevision(copyFromJob.getRevision());
         copyToJob.setTenantId(copyFromJob.getTenantId());
@@ -579,5 +686,4 @@ public class DefaultJobManager implements JobManager {
     protected ExecutionEntityManager getExecutionEntityManager() {
         return processEngineConfiguration.getExecutionEntityManager();
     }
-
 }

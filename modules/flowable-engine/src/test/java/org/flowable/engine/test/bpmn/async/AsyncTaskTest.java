@@ -19,6 +19,7 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.Job;
@@ -123,7 +124,6 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
             }
         }
         assertNotNull(execution);
-        assertEquals("service", runtimeService.getActiveActivityIds(execution.getId()).get(0));
 
         // there is still a single job because the timer was created in the same
         // transaction as the service was executed (which rolled back)
@@ -228,7 +228,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
 
         assertProcessEnded(processInstance.getId());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list();
             assertEquals(3, variables.size());
 
@@ -342,7 +342,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         // the job is done
         assertEquals(0, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricActivityInstance> historicActivities = historyService.createHistoricActivityInstanceQuery()
                     .processInstanceId(processInstance.getId())
                     .list();
@@ -376,7 +376,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         // start process
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncTask");
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricActivityInstance> historicActivities = historyService.createHistoricActivityInstanceQuery()
                     .processInstanceId(processInstance.getId())
                     .list();
@@ -427,7 +427,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         // the job is done
         assertEquals(0, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricActivityInstance> historicActivities = historyService.createHistoricActivityInstanceQuery()
                     .processInstanceId(processInstance.getId())
                     .list();
@@ -461,7 +461,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         // start process
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncTask");
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricActivityInstance> historicActivities = historyService.createHistoricActivityInstanceQuery()
                     .processInstanceId(processInstance.getId())
                     .list();

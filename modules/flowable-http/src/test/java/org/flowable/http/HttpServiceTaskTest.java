@@ -12,6 +12,9 @@
  */
 package org.flowable.http;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.HashMap;
@@ -27,15 +30,12 @@ import org.flowable.engine.test.Deployment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Harsha Teja Kanna
  */
 public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
 
-    private static Logger log = LoggerFactory.getLogger(HttpServiceTaskTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServiceTaskTest.class);
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -110,8 +110,8 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         try {
             runtimeService.startProcessInstanceByKey("connectTimeout");
         } catch (final Exception e) {
-            assertEquals(true, e instanceof FlowableException);
-            assertEquals(true, e.getCause() instanceof IOException);
+            assertTrue(e instanceof FlowableException);
+            assertTrue(e.getCause() instanceof IOException);
         }
     }
 
@@ -120,8 +120,8 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         try {
             runtimeService.startProcessInstanceByKey("requestTimeout");
         } catch (final Exception e) {
-            assertEquals(true, e instanceof FlowableException);
-            assertEquals(true, e.getCause() instanceof SocketException);
+            assertTrue(e instanceof FlowableException);
+            assertTrue(e.getCause() instanceof SocketException);
         }
     }
 
@@ -130,8 +130,8 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         try {
             runtimeService.startProcessInstanceByKey("disallowRedirects");
         } catch (Exception e) {
-            assertEquals(true, e instanceof FlowableException);
-            assertEquals("HTTP302", ((FlowableException) e).getMessage());
+            assertTrue(e instanceof FlowableException);
+            assertEquals("HTTP302", e.getMessage());
         }
     }
 
@@ -141,8 +141,8 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         try {
             process = runtimeService.startProcessInstanceByKey("failStatusCodes");
         } catch (Exception e) {
-            assertEquals(true, e instanceof FlowableException);
-            assertEquals("HTTP400", ((FlowableException) e).getMessage());
+            assertTrue(e instanceof FlowableException);
+            assertEquals("HTTP400", e.getMessage());
         }
         assertProcessEnded(process.getId());
     }
@@ -186,7 +186,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         String body = (String) runtimeService.getVariable(process.getId(), "result.responseBody");
         assertNotNull(body);
         JsonNode jsonNode = mapper.readValue(body, JsonNode.class);
-        HttpTestData testData = mapper.convertValue(jsonNode, HttpTestData.class);
+        mapper.convertValue(jsonNode, HttpTestData.class);
         continueProcess(process);
     }
 
@@ -206,8 +206,8 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         try {
             runtimeService.startProcessInstanceByKey("testHttpGet4XX");
         } catch (Exception e) {
-            assertEquals(true, e instanceof FlowableException);
-            assertEquals("HTTP404", ((FlowableException) e).getMessage());
+            assertTrue(e instanceof FlowableException);
+            assertEquals("HTTP404", e.getMessage());
         }
     }
 

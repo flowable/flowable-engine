@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AbstractCommandContext {
 
-    private static Logger log = LoggerFactory.getLogger(AbstractCommandContext.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCommandContext.class);
 
     protected BaseCommand<?, ? extends AbstractCommandContext> command;
     protected Map<Class<?>, SessionFactory> sessionFactories;
@@ -93,11 +93,15 @@ public class AbstractCommandContext {
     }
 
     protected void logException() {
+        if (exception instanceof FlowableException && !((FlowableException) exception).isLogged()) {
+            return;
+        }
+        
         if (exception instanceof FlowableOptimisticLockingException) {
             // reduce log level, as normally we're not interested in logging this exception
-            log.debug("Optimistic locking exception : {}", exception.getMessage(), exception);
+            LOGGER.debug("Optimistic locking exception : {}", exception.getMessage(), exception);
         } else {
-            log.error("Error while closing command context", exception);
+            LOGGER.error("Error while closing command context", exception);
         }
     }
 
@@ -196,7 +200,7 @@ public class AbstractCommandContext {
             this.exception = exception;
 
         } else {
-            log.error("masked exception in command context. for root cause, see below as it will be rethrown later.", exception);
+            LOGGER.error("masked exception in command context. for root cause, see below as it will be rethrown later.", exception);
         }
     }
 

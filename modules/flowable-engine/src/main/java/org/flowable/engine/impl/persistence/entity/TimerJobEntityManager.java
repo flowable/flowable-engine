@@ -70,7 +70,7 @@ public interface TimerJobEntityManager extends EntityManager<TimerJobEntity> {
     /**
      * Executes a {@link JobQueryImpl} and returns the matching {@link TimerJobEntity} instances.
      */
-    List<Job> findJobsByQueryCriteria(TimerJobQueryImpl jobQuery, Page page);
+    List<Job> findJobsByQueryCriteria(TimerJobQueryImpl jobQuery);
 
     /**
      * Same as {@link #findJobsByQueryCriteria(TimerJobQueryImpl, Page)}, but only returns a count and not the instances itself.

@@ -23,6 +23,8 @@ import org.flowable.bpmn.model.CancelEventDefinition;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.Gateway;
+import org.flowable.bpmn.model.InclusiveGateway;
+import org.flowable.bpmn.model.ParallelGateway;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.engine.common.api.FlowableException;
@@ -104,7 +106,16 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
                 executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_END);
             }
 
-            commandContext.getHistoryManager().recordActivityEnd(execution, null);
+            if (execution.isActive()
+                    && !flowNode.getOutgoingFlows().isEmpty()
+                    && !(flowNode instanceof ParallelGateway) // Parallel gw takes care of its own history
+                    && !(flowNode instanceof InclusiveGateway) // Inclusive gw takes care of its own history
+                    && !(flowNode instanceof SubProcess) // Subprocess handling creates and destroys scoped execution. The execution taking the seq flow is different from the one entering
+                    && (!(flowNode instanceof Activity) || ((Activity) flowNode).getLoopCharacteristics() == null) // Multi instance root execution leaving the node isn't stored in history
+                    ) {  
+                // If no sequence flow: will be handled by the deletion of executions
+                commandContext.getHistoryManager().recordActivityEnd(execution, null);
+            }
 
             if (!(execution.getCurrentFlowElement() instanceof SubProcess)) {
                 Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
@@ -114,7 +125,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
 
         }
     }
-
+    
     protected void leaveFlowNode(FlowNode flowNode) {
 
         logger.debug("Leaving flow node {} with id '{}' by following it's {} outgoing sequenceflow",
@@ -179,7 +190,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
 
             // Reuse existing one
             execution.setCurrentFlowElement(sequenceFlow);
-            execution.setActive(true);
+            execution.setActive(false);
             outgoingExecutions.add(execution);
 
             // Executions for all the other one
@@ -190,6 +201,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
                     ExecutionEntity outgoingExecutionEntity = commandContext.getExecutionEntityManager().createChildExecution(parent);
 
                     SequenceFlow outgoingSequenceFlow = outgoingSequenceFlows.get(i);
+                    outgoingExecutionEntity.setActive(false);
                     outgoingExecutionEntity.setCurrentFlowElement(outgoingSequenceFlow);
 
                     executionEntityManager.insert(outgoingExecutionEntity);
@@ -247,8 +259,6 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
     protected void cleanupCompensation() {
 
         // The compensation is at the end here. Simply stop the execution.
-
-        commandContext.getHistoryManager().recordActivityEnd(execution, null);
         commandContext.getExecutionEntityManager().deleteExecutionAndRelatedData(execution, null, false);
 
         ExecutionEntity parentExecutionEntity = execution.getParent();

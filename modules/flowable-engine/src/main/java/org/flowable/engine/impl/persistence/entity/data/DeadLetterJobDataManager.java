@@ -14,7 +14,6 @@ package org.flowable.engine.impl.persistence.entity.data;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.DeadLetterJobQueryImpl;
 import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntity;
@@ -27,7 +26,7 @@ public interface DeadLetterJobDataManager extends DataManager<DeadLetterJobEntit
 
     List<DeadLetterJobEntity> findJobsByExecutionId(String executionId);
 
-    List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery, Page page);
+    List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery);
 
     long findJobCountByQueryCriteria(DeadLetterJobQueryImpl jobQuery);
 

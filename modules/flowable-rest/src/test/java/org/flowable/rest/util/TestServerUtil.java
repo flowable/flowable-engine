@@ -31,7 +31,7 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
  */
 public class TestServerUtil {
 
-    private static final Logger log = LoggerFactory.getLogger(TestServerUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestServerUtil.class);
 
     protected static final int START_PORT = 9797;
     private static AtomicInteger NEXT_PORT = new AtomicInteger(9797);
@@ -51,7 +51,7 @@ public class TestServerUtil {
             server.setHandler(getServletContextHandler(applicationContext));
             server.start();
         } catch (Exception e) {
-            log.error("Error starting server", e);
+            LOGGER.error("Error starting server", e);
         }
 
         return new TestServer(server, applicationContext, port);

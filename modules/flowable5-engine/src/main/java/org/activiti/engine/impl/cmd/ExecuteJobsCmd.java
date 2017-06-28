@@ -37,7 +37,7 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(ExecuteJobsCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteJobsCmd.class);
 
     protected String jobId;
     protected JobEntity job;
@@ -66,8 +66,8 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
             throw new JobNotFoundException(jobId);
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Executing job {}", job.getId());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Executing job {}", job.getId());
         }
 
         JobExecutorContext jobExecutorContext = Context.getJobExecutorContext();
@@ -100,7 +100,7 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
                     commandContext.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityExceptionEvent(
                             FlowableEngineEventType.JOB_EXECUTION_FAILURE, job, exception));
                 } catch (Throwable ignore) {
-                    log.warn("Exception occurred while dispatching job failure event, ignoring.", ignore);
+                    LOGGER.warn("Exception occurred while dispatching job failure event, ignoring.", ignore);
                 }
             }
 

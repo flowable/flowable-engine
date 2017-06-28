@@ -12,11 +12,11 @@
  */
 package org.flowable.engine.impl.bpmn.deployer;
 
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
-
-import java.util.Map;
 
 /**
  * Static methods for working with BPMN and image resource names.

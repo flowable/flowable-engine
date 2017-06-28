@@ -56,7 +56,7 @@ public class ExecutionImpl implements
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(ExecutionImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionImpl.class);
 
     // current position /////////////////////////////////////////////////////////
 
@@ -206,7 +206,7 @@ public class ExecutionImpl implements
         List<InterpretableExecution> childExecutions = new ArrayList<InterpretableExecution>(getExecutions());
         for (InterpretableExecution childExecution : childExecutions) {
             if (childExecution.isEventScope()) {
-                log.debug("removing eventScope {}", childExecution);
+                LOGGER.debug("removing eventScope {}", childExecution);
                 childExecution.destroy();
                 childExecution.remove();
             }
@@ -216,7 +216,7 @@ public class ExecutionImpl implements
     @Override
     public void destroyScope(String reason) {
 
-        log.debug("performing destroy scope behavior for execution {}", this);
+        LOGGER.debug("performing destroy scope behavior for execution {}", this);
 
         // remove all child executions and sub process instances:
         List<InterpretableExecution> executions = new ArrayList<InterpretableExecution>(getExecutions());
@@ -540,9 +540,9 @@ public class ExecutionImpl implements
                 otherConcurrentExecutions.add(this);
             }
         }
-        if (log.isDebugEnabled()) {
-            log.debug("inactive concurrent executions in '{}': {}", activity, inactiveConcurrentExecutionsInActivity);
-            log.debug("other concurrent executions: {}", otherConcurrentExecutions);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("inactive concurrent executions in '{}': {}", activity, inactiveConcurrentExecutionsInActivity);
+            LOGGER.debug("other concurrent executions: {}", otherConcurrentExecutions);
         }
         return inactiveConcurrentExecutionsInActivity;
     }
@@ -568,9 +568,9 @@ public class ExecutionImpl implements
             }
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("transitions to take concurrent: {}", transitions);
-            log.debug("active concurrent executions: {}", concurrentActiveExecutions);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("transitions to take concurrent: {}", transitions);
+            LOGGER.debug("active concurrent executions: {}", concurrentActiveExecutions);
         }
 
         if ((transitions.size() == 1)
@@ -583,12 +583,12 @@ public class ExecutionImpl implements
                 // Some recyclable executions are inactivated (joined executions)
                 // Others are already ended (end activities)
                 if (!prunedExecution.isEnded()) {
-                    log.debug("pruning execution {}", prunedExecution);
+                    LOGGER.debug("pruning execution {}", prunedExecution);
                     prunedExecution.remove();
                 }
             }
 
-            log.debug("activating the concurrent root {} as the single path of execution going forward", concurrentRoot);
+            LOGGER.debug("activating the concurrent root {} as the single path of execution going forward", concurrentRoot);
             concurrentRoot.setActive(true);
             concurrentRoot.setActivity(activity);
             concurrentRoot.setConcurrent(false);
@@ -600,7 +600,7 @@ public class ExecutionImpl implements
 
             recyclableExecutions.remove(concurrentRoot);
 
-            log.debug("recyclable executions for reused: {}", recyclableExecutions);
+            LOGGER.debug("recyclable executions for reused: {}", recyclableExecutions);
 
             // first create the concurrent executions
             while (!transitions.isEmpty()) {
@@ -609,10 +609,10 @@ public class ExecutionImpl implements
                 ExecutionImpl outgoingExecution = null;
                 if (recyclableExecutions.isEmpty()) {
                     outgoingExecution = concurrentRoot.createExecution();
-                    log.debug("new {} created to take transition {}", outgoingExecution, outgoingTransition);
+                    LOGGER.debug("new {} created to take transition {}", outgoingExecution, outgoingTransition);
                 } else {
                     outgoingExecution = (ExecutionImpl) recyclableExecutions.remove(0);
-                    log.debug("recycled {} to take transition {}", outgoingExecution, outgoingTransition);
+                    LOGGER.debug("recycled {} to take transition {}", outgoingExecution, outgoingTransition);
                 }
 
                 outgoingExecution.setActive(true);
@@ -623,7 +623,7 @@ public class ExecutionImpl implements
 
             // prune the executions that are not recycled
             for (ActivityExecution prunedExecution : recyclableExecutions) {
-                log.debug("pruning execution {}", prunedExecution);
+                LOGGER.debug("pruning execution {}", prunedExecution);
                 prunedExecution.end();
             }
 
@@ -641,8 +641,8 @@ public class ExecutionImpl implements
             while (nextOperation != null) {
                 AtomicOperation currentOperation = this.nextOperation;
                 this.nextOperation = null;
-                if (log.isTraceEnabled()) {
-                    log.trace("AtomicOperation: {} on {}", currentOperation, this);
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace("AtomicOperation: {} on {}", currentOperation, this);
                 }
                 currentOperation.execute(this);
             }
@@ -740,7 +740,7 @@ public class ExecutionImpl implements
     }
 
     public void setVariableLocally(String variableName, Object value) {
-        log.debug("setting variable '{}' to value '{}' on {}", variableName, value, this);
+        LOGGER.debug("setting variable '{}' to value '{}' on {}", variableName, value, this);
         variables.put(variableName, value);
     }
 
@@ -1026,6 +1026,12 @@ public class ExecutionImpl implements
     }
 
     public void setVariablesLocal(Map<String, ? extends Object> variables) {
+    }
+    
+    @Override
+    public Object setVariableLocal(String variableName, Object value, org.flowable.engine.impl.persistence.entity.ExecutionEntity sourceActivityExecution, boolean fetchAllVariables) {
+        // This method is called from v6 only, v5 will never call this method.
+        throw new UnsupportedOperationException();
     }
 
     public boolean isEventScope() {

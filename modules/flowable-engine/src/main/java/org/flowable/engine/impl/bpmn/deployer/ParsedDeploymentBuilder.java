@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 public class ParsedDeploymentBuilder {
 
-    private static final Logger log = LoggerFactory.getLogger(ParsedDeploymentBuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParsedDeploymentBuilder.class);
 
     protected DeploymentEntity deployment;
     protected BpmnParser bpmnParser;
@@ -49,7 +49,7 @@ public class ParsedDeploymentBuilder {
 
         for (ResourceEntity resource : deployment.getResources().values()) {
             if (isBpmnResource(resource.getName())) {
-                log.debug("Processing BPMN resource {}", resource.getName());
+                LOGGER.debug("Processing BPMN resource {}", resource.getName());
                 BpmnParse parse = createBpmnParseFromResource(resource);
                 for (ProcessDefinitionEntity processDefinition : parse.getProcessDefinitions()) {
                     processDefinitions.add(processDefinition);

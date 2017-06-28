@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * @author Tijs Rademakers
  */
 public class CommandContextInterceptor extends AbstractCommandInterceptor {
-    private static final Logger log = LoggerFactory.getLogger(CommandContextInterceptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommandContextInterceptor.class);
 
     protected CommandContextFactory commandContextFactory;
     protected ContentEngineConfiguration contentEngineConfiguration;
@@ -45,7 +45,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
         if (!config.isContextReusePossible() || context == null || context.getException() != null) {
             context = commandContextFactory.createCommandContext(command);
         } else {
-            log.debug("Valid context found. Reusing it for the current command '{}'", command.getClass().getCanonicalName());
+            LOGGER.debug("Valid context found. Reusing it for the current command '{}'", command.getClass().getCanonicalName());
             contextReused = true;
         }
 

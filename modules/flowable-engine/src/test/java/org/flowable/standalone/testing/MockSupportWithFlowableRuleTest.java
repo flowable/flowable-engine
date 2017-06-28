@@ -12,8 +12,8 @@
  */
 package org.flowable.standalone.testing;
 
-import org.flowable.engine.test.FlowableRule;
 import org.flowable.engine.test.Deployment;
+import org.flowable.engine.test.FlowableRule;
 import org.flowable.engine.test.mock.FlowableMockSupport;
 import org.flowable.engine.test.mock.MockServiceTask;
 import org.flowable.engine.test.mock.MockServiceTasks;

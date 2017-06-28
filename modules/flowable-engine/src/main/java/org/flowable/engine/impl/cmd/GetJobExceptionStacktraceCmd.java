@@ -19,7 +19,7 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.AbstractJobEntity;
+import org.flowable.engine.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.engine.runtime.Job;
 
 /**
@@ -42,7 +42,7 @@ public class GetJobExceptionStacktraceCmd implements Command<String>, Serializab
             throw new FlowableIllegalArgumentException("jobId is null");
         }
 
-        AbstractJobEntity job = null;
+        AbstractRuntimeJobEntity job = null;
         switch (jobType) {
         case ASYNC:
             job = commandContext.getJobEntityManager().findById(jobId);

@@ -102,13 +102,14 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
             taskService.setAssignee(task.getId(), "kermit");
 
             // Boundary-event should have been signalled and a new task should
-            // be available, the already
-            // existing one is gone, since the cancelActivity='true'
+            // be available, the already existing one is gone, since the cancelActivity='true'
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subTask").singleResult();
             assertNull(task);
 
             Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
             assertNotNull(boundaryTask);
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         } finally {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);

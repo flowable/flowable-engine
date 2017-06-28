@@ -16,7 +16,6 @@ package org.flowable.engine.impl;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.repository.Model;
@@ -210,9 +209,9 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return commandContext.getModelEntityManager().findModelCountByQueryCriteria(this);
     }
 
-    public List<Model> executeList(CommandContext commandContext, Page page) {
+    public List<Model> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getModelEntityManager().findModelsByQueryCriteria(this, page);
+        return commandContext.getModelEntityManager().findModelsByQueryCriteria(this);
     }
 
     // getters ////////////////////////////////////////////

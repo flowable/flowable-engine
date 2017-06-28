@@ -29,7 +29,7 @@
               <text><![CDATA[== empty]]></text>
             </inputEntry>
             <inputEntry id="inputEntry4">
-              <text><![CDATA[contains 'foobar']]></text>
+              <text><![CDATA[.contains('foobar')]]></text>
             </inputEntry>
             <outputEntry id="outputEntry2">
               <text>'test2'</text>

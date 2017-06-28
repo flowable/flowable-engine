@@ -51,6 +51,7 @@ public class EndpointAutoConfigurationTest {
             MetricRepositoryAutoConfiguration.class,
             DataSourceProcessEngineAutoConfiguration.DataSourceProcessEngineConfiguration.class,
             EndpointAutoConfiguration.class })
+    @PropertySource("test-actuator-endpoint.properties")
     public static class EndpointConfiguration {
 
         @Bean

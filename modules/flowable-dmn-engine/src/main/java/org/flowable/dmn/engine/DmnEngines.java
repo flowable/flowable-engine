@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class DmnEngines {
 
-    private static Logger log = LoggerFactory.getLogger(DmnEngines.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DmnEngines.class);
 
     public static final String NAME_DEFAULT = "default";
 
@@ -73,7 +73,7 @@ public abstract class DmnEngines {
             }
             for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
                 URL resource = iterator.next();
-                log.info("Initializing dmn engine using configuration '{}'", resource.toString());
+                LOGGER.info("Initializing dmn engine using configuration '{}'", resource.toString());
                 initDmnEngineFromResource(resource);
             }
 
@@ -85,13 +85,13 @@ public abstract class DmnEngines {
 
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
-                log.info("Initializing dmn engine using Spring configuration '{}'", resource.toString());
+                LOGGER.info("Initializing dmn engine using Spring configuration '{}'", resource.toString());
                 initDmnEngineFromSpringResource(resource);
             }
 
             setInitialized(true);
         } else {
-            log.info("DMN engines already initialized");
+            LOGGER.info("DMN engines already initialized");
         }
     }
 
@@ -141,15 +141,15 @@ public abstract class DmnEngines {
 
         String resourceUrlString = resourceUrl.toString();
         try {
-            log.info("initializing dmn engine for resource {}", resourceUrl);
+            LOGGER.info("initializing dmn engine for resource {}", resourceUrl);
             DmnEngine dmnEngine = buildDmnEngine(resourceUrl);
             String dmnEngineName = dmnEngine.getName();
-            log.info("initialised dmn engine {}", dmnEngineName);
+            LOGGER.info("initialised dmn engine {}", dmnEngineName);
             dmnEngineInfo = new EngineInfo(dmnEngineName, resourceUrlString, null);
             dmnEngines.put(dmnEngineName, dmnEngine);
             dmnEngineInfosByName.put(dmnEngineName, dmnEngineInfo);
         } catch (Throwable e) {
-            log.error("Exception while initializing dmn engine: {}", e.getMessage(), e);
+            LOGGER.error("Exception while initializing dmn engine: {}", e.getMessage(), e);
             dmnEngineInfo = new EngineInfo(null, resourceUrlString, getExceptionString(e));
         }
         dmnEngineInfosByResourceUrl.put(resourceUrlString, dmnEngineInfo);
@@ -212,7 +212,7 @@ public abstract class DmnEngines {
      * retries to initialize a dmn engine that previously failed.
      */
     public static EngineInfo retry(String resourceUrl) {
-        log.debug("retying initializing of resource {}", resourceUrl);
+        LOGGER.debug("retying initializing of resource {}", resourceUrl);
         try {
             return initDmnEngineFromResource(new URL(resourceUrl));
         } catch (MalformedURLException e) {
@@ -240,7 +240,7 @@ public abstract class DmnEngines {
                 try {
                     dmnEngine.close();
                 } catch (Exception e) {
-                    log.error("exception while closing {}", (dmnEngineName == null ? "the default dmn engine" : "dmn engine " + dmnEngineName), e);
+                    LOGGER.error("exception while closing {}", (dmnEngineName == null ? "the default dmn engine" : "dmn engine " + dmnEngineName), e);
                 }
             }
 

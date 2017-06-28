@@ -23,6 +23,7 @@
   <insert id="insertHistoricActivityInstance" parameterType="org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityImpl">
       insert into ${prefix}ACT_HI_ACTINST (
         ID_,
+        REV_,
         PROC_DEF_ID_,
         PROC_INST_ID_,
         EXECUTION_ID_,
@@ -39,6 +40,7 @@
         TENANT_ID_
       ) values (
         #{id ,jdbcType=VARCHAR},
+        1,
         #{processDefinitionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
@@ -59,6 +61,7 @@
   <insert id="bulkInsertHistoricActivityInstance" parameterType="java.util.List">
       insert into ${prefix}ACT_HI_ACTINST (
         ID_,
+        REV_,
         PROC_DEF_ID_,
         PROC_INST_ID_,
         EXECUTION_ID_,
@@ -76,6 +79,7 @@
       ) values 
       <foreach collection="list" item="historicActivityInstance" index="index" separator=",">
          (#{historicActivityInstance.id ,jdbcType=VARCHAR},
+          1,
           #{historicActivityInstance.processDefinitionId, jdbcType=VARCHAR},
           #{historicActivityInstance.processInstanceId, jdbcType=VARCHAR},
           #{historicActivityInstance.executionId, jdbcType=VARCHAR},
@@ -98,6 +102,7 @@
       <foreach collection="list" item="historicActivityInstance" index="index">
         INTO ${prefix}ACT_HI_ACTINST (
           ID_,
+          REV_,
           PROC_DEF_ID_,
           PROC_INST_ID_,
           EXECUTION_ID_,
@@ -114,6 +119,7 @@
           TENANT_ID_
         ) VALUES 
            (#{historicActivityInstance.id ,jdbcType=VARCHAR},
+            1,
             #{historicActivityInstance.processDefinitionId, jdbcType=VARCHAR},
             #{historicActivityInstance.processInstanceId, jdbcType=VARCHAR},
             #{historicActivityInstance.executionId, jdbcType=VARCHAR},
@@ -135,14 +141,34 @@
   <!-- HISTORIC ACTIVITY INSTANCE UPDATE -->
   
   <update id="updateHistoricActivityInstance" parameterType="org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityImpl">
-    update ${prefix}ACT_HI_ACTINST set
-      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
-      ASSIGNEE_ = #{assignee, jdbcType=VARCHAR},
-      END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
-      DURATION_ = #{durationInMillis ,jdbcType=BIGINT},
-      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR}
+    update ${prefix}ACT_HI_ACTINST
+    <set>
+        REV_ = #{revisionNext, jdbcType=INTEGER},
+        <if test="originalPersistentState.executionId != executionId">
+            EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.taskId != taskId">
+            TASK_ID_ = #{taskId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.assignee != assignee">
+            ASSIGNEE_ = #{assignee, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.endTime != endTime">
+            END_TIME_ = #{endTime, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.durationInMillis != durationInMillis">
+            DURATION_ = #{durationInMillis, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.deleteReason != deleteReason">
+            DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.calledProcessInstanceId != calledProcessInstanceId">
+            CALL_PROC_INST_ID_ = #{calledProcessInstanceId, jdbcType=VARCHAR}
+        </if>
+    </set>
     where ID_ = #{id}
-  </update>
+    and REV_ = #{revision, jdbcType=INTEGER}
+</update>
 
   <!-- HISTORIC ACTIVITY INSTANCE DELETE -->
   
@@ -154,6 +180,7 @@
 
   <resultMap id="historicActivityInstanceResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER"/>
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
@@ -177,11 +204,11 @@
   </select>
 
   <select id="selectHistoricActivityInstancesByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricActivityInstanceQueryImpl" resultMap="historicActivityInstanceResultMap">
-    ${limitBefore}
-    select RES.* ${limitBetween}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
   <select id="selectHistoricActivityInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricActivityInstanceQueryImpl" resultType="long">
@@ -251,6 +278,11 @@
   <select id="selectUnfinishedHistoricActivityInstanceExecutionIdAndActivityId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">
     select * from ${prefix}ACT_HI_ACTINST RES
     where EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR} and ACT_ID_ = #{parameter.activityId, jdbcType=VARCHAR} and END_TIME_ is null
+  </select>
+  
+  <select id="selectHistoricActivityInstanceExecutionIdAndActivityId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">
+    select * from ${prefix}ACT_HI_ACTINST RES
+    where EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR} and ACT_ID_ = #{parameter.activityId, jdbcType=VARCHAR}
   </select>
   
    <select id="selectUnfinishedHistoricActivityInstanceByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">

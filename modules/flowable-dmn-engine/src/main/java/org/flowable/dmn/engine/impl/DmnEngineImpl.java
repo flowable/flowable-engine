@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DmnEngineImpl implements DmnEngine {
 
-    private static Logger log = LoggerFactory.getLogger(DmnEngineImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DmnEngineImpl.class);
 
     protected String name;
     protected DmnManagementService dmnManagementService;
@@ -42,9 +42,9 @@ public class DmnEngineImpl implements DmnEngine {
         this.dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
 
         if (name == null) {
-            log.info("default flowable DmnEngine created");
+            LOGGER.info("default flowable DmnEngine created");
         } else {
-            log.info("DmnEngine {} created", name);
+            LOGGER.info("DmnEngine {} created", name);
         }
 
         DmnEngines.registerDmnEngine(this);

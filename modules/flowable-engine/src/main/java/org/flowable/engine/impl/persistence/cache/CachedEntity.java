@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.persistence.cache;
 
+import java.util.HashMap;
+
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 
 /**
@@ -34,6 +36,9 @@ public class CachedEntity {
         this.entity = entity;
         if (storeState) {
             this.originalPersistentState = entity.getPersistentState();
+            entity.setOriginalPersistentState(originalPersistentState);
+        } else if (entity.getOriginalPersistentState() == null){
+            entity.setOriginalPersistentState(new HashMap<>(1));
         }
     }
 

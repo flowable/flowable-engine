@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.query.Query;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.interceptor.CommandExecutor;
@@ -50,7 +49,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
     public abstract long executeCount(CommandContext commandContext);
 
     @Override
-    public abstract List<U> executeList(CommandContext commandContext, Page page);
+    public abstract List<U> executeList(CommandContext commandContext);
 
     public T variableValueEquals(String name, Object value) {
         return variableValueEquals(name, value, true);

@@ -15,7 +15,6 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 import org.flowable.engine.impl.DeploymentQueryImpl;
 import org.flowable.engine.repository.Deployment;
@@ -25,13 +24,11 @@ import org.flowable.engine.repository.Deployment;
  */
 public interface DeploymentEntityManager extends EntityManager<DeploymentEntity> {
 
-    DeploymentEntity findLatestDeploymentByName(String deploymentName);
-
-    List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery, Page page);
+    List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery);
 
     List<String> getDeploymentResourceNames(String deploymentId);
 
-    List<Deployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<Deployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap);
 
     long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap);
 

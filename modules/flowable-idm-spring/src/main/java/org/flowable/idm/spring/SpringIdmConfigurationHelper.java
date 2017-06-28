@@ -29,10 +29,10 @@ import org.springframework.core.io.UrlResource;
  */
 public class SpringIdmConfigurationHelper {
 
-    private static Logger log = LoggerFactory.getLogger(SpringIdmConfigurationHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringIdmConfigurationHelper.class);
 
     public static IdmEngine buildIdmEngine(URL resource) {
-        log.debug("==== BUILDING SPRING APPLICATION CONTEXT AND IDM ENGINE =========================================");
+        LOGGER.debug("==== BUILDING SPRING APPLICATION CONTEXT AND IDM ENGINE =========================================");
 
         ApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource));
         Map<String, IdmEngine> beansOfType = applicationContext.getBeansOfType(IdmEngine.class);
@@ -42,7 +42,7 @@ public class SpringIdmConfigurationHelper {
 
         IdmEngine idmEngine = beansOfType.values().iterator().next();
 
-        log.debug("==== SPRING IDM ENGINE CREATED ==================================================================");
+        LOGGER.debug("==== SPRING IDM ENGINE CREATED ==================================================================");
         return idmEngine;
     }
 

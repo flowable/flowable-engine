@@ -17,8 +17,10 @@ import java.util.List;
 
 import org.flowable.app.idm.service.GroupService;
 import org.flowable.app.model.common.GroupRepresentation;
+import org.flowable.app.service.exception.NotFoundException;
 import org.flowable.idm.api.Group;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,6 +31,17 @@ public class ApiGroupsResource {
 
     @Autowired
     protected GroupService groupService;
+    
+    @RequestMapping(value = "/idm/groups/{groupId}", method = RequestMethod.GET, produces = { "application/json" })
+    public GroupRepresentation getGroupInformation(@PathVariable String groupId) {
+        Group group = groupService.getGroup(groupId);
+        if (group != null) {
+            return new GroupRepresentation(group);
+            
+        } else {
+            throw new NotFoundException();
+        }
+    }
 
     @RequestMapping(value = "/idm/groups", method = RequestMethod.GET, produces = { "application/json" })
     public List<GroupRepresentation> findGroupsByFilter(@RequestParam("filter") String filter) {

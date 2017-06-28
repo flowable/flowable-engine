@@ -10,7 +10,7 @@
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-root</artifactId>
 		<relativePath>../..</relativePath>
-		<version>6.1.0-SNAPSHOT</version>
+		<version>6.1.1-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -64,14 +64,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
         </dependency>
-        <dependency>
-			<groupId>de.odysseus.juel</groupId>
-			<artifactId>juel-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>de.odysseus.juel</groupId>
-			<artifactId>juel-impl</artifactId>
-		</dependency>
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>

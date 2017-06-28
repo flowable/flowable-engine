@@ -24,7 +24,7 @@ import org.flowable.http.HttpServiceTaskTestCase;
 public class HttpServiceTaskExampleTest extends HttpServiceTaskTestCase {
     @Deployment
     public void testExampleUsage() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("requestTimeout", 10000);
         try {
             String procId = runtimeService.startProcessInstanceByKey("exampleUsage", variables).getId();

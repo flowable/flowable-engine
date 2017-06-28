@@ -14,11 +14,13 @@ package org.flowable.engine.impl.agenda;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
@@ -37,10 +39,13 @@ import org.slf4j.LoggerFactory;
  */
 public class ContinueMultiInstanceOperation extends AbstractOperation {
 
-    private static Logger logger = LoggerFactory.getLogger(ContinueMultiInstanceOperation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContinueMultiInstanceOperation.class);
+    
+    protected int loopCounter;
 
-    public ContinueMultiInstanceOperation(CommandContext commandContext, ExecutionEntity execution) {
+    public ContinueMultiInstanceOperation(CommandContext commandContext, ExecutionEntity execution, int loopCounter) {
         super(commandContext, execution);
+        this.loopCounter = loopCounter;
     }
 
     @Override
@@ -54,6 +59,7 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
     }
 
     protected void continueThroughMultiInstanceFlowNode(FlowNode flowNode) {
+        setLoopCounterVariable(flowNode);
         if (!flowNode.isAsynchronous()) {
             executeSynchronous(flowNode);
         } else {
@@ -62,38 +68,34 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
     }
 
     protected void executeSynchronous(FlowNode flowNode) {
-
+        
+        commandContext.getHistoryManager().recordActivityStart(execution);
+        
         // Execution listener
         if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
             executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
         }
-
-        commandContext.getHistoryManager().recordActivityStart(execution);
-
+        
         // Execute actual behavior
         ActivityBehavior activityBehavior = (ActivityBehavior) flowNode.getBehavior();
-        if (activityBehavior != null) {
-            logger.debug("Executing activityBehavior {} on activity '{}' with execution {}", activityBehavior.getClass(), flowNode.getId(), execution.getId());
+        LOGGER.debug("Executing activityBehavior {} on activity '{}' with execution {}", activityBehavior.getClass(), flowNode.getId(), execution.getId());
 
-            if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-                Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                        FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
-                                execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
-            }
+        if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
+                            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
+        }
 
-            try {
-                activityBehavior.execute(execution);
-            } catch (BpmnError error) {
-                // re-throw business fault so that it can be caught by an Error Intermediate Event or Error Event Sub-Process in the process
-                ErrorPropagation.propagateError(error, execution);
-            } catch (RuntimeException e) {
-                if (LogMDC.isMDCEnabled()) {
-                    LogMDC.putMDCExecution(execution);
-                }
-                throw e;
+        try {
+            activityBehavior.execute(execution);
+        } catch (BpmnError error) {
+            // re-throw business fault so that it can be caught by an Error Intermediate Event or Error Event Sub-Process in the process
+            ErrorPropagation.propagateError(error, execution);
+        } catch (RuntimeException e) {
+            if (LogMDC.isMDCEnabled()) {
+                LogMDC.putMDCExecution(execution);
             }
-        } else {
-            logger.debug("No activityBehavior on activity '{}' with execution {}", flowNode.getId(), execution.getId());
+            throw e;
         }
     }
 
@@ -101,4 +103,16 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
         JobEntity job = commandContext.getJobManager().createAsyncJob(execution, flowNode.isExclusive());
         commandContext.getJobManager().scheduleAsyncJob(job);
     }
+    
+    protected ActivityBehavior setLoopCounterVariable(FlowNode flowNode) {
+        ActivityBehavior activityBehavior = (ActivityBehavior) flowNode.getBehavior();
+        if (!(activityBehavior instanceof MultiInstanceActivityBehavior)) {
+            throw new FlowableException("Programmatic error: expected multi instance activity behavior, but got " + activityBehavior.getClass());
+        }
+        MultiInstanceActivityBehavior multiInstanceActivityBehavior = (MultiInstanceActivityBehavior) activityBehavior;
+        String elementIndexVariable = multiInstanceActivityBehavior.getCollectionElementIndexVariable();
+        execution.setVariableLocal(elementIndexVariable, loopCounter);
+        return activityBehavior;
+    }
+    
 }

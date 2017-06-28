@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ServiceTaskParseHandler extends AbstractActivityBpmnParseHandler<ServiceTask> {
 
-    private static Logger logger = LoggerFactory.getLogger(ServiceTaskParseHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceTaskParseHandler.class);
 
     public Class<? extends BaseElement> getHandledType() {
         return ServiceTask.class;
@@ -56,7 +56,7 @@ public class ServiceTaskParseHandler extends AbstractActivityBpmnParseHandler<Se
                 serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createHttpActivityBehavior(serviceTask));
 
             } else {
-                logger.warn("Invalid service task type: '{}'  for service task {}", serviceTask.getType(), serviceTask.getId());
+                LOGGER.warn("Invalid service task type: '{}'  for service task {}", serviceTask.getType(), serviceTask.getId());
             }
 
             // activiti:class
@@ -81,7 +81,7 @@ public class ServiceTaskParseHandler extends AbstractActivityBpmnParseHandler<Se
             serviceTask.setBehavior(webServiceActivityBehavior);
 
         } else {
-            logger.warn("One of the attributes 'class', 'delegateExpression', 'type', 'operation', or 'expression' is mandatory on serviceTask {}", serviceTask.getId());
+            LOGGER.warn("One of the attributes 'class', 'delegateExpression', 'type', 'operation', or 'expression' is mandatory on serviceTask {}", serviceTask.getId());
         }
 
     }

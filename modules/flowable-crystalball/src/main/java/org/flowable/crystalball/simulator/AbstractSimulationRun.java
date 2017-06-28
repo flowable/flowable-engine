@@ -12,14 +12,14 @@
  */
 package org.flowable.crystalball.simulator;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.delegate.VariableScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This class implements all methods for Simulation run
@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public abstract class AbstractSimulationRun implements SimulationRun, SimulationDebugger {
 
-    private static Logger log = LoggerFactory.getLogger(AbstractSimulationRun.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSimulationRun.class);
 
     protected String id;
     /**
@@ -69,11 +69,11 @@ public abstract class AbstractSimulationRun implements SimulationRun, Simulation
     public void step() {
         SimulationEvent event = removeSimulationEvent();
         if (!simulationEnd(event)) {
-            log.debug("executing simulation event {}", event);
+            LOGGER.debug("executing simulation event {}", event);
             executeEvent(event);
-            log.debug("simulation event {} execution done", event);
+            LOGGER.debug("simulation event {} execution done", event);
         } else {
-            log.info("Simulation run has ended.");
+            LOGGER.info("Simulation run has ended.");
         }
     }
 
@@ -124,14 +124,14 @@ public abstract class AbstractSimulationRun implements SimulationRun, Simulation
 
     protected void executeEvent(SimulationEvent event) {
         // set simulation time to the next event for process engine too
-        log.debug("Simulation time: {}", this.processEngine.getProcessEngineConfiguration().getClock().getCurrentTime());
+        LOGGER.debug("Simulation time: {}", this.processEngine.getProcessEngineConfiguration().getClock().getCurrentTime());
 
         SimulationEventHandler handler = eventHandlerMap.get(event.getType());
         if (handler != null) {
-            log.debug("Handling event of type[{}]", event.getType());
+            LOGGER.debug("Handling event of type[{}]", event.getType());
             handler.handle(event);
         } else {
-            log.warn("Event type[{}] does not have any handler assigned.", event.getType());
+            LOGGER.warn("Event type[{}] does not have any handler assigned.", event.getType());
         }
     }
 

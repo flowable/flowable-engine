@@ -19,6 +19,16 @@
             #{tenantId, jdbcType=VARCHAR})
   </insert>
 
+  <update id="updateFormInstance" parameterType="org.flowable.form.engine.impl.persistence.entity.FormInstanceEntityImpl">
+    update ${prefix}ACT_FO_FORM_INSTANCE
+    set
+      SUBMITTED_DATE_ = #{submittedDate, jdbcType=TIMESTAMP},
+      SUBMITTED_BY_ = #{submittedBy, jdbcType=VARCHAR},
+      TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+    where
+      ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+
   <!-- FORM INSTANCE DELETE -->
 
   <delete id="deleteFormInstancesByProcessDefinitionId" parameterType="string">
@@ -50,11 +60,11 @@
   </select>
   
   <select id="selectFormInstancesByQueryCriteria" parameterType="org.flowable.form.engine.impl.FormInstanceQueryImpl" resultMap="formInstanceResultMap">
-  	${limitBefore}
-    select RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectFormInstancesByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
   <select id="selectFormInstancesCountByQueryCriteria" parameterType="org.flowable.form.engine.impl.FormInstanceQueryImpl" resultType="long">
@@ -127,15 +137,15 @@
     
   <!-- mysql specific sql -->
   <select id="selectFormInstancesByQueryCriteria" databaseId="mysql" parameterType="org.flowable.form.engine.impl.FormInstanceQueryImpl" resultMap="formInstanceResultMap">
-  	${limitBefore}
-    select distinct RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectFormInstancesByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
   <!-- mysql specific sql -->
-  <select id="selectFormInstanceCountByQueryCriteria" databaseId="mysql" parameterType="org.flowable.form.engine.impl.FormInstanceQueryImpl" resultType="long">
+  <select id="selectFormInstancesCountByQueryCriteria" databaseId="mysql" parameterType="org.flowable.form.engine.impl.FormInstanceQueryImpl" resultType="long">
     select distinct count(RES.ID_)
     <include refid="selectFormInstancesByQueryCriteriaSql"/>
   </select>

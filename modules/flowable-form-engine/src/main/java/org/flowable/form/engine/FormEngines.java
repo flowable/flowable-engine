@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class FormEngines {
 
-    private static Logger log = LoggerFactory.getLogger(FormEngines.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FormEngines.class);
 
     public static final String NAME_DEFAULT = "default";
 
@@ -73,7 +73,7 @@ public abstract class FormEngines {
             }
             for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
                 URL resource = iterator.next();
-                log.info("Initializing form engine using configuration '{}'", resource.toString());
+                LOGGER.info("Initializing form engine using configuration '{}'", resource.toString());
                 initFormEngineFromResource(resource);
             }
 
@@ -85,13 +85,13 @@ public abstract class FormEngines {
 
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
-                log.info("Initializing form engine using Spring configuration '{}'", resource.toString());
+                LOGGER.info("Initializing form engine using Spring configuration '{}'", resource.toString());
                 initFormEngineFromSpringResource(resource);
             }
 
             setInitialized(true);
         } else {
-            log.info("Form engines already initialized");
+            LOGGER.info("Form engines already initialized");
         }
     }
 
@@ -141,15 +141,15 @@ public abstract class FormEngines {
 
         String resourceUrlString = resourceUrl.toString();
         try {
-            log.info("initializing dmn engine for resource {}", resourceUrl);
+            LOGGER.info("initializing dmn engine for resource {}", resourceUrl);
             FormEngine formEngine = buildFormEngine(resourceUrl);
             String formEngineName = formEngine.getName();
-            log.info("initialised form engine {}", formEngineName);
+            LOGGER.info("initialised form engine {}", formEngineName);
             formEngineInfo = new EngineInfo(formEngineName, resourceUrlString, null);
             formEngines.put(formEngineName, formEngine);
             formEngineInfosByName.put(formEngineName, formEngineInfo);
         } catch (Throwable e) {
-            log.error("Exception while initializing form engine: {}", e.getMessage(), e);
+            LOGGER.error("Exception while initializing form engine: {}", e.getMessage(), e);
             formEngineInfo = new EngineInfo(null, resourceUrlString, getExceptionString(e));
         }
         formEngineInfosByResourceUrl.put(resourceUrlString, formEngineInfo);
@@ -212,7 +212,7 @@ public abstract class FormEngines {
      * retries to initialize a form engine that previously failed.
      */
     public static EngineInfo retry(String resourceUrl) {
-        log.debug("retying initializing of resource {}", resourceUrl);
+        LOGGER.debug("retying initializing of resource {}", resourceUrl);
         try {
             return initFormEngineFromResource(new URL(resourceUrl));
         } catch (MalformedURLException e) {
@@ -240,7 +240,7 @@ public abstract class FormEngines {
                 try {
                     formEngine.close();
                 } catch (Exception e) {
-                    log.error("exception while closing {}", (formEngineName == null ? "the default form engine" : "form engine " + formEngineName), e);
+                    LOGGER.error("exception while closing {}", (formEngineName == null ? "the default form engine" : "form engine " + formEngineName), e);
                 }
             }
 

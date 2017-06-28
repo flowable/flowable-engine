@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.agenda;
 
+import java.util.LinkedList;
+
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.context.Context;
@@ -22,8 +24,6 @@ import org.flowable.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.LinkedList;
 
 /**
  * For each API call (and thus {@link Command}) being executed, a new agenda instance is created. On this agenda, operations are put, which the {@link CommandExecutor} will keep executing until all
@@ -100,8 +100,8 @@ public class DefaultFlowableEngineAgenda implements FlowableEngineAgenda {
         planOperation(new ContinueProcessOperation(commandContext, execution, false, true), execution);
     }
 
-    public void planContinueMultiInstanceOperation(ExecutionEntity execution) {
-        planOperation(new ContinueMultiInstanceOperation(commandContext, execution), execution);
+    public void planContinueMultiInstanceOperation(ExecutionEntity execution, int loopCounter) {
+        planOperation(new ContinueMultiInstanceOperation(commandContext, execution, loopCounter), execution);
     }
 
     public void planTakeOutgoingSequenceFlowsOperation(ExecutionEntity execution, boolean evaluateConditions) {

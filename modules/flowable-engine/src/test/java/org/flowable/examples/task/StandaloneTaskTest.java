@@ -20,6 +20,7 @@ import org.flowable.engine.common.api.FlowableOptimisticLockingException;
 import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Task;
 
@@ -148,7 +149,7 @@ public class StandaloneTaskTest extends PluggableFlowableTestCase {
     }
 
     public void testHistoricVariableOkOnUpdate() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             // 1. create a task
             Task task = taskService.newTask();
             task.setName("test execution");
@@ -165,6 +166,8 @@ public class StandaloneTaskTest extends PluggableFlowableTestCase {
             Map<String, Object> finishVariables = new HashMap<String, Object>();
             finishVariables.put("finishedAmount", 40);
             taskService.complete(task.getId(), finishVariables);
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             // 4. get completed variable
             List<HistoricVariableInstance> hisVarList = historyService.createHistoricVariableInstanceQuery().taskId(task.getId()).list();

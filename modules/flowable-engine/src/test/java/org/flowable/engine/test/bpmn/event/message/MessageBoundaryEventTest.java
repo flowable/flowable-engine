@@ -519,7 +519,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
                 return taskService.createTaskQuery().count() == 2;
             }
         });
-
+        
         // It is a repeating job, so it will come back.
         assertEquals(1L, jobQuery.count());
 
@@ -575,7 +575,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         // After setting the clock to time '2 hours and 5 seconds', the timer
         // should fire.
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((2 * 60 * 60 * 1000) + 5000)));
-        waitForJobExecutorOnCondition(2000L, 100L, new Callable<Boolean>() {
+        waitForJobExecutorOnCondition(10000L, 100L, new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 return taskService.createTaskQuery().count() == 2;

@@ -12,14 +12,14 @@
  */
 package org.flowable.idm.engine.impl;
 
+import java.util.List;
+
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.NativeGroupQuery;
 import org.flowable.idm.api.NativeTokenQuery;
 import org.flowable.idm.api.NativeUserQuery;
-import org.flowable.idm.api.PasswordEncoder;
-import org.flowable.idm.api.PasswordSalt;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.PrivilegeMapping;
@@ -28,8 +28,6 @@ import org.flowable.idm.api.Token;
 import org.flowable.idm.api.TokenQuery;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
-import org.flowable.idm.engine.impl.authentication.BlankSalt;
-import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
 import org.flowable.idm.engine.impl.cmd.AddPrivilegeMappingCmd;
 import org.flowable.idm.engine.impl.cmd.CheckPassword;
 import org.flowable.idm.engine.impl.cmd.CreateGroupCmd;
@@ -62,15 +60,10 @@ import org.flowable.idm.engine.impl.cmd.SetUserPictureCmd;
 import org.flowable.idm.engine.impl.cmd.UpdateUserPasswordCmd;
 import org.flowable.idm.engine.impl.persistence.entity.IdentityInfoEntity;
 
-import java.util.List;
-
 /**
  * @author Tijs Rademakers
  */
 public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentityService {
-
-    private PasswordEncoder passwordEncoder = ClearTextPasswordEncoder.getInstance();
-    private PasswordSalt passwordSalt = BlankSalt.getInstance();
 
     public Group newGroup(String groupId) {
         return commandExecutor.execute(new CreateGroupCmd(groupId));
@@ -85,11 +78,11 @@ public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentitySe
     }
 
     public void saveUser(User user) {
-        commandExecutor.execute(new SaveUserCmd(user, passwordEncoder, passwordSalt));
+        commandExecutor.execute(new SaveUserCmd(user));
     }
 
     public void updateUserPassword(User user) {
-        commandExecutor.execute(new UpdateUserPasswordCmd(user, passwordEncoder, passwordSalt));
+        commandExecutor.execute(new UpdateUserPasswordCmd(user));
     }
 
     public UserQuery createUserQuery() {
@@ -123,7 +116,7 @@ public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentitySe
     }
 
     public boolean checkPassword(String userId, String password) {
-        return commandExecutor.execute(new CheckPassword(userId, password, passwordEncoder, passwordSalt));
+        return commandExecutor.execute(new CheckPassword(userId, password));
     }
 
     public void deleteUser(String userId) {
@@ -223,25 +216,4 @@ public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentitySe
     public List<User> getUsersWithPrivilege(String name) {
         return commandExecutor.execute(new GetUsersWithPrivilegeCmd(name));
     }
-
-    @Override
-    public PasswordEncoder getPasswordEncoder() {
-        return passwordEncoder;
-    }
-
-    @Override
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
-
-    @Override
-    public PasswordSalt getPasswordSalt() {
-        return passwordSalt;
-    }
-
-    @Override
-    public void setPasswordSalt(PasswordSalt passwordSalt) {
-        this.passwordSalt = passwordSalt;
-    }
-
 }

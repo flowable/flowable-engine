@@ -12,9 +12,14 @@
  */
 package org.flowable.spring.test.authentication;
 
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
+
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.PasswordEncoder;
 import org.flowable.idm.api.User;
+import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.IdmEngines;
 import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
 import org.flowable.idm.engine.impl.authentication.PasswordSaltImpl;
@@ -32,9 +37,6 @@ import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertFalse;
-
 /**
  * @author faizal-manan
  */
@@ -42,30 +44,36 @@ import static org.junit.Assert.assertFalse;
 @ContextConfiguration("classpath:org/flowable/spring/test/engine/springIdmEngineWithPasswordEncoder-context.xml")
 public class SpringPasswordEncoderTest {
 
-    private static Logger log = LoggerFactory.getLogger(SpringPasswordEncoderTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringPasswordEncoderTest.class);
 
+    @Autowired
+    private IdmEngineConfiguration autoWiredIdmIdmEngineConfiguration;
+    
     @Autowired
     private IdmIdentityService autoWiredIdmIdentityService;
 
     @Test
     public void testSpringPasswordEncoderInstance() {
+        PasswordEncoder passwordEncoder = autoWiredIdmIdmEngineConfiguration.getPasswordEncoder();
 
-        autoWiredIdmIdentityService.setPasswordEncoder(new SpringEncoder(new Md5PasswordEncoder()));
+        autoWiredIdmIdmEngineConfiguration.setPasswordEncoder(new SpringEncoder(new Md5PasswordEncoder()));
         validatePassword();
 
-        autoWiredIdmIdentityService.setPasswordEncoder(new SpringEncoder(new StandardPasswordEncoder()));
+        autoWiredIdmIdmEngineConfiguration.setPasswordEncoder(new SpringEncoder(new StandardPasswordEncoder()));
         validatePassword();
+        
+        autoWiredIdmIdmEngineConfiguration.setPasswordEncoder(passwordEncoder);
     }
 
     @Test
     public void testValidateSpringPasswordEncoder() {
+        PasswordEncoder passwordEncoder = autoWiredIdmIdmEngineConfiguration.getPasswordEncoder();
 
-        PasswordEncoder passwordEncoder = autoWiredIdmIdentityService.getPasswordEncoder();
-        IdmIdentityService defaultIdmIdentityService = IdmEngines.getDefaultIdmEngine().getIdmIdentityService();
+        IdmEngineConfiguration defaultIdmEngineConfiguration = IdmEngines.getDefaultIdmEngine().getIdmEngineConfiguration();
 
-        assertTrue(defaultIdmIdentityService.getPasswordEncoder() instanceof ClearTextPasswordEncoder);
+        assertTrue(defaultIdmEngineConfiguration.getPasswordEncoder() instanceof ClearTextPasswordEncoder);
         assertTrue(passwordEncoder instanceof SpringEncoder);
-        assertTrue(null != ((SpringEncoder) passwordEncoder).getSpringEncodingProvider());
+        assertNotNull(((SpringEncoder) passwordEncoder).getSpringEncodingProvider());
         assertTrue(((SpringEncoder) passwordEncoder).getSpringEncodingProvider() instanceof org.springframework.security.authentication.encoding.PasswordEncoder ||
                 ((SpringEncoder) passwordEncoder).getSpringEncodingProvider() instanceof org.springframework.security.crypto.password.PasswordEncoder);
 
@@ -73,8 +81,9 @@ public class SpringPasswordEncoderTest {
 
     @Test
     public void testSpringSaltPasswordEncoderInstance() {
+        PasswordEncoder passwordEncoder = autoWiredIdmIdmEngineConfiguration.getPasswordEncoder();
 
-        autoWiredIdmIdentityService.setPasswordEncoder(new SpringEncoder(new BCryptPasswordEncoder()));
+        autoWiredIdmIdmEngineConfiguration.setPasswordEncoder(new SpringEncoder(new BCryptPasswordEncoder()));
 
         User user = autoWiredIdmIdentityService.newUser("johndoe");
         user.setPassword("xxx");
@@ -86,7 +95,7 @@ public class SpringPasswordEncoderTest {
 
         SystemWideSaltSource saltSource = new SystemWideSaltSource();
         saltSource.setSystemWideSalt("salt");
-        autoWiredIdmIdentityService.setPasswordSalt(new PasswordSaltImpl(new SpringSaltProvider(saltSource)));
+        autoWiredIdmIdmEngineConfiguration.setPasswordSalt(new PasswordSaltImpl(new SpringSaltProvider(saltSource)));
         user = autoWiredIdmIdentityService.newUser("johndoe1");
         user.setPassword("xxx");
         autoWiredIdmIdentityService.saveUser(user);
@@ -96,6 +105,8 @@ public class SpringPasswordEncoderTest {
 
         assertFalse(noSalt.equals(salt));
         autoWiredIdmIdentityService.deleteUser("johndoe1");
+        
+        autoWiredIdmIdmEngineConfiguration.setPasswordEncoder(passwordEncoder);
     }
 
 
@@ -105,7 +116,7 @@ public class SpringPasswordEncoderTest {
         autoWiredIdmIdentityService.saveUser(user);
 
         User johndoe = autoWiredIdmIdentityService.createUserQuery().userId("johndoe").list().get(0);
-        log.info("Hash Password = {} ", johndoe.getPassword());
+        LOGGER.info("Hash Password = {} ", johndoe.getPassword());
 
         assertFalse("xxx".equals(johndoe.getPassword()));
         assertTrue(autoWiredIdmIdentityService.checkPassword("johndoe", "xxx"));

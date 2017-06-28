@@ -12,6 +12,9 @@
  */
 package org.flowable.rest.dmn.util;
 
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.session.HashSessionIdManager;
 import org.eclipse.jetty.server.session.HashSessionManager;
@@ -20,19 +23,15 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.flowable.rest.dmn.WebConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Joram Barrez
  */
 public class TestServerUtil {
 
-    private static final Logger log = LoggerFactory.getLogger(TestServerUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestServerUtil.class);
 
     protected static final int START_PORT = 9797;
     private static AtomicInteger NEXT_PORT = new AtomicInteger(9797);
@@ -52,7 +51,7 @@ public class TestServerUtil {
             server.setHandler(getServletContextHandler(applicationContext));
             server.start();
         } catch (Exception e) {
-            log.error("Error starting server", e);
+            LOGGER.error("Error starting server", e);
         }
 
         return new TestServer(server, applicationContext, port);

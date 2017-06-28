@@ -292,3 +292,21 @@ angular.module('flowableModeler').
             }
         };
     });
+
+angular.module('flowableModeler').
+    directive('hotAutoDestroy',["hotRegisterer",function(hotRegisterer) {
+    return {
+        restrict: 'A',
+        link: function (scope, element, attr){
+            element.on("$destroy", function() {
+                try{
+                    var hotInstance = hotRegisterer.getInstance(attr.hotId);
+                    hotInstance.destroy();
+                }
+                catch(er){
+                    console.log(er);
+                }
+            });
+        }
+    };
+}]);

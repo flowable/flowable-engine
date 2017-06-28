@@ -15,7 +15,6 @@ package org.flowable.form.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.engine.impl.FormDefinitionQueryImpl;
@@ -33,7 +32,7 @@ public interface FormDefinitionEntityManager extends EntityManager<FormDefinitio
 
     FormDefinitionEntity findLatestFormDefinitionByKeyParentDeploymentIdAndTenantId(String formDefinitionKey, String parentDeploymentId, String tenantId);
 
-    List<FormDefinition> findFormDefinitionsByQueryCriteria(FormDefinitionQueryImpl formQuery, Page page);
+    List<FormDefinition> findFormDefinitionsByQueryCriteria(FormDefinitionQueryImpl formQuery);
 
     long findFormDefinitionCountByQueryCriteria(FormDefinitionQueryImpl formQuery);
 
@@ -43,7 +42,7 @@ public interface FormDefinitionEntityManager extends EntityManager<FormDefinitio
 
     FormDefinitionEntity findFormDefinitionByKeyAndVersionAndTenantId(String formDefinitionKey, Integer formVersion, String tenantId);
 
-    List<FormDefinition> findFormDefinitionsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<FormDefinition> findFormDefinitionsByNativeQuery(Map<String, Object> parameterMap);
 
     long findFormDefinitionCountByNativeQuery(Map<String, Object> parameterMap);
 

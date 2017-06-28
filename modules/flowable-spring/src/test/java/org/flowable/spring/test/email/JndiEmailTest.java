@@ -22,7 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:org/flowable/spring/test/email/jndiEmailConfiguaration-context.xml")
 public class JndiEmailTest extends SpringFlowableTestCase {
 
-    private static Logger logger = LoggerFactory.getLogger(JndiEmailTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JndiEmailTest.class);
 
     @BeforeClass
     public void setUp() {
@@ -41,9 +41,9 @@ public class JndiEmailTest extends SpringFlowableTestCase {
             builder = SimpleNamingContextBuilder.emptyActivatedContextBuilder();
             builder.bind("java:comp/env/Session", mailSession);
         } catch (NamingException e) {
-            logger.error("Naming error in email setup", e);
+            LOGGER.error("Naming error in email setup", e);
         } catch (NoSuchProviderException e) {
-            logger.error("provider error in email setup", e);
+            LOGGER.error("provider error in email setup", e);
         }
     }
 

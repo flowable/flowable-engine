@@ -14,13 +14,13 @@
 package org.flowable.engine.impl.asyncexecutor;
 
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.JobInfo;
 
 /**
  * @author Joram Barrez
  */
 public interface ExecuteAsyncRunnableFactory {
 
-    Runnable createExecuteAsyncRunnable(Job job, ProcessEngineConfigurationImpl processEngineConfiguration);
+    Runnable createExecuteAsyncRunnable(JobInfo job, ProcessEngineConfigurationImpl processEngineConfiguration);
 
 }

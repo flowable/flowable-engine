@@ -60,9 +60,6 @@ public class ExecutionListenerOnTransactionTest extends SpringFlowableTestCase {
         assertNotNull(currentActivities.get(0).getProcessInstanceId());
 
         assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
-        List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getId());
-        assertEquals(1, activeActivityIds.size());
-        assertEquals("serviceTask2", activeActivityIds.get(0));
     }
 
     @Deployment

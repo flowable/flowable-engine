@@ -29,10 +29,10 @@ import org.slf4j.LoggerFactory;
  */
 public class AppDeployer implements Deployer {
 
-    private static final Logger log = LoggerFactory.getLogger(AppDeployer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppDeployer.class);
 
     public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
-        log.debug("Processing app deployment {}", deployment.getName());
+        LOGGER.debug("Processing app deployment {}", deployment.getName());
 
         ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
         DeploymentManager deploymentManager = processEngineConfiguration.getDeploymentManager();
@@ -41,7 +41,7 @@ public class AppDeployer implements Deployer {
         Map<String, ResourceEntity> resources = deployment.getResources();
         for (String resourceName : resources.keySet()) {
             if (resourceName.endsWith(".app")) {
-                log.info("Processing app resource {}", resourceName);
+                LOGGER.info("Processing app resource {}", resourceName);
 
                 ResourceEntity resourceEntity = resources.get(resourceName);
                 byte[] resourceBytes = resourceEntity.getBytes();

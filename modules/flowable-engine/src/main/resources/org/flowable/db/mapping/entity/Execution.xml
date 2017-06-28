@@ -7,7 +7,7 @@
   <!-- EXECUTION INSERT -->
 
   <insert id="insertExecution" parameterType="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
-    insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_, TENANT_ID_, NAME_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_)
+    insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_, TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_)
     values (
       #{id ,jdbcType=VARCHAR},
       1,
@@ -26,6 +26,7 @@
       #{suspensionState, jdbcType=INTEGER},
       #{tenantId, jdbcType=VARCHAR},
       #{name, jdbcType=VARCHAR},
+      #{startActivityId, jdbcType=VARCHAR},
       #{startTime, jdbcType=TIMESTAMP},
       #{startUserId, jdbcType=VARCHAR},
       #{isCountEnabled, jdbcType=BOOLEAN},
@@ -41,7 +42,7 @@
   </insert>
 
   <insert id="bulkInsertExecution" parameterType="java.util.List">
-    insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_, TENANT_ID_, NAME_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_)
+    insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_, TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_)
     values 
       <foreach collection="list" item="execution" index="index" separator=",">
         (#{execution.id ,jdbcType=VARCHAR},
@@ -61,6 +62,7 @@
          #{execution.suspensionState, jdbcType=INTEGER},
          #{execution.tenantId, jdbcType=VARCHAR},
          #{execution.name, jdbcType=VARCHAR},
+         #{execution.startActivityId, jdbcType=VARCHAR},
          #{execution.startTime, jdbcType=TIMESTAMP},
          #{execution.startUserId, jdbcType=VARCHAR},
          #{execution.isCountEnabled, jdbcType=BOOLEAN},
@@ -79,7 +81,7 @@
     INSERT ALL 
       <foreach collection="list" item="execution" index="index">
         into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_,
-        IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_, TENANT_ID_, NAME_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_) VALUES
+        IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_, TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_) VALUES
             (#{execution.id ,jdbcType=VARCHAR},
              1,
              #{execution.processInstanceId, jdbcType=VARCHAR},
@@ -97,6 +99,7 @@
              #{execution.suspensionState, jdbcType=INTEGER},
              #{execution.tenantId, jdbcType=VARCHAR},
              #{execution.name, jdbcType=VARCHAR},
+             #{execution.startActivityId, jdbcType=VARCHAR},
              #{execution.startTime, jdbcType=TIMESTAMP},
              #{execution.startUserId, jdbcType=VARCHAR},
              #{execution.isCountEnabled, jdbcType=BOOLEAN},
@@ -115,30 +118,76 @@
   <!-- EXECUTION UPDATE -->
   
   <update id="updateExecution" parameterType="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
-    update ${prefix}ACT_RU_EXECUTION set
-      REV_ = #{revisionNext, jdbcType=INTEGER},
-      BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR},
-      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
-      ACT_ID_ = #{activityId, jdbcType=VARCHAR},
-      IS_ACTIVE_ = #{isActive, jdbcType=BOOLEAN},
-      IS_CONCURRENT_ = #{isConcurrent, jdbcType=BOOLEAN},
-      IS_SCOPE_ = #{isScope, jdbcType=BOOLEAN},
-      IS_EVENT_SCOPE_ = #{isEventScope, jdbcType=BOOLEAN},
-      IS_MI_ROOT_ = #{isMultiInstanceRoot, jdbcType=BOOLEAN},
-      PARENT_ID_ = #{parentId, jdbcType=VARCHAR},
-      SUPER_EXEC_ = #{superExecutionId, jdbcType=VARCHAR},
-      ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR},
-      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
-      NAME_ = #{name, jdbcType=VARCHAR},
-      IS_COUNT_ENABLED_ = #{isCountEnabled, jdbcType=BOOLEAN},
-      EVT_SUBSCR_COUNT_ = #{eventSubscriptionCount, jdbcType=INTEGER}, 
-      TASK_COUNT_ = #{taskCount, jdbcType=INTEGER}, 
-      JOB_COUNT_ = #{jobCount, jdbcType=INTEGER},
-      TIMER_JOB_COUNT_ = #{timerJobCount, jdbcType=INTEGER},
-      SUSP_JOB_COUNT_ = #{suspendedJobCount, jdbcType=INTEGER},
-      DEADLETTER_JOB_COUNT_ = #{deadLetterJobCount, jdbcType=INTEGER},
-      VAR_COUNT_ = #{variableCount, jdbcType=INTEGER},
-      ID_LINK_COUNT_ = #{identityLinkCount, jdbcType=INTEGER}
+    update ${prefix}ACT_RU_EXECUTION
+        <set>
+            REV_ = #{revisionNext, jdbcType=INTEGER},
+            <if test="originalPersistentState.businessKey != businessKey">
+                BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.processDefinitionId != processDefinitionId">
+                PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.activityId != activityId">
+                ACT_ID_ = #{activityId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.isActive != isActive">
+                IS_ACTIVE_ = #{isActive, jdbcType=BOOLEAN},
+            </if>
+            <if test="originalPersistentState.isConcurrent != isConcurrent">
+                IS_CONCURRENT_ = #{isConcurrent, jdbcType=BOOLEAN},
+            </if>
+            <if test="originalPersistentState.isScope != isScope">
+                IS_SCOPE_ = #{isScope, jdbcType=BOOLEAN},
+            </if>
+            <if test="originalPersistentState.isEventScope != isEventScope">
+                IS_EVENT_SCOPE_ = #{isEventScope, jdbcType=BOOLEAN},
+            </if>
+            <if test="originalPersistentState.isMultiInstanceRoot != isMultiInstanceRoot">
+                IS_MI_ROOT_ = #{isMultiInstanceRoot, jdbcType=BOOLEAN},
+            </if>
+            <if test="originalPersistentState.parentId != parentId">
+                PARENT_ID_ = #{parentId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.superExecutionId != superExecutionId">
+                SUPER_EXEC_ = #{superExecutionId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.rootProcessInstanceId != rootProcessInstanceId">
+                ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.suspensionState != suspensionState">
+                SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
+            </if>
+            <if test="originalPersistentState.name != name">
+                NAME_ = #{name, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.isCountEnabled != isCountEnabled">
+                IS_COUNT_ENABLED_ = #{isCountEnabled, jdbcType=BOOLEAN},
+            </if>
+            <if test="originalPersistentState.eventSubscriptionCount != eventSubscriptionCount">
+                EVT_SUBSCR_COUNT_ = #{eventSubscriptionCount, jdbcType=INTEGER}, 
+            </if>
+            <if test="originalPersistentState.taskCount != taskCount">
+                TASK_COUNT_ = #{taskCount, jdbcType=INTEGER}, 
+            </if>
+            <if test="originalPersistentState.jobCount != jobCount">
+                JOB_COUNT_ = #{jobCount, jdbcType=INTEGER},
+            </if>
+            <if test="originalPersistentState.timerJobCount != timerJobCount">
+                TIMER_JOB_COUNT_ = #{timerJobCount, jdbcType=INTEGER},
+            </if>
+            <if test="originalPersistentState.suspendedJobCount != suspendedJobCount">
+                SUSP_JOB_COUNT_ = #{suspendedJobCount, jdbcType=INTEGER},
+            </if>
+            <if test="originalPersistentState.deadLetterJobCount != deadLetterJobCount">
+                DEADLETTER_JOB_COUNT_ = #{deadLetterJobCount, jdbcType=INTEGER},
+            </if>
+            <if test="originalPersistentState.variableCount != variableCount">
+                VAR_COUNT_ = #{variableCount, jdbcType=INTEGER},
+            </if>
+            <if test="originalPersistentState.identityLinkCount != identityLinkCount">
+                ID_LINK_COUNT_ = #{identityLinkCount, jdbcType=INTEGER}
+            </if>
+        </set>
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
@@ -229,6 +278,7 @@
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
     <result property="isCountEnabled" column="IS_COUNT_ENABLED_" jdbcType="BOOLEAN" />
@@ -268,6 +318,7 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="lockTime" column="LOCK_TIME_" jdbcType="TIMESTAMP" />
+    <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
     <result property="isCountEnabled" column="IS_COUNT_ENABLED_" jdbcType="BOOLEAN" />
@@ -299,6 +350,7 @@
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
     <result property="isCountEnabled" column="IS_COUNT_ENABLED_" jdbcType="BOOLEAN" />
@@ -349,6 +401,7 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="lockTime" column="LOCK_TIME_" jdbcType="TIMESTAMP" />
+    <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
     <result property="isCountEnabled" column="IS_COUNT_ENABLED_" jdbcType="BOOLEAN" />
@@ -439,11 +492,11 @@
   </select>
   
   <select id="selectExecutionsByQueryCriteria" parameterType="org.flowable.engine.impl.ExecutionQueryImpl" resultMap="executionResultMap">
-  	${limitBefore}
-    select distinct RES.* ${limitBetween}, P.KEY_ as ProcessDefinitionKey, P.ID_ as ProcessDefinitionId
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>, P.KEY_ as ProcessDefinitionKey, P.ID_ as ProcessDefinitionId
     <include refid="selectExecutionsByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
   <select id="selectExecutionCountByQueryCriteria" parameterType="org.flowable.engine.impl.ExecutionQueryImpl" resultType="long">
@@ -453,11 +506,11 @@
   
   <!--  same as selectExecutionsByQueryCriteria, but with different parameterType -->
   <select id="selectProcessInstanceByQueryCriteria" parameterType="org.flowable.engine.impl.ProcessInstanceQueryImpl" resultMap="processInstanceResultMap">
-  	${limitBefore}
-    select distinct RES.* ${limitBetween}, P.KEY_ as ProcessDefinitionKey, P.ID_ as ProcessDefinitionId, P.NAME_ as ProcessDefinitionName, P.VERSION_ as ProcessDefinitionVersion, P.DEPLOYMENT_ID_ as DeploymentId
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>, P.KEY_ as ProcessDefinitionKey, P.ID_ as ProcessDefinitionId, P.NAME_ as ProcessDefinitionName, P.VERSION_ as ProcessDefinitionVersion, P.DEPLOYMENT_ID_ as DeploymentId
     <include refid="selectExecutionsByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
   <select id="selectProcessInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.ProcessInstanceQueryImpl" resultType="long">
@@ -475,18 +528,18 @@
     <include refid="selectProcessInstanceWithVariablesByQueryCriteriaColumns"/> 
     <include refid="selectProcessInstanceWithVariablesByQueryCriteriaSql"/> 
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
   <sql id="selectProcessInstanceWithVariablesByQueryCriteriaColumns">
-   ${limitBefore}
+   <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
    <if test="_databaseId != 'db2' and _databaseId != 'mssql'">  
     select distinct RES.*, P.KEY_ as ProcessDefinitionKey, P.ID_ as ProcessDefinitionId, P.NAME_ as ProcessDefinitionName, P.VERSION_ as ProcessDefinitionVersion, P.DEPLOYMENT_ID_ as DeploymentId, 
     VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
     VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, VAR.TASK_ID_ as VAR_TASK_ID_,
     VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, VAR.DOUBLE_ as VAR_DOUBLE_, 
     VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LONG_ as VAR_LONG_
-    ${limitBetween}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
    </if>
    <if test="_databaseId == 'db2' || _databaseId == 'mssql'">
     select distinct TEMPRES_ID_ as ID_, TEMPP_KEY_ as ProcessDefinitionKey, TEMPP_ID_ as ProcessDefinitionId, TEMPP_NAME_ as ProcessDefinitionName, TEMPP_VERSION_ as ProcessDefinitionVersion, TEMPP_DEPLOYMENT_ID_ as DeploymentId, 
@@ -512,7 +565,7 @@
     TEMPVAR_PROC_INST_ID_ as VAR_PROC_INST_ID_, TEMPVAR_EXECUTION_ID_ as VAR_EXECUTION_ID_, TEMPVAR_TASK_ID_ as VAR_TASK_ID_,
     TEMPVAR_BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, TEMPVAR_DOUBLE_ as VAR_DOUBLE_, 
     TEMPVAR_TEXT_ as VAR_TEXT_, TEMPVAR_TEXT2_ as VAR_TEXT2_, TEMPVAR_LONG_ as VAR_LONG_
-     ${limitOuterJoinBetween}
+     <if test="firstResult != null and firstResult &gt;= 0">${limitOuterJoinBetween}</if>
     RES.ID_ as TEMPRES_ID_, RES.REV_ as TEMPRES_REV_, P.KEY_ as TEMPP_KEY_, P.ID_ as TEMPP_ID_, P.NAME_ as TEMPP_NAME_, P.VERSION_ as TEMPP_VERSION_, P.DEPLOYMENT_ID_ as TEMPP_DEPLOYMENT_ID_,
     
     RES.ACT_ID_ as TEMPRES_ACT_ID_, 

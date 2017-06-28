@@ -76,7 +76,6 @@ public abstract class BaseDmnXMLConverter implements DmnXMLConstants {
 
     public void convertToXML(XMLStreamWriter xtw, DmnElement baseElement, DmnDefinition model) throws Exception {
         xtw.writeStartElement(getXMLElementName());
-        boolean didWriteExtensionStartElement = false;
         writeDefaultAttribute(ATTRIBUTE_ID, baseElement.getId(), xtw);
 
         writeAdditionalAttributes(baseElement, model, xtw);

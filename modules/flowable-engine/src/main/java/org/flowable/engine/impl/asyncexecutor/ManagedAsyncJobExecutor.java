@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ManagedAsyncJobExecutor extends DefaultAsyncJobExecutor {
 
-    private static Logger log = LoggerFactory.getLogger(ManagedAsyncJobExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ManagedAsyncJobExecutor.class);
 
     protected ManagedThreadFactory threadFactory;
 
@@ -44,16 +44,16 @@ public class ManagedAsyncJobExecutor extends DefaultAsyncJobExecutor {
 
     protected void initAsyncJobExecutionThreadPool() {
         if (threadFactory == null) {
-            log.warn("A managed thread factory was not found, falling back to self-managed threads");
+            LOGGER.warn("A managed thread factory was not found, falling back to self-managed threads");
             super.initAsyncJobExecutionThreadPool();
         } else {
             if (threadPoolQueue == null) {
-                log.info("Creating thread pool queue of size {}", queueSize);
+                LOGGER.info("Creating thread pool queue of size {}", queueSize);
                 threadPoolQueue = new ArrayBlockingQueue<Runnable>(queueSize);
             }
 
             if (executorService == null) {
-                log.info("Creating executor service with corePoolSize {}, maxPoolSize {} and keepAliveTime {}", corePoolSize, maxPoolSize, keepAliveTime);
+                LOGGER.info("Creating executor service with corePoolSize {}, maxPoolSize {} and keepAliveTime {}", corePoolSize, maxPoolSize, keepAliveTime);
 
                 ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, threadPoolQueue, threadFactory);
                 threadPoolExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());

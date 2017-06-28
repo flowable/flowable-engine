@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ControllableThread extends Thread {
 
-    private static Logger log = LoggerFactory.getLogger(ControllableThread.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ControllableThread.class);
 
     public ControllableThread() {
         String className = getClass().getName();
@@ -30,7 +30,7 @@ public class ControllableThread extends Thread {
     }
 
     public synchronized void startAndWaitUntilControlIsReturned() {
-        log.debug("test thread will start {} and wait till it returns control", getName());
+        LOGGER.debug("test thread will start {} and wait till it returns control", getName());
         start();
         try {
             wait();
@@ -40,7 +40,7 @@ public class ControllableThread extends Thread {
     }
 
     public synchronized void returnControlToTestThreadAndWait() {
-        log.debug("{} will notify test thread and till test thread proceeds this thread", getName());
+        LOGGER.debug("{} will notify test thread and till test thread proceeds this thread", getName());
         this.notify();
         try {
             this.wait();
@@ -50,7 +50,7 @@ public class ControllableThread extends Thread {
     }
 
     public synchronized void proceedAndWaitTillDone() {
-        log.debug("test thread will notify {} and wait until it completes", getName());
+        LOGGER.debug("test thread will notify {} and wait until it completes", getName());
         notify();
         try {
             join();

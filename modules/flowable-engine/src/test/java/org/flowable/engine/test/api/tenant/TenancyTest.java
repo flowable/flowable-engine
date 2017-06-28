@@ -20,6 +20,7 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
@@ -52,7 +53,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
 
         if (!autoCleanedUpDeploymentIds.isEmpty()) {
             for (String deploymentId : autoCleanedUpDeploymentIds) {
-                repositoryService.deleteDeployment(deploymentId, true);
+                deleteDeployment(deploymentId);
             }
         }
     }
@@ -422,7 +423,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
 
     public void testHistoryTenancy() {
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
 
             // Generate 3 tasks with tenant
             String processDefinitionIdWithTenant = deployTestProcessWithTestTenant();
@@ -442,6 +443,8 @@ public class TenancyTest extends PluggableFlowableTestCase {
             for (Task task : taskService.createTaskQuery().list()) {
                 taskService.complete(task.getId());
             }
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             // Verify process instances
             assertEquals(TEST_TENANT_ID, historyService.createHistoricProcessInstanceQuery().processDefinitionId(processDefinitionIdWithTenant).list().get(0).getTenantId());
@@ -844,7 +847,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
 
     // Bug from http://forums.activiti.org/content/callactiviti-tenant-id
     public void testCallActivityWithTenant() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             String tenantId = "apache";
 
             // deploying both processes. Process 1 will call Process 2
@@ -852,10 +855,11 @@ public class TenancyTest extends PluggableFlowableTestCase {
             repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/tenant/TenancyTest.testCallActivityWithTenant-process02.bpmn20.xml").tenantId(tenantId).deploy();
 
             // Starting Process 1. Process 1 will be executed successfully but
-            // when the call to process 2 is made internally it will throw the
-            // exception
+            // when the call to process 2 is made internally it will throw the exception
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId("process1", null, CollectionUtil.singletonMap("sendFor", "test"), tenantId);
             Assert.assertNotNull(processInstance);
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("process2").processInstanceTenantId(tenantId).count());
             Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("process2").count());
@@ -870,9 +874,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
             }
 
             // Cleanup
-            for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
-                repositoryService.deleteDeployment(deployment.getId(), true);
-            }
+            deleteDeployments();
         }
     }
 
