@@ -50,7 +50,6 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
     protected Date lockExpirationTime;
     protected Date createTime;
 
-    @SuppressWarnings("unchecked")
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<String, Object>();
         persistentState.put("retries", retries);

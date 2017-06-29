@@ -551,7 +551,13 @@ public class DefaultJobManager implements JobManager {
             getCommandContext().addCloseListener(jobAddedNotification);
         }
     }
-
+    
+    @Override
+    public HistoryJobEntity scheduleHistoryJob(HistoryJobEntity historyJobEntity) {
+        processEngineConfiguration.getHistoryJobEntityManager().insert(historyJobEntity);
+        return historyJobEntity;
+    }
+    
     protected JobEntity internalCreateAsyncJob(ExecutionEntity execution, boolean exclusive) {
         JobEntity asyncJob = processEngineConfiguration.getJobEntityManager().create();
         fillDefaultAsyncJobInfo(asyncJob, execution, exclusive);
@@ -672,9 +678,10 @@ public class DefaultJobManager implements JobManager {
     }
 
     protected boolean isAsyncExecutorActive() {
-        return processEngineConfiguration.getAsyncExecutor().isActive();
+        return processEngineConfiguration.getAsyncExecutor() != null
+                && processEngineConfiguration.getAsyncExecutor().isActive();
     }
-
+    
     protected CommandContext getCommandContext() {
         return Context.getCommandContext();
     }

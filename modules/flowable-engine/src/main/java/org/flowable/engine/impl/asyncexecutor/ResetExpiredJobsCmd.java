@@ -35,14 +35,10 @@ public class ResetExpiredJobsCmd implements Command<Void> {
 
     @Override
     public Void execute(CommandContext commandContext) {
-        boolean messageQueueMode = commandContext.getProcessEngineConfiguration().isAsyncExecutorIsMessageQueueMode();
         for (String jobId : jobIds) {
-            if (!messageQueueMode) {
-                Job job = commandContext.getJobEntityManager().findById(jobId);
-                commandContext.getJobManager().unacquire(job);
-            } else {
-                jobEntityManager.resetExpiredJob(jobId);
-            }
+            Job job = commandContext.getJobEntityManager().findById(jobId);
+            commandContext.getJobManager().unacquire(job);
+            jobEntityManager.resetExpiredJob(jobId);
         }
         return null;
     }

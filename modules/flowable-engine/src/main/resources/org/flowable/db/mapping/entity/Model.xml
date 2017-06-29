@@ -91,7 +91,7 @@
           <if test="originalPersistentState.deploymentId != deploymentId">
               DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR},
           </if>
-          <if test="originalPersistentState.editrSourceValueId != editorSourceValueId">
+          <if test="originalPersistentState.editorSourceValueId != editorSourceValueId">
               EDITOR_SOURCE_VALUE_ID_ = #{editorSourceValueId, jdbcType=VARCHAR},
           </if>
           <if test="originalPersistentState.editorSourceExtraValueId != editorSourceExtraValueId">

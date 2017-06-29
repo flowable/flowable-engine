@@ -74,12 +74,13 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
 
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<String, Object>();
+        persistentState.put("startTime", startTime);
         persistentState.put("endTime", endTime);
         persistentState.put("businessKey", businessKey);
         persistentState.put("name", name);
         persistentState.put("durationInMillis", durationInMillis);
         persistentState.put("deleteReason", deleteReason);
-        persistentState.put("endStateName", endActivityId);
+        persistentState.put("endActivityId", endActivityId);
         persistentState.put("superProcessInstanceId", superProcessInstanceId);
         persistentState.put("processDefinitionId", processDefinitionId);
         persistentState.put("processDefinitionKey", processDefinitionKey);

@@ -23,7 +23,8 @@ public class UnacquireAsyncHistoryJobExceptionHandler implements AsyncRunnableEx
 
     @Override
     public boolean handleException(final ProcessEngineConfigurationImpl processEngineConfiguration, final JobInfo job, final Throwable exception) {
-        if (job != null && AsyncHistoryJobHandler.JOB_TYPE.equals(job.getJobHandlerType())) {
+        if (job != null 
+                && (AsyncHistoryJobHandler.JOB_TYPE.equals(job.getJobHandlerType()) || AsyncHistoryJobZippedHandler.JOB_TYPE.equals(job.getJobHandlerType()) ) ) {
             
             return processEngineConfiguration.getCommandExecutor().execute(new Command<Boolean>() {
                 public Boolean execute(CommandContext commandContext) {

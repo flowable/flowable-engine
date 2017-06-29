@@ -75,6 +75,7 @@ public class JobEntityManagerImpl extends JobInfoEntityManagerImpl<JobEntity> im
             }
         }
 
+        jobEntity.setCreateTime(getProcessEngineConfiguration().getClock().getCurrentTime());
         super.insert(jobEntity, fireCreateEvent);
         return true;
     }

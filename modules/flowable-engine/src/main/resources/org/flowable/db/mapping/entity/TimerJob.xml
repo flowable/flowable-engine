@@ -21,6 +21,7 @@
         <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
         <result property="jobHandlerType" column="HANDLER_TYPE_" jdbcType="VARCHAR" />
         <result property="jobHandlerConfiguration" column="HANDLER_CFG_" jdbcType="VARCHAR" />
+        <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
         <result property="duedate" column="DUEDATE_" jdbcType="TIMESTAMP" />
         <result property="repeat" column="REPEAT_" jdbcType="VARCHAR" />
@@ -127,6 +128,7 @@
         REPEAT_,
         HANDLER_TYPE_,
         HANDLER_CFG_,
+        CREATE_TIME_,
         TENANT_ID_)
         values (#{id, jdbcType=VARCHAR},
         #{revision, jdbcType=INTEGER},
@@ -142,6 +144,7 @@
         #{repeat, jdbcType=VARCHAR},
         #{jobHandlerType, jdbcType=VARCHAR},
         #{jobHandlerConfiguration, jdbcType=VARCHAR},
+        #{createTime, jdbcType=TIMESTAMP},
         #{tenantId, jdbcType=VARCHAR}
         )
     </insert>
@@ -162,6 +165,7 @@
         REPEAT_,
         HANDLER_TYPE_,
         HANDLER_CFG_,
+        CREATE_TIME_,
         TENANT_ID_) VALUES
         <foreach collection="list" item="job" index="index" separator=",">
             (#{job.id, jdbcType=VARCHAR},
@@ -178,6 +182,7 @@
             #{job.repeat, jdbcType=VARCHAR},
             #{job.jobHandlerType, jdbcType=VARCHAR},
             #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
+            #{job.createTime, jdbcType=TIMESTAMP},
             #{job.tenantId, jdbcType=VARCHAR})
         </foreach>
     </insert>
@@ -200,6 +205,7 @@
             REPEAT_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
+            CREATE_TIME_,
             TENANT_ID_) VALUES
             (#{job.id, jdbcType=VARCHAR},
             #{job.revision, jdbcType=INTEGER},
@@ -215,6 +221,7 @@
             #{job.repeat, jdbcType=VARCHAR},
             #{job.jobHandlerType, jdbcType=VARCHAR},
             #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
+            #{job.createTime, jdbcType=TIMESTAMP},
             #{job.tenantId, jdbcType=VARCHAR})
         </foreach>
         SELECT * FROM dual
@@ -236,7 +243,10 @@
             <if test="originalPersistentState.duedate != duedate">
                 DUEDATE_ = #{duedate, jdbcType=TIMESTAMP},
             </if>
-            <if test="(exceptionByteArrayRef != null and exceptionByteArrayRef == null) or (exceptionByteArrayRef == null and originalPersistentState.exceptionByteArrayRef != null) or (originalPersistentState.exceptionByteArrayRef != exceptionByteArrayRef)">
+            <if test="originalPersistentState.createTime != createTime">
+                CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="(exceptionByteArrayRef != null and originalPersistentState.exceptionByteArrayRef == null) or (exceptionByteArrayRef == null and originalPersistentState.exceptionByteArrayRef != null) or (originalPersistentState.exceptionByteArrayRef != exceptionByteArrayRef)">
                 EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
             </if>
             <if test="originalPersistentState.exceptionMessage != exceptionMessage">

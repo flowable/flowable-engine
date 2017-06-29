@@ -149,7 +149,8 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
                 return false;
             }
         }
-
+        
+        jobEntity.setCreateTime(getProcessEngineConfiguration().getClock().getCurrentTime());
         super.insert(jobEntity, fireCreateEvent);
         return true;
     }

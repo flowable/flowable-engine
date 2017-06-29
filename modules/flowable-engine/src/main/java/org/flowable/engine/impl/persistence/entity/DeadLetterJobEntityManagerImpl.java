@@ -79,6 +79,7 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
             }
         }
 
+        jobEntity.setCreateTime(getProcessEngineConfiguration().getClock().getCurrentTime());
         super.insert(jobEntity, fireCreateEvent);
     }
 

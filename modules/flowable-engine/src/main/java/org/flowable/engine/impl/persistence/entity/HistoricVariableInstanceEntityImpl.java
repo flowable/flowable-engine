@@ -56,10 +56,15 @@ public class HistoricVariableInstanceEntityImpl extends AbstractEntity implement
     public Object getPersistentState() {
         HashMap<String, Object> persistentState = new HashMap<String, Object>();
 
+        persistentState.put("name", name);
         persistentState.put("textValue", textValue);
         persistentState.put("textValue2", textValue2);
         persistentState.put("doubleValue", doubleValue);
         persistentState.put("longValue", longValue);
+        
+        if (variableType != null) {
+            persistentState.put("typeName", variableType.getTypeName());
+        }
 
         if (byteArrayRef != null) {
             persistentState.put("byteArrayRef", byteArrayRef.getId());

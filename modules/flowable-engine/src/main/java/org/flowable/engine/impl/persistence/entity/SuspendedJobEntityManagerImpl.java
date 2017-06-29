@@ -82,6 +82,7 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
             }
         }
 
+        jobEntity.setCreateTime(getProcessEngineConfiguration().getClock().getCurrentTime());
         super.insert(jobEntity, fireCreateEvent);
     }
 

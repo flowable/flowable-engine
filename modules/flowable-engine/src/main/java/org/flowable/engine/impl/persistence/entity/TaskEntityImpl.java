@@ -111,6 +111,8 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         persistentState.put("owner", this.owner);
         persistentState.put("name", this.name);
         persistentState.put("priority", this.priority);
+        persistentState.put("category", this.category);
+        persistentState.put("formKey", this.formKey);
         if (executionId != null) {
             persistentState.put("executionId", this.executionId);
         }
@@ -144,6 +146,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
             persistentState.put("claimTime", this.claimTime);
         }
 
+        persistentState.put("isCountEnabled", this.isCountEnabled);
         persistentState.put("variableCount", this.variableCount);
         persistentState.put("identityLinkCount", this.identityLinkCount);
 

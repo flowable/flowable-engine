@@ -42,7 +42,8 @@
         select
         RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         from ${prefix}ACT_RU_HISTORY_JOB RES
-        where LOCK_EXP_TIME_ is not null and LOCK_EXP_TIME_ &lt; #{parameter, jdbcType=TIMESTAMP}
+        where (LOCK_EXP_TIME_ is not null and LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
+              or (LOCK_EXP_TIME_ is null and CREATE_TIME_ &lt; #{parameter.maxTimeout, jdbcType=TIMESTAMP})
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
@@ -225,7 +226,7 @@
             <if test="originalPersistentState.retries != retries">
                 RETRIES_ = #{retries, jdbcType=INTEGER},
             </if>
-            <if test="(exceptionByteArrayRef != null and exceptionByteArrayRef == null) or (exceptionByteArrayRef == null and originalPersistentState.exceptionByteArrayRef != null) or (originalPersistentState.exceptionByteArrayRef != exceptionByteArrayRef)">
+            <if test="(originalPersistentState.exceptionByteArrayRef != null and exceptionByteArrayRef == null) or (exceptionByteArrayRef == null and originalPersistentState.exceptionByteArrayRef != null) or (originalPersistentState.exceptionByteArrayRef != exceptionByteArrayRef)">
                 EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
             </if>
             <if test="originalPersistentState.exceptionMessage != exceptionMessage">

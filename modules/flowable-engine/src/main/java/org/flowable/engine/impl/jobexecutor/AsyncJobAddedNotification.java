@@ -19,7 +19,7 @@ import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.interceptor.CommandContextCloseListener;
 import org.flowable.engine.impl.interceptor.CommandExecutor;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,10 +30,10 @@ public class AsyncJobAddedNotification implements CommandContextCloseListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AsyncJobAddedNotification.class);
 
-    protected JobEntity job;
+    protected JobInfoEntity job;
     protected AsyncExecutor asyncExecutor;
 
-    public AsyncJobAddedNotification(JobEntity job, AsyncExecutor asyncExecutor) {
+    public AsyncJobAddedNotification(JobInfoEntity job, AsyncExecutor asyncExecutor) {
         this.job = job;
         this.asyncExecutor = asyncExecutor;
     }

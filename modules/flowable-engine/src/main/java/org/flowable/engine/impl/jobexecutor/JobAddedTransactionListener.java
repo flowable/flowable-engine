@@ -19,7 +19,7 @@ import org.flowable.engine.impl.cfg.TransactionListener;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.interceptor.CommandExecutor;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,10 +30,10 @@ public class JobAddedTransactionListener implements TransactionListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobAddedTransactionListener.class);
 
-    protected JobEntity job;
+    protected JobInfoEntity job;
     protected AsyncExecutor asyncExecutor;
 
-    public JobAddedTransactionListener(JobEntity job, AsyncExecutor asyncExecutor) {
+    public JobAddedTransactionListener(JobInfoEntity job, AsyncExecutor asyncExecutor) {
         this.job = job;
         this.asyncExecutor = asyncExecutor;
     }

@@ -94,6 +94,43 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
             assertNull(jobEntity.getLockExpirationTime());
         }
     }
+    
+    @Deployment
+    public void testResetExpiredJobTimeout() {
+        Date startOfTestTime = new Date();
+        processEngineConfiguration.getClock().setCurrentTime(startOfTestTime);
+
+        runtimeService.startProcessInstanceByKey("myProcess");
+        Job job = managementService.createJobQuery().singleResult();
+        assertNotNull(job);
+        assertTrue(job instanceof JobEntity);
+        
+        JobEntity jobEntity = (JobEntity) job;
+        assertNull(jobEntity.getLockOwner());
+        assertNull(jobEntity.getLockExpirationTime());
+        
+        int expiredJobsPagesSize = processEngineConfiguration.getAsyncExecutorResetExpiredJobsPageSize();
+        List<? extends JobInfoEntity> expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, processEngineConfiguration.getJobEntityManager()));
+        assertEquals(0, expiredJobs.size());
+        
+        // Move time to timeout + 1 second. This should trigger the max timeout and the job should be reset (unacquired: reinserted as a new job)
+        processEngineConfiguration.getClock().setCurrentTime(new Date(startOfTestTime.getTime() + (processEngineConfiguration.getAsyncExecutorResetExpiredJobsMaxTimeout() + 1)));
+      
+        expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, processEngineConfiguration.getJobEntityManager()));
+        assertEquals(1, expiredJobs.size());
+        assertEquals(job.getId(), expiredJobs.get(0).getId());
+        assertJobDetails(false);
+
+        List<String> jobIds = new ArrayList<String>();
+        for (JobInfoEntity j : expiredJobs) {
+            jobIds.add(j.getId());
+        }
+        managementService.executeCommand(new ResetExpiredJobsCmd(jobIds, processEngineConfiguration.getJobEntityManager()));
+        assertEquals(0, managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, processEngineConfiguration.getJobEntityManager())).size());
+        
+        assertNull(managementService.createJobQuery().jobId(job.getId()).singleResult());
+        assertNotNull(managementService.createJobQuery().singleResult());
+    }
 
     protected void assertJobDetails(boolean locked) {
         JobQuery jobQuery = managementService.createJobQuery();
