@@ -13,6 +13,7 @@
 package org.flowable.app.conf;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.app.events.TimerFiredEventHandler;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
 import org.flowable.content.spring.configurator.SpringContentEngineConfigurator;
@@ -29,11 +30,13 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.agenda.DebugFlowableEngineAgendaFactory;
 import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.event.BreakpointJobHandler;
+import org.flowable.engine.impl.event.logger.handler.EventLoggerEventHandler;
 import org.flowable.engine.impl.jobexecutor.JobHandler;
 import org.flowable.engine.runtime.ProcessDebugger;
 import org.flowable.form.api.FormRepositoryService;
@@ -52,6 +55,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
+import java.util.Collections;
 
 @Configuration
 @ComponentScan(basePackages = {
@@ -103,6 +107,9 @@ public class FlowableEngineConfiguration {
         processEngineConfiguration.setAsyncExecutorActivate(true);
         processEngineConfiguration.setAsyncExecutor(asyncExecutor());
         processEngineConfiguration.setEnableDatabaseEventLogging(true);
+        processEngineConfiguration.setCustomDatabaseEventLoggingHandlers(
+                Collections.<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>>singletonMap(FlowableEngineEventType.TIMER_FIRED, TimerFiredEventHandler.class)
+        );
 
         if (environment.getProperty("debugger.enabled", Boolean.class, false)) {
             processEngineConfiguration.setAgendaFactory(agendaFactory());

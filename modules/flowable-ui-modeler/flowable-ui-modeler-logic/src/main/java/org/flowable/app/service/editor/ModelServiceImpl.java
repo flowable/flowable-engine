@@ -508,14 +508,20 @@ public class ModelServiceImpl implements ModelService {
                     }
                     break;
                 case "TASK_ASSIGNED":
+                    try {
+                        String taskDefinitionKey = (String) objectMapper.readValue(eventLogEntry.get("data").binaryValue(), Map.class).get("taskDefinitionKey");
                     nodes.add(createScriptTask(position, "claimTask" + position++, "Claim task " +
                                     eventLogEntry.get("taskId").textValue() + " to user "+ eventLogEntry.get("userId"),
                             "import org.flowable.engine.impl.context.Context;\n" +
                                     "\n" +
                                     "processInstanceIds = testHelper.getSubProcessInstanceIds(processInstanceId)\n" +
-                                    "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceIdIn(processInstanceIds).singleResult().getId();\n" +
+                                    "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceIdIn(processInstanceIds)." +
+                                    "taskDefinitionKey(\""+taskDefinitionKey+"\").singleResult().getId();\n" +
                                     "Context.getProcessEngineConfiguration().getTaskService().claim(taskId, '"+ eventLogEntry.get("userId").textValue() +"');"
                     ));
+                    } catch (IOException e) {
+                        throw new RuntimeException("eventLog entry [" + eventLogEntry + "] does not have a correct format", e);
+                    }
                     break;
                 case "TIMER_FIRED":
                     nodes.add(createScriptTask(position, "fireAllTimers" + position++, "Fire all timers",
@@ -524,7 +530,8 @@ public class ModelServiceImpl implements ModelService {
                                     "processInstanceIds = testHelper.getSubProcessInstanceIds(processInstanceId)\n" +
                                     "managementService = Context.getProcessEngineConfiguration().getManagementService();\n" +
                                     "for( String processInstanceId : processInstanceIds) {\n" +
-                                    "    timers = managementService.createTimerJobQuery().processInstanceId(processInstanceId).timers.list();\n" +
+                                    "    timers = managementService.createTimerJobQuery().processInstanceId(processInstanceId)." +
+                                    "timers().list();\n" +
                                     "    for( org.flowable.engine.runtime.Job timer : timers) {\n" +
                                     "        managementService.executeJob(timer.getId());\n" +
                                     "    }" +
@@ -532,13 +539,19 @@ public class ModelServiceImpl implements ModelService {
                     ));
                     break;
                 case "TASK_COMPLETED":
-                    nodes.add(createScriptTask(position, "completeTask"+position++, "Complete task "+ eventLogEntry.get("taskId").textValue(),
+                    try {
+                        String taskDefinitionKey = (String) objectMapper.readValue(eventLogEntry.get("data").binaryValue(), Map.class).get("taskDefinitionKey");
+                        nodes.add(createScriptTask(position, "completeTask"+position++, "Complete task "+ eventLogEntry.get("taskId").textValue(),
                             "import org.flowable.engine.impl.context.Context;\n" +
                                     "\n" +
                                     "processInstanceIds = testHelper.getSubProcessInstanceIds(processInstanceId)\n" +
-                                    "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceIdIn(processInstanceIds).singleResult().getId();\n" +
+                                    "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery()." +
+                                    "processInstanceIdIn(processInstanceIds).taskDefinitionKey(\""+taskDefinitionKey+"\").singleResult().getId();\n" +
                                     "Context.getProcessEngineConfiguration().getTaskService().complete(taskId);"
                     ));
+                    } catch (IOException e) {
+                        throw new RuntimeException("eventLog entry [" + eventLogEntry + "] does not have a correct format", e);
+                    }
                     break;
                 case "DEBUG_LOG_SCRIPT":
                     try {

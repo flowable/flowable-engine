@@ -166,6 +166,7 @@ import org.flowable.engine.impl.event.EventHandler;
 import org.flowable.engine.impl.event.MessageEventHandler;
 import org.flowable.engine.impl.event.SignalEventHandler;
 import org.flowable.engine.impl.event.logger.EventLogger;
+import org.flowable.engine.impl.event.logger.handler.EventLoggerEventHandler;
 import org.flowable.engine.impl.form.BooleanFormType;
 import org.flowable.engine.impl.form.DateFormType;
 import org.flowable.engine.impl.form.DoubleFormType;
@@ -487,7 +488,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // History Manager
 
     protected HistoryManager historyManager;
-    
+
     protected boolean isAsyncHistoryEnabled;
     //protected boolean isAsyncHistoryJsonGzipCompressionEnabled;
     //protected boolean isAsyncHistoryJsonGroupingEnabled;
@@ -544,7 +545,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected List<JobHandler> customJobHandlers;
     protected Map<String, JobHandler> jobHandlers;
     protected AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler;
-    
+
     protected List<HistoryJobHandler> customHistoryJobHandlers;
     protected Map<String, HistoryJobHandler> historyJobHandlers;
 
@@ -558,7 +559,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      * The number of retries for a job.
      */
     protected int asyncExecutorNumberOfRetries = 3;
-    protected int asyncHistoryExecutorNumberOfRetries = 10; 
+    protected int asyncHistoryExecutorNumberOfRetries = 10;
 
     /**
      * The minimal number of threads that are kept alive in the threadpool for job execution. Default value = 2. (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
@@ -788,6 +789,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // Event logging to database
     protected boolean enableDatabaseEventLogging;
+    protected Map<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>> customDatabaseEventLoggingHandlers;
+
 
     /**
      * Using field injection together with a delegate expression for a service task / execution listener / task listener is not thread-sade , see user guide section 'Field Injection' for more
@@ -1294,7 +1297,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             if (usingRelationalDatabase) {
                 initDbSqlSessionFactory();
             }
-            
+
             if (isAsyncHistoryEnabled) {
                 initAsyncHistorySessionFactory();
             }
@@ -1329,7 +1332,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public DbSqlSessionFactory createDbSqlSessionFactory() {
         return new DbSqlSessionFactory();
     }
-    
+
     public void initAsyncHistorySessionFactory() {
         AsyncHistorySessionFactory asyncHistorySessionFactory = new AsyncHistorySessionFactory();
         if (asyncHistoryListener == null) {
@@ -1711,17 +1714,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             }
         }
     }
-    
+
     protected void initHistoryJobHandlers() {
         if (isAsyncHistoryEnabled) {
             historyJobHandlers = new HashMap<String, HistoryJobHandler>();
-            
+
             AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler();
             asyncHistoryJobHandler.initDefaultTransformers();
             //asyncHistoryJobHandler.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
             //asyncHistoryJobHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
             historyJobHandlers.put(asyncHistoryJobHandler.getType(), asyncHistoryJobHandler);
-    
+
             if (getCustomHistoryJobHandlers() != null) {
                 for (HistoryJobHandler customJobHandler : getCustomHistoryJobHandlers()) {
                     historyJobHandlers.put(customJobHandler.getType(), customJobHandler);
@@ -1781,11 +1784,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         asyncExecutor.setProcessEngineConfiguration(this);
         asyncExecutor.setAutoActivate(asyncExecutorActivate);
     }
-    
+
     public void initAsyncHistoryExecutor() {
         if (asyncHistoryExecutor == null) {
             DefaultAsyncJobExecutor defaultAsyncHistoryExecutor = new DefaultAsyncHistoryJobExecutor();
-            
+
             // Message queue mode
             defaultAsyncHistoryExecutor.setMessageQueueMode(asyncHistoryExecutorMessageQueueMode);
 
@@ -2104,7 +2107,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (enableDatabaseEventLogging) {
             // Database event logging uses the default logging mechanism and adds
             // a specific event listener to the list of event listeners
-            getEventDispatcher().addEventListener(new EventLogger(clock, objectMapper));
+            getEventDispatcher().addEventListener(new EventLogger(clock, objectMapper, customDatabaseEventLoggingHandlers));
         }
     }
 
@@ -2124,7 +2127,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
             if (flowable5CompatibilityHandler != null) {
                 log.info("Found compatibility handler instance : {}", flowable5CompatibilityHandler.getClass());
-                
+
                 flowable5CompatibilityHandler.setFlowable6ProcessEngineConfiguration(this);
             }
         }
@@ -2738,7 +2741,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.jobHandlers = jobHandlers;
         return this;
     }
-    
+
     public Map<String, HistoryJobHandler> getHistoryJobHandlers() {
         return historyJobHandlers;
     }
@@ -2801,7 +2804,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.customJobHandlers = customJobHandlers;
         return this;
     }
-    
+
     public List<HistoryJobHandler> getCustomHistoryJobHandlers() {
         return customHistoryJobHandlers;
     }
@@ -3124,6 +3127,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    public Map<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>> getCustomDatabaseEventLoggingHandlers() {
+        return customDatabaseEventLoggingHandlers;
+    }
+
+    public void setCustomDatabaseEventLoggingHandlers(Map<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>> customDatabaseEventLoggingHandlers) {
+        this.customDatabaseEventLoggingHandlers = customDatabaseEventLoggingHandlers;
+    }
+
     public int getMaxLengthStringVariableType() {
         return maxLengthStringVariableType;
     }
@@ -3355,7 +3366,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.deadLetterJobDataManager = deadLetterJobDataManager;
         return this;
     }
-    
+
     public HistoryJobDataManager getHistoryJobDataManager() {
         return historyJobDataManager;
     }
@@ -3593,7 +3604,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.deadLetterJobEntityManager = deadLetterJobEntityManager;
         return this;
     }
-    
+
     public HistoryJobEntityManager getHistoryJobEntityManager() {
         return historyJobEntityManager;
     }
@@ -3682,18 +3693,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void setCandidateManager(CandidateManager candidateManager) {
         this.candidateManager = candidateManager;
     }
-    
+
     public AsyncRunnableExecutionExceptionHandler getAsyncRunnableExecutionExceptionHandler() {
         return asyncRunnableExecutionExceptionHandler;
     }
 
     public ProcessEngineConfigurationImpl setAsyncRunnableExecutionExceptionHandler(
                     AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler) {
-        
+
         this.asyncRunnableExecutionExceptionHandler = asyncRunnableExecutionExceptionHandler;
         return this;
     }
-    
+
     public HistoryManager getHistoryManager() {
         return historyManager;
     }
@@ -3720,7 +3731,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.isAsyncHistoryJsonGzipCompressionEnabled = isAsyncHistoryJsonGzipCompressionEnabled;
         return this;
     }
-    
+
     public boolean isAsyncHistoryJsonGroupingEnabled() {
         return isAsyncHistoryJsonGroupingEnabled;
     }
@@ -3930,7 +3941,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.asyncExecutorNumberOfRetries = asyncExecutorNumberOfRetries;
         return this;
     }
-    
+
     public int getAsyncHistoryExecutorNumberOfRetries() {
         return asyncHistoryExecutorNumberOfRetries;
     }
@@ -4074,7 +4085,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.asyncExecutorExecuteAsyncRunnableFactory = asyncExecutorExecuteAsyncRunnableFactory;
         return this;
     }
-    
+
     public int getAsyncExecutorResetExpiredJobsPageSize() {
         return asyncExecutorResetExpiredJobsPageSize;
     }

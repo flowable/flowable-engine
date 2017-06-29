@@ -1,5 +1,6 @@
 package org.flowable.app.service.runtime;
 
+import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.Execution;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ public class TestHelper {
     @Autowired
     protected RuntimeService runtimeService;
 
+    @Autowired
+    protected RepositoryService repositoryService;
+
 
     @SuppressWarnings("unused")
     public List<String> getSubProcessInstanceIds(String rootProcessInstanceId) {
@@ -24,6 +28,11 @@ public class TestHelper {
             processInstanceIds.add(processInstance.getId());
         }
         return processInstanceIds;
+    }
+
+    @SuppressWarnings("unused")
+    public String getKeyFromProcessDefinitionId(String processDefinitionId) {
+        return this.repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult().getKey();
     }
 
 }

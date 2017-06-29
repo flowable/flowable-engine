@@ -338,8 +338,7 @@ angular.module('flowableApp')
                 $scope.$hide();
 
                 $scope.model.loading = false;
-                var win = window.open("/flowable-modeler/#/editor/" + data.id, '_blank');
-                win.focus();
+                alert('Model successfuly created');
             }).error(function (data, status, headers, config) {
                 $scope.model.loading = false;
                 $scope.model.errorMessage = data.message;

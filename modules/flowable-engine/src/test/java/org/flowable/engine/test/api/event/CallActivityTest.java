@@ -32,7 +32,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
 
         // Database event logger setup
         databaseEventLogger = new EventLogger(processEngineConfiguration.getClock(),
-                processEngineConfiguration.getObjectMapper());
+                processEngineConfiguration.getObjectMapper(), null);
         runtimeService.addEventListener(databaseEventLogger);
     }
 
@@ -245,7 +245,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
 
         assertEquals(26, mylistener.getEventsReceived().size());
     }
-    
+
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivity.bpmn20.xml" })
@@ -274,8 +274,8 @@ public class CallActivityTest extends PluggableFlowableTestCase {
 
         assertEquals("Default name", runtimeService.getVariable(processInstance.getId(), "Name"));
         assertEquals("Default name", runtimeService.getVariable(subprocessInstance.getId(), "FullName"));
-        
-        runtimeService.deleteProcessInstance(processInstance.getId(), null);  
+
+        runtimeService.deleteProcessInstance(processInstance.getId(), null);
 
         FlowableEntityEvent entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(0);
         assertEquals(FlowableEngineEventType.ENTITY_CREATED, entityEvent.getType());
@@ -346,23 +346,23 @@ public class CallActivityTest extends PluggableFlowableTestCase {
 
         // user task within external subprocess cancelled
         FlowableActivityCancelledEvent activityCancelledEvent = (FlowableActivityCancelledEvent) mylistener.getEventsReceived().get(13);
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityCancelledEvent.getType());       
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityCancelledEvent.getType());
         assertEquals("User Task2 in External", activityCancelledEvent.getActivityName());
         assertEquals("userTask", activityCancelledEvent.getActivityType());
-   
+
         // external subprocess cancelled
         FlowableCancelledEvent processCancelledEvent = (FlowableCancelledEvent) mylistener.getEventsReceived().get(14);
-        assertEquals(FlowableEngineEventType.PROCESS_CANCELLED, processCancelledEvent.getType());       
+        assertEquals(FlowableEngineEventType.PROCESS_CANCELLED, processCancelledEvent.getType());
         assertEquals(subprocessInstance.getId(), processCancelledEvent.getProcessInstanceId());
-        
+
         // expecting cancelled event for Call Activity
         activityCancelledEvent = (FlowableActivityCancelledEvent) mylistener.getEventsReceived().get(15);
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityCancelledEvent.getType());       
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityCancelledEvent.getType());
         assertEquals("callActivity", activityCancelledEvent.getActivityType());
-        
+
         // parent process cancelled
         processCancelledEvent = (FlowableCancelledEvent) mylistener.getEventsReceived().get(16);
-        assertEquals(FlowableEngineEventType.PROCESS_CANCELLED, processCancelledEvent.getType());       
+        assertEquals(FlowableEngineEventType.PROCESS_CANCELLED, processCancelledEvent.getType());
         assertEquals(processInstance.getId(), processCancelledEvent.getProcessInstanceId());
 
         assertEquals(17, mylistener.getEventsReceived().size());

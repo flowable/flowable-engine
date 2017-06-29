@@ -40,7 +40,7 @@ public class EventLogResourceTest extends BaseSpringRestTestCase {
         super.setUp();
 
         // Database event logger setup
-        databaseEventLogger = new EventLogger(processEngineConfiguration.getClock(), processEngineConfiguration.getObjectMapper());
+        databaseEventLogger = new EventLogger(processEngineConfiguration.getClock(), processEngineConfiguration.getObjectMapper(), null);
         runtimeService.addEventListener(databaseEventLogger);
     }
 

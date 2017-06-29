@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,7 +40,7 @@ import org.flowable.engine.test.Deployment;
 
 /**
  * Test case for all {@link FlowableEvent}s related to activities.
- * 
+ *
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
@@ -55,7 +55,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         super.setUp();
 
         // Database event logger setup
-        databaseEventLogger = new EventLogger(processEngineConfiguration.getClock(), processEngineConfiguration.getObjectMapper());
+        databaseEventLogger = new EventLogger(processEngineConfiguration.getClock(), processEngineConfiguration.getObjectMapper(), null);
         runtimeService.addEventListener(databaseEventLogger);
     }
 

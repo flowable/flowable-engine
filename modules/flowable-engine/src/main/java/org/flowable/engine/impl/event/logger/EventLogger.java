@@ -69,10 +69,15 @@ public class EventLogger implements FlowableEventListener {
         initializeDefaultHandlers();
     }
 
-    public EventLogger(Clock clock, ObjectMapper objectMapper) {
+    public EventLogger(Clock clock, ObjectMapper objectMapper, Map<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>> customEventHandlers) {
         this();
         this.clock = clock;
         this.objectMapper = objectMapper;
+        if (customEventHandlers != null) {
+            for (Map.Entry<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>> customEventHandler : customEventHandlers.entrySet()) {
+                addEventHandler(customEventHandler.getKey(), customEventHandler.getValue());
+            }
+        }
     }
 
     protected void initializeDefaultHandlers() {
