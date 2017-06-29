@@ -7,5 +7,5 @@
     window.__sfbEnv.customComponentRest = "sf/components/custom";
     window.__sfbEnv.enableDebug = true;
     window.__sfbEnv.usedInFlowablUi = true;
-    window.__sfbEnv.previewUrl = baseUrl + 'rdsFormPreviewer.jsp/?formKey={{formKey}}&theme={{theme}}';
+    window.__sfbEnv.previewUrl = baseUrl + 'rdsFormPreviewer.jsp?formKey={{formKey}}&theme={{theme}}';
 }(this));
