@@ -65,7 +65,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DbSqlSession implements Session {
 
-    private static final Logger log = LoggerFactory.getLogger(DbSqlSession.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DbSqlSession.class);
 
     protected static final Pattern CLEAN_VERSION_REGEX = Pattern.compile("\\d\\.\\d*");
 
@@ -131,7 +131,7 @@ public class DbSqlSession implements Session {
     public void delete(PersistentObject persistentObject) {
         for (DeleteOperation deleteOperation : deleteOperations) {
             if (deleteOperation.sameIdentity(persistentObject)) {
-                log.debug("skipping redundant delete: {}", persistentObject);
+                LOGGER.debug("skipping redundant delete: {}", persistentObject);
                 return; // Skip this delete. It was already added.
             }
         }
@@ -535,27 +535,27 @@ public class DbSqlSession implements Session {
         flushDeserializedObjects();
         List<PersistentObject> updatedObjects = getUpdatedObjects();
 
-        if (log.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             Collection<List<PersistentObject>> insertedObjectLists = insertedObjects.values();
             int nrOfInserts = 0;
             int nrOfUpdates = 0;
             int nrOfDeletes = 0;
             for (List<PersistentObject> insertedObjectList : insertedObjectLists) {
                 for (PersistentObject insertedObject : insertedObjectList) {
-                    log.debug("  insert {}", insertedObject);
+                    LOGGER.debug("  insert {}", insertedObject);
                     nrOfInserts++;
                 }
             }
             for (PersistentObject updatedObject : updatedObjects) {
-                log.debug("  update {}", updatedObject);
+                LOGGER.debug("  update {}", updatedObject);
                 nrOfUpdates++;
             }
             for (DeleteOperation deleteOperation : deleteOperations) {
-                log.debug("  {}", deleteOperation);
+                LOGGER.debug("  {}", deleteOperation);
                 nrOfDeletes++;
             }
-            log.debug("flush summary: {} insert, {} update, {} delete.", nrOfInserts, nrOfUpdates, nrOfDeletes);
-            log.debug("now executing flush...");
+            LOGGER.debug("flush summary: {} insert, {} update, {} delete.", nrOfInserts, nrOfUpdates, nrOfDeletes);
+            LOGGER.debug("now executing flush...");
         }
 
         flushInserts();
@@ -699,7 +699,7 @@ public class DbSqlSession implements Session {
 
                         updatedObjects.add(persistentObject);
                     } else {
-                        log.trace("loaded object '{}' was not updated", persistentObject);
+                        LOGGER.trace("loaded object '{}' was not updated", persistentObject);
                     }
                 }
 
@@ -772,7 +772,7 @@ public class DbSqlSession implements Session {
             throw new ActivitiException("no insert statement for " + persistentObject.getClass() + " in the ibatis mapping files");
         }
 
-        log.debug("inserting: {}", persistentObject);
+        LOGGER.debug("inserting: {}", persistentObject);
         sqlSession.insert(insertStatement, persistentObject);
 
         // See https://activiti.atlassian.net/browse/ACT-1290
@@ -823,7 +823,7 @@ public class DbSqlSession implements Session {
                 throw new ActivitiException("no update statement for " + updatedObject.getClass() + " in the ibatis mapping files");
             }
 
-            log.debug("updating: {}", updatedObject);
+            LOGGER.debug("updating: {}", updatedObject);
             int updatedRecords = sqlSession.update(updateStatement, updatedObject);
             if (updatedRecords != 1) {
                 throw new ActivitiOptimisticLockingException(updatedObject + " was updated by another transaction concurrently");
@@ -876,7 +876,7 @@ public class DbSqlSession implements Session {
 
     protected void flushRegularDeletes(boolean dispatchEvent) {
         for (DeleteOperation delete : deleteOperations) {
-            log.debug("executing: {}", delete);
+            LOGGER.debug("executing: {}", delete);
 
             delete.execute();
 
@@ -953,7 +953,7 @@ public class DbSqlSession implements Session {
             }
         }
 
-        log.debug("activiti db schema check successful");
+        LOGGER.debug("activiti db schema check successful");
     }
 
     protected String addMissingComponent(String missingComponents, String component) {
@@ -1014,7 +1014,7 @@ public class DbSqlSession implements Session {
                 try {
                     tables.close();
                 } catch (Exception e) {
-                    log.error("Error closing meta data tables", e);
+                    LOGGER.error("Error closing meta data tables", e);
                 }
             }
 

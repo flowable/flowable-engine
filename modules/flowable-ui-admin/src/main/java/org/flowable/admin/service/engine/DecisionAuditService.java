@@ -14,6 +14,8 @@ package org.flowable.admin.service.engine;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.Map;
+
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.flowable.admin.domain.ServerConfig;
@@ -22,15 +24,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-
 /**
  * Service for invoking Flowable REST services.
  */
 @Service
 public class DecisionAuditService {
 
-    private final Logger log = LoggerFactory.getLogger(DecisionAuditService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DecisionAuditService.class);
 
     @Autowired
     protected FlowableClientService clientUtil;

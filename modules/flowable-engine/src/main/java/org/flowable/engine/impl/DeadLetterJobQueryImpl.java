@@ -18,7 +18,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.interceptor.CommandExecutor;
@@ -229,9 +228,9 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         return commandContext.getDeadLetterJobEntityManager().findJobCountByQueryCriteria(this);
     }
 
-    public List<Job> executeList(CommandContext commandContext, Page page) {
+    public List<Job> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getDeadLetterJobEntityManager().findJobsByQueryCriteria(this, page);
+        return commandContext.getDeadLetterJobEntityManager().findJobsByQueryCriteria(this);
     }
 
     // getters //////////////////////////////////////////

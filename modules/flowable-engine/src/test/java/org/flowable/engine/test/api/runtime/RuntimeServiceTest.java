@@ -35,6 +35,7 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
@@ -238,7 +239,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         // test that the delete reason of the process instance shows up as
         // delete reason of the task in history
         // ACT-848
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
 
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
 
@@ -261,7 +262,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         runtimeService.deleteProcessInstance(processInstance.getId(), null);
         assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
 
             assertNotNull(historicInstance);
@@ -540,7 +541,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     }
 
     private void checkHistoricVariableUpdateEntity(String variableName, String processInstanceId) {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             boolean deletedVariableUpdateFound = false;
 
             List<HistoricDetail> resultSet = historyService.createHistoricDetailQuery().processInstanceId(processInstanceId).list();
@@ -979,7 +980,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     // Test for https://activiti.atlassian.net/browse/ACT-2186
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testHistoricVariableRemovedWhenRuntimeVariableIsRemoved() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             Map<String, Object> vars = new HashMap<String, Object>();
             vars.put("var1", "Hello");
             vars.put("var2", "World");
@@ -990,6 +991,8 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             assertEquals(3, runtimeService.getVariables(processInstance.getId()).size());
             assertEquals(3, runtimeService.getVariables(processInstance.getId(), Arrays.asList("var1", "var2", "var3")).size());
             assertNotNull(runtimeService.getVariable(processInstance.getId(), "var2"));
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             // Verify history
             assertEquals(3, historyService.createHistoricVariableInstanceQuery().list().size());
@@ -997,6 +1000,8 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
             // Remove one variable
             runtimeService.removeVariable(processInstance.getId(), "var2");
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             // Verify runtime
             assertEquals(2, runtimeService.getVariables(processInstance.getId()).size());

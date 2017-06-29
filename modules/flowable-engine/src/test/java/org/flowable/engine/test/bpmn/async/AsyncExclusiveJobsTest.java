@@ -14,6 +14,7 @@ package org.flowable.engine.test.bpmn.async;
 
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 
@@ -25,12 +26,14 @@ public class AsyncExclusiveJobsTest extends PluggableFlowableTestCase {
     @Deployment
     public void testExclusiveJobs() {
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
 
             // The process has two script tasks in parallel, both exclusive.
             // They should be executed with at least 6 seconds in between (as they both sleep for 6 seconds)
             runtimeService.startProcessInstanceByKey("testExclusiveJobs");
             waitForJobExecutorToProcessAllJobs(20000L, 500L);
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             HistoricActivityInstance scriptTaskAInstance = historyService.createHistoricActivityInstanceQuery().activityId("scriptTaskA").singleResult();
             HistoricActivityInstance scriptTaskBInstance = historyService.createHistoricActivityInstanceQuery().activityId("scriptTaskB").singleResult();

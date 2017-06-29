@@ -307,7 +307,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                 xtw.writeAttribute(ATTRIBUTE_ID, decisionTable.getId());
 
                 if (decisionTable.getHitPolicy() != null) {
-                    xtw.writeAttribute(ATTRIBUTE_HIT_POLICY, decisionTable.getHitPolicy().toString());
+                    xtw.writeAttribute(ATTRIBUTE_HIT_POLICY, decisionTable.getHitPolicy().getValue());
                 }
 
                 if (decisionTable.getAggregation() != null) {
@@ -343,6 +343,14 @@ public class DmnXMLConverter implements DmnXMLConstants {
                             xtw.writeEndElement();
                         }
 
+                        xtw.writeEndElement();
+                    }
+
+                    if (clause.getInputValues() != null && StringUtils.isNotEmpty(clause.getInputValues().getText())) {
+                        xtw.writeStartElement(ELEMENT_INPUT_VALUES);
+                        xtw.writeStartElement(ELEMENT_TEXT);
+                        xtw.writeCharacters(clause.getInputValues().getText());
+                        xtw.writeEndElement();
                         xtw.writeEndElement();
                     }
 
@@ -392,7 +400,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                         xtw.writeAttribute(ATTRIBUTE_ID, container.getInputEntry().getId());
 
                         xtw.writeStartElement(ELEMENT_TEXT);
-                        xtw.writeCharacters(container.getInputEntry().getText());
+                        xtw.writeCData(container.getInputEntry().getText());
                         xtw.writeEndElement();
 
                         xtw.writeEndElement();
@@ -403,7 +411,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                         xtw.writeAttribute(ATTRIBUTE_ID, container.getOutputEntry().getId());
 
                         xtw.writeStartElement(ELEMENT_TEXT);
-                        xtw.writeCharacters(container.getOutputEntry().getText());
+                        xtw.writeCData(container.getOutputEntry().getText());
                         xtw.writeEndElement();
 
                         xtw.writeEndElement();

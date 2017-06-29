@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
 
-    protected static final Logger logger = LoggerFactory.getLogger(JPAEnhancedVariableTest.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(JPAEnhancedVariableTest.class);
     protected static EntityManagerFactory entityManagerFactory;
     protected static ProcessEngine cachedProcessEngine;
     protected static org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5ProcessEngineConfig;
@@ -109,7 +109,7 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
     public void testEnhancedEntityVariables() throws Exception {
         // test if enhancement is used
         if (FieldAccessJPAEntity.class == fieldEntity.getClass() || PropertyAccessJPAEntity.class == propertyEntity.getClass()) {
-            logger.warn("Entity enhancement is not used");
+            LOGGER.warn("Entity enhancement is not used");
             return;
         }
 
@@ -139,7 +139,7 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
     public void testEnhancedEntityListVariables() throws Exception {
         // test if enhancement is used
         if (FieldAccessJPAEntity.class == fieldEntity.getClass() || PropertyAccessJPAEntity.class == propertyEntity.getClass()) {
-            logger.warn("Entity enhancement is not used");
+            LOGGER.warn("Entity enhancement is not used");
             return;
         }
 

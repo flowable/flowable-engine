@@ -31,7 +31,8 @@ var flowableModeler = angular.module('flowableModeler', [
   'ngFileUpload',
   'angularSpectrumColorpicker',
   'duScroll',
-  'dndLists'
+  'dndLists',
+  'ngHandsontable'
 ]);
 
 var flowableModule = flowableModeler;

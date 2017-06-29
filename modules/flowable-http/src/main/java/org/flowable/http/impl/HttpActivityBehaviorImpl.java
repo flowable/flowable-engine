@@ -76,7 +76,7 @@ import org.slf4j.LoggerFactory;
 public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger log = LoggerFactory.getLogger(HttpActivityBehaviorImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpActivityBehaviorImpl.class);
     
     protected HttpServiceTask httpServiceTask;
 
@@ -100,7 +100,7 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
                         }));
                 
             } catch (Exception e) {
-                log.error("Could not configure HTTP client SSL self signed strategy", e);
+                LOGGER.error("Could not configure HTTP client SSL self signed strategy", e);
             }
         }
 
@@ -113,7 +113,7 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
 
         // Build http client
         client = httpClientBuilder.build();
-        log.info("HTTP client is initialized");
+        LOGGER.info("HTTP client is initialized");
 
         // Shutdown hook to close the http client
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -122,9 +122,9 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
                 if (client != null) {
                     try {
                         client.close();
-                        log.info("HTTP client is closed");
+                        LOGGER.info("HTTP client is closed");
                     } catch (Throwable e) {
-                        log.error("Could not close http client", e);
+                        LOGGER.error("Could not close http client", e);
                     }
                 }
             }
@@ -229,7 +229,7 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
                 try {
                     response.close();
                 } catch (Throwable e) {
-                    log.error("Could not close http response", e);
+                    LOGGER.error("Could not close http response", e);
                 }
             }
         }
@@ -247,7 +247,7 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
     protected String getHeadersAsString(final Header[] headers) {
         StringBuilder hb = new StringBuilder();
         for (Header header : headers) {
-            hb.append(header.getName()).append(": ").append(header.getValue()).append("\n");
+            hb.append(header.getName()).append(": ").append(header.getValue()).append('\n');
         }
         return hb.toString();
     }
@@ -296,7 +296,7 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
     }
     
     protected List<FieldDeclaration> createFieldDeclarations(List<FieldExtension> fieldList, ProcessEngineConfigurationImpl processEngineConfiguration) {
-        List<FieldDeclaration> fieldDeclarations = new ArrayList<FieldDeclaration>();
+        List<FieldDeclaration> fieldDeclarations = new ArrayList<>();
 
         for (FieldExtension fieldExtension : fieldList) {
             FieldDeclaration fieldDeclaration = null;

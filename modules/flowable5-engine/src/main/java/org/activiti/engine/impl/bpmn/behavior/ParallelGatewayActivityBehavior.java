@@ -45,7 +45,7 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(ParallelGatewayActivityBehavior.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParallelGatewayActivityBehavior.class);
 
     public void execute(DelegateExecution execution) {
         ActivityExecution activityExecution = (ActivityExecution) execution;
@@ -62,13 +62,13 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
         if (nbrOfExecutionsJoined == nbrOfExecutionsToJoin) {
 
             // Fork
-            if (log.isDebugEnabled()) {
-                log.debug("parallel gateway '{}' activates: {} of {} joined", activity.getId(), nbrOfExecutionsJoined, nbrOfExecutionsToJoin);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("parallel gateway '{}' activates: {} of {} joined", activity.getId(), nbrOfExecutionsJoined, nbrOfExecutionsToJoin);
             }
             activityExecution.takeAll(outgoingTransitions, joinedExecutions);
 
-        } else if (log.isDebugEnabled()) {
-            log.debug("parallel gateway '{}' does not activate: {} of {} joined", activity.getId(), nbrOfExecutionsJoined, nbrOfExecutionsToJoin);
+        } else if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("parallel gateway '{}' does not activate: {} of {} joined", activity.getId(), nbrOfExecutionsJoined, nbrOfExecutionsToJoin);
         }
     }
 

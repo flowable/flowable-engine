@@ -21,7 +21,6 @@ import java.util.Set;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.context.Context;
@@ -572,7 +571,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     }
 
     public String getMssqlOrDB2OrderBy() {
-        String specialOrderBy = super.getOrderBy();
+        String specialOrderBy = super.getOrderByColumns();
         if (specialOrderBy != null && specialOrderBy.length() > 0) {
             specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
             specialOrderBy = specialOrderBy.replace("VAR.", "TEMPVAR_");
@@ -586,7 +585,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         return commandContext.getHistoricProcessInstanceEntityManager().findHistoricProcessInstanceCountByQueryCriteria(this);
     }
 
-    public List<HistoricProcessInstance> executeList(CommandContext commandContext, Page page) {
+    public List<HistoricProcessInstance> executeList(CommandContext commandContext) {
         checkQueryOk();
         ensureVariablesInitialized();
         List<HistoricProcessInstance> results = null;

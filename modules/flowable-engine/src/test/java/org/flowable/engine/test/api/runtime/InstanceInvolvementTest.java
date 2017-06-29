@@ -28,8 +28,7 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/threeParallelTasks.bpmn20.xml" })
     public void testInvolvements() {
-        // "user1", "user2", "user3" and "user4 should not be involved with any
-        // process instance
+        // "user1", "user2", "user3" and "user4 should not be involved with any process instance
         assertNoInvolvement("user1");
         assertNoInvolvement("user2");
         assertNoInvolvement("user3");
@@ -84,6 +83,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         assertNoInvolvement("user2");
         assertNoInvolvement("user3");
         assertNoInvolvement("user4");
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/threeParallelTasks.bpmn20.xml" })

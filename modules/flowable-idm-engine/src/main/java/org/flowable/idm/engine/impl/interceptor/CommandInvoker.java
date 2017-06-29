@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CommandInvoker extends AbstractCommandInterceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(CommandInvoker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommandInvoker.class);
 
     @Override
     public <T> T execute(final CommandConfig config, final Command<T> command) {

@@ -15,7 +15,6 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 import org.flowable.engine.impl.ModelQueryImpl;
 import org.flowable.engine.repository.Model;
@@ -29,7 +28,7 @@ public interface ModelEntityManager extends EntityManager<ModelEntity> {
 
     void insertEditorSourceExtraForModel(String modelId, byte[] modelSource);
 
-    List<Model> findModelsByQueryCriteria(ModelQueryImpl query, Page page);
+    List<Model> findModelsByQueryCriteria(ModelQueryImpl query);
 
     long findModelCountByQueryCriteria(ModelQueryImpl query);
 
@@ -37,7 +36,7 @@ public interface ModelEntityManager extends EntityManager<ModelEntity> {
 
     byte[] findEditorSourceExtraByModelId(String modelId);
 
-    List<Model> findModelsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<Model> findModelsByNativeQuery(Map<String, Object> parameterMap);
 
     long findModelCountByNativeQuery(Map<String, Object> parameterMap);
 

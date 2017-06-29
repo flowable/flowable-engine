@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LoggingExecutionTreeCommandInvoker extends CommandInvoker {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoggingExecutionTreeCommandInvoker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoggingExecutionTreeCommandInvoker.class);
 
     @Override
     public void executeOperation(Runnable runnable) {
@@ -30,8 +30,8 @@ public class LoggingExecutionTreeCommandInvoker extends CommandInvoker {
             AbstractOperation operation = (AbstractOperation) runnable;
 
             if (operation.getExecution() != null) {
-                logger.info("Execution tree while executing operation {} :", operation.getClass());
-                logger.info("{}", System.lineSeparator() + ExecutionTreeUtil.buildExecutionTree(operation.getExecution()));
+                LOGGER.info("Execution tree while executing operation {} :", operation.getClass());
+                LOGGER.info("{}", System.lineSeparator() + ExecutionTreeUtil.buildExecutionTree(operation.getExecution()));
             }
 
         }

@@ -39,8 +39,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testError");
             assertNotNull(processInstance);
 
-            // Fetch the task and assign it. Should cause error-event to be
-            // dispatched
+            // Fetch the task and assign it. Should cause error-event to be dispatched
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
             assertNotNull(task);
             taskService.setAssignee(task.getId(), "kermit");
@@ -49,6 +48,8 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
             // should be available instead of original one
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask").singleResult();
             assertNotNull(task);
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         } finally {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
@@ -70,6 +71,8 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
         // available instead of original one
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask").singleResult();
         assertNotNull(task);
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
     }
 
     @Deployment
@@ -95,21 +98,22 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask").singleResult();
             assertNotNull(task);
 
-            // Try with a different error-code, resulting in a different task
-            // being created
+            // Try with a different error-code, resulting in a different task being created
             listener.setErrorCode("456");
 
             processInstance = runtimeService.startProcessInstanceByKey("testError");
             assertNotNull(processInstance);
 
-            // Fetch the task and assign it. Should cause error-event to be
-            // dispatched
+            // Fetch the task and assign it. Should cause error-event to be dispatched
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
             assertNotNull(task);
             taskService.setAssignee(task.getId(), "kermit");
 
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask2").singleResult();
             assertNotNull(task);
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            
         } finally {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
         }
@@ -120,8 +124,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testError");
         assertNotNull(processInstance);
 
-        // Fetch the task and assign it. Should cause error-event to be
-        // dispatched
+        // Fetch the task and assign it. Should cause error-event to be dispatched
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
         assertNotNull(task);
         taskService.setAssignee(task.getId(), "kermit");
@@ -130,5 +133,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
         // available instead of original one
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask").singleResult();
         assertNotNull(task);
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
     }
 }

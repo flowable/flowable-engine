@@ -14,6 +14,8 @@ package org.flowable.app.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.List;
+
 import org.flowable.rest.service.api.PutAwareCommonsMultipartResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,14 +30,12 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import java.util.List;
-
 /**
  * @author Yvo Swillens
  */
 public class BaseDispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
-    protected final Logger log = LoggerFactory.getLogger(BaseDispatcherServletConfiguration.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(BaseDispatcherServletConfiguration.class);
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -47,7 +47,7 @@ public class BaseDispatcherServletConfiguration extends WebMvcConfigurationSuppo
 
     @Bean
     public LocaleChangeInterceptor localeChangeInterceptor() {
-        log.debug("Configuring localeChangeInterceptor");
+        LOGGER.debug("Configuring localeChangeInterceptor");
         LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
         localeChangeInterceptor.setParamName("language");
         return localeChangeInterceptor;
@@ -61,7 +61,7 @@ public class BaseDispatcherServletConfiguration extends WebMvcConfigurationSuppo
 
     @Bean
     public RequestMappingHandlerMapping requestMappingHandlerMapping() {
-        log.debug("Creating requestMappingHandlerMapping");
+        LOGGER.debug("Creating requestMappingHandlerMapping");
         RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();
         requestMappingHandlerMapping.setUseSuffixPatternMatch(false);
         Object[] interceptors = { localeChangeInterceptor() };

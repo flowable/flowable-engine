@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RedeployV5ProcessDefinitionsCmd implements Command<Void> {
 
-    private static final Logger logger = LoggerFactory.getLogger(RedeployV5ProcessDefinitionsCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RedeployV5ProcessDefinitionsCmd.class);
 
     @Override
     public Void execute(CommandContext commandContext) {
@@ -91,7 +91,7 @@ public class RedeployV5ProcessDefinitionsCmd implements Command<Void> {
 
                 List<ProcessDefinition> groupedProcessDefinitions = deploymentMap.get(deployment.getId());
                 for (ProcessDefinition processDefinition : groupedProcessDefinitions) {
-                    logger.info("adding v5 process definition with id: {} and key: {} for redeployment",
+                    LOGGER.info("adding v5 process definition with id: {} and key: {} for redeployment",
                             processDefinition.getId(), processDefinition.getKey());
 
                     InputStream definitionStream = repositoryService.getResourceAsStream(deployment.getId(), processDefinition.getResourceName());

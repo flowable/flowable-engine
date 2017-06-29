@@ -246,7 +246,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfiguration {
 
-    private static Logger log = LoggerFactory.getLogger(ProcessEngineConfigurationImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessEngineConfigurationImpl.class);
 
     public static final String DB_SCHEMA_UPDATE_CREATE = "create";
     public static final String DB_SCHEMA_UPDATE_DROP_CREATE = "drop-create";
@@ -716,7 +716,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                     throw new ActivitiException("DataSource or JDBC properties have to be specified in a process engine configuration");
                 }
 
-                log.debug("initializing datasource to db: {}", jdbcUrl);
+                LOGGER.debug("initializing datasource to db: {}", jdbcUrl);
 
                 PooledDataSource pooledDataSource = new PooledDataSource(ReflectUtil.getClassLoader(), jdbcDriver, jdbcUrl, jdbcUsername, jdbcPassword);
 
@@ -805,22 +805,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             connection = dataSource.getConnection();
             DatabaseMetaData databaseMetaData = connection.getMetaData();
             String databaseProductName = databaseMetaData.getDatabaseProductName();
-            log.debug("database product name: '{}'", databaseProductName);
+            LOGGER.debug("database product name: '{}'", databaseProductName);
             databaseType = databaseTypeMappings.getProperty(databaseProductName);
             if (databaseType == null) {
                 throw new ActivitiException("couldn't deduct database type from database product name '" + databaseProductName + "'");
             }
-            log.debug("using database type: {}", databaseType);
+            LOGGER.debug("using database type: {}", databaseType);
 
         } catch (SQLException e) {
-            log.error("Exception while initializing Database connection", e);
+            LOGGER.error("Exception while initializing Database connection", e);
         } finally {
             try {
                 if (connection != null) {
                     connection.close();
                 }
             } catch (SQLException e) {
-                log.error("Exception while closing the Database connection", e);
+                LOGGER.error("Exception while closing the Database connection", e);
             }
         }
     }
@@ -1024,7 +1024,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             }
 
             if (nrOfServiceLoadedConfigurators > 0) {
-                log.info("Found {} auto-discoverable Process Engine Configurator{}", nrOfServiceLoadedConfigurators++, nrOfServiceLoadedConfigurators > 1 ? "s" : "");
+                LOGGER.info("Found {} auto-discoverable Process Engine Configurator{}", nrOfServiceLoadedConfigurators++, nrOfServiceLoadedConfigurators > 1 ? "s" : "");
             }
 
             if (!allConfigurators.isEmpty()) {
@@ -1046,9 +1046,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 });
 
                 // Execute the configurators
-                log.info("Found {} Process Engine Configurators in total:", allConfigurators.size());
+                LOGGER.info("Found {} Process Engine Configurators in total:", allConfigurators.size());
                 for (ProcessEngineConfigurator configurator : allConfigurators) {
-                    log.info("{} (priority:{})", configurator.getClass(), configurator.getPriority());
+                    LOGGER.info("{} (priority:{})", configurator.getClass(), configurator.getPriority());
                 }
 
             }
@@ -1058,14 +1058,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected void configuratorsBeforeInit() {
         for (ProcessEngineConfigurator configurator : allConfigurators) {
-            log.info("Executing beforeInit() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
+            LOGGER.info("Executing beforeInit() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
             configurator.beforeInit(this);
         }
     }
 
     protected void configuratorsAfterInit() {
         for (ProcessEngineConfigurator configurator : allConfigurators) {
-            log.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
+            LOGGER.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
             configurator.configure(this);
         }
     }
@@ -1238,7 +1238,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                     Class<?> handledType = defaultBpmnParseHandler.getHandledTypes().iterator().next();
                     if (customParseHandlerMap.containsKey(handledType)) {
                         BpmnParseHandler newBpmnParseHandler = customParseHandlerMap.get(handledType);
-                        log.info("Replacing default BpmnParseHandler {} with {}", defaultBpmnParseHandler.getClass().getName(), newBpmnParseHandler.getClass()
+                        LOGGER.info("Replacing default BpmnParseHandler {} with {}", defaultBpmnParseHandler.getClass().getName(), newBpmnParseHandler.getClass()
                                 .getName());
                         bpmnParserHandlers.set(i, newBpmnParseHandler);
                     }

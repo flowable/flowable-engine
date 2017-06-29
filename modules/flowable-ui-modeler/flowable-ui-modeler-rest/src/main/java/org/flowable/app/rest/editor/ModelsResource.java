@@ -12,24 +12,26 @@
  */
 package org.flowable.app.rest.editor;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.domain.editor.AbstractModel;
-import org.flowable.app.domain.editor.AppDefinition;
 import org.flowable.app.domain.editor.Model;
 import org.flowable.app.model.common.ResultListDataRepresentation;
 import org.flowable.app.model.editor.ModelKeyRepresentation;
 import org.flowable.app.model.editor.ModelRepresentation;
-import org.flowable.app.model.editor.decisiontable.DecisionTableDefinitionRepresentation;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.api.ModelService;
 import org.flowable.app.service.editor.FlowableModelQueryService;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.InternalServerErrorException;
-import org.flowable.form.model.FormModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,15 +43,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 @RestController
 public class ModelsResource {
 
-    private final Logger logger = LoggerFactory.getLogger(ModelsResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModelsResource.class);
 
     @Autowired
     protected FlowableModelQueryService modelQueryService;
@@ -88,7 +85,7 @@ public class ModelsResource {
         try {
             modelRepresentationJson = objectMapper.writeValueAsString(modelRepresentation);
         } catch (Exception e) {
-            logger.error("Error while processing Model representation json", e);
+            LOGGER.error("Error while processing Model representation json", e);
             throw new InternalServerErrorException("Model Representation could not be saved");
         }
 
@@ -104,74 +101,7 @@ public class ModelsResource {
             throw new BadRequestException("Provided model key already exists: " + modelRepresentation.getKey());
         }
 
-        String json = null;
-        if (modelRepresentation.getModelType() != null && modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_FORM)) {
-            try {
-                json = objectMapper.writeValueAsString(new FormModel());
-            } catch (Exception e) {
-                logger.error("Error creating form model", e);
-                throw new InternalServerErrorException("Error creating form");
-            }
-
-        } else if (modelRepresentation.getModelType() != null && modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_DECISION_TABLE)) {
-            try {
-                DecisionTableDefinitionRepresentation decisionTableDefinition = new DecisionTableDefinitionRepresentation();
-
-                String decisionTableDefinitionKey = modelRepresentation.getName().replaceAll(" ", "");
-                decisionTableDefinition.setKey(decisionTableDefinitionKey);
-
-                json = objectMapper.writeValueAsString(decisionTableDefinition);
-            } catch (Exception e) {
-                logger.error("Error creating decision table model", e);
-                throw new InternalServerErrorException("Error creating decision table");
-            }
-
-        } else if (modelRepresentation.getModelType() != null && modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_APP)) {
-            try {
-                json = objectMapper.writeValueAsString(new AppDefinition());
-            } catch (Exception e) {
-                logger.error("Error creating app definition", e);
-                throw new InternalServerErrorException("Error creating app definition");
-            }
-
-        } else {
-            ObjectNode editorNode = objectMapper.createObjectNode();
-            editorNode.put("id", "canvas");
-            editorNode.put("resourceId", "canvas");
-            ObjectNode stencilSetNode = objectMapper.createObjectNode();
-            stencilSetNode.put("namespace", "http://b3mn.org/stencilset/bpmn2.0#");
-            editorNode.set("stencilset", stencilSetNode);
-            ObjectNode propertiesNode = objectMapper.createObjectNode();
-            propertiesNode.put("process_id", modelRepresentation.getKey());
-            propertiesNode.put("name", modelRepresentation.getName());
-            if (StringUtils.isNotEmpty(modelRepresentation.getDescription())) {
-                propertiesNode.put("documentation", modelRepresentation.getDescription());
-            }
-            editorNode.set("properties", propertiesNode);
-
-            ArrayNode childShapeArray = objectMapper.createArrayNode();
-            editorNode.set("childShapes", childShapeArray);
-            ObjectNode childNode = objectMapper.createObjectNode();
-            childShapeArray.add(childNode);
-            ObjectNode boundsNode = objectMapper.createObjectNode();
-            childNode.set("bounds", boundsNode);
-            ObjectNode lowerRightNode = objectMapper.createObjectNode();
-            boundsNode.set("lowerRight", lowerRightNode);
-            lowerRightNode.put("x", 130);
-            lowerRightNode.put("y", 193);
-            ObjectNode upperLeftNode = objectMapper.createObjectNode();
-            boundsNode.set("upperLeft", upperLeftNode);
-            upperLeftNode.put("x", 100);
-            upperLeftNode.put("y", 163);
-            childNode.set("childShapes", objectMapper.createArrayNode());
-            childNode.set("dockers", objectMapper.createArrayNode());
-            childNode.set("outgoing", objectMapper.createArrayNode());
-            childNode.put("resourceId", "startEvent1");
-            ObjectNode stencilNode = objectMapper.createObjectNode();
-            childNode.set("stencil", stencilNode);
-            stencilNode.put("id", "StartNoneEvent");
-            json = editorNode.toString();
-        }
+        String json = modelService.createModelJson(modelRepresentation);
 
         Model newModel = modelService.createModel(modelRepresentation, json, SecurityUtils.getCurrentUserObject());
         return new ModelRepresentation(newModel);

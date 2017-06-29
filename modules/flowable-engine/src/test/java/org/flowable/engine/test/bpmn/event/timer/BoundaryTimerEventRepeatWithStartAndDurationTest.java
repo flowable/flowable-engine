@@ -21,6 +21,7 @@ import java.util.List;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -111,7 +112,7 @@ public class BoundaryTimerEventRepeatWithStartAndDurationTest extends PluggableF
         jobs = managementService.createJobQuery().list();
         assertEquals(0, jobs.size());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery()
                     .processInstanceId(processInstance.getId())
                     .singleResult();

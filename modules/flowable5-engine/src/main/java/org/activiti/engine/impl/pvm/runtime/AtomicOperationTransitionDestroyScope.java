@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AtomicOperationTransitionDestroyScope implements AtomicOperation {
 
-    private static Logger log = LoggerFactory.getLogger(AtomicOperationTransitionDestroyScope.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AtomicOperationTransitionDestroyScope.class);
 
     public boolean isAsync(InterpretableExecution execution) {
         return false;
@@ -46,7 +46,7 @@ public class AtomicOperationTransitionDestroyScope implements AtomicOperation {
                 InterpretableExecution concurrentRoot = (InterpretableExecution) execution.getParent();
                 parentScopeInstance = (InterpretableExecution) execution.getParent().getParent();
 
-                log.debug("moving concurrent {} one scope up under {}", execution, parentScopeInstance);
+                LOGGER.debug("moving concurrent {} one scope up under {}", execution, parentScopeInstance);
                 List<InterpretableExecution> parentScopeInstanceExecutions = (List<InterpretableExecution>) parentScopeInstance.getExecutions();
                 List<InterpretableExecution> concurrentRootExecutions = (List<InterpretableExecution>) concurrentRoot.getExecutions();
                 // if the parent scope had only one single scope child
@@ -71,7 +71,7 @@ public class AtomicOperationTransitionDestroyScope implements AtomicOperation {
                         lastConcurrent.setConcurrent(false);
 
                     } else {
-                        log.debug("merging last concurrent {} into concurrent root {}", lastConcurrent, concurrentRoot);
+                        LOGGER.debug("merging last concurrent {} into concurrent root {}", lastConcurrent, concurrentRoot);
 
                         // We can't just merge the data of the lastConcurrent into the concurrentRoot.
                         // This is because the concurrent root might be in a takeAll-loop. So the
@@ -84,7 +84,7 @@ public class AtomicOperationTransitionDestroyScope implements AtomicOperation {
                 }
 
             } else if (execution.isConcurrent() && execution.isScope()) {
-                log.debug("scoped concurrent {} becomes concurrent and remains under {}", execution, execution.getParent());
+                LOGGER.debug("scoped concurrent {} becomes concurrent and remains under {}", execution, execution.getParent());
 
                 // TODO!
                 execution.destroy();
@@ -95,7 +95,7 @@ public class AtomicOperationTransitionDestroyScope implements AtomicOperation {
                 propagatingExecution.setActivity((ActivityImpl) execution.getActivity());
                 propagatingExecution.setTransition(execution.getTransition());
                 propagatingExecution.setActive(true);
-                log.debug("destroy scope: scoped {} continues as parent scope {}", execution, propagatingExecution);
+                LOGGER.debug("destroy scope: scoped {} continues as parent scope {}", execution, propagatingExecution);
                 execution.destroy();
                 execution.remove();
             }

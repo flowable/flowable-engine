@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MvelExpressionExecutor {
 
-    private static final Logger logger = LoggerFactory.getLogger(MvelExpressionExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MvelExpressionExecutor.class);
 
     public static Boolean executeInputExpression(InputClause inputClause, UnaryTests inputEntry, MvelExecutionContext executionContext) {
         if (inputClause == null) {
@@ -53,7 +53,7 @@ public class MvelExpressionExecutor {
         executionContext.checkExecutionContext(inputClause.getInputExpression().getText());
 
         // pre parse expression
-        String parsedExpression = MvelConditionExpressionPreParser.parse(inputEntry.getText(), inputClause.getInputExpression().getText());
+        String parsedExpression = MvelConditionExpressionPreParser.parse(inputEntry.getText(), inputClause.getInputExpression().getText(), inputClause.getInputExpression().getTypeRef());
 
         // compile MVEL expression
         Serializable compiledExpression = MVEL.compileExpression(parsedExpression, executionContext.getParserContext());
@@ -64,7 +64,7 @@ public class MvelExpressionExecutor {
         try {
             result = MVEL.executeExpression(compiledExpression, executionContext.getStackVariables(), Boolean.class);
         } catch (Exception ex) {
-            logger.warn("Error while executing input entry: {}", parsedExpression, ex);
+            LOGGER.warn("Error while executing input entry: {}", parsedExpression, ex);
             throw new FlowableDmnExpressionException("error while executing input entry", parsedExpression, ex);
         }
 
@@ -91,7 +91,7 @@ public class MvelExpressionExecutor {
         try {
             result = MVEL.executeExpression(compiledExpression, executionContext.getStackVariables());
         } catch (Exception ex) {
-            logger.warn("Error while executing output entry: {}", outputEntry.getText(), ex);
+            LOGGER.warn("Error while executing output entry: {}", outputEntry.getText(), ex);
             throw new FlowableDmnExpressionException("error while executing output entry", outputEntry.getText(), ex);
         }
 

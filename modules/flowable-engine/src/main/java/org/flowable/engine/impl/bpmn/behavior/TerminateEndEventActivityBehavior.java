@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior {
     
-    private static final Logger logger = LoggerFactory.getLogger(TerminateEndEventActivityBehavior.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TerminateEndEventActivityBehavior.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -70,7 +70,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         String deleteReason = createDeleteReason(execution.getCurrentActivityId());
         deleteExecutionEntities(executionEntityManager, rootExecutionEntity, execution.getCurrentFlowElement(), deleteReason);
         endAllHistoricActivities(rootExecutionEntity.getId(), deleteReason);
-        commandContext.getHistoryManager().recordProcessInstanceEnd(rootExecutionEntity.getId(),
+        commandContext.getHistoryManager().recordProcessInstanceEnd(rootExecutionEntity,
                 deleteReason, execution.getCurrentActivityId());
     }
 
@@ -90,7 +90,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
 
             endAllHistoricActivities(scopeExecutionEntity.getId(), deleteReason);
             deleteExecutionEntities(executionEntityManager, scopeExecutionEntity, execution.getCurrentFlowElement(), deleteReason);
-            commandContext.getHistoryManager().recordProcessInstanceEnd(scopeExecutionEntity.getId(), deleteReason, execution.getCurrentActivityId());
+            commandContext.getHistoryManager().recordProcessInstanceEnd(scopeExecutionEntity, deleteReason, execution.getCurrentActivityId());
 
         } else if (scopeExecutionEntity.getCurrentFlowElement() != null
                 && scopeExecutionEntity.getCurrentFlowElement() instanceof SubProcess) { // SubProcess
@@ -125,10 +125,10 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
             try {
                 subProcessActivityBehavior.completing(callActivityExecution, scopeExecutionEntity);
             } catch (RuntimeException e) {
-                logger.error("Error while completing sub process of execution {}", scopeExecutionEntity, e);
+                LOGGER.error("Error while completing sub process of execution {}", scopeExecutionEntity, e);
                 throw e;
             } catch (Exception e) {
-                logger.error("Error while completing sub process of execution {}", scopeExecutionEntity, e);
+                LOGGER.error("Error while completing sub process of execution {}", scopeExecutionEntity, e);
                 throw new FlowableException("Error while completing sub process of execution " + scopeExecutionEntity, e);
             }
 

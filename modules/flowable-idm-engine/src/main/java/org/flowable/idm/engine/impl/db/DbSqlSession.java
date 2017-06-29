@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.idm.engine.impl.db;
 
 import java.io.BufferedReader;
@@ -22,19 +21,12 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.apache.ibatis.session.SqlSession;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableOptimisticLockingException;
 import org.flowable.engine.common.api.FlowableWrongDbException;
-import org.flowable.engine.common.impl.Page;
-import org.flowable.engine.common.impl.db.ListQueryParameterObject;
-import org.flowable.engine.common.impl.interceptor.Session;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.engine.common.impl.db.AbstractNonCachingDbSqlSession;
 import org.flowable.engine.common.impl.util.IoUtil;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
@@ -49,11 +41,9 @@ import org.slf4j.LoggerFactory;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class DbSqlSession implements Session {
+public class DbSqlSession extends AbstractNonCachingDbSqlSession {
 
-    private static final Logger log = LoggerFactory.getLogger(DbSqlSession.class);
-
-    protected static final Pattern CLEAN_VERSION_REGEX = Pattern.compile("\\d\\.\\d*");
+    private static final Logger LOGGER = LoggerFactory.getLogger(DbSqlSession.class);
 
     protected static final List<FlowableIdmVersion> FLOWABLE_IDM_VERSIONS = new ArrayList<FlowableIdmVersion>();
 
@@ -63,6 +53,7 @@ public class DbSqlSession implements Session {
         FLOWABLE_IDM_VERSIONS.add(new FlowableIdmVersion("0"));
         FLOWABLE_IDM_VERSIONS.add(new FlowableIdmVersion("6.0.0.0"));
         FLOWABLE_IDM_VERSIONS.add(new FlowableIdmVersion("6.0.1.0"));
+        FLOWABLE_IDM_VERSIONS.add(new FlowableIdmVersion("6.1.0.0"));
 
         /* Current */
         FLOWABLE_IDM_VERSIONS.add(new FlowableIdmVersion(IdmEngine.VERSION));
@@ -70,176 +61,12 @@ public class DbSqlSession implements Session {
 
     public static String[] JDBC_METADATA_TABLE_TYPES = { "TABLE" };
 
-    protected SqlSession sqlSession;
-    protected DbSqlSessionFactory dbSqlSessionFactory;
-    protected String connectionMetadataDefaultCatalog;
-    protected String connectionMetadataDefaultSchema;
-
     public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory) {
-        this.dbSqlSessionFactory = dbSqlSessionFactory;
-        this.sqlSession = dbSqlSessionFactory.getSqlSessionFactory().openSession();
+        super(dbSqlSessionFactory);
     }
 
     public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, Connection connection, String catalog, String schema) {
-        this.dbSqlSessionFactory = dbSqlSessionFactory;
-        this.sqlSession = dbSqlSessionFactory.getSqlSessionFactory().openSession(connection); // Note the use of connection param here, different from other constructor
-        this.connectionMetadataDefaultCatalog = catalog;
-        this.connectionMetadataDefaultSchema = schema;
-    }
-
-    // insert ///////////////////////////////////////////////////////////////////
-
-    public void insert(Entity entity) {
-        if (entity.getId() == null) {
-            String id = dbSqlSessionFactory.getIdGenerator().getNextId();
-            entity.setId(id);
-        }
-
-        String insertStatement = dbSqlSessionFactory.getInsertStatement(entity);
-        insertStatement = dbSqlSessionFactory.mapStatement(insertStatement);
-
-        if (insertStatement == null) {
-            throw new FlowableException("no insert statement for " + entity.getClass() + " in the ibatis mapping files");
-        }
-
-        log.debug("inserting: {}", entity);
-        sqlSession.insert(insertStatement, entity);
-    }
-
-    // update
-    // ///////////////////////////////////////////////////////////////////
-
-    public void update(Entity entity) {
-        String updateStatement = dbSqlSessionFactory.getUpdateStatement(entity);
-        updateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
-
-        if (updateStatement == null) {
-            throw new FlowableException("no update statement for " + entity.getClass() + " in the ibatis mapping files");
-        }
-
-        log.debug("updating: {}", entity);
-        int updatedRecords = sqlSession.update(updateStatement, entity);
-        if (updatedRecords == 0) {
-            throw new FlowableOptimisticLockingException(entity + " was updated by another transaction concurrently");
-        }
-    }
-
-    public int update(String statement, Object parameters) {
-        String updateStatement = dbSqlSessionFactory.mapStatement(statement);
-        return sqlSession.update(updateStatement, parameters);
-    }
-
-    // delete
-    // ///////////////////////////////////////////////////////////////////
-
-    public void delete(String statement, Object parameter) {
-        sqlSession.delete(statement, parameter);
-    }
-
-    public void delete(Entity entity) {
-        String deleteStatement = dbSqlSessionFactory.getDeleteStatement(entity.getClass());
-        deleteStatement = dbSqlSessionFactory.mapStatement(deleteStatement);
-        if (deleteStatement == null) {
-            throw new FlowableException("no delete statement for " + entity.getClass() + " in the ibatis mapping files");
-        }
-
-        sqlSession.delete(deleteStatement, entity);
-    }
-
-    // select
-    // ///////////////////////////////////////////////////////////////////
-
-    @SuppressWarnings({ "rawtypes" })
-    public List selectList(String statement) {
-        return selectList(statement, null, 0, Integer.MAX_VALUE);
-    }
-
-    @SuppressWarnings("rawtypes")
-    public List selectList(String statement, Object parameter) {
-        return selectList(statement, parameter, 0, Integer.MAX_VALUE);
-    }
-
-    @SuppressWarnings("rawtypes")
-    public List selectList(String statement, Object parameter, Page page) {
-        if (page != null) {
-            return selectList(statement, parameter, page.getFirstResult(), page.getMaxResults());
-        } else {
-            return selectList(statement, parameter, 0, Integer.MAX_VALUE);
-        }
-    }
-
-    @SuppressWarnings("rawtypes")
-    public List selectList(String statement, ListQueryParameterObject parameter, Page page) {
-        if (page != null) {
-            parameter.setFirstResult(page.getFirstResult());
-            parameter.setMaxResults(page.getMaxResults());
-        }
-        return selectList(statement, parameter);
-    }
-
-    @SuppressWarnings("rawtypes")
-    public List selectList(String statement, Object parameter, int firstResult, int maxResults) {
-        return selectList(statement, new ListQueryParameterObject(parameter, firstResult, maxResults));
-    }
-
-    @SuppressWarnings("rawtypes")
-    public List selectList(String statement, ListQueryParameterObject parameter) {
-        return selectListWithRawParameter(statement, parameter, parameter.getFirstResult(), parameter.getMaxResults());
-    }
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List selectListWithRawParameter(String statement, Object parameter, int firstResult, int maxResults) {
-        statement = dbSqlSessionFactory.mapStatement(statement);
-        if (firstResult == -1 || maxResults == -1) {
-            return Collections.EMPTY_LIST;
-        }
-        List loadedObjects = sqlSession.selectList(statement, parameter);
-        return loadedObjects;
-    }
-
-    @SuppressWarnings({ "rawtypes" })
-    public List selectListWithRawParameterWithoutFilter(String statement, Object parameter, int firstResult, int maxResults) {
-        statement = dbSqlSessionFactory.mapStatement(statement);
-        if (firstResult == -1 || maxResults == -1) {
-            return Collections.EMPTY_LIST;
-        }
-        return sqlSession.selectList(statement, parameter);
-    }
-
-    public Object selectOne(String statement, Object parameter) {
-        statement = dbSqlSessionFactory.mapStatement(statement);
-        Object result = sqlSession.selectOne(statement, parameter);
-        return result;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T extends Entity> T selectById(Class<T> entityClass, String id) {
-        T entity = null;
-
-        String selectStatement = dbSqlSessionFactory.getSelectStatement(entityClass);
-        selectStatement = dbSqlSessionFactory.mapStatement(selectStatement);
-        entity = (T) sqlSession.selectOne(selectStatement, id);
-        if (entity == null) {
-            return null;
-        }
-
-        return entity;
-    }
-
-    public void flush() {
-        sqlSession.flushStatements();
-    }
-
-    public void close() {
-        sqlSession.close();
-    }
-
-    public void commit() {
-        sqlSession.commit();
-    }
-
-    public void rollback() {
-        sqlSession.rollback();
+        super(dbSqlSessionFactory, connection, catalog, schema);
     }
 
     // schema operations
@@ -275,7 +102,7 @@ public class DbSqlSession implements Session {
             }
         }
 
-        log.debug("flowable idm db schema check successful");
+        LOGGER.debug("flowable idm db schema check successful");
     }
 
     protected String addMissingComponent(String missingComponents, String component) {
@@ -432,7 +259,7 @@ public class DbSqlSession implements Session {
                 try {
                     tables.close();
                 } catch (Exception e) {
-                    log.error("Error closing meta data tables", e);
+                    LOGGER.error("Error closing meta data tables", e);
                 }
             }
 
@@ -460,7 +287,7 @@ public class DbSqlSession implements Session {
             throw new FlowableException("Version of idm database (" + versionInDatabase + ") is more recent than the engine (" + IdmEngine.VERSION + ")");
         } else if (cleanDbVersion.compareTo(cleanEngineVersion) == 0) {
             // Versions don't match exactly, possibly snapshot is being used
-            log.warn("IDM Engine-version is the same, but not an exact match: {} vs. {}. Not performing database-upgrade.", versionInDatabase, IdmEngine.VERSION);
+            LOGGER.warn("IDM Engine-version is the same, but not an exact match: {} vs. {}. Not performing database-upgrade.", versionInDatabase, IdmEngine.VERSION);
             return false;
         }
         return true;
@@ -489,7 +316,7 @@ public class DbSqlSession implements Session {
     protected void dbSchemaUpgrade(final String component, final int currentDatabaseVersionsIndex) {
         FlowableIdmVersion flowableVersion = FLOWABLE_IDM_VERSIONS.get(currentDatabaseVersionsIndex);
         String dbVersion = flowableVersion.getMainVersion();
-        log.info("upgrading {} schema from {} to {}", component, dbVersion, IdmEngine.VERSION);
+        LOGGER.info("upgrading {} schema from {} to {}", component, dbVersion, IdmEngine.VERSION);
 
         // Actual execution of schema DDL SQL
         for (int i = currentDatabaseVersionsIndex + 1; i < FLOWABLE_IDM_VERSIONS.size(); i++) {
@@ -502,7 +329,7 @@ public class DbSqlSession implements Session {
 
             dbVersion = dbVersion.replace(".", "");
             nextVersion = nextVersion.replace(".", "");
-            log.info("Upgrade needed: {} -> {}. Looking for schema update resource for component '{}'", dbVersion, nextVersion, component);
+            LOGGER.info("Upgrade needed: {} -> {}. Looking for schema update resource for component '{}'", dbVersion, nextVersion, component);
             executeSchemaResource("upgrade", component, getResourceForDbOperation("upgrade", "upgradestep." + dbVersion + ".to." + nextVersion, component), true);
             dbVersion = nextVersion;
         }
@@ -519,7 +346,7 @@ public class DbSqlSession implements Session {
             inputStream = ReflectUtil.getResourceAsStream(resourceName);
             if (inputStream == null) {
                 if (isOptional) {
-                    log.info("no schema resource {} for {}", resourceName, operation);
+                    LOGGER.info("no schema resource {} for {}", resourceName, operation);
                 } else {
                     throw new FlowableException("resource '" + resourceName + "' is not available");
                 }
@@ -533,7 +360,7 @@ public class DbSqlSession implements Session {
     }
 
     private void executeSchemaResource(String operation, String component, String resourceName, InputStream inputStream) {
-        log.info("performing {} on {} with resource {}", operation, component, resourceName);
+        LOGGER.info("performing {} on {} with resource {}", operation, component, resourceName);
         String sqlStatement = null;
         String exceptionSqlStatement = null;
         try {
@@ -548,7 +375,7 @@ public class DbSqlSession implements Session {
                     DatabaseMetaData databaseMetaData = connection.getMetaData();
                     int majorVersion = databaseMetaData.getDatabaseMajorVersion();
                     int minorVersion = databaseMetaData.getDatabaseMinorVersion();
-                    log.info("Found MySQL: majorVersion={} minorVersion={}", majorVersion, minorVersion);
+                    LOGGER.info("Found MySQL: majorVersion={} minorVersion={}", majorVersion, minorVersion);
 
                     // Special care for MySQL < 5.6
                     if (majorVersion <= 5 && minorVersion < 6) {
@@ -556,7 +383,7 @@ public class DbSqlSession implements Session {
                     }
                 }
             } catch (Exception e) {
-                log.info("Could not get database metadata", e);
+                LOGGER.info("Could not get database metadata", e);
             }
 
             BufferedReader reader = new BufferedReader(new StringReader(ddlStatements));
@@ -564,10 +391,10 @@ public class DbSqlSession implements Session {
             boolean inOraclePlsqlBlock = false;
             while (line != null) {
                 if (line.startsWith("# ")) {
-                    log.debug(line.substring(2));
+                    LOGGER.debug(line.substring(2));
 
                 } else if (line.startsWith("-- ")) {
-                    log.debug(line.substring(3));
+                    LOGGER.debug(line.substring(3));
 
                 } else if (line.startsWith("execute java ")) {
                     String upgradestepClassName = line.substring(13).trim();
@@ -578,7 +405,7 @@ public class DbSqlSession implements Session {
                         throw new FlowableException("database update java class '" + upgradestepClassName + "' can't be instantiated: " + e.getMessage(), e);
                     }
                     try {
-                        log.debug("executing upgrade step java class {}", upgradestepClassName);
+                        LOGGER.debug("executing upgrade step java class {}", upgradestepClassName);
                         dbUpgradeStep.execute(this);
                     } catch (Exception e) {
                         throw new FlowableException("error while executing database update java class '" + upgradestepClassName + "': " + e.getMessage(), e);
@@ -601,7 +428,7 @@ public class DbSqlSession implements Session {
                         Statement jdbcStatement = connection.createStatement();
                         try {
                             // no logging needed as the connection will log it
-                            log.debug("SQL: {}", sqlStatement);
+                            LOGGER.debug("SQL: {}", sqlStatement);
                             jdbcStatement.execute(sqlStatement);
                             jdbcStatement.close();
                         } catch (Exception e) {
@@ -609,7 +436,7 @@ public class DbSqlSession implements Session {
                                 exception = e;
                                 exceptionSqlStatement = sqlStatement;
                             }
-                            log.error("problem during schema {}, statement {}", operation, sqlStatement, e);
+                            LOGGER.error("problem during schema {}, statement {}", operation, sqlStatement, e);
                         } finally {
                             sqlStatement = null;
                         }
@@ -625,7 +452,7 @@ public class DbSqlSession implements Session {
                 throw exception;
             }
 
-            log.debug("flowable db schema {} for component {} successful", operation, component);
+            LOGGER.debug("flowable db schema {} for component {} successful", operation, component);
 
         } catch (Exception e) {
             throw new FlowableException("couldn't " + operation + " db schema: " + exceptionSqlStatement, e);
@@ -688,7 +515,7 @@ public class DbSqlSession implements Session {
 
     public void performSchemaOperationsIdmEngineBuild() {
         String databaseSchemaUpdate = Context.getIdmEngineConfiguration().getDatabaseSchemaUpdate();
-        log.debug("Executing performSchemaOperationsProcessEngineBuild with setting {}", databaseSchemaUpdate);
+        LOGGER.debug("Executing performSchemaOperationsProcessEngineBuild with setting {}", databaseSchemaUpdate);
         if (IdmEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
             try {
                 dbSchemaDrop();
@@ -715,30 +542,5 @@ public class DbSqlSession implements Session {
         }
     }
 
-    public <T> T getCustomMapper(Class<T> type) {
-        return sqlSession.getMapper(type);
-    }
-
-    public boolean isMysql() {
-        return dbSqlSessionFactory.getDatabaseType().equals("mysql");
-    }
-
-    public boolean isOracle() {
-        return dbSqlSessionFactory.getDatabaseType().equals("oracle");
-    }
-
-    // query factory methods
-    // ////////////////////////////////////////////////////
-
-    // getters and setters
-    // //////////////////////////////////////////////////////
-
-    public SqlSession getSqlSession() {
-        return sqlSession;
-    }
-
-    public DbSqlSessionFactory getDbSqlSessionFactory() {
-        return dbSqlSessionFactory;
-    }
 
 }

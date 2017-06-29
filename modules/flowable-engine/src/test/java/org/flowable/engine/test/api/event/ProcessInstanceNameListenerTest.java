@@ -12,6 +12,11 @@
  */
 package org.flowable.engine.test.api.event;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import java.io.InputStream;
+
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
@@ -23,11 +28,6 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-
-import java.io.InputStream;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Test case for {@link FlowableEngineEventType#PROCESS_CREATED} event.

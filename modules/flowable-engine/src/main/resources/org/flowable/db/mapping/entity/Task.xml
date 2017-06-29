@@ -120,24 +120,60 @@
     update ${prefix}ACT_RU_TASK
     <set>
       REV_ = #{revisionNext, jdbcType=INTEGER},
-      NAME_ = #{name, jdbcType=VARCHAR},
-      PARENT_TASK_ID_ = #{parentTaskId, jdbcType=VARCHAR},
-      PRIORITY_ = #{priority, jdbcType=INTEGER},
-      CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP},
-      OWNER_ = #{owner, jdbcType=VARCHAR},
-      ASSIGNEE_ = #{assignee, jdbcType=VARCHAR},
-      DELEGATION_ = #{delegationStateString, jdbcType=VARCHAR},
-      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
-      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
-      DESCRIPTION_ = #{description, jdbcType=VARCHAR},
-      DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP},
-      CATEGORY_ = #{category, jdbcType=VARCHAR},
-      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
-      FORM_KEY_ = #{formKey, jdbcType=VARCHAR},
-      CLAIM_TIME_ = #{claimTime, jdbcType=TIMESTAMP},
-      IS_COUNT_ENABLED_ = #{isCountEnabled, jdbcType=BOOLEAN},
-	  VAR_COUNT_ = #{variableCount, jdbcType=INTEGER},
-	  ID_LINK_COUNT_ = #{identityLinkCount, jdbcType=INTEGER}
+      <if test="originalPersistentState.name != name">
+          NAME_ = #{name, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.parentTaskId != parentTaskId">
+          PARENT_TASK_ID_ = #{parentTaskId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.priority != priority">
+          PRIORITY_ = #{priority, jdbcType=INTEGER},
+      </if>
+      <if test="originalPersistentState.createTime != createTime">
+          CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP},
+      </if>
+      <if test="originalPersistentState.owner != owner">
+          OWNER_ = #{owner, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.assignee != assignee">
+          ASSIGNEE_ = #{assignee, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.delegationStateString != delegationStateString">
+          DELEGATION_ = #{delegationStateString, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.executionId != executionId">
+          EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.processDefinitionId != processDefinitionId">
+          PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.description != description">
+          DESCRIPTION_ = #{description, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.dueDate != dueDate">
+          DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP},
+      </if>
+      <if test="originalPersistentState.category != category">
+          CATEGORY_ = #{category, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.suspensionState != suspensionState">
+          SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
+      </if>
+      <if test="originalPersistentState.formKey != formKey">
+          FORM_KEY_ = #{formKey, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.claimTime != claimTime">
+          CLAIM_TIME_ = #{claimTime, jdbcType=TIMESTAMP},
+      </if>
+      <if test="originalPersistentState.isCountEnabled != isCountEnabled">
+          IS_COUNT_ENABLED_ = #{isCountEnabled, jdbcType=BOOLEAN},
+      </if>
+      <if test="originalPersistentState.variableCount != variableCount">
+          VAR_COUNT_ = #{variableCount, jdbcType=INTEGER},
+      </if>
+      <if test="originalPersistentState.identityLinkCount != identityLinkCount">
+          ID_LINK_COUNT_ = #{identityLinkCount, jdbcType=INTEGER}
+      </if>
     </set>
     where ID_= #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
@@ -295,11 +331,11 @@
   
   <!-- Using distinct here because a task can appear multiple times in a resultset when -->
   <select id="selectTaskByQueryCriteria" parameterType="org.flowable.engine.impl.TaskQueryImpl" resultMap="taskResultMap">
-    ${limitBefore}
-    select distinct RES.* ${limitBetween}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select distinct RES.* <if test="nullHandlingColumn != null">, ${nullHandlingColumn}</if> <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectTaskByQueryCriteriaSql"/> 
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
   <select id="selectTaskCountByQueryCriteria" parameterType="org.flowable.engine.impl.TaskQueryImpl" resultType="long">
@@ -316,11 +352,11 @@
     <include refid="selectTasksWithRelatedEntitiesByQueryCriteriaColumns"/>
     <include refid="selectTasksWithRelatedEntitiesByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
   <sql id="selectTasksWithRelatedEntitiesByQueryCriteriaColumns">
-    ${limitBefore}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
   	<if test="_databaseId != 'db2' and _databaseId != 'mssql'">
     select RES.*,
       <if test="includeTaskLocalVariables or includeProcessVariables">
@@ -337,7 +373,7 @@
         ILINK.GROUP_ID_ as ILINK_GROUP_ID_, ILINK.TASK_ID_ as ILINK_TASK_ID_,
         ILINK.PROC_INST_ID_ as ILINK_PROC_INST_ID_, ILINK.PROC_DEF_ID_ as ILINK_PROC_DEF_ID_
       </if>
-    ${limitBetween}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     </if>
     <if test="_databaseId == 'db2' || _databaseId == 'mssql'">
       select distinct TEMPRES_ID_ as ID_, TEMPRES_REV_ as REV_, TEMPRES_NAME_ as NAME_,
@@ -361,7 +397,7 @@
         TEMPILINK_GROUP_ID_ as ILINK_GROUP_ID_, TEMPILINK_TASK_ID_ as ILINK_TASK_ID_,
         TEMPILINK_PROC_INST_ID_ as ILINK_PROC_INST_ID_, TEMPILINK_PROC_DEF_ID_ as ILINK_PROC_DEF_ID_
       </if>
-      ${limitOuterJoinBetween}
+      <if test="firstResult != null and firstResult &gt;= 0">${limitOuterJoinBetween}</if>
       RES.ID_ as TEMPRES_ID_, RES.REV_ as TEMPRES_REV_, RES.NAME_ as TEMPRES_NAME_,
       RES.PARENT_TASK_ID_ as TEMPRES_PARENT_TASK_ID_, RES.DESCRIPTION_ as TEMPRES_DESCRIPTION_,
       RES.PRIORITY_ as TEMPRES_PRIORITY_, RES.CREATE_TIME_ as TEMPRES_CREATE_TIME_,

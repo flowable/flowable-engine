@@ -16,7 +16,6 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.HistoricActivityInstanceQueryImpl;
@@ -46,6 +45,11 @@ public class HistoricActivityInstanceEntityManagerImpl extends AbstractEntityMan
     public List<HistoricActivityInstanceEntity> findUnfinishedHistoricActivityInstancesByExecutionAndActivityId(String executionId, String activityId) {
         return historicActivityInstanceDataManager.findUnfinishedHistoricActivityInstancesByExecutionAndActivityId(executionId, activityId);
     }
+    
+    @Override
+    public List<HistoricActivityInstanceEntity> findHistoricActivityInstancesByExecutionAndActivityId(String executionId, String activityId) {
+        return historicActivityInstanceDataManager.findHistoricActivityInstancesByExecutionIdAndActivityId(executionId, activityId);
+    }
 
     @Override
     public List<HistoricActivityInstanceEntity> findUnfinishedHistoricActivityInstancesByProcessInstanceId(String processInstanceId) {
@@ -65,13 +69,13 @@ public class HistoricActivityInstanceEntityManagerImpl extends AbstractEntityMan
     }
 
     @Override
-    public List<HistoricActivityInstance> findHistoricActivityInstancesByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery, Page page) {
-        return historicActivityInstanceDataManager.findHistoricActivityInstancesByQueryCriteria(historicActivityInstanceQuery, page);
+    public List<HistoricActivityInstance> findHistoricActivityInstancesByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery) {
+        return historicActivityInstanceDataManager.findHistoricActivityInstancesByQueryCriteria(historicActivityInstanceQuery);
     }
 
     @Override
-    public List<HistoricActivityInstance> findHistoricActivityInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return historicActivityInstanceDataManager.findHistoricActivityInstancesByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<HistoricActivityInstance> findHistoricActivityInstancesByNativeQuery(Map<String, Object> parameterMap) {
+        return historicActivityInstanceDataManager.findHistoricActivityInstancesByNativeQuery(parameterMap);
     }
 
     @Override

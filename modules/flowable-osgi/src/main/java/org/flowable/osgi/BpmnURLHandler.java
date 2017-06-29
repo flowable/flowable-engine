@@ -12,10 +12,6 @@
  */
 package org.flowable.osgi;
 
-import org.osgi.service.url.AbstractURLStreamHandlerService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -24,6 +20,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
+import org.osgi.service.url.AbstractURLStreamHandlerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A URL handler to transform a BPMN xml definition into an osgi bundle
  * 
@@ -31,7 +31,7 @@ import java.net.URLConnection;
  */
 public class BpmnURLHandler extends AbstractURLStreamHandlerService {
 
-    private static Logger logger = LoggerFactory.getLogger(BpmnURLHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BpmnURLHandler.class);
 
     private static String SYNTAX = "bpmn: bpmn-xml-uri";
 
@@ -53,7 +53,7 @@ public class BpmnURLHandler extends AbstractURLStreamHandlerService {
         }
         bpmnXmlURL = new URL(url.getPath());
 
-        logger.debug("BPMN xml URL is: [{}]", bpmnXmlURL);
+        LOGGER.debug("BPMN xml URL is: [{}]", bpmnXmlURL);
         return new Connection(url);
     }
 
@@ -79,7 +79,7 @@ public class BpmnURLHandler extends AbstractURLStreamHandlerService {
                 os.close();
                 return new ByteArrayInputStream(os.toByteArray());
             } catch (Exception e) {
-                logger.error("Error opening spring xml url", e);
+                LOGGER.error("Error opening spring xml url", e);
                 throw (IOException) new IOException("Error opening spring xml url").initCause(e);
             }
         }

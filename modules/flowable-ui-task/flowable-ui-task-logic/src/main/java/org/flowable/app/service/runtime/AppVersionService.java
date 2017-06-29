@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AppVersionService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AppVersionService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppVersionService.class);
 
     private static final String VERSION_FILE = "/version.properties";
     private static final String TYPE = "type";
@@ -43,7 +43,7 @@ public class AppVersionService {
             try {
                 properties.load(this.getClass().getResourceAsStream(VERSION_FILE));
             } catch (IOException e) {
-                logger.warn("Could not load version.properties", e);
+                LOGGER.warn("Could not load version.properties", e);
             }
 
             Map<String, String> temp = new HashMap<String, String>();

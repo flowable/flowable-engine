@@ -33,7 +33,7 @@ public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(ExclusiveGatewayActivityBehavior.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExclusiveGatewayActivityBehavior.class);
 
     /**
      * The default behaviour of BPMN, taking every outgoing sequence flow (where the condition evaluates to true), is not valid for an exclusive gateway.
@@ -46,8 +46,8 @@ public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
     @Override
     protected void leave(ActivityExecution execution) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Leaving activity '{}'", execution.getActivity().getId());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Leaving activity '{}'", execution.getActivity().getId());
         }
 
         PvmTransition outgoingSeqFlow = null;
@@ -61,8 +61,8 @@ public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
                 Condition condition = (Condition) seqFlow.getProperty(BpmnParse.PROPERTYNAME_CONDITION);
                 if ((condition == null && (defaultSequenceFlow == null || !defaultSequenceFlow.equals(seqFlow.getId())))
                         || (condition != null && condition.evaluate(seqFlow.getId(), execution))) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Sequence flow '{}'selected as outgoing sequence flow.", seqFlow.getId());
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Sequence flow '{}'selected as outgoing sequence flow.", seqFlow.getId());
                     }
                     outgoingSeqFlow = seqFlow;
                 }

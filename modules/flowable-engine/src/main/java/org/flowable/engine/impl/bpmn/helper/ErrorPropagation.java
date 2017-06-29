@@ -217,14 +217,16 @@ public class ErrorPropagation {
             }
 
             ExecutionEntity eventSubProcessExecution = executionEntityManager.createChildExecution(parentExecution);
-            eventSubProcessExecution.setCurrentFlowElement(event);
+            eventSubProcessExecution.setCurrentFlowElement(event.getSubProcess() != null ? event.getSubProcess() : event);
             Context.getAgenda().planContinueProcessOperation(eventSubProcessExecution);
 
         } else {
             ExecutionEntity boundaryExecution = null;
             List<? extends ExecutionEntity> childExecutions = parentExecution.getExecutions();
             for (ExecutionEntity childExecution : childExecutions) {
-                if (childExecution.getActivityId().equals(event.getId())) {
+                if (childExecution != null
+                        && childExecution.getActivityId() != null
+                        && childExecution.getActivityId().equals(event.getId())) {
                     boundaryExecution = childExecution;
                 }
             }
@@ -337,6 +339,7 @@ public class ErrorPropagation {
             if (e.getClass().getName().equals(exceptionClass)) {
                 return errorCode;
             }
+            
             if (me.isAndChildren()) {
                 Class<?> exceptionClassClass = ReflectUtil.loadClass(exceptionClass);
                 if (exceptionClassClass.isAssignableFrom(e.getClass())) {

@@ -88,6 +88,9 @@ public class HistoricTaskInstanceEntityManagerImpl extends AbstractEntityManager
     @Override
     public void delete(String id) {
         if (getHistoryManager().isHistoryEnabled()) {
+            getCommentEntityManager().deleteCommentsByTaskId(id);
+            getAttachmentEntityManager().deleteAttachmentsByTaskId(id);
+            
             HistoricTaskInstanceEntity historicTaskInstance = findById(id);
             if (historicTaskInstance != null) {
 
@@ -105,8 +108,6 @@ public class HistoricTaskInstanceEntityManagerImpl extends AbstractEntityManager
 
                 getHistoricDetailEntityManager().deleteHistoricDetailsByTaskId(id);
                 getHistoricVariableInstanceEntityManager().deleteHistoricVariableInstancesByTaskId(id);
-                getCommentEntityManager().deleteCommentsByTaskId(id);
-                getAttachmentEntityManager().deleteAttachmentsByTaskId(id);
                 getHistoricIdentityLinkEntityManager().deleteHistoricIdentityLinksByTaskId(id);
 
                 delete(historicTaskInstance);
@@ -115,8 +116,8 @@ public class HistoricTaskInstanceEntityManagerImpl extends AbstractEntityManager
     }
 
     @Override
-    public List<HistoricTaskInstance> findHistoricTaskInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return historicTaskInstanceDataManager.findHistoricTaskInstancesByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<HistoricTaskInstance> findHistoricTaskInstancesByNativeQuery(Map<String, Object> parameterMap) {
+        return historicTaskInstanceDataManager.findHistoricTaskInstancesByNativeQuery(parameterMap);
     }
 
     @Override

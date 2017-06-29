@@ -98,7 +98,7 @@ public class EventSubProcessSignalStartEventActivityBehavior extends AbstractBpm
                 }
             }
         }
-
+        
         ExecutionEntity newSubProcessExecution = executionEntityManager.createChildExecution(executionEntity.getParent());
         newSubProcessExecution.setCurrentFlowElement((SubProcess) executionEntity.getCurrentFlowElement().getParentContainer());
         newSubProcessExecution.setEventScope(false);
@@ -106,6 +106,8 @@ public class EventSubProcessSignalStartEventActivityBehavior extends AbstractBpm
 
         ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(newSubProcessExecution);
         outgoingFlowExecution.setCurrentFlowElement(startEvent);
+        
+        commandContext.getHistoryManager().recordActivityStart(outgoingFlowExecution);
 
         leave(outgoingFlowExecution);
     }

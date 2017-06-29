@@ -41,7 +41,7 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(InclusiveGatewayActivityBehavior.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(InclusiveGatewayActivityBehavior.class.getName());
 
     public void execute(DelegateExecution execution) {
         ActivityExecution activityExecution = (ActivityExecution) execution;
@@ -51,8 +51,8 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
         PvmActivity activity = activityExecution.getActivity();
         if (!activeConcurrentExecutionsExist(activityExecution)) {
 
-            if (log.isDebugEnabled()) {
-                log.debug("inclusive gateway '{}' activates", activity.getId());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("inclusive gateway '{}' activates", activity.getId());
             }
 
             List<ActivityExecution> joinedExecutions = activityExecution.findInactiveConcurrentExecutions(activity);
@@ -97,8 +97,8 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
             }
 
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug("Inclusive gateway '{}' does not activate", activity.getId());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Inclusive gateway '{}' does not activate", activity.getId());
             }
         }
     }
@@ -131,16 +131,16 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
                     }
 
                     if (reachable) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("an active concurrent execution found: '{}'", concurrentExecution.getActivity());
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("an active concurrent execution found: '{}'", concurrentExecution.getActivity());
                         }
                         return true;
                     }
                 }
             }
         } else if (execution.isActive()) { // is this ever true?
-            if (log.isDebugEnabled()) {
-                log.debug("an active concurrent execution found: '{}'", execution.getActivity());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("an active concurrent execution found: '{}'", execution.getActivity());
             }
             return true;
         }

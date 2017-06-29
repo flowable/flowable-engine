@@ -29,10 +29,10 @@ import org.springframework.core.io.UrlResource;
  */
 public class SpringConfigurationHelper {
 
-    private static Logger log = LoggerFactory.getLogger(SpringConfigurationHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigurationHelper.class);
 
     private static ProcessEngine buildProcessEngine(URL resource) {
-        log.debug("==== BUILDING SPRING APPLICATION CONTEXT AND PROCESS ENGINE =========================================");
+        LOGGER.debug("==== BUILDING SPRING APPLICATION CONTEXT AND PROCESS ENGINE =========================================");
 
         ApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource));
         Map<String, ProcessEngine> beansOfType = applicationContext.getBeansOfType(ProcessEngine.class);
@@ -42,7 +42,7 @@ public class SpringConfigurationHelper {
 
         ProcessEngine processEngine = beansOfType.values().iterator().next();
 
-        log.debug("==== SPRING PROCESS ENGINE CREATED ==================================================================");
+        LOGGER.debug("==== SPRING PROCESS ENGINE CREATED ==================================================================");
         return processEngine;
     }
 

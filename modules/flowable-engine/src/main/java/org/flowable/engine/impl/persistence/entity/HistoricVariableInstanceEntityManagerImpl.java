@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.impl.HistoricVariableInstanceQueryImpl;
@@ -105,8 +104,8 @@ public class HistoricVariableInstanceEntityManagerImpl extends AbstractEntityMan
     }
 
     @Override
-    public List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery, Page page) {
-        return historicVariableInstanceDataManager.findHistoricVariableInstancesByQueryCriteria(historicProcessVariableQuery, page);
+    public List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery) {
+        return historicVariableInstanceDataManager.findHistoricVariableInstancesByQueryCriteria(historicProcessVariableQuery);
     }
 
     @Override
@@ -125,8 +124,8 @@ public class HistoricVariableInstanceEntityManagerImpl extends AbstractEntityMan
     }
 
     @Override
-    public List<HistoricVariableInstance> findHistoricVariableInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return historicVariableInstanceDataManager.findHistoricVariableInstancesByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<HistoricVariableInstance> findHistoricVariableInstancesByNativeQuery(Map<String, Object> parameterMap) {
+        return historicVariableInstanceDataManager.findHistoricVariableInstancesByNativeQuery(parameterMap);
     }
 
     @Override

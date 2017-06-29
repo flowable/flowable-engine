@@ -12,6 +12,9 @@
  */
 package org.flowable.rest.form.service.api.form;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.form.api.FormInstanceQuery;
 import org.flowable.form.api.FormService;
@@ -19,9 +22,6 @@ import org.flowable.form.engine.impl.FormInstanceQueryProperty;
 import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.form.FormRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Yvo Swillens

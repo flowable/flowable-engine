@@ -13,163 +13,39 @@
 
 package org.flowable.engine.impl.db;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.cfg.IdGenerator;
-import org.flowable.engine.common.impl.interceptor.AbstractCommandContext;
-import org.flowable.engine.common.impl.interceptor.Session;
-import org.flowable.engine.common.impl.interceptor.SessionFactory;
+import org.flowable.engine.common.impl.db.AbstractDbSqlSession;
+import org.flowable.engine.common.impl.db.AbstractDbSqlSessionFactory;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class DbSqlSessionFactory implements SessionFactory {
+public class DbSqlSessionFactory extends AbstractDbSqlSessionFactory {
     
-    private static Logger logger = LoggerFactory.getLogger(DbSqlSessionFactory.class);
-
-    protected Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<String, Map<String, String>>();
-
     /**
      * A map {class, boolean}, to indicate whether or not a certain {@link Entity} class can be bulk inserted.
      */
     protected Map<Class<? extends Entity>, Boolean> bulkInsertableMap;
 
-    protected String databaseType;
-    protected String databaseTablePrefix = "";
-    private boolean tablePrefixIsSchema;
-
-    protected String databaseCatalog;
-    /**
-     * In some situations you want to set the schema to use for table checks / generation if the database metadata doesn't return that correctly, see https://activiti.atlassian.net/browse/ACT-1220,
-     * https://activiti.atlassian.net/browse/ACT-1062
-     */
-    protected String databaseSchema;
-    protected SqlSessionFactory sqlSessionFactory;
-    protected IdGenerator idGenerator;
-    protected Map<String, String> statementMappings;
-
-    // Caches, filled while executing processes
-    protected Map<Class<?>, String> insertStatements = new ConcurrentHashMap<Class<?>, String>();
     protected Map<Class<?>, String> bulkInsertStatements = new ConcurrentHashMap<Class<?>, String>();
-    protected Map<Class<?>, String> updateStatements = new ConcurrentHashMap<Class<?>, String>();
-    protected Map<Class<?>, String> deleteStatements = new ConcurrentHashMap<Class<?>, String>();
     protected Map<Class<?>, String> bulkDeleteStatements = new ConcurrentHashMap<Class<?>, String>();
-    protected Map<Class<?>, String> selectStatements = new ConcurrentHashMap<Class<?>, String>();
-
-    protected boolean isDbHistoryUsed = true;
+    
     protected int maxNrOfStatementsInBulkInsert = 100;
 
     public Class<?> getSessionType() {
         return DbSqlSession.class;
     }
-
-    public Session openSession(AbstractCommandContext commandContext) {
-        CommandContext currentCommandContext = (CommandContext) commandContext;
-        DbSqlSession dbSqlSession = new DbSqlSession(this, currentCommandContext.getEntityCache());
-        if (getDatabaseSchema() != null && getDatabaseSchema().length() > 0) {
-            try {
-                dbSqlSession.getSqlSession().getConnection().setSchema(getDatabaseSchema());
-            } catch (SQLException e) {
-                throw new FlowableException("Could not set database schema on connection", e);
-            }
-        }
-        if (getDatabaseCatalog() != null && getDatabaseCatalog().length() > 0) {
-            try {
-                dbSqlSession.getSqlSession().getConnection().setCatalog(getDatabaseCatalog());
-            } catch (SQLException e) {
-                throw new FlowableException("Could not set database catalog on connection", e);
-            }
-        }
-        if (dbSqlSession.getSqlSession().getConnection() == null) {
-            throw new FlowableException("Invalid dbSqlSession: no active connection found");
-        }
-        return dbSqlSession;
-    }
-
-    // insert, update and delete statements
-    // /////////////////////////////////////
-
-    public String getInsertStatement(Entity object) {
-        return getStatement(object.getClass(), insertStatements, "insert");
-    }
-
-    public String getInsertStatement(Class<? extends Entity> clazz) {
-        return getStatement(clazz, insertStatements, "insert");
-    }
-
-    @SuppressWarnings("rawtypes")
-    public String getBulkInsertStatement(Class clazz) {
-        return getStatement(clazz, bulkInsertStatements, "bulkInsert");
-    }
-
-    public String getUpdateStatement(Entity object) {
-        return getStatement(object.getClass(), updateStatements, "update");
-    }
-
-    public String getDeleteStatement(Class<?> entityClass) {
-        return getStatement(entityClass, deleteStatements, "delete");
-    }
-
-    public String getBulkDeleteStatement(Class<?> entityClass) {
-        return getStatement(entityClass, bulkDeleteStatements, "bulkDelete");
-    }
-
-    public String getSelectStatement(Class<?> entityClass) {
-        return getStatement(entityClass, selectStatements, "select");
-    }
-
-    private String getStatement(Class<?> entityClass, Map<Class<?>, String> cachedStatements, String prefix) {
-        String statement = cachedStatements.get(entityClass);
-        if (statement != null) {
-            return statement;
-        }
-        statement = prefix + entityClass.getSimpleName();
-        if (statement.endsWith("Impl")) {
-            statement = statement.substring(0, statement.length() - 10); // removing 'entityImpl'
-        } else {
-            statement = statement.substring(0, statement.length() - 6); // removing 'entity'
-        }
-        cachedStatements.put(entityClass, statement);
-        return statement;
-    }
-
-    // db specific mappings
-    // /////////////////////////////////////////////////////
-
-    protected void addDatabaseSpecificStatement(String databaseType, String activitiStatement, String ibatisStatement) {
-        Map<String, String> specificStatements = databaseSpecificStatements.get(databaseType);
-        if (specificStatements == null) {
-            specificStatements = new HashMap<String, String>();
-            databaseSpecificStatements.put(databaseType, specificStatements);
-        }
-        specificStatements.put(activitiStatement, ibatisStatement);
-    }
-
-    public String mapStatement(String statement) {
-        if (statementMappings == null) {
-            return statement;
-        }
-        String mappedStatement = statementMappings.get(statement);
-        return (mappedStatement != null ? mappedStatement : statement);
-    }
-
-    // customized getters and setters
-    // ///////////////////////////////////////////
-
-    public void setDatabaseType(String databaseType) {
-        this.databaseType = databaseType;
-        this.statementMappings = databaseSpecificStatements.get(databaseType);
+    
+    @Override
+    protected AbstractDbSqlSession createDbSqlSession() {
+        return new DbSqlSession(this, Context.getCommandContext().getEntityCache());
     }
 
     public void setBulkInsertEnabled(boolean isBulkInsertEnabled, String databaseType) {
@@ -196,138 +72,21 @@ public class DbSqlSessionFactory implements SessionFactory {
         return bulkInsertableMap != null && bulkInsertableMap.containsKey(entityClass) && bulkInsertableMap.get(entityClass);
     }
 
-    // getters and setters //////////////////////////////////////////////////////
-
-    public SqlSessionFactory getSqlSessionFactory() {
-        return sqlSessionFactory;
-    }
-
-    public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
-        this.sqlSessionFactory = sqlSessionFactory;
-    }
-
-    public IdGenerator getIdGenerator() {
-        return idGenerator;
-    }
-
-    public void setIdGenerator(IdGenerator idGenerator) {
-        this.idGenerator = idGenerator;
-    }
-
-    public String getDatabaseType() {
-        return databaseType;
-    }
-
-    public Map<String, Map<String, String>> getDatabaseSpecificStatements() {
-        return databaseSpecificStatements;
-    }
-
-    public void setDatabaseSpecificStatements(Map<String, Map<String, String>> databaseSpecificStatements) {
-        this.databaseSpecificStatements = databaseSpecificStatements;
-    }
-
-    public Map<String, String> getStatementMappings() {
-        return statementMappings;
-    }
-
-    public void setStatementMappings(Map<String, String> statementMappings) {
-        this.statementMappings = statementMappings;
-    }
-
-    public Map<Class<?>, String> getInsertStatements() {
-        return insertStatements;
-    }
-
-    public void setInsertStatements(Map<Class<?>, String> insertStatements) {
-        this.insertStatements = insertStatements;
-    }
-
-    public Map<Class<?>, String> getBulkInsertStatements() {
-        return bulkInsertStatements;
-    }
-
-    public void setBulkInsertStatements(Map<Class<?>, String> bulkInsertStatements) {
-        this.bulkInsertStatements = bulkInsertStatements;
-    }
-
-    public Map<Class<?>, String> getUpdateStatements() {
-        return updateStatements;
-    }
-
-    public void setUpdateStatements(Map<Class<?>, String> updateStatements) {
-        this.updateStatements = updateStatements;
-    }
-
-    public Map<Class<?>, String> getDeleteStatements() {
-        return deleteStatements;
-    }
-
-    public void setDeleteStatements(Map<Class<?>, String> deleteStatements) {
-        this.deleteStatements = deleteStatements;
-    }
-
-    public Map<Class<?>, String> getBulkDeleteStatements() {
-        return bulkDeleteStatements;
-    }
-
-    public void setBulkDeleteStatements(Map<Class<?>, String> bulkDeleteStatements) {
-        this.bulkDeleteStatements = bulkDeleteStatements;
-    }
-
     public Map<Class<? extends Entity>, Boolean> getBulkInsertableMap() {
         return bulkInsertableMap;
+    }
+    
+    @SuppressWarnings("rawtypes")
+    public String getBulkInsertStatement(Class clazz) {
+        return getStatement(clazz, bulkInsertStatements, "bulkInsert");
+    }
+    
+    public String getBulkDeleteStatement(Class<?> entityClass) {
+        return getStatement(entityClass, bulkDeleteStatements, "bulkDelete");
     }
 
     public void setBulkInsertableMap(Map<Class<? extends Entity>, Boolean> bulkInsertableMap) {
         this.bulkInsertableMap = bulkInsertableMap;
-    }
-
-    public Map<Class<?>, String> getSelectStatements() {
-        return selectStatements;
-    }
-
-    public void setSelectStatements(Map<Class<?>, String> selectStatements) {
-        this.selectStatements = selectStatements;
-    }
-
-    public boolean isDbHistoryUsed() {
-        return isDbHistoryUsed;
-    }
-
-    public void setDbHistoryUsed(boolean isDbHistoryUsed) {
-        this.isDbHistoryUsed = isDbHistoryUsed;
-    }
-
-    public void setDatabaseTablePrefix(String databaseTablePrefix) {
-        this.databaseTablePrefix = databaseTablePrefix;
-    }
-
-    public String getDatabaseTablePrefix() {
-        return databaseTablePrefix;
-    }
-
-    public String getDatabaseCatalog() {
-        return databaseCatalog;
-    }
-
-    public void setDatabaseCatalog(String databaseCatalog) {
-        this.databaseCatalog = databaseCatalog;
-    }
-
-    public String getDatabaseSchema() {
-        return databaseSchema;
-    }
-
-    public void setDatabaseSchema(String databaseSchema) {
-        this.databaseSchema = databaseSchema;
-    }
-
-    public void setTablePrefixIsSchema(boolean tablePrefixIsSchema) {
-        this.tablePrefixIsSchema = tablePrefixIsSchema;
-    }
-
-    public boolean isTablePrefixIsSchema() {
-        return tablePrefixIsSchema;
     }
 
     public int getMaxNrOfStatementsInBulkInsert() {
@@ -336,6 +95,22 @@ public class DbSqlSessionFactory implements SessionFactory {
 
     public void setMaxNrOfStatementsInBulkInsert(int maxNrOfStatementsInBulkInsert) {
         this.maxNrOfStatementsInBulkInsert = maxNrOfStatementsInBulkInsert;
+    }
+    
+    public Map<Class<?>, String> getBulkInsertStatements() {
+        return bulkInsertStatements;
+    }
+
+    public void setBulkInsertStatements(Map<Class<?>, String> bulkInsertStatements) {
+        this.bulkInsertStatements = bulkInsertStatements;
+    }
+    
+    public Map<Class<?>, String> getBulkDeleteStatements() {
+        return bulkDeleteStatements;
+    }
+
+    public void setBulkDeleteStatements(Map<Class<?>, String> bulkDeleteStatements) {
+        this.bulkDeleteStatements = bulkDeleteStatements;
     }
 
 }

@@ -98,7 +98,7 @@ public class ScopeUtil {
             // the eventScopeExecution references a 'snapshot' of the local variables
             Map<String, Object> variables = subProcessExecution.getVariablesLocal();
             for (Entry<String, Object> variable : variables.entrySet()) {
-                eventScopeExecution.setVariableLocal(variable.getKey(), variable.getValue());
+                eventScopeExecution.setVariableLocal(variable.getKey(), variable.getValue(), subProcessExecution, true);
             }
 
             // set event subscriptions to the event scope execution:

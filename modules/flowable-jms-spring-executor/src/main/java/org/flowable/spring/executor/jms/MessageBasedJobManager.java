@@ -25,7 +25,7 @@ import org.flowable.engine.impl.cfg.TransactionListener;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.JobInfo;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 
@@ -50,7 +50,7 @@ public class MessageBasedJobManager extends DefaultJobManager {
     }
 
     @Override
-    public void unacquire(final Job job) {
+    public void unacquire(final JobInfo job) {
 
         if (job instanceof JobEntity) {
             JobEntity jobEntity = (JobEntity) job;
@@ -63,12 +63,12 @@ public class MessageBasedJobManager extends DefaultJobManager {
         sendMessage(job);
     }
 
-    protected void sendMessage(final Job jobEntity) {
+    protected void sendMessage(final JobInfo job) {
         Context.getTransactionContext().addTransactionListener(TransactionState.COMMITTED, new TransactionListener() {
             public void execute(CommandContext commandContext) {
                 jmsTemplate.send(new MessageCreator() {
                     public Message createMessage(Session session) throws JMSException {
-                        return session.createTextMessage(jobEntity.getId());
+                        return session.createTextMessage(job.getId());
                     }
                 });
             }

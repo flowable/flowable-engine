@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 public class AsyncJobUtil {
 
-    private static Logger log = LoggerFactory.getLogger(AsyncJobUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncJobUtil.class);
 
     public static void executeJob(final JobEntity job, final CommandExecutor commandExecutor) {
         try {
@@ -39,8 +39,8 @@ public class AsyncJobUtil {
             }
 
         } catch (Throwable lockException) {
-            if (log.isDebugEnabled()) {
-                log.debug("Could not lock exclusive job. Unlocking job so it can be acquired again. Caught exception: {}", lockException.getMessage());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Could not lock exclusive job. Unlocking job so it can be acquired again. Caught exception: {}", lockException.getMessage());
             }
 
             unacquireJob(commandExecutor, job);
@@ -55,8 +55,8 @@ public class AsyncJobUtil {
 
             handleFailedJob(job, e, commandExecutor);
 
-            if (log.isDebugEnabled()) {
-                log.debug("Optimistic locking exception during job execution. If you have multiple async executors running against the same database, " +
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Optimistic locking exception during job execution. If you have multiple async executors running against the same database, " +
                         "this exception means that this thread tried to acquire an exclusive job, which already was changed by another async executor thread." +
                         "This is expected behavior in a clustered environment. " +
                         "You can ignore this message if you indeed have multiple job executor threads running against the same database. " +
@@ -68,7 +68,7 @@ public class AsyncJobUtil {
 
             // Finally, Throw the exception to indicate the ExecuteAsyncJobCmd failed
             String message = "Job " + job.getId() + " failed";
-            log.error(message, exception);
+            LOGGER.error(message, exception);
         }
 
         try {
@@ -77,15 +77,15 @@ public class AsyncJobUtil {
             }
 
         } catch (ActivitiOptimisticLockingException optimisticLockingException) {
-            if (log.isDebugEnabled()) {
-                log.debug("Optimistic locking exception while unlocking the job. If you have multiple async executors running against the same database, " +
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Optimistic locking exception while unlocking the job. If you have multiple async executors running against the same database, " +
                         "this exception means that this thread tried to acquire an exclusive job, which already was changed by another async executor thread." +
                         "This is expected behavior in a clustered environment. " +
                         "You can ignore this message if you indeed have multiple job executor acquisition threads running against the same database. " +
                         "Exception message: {}", optimisticLockingException.getMessage());
             }
         } catch (Throwable t) {
-            log.error("Error while unlocking exclusive job {}", job.getId(), t);
+            LOGGER.error("Error while unlocking exclusive job {}", job.getId(), t);
         }
     }
 
@@ -112,7 +112,7 @@ public class AsyncJobUtil {
                 FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
                 Command<Object> cmd = failedJobCommandFactory.getCommand(job.getId(), exception);
 
-                log.trace("Using FailedJobCommandFactory '{}' and command of type '{}'", failedJobCommandFactory.getClass(), cmd.getClass());
+                LOGGER.trace("Using FailedJobCommandFactory '{}' and command of type '{}'", failedJobCommandFactory.getClass(), cmd.getClass());
                 commandExecutor.execute(commandConfig, cmd);
 
                 // Dispatch an event, indicating job execution failed in a try-catch block, to prevent the original
@@ -122,7 +122,7 @@ public class AsyncJobUtil {
                         commandContext.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityExceptionEvent(
                                 FlowableEngineEventType.JOB_EXECUTION_FAILURE, job, exception));
                     } catch (Throwable ignore) {
-                        log.warn("Exception occurred while dispatching job failure event, ignoring.", ignore);
+                        LOGGER.warn("Exception occurred while dispatching job failure event, ignoring.", ignore);
                     }
                 }
 

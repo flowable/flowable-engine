@@ -24,6 +24,7 @@ import java.util.UUID;
 import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.VariableInstance;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.variable.ValueFields;
 import org.flowable.engine.impl.variable.VariableType;
@@ -1727,7 +1728,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
         // check if the id of the variable is the same or not
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             String oldSerializableVarId = getVariableInstanceId(processInstance.getId(), "serializableVar");
             String oldLongVar = getVariableInstanceId(processInstance.getId(), "longVar");
 

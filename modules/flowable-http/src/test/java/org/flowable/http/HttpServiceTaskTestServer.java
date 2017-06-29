@@ -12,6 +12,10 @@
  */
 package org.flowable.http;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -37,10 +41,6 @@ import org.flowable.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * Http Server and API to test HTTP Activity
  *
@@ -48,7 +48,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class HttpServiceTaskTestServer {
 
-    private static Logger log = LoggerFactory.getLogger(HttpServiceTaskTestServer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServiceTaskTestServer.class);
     // These should be fixed and known as we use it in test process templates
     protected static final int HTTP_PORT = 9798;
     protected static final int HTTPS_PORT = 9799;
@@ -88,7 +88,7 @@ public class HttpServiceTaskTestServer {
             server.setHandler(contextHandler);
             server.start();
         } catch (Exception e) {
-            log.error("Error starting server", e);
+            LOGGER.error("Error starting server", e);
         }
 
         // Shutdown hook to close the http server
@@ -98,9 +98,9 @@ public class HttpServiceTaskTestServer {
                 if (server != null && server.isRunning()) {
                     try {
                         server.stop();
-                        log.info("HTTP server stopped");
+                        LOGGER.info("HTTP server stopped");
                     } catch (Exception e) {
-                        log.error("Could not close http server", e);
+                        LOGGER.error("Could not close http server", e);
                     }
                 }
             }
@@ -237,7 +237,7 @@ public class HttpServiceTaskTestServer {
             nameNode.put("firstName", "John");
             nameNode.put("lastName", "Doe");
             
-            resp.getWriter().println(responseNode.toString());
+            resp.getWriter().println(responseNode);
         }
     }
 

@@ -12,6 +12,10 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,10 +33,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * @author Bassam Al-Sarori
  * @author Yvo Swillens
@@ -40,7 +40,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @RestController
 public class FormInstancesClientResource extends AbstractClientResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(FormInstancesClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FormInstancesClientResource.class);
 
     @Autowired
     protected FormInstanceService clientService;
@@ -58,7 +58,7 @@ public class FormInstancesClientResource extends AbstractClientResource {
 
             return clientService.getFormInstances(serverConfig, bodyNode);
         } catch (FlowableServiceException e) {
-            logger.error("Error getting form instance", e);
+            LOGGER.error("Error getting form instance", e);
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -73,7 +73,7 @@ public class FormInstancesClientResource extends AbstractClientResource {
 
             return clientService.getFormInstances(serverConfig, bodyNode);
         } catch (FlowableServiceException e) {
-            logger.error("Error getting form instances for process instance id {}", processInstanceId, e);
+            LOGGER.error("Error getting form instances for process instance id {}", processInstanceId, e);
             throw new BadRequestException(e.getMessage());
         }
     }

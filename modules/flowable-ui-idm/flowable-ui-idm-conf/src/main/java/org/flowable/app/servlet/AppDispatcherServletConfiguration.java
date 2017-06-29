@@ -12,6 +12,8 @@
  */
 package org.flowable.app.servlet;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.List;
 
 import org.flowable.app.rest.idm.remote.RemoteAccountResource;
@@ -30,14 +32,12 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @Configuration
 @ComponentScan(value = { "org.flowable.app.rest.idm", "org.flowable.app.rest.exception" }, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = RemoteAccountResource.class))
 @EnableAsync
 public class AppDispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
-    private final Logger log = LoggerFactory.getLogger(AppDispatcherServletConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppDispatcherServletConfiguration.class);
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -49,7 +49,7 @@ public class AppDispatcherServletConfiguration extends WebMvcConfigurationSuppor
 
     @Bean
     public LocaleChangeInterceptor localeChangeInterceptor() {
-        log.debug("Configuring localeChangeInterceptor");
+        LOGGER.debug("Configuring localeChangeInterceptor");
         LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
         localeChangeInterceptor.setParamName("language");
         return localeChangeInterceptor;
@@ -57,7 +57,7 @@ public class AppDispatcherServletConfiguration extends WebMvcConfigurationSuppor
 
     @Bean
     public RequestMappingHandlerMapping requestMappingHandlerMapping() {
-        log.debug("Creating requestMappingHandlerMapping");
+        LOGGER.debug("Creating requestMappingHandlerMapping");
         RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();
         requestMappingHandlerMapping.setUseSuffixPatternMatch(false);
         requestMappingHandlerMapping.setRemoveSemicolonContent(false);

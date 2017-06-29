@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
  */
 public class EndExecutionOperation extends AbstractOperation {
 
-    private static final Logger logger = LoggerFactory.getLogger(EndExecutionOperation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EndExecutionOperation.class);
 
     public EndExecutionOperation(CommandContext commandContext, ExecutionEntity execution) {
         super(commandContext, execution);
@@ -73,7 +73,7 @@ public class EndExecutionOperation extends AbstractOperation {
         ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
 
         String processInstanceId = processInstanceExecution.getId(); // No parent execution == process instance id
-        logger.debug("No parent execution found. Verifying if process instance {} can be stopped.", processInstanceId);
+        LOGGER.debug("No parent execution found. Verifying if process instance {} can be stopped.", processInstanceId);
 
         ExecutionEntity superExecution = processInstanceExecution.getSuperExecution();
         SubProcessActivityBehavior subProcessActivityBehavior = null;
@@ -85,23 +85,23 @@ public class EndExecutionOperation extends AbstractOperation {
             try {
                 subProcessActivityBehavior.completing(superExecution, processInstanceExecution);
             } catch (RuntimeException e) {
-                logger.error("Error while completing sub process of execution {}", processInstanceExecution, e);
+                LOGGER.error("Error while completing sub process of execution {}", processInstanceExecution, e);
                 throw e;
             } catch (Exception e) {
-                logger.error("Error while completing sub process of execution {}", processInstanceExecution, e);
+                LOGGER.error("Error while completing sub process of execution {}", processInstanceExecution, e);
                 throw new FlowableException("Error while completing sub process of execution " + processInstanceExecution, e);
             }
         }
 
         int activeExecutions = getNumberOfActiveChildExecutionsForProcessInstance(executionEntityManager, processInstanceId);
         if (activeExecutions == 0) {
-            logger.debug("No active executions found. Ending process instance {} ", processInstanceId);
+            LOGGER.debug("No active executions found. Ending process instance {} ", processInstanceId);
 
             // note the use of execution here vs processinstance execution for getting the flow element
             executionEntityManager.deleteProcessInstanceExecutionEntity(processInstanceId,
                     execution.getCurrentFlowElement() != null ? execution.getCurrentFlowElement().getId() : null, null, false, false, true);
         } else {
-            logger.debug("Active executions found. Process instance {} will not be ended.", processInstanceId);
+            LOGGER.debug("Active executions found. Process instance {} will not be ended.", processInstanceId);
         }
 
         Process process = ProcessDefinitionUtil.getProcess(processInstanceExecution.getProcessDefinitionId());
@@ -117,10 +117,10 @@ public class EndExecutionOperation extends AbstractOperation {
             try {
                 subProcessActivityBehavior.completed(superExecution);
             } catch (RuntimeException e) {
-                logger.error("Error while completing sub process of execution {}", processInstanceExecution, e);
+                LOGGER.error("Error while completing sub process of execution {}", processInstanceExecution, e);
                 throw e;
             } catch (Exception e) {
-                logger.error("Error while completing sub process of execution {}", processInstanceExecution, e);
+                LOGGER.error("Error while completing sub process of execution {}", processInstanceExecution, e);
                 throw new FlowableException("Error while completing sub process of execution " + processInstanceExecution, e);
             }
 
@@ -140,10 +140,10 @@ public class EndExecutionOperation extends AbstractOperation {
         }
 
         // Delete current execution
-        logger.debug("Ending execution {}", execution.getId());
+        LOGGER.debug("Ending execution {}", execution.getId());
         executionEntityManager.deleteExecutionAndRelatedData(execution, null, false);
 
-        logger.debug("Parent execution found. Continuing process using execution {}", parentExecution.getId());
+        LOGGER.debug("Parent execution found. Continuing process using execution {}", parentExecution.getId());
 
         // When ending an execution in a multi instance subprocess , special care is needed
         if (isEndEventInMultiInstanceSubprocess(execution)) {
@@ -240,6 +240,7 @@ public class EndExecutionOperation extends AbstractOperation {
         // create a new execution to take the outgoing sequence flows
         executionToContinue = executionEntityManager.createChildExecution(parentExecution.getParent());
         executionToContinue.setCurrentFlowElement(subProcess);
+        executionToContinue.setActive(false);
 
         boolean hasCompensation = false;
         if (subProcess instanceof Transaction) {

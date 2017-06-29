@@ -19,6 +19,8 @@ public class InputClause extends DmnElement {
 
     protected LiteralExpression inputExpression;
 
+    protected UnaryTests inputValues;
+
     protected int inputNumber;
 
     public LiteralExpression getInputExpression() {
@@ -27,6 +29,14 @@ public class InputClause extends DmnElement {
 
     public void setInputExpression(LiteralExpression inputExpression) {
         this.inputExpression = inputExpression;
+    }
+
+    public UnaryTests getInputValues() {
+        return inputValues;
+    }
+
+    public void setInputValues(UnaryTests inputValues) {
+        this.inputValues = inputValues;
     }
 
     public int getInputNumber() {

@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TestCustomExpressionFunctionRegistry implements CustomExpressionFunctionRegistry {
 
-    private static final Logger logger = LoggerFactory.getLogger(TestCustomExpressionFunctionRegistry.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestCustomExpressionFunctionRegistry.class);
 
     protected static Map<String, Method> customFunctionConfigurations = new HashMap<String, Method>();
 
@@ -45,10 +45,10 @@ public class TestCustomExpressionFunctionRegistry implements CustomExpressionFun
 
     protected static Method getMethod(Class classRef, String methodName, Class... methodParm) {
         try {
-            logger.debug("adding method to MVEL: {} {} with {} parameters", classRef.getName(), methodName, methodParm.length);
+            LOGGER.debug("adding method to MVEL: {} {} with {} parameters", classRef.getName(), methodName, methodParm.length);
             return classRef.getMethod(methodName, methodParm);
         } catch (NoSuchMethodException nsme) {
-            logger.error("Could not find method for name: {}", methodName, nsme);
+            LOGGER.error("Could not find method for name: {}", methodName, nsme);
         }
 
         return null;

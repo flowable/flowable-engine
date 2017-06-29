@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class DmnTestHelper {
 
-    private static Logger log = LoggerFactory.getLogger(DmnTestHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DmnTestHelper.class);
 
     public static final String EMPTY_LINE = "\n";
 
@@ -48,12 +48,12 @@ public abstract class DmnTestHelper {
         try {
             method = testClass.getMethod(methodName, (Class<?>[]) null);
         } catch (Exception e) {
-            log.warn("Could not get method by reflection. This could happen if you are using @Parameters in combination with annotations.", e);
+            LOGGER.warn("Could not get method by reflection. This could happen if you are using @Parameters in combination with annotations.", e);
             return null;
         }
         DmnDeploymentAnnotation deploymentAnnotation = method.getAnnotation(DmnDeploymentAnnotation.class);
         if (deploymentAnnotation != null) {
-            log.debug("annotation @Deployment creates deployment for {}.{}", testClass.getSimpleName(), methodName);
+            LOGGER.debug("annotation @Deployment creates deployment for {}.{}", testClass.getSimpleName(), methodName);
             String[] resources = deploymentAnnotation.resources();
             if (resources.length == 0) {
                 String name = method.getName();
@@ -74,7 +74,7 @@ public abstract class DmnTestHelper {
     }
 
     public static void annotationDeploymentTearDown(DmnEngine dmnEngine, String deploymentId, Class<?> testClass, String methodName) {
-        log.debug("annotation @Deployment deletes deployment for {}.{}", testClass.getSimpleName(), methodName);
+        LOGGER.debug("annotation @Deployment deletes deployment for {}.{}", testClass.getSimpleName(), methodName);
         if (deploymentId != null) {
             try {
                 dmnEngine.getDmnRepositoryService().deleteDeployment(deploymentId);
@@ -107,9 +107,9 @@ public abstract class DmnTestHelper {
     public static DmnEngine getDmnEngine(String configurationResource) {
         DmnEngine dmnEngine = dmnEngines.get(configurationResource);
         if (dmnEngine == null) {
-            log.debug("==== BUILDING DMN ENGINE ========================================================================");
+            LOGGER.debug("==== BUILDING DMN ENGINE ========================================================================");
             dmnEngine = DmnEngineConfiguration.createDmnEngineConfigurationFromResource(configurationResource).setDatabaseSchemaUpdate(DmnEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE).buildDmnEngine();
-            log.debug("==== DMN ENGINE CREATED =========================================================================");
+            LOGGER.debug("==== DMN ENGINE CREATED =========================================================================");
             dmnEngines.put(configurationResource, dmnEngine);
         }
         return dmnEngine;
@@ -127,7 +127,7 @@ public abstract class DmnTestHelper {
      * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
      */
     public static void assertAndEnsureCleanDb(DmnEngine dmnEngine) {
-        log.debug("verifying that db is clean after test");
+        LOGGER.debug("verifying that db is clean after test");
         DmnRepositoryService repositoryService = dmnEngine.getDmnEngineConfiguration().getDmnRepositoryService();
         List<DmnDeployment> deployments = repositoryService.createDeploymentQuery().list();
         if (deployments != null && !deployments.isEmpty()) {

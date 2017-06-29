@@ -15,7 +15,6 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.DeadLetterJobQueryImpl;
@@ -31,7 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLetterJobEntity> implements DeadLetterJobEntityManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(DeadLetterJobEntityManagerImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeadLetterJobEntityManagerImpl.class);
 
     protected DeadLetterJobDataManager jobDataManager;
 
@@ -46,8 +45,8 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
     }
 
     @Override
-    public List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery, Page page) {
-        return jobDataManager.findJobsByQueryCriteria(jobQuery, page);
+    public List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery) {
+        return jobDataManager.findJobsByQueryCriteria(jobQuery);
     }
 
     @Override
@@ -117,7 +116,7 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
         }
     }
 
-    protected DeadLetterJobEntity createDeadLetterJob(AbstractJobEntity job) {
+    protected DeadLetterJobEntity createDeadLetterJob(AbstractRuntimeJobEntity job) {
         DeadLetterJobEntity newJobEntity = create();
         newJobEntity.setJobHandlerConfiguration(job.getJobHandlerConfiguration());
         newJobEntity.setJobHandlerType(job.getJobHandlerType());

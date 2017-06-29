@@ -16,7 +16,6 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.impl.HistoricDetailQueryImpl;
@@ -115,8 +114,8 @@ public class HistoricDetailEntityManagerImpl extends AbstractEntityManager<Histo
     }
 
     @Override
-    public List<HistoricDetail> findHistoricDetailsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery, Page page) {
-        return historicDetailDataManager.findHistoricDetailsByQueryCriteria(historicVariableUpdateQuery, page);
+    public List<HistoricDetail> findHistoricDetailsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery) {
+        return historicDetailDataManager.findHistoricDetailsByQueryCriteria(historicVariableUpdateQuery);
     }
 
     @Override
@@ -130,8 +129,8 @@ public class HistoricDetailEntityManagerImpl extends AbstractEntityManager<Histo
     }
 
     @Override
-    public List<HistoricDetail> findHistoricDetailsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return historicDetailDataManager.findHistoricDetailsByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<HistoricDetail> findHistoricDetailsByNativeQuery(Map<String, Object> parameterMap) {
+        return historicDetailDataManager.findHistoricDetailsByNativeQuery(parameterMap);
     }
 
     @Override

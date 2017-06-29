@@ -12,25 +12,7 @@
  */
 package org.flowable.http;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.eclipse.jetty.http.HttpVersion;
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.SslConnectionFactory;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class HttpServiceTaskTestCase extends PluggableFlowableTestCase {
 
-    private static Logger log = LoggerFactory.getLogger(HttpServiceTaskTestCase.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServiceTaskTestCase.class);
 
     @Override
     protected void setUp() throws Exception {

@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 public class ChangeTaskCountConfigAndRebootEngineTest extends ResourceFlowableTestCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(ChangeTaskCountConfigAndRebootEngineTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChangeTaskCountConfigAndRebootEngineTest.class);
 
     protected boolean newTaskRelationshipCountValue;
 
@@ -43,13 +43,13 @@ public class ChangeTaskCountConfigAndRebootEngineTest extends ResourceFlowableTe
 
     @Override
     protected void additionalConfiguration(ProcessEngineConfiguration processEngineConfiguration) {
-        logger.info("Applying additional config: setting schema update to true and enabling task relationship count");
+        LOGGER.info("Applying additional config: setting schema update to true and enabling task relationship count");
         processEngineConfiguration.setDatabaseSchemaUpdate("true");
         ((ProcessEngineConfigurationImpl) processEngineConfiguration).setEnableTaskRelationshipCounts(newTaskRelationshipCountValue);
     }
 
     protected void rebootEngine(boolean newTaskRelationshipCountValue) {
-        logger.info("Rebooting engine");
+        LOGGER.info("Rebooting engine");
         this.newTaskRelationshipCountValue = newTaskRelationshipCountValue;
         closeDownProcessEngine();
         initializeProcessEngine();

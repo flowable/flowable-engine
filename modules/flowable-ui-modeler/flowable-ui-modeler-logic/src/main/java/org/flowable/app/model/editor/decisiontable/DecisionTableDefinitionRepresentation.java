@@ -25,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class DecisionTableDefinitionRepresentation {
 
     protected String id;
+    protected String modelVersion;
     protected String name;
     protected String key;
     protected String description;
@@ -40,6 +41,14 @@ public class DecisionTableDefinitionRepresentation {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getModelVersion() {
+        return modelVersion;
+    }
+
+    public void setModelVersion(String modelVersion) {
+        this.modelVersion = modelVersion;
     }
 
     public String getName() {

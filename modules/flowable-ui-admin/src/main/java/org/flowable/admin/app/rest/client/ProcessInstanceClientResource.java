@@ -12,6 +12,9 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.ProcessInstanceService;
@@ -29,16 +32,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * REST controller for managing the current user's account.
  */
 @RestController
 public class ProcessInstanceClientResource extends AbstractClientResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessInstanceClientResource.class);
 
     @Autowired
     protected ProcessInstanceService clientService;
@@ -50,7 +50,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         try {
             return clientService.getProcessInstance(serverConfig, processInstanceId);
         } catch (FlowableServiceException e) {
-            logger.error("Error getting process instance {}", processInstanceId, e);
+            LOGGER.error("Error getting process instance {}", processInstanceId, e);
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -61,7 +61,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         try {
             return clientService.getTasks(serverConfig, processInstanceId);
         } catch (FlowableServiceException e) {
-            logger.error("Error getting tasks for process instance {}", processInstanceId, e);
+            LOGGER.error("Error getting tasks for process instance {}", processInstanceId, e);
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -72,7 +72,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         try {
             return clientService.getVariables(serverConfig, processInstanceId);
         } catch (FlowableServiceException e) {
-            logger.error("Error getting variables for process instance {}", processInstanceId, e);
+            LOGGER.error("Error getting variables for process instance {}", processInstanceId, e);
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -84,7 +84,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         try {
             clientService.updateVariable(serverConfig, processInstanceId, variableName, body);
         } catch (FlowableServiceException e) {
-            logger.error("Error updating variable {} for process instance {}", variableName, processInstanceId, e);
+            LOGGER.error("Error updating variable {} for process instance {}", variableName, processInstanceId, e);
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -96,7 +96,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         try {
             clientService.createVariable(serverConfig, processInstanceId, body);
         } catch (FlowableServiceException e) {
-            logger.error("Error creating variable for process instance {}", processInstanceId, e);
+            LOGGER.error("Error creating variable for process instance {}", processInstanceId, e);
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -108,7 +108,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         try {
             clientService.deleteVariable(serverConfig, processInstanceId, variableName);
         } catch (FlowableServiceException e) {
-            logger.error("Error deleting variable for process instance {}", processInstanceId, e);
+            LOGGER.error("Error deleting variable for process instance {}", processInstanceId, e);
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -119,7 +119,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         try {
             return clientService.getSubProcesses(serverConfig, processInstanceId);
         } catch (FlowableServiceException e) {
-            logger.error("Error getting sub processes for process instance {}", processInstanceId, e);
+            LOGGER.error("Error getting sub processes for process instance {}", processInstanceId, e);
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -130,7 +130,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         try {
             return clientService.getJobs(serverConfig, processInstanceId);
         } catch (FlowableServiceException e) {
-            logger.error("Error getting jobs for process instance {}", processInstanceId, e);
+            LOGGER.error("Error getting jobs for process instance {}", processInstanceId, e);
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -142,7 +142,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         try {
             clientService.executeAction(serverConfig, processInstanceId, actionBody);
         } catch (FlowableServiceException e) {
-            logger.error("Error executing action on process instance {}", processInstanceId, e);
+            LOGGER.error("Error executing action on process instance {}", processInstanceId, e);
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -154,7 +154,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         try {
             clientService.changeActivityState(serverConfig, processInstanceId, changeStateBody);
         } catch (FlowableServiceException e) {
-            logger.error("Error changing activity state for process instance {}", processInstanceId, e);
+            LOGGER.error("Error changing activity state for process instance {}", processInstanceId, e);
             throw new BadRequestException(e.getMessage());
         }
     }

@@ -12,6 +12,8 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,8 +30,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 /**
  * @author Bassam Al-Sarori
  */
@@ -37,7 +37,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RequestMapping("/rest/admin/models")
 public class ModelsClientResource extends AbstractClientResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(ModelsClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModelsClientResource.class);
 
     @Autowired
     protected ModelService clientService;
@@ -54,7 +54,7 @@ public class ModelsClientResource extends AbstractClientResource {
             return clientService.listModels(serverConfig, parameterMap);
 
         } catch (FlowableServiceException e) {
-            logger.error("Error getting models", e);
+            LOGGER.error("Error getting models", e);
             throw new BadRequestException(e.getMessage());
         }
     }

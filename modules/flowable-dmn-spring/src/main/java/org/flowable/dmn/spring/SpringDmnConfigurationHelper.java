@@ -29,10 +29,10 @@ import org.springframework.core.io.UrlResource;
  */
 public class SpringDmnConfigurationHelper {
 
-    private static Logger log = LoggerFactory.getLogger(SpringDmnConfigurationHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringDmnConfigurationHelper.class);
 
     public static DmnEngine buildDmnEngine(URL resource) {
-        log.debug("==== BUILDING SPRING APPLICATION CONTEXT AND DMN ENGINE =========================================");
+        LOGGER.debug("==== BUILDING SPRING APPLICATION CONTEXT AND DMN ENGINE =========================================");
 
         ApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource));
         Map<String, DmnEngine> beansOfType = applicationContext.getBeansOfType(DmnEngine.class);
@@ -42,7 +42,7 @@ public class SpringDmnConfigurationHelper {
 
         DmnEngine dmnEngine = beansOfType.values().iterator().next();
 
-        log.debug("==== SPRING DMN ENGINE CREATED ==================================================================");
+        LOGGER.debug("==== SPRING DMN ENGINE CREATED ==================================================================");
         return dmnEngine;
     }
 

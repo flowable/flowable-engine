@@ -30,7 +30,7 @@ public class MoveTimerToExecutableJobCmd implements Command<JobEntity>, Serializ
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(MoveTimerToExecutableJobCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MoveTimerToExecutableJobCmd.class);
 
     protected String jobId;
 
@@ -50,8 +50,8 @@ public class MoveTimerToExecutableJobCmd implements Command<JobEntity>, Serializ
             throw new JobNotFoundException(jobId);
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Executing timer job {}", timerJob.getId());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Executing timer job {}", timerJob.getId());
         }
 
         return commandContext.getJobManager().moveTimerJobToExecutableJob(timerJob);

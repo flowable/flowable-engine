@@ -12,6 +12,9 @@
  */
 package org.flowable.app.service.editor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -49,9 +52,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * @author Tijs Rademakers
  */
@@ -59,7 +59,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Transactional
 public class FlowableModelQueryService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FlowableModelQueryService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowableModelQueryService.class);
 
     protected static final String FILTER_SHARED_WITH_ME = "sharedWithMe";
     protected static final String FILTER_SHARED_WITH_OTHERS = "sharedWithOthers";
@@ -179,7 +179,7 @@ public class FlowableModelQueryService {
                 throw e;
 
             } catch (Exception e) {
-                logger.error("Import failed for {}", fileName, e);
+                LOGGER.error("Import failed for {}", fileName, e);
                 throw new BadRequestException("Import failed for " + fileName + ", error message " + e.getMessage());
             }
         } else {
@@ -196,7 +196,7 @@ public class FlowableModelQueryService {
             try {
                 appDefinition = objectMapper.readValue(model.getModelEditorJson(), AppDefinition.class);
             } catch (Exception e) {
-                logger.error("Error deserializing app {}", model.getId(), e);
+                LOGGER.error("Error deserializing app {}", model.getId(), e);
                 throw new InternalServerErrorException("Could not deserialize app definition");
             }
             ((AppDefinitionListModelRepresentation) representation).setAppDefinition(appDefinition);

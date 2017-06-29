@@ -21,7 +21,7 @@ import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.impl.test.JobTestHelper;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.JobInfo;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -147,16 +147,16 @@ public class AsyncExecutorTwoEnginesTest {
 
     static class CountingAsyncExecutor extends DefaultAsyncJobExecutor {
 
-        private static final Logger logger = LoggerFactory.getLogger(CountingAsyncExecutor.class);
+        private static final Logger LOGGER = LoggerFactory.getLogger(CountingAsyncExecutor.class);
 
         private AtomicInteger counter = new AtomicInteger(0);
 
         @Override
-        public boolean executeAsyncJob(Job job) {
-            logger.info("About to execute job {}", job.getId());
+        public boolean executeAsyncJob(JobInfo job) {
+            LOGGER.info("About to execute job {}", job.getId());
             counter.incrementAndGet();
             boolean success = super.executeAsyncJob(job);
-            logger.info("Handed off job {} to async executor (retries={})", job.getId(), job.getRetries());
+            LOGGER.info("Handed off job {} to async executor (retries={})", job.getId(), job.getRetries());
             return success;
         }
 

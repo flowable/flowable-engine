@@ -16,6 +16,7 @@ package org.flowable.engine.test.bpmn.deployment;
 import java.util.List;
 
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -357,7 +358,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
             assertEquals(2, getAllEventSubscriptions().size());
         }
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertEquals(9, historyService.createHistoricProcessInstanceQuery().count());
         }
         assertEquals(2, getAllEventSubscriptions().size());
@@ -407,9 +408,7 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
     }
 
     private void cleanup(String... deploymentIds) {
-        for (String deploymentId : deploymentIds) {
-            repositoryService.deleteDeployment(deploymentId, true);
-        }
+        deleteDeployments();
     }
 
     private List<EventSubscription> getAllEventSubscriptions() {

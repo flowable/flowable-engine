@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AcquireTimerJobsRunnable implements Runnable {
 
-    private static Logger log = LoggerFactory.getLogger(AcquireTimerJobsRunnable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AcquireTimerJobsRunnable.class);
 
     protected final AsyncExecutor asyncExecutor;
     protected final JobManager jobManager;
@@ -46,7 +46,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
     }
 
     public synchronized void run() {
-        log.info("starting to acquire async jobs due");
+        LOGGER.info("starting to acquire async jobs due");
         Thread.currentThread().setName("flowable-acquire-timer-jobs");
 
         final CommandExecutor commandExecutor = asyncExecutor.getProcessEngineConfiguration().getCommandExecutor();
@@ -75,22 +75,22 @@ public class AcquireTimerJobsRunnable implements Runnable {
                 }
 
             } catch (FlowableOptimisticLockingException optimisticLockingException) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Optimistic locking exception during timer job acquisition. If you have multiple timer executors running against the same database, "
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Optimistic locking exception during timer job acquisition. If you have multiple timer executors running against the same database, "
                             + "this exception means that this thread tried to acquire a timer job, which already was acquired by another timer executor acquisition thread."
                             + "This is expected behavior in a clustered environment. "
                             + "You can ignore this message if you indeed have multiple timer executor acquisition threads running against the same database. " + "Exception message: {}",
                             optimisticLockingException.getMessage());
                 }
             } catch (Throwable e) {
-                log.error("exception during timer job acquisition: {}", e.getMessage(), e);
+                LOGGER.error("exception during timer job acquisition: {}", e.getMessage(), e);
                 millisToWait = asyncExecutor.getDefaultTimerJobAcquireWaitTimeInMillis();
             }
 
             if (millisToWait > 0) {
                 try {
-                    if (log.isDebugEnabled()) {
-                        log.debug("timer job acquisition thread sleeping for {} millis", millisToWait);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("timer job acquisition thread sleeping for {} millis", millisToWait);
                     }
                     synchronized (MONITOR) {
                         if (!isInterrupted) {
@@ -99,12 +99,12 @@ public class AcquireTimerJobsRunnable implements Runnable {
                         }
                     }
 
-                    if (log.isDebugEnabled()) {
-                        log.debug("timer job acquisition thread woke up");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("timer job acquisition thread woke up");
                     }
                 } catch (InterruptedException e) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("timer job acquisition wait interrupted");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("timer job acquisition wait interrupted");
                     }
                 } finally {
                     isWaiting.set(false);
@@ -112,7 +112,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
             }
         }
 
-        log.info("stopped async job due acquisition");
+        LOGGER.info("stopped async job due acquisition");
     }
 
     public void stop() {

@@ -29,6 +29,8 @@ public interface RemoteIdmService {
     List<RemoteUser> findUsersByNameFilter(String filter);
     
     List<RemoteUser> findUsersByGroup(String groupId);
+    
+    RemoteGroup getGroup(String groupId);
 
     List<RemoteGroup> findGroupsByNameFilter(String filter);
 

@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class ReflectUtil {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ReflectUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReflectUtil.class);
 
     private static final Pattern GETTER_PATTERN = Pattern.compile("(get|is)[A-Z].*");
     private static final Pattern SETTER_PATTERN = Pattern.compile("set[A-Z].*");
@@ -55,7 +55,7 @@ public abstract class ReflectUtil {
 
         if (classLoader != null) {
             try {
-                LOG.trace("Trying to load class with custom classloader: {}", className);
+                LOGGER.trace("Trying to load class with custom classloader: {}", className);
                 clazz = loadClass(classLoader, className);
             } catch (Throwable t) {
                 throwable = t;
@@ -63,7 +63,7 @@ public abstract class ReflectUtil {
         }
         if (clazz == null) {
             try {
-                LOG.trace("Trying to load class with current thread context classloader: {}", className);
+                LOGGER.trace("Trying to load class with current thread context classloader: {}", className);
                 clazz = loadClass(Thread.currentThread().getContextClassLoader(), className);
             } catch (Throwable t) {
                 if (throwable == null) {
@@ -72,7 +72,7 @@ public abstract class ReflectUtil {
             }
             if (clazz == null) {
                 try {
-                    LOG.trace("Trying to load class with local classloader: {}", className);
+                    LOGGER.trace("Trying to load class with local classloader: {}", className);
                     clazz = loadClass(ReflectUtil.class.getClassLoader(), className);
                 } catch (Throwable t) {
                     if (throwable == null) {

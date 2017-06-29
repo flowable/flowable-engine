@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * @author Harsha Teja Kanna
  */
 public class HttpServiceTaskCfgTest extends HttpServiceTaskCfgTestCase {
-    private static Logger log = LoggerFactory.getLogger(HttpServiceTaskCfgTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServiceTaskCfgTest.class);
 
     public HttpServiceTaskCfgTest() {
         super("flowable.cfg.xml");
@@ -32,7 +32,7 @@ public class HttpServiceTaskCfgTest extends HttpServiceTaskCfgTestCase {
 
     @Override
     protected void additionalConfiguration(ProcessEngineConfiguration processEngineConfiguration) {
-        log.info("Set Http client config");
+        LOGGER.info("Set Http client config");
         processEngineConfiguration
                 .getHttpClientConfig()
                 .setDisableCertVerify(false);
@@ -41,10 +41,10 @@ public class HttpServiceTaskCfgTest extends HttpServiceTaskCfgTestCase {
     @Deployment
     public void testHttpsSelfSignedFail() {
         try {
-            String procId = runtimeService.startProcessInstanceByKey("httpsSelfSignedFail").getId();
+            runtimeService.startProcessInstanceByKey("httpsSelfSignedFail").getId();
         } catch (Exception e) {
-            assertEquals(true, e instanceof FlowableException);
-            assertEquals(true, e.getCause() instanceof SSLHandshakeException);
+            assertTrue(e instanceof FlowableException);
+            assertTrue(e.getCause() instanceof SSLHandshakeException);
         }
     }
 }

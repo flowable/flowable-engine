@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CompetingSignalsTest extends PluggableFlowableTestCase {
 
-    private static Logger log = LoggerFactory.getLogger(CompetingSignalsTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CompetingSignalsTest.class);
 
     Thread testThread = Thread.currentThread();
     static ControllableThread activeThread;
@@ -57,7 +57,7 @@ public class CompetingSignalsTest extends PluggableFlowableTestCase {
             } catch (FlowableOptimisticLockingException e) {
                 this.exception = e;
             }
-            log.debug("{} ends", getName());
+            LOGGER.debug("{} ends", getName());
         }
     }
 
@@ -74,19 +74,19 @@ public class CompetingSignalsTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("CompetingSignalsProcess");
         String processInstanceId = processInstance.getId();
 
-        log.debug("test thread starts thread one");
+        LOGGER.debug("test thread starts thread one");
         SignalThread threadOne = new SignalThread(processInstanceId);
         threadOne.startAndWaitUntilControlIsReturned();
 
-        log.debug("test thread continues to start thread two");
+        LOGGER.debug("test thread continues to start thread two");
         SignalThread threadTwo = new SignalThread(processInstanceId);
         threadTwo.startAndWaitUntilControlIsReturned();
 
-        log.debug("test thread notifies thread 1");
+        LOGGER.debug("test thread notifies thread 1");
         threadOne.proceedAndWaitTillDone();
         assertNull(threadOne.exception);
 
-        log.debug("test thread notifies thread 2");
+        LOGGER.debug("test thread notifies thread 2");
         threadTwo.proceedAndWaitTillDone();
         assertNotNull(threadTwo.exception);
         assertTextPresent("was updated by another transaction concurrently", threadTwo.exception.getMessage());
@@ -105,19 +105,19 @@ public class CompetingSignalsTest extends PluggableFlowableTestCase {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("CompetingSignalsProcess");
             String processInstanceId = processInstance.getId();
 
-            log.debug("test thread starts thread one");
+            LOGGER.debug("test thread starts thread one");
             SignalThread threadOne = new SignalThread(processInstanceId);
             threadOne.startAndWaitUntilControlIsReturned();
 
-            log.debug("test thread continues to start thread two");
+            LOGGER.debug("test thread continues to start thread two");
             SignalThread threadTwo = new SignalThread(processInstanceId);
             threadTwo.startAndWaitUntilControlIsReturned();
 
-            log.debug("test thread notifies thread 1");
+            LOGGER.debug("test thread notifies thread 1");
             threadOne.proceedAndWaitTillDone();
             assertNull(threadOne.exception);
 
-            log.debug("test thread notifies thread 2");
+            LOGGER.debug("test thread notifies thread 2");
             threadTwo.proceedAndWaitTillDone();
             assertNull(threadTwo.exception);
         } finally {

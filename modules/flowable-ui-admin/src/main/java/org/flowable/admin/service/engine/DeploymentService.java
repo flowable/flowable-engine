@@ -12,6 +12,9 @@
  */
 package org.flowable.admin.service.engine;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -25,7 +28,6 @@ import java.util.zip.ZipInputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -42,15 +44,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 /**
  * Service for invoking Flowable REST services.
  */
 @Service
 public class DeploymentService {
 
-    private final Logger log = LoggerFactory.getLogger(DeploymentService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeploymentService.class);
 
     @Autowired
     protected FlowableClientService clientUtil;
@@ -64,7 +64,7 @@ public class DeploymentService {
         try {
             builder = new URIBuilder("repository/deployments");
         } catch (Exception e) {
-            log.error("Error building uri", e);
+            LOGGER.error("Error building uri", e);
             throw new FlowableServiceException("Error building uri", e);
         }
 

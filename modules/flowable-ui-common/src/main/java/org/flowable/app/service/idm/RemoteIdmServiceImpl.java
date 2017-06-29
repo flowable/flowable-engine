@@ -12,6 +12,10 @@
  */
 package org.flowable.app.service.idm;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -39,14 +43,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-
 @Service
 public class RemoteIdmServiceImpl implements RemoteIdmService {
 
-    private static final Logger logger = LoggerFactory.getLogger(RemoteIdmService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteIdmServiceImpl.class);
 
     private static final String PROPERTY_URL = "idm.app.url";
     private static final String PROPERTY_ADMIN_USER = "idm.admin.user";
@@ -117,6 +117,15 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         }
         return new ArrayList<RemoteUser>();
     }
+    
+    @Override
+    public RemoteGroup getGroup(String groupId) {
+        JsonNode json = callRemoteIdmService(url + "/api/idm/groups/" + encode(groupId), adminUser, adminPassword);
+        if (json != null) {
+            return parseGroupInfo(json);
+        }
+        return null;
+    }
 
     @Override
     public List<RemoteGroup> findGroupsByNameFilter(String filter) {
@@ -140,7 +149,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
             sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
             clientBuilder.setSSLSocketFactory(sslsf);
         } catch (Exception e) {
-            logger.warn("Could not configure SSL for http client", e);
+            LOGGER.warn("Could not configure SSL for http client", e);
         }
 
         CloseableHttpClient client = clientBuilder.build();
@@ -151,13 +160,13 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
                 return objectMapper.readTree(response.getEntity().getContent());
             }
         } catch (Exception e) {
-            logger.warn("Exception while getting token", e);
+            LOGGER.warn("Exception while getting token", e);
         } finally {
             if (client != null) {
                 try {
                     client.close();
                 } catch (IOException e) {
-                    logger.warn("Exception while closing http client", e);
+                    LOGGER.warn("Exception while closing http client", e);
                 }
             }
         }
@@ -224,7 +233,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         try {
             return URLEncoder.encode(s, "UTF-8");
         } catch (Exception e) {
-            logger.warn("Could not encode url param", e);
+            LOGGER.warn("Could not encode url param", e);
             return null;
         }
     }

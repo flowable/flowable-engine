@@ -12,6 +12,8 @@
  */
 package org.activiti.engine.impl.event.logger;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,14 +47,12 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Joram Barrez
  */
 public class EventLogger implements FlowableEventListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(EventLogger.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventLogger.class);
 
     private static final String EVENT_FLUSHER_KEY = "eventFlusher";
 
@@ -180,7 +180,7 @@ public class EventLogger implements FlowableEventListener {
             eventHandler.setObjectMapper(objectMapper);
             return eventHandler;
         } catch (Exception e) {
-            logger.warn("Could not instantiate {}, this is most likely a programmatic error", eventHandlerClass);
+            LOGGER.warn("Could not instantiate {}, this is most likely a programmatic error", eventHandlerClass);
         }
         return null;
     }

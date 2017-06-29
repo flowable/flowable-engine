@@ -29,7 +29,7 @@ public class EventCollector implements ExecutionListener {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(EventCollector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventCollector.class);
 
     public List<String> events = new ArrayList<String>();
 
@@ -39,7 +39,7 @@ public class EventCollector implements ExecutionListener {
 
     public void notify(ExecutionListenerExecution execution) {
 
-        log.debug("collecting event: {} on {}", execution.getEventName(), execution.getEventSource());
+        LOGGER.debug("collecting event: {} on {}", execution.getEventName(), execution.getEventSource());
         events.add(execution.getEventName() + " on " + execution.getEventSource());
     }
 

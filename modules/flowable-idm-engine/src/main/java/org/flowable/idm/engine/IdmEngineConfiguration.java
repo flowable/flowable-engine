@@ -37,12 +37,16 @@ import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
+import org.flowable.idm.api.PasswordEncoder;
+import org.flowable.idm.api.PasswordSalt;
 import org.flowable.idm.api.event.FlowableIdmEventType;
 import org.flowable.idm.engine.delegate.event.impl.FlowableIdmEventDispatcherImpl;
 import org.flowable.idm.engine.impl.IdmEngineImpl;
 import org.flowable.idm.engine.impl.IdmIdentityServiceImpl;
 import org.flowable.idm.engine.impl.IdmManagementServiceImpl;
 import org.flowable.idm.engine.impl.ServiceImpl;
+import org.flowable.idm.engine.impl.authentication.BlankSalt;
+import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
 import org.flowable.idm.engine.impl.cfg.CommandExecutorImpl;
 import org.flowable.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
 import org.flowable.idm.engine.impl.cfg.StandaloneInMemIdmEngineConfiguration;
@@ -100,7 +104,7 @@ import org.slf4j.LoggerFactory;
 
 public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
-    protected static final Logger logger = LoggerFactory.getLogger(IdmEngineConfiguration.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(IdmEngineConfiguration.class);
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/idm/db/mapping/mappings.xml";
 
@@ -153,6 +157,9 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
     protected CommandContextFactory commandContextFactory;
     protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
+    
+    protected PasswordEncoder passwordEncoder;
+    protected PasswordSalt passwordSalt;
 
     // SESSION FACTORIES ///////////////////////////////////////////////
     protected DbSqlSessionFactory dbSqlSessionFactory;
@@ -210,6 +217,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         initTransactionFactory();
         initSqlSessionFactory();
         initSessionFactories();
+        initPasswordEncoder();
         initServices();
         initDataManagers();
         initEntityManagers();
@@ -333,8 +341,14 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         return new DbSqlSessionFactory();
     }
 
-    public String pathToEngineDbProperties() {
-        return "org/flowable/idm/db/properties/" + databaseType + ".properties";
+    public void initPasswordEncoder() {
+        if (passwordEncoder == null) {
+            passwordEncoder = ClearTextPasswordEncoder.getInstance();
+        }
+        
+        if (passwordSalt == null) {
+            passwordSalt = BlankSalt.getInstance();
+        }
     }
 
     // command executors
@@ -892,6 +906,24 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
     public IdmEngineConfiguration setTablePrefixIsSchema(boolean tablePrefixIsSchema) {
         this.tablePrefixIsSchema = tablePrefixIsSchema;
+        return this;
+    }
+
+    public PasswordEncoder getPasswordEncoder() {
+        return passwordEncoder;
+    }
+
+    public IdmEngineConfiguration setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+        return this;
+    }
+
+    public PasswordSalt getPasswordSalt() {
+        return passwordSalt;
+    }
+
+    public IdmEngineConfiguration setPasswordSalt(PasswordSalt passwordSalt) {
+        this.passwordSalt = passwordSalt;
         return this;
     }
 

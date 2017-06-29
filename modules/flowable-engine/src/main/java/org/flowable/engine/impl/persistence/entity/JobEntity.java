@@ -12,21 +12,12 @@
  */
 package org.flowable.engine.impl.persistence.entity;
 
-import java.util.Date;
-
 /**
  * Represents an async job: a piece of logic that needs to be executed asynchronously.
  * 
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public interface JobEntity extends AbstractJobEntity {
+public interface JobEntity extends JobInfoEntity, AbstractRuntimeJobEntity {
 
-    String getLockOwner();
-
-    void setLockOwner(String claimedBy);
-
-    Date getLockExpirationTime();
-
-    void setLockExpirationTime(Date claimedUntil);
 }

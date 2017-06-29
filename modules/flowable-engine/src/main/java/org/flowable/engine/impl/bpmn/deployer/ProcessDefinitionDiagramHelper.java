@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ProcessDefinitionDiagramHelper {
 
-    private static final Logger log = LoggerFactory.getLogger(ProcessDefinitionDiagramHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessDefinitionDiagramHelper.class);
 
     /**
      * Generates a diagram resource for a ProcessDefinitionEntity and associated BpmnParse. The returned resource has not yet been persisted, nor attached to the ProcessDefinitionEntity. This requires
@@ -63,7 +63,7 @@ public class ProcessDefinitionDiagramHelper {
             resource.setGenerated(true);
 
         } catch (Throwable t) { // if anything goes wrong, we don't store the image (the process will still be executable).
-            log.warn("Error while generating process diagram, image will not be stored in repository", t);
+            LOGGER.warn("Error while generating process diagram, image will not be stored in repository", t);
             resource = null;
         }
 

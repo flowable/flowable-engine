@@ -35,7 +35,7 @@ import org.springframework.web.servlet.DispatcherServlet;
  */
 public class WebConfigurer implements ServletContextListener {
 
-    private final Logger log = LoggerFactory.getLogger(WebConfigurer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebConfigurer.class);
 
     public AnnotationConfigWebApplicationContext context;
 
@@ -45,7 +45,7 @@ public class WebConfigurer implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        log.debug("Configuring Spring root application context");
+        LOGGER.debug("Configuring Spring root application context");
 
         ServletContext servletContext = sce.getServletContext();
 
@@ -76,29 +76,39 @@ public class WebConfigurer implements ServletContextListener {
         initSpring(servletContext, rootContext);
         initSpringSecurity(servletContext, disps);
 
-        log.debug("Web application fully configured");
+        LOGGER.debug("Web application fully configured");
     }
 
     /**
      * Initializes Spring and Spring MVC.
      */
     private void initSpring(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
-        log.debug("Configuring Spring Web application context");
+        LOGGER.debug("Configuring Spring Web application context");
         AnnotationConfigWebApplicationContext appDispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
         appDispatcherServletConfiguration.setParent(rootContext);
         appDispatcherServletConfiguration.register(AppDispatcherServletConfiguration.class);
 
-        log.debug("Registering Spring MVC Servlet");
+        LOGGER.debug("Registering Spring MVC Servlet");
         ServletRegistration.Dynamic appDispatcherServlet = servletContext.addServlet("appDispatcher", new DispatcherServlet(appDispatcherServletConfiguration));
         appDispatcherServlet.addMapping("/app/*");
         appDispatcherServlet.setLoadOnStartup(1);
+        
+        LOGGER.debug("Configuring Spring Web application context");
+        AnnotationConfigWebApplicationContext apiDispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
+        apiDispatcherServletConfiguration.setParent(rootContext);
+        apiDispatcherServletConfiguration.register(ApiDispatcherServletConfiguration.class);
+
+        LOGGER.debug("Registering Spring MVC Servlet");
+        ServletRegistration.Dynamic apiDispatcherServlet = servletContext.addServlet("apiDispatcher", new DispatcherServlet(apiDispatcherServletConfiguration));
+        apiDispatcherServlet.addMapping("/api/*");
+        apiDispatcherServlet.setLoadOnStartup(1);
     }
 
     /**
      * Initializes Spring Security.
      */
     private void initSpringSecurity(ServletContext servletContext, EnumSet<DispatcherType> disps) {
-        log.debug("Registering Spring Security Filter");
+        LOGGER.debug("Registering Spring Security Filter");
         FilterRegistration.Dynamic springSecurityFilter = servletContext.addFilter("springSecurityFilterChain", new DelegatingFilterProxy());
 
         springSecurityFilter.addMappingForUrlPatterns(disps, false, "/*");
@@ -106,10 +116,10 @@ public class WebConfigurer implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        log.info("Destroying Web application");
+        LOGGER.info("Destroying Web application");
         WebApplicationContext ac = WebApplicationContextUtils.getRequiredWebApplicationContext(sce.getServletContext());
         AnnotationConfigWebApplicationContext gwac = (AnnotationConfigWebApplicationContext) ac;
         gwac.close();
-        log.debug("Web application destroyed");
+        LOGGER.debug("Web application destroyed");
     }
 }

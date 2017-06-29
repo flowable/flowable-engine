@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class IdmTestHelper {
 
-    private static Logger log = LoggerFactory.getLogger(IdmTestHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IdmTestHelper.class);
 
     public static final String EMPTY_LINE = "\n";
 
@@ -35,11 +35,11 @@ public abstract class IdmTestHelper {
     public static IdmEngine getIdmEngine(String configurationResource) {
         IdmEngine idmEngine = idmEngines.get(configurationResource);
         if (idmEngine == null) {
-            log.debug("==== BUILDING IDM ENGINE ========================================================================");
+            LOGGER.debug("==== BUILDING IDM ENGINE ========================================================================");
             idmEngine = IdmEngineConfiguration.createIdmEngineConfigurationFromResource(configurationResource)
                     .setDatabaseSchemaUpdate(IdmEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE)
                     .buildIdmEngine();
-            log.debug("==== IDM ENGINE CREATED =========================================================================");
+            LOGGER.debug("==== IDM ENGINE CREATED =========================================================================");
             idmEngines.put(configurationResource, idmEngine);
         }
         return idmEngine;

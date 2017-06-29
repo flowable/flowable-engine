@@ -12,6 +12,9 @@
  */
 package org.flowable.crystalball.simulator.impl;
 
+import java.util.Collection;
+import java.util.Map;
+
 import org.flowable.crystalball.simulator.CrystalballException;
 import org.flowable.crystalball.simulator.SimulationEvent;
 import org.flowable.crystalball.simulator.SimulationEventHandler;
@@ -20,9 +23,6 @@ import org.flowable.crystalball.simulator.delegate.event.impl.ProcessInstanceCre
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Map;
-
 /**
  * This class schedules replay start simulation event and takes care about process start and next event schedule
  * 
@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public class StartReplayProcessEventHandler implements SimulationEventHandler {
 
-    private static Logger log = LoggerFactory.getLogger(StartReplayProcessEventHandler.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(StartReplayProcessEventHandler.class.getName());
 
     /** variable name where original process instance ID is stored - only for internal replay purposes */
     public static final String PROCESS_INSTANCE_ID = "_replay.processInstanceId";
@@ -80,7 +80,7 @@ public class StartReplayProcessEventHandler implements SimulationEventHandler {
         Map<String, Object> variables = (Map<String, Object>) event.getProperty(variablesKey);
         variables.put(PROCESS_INSTANCE_ID, processInstanceId);
 
-        log.debug("Starting new processDefId[{}] businessKey[{}] with variables[{}]", processDefinitionId, businessKey, variables);
+        LOGGER.debug("Starting new processDefId[{}] businessKey[{}] with variables[{}]", processDefinitionId, businessKey, variables);
         SimulationRunContext.getRuntimeService().startProcessInstanceById(processDefinitionId, businessKey, variables);
     }
 }

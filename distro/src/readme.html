@@ -26,6 +26,25 @@
 
 <h1>Flowable Release Notes</h1>
 
+<h3>Release Notes - Flowable - 6.1.0</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+    <li>Introduction of async history. By enabling the asyncHistoryEnabled property on the process engine configuration (default is false), 
+    the history tables are not filled in the same transaction as the runtime tables. Instead an async history job is created and the history information will be written
+    to the history tables in a separate, asynchronous transaction. This also opens up the option to not use the relational history tables at all, 
+    and move the historic information to a NoSQL database directly. Pluggability points are available to implement the persistence logic to a NoSQL database.</li>
+    <li>New REST task feature thanks to Harsha. With the new REST task it becomes trivial to do REST calls from a Flowable process instance. There's also support in the Flowable Modeler for REST tasks.</li>
+    <li>Introduction of a new DMN decision table editor. To improve the usability of the DMN decision table editor we are now using the <a href="https://github.com/handsontable/handsontable">Handsontable</a> framework.</li>
+    <li>The Engine SQL update logic has been improved to only update changed columns.</li>
+    <li>The Odysseus JUEL code is now included directly in the flowable-engine-common module to prevent classloading issues due to conflicting JUEL libraries or even different versions of JUEL libraries.</li>
+    <li>Added option to use a password encoder for the Flowable IDM engine (instead of the default plain text password persistence), thanks to Faizal!</li>
+    <li>Support for static Groovy scripts compilation with the new flowable-groovy-script-static-engine module by using the groovy-static scriptFormat value, thanks to Filip (fgroch)!</li>
+    <li>Several additions to the Form builder and renderer (min/max length, improved expression field and more).</li>
+    <li>Various small bugfixes all around.</li>
+</ul>
+
 <h3>Release Notes - Flowable - 6.0.1</h3>
 
 <h4>Highlights</h4>

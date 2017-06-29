@@ -908,11 +908,9 @@ public class CronExpression implements Serializable, Cloneable {
     public Calendar getTimeAfter(Calendar afterTime) {
 
         // Computation is based on Gregorian year only.
-        Calendar cl = clockReader.getCurrentCalendar(getTimeZone()); // new
-                                                                     // java.util.GregorianCalendar(getTimeZone());
+        Calendar cl = clockReader.getCurrentCalendar(getTimeZone()); // new java.util.GregorianCalendar(getTimeZone());
 
-        // move ahead one second, since we're computing the time *after* the
-        // given time
+        // move ahead one second, since we're computing the time *after* the given time
         afterTime.add(Calendar.SECOND, 1);
         // CronTrigger does not deal with milliseconds
         cl.setTimeInMillis(afterTime.getTimeInMillis());

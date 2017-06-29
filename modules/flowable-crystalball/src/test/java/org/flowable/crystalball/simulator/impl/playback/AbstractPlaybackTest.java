@@ -12,7 +12,13 @@
  */
 package org.flowable.crystalball.simulator.impl.playback;
 
-import junit.framework.AssertionFailedError;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.crystalball.simulator.SimpleEventCalendarFactory;
 import org.flowable.crystalball.simulator.SimpleSimulationRun;
 import org.flowable.crystalball.simulator.SimulationDebugger;
@@ -44,12 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import junit.framework.AssertionFailedError;
 
 /**
  * This class is supper class for all Playback tests
@@ -66,7 +67,7 @@ public abstract class AbstractPlaybackTest extends AbstractFlowableTestCase {
 
     private static final String BUSINESS_KEY = "testBusinessKey";
 
-    private static Logger log = LoggerFactory.getLogger(AbstractPlaybackTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPlaybackTest.class);
 
     protected InMemoryRecordFlowableEventListener listener = new InMemoryRecordFlowableEventListener(getTransformers());
 
@@ -84,16 +85,16 @@ public abstract class AbstractPlaybackTest extends AbstractFlowableTestCase {
     @Override
     public void runBare() throws Throwable {
 
-        log.info("Running test {} to record events", getName());
+        LOGGER.info("Running test {} to record events", getName());
 
         recordEvents();
 
-        log.info("Events for {} recorded successfully", getName());
-        log.info("Running playback simulation for {}", getName());
+        LOGGER.info("Events for {} recorded successfully", getName());
+        LOGGER.info("Running playback simulation for {}", getName());
 
         runPlayback();
 
-        log.info("Playback simulation for {} finished successfully.", getName());
+        LOGGER.info("Playback simulation for {} finished successfully.", getName());
 
     }
 
@@ -121,16 +122,16 @@ public abstract class AbstractPlaybackTest extends AbstractFlowableTestCase {
 
             _checkStatus();
         } catch (AssertionFailedError e) {
-            log.warn("Playback simulation {} has failed", getName());
-            log.error(EMPTY_LINE);
-            log.error("ASSERTION FAILED: {}", e, e);
+            LOGGER.warn("Playback simulation {} has failed", getName());
+            LOGGER.error(EMPTY_LINE);
+            LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;
             throw e;
 
         } catch (Throwable e) {
-            log.warn("Playback simulation {} has failed", getName());
-            log.error(EMPTY_LINE);
-            log.error("EXCEPTION: {}", e, e);
+            LOGGER.warn("Playback simulation {} has failed", getName());
+            LOGGER.error(EMPTY_LINE);
+            LOGGER.error("EXCEPTION: {}", e, e);
             exception = e;
             throw e;
 
@@ -152,12 +153,12 @@ public abstract class AbstractPlaybackTest extends AbstractFlowableTestCase {
         try {
             method = getClass().getMethod(getName(), (Class<?>[]) null);
         } catch (Exception e) {
-            log.warn("Could not get method by reflection. This could happen if you are using @Parameters in combination with annotations.", e);
+            LOGGER.warn("Could not get method by reflection. This could happen if you are using @Parameters in combination with annotations.", e);
             return;
         }
         CheckStatus checkStatusAnnotation = method.getAnnotation(CheckStatus.class);
         if (checkStatusAnnotation != null) {
-            log.debug("annotation @CheckStatus checks status for {}.{}", getClass().getSimpleName(), getName());
+            LOGGER.debug("annotation @CheckStatus checks status for {}.{}", getClass().getSimpleName(), getName());
             String checkStatusMethodName = checkStatusAnnotation.methodName();
             if (checkStatusMethodName.isEmpty()) {
                 String name = method.getName();
@@ -167,12 +168,12 @@ public abstract class AbstractPlaybackTest extends AbstractFlowableTestCase {
             try {
                 method = getClass().getMethod(checkStatusMethodName);
             } catch (Exception e) {
-                log.error("Could not get CheckStatus method: {} by reflection. This could happen if you are using @Parameters in combination with annotations.", checkStatusMethodName, e);
+                LOGGER.error("Could not get CheckStatus method: {} by reflection. This could happen if you are using @Parameters in combination with annotations.", checkStatusMethodName, e);
                 throw new RuntimeException("Could not get CheckStatus method by reflection");
             }
             method.invoke(this);
         } else {
-            log.warn("Check status annotation is not present - nothing is checked");
+            LOGGER.warn("Check status annotation is not present - nothing is checked");
         }
     }
 
@@ -206,22 +207,22 @@ public abstract class AbstractPlaybackTest extends AbstractFlowableTestCase {
 
             _checkStatus();
         } catch (AssertionFailedError e) {
-            log.error(EMPTY_LINE);
-            log.error("ASSERTION FAILED: {}", e, e);
+            LOGGER.error(EMPTY_LINE);
+            LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;
             throw e;
 
         } catch (Throwable e) {
-            log.warn("Record events {} has failed", getName());
-            log.error(EMPTY_LINE);
-            log.error("EXCEPTION: {}", e, e);
+            LOGGER.warn("Record events {} has failed", getName());
+            LOGGER.error(EMPTY_LINE);
+            LOGGER.error("EXCEPTION: {}", e, e);
             exception = e;
             throw e;
 
         } finally {
             TestHelper.annotationDeploymentTearDown(processEngine, deploymentIdFromDeploymentAnnotation, getClass(), getName());
             assertAndEnsureCleanDb();
-            log.info("dropping and recreating db");
+            LOGGER.info("dropping and recreating db");
 
             this.processEngineConfiguration.getClock().reset();
 

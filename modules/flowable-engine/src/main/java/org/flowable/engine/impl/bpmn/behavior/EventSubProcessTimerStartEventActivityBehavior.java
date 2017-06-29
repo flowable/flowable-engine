@@ -83,6 +83,8 @@ public class EventSubProcessTimerStartEventActivityBehavior extends AbstractBpmn
 
         ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(newSubProcessExecution);
         outgoingFlowExecution.setCurrentFlowElement(startEvent);
+        
+        commandContext.getHistoryManager().recordActivityStart(outgoingFlowExecution);
 
         leave(outgoingFlowExecution);
     }

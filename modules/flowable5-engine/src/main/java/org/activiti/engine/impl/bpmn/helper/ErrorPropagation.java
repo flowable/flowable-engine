@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ErrorPropagation {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ErrorPropagation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorPropagation.class);
 
     public static void propagateError(BpmnError error, ActivityExecution execution) {
         propagateError(error.getErrorCode(), execution);

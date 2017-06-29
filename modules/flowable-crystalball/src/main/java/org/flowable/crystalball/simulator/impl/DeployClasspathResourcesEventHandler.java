@@ -12,6 +12,8 @@
  */
 package org.flowable.crystalball.simulator.impl;
 
+import java.util.List;
+
 import org.flowable.crystalball.simulator.SimulationEvent;
 import org.flowable.crystalball.simulator.SimulationEventHandler;
 import org.flowable.crystalball.simulator.SimulationRunContext;
@@ -19,14 +21,12 @@ import org.flowable.engine.repository.DeploymentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
 /**
  * This class deploys resources from classpath
  */
 public class DeployClasspathResourcesEventHandler implements SimulationEventHandler {
 
-    private static Logger log = LoggerFactory.getLogger(DeployClasspathResourcesEventHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeployClasspathResourcesEventHandler.class);
 
     /**
      * process to start key
@@ -50,7 +50,7 @@ public class DeployClasspathResourcesEventHandler implements SimulationEventHand
         DeploymentBuilder deploymentBuilder = SimulationRunContext.getRepositoryService().createDeployment();
 
         for (String resource : resources) {
-            log.debug("adding resource [{}] to repository {}", resource, SimulationRunContext.getRepositoryService());
+            LOGGER.debug("adding resource [{}] to repository {}", resource, SimulationRunContext.getRepositoryService());
             deploymentBuilder.addClasspathResource(resource);
         }
 

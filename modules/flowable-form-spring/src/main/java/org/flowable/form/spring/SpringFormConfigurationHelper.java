@@ -29,10 +29,10 @@ import org.springframework.core.io.UrlResource;
  */
 public class SpringFormConfigurationHelper {
 
-    private static Logger log = LoggerFactory.getLogger(SpringFormConfigurationHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringFormConfigurationHelper.class);
 
     public static FormEngine buildFormEngine(URL resource) {
-        log.debug("==== BUILDING SPRING APPLICATION CONTEXT AND FORM ENGINE =========================================");
+        LOGGER.debug("==== BUILDING SPRING APPLICATION CONTEXT AND FORM ENGINE =========================================");
 
         ApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource));
         Map<String, FormEngine> beansOfType = applicationContext.getBeansOfType(FormEngine.class);
@@ -42,7 +42,7 @@ public class SpringFormConfigurationHelper {
 
         FormEngine formEngine = beansOfType.values().iterator().next();
 
-        log.debug("==== SPRING FORM ENGINE CREATED ==================================================================");
+        LOGGER.debug("==== SPRING FORM ENGINE CREATED ==================================================================");
         return formEngine;
     }
 

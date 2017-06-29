@@ -12,6 +12,8 @@
  */
 package org.flowable.app.service.editor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,8 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Tijs Rademakers
  */
@@ -43,7 +43,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Transactional
 public class FlowableFormService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FlowableFormService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowableFormService.class);
 
     @Autowired
     protected ModelService modelService;
@@ -98,7 +98,7 @@ public class FlowableFormService {
         try {
             editorJson = objectMapper.writeValueAsString(saveRepresentation.getFormRepresentation().getFormDefinition());
         } catch (Exception e) {
-            logger.error("Error while processing form json", e);
+            LOGGER.error("Error while processing form json", e);
             throw new InternalServerErrorException("Form could not be saved " + formId);
         }
 
@@ -115,7 +115,7 @@ public class FlowableFormService {
         try {
             formDefinition = objectMapper.readValue(model.getModelEditorJson(), FormModel.class);
         } catch (Exception e) {
-            logger.error("Error deserializing form", e);
+            LOGGER.error("Error deserializing form", e);
             throw new InternalServerErrorException("Could not deserialize form definition");
         }
 

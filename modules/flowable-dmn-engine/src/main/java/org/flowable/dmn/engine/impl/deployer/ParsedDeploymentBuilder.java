@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 public class ParsedDeploymentBuilder {
 
-    private static final Logger log = LoggerFactory.getLogger(ParsedDeploymentBuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParsedDeploymentBuilder.class);
 
     public static final String[] DMN_RESOURCE_SUFFIXES = new String[] { "dmn" };
 
@@ -51,7 +51,7 @@ public class ParsedDeploymentBuilder {
 
         for (ResourceEntity resource : deployment.getResources().values()) {
             if (isDmnResource(resource.getName())) {
-                log.debug("Processing DMN resource {}", resource.getName());
+                LOGGER.debug("Processing DMN resource {}", resource.getName());
                 DmnParse parse = createDmnParseFromResource(resource);
                 for (DecisionTableEntity decisionTable : parse.getDecisionTables()) {
                     decisionTables.add(decisionTable);

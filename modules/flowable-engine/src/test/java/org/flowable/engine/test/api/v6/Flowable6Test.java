@@ -19,6 +19,7 @@ import java.util.Map;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -126,7 +127,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertEquals(maxCount, CountingServiceTaskTestDelegate.CALL_COUNT.get());
         assertEquals(0, runtimeService.createExecutionQuery().count());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration, 1800000)) {
             assertEquals(maxCount, historyService.createHistoricActivityInstanceQuery()
                     .processInstanceId(processInstance.getId()).activityId("serviceTask").count());
         }

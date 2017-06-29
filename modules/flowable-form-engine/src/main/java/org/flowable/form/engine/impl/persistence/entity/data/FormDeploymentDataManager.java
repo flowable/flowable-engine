@@ -15,7 +15,6 @@ package org.flowable.form.engine.impl.persistence.entity.data;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.engine.impl.FormDeploymentQueryImpl;
@@ -26,15 +25,13 @@ import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntity;
  */
 public interface FormDeploymentDataManager extends DataManager<FormDeploymentEntity> {
 
-    FormDeploymentEntity findLatestDeploymentByName(String deploymentName);
-
     long findDeploymentCountByQueryCriteria(FormDeploymentQueryImpl deploymentQuery);
 
-    List<FormDeployment> findDeploymentsByQueryCriteria(FormDeploymentQueryImpl deploymentQuery, Page page);
+    List<FormDeployment> findDeploymentsByQueryCriteria(FormDeploymentQueryImpl deploymentQuery);
 
     List<String> getDeploymentResourceNames(String deploymentId);
 
-    List<FormDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<FormDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap);
 
     long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap);
 

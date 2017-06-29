@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TimerEventDefinitionParseHandler extends AbstractBpmnParseHandler<TimerEventDefinition> {
 
-    private static final Logger logger = LoggerFactory.getLogger(TimerEventDefinitionParseHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimerEventDefinitionParseHandler.class);
 
     public static final String PROPERTYNAME_START_TIMER = "timerStart";
 
@@ -140,7 +140,7 @@ public class TimerEventDefinitionParseHandler extends AbstractBpmnParseHandler<T
 
         // neither date, cycle or duration configured!
         if (expression == null) {
-            logger.warn("Timer needs configuration (either timeDate, timeCycle or timeDuration is needed) ({})", timerActivity.getId());
+            LOGGER.warn("Timer needs configuration (either timeDate, timeCycle or timeDuration is needed) ({})", timerActivity.getId());
         }
 
         String jobHandlerConfiguration = timerActivity.getId();

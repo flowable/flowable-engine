@@ -16,13 +16,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.Artifact;
 import org.flowable.bpmn.model.Association;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.SequenceFlow;
@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements BpmnParseHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractBpmnParseHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBpmnParseHandler.class);
 
     public static final String PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION = "eventDefinitions";
 
@@ -122,7 +122,7 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
         // association.getId());
         /*
          * } else { if (sourceActivity.getProperty("type").equals("compensationBoundaryCatch" )) { Object isForCompensation = targetActivity.getProperty(PROPERTYNAME_IS_FOR_COMPENSATION); if
-         * (isForCompensation == null || !(Boolean) isForCompensation) { logger.warn( "compensation boundary catch must be connected to element with isForCompensation=true" ); } else { ActivityImpl
+         * (isForCompensation == null || !(Boolean) isForCompensation) { LOGGER.warn( "compensation boundary catch must be connected to element with isForCompensation=true" ); } else { ActivityImpl
          * compensatedActivity = sourceActivity.getParentActivity(); compensatedActivity.setProperty(BpmnParse .PROPERTYNAME_COMPENSATION_HANDLER_ID, targetActivity.getId()); } } }
          */
     }

@@ -46,7 +46,7 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityConfiguration.class);
 
     @Autowired
     protected RemoteIdmAuthenticationProvider authenticationProvider;
@@ -73,7 +73,7 @@ public class SecurityConfiguration {
         try {
             auth.authenticationProvider(authenticationProvider);
         } catch (Exception e) {
-            logger.error("Could not configure authentication mechanism:", e);
+            LOGGER.error("Could not configure authentication mechanism:", e);
         }
     }
 

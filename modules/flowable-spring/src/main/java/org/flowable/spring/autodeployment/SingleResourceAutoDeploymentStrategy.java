@@ -13,13 +13,13 @@
 
 package org.flowable.spring.autodeployment;
 
+import java.io.IOException;
+import java.util.zip.ZipInputStream;
+
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.springframework.core.io.Resource;
-
-import java.io.IOException;
-import java.util.zip.ZipInputStream;
 
 /**
  * Implementation of {@link AutoDeploymentStrategy} that performs a separate deployment for each resource by name.

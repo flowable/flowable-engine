@@ -50,7 +50,7 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
 
     private static final long serialVersionUID = 1840892471343975524L;
 
-    private static Logger log = LoggerFactory.getLogger(ParallelGatewayActivityBehavior.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParallelGatewayActivityBehavior.class);
 
     public void execute(DelegateExecution execution) {
 
@@ -90,8 +90,8 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
         if (nbrOfExecutionsCurrentlyJoined == nbrOfExecutionsToJoin) {
 
             // Fork
-            if (log.isDebugEnabled()) {
-                log.debug("parallel gateway '{}' activates: {} of {} joined", execution.getCurrentActivityId(), nbrOfExecutionsCurrentlyJoined, nbrOfExecutionsToJoin);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("parallel gateway '{}' activates: {} of {} joined", execution.getCurrentActivityId(), nbrOfExecutionsCurrentlyJoined, nbrOfExecutionsToJoin);
             }
 
             if (parallelGateway.getIncomingFlows().size() > 1) {
@@ -101,7 +101,8 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
 
                     // The current execution will be reused and not deleted
                     if (!joinedExecution.getId().equals(execution.getId())) {
-                        executionEntityManager.deleteExecutionAndRelatedData(joinedExecution, null, false);
+                        executionEntityManager.deleteRelatedDataForExecution(joinedExecution, null, false);
+                        executionEntityManager.delete(joinedExecution);
                     }
 
                 }
@@ -110,8 +111,8 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
             // TODO: potential optimization here: reuse more then 1 execution, only 1 currently
             Context.getAgenda().planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) execution, false); // false -> ignoring conditions on parallel gw
 
-        } else if (log.isDebugEnabled()) {
-            log.debug("parallel gateway '{}' does not activate: {} of {} joined", execution.getCurrentActivityId(), nbrOfExecutionsCurrentlyJoined, nbrOfExecutionsToJoin);
+        } else if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("parallel gateway '{}' does not activate: {} of {} joined", execution.getCurrentActivityId(), nbrOfExecutionsCurrentlyJoined, nbrOfExecutionsToJoin);
         }
 
     }

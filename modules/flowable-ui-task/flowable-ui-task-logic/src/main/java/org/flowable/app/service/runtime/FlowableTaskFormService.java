@@ -12,6 +12,8 @@
  */
 package org.flowable.app.service.runtime;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.Map;
 
 import org.flowable.app.model.runtime.CompleteFormRepresentation;
 import org.flowable.app.model.runtime.ProcessInstanceVariableRepresentation;
+import org.flowable.app.model.runtime.SaveFormRepresentation;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.exception.NotFoundException;
 import org.flowable.app.service.exception.NotPermittedException;
@@ -38,8 +41,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Tijs Rademakers
  */
@@ -47,7 +48,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Transactional
 public class FlowableTaskFormService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FlowableTaskFormService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowableTaskFormService.class);
 
     @Autowired
     protected TaskService taskService;
@@ -75,6 +76,21 @@ public class FlowableTaskFormService {
         return taskService.getTaskFormModel(task.getId());
     }
 
+    public void saveTaskForm(String taskId, SaveFormRepresentation saveFormRepresentation) {
+
+        // Get the form definition
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+
+        if (task == null) {
+            throw new NotFoundException("Task not found with id: " + taskId);
+        }
+
+        checkCurrentUserCanModifyTask(task);
+
+        formService.saveFormInstanceByFormModelId(saveFormRepresentation.getValues(), saveFormRepresentation.getFormId(), taskId, task.getProcessInstanceId());
+
+    }
+
     public void completeTaskForm(String taskId, CompleteFormRepresentation completeTaskFormRepresentation) {
 
         // Get the form definition
@@ -84,12 +100,7 @@ public class FlowableTaskFormService {
             throw new NotFoundException("Task not found with id: " + taskId);
         }
 
-        User currentUser = SecurityUtils.getCurrentUserObject();
-        if (!permissionService.isTaskOwnerOrAssignee(currentUser, taskId)) {
-            if (!permissionService.validateIfUserIsInitiatorAndCanCompleteTask(currentUser, task)) {
-                throw new NotPermittedException();
-            }
-        }
+        checkCurrentUserCanModifyTask(task);
 
         taskService.completeTaskWithForm(taskId, completeTaskFormRepresentation.getFormId(),
                 completeTaskFormRepresentation.getOutcome(), completeTaskFormRepresentation.getValues());
@@ -110,5 +121,14 @@ public class FlowableTaskFormService {
 
         List<ProcessInstanceVariableRepresentation> processInstanceVariableRepresenations = new ArrayList<ProcessInstanceVariableRepresentation>(processInstanceVariables.values());
         return processInstanceVariableRepresenations;
+    }
+
+    private void checkCurrentUserCanModifyTask(Task task) {
+        User currentUser = SecurityUtils.getCurrentUserObject();
+        if (!permissionService.isTaskOwnerOrAssignee(currentUser, task.getId())) {
+            if (!permissionService.validateIfUserIsInitiatorAndCanCompleteTask(currentUser, task)) {
+                throw new NotPermittedException();
+            }
+        }
     }
 }

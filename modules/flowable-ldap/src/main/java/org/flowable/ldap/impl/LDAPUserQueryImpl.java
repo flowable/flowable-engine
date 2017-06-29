@@ -21,7 +21,6 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.idm.api.User;
 import org.flowable.idm.engine.impl.UserQueryImpl;
 import org.flowable.idm.engine.impl.interceptor.CommandContext;
@@ -37,7 +36,7 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger logger = LoggerFactory.getLogger(LDAPUserQueryImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LDAPUserQueryImpl.class);
 
     protected LDAPConfiguration ldapConfigurator;
 
@@ -51,7 +50,7 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
     }
 
     @Override
-    public List<User> executeList(CommandContext commandContext, Page page) {
+    public List<User> executeList(CommandContext commandContext) {
         return executeQuery();
     }
 
@@ -109,7 +108,7 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
                     return user;
 
                 } catch (NamingException ne) {
-                    logger.debug("Could not find user {} : {}", userId, ne.getMessage(), ne);
+                    LOGGER.debug("Could not find user {} : {}", userId, ne.getMessage(), ne);
                     return null;
                 }
             }
@@ -138,7 +137,7 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
                     namingEnum.close();
 
                 } catch (NamingException ne) {
-                    logger.debug("Could not execute LDAP query: {}", ne.getMessage(), ne);
+                    LOGGER.debug("Could not execute LDAP query: {}", ne.getMessage(), ne);
                     return null;
                 }
                 return result;

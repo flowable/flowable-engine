@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class IdmEngines {
 
-    private static Logger log = LoggerFactory.getLogger(IdmEngines.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IdmEngines.class);
 
     public static final String NAME_DEFAULT = "default";
 
@@ -73,7 +73,7 @@ public abstract class IdmEngines {
             }
             for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
                 URL resource = iterator.next();
-                log.info("Initializing idm engine using configuration '{}'", resource.toString());
+                LOGGER.info("Initializing idm engine using configuration '{}'", resource.toString());
                 initIdmEngineFromResource(resource);
             }
 
@@ -85,13 +85,13 @@ public abstract class IdmEngines {
 
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
-                log.info("Initializing idm engine using Spring configuration '{}'", resource.toString());
+                LOGGER.info("Initializing idm engine using Spring configuration '{}'", resource.toString());
                 initIdmEngineFromSpringResource(resource);
             }
 
             setInitialized(true);
         } else {
-            log.info("Idm engines already initialized");
+            LOGGER.info("Idm engines already initialized");
         }
     }
 
@@ -141,15 +141,15 @@ public abstract class IdmEngines {
 
         String resourceUrlString = resourceUrl.toString();
         try {
-            log.info("initializing idm engine for resource {}", resourceUrl);
+            LOGGER.info("initializing idm engine for resource {}", resourceUrl);
             IdmEngine idmEngine = buildIdmEngine(resourceUrl);
             String idmEngineName = idmEngine.getName();
-            log.info("initialised idm engine {}", idmEngineName);
+            LOGGER.info("initialised idm engine {}", idmEngineName);
             idmEngineInfo = new EngineInfo(idmEngineName, resourceUrlString, null);
             idmEngines.put(idmEngineName, idmEngine);
             idmEngineInfosByName.put(idmEngineName, idmEngineInfo);
         } catch (Throwable e) {
-            log.error("Exception while initializing idm engine: {}", e.getMessage(), e);
+            LOGGER.error("Exception while initializing idm engine: {}", e.getMessage(), e);
             idmEngineInfo = new EngineInfo(null, resourceUrlString, getExceptionString(e));
         }
         idmEngineInfosByResourceUrl.put(resourceUrlString, idmEngineInfo);
@@ -212,7 +212,7 @@ public abstract class IdmEngines {
      * retries to initialize a idm engine that previously failed.
      */
     public static EngineInfo retry(String resourceUrl) {
-        log.debug("retying initializing of resource {}", resourceUrl);
+        LOGGER.debug("retying initializing of resource {}", resourceUrl);
         try {
             return initIdmEngineFromResource(new URL(resourceUrl));
         } catch (MalformedURLException e) {
@@ -240,7 +240,7 @@ public abstract class IdmEngines {
                 try {
                     idmEngine.close();
                 } catch (Exception e) {
-                    log.error("exception while closing {}", (idmEngineName == null ? "the default idm engine" : "idm engine " + idmEngineName), e);
+                    LOGGER.error("exception while closing {}", (idmEngineName == null ? "the default idm engine" : "idm engine " + idmEngineName), e);
                 }
             }
 

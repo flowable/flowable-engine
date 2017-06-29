@@ -16,20 +16,20 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
 
 /**
  * @author Tijs Rademakers
  */
 public class AcquiredJobEntities {
 
-    protected Map<String, JobEntity> acquiredJobs = new HashMap<String, JobEntity>();
+    protected Map<String, JobInfoEntity> acquiredJobs = new HashMap<String, JobInfoEntity>();
 
-    public void addJob(JobEntity job) {
+    public void addJob(JobInfoEntity job) {
         acquiredJobs.put(job.getId(), job);
     }
 
-    public Collection<JobEntity> getJobs() {
+    public Collection<JobInfoEntity> getJobs() {
         return acquiredJobs.values();
     }
 

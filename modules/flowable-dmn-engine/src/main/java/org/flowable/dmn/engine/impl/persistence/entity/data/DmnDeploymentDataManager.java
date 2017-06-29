@@ -18,7 +18,6 @@ import java.util.Map;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
@@ -26,15 +25,13 @@ import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
  */
 public interface DmnDeploymentDataManager extends DataManager<DmnDeploymentEntity> {
 
-    DmnDeploymentEntity findLatestDeploymentByName(String deploymentName);
-
     long findDeploymentCountByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery);
 
-    List<DmnDeployment> findDeploymentsByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery, Page page);
+    List<DmnDeployment> findDeploymentsByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery);
 
     List<String> getDeploymentResourceNames(String deploymentId);
 
-    List<DmnDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<DmnDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap);
 
     long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap);
 

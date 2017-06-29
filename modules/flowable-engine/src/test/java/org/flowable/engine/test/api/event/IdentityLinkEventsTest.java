@@ -120,6 +120,8 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
         link = (IdentityLink) event.getEntity();
         assertEquals("kermit", link.getUserId());
         assertEquals("test", link.getType());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
     }
 
     /**
@@ -183,6 +185,8 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(2);
         assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
     }
 
     /**

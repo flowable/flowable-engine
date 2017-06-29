@@ -34,8 +34,8 @@ public class NativeHistoricVariableInstanceQueryImpl extends AbstractNativeQuery
 
     // results ////////////////////////////////////////////////////////////////
 
-    public List<HistoricVariableInstance> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return commandContext.getHistoricVariableInstanceEntityManager().findHistoricVariableInstancesByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<HistoricVariableInstance> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
+        return commandContext.getHistoricVariableInstanceEntityManager().findHistoricVariableInstancesByNativeQuery(parameterMap);
     }
 
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {

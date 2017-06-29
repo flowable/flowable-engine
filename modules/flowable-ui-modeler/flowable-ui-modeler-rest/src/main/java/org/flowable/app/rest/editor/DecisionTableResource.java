@@ -12,6 +12,8 @@
  */
 package org.flowable.app.rest.editor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,8 +36,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author yvoswillens
  * @author erikwinlof
@@ -44,7 +44,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RequestMapping("/rest/decision-table-models")
 public class DecisionTableResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(DecisionTableResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DecisionTableResource.class);
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -83,7 +83,7 @@ public class DecisionTableResource {
         try {
             json = objectMapper.writeValueAsString(decisionTableRepresentation);
         } catch (Exception e) {
-            logger.error("Error writing imported decision table json", e);
+            LOGGER.error("Error writing imported decision table json", e);
             throw new InternalServerErrorException("Error writing imported decision table representation json");
         }
         return json;

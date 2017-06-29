@@ -14,6 +14,12 @@ package org.flowable.admin.service.engine;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpDelete;
@@ -29,20 +35,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-
 /**
  * Service for invoking Flowable REST services.
- * 
+ *
  * @author Yvo Swillens
  */
 @Service
 public class FormDeploymentService {
 
-    private final Logger log = LoggerFactory.getLogger(FormDeploymentService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FormDeploymentService.class);
 
     @Autowired
     protected FlowableClientService clientUtil;
@@ -53,7 +54,7 @@ public class FormDeploymentService {
         try {
             builder = new URIBuilder("form-repository/deployments");
         } catch (Exception e) {
-            log.error("Error building uri", e);
+            LOGGER.error("Error building uri", e);
             throw new FlowableServiceException("Error building uri", e);
         }
 

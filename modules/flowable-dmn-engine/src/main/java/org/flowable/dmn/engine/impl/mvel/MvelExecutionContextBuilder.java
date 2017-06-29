@@ -22,6 +22,8 @@ import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.OutputClause;
+import org.flowable.engine.common.api.FlowableException;
+import org.joda.time.LocalDate;
 import org.mvel2.ParserContext;
 import org.mvel2.integration.PropertyHandler;
 import org.slf4j.Logger;
@@ -32,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MvelExecutionContextBuilder {
 
-    private static final Logger logger = LoggerFactory.getLogger(MvelExecutionContextBuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MvelExecutionContextBuilder.class);
 
     public static MvelExecutionContext build(Decision decision, Map<String, Object> inputVariables,
             Map<String, Method> customExpressionFunctions, Map<Class<?>, PropertyHandler> propertyHandlers) {
@@ -81,7 +83,7 @@ public class MvelExecutionContextBuilder {
 
         executionContext.setStackVariables(inputVariables);
 
-        logger.debug("Execution Context created");
+        LOGGER.debug("Execution Context created");
 
         return executionContext;
     }
@@ -111,6 +113,18 @@ public class MvelExecutionContextBuilder {
                 } else {
                     inputVariables.put(outputClause.getName(), "");
                 }
+            }
+        }
+
+        // check if transformation is needed
+        for (Map.Entry<String, Object> inputVariable : inputVariables.entrySet()) {
+            try {
+                if (inputVariable.getValue() instanceof LocalDate) {
+                    Date transformedDate = ((LocalDate) inputVariable.getValue()).toDate();
+                    inputVariables.put(inputVariable.getKey(), transformedDate);
+                }
+            } catch (Exception ex) {
+                throw new FlowableException("error while transforming variable", ex);
             }
         }
     }

@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class PluggableFlowableIdmTestCase extends AbstractFlowableIdmTestCase {
 
-    private static Logger pluggabledImTestCaseLogger = LoggerFactory.getLogger(PluggableFlowableIdmTestCase.class);
+    private static final Logger pluggabledImTestCaseLogger = LoggerFactory.getLogger(PluggableFlowableIdmTestCase.class);
 
     protected static IdmEngine cachedIdmEngine;
 

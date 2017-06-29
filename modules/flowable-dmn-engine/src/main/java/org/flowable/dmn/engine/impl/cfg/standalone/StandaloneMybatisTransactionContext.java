@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 public class StandaloneMybatisTransactionContext implements TransactionContext {
 
-    private static Logger log = LoggerFactory.getLogger(StandaloneMybatisTransactionContext.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StandaloneMybatisTransactionContext.class);
 
     protected CommandContext commandContext;
     protected Map<TransactionState, List<TransactionListener>> stateTransactionListeners;
@@ -58,12 +58,12 @@ public class StandaloneMybatisTransactionContext implements TransactionContext {
 
     public void commit() {
 
-        log.debug("firing event committing...");
+        LOGGER.debug("firing event committing...");
         fireTransactionEvent(TransactionState.COMMITTING, false);
 
-        log.debug("committing the ibatis sql session...");
+        LOGGER.debug("committing the ibatis sql session...");
         getDbSqlSession().commit();
-        log.debug("firing event committed...");
+        LOGGER.debug("firing event committed...");
         fireTransactionEvent(TransactionState.COMMITTED, true);
 
     }
@@ -115,23 +115,23 @@ public class StandaloneMybatisTransactionContext implements TransactionContext {
     public void rollback() {
         try {
             try {
-                log.debug("firing event rolling back...");
+                LOGGER.debug("firing event rolling back...");
                 fireTransactionEvent(TransactionState.ROLLINGBACK, false);
 
             } catch (Throwable exception) {
-                log.info("Exception during transaction: {}", exception.getMessage());
+                LOGGER.info("Exception during transaction: {}", exception.getMessage());
                 commandContext.exception(exception);
             } finally {
-                log.debug("rolling back ibatis sql session...");
+                LOGGER.debug("rolling back ibatis sql session...");
                 getDbSqlSession().rollback();
             }
 
         } catch (Throwable exception) {
-            log.info("Exception during transaction: {}", exception.getMessage());
+            LOGGER.info("Exception during transaction: {}", exception.getMessage());
             commandContext.exception(exception);
 
         } finally {
-            log.debug("firing event rolled back...");
+            LOGGER.debug("firing event rolled back...");
             fireTransactionEvent(TransactionState.ROLLED_BACK, true);
         }
     }

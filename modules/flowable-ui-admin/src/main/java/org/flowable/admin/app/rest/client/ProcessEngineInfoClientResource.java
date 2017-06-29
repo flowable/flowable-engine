@@ -12,6 +12,8 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.service.engine.ProcessEngineInfoService;
 import org.flowable.admin.service.engine.exception.FlowableServiceException;
@@ -25,8 +27,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 /**
  * @author Frederik Heremans
  * @author Yvo Swillens
@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RestController
 public class ProcessEngineInfoClientResource extends AbstractClientResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProcessEngineInfoClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessEngineInfoClientResource.class);
 
     @Autowired
     protected ProcessEngineInfoService clientService;
@@ -54,7 +54,7 @@ public class ProcessEngineInfoClientResource extends AbstractClientResource {
             return clientService.getEngineInfo(retrieveServerConfig(endpointType));
 
         } catch (FlowableServiceException e) {
-            logger.error("Error getting engine info {}", endpointType, e);
+            LOGGER.error("Error getting engine info {}", endpointType, e);
             throw new BadRequestException(e.getMessage());
         }
     }

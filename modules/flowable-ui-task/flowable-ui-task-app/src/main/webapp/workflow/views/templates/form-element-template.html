@@ -88,7 +88,7 @@
         </div>
     </div>
 
-    <div ng-switch-when="functional-group" class="form-group" ng-show="field.isVisible" ng-class="{'has-error': field.required &&  isEmpty(field)}">
+    <div ng-switch-when="functional-group" class="form-group" ng-show="field.isVisible" ng-class="{'has-error': field.required && isEmpty(field)}">
         <label class="control-label">{{field.name}}</label>
         <span class="marker" ng-if="field.required">*</span>
         <div id="{{activitiFieldIdPrefix + field.id}}" class="people-select">
@@ -97,8 +97,8 @@
                     on-group-selected="fieldGroupSelected(group, field)" restrict-with-group="field.params.restrictWithGroup">
                     <span ng-if="!field.value && !field.placeholder" translate="FORM.MESSAGE.SELECT-GROUP"></span>
                     <span ng-if="!field.value && field.placeholder" translate="{{field.placeholder}}"></span>
-                    <div>{{field.value.name}}</div>
-                    <div class="actions"  ng-if="field.value">
+                    <div ng-if="field.value && field.value.id && field.value.name">{{field.value.name}}</div>
+                    <div class="actions" ng-if="field.value && field.value.id && field.value.name">
                         <a ng-click="fieldGroupRemoved(field.value, field)"><i class="icon icon-remove"></i></a>
                     </div>
                 </li>
