@@ -1,5 +1,8 @@
 package org.flowable.app.service.editor;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -36,14 +39,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @Service
 @Transactional
 public class AppDefinitionImportService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AppDefinitionImportService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppDefinitionImportService.class);
 
     @Autowired
     protected AppDefinitionPublishService appDefinitionPublishService;
@@ -160,7 +160,7 @@ public class AppDefinitionImportService {
         try {
             appDefinition = objectMapper.readValue(model.getModelEditorJson(), AppDefinition.class);
         } catch (Exception e) {
-            logger.error("Error deserializing app {}", model.getId(), e);
+            LOGGER.error("Error deserializing app {}", model.getId(), e);
             throw new InternalServerErrorException("Could not deserialize app definition");
         }
         AppDefinitionRepresentation result = new AppDefinitionRepresentation(model);
@@ -212,7 +212,7 @@ public class AppDefinitionImportService {
                 zipEntry = zipInputStream.getNextEntry();
             }
         } catch (Exception e) {
-            logger.error("Error reading app definition zip file", e);
+            LOGGER.error("Error reading app definition zip file", e);
             throw new InternalServerErrorException("Error reading app definition zip file");
 
         } finally {
@@ -329,7 +329,7 @@ public class AppDefinitionImportService {
             try {
                 bpmnModelNode = objectMapper.readTree(bpmnModelObject.getModelEditorJson());
             } catch (Exception e) {
-                logger.error("Error reading BPMN json for {}", bpmnModelKey, e);
+                LOGGER.error("Error reading BPMN json for {}", bpmnModelKey, e);
                 throw new InternalServerErrorException("Error reading BPMN json for " + bpmnModelKey);
             }
 
@@ -387,7 +387,7 @@ public class AppDefinitionImportService {
         try {
             appDefinition = objectMapper.readValue(appDefinitionModel.getModelEditorJson(), AppDefinition.class);
         } catch (Exception e) {
-            logger.error("Error reading app definition {}", appDefinitionModel.getName(), e);
+            LOGGER.error("Error reading app definition {}", appDefinitionModel.getName(), e);
             throw new BadRequestException("Error reading app definition", e);
         }
 
@@ -419,7 +419,7 @@ public class AppDefinitionImportService {
             return result;
 
         } catch (Exception e) {
-            logger.error("Error storing app definition", e);
+            LOGGER.error("Error storing app definition", e);
             throw new InternalServerErrorException("Error storing app definition");
         }
     }
@@ -443,7 +443,7 @@ public class AppDefinitionImportService {
             return model;
 
         } catch (Exception e) {
-            logger.error("Error reading model json", e);
+            LOGGER.error("Error reading model json", e);
             throw new InternalServerErrorException("Error reading model json");
         }
     }

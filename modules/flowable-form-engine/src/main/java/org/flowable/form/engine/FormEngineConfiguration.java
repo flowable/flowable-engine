@@ -12,6 +12,8 @@
  */
 package org.flowable.form.engine;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -87,8 +89,6 @@ import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisResourc
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseConnection;
@@ -98,7 +98,7 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class FormEngineConfiguration extends AbstractEngineConfiguration {
 
-    protected static final Logger logger = LoggerFactory.getLogger(FormEngineConfiguration.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(FormEngineConfiguration.class);
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/form/db/mapping/mappings.xml";
 
@@ -311,14 +311,14 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
             Liquibase liquibase = new Liquibase("org/flowable/form/db/liquibase/flowable-form-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
 
             if (DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
-                logger.debug("Dropping and creating schema FORM");
+                LOGGER.debug("Dropping and creating schema FORM");
                 liquibase.dropAll();
                 liquibase.update("form");
             } else if (DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
-                logger.debug("Updating schema FORM");
+                LOGGER.debug("Updating schema FORM");
                 liquibase.update("form");
             } else if (DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
-                logger.debug("Validating schema FORM");
+                LOGGER.debug("Validating schema FORM");
                 liquibase.validate();
             }
         } catch (Exception e) {

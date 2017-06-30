@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.Date;
+
 import org.flowable.engine.common.impl.db.HasRevision;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 
@@ -34,7 +36,9 @@ public interface AbstractJobEntity extends Entity, HasRevision {
     void setExceptionMessage(String exceptionMessage);
 
     ByteArrayRef getExceptionByteArrayRef();
-
+    
     void setTenantId(String tenantId);
+    
+    Date getCreateTime();
 
 }

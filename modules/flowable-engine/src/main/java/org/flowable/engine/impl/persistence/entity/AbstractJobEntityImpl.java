@@ -34,6 +34,7 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
 
     private static final long serialVersionUID = 1L;
 
+    protected Date createTime;
     protected Date duedate;
 
     protected String executionId;
@@ -60,12 +61,13 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<String, Object>();
         persistentState.put("retries", retries);
+        persistentState.put("createTime", createTime);
         persistentState.put("duedate", duedate);
         persistentState.put("exceptionMessage", exceptionMessage);
         persistentState.put("jobHandlerType", jobHandlerType);
 
         if (exceptionByteArrayRef != null) {
-            persistentState.put("exceptionByteArrayId", exceptionByteArrayRef.getId());
+            persistentState.put("exceptionByteArrayRef", exceptionByteArrayRef);
         }
         
         return persistentState;
@@ -77,6 +79,14 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
         executionId = execution.getId();
         processInstanceId = execution.getProcessInstanceId();
         processDefinitionId = execution.getProcessDefinitionId();
+    }
+    
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     public Date getDuedate() {

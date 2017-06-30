@@ -12,18 +12,18 @@
  */
 package org.flowable.app.web;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 public class CustomUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private final Logger log = LoggerFactory.getLogger(CustomUsernamePasswordAuthenticationFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomUsernamePasswordAuthenticationFilter.class);
 
     public CustomUsernamePasswordAuthenticationFilter() {
         super();
@@ -34,7 +34,7 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
         try {
             request.setCharacterEncoding("UTF-8");
         } catch (Exception e) {
-            log.error("Error setting character encoding to UTF-8");
+            LOGGER.error("Error setting character encoding to UTF-8");
         }
         return super.attemptAuthentication(request, response);
     }

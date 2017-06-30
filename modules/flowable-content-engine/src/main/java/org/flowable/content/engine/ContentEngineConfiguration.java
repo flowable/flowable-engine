@@ -73,7 +73,7 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class ContentEngineConfiguration extends AbstractEngineConfiguration {
 
-    protected static final Logger logger = LoggerFactory.getLogger(ContentEngineConfiguration.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(ContentEngineConfiguration.class);
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/content/db/mapping/mappings.xml";
 
@@ -227,7 +227,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration {
             }
 
             if (contentRootFile != null && contentRootFile.exists()) {
-                logger.info("Content file system root : {}", contentRootFile.getAbsolutePath());
+                LOGGER.info("Content file system root : {}", contentRootFile.getAbsolutePath());
             }
 
             contentStorage = new SimpleFileSystemContentStorage(contentRootFile);
@@ -256,14 +256,14 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration {
             Liquibase liquibase = new Liquibase("org/flowable/content/db/liquibase/flowable-content-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
 
             if (DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
-                logger.debug("Dropping and creating schema CONTENT");
+                LOGGER.debug("Dropping and creating schema CONTENT");
                 liquibase.dropAll();
                 liquibase.update("content");
             } else if (DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
-                logger.debug("Updating schema CONTENT");
+                LOGGER.debug("Updating schema CONTENT");
                 liquibase.update("content");
             } else if (DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
-                logger.debug("Validating schema CONTENT");
+                LOGGER.debug("Validating schema CONTENT");
                 liquibase.validate();
             }
         } catch (Exception e) {

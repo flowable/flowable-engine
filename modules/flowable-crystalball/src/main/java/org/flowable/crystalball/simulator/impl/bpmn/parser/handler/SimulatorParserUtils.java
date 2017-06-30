@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * @author martin.grofcik
  */
 final class SimulatorParserUtils {
-    private static Logger LOG = LoggerFactory.getLogger(SimulatorParserUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimulatorParserUtils.class);
 
     /**
      * The namespace of the simulator custom BPMN extensions.
@@ -43,14 +43,14 @@ final class SimulatorParserUtils {
     // ProcessDefinitionImpl processDefinition = scope.getProcessDefinition();
     // ActivityImpl activity = processDefinition.findActivity(baseElement.getId());
     //
-    // LOG.debug("Scripting task [" + activity.getId() + "] setting behavior to [" + behaviorClassName + "]");
+    // LOGGER.debug("Scripting task [" + activity.getId() + "] setting behavior to [" + behaviorClassName + "]");
     // try {
     // @SuppressWarnings("unchecked")
     // Class<AbstractSimulationActivityBehavior> behaviorClass = (Class<AbstractSimulationActivityBehavior>) Class.forName(behaviorClassName);
     // Constructor<AbstractSimulationActivityBehavior> constructor = behaviorClass.getDeclaredConstructor(ScopeImpl.class, ActivityImpl.class);
     // activity.setActivityBehavior(constructor.newInstance(scope, activity));
     // } catch (Throwable t) {
-    // LOG.error("unable to set simulation behavior class[" + behaviorClassName + "]", t);
+    // LOGGER.error("unable to set simulation behavior class[" + behaviorClassName + "]", t);
     // throw new FlowableException("unable to set simulation behavior class[" + behaviorClassName + "]");
     // }
     // }

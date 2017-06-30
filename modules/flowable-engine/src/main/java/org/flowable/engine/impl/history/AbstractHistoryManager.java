@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractHistoryManager extends AbstractManager implements HistoryManager {
 
-    private static Logger log = LoggerFactory.getLogger(AbstractHistoryManager.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractHistoryManager.class.getName());
 
     protected HistoryLevel historyLevel;
 
@@ -43,8 +43,8 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
 
     @Override
     public boolean isHistoryLevelAtLeast(HistoryLevel level) {
-        if (log.isDebugEnabled()) {
-            log.debug("Current history level: {}, level required: {}", historyLevel, level);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Current history level: {}, level required: {}", historyLevel, level);
         }
         // Comparing enums actually compares the location of values declared in the enum
         return historyLevel.isAtLeast(level);
@@ -52,8 +52,8 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
 
     @Override
     public boolean isHistoryEnabled() {
-        if (log.isDebugEnabled()) {
-            log.debug("Current history level: {}", historyLevel);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Current history level: {}", historyLevel);
         }
         return historyLevel != HistoryLevel.NONE;
     }

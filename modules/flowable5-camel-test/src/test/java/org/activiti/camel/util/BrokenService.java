@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BrokenService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BrokenService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BrokenService.class);
 
     /**
      * Always throws an exception.
@@ -33,7 +33,7 @@ public class BrokenService {
      * @throws BrokenServiceException
      */
     public void alwaysFails() throws BrokenServiceException {
-        LOG.info("{} called", this.getClass().getSimpleName());
+        LOGGER.info("{} called", this.getClass().getSimpleName());
         throw new BrokenServiceException("Provoked failure");
     }
 

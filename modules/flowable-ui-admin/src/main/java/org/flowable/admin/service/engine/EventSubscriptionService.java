@@ -12,6 +12,10 @@
  */
 package org.flowable.admin.service.engine;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.Map;
 
 import org.apache.http.client.methods.HttpGet;
@@ -25,17 +29,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * Service for invoking Flowable event subscription REST services.
  */
 @Service
 public class EventSubscriptionService {
 
-    private final Logger log = LoggerFactory.getLogger(EventSubscriptionService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventSubscriptionService.class);
 
     @Autowired
     protected FlowableClientService clientUtil;
@@ -46,7 +46,7 @@ public class EventSubscriptionService {
         try {
             builder = new URIBuilder("runtime/event-subscriptions");
         } catch (Exception e) {
-            log.error("Error building uri", e);
+            LOGGER.error("Error building uri", e);
             throw new FlowableServiceException("Error building uri", e);
         }
 

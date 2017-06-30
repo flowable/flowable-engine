@@ -12,6 +12,8 @@
  */
 package org.flowable.app.conf;
 
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+
 import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -39,8 +41,6 @@ import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseConnection;
@@ -52,7 +52,7 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 @EnableTransactionManagement
 public class DatabaseConfiguration {
 
-    private final Logger log = LoggerFactory.getLogger(DatabaseConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseConfiguration.class);
 
     protected static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_DE_";
 
@@ -106,12 +106,12 @@ public class DatabaseConfiguration {
 
     @Bean
     public DataSource dataSource() {
-        log.info("Configuring Datasource");
+        LOGGER.info("Configuring Datasource");
 
         String dataSourceJndiName = env.getProperty("datasource.jndi.name");
         if (StringUtils.isNotEmpty(dataSourceJndiName)) {
 
-            log.info("Using jndi datasource '{}'", dataSourceJndiName);
+            LOGGER.info("Using jndi datasource '{}'", dataSourceJndiName);
             JndiDataSourceLookup dsLookup = new JndiDataSourceLookup();
             dsLookup.setResourceRef(env.getProperty("datasource.jndi.resourceRef", Boolean.class, Boolean.TRUE));
             DataSource dataSource = dsLookup.getDataSource(dataSourceJndiName);
@@ -162,19 +162,19 @@ public class DatabaseConfiguration {
                 maxIdleTimeExcessConnections = 1800;
             }
 
-            if (log.isInfoEnabled()) {
-                log.info("Configuring Datasource with following properties (omitted password for security)");
-                log.info("datasource driver : {}", dataSourceDriver);
-                log.info("datasource url : {}", dataSourceUrl);
-                log.info("datasource user name : {}", dataSourceUsername);
-                log.info("Min pool size | Max pool size | acquire increment : {} | {} | {}", minPoolSize, maxPoolSize, acquireIncrement);
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Configuring Datasource with following properties (omitted password for security)");
+                LOGGER.info("datasource driver : {}", dataSourceDriver);
+                LOGGER.info("datasource url : {}", dataSourceUrl);
+                LOGGER.info("datasource user name : {}", dataSourceUsername);
+                LOGGER.info("Min pool size | Max pool size | acquire increment : {} | {} | {}", minPoolSize, maxPoolSize, acquireIncrement);
             }
 
             ComboPooledDataSource ds = new ComboPooledDataSource();
             try {
                 ds.setDriverClass(dataSourceDriver);
             } catch (PropertyVetoException e) {
-                log.error("Could not set Jdbc Driver class", e);
+                LOGGER.error("Could not set Jdbc Driver class", e);
                 return null;
             }
 
@@ -242,7 +242,7 @@ public class DatabaseConfiguration {
 
     @Bean
     public Liquibase liquibase() {
-        log.info("Configuring Liquibase");
+        LOGGER.info("Configuring Liquibase");
 
         try {
             DatabaseConnection connection = new JdbcConnection(dataSource().getConnection());
@@ -266,22 +266,22 @@ public class DatabaseConfiguration {
             connection = dataSource.getConnection();
             DatabaseMetaData databaseMetaData = connection.getMetaData();
             String databaseProductName = databaseMetaData.getDatabaseProductName();
-            log.info("database product name: '{}'", databaseProductName);
+            LOGGER.info("database product name: '{}'", databaseProductName);
             databaseType = databaseTypeMappings.getProperty(databaseProductName);
             if (databaseType == null) {
                 throw new FlowableException("couldn't deduct database type from database product name '" + databaseProductName + "'");
             }
-            log.info("using database type: {}", databaseType);
+            LOGGER.info("using database type: {}", databaseType);
 
         } catch (SQLException e) {
-            log.error("Exception while initializing Database connection", e);
+            LOGGER.error("Exception while initializing Database connection", e);
         } finally {
             try {
                 if (connection != null) {
                     connection.close();
                 }
             } catch (SQLException e) {
-                log.error("Exception while closing the Database connection", e);
+                LOGGER.error("Exception while closing the Database connection", e);
             }
         }
 

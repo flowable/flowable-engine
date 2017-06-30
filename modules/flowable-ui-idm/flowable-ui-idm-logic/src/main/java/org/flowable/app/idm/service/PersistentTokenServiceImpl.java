@@ -12,6 +12,11 @@
  */
 package org.flowable.app.idm.service;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
+
 import java.security.SecureRandom;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
@@ -31,11 +36,6 @@ import org.springframework.security.crypto.codec.Base64;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.util.concurrent.UncheckedExecutionException;
-
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
@@ -44,7 +44,7 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 @Transactional
 public class PersistentTokenServiceImpl implements PersistentTokenService {
 
-    private static final Logger logger = LoggerFactory.getLogger(PersistentTokenServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PersistentTokenServiceImpl.class);
 
     private static final int DEFAULT_SERIES_LENGTH = 16;
 
@@ -154,7 +154,7 @@ public class PersistentTokenServiceImpl implements PersistentTokenService {
             saveAndFlush(token);
             return token;
         } catch (DataAccessException e) {
-            logger.error("Failed to save persistent token ", e);
+            LOGGER.error("Failed to save persistent token ", e);
             return token;
         }
     }

@@ -26,7 +26,7 @@ public class DeadLetterJobEntity extends AbstractJobEntity {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(DeadLetterJobEntity.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeadLetterJobEntity.class);
 
     public DeadLetterJobEntity() {
     }

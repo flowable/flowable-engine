@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SecureJavascriptTaskParseHandler extends ScriptTaskParseHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(SecureJavascriptTaskParseHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecureJavascriptTaskParseHandler.class);
 
     public static final String LANGUAGE_JAVASCRIPT = "javascript";
 
@@ -40,7 +40,7 @@ public class SecureJavascriptTaskParseHandler extends ScriptTaskParseHandler {
 
     protected void createSecureJavascriptTaskBehavior(BpmnParse bpmnParse, ScriptTask scriptTask, String language) {
         if (StringUtils.isEmpty(scriptTask.getScript())) {
-            logger.warn("No script provided for scriptTask {}", scriptTask.getId());
+            LOGGER.warn("No script provided for scriptTask {}", scriptTask.getId());
         }
 
         scriptTask.setBehavior(new SecureJavascriptTaskActivityBehavior(scriptTask.getId(),

@@ -31,18 +31,18 @@ public class CloseXADataSourceLifecycleListener implements ProcessEngineLifecycl
     private PoolingDataSource dataSource;
     private BitronixTransactionManager transactionManager;
 
-    private static final Logger LOG = LoggerFactory.getLogger(CloseXADataSourceLifecycleListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CloseXADataSourceLifecycleListener.class);
 
     @Override
     public void onProcessEngineBuilt(ProcessEngine processEngine) {
-        LOG.info("--------------------- Callback for engine start");
+        LOGGER.info("--------------------- Callback for engine start");
     }
 
     @Override
     public void onProcessEngineClosed(ProcessEngine processEngine) {
-        LOG.info("--------------------- Callback for engine end");
+        LOGGER.info("--------------------- Callback for engine end");
         if (dataSource != null) {
-            LOG.info("--------------------- Closing datasource");
+            LOGGER.info("--------------------- Closing datasource");
             dataSource.close();
         }
 

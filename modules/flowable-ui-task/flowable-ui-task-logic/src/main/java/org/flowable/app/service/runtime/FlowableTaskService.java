@@ -44,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class FlowableTaskService extends FlowableAbstractTaskService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FlowableTaskService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowableTaskService.class);
 
     public TaskRepresentation getTask(String taskId, HttpServletResponse response) {
         User currentUser = SecurityUtils.getCurrentUserObject();
@@ -55,7 +55,7 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
             try {
                 processDefinition = repositoryService.getProcessDefinition(task.getProcessDefinitionId());
             } catch (FlowableException e) {
-                logger.error("Error getting process definition {}", task.getProcessDefinitionId(), e);
+                LOGGER.error("Error getting process definition {}", task.getProcessDefinitionId(), e);
             }
         }
 

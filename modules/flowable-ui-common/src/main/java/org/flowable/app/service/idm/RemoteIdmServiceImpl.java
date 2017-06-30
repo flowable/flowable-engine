@@ -12,6 +12,10 @@
  */
 package org.flowable.app.service.idm;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -31,16 +35,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-
-import static org.flowable.app.rest.HttpRequestHelper.executeHttpGet;
-
 @Service
 public class RemoteIdmServiceImpl implements RemoteIdmService {
 
-    private static final Logger logger = LoggerFactory.getLogger(RemoteIdmService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteIdmServiceImpl.class);
 
     private static final String PROPERTY_URL = "idm.app.url";
     private static final String PROPERTY_ADMIN_USER = "idm.admin.user";
@@ -113,6 +111,15 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
     }
 
     @Override
+    public RemoteGroup getGroup(String groupId) {
+        JsonNode json = callRemoteIdmService(url + "/api/idm/groups/" + encode(groupId), adminUser, adminPassword);
+        if (json != null) {
+            return parseGroupInfo(json);
+        }
+        return null;
+    }
+
+    @Override
     public List<RemoteGroup> findGroupsByNameFilter(String filter) {
         JsonNode json = callRemoteIdmService(url + "/api/idm/groups?filter=" + encode(filter), adminUser, adminPassword);
         if (json != null) {
@@ -122,19 +129,40 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
     }
 
     protected JsonNode callRemoteIdmService(String url, String username, String password) {
-        return executeHttpGet(url, username, password, new Function<HttpResponse, JsonNode>() {
-            @Override
-            public JsonNode apply(HttpResponse httpResponse) {
-                if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                    try {
-                        return objectMapper.readTree(httpResponse.getEntity().getContent());
-                    } catch (IOException e) {
-                        logger.warn("Exception while getting token", e);
-                    }
-                }
-                return null;
+        HttpGet httpGet = new HttpGet(url);
+        httpGet.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
+                Base64.encodeBase64((username + ":" + password).getBytes(Charset.forName("UTF-8")))));
+
+        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+        SSLConnectionSocketFactory sslsf = null;
+        try {
+            SSLContextBuilder builder = new SSLContextBuilder();
+            builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+            sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            clientBuilder.setSSLSocketFactory(sslsf);
+        } catch (Exception e) {
+            LOGGER.warn("Could not configure SSL for http client", e);
+        }
+
+        CloseableHttpClient client = clientBuilder.build();
+
+        try {
+            HttpResponse response = client.execute(httpGet);
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                return objectMapper.readTree(response.getEntity().getContent());
             }
-        });
+        } catch (Exception e) {
+            LOGGER.warn("Exception while getting token", e);
+        } finally {
+            if (client != null) {
+                try {
+                    client.close();
+                } catch (IOException e) {
+                    LOGGER.warn("Exception while closing http client", e);
+                }
+            }
+        }
+        return null;
     }
 
     protected List<RemoteUser> parseUsersInfo(JsonNode json) {
@@ -197,7 +225,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         try {
             return URLEncoder.encode(s, "UTF-8");
         } catch (Exception e) {
-            logger.warn("Could not encode url param", e);
+            LOGGER.warn("Could not encode url param", e);
             return null;
         }
     }

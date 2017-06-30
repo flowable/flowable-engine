@@ -50,7 +50,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @RestController
 public class ModelResource {
 
-    private static final Logger log = LoggerFactory.getLogger(ModelResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModelResource.class);
 
     private static final String RESOLVE_ACTION_OVERWRITE = "overwrite";
     private static final String RESOLVE_ACTION_SAVE_AS = "saveAs";
@@ -125,7 +125,7 @@ public class ModelResource {
             modelService.deleteModel(model.getId());
 
         } catch (Exception e) {
-            log.error("Error while deleting: ", e);
+            LOGGER.error("Error while deleting: ", e);
             throw new BadRequestException("Model cannot be deleted: " + modelId);
         }
     }
@@ -149,7 +149,7 @@ public class ModelResource {
                 editorJsonNode.put("modelType", "model");
                 modelNode.set("model", editorJsonNode);
             } catch (Exception e) {
-                log.error("Error reading editor json {}", modelId, e);
+                LOGGER.error("Error reading editor json {}", modelId, e);
                 throw new InternalServerErrorException("Error reading editor json " + modelId);
             }
 
@@ -272,7 +272,7 @@ public class ModelResource {
             return new ModelRepresentation(model);
 
         } catch (Exception e) {
-            log.error("Error saving model {}", model.getId(), e);
+            LOGGER.error("Error saving model {}", model.getId(), e);
             throw new BadRequestException("Process model could not be saved " + model.getId());
         }
     }

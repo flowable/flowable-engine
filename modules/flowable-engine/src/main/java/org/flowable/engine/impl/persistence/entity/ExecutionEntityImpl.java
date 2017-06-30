@@ -235,6 +235,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         persistentState.put("lockTime", lockTime);
         persistentState.put("superExecution", this.superExecutionId);
         persistentState.put("rootProcessInstanceId", this.rootProcessInstanceId);
+        persistentState.put("isMultiInstanceRoot", this.isMultiInstanceRoot);
         if (forcedUpdate) {
             persistentState.put("forcedUpdate", Boolean.TRUE);
         }
@@ -242,6 +243,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         persistentState.put("startActivityId", this.startActivityId);
         persistentState.put("startTime", this.startTime);
         persistentState.put("startUserId", this.startUserId);
+        persistentState.put("isCountEnabled", this.isCountEnabled);
         persistentState.put("eventSubscriptionCount", eventSubscriptionCount);
         persistentState.put("taskCount", taskCount);
         persistentState.put("jobCount", jobCount);

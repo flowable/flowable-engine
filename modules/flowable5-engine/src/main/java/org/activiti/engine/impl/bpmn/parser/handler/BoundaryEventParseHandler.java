@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BoundaryEventParseHandler extends AbstractFlowNodeBpmnParseHandler<BoundaryEvent> {
 
-    private static final Logger logger = LoggerFactory.getLogger(BoundaryEventParseHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BoundaryEventParseHandler.class);
 
     public Class<? extends BaseElement> getHandledType() {
         return BoundaryEvent.class;
@@ -40,7 +40,7 @@ public class BoundaryEventParseHandler extends AbstractFlowNodeBpmnParseHandler<
 
         ActivityImpl parentActivity = findActivity(bpmnParse, boundaryEvent.getAttachedToRefId());
         if (parentActivity == null) {
-            logger.warn("Invalid reference in boundary event. Make sure that the referenced activity is defined in the same scope as the boundary event {}", boundaryEvent.getId());
+            LOGGER.warn("Invalid reference in boundary event. Make sure that the referenced activity is defined in the same scope as the boundary event {}", boundaryEvent.getId());
             return;
         }
 
@@ -62,7 +62,7 @@ public class BoundaryEventParseHandler extends AbstractFlowNodeBpmnParseHandler<
             bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
 
         } else {
-            logger.warn("Unsupported boundary event type for boundary event {}", boundaryEvent.getId());
+            LOGGER.warn("Unsupported boundary event type for boundary event {}", boundaryEvent.getId());
         }
     }
 

@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AtomicOperationActivityExecute implements AtomicOperation {
 
-    private static Logger log = LoggerFactory.getLogger(AtomicOperationActivityExecute.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AtomicOperationActivityExecute.class);
 
     public boolean isAsync(InterpretableExecution execution) {
         return false;
@@ -43,7 +43,7 @@ public class AtomicOperationActivityExecute implements AtomicOperation {
             throw new PvmException("no behavior specified in " + activity);
         }
 
-        log.debug("{} executes {}: {}", execution, activity, activityBehavior.getClass().getName());
+        LOGGER.debug("{} executes {}: {}", execution, activity, activityBehavior.getClass().getName());
 
         try {
             if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {

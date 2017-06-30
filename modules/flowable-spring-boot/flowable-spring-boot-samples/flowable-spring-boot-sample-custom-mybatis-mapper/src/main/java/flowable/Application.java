@@ -19,7 +19,7 @@ import flowable.mappers.CustomMybatisMapper;
 @SpringBootApplication
 public class Application {
 
-    private static final Logger logger = LoggerFactory.getLogger(Application.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
     @Bean
     CommandLineRunner customMybatisMapper(final ManagementService managementService) {
@@ -33,7 +33,7 @@ public class Application {
                     }
                 });
 
-                logger.info("Process definition id = {}", processDefinitionId);
+                LOGGER.info("Process definition id = {}", processDefinitionId);
             }
         };
     }
@@ -52,7 +52,7 @@ public class Application {
                     }
                 });
 
-                logger.info("Process definition deployment id = {}", processDefinitionDeploymentId);
+                LOGGER.info("Process definition deployment id = {}", processDefinitionDeploymentId);
             }
         };
     }

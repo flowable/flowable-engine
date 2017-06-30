@@ -12,6 +12,8 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.DecisionTableService;
@@ -25,15 +27,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 /**
  * @author Yvo Swillens
  */
 @RestController
 public class DecisionTableClientResource extends AbstractClientResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(DecisionTableClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DecisionTableClientResource.class);
 
     @Autowired
     protected DecisionTableService clientService;
@@ -45,7 +45,7 @@ public class DecisionTableClientResource extends AbstractClientResource {
         try {
             return clientService.getDecisionTable(serverConfig, decisionTableId);
         } catch (FlowableServiceException e) {
-            logger.error("Error getting decision table {}", decisionTableId, e);
+            LOGGER.error("Error getting decision table {}", decisionTableId, e);
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -57,7 +57,7 @@ public class DecisionTableClientResource extends AbstractClientResource {
         try {
             return clientService.getEditorJsonForDecisionTable(serverConfig, decisionTableId);
         } catch (FlowableServiceException e) {
-            logger.error("Error getting editor json for decision table {}", decisionTableId, e);
+            LOGGER.error("Error getting editor json for decision table {}", decisionTableId, e);
             throw new BadRequestException(e.getMessage());
         }
     }

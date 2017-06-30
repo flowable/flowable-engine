@@ -12,6 +12,8 @@
  */
 package org.flowable.app.service.runtime;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +45,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Tijs Rademakers
  */
@@ -52,7 +52,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Transactional
 public class FlowableProcessDefinitionService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FlowableProcessDefinitionService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowableProcessDefinitionService.class);
 
     @Autowired
     protected RepositoryService repositoryService;
@@ -188,7 +188,7 @@ public class FlowableProcessDefinitionService {
         try {
             processDefinitionId = URLDecoder.decode(processDefinitionVariable, "UTF-8");
         } catch (Exception e) {
-            logger.error("Error decoding process definition {}", processDefinitionVariable, e);
+            LOGGER.error("Error decoding process definition {}", processDefinitionVariable, e);
             throw new InternalServerErrorException("Error decoding process definition " + processDefinitionVariable);
         }
         return processDefinitionId;

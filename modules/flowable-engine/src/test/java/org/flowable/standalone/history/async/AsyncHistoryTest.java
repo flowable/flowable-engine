@@ -21,6 +21,7 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.history.async.AsyncHistoryJobHandler;
+import org.flowable.engine.impl.history.async.AsyncHistoryJobZippedHandler;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.HistoryJob;
@@ -34,7 +35,8 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
     protected void tearDown() throws Exception {
 
         for (Job job : managementService.createJobQuery().list()) {
-            if (job.getJobHandlerType().equals(AsyncHistoryJobHandler.JOB_TYPE)) {
+            if (job.getJobHandlerType().equals(AsyncHistoryJobHandler.JOB_TYPE)
+                    || job.getJobHandlerType().equals(AsyncHistoryJobZippedHandler.JOB_TYPE)) {
                 managementService.deleteJob(job.getId());
             }
         }

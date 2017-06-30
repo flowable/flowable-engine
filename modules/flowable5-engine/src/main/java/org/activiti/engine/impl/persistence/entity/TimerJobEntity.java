@@ -47,7 +47,7 @@ public class TimerJobEntity extends AbstractJobEntity {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(TimerJobEntity.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimerJobEntity.class);
 
     public TimerJobEntity() {
     }
@@ -89,8 +89,8 @@ public class TimerJobEntity extends AbstractJobEntity {
         restoreExtraData(commandContext, jobHandlerConfiguration);
 
         if (this.getDuedate() != null && !isValidTime(this.getDuedate())) {
-            if (log.isDebugEnabled()) {
-                log.debug("Timer {} fired. but the dueDate is after the endDate.  Deleting timer.", getId());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Timer {} fired. but the dueDate is after the endDate.  Deleting timer.", getId());
             }
             delete();
             return;
@@ -105,8 +105,8 @@ public class TimerJobEntity extends AbstractJobEntity {
         JobHandler jobHandler = jobHandlers.get(jobHandlerType);
         jobHandler.execute(this, jobHandlerConfiguration, execution, commandContext);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Timer {} fired. Deleting timer.", getId());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Timer {} fired. Deleting timer.", getId());
         }
         delete();
 

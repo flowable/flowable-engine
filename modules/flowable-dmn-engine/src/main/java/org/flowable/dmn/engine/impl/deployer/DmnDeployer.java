@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DmnDeployer implements Deployer {
 
-    private static final Logger log = LoggerFactory.getLogger(DmnDeployer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DmnDeployer.class);
 
     protected IdGenerator idGenerator;
     protected ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory;
@@ -39,7 +39,7 @@ public class DmnDeployer implements Deployer {
     protected CachingAndArtifactsManager cachingAndArtifactsManager;
 
     public void deploy(DmnDeploymentEntity deployment, Map<String, Object> deploymentSettings) {
-        log.debug("Processing deployment {}", deployment.getName());
+        LOGGER.debug("Processing deployment {}", deployment.getName());
 
         // The ParsedDeployment represents the deployment, the decision tables, and the DMN
         // resource, parse, and model associated with each decision table.

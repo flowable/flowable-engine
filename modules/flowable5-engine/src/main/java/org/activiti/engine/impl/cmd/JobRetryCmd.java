@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
 
 public class JobRetryCmd implements Command<Object> {
 
-    private static final Logger log = LoggerFactory.getLogger(JobRetryCmd.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobRetryCmd.class.getName());
 
     protected String jobId;
     protected Throwable exception;
@@ -71,7 +71,7 @@ public class JobRetryCmd implements Command<Object> {
 
         AbstractJobEntity newJobEntity = null;
         if (activity == null || activity.getFailedJobRetryTimeCycleValue() == null) {
-            log.debug("activity or FailedJobRetryTimerCycleValue is null in job '{}'. Only decrementing retries.", jobId);
+            LOGGER.debug("activity or FailedJobRetryTimerCycleValue is null in job '{}'. Only decrementing retries.", jobId);
 
             if (job.getRetries() <= 1) {
                 DeadLetterJobEntity deadLetterJob = new DeadLetterJobEntity(job);
@@ -115,10 +115,10 @@ public class JobRetryCmd implements Command<Object> {
                 newJobEntity.setDuedate(durationHelper.getDateAfter());
 
                 if (job.getExceptionMessage() == null) { // is it the first exception
-                    log.debug("Applying JobRetryStrategy '{}' the first time for job {} with {} retries", failedJobRetryTimeCycle, job.getId(), durationHelper.getTimes());
+                    LOGGER.debug("Applying JobRetryStrategy '{}' the first time for job {} with {} retries", failedJobRetryTimeCycle, job.getId(), durationHelper.getTimes());
 
                 } else {
-                    log.debug("Decrementing retries of JobRetryStrategy '{}' for job {}", failedJobRetryTimeCycle, job.getId());
+                    LOGGER.debug("Decrementing retries of JobRetryStrategy '{}' for job {}", failedJobRetryTimeCycle, job.getId());
                 }
                 newJobEntity.setRetries(jobRetries - 1);
 

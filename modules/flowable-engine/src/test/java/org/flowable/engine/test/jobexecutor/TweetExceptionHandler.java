@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TweetExceptionHandler implements JobHandler {
 
-    private static Logger log = LoggerFactory.getLogger(TweetExceptionHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TweetExceptionHandler.class);
 
     protected int exceptionsRemaining = 2;
 
@@ -37,7 +37,7 @@ public class TweetExceptionHandler implements JobHandler {
             exceptionsRemaining--;
             throw new RuntimeException("exception remaining: " + exceptionsRemaining);
         }
-        log.info("no more exceptions to throw.");
+        LOGGER.info("no more exceptions to throw.");
     }
 
     public int getExceptionsRemaining() {

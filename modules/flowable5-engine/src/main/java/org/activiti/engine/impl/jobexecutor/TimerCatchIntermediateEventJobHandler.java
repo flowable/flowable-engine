@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 public class TimerCatchIntermediateEventJobHandler extends TimerEventHandler implements JobHandler {
 
-    private static Logger log = LoggerFactory.getLogger(TimerCatchIntermediateEventJobHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimerCatchIntermediateEventJobHandler.class);
 
     public static final String TYPE = "timer-intermediate-transition";
 
@@ -55,12 +55,12 @@ public class TimerCatchIntermediateEventJobHandler extends TimerEventHandler imp
             execution.signal(null, null);
         } catch (RuntimeException e) {
             LogMDC.putMDCExecution(execution);
-            log.error("exception during timer execution", e);
+            LOGGER.error("exception during timer execution", e);
             LogMDC.clear();
             throw e;
         } catch (Exception e) {
             LogMDC.putMDCExecution(execution);
-            log.error("exception during timer execution", e);
+            LOGGER.error("exception during timer execution", e);
             LogMDC.clear();
             throw new ActivitiException("exception during timer execution: " + e.getMessage(), e);
         }

@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 public class IntermediateThrowEventParseHandler extends AbstractActivityBpmnParseHandler<ThrowEvent> {
 
-    private static final Logger logger = LoggerFactory.getLogger(IntermediateThrowEventParseHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IntermediateThrowEventParseHandler.class);
 
     public Class<? extends BaseElement> getHandledType() {
         return ThrowEvent.class;
@@ -52,7 +52,7 @@ public class IntermediateThrowEventParseHandler extends AbstractActivityBpmnPars
         } else if (eventDefinition == null) {
             nestedActivityImpl.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateThrowNoneEventActivityBehavior(intermediateEvent));
         } else {
-            logger.warn("Unsupported intermediate throw event type for throw event {}", intermediateEvent.getId());
+            LOGGER.warn("Unsupported intermediate throw event type for throw event {}", intermediateEvent.getId());
         }
     }
 

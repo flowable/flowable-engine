@@ -44,7 +44,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
         super(formEngineConfiguration);
     }
 
-    private static Logger log = LoggerFactory.getLogger(TableDataManagerImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TableDataManagerImpl.class);
 
     public static Map<Class<?>, String> apiTypeToTableNameMap = new HashMap<Class<?>, String>();
     public static Map<Class<? extends Entity>, String> entityToTableNameMap = new HashMap<Class<? extends Entity>, String>();
@@ -69,7 +69,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
             for (String tableName : getTablesPresentInDatabase()) {
                 tableCount.put(tableName, getTableCount(tableName));
             }
-            log.debug("Number of rows per flowable table: {}", tableCount);
+            LOGGER.debug("Number of rows per flowable table: {}", tableCount);
         } catch (Exception e) {
             throw new FlowableException("couldn't get table counts", e);
         }
@@ -85,7 +85,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
             DatabaseMetaData databaseMetaData = connection.getMetaData();
             ResultSet tables = null;
             try {
-                log.debug("retrieving flowable tables from jdbc metadata");
+                LOGGER.debug("retrieving flowable tables from jdbc metadata");
                 String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
                 String tableNameFilter = databaseTablePrefix + "ACT_%";
                 if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
@@ -114,7 +114,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
                     String tableName = tables.getString("TABLE_NAME");
                     tableName = tableName.toUpperCase();
                     tableNames.add(tableName);
-                    log.debug("  retrieved flowable table name {}", tableName);
+                    LOGGER.debug("  retrieved flowable table name {}", tableName);
                 }
             } finally {
                 tables.close();
@@ -126,7 +126,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
     }
 
     protected long getTableCount(String tableName) {
-        log.debug("selecting table count for {}", tableName);
+        LOGGER.debug("selecting table count for {}", tableName);
         Long count = (Long) getDbSqlSession().selectOne("org.flowable.form.engine.impl.TablePageMap.selectTableCount", Collections.singletonMap("tableName", tableName));
         return count;
     }

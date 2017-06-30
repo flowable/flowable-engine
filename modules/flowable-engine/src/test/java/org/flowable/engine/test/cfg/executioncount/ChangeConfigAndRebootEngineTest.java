@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ChangeConfigAndRebootEngineTest extends ResourceFlowableTestCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(ChangeConfigAndRebootEngineTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChangeConfigAndRebootEngineTest.class);
 
     protected boolean newExecutionRelationshipCountValue;
 
@@ -48,13 +48,13 @@ public class ChangeConfigAndRebootEngineTest extends ResourceFlowableTestCase {
 
     @Override
     protected void additionalConfiguration(ProcessEngineConfiguration processEngineConfiguration) {
-        logger.info("Applying additional config: setting schema update to true and enabling execution relationship count");
+        LOGGER.info("Applying additional config: setting schema update to true and enabling execution relationship count");
         processEngineConfiguration.setDatabaseSchemaUpdate("true");
         ((ProcessEngineConfigurationImpl) processEngineConfiguration).setEnableExecutionRelationshipCounts(newExecutionRelationshipCountValue);
     }
 
     protected void rebootEngine(boolean newExecutionRelationshipCountValue) {
-        logger.info("Rebooting engine");
+        LOGGER.info("Rebooting engine");
         this.newExecutionRelationshipCountValue = newExecutionRelationshipCountValue;
         closeDownProcessEngine();
         initializeProcessEngine();

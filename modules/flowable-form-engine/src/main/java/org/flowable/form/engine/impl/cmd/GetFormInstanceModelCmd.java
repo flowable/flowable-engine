@@ -12,6 +12,9 @@
  */
 package org.flowable.form.engine.impl.cmd;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,15 +48,12 @@ import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Tijs Rademakers
  */
 public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Serializable {
 
-    private static Logger logger = LoggerFactory.getLogger(GetFormInstanceModelCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GetFormInstanceModelCmd.class);
 
     private static final long serialVersionUID = 1L;
     
@@ -138,7 +138,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
                     try {
                         field.setValue(formExpression.getValue(variables));
                     } catch (Exception e) {
-                        logger.error("Error getting value for expression {} {}", expressionField.getExpression(), e.getMessage());
+                        LOGGER.error("Error getting value for expression {} {}", expressionField.getExpression(), e.getMessage());
                     }
 
                 } else if (FormFieldTypes.UPLOAD.equals(field.getType())) {
@@ -311,7 +311,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
                         variables.put(field.getId(), dateValue.toString("d-M-yyyy"));
                     }
                 } catch (Exception e) {
-                    logger.error("Error parsing form date value for process instance {} and task {} with value {}", processInstanceId, taskId, fieldValue, e);
+                    LOGGER.error("Error parsing form date value for process instance {} and task {} with value {}", processInstanceId, taskId, fieldValue, e);
                 }
 
             } else {

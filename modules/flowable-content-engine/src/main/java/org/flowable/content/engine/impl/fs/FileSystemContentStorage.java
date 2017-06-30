@@ -46,7 +46,7 @@ public class FileSystemContentStorage implements ContentStorage {
     private Object idLock = new Object();
     private int currentIndex;
 
-    private static final Logger logger = LoggerFactory.getLogger(FileSystemContentStorage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemContentStorage.class);
 
     /**
      * Maximum number of times the next folder should be attempted to be acquired in a row before failing.
@@ -240,7 +240,7 @@ public class FileSystemContentStorage implements ContentStorage {
     protected File getFirstAvailableFolder(int maxRetries) {
 
         if (maxRetries == 0) {
-            logger.error("Giving up looking for next available folder, no more retries left");
+            LOGGER.error("Giving up looking for next available folder, no more retries left");
             throw new ContentStorageException("Took too many attempts to get an available free folder");
         }
 
@@ -270,7 +270,7 @@ public class FileSystemContentStorage implements ContentStorage {
             int lastIndex = indexes[converter.getIterationDepth() - 2];
             if (lastIndex >= converter.getBlockSize() - 1) {
 
-                logger.debug("Block size reached, moving up one level: {}", currentMaxFolder.getAbsolutePath());
+                LOGGER.debug("Block size reached, moving up one level: {}", currentMaxFolder.getAbsolutePath());
 
                 // Need to flip to a higher folder
                 boolean needsMove = false;
@@ -289,7 +289,7 @@ public class FileSystemContentStorage implements ContentStorage {
                 }
 
                 if (needsMove) {
-                    logger.error("Maximum number of content items reached, cannot store any more content: {}", currentMaxFolder.getAbsolutePath());
+                    LOGGER.error("Maximum number of content items reached, cannot store any more content: {}", currentMaxFolder.getAbsolutePath());
                     throw new ContentStorageException("Maximum number of content items reached, cannot store any more content");
                 }
 
@@ -305,7 +305,7 @@ public class FileSystemContentStorage implements ContentStorage {
 
                 // File already existed, repeat the process again to find the next
                 // available folder
-                logger.debug("Next folder already created, retrying...");
+                LOGGER.debug("Next folder already created, retrying...");
                 return getFirstAvailableFolder(--maxRetries);
             } else {
                 File newFolder = new File(currentMaxFolder.getParentFile(), String.valueOf(lastIndex + 1));
@@ -315,7 +315,7 @@ public class FileSystemContentStorage implements ContentStorage {
 
                 // File already existed, repeat the process again to find the next
                 // available folder
-                logger.debug("Next folder already created, retrying...");
+                LOGGER.debug("Next folder already created, retrying...");
                 return getFirstAvailableFolder(--maxRetries);
             }
         }
@@ -336,7 +336,7 @@ public class FileSystemContentStorage implements ContentStorage {
                 }
             } catch (NumberFormatException nfe) {
                 // Ignore bad named folders
-                logger.warn("Content store contains bad folder: {}", s);
+                LOGGER.warn("Content store contains bad folder: {}", s);
             }
         }
 

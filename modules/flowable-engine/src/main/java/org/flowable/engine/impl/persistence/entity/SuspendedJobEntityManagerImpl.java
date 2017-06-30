@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<SuspendedJobEntity> implements SuspendedJobEntityManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(SuspendedJobEntityManagerImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SuspendedJobEntityManagerImpl.class);
 
     protected SuspendedJobDataManager jobDataManager;
 
@@ -82,6 +82,7 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
             }
         }
 
+        jobEntity.setCreateTime(getProcessEngineConfiguration().getClock().getCurrentTime());
         super.insert(jobEntity, fireCreateEvent);
     }
 

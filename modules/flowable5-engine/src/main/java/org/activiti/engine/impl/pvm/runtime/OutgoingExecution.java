@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public class OutgoingExecution {
 
-    private static Logger log = LoggerFactory.getLogger(OutgoingExecution.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OutgoingExecution.class);
 
     protected InterpretableExecution outgoingExecution;
     protected PvmTransition outgoingTransition;
@@ -47,7 +47,7 @@ public class OutgoingExecution {
         if (!outgoingExecution.isDeleteRoot()) {
             outgoingExecution.take(outgoingTransition, fireActivityCompletedEvent);
         } else {
-            log.debug("Not taking transition '{}', outgoing execution has ended.", outgoingTransition);
+            LOGGER.debug("Not taking transition '{}', outgoing execution has ended.", outgoingTransition);
         }
     }
 }

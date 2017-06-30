@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ResetExpiredJobsRunnable implements Runnable {
 
-    private static Logger log = LoggerFactory.getLogger(ResetExpiredJobsRunnable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResetExpiredJobsRunnable.class);
 
     protected final String name;
     protected final AsyncExecutor asyncExecutor;
@@ -52,7 +52,7 @@ public class ResetExpiredJobsRunnable implements Runnable {
     }
 
     public synchronized void run() {
-        log.info("starting to reset expired jobs");
+        LOGGER.info("starting to reset expired jobs");
         Thread.currentThread().setName(name);
 
         while (!isInterrupted) {
@@ -74,9 +74,9 @@ public class ResetExpiredJobsRunnable implements Runnable {
 
             } catch (Throwable e) {
                 if (e instanceof FlowableOptimisticLockingException) {
-                    log.debug("Optimistic lock exception while resetting locked jobs", e);
+                    LOGGER.debug("Optimistic lock exception while resetting locked jobs", e);
                 } else {
-                    log.error("exception during resetting expired jobs: {}", e.getMessage(), e);
+                    LOGGER.error("exception during resetting expired jobs: {}", e.getMessage(), e);
                 }
             }
 
@@ -91,8 +91,8 @@ public class ResetExpiredJobsRunnable implements Runnable {
                 }
 
             } catch (InterruptedException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug("async reset expired jobs wait interrupted");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("async reset expired jobs wait interrupted");
                 }
             } finally {
                 isWaiting.set(false);
@@ -100,7 +100,7 @@ public class ResetExpiredJobsRunnable implements Runnable {
 
         }
 
-        log.info("stopped resetting expired jobs");
+        LOGGER.info("stopped resetting expired jobs");
     }
 
     public void stop() {

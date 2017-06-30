@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionEntity> implements ExecutionEntityManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExecutionEntityManagerImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionEntityManagerImpl.class);
 
     protected ExecutionDataManager executionDataManager;
 
@@ -274,8 +274,8 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         // Insert the child execution
         insert(childExecution, false);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Child execution {} created with parent {}", childExecution, parentExecutionEntity.getId());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Child execution {} created with parent {}", childExecution, parentExecutionEntity.getId());
         }
 
         if (getEventDispatcher().isEnabled()) {
@@ -305,8 +305,8 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         // Store in database
         insert(subProcessInstance, false);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Child execution {} created with super execution {}", subProcessInstance, superExecutionEntity.getId());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Child execution {} created with super execution {}", subProcessInstance, superExecutionEntity.getId());
         }
 
         subProcessInstance.setProcessInstanceId(subProcessInstance.getId());

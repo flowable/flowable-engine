@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class HttpServiceTaskCfgTestCase extends ResourceFlowableTestCase {
 
-    private static Logger log = LoggerFactory.getLogger(HttpServiceTaskCfgTestCase.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServiceTaskCfgTestCase.class);
 
     public HttpServiceTaskCfgTestCase(String configPath) {
         super(configPath);

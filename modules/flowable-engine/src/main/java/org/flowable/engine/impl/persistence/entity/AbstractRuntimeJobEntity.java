@@ -47,5 +47,7 @@ public interface AbstractRuntimeJobEntity extends Job, AbstractJobEntity {
     void setMaxIterations(int maxIterations);
     
     void setJobType(String jobType);
+    
+    void setCreateTime(Date createTime);
 
 }

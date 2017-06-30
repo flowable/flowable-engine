@@ -22,16 +22,16 @@ import org.slf4j.LoggerFactory;
 public class HttpExecutionListener implements ExecutionListener {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger log = LoggerFactory.getLogger(HttpExecutionListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpExecutionListener.class);
 
     public static int runs;
 
     public void notify(DelegateExecution execution) {
         execution.setVariable("runs", ++runs);
         for (Map.Entry e : execution.getVariables().entrySet()) {
-            log.info("key: {}", e.getKey());
+            LOGGER.info("key: {}", e.getKey());
             if (e.getValue() != null) {
-                log.info("Value: {}", e.getValue());
+                LOGGER.info("Value: {}", e.getValue());
             }
         }
     }

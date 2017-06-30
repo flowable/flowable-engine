@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLetterJobEntity> implements DeadLetterJobEntityManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(DeadLetterJobEntityManagerImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeadLetterJobEntityManagerImpl.class);
 
     protected DeadLetterJobDataManager jobDataManager;
 
@@ -79,6 +79,7 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
             }
         }
 
+        jobEntity.setCreateTime(getProcessEngineConfiguration().getClock().getCurrentTime());
         super.insert(jobEntity, fireCreateEvent);
     }
 

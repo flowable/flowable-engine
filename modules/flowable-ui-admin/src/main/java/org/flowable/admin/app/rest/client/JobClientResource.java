@@ -12,6 +12,8 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -30,15 +32,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 /**
  * REST controller for managing the current user's account.
  */
 @RestController
 public class JobClientResource extends AbstractClientResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(JobClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobClientResource.class);
 
     @Autowired
     protected JobService clientService;
@@ -54,7 +54,7 @@ public class JobClientResource extends AbstractClientResource {
         try {
             return clientService.getJob(serverConfig, jobId, jobType);
         } catch (FlowableServiceException e) {
-            logger.error("Error getting job {}", jobId, e);
+            LOGGER.error("Error getting job {}", jobId, e);
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -71,7 +71,7 @@ public class JobClientResource extends AbstractClientResource {
         try {
             clientService.deleteJob(serverConfig, jobId, jobType);
         } catch (FlowableServiceException e) {
-            logger.error("Error deleting job {}", jobId, e);
+            LOGGER.error("Error deleting job {}", jobId, e);
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -87,11 +87,11 @@ public class JobClientResource extends AbstractClientResource {
         try {
             clientService.executeJob(serverConfig, jobId);
         } catch (FlowableServiceException e) {
-            logger.error("Error executing job {}", jobId, e);
+            LOGGER.error("Error executing job {}", jobId, e);
             throw new BadRequestException(e.getMessage());
         }
     }
-    
+
     /**
      * POST /rest/admin/move-jobs/{jobId} -> move job
      */
@@ -104,7 +104,7 @@ public class JobClientResource extends AbstractClientResource {
         try {
             clientService.moveJob(serverConfig, jobId, jobType);
         } catch (FlowableServiceException e) {
-            logger.error("Error executing job {}", jobId, e);
+            LOGGER.error("Error executing job {}", jobId, e);
             throw new BadRequestException(e.getMessage());
         }
     }
@@ -124,7 +124,7 @@ public class JobClientResource extends AbstractClientResource {
             }
             return trace;
         } catch (FlowableServiceException e) {
-            logger.error("Error getting job stacktrace {}", jobId, e);
+            LOGGER.error("Error getting job stacktrace {}", jobId, e);
             throw new BadRequestException(e.getMessage());
         }
     }

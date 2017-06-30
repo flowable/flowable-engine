@@ -78,14 +78,17 @@
     update ${prefix}ACT_RU_VARIABLE
     <set>
         REV_ = #{revisionNext, jdbcType=INTEGER},
+        <if test="originalPersistentState.name != name">
+              NAME_ = #{name, jdbcType=VARCHAR}
+          </if>
         <if test="originalPersistentState.executionId != executionId">
             EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
         </if>
         <if test="(byteArrayRef != null and originalPersistentState.byteArrayRef == null) or (byteArrayRef == null and originalPersistentState.byteArrayRef != null) or (originalPersistentState.byteArrayRef != byteArrayRef.id)">
             BYTEARRAY_ID_ = #{byteArrayRef, typeHandler=ByteArrayRefTypeHandler},
         </if>
-        <if test="originalPersistentState.type != type">
-            TYPE_ =  #{type, jdbcType=VARCHAR },
+        <if test="(originalPersistentState.typeName == null and type != null) or (originalPersistentState.typeName != null and type == null) or (originalPersistentState.typeName != type.typeName)">
+            TYPE_ = #{type, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.doubleValue != doubleValue">
             DOUBLE_ = #{doubleValue, jdbcType=DOUBLE},

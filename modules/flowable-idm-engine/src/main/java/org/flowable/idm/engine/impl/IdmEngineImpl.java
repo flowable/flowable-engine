@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public class IdmEngineImpl implements IdmEngine {
 
-    private static Logger log = LoggerFactory.getLogger(IdmEngineImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IdmEngineImpl.class);
 
     protected String name;
     protected IdmIdentityService identityService;
@@ -46,9 +46,9 @@ public class IdmEngineImpl implements IdmEngine {
         }
 
         if (name == null) {
-            log.info("default flowable IdmEngine created");
+            LOGGER.info("default flowable IdmEngine created");
         } else {
-            log.info("IdmEngine {} created", name);
+            LOGGER.info("IdmEngine {} created", name);
         }
 
         IdmEngines.registerIdmEngine(this);

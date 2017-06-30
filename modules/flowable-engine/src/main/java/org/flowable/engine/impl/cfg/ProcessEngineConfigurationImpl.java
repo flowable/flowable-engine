@@ -179,6 +179,7 @@ import org.flowable.engine.impl.history.DefaultHistoryManager;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.history.async.AsyncHistoryJobHandler;
+import org.flowable.engine.impl.history.async.AsyncHistoryJobZippedHandler;
 import org.flowable.engine.impl.history.async.AsyncHistoryListener;
 import org.flowable.engine.impl.history.async.AsyncHistoryManager;
 import org.flowable.engine.impl.history.async.AsyncHistorySession;
@@ -368,7 +369,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfiguration {
 
-    private static Logger log = LoggerFactory.getLogger(ProcessEngineConfigurationImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessEngineConfigurationImpl.class);
 
     public static final String DEFAULT_WS_SYNC_FACTORY = "org.flowable.engine.impl.webservice.CxfWebServiceClientFactory";
 
@@ -490,8 +491,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected HistoryManager historyManager;
 
     protected boolean isAsyncHistoryEnabled;
-    //protected boolean isAsyncHistoryJsonGzipCompressionEnabled;
-    //protected boolean isAsyncHistoryJsonGroupingEnabled;
+    protected boolean isAsyncHistoryJsonGzipCompressionEnabled;
+    protected boolean isAsyncHistoryJsonGroupingEnabled;
+    protected int asyncHistoryJsonGroupingThreshold = 10;
     protected AsyncHistoryListener asyncHistoryListener;
 
     // Job Manager
@@ -678,11 +680,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      *
      * During such a check, jobs that are expired are again made available, meaning the lock owner and lock time will be removed. Other executors will now be able to pick it up.
      *
-     * A job is deemed expired if the lock time is before the current date.
+     * A job is deemed expired if the current time has passed the lock time.
      *
      * By default one minute.
      */
     protected int asyncExecutorResetExpiredJobsInterval = 60 * 1000;
+
+    /**
+     * The amount of time (in milliseconds) a job can maximum be in the 'executable' state before being deemed expired.
+     * Note that this won't happen when using the threadpool based executor, as the acquire thread will fetch these kind of jobs earlier.
+     * However, in the message queue based execution, it could be some job is posted to a queue but then never is locked nor executed.
+     *
+     * By default 24 hours, as this should be a very exceptional case.
+     */
+    protected int asyncExecutorResetExpiredJobsMaxTimeout = 24 * 60 * 60 * 1000;
 
     /**
      * The {@link AsyncExecutor} has a 'cleanup' thread that resets expired jobs so they can be re-acquired by other executors. This setting defines the size of the page being used when fetching these
@@ -1381,7 +1392,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             }
 
             if (nrOfServiceLoadedConfigurators > 0) {
-                log.info("Found {} auto-discoverable Process Engine Configurator{}", nrOfServiceLoadedConfigurators++, nrOfServiceLoadedConfigurators > 1 ? "s" : "");
+                LOGGER.info("Found {} auto-discoverable Process Engine Configurator{}", nrOfServiceLoadedConfigurators++, nrOfServiceLoadedConfigurators > 1 ? "s" : "");
             }
 
             if (!allConfigurators.isEmpty()) {
@@ -1404,9 +1415,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 });
 
                 // Execute the configurators
-                log.info("Found {} Process Engine Configurators in total:", allConfigurators.size());
+                LOGGER.info("Found {} Process Engine Configurators in total:", allConfigurators.size());
                 for (ProcessEngineConfigurator configurator : allConfigurators) {
-                    log.info("{} (priority:{})", configurator.getClass(), configurator.getPriority());
+                    LOGGER.info("{} (priority:{})", configurator.getClass(), configurator.getPriority());
                 }
 
             }
@@ -1416,14 +1427,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void configuratorsBeforeInit() {
         for (ProcessEngineConfigurator configurator : allConfigurators) {
-            log.info("Executing beforeInit() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
+            LOGGER.info("Executing beforeInit() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
             configurator.beforeInit(this);
         }
     }
 
     public void configuratorsAfterInit() {
         for (ProcessEngineConfigurator configurator : allConfigurators) {
-            log.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
+            LOGGER.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
             configurator.configure(this);
         }
     }
@@ -1670,7 +1681,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                     Class<?> handledType = defaultBpmnParseHandler.getHandledTypes().iterator().next();
                     if (customParseHandlerMap.containsKey(handledType)) {
                         BpmnParseHandler newBpmnParseHandler = customParseHandlerMap.get(handledType);
-                        log.info("Replacing default BpmnParseHandler {} with {}", defaultBpmnParseHandler.getClass().getName(), newBpmnParseHandler.getClass().getName());
+                        LOGGER.info("Replacing default BpmnParseHandler {} with {}", defaultBpmnParseHandler.getClass().getName(), newBpmnParseHandler.getClass().getName());
                         bpmnParserHandlers.set(i, newBpmnParseHandler);
                     }
                 }
@@ -1721,10 +1732,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
             AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler();
             asyncHistoryJobHandler.initDefaultTransformers();
-            //asyncHistoryJobHandler.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
-            //asyncHistoryJobHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
+            asyncHistoryJobHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
             historyJobHandlers.put(asyncHistoryJobHandler.getType(), asyncHistoryJobHandler);
-
+    AsyncHistoryJobZippedHandler asyncHistoryJobZippedHandler = new AsyncHistoryJobZippedHandler();
+            asyncHistoryJobZippedHandler.initDefaultTransformers();
+            asyncHistoryJobZippedHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
+            historyJobHandlers.put(asyncHistoryJobZippedHandler.getType(), asyncHistoryJobZippedHandler);
             if (getCustomHistoryJobHandlers() != null) {
                 for (HistoryJobHandler customJobHandler : getCustomHistoryJobHandlers()) {
                     historyJobHandlers.put(customJobHandler.getType(), customJobHandler);
@@ -2126,8 +2139,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             flowable5CompatibilityHandler = flowable5CompatibilityHandlerFactory.createFlowable5CompatibilityHandler();
 
             if (flowable5CompatibilityHandler != null) {
-                log.info("Found compatibility handler instance : {}", flowable5CompatibilityHandler.getClass());
-
+                LOGGER.info("Found compatibility handler instance : {}", flowable5CompatibilityHandler.getClass());
                 flowable5CompatibilityHandler.setFlowable6ProcessEngineConfiguration(this);
             }
         }
@@ -3723,7 +3735,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    /*public boolean isAsyncHistoryJsonGzipCompressionEnabled() {
+    public boolean isAsyncHistoryJsonGzipCompressionEnabled() {
         return isAsyncHistoryJsonGzipCompressionEnabled;
     }
 
@@ -3739,7 +3751,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public ProcessEngineConfigurationImpl setAsyncHistoryJsonGroupingEnabled(boolean isAsyncHistoryJsonGroupingEnabled) {
         this.isAsyncHistoryJsonGroupingEnabled = isAsyncHistoryJsonGroupingEnabled;
         return this;
-    }*/
+    }
+
+    public int getAsyncHistoryJsonGroupingThreshold() {
+        return asyncHistoryJsonGroupingThreshold;
+    }
+
+    public void setAsyncHistoryJsonGroupingThreshold(int asyncHistoryJsonGroupingThreshold) {
+        this.asyncHistoryJsonGroupingThreshold = asyncHistoryJsonGroupingThreshold;
+    }
 
     public AsyncHistoryListener getAsyncHistoryListener() {
         return asyncHistoryListener;
@@ -4074,6 +4094,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setAsyncExecutorResetExpiredJobsInterval(int asyncExecutorResetExpiredJobsInterval) {
         this.asyncExecutorResetExpiredJobsInterval = asyncExecutorResetExpiredJobsInterval;
+        return this;
+    }
+
+    public int getAsyncExecutorResetExpiredJobsMaxTimeout() {
+        return asyncExecutorResetExpiredJobsMaxTimeout;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncExecutorResetExpiredJobsMaxTimeout(int asyncExecutorResetExpiredJobsMaxTimeout) {
+        this.asyncExecutorResetExpiredJobsMaxTimeout = asyncExecutorResetExpiredJobsMaxTimeout;
         return this;
     }
 

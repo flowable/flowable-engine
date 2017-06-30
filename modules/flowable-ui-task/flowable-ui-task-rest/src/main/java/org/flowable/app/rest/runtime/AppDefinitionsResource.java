@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AppDefinitionsResource {
 
-    private final Logger logger = LoggerFactory.getLogger(AppDefinitionsResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppDefinitionsResource.class);
 
     @Autowired
     protected FlowableAppDefinitionService appDefinitionService;

@@ -12,6 +12,8 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.admin.domain.EndpointType;
@@ -27,15 +29,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 /**
  * @author Yvo Swillens
  */
 @RestController
 public class DecisionTableDeploymentClientResource extends AbstractClientResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(DecisionTableDeploymentClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DecisionTableDeploymentClientResource.class);
 
     @Autowired
     protected DecisionTableDeploymentService clientService;
@@ -47,7 +47,7 @@ public class DecisionTableDeploymentClientResource extends AbstractClientResourc
         try {
             return clientService.getDeployment(serverConfig, deploymentId);
         } catch (FlowableServiceException e) {
-            logger.error("Error getting deployment {}", deploymentId, e);
+            LOGGER.error("Error getting deployment {}", deploymentId, e);
             throw new BadRequestException(e.getMessage());
         }
     }

@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AbstractFlowable6Test {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractFlowable6Test.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractFlowable6Test.class);
 
     public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000";
 
@@ -135,7 +135,7 @@ public class AbstractFlowable6Test {
             server.start();
 
         } catch (SQLException e) {
-            logger.warn("Could not start H2 webapp", e);
+            LOGGER.warn("Could not start H2 webapp", e);
         }
     }
 

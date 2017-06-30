@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ExecuteInactiveBehaviorsOperation extends AbstractOperation {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExecuteInactiveBehaviorsOperation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteInactiveBehaviorsOperation.class);
 
     protected Collection<ExecutionEntity> involvedExecutions;
 
@@ -73,7 +73,7 @@ public class ExecuteInactiveBehaviorsOperation extends AbstractOperation {
 
                         FlowNode flowNode = (FlowNode) process.getFlowElement(inactiveExecution.getActivityId(), true);
                         InactiveActivityBehavior inactiveActivityBehavior = ((InactiveActivityBehavior) flowNode.getBehavior());
-                        logger.debug("Found InactiveActivityBehavior instance of class {} that can be executed on activity '{}'", inactiveActivityBehavior.getClass(), flowNode.getId());
+                        LOGGER.debug("Found InactiveActivityBehavior instance of class {} that can be executed on activity '{}'", inactiveActivityBehavior.getClass(), flowNode.getId());
                         inactiveActivityBehavior.executeInactive(inactiveExecution);
                     }
                 }

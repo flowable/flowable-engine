@@ -34,7 +34,7 @@ public class ExecuteJobCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(ExecuteJobCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteJobCmd.class);
 
     protected String jobId;
 
@@ -54,8 +54,8 @@ public class ExecuteJobCmd implements Command<Object>, Serializable {
             throw new JobNotFoundException(jobId);
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Executing job {}", job.getId());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Executing job {}", job.getId());
         }
 
         if (job.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, job.getProcessDefinitionId())) {

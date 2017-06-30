@@ -33,6 +33,7 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
 
     protected boolean isJsonGzipCompressionEnabled;
     protected boolean isAsyncHistoryJsonGroupingEnabled;
+    protected int asyncHistoryJsonGroupingThreshold;
     
     @Override
     public void historyDataGenerated(List<ObjectNode> historyObjectNodes) {
@@ -41,37 +42,40 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
 
     protected void createJobsWithHistoricalData(List<ObjectNode> historyObjectNodes, CommandContext commandContext) {
         AsyncHistorySession asyncHistorySession = commandContext.getSession(AsyncHistorySession.class);
-        if (isAsyncHistoryJsonGroupingEnabled) {
-            HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession);
+        if (isAsyncHistoryJsonGroupingEnabled && historyObjectNodes.size() >= asyncHistoryJsonGroupingThreshold) {
+            String jobType = isJsonGzipCompressionEnabled ? AsyncHistoryJobZippedHandler.JOB_TYPE : AsyncHistoryJobHandler.JOB_TYPE;
+            HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession, jobType);
             ArrayNode arrayNode = commandContext.getProcessEngineConfiguration().getObjectMapper().createArrayNode();
             for (ObjectNode historyJsonNode : historyObjectNodes) {
                 arrayNode.add(historyJsonNode);
             }
-            addJsonToJob(commandContext, jobEntity, arrayNode);
+            addJsonToJob(commandContext, jobEntity, arrayNode, isJsonGzipCompressionEnabled);
+            
         } else {
             for (ObjectNode historyJsonNode : historyObjectNodes) {
-                HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession);
-                addJsonToJob(commandContext, jobEntity, historyJsonNode);
+                HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession, AsyncHistoryJobHandler.JOB_TYPE);
+                addJsonToJob(commandContext, jobEntity, historyJsonNode, false);
             }
+            
         }
     }
     
-    protected HistoryJobEntity createAndInsertJobEntity(CommandContext commandContext, AsyncHistorySession asyncHistorySession) {
+    protected HistoryJobEntity createAndInsertJobEntity(CommandContext commandContext, AsyncHistorySession asyncHistorySession, String jobType) {
         ProcessEngineConfiguration processEngineConfiguration = commandContext.getProcessEngineConfiguration();
         HistoryJobEntityManager historyJobEntityManager = commandContext.getHistoryJobEntityManager();
         HistoryJobEntity currentJobEntity = historyJobEntityManager.create();
-        currentJobEntity.setJobHandlerType(AsyncHistoryJobHandler.JOB_TYPE);
+        currentJobEntity.setJobHandlerType(jobType);
         currentJobEntity.setRetries(commandContext.getProcessEngineConfiguration().getAsyncHistoryExecutorNumberOfRetries());
         currentJobEntity.setTenantId(asyncHistorySession.getTenantId());
         currentJobEntity.setCreateTime(processEngineConfiguration.getClock().getCurrentTime());
-        historyJobEntityManager.insert(currentJobEntity);
+        commandContext.getJobManager().scheduleHistoryJob(currentJobEntity);
         return currentJobEntity;
     }
 
-    protected void addJsonToJob(CommandContext commandContext, HistoryJobEntity jobEntity, JsonNode rootObjectNode) {
+    protected void addJsonToJob(CommandContext commandContext, HistoryJobEntity jobEntity, JsonNode rootObjectNode, boolean applyCompression) {
         try {
             byte[] bytes = commandContext.getProcessEngineConfiguration().getObjectMapper().writeValueAsBytes(rootObjectNode);
-            if (isJsonGzipCompressionEnabled) {
+            if (applyCompression) {
                 bytes = compress(bytes);
             }
             jobEntity.setAdvancedJobHandlerConfigurationBytes(bytes);
@@ -105,6 +109,14 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
 
     public void setAsyncHistoryJsonGroupingEnabled(boolean isAsyncHistoryJsonGroupingEnabled) {
         this.isAsyncHistoryJsonGroupingEnabled = isAsyncHistoryJsonGroupingEnabled;
+    }
+
+    public int getAsyncHistoryJsonGroupingThreshold() {
+        return asyncHistoryJsonGroupingThreshold;
+    }
+
+    public void setAsyncHistoryJsonGroupingThreshold(int asyncHistoryJsonGroupingThreshold) {
+        this.asyncHistoryJsonGroupingThreshold = asyncHistoryJsonGroupingThreshold;
     }
     
 }

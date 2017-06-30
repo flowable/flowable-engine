@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CommandContext extends AbstractCommandContext {
 
-    private static Logger log = LoggerFactory.getLogger(CommandContext.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommandContext.class);
 
     protected DmnEngineConfiguration dmnEngineConfiguration;
 

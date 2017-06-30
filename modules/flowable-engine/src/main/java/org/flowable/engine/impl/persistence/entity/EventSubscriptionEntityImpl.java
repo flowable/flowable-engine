@@ -48,8 +48,13 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEntity impleme
 
     public Object getPersistentState() {
         HashMap<String, Object> persistentState = new HashMap<String, Object>();
-        persistentState.put("executionId", executionId);
-        persistentState.put("configuration", configuration);
+        persistentState.put("eventName", this.eventName);
+        persistentState.put("executionId", this.executionId);
+        persistentState.put("processInstanceId", this.processInstanceId);
+        persistentState.put("activityId", this.activityId);
+        persistentState.put("created", this.created);
+        persistentState.put("configuration", this.configuration);
+        persistentState.put("tenantId", this.tenantId);
         return persistentState;
     }
 

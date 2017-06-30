@@ -12,6 +12,8 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.FormDefinitionService;
@@ -25,8 +27,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 /**
  * @author Bassam Al-Sarori
  * @author Yvo Swillens
@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RestController
 public class FormDefinitionClientResource extends AbstractClientResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(FormDefinitionClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FormDefinitionClientResource.class);
 
     @Autowired
     protected FormDefinitionService clientService;
@@ -46,7 +46,7 @@ public class FormDefinitionClientResource extends AbstractClientResource {
         try {
             return clientService.getForm(serverConfig, formDefinitionId);
         } catch (FlowableServiceException e) {
-            logger.error("Error getting form definition {}", formDefinitionId, e);
+            LOGGER.error("Error getting form definition {}", formDefinitionId, e);
             throw new BadRequestException(e.getMessage());
         }
     }

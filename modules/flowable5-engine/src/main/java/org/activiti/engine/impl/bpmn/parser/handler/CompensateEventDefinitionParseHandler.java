@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CompensateEventDefinitionParseHandler extends AbstractBpmnParseHandler<CompensateEventDefinition> {
 
-    private static final Logger logger = LoggerFactory.getLogger(CompensateEventDefinitionParseHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CompensateEventDefinitionParseHandler.class);
 
     public Class<? extends BaseElement> getHandledType() {
         return CompensateEventDefinition.class;
@@ -39,7 +39,7 @@ public class CompensateEventDefinitionParseHandler extends AbstractBpmnParseHand
         ScopeImpl scope = bpmnParse.getCurrentScope();
         if (StringUtils.isNotEmpty(eventDefinition.getActivityRef())) {
             if (scope.findActivity(eventDefinition.getActivityRef()) == null) {
-                logger.warn("Invalid attribute value for 'activityRef': no activity with id '{}' in current scope {}", eventDefinition.getActivityRef(), scope.getId());
+                LOGGER.warn("Invalid attribute value for 'activityRef': no activity with id '{}' in current scope {}", eventDefinition.getActivityRef(), scope.getId());
             }
         }
 

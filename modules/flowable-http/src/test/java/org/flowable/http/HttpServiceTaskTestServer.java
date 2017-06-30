@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpServiceTaskTestServer {
 
-    private static Logger log = LoggerFactory.getLogger(HttpServiceTaskTestServer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServiceTaskTestServer.class);
     // These should be fixed and known as we use it in test process templates
     protected static final int HTTP_PORT = 9798;
     protected static final int HTTPS_PORT = 9799;
@@ -88,7 +88,7 @@ public class HttpServiceTaskTestServer {
             server.setHandler(contextHandler);
             server.start();
         } catch (Exception e) {
-            log.error("Error starting server", e);
+            LOGGER.error("Error starting server", e);
         }
 
         // Shutdown hook to close the http server
@@ -98,9 +98,9 @@ public class HttpServiceTaskTestServer {
                 if (server != null && server.isRunning()) {
                     try {
                         server.stop();
-                        log.info("HTTP server stopped");
+                        LOGGER.info("HTTP server stopped");
                     } catch (Exception e) {
-                        log.error("Could not close http server", e);
+                        LOGGER.error("Could not close http server", e);
                     }
                 }
             }

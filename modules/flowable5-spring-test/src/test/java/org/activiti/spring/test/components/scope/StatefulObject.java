@@ -1,3 +1,15 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.spring.test.components.scope;
 
 import org.flowable.engine.runtime.ProcessInstance;
@@ -16,7 +28,7 @@ import java.io.Serializable;
  */
 public class StatefulObject implements Serializable, InitializingBean {
 
-    private transient Logger logger = LoggerFactory.getLogger(getClass());
+    private transient Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     public static final long serialVersionUID = 1L;
 
@@ -40,7 +52,7 @@ public class StatefulObject implements Serializable, InitializingBean {
 
         this.customerId = customerId;
 
-        logger.info("setting this {} instances 'customerId' to {}. The current executionId is {}", StatefulObject.class.getName(), this.customerId, this.executionId);
+        LOGGER.info("setting this {} instances 'customerId' to {}. The current executionId is {}", StatefulObject.class.getName(), this.customerId, this.executionId);
 
     }
 
@@ -94,6 +106,6 @@ public class StatefulObject implements Serializable, InitializingBean {
 
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(this.processInstance, "the processInstance should be equal to the currently active processInstance!");
-        logger.info("the 'processInstance' property is non-null: PI ID#{}", this.processInstance.getId());
+        LOGGER.info("the 'processInstance' property is non-null: PI ID#{}", this.processInstance.getId());
     }
 }

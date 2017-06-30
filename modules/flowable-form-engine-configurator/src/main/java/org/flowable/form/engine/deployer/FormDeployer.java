@@ -28,21 +28,21 @@ import org.slf4j.LoggerFactory;
  */
 public class FormDeployer implements Deployer {
 
-    private static final Logger log = LoggerFactory.getLogger(FormDeployer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FormDeployer.class);
 
     @Override
     public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
         if (!deployment.isNew())
             return;
 
-        log.debug("FormDeployer: processing deployment {}", deployment.getName());
+        LOGGER.debug("FormDeployer: processing deployment {}", deployment.getName());
 
         FormDeploymentBuilder formDeploymentBuilder = null;
 
         Map<String, ResourceEntity> resources = deployment.getResources();
         for (String resourceName : resources.keySet()) {
             if (resourceName.endsWith(".form")) {
-                log.info("FormDeployer: processing resource {}", resourceName);
+                LOGGER.info("FormDeployer: processing resource {}", resourceName);
                 if (formDeploymentBuilder == null) {
                     FormRepositoryService formRepositoryService = Context.getProcessEngineConfiguration().getFormEngineRepositoryService();
                     formDeploymentBuilder = formRepositoryService.createDeployment();

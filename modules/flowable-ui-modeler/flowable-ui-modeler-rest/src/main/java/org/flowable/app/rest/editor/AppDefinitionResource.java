@@ -12,6 +12,8 @@
  */
 package org.flowable.app.rest.editor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,8 +40,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @RestController
 public class AppDefinitionResource {
 
@@ -58,7 +58,7 @@ public class AppDefinitionResource {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    private static final Logger logger = LoggerFactory.getLogger(AppDefinitionResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppDefinitionResource.class);
 
     @RequestMapping(value = "/rest/app-definitions/{modelId}", method = RequestMethod.GET, produces = "application/json")
     public AppDefinitionRepresentation getAppDefinition(@PathVariable("modelId") String modelId) {
@@ -121,7 +121,7 @@ public class AppDefinitionResource {
         try {
             appDefinitionRepresentationJson = objectMapper.writeValueAsString(appDefinitionRepresentation);
         } catch (Exception e) {
-            logger.error("Error while App Definition representation json", e);
+            LOGGER.error("Error while App Definition representation json", e);
             throw new InternalServerErrorException("App definition could not be saved");
         }
 
@@ -142,7 +142,7 @@ public class AppDefinitionResource {
         try {
             appDefinitionRepresentationJson = objectMapper.writeValueAsString(appDefinitionRepresentation);
         } catch (Exception e) {
-            logger.error("Error while App Definition representation json", e);
+            LOGGER.error("Error while App Definition representation json", e);
             throw new InternalServerErrorException("App definition could not be saved");
         }
 

@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SimpleEventCalendar implements EventCalendar {
 
-    private static Logger log = LoggerFactory.getLogger(SimpleEventCalendar.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleEventCalendar.class.getName());
 
     private static final int NULL = -1;
 
@@ -87,7 +87,7 @@ public class SimpleEventCalendar implements EventCalendar {
 
     @Override
     public void addEvent(SimulationEvent event) {
-        log.debug("Scheduling new event [{}]", event);
+        LOGGER.debug("Scheduling new event [{}]", event);
         if (event != null && isMinimal(event))
             minIndex = eventList.size();
         eventList.add(event);

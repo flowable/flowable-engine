@@ -71,8 +71,12 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoryJobEntity> findExpiredJobs(Page page) {
+        Map<String, Object> params = new HashMap<>();
         Date now = getClock().getCurrentTime();
-        return getDbSqlSession().selectList("selectExpiredHistoryJobs", now, page);
+        params.put("now", now);
+        Date maxTimeout = new Date(now.getTime() - getProcessEngineConfiguration().getAsyncExecutorResetExpiredJobsMaxTimeout());
+        params.put("maxTimeout", maxTimeout);
+        return getDbSqlSession().selectList("selectExpiredHistoryJobs", params, page);
     }
 
     @Override

@@ -47,7 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class FlowableProcessInstanceService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FlowableProcessInstanceService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowableProcessInstanceService.class);
 
     @Autowired
     protected RepositoryService repositoryService;

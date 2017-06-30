@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ValidateV5EntitiesCmd implements Command<Void> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ValidateV5EntitiesCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ValidateV5EntitiesCmd.class);
 
     @Override
     public Void execute(CommandContext commandContext) {
@@ -39,7 +39,7 @@ public class ValidateV5EntitiesCmd implements Command<Void> {
 
             RepositoryService repositoryService = processEngineConfiguration.getRepositoryService();
             long numberOfV5Deployments = repositoryService.createDeploymentQuery().deploymentEngineVersion(Flowable5Util.V5_ENGINE_TAG).count();
-            logger.info("Total of v5 deployments found: {}", numberOfV5Deployments);
+            LOGGER.info("Total of v5 deployments found: {}", numberOfV5Deployments);
 
             if (numberOfV5Deployments > 0) {
                 List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
@@ -51,10 +51,10 @@ public class ValidateV5EntitiesCmd implements Command<Void> {
                     String message = new StringBuilder("Found v5 process definitions that are the latest version.")
                             .append(" Enable the 'flowable5CompatibilityEnabled' property in the process engine configuration")
                             .append(" and make sure the flowable5-compatibility dependency is available on the classpath").toString();
-                    logger.error(message);
+                    LOGGER.error(message);
 
                     for (ProcessDefinition processDefinition : processDefinitions) {
-                        logger.error("Found v5 process definition with id: {}, and key: {}", processDefinition.getId(), processDefinition.getKey());
+                        LOGGER.error("Found v5 process definition with id: {}, and key: {}", processDefinition.getId(), processDefinition.getKey());
                     }
 
                     throw new FlowableException(message);
@@ -67,7 +67,7 @@ public class ValidateV5EntitiesCmd implements Command<Void> {
                     String message = new StringBuilder("Found at least one running v5 process instance.")
                             .append(" Enable the 'flowable5CompatibilityEnabled' property in the process engine configuration")
                             .append(" and make sure the flowable5-compatibility dependency is available on the classpath").toString();
-                    logger.error(message);
+                    LOGGER.error(message);
 
                     throw new FlowableException(message);
                 }

@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AtomicOperationTransitionCreateScope implements AtomicOperation {
 
-    private static Logger log = LoggerFactory.getLogger(AtomicOperationTransitionCreateScope.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AtomicOperationTransitionCreateScope.class);
 
     public boolean isAsync(InterpretableExecution execution) {
         ActivityImpl activity = (ActivityImpl) execution.getActivity();
@@ -38,7 +38,7 @@ public class AtomicOperationTransitionCreateScope implements AtomicOperation {
             execution.setTransition(null);
             execution.setActivity(null);
             execution.setActive(false);
-            log.debug("create scope: parent {} continues as execution {}", execution, propagatingExecution);
+            LOGGER.debug("create scope: parent {} continues as execution {}", execution, propagatingExecution);
             propagatingExecution.initialize();
 
         } else {

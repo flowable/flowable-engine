@@ -28,21 +28,21 @@ import org.slf4j.LoggerFactory;
  */
 public class DmnDeployer implements Deployer {
 
-    private static final Logger log = LoggerFactory.getLogger(DmnDeployer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DmnDeployer.class);
 
     @Override
     public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
         if (!deployment.isNew())
             return;
 
-        log.debug("DmnDeployer: processing deployment {}", deployment.getName());
+        LOGGER.debug("DmnDeployer: processing deployment {}", deployment.getName());
 
         DmnDeploymentBuilder dmnDeploymentBuilder = null;
 
         Map<String, ResourceEntity> resources = deployment.getResources();
         for (String resourceName : resources.keySet()) {
             if (resourceName.endsWith(".dmn")) {
-                log.info("DmnDeployer: processing resource {}", resourceName);
+                LOGGER.info("DmnDeployer: processing resource {}", resourceName);
                 if (dmnDeploymentBuilder == null) {
                     DmnRepositoryService dmnRepositoryService = Context.getProcessEngineConfiguration().getDmnEngineRepositoryService();
                     dmnDeploymentBuilder = dmnRepositoryService.createDeployment();

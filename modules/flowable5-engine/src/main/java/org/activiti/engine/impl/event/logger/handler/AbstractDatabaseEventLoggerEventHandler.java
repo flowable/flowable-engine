@@ -12,6 +12,8 @@
  */
 package org.activiti.engine.impl.event.logger.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.Date;
 import java.util.Map;
 
@@ -27,14 +29,12 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Joram Barrez
  */
 public abstract class AbstractDatabaseEventLoggerEventHandler implements EventLoggerEventHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractDatabaseEventLoggerEventHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDatabaseEventLoggerEventHandler.class);
 
     protected FlowableEvent event;
     protected Date timeStamp;
@@ -87,7 +87,7 @@ public abstract class AbstractDatabaseEventLoggerEventHandler implements EventLo
         try {
             eventLogEntry.setData(objectMapper.writeValueAsBytes(data));
         } catch (Exception e) {
-            logger.warn("Could not serialize event data. Data will not be written to the database", e);
+            LOGGER.warn("Could not serialize event data. Data will not be written to the database", e);
         }
 
         return eventLogEntry;

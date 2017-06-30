@@ -12,12 +12,16 @@
  */
 package org.flowable.editor.language.json.converter;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BooleanDataObject;
 import org.flowable.bpmn.model.BpmnModel;
@@ -26,6 +30,7 @@ import org.flowable.bpmn.model.DoubleDataObject;
 import org.flowable.bpmn.model.EventListener;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.IntegerDataObject;
 import org.flowable.bpmn.model.ItemDefinition;
@@ -46,17 +51,12 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * @author Tijs Rademakers
  */
 public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConstants {
 
-    private static final Logger logger = LoggerFactory.getLogger(BpmnJsonConverterUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BpmnJsonConverterUtil.class);
 
     private static DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateTimeParser();
     private static ObjectMapper objectMapper = new ObjectMapper();
@@ -511,7 +511,7 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
                 try {
                     objectNode = objectMapper.readTree(objectNode.asText());
                 } catch (Exception e) {
-                    logger.info("Data properties node cannot be read", e);
+                    LOGGER.info("Data properties node cannot be read", e);
                 }
             }
 
@@ -538,7 +538,7 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
                         } else if (dataType.equals("datetime")) {
                             dataObject = new DateDataObject();
                         } else {
-                            logger.error("Error converting {}", dataIdNode.asText());
+                            LOGGER.error("Error converting {}", dataIdNode.asText());
                         }
 
                         if (null != dataObject) {
@@ -552,7 +552,7 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
                                 try {
                                     dataObject.setValue(dateTimeFormatter.parseDateTime(dataNode.get(PROPERTY_DATA_VALUE).asText()).toDate());
                                 } catch (Exception e) {
-                                    logger.error("Error converting {}", dataObject.getName(), e);
+                                    LOGGER.error("Error converting {}", dataObject.getName(), e);
                                 }
                             } else {
                                 dataObject.setValue(dataNode.get(PROPERTY_DATA_VALUE).asText());
@@ -606,7 +606,7 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
             try {
                 node = validateIfNodeIsTextual(objectMapper.readTree(node.asText()));
             } catch (Exception e) {
-                logger.error("Error converting textual node", e);
+                LOGGER.error("Error converting textual node", e);
             }
         }
         return node;

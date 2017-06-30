@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.impl.bpmn.deployer;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -44,16 +47,13 @@ import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
 public class BpmnDeployer implements Deployer {
 
-    private static final Logger log = LoggerFactory.getLogger(BpmnDeployer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BpmnDeployer.class);
 
     protected IdGenerator idGenerator;
     protected ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory;
@@ -63,7 +63,7 @@ public class BpmnDeployer implements Deployer {
 
     @Override
     public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
-        log.debug("Processing deployment {}", deployment.getName());
+        LOGGER.debug("Processing deployment {}", deployment.getName());
 
         // The ParsedDeployment represents the deployment, the process definitions, and the BPMN
         // resource, parse, and model associated with each process definition.

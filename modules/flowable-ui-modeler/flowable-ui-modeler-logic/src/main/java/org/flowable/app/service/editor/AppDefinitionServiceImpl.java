@@ -12,6 +12,8 @@
  */
 package org.flowable.app.service.editor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,13 +43,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @Service
 @Transactional
 public class AppDefinitionServiceImpl implements AppDefinitionService {
 
-    private final Logger logger = LoggerFactory.getLogger(AppDefinitionServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppDefinitionServiceImpl.class);
 
     @Autowired
     protected AppDefinitionPublishService appDefinitionPublishService;
@@ -139,7 +139,7 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
         try {
             editorJson = objectMapper.writeValueAsString(updatedModel.getAppDefinition().getDefinition());
         } catch (Exception e) {
-            logger.error("Error while processing app definition json {}", modelId, e);
+            LOGGER.error("Error while processing app definition json {}", modelId, e);
             throw new InternalServerErrorException("App definition could not be saved " + modelId);
         }
 
@@ -172,7 +172,7 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
         try {
             appDefinition = objectMapper.readValue(model.getModelEditorJson(), AppDefinition.class);
         } catch (Exception e) {
-            logger.error("Error deserializing app {}", model.getId(), e);
+            LOGGER.error("Error deserializing app {}", model.getId(), e);
             throw new InternalServerErrorException("Could not deserialize app definition");
         }
 
@@ -196,7 +196,7 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
         try {
             appDefinition = objectMapper.readValue(model.getModelEditorJson(), AppDefinition.class);
         } catch (Exception e) {
-            logger.error("Error deserializing app {}", model.getId(), e);
+            LOGGER.error("Error deserializing app {}", model.getId(), e);
             throw new InternalServerErrorException("Could not deserialize app definition");
         }
         AppDefinitionRepresentation result = new AppDefinitionRepresentation(model);

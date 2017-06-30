@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ValidateTaskRelatedEntityCountCfgCmd implements Command<Void> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ValidateTaskRelatedEntityCountCfgCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ValidateTaskRelatedEntityCountCfgCmd.class);
 
     public static String PROPERTY_TASK_RELATED_ENTITY_COUNT = "cfg.task-related-entities-count";
 
@@ -50,8 +50,8 @@ public class ValidateTaskRelatedEntityCountCfgCmd implements Command<Void> {
             // TODO: is this required since we check the global "task count" flag each time we read/update?
             // might have a serious performance impact when thousands of tasks are present.
             if (!configProperty && propertyValue) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("Configuration change: task related entity counting feature was enabled before, but now disabled. "
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Configuration change: task related entity counting feature was enabled before, but now disabled. "
                             + "Updating all task entities.");
                 }
                 commandContext.getProcessEngineConfiguration().getTaskDataManager().updateAllTaskRelatedEntityCountFlags(configProperty);

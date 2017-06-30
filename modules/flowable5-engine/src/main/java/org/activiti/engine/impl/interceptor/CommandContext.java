@@ -68,7 +68,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CommandContext {
 
-    private static Logger log = LoggerFactory.getLogger(CommandContext.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommandContext.class);
 
     protected Command<?> command;
     protected TransactionContext transactionContext;
@@ -88,8 +88,8 @@ public class CommandContext {
                 Context.setExecutionContext(execution);
                 while (!nextOperations.isEmpty()) {
                     AtomicOperation currentOperation = nextOperations.removeFirst();
-                    if (log.isTraceEnabled()) {
-                        log.trace("AtomicOperation: {} on {}", currentOperation, this);
+                    if (LOGGER.isTraceEnabled()) {
+                        LOGGER.trace("AtomicOperation: {} on {}", currentOperation, this);
                     }
                     if (execution.getReplacedBy() == null) {
                         currentOperation.execute(execution);
@@ -161,12 +161,12 @@ public class CommandContext {
                     if (exception != null) {
                         if (exception instanceof JobNotFoundException || exception instanceof ActivitiTaskAlreadyClaimedException) {
                             // reduce log level, because this may have been caused because of job deletion due to cancelActiviti="true"
-                            log.info("Error while closing command context", exception);
+                            LOGGER.info("Error while closing command context", exception);
                         } else if (exception instanceof ActivitiOptimisticLockingException) {
                             // reduce log level, as normally we're not interested in logging this exception
-                            log.debug("Optimistic locking exception : {}", exception.getMessage(), exception);
+                            LOGGER.debug("Optimistic locking exception : {}", exception.getMessage(), exception);
                         } else {
-                            log.error("Error while closing command context", exception);
+                            LOGGER.error("Error while closing command context", exception);
                         }
 
                         transactionContext.rollback();
@@ -228,7 +228,7 @@ public class CommandContext {
             if (Context.isExecutionContextActive()) {
                 LogMDC.putMDCExecution(Context.getExecutionContext().getExecution());
             }
-            log.error("masked exception in command context. for root cause, see below as it will be rethrown later.", exception);
+            LOGGER.error("masked exception in command context. for root cause, see below as it will be rethrown later.", exception);
             LogMDC.clear();
         }
     }

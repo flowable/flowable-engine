@@ -12,6 +12,11 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -53,15 +58,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 @RestController
 public class DisplayJsonClientResource extends AbstractClientResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(DisplayJsonClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DisplayJsonClientResource.class);
 
     @Autowired
     protected ProcessDefinitionService clientService;
@@ -103,7 +103,7 @@ public class DisplayJsonClientResource extends AbstractClientResource {
                 displayNode.put("diagramHeight", diagramInfo.getHeight());
 
             } catch (Exception e) {
-                logger.error("Error creating model JSON", e);
+                LOGGER.error("Error creating model JSON", e);
             }
         }
 
@@ -162,7 +162,7 @@ public class DisplayJsonClientResource extends AbstractClientResource {
                 }
 
             } catch (Exception e) {
-                logger.error("Error creating model JSON", e);
+                LOGGER.error("Error creating model JSON", e);
             }
         }
 

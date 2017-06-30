@@ -44,7 +44,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration("classpath:org/flowable/spring/test/engine/springIdmEngineWithPasswordEncoder-context.xml")
 public class SpringPasswordEncoderTest {
 
-    private static Logger log = LoggerFactory.getLogger(SpringPasswordEncoderTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringPasswordEncoderTest.class);
 
     @Autowired
     private IdmEngineConfiguration autoWiredIdmIdmEngineConfiguration;
@@ -116,7 +116,7 @@ public class SpringPasswordEncoderTest {
         autoWiredIdmIdentityService.saveUser(user);
 
         User johndoe = autoWiredIdmIdentityService.createUserQuery().userId("johndoe").list().get(0);
-        log.info("Hash Password = {} ", johndoe.getPassword());
+        LOGGER.info("Hash Password = {} ", johndoe.getPassword());
 
         assertFalse("xxx".equals(johndoe.getPassword()));
         assertTrue(autoWiredIdmIdentityService.checkPassword("johndoe", "xxx"));

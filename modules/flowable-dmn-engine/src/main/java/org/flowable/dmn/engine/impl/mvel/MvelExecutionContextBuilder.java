@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MvelExecutionContextBuilder {
 
-    private static final Logger logger = LoggerFactory.getLogger(MvelExecutionContextBuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MvelExecutionContextBuilder.class);
 
     public static MvelExecutionContext build(Decision decision, Map<String, Object> inputVariables,
             Map<String, Method> customExpressionFunctions, Map<Class<?>, PropertyHandler> propertyHandlers) {
@@ -83,7 +83,7 @@ public class MvelExecutionContextBuilder {
 
         executionContext.setStackVariables(inputVariables);
 
-        logger.debug("Execution Context created");
+        LOGGER.debug("Execution Context created");
 
         return executionContext;
     }

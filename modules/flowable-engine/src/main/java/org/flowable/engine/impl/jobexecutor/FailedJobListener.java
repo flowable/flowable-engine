@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FailedJobListener implements CommandContextCloseListener {
 
-    private static final Logger log = LoggerFactory.getLogger(FailedJobListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FailedJobListener.class);
 
     protected CommandExecutor commandExecutor;
     protected Job job;
@@ -68,7 +68,7 @@ public class FailedJobListener implements CommandContextCloseListener {
         FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
         Command<Object> cmd = failedJobCommandFactory.getCommand(job.getId(), commandContext.getException());
 
-        log.trace("Using FailedJobCommandFactory '{}' and command of type '{}'", failedJobCommandFactory.getClass(), cmd.getClass());
+        LOGGER.trace("Using FailedJobCommandFactory '{}' and command of type '{}'", failedJobCommandFactory.getClass(), cmd.getClass());
         commandExecutor.execute(commandConfig, cmd);
     }
 

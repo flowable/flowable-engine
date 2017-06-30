@@ -64,7 +64,7 @@ import org.springframework.util.ReflectionUtils;
 @Service
 public class CustomPersistentRememberMeServices extends AbstractRememberMeServices implements CustomRememberMeService {
 
-    private final Logger log = LoggerFactory.getLogger(CustomPersistentRememberMeServices.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomPersistentRememberMeServices.class);
 
     @Autowired
     private PersistentTokenService persistentTokenService;
@@ -87,7 +87,7 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
 
         Integer tokenMaxAgeSeconds = env.getProperty("security.cookie.max-age", Integer.class);
         if (tokenMaxAgeSeconds != null) {
-            log.info("Cookie max-age set to {} seconds", tokenMaxAgeSeconds);
+            LOGGER.info("Cookie max-age set to {} seconds", tokenMaxAgeSeconds);
         } else {
             tokenMaxAgeSeconds = 2678400; // Default: 31 days
         }
@@ -96,7 +96,7 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
 
         Integer tokenRefreshSeconds = env.getProperty("security.cookie.refresh-age", Integer.class);
         if (tokenRefreshSeconds != null) {
-            log.info("Cookie refresh age set to {} seconds", tokenRefreshSeconds);
+            LOGGER.info("Cookie refresh age set to {} seconds", tokenRefreshSeconds);
         } else {
             tokenRefreshSeconds = 86400; // Default : 1 day
         }
@@ -109,7 +109,7 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
     protected void onLoginSuccess(HttpServletRequest request, HttpServletResponse response, Authentication successfulAuthentication) {
         String userEmail = successfulAuthentication.getName();
 
-        log.debug("Creating new persistent login for user {}", userEmail);
+        LOGGER.debug("Creating new persistent login for user {}", userEmail);
         FlowableAppUser appUser = (FlowableAppUser) successfulAuthentication.getPrincipal();
 
         Token token = createAndInsertPersistentToken(appUser.getUserObject(), request.getRemoteAddr(), request.getHeader("User-Agent"));
@@ -135,7 +135,7 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
                 addCookie(token, request, response);
 
             } catch (DataAccessException e) {
-                log.error("Failed to update token: ", e);
+                LOGGER.error("Failed to update token: ", e);
                 throw new RememberMeAuthenticationException("Autologin failed due to data access problem: " + e.getMessage());
             }
 
@@ -159,9 +159,9 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
                 Token token = getPersistentToken(cookieTokens);
                 persistentTokenService.delete(token);
             } catch (InvalidCookieException ice) {
-                log.info("Invalid cookie, no persistent token could be deleted");
+                LOGGER.info("Invalid cookie, no persistent token could be deleted");
             } catch (RememberMeAuthenticationException rmae) {
-                log.debug("No persistent token found, so no token could be deleted");
+                LOGGER.debug("No persistent token found, so no token could be deleted");
             }
         }
         super.logout(request, response, authentication);
