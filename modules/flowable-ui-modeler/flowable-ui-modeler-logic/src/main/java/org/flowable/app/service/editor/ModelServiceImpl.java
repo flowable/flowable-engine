@@ -185,80 +185,6 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public String createModelJson(ModelRepresentation model) {
-        String json = null;
-        if (Integer.valueOf(AbstractModel.MODEL_TYPE_FORM).equals(model.getModelType())) {
-            try {
-                json = objectMapper.writeValueAsString(new FormModel());
-            } catch (Exception e) {
-                LOGGER.error("Error creating form model", e);
-                throw new InternalServerErrorException("Error creating form");
-            }
-
-        } else if (Integer.valueOf(AbstractModel.MODEL_TYPE_DECISION_TABLE).equals(model.getModelType())) {
-            try {
-                DecisionTableDefinitionRepresentation decisionTableDefinition = new DecisionTableDefinitionRepresentation();
-
-                String decisionTableDefinitionKey = model.getName().replaceAll(" ", "");
-                decisionTableDefinition.setKey(decisionTableDefinitionKey);
-
-                json = objectMapper.writeValueAsString(decisionTableDefinition);
-            } catch (Exception e) {
-                LOGGER.error("Error creating decision table model", e);
-                throw new InternalServerErrorException("Error creating decision table");
-            }
-
-        } else if (Integer.valueOf(AbstractModel.MODEL_TYPE_APP).equals(model.getModelType())) {
-            try {
-                json = objectMapper.writeValueAsString(new AppDefinition());
-            } catch (Exception e) {
-                LOGGER.error("Error creating app definition", e);
-                throw new InternalServerErrorException("Error creating app definition");
-            }
-
-        } else {
-            ObjectNode editorNode = objectMapper.createObjectNode();
-            editorNode.put("id", "canvas");
-            editorNode.put("resourceId", "canvas");
-            ObjectNode stencilSetNode = objectMapper.createObjectNode();
-            stencilSetNode.put("namespace", "http://b3mn.org/stencilset/bpmn2.0#");
-            editorNode.set("stencilset", stencilSetNode);
-            ObjectNode propertiesNode = objectMapper.createObjectNode();
-            propertiesNode.put("process_id", model.getKey());
-            propertiesNode.put("name", model.getName());
-            if (StringUtils.isNotEmpty(model.getDescription())) {
-                propertiesNode.put("documentation", model.getDescription());
-            }
-            editorNode.set("properties", propertiesNode);
-
-            ArrayNode childShapeArray = objectMapper.createArrayNode();
-            editorNode.set("childShapes", childShapeArray);
-            ObjectNode childNode = objectMapper.createObjectNode();
-            childShapeArray.add(childNode);
-            ObjectNode boundsNode = objectMapper.createObjectNode();
-            childNode.set("bounds", boundsNode);
-            ObjectNode lowerRightNode = objectMapper.createObjectNode();
-            boundsNode.set("lowerRight", lowerRightNode);
-            lowerRightNode.put("x", 130);
-            lowerRightNode.put("y", 193);
-            ObjectNode upperLeftNode = objectMapper.createObjectNode();
-            boundsNode.set("upperLeft", upperLeftNode);
-            upperLeftNode.put("x", 100);
-            upperLeftNode.put("y", 163);
-            childNode.set("childShapes", objectMapper.createArrayNode());
-            childNode.set("dockers", objectMapper.createArrayNode());
-            childNode.set("outgoing", objectMapper.createArrayNode());
-            childNode.put("resourceId", "startEvent1");
-            ObjectNode stencilNode = objectMapper.createObjectNode();
-            childNode.set("stencil", stencilNode);
-            stencilNode.put("id", "StartNoneEvent");
-            json = editorNode.toString();
-        }
-
-        return json;
-    }
-
-    @Override
     public Model createModel(Model newModel, User createdBy) {
         newModel.setVersion(1);
         newModel.setCreated(Calendar.getInstance().getTime());
@@ -278,11 +204,13 @@ public class ModelServiceImpl implements ModelService {
         newModel.setKey(model.getKey());
         newModel.setModelType(model.getModelType());
         newModel.setCreated(Calendar.getInstance().getTime());
-        newModel.setCreatedBy(createdBy.getId());
+        if (createdBy != null) {
+            newModel.setCreatedBy(createdBy.getId());
+            newModel.setLastUpdatedBy(createdBy.getId());
+        }
         newModel.setDescription(model.getDescription());
         newModel.setModelEditorJson(getInitialEditorModel(model, skeleton));
         newModel.setLastUpdated(Calendar.getInstance().getTime());
-        newModel.setLastUpdatedBy(createdBy.getId());
 
         persistModel(newModel);
         return newModel;

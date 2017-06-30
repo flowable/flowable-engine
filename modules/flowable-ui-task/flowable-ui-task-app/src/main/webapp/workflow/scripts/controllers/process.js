@@ -341,7 +341,7 @@ angular.module('flowableApp')
                 alert('Model successfuly created');
             }).error(function (data, status, headers, config) {
                 $scope.model.loading = false;
-                $scope.model.errorMessage = data.message;
+                $scope.model.errorMessage = 'Test create has failed';
             });
         };
 

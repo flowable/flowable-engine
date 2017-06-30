@@ -174,7 +174,7 @@ angular.module('flowableModeler')
 
         $scope.model.loading = true;
 
-        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models', data: $scope.model.process}).
+        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/api/rest/models', data: $scope.model.process}).
             success(function(data) {
                 $scope.$hide();
 
@@ -224,7 +224,7 @@ angular.module('flowableModeler')
 
         $scope.model.loading = true;
 
-        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models?skeleton='+ $scope.model.skeleton, data: $scope.model.process}).
+        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/api/editor/models?skeleton='+ $scope.model.skeleton, data: $scope.model.process}).
             success(function(data) {
                 $scope.$hide();
 
