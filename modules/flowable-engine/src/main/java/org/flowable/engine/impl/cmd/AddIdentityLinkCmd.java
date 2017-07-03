@@ -19,6 +19,8 @@ import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.task.IdentityLinkType;
 
+import java.util.Objects;
+
 /**
  * @author Joram Barrez
  */
@@ -72,11 +74,12 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
             return null;
         }
 
-        boolean assignedToNoOne = false;
+        String oldIdentityId = null;
         if (IdentityLinkType.ASSIGNEE.equals(identityType)) {
+            oldIdentityId = task.getAssignee();
             commandContext.getTaskEntityManager().changeTaskAssignee(task, identityId);
-            assignedToNoOne = identityId == null;
         } else if (IdentityLinkType.OWNER.equals(identityType)) {
+            oldIdentityId = task.getOwner();
             commandContext.getTaskEntityManager().changeTaskOwner(task, identityId);
         } else if (IDENTITY_USER == identityIdType) {
             task.addUserIdentityLink(identityId, identityType);
@@ -84,16 +87,14 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
             task.addGroupIdentityLink(identityId, identityType);
         }
 
-        boolean forceNullUserId = false;
-        if (assignedToNoOne) {
-            // ACT-1317: Special handling when assignee is set to NULL, a
-            // CommentEntity notifying of assignee-delete should be created
-            forceNullUserId = true;
-
+        if (Objects.equals(oldIdentityId, identityId)) {
+            return null;
         }
 
         if (IDENTITY_USER == identityIdType) {
-            commandContext.getHistoryManager().createUserIdentityLinkComment(taskId, identityId, identityType, true, forceNullUserId);
+            boolean nullIdentityId = identityId == null;
+            commandContext.getHistoryManager().createUserIdentityLinkComment(taskId, nullIdentityId ? oldIdentityId : identityId,
+                    identityType, !nullIdentityId, nullIdentityId);
         } else {
             commandContext.getHistoryManager().createGroupIdentityLinkComment(taskId, identityId, identityType, true);
         }

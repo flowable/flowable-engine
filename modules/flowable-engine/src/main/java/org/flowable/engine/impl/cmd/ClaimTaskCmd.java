@@ -17,6 +17,7 @@ import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.flowable.engine.task.IdentityLinkType;
 
 /**
  * @author Joram Barrez
@@ -39,28 +40,26 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
             return null;
         }
 
+        if (userId != null && task.getAssignee() != null) {
+            if (!task.getAssignee().equals(userId)) {
+                // When the task is already claimed by another user, throw
+                // exception. Otherwise, ignore this, post-conditions of method already met.
+                throw new FlowableTaskAlreadyClaimedException(task.getId(), task.getAssignee());
+            }
+        }
+
         if (userId != null) {
             task.setClaimTime(commandContext.getProcessEngineConfiguration().getClock().getCurrentTime());
-
-            if (task.getAssignee() != null) {
-                if (!task.getAssignee().equals(userId)) {
-                    // When the task is already claimed by another user, throw
-                    // exception. Otherwise, ignore this, post-conditions of method already met.
-                    throw new FlowableTaskAlreadyClaimedException(task.getId(), task.getAssignee());
-                }
-                commandContext.getHistoryManager().recordTaskInfoChange(task);
-                
-            } else {
-                commandContext.getTaskEntityManager().changeTaskAssignee(task, userId);
-            }
-            
         } else {
             // Task claim time should be null
             task.setClaimTime(null);
-
-            // Task should be assigned to no one
-            commandContext.getTaskEntityManager().changeTaskAssignee(task, null);
         }
+
+        new AddIdentityLinkCmd(taskId, userId, AddIdentityLinkCmd.IDENTITY_USER, IdentityLinkType.ASSIGNEE)
+                .execute(commandContext, task);
+
+        // to update claim time
+        commandContext.getHistoryManager().recordTaskInfoChange(task);
 
         return null;
     }
