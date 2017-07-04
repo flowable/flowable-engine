@@ -207,6 +207,9 @@ public class ModelServiceImpl implements ModelService {
         if (createdBy != null) {
             newModel.setCreatedBy(createdBy.getId());
             newModel.setLastUpdatedBy(createdBy.getId());
+        } else {
+            newModel.setCreatedBy("admin");
+            newModel.setLastUpdatedBy("admin");
         }
         newModel.setDescription(model.getDescription());
         newModel.setModelEditorJson(getInitialEditorModel(model, skeleton));

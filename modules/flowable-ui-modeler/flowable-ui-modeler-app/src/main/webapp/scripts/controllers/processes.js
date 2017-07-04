@@ -174,7 +174,7 @@ angular.module('flowableModeler')
 
         $scope.model.loading = true;
 
-        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/api/rest/models', data: $scope.model.process}).
+        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/api/editor/models', data: $scope.model.process}).
             success(function(data) {
                 $scope.$hide();
 
