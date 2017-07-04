@@ -12,7 +12,11 @@
  */
 package org.flowable.engine.test.bpmn.event.error;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
@@ -20,6 +24,10 @@ import org.flowable.engine.test.Deployment;
  * @author Tijs Rademakers
  */
 public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
+    
+    private static final String STANDALONE_SUBPROCESS_FLAG_VARIABLE_NAME = "standalone";
+    private static final String LOCAL_ERROR_FLAG_VARIABLE_NAME = "localError";
+    private static final String PROCESS_KEY_UNDER_TEST = "helloWorldWithBothSubProcessTypes";
 
     @Deployment
     // an event subprocesses takes precedence over a boundary event
@@ -79,6 +87,19 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
     public void testThrowErrorInScriptTaskInsideCallActivitiCatchInTopLevelProcess() {
         String procId = runtimeService.startProcessInstanceByKey("testThrowErrorInScriptTaskInsideCallActivitiCatchInTopLevelProcess").getId();
         assertThatErrorHasBeenCaught(procId);
+    }
+    
+    @Deployment(resources = {"org/flowable/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchMultipleRethrowParent.bpmn",
+                    "org/flowable/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchMultipleRethrowSubProcess.bpmn"})
+    public void testMultipleRethrowEvents() {
+        Map<String, Object> variableMap = new HashMap<String, Object>();
+        variableMap.put(LOCAL_ERROR_FLAG_VARIABLE_NAME, true);
+        variableMap.put(STANDALONE_SUBPROCESS_FLAG_VARIABLE_NAME, true);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY_UNDER_TEST, variableMap);
+        
+        assertNotNull(processInstance.getId());
+        System.out.println("id " + processInstance.getId() + " "
+                + processInstance.getProcessDefinitionId());
     }
 
     private void assertThatErrorHasBeenCaught(String procId) {
