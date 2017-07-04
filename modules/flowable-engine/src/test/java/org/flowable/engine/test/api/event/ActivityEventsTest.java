@@ -55,7 +55,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         super.setUp();
 
         // Database event logger setup
-        databaseEventLogger = new EventLogger(processEngineConfiguration.getClock(), processEngineConfiguration.getObjectMapper(), null);
+        databaseEventLogger = new EventLogger(processEngineConfiguration.getClock(), processEngineConfiguration.getObjectMapper(), processEngineConfiguration.getCustomDatabaseEventLoggingHandlers());
         runtimeService.addEventListener(databaseEventLogger);
     }
 

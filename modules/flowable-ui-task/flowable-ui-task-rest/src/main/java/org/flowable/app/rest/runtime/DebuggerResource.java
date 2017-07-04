@@ -12,8 +12,14 @@
  */
 package org.flowable.app.rest.runtime;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.app.model.debugger.BreakpointRepresentation;
 import org.flowable.app.service.runtime.DebuggerService;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.impl.event.logger.handler.AbstractDatabaseEventLoggerEventHandler;
+import org.flowable.engine.impl.interceptor.Command;
+import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.persistence.entity.EventLogEntryEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +27,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * REST controller for managing a debugger requests.
@@ -33,6 +41,12 @@ public class DebuggerResource {
 
     @Autowired
     protected DebuggerService debuggerService;
+
+    @Autowired
+    protected ManagementService managementService;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @RequestMapping(value = "/rest/debugger/breakpoints", method = RequestMethod.GET, produces = "application/json")
     public Collection<BreakpointRepresentation> getBreakpoints() {
@@ -62,6 +76,57 @@ public class DebuggerResource {
     @RequestMapping(value = "/rest/debugger/evaluate/script/{executionId}", method = RequestMethod.POST)
     public void evaluateScript(@PathVariable String executionId, @RequestBody String script) {
         debuggerService.evaluateScript(executionId, script);
+    }
+
+    @RequestMapping(value = "/rest/debugger/event-log", method = RequestMethod.PUT)
+    public void insertEventLogEntry(@RequestBody EventLogInsertRequest eventLogInsertRequest, HttpServletRequest request) {
+        insertEventLogEntry(eventLogInsertRequest);
+    }
+
+    protected void insertEventLogEntry(final EventLogInsertRequest eventLogInsertRequest) {
+        this.managementService.executeCommand(new Command<Void>() {
+            @Override
+            public Void execute(CommandContext commandContext) {
+                ExternalEventHandler externalEventHandler = new ExternalEventHandler(
+                        eventLogInsertRequest.getType(),
+                        eventLogInsertRequest.getProcessDefinitionId(),
+                        eventLogInsertRequest.getProcessInstanceId(),
+                        eventLogInsertRequest.getExecutionId(),
+                        eventLogInsertRequest.getTaskId(),
+                        eventLogInsertRequest.getData()
+                );
+                externalEventHandler.setTimeStamp(commandContext.getProcessEngineConfiguration().getClock().getCurrentTime());
+                externalEventHandler.setObjectMapper(objectMapper);
+                EventLogEntryEntity eventLogEntryEntity = externalEventHandler.generateEventLogEntry(commandContext);
+                commandContext.getEventLogEntryEntityManager().insert(eventLogEntryEntity);
+                return null;
+            }
+        });
+    }
+
+    private class ExternalEventHandler extends AbstractDatabaseEventLoggerEventHandler {
+        private Map<String, Object> data;
+        private String type;
+        private String processDefinitionId;
+        private String processInstanceId;
+        private String executionId;
+
+        public ExternalEventHandler(String type, String processDefinitionId, String processInstanceId, String executionId, String taskId, Map<String, Object> data) {
+            this.data = data;
+            this.type = type;
+            this.processDefinitionId = processDefinitionId;
+            this.processInstanceId = processInstanceId;
+            this.executionId = executionId;
+            this.taskId = taskId;
+        }
+
+        private String taskId;
+
+        @Override
+        public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
+            return createEventLogEntry(this.type, this.processDefinitionId, this.processInstanceId, this.executionId,
+                    this.taskId, this.data);
+        }
     }
 
 }

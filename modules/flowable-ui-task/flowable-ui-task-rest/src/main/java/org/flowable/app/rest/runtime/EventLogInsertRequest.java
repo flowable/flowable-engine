@@ -1,4 +1,4 @@
-package org.flowable.rest.service.api.management;
+package org.flowable.app.rest.runtime;
 
 import java.util.Map;
 

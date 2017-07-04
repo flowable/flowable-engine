@@ -265,7 +265,7 @@ angular.module('flowableApp')
 
                 $http({
                     method: 'PUT',
-                    url: '../process-api/management/event-log',
+                    url: '../app/rest/debugger/event-log',
                     data: eventLogRequest
                 }).success(function (data) {
                     $scope.model.result = data;
@@ -289,7 +289,7 @@ angular.module('flowableApp')
 
                 $http({
                     method: 'PUT',
-                    url: '../process-api/management/event-log',
+                    url: '../app/rest/debugger/event-log',
                     data: eventLogRequest
                 }).success(function (data) {
                     $scope.model.result = data;

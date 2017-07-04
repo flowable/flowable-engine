@@ -38,6 +38,7 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.flowable.app.model.common.RemoteGroup;
 import org.flowable.app.model.common.RemoteToken;
 import org.flowable.app.model.common.RemoteUser;
+import org.flowable.app.rest.HttpRequestHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,40 +139,16 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
     }
 
     protected JsonNode callRemoteIdmService(String url, String username, String password) {
-        HttpGet httpGet = new HttpGet(url);
-        httpGet.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
-                Base64.encodeBase64((username + ":" + password).getBytes(Charset.forName("UTF-8")))));
-
-        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-        SSLConnectionSocketFactory sslsf = null;
-        try {
-            SSLContextBuilder builder = new SSLContextBuilder();
-            builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-            sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-            clientBuilder.setSSLSocketFactory(sslsf);
-        } catch (Exception e) {
-            LOGGER.warn("Could not configure SSL for http client", e);
-        }
-
-        CloseableHttpClient client = clientBuilder.build();
-
-        try {
-            HttpResponse response = client.execute(httpGet);
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                return objectMapper.readTree(response.getEntity().getContent());
-            }
-        } catch (Exception e) {
-            LOGGER.warn("Exception while getting token", e);
-        } finally {
-            if (client != null) {
+        return HttpRequestHelper.executeHttpGet(url, username, password, new Function<HttpResponse, JsonNode>() {
+            @Override
+            public JsonNode apply(HttpResponse httpResponse) {
                 try {
-                    client.close();
+                    return objectMapper.readTree(httpResponse.getEntity().getContent());
                 } catch (IOException e) {
-                    LOGGER.warn("Exception while closing http client", e);
+                    throw new RuntimeException("Unable to resolve entity content.", e);
                 }
             }
-        }
-        return null;
+        });
     }
 
     protected List<RemoteUser> parseUsersInfo(JsonNode json) {

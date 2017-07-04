@@ -37,14 +37,4 @@ public class EventLogResource extends EventLogBaseResource {
         return getQueryResponse(processInstanceId, includeSubProcesses);
     }
 
-    @ApiOperation(value = "Insert EventLog ", tags = {
-            "EventLog"}, notes = "All EventLogEntry attributes are inserted into log")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates request was successful and the log entry was inserted"),
-            @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information")})
-    @RequestMapping(value = "/management/event-log", method = RequestMethod.PUT, produces = "application/json")
-    public void insertEventLogEntry(@RequestBody EventLogInsertRequest eventLogInsertRequest, HttpServletRequest request) {
-        inserEventLogEntry(eventLogInsertRequest);
-    }
-
 }

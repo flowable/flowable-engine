@@ -442,7 +442,7 @@ public class ModelServiceImpl implements ModelService {
                     try {
                         String taskDefinitionKey = (String) objectMapper.readValue(eventLogEntry.get("data").binaryValue(), Map.class).get("taskDefinitionKey");
                     nodes.add(createScriptTask(position, "claimTask" + position++, "Claim task " +
-                                    eventLogEntry.get("taskId").textValue() + " to user "+ eventLogEntry.get("userId"),
+                                    taskDefinitionKey + " to user "+ eventLogEntry.get("userId"),
                             "import org.flowable.engine.impl.context.Context;\n" +
                                     "\n" +
                                     "processInstanceIds = testHelper.getSubProcessInstanceIds(processInstanceId)\n" +
