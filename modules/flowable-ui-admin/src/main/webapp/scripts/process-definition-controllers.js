@@ -140,14 +140,6 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
             });
         };
         
-        function loadStartForm () {
-            $scope.jobs = undefined;
-            $http({method: 'GET', url: '/app/rest/admin/process-definition-start-form-definition/' + $scope.definition.id}).
-            success(function(data, status, headers, config) {
-                $scope.startForm = data;
-            });
-        };
-        
         $scope.loadDecisionTables = function() {
             // Load decision tables
             $http({method: 'GET', url: '/app/rest/admin/process-definition-decision-tables/' + $scope.definition.id}).
@@ -179,9 +171,7 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
 		        $scope.loadJobs();
                 $scope.tabData.tabs.push({id: 'decisionTables', name: 'PROCESS-DEFINITION.TITLE.DECISION-TABLES'});
                 $scope.tabData.tabs.push({id: 'forms', name: 'PROCESS-DEFINITION.TITLE.FORMS'});
-                if (data.startFormDefined) {
-                    loadStartForm();
-                }
+                
                 $scope.loadDecisionTables();
                 $scope.loadFormDefinitions();
 		    }).
