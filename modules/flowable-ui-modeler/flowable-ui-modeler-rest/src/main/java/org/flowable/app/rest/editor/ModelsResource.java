@@ -59,7 +59,7 @@ public class ModelsResource {
 
     @RequestMapping(value = "/rest/models", method = RequestMethod.GET, produces = "application/json")
     public ResultListDataRepresentation getModels(@RequestParam(required = false) String filter, @RequestParam(required = false) String sort, @RequestParam(required = false) Integer modelType,
-            HttpServletRequest request) {
+                                                  HttpServletRequest request) {
 
         return modelQueryService.getModels(filter, sort, modelType, request);
     }
@@ -90,6 +90,19 @@ public class ModelsResource {
         }
 
         return modelRepresentationJson;
+    }
+
+    @RequestMapping(value = "/rest/models", method = RequestMethod.POST, produces = "application/json")
+    public ModelRepresentation createModel(@RequestBody ModelRepresentation modelRepresentation) {
+        modelRepresentation.setKey(modelRepresentation.getKey().replaceAll(" ", ""));
+
+        ModelKeyRepresentation modelKeyInfo = modelService.validateModelKey(null, modelRepresentation.getModelType(), modelRepresentation.getKey());
+        if (modelKeyInfo.isKeyAlreadyExists()) {
+            throw new BadRequestException("Provided model key already exists: " + modelRepresentation.getKey());
+        }
+
+        Model newModel = modelService.createModel(modelRepresentation, null, SecurityUtils.getCurrentUserObject());
+        return new ModelRepresentation(newModel);
     }
 
     @RequestMapping(value = "/rest/models/{modelId}/clone", method = RequestMethod.POST, produces = "application/json")
