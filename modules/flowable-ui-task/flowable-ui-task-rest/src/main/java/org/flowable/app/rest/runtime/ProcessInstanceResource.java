@@ -12,19 +12,9 @@
  */
 package org.flowable.app.rest.runtime;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.flowable.app.model.runtime.ProcessInstanceRepresentation;
-import org.flowable.app.service.exception.InternalServerErrorException;
 import org.flowable.app.service.runtime.FlowableProcessInstanceService;
 import org.flowable.form.model.FormModel;
 import org.slf4j.Logger;
@@ -41,8 +31,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.nio.charset.Charset;
+
+import static org.flowable.app.rest.HttpRequestHelper.executePostRequest;
 
 /**
  * REST controller for managing a process instance.
@@ -85,47 +75,7 @@ public class ProcessInstanceResource {
         }
         modelApiUrl = modelApiUrl.concat("api/editor/models?skeleton=" + skeleton);
 
-        HttpPost httpPost = new HttpPost(modelApiUrl);
-        httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
-                Base64.encodeBase64((basicAuthUser + ":" + basicAuthPassword).getBytes(Charset.forName("UTF-8")))));
-
-        StringEntity dataEntity = new StringEntity(data, ContentType.create("application/json", "UTF-8"));
-        httpPost.setEntity(dataEntity);
-
-        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-        SSLConnectionSocketFactory sslsf = null;
-        try {
-            SSLContextBuilder builder = new SSLContextBuilder();
-            builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-            sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-            clientBuilder.setSSLSocketFactory(sslsf);
-        } catch (Exception e) {
-            log.error("Could not configure SSL for http client", e);
-            throw new InternalServerErrorException("Could not configure SSL for http client", e);
-        }
-
-        CloseableHttpClient client = clientBuilder.build();
-
-        try {
-            HttpResponse response = client.execute(httpPost);
-            if (response.getStatusLine().getStatusCode() == org.apache.http.HttpStatus.SC_OK) {
-                return;
-            } else {
-                log.error("Invalid create model result code: {}", response.getStatusLine());
-                throw new InternalServerErrorException("Invalid create model result code: " + response.getStatusLine());
-            }
-        } catch (IOException ioe) {
-            log.error("Error calling deploy endpoint", ioe);
-            throw new InternalServerErrorException("Error calling models endpoint: " + ioe.getMessage());
-        } finally {
-            if (client != null) {
-                try {
-                    client.close();
-                } catch (IOException e) {
-                    log.warn("Exception while closing http client", e);
-                }
-            }
-        }
+        executePostRequest(modelApiUrl, basicAuthUser, basicAuthPassword, new StringEntity(data, ContentType.create("application/json", "UTF-8")), org.apache.http.HttpStatus.SC_OK);
     }
 
 }

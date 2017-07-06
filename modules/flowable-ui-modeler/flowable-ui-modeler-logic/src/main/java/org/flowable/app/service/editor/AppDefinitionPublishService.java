@@ -12,25 +12,14 @@
  */
 package org.flowable.app.service.editor;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.flowable.app.domain.editor.AppDefinition;
 import org.flowable.app.domain.editor.Model;
 import org.flowable.app.service.api.AppDefinitionService;
@@ -43,9 +32,11 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.flowable.app.rest.HttpRequestHelper.executePostRequest;
+
 /**
  * Can't merge this with {@link AppDefinitionService}, as it doesn't have visibility of domain models needed to do the publication.
- * 
+ *
  * @author jbarrez
  */
 @Service
@@ -92,51 +83,12 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
         deployApiUrl = deployApiUrl.concat(String.format("repository/deployments?deploymentKey=%s&deploymentName=%s",
                 encode(deploymentKey), encode(deploymentName)));
 
-        HttpPost httpPost = new HttpPost(deployApiUrl);
-        httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
-                Base64.encodeBase64((basicAuthUser + ":" + basicAuthPassword).getBytes(Charset.forName("UTF-8")))));
-
         MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
         entityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
         entityBuilder.addBinaryBody("artifact", zipArtifact, ContentType.DEFAULT_BINARY, artifactName);
 
         HttpEntity entity = entityBuilder.build();
-        httpPost.setEntity(entity);
-
-        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-        SSLConnectionSocketFactory sslsf = null;
-        try {
-            SSLContextBuilder builder = new SSLContextBuilder();
-            builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-            sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-            clientBuilder.setSSLSocketFactory(sslsf);
-        } catch (Exception e) {
-            LOGGER.error("Could not configure SSL for http client", e);
-            throw new InternalServerErrorException("Could not configure SSL for http client", e);
-        }
-
-        CloseableHttpClient client = clientBuilder.build();
-
-        try {
-            HttpResponse response = client.execute(httpPost);
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
-                return;
-            } else {
-                LOGGER.error("Invalid deploy result code: {}", response.getStatusLine());
-                throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
-            }
-        } catch (IOException ioe) {
-            LOGGER.error("Error calling deploy endpoint", ioe);
-            throw new InternalServerErrorException("Error calling deploy endpoint: " + ioe.getMessage());
-        } finally {
-            if (client != null) {
-                try {
-                    client.close();
-                } catch (IOException e) {
-                    LOGGER.warn("Exception while closing http client", e);
-                }
-            }
-        }
+        executePostRequest(deployApiUrl, basicAuthUser, basicAuthPassword, entity, HttpStatus.SC_CREATED);
     }
 
     protected String encode(String string) {
