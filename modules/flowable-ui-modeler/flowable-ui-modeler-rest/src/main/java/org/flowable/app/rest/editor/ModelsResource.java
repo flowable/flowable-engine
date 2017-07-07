@@ -93,7 +93,7 @@ public class ModelsResource {
     }
 
     @RequestMapping(value = "/rest/models", method = RequestMethod.POST, produces = "application/json")
-    public ModelRepresentation createModel(@RequestBody ModelRepresentation modelRepresentation) {
+    public ModelRepresentation createModel(@RequestBody ModelRepresentation modelRepresentation, @RequestParam(required = false) String skeleton) {
         modelRepresentation.setKey(modelRepresentation.getKey().replaceAll(" ", ""));
 
         ModelKeyRepresentation modelKeyInfo = modelService.validateModelKey(null, modelRepresentation.getModelType(), modelRepresentation.getKey());
@@ -101,7 +101,7 @@ public class ModelsResource {
             throw new BadRequestException("Provided model key already exists: " + modelRepresentation.getKey());
         }
 
-        Model newModel = modelService.createModel(modelRepresentation, null, SecurityUtils.getCurrentUserObject());
+        Model newModel = modelService.createModel(modelRepresentation, skeleton, SecurityUtils.getCurrentUserObject());
         return new ModelRepresentation(newModel);
     }
 

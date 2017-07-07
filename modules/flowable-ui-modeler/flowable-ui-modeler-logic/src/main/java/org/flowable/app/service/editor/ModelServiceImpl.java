@@ -470,7 +470,7 @@ public class ModelServiceImpl implements ModelService {
                 case "TASK_COMPLETED":
                     try {
                         String taskDefinitionKey = (String) objectMapper.readValue(eventLogEntry.get("data").binaryValue(), Map.class).get("taskDefinitionKey");
-                        nodes.add(createScriptTask(position, "completeTask"+position++, "Complete task "+ eventLogEntry.get("taskId").textValue(),
+                        nodes.add(createScriptTask(position, "completeTask"+position++, "Complete task "+ taskDefinitionKey,
                             "import org.flowable.engine.impl.context.Context;\n" +
                                     "\n" +
                                     "processInstanceIds = testHelper.getSubProcessInstanceIds(processInstanceId)\n" +
