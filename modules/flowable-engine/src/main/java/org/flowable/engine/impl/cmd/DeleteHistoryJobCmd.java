@@ -16,12 +16,12 @@ import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,13 +46,13 @@ public class DeleteHistoryJobCmd implements Command<Object>, Serializable {
 
         sendCancelEvent(jobToDelete);
 
-        commandContext.getHistoryJobEntityManager().delete(jobToDelete);
+        CommandContextUtil.getHistoryJobEntityManager(commandContext).delete(jobToDelete);
         return null;
     }
 
     protected void sendCancelEvent(HistoryJobEntity jobToDelete) {
-        if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
+        if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
         }
     }
 
@@ -64,7 +64,7 @@ public class DeleteHistoryJobCmd implements Command<Object>, Serializable {
             LOGGER.debug("Deleting job {}", historyJobId);
         }
 
-        HistoryJobEntity job = commandContext.getHistoryJobEntityManager().findById(historyJobId);
+        HistoryJobEntity job = CommandContextUtil.getHistoryJobEntityManager(commandContext).findById(historyJobId);
         if (job == null) {
             throw new FlowableObjectNotFoundException("No history job found with id '" + historyJobId + "'", Job.class);
         }

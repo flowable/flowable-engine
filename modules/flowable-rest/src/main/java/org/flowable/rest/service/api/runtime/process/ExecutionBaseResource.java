@@ -27,8 +27,8 @@ import org.flowable.engine.runtime.ExecutionQuery;
 import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
-import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.QueryVariable.QueryVariableOperation;
+import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

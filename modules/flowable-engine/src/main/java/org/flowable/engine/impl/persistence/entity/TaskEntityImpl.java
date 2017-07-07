@@ -26,12 +26,12 @@ import java.util.Set;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.db.BulkDeleteable;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.CountingTaskEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.DelegationState;
 import org.flowable.engine.task.IdentityLink;
 import org.flowable.engine.task.IdentityLinkType;
@@ -42,7 +42,7 @@ import org.flowable.engine.task.IdentityLinkType;
  * @author Falko Menge
  * @author Tijs Rademakers
  */
-public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, CountingTaskEntity, Serializable, BulkDeleteable {
+public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, CountingTaskEntity, Serializable {
 
     public static final String DELETE_REASON_COMPLETED = "completed";
     public static final String DELETE_REASON_DELETED = "deleted";
@@ -177,7 +177,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
 
     @Override
     protected List<VariableInstanceEntity> loadVariableInstances() {
-        return Context.getCommandContext().getVariableInstanceEntityManager().findVariableInstancesByTaskId(id);
+        return CommandContextUtil.getVariableInstanceEntityManager().findVariableInstancesByTaskId(id);
     }
 
     @Override
@@ -185,9 +185,8 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         VariableInstanceEntity result = super.createVariableInstance(variableName, value, sourceActivityExecution);
 
         // Dispatch event, if needed
-        if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            Context
-                    .getProcessEngineConfiguration()
+        if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration()
                     .getEventDispatcher()
                     .dispatchEvent(
                             FlowableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_CREATED, variableName, value, result.getType(), result.getTaskId(), result.getExecutionId(), getProcessInstanceId(),
@@ -201,9 +200,8 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         super.updateVariableInstance(variableInstance, value, sourceActivityExecution);
 
         // Dispatch event, if needed
-        if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            Context
-                    .getProcessEngineConfiguration()
+        if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration()
                     .getEventDispatcher()
                     .dispatchEvent(
                             FlowableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_UPDATED, variableInstance.getName(), value, variableInstance.getType(), variableInstance.getTaskId(),
@@ -216,7 +214,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     @Override
     public ExecutionEntity getExecution() {
         if ((execution == null) && (executionId != null)) {
-            this.execution = Context.getCommandContext().getExecutionEntityManager().findById(executionId);
+            this.execution = CommandContextUtil.getExecutionEntityManager().findById(executionId);
         }
         return execution;
     }
@@ -225,32 +223,32 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
 
     @Override
     public void addCandidateUser(String userId) {
-        Context.getCommandContext().getIdentityLinkEntityManager().addCandidateUser(this, userId);
+        CommandContextUtil.getIdentityLinkEntityManager().addCandidateUser(this, userId);
     }
 
     @Override
     public void addCandidateUsers(Collection<String> candidateUsers) {
-        Context.getCommandContext().getIdentityLinkEntityManager().addCandidateUsers(this, candidateUsers);
+        CommandContextUtil.getIdentityLinkEntityManager().addCandidateUsers(this, candidateUsers);
     }
 
     @Override
     public void addCandidateGroup(String groupId) {
-        Context.getCommandContext().getIdentityLinkEntityManager().addCandidateGroup(this, groupId);
+        CommandContextUtil.getIdentityLinkEntityManager().addCandidateGroup(this, groupId);
     }
 
     @Override
     public void addCandidateGroups(Collection<String> candidateGroups) {
-        Context.getCommandContext().getIdentityLinkEntityManager().addCandidateGroups(this, candidateGroups);
+        CommandContextUtil.getIdentityLinkEntityManager().addCandidateGroups(this, candidateGroups);
     }
 
     @Override
     public void addUserIdentityLink(String userId, String identityLinkType) {
-        Context.getCommandContext().getIdentityLinkEntityManager().addUserIdentityLink(this, userId, identityLinkType);
+        CommandContextUtil.getIdentityLinkEntityManager().addUserIdentityLink(this, userId, identityLinkType);
     }
 
     @Override
     public void addGroupIdentityLink(String groupId, String identityLinkType) {
-        Context.getCommandContext().getIdentityLinkEntityManager().addGroupIdentityLink(this, groupId, identityLinkType);
+        CommandContextUtil.getIdentityLinkEntityManager().addGroupIdentityLink(this, groupId, identityLinkType);
     }
 
     @Override
@@ -277,14 +275,14 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     @Override
     public void deleteGroupIdentityLink(String groupId, String identityLinkType) {
         if (groupId != null) {
-            Context.getCommandContext().getIdentityLinkEntityManager().deleteIdentityLink(this, null, groupId, identityLinkType);
+            CommandContextUtil.getIdentityLinkEntityManager().deleteIdentityLink(this, null, groupId, identityLinkType);
         }
     }
 
     @Override
     public void deleteUserIdentityLink(String userId, String identityLinkType) {
         if (userId != null) {
-            Context.getCommandContext().getIdentityLinkEntityManager().deleteIdentityLink(this, userId, null, identityLinkType);
+            CommandContextUtil.getIdentityLinkEntityManager().deleteIdentityLink(this, userId, null, identityLinkType);
         }
     }
 
@@ -292,7 +290,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     public List<IdentityLinkEntity> getIdentityLinks() {
         if (!isIdentityLinksInitialized) {
             if (queryIdentityLinks == null) {
-                taskIdentityLinkEntities = Context.getCommandContext().getIdentityLinkEntityManager().findIdentityLinksByTaskId(id);
+                taskIdentityLinkEntities = CommandContextUtil.getIdentityLinkEntityManager().findIdentityLinksByTaskId(id);
             } else {
                 taskIdentityLinkEntities = queryIdentityLinks;
             }
@@ -375,7 +373,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         if (commandContext == null) {
             throw new FlowableException("lazy loading outside command context");
         }
-        VariableInstanceEntity variableInstance = commandContext.getVariableInstanceEntityManager().findVariableInstanceByTaskAndName(id, variableName);
+        VariableInstanceEntity variableInstance = CommandContextUtil.getVariableInstanceEntityManager(commandContext).findVariableInstanceByTaskAndName(id, variableName);
 
         return variableInstance;
     }
@@ -386,7 +384,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         if (commandContext == null) {
             throw new FlowableException("lazy loading outside command context");
         }
-        return commandContext.getVariableInstanceEntityManager().findVariableInstancesByTaskAndNames(id, variableNames);
+        return CommandContextUtil.getVariableInstanceEntityManager(commandContext).findVariableInstancesByTaskAndNames(id, variableNames);
     }
 
     // regular getters and setters ////////////////////////////////////////////////////////
@@ -519,7 +517,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     @Override
     public ExecutionEntity getProcessInstance() {
         if (processInstance == null && processInstanceId != null) {
-            processInstance = Context.getCommandContext().getExecutionEntityManager().findById(processInstanceId);
+            processInstance = CommandContextUtil.getExecutionEntityManager().findById(processInstanceId);
         }
         return processInstance;
     }

@@ -12,70 +12,77 @@
  */
 package org.flowable.engine.impl.cfg;
 
-import javax.sql.DataSource;
+import java.util.Arrays;
+import java.util.List;
 
-import org.flowable.engine.cfg.AbstractProcessEngineConfigurator;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.transaction.TransactionContextAwareDataSource;
-import org.flowable.engine.common.impl.transaction.TransactionContextAwareTransactionFactory;
+import org.apache.ibatis.type.JdbcType;
+import org.flowable.engine.cfg.AbstractEngineConfigurator;
+import org.flowable.engine.common.impl.db.CustomMyBatisTypeHandlerConfig;
+import org.flowable.engine.common.impl.db.CustomMybatisTypeAliasConfig;
+import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.engine.impl.persistence.deploy.Deployer;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
+import org.flowable.idm.engine.impl.db.EntityDependencyOrder;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
-public class IdmEngineConfigurator extends AbstractProcessEngineConfigurator {
+public class IdmEngineConfigurator extends AbstractEngineConfigurator {
 
     protected IdmEngineConfiguration idmEngineConfiguration;
-
+    
+    @Override
+    public int getPriority() {
+        return EngineConfigurationConstants.PRIORITY_ENGINE_IDM;
+    }
+    
+    @Override
+    protected List<Deployer> getCustomDeployers() {
+        return null;
+    }
+    
+    @Override
+    protected String getMybatisCfgPath() {
+        return IdmEngineConfiguration.DEFAULT_MYBATIS_MAPPING_FILE;
+    }
+    
+    @Override
+    protected List<CustomMybatisTypeAliasConfig> getMybatisTypeAliases() {
+        return Arrays.asList(new CustomMybatisTypeAliasConfig("IdmByteArrayRefTypeHandler", org.flowable.idm.engine.impl.persistence.ByteArrayRefTypeHandler.class));
+    }
+    
+    @Override
+    protected List<CustomMyBatisTypeHandlerConfig> getMybatisTypeHandlers() {
+        return Arrays.asList(new CustomMyBatisTypeHandlerConfig(
+                org.flowable.idm.engine.impl.persistence.entity.ByteArrayRef.class, 
+                JdbcType.VARCHAR, 
+                org.flowable.idm.engine.impl.persistence.ByteArrayRefTypeHandler.class));
+    }
+    
     @Override
     public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (idmEngineConfiguration == null) {
             idmEngineConfiguration = new StandaloneIdmEngineConfiguration();
-
-            if (processEngineConfiguration.getDataSource() != null) {
-                DataSource originalDatasource = processEngineConfiguration.getDataSource();
-                if (processEngineConfiguration.isTransactionsExternallyManaged()) {
-                    idmEngineConfiguration.setDataSource(originalDatasource);
-                } else {
-                    idmEngineConfiguration.setDataSource(new TransactionContextAwareDataSource(originalDatasource));
-                }
-
-            } else {
-                throw new FlowableException("A datasource is required for initializing the IDM engine ");
-            }
-
-            idmEngineConfiguration.setDatabaseType(processEngineConfiguration.getDatabaseType());
-            idmEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
-            idmEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
-            idmEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
-            idmEngineConfiguration.setDatabaseTablePrefix(processEngineConfiguration.getDatabaseTablePrefix());
-            idmEngineConfiguration.setDatabaseWildcardEscapeCharacter(processEngineConfiguration.getDatabaseWildcardEscapeCharacter());
-
-            if (processEngineConfiguration.isTransactionsExternallyManaged()) {
-                idmEngineConfiguration.setTransactionsExternallyManaged(true);
-            } else {
-                idmEngineConfiguration.setTransactionFactory(
-                        new TransactionContextAwareTransactionFactory<org.flowable.idm.engine.impl.cfg.TransactionContext>(
-                                org.flowable.idm.engine.impl.cfg.TransactionContext.class));
-            }
-
-            if (processEngineConfiguration.getEventDispatcher() != null) {
-                idmEngineConfiguration.setEventDispatcher(processEngineConfiguration.getEventDispatcher());
-            }
-
+            initialiseCommonProperties(processEngineConfiguration, idmEngineConfiguration, EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
         }
-
+        
         IdmEngine idmEngine = idmEngineConfiguration.buildIdmEngine();
-
         processEngineConfiguration.setIdmEngineInitialized(true);
         processEngineConfiguration.setIdmIdentityService(idmEngine.getIdmIdentityService());
     }
-
+    
     @Override
-    public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        // Nothing to do in the before init: we boot up the IDM engine once the process engine is ready
+    protected List<Class<? extends Entity>> getEntityInsertionOrder() {
+        return EntityDependencyOrder.INSERT_ORDER;
+    }
+    
+    @Override
+    protected List<Class<? extends Entity>> getEntityDeletionOrder() {
+        return EntityDependencyOrder.DELETE_ORDER;
     }
 
     public IdmEngineConfiguration getIdmEngineConfiguration() {

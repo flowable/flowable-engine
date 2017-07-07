@@ -15,9 +15,9 @@ package org.flowable.engine.impl.bpmn.deployer;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
@@ -26,6 +26,7 @@ import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -41,7 +42,7 @@ public class CachingAndArtifactsManager {
      */
     public void updateCachingAndArtifacts(ParsedDeployment parsedDeployment) {
         CommandContext commandContext = Context.getCommandContext();
-        final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+        final ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         DeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache = processEngineConfiguration.getDeploymentManager().getProcessDefinitionCache();
         DeploymentEntity deployment = parsedDeployment.getDeployment();
 
@@ -61,7 +62,7 @@ public class CachingAndArtifactsManager {
      * Ensures that the process definition is cached in the appropriate places.
      */
     public void updateProcessDefinitionCache(ParsedDeployment parsedDeployment) {
-        final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+        final ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         DeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache = processEngineConfiguration.getDeploymentManager().getProcessDefinitionCache();
 
         for (ProcessDefinitionEntity processDefinition : parsedDeployment.getAllProcessDefinitions()) {
@@ -80,8 +81,8 @@ public class CachingAndArtifactsManager {
         }
 
         DeploymentManager deploymentManager = processEngineConfiguration.getDeploymentManager();
-        ProcessDefinitionInfoEntityManager definitionInfoEntityManager = commandContext.getProcessDefinitionInfoEntityManager();
-        ObjectMapper objectMapper = commandContext.getProcessEngineConfiguration().getObjectMapper();
+        ProcessDefinitionInfoEntityManager definitionInfoEntityManager = CommandContextUtil.getProcessDefinitionInfoEntityManager(commandContext);
+        ObjectMapper objectMapper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getObjectMapper();
         ProcessDefinitionInfoEntity definitionInfoEntity = definitionInfoEntityManager.findProcessDefinitionInfoByProcessDefinitionId(processDefinition.getId());
 
         ObjectNode infoNode = null;

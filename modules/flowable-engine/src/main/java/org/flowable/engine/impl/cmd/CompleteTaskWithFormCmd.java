@@ -22,9 +22,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
@@ -66,7 +67,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     protected Void execute(CommandContext commandContext, TaskEntity task) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (!processEngineConfiguration.isFormEngineInitialized()) {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }
@@ -96,7 +97,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
      * content so we can retrieve it later.
      */
     protected void processUploadFieldsIfNeeded(FormModel formModel, TaskEntity task, CommandContext commandContext) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (!processEngineConfiguration.isContentEngineInitialized()) {
             return;
         }

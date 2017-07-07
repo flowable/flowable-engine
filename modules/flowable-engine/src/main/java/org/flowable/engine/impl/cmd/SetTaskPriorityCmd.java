@@ -12,9 +12,10 @@
  */
 package org.flowable.engine.impl.cmd;
 
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 
 /**
@@ -39,8 +40,8 @@ public class SetTaskPriorityCmd extends NeedsActiveTaskCmd<Void> {
         }
 
         task.setPriority(priority);
-        commandContext.getHistoryManager().recordTaskInfoChange(task);
-        commandContext.getTaskEntityManager().update(task);
+        CommandContextUtil.getHistoryManager(commandContext).recordTaskInfoChange(task);
+        CommandContextUtil.getTaskEntityManager(commandContext).update(task);
         return null;
     }
 

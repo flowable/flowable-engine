@@ -15,12 +15,12 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Map;
 
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 
 /**
@@ -59,11 +59,11 @@ public class TriggerCmd extends NeedsActiveExecutionCmd<Object> {
             execution.setTransientVariables(transientVariables);
         }
 
-        Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+        CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
                 FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, execution.getCurrentActivityId(), null,
                         null, execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId()));
 
-        commandContext.getAgenda().planTriggerExecutionOperation(execution);
+        CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(execution);
         return null;
     }
 

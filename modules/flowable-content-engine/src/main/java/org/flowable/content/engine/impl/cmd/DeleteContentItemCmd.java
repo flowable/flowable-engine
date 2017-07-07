@@ -15,11 +15,12 @@ package org.flowable.content.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.content.api.ContentStorage;
-import org.flowable.content.engine.impl.interceptor.Command;
-import org.flowable.content.engine.impl.interceptor.CommandContext;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntity;
+import org.flowable.content.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Tijs Rademakers
@@ -39,19 +40,19 @@ public class DeleteContentItemCmd implements Command<Void>, Serializable {
             throw new FlowableIllegalArgumentException("contentItemId is null");
         }
 
-        ContentItemEntity contentItem = (ContentItemEntity) commandContext.getContentItemEntityManager().findById(contentItemId);
+        ContentItemEntity contentItem = (ContentItemEntity) CommandContextUtil.getContentItemEntityManager().findById(contentItemId);
         if (contentItem == null) {
             throw new FlowableObjectNotFoundException("content item could not be found with id " + contentItemId);
         }
 
         if (contentItem.getContentStoreId() != null) {
-            ContentStorage contentStorage = commandContext.getContentEngineConfiguration().getContentStorage();
+            ContentStorage contentStorage = CommandContextUtil.getContentEngineConfiguration().getContentStorage();
             if (contentItem.isContentAvailable()) {
                 contentStorage.deleteContentObject(contentItem.getContentStoreId());
             }
         }
 
-        commandContext.getContentItemEntityManager().delete(contentItem);
+        CommandContextUtil.getContentItemEntityManager().delete(contentItem);
 
         return null;
     }

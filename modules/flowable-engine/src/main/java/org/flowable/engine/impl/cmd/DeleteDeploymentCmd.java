@@ -15,8 +15,9 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -38,7 +39,7 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
         }
 
         // Remove process definitions from cache:
-        commandContext.getProcessEngineConfiguration().getDeploymentManager().removeDeployment(deploymentId, cascade);
+        CommandContextUtil.getProcessEngineConfiguration(commandContext).getDeploymentManager().removeDeployment(deploymentId, cascade);
 
         return null;
     }

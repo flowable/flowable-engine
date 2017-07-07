@@ -31,10 +31,11 @@ import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentService;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -65,7 +66,7 @@ public class StartProcessInstanceWithFormCmd implements Command<ProcessInstance>
     }
 
     public ProcessInstance execute(CommandContext commandContext) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         DeploymentManager deploymentCache = processEngineConfiguration.getDeploymentManager();
 
         // Find the process definition
@@ -109,7 +110,7 @@ public class StartProcessInstanceWithFormCmd implements Command<ProcessInstance>
     protected ProcessInstance createAndStartProcessInstance(ProcessDefinition processDefinition, String processInstanceName,
             Map<String, Object> variables, CommandContext commandContext) {
 
-        ProcessInstanceHelper processInstanceHelper = commandContext.getProcessEngineConfiguration().getProcessInstanceHelper();
+        ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
         return processInstanceHelper.createAndStartProcessInstance(processDefinition, null, processInstanceName, variables, null);
     }
 
@@ -129,7 +130,7 @@ public class StartProcessInstanceWithFormCmd implements Command<ProcessInstance>
      * content so we can retrieve it later.
      */
     protected void processUploadFieldsIfNeeded(FormModel formModel, String processInstanceId, CommandContext commandContext) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (!processEngineConfiguration.isContentEngineInitialized()) {
             return;
         }

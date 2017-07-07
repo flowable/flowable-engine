@@ -17,9 +17,10 @@ import java.io.Serializable;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;
 
 /**
@@ -40,7 +41,7 @@ public abstract class NeedsActiveExecutionCmd<T> implements Command<T>, Serializ
             throw new FlowableIllegalArgumentException("executionId is null");
         }
 
-        ExecutionEntity execution = commandContext.getExecutionEntityManager().findById(executionId);
+        ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager(commandContext).findById(executionId);
 
         if (execution == null) {
             throw new FlowableObjectNotFoundException("execution " + executionId + " doesn't exist", Execution.class);

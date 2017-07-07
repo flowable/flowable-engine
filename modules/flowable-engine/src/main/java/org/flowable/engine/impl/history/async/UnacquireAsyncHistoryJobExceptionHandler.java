@@ -12,11 +12,12 @@
  */
 package org.flowable.engine.impl.history.async;
 
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.asyncexecutor.AsyncRunnableExecutionExceptionHandler;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.JobInfo;
 
 public class UnacquireAsyncHistoryJobExceptionHandler implements AsyncRunnableExecutionExceptionHandler {
@@ -31,7 +32,7 @@ public class UnacquireAsyncHistoryJobExceptionHandler implements AsyncRunnableEx
                     CommandConfig commandConfig = processEngineConfiguration.getCommandExecutor().getDefaultConfig().transactionRequiresNew();
                     return processEngineConfiguration.getCommandExecutor().execute(commandConfig, new Command<Boolean>() {
                         public Boolean execute(CommandContext commandContext2) {
-                            commandContext2.getJobManager().unacquireWithDecrementRetries(job);
+                            CommandContextUtil.getJobManager(commandContext2).unacquireWithDecrementRetries(job);
                             return true;
                         }
                     });

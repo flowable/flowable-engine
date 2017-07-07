@@ -26,10 +26,10 @@ import org.flowable.engine.impl.TimerJobQueryImpl;
 import org.flowable.engine.impl.calendar.BusinessCalendar;
 import org.flowable.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.data.TimerJobDataManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -254,7 +254,7 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
     protected String getBusinessCalendarName(String calendarName, VariableScope variableScope) {
         String businessCalendarName = CycleBusinessCalendar.NAME;
         if (StringUtils.isNotEmpty(calendarName)) {
-            businessCalendarName = (String) Context.getProcessEngineConfiguration().getExpressionManager()
+            businessCalendarName = (String) CommandContextUtil.getProcessEngineConfiguration().getExpressionManager()
                     .createExpression(calendarName).getValue(variableScope);
         }
         return businessCalendarName;

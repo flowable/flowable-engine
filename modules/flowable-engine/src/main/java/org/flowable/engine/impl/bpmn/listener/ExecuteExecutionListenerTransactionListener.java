@@ -12,14 +12,15 @@
  */
 package org.flowable.engine.impl.bpmn.listener;
 
+import org.flowable.engine.common.impl.cfg.TransactionListener;
 import org.flowable.engine.common.impl.cfg.TransactionPropagation;
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.TransactionDependentExecutionListener;
-import org.flowable.engine.impl.cfg.TransactionListener;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * A {@link TransactionListener} that invokes an {@link ExecutionListener}.
@@ -39,7 +40,7 @@ public class ExecuteExecutionListenerTransactionListener implements TransactionL
 
     @Override
     public void execute(CommandContext commandContext) {
-        CommandExecutor commandExecutor = commandContext.getProcessEngineConfiguration().getCommandExecutor();
+        CommandExecutor commandExecutor = CommandContextUtil.getProcessEngineConfiguration(commandContext).getCommandExecutor();
         CommandConfig commandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
         commandExecutor.execute(commandConfig, new Command<Void>() {
             public Void execute(CommandContext commandContext) {

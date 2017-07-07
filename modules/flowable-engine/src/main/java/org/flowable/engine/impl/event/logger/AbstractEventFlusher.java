@@ -15,8 +15,8 @@ package org.flowable.engine.impl.event.logger;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.event.logger.handler.EventLoggerEventHandler;
-import org.flowable.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez

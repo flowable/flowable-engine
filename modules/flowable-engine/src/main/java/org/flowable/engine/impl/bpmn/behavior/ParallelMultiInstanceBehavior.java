@@ -26,14 +26,14 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.Transaction;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.ScopeUtil;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -62,7 +62,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
         List<ExecutionEntity> concurrentExecutions = new ArrayList<>();
         for (int loopCounter = 0; loopCounter < nrOfInstances; loopCounter++) {
-            ExecutionEntity concurrentExecution = Context.getCommandContext().getExecutionEntityManager()
+            ExecutionEntity concurrentExecution = CommandContextUtil.getExecutionEntityManager()
                     .createChildExecution((ExecutionEntity) multiInstanceRootExecution);
             concurrentExecution.setCurrentFlowElement(activity);
             concurrentExecution.setActive(true);
@@ -71,7 +71,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
             concurrentExecutions.add(concurrentExecution);
             logLoopDetails(concurrentExecution, "initialized", loopCounter, 0, nrOfInstances, nrOfInstances);
             
-            //Context.getCommandContext().getHistoryManager().recordActivityStart(concurrentExecution);
+            //CommandContextUtil.getHistoryManager().recordActivityStart(concurrentExecution);
         }
 
         // Before the activities are executed, all executions MUST be created up front
@@ -116,7 +116,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         int nrOfCompletedInstances = getLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES) + 1;
         int nrOfActiveInstances = getLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES) - 1;
 
-        Context.getCommandContext().getHistoryManager().recordActivityEnd((ExecutionEntity) execution, null);
+        CommandContextUtil.getHistoryManager().recordActivityEnd((ExecutionEntity) execution, null);
         callActivityEndListeners(execution);
 
         if (zeroNrOfInstances) {
@@ -144,7 +144,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
                 if (nrOfInstances > 0) {
                     leavingExecution = executionEntity.getParent();
                 } else {
-                    Context.getCommandContext().getHistoryManager().recordActivityEnd((ExecutionEntity) execution, null);
+                    CommandContextUtil.getHistoryManager().recordActivityEnd((ExecutionEntity) execution, null);
                     leavingExecution = executionEntity;
                 }
 
@@ -206,7 +206,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
     protected void verifyCallActivity(ExecutionEntity executionToUse, Activity activity) {
         if (activity instanceof CallActivity) {
-            ExecutionEntityManager executionEntityManager = Context.getCommandContext().getExecutionEntityManager();
+            ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
             if (executionToUse != null) {
                 List<String> callActivityExecutionIds = new ArrayList<String>();
 
@@ -238,7 +238,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
     protected void lockFirstParentScope(DelegateExecution execution) {
 
-        ExecutionEntityManager executionEntityManager = Context.getCommandContext().getExecutionEntityManager();
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
 
         boolean found = false;
         ExecutionEntity parentScopeExecution = null;
@@ -257,7 +257,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     // TODO: can the ExecutionManager.deleteChildExecution not be used?
     protected void deleteChildExecutions(ExecutionEntity parentExecution, boolean deleteExecution, CommandContext commandContext) {
         // Delete all child executions
-        ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         Collection<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByParentExecutionId(parentExecution.getId());
         if (CollectionUtil.isNotEmpty(childExecutions)) {
             for (ExecutionEntity childExecution : childExecutions) {

@@ -16,10 +16,11 @@ import java.io.Serializable;
 
 import org.flowable.engine.JobNotFoundException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ public class MoveDeadLetterJobToExecutableJobCmd implements Command<JobEntity>, 
             throw new FlowableIllegalArgumentException("jobId and job is null");
         }
 
-        DeadLetterJobEntity job = commandContext.getDeadLetterJobEntityManager().findById(jobId);
+        DeadLetterJobEntity job = CommandContextUtil.getDeadLetterJobEntityManager(commandContext).findById(jobId);
         if (job == null) {
             throw new JobNotFoundException(jobId);
         }
@@ -55,7 +56,7 @@ public class MoveDeadLetterJobToExecutableJobCmd implements Command<JobEntity>, 
             LOGGER.debug("Moving deadletter job to executable job table {}", job.getId());
         }
 
-        return commandContext.getJobManager().moveDeadLetterJobToExecutableJob(job, retries);
+        return CommandContextUtil.getJobManager(commandContext).moveDeadLetterJobToExecutableJob(job, retries);
     }
 
     public String getJobId() {

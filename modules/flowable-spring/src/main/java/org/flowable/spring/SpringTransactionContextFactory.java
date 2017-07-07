@@ -13,10 +13,10 @@
 
 package org.flowable.spring;
 
+import org.flowable.engine.common.impl.cfg.TransactionContext;
 import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
-import org.flowable.engine.impl.cfg.TransactionContext;
-import org.flowable.engine.impl.cfg.TransactionListener;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.cfg.TransactionListener;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**

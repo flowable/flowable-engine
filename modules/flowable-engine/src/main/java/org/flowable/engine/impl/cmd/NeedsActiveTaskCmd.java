@@ -17,9 +17,10 @@ import java.io.Serializable;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Task;
 
 /**
@@ -43,7 +44,7 @@ public abstract class NeedsActiveTaskCmd<T> implements Command<T>, Serializable 
             throw new FlowableIllegalArgumentException("taskId is null");
         }
 
-        TaskEntity task = commandContext.getTaskEntityManager().findById(taskId);
+        TaskEntity task = CommandContextUtil.getTaskEntityManager(commandContext).findById(taskId);
 
         if (task == null) {
             throw new FlowableObjectNotFoundException("Cannot find task with id " + taskId, Task.class);

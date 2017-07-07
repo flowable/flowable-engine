@@ -17,11 +17,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.engine.common.impl.Page;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -148,7 +149,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
             public Void execute(CommandContext commandContext) {
                 Date currentTime = processEngineConfiguration.getClock().getCurrentTime();
-                commandContext.getTimerJobEntityManager().findById(job.getId()).setDuedate(new Date(currentTime.getTime() - 10000));
+                CommandContextUtil.getTimerJobEntityManager(commandContext).findById(job.getId()).setDuedate(new Date(currentTime.getTime() - 10000));
                 return null;
             }
 
@@ -158,7 +159,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
     protected List<TimerJobEntity> executeAcquireJobsCommand() {
         return processEngineConfiguration.getCommandExecutor().execute(new Command<List<TimerJobEntity>>() {
             public List<TimerJobEntity> execute(CommandContext commandContext) {
-                return commandContext.getTimerJobEntityManager().findTimerJobsToExecute(new Page(0, 1));
+                return CommandContextUtil.getTimerJobEntityManager(commandContext).findTimerJobsToExecute(new Page(0, 1));
             }
 
         });

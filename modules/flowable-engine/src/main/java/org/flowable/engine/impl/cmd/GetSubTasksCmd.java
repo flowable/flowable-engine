@@ -16,8 +16,9 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Task;
 
 /**
@@ -33,7 +34,7 @@ public class GetSubTasksCmd implements Command<List<Task>>, Serializable {
     }
 
     public List<Task> execute(CommandContext commandContext) {
-        return commandContext.getTaskEntityManager().findTasksByParentTaskId(parentTaskId);
+        return CommandContextUtil.getTaskEntityManager(commandContext).findTasksByParentTaskId(parentTaskId);
     }
 
 }

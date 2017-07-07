@@ -25,11 +25,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.content.api.ContentItem;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormFieldTypes;
@@ -49,7 +50,7 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
     }
 
     public FormModel execute(CommandContext commandContext) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (!processEngineConfiguration.isFormEngineInitialized()) {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }

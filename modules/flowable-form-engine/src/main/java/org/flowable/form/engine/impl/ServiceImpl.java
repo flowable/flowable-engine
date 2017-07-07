@@ -12,8 +12,8 @@
  */
 package org.flowable.form.engine.impl;
 
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.form.engine.FormEngineConfiguration;
-import org.flowable.form.engine.impl.interceptor.CommandExecutor;
 
 public abstract class ServiceImpl {
 

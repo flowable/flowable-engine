@@ -15,10 +15,11 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.IdentityLink;
 import org.flowable.engine.task.IdentityLinkType;
 
@@ -37,7 +38,7 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<IdentityLink> execute(CommandContext commandContext) {
-        TaskEntity task = commandContext.getTaskEntityManager().findById(taskId);
+        TaskEntity task = CommandContextUtil.getTaskEntityManager(commandContext).findById(taskId);
 
         List<IdentityLink> identityLinks = (List) task.getIdentityLinks();
 
@@ -53,14 +54,14 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
         // and of course this leads to exception while trying to delete a
         // non-existing identityLink
         if (task.getAssignee() != null) {
-            IdentityLinkEntity identityLink = commandContext.getIdentityLinkEntityManager().create();
+            IdentityLinkEntity identityLink = CommandContextUtil.getIdentityLinkEntityManager(commandContext).create();
             identityLink.setUserId(task.getAssignee());
             identityLink.setType(IdentityLinkType.ASSIGNEE);
             identityLink.setTaskId(task.getId());
             identityLinks.add(identityLink);
         }
         if (task.getOwner() != null) {
-            IdentityLinkEntity identityLink = commandContext.getIdentityLinkEntityManager().create();
+            IdentityLinkEntity identityLink = CommandContextUtil.getIdentityLinkEntityManager(commandContext).create();
             identityLink.setUserId(task.getOwner());
             identityLink.setTaskId(task.getId());
             identityLink.setType(IdentityLinkType.OWNER);

@@ -14,7 +14,7 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * <p>
@@ -61,7 +61,7 @@ public class ByteArrayRef implements Serializable {
     private void setBytes(byte[] bytes) {
         if (id == null) {
             if (bytes != null) {
-                ByteArrayEntityManager byteArrayEntityManager = Context.getCommandContext().getByteArrayEntityManager();
+                ByteArrayEntityManager byteArrayEntityManager = CommandContextUtil.getByteArrayEntityManager();
                 entity = byteArrayEntityManager.create();
                 entity.setName(name);
                 entity.setBytes(bytes);
@@ -84,9 +84,9 @@ public class ByteArrayRef implements Serializable {
             if (entity != null) {
                 // if the entity has been loaded already,
                 // we might as well use the safer optimistic locking delete.
-                Context.getCommandContext().getByteArrayEntityManager().delete(entity);
+                CommandContextUtil.getByteArrayEntityManager().delete(entity);
             } else {
-                Context.getCommandContext().getByteArrayEntityManager().deleteByteArrayById(id);
+                CommandContextUtil.getByteArrayEntityManager().deleteByteArrayById(id);
             }
             entity = null;
             id = null;
@@ -96,7 +96,7 @@ public class ByteArrayRef implements Serializable {
 
     private void ensureInitialized() {
         if (id != null && entity == null) {
-            entity = Context.getCommandContext().getByteArrayEntityManager().findById(id);
+            entity = CommandContextUtil.getByteArrayEntityManager().findById(id);
             name = entity.getName();
         }
     }

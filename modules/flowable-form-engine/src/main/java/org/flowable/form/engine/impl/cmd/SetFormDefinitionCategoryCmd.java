@@ -14,11 +14,12 @@ package org.flowable.form.engine.impl.cmd;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.form.engine.impl.interceptor.Command;
-import org.flowable.form.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.form.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.form.engine.impl.persistence.deploy.FormDefinitionCacheEntry;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
+import org.flowable.form.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -40,7 +41,7 @@ public class SetFormDefinitionCategoryCmd implements Command<Void> {
             throw new FlowableIllegalArgumentException("Form definition id is null");
         }
 
-        FormDefinitionEntity formDefinition = commandContext.getFormDefinitionEntityManager().findById(formDefinitionId);
+        FormDefinitionEntity formDefinition = CommandContextUtil.getFormDefinitionEntityManager(commandContext).findById(formDefinitionId);
 
         if (formDefinition == null) {
             throw new FlowableObjectNotFoundException("No form definition found for id = '" + formDefinitionId + "'");
@@ -50,12 +51,12 @@ public class SetFormDefinitionCategoryCmd implements Command<Void> {
         formDefinition.setCategory(category);
 
         // Remove form from cache, it will be refetched later
-        DeploymentCache<FormDefinitionCacheEntry> formDefinitionCache = commandContext.getFormEngineConfiguration().getFormDefinitionCache();
+        DeploymentCache<FormDefinitionCacheEntry> formDefinitionCache = CommandContextUtil.getFormEngineConfiguration().getFormDefinitionCache();
         if (formDefinitionCache != null) {
             formDefinitionCache.remove(formDefinitionId);
         }
 
-        commandContext.getFormDefinitionEntityManager().update(formDefinition);
+        CommandContextUtil.getFormDefinitionEntityManager(commandContext).update(formDefinition);
 
         return null;
     }

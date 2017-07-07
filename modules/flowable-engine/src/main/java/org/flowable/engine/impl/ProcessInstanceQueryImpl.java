@@ -22,11 +22,12 @@ import java.util.Set;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.SuspensionState;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 
@@ -628,7 +629,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         ensureVariablesInitialized();
-        return commandContext.getExecutionEntityManager().findProcessInstanceCountByQueryCriteria(this);
+        return CommandContextUtil.getExecutionEntityManager(commandContext).findProcessInstanceCountByQueryCriteria(this);
     }
 
     public List<ProcessInstance> executeList(CommandContext commandContext) {
@@ -636,12 +637,12 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         ensureVariablesInitialized();
         List<ProcessInstance> processInstances = null;
         if (includeProcessVariables) {
-            processInstances = commandContext.getExecutionEntityManager().findProcessInstanceAndVariablesByQueryCriteria(this);
+            processInstances = CommandContextUtil.getExecutionEntityManager(commandContext).findProcessInstanceAndVariablesByQueryCriteria(this);
         } else {
-            processInstances = commandContext.getExecutionEntityManager().findProcessInstanceByQueryCriteria(this);
+            processInstances = CommandContextUtil.getExecutionEntityManager(commandContext).findProcessInstanceByQueryCriteria(this);
         }
 
-        if (Context.getProcessEngineConfiguration().getPerformanceSettings().isEnableLocalization()) {
+        if (CommandContextUtil.getProcessEngineConfiguration().getPerformanceSettings().isEnableLocalization()) {
             for (ProcessInstance processInstance : processInstances) {
                 localize(processInstance);
             }
@@ -667,7 +668,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         if (locale != null) {
             String processDefinitionId = processInstanceExecution.getProcessDefinitionId();
             if (processDefinitionId != null) {
-                ObjectNode languageNode = Context.getLocalizationElementProperties(locale, processInstanceExecution.getProcessDefinitionKey(), processDefinitionId, withLocalizationFallback);
+                ObjectNode languageNode = BpmnOverrideContext.getLocalizationElementProperties(locale, processInstanceExecution.getProcessDefinitionKey(), processDefinitionId, withLocalizationFallback);
                 if (languageNode != null) {
                     JsonNode languageNameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
                     if (languageNameNode != null && !languageNameNode.isNull()) {

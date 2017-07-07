@@ -15,8 +15,9 @@ package org.flowable.idm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -40,7 +41,7 @@ public class CreateMembershipCmd implements Command<Object>, Serializable {
         if (groupId == null) {
             throw new FlowableIllegalArgumentException("groupId is null");
         }
-        commandContext.getMembershipEntityManager().createMembership(userId, groupId);
+        CommandContextUtil.getMembershipEntityManager(commandContext).createMembership(userId, groupId);
         return null;
     }
 }

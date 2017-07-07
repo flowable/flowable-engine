@@ -24,7 +24,6 @@ import java.util.regex.Pattern;
 import org.flowable.engine.common.api.FlowableClassLoadingException;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.idm.engine.IdmEngineConfiguration;
-import org.flowable.idm.engine.impl.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -262,7 +261,7 @@ public abstract class ReflectUtil {
     }
 
     private static ClassLoader getCustomClassLoader() {
-        IdmEngineConfiguration idmEngineConfiguration = Context.getIdmEngineConfiguration();
+        IdmEngineConfiguration idmEngineConfiguration = CommandContextUtil.getIdmEngineConfiguration();
         if (idmEngineConfiguration != null) {
             final ClassLoader classLoader = idmEngineConfiguration.getClassLoader();
             if (classLoader != null) {
@@ -273,7 +272,7 @@ public abstract class ReflectUtil {
     }
 
     private static Class loadClass(ClassLoader classLoader, String className) throws ClassNotFoundException {
-        IdmEngineConfiguration idmEngineConfiguration = Context.getIdmEngineConfiguration();
+        IdmEngineConfiguration idmEngineConfiguration = CommandContextUtil.getIdmEngineConfiguration();
         boolean useClassForName = idmEngineConfiguration == null || idmEngineConfiguration.isUseClassForNameClassLoading();
         return useClassForName ? Class.forName(className, true, classLoader) : classLoader.loadClass(className);
     }

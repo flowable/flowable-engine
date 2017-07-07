@@ -13,10 +13,12 @@
 
 package org.flowable.engine.impl.event;
 
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Daniel Meyer
@@ -33,9 +35,9 @@ public class MessageEventHandler extends AbstractEventHandler {
     public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
         // As stated in the FlowableEventType java-doc, the message-event is
         // thrown before the actual message has been sent
-        if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            commandContext
-                    .getProcessEngineConfiguration()
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        if (processEngineConfiguration.getEventDispatcher().isEnabled()) {
+            processEngineConfiguration
                     .getEventDispatcher()
                     .dispatchEvent(
                             FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_RECEIVED, eventSubscription.getActivityId(), eventSubscription.getEventName(), payload,

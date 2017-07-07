@@ -23,11 +23,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.javax.el.ELContext;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.variable.VariableType;
 import org.flowable.engine.impl.variable.VariableTypes;
 
@@ -819,14 +820,14 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
     }
 
     protected void deleteVariableInstanceForExplicitUserCall(VariableInstanceEntity variableInstance, ExecutionEntity sourceActivityExecution) {
-        Context.getCommandContext().getVariableInstanceEntityManager().delete(variableInstance);
+        CommandContextUtil.getVariableInstanceEntityManager().delete(variableInstance);
         variableInstance.setValue(null);
 
         // Record historic variable deletion
-        Context.getCommandContext().getHistoryManager().recordVariableRemoved(variableInstance);
+        CommandContextUtil.getHistoryManager().recordVariableRemoved(variableInstance);
 
         // Record historic detail
-        Context.getCommandContext().getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, sourceActivityExecution, isActivityIdUsedForDetails());
+        CommandContextUtil.getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, sourceActivityExecution, isActivityIdUsedForDetails());
     }
 
     protected void updateVariableInstance(VariableInstanceEntity variableInstance, Object value, ExecutionEntity sourceActivityExecution) {
@@ -835,7 +836,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         // checking chain (e.g. serializable) and will return true on isAbleToStore(), even though another type
         // higher in the chain is eligible for storage.
 
-        VariableTypes variableTypes = Context.getProcessEngineConfiguration().getVariableTypes();
+        VariableTypes variableTypes = CommandContextUtil.getProcessEngineConfiguration().getVariableTypes();
 
         VariableType newType = variableTypes.findVariableType(value);
 
@@ -848,31 +849,29 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             variableInstance.setValue(value);
         }
 
-        Context.getCommandContext().getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, sourceActivityExecution, isActivityIdUsedForDetails());
+        CommandContextUtil.getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, sourceActivityExecution, isActivityIdUsedForDetails());
 
-        Context.getCommandContext().getHistoryManager().recordVariableUpdate(variableInstance);
+        CommandContextUtil.getHistoryManager().recordVariableUpdate(variableInstance);
     }
 
     protected VariableInstanceEntity createVariableInstance(String variableName, Object value, ExecutionEntity sourceActivityExecution) {
-        VariableTypes variableTypes = Context.getProcessEngineConfiguration().getVariableTypes();
+        VariableTypes variableTypes = CommandContextUtil.getProcessEngineConfiguration().getVariableTypes();
 
         VariableType type = variableTypes.findVariableType(value);
 
-        VariableInstanceEntity variableInstance = Context.getCommandContext()
-                .getVariableInstanceEntityManager()
-                .create(variableName, type, value);
+        VariableInstanceEntity variableInstance = CommandContextUtil.getVariableInstanceEntityManager().create(variableName, type, value);
         initializeVariableInstanceBackPointer(variableInstance);
-        Context.getCommandContext().getVariableInstanceEntityManager().insert(variableInstance);
+        CommandContextUtil.getVariableInstanceEntityManager().insert(variableInstance);
 
         if (variableInstances != null) {
             variableInstances.put(variableName, variableInstance);
         }
 
         // Record historic variable
-        Context.getCommandContext().getHistoryManager().recordVariableCreate(variableInstance);
+        CommandContextUtil.getHistoryManager().recordVariableCreate(variableInstance);
 
         // Record historic detail
-        Context.getCommandContext().getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, sourceActivityExecution, isActivityIdUsedForDetails());
+        CommandContextUtil.getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, sourceActivityExecution, isActivityIdUsedForDetails());
 
         return variableInstance;
     }

@@ -22,10 +22,11 @@ import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -69,7 +70,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     }
 
     public ProcessInstance execute(CommandContext commandContext) {
-        DeploymentManager deploymentCache = commandContext.getProcessEngineConfiguration().getDeploymentManager();
+        DeploymentManager deploymentCache = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDeploymentManager();
 
         // Find the process definition
         ProcessDefinition processDefinition = null;
@@ -98,7 +99,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
             throw new FlowableIllegalArgumentException("processDefinitionKey and processDefinitionId are null");
         }
 
-        processInstanceHelper = commandContext.getProcessEngineConfiguration().getProcessInstanceHelper();
+        processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
         ProcessInstance processInstance = createAndStartProcessInstance(processDefinition, businessKey, processInstanceName, variables, transientVariables);
 
         return processInstance;

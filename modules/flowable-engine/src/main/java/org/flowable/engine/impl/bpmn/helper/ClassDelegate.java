@@ -36,13 +36,14 @@ import org.flowable.engine.delegate.TransactionDependentTaskListener;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ServiceTaskJavaDelegateActivityBehavior;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
 import org.flowable.engine.impl.delegate.invocation.ExecutionListenerInvocation;
 import org.flowable.engine.impl.delegate.invocation.TaskListenerInvocation;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -92,7 +93,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
     @Override
     public void notify(DelegateExecution execution) {
         ExecutionListener executionListenerInstance = getExecutionListenerInstance();
-        Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new ExecutionListenerInvocation(executionListenerInstance, execution));
+        CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new ExecutionListenerInvocation(executionListenerInstance, execution));
     }
 
     // Transaction Dependent execution listener
@@ -118,7 +119,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         TaskListener taskListenerInstance = getTaskListenerInstance();
 
         try {
-            Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new TaskListenerInvocation(taskListenerInstance, delegateTask));
+            CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new TaskListenerInvocation(taskListenerInstance, delegateTask));
         } catch (Exception e) {
             throw new FlowableException("Exception while invoking TaskListener: " + e.getMessage(), e);
         }
@@ -179,8 +180,8 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
 
     // Activity Behavior
     public void execute(DelegateExecution execution) {
-        if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
-            ObjectNode taskElementProperties = Context.getBpmnOverrideElementProperties(serviceTaskId, execution.getProcessDefinitionId());
+        if (CommandContextUtil.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
+            ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(serviceTaskId, execution.getProcessDefinitionId());
             if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME)) {
                 String overrideClassName = taskElementProperties.get(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME).asText();
                 if (StringUtils.isNotEmpty(overrideClassName) && !overrideClassName.equals(className)) {

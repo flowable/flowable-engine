@@ -15,9 +15,10 @@ package org.flowable.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.idm.api.GroupQuery;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -27,7 +28,7 @@ public class CreateGroupQueryCmd implements Command<GroupQuery>, Serializable {
     private static final long serialVersionUID = 1L;
 
     public GroupQuery execute(CommandContext commandContext) {
-        return commandContext.getGroupEntityManager().createNewGroupQuery();
+        return CommandContextUtil.getGroupEntityManager(commandContext).createNewGroupQuery();
     }
 
 }

@@ -20,13 +20,13 @@ import java.util.List;
 
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.delegate.TaskListener;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -227,7 +227,7 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
 
         @Override
         public void notify(DelegateTask delegateTask) {
-            IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
+            IdentityService identityService = CommandContextUtil.getProcessEngineConfiguration().getIdentityService();
             User user = identityService.newUser("Kermit");
             user.setFirstName("Mr");
             user.setLastName("Kermit");
@@ -241,7 +241,7 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
         @Override
         public void execute(DelegateExecution execution) {
 
-            ManagementService managementService = Context.getProcessEngineConfiguration().getManagementService();
+            ManagementService managementService = CommandContextUtil.getProcessEngineConfiguration().getManagementService();
             managementService.executeCommand(new Command<Void>() {
                 @Override
                 public Void execute(CommandContext commandContext) {
@@ -249,7 +249,7 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
                 }
             });
 
-            IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
+            IdentityService identityService = CommandContextUtil.getProcessEngineConfiguration().getIdentityService();
 
             String username = "Kermit";
             User user = identityService.newUser(username);

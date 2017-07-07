@@ -13,9 +13,9 @@
 package org.flowable.engine.impl.bpmn.behavior;
 
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * Super class for all gateway activity implementations.
@@ -28,7 +28,7 @@ public abstract class GatewayActivityBehavior extends FlowNodeActivityBehavior {
 
     protected void lockFirstParentScope(DelegateExecution execution) {
 
-        ExecutionEntityManager executionEntityManager = Context.getCommandContext().getExecutionEntityManager();
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
 
         boolean found = false;
         ExecutionEntity parentScopeExecution = null;

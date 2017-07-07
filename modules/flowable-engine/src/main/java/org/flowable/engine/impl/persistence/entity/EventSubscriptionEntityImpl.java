@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -43,7 +43,7 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEntity impleme
     protected ExecutionEntity execution;
 
     public EventSubscriptionEntityImpl() {
-        this.created = Context.getProcessEngineConfiguration().getClock().getCurrentTime();
+        this.created = CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTime();
     }
 
     public Object getPersistentState() {
@@ -86,7 +86,7 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEntity impleme
 
     public ExecutionEntity getExecution() {
         if (execution == null && executionId != null) {
-            execution = Context.getCommandContext().getExecutionEntityManager().findById(executionId);
+            execution = CommandContextUtil.getExecutionEntityManager().findById(executionId);
         }
         return execution;
     }

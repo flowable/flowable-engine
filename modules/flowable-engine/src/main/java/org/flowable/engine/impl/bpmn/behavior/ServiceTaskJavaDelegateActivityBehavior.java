@@ -18,9 +18,9 @@ import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.invocation.JavaDelegateInvocation;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -43,7 +43,7 @@ public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavio
     public void execute(DelegateExecution execution) {
         boolean isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(execution, skipExpression);
         if (!isSkipExpressionEnabled || (isSkipExpressionEnabled && !SkipExpressionUtil.shouldSkipFlowElement(execution, skipExpression))) {
-            Context.getProcessEngineConfiguration().getDelegateInterceptor()
+            CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor()
                 .handleInvocation(new JavaDelegateInvocation(javaDelegate, execution));
         }
         leave(execution);

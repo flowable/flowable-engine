@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -63,7 +63,7 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
 
     public Map<String, ResourceEntity> getResources() {
         if (resources == null && id != null) {
-            List<ResourceEntity> resourcesList = Context.getCommandContext().getResourceEntityManager().findResourcesByDeploymentId(id);
+            List<ResourceEntity> resourcesList = CommandContextUtil.getResourceEntityManager().findResourcesByDeploymentId(id);
             resources = new HashMap<String, ResourceEntity>();
             for (ResourceEntity resource : resourcesList) {
                 resources.put(resource.getName(), resource);

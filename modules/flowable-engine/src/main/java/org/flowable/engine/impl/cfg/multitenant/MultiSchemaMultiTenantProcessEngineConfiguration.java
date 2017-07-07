@@ -18,6 +18,9 @@ import javax.sql.DataSource;
 
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.common.impl.persistence.StrongUuidGenerator;
 import org.flowable.engine.impl.SchemaOperationProcessEngineClose;
 import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
@@ -26,9 +29,7 @@ import org.flowable.engine.impl.asyncexecutor.multitenant.SharedExecutorServiceA
 import org.flowable.engine.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.db.DbIdGenerator;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -181,7 +182,7 @@ public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEng
     public Command<Void> getProcessEngineCloseCommand() {
         return new Command<Void>() {
             public Void execute(CommandContext commandContext) {
-                commandContext.getProcessEngineConfiguration().getCommandExecutor().execute(new SchemaOperationProcessEngineClose());
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getCommandExecutor().execute(new SchemaOperationProcessEngineClose());
                 return null;
             }
         };

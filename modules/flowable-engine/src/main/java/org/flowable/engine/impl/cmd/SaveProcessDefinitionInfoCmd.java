@@ -16,10 +16,11 @@ import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -48,17 +49,17 @@ public class SaveProcessDefinitionInfoCmd implements Command<Void>, Serializable
             throw new FlowableIllegalArgumentException("process definition info node is null");
         }
 
-        ProcessDefinitionInfoEntityManager definitionInfoEntityManager = commandContext.getProcessDefinitionInfoEntityManager();
+        ProcessDefinitionInfoEntityManager definitionInfoEntityManager = CommandContextUtil.getProcessDefinitionInfoEntityManager(commandContext);
         ProcessDefinitionInfoEntity definitionInfoEntity = definitionInfoEntityManager.findProcessDefinitionInfoByProcessDefinitionId(processDefinitionId);
         if (definitionInfoEntity == null) {
             definitionInfoEntity = definitionInfoEntityManager.create();
             definitionInfoEntity.setProcessDefinitionId(processDefinitionId);
-            commandContext.getProcessDefinitionInfoEntityManager().insertProcessDefinitionInfo(definitionInfoEntity);
+            CommandContextUtil.getProcessDefinitionInfoEntityManager().insertProcessDefinitionInfo(definitionInfoEntity);
         }
 
         try {
-            ObjectWriter writer = commandContext.getProcessEngineConfiguration().getObjectMapper().writer();
-            commandContext.getProcessDefinitionInfoEntityManager().updateInfoJson(definitionInfoEntity.getId(), writer.writeValueAsBytes(infoNode));
+            ObjectWriter writer = CommandContextUtil.getProcessEngineConfiguration(commandContext).getObjectMapper().writer();
+            CommandContextUtil.getProcessDefinitionInfoEntityManager().updateInfoJson(definitionInfoEntity.getId(), writer.writeValueAsBytes(infoNode));
         } catch (Exception e) {
             throw new FlowableException("Unable to serialize info node " + infoNode);
         }

@@ -21,10 +21,10 @@ import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DmnRepositoryServiceImpl;
-import org.flowable.dmn.engine.impl.context.Context;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
-import org.flowable.dmn.engine.impl.persistence.entity.ResourceEntity;
-import org.flowable.dmn.engine.impl.persistence.entity.ResourceEntityManager;
+import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntity;
+import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityManager;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
 import org.flowable.engine.common.api.FlowableException;
@@ -38,14 +38,14 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
     protected static final String DEFAULT_ENCODING = "UTF-8";
 
     protected transient DmnRepositoryServiceImpl repositoryService;
-    protected transient ResourceEntityManager resourceEntityManager;
+    protected transient DmnResourceEntityManager resourceEntityManager;
 
     protected DmnDeploymentEntity deployment;
     protected boolean isDmn20XsdValidationEnabled = true;
     protected boolean isDuplicateFilterEnabled;
 
     public DmnDeploymentBuilderImpl() {
-        DmnEngineConfiguration dmnEngineConfiguration = Context.getDmnEngineConfiguration();
+        DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
         this.repositoryService = (DmnRepositoryServiceImpl) dmnEngineConfiguration.getDmnRepositoryService();
         this.deployment = dmnEngineConfiguration.getDeploymentEntityManager().create();
         this.resourceEntityManager = dmnEngineConfiguration.getResourceEntityManager();
@@ -67,7 +67,7 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
             throw new FlowableException("byte array for resource '" + resourceName + "' is null");
         }
 
-        ResourceEntity resource = resourceEntityManager.create();
+        DmnResourceEntity resource = resourceEntityManager.create();
         resource.setName(resourceName);
         resource.setBytes(bytes);
         deployment.addResource(resource);
@@ -87,7 +87,7 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
             throw new FlowableException("text is null");
         }
 
-        ResourceEntity resource = resourceEntityManager.create();
+        DmnResourceEntity resource = resourceEntityManager.create();
         resource.setName(resourceName);
         try {
             resource.setBytes(text.getBytes(DEFAULT_ENCODING));
@@ -103,7 +103,7 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
             throw new FlowableException("dmn bytes is null");
         }
 
-        ResourceEntity resource = resourceEntityManager.create();
+        DmnResourceEntity resource = resourceEntityManager.create();
         resource.setName(resourceName);
         resource.setBytes(dmnBytes);
         deployment.addResource(resource);

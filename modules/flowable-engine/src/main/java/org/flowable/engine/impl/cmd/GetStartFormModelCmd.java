@@ -27,9 +27,10 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.content.api.ContentItem;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.form.model.FormField;
@@ -52,7 +53,7 @@ public class GetStartFormModelCmd implements Command<FormModel>, Serializable {
     }
 
     public FormModel execute(CommandContext commandContext) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (!processEngineConfiguration.isFormEngineInitialized()) {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }

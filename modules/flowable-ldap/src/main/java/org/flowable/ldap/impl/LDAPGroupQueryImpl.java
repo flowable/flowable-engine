@@ -22,9 +22,9 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.engine.impl.GroupQueryImpl;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntity;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl;
 import org.flowable.ldap.LDAPCallBack;

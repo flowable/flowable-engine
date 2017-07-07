@@ -22,10 +22,11 @@ import org.flowable.content.api.ContentMetaDataKeys;
 import org.flowable.content.api.ContentObject;
 import org.flowable.content.api.ContentStorage;
 import org.flowable.content.engine.ContentEngineConfiguration;
-import org.flowable.content.engine.impl.interceptor.Command;
-import org.flowable.content.engine.impl.interceptor.CommandContext;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntity;
+import org.flowable.content.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Tijs Rademakers
@@ -57,7 +58,7 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
 
         ContentItemEntity contentItemEntity = (ContentItemEntity) contentItem;
 
-        ContentEngineConfiguration contentEngineConfiguration = commandContext.getContentEngineConfiguration();
+        ContentEngineConfiguration contentEngineConfiguration = CommandContextUtil.getContentEngineConfiguration();
 
         if (inputStream != null) {
             // Stream given, write to store and save a reference to the content object
@@ -90,10 +91,10 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
                 contentItemEntity.setCreated(contentEngineConfiguration.getClock().getCurrentTime());
             }
 
-            commandContext.getContentItemEntityManager().insert(contentItemEntity);
+            CommandContextUtil.getContentItemEntityManager().insert(contentItemEntity);
 
         } else {
-            commandContext.getContentItemEntityManager().update(contentItemEntity);
+            CommandContextUtil.getContentItemEntityManager().update(contentItemEntity);
         }
 
         return null;

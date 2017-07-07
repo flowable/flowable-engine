@@ -12,9 +12,6 @@
  */
 package org.flowable.engine.impl.event.logger.handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +31,9 @@ import org.flowable.engine.impl.variable.UUIDType;
 import org.flowable.engine.impl.variable.VariableType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez

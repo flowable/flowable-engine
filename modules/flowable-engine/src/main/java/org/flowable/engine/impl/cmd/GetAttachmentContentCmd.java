@@ -17,10 +17,11 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
 
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntity;
 import org.flowable.engine.impl.persistence.entity.ByteArrayEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -35,14 +36,14 @@ public class GetAttachmentContentCmd implements Command<InputStream>, Serializab
     }
 
     public InputStream execute(CommandContext commandContext) {
-        AttachmentEntity attachment = commandContext.getAttachmentEntityManager().findById(attachmentId);
+        AttachmentEntity attachment = CommandContextUtil.getAttachmentEntityManager().findById(attachmentId);
 
         String contentId = attachment.getContentId();
         if (contentId == null) {
             return null;
         }
 
-        ByteArrayEntity byteArray = commandContext.getByteArrayEntityManager().findById(contentId);
+        ByteArrayEntity byteArray = CommandContextUtil.getByteArrayEntityManager().findById(contentId);
         byte[] bytes = byteArray.getBytes();
 
         return new ByteArrayInputStream(bytes);

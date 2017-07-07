@@ -12,16 +12,16 @@
  */
 package org.flowable.crystalball.simulator.delegate.event.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.flowable.crystalball.simulator.SimulationEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author martin.grofcik
@@ -54,7 +54,7 @@ public class ProcessInstanceCreateTransformer extends Flowable2SimulationEventFu
             simEventProperties.put(variablesKey, executionEntity.getVariables());
             simEventProperties.put(PROCESS_INSTANCE_ID, executionEntity.getProcessInstanceId());
 
-            return new SimulationEvent.Builder(simulationEventType).simulationTime(Context.getProcessEngineConfiguration().getClock().getCurrentTime().getTime()).properties(simEventProperties).priority(2).build();
+            return new SimulationEvent.Builder(simulationEventType).simulationTime(CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTime().getTime()).properties(simEventProperties).priority(2).build();
         }
         return null;
     }

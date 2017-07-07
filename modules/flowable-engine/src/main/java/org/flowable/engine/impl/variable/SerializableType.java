@@ -23,8 +23,8 @@ import java.io.OutputStream;
 import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.util.IoUtil;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.engine.impl.util.ReflectUtil;
 

@@ -15,10 +15,11 @@ package org.flowable.form.engine.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.NativeFormDeploymentQuery;
-import org.flowable.form.engine.impl.interceptor.CommandContext;
-import org.flowable.form.engine.impl.interceptor.CommandExecutor;
+import org.flowable.form.engine.impl.util.CommandContextUtil;
 
 public class NativeFormDeploymentQueryImpl extends AbstractNativeQuery<NativeFormDeploymentQuery, FormDeployment> implements NativeFormDeploymentQuery {
 
@@ -35,11 +36,11 @@ public class NativeFormDeploymentQueryImpl extends AbstractNativeQuery<NativeFor
     // results ////////////////////////////////////////////////////////////////
 
     public List<FormDeployment> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return commandContext.getDeploymentEntityManager().findDeploymentsByNativeQuery(parameterMap);
+        return CommandContextUtil.getDeploymentEntityManager(commandContext).findDeploymentsByNativeQuery(parameterMap);
     }
 
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return commandContext.getDeploymentEntityManager().findDeploymentCountByNativeQuery(parameterMap);
+        return CommandContextUtil.getDeploymentEntityManager(commandContext).findDeploymentCountByNativeQuery(parameterMap);
     }
 
 }

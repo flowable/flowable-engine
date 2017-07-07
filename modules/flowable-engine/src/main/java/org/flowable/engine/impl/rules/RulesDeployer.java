@@ -21,11 +21,11 @@ import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.deploy.Deployer;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,7 @@ public class RulesDeployer implements Deployer {
 
         KnowledgeBuilder knowledgeBuilder = null;
 
-        DeploymentManager deploymentManager = Context.getProcessEngineConfiguration().getDeploymentManager();
+        DeploymentManager deploymentManager = CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager();
 
         Map<String, ResourceEntity> resources = deployment.getResources();
         for (String resourceName : resources.keySet()) {

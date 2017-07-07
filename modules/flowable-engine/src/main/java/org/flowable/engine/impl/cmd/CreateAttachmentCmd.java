@@ -17,17 +17,18 @@ import java.io.InputStream;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.util.IoUtil;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.identity.Authentication;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntity;
 import org.flowable.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Attachment;
@@ -76,7 +77,7 @@ public class CreateAttachmentCmd implements Command<Attachment> {
             }
         }
 
-        AttachmentEntity attachment = commandContext.getAttachmentEntityManager().create();
+        AttachmentEntity attachment = CommandContextUtil.getAttachmentEntityManager().create();
         attachment.setName(attachmentName);
         attachment.setProcessInstanceId(processInstanceId);
         attachment.setTaskId(taskId);
@@ -84,35 +85,35 @@ public class CreateAttachmentCmd implements Command<Attachment> {
         attachment.setType(attachmentType);
         attachment.setUrl(url);
         attachment.setUserId(Authentication.getAuthenticatedUserId());
-        attachment.setTime(commandContext.getProcessEngineConfiguration().getClock().getCurrentTime());
+        attachment.setTime(CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime());
 
-        commandContext.getAttachmentEntityManager().insert(attachment, false);
+        CommandContextUtil.getAttachmentEntityManager().insert(attachment, false);
 
         if (content != null) {
             byte[] bytes = IoUtil.readInputStream(content, attachmentName);
-            ByteArrayEntity byteArray = commandContext.getByteArrayEntityManager().create();
+            ByteArrayEntity byteArray = CommandContextUtil.getByteArrayEntityManager().create();
             byteArray.setBytes(bytes);
-            commandContext.getByteArrayEntityManager().insert(byteArray);
+            CommandContextUtil.getByteArrayEntityManager().insert(byteArray);
             attachment.setContentId(byteArray.getId());
             attachment.setContent(byteArray);
         }
 
-        commandContext.getHistoryManager().createAttachmentComment(taskId, processInstanceId, attachmentName, true);
+        CommandContextUtil.getHistoryManager(commandContext).createAttachmentComment(taskId, processInstanceId, attachmentName, true);
 
-        if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
             // Forced to fetch the process-instance to associate the right
             // process definition
             String processDefinitionId = null;
             if (attachment.getProcessInstanceId() != null) {
-                ExecutionEntity process = commandContext.getExecutionEntityManager().findById(processInstanceId);
+                ExecutionEntity process = CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstanceId);
                 if (process != null) {
                     processDefinitionId = process.getProcessDefinitionId();
                 }
             }
 
-            commandContext.getProcessEngineConfiguration().getEventDispatcher()
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
                     .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, attachment, processInstanceId, processInstanceId, processDefinitionId));
-            commandContext.getProcessEngineConfiguration().getEventDispatcher()
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
                     .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, attachment, processInstanceId, processInstanceId, processDefinitionId));
         }
 
@@ -120,7 +121,7 @@ public class CreateAttachmentCmd implements Command<Attachment> {
     }
 
     protected TaskEntity verifyTaskParameters(CommandContext commandContext) {
-        TaskEntity task = commandContext.getTaskEntityManager().findById(taskId);
+        TaskEntity task = CommandContextUtil.getTaskEntityManager(commandContext).findById(taskId);
 
         if (task == null) {
             throw new FlowableObjectNotFoundException("Cannot find task with id " + taskId, Task.class);
@@ -134,7 +135,7 @@ public class CreateAttachmentCmd implements Command<Attachment> {
     }
 
     protected ExecutionEntity verifyExecutionParameters(CommandContext commandContext) {
-        ExecutionEntity execution = commandContext.getExecutionEntityManager().findById(processInstanceId);
+        ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstanceId);
 
         if (execution == null) {
             throw new FlowableObjectNotFoundException("Process instance " + processInstanceId + " doesn't exist", ProcessInstance.class);

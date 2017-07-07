@@ -13,9 +13,10 @@
 package org.flowable.engine.impl.history.async;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.jobexecutor.HistoryJobHandler;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +28,7 @@ public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandle
 
     @Override
     public void execute(HistoryJobEntity job, String configuration, CommandContext commandContext) {
-        ObjectMapper objectMapper = commandContext.getProcessEngineConfiguration().getObjectMapper();
+        ObjectMapper objectMapper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getObjectMapper();
         if (job.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
             try {
 

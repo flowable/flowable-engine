@@ -12,15 +12,15 @@
  */
 package org.flowable.crystalball.simulator.delegate.event.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.flowable.crystalball.simulator.SimulationEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Task;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author martin.grofcik
@@ -45,7 +45,7 @@ public class UserTaskCompleteTransformer extends Flowable2SimulationEventFunctio
             properties.put(TASK_DEFINITION_KEY, task.getTaskDefinitionKey());
             properties.put(PROCESS_INSTANCE_ID, task.getProcessInstanceId());
             properties.put(TASK_VARIABLES, task.getProcessVariables());
-            return new SimulationEvent.Builder(this.simulationEventType).simulationTime(Context.getProcessEngineConfiguration().getClock().getCurrentTime().getTime()).properties(properties).build();
+            return new SimulationEvent.Builder(this.simulationEventType).simulationTime(CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTime().getTime()).properties(properties).build();
         }
         return null;
     }

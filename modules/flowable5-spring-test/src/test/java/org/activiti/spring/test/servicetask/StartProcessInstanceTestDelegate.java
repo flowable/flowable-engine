@@ -15,7 +15,7 @@ package org.activiti.spring.test.servicetask;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -23,7 +23,7 @@ import org.flowable.engine.impl.context.Context;
 public class StartProcessInstanceTestDelegate implements JavaDelegate {
 
     public void execute(DelegateExecution execution) {
-        RuntimeService runtimeService = Context.getProcessEngineConfiguration().getRuntimeService();
+        RuntimeService runtimeService = CommandContextUtil.getProcessEngineConfiguration().getRuntimeService();
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
     }
 

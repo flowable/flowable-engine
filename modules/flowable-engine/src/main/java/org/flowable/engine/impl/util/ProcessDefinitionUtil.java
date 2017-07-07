@@ -16,8 +16,8 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -37,7 +37,7 @@ public class ProcessDefinitionUtil {
     }
 
     public static ProcessDefinition getProcessDefinition(String processDefinitionId, boolean checkCacheOnly) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         if (checkCacheOnly) {
             ProcessDefinitionCacheEntry cacheEntry = processEngineConfiguration.getProcessDefinitionCache().get(processDefinitionId);
             if (cacheEntry != null) {
@@ -55,11 +55,11 @@ public class ProcessDefinitionUtil {
         if (Context.getCommandContext() == null) {
             throw new FlowableException("Cannot get process model: no current command context is active");
             
-        } else if (Context.getProcessEngineConfiguration() == null) {
+        } else if (CommandContextUtil.getProcessEngineConfiguration() == null) {
             return Flowable5Util.getFlowable5CompatibilityHandler().getProcessDefinitionProcessObject(processDefinitionId);
 
         } else {
-            DeploymentManager deploymentManager = Context.getProcessEngineConfiguration().getDeploymentManager();
+            DeploymentManager deploymentManager = CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager();
 
             // This will check the cache in the findDeployedProcessDefinitionById and resolveProcessDefinition method
             ProcessDefinition processDefinitionEntity = deploymentManager.findDeployedProcessDefinitionById(processDefinitionId);
@@ -68,11 +68,11 @@ public class ProcessDefinitionUtil {
     }
 
     public static BpmnModel getBpmnModel(String processDefinitionId) {
-        if (Context.getProcessEngineConfiguration() == null) {
+        if (CommandContextUtil.getProcessEngineConfiguration() == null) {
             return Flowable5Util.getFlowable5CompatibilityHandler().getProcessDefinitionBpmnModel(processDefinitionId);
 
         } else {
-            DeploymentManager deploymentManager = Context.getProcessEngineConfiguration().getDeploymentManager();
+            DeploymentManager deploymentManager = CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager();
 
             // This will check the cache in the findDeployedProcessDefinitionById and resolveProcessDefinition method
             ProcessDefinition processDefinitionEntity = deploymentManager.findDeployedProcessDefinitionById(processDefinitionId);
@@ -81,7 +81,7 @@ public class ProcessDefinitionUtil {
     }
 
     public static BpmnModel getBpmnModelFromCache(String processDefinitionId) {
-        ProcessDefinitionCacheEntry cacheEntry = Context.getProcessEngineConfiguration().getProcessDefinitionCache().get(processDefinitionId);
+        ProcessDefinitionCacheEntry cacheEntry = CommandContextUtil.getProcessEngineConfiguration().getProcessDefinitionCache().get(processDefinitionId);
         if (cacheEntry != null) {
             return cacheEntry.getBpmnModel();
         }
@@ -94,7 +94,7 @@ public class ProcessDefinitionUtil {
     }
 
     public static ProcessDefinitionEntity getProcessDefinitionFromDatabase(String processDefinitionId) {
-        ProcessDefinitionEntityManager processDefinitionEntityManager = Context.getProcessEngineConfiguration().getProcessDefinitionEntityManager();
+        ProcessDefinitionEntityManager processDefinitionEntityManager = CommandContextUtil.getProcessEngineConfiguration().getProcessDefinitionEntityManager();
         ProcessDefinitionEntity processDefinition = processDefinitionEntityManager.findById(processDefinitionId);
         if (processDefinition == null) {
             throw new FlowableObjectNotFoundException("No process definition found with id " + processDefinitionId);

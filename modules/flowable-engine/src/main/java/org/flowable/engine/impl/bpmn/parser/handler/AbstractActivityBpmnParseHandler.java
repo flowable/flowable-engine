@@ -20,8 +20,8 @@ import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.el.ExpressionManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -52,7 +52,7 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
 
         modelActivity.setBehavior(miActivityBehavior);
 
-        ExpressionManager expressionManager = Context.getProcessEngineConfiguration().getExpressionManager();
+        ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
 
         // loop cardinality
         if (StringUtils.isNotEmpty(loopCharacteristics.getLoopCardinality())) {

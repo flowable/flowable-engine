@@ -24,11 +24,11 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.TaskWithFieldExtensions;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.el.FixedValue;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 
 /**
@@ -42,7 +42,7 @@ public class DelegateHelper {
      * To be used in an {@link ActivityBehavior} or {@link JavaDelegate}: leaves according to the default BPMN 2.0 rules: all sequenceflow with a condition that evaluates to true are followed.
      */
     public static void leaveDelegate(DelegateExecution delegateExecution) {
-        Context.getAgenda().planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) delegateExecution, true);
+        CommandContextUtil.getAgenda().planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) delegateExecution, true);
     }
 
     /**
@@ -54,7 +54,7 @@ public class DelegateHelper {
         FlowElement flowElement = process.getFlowElement(sequenceFlowId);
         if (flowElement instanceof SequenceFlow) {
             delegateExecution.setCurrentFlowElement(flowElement);
-            Context.getAgenda().planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) delegateExecution, false);
+            CommandContextUtil.getAgenda().planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) delegateExecution, false);
         } else {
             throw new FlowableException(sequenceFlowId + " does not match a sequence flow");
         }
@@ -186,7 +186,7 @@ public class DelegateHelper {
      */
     public static Expression createExpressionForField(FieldExtension fieldExtension) {
         if (StringUtils.isNotEmpty(fieldExtension.getExpression())) {
-            ExpressionManager expressionManager = Context.getProcessEngineConfiguration().getExpressionManager();
+            ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
             return expressionManager.createExpression(fieldExtension.getExpression());
         } else {
             return new FixedValue(fieldExtension.getStringValue());

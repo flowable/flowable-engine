@@ -12,9 +12,9 @@
  */
 package org.flowable.idm.engine.impl;
 
-import org.flowable.idm.engine.impl.db.DbSqlSession;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.impl.db.IdmDbSchemaManager;
 
 /**
  * @author Tijs Rademakers
@@ -23,10 +23,7 @@ import org.flowable.idm.engine.impl.interceptor.CommandContext;
 public final class SchemaOperationsIdmEngineBuild implements Command<Object> {
 
     public Object execute(CommandContext commandContext) {
-        DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
-        if (dbSqlSession != null) {
-            dbSqlSession.performSchemaOperationsIdmEngineBuild();
-        }
+        IdmDbSchemaManager.performSchemaOperationsIdmEngineBuild();
         return null;
     }
 }

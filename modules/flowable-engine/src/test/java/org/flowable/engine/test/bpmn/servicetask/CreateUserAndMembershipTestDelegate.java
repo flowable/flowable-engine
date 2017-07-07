@@ -14,11 +14,11 @@ package org.flowable.engine.test.bpmn.servicetask;
 
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 
@@ -30,7 +30,7 @@ public class CreateUserAndMembershipTestDelegate implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) {
 
-        ManagementService managementService = Context.getProcessEngineConfiguration().getManagementService();
+        ManagementService managementService = CommandContextUtil.getProcessEngineConfiguration().getManagementService();
         managementService.executeCommand(new Command<Void>() {
             @Override
             public Void execute(CommandContext commandContext) {
@@ -38,7 +38,7 @@ public class CreateUserAndMembershipTestDelegate implements JavaDelegate {
             }
         });
 
-        IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
+        IdentityService identityService = CommandContextUtil.getProcessEngineConfiguration().getIdentityService();
 
         String username = "Kermit";
         User user = identityService.newUser(username);

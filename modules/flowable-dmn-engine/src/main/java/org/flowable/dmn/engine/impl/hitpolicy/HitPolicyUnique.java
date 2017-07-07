@@ -12,17 +12,17 @@
  */
 package org.flowable.dmn.engine.impl.hitpolicy;
 
-import org.flowable.dmn.api.RuleExecutionAuditContainer;
-import org.flowable.dmn.engine.impl.context.Context;
-import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
-import org.flowable.dmn.model.HitPolicy;
-import org.flowable.engine.common.api.FlowableException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.flowable.dmn.api.RuleExecutionAuditContainer;
+import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
+import org.flowable.dmn.model.HitPolicy;
+import org.flowable.engine.common.api.FlowableException;
 
 /**
  * @author Yvo Swillens
@@ -41,7 +41,7 @@ public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleVa
             if (entry.getKey().equals(ruleNumber) == false && entry.getValue().isValid()) {
                 String hitPolicyViolatedMessage = String.format("HitPolicy UNIQUE violated: rule %d is valid but rule %d was already valid", ruleNumber, entry.getKey());
 
-                if (Context.getDmnEngineConfiguration().isStrictMode()) {
+                if (CommandContextUtil.getDmnEngineConfiguration().isStrictMode()) {
                     executionContext.getAuditContainer().getRuleExecutions().get(ruleNumber).setExceptionMessage(hitPolicyViolatedMessage);
                     throw new FlowableException("HitPolicy UNIQUE violated");
                 }
@@ -53,7 +53,7 @@ public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleVa
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
         List<Map<String, Object>> decisionResult;
 
-        if (Context.getDmnEngineConfiguration().isStrictMode() == false) {
+        if (CommandContextUtil.getDmnEngineConfiguration().isStrictMode() == false) {
             Map<String, Object> lastResult = new HashMap<>();
 
             for (Map<String, Object> ruleResult : ruleResults) {

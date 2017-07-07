@@ -39,9 +39,9 @@ import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.ReflectUtil;
 
@@ -167,7 +167,7 @@ public class ErrorPropagation {
         if (matchingEvent != null && parentExecution != null) {
             
             for (String processInstanceId : toDeleteProcessInstanceIds) {
-                ExecutionEntityManager executionEntityManager = Context.getCommandContext().getExecutionEntityManager();
+                ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
                 ExecutionEntity processInstanceEntity = executionEntityManager.findById(processInstanceId);
 
                 // Delete
@@ -176,8 +176,8 @@ public class ErrorPropagation {
                                                 "ERROR_EVENT " + errorId, false, false, false);
 
                 // Event
-                if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-                    Context.getProcessEngineConfiguration().getEventDispatcher()
+                if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+                    CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher()
                             .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED_WITH_ERROR_END_EVENT, processInstanceEntity));
                 }
             }
@@ -190,7 +190,7 @@ public class ErrorPropagation {
     }
 
     protected static void executeEventHandler(Event event, ExecutionEntity parentExecution, ExecutionEntity currentExecution, String errorId) {
-        if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+        if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentExecution.getProcessDefinitionId());
             if (bpmnModel != null) {
 
@@ -199,26 +199,26 @@ public class ErrorPropagation {
                     errorCode = errorId;
                 }
 
-                Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
                         FlowableEventBuilder.createErrorEvent(FlowableEngineEventType.ACTIVITY_ERROR_RECEIVED, event.getId(), errorId, errorCode, parentExecution.getId(),
                                 parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId()));
             }
         }
 
         if (event instanceof StartEvent) {
-            ExecutionEntityManager executionEntityManager = Context.getCommandContext().getExecutionEntityManager();
+            ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
 
             if (parentExecution.isProcessInstanceType()) {
                 executionEntityManager.deleteChildExecutions(parentExecution, null, true);
             } else if (!currentExecution.getParentId().equals(parentExecution.getId())) {
-                Context.getAgenda().planDestroyScopeOperation(currentExecution);
+                CommandContextUtil.getAgenda().planDestroyScopeOperation(currentExecution);
             } else {
                 executionEntityManager.deleteExecutionAndRelatedData(currentExecution, null, false);
             }
 
             ExecutionEntity eventSubProcessExecution = executionEntityManager.createChildExecution(parentExecution);
             eventSubProcessExecution.setCurrentFlowElement(event.getSubProcess() != null ? event.getSubProcess() : event);
-            Context.getAgenda().planContinueProcessOperation(eventSubProcessExecution);
+            CommandContextUtil.getAgenda().planContinueProcessOperation(eventSubProcessExecution);
 
         } else {
             ExecutionEntity boundaryExecution = null;
@@ -231,7 +231,7 @@ public class ErrorPropagation {
                 }
             }
 
-            Context.getAgenda().planTriggerExecutionOperation(boundaryExecution);
+            CommandContextUtil.getAgenda().planTriggerExecutionOperation(boundaryExecution);
         }
     }
 

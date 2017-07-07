@@ -23,10 +23,10 @@ import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormDeploymentBuilder;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.FormRepositoryServiceImpl;
-import org.flowable.form.engine.impl.context.Context;
 import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntity;
-import org.flowable.form.engine.impl.persistence.entity.ResourceEntity;
-import org.flowable.form.engine.impl.persistence.entity.ResourceEntityManager;
+import org.flowable.form.engine.impl.persistence.entity.FormResourceEntity;
+import org.flowable.form.engine.impl.persistence.entity.FormResourceEntityManager;
+import org.flowable.form.engine.impl.util.CommandContextUtil;
 import org.flowable.form.model.FormModel;
 
 /**
@@ -38,13 +38,13 @@ public class FormDeploymentBuilderImpl implements FormDeploymentBuilder, Seriali
     protected static final String DEFAULT_ENCODING = "UTF-8";
 
     protected transient FormRepositoryServiceImpl repositoryService;
-    protected transient ResourceEntityManager resourceEntityManager;
+    protected transient FormResourceEntityManager resourceEntityManager;
 
     protected FormDeploymentEntity deployment;
     protected boolean isDuplicateFilterEnabled;
 
     public FormDeploymentBuilderImpl() {
-        FormEngineConfiguration formEngineConfiguration = Context.getFormEngineConfiguration();
+        FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration();
         this.repositoryService = (FormRepositoryServiceImpl) formEngineConfiguration.getFormRepositoryService();
         this.deployment = formEngineConfiguration.getDeploymentEntityManager().create();
         this.resourceEntityManager = formEngineConfiguration.getResourceEntityManager();
@@ -66,7 +66,7 @@ public class FormDeploymentBuilderImpl implements FormDeploymentBuilder, Seriali
             throw new FlowableException("byte array for resource '" + resourceName + "' is null");
         }
 
-        ResourceEntity resource = resourceEntityManager.create();
+        FormResourceEntity resource = resourceEntityManager.create();
         resource.setName(resourceName);
         resource.setBytes(bytes);
         deployment.addResource(resource);
@@ -86,7 +86,7 @@ public class FormDeploymentBuilderImpl implements FormDeploymentBuilder, Seriali
             throw new FlowableException("text is null");
         }
 
-        ResourceEntity resource = resourceEntityManager.create();
+        FormResourceEntity resource = resourceEntityManager.create();
         resource.setName(resourceName);
         try {
             resource.setBytes(text.getBytes(DEFAULT_ENCODING));
@@ -102,7 +102,7 @@ public class FormDeploymentBuilderImpl implements FormDeploymentBuilder, Seriali
             throw new FlowableException("form bytes is null");
         }
 
-        ResourceEntity resource = resourceEntityManager.create();
+        FormResourceEntity resource = resourceEntityManager.create();
         resource.setName(resourceName);
         resource.setBytes(formBytes);
         deployment.addResource(resource);

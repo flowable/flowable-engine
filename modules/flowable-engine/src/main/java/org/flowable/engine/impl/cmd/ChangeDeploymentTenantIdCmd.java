@@ -17,10 +17,11 @@ import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -47,13 +48,13 @@ public class ChangeDeploymentTenantIdCmd implements Command<Void>, Serializable 
 
         // Update all entities
 
-        DeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
+        DeploymentEntity deployment = CommandContextUtil.getDeploymentEntityManager(commandContext).findById(deploymentId);
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("Could not find deployment with id " + deploymentId, Deployment.class);
         }
 
         if (Flowable5Util.isFlowable5Deployment(deployment, commandContext)) {
-            commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().changeDeploymentTenantId(deploymentId, newTenantId);
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getFlowable5CompatibilityHandler().changeDeploymentTenantId(deploymentId, newTenantId);
             return null;
         }
 
@@ -62,23 +63,23 @@ public class ChangeDeploymentTenantIdCmd implements Command<Void>, Serializable 
 
         // Doing process instances, executions and tasks with direct SQL updates
         // (otherwise would not be performant)
-        commandContext.getProcessDefinitionEntityManager().updateProcessDefinitionTenantIdForDeployment(deploymentId, newTenantId);
-        commandContext.getExecutionEntityManager().updateExecutionTenantIdForDeployment(deploymentId, newTenantId);
-        commandContext.getTaskEntityManager().updateTaskTenantIdForDeployment(deploymentId, newTenantId);
-        commandContext.getJobEntityManager().updateJobTenantIdForDeployment(deploymentId, newTenantId);
-        commandContext.getTimerJobEntityManager().updateJobTenantIdForDeployment(deploymentId, newTenantId);
-        commandContext.getSuspendedJobEntityManager().updateJobTenantIdForDeployment(deploymentId, newTenantId);
-        commandContext.getDeadLetterJobEntityManager().updateJobTenantIdForDeployment(deploymentId, newTenantId);
-        commandContext.getEventSubscriptionEntityManager().updateEventSubscriptionTenantId(oldTenantId, newTenantId);
+        CommandContextUtil.getProcessDefinitionEntityManager(commandContext).updateProcessDefinitionTenantIdForDeployment(deploymentId, newTenantId);
+        CommandContextUtil.getExecutionEntityManager(commandContext).updateExecutionTenantIdForDeployment(deploymentId, newTenantId);
+        CommandContextUtil.getTaskEntityManager(commandContext).updateTaskTenantIdForDeployment(deploymentId, newTenantId);
+        CommandContextUtil.getJobEntityManager(commandContext).updateJobTenantIdForDeployment(deploymentId, newTenantId);
+        CommandContextUtil.getTimerJobEntityManager(commandContext).updateJobTenantIdForDeployment(deploymentId, newTenantId);
+        CommandContextUtil.getSuspendedJobEntityManager(commandContext).updateJobTenantIdForDeployment(deploymentId, newTenantId);
+        CommandContextUtil.getDeadLetterJobEntityManager(commandContext).updateJobTenantIdForDeployment(deploymentId, newTenantId);
+        CommandContextUtil.getEventSubscriptionEntityManager(commandContext).updateEventSubscriptionTenantId(oldTenantId, newTenantId);
 
         // Doing process definitions in memory, cause we need to clear the process definition cache
         List<ProcessDefinition> processDefinitions = new ProcessDefinitionQueryImpl().deploymentId(deploymentId).list();
         for (ProcessDefinition processDefinition : processDefinitions) {
-            commandContext.getProcessEngineConfiguration().getProcessDefinitionCache().remove(processDefinition.getId());
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessDefinitionCache().remove(processDefinition.getId());
         }
 
         // Clear process definition cache
-        commandContext.getProcessEngineConfiguration().getProcessDefinitionCache().clear();
+        CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessDefinitionCache().clear();
 
         return null;
 

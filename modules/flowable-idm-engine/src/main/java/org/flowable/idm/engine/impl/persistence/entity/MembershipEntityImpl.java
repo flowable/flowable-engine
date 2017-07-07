@@ -35,8 +35,8 @@ public class MembershipEntityImpl extends AbstractEntityNoRevision implements Me
     }
 
     public String getId() {
-        // membership doesn't have an id
-        return null;
+        // membership doesn't have an id, returning a fake one to make the internals work
+        return userId + groupId;
     }
 
     public void setId(String id) {

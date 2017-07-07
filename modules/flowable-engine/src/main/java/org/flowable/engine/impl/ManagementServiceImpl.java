@@ -22,7 +22,11 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.management.TableMetaData;
 import org.flowable.engine.common.api.management.TablePageQuery;
 import org.flowable.engine.common.impl.cmd.CustomSqlExecution;
+import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.cmd.DeleteDeadLetterJobCmd;
 import org.flowable.engine.impl.cmd.DeleteEventLogEntry;
@@ -45,10 +49,8 @@ import org.flowable.engine.impl.cmd.MoveTimerToExecutableJobCmd;
 import org.flowable.engine.impl.cmd.RescheduleTimerJobCmd;
 import org.flowable.engine.impl.cmd.SetJobRetriesCmd;
 import org.flowable.engine.impl.cmd.SetTimerJobRetriesCmd;
-import org.flowable.engine.impl.db.DbSqlSession;
-import org.flowable.engine.impl.db.DbSqlSessionFactory;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.db.DbSchemaManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.DeadLetterJobQuery;
 import org.flowable.engine.runtime.HistoryJobQuery;
 import org.flowable.engine.runtime.Job;
@@ -203,9 +205,9 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
         return commandExecutor.execute(config, new Command<String>() {
             public String execute(CommandContext commandContext) {
                 DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) commandContext.getSessionFactories().get(DbSqlSession.class);
-                DbSqlSession dbSqlSession = new DbSqlSession(dbSqlSessionFactory, commandContext.getEntityCache(), connection, catalog, schema);
+                DbSqlSession dbSqlSession = new DbSqlSession(dbSqlSessionFactory, CommandContextUtil.getEntityCache(commandContext), connection, catalog, schema);
                 commandContext.getSessions().put(DbSqlSession.class, dbSqlSession);
-                return dbSqlSession.dbSchemaUpdate();
+                return DbSchemaManager.dbSchemaUpdate();
             }
         });
     }

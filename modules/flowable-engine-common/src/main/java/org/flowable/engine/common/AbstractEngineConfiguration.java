@@ -18,6 +18,7 @@ import java.io.Reader;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,16 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
+import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
+import org.flowable.engine.common.impl.cfg.TransactionListener;
+import org.flowable.engine.common.impl.db.CustomMyBatisTypeHandlerConfig;
+import org.flowable.engine.common.impl.db.CustomMybatisTypeAliasConfig;
+import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContextFactory;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.common.impl.persistence.StrongUuidGenerator;
 import org.flowable.engine.common.impl.util.DefaultClockImpl;
@@ -98,8 +108,17 @@ public abstract class AbstractEngineConfiguration {
 
     // COMMAND EXECUTORS ///////////////////////////////////////////////
 
+    protected CommandExecutor commandExecutor;
+    protected Collection<? extends CommandInterceptor> defaultCommandInterceptors;
     protected CommandConfig defaultCommandConfig;
     protected CommandConfig schemaCommandConfig;
+    protected CommandContextFactory commandContextFactory;
+    protected CommandInterceptor commandInvoker;
+    
+    protected List<CommandInterceptor> customPreCommandInterceptors;
+    protected List<CommandInterceptor> customPostCommandInterceptors;
+
+    protected List<CommandInterceptor> commandInterceptors;
 
     protected ClassLoader classLoader;
     /**
@@ -109,11 +128,15 @@ public abstract class AbstractEngineConfiguration {
 
     // MYBATIS SQL SESSION FACTORY /////////////////////////////////////
 
+    protected DbSqlSessionFactory dbSqlSessionFactory;
     protected SqlSessionFactory sqlSessionFactory;
     protected TransactionFactory transactionFactory;
+    protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
 
     protected Set<Class<?>> customMybatisMappers;
     protected Set<String> customMybatisXMLMappers;
+    protected List<CustomMybatisTypeAliasConfig> customMybatisTypeAliasConfigs;
+    protected List<CustomMyBatisTypeHandlerConfig> customMybatisTypeHandlerConfigs;
 
     // SESSION FACTORIES ///////////////////////////////////////////////
     protected List<SessionFactory> customSessionFactories;
@@ -422,7 +445,7 @@ public abstract class AbstractEngineConfiguration {
 
         initCustomMybatisMappers(configuration);
 
-        configuration = parseMybatisConfiguration(configuration, parser);
+        configuration = parseMybatisConfiguration(parser);
         return configuration;
     }
 
@@ -434,8 +457,19 @@ public abstract class AbstractEngineConfiguration {
         }
     }
 
-    public Configuration parseMybatisConfiguration(Configuration configuration, XMLConfigBuilder parser) {
-        return parseCustomMybatisXMLMappers(parser.parse());
+    public Configuration parseMybatisConfiguration(XMLConfigBuilder parser) {
+        Configuration configuration = parser.parse();
+        if (customMybatisTypeAliasConfigs != null) {
+            for (CustomMybatisTypeAliasConfig customMybatisTypeAliasConfig : customMybatisTypeAliasConfigs) {
+                configuration.getTypeAliasRegistry().registerAlias(customMybatisTypeAliasConfig.getAliasName(), customMybatisTypeAliasConfig.getTypeHandlerClass());
+            }
+        }
+        if (customMybatisTypeHandlerConfigs != null) {
+            for (CustomMyBatisTypeHandlerConfig customMyBatisTypeHandlerConfig : customMybatisTypeHandlerConfigs) {
+                configuration.getTypeHandlerRegistry().register(customMyBatisTypeHandlerConfig.getJavaTypeClass(), customMyBatisTypeHandlerConfig.getJdbcType(), customMyBatisTypeHandlerConfig.getTypeHandlerClass());
+            }
+        }
+        return parseCustomMybatisXMLMappers(configuration);
     }
 
     public Configuration parseCustomMybatisXMLMappers(Configuration configuration) {
@@ -666,6 +700,68 @@ public abstract class AbstractEngineConfiguration {
         this.defaultCommandConfig = defaultCommandConfig;
         return this;
     }
+    
+    public CommandExecutor getCommandExecutor() {
+        return commandExecutor;
+    }
+
+    public AbstractEngineConfiguration setCommandExecutor(CommandExecutor commandExecutor) {
+        this.commandExecutor = commandExecutor;
+        return this;
+    }
+    
+    public CommandContextFactory getCommandContextFactory() {
+        return commandContextFactory;
+    }
+
+    public AbstractEngineConfiguration setCommandContextFactory(CommandContextFactory commandContextFactory) {
+        this.commandContextFactory = commandContextFactory;
+        return this;
+    }
+    
+    public CommandInterceptor getCommandInvoker() {
+        return commandInvoker;
+    }
+
+    public AbstractEngineConfiguration setCommandInvoker(CommandInterceptor commandInvoker) {
+        this.commandInvoker = commandInvoker;
+        return this;
+    }
+    
+    public List<CommandInterceptor> getCustomPreCommandInterceptors() {
+        return customPreCommandInterceptors;
+    }
+
+    public AbstractEngineConfiguration setCustomPreCommandInterceptors(List<CommandInterceptor> customPreCommandInterceptors) {
+        this.customPreCommandInterceptors = customPreCommandInterceptors;
+        return this;
+    }
+
+    public List<CommandInterceptor> getCustomPostCommandInterceptors() {
+        return customPostCommandInterceptors;
+    }
+
+    public AbstractEngineConfiguration setCustomPostCommandInterceptors(List<CommandInterceptor> customPostCommandInterceptors) {
+        this.customPostCommandInterceptors = customPostCommandInterceptors;
+        return this;
+    }
+
+    public List<CommandInterceptor> getCommandInterceptors() {
+        return commandInterceptors;
+    }
+
+    public AbstractEngineConfiguration setCommandInterceptors(List<CommandInterceptor> commandInterceptors) {
+        this.commandInterceptors = commandInterceptors;
+        return this;
+    }
+    
+    public Collection<? extends CommandInterceptor> getDefaultCommandInterceptors() {
+        return defaultCommandInterceptors;
+    }
+
+    public void setDefaultCommandInterceptors(Collection<? extends CommandInterceptor> defaultCommandInterceptors) {
+        this.defaultCommandInterceptors = defaultCommandInterceptors;
+    }
 
     public SqlSessionFactory getSqlSessionFactory() {
         return sqlSessionFactory;
@@ -675,6 +771,15 @@ public abstract class AbstractEngineConfiguration {
         this.sqlSessionFactory = sqlSessionFactory;
         return this;
     }
+    
+    public DbSqlSessionFactory getDbSqlSessionFactory() {
+        return dbSqlSessionFactory;
+    }
+
+    public AbstractEngineConfiguration setDbSqlSessionFactory(DbSqlSessionFactory dbSqlSessionFactory) {
+        this.dbSqlSessionFactory = dbSqlSessionFactory;
+        return this;
+    }
 
     public TransactionFactory getTransactionFactory() {
         return transactionFactory;
@@ -682,6 +787,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setTransactionFactory(TransactionFactory transactionFactory) {
         this.transactionFactory = transactionFactory;
+        return this;
+    }
+    
+    public TransactionContextFactory<TransactionListener, CommandContext> getTransactionContextFactory() {
+        return transactionContextFactory;
+    }
+
+    public AbstractEngineConfiguration setTransactionContextFactory(TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory) {
+        this.transactionContextFactory = transactionContextFactory;
         return this;
     }
 
@@ -700,6 +814,24 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setCustomMybatisXMLMappers(Set<String> customMybatisXMLMappers) {
         this.customMybatisXMLMappers = customMybatisXMLMappers;
+        return this;
+    }
+    
+    public List<CustomMybatisTypeAliasConfig> getCustomMybatisTypeAliasConfigs() {
+        return customMybatisTypeAliasConfigs;
+    }
+
+    public AbstractEngineConfiguration setCustomMybatisTypeAliasConfigs(List<CustomMybatisTypeAliasConfig> customMybatisTypeAliasConfigs) {
+        this.customMybatisTypeAliasConfigs = customMybatisTypeAliasConfigs;
+        return this;
+    }
+
+    public List<CustomMyBatisTypeHandlerConfig> getCustomMybatisTypeHandlerConfigs() {
+        return customMybatisTypeHandlerConfigs;
+    }
+
+    public AbstractEngineConfiguration setCustomMybatisTypeHandlerConfigs(List<CustomMyBatisTypeHandlerConfig> customMybatisTypeHandlerConfigs) {
+        this.customMybatisTypeHandlerConfigs = customMybatisTypeHandlerConfigs;
         return this;
     }
 

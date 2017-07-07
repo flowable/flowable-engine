@@ -18,9 +18,10 @@ import java.util.List;
 
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.task.IdentityLink;
 import org.flowable.idm.api.Group;
@@ -40,13 +41,13 @@ public class GetPotentialStarterGroupsCmd implements Command<List<Group>>, Seria
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<Group> execute(CommandContext commandContext) {
-        ProcessDefinitionEntity processDefinition = commandContext.getProcessDefinitionEntityManager().findById(processDefinitionId);
+        ProcessDefinitionEntity processDefinition = CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findById(processDefinitionId);
 
         if (processDefinition == null) {
             throw new FlowableObjectNotFoundException("Cannot find process definition with id " + processDefinitionId, ProcessDefinition.class);
         }
 
-        IdentityService identityService = commandContext.getProcessEngineConfiguration().getIdentityService();
+        IdentityService identityService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getIdentityService();
 
         List<String> groupIds = new ArrayList<String>();
         List<IdentityLink> identityLinks = (List) processDefinition.getIdentityLinks();

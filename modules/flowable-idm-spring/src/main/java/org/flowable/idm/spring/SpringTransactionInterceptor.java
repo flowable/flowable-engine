@@ -13,9 +13,9 @@
 package org.flowable.idm.spring;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.AbstractCommandInterceptor;
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.idm.engine.impl.interceptor.AbstractCommandInterceptor;
-import org.flowable.idm.engine.impl.interceptor.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.PlatformTransactionManager;

@@ -12,10 +12,11 @@
  */
 package org.flowable.engine.impl.history.async.json.transformer;
 
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -29,14 +30,14 @@ public class SetProcessDefinitionHistoryJsonTransformer extends AbstractNeedsHis
     @Override
     public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
         String processInstanceId = getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID);
-        return commandContext.getProcessEngineConfiguration().getHistoricProcessInstanceEntityManager().findById(processInstanceId) != null;
+        return CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoricProcessInstanceEntityManager().findById(processInstanceId) != null;
     }
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         String processInstanceId = getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID);
         String processDefinitionId = getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_ID);
-        HistoricProcessInstanceEntity historicProcessInstance = commandContext.getProcessEngineConfiguration().getHistoricProcessInstanceEntityManager().findById(processInstanceId);
+        HistoricProcessInstanceEntity historicProcessInstance = CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoricProcessInstanceEntityManager().findById(processInstanceId);
         historicProcessInstance.setProcessDefinitionId(processDefinitionId);
     }
 

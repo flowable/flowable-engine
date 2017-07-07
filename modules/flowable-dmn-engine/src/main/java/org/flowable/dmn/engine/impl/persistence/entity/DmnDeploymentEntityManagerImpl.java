@@ -45,7 +45,7 @@ public class DmnDeploymentEntityManagerImpl extends AbstractEntityManager<DmnDep
     public void insert(DmnDeploymentEntity deployment) {
         super.insert(deployment, true);
 
-        for (ResourceEntity resource : deployment.getResources().values()) {
+        for (DmnResourceEntity resource : deployment.getResources().values()) {
             resource.setDeploymentId(deployment.getId());
             getResourceEntityManager().insert(resource);
         }

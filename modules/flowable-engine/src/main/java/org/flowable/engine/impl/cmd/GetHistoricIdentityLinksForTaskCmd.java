@@ -17,12 +17,13 @@ import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.history.HistoricIdentityLink;
 import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.IdentityLinkType;
 
 /**
@@ -52,13 +53,13 @@ public class GetHistoricIdentityLinksForTaskCmd implements Command<List<Historic
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected List<HistoricIdentityLink> getLinksForTask(CommandContext commandContext) {
-        HistoricTaskInstanceEntity task = commandContext.getHistoricTaskInstanceEntityManager().findById(taskId);
+        HistoricTaskInstanceEntity task = CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).findById(taskId);
 
         if (task == null) {
             throw new FlowableObjectNotFoundException("No historic task exists with the given id: " + taskId, HistoricTaskInstance.class);
         }
 
-        List<HistoricIdentityLink> identityLinks = (List) commandContext.getHistoricIdentityLinkEntityManager().findHistoricIdentityLinksByTaskId(taskId);
+        List<HistoricIdentityLink> identityLinks = (List) CommandContextUtil.getHistoricIdentityLinkEntityManager(commandContext).findHistoricIdentityLinksByTaskId(taskId);
 
         HistoricIdentityLink assigneeIdentityLink = null;
         HistoricIdentityLink ownerIdentityLink = null;
@@ -73,7 +74,7 @@ public class GetHistoricIdentityLinksForTaskCmd implements Command<List<Historic
 
         // Similar to GetIdentityLinksForTask, return assignee and owner as identity link
         if (task.getAssignee() != null && assigneeIdentityLink == null) {
-            HistoricIdentityLinkEntity identityLink = commandContext.getHistoricIdentityLinkEntityManager().create();
+            HistoricIdentityLinkEntity identityLink = CommandContextUtil.getHistoricIdentityLinkEntityManager(commandContext).create();
             identityLink.setUserId(task.getAssignee());
             identityLink.setTaskId(task.getId());
             identityLink.setType(IdentityLinkType.ASSIGNEE);
@@ -81,7 +82,7 @@ public class GetHistoricIdentityLinksForTaskCmd implements Command<List<Historic
         }
 
         if (task.getOwner() != null && ownerIdentityLink == null) {
-            HistoricIdentityLinkEntity identityLink = commandContext.getHistoricIdentityLinkEntityManager().create();
+            HistoricIdentityLinkEntity identityLink = CommandContextUtil.getHistoricIdentityLinkEntityManager(commandContext).create();
             identityLink.setTaskId(task.getId());
             identityLink.setUserId(task.getOwner());
             identityLink.setType(IdentityLinkType.OWNER);
@@ -93,7 +94,7 @@ public class GetHistoricIdentityLinksForTaskCmd implements Command<List<Historic
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected List<HistoricIdentityLink> getLinksForProcessInstance(CommandContext commandContext) {
-        return (List) commandContext.getHistoricIdentityLinkEntityManager().findHistoricIdentityLinksByProcessInstanceId(processInstanceId);
+        return (List) CommandContextUtil.getHistoricIdentityLinkEntityManager(commandContext).findHistoricIdentityLinksByProcessInstanceId(processInstanceId);
     }
 
 }

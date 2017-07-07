@@ -50,7 +50,7 @@ public class FormDeploymentEntityManagerImpl extends AbstractEntityManager<FormD
     public void insert(FormDeploymentEntity deployment, boolean fireEvent) {
         super.insert(deployment, fireEvent);
 
-        for (ResourceEntity resource : deployment.getResources().values()) {
+        for (FormResourceEntity resource : deployment.getResources().values()) {
             resource.setDeploymentId(deployment.getId());
             getResourceEntityManager().insert(resource);
         }

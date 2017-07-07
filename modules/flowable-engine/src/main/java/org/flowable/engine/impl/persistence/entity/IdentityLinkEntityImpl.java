@@ -18,13 +18,12 @@ import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.db.BulkDeleteable;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
  */
-public class IdentityLinkEntityImpl extends AbstractEntityNoRevision implements IdentityLinkEntity, Serializable, BulkDeleteable {
+public class IdentityLinkEntityImpl extends AbstractEntityNoRevision implements IdentityLinkEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -134,7 +133,7 @@ public class IdentityLinkEntityImpl extends AbstractEntityNoRevision implements 
 
     public TaskEntity getTask() {
         if ((task == null) && (taskId != null)) {
-            this.task = Context.getCommandContext().getTaskEntityManager().findById(taskId);
+            this.task = CommandContextUtil.getTaskEntityManager().findById(taskId);
         }
         return task;
     }
@@ -146,7 +145,7 @@ public class IdentityLinkEntityImpl extends AbstractEntityNoRevision implements 
 
     public ExecutionEntity getProcessInstance() {
         if ((processInstance == null) && (processInstanceId != null)) {
-            this.processInstance = Context.getCommandContext().getExecutionEntityManager().findById(processInstanceId);
+            this.processInstance = CommandContextUtil.getExecutionEntityManager().findById(processInstanceId);
         }
         return processInstance;
     }
@@ -158,7 +157,7 @@ public class IdentityLinkEntityImpl extends AbstractEntityNoRevision implements 
 
     public ProcessDefinitionEntity getProcessDef() {
         if ((processDef == null) && (processDefId != null)) {
-            this.processDef = Context.getCommandContext().getProcessDefinitionEntityManager().findById(processDefId);
+            this.processDef = CommandContextUtil.getProcessDefinitionEntityManager().findById(processDefId);
         }
         return processDef;
     }

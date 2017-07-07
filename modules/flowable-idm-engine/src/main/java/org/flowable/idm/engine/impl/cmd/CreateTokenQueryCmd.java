@@ -15,9 +15,10 @@ package org.flowable.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.idm.api.TokenQuery;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -27,7 +28,7 @@ public class CreateTokenQueryCmd implements Command<TokenQuery>, Serializable {
     private static final long serialVersionUID = 1L;
 
     public TokenQuery execute(CommandContext commandContext) {
-        return commandContext.getTokenEntityManager().createNewTokenQuery();
+        return CommandContextUtil.getTokenEntityManager(commandContext).createNewTokenQuery();
     }
 
 }

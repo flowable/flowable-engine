@@ -12,9 +12,14 @@
  */
 package org.flowable.engine.impl.interceptor;
 
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.AbstractCommandInterceptor;
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.impl.agenda.AbstractOperation;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +42,7 @@ public class CommandInvoker extends AbstractCommandInterceptor {
 
             // Execute the command.
             // This will produce operations that will be put on the agenda.
-            commandContext.getAgenda().planOperation(new Runnable() {
+            CommandContextUtil.getAgenda(commandContext).planOperation(new Runnable() {
     
                 @Override
                 public void run() {
@@ -50,8 +55,8 @@ public class CommandInvoker extends AbstractCommandInterceptor {
     
             // At the end, call the execution tree change listeners.
             // TODO: optimization: only do this when the tree has actually changed (ie check dbSqlSession).
-            if (!commandContext.isReused() && commandContext.hasInvolvedExecutions()) {
-                commandContext.getAgenda().planExecuteInactiveBehaviorsOperation();
+            if (!commandContext.isReused() && CommandContextUtil.hasInvolvedExecutions(commandContext)) {
+                CommandContextUtil.getAgenda(commandContext).planExecuteInactiveBehaviorsOperation();
                 executeOperations(commandContext);
             }
     
@@ -60,8 +65,8 @@ public class CommandInvoker extends AbstractCommandInterceptor {
     }
 
     protected void executeOperations(final CommandContext commandContext) {
-        while (!commandContext.getAgenda().isEmpty()) {
-            Runnable runnable = commandContext.getAgenda().getNextOperation();
+        while (!CommandContextUtil.getAgenda(commandContext).isEmpty()) {
+            Runnable runnable = CommandContextUtil.getAgenda(commandContext).getNextOperation();
             executeOperation(runnable);
         }
     }

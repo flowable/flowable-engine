@@ -14,9 +14,10 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.List;
 
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.HistoryJobQueryImpl;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.HistoryJob;
 
 public class UnacquireOwnedHistoryJobsCmd implements Command<Void> {
@@ -34,9 +35,9 @@ public class UnacquireOwnedHistoryJobsCmd implements Command<Void> {
         HistoryJobQueryImpl jobQuery = new HistoryJobQueryImpl(commandContext);
         jobQuery.lockOwner(lockOwner);
         jobQuery.jobTenantId(tenantId);
-        List<HistoryJob> jobs = commandContext.getHistoryJobEntityManager().findHistoryJobsByQueryCriteria(jobQuery);
+        List<HistoryJob> jobs = CommandContextUtil.getHistoryJobEntityManager(commandContext).findHistoryJobsByQueryCriteria(jobQuery);
         for (HistoryJob job : jobs) {
-            commandContext.getJobManager().unacquire(job);
+            CommandContextUtil.getJobManager(commandContext).unacquire(job);
         }
         return null;
     }

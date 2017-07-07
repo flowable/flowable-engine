@@ -19,11 +19,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.asyncexecutor.JobManager;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -34,13 +35,13 @@ public class JobExecutorTest extends JobExecutorTestCase {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         commandExecutor.execute(new Command<Void>() {
             public Void execute(CommandContext commandContext) {
-                JobManager jobManager = commandContext.getJobManager();
+                JobManager jobManager = CommandContextUtil.getJobManager(commandContext);
                 jobManager.execute(createTweetMessage("message-one"));
                 jobManager.execute(createTweetMessage("message-two"));
                 jobManager.execute(createTweetMessage("message-three"));
                 jobManager.execute(createTweetMessage("message-four"));
 
-                TimerJobEntityManager timerJobManager = commandContext.getTimerJobEntityManager();
+                TimerJobEntityManager timerJobManager = CommandContextUtil.getTimerJobEntityManager(commandContext);
                 timerJobManager.insert(createTweetTimer("timer-one", new Date()));
                 timerJobManager.insert(createTweetTimer("timer-one", new Date()));
                 timerJobManager.insert(createTweetTimer("timer-two", new Date()));

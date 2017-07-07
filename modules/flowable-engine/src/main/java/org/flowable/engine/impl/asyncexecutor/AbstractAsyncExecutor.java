@@ -17,9 +17,9 @@ import java.util.UUID;
 
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.UnacquireOwnedJobsCmd;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
 import org.flowable.engine.impl.persistence.entity.JobInfoEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.JobInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,7 +130,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         }
 
         JobInfoEntityManager<? extends JobInfoEntity> jobEntityManagerToUse = jobEntityManager != null
-                ? jobEntityManager : Context.getProcessEngineConfiguration().getJobEntityManager();
+                ? jobEntityManager : CommandContextUtil.getProcessEngineConfiguration().getJobEntityManager();
 
         if (resetExpiredJobsRunnable == null) {
             String resetRunnableName = resetExpiredRunnableName != null ? resetExpiredRunnableName : "flowable-reset-expired-jobs";

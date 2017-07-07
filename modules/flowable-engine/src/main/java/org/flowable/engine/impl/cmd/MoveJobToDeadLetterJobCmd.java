@@ -16,10 +16,11 @@ import java.io.Serializable;
 
 import org.flowable.engine.JobNotFoundException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,9 +45,9 @@ public class MoveJobToDeadLetterJobCmd implements Command<DeadLetterJobEntity>, 
             throw new FlowableIllegalArgumentException("jobId and job is null");
         }
 
-        AbstractRuntimeJobEntity job = commandContext.getTimerJobEntityManager().findById(jobId);
+        AbstractRuntimeJobEntity job = CommandContextUtil.getTimerJobEntityManager(commandContext).findById(jobId);
         if (job == null) {
-            job = commandContext.getJobEntityManager().findById(jobId);
+            job = CommandContextUtil.getJobEntityManager(commandContext).findById(jobId);
         }
 
         if (job == null) {
@@ -57,7 +58,7 @@ public class MoveJobToDeadLetterJobCmd implements Command<DeadLetterJobEntity>, 
             LOGGER.debug("Moving job to deadletter job table {}", job.getId());
         }
 
-        DeadLetterJobEntity deadLetterJob = commandContext.getJobManager().moveJobToDeadLetterJob(job);
+        DeadLetterJobEntity deadLetterJob = CommandContextUtil.getJobManager(commandContext).moveJobToDeadLetterJob(job);
 
         return deadLetterJob;
     }

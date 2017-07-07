@@ -14,7 +14,9 @@
 package org.flowable.engine.common.impl.db;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -45,6 +47,9 @@ public abstract class AbstractDbSqlSessionFactory implements SessionFactory {
     protected Map<Class<?>, String> updateStatements = new ConcurrentHashMap<Class<?>, String>();
     protected Map<Class<?>, String> deleteStatements = new ConcurrentHashMap<Class<?>, String>();
     protected Map<Class<?>, String> selectStatements = new ConcurrentHashMap<Class<?>, String>();
+    
+    protected List<Class<? extends Entity>> insertionOrder = new ArrayList<Class<? extends Entity>>();
+    protected List<Class<? extends Entity>> deletionOrder = new ArrayList<Class<? extends Entity>>();
 
     protected boolean isDbHistoryUsed = true;
 
@@ -136,6 +141,14 @@ public abstract class AbstractDbSqlSessionFactory implements SessionFactory {
     public void setDatabaseType(String databaseType) {
         this.databaseType = databaseType;
         this.statementMappings = databaseSpecificStatements.get(databaseType);
+    }
+    
+    public boolean isMysql() {
+        return getDatabaseType().equals("mysql");
+    }
+
+    public boolean isOracle() {
+        return getDatabaseType().equals("oracle");
     }
 
     // getters and setters //////////////////////////////////////////////////////
@@ -246,6 +259,22 @@ public abstract class AbstractDbSqlSessionFactory implements SessionFactory {
 
     public boolean isTablePrefixIsSchema() {
         return tablePrefixIsSchema;
+    }
+    
+    public List<Class<? extends Entity>> getInsertionOrder() {
+        return insertionOrder;
+    }
+
+    public void setInsertionOrder(List<Class<? extends Entity>> insertionOrder) {
+        this.insertionOrder = insertionOrder;
+    }
+
+    public List<Class<? extends Entity>> getDeletionOrder() {
+        return deletionOrder;
+    }
+
+    public void setDeletionOrder(List<Class<? extends Entity>> deletionOrder) {
+        this.deletionOrder = deletionOrder;
     }
 
 }

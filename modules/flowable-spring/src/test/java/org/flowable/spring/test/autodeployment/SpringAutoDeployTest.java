@@ -13,6 +13,11 @@
 
 package org.flowable.spring.test.autodeployment;
 
+import java.net.URISyntaxException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.common.impl.util.IoUtil;
 import org.flowable.engine.impl.test.AbstractTestCase;
@@ -23,11 +28,6 @@ import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.net.URISyntaxException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author Tom Baeyens

@@ -14,6 +14,7 @@ package org.flowable.engine.common.impl.interceptor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,7 @@ public class AbstractCommandContext {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCommandContext.class);
 
+    protected CommandExecutor commandExecutor;
     protected BaseCommand<?, ? extends AbstractCommandContext> command;
     protected Map<Class<?>, SessionFactory> sessionFactories;
     protected Map<Class<?>, Session> sessions = new HashMap<Class<?>, Session>();
@@ -37,6 +39,7 @@ public class AbstractCommandContext {
     protected List<BaseCommandContextCloseListener<AbstractCommandContext>> closeListeners;
     protected Map<String, Object> attributes; // General-purpose storing of anything during the lifetime of a command context
     protected boolean reused;
+    protected LinkedList<Object> resultStack = new LinkedList<Object>(); // needs to be a stack, as JavaDelegates can do api calls again
 
     public AbstractCommandContext(BaseCommand<?, ? extends AbstractCommandContext> command) {
         this.command = command;
@@ -100,8 +103,14 @@ public class AbstractCommandContext {
         if (exception instanceof FlowableOptimisticLockingException) {
             // reduce log level, as normally we're not interested in logging this exception
             LOGGER.debug("Optimistic locking exception : {}", exception.getMessage(), exception);
+            
+        } else if (exception instanceof FlowableException && ((FlowableException) exception).isReduceLogLevel()) {
+            // reduce log level, because this may have been caused because of job deletion due to cancelActiviti="true"
+            LOGGER.info("Error while closing command context", exception);
+            
         } else {
             LOGGER.error("Error while closing command context", exception);
+            
         }
     }
 
@@ -217,7 +226,7 @@ public class AbstractCommandContext {
         }
         return null;
     }
-
+    
     @SuppressWarnings({ "unchecked" })
     public <T> T getSession(Class<T> sessionClass) {
         Session session = sessions.get(sessionClass);
@@ -236,12 +245,24 @@ public class AbstractCommandContext {
     public Map<Class<?>, SessionFactory> getSessionFactories() {
         return sessionFactories;
     }
+    
+    public void setSessionFactories(Map<Class<?>, SessionFactory> sessionFactories) {
+        this.sessionFactories = sessionFactories;
+    }    
 
     // getters and setters
     // //////////////////////////////////////////////////////
-
+    
     public BaseCommand<?, ? extends AbstractCommandContext> getCommand() {
         return command;
+    }
+
+    public CommandExecutor getCommandExecutor() {
+        return commandExecutor;
+    }
+
+    public void setCommandExecutor(CommandExecutor commandExecutor) {
+        this.commandExecutor = commandExecutor;
     }
 
     public Map<Class<?>, Session> getSessions() {
@@ -258,6 +279,14 @@ public class AbstractCommandContext {
 
     public void setReused(boolean reused) {
         this.reused = reused;
+    }
+    
+    public Object getResult() {
+        return resultStack.pollLast();
+    }
+
+    public void setResult(Object result) {
+        resultStack.add(result);
     }
 
 }

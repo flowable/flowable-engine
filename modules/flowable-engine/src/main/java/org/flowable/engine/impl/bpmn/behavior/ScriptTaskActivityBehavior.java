@@ -19,8 +19,9 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.scripting.ScriptingEngines;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,10 +60,10 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
 
     public void execute(DelegateExecution execution) {
 
-        ScriptingEngines scriptingEngines = Context.getProcessEngineConfiguration().getScriptingEngines();
+        ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
 
-        if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
-            ObjectNode taskElementProperties = Context.getBpmnOverrideElementProperties(scriptTaskId, execution.getProcessDefinitionId());
+        if (CommandContextUtil.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
+            ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(scriptTaskId, execution.getProcessDefinitionId());
             if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT)) {
                 String overrideScript = taskElementProperties.get(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT).asText();
                 if (StringUtils.isNotEmpty(overrideScript) && !overrideScript.equals(script)) {

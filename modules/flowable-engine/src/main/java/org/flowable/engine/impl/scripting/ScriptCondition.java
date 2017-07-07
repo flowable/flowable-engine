@@ -15,7 +15,7 @@ package org.flowable.engine.impl.scripting;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.Condition;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -31,7 +31,7 @@ public class ScriptCondition implements Condition {
     }
 
     public boolean evaluate(String sequenceFlowId, DelegateExecution execution) {
-        ScriptingEngines scriptingEngines = Context.getProcessEngineConfiguration().getScriptingEngines();
+        ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
 
         Object result = scriptingEngines.evaluate(expression, language, execution);
         if (result == null) {

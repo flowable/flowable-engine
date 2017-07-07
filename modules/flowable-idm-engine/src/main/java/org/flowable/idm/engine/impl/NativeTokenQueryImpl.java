@@ -15,10 +15,11 @@ package org.flowable.idm.engine.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.NativeTokenQuery;
 import org.flowable.idm.api.Token;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
-import org.flowable.idm.engine.impl.interceptor.CommandExecutor;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 public class NativeTokenQueryImpl extends AbstractNativeQuery<NativeTokenQuery, Token> implements NativeTokenQuery {
 
@@ -35,11 +36,11 @@ public class NativeTokenQueryImpl extends AbstractNativeQuery<NativeTokenQuery, 
     // results ////////////////////////////////////////////////////////////////
 
     public List<Token> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return commandContext.getTokenEntityManager().findTokensByNativeQuery(parameterMap);
+        return CommandContextUtil.getTokenEntityManager(commandContext).findTokensByNativeQuery(parameterMap);
     }
 
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return commandContext.getTokenEntityManager().findTokenCountByNativeQuery(parameterMap);
+        return CommandContextUtil.getTokenEntityManager(commandContext).findTokenCountByNativeQuery(parameterMap);
     }
 
 }

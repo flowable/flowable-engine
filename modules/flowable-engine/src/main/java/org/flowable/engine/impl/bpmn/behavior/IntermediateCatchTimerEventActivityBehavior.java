@@ -18,13 +18,13 @@ import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.asyncexecutor.JobManager;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.persistence.entity.JobEntityManager;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 public class IntermediateCatchTimerEventActivityBehavior extends IntermediateCatchEventActivityBehavior {
 
@@ -38,7 +38,7 @@ public class IntermediateCatchTimerEventActivityBehavior extends IntermediateCat
 
     @Override
     public void execute(DelegateExecution execution) {
-        JobManager jobManager = Context.getCommandContext().getJobManager();
+        JobManager jobManager = CommandContextUtil.getJobManager();
 
         // end date should be ignored for intermediate timer events.
         TimerJobEntity timerJob = jobManager.createTimerJob(timerEventDefinition, false, (ExecutionEntity) execution, TriggerTimerEventJobHandler.TYPE,
@@ -51,14 +51,14 @@ public class IntermediateCatchTimerEventActivityBehavior extends IntermediateCat
 
     @Override
     public void eventCancelledByEventGateway(DelegateExecution execution) {
-        JobEntityManager jobEntityManager = Context.getCommandContext().getJobEntityManager();
+        JobEntityManager jobEntityManager = CommandContextUtil.getJobEntityManager();
         List<JobEntity> jobEntities = jobEntityManager.findJobsByExecutionId(execution.getId());
 
         for (JobEntity jobEntity : jobEntities) { // Should be only one
             jobEntityManager.delete(jobEntity);
         }
 
-        Context.getCommandContext().getExecutionEntityManager().deleteExecutionAndRelatedData((ExecutionEntity) execution,
+        CommandContextUtil.getExecutionEntityManager().deleteExecutionAndRelatedData((ExecutionEntity) execution,
                 DeleteReason.EVENT_BASED_GATEWAY_CANCEL, false);
     }
 

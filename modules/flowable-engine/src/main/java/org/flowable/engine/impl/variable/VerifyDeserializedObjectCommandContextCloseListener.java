@@ -12,9 +12,9 @@
  */
 package org.flowable.engine.impl.variable;
 
-import org.flowable.engine.impl.db.DbSqlSession;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandContextCloseListener;
+import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContextCloseListener;
 
 /**
  * A {@link CommandContextCloseListener} that holds one {@link DeserializedObject} instance that is added by the {@link SerializableType}.

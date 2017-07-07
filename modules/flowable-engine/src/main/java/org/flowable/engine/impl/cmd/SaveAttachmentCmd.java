@@ -15,13 +15,14 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.task.Attachment;
 
@@ -38,12 +39,12 @@ public class SaveAttachmentCmd implements Command<Object>, Serializable {
     }
 
     public Object execute(CommandContext commandContext) {
-        AttachmentEntity updateAttachment = commandContext.getAttachmentEntityManager().findById(attachment.getId());
+        AttachmentEntity updateAttachment = CommandContextUtil.getAttachmentEntityManager().findById(attachment.getId());
 
         String processInstanceId = updateAttachment.getProcessInstanceId();
         String processDefinitionId = null;
         if (updateAttachment.getProcessInstanceId() != null) {
-            ExecutionEntity process = commandContext.getExecutionEntityManager().findById(processInstanceId);
+            ExecutionEntity process = CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstanceId);
             if (process != null) {
                 processDefinitionId = process.getProcessDefinitionId();
                 if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, process.getProcessDefinitionId())) {
@@ -57,8 +58,8 @@ public class SaveAttachmentCmd implements Command<Object>, Serializable {
         updateAttachment.setName(attachment.getName());
         updateAttachment.setDescription(attachment.getDescription());
 
-        if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            commandContext.getProcessEngineConfiguration().getEventDispatcher()
+        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
                     .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, attachment, processInstanceId, processInstanceId, processDefinitionId));
         }
 

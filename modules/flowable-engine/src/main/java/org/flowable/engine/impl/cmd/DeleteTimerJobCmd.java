@@ -17,12 +17,12 @@ import java.io.Serializable;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,13 +47,13 @@ public class DeleteTimerJobCmd implements Command<Object>, Serializable {
 
         sendCancelEvent(jobToDelete);
 
-        commandContext.getTimerJobEntityManager().delete(jobToDelete);
+        CommandContextUtil.getTimerJobEntityManager(commandContext).delete(jobToDelete);
         return null;
     }
 
     protected void sendCancelEvent(TimerJobEntity jobToDelete) {
-        if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
+        if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
         }
     }
 
@@ -65,7 +65,7 @@ public class DeleteTimerJobCmd implements Command<Object>, Serializable {
             LOGGER.debug("Deleting job {}", timerJobId);
         }
 
-        TimerJobEntity job = commandContext.getTimerJobEntityManager().findById(timerJobId);
+        TimerJobEntity job = CommandContextUtil.getTimerJobEntityManager(commandContext).findById(timerJobId);
         if (job == null) {
             throw new FlowableObjectNotFoundException("No timer job found with id '" + timerJobId + "'", Job.class);
         }

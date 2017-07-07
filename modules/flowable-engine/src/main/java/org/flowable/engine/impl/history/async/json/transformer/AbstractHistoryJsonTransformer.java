@@ -18,10 +18,11 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.AsyncHistoryDateUtil;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -77,7 +78,7 @@ public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTrans
     }
 
     protected void dispatchEvent(CommandContext commandContext, FlowableEvent event) {
-        FlowableEventDispatcher eventDispatcher = commandContext.getProcessEngineConfiguration().getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(event);
         }
@@ -116,7 +117,7 @@ public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTrans
 
         HistoricActivityInstanceEntity historicActivityInstanceEntity = getUnfinishedHistoricActivityInstanceFromCache(commandContext, executionId, activityId);
         if (historicActivityInstanceEntity == null) {
-            List<HistoricActivityInstanceEntity> historicActivityInstances = commandContext.getHistoricActivityInstanceEntityManager()
+            List<HistoricActivityInstanceEntity> historicActivityInstances = CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext)
                             .findUnfinishedHistoricActivityInstancesByExecutionAndActivityId(executionId, activityId);
             if (!historicActivityInstances.isEmpty()) {
                 historicActivityInstanceEntity = historicActivityInstances.get(0);
@@ -128,7 +129,7 @@ public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTrans
     protected HistoricActivityInstanceEntity getUnfinishedHistoricActivityInstanceFromCache(CommandContext commandContext,
                     String executionId, String activityId) {
         
-        List<HistoricActivityInstanceEntity> cachedHistoricActivityInstances = commandContext.getEntityCache().findInCache(HistoricActivityInstanceEntity.class);
+        List<HistoricActivityInstanceEntity> cachedHistoricActivityInstances = CommandContextUtil.getEntityCache(commandContext).findInCache(HistoricActivityInstanceEntity.class);
         for (HistoricActivityInstanceEntity cachedHistoricActivityInstance : cachedHistoricActivityInstances) {
             if (activityId != null
                             && activityId.equals(cachedHistoricActivityInstance.getActivityId())
@@ -148,7 +149,7 @@ public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTrans
 
         HistoricActivityInstanceEntity historicActivityInstanceEntity = getHistoricActivityInstanceFromCache(commandContext, executionId, activityId);
         if (historicActivityInstanceEntity == null) {
-            List<HistoricActivityInstanceEntity> historicActivityInstances = commandContext.getHistoricActivityInstanceEntityManager()
+            List<HistoricActivityInstanceEntity> historicActivityInstances = CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext)
                             .findHistoricActivityInstancesByExecutionAndActivityId(executionId, activityId);
             if (!historicActivityInstances.isEmpty()) {
                 historicActivityInstanceEntity = historicActivityInstances.get(0);
@@ -160,7 +161,7 @@ public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTrans
     protected HistoricActivityInstanceEntity getHistoricActivityInstanceFromCache(CommandContext commandContext,
                     String executionId, String activityId) {
         
-        List<HistoricActivityInstanceEntity> cachedHistoricActivityInstances = commandContext.getEntityCache().findInCache(HistoricActivityInstanceEntity.class);
+        List<HistoricActivityInstanceEntity> cachedHistoricActivityInstances = CommandContextUtil.getEntityCache(commandContext).findInCache(HistoricActivityInstanceEntity.class);
         for (HistoricActivityInstanceEntity cachedHistoricActivityInstance : cachedHistoricActivityInstances) {
             if (activityId != null
                             && activityId.equals(cachedHistoricActivityInstance.getActivityId())

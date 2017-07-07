@@ -22,7 +22,6 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.context.Context;
 import org.flowable.engine.common.api.FlowableClassLoadingException;
 import org.flowable.engine.common.api.FlowableException;
 import org.slf4j.Logger;
@@ -263,7 +262,7 @@ public abstract class ReflectUtil {
     }
 
     private static ClassLoader getCustomClassLoader() {
-        DmnEngineConfiguration dmnEngineConfiguration = Context.getDmnEngineConfiguration();
+        DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
         if (dmnEngineConfiguration != null) {
             final ClassLoader classLoader = dmnEngineConfiguration.getClassLoader();
             if (classLoader != null) {
@@ -274,7 +273,7 @@ public abstract class ReflectUtil {
     }
 
     private static Class loadClass(ClassLoader classLoader, String className) throws ClassNotFoundException {
-        DmnEngineConfiguration dmnEngineConfiguration = Context.getDmnEngineConfiguration();
+        DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
         boolean useClassForName = dmnEngineConfiguration == null || dmnEngineConfiguration.isUseClassForNameClassLoading();
         return useClassForName ? Class.forName(className, true, classLoader) : classLoader.loadClass(className);
     }

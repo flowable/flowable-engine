@@ -12,10 +12,8 @@
  */
 package org.flowable.spring.configurator;
 
-import javax.sql.DataSource;
-
-import org.flowable.engine.cfg.AbstractProcessEngineConfigurator;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.impl.cfg.IdmEngineConfigurator;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
@@ -25,7 +23,7 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
 /**
  * @author Tijs Rademakers
  */
-public class SpringIdmEngineConfigurator extends AbstractProcessEngineConfigurator {
+public class SpringIdmEngineConfigurator extends IdmEngineConfigurator {
 
     protected SpringIdmEngineConfiguration idmEngineConfiguration;
 
@@ -33,36 +31,14 @@ public class SpringIdmEngineConfigurator extends AbstractProcessEngineConfigurat
     public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (idmEngineConfiguration == null) {
             idmEngineConfiguration = new SpringIdmEngineConfiguration();
+            initialiseCommonProperties(processEngineConfiguration, idmEngineConfiguration, EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
         }
-
-        if (processEngineConfiguration.getDataSource() != null) {
-            DataSource originalDatasource = processEngineConfiguration.getDataSource();
-            idmEngineConfiguration.setDataSource(originalDatasource);
-
-        } else {
-            throw new FlowableException("A datasource is required for initializing the IDM engine ");
-        }
-
-        idmEngineConfiguration.setDatabaseType(processEngineConfiguration.getDatabaseType());
-        idmEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
-        idmEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
-        idmEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
-
         idmEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
 
-        if (processEngineConfiguration.getEventDispatcher() != null) {
-            idmEngineConfiguration.setEventDispatcher(processEngineConfiguration.getEventDispatcher());
-        }
 
         IdmEngine idmEngine = idmEngineConfiguration.buildIdmEngine();
-
         processEngineConfiguration.setIdmEngineInitialized(true);
         processEngineConfiguration.setIdmIdentityService(idmEngine.getIdmIdentityService());
-    }
-
-    @Override
-    public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        // Nothing to do in the before init: we boot up the IDM engine once the process engine is ready
     }
 
     public IdmEngineConfiguration getIdmEngineConfiguration() {

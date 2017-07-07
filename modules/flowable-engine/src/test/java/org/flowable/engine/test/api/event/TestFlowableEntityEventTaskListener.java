@@ -17,8 +17,8 @@ import java.util.List;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Task;
 
 /**
@@ -48,7 +48,7 @@ public class TestFlowableEntityEventTaskListener extends TestFlowableEntityEvent
     }
 
     protected Task copy(Task aTask) {
-        TaskEntity ent = Context.getCommandContext().getTaskEntityManager().create();
+        TaskEntity ent = CommandContextUtil.getTaskEntityManager().create();
         ent.setId(aTask.getId());
         ent.setName(aTask.getName());
         ent.setDescription(aTask.getDescription());

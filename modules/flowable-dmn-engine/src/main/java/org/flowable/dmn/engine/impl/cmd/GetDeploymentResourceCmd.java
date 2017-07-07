@@ -16,11 +16,12 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
 
-import org.flowable.dmn.engine.impl.interceptor.Command;
-import org.flowable.dmn.engine.impl.interceptor.CommandContext;
-import org.flowable.dmn.engine.impl.persistence.entity.ResourceEntity;
+import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntity;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
@@ -44,9 +45,9 @@ public class GetDeploymentResourceCmd implements Command<InputStream>, Serializa
             throw new FlowableIllegalArgumentException("resourceName is null");
         }
 
-        ResourceEntity resource = commandContext.getResourceEntityManager().findResourceByDeploymentIdAndResourceName(deploymentId, resourceName);
+        DmnResourceEntity resource = CommandContextUtil.getResourceEntityManager().findResourceByDeploymentIdAndResourceName(deploymentId, resourceName);
         if (resource == null) {
-            if (commandContext.getDeploymentEntityManager().findById(deploymentId) == null) {
+            if (CommandContextUtil.getDeploymentEntityManager(commandContext).findById(deploymentId) == null) {
                 throw new FlowableObjectNotFoundException("deployment does not exist: " + deploymentId);
             } else {
                 throw new FlowableObjectNotFoundException("no resource found with name '" + resourceName + "' in deployment '" + deploymentId + "'");

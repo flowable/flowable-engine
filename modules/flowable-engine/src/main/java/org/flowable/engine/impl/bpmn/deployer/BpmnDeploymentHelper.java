@@ -23,12 +23,13 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.IdentityLinkType;
 
 /**
@@ -100,7 +101,7 @@ public class BpmnDeploymentHelper {
     public ProcessDefinitionEntity getMostRecentVersionOfProcessDefinition(ProcessDefinitionEntity processDefinition) {
         String key = processDefinition.getKey();
         String tenantId = processDefinition.getTenantId();
-        ProcessDefinitionEntityManager processDefinitionManager = Context.getCommandContext().getProcessEngineConfiguration().getProcessDefinitionEntityManager();
+        ProcessDefinitionEntityManager processDefinitionManager = CommandContextUtil.getProcessEngineConfiguration().getProcessDefinitionEntityManager();
 
         ProcessDefinitionEntity existingDefinition = null;
 
@@ -123,7 +124,7 @@ public class BpmnDeploymentHelper {
             throw new IllegalStateException("Provided process definition must have a deployment id.");
         }
 
-        ProcessDefinitionEntityManager processDefinitionManager = Context.getCommandContext().getProcessEngineConfiguration().getProcessDefinitionEntityManager();
+        ProcessDefinitionEntityManager processDefinitionManager = CommandContextUtil.getProcessEngineConfiguration().getProcessDefinitionEntityManager();
         ProcessDefinitionEntity persistedProcessDefinition = null;
         if (processDefinition.getTenantId() == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(processDefinition.getTenantId())) {
             persistedProcessDefinition = processDefinitionManager.findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinition.getKey());
@@ -175,7 +176,7 @@ public class BpmnDeploymentHelper {
             while (iterator.hasNext()) {
                 @SuppressWarnings("cast")
                 String expression = iterator.next();
-                IdentityLinkEntity identityLink = commandContext.getIdentityLinkEntityManager().create();
+                IdentityLinkEntity identityLink = CommandContextUtil.getIdentityLinkEntityManager(commandContext).create();
                 identityLink.setProcessDef(processDefinition);
                 if (expressionType == ExpressionType.USER) {
                     identityLink.setUserId(expression);
@@ -183,7 +184,7 @@ public class BpmnDeploymentHelper {
                     identityLink.setGroupId(expression);
                 }
                 identityLink.setType(IdentityLinkType.CANDIDATE);
-                commandContext.getIdentityLinkEntityManager().insert(identityLink);
+                CommandContextUtil.getIdentityLinkEntityManager(commandContext).insert(identityLink);
             }
         }
 

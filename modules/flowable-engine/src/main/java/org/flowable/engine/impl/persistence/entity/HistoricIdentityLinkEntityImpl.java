@@ -19,12 +19,11 @@ import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
-import org.flowable.engine.impl.db.BulkDeleteable;
 
 /**
  * @author Frederik Heremans
  */
-public class HistoricIdentityLinkEntityImpl extends AbstractEntityNoRevision implements HistoricIdentityLinkEntity, Serializable, BulkDeleteable {
+public class HistoricIdentityLinkEntityImpl extends AbstractEntityNoRevision implements HistoricIdentityLinkEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

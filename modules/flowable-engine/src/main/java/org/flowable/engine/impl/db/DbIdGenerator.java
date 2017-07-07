@@ -16,8 +16,8 @@ package org.flowable.engine.impl.db;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.db.IdBlock;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.cmd.GetNextIdBlockCmd;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
 
 /**
  * @author Tom Baeyens

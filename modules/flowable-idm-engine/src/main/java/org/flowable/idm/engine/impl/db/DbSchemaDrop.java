@@ -13,12 +13,12 @@
 
 package org.flowable.idm.engine.impl.db;
 
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngines;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
-import org.flowable.idm.engine.impl.interceptor.CommandExecutor;
 
 /**
  * @author Tijs Rademakers
@@ -31,7 +31,7 @@ public class DbSchemaDrop {
         CommandConfig config = new CommandConfig().transactionNotSupported();
         commandExecutor.execute(config, new Command<Object>() {
             public Object execute(CommandContext commandContext) {
-                commandContext.getDbSqlSession().dbSchemaDrop();
+                IdmDbSchemaManager.dbSchemaDrop();
                 return null;
             }
         });

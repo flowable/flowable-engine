@@ -15,11 +15,12 @@ package org.flowable.idm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.idm.api.Group;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntity;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -38,17 +39,17 @@ public class SaveGroupCmd implements Command<Void>, Serializable {
             throw new FlowableIllegalArgumentException("group is null");
         }
 
-        if (commandContext.getGroupEntityManager().isNewGroup(group)) {
+        if (CommandContextUtil.getGroupEntityManager(commandContext).isNewGroup(group)) {
             if (group instanceof GroupEntity) {
-                commandContext.getGroupEntityManager().insert((GroupEntity) group);
+                CommandContextUtil.getGroupEntityManager(commandContext).insert((GroupEntity) group);
             } else {
-                commandContext.getDbSqlSession().insert((Entity) group);
+                CommandContextUtil.getDbSqlSession(commandContext).insert((Entity) group);
             }
         } else {
             if (group instanceof GroupEntity) {
-                commandContext.getGroupEntityManager().update((GroupEntity) group);
+                CommandContextUtil.getGroupEntityManager(commandContext).update((GroupEntity) group);
             } else {
-                commandContext.getDbSqlSession().update((Entity) group);
+                CommandContextUtil.getDbSqlSession(commandContext).update((Entity) group);
             }
 
         }

@@ -12,11 +12,12 @@
  */
 package org.flowable.engine.impl.history.async.json.transformer;
 
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -29,12 +30,12 @@ public class VariableRemovedHistoryJsonTransformer extends AbstractHistoryJsonTr
 
     @Override
     public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
-        return commandContext.getHistoricVariableInstanceEntityManager().findById(getStringFromJson(historicalData, HistoryJsonConstants.ID)) != null;
+        return CommandContextUtil.getHistoricVariableInstanceEntityManager(commandContext).findById(getStringFromJson(historicalData, HistoryJsonConstants.ID)) != null;
     }
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = commandContext.getProcessEngineConfiguration().getHistoricVariableInstanceEntityManager();
+        HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoricVariableInstanceEntityManager();
         HistoricVariableInstanceEntity historicVariable = historicVariableInstanceEntityManager.findById(getStringFromJson(historicalData, HistoryJsonConstants.ID));
         
         if (historicVariable != null) {

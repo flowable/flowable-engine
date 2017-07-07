@@ -15,7 +15,8 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.List;
 
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Comment;
 
 /**
@@ -32,7 +33,7 @@ public class GetTaskCommentsByTypeCmd extends GetTaskCommentsCmd {
     }
 
     public List<Comment> execute(CommandContext commandContext) {
-        return commandContext.getCommentEntityManager().findCommentsByTaskIdAndType(taskId, type);
+        return CommandContextUtil.getCommentEntityManager(commandContext).findCommentsByTaskIdAndType(taskId, type);
     }
 
 }

@@ -48,6 +48,7 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.javax.el.PropertyNotFoundException;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
@@ -55,7 +56,6 @@ import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.form.StartFormData;
 import org.flowable.engine.impl.cmd.AddIdentityLinkCmd;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
@@ -66,6 +66,7 @@ import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.engine.impl.persistence.entity.VariableInstance;
 import org.flowable.engine.impl.repository.DeploymentBuilderImpl;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Job;
@@ -942,7 +943,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         if (processEngine == null) {
             synchronized (this) {
                 if (processEngine == null) {
-                    processEngine = getProcessEngineFactory().buildProcessEngine(Context.getProcessEngineConfiguration());
+                    processEngine = getProcessEngineFactory().buildProcessEngine(CommandContextUtil.getProcessEngineConfiguration());
                 }
             }
         }

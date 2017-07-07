@@ -21,8 +21,8 @@ import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.bpmn.helper.DelegateExpressionUtil;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.delegate.invocation.TaskListenerInvocation;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -41,7 +41,7 @@ public class DelegateExpressionTaskListener implements TaskListener {
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, delegateTask, fieldDeclarations);
         if (delegate instanceof TaskListener) {
             try {
-                Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new TaskListenerInvocation((TaskListener) delegate, delegateTask));
+                CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new TaskListenerInvocation((TaskListener) delegate, delegateTask));
             } catch (Exception e) {
                 throw new FlowableException("Exception while invoking TaskListener: " + e.getMessage(), e);
             }

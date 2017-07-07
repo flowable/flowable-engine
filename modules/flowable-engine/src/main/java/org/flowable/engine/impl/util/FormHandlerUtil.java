@@ -18,12 +18,11 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FormProperty;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.form.DefaultStartFormHandler;
 import org.flowable.engine.impl.form.DefaultTaskFormHandler;
 import org.flowable.engine.impl.form.StartFormHandler;
 import org.flowable.engine.impl.form.TaskFormHandler;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -44,7 +43,7 @@ public class FormHandlerUtil {
 
             List<FormProperty> formProperties = startEvent.getFormProperties();
             String formKey = startEvent.getFormKey();
-            DeploymentEntity deploymentEntity = commandContext.getDeploymentEntityManager().findById(processDefinition.getDeploymentId());
+            DeploymentEntity deploymentEntity = CommandContextUtil.getDeploymentEntityManager(commandContext).findById(processDefinition.getDeploymentId());
 
             startFormHandler.parseConfiguration(formProperties, formKey, deploymentEntity, processDefinition);
             return startFormHandler;
@@ -61,7 +60,7 @@ public class FormHandlerUtil {
             UserTask userTask = (UserTask) flowElement;
 
             ProcessDefinition processDefinitionEntity = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
-            DeploymentEntity deploymentEntity = Context.getProcessEngineConfiguration()
+            DeploymentEntity deploymentEntity = CommandContextUtil.getProcessEngineConfiguration()
                     .getDeploymentEntityManager().findById(processDefinitionEntity.getDeploymentId());
 
             TaskFormHandler taskFormHandler = new DefaultTaskFormHandler();

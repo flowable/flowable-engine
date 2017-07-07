@@ -12,7 +12,6 @@
  */
 package org.flowable.validation.validator;
 
-import org.flowable.validation.validator.impl.FlowableEventListenerValidator;
 import org.flowable.validation.validator.impl.AssociationValidator;
 import org.flowable.validation.validator.impl.BoundaryEventValidator;
 import org.flowable.validation.validator.impl.BpmnModelValidator;
@@ -26,6 +25,7 @@ import org.flowable.validation.validator.impl.EventValidator;
 import org.flowable.validation.validator.impl.ExclusiveGatewayValidator;
 import org.flowable.validation.validator.impl.ExecutionListenerValidator;
 import org.flowable.validation.validator.impl.FlowElementValidator;
+import org.flowable.validation.validator.impl.FlowableEventListenerValidator;
 import org.flowable.validation.validator.impl.IntermediateCatchEventValidator;
 import org.flowable.validation.validator.impl.IntermediateThrowEventValidator;
 import org.flowable.validation.validator.impl.MessageValidator;

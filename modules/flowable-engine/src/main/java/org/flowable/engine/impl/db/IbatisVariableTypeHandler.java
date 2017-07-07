@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.variable.VariableType;
 import org.flowable.engine.impl.variable.VariableTypes;
 
@@ -57,7 +57,7 @@ public class IbatisVariableTypeHandler implements TypeHandler<VariableType> {
 
     protected VariableTypes getVariableTypes() {
         if (variableTypes == null) {
-            variableTypes = Context.getProcessEngineConfiguration().getVariableTypes();
+            variableTypes = CommandContextUtil.getProcessEngineConfiguration().getVariableTypes();
         }
         return variableTypes;
     }

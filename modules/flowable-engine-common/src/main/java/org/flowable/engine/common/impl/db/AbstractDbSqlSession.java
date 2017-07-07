@@ -110,18 +110,6 @@ public abstract class AbstractDbSqlSession implements Session {
         
     public abstract void delete(Entity entity);
     
-    public void dbSchemaCheckVersion() {
-        
-    }
-    
-    public void dbSchemaCreate() {
-        
-    }
-
-    public void dbSchemaDrop() { 
-        
-    }
-    
     public void flush() {
         sqlSession.flushStatements();
     }
@@ -142,14 +130,6 @@ public abstract class AbstractDbSqlSession implements Session {
         return sqlSession.getMapper(type);
     }
 
-    public boolean isMysql() {
-        return dbSqlSessionFactory.getDatabaseType().equals("mysql");
-    }
-
-    public boolean isOracle() {
-        return dbSqlSessionFactory.getDatabaseType().equals("oracle");
-    }
-    
     // getters and setters
     // //////////////////////////////////////////////////////
 
@@ -161,4 +141,20 @@ public abstract class AbstractDbSqlSession implements Session {
         return dbSqlSessionFactory;
     }
 
+    public String getConnectionMetadataDefaultCatalog() {
+        return connectionMetadataDefaultCatalog;
+    }
+
+    public void setConnectionMetadataDefaultCatalog(String connectionMetadataDefaultCatalog) {
+        this.connectionMetadataDefaultCatalog = connectionMetadataDefaultCatalog;
+    }
+
+    public String getConnectionMetadataDefaultSchema() {
+        return connectionMetadataDefaultSchema;
+    }
+
+    public void setConnectionMetadataDefaultSchema(String connectionMetadataDefaultSchema) {
+        this.connectionMetadataDefaultSchema = connectionMetadataDefaultSchema;
+    }
+    
 }

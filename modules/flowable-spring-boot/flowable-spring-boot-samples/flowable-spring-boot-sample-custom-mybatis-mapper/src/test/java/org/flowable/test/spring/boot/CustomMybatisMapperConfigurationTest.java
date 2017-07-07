@@ -6,9 +6,10 @@ import java.net.URL;
 import java.util.Properties;
 
 import org.flowable.engine.ManagementService;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cmd.AbstractCustomSqlExecution;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -42,7 +43,7 @@ public class CustomMybatisMapperConfigurationTest {
         String processDefinitionDeploymentId = managementService.executeCommand(new Command<String>() {
             @Override
             public String execute(CommandContext commandContext) {
-                return (String) commandContext.getDbSqlSession().selectOne("selectProcessDefinitionDeploymentIdByKey", "waiter");
+                return (String) CommandContextUtil.getDbSqlSession(commandContext).selectOne("selectProcessDefinitionDeploymentIdByKey", "waiter");
             }
         });
         Assert.assertNotNull("the processDefinitionDeploymentId should not be null!", processDefinitionDeploymentId);

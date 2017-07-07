@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cmd.ActivateProcessDefinitionCmd;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.util.json.JSONObject;

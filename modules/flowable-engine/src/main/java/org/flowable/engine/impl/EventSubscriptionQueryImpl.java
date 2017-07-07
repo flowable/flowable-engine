@@ -17,8 +17,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.EventSubscriptionQuery;
 
@@ -159,13 +160,13 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getEventSubscriptionEntityManager().findEventSubscriptionCountByQueryCriteria(this);
+        return CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findEventSubscriptionCountByQueryCriteria(this);
     }
 
     @Override
     public List<EventSubscription> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getEventSubscriptionEntityManager().findEventSubscriptionsByQueryCriteria(this);
+        return CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findEventSubscriptionsByQueryCriteria(this);
     }
 
     // getters //////////////////////////////////////////

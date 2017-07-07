@@ -13,11 +13,12 @@
 package org.flowable.engine.impl.agenda;
 
 import org.flowable.bpmn.model.FlowNode;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessDebugger;
 
 /**
@@ -71,7 +72,7 @@ public class DebugContinueProcessOperation extends ContinueProcessOperation {
     }
 
     protected DeadLetterJobEntityManager getDeadLetterJobEntityManager() {
-        return this.commandContext.getDeadLetterJobEntityManager();
+        return CommandContextUtil.getDeadLetterJobEntityManager(commandContext);
     }
 
 }

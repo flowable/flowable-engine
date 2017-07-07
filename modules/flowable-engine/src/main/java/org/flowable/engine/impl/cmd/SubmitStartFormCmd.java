@@ -16,11 +16,12 @@ package org.flowable.engine.impl.cmd;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.form.StartFormHandler;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.FormHandlerUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
@@ -50,7 +51,7 @@ public class SubmitStartFormCmd extends NeedsActiveProcessDefinitionCmd<ProcessI
         }
 
         ExecutionEntity processInstance = null;
-        ProcessInstanceHelper processInstanceHelper = commandContext.getProcessEngineConfiguration().getProcessInstanceHelper();
+        ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
 
         // TODO: backwards compatibility? Only create the process instance and not start it? How?
         if (businessKey != null) {
@@ -59,7 +60,7 @@ public class SubmitStartFormCmd extends NeedsActiveProcessDefinitionCmd<ProcessI
             processInstance = (ExecutionEntity) processInstanceHelper.createProcessInstance(processDefinition, null, null, null, null);
         }
 
-        commandContext.getHistoryManager().recordFormPropertiesSubmitted(processInstance.getExecutions().get(0), properties, null);
+        CommandContextUtil.getHistoryManager(commandContext).recordFormPropertiesSubmitted(processInstance.getExecutions().get(0), properties, null);
 
         StartFormHandler startFormHandler = FormHandlerUtil.getStartFormHandler(commandContext, processDefinition);
         startFormHandler.submitFormProperties(properties, processInstance);

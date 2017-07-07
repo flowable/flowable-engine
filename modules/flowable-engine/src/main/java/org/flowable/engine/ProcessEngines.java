@@ -71,8 +71,7 @@ public abstract class ProcessEngines {
     public static synchronized void init() {
         if (!isInitialized()) {
             if (processEngines == null) {
-                // Create new map to store process-engines if current map is
-                // null
+                // Create new map to store process-engines if current map is null
                 processEngines = new HashMap<String, ProcessEngine>();
             }
             ClassLoader classLoader = ReflectUtil.getClassLoader();

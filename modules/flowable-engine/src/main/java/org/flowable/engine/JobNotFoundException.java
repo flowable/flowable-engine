@@ -26,10 +26,11 @@ public class JobNotFoundException extends FlowableObjectNotFoundException {
 
     /** the id of the job */
     private String jobId;
-
+    
     public JobNotFoundException(String jobId) {
         super("No job found with id '" + jobId + "'.", Job.class);
         this.jobId = jobId;
+        this.reduceLogLevel = true;
     }
 
     public String getJobId() {

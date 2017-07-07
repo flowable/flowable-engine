@@ -2,7 +2,7 @@ package org.flowable.engine.impl.el;
 
 import java.util.Date;
 
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
@@ -15,7 +15,7 @@ public class DateUtil {
         if (value instanceof Date) {
             Date date = (Date) value;
             DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
-            DateTimeZone dateTimeZone = DateTimeZone.forTimeZone(Context.getProcessEngineConfiguration().getClock().getCurrentTimeZone());
+            DateTimeZone dateTimeZone = DateTimeZone.forTimeZone(CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTimeZone());
             formattedString = fmt.print(new DateTime(date, dateTimeZone));
         } else {
             formattedString = value.toString();

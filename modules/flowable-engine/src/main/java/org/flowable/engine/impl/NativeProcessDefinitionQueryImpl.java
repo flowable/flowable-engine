@@ -15,8 +15,9 @@ package org.flowable.engine.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.NativeProcessDefinitionQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 
@@ -35,11 +36,11 @@ public class NativeProcessDefinitionQueryImpl extends AbstractNativeQuery<Native
     // results ////////////////////////////////////////////////////////////////
 
     public List<ProcessDefinition> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return commandContext.getProcessDefinitionEntityManager().findProcessDefinitionsByNativeQuery(parameterMap);
+        return CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findProcessDefinitionsByNativeQuery(parameterMap);
     }
 
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return commandContext.getProcessDefinitionEntityManager().findProcessDefinitionCountByNativeQuery(parameterMap);
+        return CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findProcessDefinitionCountByNativeQuery(parameterMap);
     }
 
 }

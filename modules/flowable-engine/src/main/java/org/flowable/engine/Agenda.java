@@ -12,10 +12,13 @@
  */
 package org.flowable.engine;
 
+import org.flowable.engine.common.impl.interceptor.Session;
+
 /**
  * This interface exposes independent agenda methods.
  */
-public interface Agenda {
+public interface Agenda extends Session {
+    
     boolean isEmpty();
 
     /**

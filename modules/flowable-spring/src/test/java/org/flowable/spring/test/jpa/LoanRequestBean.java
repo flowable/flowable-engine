@@ -13,10 +13,10 @@
 
 package org.flowable.spring.test.jpa;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service bean that handles loan requests.

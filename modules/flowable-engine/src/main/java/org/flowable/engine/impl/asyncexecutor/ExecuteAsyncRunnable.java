@@ -13,7 +13,10 @@
 package org.flowable.engine.impl.asyncexecutor;
 
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
@@ -21,16 +24,14 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ExecuteAsyncJobCmd;
 import org.flowable.engine.impl.cmd.LockExclusiveJobCmd;
 import org.flowable.engine.impl.cmd.UnlockExclusiveJobCmd;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.jobexecutor.FailedJobCommandFactory;
 import org.flowable.engine.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
 import org.flowable.engine.impl.persistence.entity.JobInfoEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
-import org.flowable.engine.runtime.JobInfo;
 import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.JobInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,7 +108,7 @@ public class ExecuteAsyncRunnable implements Runnable {
             return processEngineConfiguration.getCommandExecutor().execute(new Command<Boolean>() {
                 @Override
                 public Boolean execute(CommandContext commandContext) {
-                    commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().executeJobWithLockAndRetry((Job) job);
+                    CommandContextUtil.getProcessEngineConfiguration(commandContext).getFlowable5CompatibilityHandler().executeJobWithLockAndRetry((Job) job);
                     return true;
                 }
             });
@@ -182,11 +183,11 @@ public class ExecuteAsyncRunnable implements Runnable {
     protected void unacquireJob() {
         CommandContext commandContext = Context.getCommandContext();
         if (commandContext != null) {
-            commandContext.getJobManager().unacquire(job);
+            CommandContextUtil.getJobManager(commandContext).unacquire(job);
         } else {
             processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
                 public Void execute(CommandContext commandContext) {
-                    commandContext.getJobManager().unacquire(job);
+                    CommandContextUtil.getJobManager(commandContext).unacquire(job);
                     return null;
                 }
             });
@@ -227,7 +228,7 @@ public class ExecuteAsyncRunnable implements Runnable {
                 }
 
                 CommandConfig commandConfig = processEngineConfiguration.getCommandExecutor().getDefaultConfig().transactionRequiresNew();
-                FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
+                FailedJobCommandFactory failedJobCommandFactory = CommandContextUtil.getFailedJobCommandFactory();
                 Command<Object> cmd = failedJobCommandFactory.getCommand(job.getId(), exception);
 
                 LOGGER.trace("Using FailedJobCommandFactory '{}' and command of type '{}'", failedJobCommandFactory.getClass(), cmd.getClass());
@@ -235,9 +236,9 @@ public class ExecuteAsyncRunnable implements Runnable {
 
                 // Dispatch an event, indicating job execution failed in a
                 // try-catch block, to prevent the original exception to be swallowed
-                if (commandContext.getEventDispatcher().isEnabled()) {
+                if (CommandContextUtil.getEventDispatcher().isEnabled()) {
                     try {
-                        commandContext.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityExceptionEvent(FlowableEngineEventType.JOB_EXECUTION_FAILURE, job, exception));
+                        CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityExceptionEvent(FlowableEngineEventType.JOB_EXECUTION_FAILURE, job, exception));
                     } catch (Throwable ignore) {
                         LOGGER.warn("Exception occurred while dispatching job failure event, ignoring.", ignore);
                     }

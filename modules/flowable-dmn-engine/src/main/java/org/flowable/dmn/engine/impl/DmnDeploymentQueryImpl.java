@@ -18,9 +18,10 @@ import java.util.List;
 
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentQuery;
-import org.flowable.dmn.engine.impl.interceptor.CommandContext;
-import org.flowable.dmn.engine.impl.interceptor.CommandExecutor;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 
 /**
  * @author Tijs Rademakers
@@ -169,13 +170,13 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
     @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getDeploymentEntityManager().findDeploymentCountByQueryCriteria(this);
+        return CommandContextUtil.getDeploymentEntityManager(commandContext).findDeploymentCountByQueryCriteria(this);
     }
 
     @Override
     public List<DmnDeployment> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getDeploymentEntityManager().findDeploymentsByQueryCriteria(this);
+        return CommandContextUtil.getDeploymentEntityManager(commandContext).findDeploymentsByQueryCriteria(this);
     }
 
     // getters ////////////////////////////////////////////////////////

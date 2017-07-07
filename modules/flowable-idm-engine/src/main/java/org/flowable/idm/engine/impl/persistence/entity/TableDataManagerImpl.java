@@ -27,6 +27,7 @@ import org.apache.ibatis.session.RowBounds;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.management.TableMetaData;
 import org.flowable.engine.common.api.management.TablePage;
+import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.Privilege;
@@ -34,7 +35,6 @@ import org.flowable.idm.api.Token;
 import org.flowable.idm.api.User;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.TablePageQueryImpl;
-import org.flowable.idm.engine.impl.db.DbSqlSession;
 import org.flowable.idm.engine.impl.persistence.AbstractManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,8 +64,8 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
         entityToTableNameMap.put(PrivilegeEntity.class, "ACT_ID_PRIV");
 
         // general
-        entityToTableNameMap.put(PropertyEntity.class, "ACT_ID_PROPERTY");
-        entityToTableNameMap.put(ByteArrayEntity.class, "ACT_ID_BYTEARRAY");
+        entityToTableNameMap.put(IdmPropertyEntity.class, "ACT_ID_PROPERTY");
+        entityToTableNameMap.put(IdmByteArrayEntity.class, "ACT_ID_BYTEARRAY");
 
         apiTypeToTableNameMap.put(Group.class, "ACT_ID_GROUP");
         apiTypeToTableNameMap.put(User.class, "ACT_ID_USER");

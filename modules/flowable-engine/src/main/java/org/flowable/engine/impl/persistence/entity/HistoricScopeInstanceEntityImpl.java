@@ -18,7 +18,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Christian Stettler
@@ -37,7 +37,7 @@ public abstract class HistoricScopeInstanceEntityImpl extends AbstractEntity imp
     public void markEnded(String deleteReason) {
         if (this.endTime == null) {
             this.deleteReason = deleteReason;
-            this.endTime = Context.getProcessEngineConfiguration().getClock().getCurrentTime();
+            this.endTime = CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTime();
             if (endTime != null && startTime != null) {
                 this.durationInMillis = endTime.getTime() - startTime.getTime();
             }

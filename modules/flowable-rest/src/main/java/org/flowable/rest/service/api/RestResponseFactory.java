@@ -55,16 +55,8 @@ import org.flowable.rest.service.api.engine.AttachmentResponse;
 import org.flowable.rest.service.api.engine.CommentResponse;
 import org.flowable.rest.service.api.engine.EventResponse;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
-import org.flowable.rest.variable.BooleanRestVariableConverter;
-import org.flowable.rest.variable.DateRestVariableConverter;
-import org.flowable.rest.variable.DoubleRestVariableConverter;
-import org.flowable.rest.variable.IntegerRestVariableConverter;
-import org.flowable.rest.variable.LongRestVariableConverter;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
-import org.flowable.rest.variable.RestVariableConverter;
-import org.flowable.rest.variable.ShortRestVariableConverter;
-import org.flowable.rest.variable.StringRestVariableConverter;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.flowable.rest.service.api.form.FormDataResponse;
 import org.flowable.rest.service.api.form.RestEnumFormProperty;
@@ -91,6 +83,14 @@ import org.flowable.rest.service.api.runtime.process.EventSubscriptionResponse;
 import org.flowable.rest.service.api.runtime.process.ExecutionResponse;
 import org.flowable.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.flowable.rest.service.api.runtime.task.TaskResponse;
+import org.flowable.rest.variable.BooleanRestVariableConverter;
+import org.flowable.rest.variable.DateRestVariableConverter;
+import org.flowable.rest.variable.DoubleRestVariableConverter;
+import org.flowable.rest.variable.IntegerRestVariableConverter;
+import org.flowable.rest.variable.LongRestVariableConverter;
+import org.flowable.rest.variable.RestVariableConverter;
+import org.flowable.rest.variable.ShortRestVariableConverter;
+import org.flowable.rest.variable.StringRestVariableConverter;
 
 /**
  * Default implementation of a {@link RestResponseFactory}.

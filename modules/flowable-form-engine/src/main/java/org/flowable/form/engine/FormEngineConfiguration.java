@@ -12,29 +12,31 @@
  */
 package org.flowable.form.engine;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.transaction.TransactionFactory;
 import org.flowable.editor.form.converter.FormJsonConverter;
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
-import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.cfg.CommandExecutorImpl;
+import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
+import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
+import org.flowable.engine.common.impl.interceptor.CommandContextFactory;
+import org.flowable.engine.common.impl.interceptor.CommandContextInterceptor;
+import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
+import org.flowable.engine.common.impl.interceptor.DefaultCommandInvoker;
+import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.common.impl.interceptor.LogInterceptor;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.common.impl.interceptor.TransactionContextInterceptor;
+import org.flowable.engine.common.impl.persistence.cache.EntityCache;
+import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
+import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
@@ -43,26 +45,16 @@ import org.flowable.form.engine.impl.FormManagementServiceImpl;
 import org.flowable.form.engine.impl.FormRepositoryServiceImpl;
 import org.flowable.form.engine.impl.FormServiceImpl;
 import org.flowable.form.engine.impl.ServiceImpl;
-import org.flowable.form.engine.impl.cfg.CommandExecutorImpl;
 import org.flowable.form.engine.impl.cfg.StandaloneFormEngineConfiguration;
 import org.flowable.form.engine.impl.cfg.StandaloneInMemFormEngineConfiguration;
-import org.flowable.form.engine.impl.cfg.TransactionListener;
-import org.flowable.form.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
-import org.flowable.form.engine.impl.db.DbSqlSessionFactory;
+import org.flowable.form.engine.impl.db.EntityDependencyOrder;
 import org.flowable.form.engine.impl.deployer.CachingAndArtifactsManager;
 import org.flowable.form.engine.impl.deployer.FormDefinitionDeployer;
 import org.flowable.form.engine.impl.deployer.FormDefinitionDeploymentHelper;
 import org.flowable.form.engine.impl.deployer.ParsedDeploymentBuilderFactory;
 import org.flowable.form.engine.impl.el.ExpressionManager;
-import org.flowable.form.engine.impl.interceptor.CommandContext;
-import org.flowable.form.engine.impl.interceptor.CommandContextFactory;
-import org.flowable.form.engine.impl.interceptor.CommandContextInterceptor;
-import org.flowable.form.engine.impl.interceptor.CommandExecutor;
-import org.flowable.form.engine.impl.interceptor.CommandInterceptor;
-import org.flowable.form.engine.impl.interceptor.CommandInvoker;
-import org.flowable.form.engine.impl.interceptor.LogInterceptor;
-import org.flowable.form.engine.impl.interceptor.TransactionContextInterceptor;
 import org.flowable.form.engine.impl.parser.FormDefinitionParseFactory;
+import org.flowable.form.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.form.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.form.engine.impl.persistence.deploy.Deployer;
 import org.flowable.form.engine.impl.persistence.deploy.DeploymentCache;
@@ -74,20 +66,22 @@ import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntityMana
 import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntityManagerImpl;
 import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntityManager;
 import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntityManagerImpl;
-import org.flowable.form.engine.impl.persistence.entity.ResourceEntityManager;
-import org.flowable.form.engine.impl.persistence.entity.ResourceEntityManagerImpl;
+import org.flowable.form.engine.impl.persistence.entity.FormResourceEntityManager;
+import org.flowable.form.engine.impl.persistence.entity.FormResourceEntityManagerImpl;
 import org.flowable.form.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.form.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.form.engine.impl.persistence.entity.data.FormDefinitionDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.FormDeploymentDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.FormInstanceDataManager;
-import org.flowable.form.engine.impl.persistence.entity.data.ResourceDataManager;
+import org.flowable.form.engine.impl.persistence.entity.data.FormResourceDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormDefinitionDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormDeploymentDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormInstanceDataManager;
-import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
+import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormResourceDataManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -106,21 +100,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
 
     protected String formEngineName = FormEngines.NAME_DEFAULT;
 
-    // COMMAND EXECUTORS ///////////////////////////////////////////////
-
-    protected CommandInterceptor commandInvoker;
-
-    /**
-     * the configurable list which will be {@link #initInterceptorChain(java.util.List) processed} to build the {@link #commandExecutor}
-     */
-    protected List<CommandInterceptor> customPreCommandInterceptors;
-    protected List<CommandInterceptor> customPostCommandInterceptors;
-
-    protected List<CommandInterceptor> commandInterceptors;
-
-    /** this will be initialized during the configurationComplete() */
-    protected CommandExecutor commandExecutor;
-
     // SERVICES
     // /////////////////////////////////////////////////////////////////
 
@@ -132,25 +111,19 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
 
     protected FormDeploymentDataManager deploymentDataManager;
     protected FormDefinitionDataManager formDefinitionDataManager;
-    protected ResourceDataManager resourceDataManager;
+    protected FormResourceDataManager resourceDataManager;
     protected FormInstanceDataManager formInstanceDataManager;
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
     protected FormDeploymentEntityManager deploymentEntityManager;
     protected FormDefinitionEntityManager formDefinitionEntityManager;
-    protected ResourceEntityManager resourceEntityManager;
+    protected FormResourceEntityManager resourceEntityManager;
     protected FormInstanceEntityManager formInstanceEntityManager;
     protected TableDataManager tableDataManager;
-
-    protected CommandContextFactory commandContextFactory;
-    protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
 
     protected ExpressionManager expressionManager;
 
     protected FormJsonConverter formJsonConverter = new FormJsonConverter();
-
-    // SESSION FACTORIES ///////////////////////////////////////////////
-    protected DbSqlSessionFactory dbSqlSessionFactory;
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
@@ -264,7 +237,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
             formDefinitionDataManager = new MybatisFormDefinitionDataManager(this);
         }
         if (resourceDataManager == null) {
-            resourceDataManager = new MybatisResourceDataManager(this);
+            resourceDataManager = new MybatisFormResourceDataManager(this);
         }
         if (formInstanceDataManager == null) {
             formInstanceDataManager = new MybatisFormInstanceDataManager(this);
@@ -279,7 +252,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
             formDefinitionEntityManager = new FormDefinitionEntityManagerImpl(this, formDefinitionDataManager);
         }
         if (resourceEntityManager == null) {
-            resourceEntityManager = new ResourceEntityManagerImpl(this, resourceDataManager);
+            resourceEntityManager = new FormResourceEntityManagerImpl(this, resourceDataManager);
         }
         if (formInstanceEntityManager == null) {
             formInstanceEntityManager = new FormInstanceEntityManagerImpl(this, formInstanceDataManager);
@@ -335,6 +308,10 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
             if (usingRelationalDatabase) {
                 initDbSqlSessionFactory();
             }
+            
+            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
+            
+            commandContextFactory.setSessionFactories(sessionFactories);
         }
 
         if (customSessionFactories != null) {
@@ -347,15 +324,26 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
     public void initDbSqlSessionFactory() {
         if (dbSqlSessionFactory == null) {
             dbSqlSessionFactory = createDbSqlSessionFactory();
+            dbSqlSessionFactory.setDatabaseType(databaseType);
+            dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
+            dbSqlSessionFactory.setIdGenerator(idGenerator);
+            dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
+            dbSqlSessionFactory.setTablePrefixIsSchema(tablePrefixIsSchema);
+            dbSqlSessionFactory.setDatabaseCatalog(databaseCatalog);
+            dbSqlSessionFactory.setDatabaseSchema(databaseSchema);
+            addSessionFactory(dbSqlSessionFactory);
         }
-        dbSqlSessionFactory.setDatabaseType(databaseType);
-        dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
-        dbSqlSessionFactory.setIdGenerator(idGenerator);
-        dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
-        dbSqlSessionFactory.setTablePrefixIsSchema(tablePrefixIsSchema);
-        dbSqlSessionFactory.setDatabaseCatalog(databaseCatalog);
-        dbSqlSessionFactory.setDatabaseSchema(databaseSchema);
-        addSessionFactory(dbSqlSessionFactory);
+        initDbSqlSessionFactoryEntitySettings();
+    }
+    
+    protected void initDbSqlSessionFactoryEntitySettings() {
+        for (Class<? extends Entity> clazz : EntityDependencyOrder.INSERT_ORDER) {
+            dbSqlSessionFactory.getInsertionOrder().add(clazz);
+        }
+        
+        for (Class<? extends Entity> clazz : EntityDependencyOrder.DELETE_ORDER) {
+            dbSqlSessionFactory.getDeletionOrder().add(clazz);
+        }
     }
 
     public DbSqlSessionFactory createDbSqlSessionFactory() {
@@ -375,7 +363,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
 
     public void initCommandInvoker() {
         if (commandInvoker == null) {
-            commandInvoker = new CommandInvoker();
+            commandInvoker = new DefaultCommandInvoker();
         }
     }
 
@@ -394,23 +382,36 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
     }
 
     public Collection<? extends CommandInterceptor> getDefaultCommandInterceptors() {
-        List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
-        interceptors.add(new LogInterceptor());
-
-        interceptors.add(new CommandContextInterceptor(commandContextFactory, this));
-
-        CommandInterceptor transactionInterceptor = createTransactionInterceptor();
-        if (transactionInterceptor != null) {
-            interceptors.add(transactionInterceptor);
+        if (defaultCommandInterceptors == null) {
+            List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
+            interceptors.add(new LogInterceptor());
+            
+            CommandInterceptor transactionInterceptor = createTransactionInterceptor();
+            if (transactionInterceptor != null) {
+                interceptors.add(transactionInterceptor);
+            }
+         
+            if (commandContextFactory != null) {
+                CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory);
+                commandContextInterceptor.getEngineConfigurations().put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, this);
+                interceptors.add(commandContextInterceptor);
+            }
+            
+            if (transactionContextFactory != null) {
+                interceptors.add(new TransactionContextInterceptor(transactionContextFactory));
+            }
+            
+            defaultCommandInterceptors = interceptors;
         }
-
-        return interceptors;
+        return defaultCommandInterceptors;
     }
 
     public void initCommandExecutor() {
         if (commandExecutor == null) {
             CommandInterceptor first = initInterceptorChain(commandInterceptors);
             commandExecutor = new CommandExecutorImpl(getDefaultCommandConfig(), first);
+            
+            commandContextFactory.setCommandExecutor(commandExecutor);
         }
     }
 
@@ -425,11 +426,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
     }
 
     public CommandInterceptor createTransactionInterceptor() {
-        if (transactionContextFactory != null) {
-            return new TransactionContextInterceptor(transactionContextFactory);
-        } else {
-            return null;
-        }
+        return null;
     }
 
     // deployers
@@ -508,7 +505,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
         if (commandContextFactory == null) {
             commandContextFactory = new CommandContextFactory();
         }
-        commandContextFactory.setDmnEngineConfiguration(this);
     }
 
     public void initTransactionContextFactory() {
@@ -533,141 +529,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
 
     public FormEngineConfiguration setEngineName(String formEngineName) {
         this.formEngineName = formEngineName;
-        return this;
-    }
-
-    public FormEngineConfiguration setDatabaseType(String databaseType) {
-        this.databaseType = databaseType;
-        return this;
-    }
-
-    public FormEngineConfiguration setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-        return this;
-    }
-
-    public FormEngineConfiguration setJdbcDriver(String jdbcDriver) {
-        this.jdbcDriver = jdbcDriver;
-        return this;
-    }
-
-    public FormEngineConfiguration setJdbcUrl(String jdbcUrl) {
-        this.jdbcUrl = jdbcUrl;
-        return this;
-    }
-
-    public FormEngineConfiguration setJdbcUsername(String jdbcUsername) {
-        this.jdbcUsername = jdbcUsername;
-        return this;
-    }
-
-    public FormEngineConfiguration setJdbcPassword(String jdbcPassword) {
-        this.jdbcPassword = jdbcPassword;
-        return this;
-    }
-
-    public FormEngineConfiguration setJdbcMaxActiveConnections(int jdbcMaxActiveConnections) {
-        this.jdbcMaxActiveConnections = jdbcMaxActiveConnections;
-        return this;
-    }
-
-    public FormEngineConfiguration setJdbcMaxIdleConnections(int jdbcMaxIdleConnections) {
-        this.jdbcMaxIdleConnections = jdbcMaxIdleConnections;
-        return this;
-    }
-
-    public FormEngineConfiguration setJdbcMaxCheckoutTime(int jdbcMaxCheckoutTime) {
-        this.jdbcMaxCheckoutTime = jdbcMaxCheckoutTime;
-        return this;
-    }
-
-    public FormEngineConfiguration setJdbcMaxWaitTime(int jdbcMaxWaitTime) {
-        this.jdbcMaxWaitTime = jdbcMaxWaitTime;
-        return this;
-    }
-
-    public FormEngineConfiguration setJdbcPingEnabled(boolean jdbcPingEnabled) {
-        this.jdbcPingEnabled = jdbcPingEnabled;
-        return this;
-    }
-
-    public FormEngineConfiguration setJdbcPingConnectionNotUsedFor(int jdbcPingConnectionNotUsedFor) {
-        this.jdbcPingConnectionNotUsedFor = jdbcPingConnectionNotUsedFor;
-        return this;
-    }
-
-    public FormEngineConfiguration setJdbcDefaultTransactionIsolationLevel(int jdbcDefaultTransactionIsolationLevel) {
-        this.jdbcDefaultTransactionIsolationLevel = jdbcDefaultTransactionIsolationLevel;
-        return this;
-    }
-
-    public FormEngineConfiguration setJdbcPingQuery(String jdbcPingQuery) {
-        this.jdbcPingQuery = jdbcPingQuery;
-        return this;
-    }
-
-    public FormEngineConfiguration setDataSourceJndiName(String dataSourceJndiName) {
-        this.dataSourceJndiName = dataSourceJndiName;
-        return this;
-    }
-
-    public FormEngineConfiguration setXmlEncoding(String xmlEncoding) {
-        this.xmlEncoding = xmlEncoding;
-        return this;
-    }
-
-    public FormEngineConfiguration setBeans(Map<Object, Object> beans) {
-        this.beans = beans;
-        return this;
-    }
-
-    public FormEngineConfiguration setDefaultCommandConfig(CommandConfig defaultCommandConfig) {
-        this.defaultCommandConfig = defaultCommandConfig;
-        return this;
-    }
-
-    public CommandInterceptor getCommandInvoker() {
-        return commandInvoker;
-    }
-
-    public FormEngineConfiguration setCommandInvoker(CommandInterceptor commandInvoker) {
-        this.commandInvoker = commandInvoker;
-        return this;
-    }
-
-    public List<CommandInterceptor> getCustomPreCommandInterceptors() {
-        return customPreCommandInterceptors;
-    }
-
-    public FormEngineConfiguration setCustomPreCommandInterceptors(List<CommandInterceptor> customPreCommandInterceptors) {
-        this.customPreCommandInterceptors = customPreCommandInterceptors;
-        return this;
-    }
-
-    public List<CommandInterceptor> getCustomPostCommandInterceptors() {
-        return customPostCommandInterceptors;
-    }
-
-    public FormEngineConfiguration setCustomPostCommandInterceptors(List<CommandInterceptor> customPostCommandInterceptors) {
-        this.customPostCommandInterceptors = customPostCommandInterceptors;
-        return this;
-    }
-
-    public List<CommandInterceptor> getCommandInterceptors() {
-        return commandInterceptors;
-    }
-
-    public FormEngineConfiguration setCommandInterceptors(List<CommandInterceptor> commandInterceptors) {
-        this.commandInterceptors = commandInterceptors;
-        return this;
-    }
-
-    public CommandExecutor getCommandExecutor() {
-        return commandExecutor;
-    }
-
-    public FormEngineConfiguration setCommandExecutor(CommandExecutor commandExecutor) {
-        this.commandExecutor = commandExecutor;
         return this;
     }
 
@@ -760,11 +621,11 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
-    public ResourceDataManager getResourceDataManager() {
+    public FormResourceDataManager getResourceDataManager() {
         return resourceDataManager;
     }
 
-    public FormEngineConfiguration setResourceDataManager(ResourceDataManager resourceDataManager) {
+    public FormEngineConfiguration setResourceDataManager(FormResourceDataManager resourceDataManager) {
         this.resourceDataManager = resourceDataManager;
         return this;
     }
@@ -796,11 +657,11 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
-    public ResourceEntityManager getResourceEntityManager() {
+    public FormResourceEntityManager getResourceEntityManager() {
         return resourceEntityManager;
     }
 
-    public FormEngineConfiguration setResourceEntityManager(ResourceEntityManager resourceEntityManager) {
+    public FormEngineConfiguration setResourceEntityManager(FormResourceEntityManager resourceEntityManager) {
         this.resourceEntityManager = resourceEntityManager;
         return this;
     }
@@ -823,25 +684,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
-    public CommandContextFactory getCommandContextFactory() {
-        return commandContextFactory;
-    }
-
-    public FormEngineConfiguration setCommandContextFactory(CommandContextFactory commandContextFactory) {
-        this.commandContextFactory = commandContextFactory;
-        return this;
-    }
-
-    public FormEngineConfiguration setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
-        this.sqlSessionFactory = sqlSessionFactory;
-        return this;
-    }
-
-    public FormEngineConfiguration setTransactionFactory(TransactionFactory transactionFactory) {
-        this.transactionFactory = transactionFactory;
-        return this;
-    }
-
     public ExpressionManager getExpressionManager() {
         return expressionManager;
     }
@@ -857,81 +699,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
 
     public FormEngineConfiguration setFormJsonConverter(FormJsonConverter formJsonConverter) {
         this.formJsonConverter = formJsonConverter;
-        return this;
-    }
-
-    public FormEngineConfiguration setCustomMybatisMappers(Set<Class<?>> customMybatisMappers) {
-        this.customMybatisMappers = customMybatisMappers;
-        return this;
-    }
-
-    public FormEngineConfiguration setCustomMybatisXMLMappers(Set<String> customMybatisXMLMappers) {
-        this.customMybatisXMLMappers = customMybatisXMLMappers;
-        return this;
-    }
-
-    public FormEngineConfiguration setCustomSessionFactories(List<SessionFactory> customSessionFactories) {
-        this.customSessionFactories = customSessionFactories;
-        return this;
-    }
-
-    public DbSqlSessionFactory getDbSqlSessionFactory() {
-        return dbSqlSessionFactory;
-    }
-
-    public FormEngineConfiguration setDbSqlSessionFactory(DbSqlSessionFactory dbSqlSessionFactory) {
-        this.dbSqlSessionFactory = dbSqlSessionFactory;
-        return this;
-    }
-
-    public FormEngineConfiguration setUsingRelationalDatabase(boolean usingRelationalDatabase) {
-        this.usingRelationalDatabase = usingRelationalDatabase;
-        return this;
-    }
-
-    public FormEngineConfiguration setDatabaseTablePrefix(String databaseTablePrefix) {
-        this.databaseTablePrefix = databaseTablePrefix;
-        return this;
-    }
-
-    public FormEngineConfiguration setDatabaseCatalog(String databaseCatalog) {
-        this.databaseCatalog = databaseCatalog;
-        return this;
-    }
-
-    public FormEngineConfiguration setDatabaseSchema(String databaseSchema) {
-        this.databaseSchema = databaseSchema;
-        return this;
-    }
-
-    public FormEngineConfiguration setTablePrefixIsSchema(boolean tablePrefixIsSchema) {
-        this.tablePrefixIsSchema = tablePrefixIsSchema;
-        return this;
-    }
-
-    public FormEngineConfiguration setSessionFactories(Map<Class<?>, SessionFactory> sessionFactories) {
-        this.sessionFactories = sessionFactories;
-        return this;
-    }
-
-    public TransactionContextFactory<TransactionListener, CommandContext> getTransactionContextFactory() {
-        return transactionContextFactory;
-    }
-
-    public FormEngineConfiguration setTransactionContextFactory(
-            TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory) {
-
-        this.transactionContextFactory = transactionContextFactory;
-        return this;
-    }
-
-    public FormEngineConfiguration setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
-        this.databaseSchemaUpdate = databaseSchemaUpdate;
-        return this;
-    }
-
-    public FormEngineConfiguration setClock(Clock clock) {
-        this.clock = clock;
         return this;
     }
 

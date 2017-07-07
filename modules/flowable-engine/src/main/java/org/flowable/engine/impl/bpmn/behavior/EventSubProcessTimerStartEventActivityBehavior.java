@@ -23,12 +23,13 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.ValuedDataObject;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.DeleteReason;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * Implementation of the BPMN 2.0 event subprocess timer start event.
@@ -61,7 +62,7 @@ public class EventSubProcessTimerStartEventActivityBehavior extends AbstractBpmn
     @Override
     public void trigger(DelegateExecution execution, String triggerName, Object triggerData) {
         CommandContext commandContext = Context.getCommandContext();
-        ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
         StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
@@ -84,7 +85,7 @@ public class EventSubProcessTimerStartEventActivityBehavior extends AbstractBpmn
         ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(newSubProcessExecution);
         outgoingFlowExecution.setCurrentFlowElement(startEvent);
         
-        commandContext.getHistoryManager().recordActivityStart(outgoingFlowExecution);
+        CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(outgoingFlowExecution);
 
         leave(outgoingFlowExecution);
     }

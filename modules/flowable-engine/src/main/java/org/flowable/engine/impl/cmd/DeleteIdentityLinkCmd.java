@@ -14,9 +14,10 @@
 package org.flowable.engine.impl.cmd;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.task.IdentityLinkType;
 
@@ -76,14 +77,14 @@ public class DeleteIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
         }
 
         if (IdentityLinkType.ASSIGNEE.equals(type)) {
-            commandContext.getTaskEntityManager().changeTaskAssignee(task, null);
+            CommandContextUtil.getTaskEntityManager(commandContext).changeTaskAssignee(task, null);
         } else if (IdentityLinkType.OWNER.equals(type)) {
-            commandContext.getTaskEntityManager().changeTaskOwner(task, null);
+            CommandContextUtil.getTaskEntityManager(commandContext).changeTaskOwner(task, null);
         } else {
-            commandContext.getIdentityLinkEntityManager().deleteIdentityLink(task, userId, groupId, type);
+            CommandContextUtil.getIdentityLinkEntityManager(commandContext).deleteIdentityLink(task, userId, groupId, type);
         }
 
-        commandContext.getHistoryManager().createIdentityLinkComment(taskId, userId, groupId, type, false);
+        CommandContextUtil.getHistoryManager(commandContext).createIdentityLinkComment(taskId, userId, groupId, type, false);
 
         return null;
     }

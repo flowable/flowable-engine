@@ -21,8 +21,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.flowable.engine.common.AbstractEngineConfiguration;
@@ -30,10 +28,22 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
+import org.flowable.engine.common.impl.cfg.CommandExecutorImpl;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
-import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
+import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
+import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandContextFactory;
+import org.flowable.engine.common.impl.interceptor.CommandContextInterceptor;
+import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
+import org.flowable.engine.common.impl.interceptor.DefaultCommandInvoker;
+import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.common.impl.interceptor.LogInterceptor;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
+import org.flowable.engine.common.impl.interceptor.TransactionContextInterceptor;
+import org.flowable.engine.common.impl.persistence.cache.EntityCache;
+import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
+import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
@@ -47,20 +57,10 @@ import org.flowable.idm.engine.impl.IdmManagementServiceImpl;
 import org.flowable.idm.engine.impl.ServiceImpl;
 import org.flowable.idm.engine.impl.authentication.BlankSalt;
 import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
-import org.flowable.idm.engine.impl.cfg.CommandExecutorImpl;
 import org.flowable.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
 import org.flowable.idm.engine.impl.cfg.StandaloneInMemIdmEngineConfiguration;
-import org.flowable.idm.engine.impl.cfg.TransactionListener;
-import org.flowable.idm.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
-import org.flowable.idm.engine.impl.db.DbSqlSessionFactory;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
-import org.flowable.idm.engine.impl.interceptor.CommandContextFactory;
-import org.flowable.idm.engine.impl.interceptor.CommandContextInterceptor;
-import org.flowable.idm.engine.impl.interceptor.CommandExecutor;
-import org.flowable.idm.engine.impl.interceptor.CommandInterceptor;
-import org.flowable.idm.engine.impl.interceptor.CommandInvoker;
-import org.flowable.idm.engine.impl.interceptor.LogInterceptor;
-import org.flowable.idm.engine.impl.interceptor.TransactionContextInterceptor;
+import org.flowable.idm.engine.impl.db.EntityDependencyOrder;
+import org.flowable.idm.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.idm.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.ByteArrayEntityManagerImpl;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntityManager;
@@ -110,21 +110,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
     protected String idmEngineName = IdmEngines.NAME_DEFAULT;
 
-    // COMMAND EXECUTORS ///////////////////////////////////////////////
-
-    protected CommandInterceptor commandInvoker;
-
-    /**
-     * the configurable list which will be {@link #initInterceptorChain(java.util.List) processed} to build the {@link #commandExecutor}
-     */
-    protected List<CommandInterceptor> customPreCommandInterceptors;
-    protected List<CommandInterceptor> customPostCommandInterceptors;
-
-    protected List<CommandInterceptor> commandInterceptors;
-
-    /** this will be initialized during the configurationComplete() */
-    protected CommandExecutor commandExecutor;
-
     // SERVICES
     // /////////////////////////////////////////////////////////////////
 
@@ -155,14 +140,8 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     protected PrivilegeEntityManager privilegeEntityManager;
     protected PrivilegeMappingEntityManager privilegeMappingEntityManager;
 
-    protected CommandContextFactory commandContextFactory;
-    protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
-    
     protected PasswordEncoder passwordEncoder;
     protected PasswordSalt passwordSalt;
-
-    // SESSION FACTORIES ///////////////////////////////////////////////
-    protected DbSqlSessionFactory dbSqlSessionFactory;
 
     public static IdmEngineConfiguration createIdmEngineConfigurationFromResourceDefault() {
         return createIdmEngineConfigurationFromResource("flowable.idm.cfg.xml", "idmEngineConfiguration");
@@ -314,6 +293,10 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
             if (usingRelationalDatabase) {
                 initDbSqlSessionFactory();
             }
+            
+            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
+            
+            commandContextFactory.setSessionFactories(sessionFactories);
         }
 
         if (customSessionFactories != null) {
@@ -326,19 +309,30 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     public void initDbSqlSessionFactory() {
         if (dbSqlSessionFactory == null) {
             dbSqlSessionFactory = createDbSqlSessionFactory();
+            dbSqlSessionFactory.setDatabaseType(databaseType);
+            dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
+            dbSqlSessionFactory.setIdGenerator(idGenerator);
+            dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
+            dbSqlSessionFactory.setTablePrefixIsSchema(tablePrefixIsSchema);
+            dbSqlSessionFactory.setDatabaseCatalog(databaseCatalog);
+            dbSqlSessionFactory.setDatabaseSchema(databaseSchema);
+            addSessionFactory(dbSqlSessionFactory);
         }
-        dbSqlSessionFactory.setDatabaseType(databaseType);
-        dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
-        dbSqlSessionFactory.setIdGenerator(idGenerator);
-        dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
-        dbSqlSessionFactory.setTablePrefixIsSchema(tablePrefixIsSchema);
-        dbSqlSessionFactory.setDatabaseCatalog(databaseCatalog);
-        dbSqlSessionFactory.setDatabaseSchema(databaseSchema);
-        addSessionFactory(dbSqlSessionFactory);
+        initDbSqlSessionFactoryEntitySettings();
     }
-
+    
     public DbSqlSessionFactory createDbSqlSessionFactory() {
         return new DbSqlSessionFactory();
+    }
+    
+    protected void initDbSqlSessionFactoryEntitySettings() {
+        for (Class<? extends Entity> clazz : EntityDependencyOrder.INSERT_ORDER) {
+            dbSqlSessionFactory.getInsertionOrder().add(clazz);
+        }
+        
+        for (Class<? extends Entity> clazz : EntityDependencyOrder.DELETE_ORDER) {
+            dbSqlSessionFactory.getDeletionOrder().add(clazz);
+        }
     }
 
     public void initPasswordEncoder() {
@@ -364,7 +358,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
     public void initCommandInvoker() {
         if (commandInvoker == null) {
-            commandInvoker = new CommandInvoker();
+            commandInvoker = new DefaultCommandInvoker();
         }
     }
 
@@ -383,29 +377,35 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     }
 
     public Collection<? extends CommandInterceptor> getDefaultCommandInterceptors() {
-        List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
-        interceptors.add(new LogInterceptor());
-
-        CommandInterceptor transactionInterceptor = createTransactionInterceptor();
-        if (transactionInterceptor != null) {
-            interceptors.add(transactionInterceptor);
-        }
-
-        if (commandContextFactory != null) {
-            interceptors.add(new CommandContextInterceptor(commandContextFactory, this));
-        }
-
-        if (transactionContextFactory != null) {
-            interceptors.add(new TransactionContextInterceptor(transactionContextFactory));
-        }
-
-        return interceptors;
+        if (defaultCommandInterceptors == null) {
+            List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
+            interceptors.add(new LogInterceptor());
+            
+            CommandInterceptor transactionInterceptor = createTransactionInterceptor();
+            if (transactionInterceptor != null) {
+                interceptors.add(transactionInterceptor);
+            }
+    
+            if (commandContextFactory != null) {
+                CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory);
+                commandContextInterceptor.getEngineConfigurations().put(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG, this);
+                interceptors.add(commandContextInterceptor);
+            }
+            
+            if (transactionContextFactory != null) {
+                interceptors.add(new TransactionContextInterceptor(transactionContextFactory));
+            }
+            defaultCommandInterceptors = interceptors;
+        } 
+        return defaultCommandInterceptors;
     }
 
     public void initCommandExecutor() {
         if (commandExecutor == null) {
             CommandInterceptor first = initInterceptorChain(commandInterceptors);
             commandExecutor = new CommandExecutorImpl(getDefaultCommandConfig(), first);
+            
+            commandContextFactory.setCommandExecutor(commandExecutor);
         }
     }
 
@@ -431,7 +431,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         if (commandContextFactory == null) {
             commandContextFactory = new CommandContextFactory();
         }
-        commandContextFactory.setIdmEngineConfiguration(this);
     }
 
     public void initTransactionContextFactory() {
@@ -482,41 +481,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
-    public IdmEngineConfiguration setClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
-        return this;
-    }
-
-    public IdmEngineConfiguration setUseClassForNameClassLoading(boolean useClassForNameClassLoading) {
-        this.useClassForNameClassLoading = useClassForNameClassLoading;
-        return this;
-    }
-
-    public IdmEngineConfiguration setDatabaseType(String databaseType) {
-        this.databaseType = databaseType;
-        return this;
-    }
-
-    public IdmEngineConfiguration setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-        return this;
-    }
-
-    public IdmEngineConfiguration setJdbcDriver(String jdbcDriver) {
-        this.jdbcDriver = jdbcDriver;
-        return this;
-    }
-
-    @Override
-    public IdmEngineConfiguration setJdbcUrl(String jdbcUrl) {
-        this.jdbcUrl = jdbcUrl;
-        return this;
-    }
-
-    public IdmEngineConfiguration setJdbcUsername(String jdbcUsername) {
-        this.jdbcUsername = jdbcUsername;
-        return this;
-    }
 
     public IdmEngineConfiguration setJdbcPassword(String jdbcPassword) {
         this.jdbcPassword = jdbcPassword;
@@ -595,51 +559,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
     public IdmEngineConfiguration setDefaultCommandConfig(CommandConfig defaultCommandConfig) {
         this.defaultCommandConfig = defaultCommandConfig;
-        return this;
-    }
-
-    public CommandInterceptor getCommandInvoker() {
-        return commandInvoker;
-    }
-
-    public IdmEngineConfiguration setCommandInvoker(CommandInterceptor commandInvoker) {
-        this.commandInvoker = commandInvoker;
-        return this;
-    }
-
-    public List<CommandInterceptor> getCustomPreCommandInterceptors() {
-        return customPreCommandInterceptors;
-    }
-
-    public IdmEngineConfiguration setCustomPreCommandInterceptors(List<CommandInterceptor> customPreCommandInterceptors) {
-        this.customPreCommandInterceptors = customPreCommandInterceptors;
-        return this;
-    }
-
-    public List<CommandInterceptor> getCustomPostCommandInterceptors() {
-        return customPostCommandInterceptors;
-    }
-
-    public IdmEngineConfiguration setCustomPostCommandInterceptors(List<CommandInterceptor> customPostCommandInterceptors) {
-        this.customPostCommandInterceptors = customPostCommandInterceptors;
-        return this;
-    }
-
-    public List<CommandInterceptor> getCommandInterceptors() {
-        return commandInterceptors;
-    }
-
-    public IdmEngineConfiguration setCommandInterceptors(List<CommandInterceptor> commandInterceptors) {
-        this.commandInterceptors = commandInterceptors;
-        return this;
-    }
-
-    public CommandExecutor getCommandExecutor() {
-        return commandExecutor;
-    }
-
-    public IdmEngineConfiguration setCommandExecutor(CommandExecutor commandExecutor) {
-        this.commandExecutor = commandExecutor;
         return this;
     }
 
@@ -836,15 +755,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
-    public CommandContextFactory getCommandContextFactory() {
-        return commandContextFactory;
-    }
-
-    public IdmEngineConfiguration setCommandContextFactory(CommandContextFactory commandContextFactory) {
-        this.commandContextFactory = commandContextFactory;
-        return this;
-    }
-
     public IdmEngineConfiguration setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
         this.sqlSessionFactory = sqlSessionFactory;
         return this;
@@ -867,15 +777,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
     public IdmEngineConfiguration setCustomSessionFactories(List<SessionFactory> customSessionFactories) {
         this.customSessionFactories = customSessionFactories;
-        return this;
-    }
-
-    public DbSqlSessionFactory getDbSqlSessionFactory() {
-        return dbSqlSessionFactory;
-    }
-
-    public IdmEngineConfiguration setDbSqlSessionFactory(DbSqlSessionFactory dbSqlSessionFactory) {
-        this.dbSqlSessionFactory = dbSqlSessionFactory;
         return this;
     }
 
@@ -929,15 +830,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
     public IdmEngineConfiguration setSessionFactories(Map<Class<?>, SessionFactory> sessionFactories) {
         this.sessionFactories = sessionFactories;
-        return this;
-    }
-
-    public TransactionContextFactory<TransactionListener, CommandContext> getTransactionContextFactory() {
-        return transactionContextFactory;
-    }
-
-    public IdmEngineConfiguration setTransactionContextFactory(TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory) {
-        this.transactionContextFactory = transactionContextFactory;
         return this;
     }
 

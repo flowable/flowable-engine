@@ -12,6 +12,9 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.api.RuleEngineExecutionSingleResult;
 import org.flowable.dmn.engine.DmnEngine;
@@ -20,9 +23,6 @@ import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Yvo Swillens

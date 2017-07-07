@@ -17,12 +17,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.history.HistoricVariableInstanceQuery;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.variable.CacheableVariable;
 import org.flowable.engine.impl.variable.JPAEntityListVariableType;
 import org.flowable.engine.impl.variable.JPAEntityVariableType;
@@ -204,7 +204,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
     protected void ensureVariablesInitialized() {
         if (this.queryVariableValue != null) {
-            VariableTypes variableTypes = Context.getProcessEngineConfiguration().getVariableTypes();
+            VariableTypes variableTypes = CommandContextUtil.getProcessEngineConfiguration().getVariableTypes();
             queryVariableValue.initialize(variableTypes);
         }
     }
@@ -212,14 +212,14 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         ensureVariablesInitialized();
-        return commandContext.getHistoricVariableInstanceEntityManager().findHistoricVariableInstanceCountByQueryCriteria(this);
+        return CommandContextUtil.getHistoricVariableInstanceEntityManager(commandContext).findHistoricVariableInstanceCountByQueryCriteria(this);
     }
 
     public List<HistoricVariableInstance> executeList(CommandContext commandContext) {
         checkQueryOk();
         ensureVariablesInitialized();
 
-        List<HistoricVariableInstance> historicVariableInstances = commandContext.getHistoricVariableInstanceEntityManager().findHistoricVariableInstancesByQueryCriteria(this);
+        List<HistoricVariableInstance> historicVariableInstances = CommandContextUtil.getHistoricVariableInstanceEntityManager(commandContext).findHistoricVariableInstancesByQueryCriteria(this);
 
         if (!excludeVariableInitialization) {
             for (HistoricVariableInstance historicVariableInstance : historicVariableInstances) {

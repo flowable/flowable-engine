@@ -12,13 +12,13 @@
  */
 package org.flowable.spring.integration;
 
-import org.springframework.integration.mapping.HeaderMapper;
-import org.springframework.messaging.MessageHeaders;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
+
+import org.springframework.integration.mapping.HeaderMapper;
+import org.springframework.messaging.MessageHeaders;
 
 /**
  * @author Josh Long

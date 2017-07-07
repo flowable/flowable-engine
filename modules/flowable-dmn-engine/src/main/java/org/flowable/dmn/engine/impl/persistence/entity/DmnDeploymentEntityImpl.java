@@ -35,7 +35,7 @@ public class DmnDeploymentEntityImpl extends AbstractEntityNoRevision implements
     protected String category;
     protected String tenantId = DmnEngineConfiguration.NO_TENANT_ID;
     protected String parentDeploymentId;
-    protected Map<String, ResourceEntity> resources;
+    protected Map<String, DmnResourceEntity> resources;
     protected Date deploymentTime;
     protected boolean isNew;
 
@@ -48,14 +48,14 @@ public class DmnDeploymentEntityImpl extends AbstractEntityNoRevision implements
 
     }
 
-    public void addResource(ResourceEntity resource) {
+    public void addResource(DmnResourceEntity resource) {
         if (resources == null) {
-            resources = new HashMap<String, ResourceEntity>();
+            resources = new HashMap<String, DmnResourceEntity>();
         }
         resources.put(resource.getName(), resource);
     }
 
-    public Map<String, ResourceEntity> getResources() {
+    public Map<String, DmnResourceEntity> getResources() {
         return resources;
     }
 
@@ -127,7 +127,7 @@ public class DmnDeploymentEntityImpl extends AbstractEntityNoRevision implements
         this.parentDeploymentId = parentDeploymentId;
     }
 
-    public void setResources(Map<String, ResourceEntity> resources) {
+    public void setResources(Map<String, DmnResourceEntity> resources) {
         this.resources = resources;
     }
 

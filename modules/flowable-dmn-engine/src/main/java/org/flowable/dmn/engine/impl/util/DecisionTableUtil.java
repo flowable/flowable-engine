@@ -12,7 +12,6 @@
  */
 package org.flowable.dmn.engine.impl.util;
 
-import org.flowable.dmn.engine.impl.context.Context;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
@@ -36,19 +35,19 @@ public class DecisionTableUtil {
 
     public static DecisionTableEntity getDecisionTableEntity(String decisionTableId, boolean checkCacheOnly) {
         if (checkCacheOnly) {
-            DecisionTableCacheEntry cacheEntry = Context.getDmnEngineConfiguration().getDecisionCache().get(decisionTableId);
+            DecisionTableCacheEntry cacheEntry = CommandContextUtil.getDmnEngineConfiguration().getDecisionCache().get(decisionTableId);
             if (cacheEntry != null) {
                 return cacheEntry.getDecisionTableEntity();
             }
             return null;
         } else {
             // This will check the cache in the findDeployedProcessDefinitionById method
-            return Context.getDmnEngineConfiguration().getDeploymentManager().findDeployedDecisionById(decisionTableId);
+            return CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager().findDeployedDecisionById(decisionTableId);
         }
     }
 
     public static Decision getDecision(String decisionTableId) {
-        DeploymentManager deploymentManager = Context.getDmnEngineConfiguration().getDeploymentManager();
+        DeploymentManager deploymentManager = CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager();
 
         // This will check the cache in the findDeployedProcessDefinitionById and resolveProcessDefinition method
         DecisionTableEntity decisionTableEntity = deploymentManager.findDeployedDecisionById(decisionTableId);
@@ -56,7 +55,7 @@ public class DecisionTableUtil {
     }
 
     public static DmnDefinition getDmnDefinition(String decisionTableId) {
-        DeploymentManager deploymentManager = Context.getDmnEngineConfiguration().getDeploymentManager();
+        DeploymentManager deploymentManager = CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager();
 
         // This will check the cache in the findDeployedProcessDefinitionById and resolveProcessDefinition method
         DecisionTableEntity decisionTableEntity = deploymentManager.findDeployedDecisionById(decisionTableId);
@@ -64,7 +63,7 @@ public class DecisionTableUtil {
     }
 
     public static DmnDefinition getDmnDefinitionFromCache(String decisionTableId) {
-        DecisionTableCacheEntry cacheEntry = Context.getDmnEngineConfiguration().getDecisionCache().get(decisionTableId);
+        DecisionTableCacheEntry cacheEntry = CommandContextUtil.getDmnEngineConfiguration().getDecisionCache().get(decisionTableId);
         if (cacheEntry != null) {
             return cacheEntry.getDmnDefinition();
         }
@@ -72,7 +71,7 @@ public class DecisionTableUtil {
     }
 
     public static DecisionTableEntity getDecisionTableFromDatabase(String decisionTableId) {
-        DecisionTableEntityManager decisionTableEntityManager = Context.getDmnEngineConfiguration().getDecisionTableEntityManager();
+        DecisionTableEntityManager decisionTableEntityManager = CommandContextUtil.getDmnEngineConfiguration().getDecisionTableEntityManager();
         DecisionTableEntity decisionTable = decisionTableEntityManager.findById(decisionTableId);
         if (decisionTable == null) {
             throw new FlowableException("No decision table found with id " + decisionTableId);

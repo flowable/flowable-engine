@@ -22,10 +22,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.form.AbstractFormType;
 import org.flowable.engine.form.FormProperty;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**
@@ -40,13 +40,13 @@ public class DefaultFormHandler implements FormHandler {
     public void parseConfiguration(List<org.flowable.bpmn.model.FormProperty> formProperties, String formKey, DeploymentEntity deployment, ProcessDefinition processDefinition) {
         this.deploymentId = deployment.getId();
 
-        ExpressionManager expressionManager = Context.getProcessEngineConfiguration().getExpressionManager();
+        ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
 
         if (StringUtils.isNotEmpty(formKey)) {
             this.formKey = expressionManager.createExpression(formKey);
         }
 
-        FormTypes formTypes = Context.getProcessEngineConfiguration().getFormTypes();
+        FormTypes formTypes = CommandContextUtil.getProcessEngineConfiguration().getFormTypes();
 
         for (org.flowable.bpmn.model.FormProperty formProperty : formProperties) {
             FormPropertyHandler formPropertyHandler = new FormPropertyHandler();

@@ -21,12 +21,13 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -41,10 +42,10 @@ public class TriggerTimerEventJobHandler implements JobHandler {
 
     public void execute(JobEntity job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
 
-        commandContext.getAgenda().planTriggerExecutionOperation(execution);
+        CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(execution);
 
-        if (commandContext.getEventDispatcher().isEnabled()) {
-            commandContext.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_FIRED, job));
+        if (CommandContextUtil.getEventDispatcher().isEnabled()) {
+            CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_FIRED, job));
         }
 
         if (execution.getCurrentFlowElement() instanceof BoundaryEvent) {
@@ -91,7 +92,7 @@ public class TriggerTimerEventJobHandler implements JobHandler {
 
                 // call activities
             } else if (execution.getCurrentFlowElement() instanceof CallActivity) {
-                ExecutionEntity subProcessInstance = commandContext.getExecutionEntityManager().findSubProcessInstanceBySuperExecutionId(execution.getId());
+                ExecutionEntity subProcessInstance = CommandContextUtil.getExecutionEntityManager(commandContext).findSubProcessInstanceBySuperExecutionId(execution.getId());
                 if (subProcessInstance != null) {
                     List<? extends ExecutionEntity> childExecutions = subProcessInstance.getExecutions();
                     for (ExecutionEntity subExecution : childExecutions) {
@@ -105,7 +106,7 @@ public class TriggerTimerEventJobHandler implements JobHandler {
     }
 
     protected void dispatchActivityTimeOut(JobEntity timerEntity, FlowNode flowNode, ExecutionEntity execution, CommandContext commandContext) {
-        commandContext.getEventDispatcher().dispatchEvent(
+        CommandContextUtil.getEventDispatcher().dispatchEvent(
                 FlowableEventBuilder.createActivityCancelledEvent(flowNode.getId(), flowNode.getName(), execution.getId(),
                         execution.getProcessInstanceId(), execution.getProcessDefinitionId(), parseActivityType(flowNode), timerEntity));
     }

@@ -17,10 +17,11 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * Operation that triggers a wait state and continues the process, leaving that activity.
@@ -46,7 +47,7 @@ public class TriggerExecutionOperation extends AbstractOperation {
 
                 if (currentFlowElement instanceof BoundaryEvent
                         || currentFlowElement instanceof ServiceTask) { // custom service task with no automatic leave (will not have a activity-start history entry in ContinueProcessOperation)
-                    commandContext.getHistoryManager().recordActivityStart(execution);
+                    CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(execution);
                 }
                 
                 ((TriggerableActivityBehavior) activityBehavior).trigger(execution, null, null);

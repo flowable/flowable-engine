@@ -13,9 +13,10 @@
 package org.flowable.engine.impl.bpmn.helper;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 public class SkipExpressionUtil {
 
@@ -56,7 +57,7 @@ public class SkipExpressionUtil {
     }
 
     public static boolean shouldSkipFlowElement(CommandContext commandContext, DelegateExecution execution, String skipExpressionString) {
-        Expression skipExpression = commandContext.getProcessEngineConfiguration().getExpressionManager().createExpression(skipExpressionString);
+        Expression skipExpression = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager().createExpression(skipExpressionString);
         Object value = skipExpression.getValue(execution);
 
         if (value instanceof Boolean) {

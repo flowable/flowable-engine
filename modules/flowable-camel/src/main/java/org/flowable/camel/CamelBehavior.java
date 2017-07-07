@@ -26,13 +26,14 @@ import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.bpmn.model.Process;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.Flowable5Util;
@@ -229,7 +230,8 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
 
         } else {
             // Get the ProcessEngineConfiguration object.
-            ProcessEngineConfiguration engineConfiguration = Context.getProcessEngineConfiguration();
+            ProcessEngineConfiguration engineConfiguration = (ProcessEngineConfiguration) Context.getCommandContext()
+                    .getEngineConfigurations().get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             if ((Context.getCommandContext() != null && Flowable5Util.isFlowable5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
                     (Context.getCommandContext() == null && Flowable5Util.getFlowable5CompatibilityHandler() != null)) {
 

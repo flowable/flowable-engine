@@ -12,10 +12,11 @@
  */
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.impl.persistence.entity.PropertyEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,9 +44,9 @@ public class ValidateExecutionRelatedEntityCountCfgCmd implements Command<Void> 
          * In case A and D (not there), the property needs to be written to the db Only in case E something needs to be done explicitly, the others are okay.
          */
 
-        PropertyEntityManager propertyEntityManager = commandContext.getPropertyEntityManager();
+        PropertyEntityManager propertyEntityManager = CommandContextUtil.getPropertyEntityManager(commandContext);
 
-        boolean configProperty = commandContext.getProcessEngineConfiguration().getPerformanceSettings().isEnableExecutionRelationshipCounts();
+        boolean configProperty = CommandContextUtil.getProcessEngineConfiguration(commandContext).getPerformanceSettings().isEnableExecutionRelationshipCounts();
         PropertyEntity propertyEntity = propertyEntityManager.findById(PROPERTY_EXECUTION_RELATED_ENTITY_COUNT);
 
         if (propertyEntity == null) {
@@ -65,7 +66,7 @@ public class ValidateExecutionRelatedEntityCountCfgCmd implements Command<Void> 
                     LOGGER.info("Configuration change: execution related entity counting feature was enabled before, but now disabled. "
                             + "Updating all execution entities.");
                 }
-                commandContext.getProcessEngineConfiguration().getExecutionDataManager().updateAllExecutionRelatedEntityCountFlags(configProperty);
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getExecutionDataManager().updateAllExecutionRelatedEntityCountFlags(configProperty);
             }
 
             // Update property

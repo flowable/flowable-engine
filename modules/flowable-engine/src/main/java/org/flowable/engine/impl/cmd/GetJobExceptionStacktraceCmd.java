@@ -17,9 +17,10 @@ import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.AbstractRuntimeJobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Job;
 
 /**
@@ -45,16 +46,16 @@ public class GetJobExceptionStacktraceCmd implements Command<String>, Serializab
         AbstractRuntimeJobEntity job = null;
         switch (jobType) {
         case ASYNC:
-            job = commandContext.getJobEntityManager().findById(jobId);
+            job = CommandContextUtil.getJobEntityManager(commandContext).findById(jobId);
             break;
         case TIMER:
-            job = commandContext.getTimerJobEntityManager().findById(jobId);
+            job = CommandContextUtil.getTimerJobEntityManager(commandContext).findById(jobId);
             break;
         case SUSPENDED:
-            job = commandContext.getSuspendedJobEntityManager().findById(jobId);
+            job = CommandContextUtil.getSuspendedJobEntityManager(commandContext).findById(jobId);
             break;
         case DEADLETTER:
-            job = commandContext.getDeadLetterJobEntityManager().findById(jobId);
+            job = CommandContextUtil.getDeadLetterJobEntityManager(commandContext).findById(jobId);
             break;
         }
 

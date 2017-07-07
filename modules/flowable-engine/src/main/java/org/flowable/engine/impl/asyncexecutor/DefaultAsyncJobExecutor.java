@@ -20,9 +20,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.JobInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,12 +91,12 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
             CommandContext commandContext = Context.getCommandContext();
             if (commandContext != null) {
-                commandContext.getJobManager().unacquire(job);
+                CommandContextUtil.getJobManager(commandContext).unacquire(job);
 
             } else {
                 processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
                     public Void execute(CommandContext commandContext) {
-                        commandContext.getJobManager().unacquire(job);
+                        CommandContextUtil.getJobManager(commandContext).unacquire(job);
                         return null;
                     }
                 });

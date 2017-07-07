@@ -24,7 +24,7 @@ import javax.persistence.EntityManager;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.impl.util.ReflectUtil;
 
 /**

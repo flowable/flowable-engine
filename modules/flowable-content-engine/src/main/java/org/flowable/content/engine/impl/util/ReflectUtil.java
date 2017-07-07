@@ -22,7 +22,6 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.flowable.content.engine.ContentEngineConfiguration;
-import org.flowable.content.engine.impl.context.Context;
 import org.flowable.engine.common.api.FlowableClassLoadingException;
 import org.flowable.engine.common.api.FlowableException;
 import org.slf4j.Logger;
@@ -263,7 +262,7 @@ public abstract class ReflectUtil {
     }
 
     private static ClassLoader getCustomClassLoader() {
-        ContentEngineConfiguration contentEngineConfiguration = Context.getContentEngineConfiguration();
+        ContentEngineConfiguration contentEngineConfiguration = CommandContextUtil.getContentEngineConfiguration();
         if (contentEngineConfiguration != null) {
             final ClassLoader classLoader = contentEngineConfiguration.getClassLoader();
             if (classLoader != null) {
@@ -274,7 +273,7 @@ public abstract class ReflectUtil {
     }
 
     private static Class loadClass(ClassLoader classLoader, String className) throws ClassNotFoundException {
-        ContentEngineConfiguration contentEngineConfiguration = Context.getContentEngineConfiguration();
+        ContentEngineConfiguration contentEngineConfiguration = CommandContextUtil.getContentEngineConfiguration();
         boolean useClassForName = contentEngineConfiguration == null || contentEngineConfiguration.isUseClassForNameClassLoading();
         return useClassForName ? Class.forName(className, true, classLoader) : classLoader.loadClass(className);
     }

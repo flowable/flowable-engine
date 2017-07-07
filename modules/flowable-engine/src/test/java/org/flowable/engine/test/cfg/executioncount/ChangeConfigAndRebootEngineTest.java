@@ -15,13 +15,14 @@ package org.flowable.engine.test.cfg.executioncount;
 import java.util.List;
 
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ValidateExecutionRelatedEntityCountCfgCmd;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -110,7 +111,7 @@ public class ChangeConfigAndRebootEngineTest extends ResourceFlowableTestCase {
         PropertyEntity propertyEntity = managementService.executeCommand(new Command<PropertyEntity>() {
             @Override
             public PropertyEntity execute(CommandContext commandContext) {
-                return commandContext.getPropertyEntityManager().findById(
+                return CommandContextUtil.getPropertyEntityManager(commandContext).findById(
                         ValidateExecutionRelatedEntityCountCfgCmd.PROPERTY_EXECUTION_RELATED_ENTITY_COUNT);
             }
         });

@@ -16,13 +16,14 @@ import java.util.Collection;
 
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.DeleteReason;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -68,7 +69,7 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
         // child execution to leave, which keeps the scope alive.
         // Which is what we need here.
 
-        ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExecutionEntity attachedRefScopeExecution = executionEntityManager.findById(executionEntity.getParentId());
 
         ExecutionEntity parentScopeExecution = null;
@@ -94,10 +95,10 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
         // (This is a theoretical case ... shouldn't use a boundary event without outgoing sequence flow ...)
         if (executionEntity.getCurrentFlowElement() instanceof FlowNode
                 && ((FlowNode) executionEntity.getCurrentFlowElement()).getOutgoingFlows().isEmpty()) {
-            commandContext.getHistoryManager().recordActivityEnd(executionEntity, null);
+            CommandContextUtil.getHistoryManager(commandContext).recordActivityEnd(executionEntity, null);
         }
 
-        commandContext.getAgenda().planTakeOutgoingSequenceFlowsOperation(executionEntity, true);
+        CommandContextUtil.getAgenda(commandContext).planTakeOutgoingSequenceFlowsOperation(executionEntity, true);
     }
 
     protected void executeNonInterruptingBehavior(ExecutionEntity executionEntity, CommandContext commandContext) {
@@ -111,7 +112,7 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
 
         // Note: if the parent of the parent does not exists, this becomes a concurrent execution in the process instance!
 
-        ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
         ExecutionEntity parentExecutionEntity = executionEntityManager.findById(executionEntity.getParentId());
 
@@ -129,13 +130,13 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
             throw new FlowableException("Programmatic error: no parent scope execution found for boundary event");
         }
         
-       commandContext.getHistoryManager().recordActivityEnd(executionEntity, null);
+       CommandContextUtil.getHistoryManager(commandContext).recordActivityEnd(executionEntity, null);
 
         ExecutionEntity nonInterruptingExecution = executionEntityManager.createChildExecution(scopeExecution);
         nonInterruptingExecution.setActive(false);
         nonInterruptingExecution.setCurrentFlowElement(executionEntity.getCurrentFlowElement());
 
-        commandContext.getAgenda().planTakeOutgoingSequenceFlowsOperation(nonInterruptingExecution, true);
+        CommandContextUtil.getAgenda(commandContext).planTakeOutgoingSequenceFlowsOperation(nonInterruptingExecution, true);
     }
 
     protected void deleteChildExecutions(ExecutionEntity parentExecution, ExecutionEntity notToDeleteExecution, CommandContext commandContext) {
@@ -145,7 +146,7 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
         // This could be solved by not reusing an execution, but creating a new
 
         // Delete all child executions
-        ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         Collection<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByParentExecutionId(parentExecution.getId());
         if (CollectionUtil.isNotEmpty(childExecutions)) {
             for (ExecutionEntity childExecution : childExecutions) {

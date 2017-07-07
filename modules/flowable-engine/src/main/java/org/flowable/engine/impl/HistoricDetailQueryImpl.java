@@ -15,11 +15,12 @@ package org.flowable.engine.impl;
 
 import java.util.List;
 
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricDetailQuery;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.variable.HistoricJPAEntityListVariableType;
 import org.flowable.engine.impl.variable.HistoricJPAEntityVariableType;
 import org.flowable.engine.impl.variable.JPAEntityListVariableType;
@@ -99,12 +100,12 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getHistoricDetailEntityManager().findHistoricDetailCountByQueryCriteria(this);
+        return CommandContextUtil.getHistoricDetailEntityManager(commandContext).findHistoricDetailCountByQueryCriteria(this);
     }
 
     public List<HistoricDetail> executeList(CommandContext commandContext) {
         checkQueryOk();
-        List<HistoricDetail> historicDetails = commandContext.getHistoricDetailEntityManager().findHistoricDetailsByQueryCriteria(this);
+        List<HistoricDetail> historicDetails = CommandContextUtil.getHistoricDetailEntityManager(commandContext).findHistoricDetailsByQueryCriteria(this);
 
         HistoricDetailVariableInstanceUpdateEntity varUpdate = null;
         if (historicDetails != null) {

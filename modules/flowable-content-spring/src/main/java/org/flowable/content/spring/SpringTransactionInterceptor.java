@@ -12,9 +12,9 @@
  */
 package org.flowable.content.spring;
 
-import org.flowable.content.engine.impl.interceptor.AbstractCommandInterceptor;
-import org.flowable.content.engine.impl.interceptor.Command;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.AbstractCommandInterceptor;
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

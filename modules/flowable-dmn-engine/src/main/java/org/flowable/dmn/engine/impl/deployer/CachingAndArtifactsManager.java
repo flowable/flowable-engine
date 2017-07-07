@@ -13,11 +13,11 @@
 package org.flowable.dmn.engine.impl.deployer;
 
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.context.Context;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnDefinition;
 
@@ -30,7 +30,7 @@ public class CachingAndArtifactsManager {
      * Ensures that the decision table is cached in the appropriate places, including the deployment's collection of deployed artifacts and the deployment manager's cache.
      */
     public void updateCachingAndArtifacts(ParsedDeployment parsedDeployment) {
-        final DmnEngineConfiguration dmnEngineConfiguration = Context.getDmnEngineConfiguration();
+        final DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
         DeploymentCache<DecisionTableCacheEntry> decisionTableCache = dmnEngineConfiguration.getDeploymentManager().getDecisionCache();
         DmnDeploymentEntity deployment = parsedDeployment.getDeployment();
 

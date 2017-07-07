@@ -18,11 +18,12 @@ import java.util.Map;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -60,7 +61,7 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
             throw new FlowableIllegalArgumentException("Cannot start process instance by message: message name is null");
         }
 
-        MessageEventSubscriptionEntity messageEventSubscription = commandContext.getEventSubscriptionEntityManager().findMessageStartEventSubscriptionByName(messageName, tenantId);
+        MessageEventSubscriptionEntity messageEventSubscription = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findMessageStartEventSubscriptionByName(messageName, tenantId);
 
         if (messageEventSubscription == null) {
             throw new FlowableObjectNotFoundException("Cannot start process instance by message: no subscription to message with name '" + messageName + "' found.", MessageEventSubscriptionEntity.class);
@@ -71,14 +72,14 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
             throw new FlowableException("Cannot start process instance by message: subscription to message with name '" + messageName + "' is not a message start event.");
         }
 
-        DeploymentManager deploymentCache = commandContext.getProcessEngineConfiguration().getDeploymentManager();
+        DeploymentManager deploymentCache = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDeploymentManager();
 
         ProcessDefinition processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
         if (processDefinition == null) {
             throw new FlowableObjectNotFoundException("No process definition found for id '" + processDefinitionId + "'", ProcessDefinition.class);
         }
 
-        ProcessInstanceHelper processInstanceHelper = commandContext.getProcessEngineConfiguration().getProcessInstanceHelper();
+        ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
         ProcessInstance processInstance = processInstanceHelper.createAndStartProcessInstanceByMessage(
                 processDefinition, messageName, businessKey, processVariables, transientVariables);
 

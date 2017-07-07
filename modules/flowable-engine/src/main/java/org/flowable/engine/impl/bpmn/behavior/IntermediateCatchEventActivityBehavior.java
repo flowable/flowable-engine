@@ -20,12 +20,13 @@ import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.DeleteReason;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 public class IntermediateCatchEventActivityBehavior extends AbstractBpmnActivityBehavior {
 
@@ -57,7 +58,7 @@ public class IntermediateCatchEventActivityBehavior extends AbstractBpmnActivity
      * Should be subclassed by the more specific types. For an intermediate catch without type, it's simply leaving the event.
      */
     public void eventCancelledByEventGateway(DelegateExecution execution) {
-        Context.getCommandContext().getExecutionEntityManager().deleteExecutionAndRelatedData((ExecutionEntity) execution,
+        CommandContextUtil.getExecutionEntityManager().deleteExecutionAndRelatedData((ExecutionEntity) execution,
                 DeleteReason.EVENT_BASED_GATEWAY_CANCEL, false);
     }
 
@@ -99,7 +100,7 @@ public class IntermediateCatchEventActivityBehavior extends AbstractBpmnActivity
         }
 
         CommandContext commandContext = Context.getCommandContext();
-        ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
         // Find the executions
         List<ExecutionEntity> executionEntities = executionEntityManager

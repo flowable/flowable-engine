@@ -35,12 +35,9 @@ import org.flowable.dmn.engine.impl.DmnRepositoryServiceImpl;
 import org.flowable.dmn.engine.impl.DmnRuleServiceImpl;
 import org.flowable.dmn.engine.impl.RuleEngineExecutorImpl;
 import org.flowable.dmn.engine.impl.ServiceImpl;
-import org.flowable.dmn.engine.impl.cfg.CommandExecutorImpl;
 import org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.cfg.TransactionListener;
-import org.flowable.dmn.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
-import org.flowable.dmn.engine.impl.db.DbSqlSessionFactory;
+import org.flowable.dmn.engine.impl.db.EntityDependencyOrder;
 import org.flowable.dmn.engine.impl.deployer.CachingAndArtifactsManager;
 import org.flowable.dmn.engine.impl.deployer.DmnDeployer;
 import org.flowable.dmn.engine.impl.deployer.DmnDeploymentHelper;
@@ -53,16 +50,9 @@ import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyOutputOrder;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyPriority;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyRuleOrder;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyUnique;
-import org.flowable.dmn.engine.impl.interceptor.CommandContext;
-import org.flowable.dmn.engine.impl.interceptor.CommandContextFactory;
-import org.flowable.dmn.engine.impl.interceptor.CommandContextInterceptor;
-import org.flowable.dmn.engine.impl.interceptor.CommandExecutor;
-import org.flowable.dmn.engine.impl.interceptor.CommandInterceptor;
-import org.flowable.dmn.engine.impl.interceptor.CommandInvoker;
-import org.flowable.dmn.engine.impl.interceptor.LogInterceptor;
-import org.flowable.dmn.engine.impl.interceptor.TransactionContextInterceptor;
 import org.flowable.dmn.engine.impl.mvel.config.DefaultCustomExpressionFunctionRegistry;
 import org.flowable.dmn.engine.impl.parser.DmnParseFactory;
+import org.flowable.dmn.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.dmn.engine.impl.persistence.deploy.Deployer;
@@ -72,22 +62,33 @@ import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManage
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManagerImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManagerImpl;
-import org.flowable.dmn.engine.impl.persistence.entity.ResourceEntityManager;
-import org.flowable.dmn.engine.impl.persistence.entity.ResourceEntityManagerImpl;
+import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityManager;
+import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityManagerImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DecisionTableDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DmnDeploymentDataManager;
-import org.flowable.dmn.engine.impl.persistence.entity.data.ResourceDataManager;
+import org.flowable.dmn.engine.impl.persistence.entity.data.DmnResourceDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDecisionTableDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnDeploymentDataManager;
-import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
+import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnResourceDataManager;
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
-import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.cfg.CommandExecutorImpl;
+import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
+import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
+import org.flowable.engine.common.impl.interceptor.CommandContextFactory;
+import org.flowable.engine.common.impl.interceptor.CommandContextInterceptor;
+import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
+import org.flowable.engine.common.impl.interceptor.DefaultCommandInvoker;
+import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.common.impl.interceptor.LogInterceptor;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
+import org.flowable.engine.common.impl.interceptor.TransactionContextInterceptor;
+import org.flowable.engine.common.impl.persistence.cache.EntityCache;
+import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
+import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.runtime.Clock;
 import org.mvel2.integration.PropertyHandler;
 import org.slf4j.Logger;
@@ -110,21 +111,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
 
     protected String dmnEngineName = DmnEngines.NAME_DEFAULT;
 
-    // COMMAND EXECUTORS ///////////////////////////////////////////////
-
-    protected CommandInterceptor commandInvoker;
-
-    /**
-     * the configurable list which will be {@link #initInterceptorChain(java.util.List) processed} to build the {@link #commandExecutor}
-     */
-    protected List<CommandInterceptor> customPreCommandInterceptors;
-    protected List<CommandInterceptor> customPostCommandInterceptors;
-
-    protected List<CommandInterceptor> commandInterceptors;
-
-    /** this will be initialized during the configurationComplete() */
-    protected CommandExecutor commandExecutor;
-
     // SERVICES
     // /////////////////////////////////////////////////////////////////
 
@@ -137,19 +123,13 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
 
     protected DmnDeploymentDataManager deploymentDataManager;
     protected DecisionTableDataManager decisionTableDataManager;
-    protected ResourceDataManager resourceDataManager;
+    protected DmnResourceDataManager resourceDataManager;
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
     protected DmnDeploymentEntityManager deploymentEntityManager;
     protected DecisionTableEntityManager decisionTableEntityManager;
-    protected ResourceEntityManager resourceEntityManager;
+    protected DmnResourceEntityManager resourceEntityManager;
     protected TableDataManager tableDataManager;
-
-    protected CommandContextFactory commandContextFactory;
-    protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
-
-    // SESSION FACTORIES ///////////////////////////////////////////////
-    protected DbSqlSessionFactory dbSqlSessionFactory;
 
     // DEPLOYERS
     // ////////////////////////////////////////////////////////////////
@@ -285,7 +265,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
             decisionTableDataManager = new MybatisDecisionTableDataManager(this);
         }
         if (resourceDataManager == null) {
-            resourceDataManager = new MybatisResourceDataManager(this);
+            resourceDataManager = new MybatisDmnResourceDataManager(this);
         }
     }
 
@@ -297,7 +277,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
             decisionTableEntityManager = new DecisionTableEntityManagerImpl(this, decisionTableDataManager);
         }
         if (resourceEntityManager == null) {
-            resourceEntityManager = new ResourceEntityManagerImpl(this, resourceDataManager);
+            resourceEntityManager = new DmnResourceEntityManagerImpl(this, resourceDataManager);
         }
         if (tableDataManager == null) {
             tableDataManager = new TableDataManagerImpl(this);
@@ -351,6 +331,10 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
             if (usingRelationalDatabase) {
                 initDbSqlSessionFactory();
             }
+            
+            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
+            
+            commandContextFactory.setSessionFactories(sessionFactories);
         }
 
         if (customSessionFactories != null) {
@@ -363,19 +347,30 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     public void initDbSqlSessionFactory() {
         if (dbSqlSessionFactory == null) {
             dbSqlSessionFactory = createDbSqlSessionFactory();
+            dbSqlSessionFactory.setDatabaseType(databaseType);
+            dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
+            dbSqlSessionFactory.setIdGenerator(idGenerator);
+            dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
+            dbSqlSessionFactory.setTablePrefixIsSchema(tablePrefixIsSchema);
+            dbSqlSessionFactory.setDatabaseCatalog(databaseCatalog);
+            dbSqlSessionFactory.setDatabaseSchema(databaseSchema);
+            addSessionFactory(dbSqlSessionFactory);
         }
-        dbSqlSessionFactory.setDatabaseType(databaseType);
-        dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
-        dbSqlSessionFactory.setIdGenerator(idGenerator);
-        dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
-        dbSqlSessionFactory.setTablePrefixIsSchema(tablePrefixIsSchema);
-        dbSqlSessionFactory.setDatabaseCatalog(databaseCatalog);
-        dbSqlSessionFactory.setDatabaseSchema(databaseSchema);
-        addSessionFactory(dbSqlSessionFactory);
+        initDbSqlSessionFactoryEntitySettings();
     }
-
+    
     public DbSqlSessionFactory createDbSqlSessionFactory() {
         return new DbSqlSessionFactory();
+    }
+    
+    protected void initDbSqlSessionFactoryEntitySettings() {
+        for (Class<? extends Entity> clazz : EntityDependencyOrder.INSERT_ORDER) {
+            dbSqlSessionFactory.getInsertionOrder().add(clazz);
+        }
+        
+        for (Class<? extends Entity> clazz : EntityDependencyOrder.DELETE_ORDER) {
+            dbSqlSessionFactory.getDeletionOrder().add(clazz);
+        }
     }
 
     // command executors
@@ -391,7 +386,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public void initCommandInvoker() {
         if (commandInvoker == null) {
-            commandInvoker = new CommandInvoker();
+            commandInvoker = new DefaultCommandInvoker();
         }
     }
 
@@ -410,23 +405,37 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     }
 
     public Collection<? extends CommandInterceptor> getDefaultCommandInterceptors() {
-        List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
-        interceptors.add(new LogInterceptor());
-
-        interceptors.add(new CommandContextInterceptor(commandContextFactory, this));
-
-        CommandInterceptor transactionInterceptor = createTransactionInterceptor();
-        if (transactionInterceptor != null) {
-            interceptors.add(transactionInterceptor);
+        if (defaultCommandInterceptors == null) {
+            List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
+            interceptors.add(new LogInterceptor());
+            
+            CommandInterceptor transactionInterceptor = createTransactionInterceptor();
+            if (transactionInterceptor != null) {
+                interceptors.add(transactionInterceptor);
+            }
+            
+            if (commandContextFactory != null) {
+                CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory);
+                commandContextInterceptor.getEngineConfigurations().put(EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG, this);
+                interceptors.add(commandContextInterceptor);
+            }
+            
+            if (transactionContextFactory != null) {
+                interceptors.add(new TransactionContextInterceptor(transactionContextFactory));
+            } 
+          
+            
+            defaultCommandInterceptors = interceptors;
         }
-
-        return interceptors;
+        return defaultCommandInterceptors;
     }
 
     public void initCommandExecutor() {
         if (commandExecutor == null) {
             CommandInterceptor first = initInterceptorChain(commandInterceptors);
             commandExecutor = new CommandExecutorImpl(getDefaultCommandConfig(), first);
+            
+            commandContextFactory.setCommandExecutor(commandExecutor);
         }
     }
 
@@ -441,11 +450,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     }
 
     public CommandInterceptor createTransactionInterceptor() {
-        if (transactionContextFactory != null) {
-            return new TransactionContextInterceptor(transactionContextFactory);
-        } else {
-            return null;
-        }
+        return null;
     }
 
     // deployers
@@ -524,7 +529,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
         if (commandContextFactory == null) {
             commandContextFactory = new CommandContextFactory();
         }
-        commandContextFactory.setDmnEngineConfiguration(this);
     }
 
     public void initTransactionContextFactory() {
@@ -695,66 +699,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
-    public DmnEngineConfiguration setXmlEncoding(String xmlEncoding) {
-        this.xmlEncoding = xmlEncoding;
-        return this;
-    }
-
-    public DmnEngineConfiguration setBeans(Map<Object, Object> beans) {
-        this.beans = beans;
-        return this;
-    }
-
-    public DmnEngineConfiguration setDefaultCommandConfig(CommandConfig defaultCommandConfig) {
-        this.defaultCommandConfig = defaultCommandConfig;
-        return this;
-    }
-
-    public CommandInterceptor getCommandInvoker() {
-        return commandInvoker;
-    }
-
-    public DmnEngineConfiguration setCommandInvoker(CommandInterceptor commandInvoker) {
-        this.commandInvoker = commandInvoker;
-        return this;
-    }
-
-    public List<CommandInterceptor> getCustomPreCommandInterceptors() {
-        return customPreCommandInterceptors;
-    }
-
-    public DmnEngineConfiguration setCustomPreCommandInterceptors(List<CommandInterceptor> customPreCommandInterceptors) {
-        this.customPreCommandInterceptors = customPreCommandInterceptors;
-        return this;
-    }
-
-    public List<CommandInterceptor> getCustomPostCommandInterceptors() {
-        return customPostCommandInterceptors;
-    }
-
-    public DmnEngineConfiguration setCustomPostCommandInterceptors(List<CommandInterceptor> customPostCommandInterceptors) {
-        this.customPostCommandInterceptors = customPostCommandInterceptors;
-        return this;
-    }
-
-    public List<CommandInterceptor> getCommandInterceptors() {
-        return commandInterceptors;
-    }
-
-    public DmnEngineConfiguration setCommandInterceptors(List<CommandInterceptor> commandInterceptors) {
-        this.commandInterceptors = commandInterceptors;
-        return this;
-    }
-
-    public CommandExecutor getCommandExecutor() {
-        return commandExecutor;
-    }
-
-    public DmnEngineConfiguration setCommandExecutor(CommandExecutor commandExecutor) {
-        this.commandExecutor = commandExecutor;
-        return this;
-    }
-
     public DmnManagementService getDmnManagementService() {
         return dmnManagementService;
     }
@@ -853,11 +797,11 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
-    public ResourceDataManager getResourceDataManager() {
+    public DmnResourceDataManager getResourceDataManager() {
         return resourceDataManager;
     }
 
-    public DmnEngineConfiguration setResourceDataManager(ResourceDataManager resourceDataManager) {
+    public DmnEngineConfiguration setResourceDataManager(DmnResourceDataManager resourceDataManager) {
         this.resourceDataManager = resourceDataManager;
         return this;
     }
@@ -880,11 +824,11 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
-    public ResourceEntityManager getResourceEntityManager() {
+    public DmnResourceEntityManager getResourceEntityManager() {
         return resourceEntityManager;
     }
 
-    public DmnEngineConfiguration setResourceEntityManager(ResourceEntityManager resourceEntityManager) {
+    public DmnEngineConfiguration setResourceEntityManager(DmnResourceEntityManager resourceEntityManager) {
         this.resourceEntityManager = resourceEntityManager;
         return this;
     }
@@ -895,15 +839,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public DmnEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
         this.tableDataManager = tableDataManager;
-        return this;
-    }
-
-    public CommandContextFactory getCommandContextFactory() {
-        return commandContextFactory;
-    }
-
-    public DmnEngineConfiguration setCommandContextFactory(CommandContextFactory commandContextFactory) {
-        this.commandContextFactory = commandContextFactory;
         return this;
     }
 
@@ -929,15 +864,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public DmnEngineConfiguration setCustomSessionFactories(List<SessionFactory> customSessionFactories) {
         this.customSessionFactories = customSessionFactories;
-        return this;
-    }
-
-    public DbSqlSessionFactory getDbSqlSessionFactory() {
-        return dbSqlSessionFactory;
-    }
-
-    public DmnEngineConfiguration setDbSqlSessionFactory(DbSqlSessionFactory dbSqlSessionFactory) {
-        this.dbSqlSessionFactory = dbSqlSessionFactory;
         return this;
     }
 
@@ -968,15 +894,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public DmnEngineConfiguration setSessionFactories(Map<Class<?>, SessionFactory> sessionFactories) {
         this.sessionFactories = sessionFactories;
-        return this;
-    }
-
-    public TransactionContextFactory<TransactionListener, CommandContext> getTransactionContextFactory() {
-        return transactionContextFactory;
-    }
-
-    public DmnEngineConfiguration setTransactionContextFactory(TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory) {
-        this.transactionContextFactory = transactionContextFactory;
         return this;
     }
 

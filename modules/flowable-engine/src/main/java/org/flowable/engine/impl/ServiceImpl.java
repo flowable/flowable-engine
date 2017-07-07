@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.impl;
 
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
 
 /**
  * @author Tom Baeyens

@@ -17,16 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngineConfiguration;
-import org.flowable.form.engine.impl.db.DbSqlSession;
-import org.flowable.form.engine.impl.interceptor.Command;
-import org.flowable.form.engine.impl.interceptor.CommandContext;
-import org.flowable.form.engine.impl.interceptor.CommandExecutor;
+import org.flowable.form.engine.impl.db.FormDbSchemaManager;
 import org.flowable.form.engine.test.FormTestHelper;
 import org.junit.Assert;
 
@@ -143,9 +143,8 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
             CommandConfig config = new CommandConfig().transactionNotSupported();
             commandExecutor.execute(config, new Command<Object>() {
                 public Object execute(CommandContext commandContext) {
-                    DbSqlSession session = commandContext.getDbSqlSession();
-                    session.dbSchemaDrop();
-                    session.dbSchemaCreate();
+                    FormDbSchemaManager.dbSchemaDrop();
+                    FormDbSchemaManager.dbSchemaCreate();
                     return null;
                 }
             });

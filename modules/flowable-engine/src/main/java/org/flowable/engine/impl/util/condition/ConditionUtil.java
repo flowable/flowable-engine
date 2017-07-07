@@ -18,8 +18,9 @@ import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.Condition;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.el.UelExpressionCondition;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -32,8 +33,8 @@ public class ConditionUtil {
 
     public static boolean hasTrueCondition(SequenceFlow sequenceFlow, DelegateExecution execution) {
         String conditionExpression = null;
-        if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
-            ObjectNode elementProperties = Context.getBpmnOverrideElementProperties(sequenceFlow.getId(), execution.getProcessDefinitionId());
+        if (CommandContextUtil.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
+            ObjectNode elementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(sequenceFlow.getId(), execution.getProcessDefinitionId());
             conditionExpression = getActiveValue(sequenceFlow.getConditionExpression(), DynamicBpmnConstants.SEQUENCE_FLOW_CONDITION, elementProperties);
         } else {
             conditionExpression = sequenceFlow.getConditionExpression();
@@ -41,7 +42,7 @@ public class ConditionUtil {
 
         if (StringUtils.isNotEmpty(conditionExpression)) {
 
-            Expression expression = Context.getProcessEngineConfiguration().getExpressionManager().createExpression(conditionExpression);
+            Expression expression = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(conditionExpression);
             Condition condition = new UelExpressionCondition(expression);
             return condition.evaluate(sequenceFlow.getId(), execution);
         } else {

@@ -26,7 +26,6 @@ import org.flowable.engine.common.api.FlowableClassLoadingException;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -314,7 +313,7 @@ public abstract class ReflectUtil {
     }
 
     private static ClassLoader getCustomClassLoader() {
-        ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         if (processEngineConfiguration != null) {
             final ClassLoader classLoader = processEngineConfiguration.getClassLoader();
             if (classLoader != null) {
@@ -325,7 +324,7 @@ public abstract class ReflectUtil {
     }
 
     private static Class loadClass(ClassLoader classLoader, String className) throws ClassNotFoundException {
-        ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         boolean useClassForName = processEngineConfiguration == null || processEngineConfiguration.isUseClassForNameClassLoading();
         return useClassForName ? Class.forName(className, true, classLoader) : classLoader.loadClass(className);
     }

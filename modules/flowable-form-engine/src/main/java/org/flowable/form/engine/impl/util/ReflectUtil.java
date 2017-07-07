@@ -24,7 +24,6 @@ import java.util.regex.Pattern;
 import org.flowable.engine.common.api.FlowableClassLoadingException;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.form.engine.FormEngineConfiguration;
-import org.flowable.form.engine.impl.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -263,7 +262,7 @@ public abstract class ReflectUtil {
     }
 
     private static ClassLoader getCustomClassLoader() {
-        FormEngineConfiguration formEngineConfiguration = Context.getFormEngineConfiguration();
+        FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration();
         if (formEngineConfiguration != null) {
             final ClassLoader classLoader = formEngineConfiguration.getClassLoader();
             if (classLoader != null) {
@@ -274,7 +273,7 @@ public abstract class ReflectUtil {
     }
 
     private static Class loadClass(ClassLoader classLoader, String className) throws ClassNotFoundException {
-        FormEngineConfiguration formEngineConfiguration = Context.getFormEngineConfiguration();
+        FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration();
         boolean useClassForName = formEngineConfiguration == null || formEngineConfiguration.isUseClassForNameClassLoading();
         return useClassForName ? Class.forName(className, true, classLoader) : classLoader.loadClass(className);
     }

@@ -12,8 +12,6 @@
  */
 package org.flowable.rest.api.jpa;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +23,8 @@ import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.api.jpa.model.Message;
 import org.flowable.rest.service.api.RestUrls;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class JpaRestTest extends BaseJPARestTestCase {
 

@@ -16,10 +16,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.impl.util.IoUtil;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +43,7 @@ public class ProcessDefinitionDiagramHelper {
         }
 
         ResourceEntity resource = createResourceEntity();
-        ProcessEngineConfiguration processEngineConfiguration = Context.getCommandContext().getProcessEngineConfiguration();
+        ProcessEngineConfiguration processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         try {
             byte[] diagramBytes = IoUtil.readInputStream(
                     processEngineConfiguration.getProcessDiagramGenerator().generateDiagram(bpmnParse.getBpmnModel(), "png",
@@ -71,13 +71,13 @@ public class ProcessDefinitionDiagramHelper {
     }
 
     protected ResourceEntity createResourceEntity() {
-        return Context.getCommandContext().getProcessEngineConfiguration().getResourceEntityManager().create();
+        return CommandContextUtil.getProcessEngineConfiguration().getResourceEntityManager().create();
     }
 
     public boolean shouldCreateDiagram(ProcessDefinitionEntity processDefinition, DeploymentEntity deployment) {
         if (deployment.isNew()
                 && processDefinition.isGraphicalNotationDefined()
-                && Context.getCommandContext().getProcessEngineConfiguration().isCreateDiagramOnDeploy()) {
+                && CommandContextUtil.getProcessEngineConfiguration().isCreateDiagramOnDeploy()) {
 
             // If the 'getProcessDiagramResourceNameFromDeployment' call returns null, it means
             // no diagram image for the process definition was provided in the deployment resources.

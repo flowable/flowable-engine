@@ -22,8 +22,6 @@ import org.flowable.engine.impl.persistence.entity.HistoricDetailAssignmentEntit
 import org.flowable.engine.impl.persistence.entity.HistoricDetailAssignmentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityImpl;
-import org.flowable.engine.impl.persistence.entity.HistoricDetailTransitionInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricDetailTransitionInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricFormPropertyEntity;
@@ -54,11 +52,6 @@ public class MybatisHistoricDetailDataManager extends AbstractDataManager<Histor
     @Override
     public HistoricDetailAssignmentEntity createHistoricDetailAssignment() {
         return new HistoricDetailAssignmentEntityImpl();
-    }
-
-    @Override
-    public HistoricDetailTransitionInstanceEntity createHistoricDetailTransitionInstance() {
-        return new HistoricDetailTransitionInstanceEntityImpl();
     }
 
     @Override

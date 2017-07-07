@@ -116,11 +116,12 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         assertTask.setAsynchronous(true);
         assertTask.setScriptFormat("groovy");
         assertTask.setScript(
-                "import org.flowable.engine.impl.context.Context;\n" +
+                "import org.flowable.engine.common.impl.context.Context;\n" +
+                "import org.flowable.engine.impl.util.CommandContextUtil;\n" +
                         "import static org.hamcrest.core.Is.is;\n" +
                         "import static org.flowable.examples.test.MatcherAssert.assertThat;\n" +
                         "\n" +
-                        "assertThat(Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));"
+                        "assertThat(CommandContextUtil.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));"
         );
         testFlowNodesSkeleton.add(assertTask);
 
@@ -168,9 +169,10 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
                     startProcess.setScriptFormat("groovy");
                     startProcess.setAsynchronous(true);
                     startProcess.setScript(
-                            "import org.flowable.engine.impl.context.Context;\n" +
+                            "import org.flowable.engine.common.impl.context.Context;\n" +
+                            "import org.flowable.engine.impl.util.CommandContextUtil;\n" +
                                     "\n" +
-                                    "execution.setVariable('processInstanceId', Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceBuilder().processDefinitionKey('" +
+                                    "execution.setVariable('processInstanceId', CommandContextUtil.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceBuilder().processDefinitionKey('" +
                                     processDefinition.getKey() + "').start().getId());"
                     );
                     flowNodes.add(startProcess);
@@ -182,10 +184,11 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
                     completeTask.setAsynchronous(true);
                     completeTask.setScriptFormat("groovy");
                     completeTask.setScript(
-                            "import org.flowable.engine.impl.context.Context;\n" +
+                            "import org.flowable.engine.common.impl.context.Context;\n" +
+                            "import org.flowable.engine.impl.util.CommandContextUtil;\n" +
                                     "\n" +
-                                    "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();\n" +
-                                    "Context.getProcessEngineConfiguration().getTaskService().complete(taskId);"
+                                    "taskId = CommandContextUtil.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();\n" +
+                                    "CommandContextUtil.getProcessEngineConfiguration().getTaskService().complete(taskId);"
                     );
                     flowNodes.add(completeTask);
                     break;
@@ -216,9 +219,10 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         startProcess.setScriptFormat("groovy");
         startProcess.setAsynchronous(true);
         startProcess.setScript(
-                "import org.flowable.engine.impl.context.Context;\n" +
+                "import org.flowable.engine.common.impl.context.Context;\n" +
+                "import org.flowable.engine.impl.util.CommandContextUtil;\n" +
                         "\n" +
-                        "execution.setVariable('processInstanceId', Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceBuilder().processDefinitionKey('" + processToTestDefinitionKey + "').start().getId());"
+                        "execution.setVariable('processInstanceId', CommandContextUtil.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceBuilder().processDefinitionKey('" + processToTestDefinitionKey + "').start().getId());"
         );
         process.addFlowElement(startProcess);
 
@@ -228,10 +232,11 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         completeTask.setAsynchronous(true);
         completeTask.setScriptFormat("groovy");
         completeTask.setScript(
-                "import org.flowable.engine.impl.context.Context;\n" +
+                "import org.flowable.engine.common.impl.context.Context;\n" +
+                "import org.flowable.engine.impl.util.CommandContextUtil;\n" +
                         "\n" +
-                        "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();\n" +
-                        "Context.getProcessEngineConfiguration().getTaskService().complete(taskId);"
+                        "taskId = CommandContextUtil.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();\n" +
+                        "CommandContextUtil.getProcessEngineConfiguration().getTaskService().complete(taskId);"
         );
         process.addFlowElement(completeTask);
 
@@ -241,11 +246,12 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         assertTask.setAsynchronous(true);
         assertTask.setScriptFormat("groovy");
         assertTask.setScript(
-                "import org.flowable.engine.impl.context.Context;\n" +
+                "import org.flowable.engine.common.impl.context.Context;\n" +
+                "import org.flowable.engine.impl.util.CommandContextUtil;\n" +
                         "import static org.hamcrest.core.Is.is;\n" +
                         "import static org.flowable.examples.test.MatcherAssert.assertThat;\n" +
                         "\n" +
-                        "assertThat(Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));"
+                        "assertThat(CommandContextUtil.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));"
         );
         process.addFlowElement(assertTask);
 

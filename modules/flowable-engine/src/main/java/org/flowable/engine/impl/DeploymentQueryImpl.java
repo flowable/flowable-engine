@@ -17,8 +17,9 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentQuery;
 
@@ -203,13 +204,13 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
     @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getDeploymentEntityManager().findDeploymentCountByQueryCriteria(this);
+        return CommandContextUtil.getDeploymentEntityManager(commandContext).findDeploymentCountByQueryCriteria(this);
     }
 
     @Override
     public List<Deployment> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getDeploymentEntityManager().findDeploymentsByQueryCriteria(this);
+        return CommandContextUtil.getDeploymentEntityManager(commandContext).findDeploymentsByQueryCriteria(this);
     }
 
     // getters ////////////////////////////////////////////////////////

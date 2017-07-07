@@ -14,9 +14,10 @@ package org.flowable.standalone.cfg;
 
 import java.util.List;
 
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Task;
 
@@ -40,7 +41,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
         CustomTask customTask = managementService.executeCommand(new Command<CustomTask>() {
             @Override
             public CustomTask execute(CommandContext commandContext) {
-                return (CustomTask) commandContext.getDbSqlSession().selectOne("selectOneCustomTask", taskId);
+                return (CustomTask) CommandContextUtil.getDbSqlSession(commandContext).selectOne("selectOneCustomTask", taskId);
             }
         });
 
@@ -68,7 +69,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
             @SuppressWarnings("unchecked")
             @Override
             public List<CustomTask> execute(CommandContext commandContext) {
-                return (List<CustomTask>) commandContext.getDbSqlSession().selectList("selectCustomTaskList");
+                return (List<CustomTask>) CommandContextUtil.getDbSqlSession(commandContext).selectList("selectCustomTaskList");
             }
         });
 
