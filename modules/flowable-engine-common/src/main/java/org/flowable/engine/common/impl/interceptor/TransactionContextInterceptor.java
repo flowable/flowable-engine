@@ -23,12 +23,12 @@ import org.flowable.engine.common.impl.context.Context;
  */
 public class TransactionContextInterceptor extends AbstractCommandInterceptor {
 
-    protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
+    protected TransactionContextFactory transactionContextFactory;
 
     public TransactionContextInterceptor() {
     }
 
-    public TransactionContextInterceptor(TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory) {
+    public TransactionContextInterceptor(TransactionContextFactory transactionContextFactory) {
         this.transactionContextFactory = transactionContextFactory;
     }
 
@@ -58,11 +58,11 @@ public class TransactionContextInterceptor extends AbstractCommandInterceptor {
 
     }
 
-    public TransactionContextFactory<TransactionListener, CommandContext> getTransactionContextFactory() {
+    public TransactionContextFactory getTransactionContextFactory() {
         return transactionContextFactory;
     }
 
-    public void setTransactionContextFactory(TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory) {
+    public void setTransactionContextFactory(TransactionContextFactory transactionContextFactory) {
         this.transactionContextFactory = transactionContextFactory;
     }
 

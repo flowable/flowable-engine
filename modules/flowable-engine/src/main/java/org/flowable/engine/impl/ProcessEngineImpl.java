@@ -28,8 +28,6 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
-import org.flowable.engine.common.impl.cfg.TransactionListener;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -67,7 +65,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     protected AsyncExecutor asyncHistoryExecutor;
     protected CommandExecutor commandExecutor;
     protected Map<Class<?>, SessionFactory> sessionFactories;
-    protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
+    protected TransactionContextFactory transactionContextFactory;
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
     public ProcessEngineImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {

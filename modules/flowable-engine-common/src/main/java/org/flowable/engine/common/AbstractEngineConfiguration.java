@@ -43,12 +43,10 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
-import org.flowable.engine.common.impl.cfg.TransactionListener;
 import org.flowable.engine.common.impl.db.CustomMyBatisTypeHandlerConfig;
 import org.flowable.engine.common.impl.db.CustomMybatisTypeAliasConfig;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandContextFactory;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
@@ -131,7 +129,7 @@ public abstract class AbstractEngineConfiguration {
     protected DbSqlSessionFactory dbSqlSessionFactory;
     protected SqlSessionFactory sqlSessionFactory;
     protected TransactionFactory transactionFactory;
-    protected TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory;
+    protected TransactionContextFactory transactionContextFactory;
 
     protected Set<Class<?>> customMybatisMappers;
     protected Set<String> customMybatisXMLMappers;
@@ -790,11 +788,11 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
     
-    public TransactionContextFactory<TransactionListener, CommandContext> getTransactionContextFactory() {
+    public TransactionContextFactory getTransactionContextFactory() {
         return transactionContextFactory;
     }
 
-    public AbstractEngineConfiguration setTransactionContextFactory(TransactionContextFactory<TransactionListener, CommandContext> transactionContextFactory) {
+    public AbstractEngineConfiguration setTransactionContextFactory(TransactionContextFactory transactionContextFactory) {
         this.transactionContextFactory = transactionContextFactory;
         return this;
     }

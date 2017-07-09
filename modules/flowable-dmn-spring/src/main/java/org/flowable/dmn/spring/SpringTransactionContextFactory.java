@@ -15,14 +15,13 @@ package org.flowable.dmn.spring;
 
 import org.flowable.engine.common.impl.cfg.TransactionContext;
 import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
-import org.flowable.engine.common.impl.cfg.TransactionListener;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * @author Tijs Rademakers
  */
-public class SpringTransactionContextFactory implements TransactionContextFactory<TransactionListener, CommandContext> {
+public class SpringTransactionContextFactory implements TransactionContextFactory {
 
     protected PlatformTransactionManager transactionManager;
     protected Integer transactionSynchronizationAdapterOrder;

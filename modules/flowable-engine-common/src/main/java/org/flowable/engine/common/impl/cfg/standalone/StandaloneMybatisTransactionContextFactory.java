@@ -14,13 +14,12 @@ package org.flowable.engine.common.impl.cfg.standalone;
 
 import org.flowable.engine.common.impl.cfg.TransactionContext;
 import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
-import org.flowable.engine.common.impl.cfg.TransactionListener;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Tom Baeyens
  */
-public class StandaloneMybatisTransactionContextFactory implements TransactionContextFactory<TransactionListener, CommandContext> {
+public class StandaloneMybatisTransactionContextFactory implements TransactionContextFactory {
 
     public TransactionContext openTransactionContext(CommandContext commandContext) {
         return new StandaloneMybatisTransactionContext(commandContext);

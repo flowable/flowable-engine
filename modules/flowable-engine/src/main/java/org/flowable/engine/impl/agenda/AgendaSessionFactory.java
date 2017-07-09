@@ -14,7 +14,6 @@ package org.flowable.engine.impl.agenda;
 
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.FlowableEngineAgendaFactory;
-import org.flowable.engine.common.impl.interceptor.AbstractCommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.Session;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
@@ -33,7 +32,7 @@ public class AgendaSessionFactory implements SessionFactory {
     }
 
     @Override
-    public Session openSession(AbstractCommandContext commandContext) {
+    public Session openSession(CommandContext commandContext) {
         return flowableEngineAgendaFactory.createAgenda((CommandContext) commandContext);
     }
 

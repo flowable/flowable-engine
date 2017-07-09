@@ -19,7 +19,7 @@ import org.flowable.engine.common.impl.cfg.TransactionContext;
  * 
  * @author Joram Barrez
  */
-public interface CommandContextCloseListener extends BaseCommandContextCloseListener<CommandContext> {
+public interface CommandContextCloseListener {
 
     /**
      * Called when the {@link CommandContext} is being closed, but no 'close logic' has been executed.

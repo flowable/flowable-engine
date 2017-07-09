@@ -17,7 +17,7 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 /**
  * @author Tom Baeyens
  */
-public interface TransactionListener extends BaseTransactionListener<CommandContext> {
+public interface TransactionListener {
 
     void execute(CommandContext commandContext);
 }

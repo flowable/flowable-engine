@@ -24,8 +24,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.ibatis.session.SqlSession;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.engine.common.impl.Page;
+import org.flowable.engine.common.impl.interceptor.Session;
 import org.flowable.engine.common.impl.persistence.cache.CachedEntity;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.entity.AlwaysUpdatedPersistentObject;
@@ -37,12 +40,17 @@ import org.slf4j.LoggerFactory;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class DbSqlSession extends AbstractDbSqlSession {
+public class DbSqlSession implements Session {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DbSqlSession.class);
+    
+    public static String[] JDBC_METADATA_TABLE_TYPES = { "TABLE" };
 
-    protected DbSqlSessionFactory processEngineDbSqlSessionFactory;
     protected EntityCache entityCache;
+    protected SqlSession sqlSession;
+    protected DbSqlSessionFactory dbSqlSessionFactory;
+    protected String connectionMetadataDefaultCatalog;
+    protected String connectionMetadataDefaultSchema;
 
     protected Map<Class<? extends Entity>, Map<String, Entity>> insertedObjects = new HashMap<Class<? extends Entity>, Map<String, Entity>>();
     protected Map<Class<? extends Entity>, Map<String, Entity>> deletedObjects = new HashMap<Class<? extends Entity>, Map<String, Entity>>();
@@ -50,22 +58,25 @@ public class DbSqlSession extends AbstractDbSqlSession {
     protected List<Entity> updatedObjects = new ArrayList<Entity>();
     
     public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, EntityCache entityCache) {
-        super(dbSqlSessionFactory);
-        this.processEngineDbSqlSessionFactory = dbSqlSessionFactory;
+        this.dbSqlSessionFactory = dbSqlSessionFactory;
         this.entityCache = entityCache;
+        this.sqlSession = dbSqlSessionFactory.getSqlSessionFactory().openSession();
     }
 
     public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, EntityCache entityCache, Connection connection, String catalog, String schema) {
-        super(dbSqlSessionFactory, connection, catalog, schema);
-        this.processEngineDbSqlSessionFactory = dbSqlSessionFactory;
+        this.dbSqlSessionFactory = dbSqlSessionFactory;
+        this.entityCache = entityCache;
+        this.sqlSession = dbSqlSessionFactory.getSqlSessionFactory().openSession(connection); // Note the use of connection param here, different from other constructor
+        this.connectionMetadataDefaultCatalog = catalog;
+        this.connectionMetadataDefaultSchema = schema;
         this.entityCache = entityCache;
     }
-
+    
     // insert ///////////////////////////////////////////////////////////////////
 
     public void insert(Entity entity) {
         if (entity.getId() == null) {
-            String id = processEngineDbSqlSessionFactory.getIdGenerator().getNextId();
+            String id = dbSqlSessionFactory.getIdGenerator().getNextId();
             entity.setId(id);
         }
 
@@ -88,14 +99,13 @@ public class DbSqlSession extends AbstractDbSqlSession {
     }
 
     public int update(String statement, Object parameters) {
-        String updateStatement = processEngineDbSqlSessionFactory.mapStatement(statement);
+        String updateStatement = dbSqlSessionFactory.mapStatement(statement);
         return getSqlSession().update(updateStatement, parameters);
     }
 
     // delete
     // ///////////////////////////////////////////////////////////////////
     
-    @Override
     public void delete(String statement, Object parameter) {
         sqlSession.delete(statement, parameter);
     }
@@ -108,7 +118,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
         if (!bulkDeleteOperations.containsKey(entityClass)) {
             bulkDeleteOperations.put(entityClass, new ArrayList<BulkDeleteOperation>(1));
         }
-        bulkDeleteOperations.get(entityClass).add(new BulkDeleteOperation(processEngineDbSqlSessionFactory.mapStatement(statement), parameter));
+        bulkDeleteOperations.get(entityClass).add(new BulkDeleteOperation(dbSqlSessionFactory.mapStatement(statement), parameter));
     }
 
     public void delete(Entity entity) {
@@ -122,6 +132,36 @@ public class DbSqlSession extends AbstractDbSqlSession {
 
     // select
     // ///////////////////////////////////////////////////////////////////
+    
+    @SuppressWarnings({ "rawtypes" })
+    public List selectList(String statement) {
+        return selectList(statement, null, -1, -1);
+    }
+
+    @SuppressWarnings("rawtypes")
+    public List selectList(String statement, Object parameter) {
+        return selectList(statement, parameter, -1, -1);
+    }
+    
+    @SuppressWarnings("rawtypes")
+    public List selectList(String statement, Object parameter, Page page) {
+        if (page != null) {
+            return selectList(statement, parameter, page.getFirstResult(), page.getMaxResults());
+        } else {
+            return selectList(statement, parameter, -1, -1);
+        }
+    }
+    
+    @SuppressWarnings("rawtypes")
+    public List selectList(String statement, ListQueryParameterObject parameter) {
+        parameter.setDatabaseType(dbSqlSessionFactory.getDatabaseType());
+        return selectListWithRawParameter(statement, parameter);
+    }
+    
+    @SuppressWarnings("rawtypes")
+    public List selectList(String statement, Object parameter, int firstResult, int maxResults) {
+        return selectList(statement, new ListQueryParameterObject(parameter, firstResult, maxResults));
+    }
 
     @SuppressWarnings("rawtypes")
     public List selectListNoCacheCheck(String statement, Object parameter) {
@@ -148,7 +188,6 @@ public class DbSqlSession extends AbstractDbSqlSession {
         return selectListWithRawParameter(statement, parameter, false);
     }
     
-    @Override
     @SuppressWarnings("rawtypes")
     public List selectListWithRawParameter(String statement, Object parameter) {
         // All other selectList methods eventually end up here, passing it into the method
@@ -159,7 +198,8 @@ public class DbSqlSession extends AbstractDbSqlSession {
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List selectListWithRawParameter(String statement, Object parameter, boolean useCache) {
-        List loadedObjects = super.selectListWithRawParameter(statement, parameter);
+        statement = dbSqlSessionFactory.mapStatement(statement);
+        List loadedObjects = sqlSession.selectList(statement, parameter);
         if (useCache) {
             return cacheLoadOrStore(loadedObjects);
         } else {
@@ -192,8 +232,8 @@ public class DbSqlSession extends AbstractDbSqlSession {
             }
         }
 
-        String selectStatement = processEngineDbSqlSessionFactory.getSelectStatement(entityClass);
-        selectStatement = processEngineDbSqlSessionFactory.mapStatement(selectStatement);
+        String selectStatement = dbSqlSessionFactory.getSelectStatement(entityClass);
+        selectStatement = dbSqlSessionFactory.mapStatement(selectStatement);
         entity = (T) sqlSession.selectOne(selectStatement, id);
         if (entity == null) {
             return null;
@@ -376,7 +416,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
     protected void flushInsertEntities(Class<? extends Entity> entityClass, Collection<Entity> entitiesToInsert) {
         if (entitiesToInsert.size() == 1) {
             flushRegularInsert(entitiesToInsert.iterator().next(), entityClass);
-        } else if (Boolean.FALSE.equals(processEngineDbSqlSessionFactory.isBulkInsertable(entityClass))) {
+        } else if (Boolean.FALSE.equals(dbSqlSessionFactory.isBulkInsertable(entityClass))) {
             for (Entity entity : entitiesToInsert) {
                 flushRegularInsert(entity, entityClass);
             }
@@ -386,8 +426,8 @@ public class DbSqlSession extends AbstractDbSqlSession {
     }
 
     protected void flushRegularInsert(Entity entity, Class<? extends Entity> clazz) {
-        String insertStatement = processEngineDbSqlSessionFactory.getInsertStatement(entity);
-        insertStatement = processEngineDbSqlSessionFactory.mapStatement(insertStatement);
+        String insertStatement = dbSqlSessionFactory.getInsertStatement(entity);
+        insertStatement = dbSqlSessionFactory.mapStatement(insertStatement);
 
         if (insertStatement == null) {
             throw new FlowableException("no insert statement for " + entity.getClass() + " in the ibatis mapping files");
@@ -403,8 +443,8 @@ public class DbSqlSession extends AbstractDbSqlSession {
     }
 
     protected void flushBulkInsert(Collection<Entity> entities, Class<? extends Entity> clazz) {
-        String insertStatement = processEngineDbSqlSessionFactory.getBulkInsertStatement(clazz);
-        insertStatement = processEngineDbSqlSessionFactory.mapStatement(insertStatement);
+        String insertStatement = dbSqlSessionFactory.getBulkInsertStatement(clazz);
+        insertStatement = dbSqlSessionFactory.mapStatement(insertStatement);
 
         if (insertStatement == null) {
             throw new FlowableException("no insert statement for " + entities.iterator().next().getClass() + " in the ibatis mapping files");
@@ -416,7 +456,7 @@ public class DbSqlSession extends AbstractDbSqlSession {
         while (entityIterator.hasNext()) {
             List<Entity> subList = new ArrayList<Entity>();
             int index = 0;
-            while (entityIterator.hasNext() && index < processEngineDbSqlSessionFactory.getMaxNrOfStatementsInBulkInsert()) {
+            while (entityIterator.hasNext() && index < dbSqlSessionFactory.getMaxNrOfStatementsInBulkInsert()) {
                 Entity entity = entityIterator.next();
                 subList.add(entity);
 
@@ -446,8 +486,8 @@ public class DbSqlSession extends AbstractDbSqlSession {
 
     protected void flushUpdates() {
         for (Entity updatedObject : updatedObjects) {
-            String updateStatement = processEngineDbSqlSessionFactory.getUpdateStatement(updatedObject);
-            updateStatement = processEngineDbSqlSessionFactory.mapStatement(updateStatement);
+            String updateStatement = dbSqlSessionFactory.getUpdateStatement(updatedObject);
+            updateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
 
             if (updateStatement == null) {
                 throw new FlowableException("no update statement for " + updatedObject.getClass() + " in the ibatis mapping files");
@@ -506,8 +546,8 @@ public class DbSqlSession extends AbstractDbSqlSession {
 
     protected void flushDeleteEntities(Class<? extends Entity> entityClass, Collection<Entity> entitiesToDelete) {
         for (Entity entity : entitiesToDelete) {
-            String deleteStatement = processEngineDbSqlSessionFactory.getDeleteStatement(entity.getClass());
-            deleteStatement = processEngineDbSqlSessionFactory.mapStatement(deleteStatement);
+            String deleteStatement = dbSqlSessionFactory.getDeleteStatement(entity.getClass());
+            deleteStatement = dbSqlSessionFactory.mapStatement(deleteStatement);
             if (deleteStatement == null) {
                 throw new FlowableException("no delete statement for " + entity.getClass() + " in the ibatis mapping files");
             }
@@ -523,6 +563,49 @@ public class DbSqlSession extends AbstractDbSqlSession {
                 sqlSession.delete(deleteStatement, entity);
             }
         }
+    }
+    
+    public void close() {
+        sqlSession.close();
+    }
+
+    public void commit() {
+        sqlSession.commit();
+    }
+
+    public void rollback() {
+        sqlSession.rollback();
+    }
+    
+    public <T> T getCustomMapper(Class<T> type) {
+        return sqlSession.getMapper(type);
+    }
+
+    // getters and setters
+    // //////////////////////////////////////////////////////
+
+    public SqlSession getSqlSession() {
+        return sqlSession;
+    }
+    
+    public DbSqlSessionFactory getDbSqlSessionFactory() {
+        return dbSqlSessionFactory;
+    }
+
+    public String getConnectionMetadataDefaultCatalog() {
+        return connectionMetadataDefaultCatalog;
+    }
+
+    public void setConnectionMetadataDefaultCatalog(String connectionMetadataDefaultCatalog) {
+        this.connectionMetadataDefaultCatalog = connectionMetadataDefaultCatalog;
+    }
+
+    public String getConnectionMetadataDefaultSchema() {
+        return connectionMetadataDefaultSchema;
+    }
+
+    public void setConnectionMetadataDefaultSchema(String connectionMetadataDefaultSchema) {
+        this.connectionMetadataDefaultSchema = connectionMetadataDefaultSchema;
     }
 
 }

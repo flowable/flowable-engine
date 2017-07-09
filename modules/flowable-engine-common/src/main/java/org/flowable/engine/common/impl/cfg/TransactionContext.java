@@ -12,12 +12,10 @@
  */
 package org.flowable.engine.common.impl.cfg;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-
 /**
  * @author Tom Baeyens
  */
-public interface TransactionContext extends BaseTransactionContext<TransactionListener, CommandContext> {
+public interface TransactionContext {
 
     void commit();
 

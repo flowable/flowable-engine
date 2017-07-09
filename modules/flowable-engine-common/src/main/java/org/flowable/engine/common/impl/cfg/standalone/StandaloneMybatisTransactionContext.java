@@ -24,7 +24,6 @@ import org.flowable.engine.common.impl.cfg.TransactionPropagation;
 import org.flowable.engine.common.impl.cfg.TransactionState;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.db.DbSqlSession;
-import org.flowable.engine.common.impl.interceptor.AbstractCommandContext;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -44,7 +43,7 @@ public class StandaloneMybatisTransactionContext implements TransactionContext {
     protected DbSqlSession dbSqlSession;
     protected Map<TransactionState, List<TransactionListener>> stateTransactionListeners;
 
-    public StandaloneMybatisTransactionContext(AbstractCommandContext commandContext) {
+    public StandaloneMybatisTransactionContext(CommandContext commandContext) {
         this.commandContext = (CommandContext) commandContext;
         this.dbSqlSession = Context.getCommandContext().getSession(DbSqlSession.class);
     }

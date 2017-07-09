@@ -30,8 +30,8 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableWrongDbException;
-import org.flowable.engine.common.impl.db.AbstractDbSqlSessionFactory;
 import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.util.IoUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.db.upgrade.DbUpgradeStep;
@@ -297,7 +297,7 @@ public class DbSchemaManager {
         // ACT-1610: in case the prefix IS the schema itself, we don't add the
         // prefix, since the check is already aware of the schema
         DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-        AbstractDbSqlSessionFactory dbSqlSessionFactory = dbSqlSession.getDbSqlSessionFactory();
+        DbSqlSessionFactory dbSqlSessionFactory = dbSqlSession.getDbSqlSessionFactory();
         if (!dbSqlSession.getDbSqlSessionFactory().isTablePrefixIsSchema()) {
             tableName = prependDatabaseTablePrefix(tableName);
         }

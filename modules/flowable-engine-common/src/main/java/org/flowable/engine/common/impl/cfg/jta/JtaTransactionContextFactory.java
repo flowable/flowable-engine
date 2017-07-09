@@ -17,7 +17,7 @@ import javax.transaction.TransactionManager;
 
 import org.flowable.engine.common.impl.cfg.TransactionContext;
 import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
-import org.flowable.engine.common.impl.interceptor.AbstractCommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Daniel Meyer
@@ -30,7 +30,7 @@ public class JtaTransactionContextFactory implements TransactionContextFactory {
         this.transactionManager = transactionManager;
     }
 
-    public TransactionContext openTransactionContext(AbstractCommandContext commandContext) {
+    public TransactionContext openTransactionContext(CommandContext commandContext) {
         return new JtaTransactionContext(transactionManager);
     }
 

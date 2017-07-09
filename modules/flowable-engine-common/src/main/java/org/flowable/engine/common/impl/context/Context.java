@@ -45,7 +45,7 @@ public class Context {
     }
 
     public static TransactionContext getTransactionContext() {
-        return (TransactionContext) TransactionContextHolder.getTransactionContext();
+        return TransactionContextHolder.getTransactionContext();
     }
 
     public static void setTransactionContext(TransactionContext transactionContext) {

@@ -16,7 +16,7 @@ package org.flowable.spring;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.flowable.engine.common.impl.interceptor.AbstractCommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.Session;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.impl.variable.EntityManagerSession;
@@ -47,7 +47,7 @@ public class SpringEntityManagerSessionFactory implements SessionFactory {
         return EntityManagerFactory.class;
     }
 
-    public Session openSession(AbstractCommandContext commandContext) {
+    public Session openSession(CommandContext commandContext) {
         EntityManager entityManager = EntityManagerFactoryUtils.getTransactionalEntityManager(entityManagerFactory);
         if (entityManager == null) {
             return new EntityManagerSessionImpl(entityManagerFactory, handleTransactions, closeEntityManager);

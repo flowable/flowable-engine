@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.common.impl.interceptor;
 
-public interface Command<T> extends BaseCommand<T, CommandContext> {
+public interface Command<T> {
 
     T execute(CommandContext commandContext);
 }
