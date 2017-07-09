@@ -55,20 +55,20 @@ public abstract class AbstractEngineConfigurator implements ProcessEngineConfigu
         List<CustomMybatisTypeAliasConfig> typeAliasConfigs = getMybatisTypeAliases();
         if (typeAliasConfigs != null) {
             for (CustomMybatisTypeAliasConfig customMybatisTypeAliasConfig : typeAliasConfigs) {
-                if (processEngineConfiguration.getCustomMybatisTypeAliasConfigs() == null) {
-                    processEngineConfiguration.setCustomMybatisTypeAliasConfigs(new ArrayList<CustomMybatisTypeAliasConfig>());
+                if (processEngineConfiguration.getDependentEngineMybatisTypeAliasConfigs() == null) {
+                    processEngineConfiguration.setDependentEngineMybatisTypeAliasConfigs(new ArrayList<CustomMybatisTypeAliasConfig>());
                 }
-                processEngineConfiguration.getCustomMybatisTypeAliasConfigs().add(customMybatisTypeAliasConfig);
+                processEngineConfiguration.getDependentEngineMybatisTypeAliasConfigs().add(customMybatisTypeAliasConfig);
             }
         }
         
         List<CustomMyBatisTypeHandlerConfig> typeHandlerConfigs = getMybatisTypeHandlers();
         if (typeHandlerConfigs != null) {
             for (CustomMyBatisTypeHandlerConfig typeHandler : typeHandlerConfigs) {
-                if (processEngineConfiguration.getCustomMybatisTypeHandlerConfigs() == null) {
-                    processEngineConfiguration.setCustomMybatisTypeHandlerConfigs(new ArrayList<CustomMyBatisTypeHandlerConfig>());
+                if (processEngineConfiguration.getDependentEngineMybatisTypeHandlerConfigs() == null) {
+                    processEngineConfiguration.setDependentEngineMybatisTypeHandlerConfigs(new ArrayList<CustomMyBatisTypeHandlerConfig>());
                 }
-                processEngineConfiguration.getCustomMybatisTypeHandlerConfigs() .add(typeHandler);
+                processEngineConfiguration.getDependentEngineMybatisTypeHandlerConfigs() .add(typeHandler);
             }
         }
     }

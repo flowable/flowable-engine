@@ -133,8 +133,10 @@ public abstract class AbstractEngineConfiguration {
 
     protected Set<Class<?>> customMybatisMappers;
     protected Set<String> customMybatisXMLMappers;
-    protected List<CustomMybatisTypeAliasConfig> customMybatisTypeAliasConfigs;
-    protected List<CustomMyBatisTypeHandlerConfig> customMybatisTypeHandlerConfigs;
+    
+    protected Set<String> dependentEngineMyBatisXmlMappers;
+    protected List<CustomMybatisTypeAliasConfig> dependentEngineMybatisTypeAliasConfigs;
+    protected List<CustomMyBatisTypeHandlerConfig> dependentEngineMybatisTypeHandlerConfigs;
 
     // SESSION FACTORIES ///////////////////////////////////////////////
     protected List<SessionFactory> customSessionFactories;
@@ -457,28 +459,43 @@ public abstract class AbstractEngineConfiguration {
 
     public Configuration parseMybatisConfiguration(XMLConfigBuilder parser) {
         Configuration configuration = parser.parse();
-        if (customMybatisTypeAliasConfigs != null) {
-            for (CustomMybatisTypeAliasConfig customMybatisTypeAliasConfig : customMybatisTypeAliasConfigs) {
-                configuration.getTypeAliasRegistry().registerAlias(customMybatisTypeAliasConfig.getAliasName(), customMybatisTypeAliasConfig.getTypeHandlerClass());
+        
+        if (dependentEngineMybatisTypeAliasConfigs != null) {
+            for (CustomMybatisTypeAliasConfig typeAliasConfig : dependentEngineMybatisTypeAliasConfigs) {
+                configuration.getTypeAliasRegistry().registerAlias(typeAliasConfig.getAliasName(), typeAliasConfig.getTypeHandlerClass());
             }
         }
-        if (customMybatisTypeHandlerConfigs != null) {
-            for (CustomMyBatisTypeHandlerConfig customMyBatisTypeHandlerConfig : customMybatisTypeHandlerConfigs) {
-                configuration.getTypeHandlerRegistry().register(customMyBatisTypeHandlerConfig.getJavaTypeClass(), customMyBatisTypeHandlerConfig.getJdbcType(), customMyBatisTypeHandlerConfig.getTypeHandlerClass());
+        if (dependentEngineMybatisTypeHandlerConfigs != null) {
+            for (CustomMyBatisTypeHandlerConfig typeHandlerConfig : dependentEngineMybatisTypeHandlerConfigs) {
+                configuration.getTypeHandlerRegistry().register(typeHandlerConfig.getJavaTypeClass(), typeHandlerConfig.getJdbcType(), typeHandlerConfig.getTypeHandlerClass());
             }
         }
-        return parseCustomMybatisXMLMappers(configuration);
+        
+        parseDependentEngineMybatisXMLMappers(configuration);
+        parseCustomMybatisXMLMappers(configuration);
+        return configuration;
     }
 
-    public Configuration parseCustomMybatisXMLMappers(Configuration configuration) {
+    public void parseCustomMybatisXMLMappers(Configuration configuration) {
         if (getCustomMybatisXMLMappers() != null) {
-            // see XMLConfigBuilder.mapperElement()
             for (String resource : getCustomMybatisXMLMappers()) {
-                XMLMapperBuilder mapperParser = new XMLMapperBuilder(getResourceAsStream(resource), configuration, resource, configuration.getSqlFragments());
-                mapperParser.parse();
+                parseMybatisXmlMapping(configuration, resource);
             }
         }
-        return configuration;
+    }
+    
+    public void parseDependentEngineMybatisXMLMappers(Configuration configuration) {
+        if (getDependentEngineMyBatisXmlMappers() != null) {
+            for (String resource : getDependentEngineMyBatisXmlMappers()) {
+                parseMybatisXmlMapping(configuration, resource);
+            }
+        }
+    }
+
+    protected void parseMybatisXmlMapping(Configuration configuration, String resource) {
+        // see XMLConfigBuilder.mapperElement()
+        XMLMapperBuilder mapperParser = new XMLMapperBuilder(getResourceAsStream(resource), configuration, resource, configuration.getSqlFragments());
+        mapperParser.parse();
     }
 
     protected InputStream getResourceAsStream(String resource) {
@@ -815,21 +832,30 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
     
-    public List<CustomMybatisTypeAliasConfig> getCustomMybatisTypeAliasConfigs() {
-        return customMybatisTypeAliasConfigs;
+    public Set<String> getDependentEngineMyBatisXmlMappers() {
+        return dependentEngineMyBatisXmlMappers;
     }
 
-    public AbstractEngineConfiguration setCustomMybatisTypeAliasConfigs(List<CustomMybatisTypeAliasConfig> customMybatisTypeAliasConfigs) {
-        this.customMybatisTypeAliasConfigs = customMybatisTypeAliasConfigs;
+    public AbstractEngineConfiguration setDependentEngineMyBatisXmlMappers(Set<String> dependentEngineMyBatisXmlMappers) {
+        this.dependentEngineMyBatisXmlMappers = dependentEngineMyBatisXmlMappers;
         return this;
     }
 
-    public List<CustomMyBatisTypeHandlerConfig> getCustomMybatisTypeHandlerConfigs() {
-        return customMybatisTypeHandlerConfigs;
+    public List<CustomMybatisTypeAliasConfig> getDependentEngineMybatisTypeAliasConfigs() {
+        return dependentEngineMybatisTypeAliasConfigs;
     }
 
-    public AbstractEngineConfiguration setCustomMybatisTypeHandlerConfigs(List<CustomMyBatisTypeHandlerConfig> customMybatisTypeHandlerConfigs) {
-        this.customMybatisTypeHandlerConfigs = customMybatisTypeHandlerConfigs;
+    public AbstractEngineConfiguration setDependentEngineMybatisTypeAliasConfigs(List<CustomMybatisTypeAliasConfig> dependentEngineMybatisTypeAliasConfigs) {
+        this.dependentEngineMybatisTypeAliasConfigs = dependentEngineMybatisTypeAliasConfigs;
+        return this;
+    }
+
+    public List<CustomMyBatisTypeHandlerConfig> getDependentEngineMybatisTypeHandlerConfigs() {
+        return dependentEngineMybatisTypeHandlerConfigs;
+    }
+
+    public AbstractEngineConfiguration setDependentEngineMybatisTypeHandlerConfigs(List<CustomMyBatisTypeHandlerConfig> dependentEngineMybatisTypeHandlerConfigs) {
+        this.dependentEngineMybatisTypeHandlerConfigs = dependentEngineMybatisTypeHandlerConfigs;
         return this;
     }
 
