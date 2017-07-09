@@ -37,7 +37,6 @@ import org.flowable.content.engine.impl.cfg.StandaloneContentEngineConfiguration
 import org.flowable.content.engine.impl.cfg.StandaloneInMemContentEngineConfiguration;
 import org.flowable.content.engine.impl.db.EntityDependencyOrder;
 import org.flowable.content.engine.impl.fs.SimpleFileSystemContentStorage;
-import org.flowable.content.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntityManager;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntityManagerImpl;
 import org.flowable.content.engine.impl.persistence.entity.TableDataManager;
@@ -58,6 +57,7 @@ import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.interceptor.LogInterceptor;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.common.impl.interceptor.TransactionContextInterceptor;
+import org.flowable.engine.common.impl.persistence.GenericManagerFactory;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.entity.Entity;

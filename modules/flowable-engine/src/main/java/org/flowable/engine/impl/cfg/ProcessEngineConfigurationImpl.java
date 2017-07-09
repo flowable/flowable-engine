@@ -78,6 +78,7 @@ import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.interceptor.LogInterceptor;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.common.impl.interceptor.TransactionContextInterceptor;
+import org.flowable.engine.common.impl.persistence.GenericManagerFactory;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
@@ -212,7 +213,6 @@ import org.flowable.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandle
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
-import org.flowable.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.impl.persistence.deploy.Deployer;
 import org.flowable.engine.impl.persistence.deploy.DeploymentCache;

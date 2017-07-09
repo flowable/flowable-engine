@@ -17,13 +17,13 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntityImpl;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl;
 import org.flowable.idm.engine.impl.persistence.entity.IdentityInfoEntityImpl;
+import org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntityImpl;
+import org.flowable.idm.engine.impl.persistence.entity.IdmPropertyEntityImpl;
 import org.flowable.idm.engine.impl.persistence.entity.MembershipEntityImpl;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityImpl;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntityImpl;
-import org.flowable.idm.engine.impl.persistence.entity.IdmPropertyEntityImpl;
 import org.flowable.idm.engine.impl.persistence.entity.TokenEntityImpl;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl;
 

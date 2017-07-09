@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.content.engine.impl.persistence;
+package org.flowable.engine.common.impl.persistence;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -19,7 +19,7 @@ import org.flowable.engine.common.impl.interceptor.Session;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
 
 /**
- * @author Tijs Rademakers
+ * @author Tom Baeyens
  * @author Joram Barrez
  */
 public class GenericManagerFactory implements SessionFactory {
