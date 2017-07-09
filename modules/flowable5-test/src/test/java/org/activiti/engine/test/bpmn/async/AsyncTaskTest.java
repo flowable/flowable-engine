@@ -16,11 +16,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -151,7 +150,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         assertEquals(2, managementService.createJobQuery().count());
 
         // now the timer triggers:
-        CommandContextUtil.getProcessEngineConfiguration().getClock().setCurrentTime(new Date(System.currentTimeMillis() + 10000));
+        Context.getProcessEngineConfiguration().getClock().setCurrentTime(new Date(System.currentTimeMillis() + 10000));
         waitForJobExecutorToProcessAllJobs(10000L, 300L);
 
         // and we are done:

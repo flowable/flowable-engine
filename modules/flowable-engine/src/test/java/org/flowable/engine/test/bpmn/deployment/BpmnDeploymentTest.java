@@ -25,8 +25,8 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.common.impl.util.IoUtil;
 import org.flowable.engine.impl.RepositoryServiceImpl;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ReflectUtil;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -209,7 +209,7 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
             CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
             ProcessDefinition processDefinition = commandExecutor.execute(new Command<ProcessDefinition>() {
                 public ProcessDefinition execute(CommandContext commandContext) {
-                    return CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager().findDeployedLatestProcessDefinitionByKey("myProcess");
+                    return Context.getProcessEngineConfiguration().getDeploymentManager().findDeployedLatestProcessDefinitionByKey("myProcess");
                 }
             });
 

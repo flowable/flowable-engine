@@ -35,10 +35,10 @@ import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -295,7 +295,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
                 }
                 
                 if (FlowableEngineEventType.ACTIVITY_CANCELLED == event.getType()) {
-                    List<Task> list = CommandContextUtil.getProcessEngineConfiguration().getTaskService().createTaskQuery().list();
+                    List<Task> list = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().list();
                     if (!list.isEmpty()) {
                         events.add(event);
                     }

@@ -18,7 +18,7 @@ import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
-import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 
@@ -30,7 +30,7 @@ public class CreateUserAndMembershipTestDelegate implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) {
 
-        ManagementService managementService = CommandContextUtil.getProcessEngineConfiguration().getManagementService();
+        ManagementService managementService = Context.getProcessEngineConfiguration().getManagementService();
         managementService.executeCommand(new Command<Void>() {
             @Override
             public Void execute(CommandContext commandContext) {
@@ -38,7 +38,7 @@ public class CreateUserAndMembershipTestDelegate implements JavaDelegate {
             }
         });
 
-        IdentityService identityService = CommandContextUtil.getProcessEngineConfiguration().getIdentityService();
+        IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
 
         String username = "Kermit";
         User user = identityService.newUser(username);

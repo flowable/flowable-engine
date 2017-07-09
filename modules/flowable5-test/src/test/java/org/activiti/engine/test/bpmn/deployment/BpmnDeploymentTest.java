@@ -22,11 +22,10 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.impl.util.ReflectUtil;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
@@ -219,7 +218,7 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
             CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
             ProcessDefinition processDefinition = commandExecutor.execute(new Command<ProcessDefinition>() {
                 public ProcessDefinition execute(CommandContext commandContext) {
-                    return CommandContextUtil.getProcessEngineConfiguration(commandContext)
+                    return Context.getProcessEngineConfiguration()
                             .getDeploymentManager()
                             .findDeployedLatestProcessDefinitionByKey("myProcess");
                 }

@@ -19,8 +19,8 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.idm.api.Group;
@@ -123,7 +123,7 @@ public class IdmTransactionsTest extends PluggableFlowableTestCase {
 
         @Override
         public void notify(DelegateTask delegateTask) {
-            IdentityService identityService = CommandContextUtil.getProcessEngineConfiguration().getIdentityService();
+            IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
             User user = identityService.newUser("Kermit");
             user.setFirstName("Mr");
             user.setLastName("Kermit");
