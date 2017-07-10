@@ -24,7 +24,11 @@
 		<mule.version>3.8.0</mule.version>
 		<cxf.version>3.1.6</cxf.version>
 		<batik.version>1.7</batik.version>
-		<!-- JVM params for test execution -->
+
+        <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
+        <checkstyle.suppressions.location>/checkstyle/flowable-suppressions.xml</checkstyle.suppressions.location>
+
+        <!-- JVM params for test execution -->
 		<argLine>-Duser.language=en</argLine>
 
 		<!-- OSGi bundles properties -->
@@ -1424,6 +1428,16 @@
 			</build>
 		</profile>
 	</profiles>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.17</version>
+            </plugin>
+        </plugins>
+    </reporting>
 
 	<!-- Various information, not used by the build -->
 
