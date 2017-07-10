@@ -34,7 +34,7 @@ public class CommandContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandContext.class);
 
     protected Map<String, AbstractEngineConfiguration> engineConfigurations;
-    protected CommandExecutor commandExecutor;
+    protected AbstractEngineConfiguration currentEngineConfiguration;
     protected Command<?> command;
     protected Map<Class<?>, SessionFactory> sessionFactories;
     protected Map<Class<?>, Session> sessions = new HashMap<Class<?>, Session>();
@@ -253,6 +253,14 @@ public class CommandContext {
         this.sessionFactories = sessionFactories;
     }   
 
+    public AbstractEngineConfiguration getCurrentEngineConfiguration() {
+        return currentEngineConfiguration;
+    }
+
+    public void setCurrentEngineConfiguration(AbstractEngineConfiguration currentEngineConfiguration) {
+        this.currentEngineConfiguration = currentEngineConfiguration;
+    }
+
     public Map<String, AbstractEngineConfiguration> getEngineConfigurations() {
         return engineConfigurations;
     }
@@ -273,14 +281,6 @@ public class CommandContext {
     
     public Command<?> getCommand() {
         return command;
-    }
-
-    public CommandExecutor getCommandExecutor() {
-        return commandExecutor;
-    }
-
-    public void setCommandExecutor(CommandExecutor commandExecutor) {
-        this.commandExecutor = commandExecutor;
     }
 
     public Map<Class<?>, Session> getSessions() {

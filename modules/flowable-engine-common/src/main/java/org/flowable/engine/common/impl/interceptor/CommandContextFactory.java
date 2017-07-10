@@ -21,22 +21,12 @@ import java.util.Map;
  */
 public class CommandContextFactory {
     
-    protected CommandExecutor commandExecutor;
     protected Map<Class<?>, SessionFactory> sessionFactories;
 
     public CommandContext createCommandContext(Command<?> cmd) {
         CommandContext commandContext = new CommandContext(cmd);
-        commandContext.setCommandExecutor(commandExecutor);
         commandContext.setSessionFactories(sessionFactories);
         return commandContext;
-    }
-
-    public CommandExecutor getCommandExecutor() {
-        return commandExecutor;
-    }
-
-    public void setCommandExecutor(CommandExecutor commandExecutor) {
-        this.commandExecutor = commandExecutor;
     }
 
     public Map<Class<?>, SessionFactory> getSessionFactories() {

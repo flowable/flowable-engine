@@ -23,7 +23,6 @@ import org.flowable.editor.form.converter.FormJsonConverter;
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
-import org.flowable.engine.common.impl.cfg.CommandExecutorImpl;
 import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.interceptor.CommandContextFactory;
@@ -393,7 +392,9 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
          
             if (commandContextFactory != null) {
                 CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory);
-                commandContextInterceptor.getEngineConfigurations().put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, this);
+                engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, this);
+                commandContextInterceptor.setEngineConfigurations(engineConfigurations);
+                commandContextInterceptor.setCurrentEngineConfigurationKey(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
                 interceptors.add(commandContextInterceptor);
             }
             
@@ -404,25 +405,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration {
             defaultCommandInterceptors = interceptors;
         }
         return defaultCommandInterceptors;
-    }
-
-    public void initCommandExecutor() {
-        if (commandExecutor == null) {
-            CommandInterceptor first = initInterceptorChain(commandInterceptors);
-            commandExecutor = new CommandExecutorImpl(getDefaultCommandConfig(), first);
-            
-            commandContextFactory.setCommandExecutor(commandExecutor);
-        }
-    }
-
-    public CommandInterceptor initInterceptorChain(List<CommandInterceptor> chain) {
-        if (chain == null || chain.isEmpty()) {
-            throw new FlowableException("invalid command interceptor chain configuration: " + chain);
-        }
-        for (int i = 0; i < chain.size() - 1; i++) {
-            chain.get(i).setNext(chain.get(i + 1));
-        }
-        return chain.get(0);
     }
 
     public CommandInterceptor createTransactionInterceptor() {

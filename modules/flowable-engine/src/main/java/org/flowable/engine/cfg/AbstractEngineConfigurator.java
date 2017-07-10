@@ -15,7 +15,6 @@ package org.flowable.engine.cfg;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,8 +28,6 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.db.CustomMyBatisTypeHandlerConfig;
 import org.flowable.engine.common.impl.db.CustomMybatisTypeAliasConfig;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
-import org.flowable.engine.common.impl.interceptor.CommandContextInterceptor;
-import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.deploy.Deployer;
@@ -133,8 +130,8 @@ public abstract class AbstractEngineConfigurator implements ProcessEngineConfigu
     }
 
     protected void initialiseCommonProperties(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration, String engineKey) {
-        initCommandExecutor(processEngineConfiguration, targetEngineConfiguration);
-        initCommandInterceptors(processEngineConfiguration, targetEngineConfiguration, engineKey);
+        initEngineConfigurations(processEngineConfiguration, targetEngineConfiguration, engineKey);
+        initCommandContextFactory(processEngineConfiguration, targetEngineConfiguration);
         initDataSource(processEngineConfiguration, targetEngineConfiguration);
         initDbSqlSessionFactory(processEngineConfiguration, targetEngineConfiguration);
         initSessionFactories(processEngineConfiguration, targetEngineConfiguration);
@@ -143,19 +140,12 @@ public abstract class AbstractEngineConfigurator implements ProcessEngineConfigu
         initClock(processEngineConfiguration, targetEngineConfiguration);
     }
 
-    protected void initCommandExecutor(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
-        targetEngineConfiguration.setCommandExecutor(processEngineConfiguration.getCommandExecutor());
-        targetEngineConfiguration.setCommandContextFactory(processEngineConfiguration.getCommandContextFactory());
+    protected void initEngineConfigurations(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration, String engineKey) {
+        targetEngineConfiguration.setEngineConfigurations(processEngineConfiguration.getEngineConfigurations());
     }
 
-    protected void initCommandInterceptors(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration, String engineKey) {
-        Collection<? extends CommandInterceptor> defaultInterceptors = processEngineConfiguration.getDefaultCommandInterceptors();
-        targetEngineConfiguration.setDefaultCommandInterceptors(defaultInterceptors);
-        for (CommandInterceptor commandInterceptor : defaultInterceptors) {
-            if (commandInterceptor instanceof CommandContextInterceptor) {
-                ((CommandContextInterceptor) commandInterceptor).getEngineConfigurations().put(engineKey, targetEngineConfiguration);
-            }
-        }
+    protected void initCommandContextFactory(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
+        targetEngineConfiguration.setCommandContextFactory(processEngineConfiguration.getCommandContextFactory());
     }
 
     protected void initDataSource(ProcessEngineConfigurationImpl processEngineConfiguration,

@@ -30,6 +30,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandContextInterceptor.class);
 
     protected CommandContextFactory commandContextFactory;
+    protected String currentEngineConfigurationKey;
     protected Map<String, AbstractEngineConfiguration> engineConfigurations = new HashMap<>();
 
     public CommandContextInterceptor() {
@@ -43,6 +44,8 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
         CommandContext context = Context.getCommandContext();
 
         boolean contextReused = false;
+        AbstractEngineConfiguration previousEngineConfiguration = null;
+        
         // We need to check the exception, because the transaction can be in a
         // rollback state, and some other command is being fired to compensate (eg. decrementing job retries)
         if (!config.isContextReusePossible() || context == null || context.getException() != null) {
@@ -53,10 +56,12 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
             LOGGER.debug("Valid context found. Reusing it for the current command '{}'", command.getClass().getCanonicalName());
             contextReused = true;
             context.setReused(true);
+            previousEngineConfiguration = context.getCurrentEngineConfiguration();
         }
 
         try {
 
+            context.setCurrentEngineConfiguration(engineConfigurations.get(currentEngineConfigurationKey));
             // Push on stack
             Context.setCommandContext(context);
 
@@ -75,18 +80,27 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
 
                 // Pop from stack
                 Context.removeCommandContext();
+                context.setCurrentEngineConfiguration(previousEngineConfiguration);
             }
         }
 
         return null;
     }
-
+    
     public CommandContextFactory getCommandContextFactory() {
         return commandContextFactory;
     }
 
     public void setCommandContextFactory(CommandContextFactory commandContextFactory) {
         this.commandContextFactory = commandContextFactory;
+    }
+    
+    public String getCurrentEngineConfigurationKey() {
+        return currentEngineConfigurationKey;
+    }
+
+    public void setCurrentEngineConfigurationKey(String currentEngineConfigurationKey) {
+        this.currentEngineConfigurationKey = currentEngineConfigurationKey;
     }
 
     public Map<String, AbstractEngineConfiguration> getEngineConfigurations() {

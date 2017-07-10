@@ -41,6 +41,7 @@ import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.common.impl.cfg.CommandExecutorImpl;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
 import org.flowable.engine.common.impl.db.CustomMyBatisTypeHandlerConfig;
@@ -115,8 +116,9 @@ public abstract class AbstractEngineConfiguration {
     
     protected List<CommandInterceptor> customPreCommandInterceptors;
     protected List<CommandInterceptor> customPostCommandInterceptors;
-
     protected List<CommandInterceptor> commandInterceptors;
+    
+    protected Map<String, AbstractEngineConfiguration> engineConfigurations = new HashMap<>();
 
     protected ClassLoader classLoader;
     /**
@@ -241,7 +243,7 @@ public abstract class AbstractEngineConfiguration {
     protected IdGenerator idGenerator;
 
     protected Clock clock;
-
+    
     // DataSource
     // ///////////////////////////////////////////////////////////////
 
@@ -350,6 +352,26 @@ public abstract class AbstractEngineConfiguration {
             schemaCommandConfig = new CommandConfig().transactionNotSupported();
         }
     }
+    
+    public void initCommandExecutor() {
+        if (commandExecutor == null) {
+            CommandInterceptor first = initInterceptorChain(commandInterceptors);
+            commandExecutor = new CommandExecutorImpl(getDefaultCommandConfig(), first);
+        }
+    }
+    
+    public CommandInterceptor initInterceptorChain(List<CommandInterceptor> chain) {
+        if (chain == null || chain.isEmpty()) {
+            throw new FlowableException("invalid command interceptor chain configuration: " + chain);
+        }
+        for (int i = 0; i < chain.size() - 1; i++) {
+            chain.get(i).setNext(chain.get(i + 1));
+        }
+        return chain.get(0);
+    }
+    
+    public abstract CommandInterceptor createTransactionInterceptor();
+
 
     public void initBeans() {
         if (beans == null) {
@@ -770,6 +792,22 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
     
+    public Map<String, AbstractEngineConfiguration> getEngineConfigurations() {
+        return engineConfigurations;
+    }
+
+    public AbstractEngineConfiguration setEngineConfigurations(Map<String, AbstractEngineConfiguration> engineConfigurations) {
+        this.engineConfigurations = engineConfigurations;
+        return this;
+    }
+    
+    public void addEngineConfiguration(String key, AbstractEngineConfiguration engineConfiguration) {
+        if (engineConfigurations == null) {
+            engineConfigurations = new HashMap<>();
+        }
+        engineConfigurations.put(key, engineConfiguration);
+    }
+
     public Collection<? extends CommandInterceptor> getDefaultCommandInterceptors() {
         return defaultCommandInterceptors;
     }
