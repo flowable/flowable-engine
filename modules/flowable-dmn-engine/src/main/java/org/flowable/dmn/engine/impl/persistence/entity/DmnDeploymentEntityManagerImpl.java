@@ -53,13 +53,10 @@ public class DmnDeploymentEntityManagerImpl extends AbstractEntityManager<DmnDep
 
     @Override
     public void deleteDeployment(String deploymentId) {
-        deleteDecisionTablesForDeployment(deploymentId);
+        getHistoricDecisionExecutionEntityManager().deleteHistoricDecisionExecutionsByDeploymentId(deploymentId);
+        getDecisionTableEntityManager().deleteDecisionTablesByDeploymentId(deploymentId);
         getResourceEntityManager().deleteResourcesByDeploymentId(deploymentId);
         delete(findById(deploymentId));
-    }
-
-    protected void deleteDecisionTablesForDeployment(String deploymentId) {
-        getDecisionTableEntityManager().deleteDecisionTablesByDeploymentId(deploymentId);
     }
 
     protected DecisionTableEntity findLatestDecisionTable(DmnDecisionTable decisionTable) {

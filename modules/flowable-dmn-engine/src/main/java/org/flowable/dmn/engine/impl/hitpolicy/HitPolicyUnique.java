@@ -12,17 +12,17 @@
  */
 package org.flowable.dmn.engine.impl.hitpolicy;
 
-import org.flowable.dmn.api.RuleExecutionAuditContainer;
-import org.flowable.dmn.engine.impl.context.Context;
-import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
-import org.flowable.dmn.model.HitPolicy;
-import org.flowable.engine.common.api.FlowableException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.flowable.dmn.api.RuleExecutionAuditContainer;
+import org.flowable.dmn.engine.impl.context.Context;
+import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
+import org.flowable.dmn.model.HitPolicy;
+import org.flowable.engine.common.api.FlowableException;
 
 /**
  * @author Yvo Swillens
@@ -51,7 +51,7 @@ public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleVa
 
     public void composeDecisionResults(MvelExecutionContext executionContext) {
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
-        List<Map<String, Object>> decisionResult;
+        List<Map<String, Object>> decisionResult = null;
 
         if (Context.getDmnEngineConfiguration().isStrictMode() == false) {
             Map<String, Object> lastResult = new HashMap<>();
@@ -64,10 +64,11 @@ public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleVa
                 }
             }
             decisionResult = Arrays.asList(lastResult);
+            
         } else {
             decisionResult = ruleResults;
         }
 
-        executionContext.setDecisionResults(decisionResult);
+        executionContext.getAuditContainer().setDecisionResult(decisionResult);
     }
 }

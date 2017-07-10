@@ -12,17 +12,22 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
-import org.flowable.dmn.api.DmnRuleService;
-import org.flowable.dmn.api.RuleEngineExecutionSingleResult;
-import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
-import org.flowable.dmn.engine.test.FlowableDmnRule;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.engine.DmnEngine;
+import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
+import org.flowable.dmn.engine.test.FlowableDmnRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * @author Yvo Swillens
@@ -39,13 +44,13 @@ public class HitPolicyPriorityTest {
 
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
 
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("inputVariable1", 5);
-
-        Map<String, Object> result = dmnRuleService.executeDecisionByKeySingleResult("decision1", inputVariables);
-
-        Assert.assertEquals(1, result.keySet().size());
-        Assert.assertEquals("OUTPUT2", result.get("outputVariable1"));
+        Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 5)
+                .executeWithSingleResult();
+        
+        assertEquals(1, result.keySet().size());
+        assertEquals("OUTPUT2", result.get("outputVariable1"));
     }
 
     @Test
@@ -55,14 +60,14 @@ public class HitPolicyPriorityTest {
 
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
 
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("inputVariable1", 5);
-
-        Map<String, Object> result = dmnRuleService.executeDecisionByKeySingleResult("decision1", inputVariables);
-
-        Assert.assertEquals(2, result.keySet().size());
-        Assert.assertEquals("REFER", result.get("outputVariable1"));
-        Assert.assertEquals("LEVEL 2", result.get("outputVariable2"));
+        Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 5)
+                .executeWithSingleResult();
+        
+        assertEquals(2, result.keySet().size());
+        assertEquals("REFER", result.get("outputVariable1"));
+        assertEquals("LEVEL 2", result.get("outputVariable2"));
     }
 
     @Test
@@ -72,14 +77,14 @@ public class HitPolicyPriorityTest {
 
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
 
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("inputVariable1", 5);
-
-        Map<String, Object> result = dmnRuleService.executeDecisionByKeySingleResult("decision1", inputVariables);
-
-        Assert.assertEquals(2, result.keySet().size());
-        Assert.assertEquals("REFER", result.get("outputVariable1"));
-        Assert.assertEquals("LEVEL 1", result.get("outputVariable2"));
+        Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 5)
+                .executeWithSingleResult();
+        
+        assertEquals(2, result.keySet().size());
+        assertEquals("REFER", result.get("outputVariable1"));
+        assertEquals("LEVEL 1", result.get("outputVariable2"));
     }
 
     @Test
@@ -89,14 +94,14 @@ public class HitPolicyPriorityTest {
 
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
 
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("inputVariable1", 5);
+        Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 5)
+                .executeWithSingleResult();
 
-        Map<String, Object> result = dmnRuleService.executeDecisionByKeySingleResult("decision1", inputVariables);
-
-        Assert.assertEquals(2, result.keySet().size());
-        Assert.assertEquals("REFER", result.get("outputVariable1"));
-        Assert.assertEquals("LEVEL 2", result.get("outputVariable2"));
+        assertEquals(2, result.keySet().size());
+        assertEquals("REFER", result.get("outputVariable1"));
+        assertEquals("LEVEL 2", result.get("outputVariable2"));
     }
 
     @Test
@@ -109,11 +114,14 @@ public class HitPolicyPriorityTest {
         Map<String, Object> inputVariables = new HashMap<>();
         inputVariables.put("inputVariable1", 5);
 
-        RuleEngineExecutionSingleResult result = dmnRuleService.executeDecisionByKeySingleResultWithAuditTrail("decision1", inputVariables);
-
-        Assert.assertNull(result.getDecisionResult());
-        Assert.assertTrue(result.getAuditTrail().isFailed());
-        Assert.assertNotNull(result.getAuditTrail().getExceptionMessage());
+        DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 5)
+                .executeWithAuditTrail();
+        
+        assertEquals(0, result.getDecisionResult().size());
+        assertTrue(result.isFailed());
+        assertNotNull(result.getExceptionMessage());
     }
 
     @Test
@@ -124,17 +132,19 @@ public class HitPolicyPriorityTest {
 
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
 
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("inputVariable1", 5);
+        DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 5)
+                .executeWithAuditTrail();
 
-        RuleEngineExecutionSingleResult result = dmnRuleService.executeDecisionByKeySingleResultWithAuditTrail("decision1", inputVariables);
+        assertEquals(1, result.getDecisionResult().size());
+        Map<String, Object> outputMap = result.getDecisionResult().iterator().next();
+        assertEquals(2, outputMap.keySet().size());
+        assertEquals("ACCEPT", outputMap.get("outputVariable1"));
+        assertEquals("NONE", outputMap.get("outputVariable2"));
 
-        Assert.assertEquals(2, result.getDecisionResult().keySet().size());
-        Assert.assertEquals("ACCEPT", result.getDecisionResult().get("outputVariable1"));
-        Assert.assertEquals("NONE", result.getDecisionResult().get("outputVariable2"));
-
-        Assert.assertFalse(result.getAuditTrail().isFailed());
-        Assert.assertNull(result.getAuditTrail().getExceptionMessage());
+        assertFalse(result.isFailed());
+        assertNull(result.getExceptionMessage());
 
         dmnEngine.getDmnEngineConfiguration().setStrictMode(true);
     }
@@ -147,12 +157,12 @@ public class HitPolicyPriorityTest {
 
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
 
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("inputVariable1", 5);
-
-        Map<String, Object> result = dmnRuleService.executeDecisionByKeySingleResult("decision1", inputVariables);
-
-        Assert.assertEquals(1, result.keySet().size());
-        Assert.assertEquals(20D, result.get("outputVariable1"));
+        Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 5)
+                .executeWithSingleResult();
+        
+        assertEquals(1, result.keySet().size());
+        assertEquals(20D, result.get("outputVariable1"));
     }
 }

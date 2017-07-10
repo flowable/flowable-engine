@@ -18,6 +18,7 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.db.DbSqlSession;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
+import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.ResourceEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.engine.common.impl.interceptor.AbstractCommandContext;
@@ -63,6 +64,10 @@ public class CommandContext extends AbstractCommandContext {
 
     public ResourceEntityManager getResourceEntityManager() {
         return dmnEngineConfiguration.getResourceEntityManager();
+    }
+    
+    public HistoricDecisionExecutionEntityManager getHistoricDecisionExecutionEntityManager() {
+        return dmnEngineConfiguration.getHistoricDecisionExecutionEntityManager();
     }
 
     public TableDataManager getTableDataManager() {

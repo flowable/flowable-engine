@@ -12,26 +12,15 @@
  */
 package org.flowable.dmn.api;
 
-import java.util.Map;
-
 /**
- * @author Yvo Swillens
+ * Service providing access to the history of decision executions.
+ *
+ * @author Tijs Rademakers
  */
-public class RuleEngineExecutionSingleResult {
+public interface DmnHistoryService {
 
-    protected Map<String, Object> decisionResult;
-    protected DecisionExecutionAuditContainer auditTrail;
+    DmnHistoricDecisionExecutionQuery createHistoricDecisionExecutionQuery();
 
-    public RuleEngineExecutionSingleResult(Map<String, Object> decisionResult, DecisionExecutionAuditContainer auditTrail) {
-        this.decisionResult = decisionResult;
-        this.auditTrail = auditTrail;
-    }
+    NativeHistoricDecisionExecutionQuery createNativeHistoricDecisionExecutionQuery();
 
-    public Map<String, Object> getDecisionResult() {
-        return decisionResult;
-    }
-
-    public DecisionExecutionAuditContainer getAuditTrail() {
-        return auditTrail;
-    }
 }

@@ -12,15 +12,18 @@
  */
 package org.flowable.dmn.api;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Yvo Swillens
  */
+@JsonInclude(Include.NON_NULL)
 public class RuleExecutionAuditContainer {
 
     protected Date startTime;
@@ -32,20 +35,20 @@ public class RuleExecutionAuditContainer {
     @JsonProperty("exception")
     protected String exceptionMessage;
 
-    protected Map<Integer, ExpressionExecution> conditionResults = new HashMap<>();
-    protected Map<Integer, ExpressionExecution> conclusionResults = new HashMap<>();
+    protected List<ExpressionExecution> conditionResults = new ArrayList<>();
+    protected List<ExpressionExecution> conclusionResults = new ArrayList<>();
 
     public RuleExecutionAuditContainer(int ruleNumber) {
         this.ruleNumber = ruleNumber;
         this.startTime = new Date();
     }
 
-    public void addConditionResult(int inputNumber, ExpressionExecution expressionExecution) {
-        conditionResults.put(inputNumber, expressionExecution);
+    public void addConditionResult(ExpressionExecution expressionExecution) {
+        conditionResults.add(expressionExecution);
     }
 
-    public void addConclusionResult(int outputNumber, ExpressionExecution executionResult) {
-        conclusionResults.put(outputNumber, executionResult);
+    public void addConclusionResult(ExpressionExecution executionResult) {
+        conclusionResults.add(executionResult);
     }
 
     public void markRuleEnd() {
@@ -88,11 +91,11 @@ public class RuleExecutionAuditContainer {
         this.exceptionMessage = exceptionMessage;
     }
 
-    public Map<Integer, ExpressionExecution> getConditionResults() {
+    public List<ExpressionExecution> getConditionResults() {
         return conditionResults;
     }
 
-    public Map<Integer, ExpressionExecution> getConclusionResults() {
+    public List<ExpressionExecution> getConclusionResults() {
         return conclusionResults;
     }
 

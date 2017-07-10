@@ -26,10 +26,12 @@ import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
+import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.impl.DmnEngineImpl;
+import org.flowable.dmn.engine.impl.DmnHistoryServiceImpl;
 import org.flowable.dmn.engine.impl.DmnManagementServiceImpl;
 import org.flowable.dmn.engine.impl.DmnRepositoryServiceImpl;
 import org.flowable.dmn.engine.impl.DmnRuleServiceImpl;
@@ -72,15 +74,19 @@ import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManage
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManagerImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManagerImpl;
+import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityManager;
+import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityManagerImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.ResourceEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.ResourceEntityManagerImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DecisionTableDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DmnDeploymentDataManager;
+import org.flowable.dmn.engine.impl.persistence.entity.data.HistoricDecisionExecutionDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.ResourceDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDecisionTableDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnDeploymentDataManager;
+import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisHistoricDecisionExecutionDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
@@ -92,6 +98,9 @@ import org.flowable.engine.common.runtime.Clock;
 import org.mvel2.integration.PropertyHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -131,6 +140,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     protected DmnManagementService dmnManagementService = new DmnManagementServiceImpl();
     protected DmnRepositoryService dmnRepositoryService = new DmnRepositoryServiceImpl();
     protected DmnRuleService ruleService = new DmnRuleServiceImpl();
+    protected DmnHistoryService dmnHistoryService = new DmnHistoryServiceImpl();
     protected RuleEngineExecutor ruleEngineExecutor;
 
     // DATA MANAGERS ///////////////////////////////////////////////////
@@ -138,11 +148,13 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     protected DmnDeploymentDataManager deploymentDataManager;
     protected DecisionTableDataManager decisionTableDataManager;
     protected ResourceDataManager resourceDataManager;
+    protected HistoricDecisionExecutionDataManager historicDecisionExecutionDataManager;
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
     protected DmnDeploymentEntityManager deploymentEntityManager;
     protected DecisionTableEntityManager decisionTableEntityManager;
     protected ResourceEntityManager resourceEntityManager;
+    protected HistoricDecisionExecutionEntityManager historicDecisionExecutionEntityManager;
     protected TableDataManager tableDataManager;
 
     protected CommandContextFactory commandContextFactory;
@@ -163,9 +175,13 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     protected List<Deployer> customPostDeployers;
     protected List<Deployer> deployers;
     protected DeploymentManager deploymentManager;
+    
+    protected boolean historyEnabled;
 
     protected int decisionCacheLimit = -1; // By default, no limit
     protected DeploymentCache<DecisionTableCacheEntry> decisionCache;
+    
+    protected ObjectMapper objectMapper = new ObjectMapper();
 
     // CUSTOM EXPRESSION FUNCTIONS
     // ////////////////////////////////////////////////////////////////
@@ -244,6 +260,8 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
             initDataSource();
             initDbSchema();
         }
+        
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
         initBeans();
         initTransactionFactory();
@@ -266,6 +284,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
         initService(dmnManagementService);
         initService(dmnRepositoryService);
         initService(ruleService);
+        initService(dmnHistoryService);
     }
 
     protected void initService(Object service) {
@@ -287,6 +306,9 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
         if (resourceDataManager == null) {
             resourceDataManager = new MybatisResourceDataManager(this);
         }
+        if (historicDecisionExecutionDataManager == null) {
+            historicDecisionExecutionDataManager = new MybatisHistoricDecisionExecutionDataManager(this);
+        }
     }
 
     public void initEntityManagers() {
@@ -298,6 +320,9 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
         }
         if (resourceEntityManager == null) {
             resourceEntityManager = new ResourceEntityManagerImpl(this, resourceDataManager);
+        }
+        if (historicDecisionExecutionEntityManager == null) {
+            historicDecisionExecutionEntityManager = new HistoricDecisionExecutionEntityManagerImpl(this, historicDecisionExecutionDataManager);
         }
         if (tableDataManager == null) {
             tableDataManager = new TableDataManagerImpl(this);
@@ -604,7 +629,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     // rule engine executor
     /////////////////////////////////////////////////////////////
     public void initRuleEngineExecutor() {
-        ruleEngineExecutor = new RuleEngineExecutorImpl(hitPolicyBehaviors);
+        ruleEngineExecutor = new RuleEngineExecutorImpl(hitPolicyBehaviors, objectMapper);
     }
 
 
@@ -781,6 +806,15 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
         this.ruleService = ruleService;
         return this;
     }
+    
+    public DmnHistoryService getDmnHistoryService() {
+        return dmnHistoryService;
+    }
+
+    public DmnEngineConfiguration setDmnHistoryService(DmnHistoryService dmnHistoryService) {
+        this.dmnHistoryService = dmnHistoryService;
+        return this;
+    }
 
     public RuleEngineExecutor getRuleEngineExecutor() {
         return ruleEngineExecutor;
@@ -814,6 +848,15 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public DmnEngineConfiguration setDmnParseFactory(DmnParseFactory dmnParseFactory) {
         this.dmnParseFactory = dmnParseFactory;
+        return this;
+    }
+    
+    public boolean isHistoryEnabled() {
+        return historyEnabled;
+    }
+    
+    public DmnEngineConfiguration setHistoryEnabled(boolean historyEnabled) {
+        this.historyEnabled = historyEnabled;
         return this;
     }
 
@@ -861,6 +904,15 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
         this.resourceDataManager = resourceDataManager;
         return this;
     }
+    
+    public HistoricDecisionExecutionDataManager getHistoricDecisionExecutionDataManager() {
+        return historicDecisionExecutionDataManager;
+    }
+
+    public DmnEngineConfiguration setHistoricDecisionExecutionDataManager(HistoricDecisionExecutionDataManager historicDecisionExecutionDataManager) {
+        this.historicDecisionExecutionDataManager = historicDecisionExecutionDataManager;
+        return this;
+    }
 
     public DmnDeploymentEntityManager getDeploymentEntityManager() {
         return deploymentEntityManager;
@@ -877,6 +929,15 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public DmnEngineConfiguration setDecisionTableEntityManager(DecisionTableEntityManager decisionTableEntityManager) {
         this.decisionTableEntityManager = decisionTableEntityManager;
+        return this;
+    }
+    
+    public HistoricDecisionExecutionEntityManager getHistoricDecisionExecutionEntityManager() {
+        return historicDecisionExecutionEntityManager;
+    }
+
+    public DmnEngineConfiguration setHistoricDecisionExecutionEntityManager(HistoricDecisionExecutionEntityManager historicDecisionExecutionEntityManager) {
+        this.historicDecisionExecutionEntityManager = historicDecisionExecutionEntityManager;
         return this;
     }
 
@@ -1058,5 +1119,9 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public Map<String, AbstractHitPolicy> getCustomHitPolicyBehaviors() {
         return customHitPolicyBehaviors;
+    }
+    
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
     }
 }

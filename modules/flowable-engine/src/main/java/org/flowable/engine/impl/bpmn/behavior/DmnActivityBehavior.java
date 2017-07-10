@@ -88,9 +88,16 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
         DmnRuleService ruleService = processEngineConfiguration.getDmnEngineRuleService();
 
-        List<Map<String, Object>> executionResult = ruleService.executeDecisionByKeyParentDeploymentIdAndTenantId(finaldecisionTableKeyValue,
-                processDefinition.getDeploymentId(), execution.getVariables(), execution.getTenantId());
-
+        List<Map<String, Object>> executionResult = ruleService.createExecuteDecisionBuilder()
+                        .decisionKey(finaldecisionTableKeyValue)
+                        .parentDeploymentId(processDefinition.getDeploymentId())
+                        .instanceId(execution.getProcessInstanceId())
+                        .executionId(execution.getId())
+                        .activityId(task.getId())
+                        .variables(execution.getVariables())
+                        .tenantId(execution.getTenantId())
+                        .execute();
+                
         setVariablesOnExecution(executionResult, finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
 
         leave(execution);

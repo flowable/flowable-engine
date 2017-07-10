@@ -12,6 +12,7 @@
  */
 package org.flowable.dmn.engine.impl;
 
+import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
@@ -32,6 +33,7 @@ public class DmnEngineImpl implements DmnEngine {
     protected DmnManagementService dmnManagementService;
     protected DmnRepositoryService dmnRepositoryService;
     protected DmnRuleService dmnRuleService;
+    protected DmnHistoryService dmnHistoryService;
     protected DmnEngineConfiguration dmnEngineConfiguration;
 
     public DmnEngineImpl(DmnEngineConfiguration dmnEngineConfiguration) {
@@ -40,6 +42,7 @@ public class DmnEngineImpl implements DmnEngine {
         this.dmnManagementService = dmnEngineConfiguration.getDmnManagementService();
         this.dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
         this.dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
+        this.dmnHistoryService = dmnEngineConfiguration.getDmnHistoryService();
 
         if (name == null) {
             LOGGER.info("default flowable DmnEngine created");
@@ -71,6 +74,10 @@ public class DmnEngineImpl implements DmnEngine {
 
     public DmnRuleService getDmnRuleService() {
         return dmnRuleService;
+    }
+    
+    public DmnHistoryService getDmnHistoryService() {
+        return dmnHistoryService;
     }
 
     public DmnEngineConfiguration getDmnEngineConfiguration() {

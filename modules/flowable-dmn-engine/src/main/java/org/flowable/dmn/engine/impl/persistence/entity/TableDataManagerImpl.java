@@ -51,9 +51,10 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
 
     static {
 
-        // Form module
+        // DMN module
         entityToTableNameMap.put(DmnDeploymentEntity.class, "ACT_DMN_DEPLOYMENT");
         entityToTableNameMap.put(DecisionTableEntity.class, "ACT_DMN_DECISION_TABLE");
+        entityToTableNameMap.put(HistoricDecisionExecutionEntity.class, "ACT_DMN_HI_DECISION_EXECUTION");
         entityToTableNameMap.put(ResourceEntity.class, "ACT_DMN_DEPLOYMENT_RESOURCE");
     }
 

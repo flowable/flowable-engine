@@ -18,6 +18,7 @@ import org.flowable.dmn.engine.impl.context.Context;
 import org.flowable.dmn.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
+import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.ResourceEntityManager;
 
 /**
@@ -54,6 +55,10 @@ public abstract class AbstractManager {
 
     protected DecisionTableEntityManager getDecisionTableEntityManager() {
         return getDmnEngineConfiguration().getDecisionTableEntityManager();
+    }
+    
+    protected HistoricDecisionExecutionEntityManager getHistoricDecisionExecutionEntityManager() {
+        return getDmnEngineConfiguration().getHistoricDecisionExecutionEntityManager();
     }
 
     protected ResourceEntityManager getResourceEntityManager() {

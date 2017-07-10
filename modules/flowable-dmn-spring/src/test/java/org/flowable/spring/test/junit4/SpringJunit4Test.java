@@ -12,6 +12,11 @@
  */
 package org.flowable.spring.test.junit4;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.Map;
+
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
@@ -23,12 +28,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Yvo Swillens
@@ -57,10 +56,11 @@ public class SpringJunit4Test {
     @Test
     @DmnDeploymentAnnotation
     public void simpleDecisionTest() {
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("input1", "testString");
-        Map<String, Object> executionResult = ruleService.executeDecisionByKeySingleResult("decision1", inputVariables);
-
+        Map<String, Object> executionResult = ruleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("input1", "testString")
+                .executeWithSingleResult();
+        
         assertEquals("test1", executionResult.get("output1"));
         assertNotNull(flowableDmnSpringRule.getRepositoryService());
     }

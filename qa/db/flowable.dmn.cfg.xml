@@ -11,5 +11,6 @@
     	<property name="jdbcPassword" value="@jdbc.password@" />
     	
     	<property name="databaseSchemaUpdate" value="drop-create" />
+        <property name="historyEnabled" value="true" />
     </bean>
 </beans>

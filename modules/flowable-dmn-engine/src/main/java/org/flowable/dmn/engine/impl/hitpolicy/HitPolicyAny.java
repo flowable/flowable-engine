@@ -12,15 +12,14 @@
  */
 package org.flowable.dmn.engine.impl.hitpolicy;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.dmn.engine.impl.context.Context;
 import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.engine.common.api.FlowableException;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Yvo Swillens
@@ -56,7 +55,7 @@ public class HitPolicyAny extends AbstractHitPolicy implements ComposeDecisionRe
 
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
         if (!ruleResults.isEmpty()) {
-            executionContext.setDecisionResults(Arrays.asList(ruleResults.get(ruleResults.size() - 1)));
+            executionContext.getAuditContainer().addDecisionResultObject(ruleResults.get(ruleResults.size() - 1));
         }
     }
 

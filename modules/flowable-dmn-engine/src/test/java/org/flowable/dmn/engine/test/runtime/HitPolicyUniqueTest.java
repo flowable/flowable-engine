@@ -12,17 +12,22 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
-import org.flowable.dmn.api.DmnRuleService;
-import org.flowable.dmn.api.RuleEngineExecutionSingleResult;
-import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
-import org.flowable.dmn.engine.test.FlowableDmnRule;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.engine.DmnEngine;
+import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
+import org.flowable.dmn.engine.test.FlowableDmnRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * @author Yvo Swillens
@@ -38,12 +43,12 @@ public class HitPolicyUniqueTest {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
 
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("inputVariable1", 10);
+        Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 10)
+                .executeWithSingleResult();
 
-        Map<String, Object> result = dmnRuleService.executeDecisionByKeySingleResult("decision1", inputVariables);
-
-        Assert.assertEquals("eq 10", result.get("outputVariable1"));
+        assertEquals("eq 10", result.get("outputVariable1"));
     }
 
     @Test
@@ -52,14 +57,14 @@ public class HitPolicyUniqueTest {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
 
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("inputVariable1", 9);
-
-        RuleEngineExecutionSingleResult result = dmnRuleService.executeDecisionByKeySingleResultWithAuditTrail("decision1", inputVariables);
-
-        Assert.assertNull(result.getDecisionResult());
-        Assert.assertTrue(result.getAuditTrail().isFailed());
-        Assert.assertNotNull(result.getAuditTrail().getExceptionMessage());
+        DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 9)
+                .executeWithAuditTrail();
+        
+        assertEquals(0, result.getDecisionResult().size());
+        assertTrue(result.isFailed());
+        assertNotNull(result.getExceptionMessage());
     }
 
     @Test
@@ -73,12 +78,19 @@ public class HitPolicyUniqueTest {
         Map<String, Object> inputVariables = new HashMap<>();
         inputVariables.put("inputVariable1", 9);
 
-        RuleEngineExecutionSingleResult result = dmnRuleService.executeDecisionByKeySingleResultWithAuditTrail("decision1", inputVariables);
+        DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 9)
+                .executeWithAuditTrail();
 
-        Assert.assertEquals("lt 20", result.getDecisionResult().get("outputVariable1"));
-        Assert.assertEquals(10D, result.getDecisionResult().get("outputVariable2"));
-        Assert.assertFalse(result.getAuditTrail().isFailed());
-        Assert.assertNull(result.getAuditTrail().getExceptionMessage());
+        assertEquals(1, result.getDecisionResult().size());
+        
+        Map<String, Object> outputMap = result.getDecisionResult().iterator().next();
+        
+        assertEquals("lt 20", outputMap.get("outputVariable1"));
+        assertEquals(10D, outputMap.get("outputVariable2"));
+        assertFalse(result.isFailed());
+        assertNull(result.getExceptionMessage());
 
         // re enable strict mode
         dmnEngine.getDmnEngineConfiguration().setStrictMode(true);

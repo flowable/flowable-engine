@@ -12,17 +12,17 @@
  */
 package org.flowable.dmn.engine.impl.hitpolicy;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.flowable.dmn.engine.impl.context.Context;
-import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
-import org.flowable.dmn.model.HitPolicy;
-import org.flowable.engine.common.api.FlowableException;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.flowable.dmn.engine.impl.context.Context;
+import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
+import org.flowable.dmn.model.HitPolicy;
+import org.flowable.engine.common.api.FlowableException;
 
 /**
  * @author Yvo Swillens
@@ -39,21 +39,25 @@ public class HitPolicyOutputOrder extends AbstractHitPolicy implements ComposeDe
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
 
         // sort on predefined list(s) of output values
-        Collections.sort(ruleResults, new Comparator() {
+        Collections.sort(ruleResults, new Comparator<Object>() {
             boolean noOutputValuesPresent = true;
 
+            @SuppressWarnings("unchecked")
             public int compare(Object o1, Object o2) {
                 CompareToBuilder compareToBuilder = new CompareToBuilder();
                 for (Map.Entry<String, List<Object>> entry : executionContext.getOutputValues().entrySet()) {
                     List<Object> outputValues = entry.getValue();
                     if (outputValues != null || !outputValues.isEmpty()) {
                         noOutputValuesPresent = false;
-                        compareToBuilder.append(((Map) o1).get(entry.getKey()), ((Map) o2).get(entry.getKey()), new OutputOrderComparator<>(outputValues.toArray(new Comparable[outputValues.size()])));
+                        compareToBuilder.append(((Map<String, Object>) o1).get(entry.getKey()), 
+                                        ((Map<String, Object>) o2).get(entry.getKey()), 
+                                        new OutputOrderComparator<>(outputValues.toArray(new Comparable[outputValues.size()])));
                     }
                 }
 
                 if (!noOutputValuesPresent) {
                     return compareToBuilder.toComparison();
+                    
                 } else {
                     if (Context.getDmnEngineConfiguration().isStrictMode()) {
                         throw new FlowableException(String.format("HitPolicy: %s; no output values present", getHitPolicyName()));
@@ -63,6 +67,6 @@ public class HitPolicyOutputOrder extends AbstractHitPolicy implements ComposeDe
             }
         });
 
-        executionContext.setDecisionResults(ruleResults);
+        executionContext.getAuditContainer().setDecisionResult(ruleResults);
     }
 }

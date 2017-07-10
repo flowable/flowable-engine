@@ -12,16 +12,16 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.Map;
+
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Yvo Swillens
@@ -38,12 +38,12 @@ public class HitPolicyFirstTest {
 
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
 
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("inputVariable1", 11);
-
-        Map<String, Object> result = dmnRuleService.executeDecisionByKeySingleResult("decision1", inputVariables);
-
-        Assert.assertEquals("gt 10", result.get("outputVariable1"));
-        Assert.assertEquals("result2", result.get("outputVariable2"));
+        Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 11)
+                .executeWithSingleResult();
+        
+        assertEquals("gt 10", result.get("outputVariable1"));
+        assertEquals("result2", result.get("outputVariable2"));
     }
 }
