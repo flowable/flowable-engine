@@ -98,7 +98,7 @@ public abstract class ContentEngines {
 
     protected static void initContentEngineFromSpringResource(URL resource) {
         try {
-            Class<?> springConfigurationHelperClass = ReflectUtil.loadClass(CommandContextUtil.getContentEngineConfiguration(), "org.flowable.content.spring.SpringContentConfigurationHelper");
+            Class<?> springConfigurationHelperClass = ReflectUtil.loadClass("org.flowable.content.spring.SpringContentConfigurationHelper");
             Method method = springConfigurationHelperClass.getDeclaredMethod("buildContentEngine", new Class<?>[] { URL.class });
             ContentEngine contentEngine = (ContentEngine) method.invoke(null, new Object[] { resource });
 

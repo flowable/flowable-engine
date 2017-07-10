@@ -18,7 +18,6 @@ import java.io.InputStream;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.common.impl.util.io.StreamSource;
-import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -41,7 +40,7 @@ public class ResourceStreamSource implements StreamSource {
     public InputStream getInputStream() {
         InputStream inputStream = null;
         if (classLoader == null) {
-            inputStream = ReflectUtil.getResourceAsStream(CommandContextUtil.getProcessEngineConfiguration(), resource);
+            inputStream = ReflectUtil.getResourceAsStream(resource);
         } else {
             inputStream = classLoader.getResourceAsStream(resource);
         }

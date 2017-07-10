@@ -423,7 +423,7 @@ public class DbSchemaManager {
     public static void executeSchemaResource(String operation, String component, String resourceName, boolean isOptional) {
         InputStream inputStream = null;
         try {
-            inputStream = ReflectUtil.getResourceAsStream(CommandContextUtil.getProcessEngineConfiguration(), resourceName);
+            inputStream = ReflectUtil.getResourceAsStream(resourceName);
             if (inputStream == null) {
                 if (isOptional) {
                     LOGGER.info("no schema resource {} for {}", resourceName, operation);
@@ -481,7 +481,7 @@ public class DbSchemaManager {
                     String upgradestepClassName = line.substring(13).trim();
                     DbUpgradeStep dbUpgradeStep = null;
                     try {
-                        dbUpgradeStep = (DbUpgradeStep) ReflectUtil.instantiate(CommandContextUtil.getProcessEngineConfiguration(), upgradestepClassName);
+                        dbUpgradeStep = (DbUpgradeStep) ReflectUtil.instantiate(upgradestepClassName);
                     } catch (FlowableException e) {
                         throw new FlowableException("database update java class '" + upgradestepClassName + "' can't be instantiated: " + e.getMessage(), e);
                     }

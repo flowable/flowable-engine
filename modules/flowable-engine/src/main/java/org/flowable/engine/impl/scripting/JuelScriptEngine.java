@@ -48,7 +48,6 @@ import org.flowable.engine.impl.bpmn.data.ItemInstance;
 import org.flowable.engine.impl.el.DynamicBeanPropertyELResolver;
 import org.flowable.engine.impl.el.ExpressionFactoryResolver;
 import org.flowable.engine.impl.el.JsonNodeELResolver;
-import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * ScriptEngine that used JUEL for script evaluation and compilation (JSR-223).
@@ -217,7 +216,7 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
             clazz = (Class<?>) obj;
         } else if (obj instanceof String) {
             try {
-                clazz = ReflectUtil.loadClass(CommandContextUtil.getProcessEngineConfiguration(), (String) obj);
+                clazz = ReflectUtil.loadClass((String) obj);
             } catch (FlowableException ae) {
                 throw new ELException(ae);
             }

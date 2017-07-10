@@ -32,7 +32,6 @@ import org.flowable.engine.common.EngineInfo;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.IoUtil;
 import org.flowable.engine.common.impl.util.ReflectUtil;
-import org.flowable.idm.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +97,7 @@ public abstract class IdmEngines {
 
     protected static void initIdmEngineFromSpringResource(URL resource) {
         try {
-            Class<?> springConfigurationHelperClass = ReflectUtil.loadClass(CommandContextUtil.getIdmEngineConfiguration(), "org.flowable.idm.spring.SpringIdmConfigurationHelper");
+            Class<?> springConfigurationHelperClass = ReflectUtil.loadClass("org.flowable.idm.spring.SpringIdmConfigurationHelper");
             Method method = springConfigurationHelperClass.getDeclaredMethod("buildIdmEngine", new Class<?>[] { URL.class });
             IdmEngine idmEngine = (IdmEngine) method.invoke(null, new Object[] { resource });
 

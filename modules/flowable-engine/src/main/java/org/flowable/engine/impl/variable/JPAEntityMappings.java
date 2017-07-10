@@ -26,7 +26,6 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.util.ReflectUtil;
-import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Frederik Heremans
@@ -111,7 +110,7 @@ public class JPAEntityMappings {
 
     public Object getJPAEntity(String className, String idString) {
         Class<?> entityClass = null;
-        entityClass = ReflectUtil.loadClass(CommandContextUtil.getProcessEngineConfiguration(), className);
+        entityClass = ReflectUtil.loadClass(className);
 
         EntityMetaData metaData = getEntityMetaData(entityClass);
 

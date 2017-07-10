@@ -331,7 +331,6 @@ import org.flowable.engine.impl.scripting.ResolverFactory;
 import org.flowable.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.impl.variable.BooleanType;
 import org.flowable.engine.impl.variable.ByteArrayType;
@@ -1387,7 +1386,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (enableConfiguratorServiceLoader) {
             ClassLoader classLoader = getClassLoader();
             if (classLoader == null) {
-                classLoader = ReflectUtil.getClassLoader(CommandContextUtil.getProcessEngineConfiguration());
+                classLoader = ReflectUtil.getClassLoader();
             }
 
             ServiceLoader<ProcessEngineConfigurator> configuratorServiceLoader = ServiceLoader.load(ProcessEngineConfigurator.class, classLoader);

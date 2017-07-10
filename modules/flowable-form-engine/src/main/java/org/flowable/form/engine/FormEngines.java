@@ -32,7 +32,6 @@ import org.apache.commons.io.IOUtils;
 import org.flowable.engine.common.EngineInfo;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.ReflectUtil;
-import org.flowable.form.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +97,7 @@ public abstract class FormEngines {
 
     protected static void initFormEngineFromSpringResource(URL resource) {
         try {
-            Class<?> springConfigurationHelperClass = ReflectUtil.loadClass(CommandContextUtil.getFormEngineConfiguration(), "org.flowable.form.spring.SpringFormConfigurationHelper");
+            Class<?> springConfigurationHelperClass = ReflectUtil.loadClass("org.flowable.form.spring.SpringFormConfigurationHelper");
             Method method = springConfigurationHelperClass.getDeclaredMethod("buildContentEngine", new Class<?>[] { URL.class });
             FormEngine formEngine = (FormEngine) method.invoke(null, new Object[] { resource });
 

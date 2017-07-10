@@ -341,7 +341,7 @@ public class ErrorPropagation {
             }
             
             if (me.isAndChildren()) {
-                Class<?> exceptionClassClass = ReflectUtil.loadClass(CommandContextUtil.getProcessEngineConfiguration(), exceptionClass);
+                Class<?> exceptionClassClass = ReflectUtil.loadClass(exceptionClass);
                 if (exceptionClassClass.isAssignableFrom(e.getClass())) {
                     return errorCode;
                 }

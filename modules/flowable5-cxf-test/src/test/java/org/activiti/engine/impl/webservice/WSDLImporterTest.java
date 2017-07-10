@@ -24,7 +24,6 @@ import java.util.List;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.data.SimpleStructureDefinition;
 import org.flowable.engine.impl.bpmn.data.StructureDefinition;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.webservice.CxfWSDLImporter;
 import org.flowable.engine.impl.webservice.WSOperation;
 import org.flowable.engine.impl.webservice.WSService;
@@ -45,7 +44,7 @@ public class WSDLImporterTest {
 
     @Test
     public void testImportCounter() throws Exception {
-        URL url = ReflectUtil.getResource(CommandContextUtil.getProcessEngineConfiguration(), "org/activiti/engine/impl/webservice/counter.wsdl");
+        URL url = ReflectUtil.getResource("org/activiti/engine/impl/webservice/counter.wsdl");
         importer.importFrom(url.toString());
 
         List<WSService> services = new ArrayList<WSService>(importer.getServices().values());
@@ -80,7 +79,7 @@ public class WSDLImporterTest {
 
     @Test
     public void testImportCounterWithImport() throws Exception {
-        URL url = ReflectUtil.getResource(CommandContextUtil.getProcessEngineConfiguration(), "org/activiti/engine/impl/webservice/counterWithImport.wsdl");
+        URL url = ReflectUtil.getResource("org/activiti/engine/impl/webservice/counterWithImport.wsdl");
         importer.importFrom(url.toString());
 
         List<WSService> services = new ArrayList<WSService>(importer.getServices().values());
@@ -151,13 +150,13 @@ public class WSDLImporterTest {
 
     @Test
     public void testImportInheritedElement() throws Exception {
-        URL url = ReflectUtil.getResource(CommandContextUtil.getProcessEngineConfiguration(), "org/activiti/engine/impl/webservice/inherited-elements-in-types.wsdl");
+        URL url = ReflectUtil.getResource("org/activiti/engine/impl/webservice/inherited-elements-in-types.wsdl");
         assertNotNull(url);
         importer.importFrom(url.toString());
 
         List<StructureDefinition> structures = sortStructures();
         assertEquals(1, structures.size());
-        final Object structureTypeInst = ReflectUtil.instantiate(CommandContextUtil.getProcessEngineConfiguration(), "org.activiti.webservice.counter.StructureType");
+        final Object structureTypeInst = ReflectUtil.instantiate("org.activiti.webservice.counter.StructureType");
         final Class structureType = structureTypeInst.getClass();
         this.assertStructure(structures.get(0), "inheritedRequest", new String[] { "rootElt", "inheritedElt", "newSimpleElt",
                 "newStructuredElt" }, new Class<?>[] { Short.class, Integer.class, String.class, structureType });

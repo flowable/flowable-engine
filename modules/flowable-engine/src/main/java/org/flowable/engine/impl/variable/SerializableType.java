@@ -27,7 +27,6 @@ import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.util.IoUtil;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -125,7 +124,7 @@ public class SerializableType extends ByteArrayType {
     protected ObjectInputStream createObjectInputStream(InputStream is) throws IOException {
         return new ObjectInputStream(is) {
             protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
-                return ReflectUtil.loadClass(CommandContextUtil.getProcessEngineConfiguration(), desc.getName());
+                return ReflectUtil.loadClass(desc.getName());
             }
         };
     }

@@ -14,7 +14,6 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.flowable.engine.common.impl.util.ReflectUtil;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
@@ -37,7 +36,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
             // Upload a valid BPMN-file using multipart-data
             HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION));
             httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("oneTaskProcess.bpmn20.xml", "application/xml",
-                    ReflectUtil.getResourceAsStream(CommandContextUtil.getProcessEngineConfiguration(), "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml"), null));
+                    ReflectUtil.getResourceAsStream("org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml"), null));
             CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
 
             // Check deployment
@@ -92,7 +91,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
 
             // Add bpmn-xml
             zipStream.putNextEntry(new ZipEntry("oneTaskProcess.bpmn20.xml"));
-            IOUtils.copy(ReflectUtil.getResourceAsStream(CommandContextUtil.getProcessEngineConfiguration(), "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml"), zipStream);
+            IOUtils.copy(ReflectUtil.getResourceAsStream("org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml"), zipStream);
             zipStream.closeEntry();
 
             // Add text-resource
@@ -156,7 +155,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
 
             // Add bpmn-xml
             zipStream.putNextEntry(new ZipEntry("oneTaskProcess.bpmn20.xml"));
-            IOUtils.copy(ReflectUtil.getResourceAsStream(CommandContextUtil.getProcessEngineConfiguration(), "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml"), zipStream);
+            IOUtils.copy(ReflectUtil.getResourceAsStream("org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml"), zipStream);
             zipStream.closeEntry();
 
             // Add text-resource
@@ -199,7 +198,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
         // Upload a valid BPMN-file using multipart-data
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION));
         httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("oneTaskProcess.invalidfile", "application/xml",
-                ReflectUtil.getResourceAsStream(CommandContextUtil.getProcessEngineConfiguration(), "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml"), null));
+                ReflectUtil.getResourceAsStream("org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml"), null));
         closeResponse(executeBinaryRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
     }
 

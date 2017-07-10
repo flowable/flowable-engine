@@ -73,7 +73,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
     }
 
     public DeploymentBuilder addClasspathResource(String resource) {
-        InputStream inputStream = ReflectUtil.getResourceAsStream(CommandContextUtil.getProcessEngineConfiguration(), resource);
+        InputStream inputStream = ReflectUtil.getResourceAsStream(resource);
         if (inputStream == null) {
             throw new FlowableIllegalArgumentException("resource '" + resource + "' not found");
         }

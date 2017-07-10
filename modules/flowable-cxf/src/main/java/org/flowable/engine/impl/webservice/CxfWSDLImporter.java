@@ -46,7 +46,6 @@ import org.flowable.engine.impl.bpmn.data.PrimitiveStructureDefinition;
 import org.flowable.engine.impl.bpmn.data.SimpleStructureDefinition;
 import org.flowable.engine.impl.bpmn.data.StructureDefinition;
 import org.flowable.engine.impl.bpmn.parser.XMLImporter;
-import org.flowable.engine.impl.util.CommandContextUtil;
 
 import com.ibm.wsdl.extensions.schema.SchemaImpl;
 import com.sun.codemodel.JClass;
@@ -181,7 +180,7 @@ public class CxfWSDLImporter implements XMLImporter {
         QName qname = mapping.getElement();
         final JType type = mapping.getType().getTypeClass();
         if (type.isPrimitive()) {
-            final Class<?> primitiveClass = ReflectUtil.loadClass(CommandContextUtil.getProcessEngineConfiguration(), type.boxify().fullName());
+            final Class<?> primitiveClass = ReflectUtil.loadClass(type.boxify().fullName());
             final StructureDefinition structure = new PrimitiveStructureDefinition(this.namespace + qname.getLocalPart(), primitiveClass);
             this.structures.put(structure.getId(), structure);
 
@@ -193,7 +192,7 @@ public class CxfWSDLImporter implements XMLImporter {
             importFields(theClass, structure);
 
         } else {
-            final Class<?> referencedClass = ReflectUtil.loadClass(CommandContextUtil.getProcessEngineConfiguration(), type.fullName());
+            final Class<?> referencedClass = ReflectUtil.loadClass(type.fullName());
             final StructureDefinition structure = new PrimitiveStructureDefinition(this.namespace + qname.getLocalPart(), referencedClass);
             this.structures.put(structure.getId(), structure);
         }
@@ -211,7 +210,7 @@ public class CxfWSDLImporter implements XMLImporter {
             _importFields((JDefinedClass) parentClass, index, structure);
         }
         for (Entry<String, JFieldVar> entry : theClass.fields().entrySet()) {
-            Class<?> fieldClass = ReflectUtil.loadClass(CommandContextUtil.getProcessEngineConfiguration(), entry.getValue().type().boxify().erasure().fullName());
+            Class<?> fieldClass = ReflectUtil.loadClass(entry.getValue().type().boxify().erasure().fullName());
 
             String fieldName = entry.getKey();
             if (fieldName.startsWith("_")) {

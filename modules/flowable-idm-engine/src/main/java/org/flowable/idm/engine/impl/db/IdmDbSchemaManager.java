@@ -337,7 +337,7 @@ public class IdmDbSchemaManager {
     public static void executeSchemaResource(String operation, String component, String resourceName, boolean isOptional) {
         InputStream inputStream = null;
         try {
-            inputStream = ReflectUtil.getResourceAsStream(CommandContextUtil.getIdmEngineConfiguration(), resourceName);
+            inputStream = ReflectUtil.getResourceAsStream(resourceName);
             if (inputStream == null) {
                 if (isOptional) {
                     LOGGER.info("no schema resource {} for {}", resourceName, operation);

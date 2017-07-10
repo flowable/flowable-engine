@@ -21,7 +21,6 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
-import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -33,7 +32,7 @@ public class ClassDelegateUtil {
     }
 
     public static Object instantiateDelegate(String className, List<FieldDeclaration> fieldDeclarations) {
-        Object object = ReflectUtil.instantiate(CommandContextUtil.getProcessEngineConfiguration(), className);
+        Object object = ReflectUtil.instantiate(className);
         applyFieldDeclaration(fieldDeclarations, object);
         return object;
     }

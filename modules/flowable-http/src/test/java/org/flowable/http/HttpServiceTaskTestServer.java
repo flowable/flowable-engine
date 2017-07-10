@@ -34,7 +34,6 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.flowable.engine.common.impl.util.ReflectUtil;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +68,7 @@ public class HttpServiceTaskTestServer {
         // https connector configuration
         // keytool -selfcert -alias Flowable -keystore keystore -genkey -keyalg RSA -sigalg SHA256withRSA -validity 36500
         SslContextFactory sslContextFactory = new SslContextFactory();
-        sslContextFactory.setKeyStorePath(ReflectUtil.getResource(CommandContextUtil.getProcessEngineConfiguration(), "flowable.keystore").getFile());
+        sslContextFactory.setKeyStorePath(ReflectUtil.getResource("flowable.keystore").getFile());
         sslContextFactory.setKeyStorePassword("Flowable");
 
         HttpConfiguration httpsConfig = new HttpConfiguration();

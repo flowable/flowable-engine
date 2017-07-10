@@ -33,7 +33,6 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.util.IoUtil;
 import org.flowable.engine.common.impl.util.ReflectUtil;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +74,7 @@ public abstract class ProcessEngines {
                 // Create new map to store process-engines if current map is null
                 processEngines = new HashMap<String, ProcessEngine>();
             }
-            ClassLoader classLoader = ReflectUtil.getClassLoader(CommandContextUtil.getProcessEngineConfiguration());
+            ClassLoader classLoader = ReflectUtil.getClassLoader();
             Enumeration<URL> resources = null;
             try {
                 resources = classLoader.getResources("flowable.cfg.xml");
@@ -115,7 +114,7 @@ public abstract class ProcessEngines {
 
     protected static void initProcessEngineFromSpringResource(URL resource) {
         try {
-            Class<?> springConfigurationHelperClass = ReflectUtil.loadClass(CommandContextUtil.getProcessEngineConfiguration(), "org.flowable.spring.SpringConfigurationHelper");
+            Class<?> springConfigurationHelperClass = ReflectUtil.loadClass("org.flowable.spring.SpringConfigurationHelper");
             Method method = springConfigurationHelperClass.getDeclaredMethod("buildProcessEngine", new Class<?>[] { URL.class });
             ProcessEngine processEngine = (ProcessEngine) method.invoke(null, new Object[] { resource });
 

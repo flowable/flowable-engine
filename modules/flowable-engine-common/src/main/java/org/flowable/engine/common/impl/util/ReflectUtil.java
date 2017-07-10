@@ -26,6 +26,8 @@ import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.FlowableClassLoadingException;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,17 +41,17 @@ public abstract class ReflectUtil {
     private static final Pattern GETTER_PATTERN = Pattern.compile("(get|is)[A-Z].*");
     private static final Pattern SETTER_PATTERN = Pattern.compile("set[A-Z].*");
 
-    public static ClassLoader getClassLoader(AbstractEngineConfiguration engineConfiguration) {
-        ClassLoader loader = getCustomClassLoader(engineConfiguration);
+    public static ClassLoader getClassLoader() {
+        ClassLoader loader = getCustomClassLoader();
         if (loader == null) {
             loader = Thread.currentThread().getContextClassLoader();
         }
         return loader;
     }
 
-    public static Class<?> loadClass(AbstractEngineConfiguration engineConfiguration, String className) {
+    public static Class<?> loadClass(String className) {
         Class<?> clazz = null;
-        ClassLoader classLoader = getCustomClassLoader(engineConfiguration);
+        ClassLoader classLoader = getCustomClassLoader();
 
         // First exception in chain of classloaders will be used as cause when
         // no class is found in any of them
@@ -58,7 +60,7 @@ public abstract class ReflectUtil {
         if (classLoader != null) {
             try {
                 LOGGER.trace("Trying to load class with custom classloader: {}", className);
-                clazz = loadClass(engineConfiguration, classLoader, className);
+                clazz = loadClass(classLoader, className);
             } catch (Throwable t) {
                 throwable = t;
             }
@@ -66,7 +68,7 @@ public abstract class ReflectUtil {
         if (clazz == null) {
             try {
                 LOGGER.trace("Trying to load class with current thread context classloader: {}", className);
-                clazz = loadClass(engineConfiguration, Thread.currentThread().getContextClassLoader(), className);
+                clazz = loadClass(Thread.currentThread().getContextClassLoader(), className);
             } catch (Throwable t) {
                 if (throwable == null) {
                     throwable = t;
@@ -75,7 +77,7 @@ public abstract class ReflectUtil {
             if (clazz == null) {
                 try {
                     LOGGER.trace("Trying to load class with local classloader: {}", className);
-                    clazz = loadClass(engineConfiguration, ReflectUtil.class.getClassLoader(), className);
+                    clazz = loadClass(ReflectUtil.class.getClassLoader(), className);
                 } catch (Throwable t) {
                     if (throwable == null) {
                         throwable = t;
@@ -90,9 +92,9 @@ public abstract class ReflectUtil {
         return clazz;
     }
 
-    public static InputStream getResourceAsStream(AbstractEngineConfiguration engineConfiguration, String name) {
+    public static InputStream getResourceAsStream(String name) {
         InputStream resourceStream = null;
-        ClassLoader classLoader = getCustomClassLoader(engineConfiguration);
+        ClassLoader classLoader = getCustomClassLoader();
         if (classLoader != null) {
             resourceStream = classLoader.getResourceAsStream(name);
         }
@@ -110,9 +112,9 @@ public abstract class ReflectUtil {
         return resourceStream;
     }
 
-    public static URL getResource(AbstractEngineConfiguration engineConfiguration, String name) {
+    public static URL getResource(String name) {
         URL url = null;
-        ClassLoader classLoader = getCustomClassLoader(engineConfiguration);
+        ClassLoader classLoader = getCustomClassLoader();
         if (classLoader != null) {
             url = classLoader.getResource(name);
         }
@@ -130,9 +132,9 @@ public abstract class ReflectUtil {
         return url;
     }
 
-    public static Object instantiate(AbstractEngineConfiguration engineConfiguration, String className) {
+    public static Object instantiate(String className) {
         try {
-            Class<?> clazz = loadClass(engineConfiguration, className);
+            Class<?> clazz = loadClass(className);
             return clazz.newInstance();
         } catch (Exception e) {
             throw new FlowableException("couldn't instantiate class " + className, e);
@@ -265,8 +267,8 @@ public abstract class ReflectUtil {
         return null;
     }
 
-    public static Object instantiate(AbstractEngineConfiguration engineConfiguration, String className, Object[] args) {
-        Class<?> clazz = loadClass(engineConfiguration, className);
+    public static Object instantiate(String className, Object[] args) {
+        Class<?> clazz = loadClass(className);
         Constructor<?> constructor = findMatchingConstructor(clazz, args);
         if (constructor == null) {
             throw new FlowableException("couldn't find constructor for " + className + " with args " + Arrays.asList(args));
@@ -312,17 +314,26 @@ public abstract class ReflectUtil {
         }
     }
 
-    private static ClassLoader getCustomClassLoader(AbstractEngineConfiguration engineConfiguration) {
-        if (engineConfiguration != null) {
-            final ClassLoader classLoader = engineConfiguration.getClassLoader();
-            if (classLoader != null) {
-                return classLoader;
+    private static ClassLoader getCustomClassLoader() {
+        CommandContext commandContext = Context.getCommandContext();
+        if (commandContext != null) {
+            AbstractEngineConfiguration engineConfiguration = commandContext.getCurrentEngineConfiguration();
+            if (engineConfiguration != null) {
+                final ClassLoader classLoader = engineConfiguration.getClassLoader();
+                if (classLoader != null) {
+                    return classLoader;
+                }
             }
         }
         return null;
     }
 
-    private static Class loadClass(AbstractEngineConfiguration engineConfiguration, ClassLoader classLoader, String className) throws ClassNotFoundException {
+    private static Class loadClass(ClassLoader classLoader, String className) throws ClassNotFoundException {
+        CommandContext commandContext = Context.getCommandContext();
+        AbstractEngineConfiguration engineConfiguration = null;
+        if (commandContext != null) {
+            engineConfiguration = Context.getCommandContext().getCurrentEngineConfiguration();
+        }
         boolean useClassForName = engineConfiguration == null || engineConfiguration.isUseClassForNameClassLoading();
         return useClassForName ? Class.forName(className, true, classLoader) : classLoader.loadClass(className);
     }

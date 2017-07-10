@@ -19,7 +19,6 @@ import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.webservice.BpmnInterface;
 import org.flowable.engine.impl.bpmn.webservice.BpmnInterfaceImplementation;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * Represents a WS implementation of a {@link BpmnInterface}
@@ -59,7 +58,7 @@ public class WSService implements BpmnInterfaceImplementation {
     SyncWebServiceClient getClient() {
         if (this.client == null) {
             // TODO refactor to use configuration
-            SyncWebServiceClientFactory factory = (SyncWebServiceClientFactory) ReflectUtil.instantiate(CommandContextUtil.getProcessEngineConfiguration(), ProcessEngineConfigurationImpl.DEFAULT_WS_SYNC_FACTORY);
+            SyncWebServiceClientFactory factory = (SyncWebServiceClientFactory) ReflectUtil.instantiate(ProcessEngineConfigurationImpl.DEFAULT_WS_SYNC_FACTORY);
             this.client = factory.create(this.wsdlLocation);
         }
         return this.client;

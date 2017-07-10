@@ -203,7 +203,7 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
 
                 try {
                     // it is a class
-                    Class<?> classStructure = ReflectUtil.loadClass(CommandContextUtil.getProcessEngineConfiguration(), itemDefinitionElement.getStructureRef());
+                    Class<?> classStructure = ReflectUtil.loadClass(itemDefinitionElement.getStructureRef());
                     structure = new ClassStructureDefinition(classStructure);
                 } catch (FlowableException e) {
                     // it is a reference to a different structure

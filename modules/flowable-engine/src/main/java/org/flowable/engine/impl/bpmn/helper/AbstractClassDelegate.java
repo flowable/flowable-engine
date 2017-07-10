@@ -19,7 +19,6 @@ import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
-import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * Helper class for bpmn constructs that allow class delegation.
@@ -62,7 +61,7 @@ public abstract class AbstractClassDelegate extends AbstractBpmnActivityBehavior
     }
     
     public static Object defaultInstantiateDelegate(String className, List<FieldDeclaration> fieldDeclarations, ServiceTask serviceTask) {
-        Object object = ReflectUtil.instantiate(CommandContextUtil.getProcessEngineConfiguration(), className);
+        Object object = ReflectUtil.instantiate(className);
         applyFieldDeclaration(fieldDeclarations, object);
         
         if (serviceTask != null) {

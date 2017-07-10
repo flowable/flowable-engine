@@ -19,7 +19,6 @@ import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.util.CommandContextUtil;
 
 import junit.framework.TestCase;
 
@@ -31,7 +30,7 @@ public class DatabaseTablePrefixTest extends TestCase {
     public void testPerformDatabaseSchemaOperationCreate() throws Exception {
 
         // both process engines will be using this datasource.
-        PooledDataSource pooledDataSource = new PooledDataSource(ReflectUtil.getClassLoader(CommandContextUtil.getProcessEngineConfiguration()), "org.h2.Driver", "jdbc:h2:mem:activiti-test;DB_CLOSE_DELAY=1000", "sa", "");
+        PooledDataSource pooledDataSource = new PooledDataSource(ReflectUtil.getClassLoader(), "org.h2.Driver", "jdbc:h2:mem:activiti-test;DB_CLOSE_DELAY=1000", "sa", "");
 
         // create two schemas is the database
         Connection connection = pooledDataSource.getConnection();
