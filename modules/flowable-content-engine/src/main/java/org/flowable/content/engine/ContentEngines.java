@@ -29,9 +29,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
-import org.flowable.content.engine.impl.util.ReflectUtil;
+import org.flowable.content.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.EngineInfo;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,7 +98,7 @@ public abstract class ContentEngines {
 
     protected static void initContentEngineFromSpringResource(URL resource) {
         try {
-            Class<?> springConfigurationHelperClass = ReflectUtil.loadClass("org.flowable.content.spring.SpringContentConfigurationHelper");
+            Class<?> springConfigurationHelperClass = ReflectUtil.loadClass(CommandContextUtil.getContentEngineConfiguration(), "org.flowable.content.spring.SpringContentConfigurationHelper");
             Method method = springConfigurationHelperClass.getDeclaredMethod("buildContentEngine", new Class<?>[] { URL.class });
             ContentEngine contentEngine = (ContentEngine) method.invoke(null, new Object[] { resource });
 

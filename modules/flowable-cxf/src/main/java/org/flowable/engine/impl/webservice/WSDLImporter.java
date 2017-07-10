@@ -37,10 +37,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.flowable.bpmn.model.Import;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.data.SimpleStructureDefinition;
 import org.flowable.engine.impl.bpmn.data.StructureDefinition;
 import org.flowable.engine.impl.bpmn.parser.XMLImporter;
-import org.flowable.engine.impl.util.ReflectUtil;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -181,7 +182,7 @@ public class WSDLImporter implements XMLImporter {
         Map<String, JFieldVar> fields = theClass.fields();
         int index = 0;
         for (Entry<String, JFieldVar> entry : fields.entrySet()) {
-            Class<?> fieldClass = ReflectUtil.loadClass(entry.getValue().type().boxify().fullName());
+            Class<?> fieldClass = ReflectUtil.loadClass(CommandContextUtil.getProcessEngineConfiguration(), entry.getValue().type().boxify().fullName());
             structure.setFieldName(index, entry.getKey(), fieldClass);
             index++;
         }

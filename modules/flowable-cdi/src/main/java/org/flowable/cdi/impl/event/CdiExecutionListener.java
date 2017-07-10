@@ -78,8 +78,7 @@ public class CdiExecutionListener implements ExecutionListener, Serializable {
 
     protected BusinessProcessEvent createEvent(DelegateExecution execution) {
         ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(execution.getProcessDefinitionId());
-        ProcessEngineConfiguration engineConfiguration = (ProcessEngineConfiguration) Context.getCommandContext()
-                .getEngineConfigurations().get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+        ProcessEngineConfiguration engineConfiguration = org.flowable.engine.impl.context.Context.getProcessEngineConfiguration(); 
         Date now = engineConfiguration.getClock().getCurrentTime();
         return new CdiBusinessProcessEvent(activityId, transitionName, processDefinition, execution, type, execution.getProcessInstanceId(), execution.getId(), now);
     }

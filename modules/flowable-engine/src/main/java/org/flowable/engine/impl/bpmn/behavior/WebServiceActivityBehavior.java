@@ -28,6 +28,7 @@ import org.flowable.bpmn.model.Message;
 import org.flowable.bpmn.model.SendTask;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.Expression;
@@ -52,7 +53,6 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
-import org.flowable.engine.impl.util.ReflectUtil;
 import org.flowable.engine.impl.webservice.WSOperation;
 import org.flowable.engine.impl.webservice.WSService;
 
@@ -203,7 +203,7 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
 
                 try {
                     // it is a class
-                    Class<?> classStructure = ReflectUtil.loadClass(itemDefinitionElement.getStructureRef());
+                    Class<?> classStructure = ReflectUtil.loadClass(CommandContextUtil.getProcessEngineConfiguration(), itemDefinitionElement.getStructureRef());
                     structure = new ClassStructureDefinition(classStructure);
                 } catch (FlowableException e) {
                     // it is a reference to a different structure

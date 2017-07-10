@@ -18,7 +18,7 @@ import java.util.Iterator;
 import org.flowable.engine.common.impl.javax.el.ELContext;
 import org.flowable.engine.common.impl.javax.el.ELException;
 import org.flowable.engine.common.impl.javax.el.ELResolver;
-import org.flowable.engine.impl.util.ReflectUtil;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 
 /**
  * A {@link ELResolver} for dynamic bean properties

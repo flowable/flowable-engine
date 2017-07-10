@@ -25,11 +25,12 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
 import org.flowable.engine.impl.db.DbSchemaManager;
-import org.flowable.engine.impl.util.ReflectUtil;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -199,7 +200,7 @@ public abstract class TestHelper {
     public static String getBpmnProcessDefinitionResource(Class<?> type, String name) {
         for (String suffix : ResourceNameUtil.BPMN_RESOURCE_SUFFIXES) {
             String resource = type.getName().replace('.', '/') + "." + name + "." + suffix;
-            InputStream inputStream = ReflectUtil.getResourceAsStream(resource);
+            InputStream inputStream = ReflectUtil.getResourceAsStream(CommandContextUtil.getProcessEngineConfiguration(), resource);
             if (inputStream == null) {
                 continue;
             } else {

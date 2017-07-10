@@ -21,9 +21,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.data.SimpleStructureDefinition;
 import org.flowable.engine.impl.bpmn.data.StructureDefinition;
-import org.flowable.engine.impl.util.ReflectUtil;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,7 +42,7 @@ public class WSDLImporterTest {
 
     @Test
     public void testImportCounter() throws Exception {
-        URL url = ReflectUtil.getResource("org/flowable/engine/impl/webservice/counter.wsdl");
+        URL url = ReflectUtil.getResource(CommandContextUtil.getProcessEngineConfiguration(), "org/flowable/engine/impl/webservice/counter.wsdl");
         importer.importFrom(url.toString());
 
         List<WSService> services = new ArrayList<WSService>(importer.getServices().values());
@@ -82,7 +83,7 @@ public class WSDLImporterTest {
 
     @Test
     public void testImportCounterWithImport() throws Exception {
-        URL url = ReflectUtil.getResource("org/flowable/engine/impl/webservice/counterWithImport.wsdl");
+        URL url = ReflectUtil.getResource(CommandContextUtil.getProcessEngineConfiguration(), "org/flowable/engine/impl/webservice/counterWithImport.wsdl");
         importer.importFrom(url.toString());
 
         List<WSService> services = new ArrayList<WSService>(importer.getServices().values());
@@ -159,13 +160,13 @@ public class WSDLImporterTest {
 
     @Test
     public void testImportInheritedElement() throws Exception {
-        URL url = ReflectUtil.getResource("org/flowable/engine/impl/webservice/inherited-elements-in-types.wsdl");
+        URL url = ReflectUtil.getResource(CommandContextUtil.getProcessEngineConfiguration(), "org/flowable/engine/impl/webservice/inherited-elements-in-types.wsdl");
         assertNotNull(url);
         importer.importFrom(url.toString());
 
         List<StructureDefinition> structures = sortStructures();
         assertEquals(1, structures.size());
-        final Object structureTypeInst = ReflectUtil.instantiate("org.flowable.webservice.counter.StructureType");
+        final Object structureTypeInst = ReflectUtil.instantiate(CommandContextUtil.getProcessEngineConfiguration(), "org.flowable.webservice.counter.StructureType");
         final Class<? extends Object> structureType = structureTypeInst.getClass();
         this.assertStructure(structures.get(0), "inheritedRequest", new String[] { "rootElt", "inheritedElt", "newSimpleElt",
                 "newStructuredElt" }, new Class<?>[] { Short.class, Integer.class, String.class, structureType });
@@ -178,14 +179,14 @@ public class WSDLImporterTest {
 
     @Test
     public void testImportBasicElement() throws Exception {
-        URL url = ReflectUtil.getResource("org/flowable/engine/impl/webservice/basic-elements-in-types.wsdl");
+        URL url = ReflectUtil.getResource(CommandContextUtil.getProcessEngineConfiguration(), "org/flowable/engine/impl/webservice/basic-elements-in-types.wsdl");
         assertNotNull(url);
         importer.importFrom(url.toString());
     }
 
     @Test
     public void testComplexTypeMixed() throws Exception {
-        URL url = ReflectUtil.getResource("org/flowable/engine/impl/webservice/complexType-mixed.wsdl");
+        URL url = ReflectUtil.getResource(CommandContextUtil.getProcessEngineConfiguration(), "org/flowable/engine/impl/webservice/complexType-mixed.wsdl");
         importer.importFrom(url.toString());
     }
 }

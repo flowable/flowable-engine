@@ -26,12 +26,12 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.util.IoUtil;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.RepositoryServiceImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.impl.util.ReflectUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentBuilder;
 
@@ -73,7 +73,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
     }
 
     public DeploymentBuilder addClasspathResource(String resource) {
-        InputStream inputStream = ReflectUtil.getResourceAsStream(resource);
+        InputStream inputStream = ReflectUtil.getResourceAsStream(CommandContextUtil.getProcessEngineConfiguration(), resource);
         if (inputStream == null) {
             throw new FlowableIllegalArgumentException("resource '" + resource + "' not found");
         }

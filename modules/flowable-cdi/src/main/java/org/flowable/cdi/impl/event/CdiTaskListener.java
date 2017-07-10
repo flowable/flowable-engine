@@ -77,8 +77,7 @@ public class CdiTaskListener implements TaskListener, Serializable {
     }
 
     protected BusinessProcessEvent createEvent(DelegateTask task) {
-        ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl) Context.getCommandContext()
-                .getEngineConfigurations().get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+        ProcessEngineConfigurationImpl engineConfiguration = org.flowable.engine.impl.context.Context.getProcessEngineConfiguration();
         ProcessDefinition processDefinition = engineConfiguration.getProcessDefinitionCache().get(task.getExecution().getProcessDefinitionId()).getProcessDefinition();
         Date now = engineConfiguration.getClock().getCurrentTime();
         return new CdiBusinessProcessEvent(activityId, transitionName, processDefinition, task, type, task.getExecution().getProcessInstanceId(), task.getExecutionId(), now);

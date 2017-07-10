@@ -24,10 +24,11 @@ import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.common.impl.util.IoUtil;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.RepositoryServiceImpl;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.ReflectUtil;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
@@ -63,7 +64,8 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
         assertTrue(contentFromDeployment.length() > 0);
         assertTrue(contentFromDeployment.contains("process id=\"emptyProcess\""));
 
-        InputStream fileInputStream = ReflectUtil.getResourceAsStream("org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml");
+        InputStream fileInputStream = ReflectUtil.getResourceAsStream(CommandContextUtil.getProcessEngineConfiguration(), 
+                "org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml");
         String contentFromFile = readInputStreamToString(fileInputStream);
         assertEquals(contentFromFile, contentFromDeployment);
     }

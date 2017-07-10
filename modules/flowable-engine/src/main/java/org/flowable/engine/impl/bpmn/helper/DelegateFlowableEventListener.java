@@ -16,7 +16,8 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.impl.util.ReflectUtil;
+import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * An {@link FlowableEventListener} implementation which uses a classname to create a delegate {@link FlowableEventListener} instance to use for event notification. <br>
@@ -54,7 +55,7 @@ public class DelegateFlowableEventListener extends BaseDelegateEventListener {
 
     protected FlowableEventListener getDelegateInstance() {
         if (delegateInstance == null) {
-            Object instance = ReflectUtil.instantiate(className);
+            Object instance = ReflectUtil.instantiate(CommandContextUtil.getProcessEngineConfiguration(), className);
             if (instance instanceof FlowableEventListener) {
                 delegateInstance = (FlowableEventListener) instance;
             } else {

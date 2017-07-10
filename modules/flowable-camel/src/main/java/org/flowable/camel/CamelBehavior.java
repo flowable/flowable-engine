@@ -27,7 +27,6 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -230,8 +229,7 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
 
         } else {
             // Get the ProcessEngineConfiguration object.
-            ProcessEngineConfiguration engineConfiguration = (ProcessEngineConfiguration) Context.getCommandContext()
-                    .getEngineConfigurations().get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+            ProcessEngineConfiguration engineConfiguration = org.flowable.engine.impl.context.Context.getProcessEngineConfiguration();
             if ((Context.getCommandContext() != null && Flowable5Util.isFlowable5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
                     (Context.getCommandContext() == null && Flowable5Util.getFlowable5CompatibilityHandler() != null)) {
 

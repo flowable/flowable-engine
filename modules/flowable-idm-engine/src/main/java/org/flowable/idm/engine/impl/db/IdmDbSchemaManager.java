@@ -30,11 +30,11 @@ import org.flowable.engine.common.api.FlowableWrongDbException;
 import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.util.IoUtil;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.IdmPropertyEntity;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
-import org.flowable.idm.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -337,7 +337,7 @@ public class IdmDbSchemaManager {
     public static void executeSchemaResource(String operation, String component, String resourceName, boolean isOptional) {
         InputStream inputStream = null;
         try {
-            inputStream = ReflectUtil.getResourceAsStream(resourceName);
+            inputStream = ReflectUtil.getResourceAsStream(CommandContextUtil.getIdmEngineConfiguration(), resourceName);
             if (inputStream == null) {
                 if (isOptional) {
                     LOGGER.info("no schema resource {} for {}", resourceName, operation);

@@ -29,9 +29,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
-import org.flowable.dmn.engine.impl.util.ReflectUtil;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.EngineInfo;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,7 +98,7 @@ public abstract class DmnEngines {
 
     protected static void initDmnEngineFromSpringResource(URL resource) {
         try {
-            Class<?> springConfigurationHelperClass = ReflectUtil.loadClass("org.flowable.dmn.spring.SpringDmnConfigurationHelper");
+            Class<?> springConfigurationHelperClass = ReflectUtil.loadClass(CommandContextUtil.getDmnEngineConfiguration(), "org.flowable.dmn.spring.SpringDmnConfigurationHelper");
             Method method = springConfigurationHelperClass.getDeclaredMethod("buildDmnEngine", new Class<?>[] { URL.class });
             DmnEngine dmnEngine = (DmnEngine) method.invoke(null, new Object[] { resource });
 

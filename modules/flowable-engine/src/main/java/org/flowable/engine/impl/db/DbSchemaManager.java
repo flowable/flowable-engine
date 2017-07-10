@@ -33,12 +33,12 @@ import org.flowable.engine.common.api.FlowableWrongDbException;
 import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.util.IoUtil;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.db.upgrade.DbUpgradeStep;
 import org.flowable.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -423,7 +423,7 @@ public class DbSchemaManager {
     public static void executeSchemaResource(String operation, String component, String resourceName, boolean isOptional) {
         InputStream inputStream = null;
         try {
-            inputStream = ReflectUtil.getResourceAsStream(resourceName);
+            inputStream = ReflectUtil.getResourceAsStream(CommandContextUtil.getProcessEngineConfiguration(), resourceName);
             if (inputStream == null) {
                 if (isOptional) {
                     LOGGER.info("no schema resource {} for {}", resourceName, operation);
@@ -481,7 +481,7 @@ public class DbSchemaManager {
                     String upgradestepClassName = line.substring(13).trim();
                     DbUpgradeStep dbUpgradeStep = null;
                     try {
-                        dbUpgradeStep = (DbUpgradeStep) ReflectUtil.instantiate(upgradestepClassName);
+                        dbUpgradeStep = (DbUpgradeStep) ReflectUtil.instantiate(CommandContextUtil.getProcessEngineConfiguration(), upgradestepClassName);
                     } catch (FlowableException e) {
                         throw new FlowableException("database update java class '" + upgradestepClassName + "' can't be instantiated: " + e.getMessage(), e);
                     }

@@ -82,6 +82,7 @@ import org.flowable.engine.common.impl.persistence.GenericManagerFactory;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.compatibility.DefaultFlowable5CompatibilityHandlerFactory;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
@@ -331,8 +332,8 @@ import org.flowable.engine.impl.scripting.ResolverFactory;
 import org.flowable.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
-import org.flowable.engine.impl.util.ReflectUtil;
 import org.flowable.engine.impl.variable.BooleanType;
 import org.flowable.engine.impl.variable.ByteArrayType;
 import org.flowable.engine.impl.variable.CustomObjectType;
@@ -1406,7 +1407,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (enableConfiguratorServiceLoader) {
             ClassLoader classLoader = getClassLoader();
             if (classLoader == null) {
-                classLoader = ReflectUtil.getClassLoader();
+                classLoader = ReflectUtil.getClassLoader(CommandContextUtil.getProcessEngineConfiguration());
             }
 
             ServiceLoader<ProcessEngineConfigurator> configuratorServiceLoader = ServiceLoader.load(ProcessEngineConfigurator.class, classLoader);

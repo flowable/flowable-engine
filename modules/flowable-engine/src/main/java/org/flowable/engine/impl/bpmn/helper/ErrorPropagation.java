@@ -35,6 +35,7 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -43,7 +44,6 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
-import org.flowable.engine.impl.util.ReflectUtil;
 
 /**
  * This class is responsible for finding and executing error handlers for BPMN Errors.
@@ -341,7 +341,7 @@ public class ErrorPropagation {
             }
             
             if (me.isAndChildren()) {
-                Class<?> exceptionClassClass = ReflectUtil.loadClass(exceptionClass);
+                Class<?> exceptionClassClass = ReflectUtil.loadClass(CommandContextUtil.getProcessEngineConfiguration(), exceptionClass);
                 if (exceptionClassClass.isAssignableFrom(e.getClass())) {
                     return errorCode;
                 }
