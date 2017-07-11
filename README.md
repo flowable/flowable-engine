@@ -26,7 +26,7 @@ Flowable is distributed under the Apache V2 license (http://www.apache.org/licen
 
 ### Download
 
-The Flowable downloads can be found on http://flowable.org/downloads.html
+The Flowable downloads can be found on http://flowable.org/downloads.html.
 
 ### Sources
 
@@ -38,7 +38,7 @@ Flowable runs on a JDK higher than or equal to version 7. Go to http://www.oracl
 
 ### Contributing
 
-Contributing to Flowable: https://github.com/flowable/flowable-engine/wiki
+Contributing to Flowable: https://github.com/flowable/flowable-engine/wiki.
 
 ### Reporting problems
 
