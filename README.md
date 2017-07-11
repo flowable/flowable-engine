@@ -1,7 +1,15 @@
 Flowable (V6)
 ========
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.flowable/flowable-engine/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.flowable/flowable-engine)
+[Maven Central:  
+    ![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.flowable/flowable-engine/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.flowable/flowable-engine)
+
+[Travis CI:  
+	![build status badge](https://travis-ci.org/flowable/flowable-engine.svg?branch=master)](https://travis-ci.org/flowable/flowable-engine)
+
+[License:  
+	![license](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/flowable/flowable-engine/blob/master/LICENSE)
+
 
 Homepage: http://flowable.org/
 
