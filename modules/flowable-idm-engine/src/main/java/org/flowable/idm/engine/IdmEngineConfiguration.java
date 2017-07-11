@@ -30,6 +30,7 @@ import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
+import org.flowable.engine.common.impl.event.FlowableEventDispatcherImpl;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandContextFactory;
 import org.flowable.engine.common.impl.interceptor.CommandContextInterceptor;
@@ -49,7 +50,6 @@ import org.flowable.idm.api.IdmManagementService;
 import org.flowable.idm.api.PasswordEncoder;
 import org.flowable.idm.api.PasswordSalt;
 import org.flowable.idm.api.event.FlowableIdmEventType;
-import org.flowable.idm.engine.delegate.event.impl.FlowableIdmEventDispatcherImpl;
 import org.flowable.idm.engine.impl.IdmEngineImpl;
 import org.flowable.idm.engine.impl.IdmIdentityServiceImpl;
 import org.flowable.idm.engine.impl.IdmManagementServiceImpl;
@@ -426,7 +426,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
     public void initEventDispatcher() {
         if (this.eventDispatcher == null) {
-            this.eventDispatcher = new FlowableIdmEventDispatcherImpl();
+            this.eventDispatcher = new FlowableEventDispatcherImpl();
         }
 
         this.eventDispatcher.setEnabled(enableEventDispatcher);

@@ -47,6 +47,7 @@ import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
 import org.flowable.engine.common.impl.db.CustomMyBatisTypeHandlerConfig;
 import org.flowable.engine.common.impl.db.CustomMybatisTypeAliasConfig;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
+import org.flowable.engine.common.impl.event.EventDispatchAction;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandContextFactory;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
@@ -148,6 +149,7 @@ public abstract class AbstractEngineConfiguration {
     protected FlowableEventDispatcher eventDispatcher;
     protected List<FlowableEventListener> eventListeners;
     protected Map<String, List<FlowableEventListener>> typedEventListeners;
+    protected List<EventDispatchAction> additionalEventDispatchActions;
 
     protected boolean transactionsExternallyManaged;
 
@@ -1011,6 +1013,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setTypedEventListeners(Map<String, List<FlowableEventListener>> typedEventListeners) {
         this.typedEventListeners = typedEventListeners;
+        return this;
+    }
+    
+    public List<EventDispatchAction> getAdditionalEventDispatchActions() {
+        return additionalEventDispatchActions;
+    }
+
+    public AbstractEngineConfiguration setAdditionalEventDispatchActions(List<EventDispatchAction> additionalEventDispatchActions) {
+        this.additionalEventDispatchActions = additionalEventDispatchActions;
         return this;
     }
 

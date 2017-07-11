@@ -10,25 +10,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.idm.engine.delegate.event.impl;
+package org.flowable.engine.common.impl.event;
 
+import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.api.delegate.event.FlowableEventType;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * Class capable of dispatching events.
  * 
- * @author Tijs Rademakers
+ * @author Frederik Heremans
  */
-public class FlowableIdmEventDispatcherImpl implements FlowableEventDispatcher {
+public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
 
-    protected FlowableIdmEventSupport eventSupport;
+    protected FlowableEventSupport eventSupport;
     protected boolean enabled = true;
 
-    public FlowableIdmEventDispatcherImpl() {
-        eventSupport = new FlowableIdmEventSupport();
+    public FlowableEventDispatcherImpl() {
+        eventSupport = new FlowableEventSupport();
     }
 
     public void setEnabled(boolean enabled) {
@@ -59,6 +62,24 @@ public class FlowableIdmEventDispatcherImpl implements FlowableEventDispatcher {
         if (enabled) {
             eventSupport.dispatchEvent(event);
         }
+
+        CommandContext commandContext = Context.getCommandContext();
+        if (commandContext != null) {
+            AbstractEngineConfiguration engineConfiguration = commandContext.getCurrentEngineConfiguration();
+            if (engineConfiguration != null && engineConfiguration.getAdditionalEventDispatchActions() != null) {
+                for (EventDispatchAction eventDispatchAction : engineConfiguration.getAdditionalEventDispatchActions()) {
+                    eventDispatchAction.dispatchEvent(commandContext, eventSupport, event);
+                }
+            }
+        }
+    }
+
+    public FlowableEventSupport getEventSupport() {
+        return eventSupport;
+    }
+
+    public void setEventSupport(FlowableEventSupport eventSupport) {
+        this.eventSupport = eventSupport;
     }
 
 }

@@ -15,10 +15,8 @@ package org.flowable.engine.delegate.event.impl;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.FlowableEventType;
-import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.event.EventDispatchAction;
+import org.flowable.engine.common.impl.event.FlowableEventSupport;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
@@ -26,49 +24,10 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 
-/**
- * Class capable of dispatching events.
- * 
- * @author Frederik Heremans
- */
-public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
-
-    protected FlowableEventSupport eventSupport;
-    protected boolean enabled = true;
-
-    public FlowableEventDispatcherImpl() {
-        eventSupport = new FlowableEventSupport();
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
+public class BpmnModelEventDispatchAction implements EventDispatchAction {
 
     @Override
-    public void addEventListener(FlowableEventListener listenerToAdd) {
-        eventSupport.addEventListener(listenerToAdd);
-    }
-
-    @Override
-    public void addEventListener(FlowableEventListener listenerToAdd, FlowableEventType... types) {
-        eventSupport.addEventListener(listenerToAdd, types);
-    }
-
-    @Override
-    public void removeEventListener(FlowableEventListener listenerToRemove) {
-        eventSupport.removeEventListener(listenerToRemove);
-    }
-
-    @Override
-    public void dispatchEvent(FlowableEvent event) {
-        if (enabled) {
-            eventSupport.dispatchEvent(event);
-        }
-
+    public void dispatchEvent(CommandContext commandContext, FlowableEventSupport eventSupport, FlowableEvent event) {
         if (event.getType() == FlowableEngineEventType.ENTITY_DELETED && event instanceof FlowableEntityEvent) {
             FlowableEntityEvent entityEvent = (FlowableEntityEvent) event;
             if (entityEvent.getEntity() instanceof ProcessDefinition) {
@@ -78,16 +37,14 @@ public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
         }
 
         // Try getting hold of the Process definition, based on the process definition key, if a context is active
-        CommandContext commandContext = Context.getCommandContext();
         if (commandContext != null) {
             BpmnModel bpmnModel = extractBpmnModelFromEvent(event);
             if (bpmnModel != null) {
                 ((FlowableEventSupport) bpmnModel.getEventSupport()).dispatchEvent(event);
             }
         }
-
     }
-
+    
     /**
      * In case no process-context is active, this method attempts to extract a process-definition based on the event. In case it's an event related to an entity, this can be deducted by inspecting the
      * entity, without additional queries to the database.

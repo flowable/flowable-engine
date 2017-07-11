@@ -66,6 +66,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
+import org.flowable.engine.common.impl.event.FlowableEventDispatcherImpl;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -88,7 +89,7 @@ import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandlerFactory;
 import org.flowable.engine.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.delegate.event.impl.FlowableEventDispatcherImpl;
+import org.flowable.engine.delegate.event.impl.BpmnModelEventDispatchAction;
 import org.flowable.engine.form.AbstractFormType;
 import org.flowable.engine.impl.DynamicBpmnServiceImpl;
 import org.flowable.engine.impl.FormServiceImpl;
@@ -2082,6 +2083,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initEventDispatcher() {
         if (this.eventDispatcher == null) {
             this.eventDispatcher = new FlowableEventDispatcherImpl();
+        }
+        
+        if (this.additionalEventDispatchActions == null) {
+            this.additionalEventDispatchActions = new ArrayList<>();
+            this.additionalEventDispatchActions.add(new BpmnModelEventDispatchAction());
         }
 
         this.eventDispatcher.setEnabled(enableEventDispatcher);
