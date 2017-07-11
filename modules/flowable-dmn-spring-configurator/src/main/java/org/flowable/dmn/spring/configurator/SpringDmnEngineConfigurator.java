@@ -32,19 +32,16 @@ public class SpringDmnEngineConfigurator extends DmnEngineConfigurator {
     public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (dmnEngineConfiguration == null) {
             dmnEngineConfiguration = new SpringDmnEngineConfiguration();
-            initialiseCommonProperties(processEngineConfiguration, dmnEngineConfiguration, EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
         }
+        initialiseCommonProperties(processEngineConfiguration, dmnEngineConfiguration, EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
         dmnEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
 
-        DmnEngine dmnEngine = initDmnEngine();
-        processEngineConfiguration.setDmnEngineInitialized(true);
-        processEngineConfiguration.setDmnEngineRepositoryService(dmnEngine.getDmnRepositoryService());
-        processEngineConfiguration.setDmnEngineRuleService(dmnEngine.getDmnRuleService());
+        initDmnEngine();
     }
 
     protected synchronized DmnEngine initDmnEngine() {
         if (dmnEngineConfiguration == null) {
-            throw new FlowableException("DMnEngineConfiguration is required");
+            throw new FlowableException("DmnEngineConfiguration is required");
         }
 
         return dmnEngineConfiguration.buildDmnEngine();

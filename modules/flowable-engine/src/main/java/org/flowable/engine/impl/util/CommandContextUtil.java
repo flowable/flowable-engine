@@ -15,6 +15,12 @@ package org.flowable.engine.impl.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.content.api.ContentEngineConfigurationApi;
+import org.flowable.content.api.ContentService;
+import org.flowable.dmn.api.DmnEngineConfigurationApi;
+import org.flowable.dmn.api.DmnManagementService;
+import org.flowable.dmn.api.DmnRepositoryService;
+import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.context.Context;
@@ -54,6 +60,11 @@ import org.flowable.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.engine.impl.persistence.entity.TaskEntityManager;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntityManager;
 import org.flowable.engine.impl.persistence.entity.VariableInstanceEntityManager;
+import org.flowable.form.api.FormEngineConfigurationApi;
+import org.flowable.form.api.FormManagementService;
+import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.api.FormService;
+import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityManager;
 
@@ -72,12 +83,124 @@ public class CommandContextUtil {
         return null;
     }
     
+    // IDM ENGINE
+    
     public static IdmEngineConfiguration getIdmEngineConfiguration() {
         return (IdmEngineConfiguration) getIdmEngineConfiguration(getCommandContext());
     }
     
     public static IdmEngineConfiguration getIdmEngineConfiguration(CommandContext commandContext) {
         return (IdmEngineConfiguration) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+    }
+    
+    public static IdmIdentityService getIdmIdentityService() {
+        IdmIdentityService idmIdentityService = null;
+        IdmEngineConfiguration idmEngineConfiguration = getIdmEngineConfiguration();
+        if (idmEngineConfiguration != null) {
+            idmIdentityService = idmEngineConfiguration.getIdmIdentityService();
+        }
+        
+        return idmIdentityService;
+    }
+    
+    // DMN ENGINE
+    
+    public static DmnEngineConfigurationApi getDmnEngineConfiguration() {
+        return (DmnEngineConfigurationApi) getDmnEngineConfiguration(getCommandContext());
+    }
+    
+    public static DmnEngineConfigurationApi getDmnEngineConfiguration(CommandContext commandContext) {
+        return (DmnEngineConfigurationApi) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
+    }
+    
+    public static DmnRepositoryService getDmnRepositoryService() {
+        DmnRepositoryService dmnRepositoryService = null;
+        DmnEngineConfigurationApi dmnEngineConfiguration = getDmnEngineConfiguration();
+        if (dmnEngineConfiguration != null) {
+            dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
+        }
+        
+        return dmnRepositoryService;
+    }
+    
+    public static DmnRuleService getDmnRuleService() {
+        DmnRuleService dmnRuleService = null;
+        DmnEngineConfigurationApi dmnEngineConfiguration = getDmnEngineConfiguration();
+        if (dmnEngineConfiguration != null) {
+            dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
+        }
+        
+        return dmnRuleService;
+    }
+    
+    public static DmnManagementService getDmnManagementService() {
+        DmnManagementService dmnManagementService = null;
+        DmnEngineConfigurationApi dmnEngineConfiguration = getDmnEngineConfiguration();
+        if (dmnEngineConfiguration != null) {
+            dmnManagementService = dmnEngineConfiguration.getDmnManagementService();
+        }
+        
+        return dmnManagementService;
+    }
+    
+    // FORM ENGINE
+    
+    public static FormEngineConfigurationApi getFormEngineConfiguration() {
+        return (FormEngineConfigurationApi) getFormEngineConfiguration(getCommandContext());
+    }
+    
+    public static FormEngineConfigurationApi getFormEngineConfiguration(CommandContext commandContext) {
+        return (FormEngineConfigurationApi) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+    }
+    
+    public static FormRepositoryService getFormRepositoryService() {
+        FormRepositoryService formRepositoryService = null;
+        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration();
+        if (formEngineConfiguration != null) {
+            formRepositoryService = formEngineConfiguration.getFormRepositoryService();
+        }
+        
+        return formRepositoryService;
+    }
+    
+    public static FormService getFormService() {
+        FormService formService = null;
+        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration();
+        if (formEngineConfiguration != null) {
+            formService = formEngineConfiguration.getFormService();
+        }
+        
+        return formService;
+    }
+    
+    public static FormManagementService getFormManagementService() {
+        FormManagementService formManagementService = null;
+        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration();
+        if (formEngineConfiguration != null) {
+            formManagementService = formEngineConfiguration.getFormManagementService();
+        }
+        
+        return formManagementService;
+    }
+    
+    // CONTENT ENGINE
+    
+    public static ContentEngineConfigurationApi getContentEngineConfiguration() {
+        return (ContentEngineConfigurationApi) getContentEngineConfiguration(getCommandContext());
+    }
+    
+    public static ContentEngineConfigurationApi getContentEngineConfiguration(CommandContext commandContext) {
+        return (ContentEngineConfigurationApi) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG);
+    }
+    
+    public static ContentService getContentService() {
+        ContentService contentService = null;
+        ContentEngineConfigurationApi contentEngineConfiguration = getContentEngineConfiguration();
+        if (contentEngineConfiguration != null) {
+            contentService = contentEngineConfiguration.getContentService();
+        }
+        
+        return contentService;
     }
     
     public static FlowableEngineAgenda getAgenda() {

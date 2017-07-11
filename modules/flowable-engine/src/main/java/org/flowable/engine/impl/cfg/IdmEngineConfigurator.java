@@ -22,7 +22,6 @@ import org.flowable.engine.common.impl.db.CustomMybatisTypeAliasConfig;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.persistence.deploy.Deployer;
-import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
 import org.flowable.idm.engine.impl.db.EntityDependencyOrder;
@@ -67,12 +66,11 @@ public class IdmEngineConfigurator extends AbstractEngineConfigurator {
     public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (idmEngineConfiguration == null) {
             idmEngineConfiguration = new StandaloneIdmEngineConfiguration();
-            initialiseCommonProperties(processEngineConfiguration, idmEngineConfiguration, EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
         }
         
-        IdmEngine idmEngine = idmEngineConfiguration.buildIdmEngine();
-        processEngineConfiguration.setIdmEngineInitialized(true);
-        processEngineConfiguration.setIdmIdentityService(idmEngine.getIdmIdentityService());
+        initialiseCommonProperties(processEngineConfiguration, idmEngineConfiguration, EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+        
+        idmEngineConfiguration.buildIdmEngine();
     }
     
     @Override

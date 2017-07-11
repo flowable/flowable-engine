@@ -14,9 +14,6 @@ package org.flowable.engine.impl;
 
 import java.util.Map;
 
-import org.flowable.content.api.ContentService;
-import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
@@ -34,8 +31,6 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.form.api.FormRepositoryService;
-import org.flowable.idm.api.IdmIdentityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,12 +50,6 @@ public class ProcessEngineImpl implements ProcessEngine {
     protected FormService formService;
     protected ManagementService managementService;
     protected DynamicBpmnService dynamicBpmnService;
-    protected FormRepositoryService formEngineRepositoryService;
-    protected org.flowable.form.api.FormService formEngineFormService;
-    protected DmnRepositoryService dmnRepositoryService;
-    protected DmnRuleService dmnRuleService;
-    protected IdmIdentityService idmIdentityService;
-    protected ContentService contentService;
     protected AsyncExecutor asyncExecutor;
     protected AsyncExecutor asyncHistoryExecutor;
     protected CommandExecutor commandExecutor;
@@ -84,12 +73,6 @@ public class ProcessEngineImpl implements ProcessEngine {
         this.commandExecutor = processEngineConfiguration.getCommandExecutor();
         this.sessionFactories = processEngineConfiguration.getSessionFactories();
         this.transactionContextFactory = processEngineConfiguration.getTransactionContextFactory();
-        this.formEngineRepositoryService = processEngineConfiguration.getFormEngineRepositoryService();
-        this.formEngineFormService = processEngineConfiguration.getFormEngineFormService();
-        this.dmnRepositoryService = processEngineConfiguration.getDmnEngineRepositoryService();
-        this.dmnRuleService = processEngineConfiguration.getDmnEngineRuleService();
-        this.idmIdentityService = processEngineConfiguration.getIdmIdentityService();
-        this.contentService = processEngineConfiguration.getContentService();
 
         if (processEngineConfiguration.isUsingRelationalDatabase() && processEngineConfiguration.getDatabaseSchemaUpdate() != null) {
             commandExecutor.execute(processEngineConfiguration.getSchemaCommandConfig(), new SchemaOperationsProcessEngineBuild());
@@ -179,29 +162,5 @@ public class ProcessEngineImpl implements ProcessEngine {
 
     public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
         return processEngineConfiguration;
-    }
-
-    public FormRepositoryService getFormEngineRepositoryService() {
-        return formEngineRepositoryService;
-    }
-
-    public org.flowable.form.api.FormService getFormEngineFormService() {
-        return formEngineFormService;
-    }
-
-    public DmnRepositoryService getDmnRepositoryService() {
-        return dmnRepositoryService;
-    }
-
-    public DmnRuleService getDmnRuleService() {
-        return dmnRuleService;
-    }
-
-    public IdmIdentityService getIdmIdentityService() {
-        return idmIdentityService;
-    }
-
-    public ContentService getContentService() {
-        return contentService;
     }
 }

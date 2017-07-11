@@ -16,6 +16,7 @@ import org.flowable.engine.cfg.AbstractProcessEngineConfigurator;
 import org.flowable.engine.cfg.ProcessEngineConfigurator;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.util.EngineServiceUtil;
 
 /**
  * A {@link ProcessEngineConfigurator} that integrates a LDAP system with the Flowable process engine. The LDAP system will be consulted primarily for getting user information and in particular for
@@ -53,7 +54,8 @@ public class LDAPConfigurator extends AbstractProcessEngineConfigurator {
             }
         }
 
-        processEngineConfiguration.setIdmIdentityService(new LDAPIdentityServiceImpl(ldapConfiguration, ldapGroupCache));
+        EngineServiceUtil.getIdmEngineConfiguration(processEngineConfiguration)
+                .setIdmIdentityService(new LDAPIdentityServiceImpl(ldapConfiguration, ldapGroupCache));
     }
 
     // Getters and Setters //////////////////////////////////////////////////

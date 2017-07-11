@@ -44,7 +44,7 @@ public class DmnDeployer implements Deployer {
             if (resourceName.endsWith(".dmn")) {
                 LOGGER.info("DmnDeployer: processing resource {}", resourceName);
                 if (dmnDeploymentBuilder == null) {
-                    DmnRepositoryService dmnRepositoryService = CommandContextUtil.getProcessEngineConfiguration().getDmnEngineRepositoryService();
+                    DmnRepositoryService dmnRepositoryService = CommandContextUtil.getDmnRepositoryService();
                     dmnDeploymentBuilder = dmnRepositoryService.createDeployment();
                 }
 

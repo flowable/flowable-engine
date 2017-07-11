@@ -32,14 +32,11 @@ public class SpringFormEngineConfigurator extends FormEngineConfigurator {
     public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (formEngineConfiguration == null) {
             formEngineConfiguration = new SpringFormEngineConfiguration();
-            initialiseCommonProperties(processEngineConfiguration, formEngineConfiguration, EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
         }
+        initialiseCommonProperties(processEngineConfiguration, formEngineConfiguration, EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
         formEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
 
-        FormEngine formEngine = initFormEngine();
-        processEngineConfiguration.setFormEngineInitialized(true);
-        processEngineConfiguration.setFormEngineRepositoryService(formEngine.getFormRepositoryService());
-        processEngineConfiguration.setFormEngineFormService(formEngine.getFormService());
+        initFormEngine();
     }
 
     protected synchronized FormEngine initFormEngine() {

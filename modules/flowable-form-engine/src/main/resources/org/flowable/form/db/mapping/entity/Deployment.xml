@@ -114,7 +114,7 @@
   <!-- mysql specific -->
   <select id="selectFormDeploymentCountByQueryCriteria" databaseId="mysql" parameterType="org.flowable.form.engine.impl.FormDeploymentQueryImpl" resultType="long">
     select distinct count(RES.ID_)
-    <include refid="selectDeploymentsByQueryCriteriaSql"/>
+    <include refid="selectFormDeploymentsByQueryCriteriaSql"/>
   </select>
 
   <select id="selectFormDeploymentByNativeQuery" parameterType="java.util.Map" resultMap="formDeploymentResultMap">

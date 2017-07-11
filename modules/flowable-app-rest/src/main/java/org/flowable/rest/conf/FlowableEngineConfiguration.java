@@ -2,8 +2,10 @@ package org.flowable.rest.conf;
 
 import javax.sql.DataSource;
 
+import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.spring.configurator.SpringContentEngineConfigurator;
+import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator;
@@ -12,10 +14,13 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.util.EngineServiceUtil;
+import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.spring.configurator.SpringFormEngineConfigurator;
 import org.flowable.spring.ProcessEngineFactoryBean;
@@ -58,6 +63,24 @@ public class FlowableEngineConfiguration {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    @Bean(name = "dmnEngineConfiguration")
+    public DmnEngineConfigurationApi dmnEngineConfiguration() {
+        ProcessEngineConfiguration processEngineConfiguration = processEngine().getProcessEngineConfiguration();
+        return EngineServiceUtil.getDmnEngineConfiguration(processEngineConfiguration);
+    }
+    
+    @Bean(name = "formEngineConfiguration")
+    public FormEngineConfigurationApi formEngineConfiguration() {
+        ProcessEngineConfiguration processEngineConfiguration = processEngine().getProcessEngineConfiguration();
+        return EngineServiceUtil.getFormEngineConfiguration(processEngineConfiguration);
+    }
+    
+    @Bean(name = "contentEngineConfiguration")
+    public ContentEngineConfigurationApi contentEngineConfiguration() {
+        ProcessEngineConfiguration processEngineConfiguration = processEngine().getProcessEngineConfiguration();
+        return EngineServiceUtil.getContentEngineConfiguration(processEngineConfiguration);
     }
 
     @Bean(name = "processEngineConfiguration")
@@ -113,26 +136,26 @@ public class FlowableEngineConfiguration {
 
     @Bean
     public FormRepositoryService formRepositoryService() {
-        return processEngine().getFormEngineRepositoryService();
+        return formEngineConfiguration().getFormRepositoryService();
     }
 
     @Bean
     public org.flowable.form.api.FormService formEngineFormService() {
-        return processEngine().getFormEngineFormService();
+        return formEngineConfiguration().getFormService();
     }
 
     @Bean
     public DmnRepositoryService dmnRepositoryService() {
-        return processEngine().getDmnRepositoryService();
+        return dmnEngineConfiguration().getDmnRepositoryService();
     }
 
     @Bean
     public DmnRuleService dmnRuleService() {
-        return processEngine().getDmnRuleService();
+        return dmnEngineConfiguration().getDmnRuleService();
     }
 
     @Bean
     public ContentService contentService() {
-        return processEngine().getContentService();
+        return contentEngineConfiguration().getContentService();
     }
 }

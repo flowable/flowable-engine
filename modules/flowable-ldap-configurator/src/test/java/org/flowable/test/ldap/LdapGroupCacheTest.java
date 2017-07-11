@@ -14,10 +14,11 @@ package org.flowable.test.ldap;
 
 import java.util.Date;
 
+import org.flowable.engine.impl.util.EngineServiceUtil;
 import org.flowable.engine.test.Deployment;
 import org.flowable.ldap.LDAPGroupCache;
-import org.flowable.ldap.LDAPIdentityServiceImpl;
 import org.flowable.ldap.LDAPGroupCache.LDAPGroupCacheListener;
+import org.flowable.ldap.LDAPIdentityServiceImpl;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration("classpath:flowable-context-ldap-group-cache.xml")
@@ -30,7 +31,8 @@ public class LdapGroupCacheTest extends LDAPTestCase {
         super.setUp();
 
         // Set test cache listener
-        LDAPGroupCache ldapGroupCache = ((LDAPIdentityServiceImpl) processEngineConfiguration.getIdmIdentityService()).getLdapGroupCache();
+        LDAPGroupCache ldapGroupCache = ((LDAPIdentityServiceImpl) 
+                        EngineServiceUtil.getIdmIdentityService(processEngineConfiguration)).getLdapGroupCache();
         ldapGroupCache.clear();
 
         cacheListener = new TestLDAPGroupCacheListener();

@@ -37,6 +37,7 @@ import org.flowable.engine.common.impl.persistence.GenericManagerFactory;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
@@ -89,7 +90,7 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
-public class FormEngineConfiguration extends AbstractEngineConfiguration {
+public class FormEngineConfiguration extends AbstractEngineConfiguration implements FormEngineConfigurationApi {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(FormEngineConfiguration.class);
 

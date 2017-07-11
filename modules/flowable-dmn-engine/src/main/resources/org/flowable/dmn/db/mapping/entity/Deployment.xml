@@ -120,7 +120,7 @@
   <!-- mysql specific -->
   <select id="selectDmnDeploymentCountByQueryCriteria" databaseId="mysql" parameterType="org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl" resultType="long">
     select distinct count(RES.ID_)
-    <include refid="selectDeploymentsByQueryCriteriaSql"/>
+    <include refid="selectDmnDeploymentsByQueryCriteriaSql"/>
   </select>
 
   <select id="selectDmnDeploymentByNativeQuery" parameterType="java.util.Map" resultMap="deploymentResultMap">

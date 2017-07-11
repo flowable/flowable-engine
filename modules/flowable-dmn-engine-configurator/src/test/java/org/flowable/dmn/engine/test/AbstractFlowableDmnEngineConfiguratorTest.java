@@ -12,7 +12,6 @@
  */
 package org.flowable.dmn.engine.test;
 
-import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.test.FlowableRule;
@@ -31,7 +30,6 @@ public class AbstractFlowableDmnEngineConfiguratorTest {
 
     protected static ProcessEngine cachedProcessEngine;
     protected RepositoryService repositoryService;
-    protected DmnRepositoryService dmnRepositoryService;
 
     @Before
     public void initProcessEngine() {
@@ -40,7 +38,6 @@ public class AbstractFlowableDmnEngineConfiguratorTest {
         }
 
         this.repositoryService = cachedProcessEngine.getRepositoryService();
-        this.dmnRepositoryService = cachedProcessEngine.getDmnRepositoryService();
     }
 
 }

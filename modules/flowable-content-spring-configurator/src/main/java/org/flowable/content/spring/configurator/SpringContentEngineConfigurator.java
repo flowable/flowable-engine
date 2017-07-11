@@ -32,13 +32,11 @@ public class SpringContentEngineConfigurator extends ContentEngineConfigurator {
     public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (contentEngineConfiguration == null) {
             contentEngineConfiguration = new SpringContentEngineConfiguration();
-            initialiseCommonProperties(processEngineConfiguration, contentEngineConfiguration, EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG);
         }
+        initialiseCommonProperties(processEngineConfiguration, contentEngineConfiguration, EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG);
         contentEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
         
-        ContentEngine contentEngine = initContentEngine();
-        processEngineConfiguration.setContentEngineInitialized(true);
-        processEngineConfiguration.setContentService(contentEngine.getContentService());
+        initContentEngine();
     }
 
     protected synchronized ContentEngine initContentEngine() {

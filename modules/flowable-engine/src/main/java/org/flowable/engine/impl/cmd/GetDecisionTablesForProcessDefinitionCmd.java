@@ -58,15 +58,11 @@ public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<Dm
             throw new FlowableObjectNotFoundException("Cannot find bpmn model for process definition id: " + processDefinitionId, BpmnModel.class);
         }
 
-        if (!CommandContextUtil.getProcessEngineConfiguration(commandContext).isDmnEngineInitialized()) {
-            throw new FlowableException("DMN Engine is not initialized");
-        } else {
-            if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getDmnEngineRepositoryService() == null) {
-                throw new FlowableException("DMN repository service is not available");
-            }
+        if (CommandContextUtil.getDmnRepositoryService() == null) {
+            throw new FlowableException("DMN repository service is not available");
         }
 
-        dmnRepositoryService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDmnEngineRepositoryService();
+        dmnRepositoryService = CommandContextUtil.getDmnRepositoryService();
         List<DmnDecisionTable> decisionTables = getDecisionTablesFromModel(bpmnModel, processDefinition);
 
         return decisionTables;

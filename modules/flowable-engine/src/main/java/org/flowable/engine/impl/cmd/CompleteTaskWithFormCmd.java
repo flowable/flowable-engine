@@ -23,7 +23,6 @@ import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.TaskHelper;
@@ -67,17 +66,16 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     protected Void execute(CommandContext commandContext, TaskEntity task) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        if (!processEngineConfiguration.isFormEngineInitialized()) {
+        FormService formService = CommandContextUtil.getFormService();
+        if (formService == null) {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }
 
-        FormRepositoryService formRepositoryService = processEngineConfiguration.getFormEngineRepositoryService();
+        FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService();
         FormModel formModel = formRepositoryService.getFormModelById(formDefinitionId);
 
         if (formModel != null) {
             // Extract raw variables and complete the task
-            FormService formService = processEngineConfiguration.getFormEngineFormService();
             Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formModel, variables, outcome);
 
             formService.saveFormInstance(formVariables, formModel, task.getId(), task.getProcessInstanceId());
@@ -89,6 +87,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         } else {
             TaskHelper.completeTask(task, variables, transientVariables, localScope, commandContext);
         }
+        
         return null;
     }
 
@@ -97,8 +96,8 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
      * content so we can retrieve it later.
      */
     protected void processUploadFieldsIfNeeded(FormModel formModel, TaskEntity task, CommandContext commandContext) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        if (!processEngineConfiguration.isContentEngineInitialized()) {
+        ContentService contentService = CommandContextUtil.getContentService();
+        if (contentService == null) {
             return;
         }
 
@@ -114,7 +113,6 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
                             Set<String> contentItemIdSet = new HashSet<>();
                             Collections.addAll(contentItemIdSet, contentItemIds);
 
-                            ContentService contentService = processEngineConfiguration.getContentService();
                             List<ContentItem> contentItems = contentService.createContentItemQuery().ids(contentItemIdSet).list();
 
                             for (ContentItem contentItem : contentItems) {

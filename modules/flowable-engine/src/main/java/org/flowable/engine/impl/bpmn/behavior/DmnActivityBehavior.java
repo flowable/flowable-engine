@@ -87,7 +87,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
         ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(execution.getProcessDefinitionId());
 
-        DmnRuleService ruleService = processEngineConfiguration.getDmnEngineRuleService();
+        DmnRuleService ruleService = CommandContextUtil.getDmnRuleService();
 
         List<Map<String, Object>> executionResult = ruleService.executeDecisionByKeyParentDeploymentIdAndTenantId(finaldecisionTableKeyValue,
                 processDefinition.getDeploymentId(), execution.getVariables(), execution.getTenantId());
@@ -101,7 +101,6 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         if (executionResult == null || executionResult.isEmpty()) {
             return;
         }
-        //TODO: make pluggable
 
         // multiple rule results
         // put on execution as JSON array; each entry contains output id (key) and output value (value)

@@ -53,7 +53,6 @@ public class DefaultProcessEngineFactory {
 
         copyJdbcConfig(flowable6Configuration, flowable5Configuration);
         copyHistoryConfig(flowable6Configuration, flowable5Configuration);
-        copyIdentityConfig(flowable6Configuration, flowable5Configuration);
         copyMailConfig(flowable6Configuration, flowable5Configuration);
         copyDiagramConfig(flowable6Configuration, flowable5Configuration);
         copyAsyncExecutorConfig(flowable6Configuration, flowable5Configuration);
@@ -102,11 +101,6 @@ public class DefaultProcessEngineFactory {
 
     protected void copyHistoryConfig(ProcessEngineConfigurationImpl flowable6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl flowable5Configuration) {
         flowable5Configuration.setHistoryLevel(HistoryLevel.getHistoryLevelForKey(flowable6Configuration.getHistoryLevel().getKey()));
-    }
-
-    protected void copyIdentityConfig(ProcessEngineConfigurationImpl flowable6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl flowable5Configuration) {
-        flowable5Configuration.setIdmEngineInitialized(flowable6Configuration.isIdmEngineInitialized());
-        flowable5Configuration.setIdmIdentityService(flowable6Configuration.getIdmIdentityService());
     }
 
     protected void copyDiagramConfig(ProcessEngineConfigurationImpl flowable6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl flowable5Configuration) {

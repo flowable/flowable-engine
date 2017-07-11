@@ -44,7 +44,7 @@ public class FormDeployer implements Deployer {
             if (resourceName.endsWith(".form")) {
                 LOGGER.info("FormDeployer: processing resource {}", resourceName);
                 if (formDeploymentBuilder == null) {
-                    FormRepositoryService formRepositoryService = CommandContextUtil.getProcessEngineConfiguration().getFormEngineRepositoryService();
+                    FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService();
                     formDeploymentBuilder = formRepositoryService.createDeployment();
                 }
 

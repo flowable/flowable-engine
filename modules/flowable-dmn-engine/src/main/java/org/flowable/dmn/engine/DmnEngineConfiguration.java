@@ -26,6 +26,7 @@ import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
+import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
@@ -100,7 +101,7 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
-public class DmnEngineConfiguration extends AbstractEngineConfiguration {
+public class DmnEngineConfiguration extends AbstractEngineConfiguration implements DmnEngineConfigurationApi {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(DmnEngineConfiguration.class);
 

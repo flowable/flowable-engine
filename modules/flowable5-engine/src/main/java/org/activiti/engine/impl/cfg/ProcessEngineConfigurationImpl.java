@@ -13,8 +13,6 @@
 
 package org.activiti.engine.impl.cfg;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -233,12 +231,13 @@ import org.flowable.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.variable.VariableType;
 import org.flowable.engine.impl.variable.VariableTypes;
-import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tom Baeyens
@@ -267,8 +266,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected DynamicBpmnService dynamicBpmnService = new DynamicBpmnServiceImpl(this);
 
     // IDM ENGINE SERVICES /////////////////////////////////////////////////////
-    protected boolean idmEngineInitialized;
-    protected IdmIdentityService idmIdentityService;
     protected FlowableEventDispatcher idmEventDispatcher;
 
     // COMMAND EXECUTORS ////////////////////////////////////////////////////////
@@ -1636,24 +1633,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public ProcessEngineConfiguration getProcessEngineConfiguration() {
-        return this;
-    }
-
-    public boolean isIdmEngineInitialized() {
-        return idmEngineInitialized;
-    }
-
-    public ProcessEngineConfigurationImpl setIdmEngineInitialized(boolean idmEngineInitialized) {
-        this.idmEngineInitialized = idmEngineInitialized;
-        return this;
-    }
-
-    public IdmIdentityService getIdmIdentityService() {
-        return idmIdentityService;
-    }
-
-    public ProcessEngineConfigurationImpl setIdmIdentityService(IdmIdentityService idmIdentityService) {
-        this.idmIdentityService = idmIdentityService;
         return this;
     }
 

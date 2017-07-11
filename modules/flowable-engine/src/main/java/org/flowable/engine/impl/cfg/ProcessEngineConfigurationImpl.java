@@ -42,9 +42,6 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.JdbcType;
-import org.flowable.content.api.ContentService;
-import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.CandidateManager;
 import org.flowable.engine.DefaultCandidateManager;
 import org.flowable.engine.DynamicBpmnService;
@@ -358,8 +355,6 @@ import org.flowable.engine.impl.variable.UUIDType;
 import org.flowable.engine.impl.variable.VariableType;
 import org.flowable.engine.impl.variable.VariableTypes;
 import org.flowable.engine.parse.BpmnParseHandler;
-import org.flowable.form.api.FormRepositoryService;
-import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
@@ -394,24 +389,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected ManagementService managementService = new ManagementServiceImpl();
     protected DynamicBpmnService dynamicBpmnService = new DynamicBpmnServiceImpl(this);
 
-    // IDM ENGINE SERVICES /////////////////////////////////////////////////////
+    // IDM ENGINE /////////////////////////////////////////////////////
     protected boolean disableIdmEngine;
-    protected boolean idmEngineInitialized;
-    protected IdmIdentityService idmIdentityService;
-
-    // FORM ENGINE SERVICES /////////////////////////////////////////////////////
-    protected boolean formEngineInitialized;
-    protected FormRepositoryService formEngineRepositoryService;
-    protected org.flowable.form.api.FormService formEngineFormService;
-
-    // DMN ENGINE SERVICES /////////////////////////////////////////////////////
-    protected boolean dmnEngineInitialized;
-    protected DmnRepositoryService dmnEngineRepositoryService;
-    protected DmnRuleService dmnEngineRuleService;
-
-    // CONTENT ENGINE SERVICES /////////////////////////////////////////////////////
-    protected boolean contentEngineInitialized;
-    protected ContentService contentService;
 
     // DATA MANAGERS /////////////////////////////////////////////////////////////
 
@@ -2336,96 +2315,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setDisableIdmEngine(boolean disableIdmEngine) {
         this.disableIdmEngine = disableIdmEngine;
-        return this;
-    }
-
-    public boolean isIdmEngineInitialized() {
-        return idmEngineInitialized;
-    }
-
-    public ProcessEngineConfigurationImpl setIdmEngineInitialized(boolean idmEngineInitialized) {
-        this.idmEngineInitialized = idmEngineInitialized;
-        return this;
-    }
-
-    public IdmIdentityService getIdmIdentityService() {
-        return idmIdentityService;
-    }
-
-    public ProcessEngineConfigurationImpl setIdmIdentityService(IdmIdentityService idmIdentityService) {
-        this.idmIdentityService = idmIdentityService;
-        return this;
-    }
-
-    public boolean isFormEngineInitialized() {
-        return formEngineInitialized;
-    }
-
-    public ProcessEngineConfigurationImpl setFormEngineInitialized(boolean formEngineInitialized) {
-        this.formEngineInitialized = formEngineInitialized;
-        return this;
-    }
-
-    public FormRepositoryService getFormEngineRepositoryService() {
-        return formEngineRepositoryService;
-    }
-
-    public ProcessEngineConfigurationImpl setFormEngineRepositoryService(FormRepositoryService formEngineRepositoryService) {
-        this.formEngineRepositoryService = formEngineRepositoryService;
-        return this;
-    }
-
-    public org.flowable.form.api.FormService getFormEngineFormService() {
-        return formEngineFormService;
-    }
-
-    public ProcessEngineConfigurationImpl setFormEngineFormService(org.flowable.form.api.FormService formEngineFormService) {
-        this.formEngineFormService = formEngineFormService;
-        return this;
-    }
-
-    public boolean isDmnEngineInitialized() {
-        return dmnEngineInitialized;
-    }
-
-    public ProcessEngineConfigurationImpl setDmnEngineInitialized(boolean dmnEngineInitialized) {
-        this.dmnEngineInitialized = dmnEngineInitialized;
-        return this;
-    }
-
-    public DmnRepositoryService getDmnEngineRepositoryService() {
-        return dmnEngineRepositoryService;
-    }
-
-    public ProcessEngineConfigurationImpl setDmnEngineRepositoryService(DmnRepositoryService dmnEngineRepositoryService) {
-        this.dmnEngineRepositoryService = dmnEngineRepositoryService;
-        return this;
-    }
-
-    public DmnRuleService getDmnEngineRuleService() {
-        return dmnEngineRuleService;
-    }
-
-    public ProcessEngineConfigurationImpl setDmnEngineRuleService(DmnRuleService dmnEngineRuleService) {
-        this.dmnEngineRuleService = dmnEngineRuleService;
-        return this;
-    }
-
-    public boolean isContentEngineInitialized() {
-        return contentEngineInitialized;
-    }
-
-    public ProcessEngineConfigurationImpl setContentEngineInitialized(boolean contentEngineInitialized) {
-        this.contentEngineInitialized = contentEngineInitialized;
-        return this;
-    }
-
-    public ContentService getContentService() {
-        return contentService;
-    }
-
-    public ProcessEngineConfigurationImpl setContentService(ContentService contentService) {
-        this.contentService = contentService;
         return this;
     }
 

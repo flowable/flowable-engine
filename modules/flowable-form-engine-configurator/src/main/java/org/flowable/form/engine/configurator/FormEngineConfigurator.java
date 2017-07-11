@@ -72,13 +72,11 @@ public class FormEngineConfigurator extends AbstractEngineConfigurator {
     public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (formEngineConfiguration == null) {
             formEngineConfiguration = new StandaloneFormEngineConfiguration();
-            initialiseCommonProperties(processEngineConfiguration, formEngineConfiguration, EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
         }
+        
+        initialiseCommonProperties(processEngineConfiguration, formEngineConfiguration, EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
 
-        FormEngine formEngine = initFormEngine();
-        processEngineConfiguration.setFormEngineInitialized(true);
-        processEngineConfiguration.setFormEngineRepositoryService(formEngine.getFormRepositoryService());
-        processEngineConfiguration.setFormEngineFormService(formEngine.getFormService());
+        initFormEngine();
     }
     
     @Override

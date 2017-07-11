@@ -52,12 +52,11 @@ public class ContentEngineConfigurator extends AbstractEngineConfigurator {
     public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (contentEngineConfiguration == null) {
             contentEngineConfiguration = new StandaloneContentEngineConfiguration();
-            initialiseCommonProperties(processEngineConfiguration, contentEngineConfiguration, EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG);
         }
+        
+        initialiseCommonProperties(processEngineConfiguration, contentEngineConfiguration, EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG);
 
-        ContentEngine contentEngine = initContentEngine();
-        processEngineConfiguration.setContentEngineInitialized(true);
-        processEngineConfiguration.setContentService(contentEngine.getContentService());
+        initContentEngine();
     }
     
     @Override

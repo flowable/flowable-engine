@@ -56,13 +56,11 @@ public class DmnEngineConfigurator extends AbstractEngineConfigurator {
     public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (dmnEngineConfiguration == null) {
             dmnEngineConfiguration = new StandaloneInMemDmnEngineConfiguration();
-            initialiseCommonProperties(processEngineConfiguration, dmnEngineConfiguration, EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
         }
+        
+        initialiseCommonProperties(processEngineConfiguration, dmnEngineConfiguration, EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
 
-        DmnEngine dmnEngine = initDmnEngine();
-        processEngineConfiguration.setDmnEngineInitialized(true);
-        processEngineConfiguration.setDmnEngineRepositoryService(dmnEngine.getDmnRepositoryService());
-        processEngineConfiguration.setDmnEngineRuleService(dmnEngine.getDmnRuleService());
+        initDmnEngine();
     }
     
     @Override
