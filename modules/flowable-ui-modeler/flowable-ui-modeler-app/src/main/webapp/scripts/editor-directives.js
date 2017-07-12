@@ -126,7 +126,7 @@ angular.module('flowableModeler').directive('formBuilderElement', ['$rootScope',
             };
 
             $scope.openFieldPopover = function () {
-
+            
                 // Storing original values. In case the changes would trigger a layout change
                 var originalFormElementType = $scope.formElement.type;
                 var originalDisplayFieldType = undefined;
@@ -167,12 +167,26 @@ angular.module('flowableModeler').directive('formBuilderElement', ['$rootScope',
             };
 
             $scope.formElementNameChanged = function (field) {
+                var map={"â":"a","Â":"A","à":"a","À":"A","á":"a","Á":"A","ã":"a","Ã":"A","ê":"e","Ê":"E","è":"e","È":"E","é":"e","É":"E","î":"i","Î":"I","ì":"i","Ì":"I","í":"i","Í":"I","õ":"o","Õ":"O","ô":"o","Ô":"O","ò":"o","Ò":"O","ó":"o","Ó":"O","ü":"u","Ü":"U","û":"u","Û":"U","ú":"u","Ú":"U","ù":"u","Ù":"U","ç":"c","Ç":"C"};
+                var removeExpecialChars = function(s) { return s.replace(/[\W\[\] ]/g,function(a){return map[a]||a}) };
+                var regex = /__/g;
                 if (!field.overrideId) {
                     var fieldId;
                     if (field.name && field.name.length > 0) {
+                        console.log(field.name.toLowerCase().split());
                         fieldId = field.name.toLowerCase();
-                        fieldId = fieldId.replace(new RegExp(' ', 'g'), '');
-                        fieldId = fieldId.replace(/[&\/\\#,+~%.'":*?!<>{}()$@;]/g, '');
+                        fieldId = fieldId.replace(/^\d+/, '');
+                        fieldId = fieldId.replace(new RegExp('_+', 'g'), '');
+                        fieldId = removeExpecialChars(fieldId);
+                        fieldId = fieldId.replace(new RegExp(' +', 'g'), '_');
+                        fieldId = fieldId.replace(/[&\/\\#,+~%.'":*?!<>{}()$@;\[\]=]/g, '');
+                        fieldId = fieldId.replace(/[\W\[\] ]/g, function(a) {return map[a]||a});
+                        fieldId = fieldId.replace(/_[a-zA-Z]/g, function(a) {return a.replace("_", "").toUpperCase();});
+
+                        while((found = regex.exec(fieldId)) != null) {
+                          fieldId = fieldId.replace("__", "_");
+                        }
+                        console.log(fieldId.split());
                     } else {
                         var index = 1;
                         if (field.layout) {
