@@ -50,7 +50,7 @@
     <property name="asyncHistoryEnabled" value="false" />
     
     <property name="enableProcessDefinitionInfoCache" value="true" />
-    <property name="passwordEncoder" ref="passwordEncoder"/>
+    
   </bean>
   
   <bean id="asyncExecutor" class="org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor">
@@ -60,9 +60,5 @@
     
   <bean id="throwCustomExceptionBean" class="org.flowable.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionBean" />
   <bean id="throwCustomExceptionDelegate" class="org.flowable.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionDelegate" />
-
-  <bean id="passwordEncoder" class="org.flowable.idm.engine.impl.authentication.ApacheDigester">
-    <constructor-arg value="MD5"/>
-  </bean>
 
 </beans>

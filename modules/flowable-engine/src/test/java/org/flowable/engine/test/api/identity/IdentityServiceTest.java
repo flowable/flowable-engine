@@ -13,6 +13,9 @@
 
 package org.flowable.engine.test.api.identity;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
@@ -20,9 +23,10 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.User;
-
-import java.util.Arrays;
-import java.util.List;
+import org.flowable.idm.engine.IdmEngineConfiguration;
+import org.flowable.idm.engine.IdmEngines;
+import org.flowable.idm.engine.impl.authentication.ApacheDigester;
+import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
 
 /**
  * @author Frederik Heremans
@@ -338,33 +342,37 @@ public class IdentityServiceTest extends PluggableFlowableTestCase {
 
     public void testChangePassword() {
 
-        //passwordEncoder and salt are required to be configure during initializeProcessEngine,
-        //flowable-engine module is not able to access IdmEngineConfigurator after the initialization
-        //processEngineConfiguration.setPasswordEncoder(new ApacheDigester(ApacheDigester.Digester.MD5));
+        IdmEngineConfiguration idmEngineConfiguration = IdmEngines.getDefaultIdmEngine().getIdmEngineConfiguration();
+        idmEngineConfiguration.setPasswordEncoder(new ApacheDigester(ApacheDigester.Digester.MD5));
 
-        User user = identityService.newUser("johndoe");
-        user.setPassword("xxx");
-        identityService.saveUser(user);
-
-        user = identityService.createUserQuery().userId("johndoe").list().get(0);
-        user.setFirstName("John Doe");
-        identityService.saveUser(user);
-        User johndoe = identityService.createUserQuery().userId("johndoe").list().get(0);
-        assertFalse(johndoe.getPassword().equals("xxx"));
-        assertTrue(johndoe.getFirstName().equals("John Doe"));
-        assertTrue(identityService.checkPassword("johndoe", "xxx"));
-
-        user = identityService.createUserQuery().userId("johndoe").list().get(0);
-        user.setPassword("yyy");
-        identityService.saveUser(user);
-        assertTrue(identityService.checkPassword("johndoe", "xxx"));
-
-        user = identityService.createUserQuery().userId("johndoe").list().get(0);
-        user.setPassword("yyy");
-        identityService.updateUserPassword(user);
-        assertTrue(identityService.checkPassword("johndoe", "yyy"));
-
-        identityService.deleteUser("johndoe");
+        try {
+            User user = identityService.newUser("johndoe");
+            user.setPassword("xxx");
+            identityService.saveUser(user);
+    
+            user = identityService.createUserQuery().userId("johndoe").list().get(0);
+            user.setFirstName("John Doe");
+            identityService.saveUser(user);
+            User johndoe = identityService.createUserQuery().userId("johndoe").list().get(0);
+            assertFalse(johndoe.getPassword().equals("xxx"));
+            assertTrue(johndoe.getFirstName().equals("John Doe"));
+            assertTrue(identityService.checkPassword("johndoe", "xxx"));
+    
+            user = identityService.createUserQuery().userId("johndoe").list().get(0);
+            user.setPassword("yyy");
+            identityService.saveUser(user);
+            assertTrue(identityService.checkPassword("johndoe", "xxx"));
+    
+            user = identityService.createUserQuery().userId("johndoe").list().get(0);
+            user.setPassword("yyy");
+            identityService.updateUserPassword(user);
+            assertTrue(identityService.checkPassword("johndoe", "yyy"));
+    
+            identityService.deleteUser("johndoe");
+            
+        } finally {
+            idmEngineConfiguration.setPasswordEncoder(ClearTextPasswordEncoder.getInstance());
+        }
     }
 
     public void testUserOptimisticLockingException() {
