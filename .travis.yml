@@ -15,7 +15,7 @@ notifications:
     on_start: never     # options: [always|never|change] default: always
 
 script:
-  mvn test -B
+  mvn test -PinfoLogging -B
 
 after_failure:
   - cat /home/travis/build/flowable/flowable-engine/modules/*/target/surefire-reports/*.txt
