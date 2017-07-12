@@ -1350,7 +1350,7 @@
         </profile>
         
         <profile>
-            <id>infoLogging</id>
+            <id>errorLogging</id>
             <build>
                 <plugins>
                     <plugin>
@@ -1367,7 +1367,7 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <echo message="updating log4j configuration to info logging" />
+                                        <echo message="updating log4j configuration to error logging" />
                                         <copy file="${basedir}/../../qa/logging/log4j.properties" todir="target/test-classes" overwrite="true" />
                                     </tasks>
                                 </configuration>
