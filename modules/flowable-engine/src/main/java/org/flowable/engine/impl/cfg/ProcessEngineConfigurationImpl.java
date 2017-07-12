@@ -354,6 +354,8 @@ import org.flowable.engine.impl.variable.VariableTypes;
 import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.api.PasswordEncoder;
+import org.flowable.idm.api.PasswordSalt;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
@@ -392,6 +394,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected boolean disableIdmEngine;
     protected boolean idmEngineInitialized;
     protected IdmIdentityService idmIdentityService;
+    
+    // PASSWORD CONFIG FOR IDM IDENTITY SERVICES /////////////////////////////////////////////////////
+    protected PasswordEncoder passwordEncoder;
+    protected PasswordSalt passwordSalt;
 
     // FORM ENGINE SERVICES /////////////////////////////////////////////////////
     protected boolean formEngineInitialized;
@@ -4133,4 +4139,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.asyncHistoryExecutorMessageQueueMode = asyncHistoryExecutorMessageQueueMode;
         return this;
     }
+    
+    public PasswordEncoder getPasswordEncoder() {
+        return passwordEncoder;
+    }
+ 
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    public PasswordSalt getPasswordSalt() {
+        return passwordSalt;
+    }
+
+    public void setPasswordSalt(PasswordSalt passwordSalt) {
+        this.passwordSalt = passwordSalt;
+    }
+
 }

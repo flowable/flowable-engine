@@ -12,8 +12,6 @@
  */
 package org.flowable.engine.impl;
 
-import java.util.List;
-
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.GetPotentialStarterGroupsCmd;
@@ -26,6 +24,8 @@ import org.flowable.idm.api.NativeUserQuery;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
+
+import java.util.List;
 
 /**
  * @author Tom Baeyens
@@ -54,6 +54,10 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
 
     public void saveUser(User user) {
         processEngineConfiguration.getIdmIdentityService().saveUser(user);
+    }
+
+    public void updateUserPassword(User user) {
+        processEngineConfiguration.getIdmIdentityService().updateUserPassword(user);
     }
 
     public UserQuery createUserQuery() {

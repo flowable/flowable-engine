@@ -12,8 +12,6 @@
  */
 package org.flowable.engine.impl.cfg;
 
-import javax.sql.DataSource;
-
 import org.flowable.engine.cfg.AbstractProcessEngineConfigurator;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.transaction.TransactionContextAwareDataSource;
@@ -21,6 +19,8 @@ import org.flowable.engine.common.impl.transaction.TransactionContextAwareTransa
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
+
+import javax.sql.DataSource;
 
 /**
  * @author Tijs Rademakers
@@ -52,6 +52,8 @@ public class IdmEngineConfigurator extends AbstractProcessEngineConfigurator {
             idmEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
             idmEngineConfiguration.setDatabaseTablePrefix(processEngineConfiguration.getDatabaseTablePrefix());
             idmEngineConfiguration.setDatabaseWildcardEscapeCharacter(processEngineConfiguration.getDatabaseWildcardEscapeCharacter());
+            idmEngineConfiguration.setPasswordEncoder(processEngineConfiguration.getPasswordEncoder());
+            idmEngineConfiguration.setPasswordSalt(processEngineConfiguration.getPasswordSalt());
 
             if (processEngineConfiguration.isTransactionsExternallyManaged()) {
                 idmEngineConfiguration.setTransactionsExternallyManaged(true);

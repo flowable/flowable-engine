@@ -12,8 +12,6 @@
  */
 package org.activiti.engine;
 
-import java.util.List;
-
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.NativeGroupQuery;
@@ -21,6 +19,8 @@ import org.flowable.idm.api.NativeUserQuery;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
+
+import java.util.List;
 
 /**
  * Service to manage {@link User}s and {@link Group}s.
@@ -38,14 +38,24 @@ public interface IdentityService {
     User newUser(String userId);
 
     /**
-     * Saves the user. If the user already existed, the user is updated.
+     * Saves the user. If the user already existed, the user is updated except user password.
+     * Use {@link #updateUserPassword(User)} to update existing user password.
      * 
      * @param user
      *            user to save, cannot be null.
      * @throws RuntimeException
      *             when a user with the same name already exists.
+     * @see #updateUserPassword(User)
      */
     void saveUser(User user);
+
+    /**
+     * Update user password. Use {@link #saveUser(User)} for new user.
+     *
+     * @param user user password to change, cannot be null.
+     * @see #saveUser(User)
+     */
+    void updateUserPassword(User user);
 
     /**
      * Creates a {@link UserQuery} that allows to programmatically query the users.
