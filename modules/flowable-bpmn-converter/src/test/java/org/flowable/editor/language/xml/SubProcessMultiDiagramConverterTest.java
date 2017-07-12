@@ -192,6 +192,10 @@ public class SubProcessMultiDiagramConverterTest extends AbstractConverterTest {
     	assertEquals(5, multiMainShapeMap.size());
     	assertEquals(2, multiSubEdgeMap.size());
     	assertEquals(4, multiSubShapeMap.size());
+    	
+    	// verify annotations are in correct diagram
+    	assertTrue(multiMainShapeMap.containsKey("textannotation1"));
+    	assertTrue(multiSubShapeMap.containsKey("textannotation2"));
 
     	// verify sequence flows/edges
     	for (String id : flowLocationMap.keySet()) {
