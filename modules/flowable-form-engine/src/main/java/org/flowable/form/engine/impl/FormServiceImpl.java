@@ -21,6 +21,7 @@ import org.flowable.form.engine.impl.cmd.CreateFormInstanceCmd;
 import org.flowable.form.engine.impl.cmd.GetFormInstanceModelCmd;
 import org.flowable.form.engine.impl.cmd.GetFormModelWithVariablesCmd;
 import org.flowable.form.engine.impl.cmd.GetVariablesFromFormSubmissionCmd;
+import org.flowable.form.engine.impl.cmd.SaveFormInstanceCmd;
 import org.flowable.form.model.FormInstanceModel;
 import org.flowable.form.model.FormModel;
 
@@ -41,35 +42,43 @@ public class FormServiceImpl extends ServiceImpl implements FormService {
         return commandExecutor.execute(new CreateFormInstanceCmd(formModel, variables, taskId, processInstanceId));
     }
 
-    public FormModel getFormModelWithVariablesById(String formDefinitionId, String processInstanceId, Map<String, Object> variables) {
-        return commandExecutor.execute(new GetFormModelWithVariablesCmd(null, formDefinitionId, processInstanceId, variables));
+    public FormInstance saveFormInstance(Map<String, Object> variables, FormModel formModel, String taskId, String processInstanceId) {
+        return commandExecutor.execute(new SaveFormInstanceCmd(formModel, variables, taskId, processInstanceId));
     }
 
-    public FormModel getFormModelWithVariablesById(String formId, String processInstanceId,
-            Map<String, Object> variables, String tenantId) {
-        return commandExecutor.execute(new GetFormModelWithVariablesCmd(null, formId, processInstanceId, tenantId, variables));
+    public FormInstance saveFormInstanceByFormModelId(Map<String, Object> variables, String formModelId, String taskId, String processInstanceId) {
+        return commandExecutor.execute(new SaveFormInstanceCmd(formModelId, variables, taskId, processInstanceId));
     }
 
-    public FormModel getFormModelWithVariablesByKey(String formDefinitionKey, String processInstanceId, Map<String, Object> variables) {
-        return commandExecutor.execute(new GetFormModelWithVariablesCmd(formDefinitionKey, null, processInstanceId, variables));
+    public FormModel getFormModelWithVariablesById(String formDefinitionId, String processInstanceId, String taskId, Map<String, Object> variables) {
+        return commandExecutor.execute(new GetFormModelWithVariablesCmd(null, formDefinitionId, processInstanceId, taskId, variables));
     }
 
-    public FormModel getFormModelWithVariablesByKey(String formDefinitionKey, String processInstanceId,
-            Map<String, Object> variables, String tenantId) {
+    public FormModel getFormModelWithVariablesById(String formId, String processInstanceId, String taskId,
+                                                   Map<String, Object> variables, String tenantId) {
+        return commandExecutor.execute(new GetFormModelWithVariablesCmd(null, formId, null, processInstanceId, taskId, tenantId, variables));
+    }
 
-        return commandExecutor.execute(new GetFormModelWithVariablesCmd(formDefinitionKey, null, null, processInstanceId, tenantId, variables));
+    public FormModel getFormModelWithVariablesByKey(String formDefinitionKey, String processInstanceId, String taskId, Map<String, Object> variables) {
+        return commandExecutor.execute(new GetFormModelWithVariablesCmd(formDefinitionKey, null, processInstanceId, taskId, variables));
+    }
+
+    public FormModel getFormModelWithVariablesByKey(String formDefinitionKey, String processInstanceId, String taskId,
+                                                    Map<String, Object> variables, String tenantId) {
+
+        return commandExecutor.execute(new GetFormModelWithVariablesCmd(formDefinitionKey, null, null, processInstanceId, taskId, tenantId, variables));
     }
 
     public FormModel getFormModelWithVariablesByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId,
-            String processInstanceId, Map<String, Object> variables) {
+                                                                         String processInstanceId, String taskId, Map<String, Object> variables) {
 
-        return commandExecutor.execute(new GetFormModelWithVariablesCmd(formDefinitionKey, parentDeploymentId, null, processInstanceId, variables));
+        return commandExecutor.execute(new GetFormModelWithVariablesCmd(formDefinitionKey, parentDeploymentId, null, processInstanceId, taskId, variables));
     }
 
-    public FormModel getFormModelWithVariablesByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String processInstanceId,
-            Map<String, Object> variables, String tenantId) {
+    public FormModel getFormModelWithVariablesByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String processInstanceId, String taskId,
+                                                                         Map<String, Object> variables, String tenantId) {
 
-        return commandExecutor.execute(new GetFormModelWithVariablesCmd(formDefinitionKey, parentDeploymentId, null, processInstanceId, tenantId, variables));
+        return commandExecutor.execute(new GetFormModelWithVariablesCmd(formDefinitionKey, parentDeploymentId, null, processInstanceId, taskId, tenantId, variables));
     }
 
     public FormInstanceModel getFormInstanceModelById(String formInstanceId, Map<String, Object> variables) {

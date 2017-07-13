@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -60,8 +59,8 @@ public class ProcessDefinitionEntityManagerImpl extends AbstractEntityManager<Pr
     }
 
     @Override
-    public List<ProcessDefinition> findProcessDefinitionsByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery, Page page) {
-        return processDefinitionDataManager.findProcessDefinitionsByQueryCriteria(processDefinitionQuery, page);
+    public List<ProcessDefinition> findProcessDefinitionsByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery) {
+        return processDefinitionDataManager.findProcessDefinitionsByQueryCriteria(processDefinitionQuery);
     }
 
     @Override
@@ -89,8 +88,8 @@ public class ProcessDefinitionEntityManagerImpl extends AbstractEntityManager<Pr
     }
 
     @Override
-    public List<ProcessDefinition> findProcessDefinitionsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return processDefinitionDataManager.findProcessDefinitionsByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<ProcessDefinition> findProcessDefinitionsByNativeQuery(Map<String, Object> parameterMap) {
+        return processDefinitionDataManager.findProcessDefinitionsByNativeQuery(parameterMap);
     }
 
     @Override

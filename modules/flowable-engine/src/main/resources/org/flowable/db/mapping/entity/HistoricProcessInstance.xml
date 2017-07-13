@@ -23,6 +23,7 @@
   <insert id="insertHistoricProcessInstance" parameterType="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
       insert into ${prefix}ACT_HI_PROCINST (
         ID_,
+        REV_,
         PROC_INST_ID_,
         BUSINESS_KEY_,
         PROC_DEF_ID_,
@@ -38,6 +39,7 @@
         NAME_
       ) values (
         #{id ,jdbcType=VARCHAR},
+        1,
         #{processInstanceId, jdbcType=VARCHAR},
         #{businessKey, jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
@@ -57,6 +59,7 @@
   <insert id="bulkInsertHistoricProcessInstance" parameterType="java.util.List">
       insert into ${prefix}ACT_HI_PROCINST (
         ID_,
+        REV_,
         PROC_INST_ID_,
         BUSINESS_KEY_,
         PROC_DEF_ID_,
@@ -73,6 +76,7 @@
       ) values 
         <foreach collection="list" item="historicProcessInstance" index="index" separator=",">
           (#{historicProcessInstance.id ,jdbcType=VARCHAR},
+           1,
            #{historicProcessInstance.processInstanceId, jdbcType=VARCHAR},
            #{historicProcessInstance.businessKey, jdbcType=VARCHAR},
            #{historicProcessInstance.processDefinitionId, jdbcType=VARCHAR},
@@ -94,6 +98,7 @@
         <foreach collection="list" item="historicProcessInstance" index="index">
           INTO ${prefix}ACT_HI_PROCINST (
             ID_,
+            REV_,
             PROC_INST_ID_,
             BUSINESS_KEY_,
             PROC_DEF_ID_,
@@ -109,6 +114,7 @@
             NAME_
           ) VALUES 
               (#{historicProcessInstance.id ,jdbcType=VARCHAR},
+               1,
                #{historicProcessInstance.processInstanceId, jdbcType=VARCHAR},
                #{historicProcessInstance.businessKey, jdbcType=VARCHAR},
                #{historicProcessInstance.processDefinitionId, jdbcType=VARCHAR},
@@ -129,16 +135,36 @@
   <!-- HISTORIC PROCESS INSTANCE UPDATE -->
   
   <update id="updateHistoricProcessInstance" parameterType="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
-    update ${prefix}ACT_HI_PROCINST set
-      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
-      BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR},
-      START_TIME_ = #{startTime, jdbcType=TIMESTAMP},
-      END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
-      DURATION_ = #{durationInMillis ,jdbcType=BIGINT},
-      END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
-      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
-      NAME_ = #{name, jdbcType=VARCHAR}
+    update ${prefix}ACT_HI_PROCINST
+      <set>
+      	REV_ = #{revisionNext, jdbcType=INTEGER},
+      	<if test="originalPersistentState.processDefinitionId != processDefinitionId">
+	      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+	    </if>
+	    <if test="originalPersistentState.businessKey != businessKey">
+	      BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR},
+	    </if>
+	    <if test="originalPersistentState.startTime != startTime">
+	      START_TIME_ = #{startTime, jdbcType=TIMESTAMP},
+	    </if>
+	    <if test="originalPersistentState.endTime != endTime">
+	      END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
+	    </if>
+	    <if test="originalPersistentState.durationInMillis != durationInMillis">
+	      DURATION_ = #{durationInMillis ,jdbcType=BIGINT},
+	    </if>
+	    <if test="originalPersistentState.endActivityId != endActivityId">
+	      END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.deleteReason != deleteReason">
+	      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
+	    </if>
+	    <if test="originalPersistentState.name != name">
+	      NAME_ = #{name, jdbcType=VARCHAR}
+	    </if>
+      </set>
     where ID_ = #{id}
+    and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 
   <!-- HISTORIC PROCESS INSTANCE DELETE -->
@@ -158,6 +184,7 @@
   
   <resultMap id="historicProcessInstanceResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER"/>
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR"/>
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
@@ -179,6 +206,7 @@
   
   <resultMap id="historicProcessInstanceAndVariablesResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER"/>
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR"/>
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
@@ -232,11 +260,11 @@
   
 
   <select id="selectHistoricProcessInstancesByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricProcessInstanceQueryImpl" resultMap="historicProcessInstanceResultMap">
-  	${limitBefore}
-    select distinct RES.* ${limitBetween}, DEF.KEY_ as PROC_DEF_KEY_, DEF.NAME_ as PROC_DEF_NAME_, DEF.VERSION_ as PROC_DEF_VERSION_, DEF.DEPLOYMENT_ID_ as DEPLOYMENT_ID_
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>, DEF.KEY_ as PROC_DEF_KEY_, DEF.NAME_ as PROC_DEF_NAME_, DEF.VERSION_ as PROC_DEF_VERSION_, DEF.DEPLOYMENT_ID_ as DEPLOYMENT_ID_
     <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
   <select id="selectHistoricProcessInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricProcessInstanceQueryImpl" resultType="long">
@@ -254,11 +282,11 @@
     <include refid="selectHistoricProcessInstancesWithVariablesByQueryCriteriaColumns"/> 
     <include refid="selectHistoricProcessInstancesWithVariablesByQueryCriteriaSql"/> 
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
   <sql id="selectHistoricProcessInstancesWithVariablesByQueryCriteriaColumns">  
-    ${limitBefore}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
    <if test="_databaseId != 'db2' and _databaseId != 'mssql'">
     select distinct RES.*, DEF.KEY_ as PROC_DEF_KEY_, DEF.NAME_ as PROC_DEF_NAME_, DEF.VERSION_ as PROC_DEF_VERSION_, DEF.DEPLOYMENT_ID_ as DEPLOYMENT_ID_,
     VAR.ID_ as VAR_ID_, 
@@ -274,10 +302,11 @@
     VAR.TEXT2_ as VAR_TEXT2_, 
     VAR.LAST_UPDATED_TIME_ as VAR_LAST_UPDATED_TIME_, 
     VAR.LONG_ as VAR_LONG_
-    ${limitBetween}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
    </if>
    <if test="_databaseId == 'db2' || _databaseId == 'mssql'">
     select distinct TEMPRES_ID_ as ID_,
+    TEMPRES_REV_ as REV_, 
     TEMPRES_BUSINESS_KEY_ as BUSINESS_KEY_, 
     TEMPRES_PROC_DEF_ID_ as PROC_DEF_ID_,
     TEMPRES_START_TIME_ as START_TIME_, 
@@ -307,8 +336,9 @@
     TEMPVAR_TEXT2_ as VAR_TEXT2_, 
     TEMPVAR_LAST_UPDATED_TIME_ as VAR_LAST_UPDATED_TIME_, 
     TEMPVAR_LONG_ as VAR_LONG_
-    ${limitOuterJoinBetween}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitOuterJoinBetween}</if>
     RES.ID_ as TEMPRES_ID_, 
+    RES.REV_ as TEMPRES_REV_, 
     RES.BUSINESS_KEY_ as TEMPRES_BUSINESS_KEY_,
     RES.PROC_DEF_ID_ as TEMPRES_PROC_DEF_ID_, 
     RES.PROC_INST_ID_ as TEMPRES_PROC_INST_ID_, 
@@ -366,9 +396,6 @@
         left outer join ${prefix}ACT_HI_VARINST A_OR${orIndex} on RES.PROC_INST_ID_ = A_OR${orIndex}.PROC_INST_ID_
       </if>
     </foreach>
-    <if test="deploymentId != null || (deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0)">
-      left outer join ${prefix}ACT_RE_PROCDEF DEPLOY_P ON RES.PROC_DEF_ID_ = DEPLOY_P.ID_
-    </if>
     <if test="withJobException">
       left outer join ${prefix}ACT_RU_TIMER_JOB JOB ON RES.PROC_INST_ID_ = JOB.PROCESS_INSTANCE_ID_
     </if>
@@ -408,10 +435,10 @@
         and RES.BUSINESS_KEY_ = #{businessKey}
       </if>
       <if test="deploymentId != null">
-        and DEPLOY_P.DEPLOYMENT_ID_ = #{deploymentId}
+        and DEF.DEPLOYMENT_ID_ = #{deploymentId}
       </if>
       <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
-        and DEPLOY_P.DEPLOYMENT_ID_ IN
+        and DEF.DEPLOYMENT_ID_ IN
         <foreach item="deployment" index="index" collection="deploymentIds" 
                  open="(" separator="," close=")">
           #{deployment}

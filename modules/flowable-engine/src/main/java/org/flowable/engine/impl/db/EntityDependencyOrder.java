@@ -37,6 +37,7 @@ import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity
 import org.flowable.engine.impl.persistence.entity.HistoricScopeInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
+import org.flowable.engine.impl.persistence.entity.HistoryJobEntityImpl;
 import org.flowable.engine.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.engine.impl.persistence.entity.JobEntityImpl;
 import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntityImpl;
@@ -94,6 +95,11 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(TimerJobEntityImpl.class);
         DELETE_ORDER.add(SuspendedJobEntityImpl.class);
         DELETE_ORDER.add(DeadLetterJobEntityImpl.class);
+        
+        /*
+         * FK to ByteArray
+         */
+        DELETE_ORDER.add(HistoryJobEntityImpl.class);
 
         /*
          * FK to ByteArray FK to Execution

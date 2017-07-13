@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Comment;
@@ -28,7 +29,7 @@ public class ProcessInstanceCommentTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testAddCommentToProcessInstance() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcessInstanceComment");
 
             taskService.addComment(null, processInstance.getId(), "Hello World");

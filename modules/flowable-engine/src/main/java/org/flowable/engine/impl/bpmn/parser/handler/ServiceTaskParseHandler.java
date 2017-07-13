@@ -34,7 +34,7 @@ public class ServiceTaskParseHandler extends AbstractActivityBpmnParseHandler<Se
 
     protected void executeParse(BpmnParse bpmnParse, ServiceTask serviceTask) {
 
-        // Email, Mule and Shell service tasks
+        // Email, Mule, Http and Shell service tasks
         if (StringUtils.isNotEmpty(serviceTask.getType())) {
 
             if (serviceTask.getType().equalsIgnoreCase("mail")) {
@@ -51,6 +51,9 @@ public class ServiceTaskParseHandler extends AbstractActivityBpmnParseHandler<Se
 
             } else if (serviceTask.getType().equalsIgnoreCase("dmn")) {
                 serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createDmnActivityBehavior(serviceTask));
+
+            } else if (serviceTask.getType().equalsIgnoreCase("http")) {
+                serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createHttpActivityBehavior(serviceTask));
 
             } else {
                 logger.warn("Invalid service task type: '{}'  for service task {}", serviceTask.getType(), serviceTask.getId());

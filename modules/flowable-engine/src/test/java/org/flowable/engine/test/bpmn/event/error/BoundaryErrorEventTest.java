@@ -22,6 +22,7 @@ import org.flowable.engine.common.impl.util.JvmUtil;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
@@ -156,7 +157,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(procId);
 
         HistoricProcessInstance hip;
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             hip = historyService.createHistoricProcessInstanceQuery().processInstanceId(procId).singleResult();
             assertEquals("processEnd1", hip.getEndActivityId());
         }
@@ -165,7 +166,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         procId = runtimeService.startProcessInstanceByKey("deeplyNestedErrorThrown", CollectionUtil.singletonMap("input", 1)).getId();
         assertProcessEnded(procId);
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             hip = historyService.createHistoricProcessInstanceQuery().processInstanceId(procId).singleResult();
             assertEquals("processEnd1", hip.getEndActivityId());
         }

@@ -34,8 +34,8 @@ public class NativeModelQueryImpl extends AbstractNativeQuery<NativeModelQuery, 
 
     // results ////////////////////////////////////////////////////////////////
 
-    public List<Model> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return commandContext.getModelEntityManager().findModelsByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<Model> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
+        return commandContext.getModelEntityManager().findModelsByNativeQuery(parameterMap);
     }
 
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {

@@ -12,7 +12,6 @@
  */
 package org.flowable.admin.app.rest.client;
 
-import java.io.IOException;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +21,6 @@ import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.DeploymentService;
 import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
-import org.flowable.app.service.exception.InternalServerErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

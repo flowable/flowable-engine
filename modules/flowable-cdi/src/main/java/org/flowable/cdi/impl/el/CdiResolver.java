@@ -15,14 +15,14 @@ package org.flowable.cdi.impl.el;
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
-import javax.el.ELContext;
-import javax.el.ELResolver;
 import javax.el.FunctionMapper;
 import javax.el.VariableMapper;
 import javax.enterprise.inject.spi.BeanManager;
 
 import org.flowable.cdi.impl.util.BeanManagerLookup;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
+import org.flowable.engine.common.impl.javax.el.ELContext;
+import org.flowable.engine.common.impl.javax.el.ELResolver;
 
 /**
  * Resolver wrapping an instance of javax.el.ELResolver obtained from the {@link BeanManager}. Allows flowable-engine to resolve Cdi-Beans.

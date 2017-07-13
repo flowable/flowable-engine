@@ -63,6 +63,7 @@ The additional configuration options are described in the table below:
 |===============
 |Property name|Description
 |security.rememberme.key|The hash key that is used by Spring Security to hash the password values in the applications. Make sure that you change the value of this property.
+|security.passwordencoder|Define a password encoder for the IDM users. Use a value of spring_bcrypt to use the Spring password encoder. By default, the passwords will be saved in plain text.
 |datasource.jndi.name|JNDI name of the data source, to be used when the datasource is configured in the servlet container instead of defining the datasource url and driver in this configuration file
 |datasource.jndi.resourceRef|Set whether the lookup occurs in a J2EE container, i.e. if the prefix "java:comp/env/" needs to be added if the JNDI name doesn't already contain it. Default is "true".
 |datasource.driver|The JDBC driver class name

@@ -16,7 +16,6 @@ package org.flowable.idm.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.idm.api.Token;
 import org.flowable.idm.api.TokenQuery;
@@ -56,8 +55,8 @@ public class TokenEntityManagerImpl extends AbstractEntityManager<TokenEntity> i
         return ((TokenEntity) token).getRevision() == 0;
     }
 
-    public List<Token> findTokenByQueryCriteria(TokenQueryImpl query, Page page) {
-        return tokenDataManager.findTokenByQueryCriteria(query, page);
+    public List<Token> findTokenByQueryCriteria(TokenQueryImpl query) {
+        return tokenDataManager.findTokenByQueryCriteria(query);
     }
 
     public long findTokenCountByQueryCriteria(TokenQueryImpl query) {
@@ -68,8 +67,8 @@ public class TokenEntityManagerImpl extends AbstractEntityManager<TokenEntity> i
         return new TokenQueryImpl(getCommandExecutor());
     }
 
-    public List<Token> findTokensByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return tokenDataManager.findTokensByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<Token> findTokensByNativeQuery(Map<String, Object> parameterMap) {
+        return tokenDataManager.findTokensByNativeQuery(parameterMap);
     }
 
     public long findTokenCountByNativeQuery(Map<String, Object> parameterMap) {

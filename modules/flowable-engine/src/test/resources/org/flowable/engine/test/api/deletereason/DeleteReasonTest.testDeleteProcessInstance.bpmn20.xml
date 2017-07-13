@@ -9,9 +9,9 @@
       </extensionElements>
     </userTask>
     <sequenceFlow id="sid-D9960BCC-9371-49D2-8A7E-379E69B6A969" sourceRef="startEvent1" targetRef="A"/>
-    <subProcess id="sid-7D3FE3EA-85E9-476D-BDCB-372A79B42753" name="subProcess">
+    <subProcess id="theSubProcess" name="subProcess">
       <startEvent id="sid-8249E09D-6096-4854-9F73-2B30C841BD4E"/>
-      <parallelGateway id="sid-E2C6EF03-79CA-4AC0-838A-6C883A49D752"/>
+      <parallelGateway id="fork"/>
       <userTask id="B" name="B" activiti:assignee="$INITIATOR">
         <extensionElements>
           <modeler:allow-send-email><![CDATA[true]]></modeler:allow-send-email>
@@ -30,28 +30,28 @@
           <modeler:flowable-idm-initiator><![CDATA[true]]></modeler:flowable-idm-initiator>
         </extensionElements>
       </userTask>
-      <parallelGateway id="sid-E897495E-767F-45DA-8570-5BA47A80DF1A"/>
+      <parallelGateway id="join"/>
       <endEvent id="sid-1FD19E0C-1029-4285-B581-3E72C0B599AB"/>
-      <sequenceFlow id="sid-79CAEE76-76D1-4C24-8435-7EECEE08810F" sourceRef="sid-8249E09D-6096-4854-9F73-2B30C841BD4E" targetRef="sid-E2C6EF03-79CA-4AC0-838A-6C883A49D752"/>
-      <sequenceFlow id="sid-B23FA0CE-C3AE-4867-83A8-23767063F898" sourceRef="sid-E2C6EF03-79CA-4AC0-838A-6C883A49D752" targetRef="B"/>
-      <sequenceFlow id="sid-3802A34E-75E7-419E-BB29-0F07FCC5BC2F" sourceRef="sid-E2C6EF03-79CA-4AC0-838A-6C883A49D752" targetRef="C"/>
-      <sequenceFlow id="sid-83343B9E-D184-43C2-9654-9BB338821256" sourceRef="sid-E2C6EF03-79CA-4AC0-838A-6C883A49D752" targetRef="D"/>
-      <sequenceFlow id="sid-E91537F3-B11B-4A02-A90E-ECCB47062B7B" sourceRef="C" targetRef="sid-E897495E-767F-45DA-8570-5BA47A80DF1A"/>
-      <sequenceFlow id="sid-5C5B2CD5-7A7C-41A7-92BF-14F0DF86853F" sourceRef="sid-E897495E-767F-45DA-8570-5BA47A80DF1A" targetRef="sid-1FD19E0C-1029-4285-B581-3E72C0B599AB"/>
-      <sequenceFlow id="sid-B06E2B9D-0074-4F25-B9B8-DBC4238BE189" sourceRef="D" targetRef="sid-E897495E-767F-45DA-8570-5BA47A80DF1A"/>
-      <sequenceFlow id="sid-0394838B-14BA-4CBD-A7EF-A9E38256FD60" sourceRef="B" targetRef="sid-E897495E-767F-45DA-8570-5BA47A80DF1A"/>
+      <sequenceFlow id="sid-79CAEE76-76D1-4C24-8435-7EECEE08810F" sourceRef="sid-8249E09D-6096-4854-9F73-2B30C841BD4E" targetRef="fork"/>
+      <sequenceFlow id="sid-B23FA0CE-C3AE-4867-83A8-23767063F898" sourceRef="fork" targetRef="B"/>
+      <sequenceFlow id="sid-3802A34E-75E7-419E-BB29-0F07FCC5BC2F" sourceRef="fork" targetRef="C"/>
+      <sequenceFlow id="sid-83343B9E-D184-43C2-9654-9BB338821256" sourceRef="fork" targetRef="D"/>
+      <sequenceFlow id="sid-E91537F3-B11B-4A02-A90E-ECCB47062B7B" sourceRef="C" targetRef="join"/>
+      <sequenceFlow id="sid-5C5B2CD5-7A7C-41A7-92BF-14F0DF86853F" sourceRef="join" targetRef="sid-1FD19E0C-1029-4285-B581-3E72C0B599AB"/>
+      <sequenceFlow id="sid-B06E2B9D-0074-4F25-B9B8-DBC4238BE189" sourceRef="D" targetRef="join"/>
+      <sequenceFlow id="sid-0394838B-14BA-4CBD-A7EF-A9E38256FD60" sourceRef="B" targetRef="join"/>
     </subProcess>
-    <sequenceFlow id="sid-C2443D63-F42A-4A2D-963B-D75E0610850C" sourceRef="A" targetRef="sid-7D3FE3EA-85E9-476D-BDCB-372A79B42753"/>
+    <sequenceFlow id="sid-C2443D63-F42A-4A2D-963B-D75E0610850C" sourceRef="A" targetRef="theSubProcess"/>
     <userTask id="E" name="E" activiti:assignee="$INITIATOR">
       <extensionElements>
         <modeler:allow-send-email><![CDATA[true]]></modeler:allow-send-email>
         <modeler:flowable-idm-initiator><![CDATA[true]]></modeler:flowable-idm-initiator>
       </extensionElements>
     </userTask>
-    <sequenceFlow id="sid-384A00A6-88B7-4219-AA45-AD6B536506C7" sourceRef="sid-7D3FE3EA-85E9-476D-BDCB-372A79B42753" targetRef="E"/>
+    <sequenceFlow id="sid-384A00A6-88B7-4219-AA45-AD6B536506C7" sourceRef="theSubProcess" targetRef="E"/>
     <endEvent id="sid-3C0B0F1D-84DB-47C2-BF61-E7B7EC6B95FB"/>
     <sequenceFlow id="sid-8498BE04-5B0B-43A9-87F7-5503F0BD1B8F" sourceRef="E" targetRef="sid-3C0B0F1D-84DB-47C2-BF61-E7B7EC6B95FB"/>
-    <boundaryEvent id="sid-F60CFBC1-951C-4D09-8928-4590DA76CE84" attachedToRef="sid-7D3FE3EA-85E9-476D-BDCB-372A79B42753" cancelActivity="true">
+    <boundaryEvent id="sid-F60CFBC1-951C-4D09-8928-4590DA76CE84" attachedToRef="theSubProcess" cancelActivity="true">
       <timerEventDefinition>
         <timeDuration>PT1H</timeDuration>
       </timerEventDefinition>
@@ -74,13 +74,13 @@
       <bpmndi:BPMNShape bpmnElement="A" id="BPMNShape_A">
         <omgdc:Bounds height="80.0" width="100.0" x="175.0" y="138.0"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-7D3FE3EA-85E9-476D-BDCB-372A79B42753" id="BPMNShape_sid-7D3FE3EA-85E9-476D-BDCB-372A79B42753">
+      <bpmndi:BPMNShape bpmnElement="theSubProcess" id="BPMNShape_theSubProcess">
         <omgdc:Bounds height="329.0" width="503.0" x="330.0" y="13.5"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="sid-8249E09D-6096-4854-9F73-2B30C841BD4E" id="BPMNShape_sid-8249E09D-6096-4854-9F73-2B30C841BD4E">
         <omgdc:Bounds height="30.0" width="30.0" x="360.0" y="163.0"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-E2C6EF03-79CA-4AC0-838A-6C883A49D752" id="BPMNShape_sid-E2C6EF03-79CA-4AC0-838A-6C883A49D752">
+      <bpmndi:BPMNShape bpmnElement="fork" id="BPMNShape_fork">
         <omgdc:Bounds height="40.0" width="40.0" x="435.0" y="158.25"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="B" id="BPMNShape_B">
@@ -92,7 +92,7 @@
       <bpmndi:BPMNShape bpmnElement="D" id="BPMNShape_D">
         <omgdc:Bounds height="80.0" width="100.0" x="520.0" y="240.0"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-E897495E-767F-45DA-8570-5BA47A80DF1A" id="BPMNShape_sid-E897495E-767F-45DA-8570-5BA47A80DF1A">
+      <bpmndi:BPMNShape bpmnElement="join" id="BPMNShape_join">
         <omgdc:Bounds height="40.0" width="40.0" x="665.0" y="158.625"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="sid-1FD19E0C-1029-4285-B581-3E72C0B599AB" id="BPMNShape_sid-1FD19E0C-1029-4285-B581-3E72C0B599AB">

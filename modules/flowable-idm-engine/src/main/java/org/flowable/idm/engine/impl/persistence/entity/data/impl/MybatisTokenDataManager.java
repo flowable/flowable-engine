@@ -15,7 +15,6 @@ package org.flowable.idm.engine.impl.persistence.entity.data.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.idm.api.Token;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.TokenQueryImpl;
@@ -44,8 +43,8 @@ public class MybatisTokenDataManager extends AbstractDataManager<TokenEntity> im
     }
 
     @SuppressWarnings("unchecked")
-    public List<Token> findTokenByQueryCriteria(TokenQueryImpl query, Page page) {
-        return getDbSqlSession().selectList("selectTokenByQueryCriteria", query, page);
+    public List<Token> findTokenByQueryCriteria(TokenQueryImpl query) {
+        return getDbSqlSession().selectList("selectTokenByQueryCriteria", query);
     }
 
     public long findTokenCountByQueryCriteria(TokenQueryImpl query) {
@@ -53,8 +52,8 @@ public class MybatisTokenDataManager extends AbstractDataManager<TokenEntity> im
     }
 
     @SuppressWarnings("unchecked")
-    public List<Token> findTokensByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return getDbSqlSession().selectListWithRawParameter("selectTokenByNativeQuery", parameterMap, firstResult, maxResults);
+    public List<Token> findTokensByNativeQuery(Map<String, Object> parameterMap) {
+        return getDbSqlSession().selectListWithRawParameter("selectTokenByNativeQuery", parameterMap);
     }
 
     public long findTokenCountByNativeQuery(Map<String, Object> parameterMap) {

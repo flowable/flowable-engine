@@ -22,7 +22,6 @@ import java.util.Set;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.interceptor.CommandExecutor;
@@ -615,7 +614,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     }
 
     public String getMssqlOrDB2OrderBy() {
-        String specialOrderBy = super.getOrderBy();
+        String specialOrderBy = super.getOrderByColumns();
         if (specialOrderBy != null && specialOrderBy.length() > 0) {
             specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
             specialOrderBy = specialOrderBy.replace("ProcessDefinitionKey", "TEMPP_KEY_");
@@ -632,7 +631,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         return commandContext.getExecutionEntityManager().findProcessInstanceCountByQueryCriteria(this);
     }
 
-    public List<ProcessInstance> executeList(CommandContext commandContext, Page page) {
+    public List<ProcessInstance> executeList(CommandContext commandContext) {
         checkQueryOk();
         ensureVariablesInitialized();
         List<ProcessInstance> processInstances = null;

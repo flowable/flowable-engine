@@ -131,6 +131,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         }
         if (delegationState != null) {
             persistentState.put("delegationState", this.delegationState);
+            persistentState.put("delegationStateString", getDelegationStateString());
         }
 
         persistentState.put("suspensionState", this.suspensionState);

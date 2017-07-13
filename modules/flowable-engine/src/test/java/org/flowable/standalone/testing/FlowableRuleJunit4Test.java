@@ -20,8 +20,8 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.task.Task;
-import org.flowable.engine.test.FlowableRule;
 import org.flowable.engine.test.Deployment;
+import org.flowable.engine.test.FlowableRule;
 import org.junit.Rule;
 import org.junit.Test;
 

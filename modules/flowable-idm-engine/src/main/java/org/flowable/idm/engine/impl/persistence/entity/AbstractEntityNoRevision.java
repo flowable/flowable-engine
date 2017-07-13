@@ -25,6 +25,8 @@ public abstract class AbstractEntityNoRevision implements Entity {
     protected boolean isInserted;
     protected boolean isUpdated;
     protected boolean isDeleted;
+    
+    protected Object originalPersistentState;
 
     @Override
     public String getId() {
@@ -60,4 +62,13 @@ public abstract class AbstractEntityNoRevision implements Entity {
         this.isDeleted = isDeleted;
     }
 
+    @Override
+    public Object getOriginalPersistentState() {
+        return originalPersistentState;
+    }
+
+    @Override
+    public void setOriginalPersistentState(Object persistentState) {
+        this.originalPersistentState = persistentState;
+    }
 }

@@ -1027,6 +1027,12 @@ public class ExecutionImpl implements
 
     public void setVariablesLocal(Map<String, ? extends Object> variables) {
     }
+    
+    @Override
+    public Object setVariableLocal(String variableName, Object value, org.flowable.engine.impl.persistence.entity.ExecutionEntity sourceActivityExecution, boolean fetchAllVariables) {
+        // This method is called from v6 only, v5 will never call this method.
+        throw new UnsupportedOperationException();
+    }
 
     public boolean isEventScope() {
         return isEventScope;

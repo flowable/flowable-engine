@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CachedEntityMatcher;
@@ -114,9 +113,9 @@ public class MybatisEventSubscriptionDataManager extends AbstractDataManager<Eve
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<EventSubscription> findEventSubscriptionsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl, Page page) {
+    public List<EventSubscription> findEventSubscriptionsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl) {
         final String query = "selectEventSubscriptionByQueryCriteria";
-        return getDbSqlSession().selectList(query, eventSubscriptionQueryImpl, page);
+        return getDbSqlSession().selectList(query, eventSubscriptionQueryImpl);
     }
 
     @Override

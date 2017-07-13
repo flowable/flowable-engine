@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -43,10 +44,9 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         assertNotNull(task.getProcessDefinitionId());
         assertNotNull(task.getTaskDefinitionKey());
         assertNotNull(task.getCreateTime());
-
-        // the next test verifies that if an execution creates a task, that no
-        // events are created during creation of the task.
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        
+        // the next test verifies that if an execution creates a task, that no events are created during creation of the task.
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertEquals(0, taskService.getTaskEvents(task.getId()).size());
         }
     }
@@ -89,26 +89,29 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         assertEquals("Task with category", taskService.createTaskQuery().taskCategory(testCategory).singleResult().getName());
         assertEquals(0, taskService.createTaskQuery().taskCategory("Does not exist").count());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             // Check historic task
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
             assertEquals(testCategory, historicTaskInstance.getCategory());
             assertEquals("Task with category", historyService.createHistoricTaskInstanceQuery().taskCategory(testCategory).singleResult().getName());
             assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskCategory("Does not exist").count());
+        }
 
-            // Update category
-            String newCategory = "New Test Category";
-            task.setCategory(newCategory);
-            taskService.saveTask(task);
+        // Update category
+        String newCategory = "New Test Category";
+        task.setCategory(newCategory);
+        taskService.saveTask(task);
 
-            task = taskService.createTaskQuery().singleResult();
-            assertEquals(newCategory, task.getCategory());
-            assertEquals("Task with category", taskService.createTaskQuery().taskCategory(newCategory).singleResult().getName());
-            assertEquals(0, taskService.createTaskQuery().taskCategory(testCategory).count());
+        task = taskService.createTaskQuery().singleResult();
+        assertEquals(newCategory, task.getCategory());
+        assertEquals("Task with category", taskService.createTaskQuery().taskCategory(newCategory).singleResult().getName());
+        assertEquals(0, taskService.createTaskQuery().taskCategory(testCategory).count());
 
-            // Complete task and verify history
-            taskService.complete(task.getId());
-            historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
+        // Complete task and verify history
+        taskService.complete(task.getId());
+            
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
             assertEquals(newCategory, historicTaskInstance.getCategory());
             assertEquals("Task with category", historyService.createHistoricTaskInstanceQuery().taskCategory(newCategory).singleResult().getName());
             assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskCategory(testCategory).count());

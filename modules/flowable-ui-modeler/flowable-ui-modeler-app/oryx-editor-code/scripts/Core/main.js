@@ -318,17 +318,17 @@ ORYX.Editor = {
 		// (that comes from the usage of oryx with a mashup api)
 		if( ORYX.MashupAPI && ORYX.MashupAPI.loadablePlugins && ORYX.MashupAPI.loadablePlugins instanceof Array ){
 		
-			// Get the plugins from the available plugins (those who are in the plugins.xml)
+		    // Get the plugins from the available plugins (those who are in the plugins.xml)
 			ORYX.availablePlugins = $A(ORYX.availablePlugins).findAll(function(value){
 										return ORYX.MashupAPI.loadablePlugins.include( value.name )
-									})
+									});
 			
 			// Add those plugins to the list, which are only in the loadablePlugins list
 			ORYX.MashupAPI.loadablePlugins.each(function( className ){
 				if( !(ORYX.availablePlugins.find(function(val){ return val.name == className }))){
 					ORYX.availablePlugins.push( {name: className } );
 				}
-			})
+			});
 		}
 		
 		
@@ -341,7 +341,7 @@ ORYX.Editor = {
 				(value.get("engaged") || (value.get("engaged")===undefined)) ){
 
 				try {
-					var className 	= eval(value.get("name"));//wow funcky code here!
+					var className 	= eval(value.get("name")); // wow funcky code here!
 					if( className ){
 						var plugin = new className(facade, value);
 						plugin.type	= value.get("name");
@@ -360,11 +360,11 @@ ORYX.Editor = {
 
 		newPlugins.each(function(value) {
 			// If there is an GUI-Plugin, they get all Plugins-Offer-Meta-Data
-			if(value.registryChanged)
+			if (value.registryChanged)
 				value.registryChanged(me.pluginsData);
 
 			// If there have an onSelection-Method it will pushed to the Editor Event-Handler
-			if(value.onSelectionChanged)
+			if (value.onSelectionChanged)
 				me.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, value.onSelectionChanged.bind(value));
 		});
 

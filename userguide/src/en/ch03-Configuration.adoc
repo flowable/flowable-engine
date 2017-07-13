@@ -306,7 +306,7 @@ To upgrade, you have to start by putting the following configuration property in
 
 [[jobExecutorConfiguration]]
 
-=== Job Executor (from version 6.0.1 onwards)
+=== Job Executor (from version 6.0.0 onwards)
 
 The async executor of Flowable v5 is the only available job executor in Flowable V6, as it is a more performant and more database friendly way of executing asynchronous jobs in the Flowable engine.
 The old job executor of Flowable 5 is no longer available in V6. More information can be found in the advanced section of the user guide.
@@ -359,6 +359,20 @@ Customizing the configuration of history storage is optional. This allows you to
 [source,xml,linenums]
 ----
 <property name="history" value="audit" />
+----
+
+
+[[asyncHistoryConfiguration]]
+
+
+=== Async history configuration
+
+[Experimental] Since Flowable 6.1.0 the async history feature has been added. When async history is enabled, the historic data will be persisted by a history job executor, instead of synchronous persistence as part of the runtime execution persistence. 
+See <<asyncHistoryConfig,async history configuration>> for more details.
+
+[source,xml,linenums]
+----
+<property name="asyncHistoryEnabled" value="true" />
 ----
 
 

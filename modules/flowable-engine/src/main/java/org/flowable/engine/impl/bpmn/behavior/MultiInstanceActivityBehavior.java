@@ -35,6 +35,7 @@ import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,29 +83,56 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         setInnerActivityBehavior(innerActivityBehavior);
     }
 
-    public void execute(DelegateExecution execution) {
+    public void execute(DelegateExecution delegateExecution) {
+        ExecutionEntity execution = (ExecutionEntity) delegateExecution;
         if (getLocalLoopVariable(execution, getCollectionElementIndexVariable()) == null) {
 
             int nrOfInstances = 0;
 
             try {
-                nrOfInstances = createInstances(execution);
+                nrOfInstances = createInstances(delegateExecution);
             } catch (BpmnError error) {
                 ErrorPropagation.propagateError(error, execution);
             }
 
             if (nrOfInstances == 0) {
-                super.leave(execution);
+                cleanupMiRoot(execution);
             }
 
         } else {
-            Context.getCommandContext().getHistoryManager().recordActivityStart((ExecutionEntity) execution);
-
+            // for synchronous, history was created already in ContinueMultiInstanceOperation,
+            // but that would lead to wrong timings for asynchronous which is why it's here
+            if (activity.isAsynchronous()) {
+                Context.getCommandContext().getHistoryManager().recordActivityStart((ExecutionEntity) execution);
+            }
             innerActivityBehavior.execute(execution);
         }
     }
 
     protected abstract int createInstances(DelegateExecution execution);
+    
+    @Override
+    public void leave(DelegateExecution execution) {
+        cleanupMiRoot(execution);
+    }
+
+    protected void cleanupMiRoot(DelegateExecution execution) {
+        // Delete multi instance root and all child executions.
+        // Create a fresh execution to continue
+        
+        ExecutionEntity multiInstanceRootExecution = (ExecutionEntity) getMultiInstanceRootExecution(execution);
+        FlowElement flowElement = multiInstanceRootExecution.getCurrentFlowElement();
+        ExecutionEntity parentExecution = multiInstanceRootExecution.getParent();
+        
+        ExecutionEntityManager executionEntityManager = Context.getCommandContext().getExecutionEntityManager();
+        executionEntityManager.deleteChildExecutions(multiInstanceRootExecution, "MI_END", false);
+        executionEntityManager.deleteRelatedDataForExecution(multiInstanceRootExecution, null, false);
+        executionEntityManager.delete(multiInstanceRootExecution);
+        
+        ExecutionEntity newExecution = executionEntityManager.createChildExecution(parentExecution);
+        newExecution.setCurrentFlowElement(flowElement);
+        super.leave(newExecution);
+    }
 
     protected void executeCompensationBoundaryEvents(FlowElement flowElement, DelegateExecution execution) {
 
@@ -204,7 +232,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         }
 
         execution.setCurrentFlowElement(activity);
-        Context.getAgenda().planContinueMultiInstanceOperation((ExecutionEntity) execution);
+        Context.getAgenda().planContinueMultiInstanceOperation((ExecutionEntity) execution, loopCounter);
     }
 
     @SuppressWarnings("rawtypes")
@@ -295,10 +323,6 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
     protected Integer getLocalLoopVariable(DelegateExecution execution, String variableName) {
         return (Integer) execution.getVariableLocal(variableName);
-    }
-
-    protected void removeLocalLoopVariable(DelegateExecution execution, String variableName) {
-        execution.removeVariableLocal(variableName);
     }
 
     /**

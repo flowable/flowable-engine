@@ -28,6 +28,7 @@ import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -45,7 +46,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             "org/activiti/examples/bpmn/callactivity/checkCreditProcess.bpmn20.xml"
     })
     public void testOrderProcessWithCallActivity() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             // After the process has started, the 'verify credit history' task should be active
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("orderProcess");
             TaskQuery taskQuery = taskService.createTaskQuery();
@@ -66,7 +67,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testSimple() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc");
             TaskQuery taskQuery = taskService.createTaskQuery();
             Task userTask = taskQuery.singleResult();
@@ -89,7 +90,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testSimpleNoWaitState() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc");
             assertProcessEnded(processInstance.getId());
 
@@ -106,7 +107,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testParallel() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc");
             TaskQuery taskQuery = taskService.createTaskQuery();
             Task userTask = taskQuery.singleResult();
@@ -134,7 +135,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testParallelNoWaitState() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc");
             assertProcessEnded(processInstance.getId());
 
@@ -151,7 +152,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testTwoSubProcessInParallelWithinSubProcess() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoSubProcessInParallelWithinSubProcess");
             assertProcessEnded(processInstance.getId());
 
@@ -176,7 +177,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             "org/activiti/engine/test/history/simpleSubProcess.bpmn20.xml"
     })
     public void testHistoricVariableInstanceQuery() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
             assertProcessEnded(processInstance.getId());
 
@@ -415,7 +416,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             "org/activiti/engine/test/api/oneTaskProcess.bpmn20.xml"
     })
     public void testHistoricProcessVariableOnDeletion() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             HashMap<String, Object> variables = new HashMap<String, Object>();
             variables.put("testVar", "Hallo Christian");
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
@@ -429,7 +430,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/activiti/standalone/history/FullHistoryTest.testVariableUpdatesAreLinkedToActivity.bpmn20.xml" })
     public void testVariableUpdatesLinkedToActivity() throws Exception {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("ProcessWithSubProcess");
 
             Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
@@ -486,7 +487,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testHistoricProcessInstanceDeleteCascadesCorrectly() {
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
 
             Map<String, Object> variables = new HashMap<String, Object>();
             variables.put("var1", "value1");
@@ -519,7 +520,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = "org/activiti/engine/test/history/HistoricVariableInstanceTest.testSimple.bpmn20.xml")
     public void testNativeHistoricVariableInstanceQuery() {
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
 
             assertEquals("ACT_HI_VARINST", managementService.getTableName(HistoricVariableInstance.class));
             assertEquals("ACT_HI_VARINST", managementService.getTableName(HistoricVariableInstanceEntity.class));
@@ -554,7 +555,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = "org/activiti/engine/test/history/HistoricVariableInstanceTest.testSimple.bpmn20.xml")
     public void testNativeHistoricDetailQuery() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             assertEquals("ACT_HI_DETAIL", managementService.getTableName(HistoricDetail.class));
             assertEquals("ACT_HI_DETAIL", managementService.getTableName(HistoricVariableUpdate.class));
 
@@ -600,7 +601,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             "org/activiti/engine/test/history/oneTaskProcess.bpmn20.xml"
     })
     public void testChangeType() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
             TaskQuery taskQuery = taskService.createTaskQuery();
             Task task = taskQuery.singleResult();
@@ -636,7 +637,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testRestrictByExecutionId() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.FULL)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc");
             TaskQuery taskQuery = taskService.createTaskQuery();
             Task userTask = taskQuery.singleResult();

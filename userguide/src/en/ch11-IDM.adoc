@@ -35,6 +35,25 @@ When no identity logic is needed in the Flowable engine the IDM engine can be di
 
 This means that no user and group queries can be used, and candidate groups in a task query can not be retrieved for a user.
 
+By default, the user passwords will be saved in plain text in the IDM database tables. To make sure that the passwords are encoded you can define a password encoder in the process engine configuration.
+
+[source,xml,linenums]
+----
+<bean id="shaEncoder"
+      class="org.springframework.security.authentication.encoding.ShaPasswordEncoder"/>
+      
+<bean id="passwordEncoder" class="org.flowable.idm.spring.authentication.SpringEncoder">
+    <constructor-arg ref="shaEncoder"/>
+</bean>
+
+<bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+  <property name="passwordEncoder" ref="passwordEncoder" />
+  ...
+</bean>
+----
+
+In this example the ShaPasswordEncoder is used, but you can also use the org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder for example. When not using Spring you can also use the org.flowable.idm.engine.impl.authentication.ApacheDigester to encode the passwords.
+
 The default IDM engine configurator can also be overridden to initialize the IDM Engine in a custom way. A good example is the LDAPConfigurator
 implementation which overrides the default IDM engine to use a LDAP server instead of the default IDM database tables. The +idmProcessEngineConfigurator+ property of the process engine configuration can be used to set a custom configurator like the LDAPConfigurator
 

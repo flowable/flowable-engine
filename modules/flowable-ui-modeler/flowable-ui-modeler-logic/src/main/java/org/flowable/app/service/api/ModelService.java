@@ -52,6 +52,8 @@ public interface ModelService {
     Map<String,byte[]> getDecisionTableDefinitionsForProcess(String modelId);
 
     BpmnModel getBpmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap);
+    
+    String createModelJson(ModelRepresentation model);
 
     Model createModel(ModelRepresentation model, String editorJson, User createdBy);
 

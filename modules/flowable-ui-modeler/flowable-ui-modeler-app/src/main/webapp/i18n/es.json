@@ -4,7 +4,7 @@
         "NAVIGATION" : {
             "PROCESSES": "Procesos",
             "FORMS": "Formularios",
-            "DECISION-TABLES": "Tablas de decisiÛn",
+            "DECISION-TABLES": "Tablas de decisi√≥n",
             "APPS": "Aplicaciones"
         },
         "TITLE": {
@@ -26,8 +26,8 @@
             "CONFIRM-AND-CLOSE": "Confirmar y cerrar",
             "NEW-FORM": "Nuevo formulario",
             "CREATE-FORM": "Crear formulario",
-            "NEW-DECISION-TABLE": "Nueva tabla de decisiÛn",
-            "CREATE-DECISION-TABLE": "Crear tabla de decisiÛn"
+            "NEW-DECISION-TABLE": "Nueva tabla de decisi√≥n",
+            "CREATE-DECISION-TABLE": "Crear tabla de decisi√≥n"
         },
         "MESSAGE": {
           "SELECT-GROUP-HELP": "Usa &uparrow; y &downarrow; para seleccionar y presiona Enter para confirmar",
@@ -47,7 +47,7 @@
           "ACTION": {
             "SAVE": "Guardar cambios",
             "DISCARD": "Descartar cambios",
-            "CONTINUE": "Continiar ediciÛn"
+            "CONTINUE": "Continiar edici√≥n"
           }
         }
       }
@@ -65,7 +65,7 @@
             "PROCESSES": "Modelo de proceso",
             "PROCESSES-COUNT": "Existen {{total}} modelos de proceso",
             "PROCESSES-ONE": "Existe un modelo de proceso",
-            "PROCESSES-EMPTY": "Aun no existe un modelo de proceso creado. puedes diseÒar tus propios modelos, formularios y despues incluirlos en una aplicaciÛn. El primer paso es crear un modelo de proceso:",
+            "PROCESSES-EMPTY": "Aun no existe un modelo de proceso creado. puedes dise√±ar tus propios modelos, formularios y despues incluirlos en una aplicaci√≥n. El primer paso es crear un modelo de proceso:",
             "PROCESSES-BPMN-HINT": "Crear un modelo BPMN usando el editor visual BPMN.",
             "PROCESSES-BPMN-IMPORT-HINT": "Tambien puede importar modelos BPMN existentes.",
             "FILTER-TEXT": ", parecido a \"{{filterText}}\"",
@@ -90,7 +90,7 @@
         "ACTION" : {
             "CREATE": "Crear formulario",
             "CREATE-INLINE": "Crear un nuevo formulario ahora!",
-            "SHOW-MORE": "Mostrar m·s..."
+            "SHOW-MORE": "Mostrar m√°s..."
         },
 
         "FILTER" : {
@@ -117,7 +117,7 @@
             "CREATE": "Crear tabla de decision",
             "IMPORT": "Importar tabla de decision",
             "CREATE-INLINE": "Crear una tabla de decision ahora!",
-            "SHOW-MORE": "Mostrar m·s..."
+            "SHOW-MORE": "Mostrar m√°s..."
         },
 
         "FILTER": {
@@ -196,8 +196,8 @@
         "POPUP": {
           "CREATE-TITLE": "Crear un nuevo modelo de proceso de negocio",
           "DUPLICATE-TITLE": "Duplicar modelo de proceso de negocio",
-          "CREATE-DESCRIPTION": "Necesitas dar un nombre para el nuevo modelo y es recomendable que agregues una descripciÛn al mismo tiempo.",
-          "DUPLICATE-DESCRIPTION": "Puedes cambiar el nombre del modelo y es recomendable que cambies la descripciÛn al mismo tiempo.",
+          "CREATE-DESCRIPTION": "Necesitas dar un nombre para el nuevo modelo y es recomendable que agregues una descripci√≥n al mismo tiempo.",
+          "DUPLICATE-DESCRIPTION": "Puedes cambiar el nombre del modelo y es recomendable que cambies la descripci√≥n al mismo tiempo.",
           "EDIT-DESCRIPTION": "Cambia cualquiera de las propiedades del modelo y despues presiona Guardar para actualizar el modelo.",
           "DELETE-DESCRIPTION": "Estas seguro que deseas borral el modelo de proceso de negocio \"{{name}}\"?",
           "EDIT-TITLE":"Editar los detalles del modelo",
@@ -441,17 +441,19 @@
             "PEOPLE": "Personas",
             "GROUP-OF-PEOPLE": "Grupo de personas",
             "UPLOAD": "Upload",
-            "EXPRESSION": "Expresion"
+            "EXPRESSION": "Expresion",
+	    "HYPERLINK": "Hiperv√≠nculo"
         },
         "TABS": {
             "GENERAL": "General",
             "OPTIONS": "Opciones",
-            "UPLOAD-OPTIONS": "Opciones Upload"
+            "UPLOAD-OPTIONS": "Opciones Upload",
+	    "ADVANCED-OPTIONS":"Avanzado"	
         },
         "VERSION": "Version {{version}}",
         "LAST-UPDATED": "Ultima vez actualizado por {{lastUpdatedBy}}, {{lastUpdated | dateformat}}",
         "TITLE": {
-            "DESIGN": "DiseÒo",
+            "DESIGN": "Dise√±o",
             "OUTCOME": "Resultado"
         },
         "POPUP": {
@@ -478,7 +480,22 @@
             "REQUIRED": "Requerido",
             "EXPRESSION": "Expresion",
             "ADD-OPTION": "+ Agregar nueva opcion",
-            "UPLOAD-ALLOW-MULTIPLE": "Permitir subir varios archivos"
+            "UPLOAD-ALLOW-MULTIPLE": "Permitir subir varios archivos",
+	          "MAX-LENGTH":"Longitud m√°xima:",
+            "MIN-LENGTH":"Longitud m√≠nima:",
+	          "HYPERLINK-URL": "URL hiperlink",
+	          "REGEX-PATTERN":"Est√°ndar  Regex",
+            "MASK":{
+              "TITLE":"M√°scara de entrada",
+              "EXAMPLES":{
+                "TITLE":"Ejemplos:",
+                "NUMBER":"Cualquier n√∫mero",
+                "LETTER":"Cualquier letra",
+                "NUMBERORLETTER":"Cualquier letra o n√∫mero",
+                "OPTIONAL":"La m√°scara opcional (no valida)",
+                "PHONE":"Tel√©fono"
+	              }
+            }
         },
         "OUTCOMES": {
             "DESCRIPTION": "Puedes definir multiples resultados para esta tarea. Cuando se este completando la tarea, el usuario selecciona uno de los resultados disponibles, que pueden ser utilizados por ejemplo eg. una condicion utilizada mas adelante en el proceso.",
@@ -523,7 +540,7 @@
 
     "TOUR": {
         "WELCOME-TITLE": "Bienvenido, {{userName}}",
-        "WELCOME-CONTENT": "Esta es una pequeÒa guia del Editor Flowable. Los siguientes pasos te guiaran a traves de diferentes secciones de la aplicacion.Presion ESC para detener la guia en cualquier momento." ,
+        "WELCOME-CONTENT": "Esta es una peque√±a guia del Editor Flowable. Los siguientes pasos te guiaran a traves de diferentes secciones de la aplicacion.Presion ESC para detener la guia en cualquier momento." ,
         "PALETTE-TITLE": "Barra de dibujo",
         "PALETTE-CONTENT": "Todos los simbolos necesarios para crear un proceso de negocio pueden ser encontrados aqui. Se encuentran agrupados de manera logica. Para abrir un grupo simplemente da click en el:",
         "CANVAS-TITLE": "El area de trabajo",
@@ -531,7 +548,7 @@
         "DRAGDROP-TITLE": "Ejemplo arrastrar y soltar",
         "DRAGDROP-CONTENT": "aqui esta un ejemplo de como comenzar a modelar:",
         "PROPERTIES-TITLE": "Propiedades",
-        "PROPERTIES-CONTENT": "Aqui puedes configurar las propuedades de un proceso de negocios. Simplemente selecciona un elemento en el area de trabajo y sus propiedades ser·n mostradas. Da click en la propiedad si deseas editarla",
+        "PROPERTIES-CONTENT": "Aqui puedes configurar las propuedades de un proceso de negocios. Simplemente selecciona un elemento en el area de trabajo y sus propiedades ser√°n mostradas. Da click en la propiedad si deseas editarla",
         "TOOLBAR-TITLE": "Barra de herramientas",
         "TOOLBAR-CONTENT": "Todas las acciones pueden ser encontradas aqui: guardar o validar un modelo, copiar y pegar partes del proceso, y continua. Pasa sobre los botnones para ver lo que realizan.",
         "END-TITLE": "Fin",
@@ -541,7 +558,7 @@
     "FEATURE-TOUR" : {
         "BENDPOINT" : {
             "TITLE": "Tutorial punto de curva",
-            "DESCRIPTION" : "Cuando estas conectando un elemento con otro usando un flujo de secuencia (Esas felechas entre los pasos del proceso), encontraras que esos flujos de secuencia se crean de manera automatica, si deseas modificar la direccione de las flechas, puedes agregar o eliminar un punto de curva de un flujo de secuencia.<br/><br/> Como se muestra debajo en la figura, primero das click en el boton 'Agregar punto curva'y despues das click en el flujo de secuencia al que deseas agregarlo. El fluo de secuencia te indicar· con un punto en verde que el punto curva puede ser agregado.<br/><br/> Para remover un punto curva, click  en 'eliminar punto curva' y da click en el flujo de secuencia del cual deseas remover."
+            "DESCRIPTION" : "Cuando estas conectando un elemento con otro usando un flujo de secuencia (Esas felechas entre los pasos del proceso), encontraras que esos flujos de secuencia se crean de manera automatica, si deseas modificar la direccione de las flechas, puedes agregar o eliminar un punto de curva de un flujo de secuencia.<br/><br/> Como se muestra debajo en la figura, primero das click en el boton 'Agregar punto curva'y despues das click en el flujo de secuencia al que deseas agregarlo. El fluo de secuencia te indicar√° con un punto en verde que el punto curva puede ser agregado.<br/><br/> Para remover un punto curva, click  en 'eliminar punto curva' y da click en el flujo de secuencia del cual deseas remover."
         }
     },
 
@@ -567,13 +584,13 @@
     "TOOLBAR.ACTION.REDO" : "Rehacer",
     "TOOLBAR.ACTION.ZOOMIN" : "Zoom in",
     "TOOLBAR.ACTION.ZOOMOUT" : "Zoom out",
-    "TOOLBAR.ACTION.ZOOMACTUAL" : "Zoom a tamaÒo actual",
+    "TOOLBAR.ACTION.ZOOMACTUAL" : "Zoom a tama√±o actual",
     "TOOLBAR.ACTION.ZOOMFIT" : "Zoom para ajustar",
     "TOOLBAR.ACTION.BENDPOINT.ADD" : "Agregar punto de curva al flujo de secuencia seleccionado",
     "TOOLBAR.ACTION.BENDPOINT.REMOVE" : "Eliminar punto de curva al flujo de secuencia seleccionado",
     "TOOLBAR.ACTION.ALIGNHORIZONTAL" : "Alinear modelo horizontalmente",
     "TOOLBAR.ACTION.ALIGNVERTICAL" : "Alinear modelo verticalmente",
-    "TOOLBAR.ACTION.SAMESIZE" : "Mismo tamaÒo",
+    "TOOLBAR.ACTION.SAMESIZE" : "Mismo tama√±o",
     "TOOLBAR.ACTION.HELP": "Iniciar la visita guiada",
     "TOOLBAR.ACTION.FEEDBACK": "Proveer retroalimentacion",
 
@@ -601,6 +618,10 @@
     "PROPERTY.ASSIGNMENT.MATCHING" : "Usa &uparrow; y &downarrow; para seleccionar y presiona Enter para confirmar o usa el mouse",
     "PROPERTY.ASSIGNMENT.ASSIGNEE_PLACEHOLDER" : "Introduce un asignado",
     "PROPERTY.ASSIGNMENT.EMPTY" : "No hay asignacion seleccionada",
+    "PROPERTY.ASSIGNMENT.NONE" : "Ninguno ...",
+    "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHUSER": "Buscar usuario",
+    "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHGROUP": "Buscar grupo",
+    "PROPERTY.ASSIGNMENT.SEARCH": "Buscar: ",
     "PROPERTY.ASSIGNMENT.ASSIGNEE_DISPLAY" : "Assignado {{assignee}}",
     "PROPERTY.ASSIGNMENT.CANDIDATE_USERS_DISPLAY" : "{{length}} Usuarios candidatos",
     "PROPERTY.ASSIGNMENT.CANDIDATE_USERS" : "Usuarios candidatos",
@@ -737,12 +758,12 @@
     "PROPERTY.EVENTLISTENERS.ERRORCODE.PLACEHOLDER" : "Introduce un codigo de error",
     "PROPERTY.EVENTLISTENERS.MESSAGENAME" : "Nombre de mensaje",
     "PROPERTY.EVENTLISTENERS.MESSAGENAME.PLACEHOLDER" : "Introduce un nombre de mensaje",
-    "PROPERTY.EVENTLISTENERS.SIGNALNAME" : "Nombre de seÒal",
-    "PROPERTY.EVENTLISTENERS.SIGNALNAME.PLACEHOLDER" : "Introduce un nombre de seÒal",
+    "PROPERTY.EVENTLISTENERS.SIGNALNAME" : "Nombre de se√±al",
+    "PROPERTY.EVENTLISTENERS.SIGNALNAME.PLACEHOLDER" : "Introduce un nombre de se√±al",
     "PROPERTY.EVENTLISTENERS.UNSELECTED" : "No hay escuchador de evento seleccionado",
 
-    "PROPERTY.SIGNALDEFINITIONS.DISPLAY" : "{{length}} definiciones de seÒal",
-    "PROPERTY.SIGNALDEFINITIONS.EMPTY" : "No hay definiciones de seÒal",
+    "PROPERTY.SIGNALDEFINITIONS.DISPLAY" : "{{length}} definiciones de se√±al",
+    "PROPERTY.SIGNALDEFINITIONS.EMPTY" : "No hay definiciones de se√±al",
     "PROPERTY.SIGNALDEFINITIONS.SCOPE-GLOBAL": "Global",
     "PROPERTY.SIGNALDEFINITIONS.SCOPE-PROCESSINSTANCE": "Instancia de proceso",
     "PROPERTY.SIGNALDEFINITIONS.ID" : "Identificador",
@@ -797,7 +818,7 @@
     "EVENT_TYPE.ACTIVITY.ERROR.RECEIVED.TOOLTIP": "Una actividad ha recibido un mensaje de error. Enviado antes que el actual error haya sido recibido por la actividad",
     "EVENT_TYPE.MEMBERSHIP.CREATED.TOOLTIP": "Una nueva membresia ha sido creada",
     "EVENT_TYPE.MEMBERSHIP.DELETED.TOOLTIP": "Una sola membresia ha sido borrada",
-    "EVENT_TYPE.MEMBERSHIPS.DELETED.TOOLTIP": "Todas las membresias relacionadas a un grupo han sido borradas. No se enviaran eventos individuales debido a razones de desempeÒo",
+    "EVENT_TYPE.MEMBERSHIPS.DELETED.TOOLTIP": "Todas las membresias relacionadas a un grupo han sido borradas. No se enviaran eventos individuales debido a razones de desempe√±o",
     "EVENT_TYPE.TASK.ASSIGNED.TOOLTIP": "Una tarea se ha asignado. Se lanzo junto al evento ENTITY_UPDATED",
     "EVENT_TYPE.TASK.COMPLETED.TOOLTIP": "Una tarea ha sido completada. Antes que la entidad sea borrada",
     "EVENT_TYPE.UNCAUGHT.BPMNERROR.TOOLTIP": "Cuando un error BPMN fue lanzado, pero no fue atrapado dentro del proceso",

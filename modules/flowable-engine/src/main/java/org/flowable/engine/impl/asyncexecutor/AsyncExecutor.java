@@ -13,8 +13,7 @@
 package org.flowable.engine.impl.asyncexecutor;
 
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.JobInfo;
 
 /**
  * @author Tijd Rademakers
@@ -33,10 +32,10 @@ public interface AsyncExecutor {
     void shutdown();
 
     /**
-     * Offers the provided {@link JobEntity} to this {@link AsyncExecutor} instance to execute. If the offering does not work for some reason, false will be returned (For example when the job queue is
+     * Offers the provided {@link JobInfo} to this {@link AsyncExecutor} instance to execute. If the offering does not work for some reason, false will be returned (For example when the job queue is
      * full in the {@link DefaultAsyncJobExecutor}).
      */
-    boolean executeAsyncJob(Job job);
+    boolean executeAsyncJob(JobInfo job);
 
     int getRemainingCapacity();
 

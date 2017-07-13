@@ -16,8 +16,9 @@ package org.flowable.idm.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.idm.api.PasswordEncoder;
+import org.flowable.idm.api.PasswordSalt;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
@@ -84,8 +85,8 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
         }
     }
 
-    public List<User> findUserByQueryCriteria(UserQueryImpl query, Page page) {
-        return userDataManager.findUserByQueryCriteria(query, page);
+    public List<User> findUserByQueryCriteria(UserQueryImpl query) {
+        return userDataManager.findUserByQueryCriteria(query);
     }
 
     public long findUserCountByQueryCriteria(UserQueryImpl query) {
@@ -96,18 +97,18 @@ public class UserEntityManagerImpl extends AbstractEntityManager<UserEntity> imp
         return new UserQueryImpl(getCommandExecutor());
     }
 
-    public Boolean checkPassword(String userId, String password) {
+    public Boolean checkPassword(String userId, String password, PasswordEncoder passwordEncoder, PasswordSalt salt) {
         User user = null;
 
         if (userId != null) {
             user = findById(userId);
         }
 
-        return (user != null) && (password != null) && (password.equals(user.getPassword()));
+        return (user != null) && (password != null) && (passwordEncoder.isMatches(password, user.getPassword(), salt));
     }
 
-    public List<User> findUsersByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return userDataManager.findUsersByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<User> findUsersByNativeQuery(Map<String, Object> parameterMap) {
+        return userDataManager.findUsersByNativeQuery(parameterMap);
     }
 
     public long findUserCountByNativeQuery(Map<String, Object> parameterMap) {

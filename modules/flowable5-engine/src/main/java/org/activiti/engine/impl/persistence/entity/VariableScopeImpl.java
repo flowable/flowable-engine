@@ -727,9 +727,14 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     public Object setVariableLocal(String variableName, Object value, boolean fetchAllVariables) {
         return setVariableLocal(variableName, value, getSourceActivityExecution(), fetchAllVariables);
     }
-
-    public Object setVariableLocal(String variableName, Object value,
-            ExecutionEntity sourceActivityExecution, boolean fetchAllVariables) {
+    
+    @Override
+    public Object setVariableLocal(String variableName, Object value, org.flowable.engine.impl.persistence.entity.ExecutionEntity sourceActivityExecution, boolean fetchAllVariables) {
+        // This method is called from v6 only, v5 will never call this method.
+        throw new UnsupportedOperationException();
+    }
+    
+    public Object setVariableLocal(String variableName, Object value, ExecutionEntity sourceActivityExecution, boolean fetchAllVariables) {
 
         if (fetchAllVariables) {
 

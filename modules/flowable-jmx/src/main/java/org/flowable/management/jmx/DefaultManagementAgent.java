@@ -163,7 +163,6 @@ public class DefaultManagementAgent implements ManagementAgent {
 
         for (MBeanServer server : servers) {
             LOG.debug("Found MBeanServer with default domain {}", server.getDefaultDomain());
-            System.out.println(server.getDefaultDomain());
 
             if (jmxConfigurator.getMbeanDomain().equals(server.getDefaultDomain())) {
                 return server;

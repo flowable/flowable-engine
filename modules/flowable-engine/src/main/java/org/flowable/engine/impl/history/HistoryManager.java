@@ -12,10 +12,8 @@
  */
 package org.flowable.engine.impl.history;
 
-import java.util.Date;
 import java.util.Map;
 
-import org.flowable.bpmn.model.FlowElement;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.IdentityLinkEntity;
@@ -38,12 +36,12 @@ public interface HistoryManager {
     /**
      * Record a process-instance ended. Updates the historic process instance if activity history is enabled.
      */
-    void recordProcessInstanceEnd(String processInstanceId, String deleteReason, String activityId);
+    void recordProcessInstanceEnd(ExecutionEntity processInstance, String deleteReason, String activityId);
 
     /**
      * Record a process-instance started and record start-event if activity history is enabled.
      */
-    void recordProcessInstanceStart(ExecutionEntity processInstance, FlowElement startElement);
+    void recordProcessInstanceStart(ExecutionEntity processInstance);
 
     /**
      * Record a process-instance name change.
@@ -53,7 +51,17 @@ public interface HistoryManager {
     /**
      * Record a sub-process-instance started and alters the calledProcessinstanceId on the current active activity's historic counterpart. Only effective when activity history is enabled.
      */
-    void recordSubProcessInstanceStart(ExecutionEntity parentExecution, ExecutionEntity subProcessInstance, FlowElement initialFlowElement);
+    void recordSubProcessInstanceStart(ExecutionEntity parentExecution, ExecutionEntity subProcessInstance);
+    
+    /**
+     * Deletes a historic process instance and all historic data included
+     */
+    void recordProcessInstanceDeleted(String processInstanceId);
+    
+    /**
+     * Deletes historic process instances for a provided process definition id
+     */
+    void recordDeleteHistoricProcessInstancesByProcessDefinitionId(String processDefinitionId);
 
     /**
      * Record the start of an activity, if activity history is enabled.
@@ -81,87 +89,14 @@ public interface HistoryManager {
     void recordTaskCreated(TaskEntity task, ExecutionEntity execution);
 
     /**
-     * Record the assignment of task, if activity history is enabled.
-     */
-    void recordTaskAssignment(TaskEntity task);
-
-    /**
-     * record task instance claim time, if audit history is enabled
-     *
-     * @param task
-     */
-
-    void recordTaskClaim(TaskEntity task);
-
-    /**
-     * Record the id of a the task associated with a historic activity, if activity history is enabled.
-     */
-    void recordTaskId(TaskEntity task);
-
-    /**
      * Record task as ended, if audit history is enabled.
      */
-    void recordTaskEnd(String taskId, String deleteReason);
-
-    /**
-     * Record task assignee change, if audit history is enabled.
-     */
-    void recordTaskAssigneeChange(String taskId, String assignee);
-
-    /**
-     * Record task owner change, if audit history is enabled.
-     */
-    void recordTaskOwnerChange(String taskId, String owner);
+    void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason);
 
     /**
      * Record task name change, if audit history is enabled.
      */
-    void recordTaskNameChange(String taskId, String taskName);
-
-    /**
-     * Record task description change, if audit history is enabled.
-     */
-    void recordTaskDescriptionChange(String taskId, String description);
-
-    /**
-     * Record task due date change, if audit history is enabled.
-     */
-    void recordTaskDueDateChange(String taskId, Date dueDate);
-
-    /**
-     * Record task priority change, if audit history is enabled.
-     */
-    void recordTaskPriorityChange(String taskId, int priority);
-
-    /**
-     * Record task category change, if audit history is enabled.
-     */
-    void recordTaskCategoryChange(String taskId, String category);
-
-    /**
-     * Record task form key change, if audit history is enabled.
-     */
-    void recordTaskFormKeyChange(String taskId, String formKey);
-
-    /**
-     * Record task parent task id change, if audit history is enabled.
-     */
-    void recordTaskParentTaskIdChange(String taskId, String parentTaskId);
-
-    /**
-     * Record task execution id change, if audit history is enabled.
-     */
-    void recordTaskExecutionIdChange(String taskId, String executionId);
-
-    /**
-     * Record task definition key change, if audit history is enabled.
-     */
-    void recordTaskDefinitionKeyChange(String taskId, String taskDefinitionKey);
-
-    /**
-     * Record a change of the process-definition id of a task instance, if activity history is enabled.
-     */
-    public abstract void recordTaskProcessDefinitionChange(String taskId, String processDefinitionId);
+    void recordTaskInfoChange(TaskEntity taskEntity);
 
     /**
      * Record a variable has been created, if audit history is enabled.
@@ -228,13 +163,15 @@ public interface HistoryManager {
      */
     void recordFormPropertiesSubmitted(ExecutionEntity processInstance, Map<String, String> properties, String taskId);
 
-    // Identity link related history
     /**
      * Record the creation of a new {@link IdentityLink}, if audit history is enabled.
      */
     void recordIdentityLinkCreated(IdentityLinkEntity identityLink);
-
-    void deleteHistoricIdentityLink(String id);
+    
+    /**
+     * Record the deletion of a {@link IdentityLink}, if audit history is enabled
+     */
+    void recordIdentityLinkDeleted(String identityLinkId);
 
     void updateProcessBusinessKeyInHistory(ExecutionEntity processInstance);
 

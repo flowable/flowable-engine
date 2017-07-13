@@ -27,6 +27,17 @@ flowableModule.service('UserService', ['$http', '$q',
                 });
             return deferred.promise;
         };
+        
+        /*
+         * Get user info by id
+         */
+        this.getUserInfo = function (userId) {
+            
+            return httpAsPromise({
+                method: 'GET',
+                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/users/' + userId
+            });
+        };
 
         /*
          * Filter users based on a filter text, in the context of workflow: for tasks, processes, etc.

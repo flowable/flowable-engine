@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
@@ -29,11 +28,13 @@ import org.flowable.engine.runtime.ProcessInstance;
  */
 public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
 
-    ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String businessKey, String tenantId, String initiatorVariableName);
+    ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String businessKey, String tenantId, 
+                    String initiatorVariableName, String startActivityId);
 
     ExecutionEntity createChildExecution(ExecutionEntity parentExecutionEntity);
 
-    ExecutionEntity createSubprocessInstance(ProcessDefinition processDefinition, ExecutionEntity superExecutionEntity, String businessKey);
+    ExecutionEntity createSubprocessInstance(ProcessDefinition processDefinition, ExecutionEntity superExecutionEntity, 
+                    String businessKey, String startActivityId);
 
     /**
      * Finds the {@link ExecutionEntity} for the given root process instance id. All children will have been fetched and initialized.
@@ -50,7 +51,7 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
 
     long findExecutionCountByQueryCriteria(ExecutionQueryImpl executionQuery);
 
-    List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery, Page page);
+    List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery);
 
     long findProcessInstanceCountByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
 
@@ -62,9 +63,9 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
 
     Collection<ExecutionEntity> findInactiveExecutionsByActivityIdAndProcessInstanceId(String activityId, String processInstanceId);
 
-    List<Execution> findExecutionsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<Execution> findExecutionsByNativeQuery(Map<String, Object> parameterMap);
 
-    List<ProcessInstance> findProcessInstanceByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<ProcessInstance> findProcessInstanceByNativeQuery(Map<String, Object> parameterMap);
 
     long findExecutionCountByNativeQuery(Map<String, Object> parameterMap);
 
@@ -86,11 +87,13 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
     void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade);
 
     void deleteProcessInstanceExecutionEntity(String processInstanceId, String currentFlowElementId,
-            String deleteReason, boolean cascade, boolean cancel);
+            String deleteReason, boolean cascade, boolean cancel, boolean fireEvents);
 
     void deleteChildExecutions(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
 
     void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
+    
+    void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
 
     void updateProcessInstanceLockTime(String processInstanceId);
 

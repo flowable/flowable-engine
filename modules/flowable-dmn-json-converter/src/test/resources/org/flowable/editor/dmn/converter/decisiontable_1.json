@@ -34,12 +34,12 @@
     "rules": [
         {
             "input1": "< 10",
-            "input2": "<= 18-09-1977",
+            "input2": "<= fn_date('1977-09-18')",
             "output1": "false"
         },
         {
             "input1": "> 10",
-            "input2": "> 18-09-1977",
+            "input2": "> fn_date('1977-09-18')",
             "output1": "true"
         }
     ]

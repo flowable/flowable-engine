@@ -17,14 +17,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.form.api.FormDefinitionQuery;
 import org.flowable.form.api.FormRepositoryService;
@@ -36,6 +28,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Yvo Swillens
@@ -86,10 +87,10 @@ public class FormDefinitionCollectionResource {
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "key,category,id,version,name,deploymentId,tenantId", paramType = "query"),
     })
     @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Indicates request was successful and the form instances are returned"),
+            @ApiResponse(code = 204, message = "Indicates request was successful and the form definitions are returned"),
             @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
-    @RequestMapping(value = "/form-repository/forms", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/form-repository/form-definitions", method = RequestMethod.GET, produces = "application/json")
     public DataResponse getForms(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         FormDefinitionQuery formDefinitionQuery = formRepositoryService.createFormDefinitionQuery();
 

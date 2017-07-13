@@ -34,8 +34,8 @@ public class NativeDecisionTableQueryImpl extends AbstractNativeQuery<NativeDeci
 
     // results ////////////////////////////////////////////////////////////////
 
-    public List<DmnDecisionTable> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return commandContext.getDecisionTableEntityManager().findDecisionTablesByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<DmnDecisionTable> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
+        return commandContext.getDecisionTableEntityManager().findDecisionTablesByNativeQuery(parameterMap);
     }
 
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {

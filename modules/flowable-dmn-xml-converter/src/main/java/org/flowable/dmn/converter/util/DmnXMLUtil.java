@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -57,7 +56,7 @@ public class DmnXMLUtil implements DmnXMLConstants {
     }
 
     public static void addXMLLocation(DmnElement element, XMLStreamReader xtr) {
-        Location location = xtr.getLocation();
+        // Location location = xtr.getLocation();
         // element.setXmlRowNumber(location.getLineNumber());
         // element.setXmlColumnNumber(location.getColumnNumber());
     }

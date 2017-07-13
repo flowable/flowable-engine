@@ -24,7 +24,7 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
  */
 public class GetProcessOnDefinitionInitializedListener implements FlowableEventListener {
 
-    public static String processId = null;
+    public static String processId;
 
     @Override
     public void onEvent(FlowableEvent event) {

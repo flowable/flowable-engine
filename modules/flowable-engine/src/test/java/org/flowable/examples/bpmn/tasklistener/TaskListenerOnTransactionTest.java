@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -133,7 +134,7 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
         ProcessInstance firstProcessInstance = runtimeService.startProcessInstanceByKey("transactionDependentTaskListenerProcess");
         assertProcessEnded(firstProcessInstance.getId());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
             assertEquals(1, historicProcessInstances.size());
             assertEquals("transactionDependentTaskListenerProcess", historicProcessInstances.get(0).getProcessDefinitionKey());
@@ -146,7 +147,7 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
 
         assertProcessEnded(secondProcessInstance.getId());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // first historic process instance was deleted by task listener
             List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
             assertEquals(1, historicProcessInstances.size());

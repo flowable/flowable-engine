@@ -23,7 +23,7 @@ import org.flowable.engine.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.engine.impl.cmd.UnacquireOwnedJobsCmd;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.JobInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +55,7 @@ public class SharedExecutorServiceAsyncExecutor extends DefaultAsyncJobExecutor 
         setExecuteAsyncRunnableFactory(new ExecuteAsyncRunnableFactory() {
 
             @Override
-            public Runnable createExecuteAsyncRunnable(Job job, ProcessEngineConfigurationImpl processEngineConfiguration) {
+            public Runnable createExecuteAsyncRunnable(JobInfo job, ProcessEngineConfigurationImpl processEngineConfiguration) {
 
                 // Here, the runnable will be created by for example the acquire thread, which has already set the current id.
                 // But it will be executed later on, by the executorService and thus we need to set it explicitly again then

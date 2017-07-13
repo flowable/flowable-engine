@@ -113,6 +113,8 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
         assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
         assertExecutionDetails(event, processInstance);
+        
+        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })

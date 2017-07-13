@@ -21,6 +21,7 @@ FLOWABLE.CONFIG = {
 	'onPremise' : true,
 	'contextRoot' : '/designer',
 	'webContextRoot' : '/designer',
+	'datesLocalization' : false,
 	'formType': 9, 
 	'deployUrls': [{
 	  "name": "localhost",

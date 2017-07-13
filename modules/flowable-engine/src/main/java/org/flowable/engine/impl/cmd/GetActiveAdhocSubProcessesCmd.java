@@ -39,7 +39,7 @@ public class GetActiveAdhocSubProcessesCmd implements Command<List<Execution>>, 
         List<Execution> adhocExecutions = new ArrayList<Execution>();
         List<ExecutionEntity> executions = commandContext.getExecutionEntityManager().findChildExecutionsByProcessInstanceId(processInstanceId);
         for (Execution execution : executions) {
-            if (execution.getCurrentFlowElement() instanceof AdhocSubProcess) {
+            if (((ExecutionEntity) execution).getCurrentFlowElement() instanceof AdhocSubProcess) {
                 adhocExecutions.add(execution);
             }
         }

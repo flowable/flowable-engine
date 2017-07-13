@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -105,6 +105,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
 
+    protected String startActivityId;
     protected String startUserId;
     protected Date startTime;
 
@@ -238,6 +239,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
             persistentState.put("forcedUpdate", Boolean.TRUE);
         }
         persistentState.put("suspensionState", this.suspensionState);
+        persistentState.put("startActivityId", this.startActivityId);
         persistentState.put("startTime", this.startTime);
         persistentState.put("startUserId", this.startUserId);
         persistentState.put("eventSubscriptionCount", eventSubscriptionCount);
@@ -841,6 +843,14 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     public String getActivityName() {
         return activityName;
+    }
+
+    public String getStartActivityId() {
+        return startActivityId;
+    }
+
+    public void setStartActivityId(String startActivityId) {
+        this.startActivityId = startActivityId;
     }
 
     public String getStartUserId() {

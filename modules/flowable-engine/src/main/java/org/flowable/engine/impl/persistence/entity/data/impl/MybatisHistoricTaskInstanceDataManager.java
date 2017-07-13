@@ -78,9 +78,6 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
     public List<HistoricTaskInstance> findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
         // paging doesn't work for combining task instances and variables
         // due to an outer join, so doing it in-memory
-        if (historicTaskInstanceQuery.getFirstResult() < 0 || historicTaskInstanceQuery.getMaxResults() <= 0) {
-            return Collections.EMPTY_LIST;
-        }
 
         int firstResult = historicTaskInstanceQuery.getFirstResult();
         int maxResults = historicTaskInstanceQuery.getMaxResults();
@@ -93,8 +90,7 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
         }
         historicTaskInstanceQuery.setFirstResult(0);
 
-        List<HistoricTaskInstance> instanceList = getDbSqlSession().selectListWithRawParameterWithoutFilter("selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteria", historicTaskInstanceQuery,
-                historicTaskInstanceQuery.getFirstResult(), historicTaskInstanceQuery.getMaxResults());
+        List<HistoricTaskInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheCheck("selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteria", historicTaskInstanceQuery);
 
         if (instanceList != null && !instanceList.isEmpty()) {
             if (firstResult > 0) {
@@ -105,7 +101,7 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
                     return Collections.EMPTY_LIST;
                 }
             } else {
-                int toIndex = Math.min(maxResults, instanceList.size());
+                int toIndex = maxResults > 0 ?  Math.min(maxResults, instanceList.size()) : instanceList.size();
                 return instanceList.subList(0, toIndex);
             }
         }
@@ -115,8 +111,8 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<HistoricTaskInstance> findHistoricTaskInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return getDbSqlSession().selectListWithRawParameter("selectHistoricTaskInstanceByNativeQuery", parameterMap, firstResult, maxResults);
+    public List<HistoricTaskInstance> findHistoricTaskInstancesByNativeQuery(Map<String, Object> parameterMap) {
+        return getDbSqlSession().selectListWithRawParameter("selectHistoricTaskInstanceByNativeQuery", parameterMap);
     }
 
     @Override

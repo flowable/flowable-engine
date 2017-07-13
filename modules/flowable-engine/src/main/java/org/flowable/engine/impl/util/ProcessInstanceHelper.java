@@ -151,11 +151,12 @@ public class ProcessInstanceHelper {
         }
 
         ExecutionEntity processInstance = commandContext.getExecutionEntityManager()
-                .createProcessInstanceExecution(processDefinition, businessKey, processDefinition.getTenantId(), initiatorVariableName);
+                .createProcessInstanceExecution(processDefinition, businessKey, processDefinition.getTenantId(), 
+                                initiatorVariableName, initialFlowElement.getId());
 
         processInstance.setName(processInstanceName);
 
-        commandContext.getHistoryManager().recordProcessInstanceStart(processInstance, initialFlowElement);
+        commandContext.getHistoryManager().recordProcessInstanceStart(processInstance);
 
         boolean eventDispatcherEnabled = Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled();
         if (eventDispatcherEnabled) {
@@ -241,6 +242,7 @@ public class ProcessInstanceHelper {
                     ExecutionEntity messageExecution = commandContext.getExecutionEntityManager().createChildExecution(parentExecution);
                     messageExecution.setCurrentFlowElement(startEvent);
                     messageExecution.setEventScope(true);
+                    messageExecution.setActive(false);
 
                     messageEventSubscriptions.add(commandContext.getEventSubscriptionEntityManager().insertMessageEvent(
                             messageEventDefinition.getMessageRef(), messageExecution));
@@ -257,6 +259,7 @@ public class ProcessInstanceHelper {
                     ExecutionEntity signalExecution = commandContext.getExecutionEntityManager().createChildExecution(parentExecution);
                     signalExecution.setCurrentFlowElement(startEvent);
                     signalExecution.setEventScope(true);
+                    signalExecution.setActive(false);
 
                     signalEventSubscriptions.add(commandContext.getEventSubscriptionEntityManager().insertSignalEvent(
                             signalEventDefinition.getSignalRef(), signal, signalExecution));
@@ -267,6 +270,7 @@ public class ProcessInstanceHelper {
                     ExecutionEntity timerExecution = commandContext.getExecutionEntityManager().createChildExecution(parentExecution);
                     timerExecution.setCurrentFlowElement(startEvent);
                     timerExecution.setEventScope(true);
+                    timerExecution.setActive(false);
 
                     JobManager jobManager = commandContext.getJobManager();
 

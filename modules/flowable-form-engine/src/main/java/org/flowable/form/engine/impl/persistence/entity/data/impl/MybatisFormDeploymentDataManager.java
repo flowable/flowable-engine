@@ -15,7 +15,6 @@ package org.flowable.form.engine.impl.persistence.entity.data.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.FormDeploymentQueryImpl;
@@ -45,24 +44,14 @@ public class MybatisFormDeploymentDataManager extends AbstractDataManager<FormDe
     }
 
     @Override
-    public FormDeploymentEntity findLatestDeploymentByName(String deploymentName) {
-        List<?> list = getDbSqlSession().selectList("selectDeploymentsByName", deploymentName, 0, 1);
-        if (list != null && !list.isEmpty()) {
-            return (FormDeploymentEntity) list.get(0);
-        }
-        return null;
-    }
-
-    @Override
     public long findDeploymentCountByQueryCriteria(FormDeploymentQueryImpl deploymentQuery) {
         return (Long) getDbSqlSession().selectOne("selectDeploymentCountByQueryCriteria", deploymentQuery);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<FormDeployment> findDeploymentsByQueryCriteria(FormDeploymentQueryImpl deploymentQuery, Page page) {
-        final String query = "selectDeploymentsByQueryCriteria";
-        return getDbSqlSession().selectList(query, deploymentQuery, page);
+    public List<FormDeployment> findDeploymentsByQueryCriteria(FormDeploymentQueryImpl deploymentQuery) {
+        return getDbSqlSession().selectList("selectDeploymentsByQueryCriteria", deploymentQuery);
     }
 
     @Override
@@ -72,8 +61,8 @@ public class MybatisFormDeploymentDataManager extends AbstractDataManager<FormDe
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<FormDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return getDbSqlSession().selectListWithRawParameter("selectDeploymentByNativeQuery", parameterMap, firstResult, maxResults);
+    public List<FormDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap) {
+        return getDbSqlSession().selectListWithRawParameter("selectDeploymentByNativeQuery", parameterMap);
     }
 
     @Override
