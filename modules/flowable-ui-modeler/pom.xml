@@ -24,7 +24,7 @@
 		<tomcat.version>7.0.53</tomcat.version>
 
         <system-builder.version>1.1.0-SNAPSHOT</system-builder.version>
-        <flowable.version>6.0.0</flowable.version>
+        <flowable.version>6.1.0</flowable.version>
   </properties>
 
 	<prerequisites>
