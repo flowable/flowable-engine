@@ -161,7 +161,7 @@ public class SubProcessMultiDiagramConverterTest extends AbstractConverterTest {
     		info = new ArrayList<GraphicInfo>(flowLocationMap.get(id));
     		diInfo = multiMainEdgeMap.get(id);
     		// if not found in main process, must be in subprocess
-    		if (null == diInfo) {
+    		if (diInfo == null) {
         		diInfo = multiSubEdgeMap.get(id);
     		}
     		assertEquals(info.size(), diInfo.size());
@@ -174,7 +174,7 @@ public class SubProcessMultiDiagramConverterTest extends AbstractConverterTest {
 			// compare graphic info for each element
 			shapeInfo = multiMainShapeMap.get(id);
     		// if not found in main process, must be in subprocess
-			if (null == shapeInfo) {
+			if (shapeInfo == null) {
 				shapeInfo = multiSubShapeMap.get(id);
 			}
         	assertTrue(locationMap.get(id).equals(shapeInfo));

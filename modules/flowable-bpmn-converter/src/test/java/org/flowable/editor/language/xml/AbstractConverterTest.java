@@ -42,7 +42,6 @@ public abstract class AbstractConverterTest implements BpmnXMLConstants {
 
     protected BpmnModel exportAndReadXMLFile(BpmnModel bpmnModel) throws Exception {
         byte[] xml = new BpmnXMLConverter().convertToXML(bpmnModel);
-        System.out.println("xml " + new String(xml, "UTF-8"));
         XMLInputFactory xif = XMLInputFactory.newInstance();
         InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(xml), "UTF-8");
         XMLStreamReader xtr = xif.createXMLStreamReader(in);
@@ -51,9 +50,9 @@ public abstract class AbstractConverterTest implements BpmnXMLConstants {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	protected Map<String, Map> parseBPMNDI(byte[] xml) throws Exception {
-    	Map<String, Map> BpmnDIMap = new HashMap<String, Map>();
-    	Map<String, List<GraphicInfo>>edgesMap = null;
-    	Map<String, GraphicInfo>shapesMap = null;
+    	Map<String, Map> bpmnDIMap = new HashMap<String, Map>();
+    	Map<String, List<GraphicInfo>> edgesMap = null;
+    	Map<String, GraphicInfo> shapesMap = null;
 
         XMLInputFactory xif = XMLInputFactory.newInstance();
         InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(xml), "UTF-8");
@@ -63,8 +62,9 @@ public abstract class AbstractConverterTest implements BpmnXMLConstants {
     	while (xtr.hasNext() && !(xtr.isEndElement() && xtr.getLocalName().equalsIgnoreCase(ELEMENT_DEFINITIONS))) {
     		if (xtr.isStartElement() && xtr.getLocalName().equalsIgnoreCase(ELEMENT_DI_PLANE)) {
     			diagramId = xtr.getAttributeValue(null, ATTRIBUTE_DI_BPMNELEMENT);
+    			
     			// retrieve diagram map
-    			Map<String, Map> diagramMap = BpmnDIMap.get(diagramId);
+    			Map<String, Map> diagramMap = bpmnDIMap.get(diagramId);
 
     			// initialize diagram map if it doesn't exist yet
     			if (null == diagramMap) {
@@ -103,6 +103,7 @@ public abstract class AbstractConverterTest implements BpmnXMLConstants {
     						if (!diagramMap.containsKey(ELEMENT_DI_SHAPE)) {
     							diagramMap.put(ELEMENT_DI_SHAPE, shapesMap);
     						}
+    						
     					} else if (xtr.getLocalName().equalsIgnoreCase(ELEMENT_DI_EDGE)) {
     						// retrieve edges map
     						edgesMap = diagramMap.get(ELEMENT_DI_EDGE);
@@ -135,12 +136,12 @@ public abstract class AbstractConverterTest implements BpmnXMLConstants {
     					}
     				}
     			}
-    			BpmnDIMap.put(diagramId, diagramMap);
+    			bpmnDIMap.put(diagramId, diagramMap);
     		}
     		xtr.next();
     	}
 
-        return BpmnDIMap;
+        return bpmnDIMap;
     }
     
     protected void compareCollections(List<GraphicInfo> info, List<GraphicInfo> diInfo) {
@@ -153,6 +154,7 @@ public abstract class AbstractConverterTest implements BpmnXMLConstants {
 					info.remove(ginfo);
 					foundMatch = false;
 					continue;
+					
 				} else {
 					assertTrue(ginfo.equals(gdInfo));
 					foundMatch = true;
