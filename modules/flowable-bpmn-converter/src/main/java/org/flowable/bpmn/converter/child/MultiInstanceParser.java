@@ -58,10 +58,19 @@ public class MultiInstanceParser extends BaseChildElementParser {
                     }
 
                 } else if (xtr.isStartElement() && ELEMENT_MULTIINSTANCE_CONDITION.equalsIgnoreCase(xtr.getLocalName())) {
-                    multiInstanceDef.setCompletionCondition(xtr.getElementText());
+                	multiInstanceDef.setCompletionCondition(xtr.getElementText());
 
+                } else if (xtr.isStartElement() && ELEMENT_EXTENSIONS.equalsIgnoreCase(xtr.getLocalName())) {
+                	// save all extension elements
+                	while (xtr.hasNext() && !(xtr.isEndElement() && ELEMENT_EXTENSIONS.equalsIgnoreCase(xtr.getLocalName()))) {
+                		xtr.next();
+                		if (xtr.isStartElement()) {
+                			// advance to next child within extension elements
+                			multiInstanceDef.addExtensionElement(BpmnXMLUtil.parseExtensionElement(xtr));
+                		}
+                	}
                 } else if (xtr.isEndElement() && getElementName().equalsIgnoreCase(xtr.getLocalName())) {
-                    readyWithMultiInstance = true;
+                	readyWithMultiInstance = true;
                 }
             }
         } catch (Exception e) {

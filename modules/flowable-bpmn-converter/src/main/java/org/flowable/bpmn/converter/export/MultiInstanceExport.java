@@ -12,12 +12,17 @@
  */
 package org.flowable.bpmn.converter.export;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.Activity;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 
 public class MultiInstanceExport implements BpmnXMLConstants {
@@ -45,6 +50,14 @@ public class MultiInstanceExport implements BpmnXMLConstants {
                     xtw.writeStartElement(ELEMENT_MULTIINSTANCE_CONDITION);
                     xtw.writeCharacters(multiInstanceObject.getCompletionCondition());
                     xtw.writeEndElement();
+                }
+
+                // check for extension elements
+                Map<String, List<ExtensionElement>> extensions = multiInstanceObject.getExtensionElements();
+                if (!extensions.isEmpty()) {
+                	Map<String, String> namespaceMap = new HashMap<String, String>();
+                	namespaceMap.put(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE);
+                    BpmnXMLUtil.writeExtensionElements(multiInstanceObject, false, namespaceMap, xtw);
                 }
                 xtw.writeEndElement();
             }
