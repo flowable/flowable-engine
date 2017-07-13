@@ -124,19 +124,9 @@ public interface HistoryManager {
     void createIdentityLinkComment(String taskId, String userId, String groupId, String type, boolean create);
 
     /**
-     * Creates a new comment to indicate a new user {@link IdentityLink} has been created or deleted, if history is enabled.
-     */
-    void createUserIdentityLinkComment(String taskId, String userId, String type, boolean create);
-
-    /**
      * Creates a new comment to indicate a new group {@link IdentityLink} has been created or deleted, if history is enabled.
      */
     void createGroupIdentityLinkComment(String taskId, String groupId, String type, boolean create);
-
-    /**
-     * Creates a new comment to indicate a new {@link IdentityLink} has been created or deleted, if history is enabled.
-     */
-    void createIdentityLinkComment(String taskId, String userId, String groupId, String type, boolean create, boolean forceNullUserId);
 
     /**
      * Creates a new comment to indicate a new user {@link IdentityLink} has been created or deleted, if history is enabled.
@@ -147,11 +137,6 @@ public interface HistoryManager {
      * Creates a new comment to indicate a new {@link IdentityLink} has been created or deleted, if history is enabled.
      */
     void createProcessInstanceIdentityLinkComment(String processInstanceId, String userId, String groupId, String type, boolean create);
-
-    /**
-     * Creates a new comment to indicate a new {@link IdentityLink} has been created or deleted, if history is enabled.
-     */
-    void createProcessInstanceIdentityLinkComment(String processInstanceId, String userId, String groupId, String type, boolean create, boolean forceNullUserId);
 
     /**
      * Creates a new comment to indicate a new attachment has been created or deleted, if history is enabled.
@@ -167,7 +152,7 @@ public interface HistoryManager {
      * Record the creation of a new {@link IdentityLink}, if audit history is enabled.
      */
     void recordIdentityLinkCreated(IdentityLinkEntity identityLink);
-    
+
     /**
      * Record the deletion of a {@link IdentityLink}, if audit history is enabled
      */

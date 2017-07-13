@@ -27,6 +27,7 @@ import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.task.Event;
+import org.flowable.engine.task.IdentityLink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,11 +65,6 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
     }
 
     @Override
-    public void createUserIdentityLinkComment(String taskId, String userId, String type, boolean create) {
-        createIdentityLinkComment(taskId, userId, null, type, create, false);
-    }
-
-    @Override
     public void createGroupIdentityLinkComment(String taskId, String groupId, String type, boolean create) {
         createIdentityLinkComment(taskId, null, groupId, type, create, false);
     }
@@ -78,13 +74,10 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
         createIdentityLinkComment(taskId, userId, null, type, create, forceNullUserId);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.flowable.engine.impl.history.HistoryManagerInterface# createIdentityLinkComment(java.lang.String, java.lang.String, java.lang.String, java.lang.String, boolean, boolean)
+    /**
+     * Creates a new comment to indicate a new {@link IdentityLink} has been created or deleted, if history is enabled.
      */
-    @Override
-    public void createIdentityLinkComment(String taskId, String userId, String groupId, String type, boolean create, boolean forceNullUserId) {
+    private void createIdentityLinkComment(String taskId, String userId, String groupId, String type, boolean create, boolean forceNullUserId) {
         if (isHistoryEnabled()) {
             String authenticatedUserId = Authentication.getAuthenticatedUserId();
             CommentEntity comment = getCommentEntityManager().create();
@@ -114,11 +107,6 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
 
     @Override
     public void createProcessInstanceIdentityLinkComment(String processInstanceId, String userId, String groupId, String type, boolean create) {
-        createProcessInstanceIdentityLinkComment(processInstanceId, userId, groupId, type, create, false);
-    }
-
-    @Override
-    public void createProcessInstanceIdentityLinkComment(String processInstanceId, String userId, String groupId, String type, boolean create, boolean forceNullUserId) {
         if (isHistoryEnabled()) {
             String authenticatedUserId = Authentication.getAuthenticatedUserId();
             CommentEntity comment = getCommentEntityManager().create();
@@ -126,7 +114,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
             comment.setType(CommentEntity.TYPE_EVENT);
             comment.setTime(getClock().getCurrentTime());
             comment.setProcessInstanceId(processInstanceId);
-            if (userId != null || forceNullUserId) {
+            if (userId != null) {
                 if (create) {
                     comment.setAction(Event.ACTION_ADD_USER_LINK);
                 } else {
