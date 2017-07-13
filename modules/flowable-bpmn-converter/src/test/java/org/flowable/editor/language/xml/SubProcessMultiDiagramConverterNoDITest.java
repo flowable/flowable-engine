@@ -16,14 +16,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-
-import org.flowable.bpmn.converter.SubprocessXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.StartEvent;
@@ -32,25 +24,6 @@ import org.flowable.bpmn.model.UserTask;
 import org.junit.Test;
 
 public class SubProcessMultiDiagramConverterNoDITest extends AbstractConverterTest {
-
-    @Override
-    protected BpmnModel readXMLFile() throws Exception {
-        InputStream xmlStream = this.getClass().getClassLoader().getResourceAsStream(getResource());
-        XMLInputFactory xif = XMLInputFactory.newInstance();
-        InputStreamReader in = new InputStreamReader(xmlStream, "UTF-8");
-        XMLStreamReader xtr = xif.createXMLStreamReader(in);
-        return new SubprocessXMLConverter().convertToBpmnModel(xtr);
-    }
-
-    @Override
-    protected BpmnModel exportAndReadXMLFile(BpmnModel bpmnModel) throws Exception {
-        byte[] xml = new SubprocessXMLConverter().convertToXML(bpmnModel);
-        System.out.println("xml " + new String(xml, "UTF-8"));
-        XMLInputFactory xif = XMLInputFactory.newInstance();
-        InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(xml), "UTF-8");
-        XMLStreamReader xtr = xif.createXMLStreamReader(in);
-        return new SubprocessXMLConverter().convertToBpmnModel(xtr);
-    }
 
     @Test
     public void convertXMLToModel() throws Exception {
