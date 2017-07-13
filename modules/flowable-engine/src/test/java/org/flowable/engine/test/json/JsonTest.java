@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -94,7 +95,7 @@ public class JsonTest extends PluggableFlowableTestCase {
         assertNotNull(task);
         assertEquals("userTaskSuccess", task.getTaskDefinitionKey());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery()
                     .processInstanceId(processInstance.getProcessInstanceId()).orderByVariableName().asc().list();
             assertEquals(2, historicVariableInstances.size());
@@ -212,7 +213,7 @@ public class JsonTest extends PluggableFlowableTestCase {
         assertNotNull(task);
         assertEquals("userTaskSuccess", task.getTaskDefinitionKey());
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
                     .processInstanceId(processInstance.getProcessInstanceId()).singleResult();
             value = (ArrayNode) historicVariableInstance.getValue();

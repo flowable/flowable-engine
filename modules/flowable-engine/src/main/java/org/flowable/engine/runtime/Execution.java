@@ -12,8 +12,6 @@
  */
 package org.flowable.engine.runtime;
 
-import org.flowable.bpmn.model.FlowElement;
-
 /**
  * Represent a 'path of execution' in a process instance.
  * 
@@ -42,11 +40,6 @@ public interface Execution {
      * Returns the id of the activity where the execution currently is at. Returns null if the execution is not a 'leaf' execution (eg concurrent parent).
      */
     String getActivityId();
-
-    /**
-     * Return current flow element
-     */
-    FlowElement getCurrentFlowElement();
 
     /**
      * Id of the root of the execution tree representing the process instance. It is the same as {@link #getId()} if this execution is the process instance.

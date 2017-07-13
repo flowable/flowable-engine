@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.engine.delegate.VariableScope;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.VariableInstance;
 
 /**
@@ -175,6 +176,11 @@ public class NoExecutionVariableScope implements VariableScope {
 
     @Override
     public Object setVariableLocal(String variableName, Object value, boolean fetchAllVariables) {
+        throw new UnsupportedOperationException("No execution active, no variables can be set");
+    }
+    
+    @Override
+    public Object setVariableLocal(String variableName, Object value, ExecutionEntity sourceActivityExecution, boolean fetchAllVariables) {
         throw new UnsupportedOperationException("No execution active, no variables can be set");
     }
 

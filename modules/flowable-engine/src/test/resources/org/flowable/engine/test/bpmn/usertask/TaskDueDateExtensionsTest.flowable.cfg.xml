@@ -71,12 +71,17 @@
         </property>
 
         <property name="history" value="full"/>
+        <property name="asyncHistoryEnabled" value="false" />
     </bean>
 
     <bean id="asyncExecutor" class="org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor">
         <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000"/>
         <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000"/>
     </bean>
+    
+    <bean id="asyncHistoryExecutor" class="org.flowable.engine.impl.asyncexecutor.DefaultAsyncHistoryJobExecutor">
+    	<property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
+  	</bean>
 
     <bean id="clock" class="org.flowable.engine.common.impl.util.DefaultClockImpl"/>
 

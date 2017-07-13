@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.impl.interceptor.Command;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.VariableInstance;
 
 /**
@@ -206,6 +207,11 @@ public interface VariableScope {
      * Similar to {@link #setVariableLocal(String, Object, value)}, but with an extra flag to indicate whether all variables should be fetched while doing this or not.
      */
     Object setVariableLocal(String variableName, Object value, boolean fetchAllVariables);
+    
+    /**
+     * Similar to ${@link #setVariableLocal(String, Object, boolean)}}, but with an extra option to provide an alternative source execution (sometimes needed for correct history).
+     */
+    Object setVariableLocal(String variableName, Object value, ExecutionEntity sourceActivityExecution, boolean fetchAllVariables);
 
     /**
      * Sets the provided variables to the variable scope.

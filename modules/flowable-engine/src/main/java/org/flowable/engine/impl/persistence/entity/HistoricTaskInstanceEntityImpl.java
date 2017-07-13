@@ -47,6 +47,7 @@ public class HistoricTaskInstanceEntityImpl extends HistoricScopeInstanceEntityI
     protected Date claimTime;
     protected String category;
     protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
+    protected Date lastUpdateTime;
     protected List<HistoricVariableInstanceEntity> queryVariables;
     protected List<HistoricIdentityLinkEntity> queryIdentityLinks;
     protected List<HistoricIdentityLinkEntity> identityLinks = new ArrayList<>();
@@ -70,6 +71,7 @@ public class HistoricTaskInstanceEntityImpl extends HistoricScopeInstanceEntityI
         this.assignee = task.getAssignee();
         this.startTime = Context.getProcessEngineConfiguration().getClock().getCurrentTime();
         this.taskDefinitionKey = task.getTaskDefinitionKey();
+        this.formKey = task.getFormKey();
 
         this.setPriority(task.getPriority());
         this.setDueDate(task.getDueDate());
@@ -105,6 +107,9 @@ public class HistoricTaskInstanceEntityImpl extends HistoricScopeInstanceEntityI
         }
         if (claimTime != null) {
             persistentState.put("claimTime", claimTime);
+        }
+        if (lastUpdateTime != null) {
+            persistentState.put("lastUpdateTime", lastUpdateTime);
         }
         return persistentState;
     }
@@ -245,6 +250,14 @@ public class HistoricTaskInstanceEntityImpl extends HistoricScopeInstanceEntityI
             return null;
         }
         return endTime.getTime() - claimTime.getTime();
+    }
+
+    public Date getLastUpdateTime() {
+        return lastUpdateTime;
+    }
+
+    public void setLastUpdateTime(Date lastUpdateTime) {
+        this.lastUpdateTime = lastUpdateTime;
     }
 
     public Map<String, Object> getTaskLocalVariables() {

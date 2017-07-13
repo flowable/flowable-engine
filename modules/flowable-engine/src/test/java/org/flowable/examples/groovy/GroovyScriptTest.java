@@ -13,7 +13,6 @@
 
 package org.flowable.examples.groovy;
 
-import java.util.Date;
 import java.util.List;
 
 import org.flowable.engine.common.impl.util.CollectionUtil;
@@ -49,8 +48,6 @@ public class GroovyScriptTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testAsyncScript() {
-        // Set the clock fixed
-        Date startTime = new Date();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testAsyncScript");
 
         JobQuery jobQuery = managementService.createJobQuery().processInstanceId(processInstance.getId());

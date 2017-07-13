@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.flowable.engine.FlowableTaskAlreadyClaimedException;
 import org.flowable.engine.FlowableEngineAgenda;
+import org.flowable.engine.FlowableTaskAlreadyClaimedException;
 import org.flowable.engine.JobNotFoundException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.interceptor.AbstractCommandContext;
@@ -45,6 +45,7 @@ import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityMan
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityManager;
+import org.flowable.engine.impl.persistence.entity.HistoryJobEntityManager;
 import org.flowable.engine.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.engine.impl.persistence.entity.JobEntityManager;
 import org.flowable.engine.impl.persistence.entity.ModelEntityManager;
@@ -75,7 +76,8 @@ public class CommandContext extends AbstractCommandContext {
     protected FlowableEngineAgenda agenda;
     protected Map<String, ExecutionEntity> involvedExecutions = new HashMap<String, ExecutionEntity>(1); // The executions involved with the command
     protected LinkedList<Object> resultStack = new LinkedList<Object>(); // needs to be a stack, as JavaDelegates can do api calls again
-
+    protected boolean hideAsyncHistoryExceptions;
+    
     public CommandContext(Command<?> command, ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(command);
         this.processEngineConfiguration = processEngineConfiguration;
@@ -89,6 +91,9 @@ public class CommandContext extends AbstractCommandContext {
             // reduce log level, because this may have been caused because of job deletion due to cancelActiviti="true"
             log.info("Error while closing command context", exception);
         } else {
+            if (hideAsyncHistoryExceptions) {
+                return;
+            }
             super.logException();
         }
     }
@@ -192,6 +197,10 @@ public class CommandContext extends AbstractCommandContext {
     public DeadLetterJobEntityManager getDeadLetterJobEntityManager() {
         return processEngineConfiguration.getDeadLetterJobEntityManager();
     }
+    
+    public HistoryJobEntityManager getHistoryJobEntityManager() {
+        return processEngineConfiguration.getHistoryJobEntityManager();
+    }
 
     public AttachmentEntityManager getAttachmentEntityManager() {
         return processEngineConfiguration.getAttachmentEntityManager();
@@ -262,5 +271,13 @@ public class CommandContext extends AbstractCommandContext {
 
     public void setResult(Object result) {
         resultStack.add(result);
+    }
+
+    public boolean isHideAsyncHistoryExceptions() {
+        return hideAsyncHistoryExceptions;
+    }
+
+    public void setHideAsyncHistoryExceptions(boolean hideAsyncHistoryExceptions) {
+        this.hideAsyncHistoryExceptions = hideAsyncHistoryExceptions;
     }
 }

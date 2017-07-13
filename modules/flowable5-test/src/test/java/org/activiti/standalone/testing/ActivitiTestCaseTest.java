@@ -14,8 +14,8 @@
 package org.activiti.standalone.testing;
 
 import org.flowable.engine.task.Task;
-import org.flowable.engine.test.FlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.flowable.engine.test.FlowableTestCase;
 
 /**
  * @author Joram Barrez

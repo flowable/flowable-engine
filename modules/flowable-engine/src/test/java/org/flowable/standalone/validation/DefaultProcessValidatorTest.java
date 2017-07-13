@@ -59,7 +59,7 @@ public class DefaultProcessValidatorTest {
         Assert.assertNotNull(bpmnModel);
 
         List<ValidationError> allErrors = processValidator.validate(bpmnModel);
-        Assert.assertEquals(65, allErrors.size());
+        Assert.assertEquals(69, allErrors.size());
 
         String setName = ValidatorSetNames.FLOWABLE_EXECUTABLE_PROCESS; // shortening it a bit
 
@@ -138,6 +138,14 @@ public class DefaultProcessValidatorTest {
         assertCommonProblemFieldForActivity(problems.get(0));
         assertCommonProblemFieldForActivity(problems.get(1));
         problems = findErrors(allErrors, setName, Problems.MAIL_TASK_NO_CONTENT, 4);
+        assertCommonProblemFieldForActivity(problems.get(0));
+        assertCommonProblemFieldForActivity(problems.get(1));
+
+        // Http task
+        problems = findErrors(allErrors, setName, Problems.HTTP_TASK_NO_REQUEST_METHOD, 2);
+        assertCommonProblemFieldForActivity(problems.get(0));
+        assertCommonProblemFieldForActivity(problems.get(1));
+        problems = findErrors(allErrors, setName, Problems.HTTP_TASK_NO_REQUEST_URL, 2);
         assertCommonProblemFieldForActivity(problems.get(0));
         assertCommonProblemFieldForActivity(problems.get(1));
 

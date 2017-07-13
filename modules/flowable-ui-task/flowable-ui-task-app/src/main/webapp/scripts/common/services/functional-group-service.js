@@ -27,6 +27,17 @@ flowableModule.service('FunctionalGroupService', ['$http', '$q',
                 });
             return deferred.promise;
         };
+        
+        /*
+         * Get group info by id
+         */
+        this.getGroupInfo = function (groupId) {
+            
+            return httpAsPromise({
+                method: 'GET',
+                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/workflow-groups/' + groupId
+            });
+        };
 
         this.getFilteredGroups = function(filterText, group, tenantId) {
 

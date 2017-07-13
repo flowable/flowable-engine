@@ -15,7 +15,6 @@ package org.flowable.engine.impl;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricDetailQuery;
 import org.flowable.engine.impl.interceptor.CommandContext;
@@ -103,9 +102,9 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
         return commandContext.getHistoricDetailEntityManager().findHistoricDetailCountByQueryCriteria(this);
     }
 
-    public List<HistoricDetail> executeList(CommandContext commandContext, Page page) {
+    public List<HistoricDetail> executeList(CommandContext commandContext) {
         checkQueryOk();
-        List<HistoricDetail> historicDetails = commandContext.getHistoricDetailEntityManager().findHistoricDetailsByQueryCriteria(this, page);
+        List<HistoricDetail> historicDetails = commandContext.getHistoricDetailEntityManager().findHistoricDetailsByQueryCriteria(this);
 
         HistoricDetailVariableInstanceUpdateEntity varUpdate = null;
         if (historicDetails != null) {

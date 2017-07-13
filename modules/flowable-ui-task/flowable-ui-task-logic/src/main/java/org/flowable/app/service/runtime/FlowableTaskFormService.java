@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.flowable.app.model.runtime.CompleteFormRepresentation;
 import org.flowable.app.model.runtime.ProcessInstanceVariableRepresentation;
+import org.flowable.app.model.runtime.SaveFormRepresentation;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.exception.NotFoundException;
 import org.flowable.app.service.exception.NotPermittedException;
@@ -75,6 +76,21 @@ public class FlowableTaskFormService {
         return taskService.getTaskFormModel(task.getId());
     }
 
+    public void saveTaskForm(String taskId, SaveFormRepresentation saveFormRepresentation) {
+
+        // Get the form definition
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+
+        if (task == null) {
+            throw new NotFoundException("Task not found with id: " + taskId);
+        }
+
+        checkCurrentUserCanModifyTask(task);
+
+        formService.saveFormInstanceByFormModelId(saveFormRepresentation.getValues(), saveFormRepresentation.getFormId(), taskId, task.getProcessInstanceId());
+
+    }
+
     public void completeTaskForm(String taskId, CompleteFormRepresentation completeTaskFormRepresentation) {
 
         // Get the form definition
@@ -84,12 +100,7 @@ public class FlowableTaskFormService {
             throw new NotFoundException("Task not found with id: " + taskId);
         }
 
-        User currentUser = SecurityUtils.getCurrentUserObject();
-        if (!permissionService.isTaskOwnerOrAssignee(currentUser, taskId)) {
-            if (!permissionService.validateIfUserIsInitiatorAndCanCompleteTask(currentUser, task)) {
-                throw new NotPermittedException();
-            }
-        }
+        checkCurrentUserCanModifyTask(task);
 
         taskService.completeTaskWithForm(taskId, completeTaskFormRepresentation.getFormId(),
                 completeTaskFormRepresentation.getOutcome(), completeTaskFormRepresentation.getValues());
@@ -110,5 +121,14 @@ public class FlowableTaskFormService {
 
         List<ProcessInstanceVariableRepresentation> processInstanceVariableRepresenations = new ArrayList<ProcessInstanceVariableRepresentation>(processInstanceVariables.values());
         return processInstanceVariableRepresenations;
+    }
+
+    private void checkCurrentUserCanModifyTask(Task task) {
+        User currentUser = SecurityUtils.getCurrentUserObject();
+        if (!permissionService.isTaskOwnerOrAssignee(currentUser, task.getId())) {
+            if (!permissionService.validateIfUserIsInitiatorAndCanCompleteTask(currentUser, task)) {
+                throw new NotPermittedException();
+            }
+        }
     }
 }

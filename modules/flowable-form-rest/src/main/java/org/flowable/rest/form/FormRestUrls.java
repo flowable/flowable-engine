@@ -12,9 +12,9 @@
  */
 package org.flowable.rest.form;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.text.MessageFormat;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Yvo Swillens
@@ -23,44 +23,43 @@ public final class FormRestUrls {
 
     public static final String SEGMENT_FORM_RESOURCES = "form";
     public static final String SEGMENT_REPOSITORY_RESOURCES = "form-repository";
-    public static final String SEGMENT_RUNTIME_FORM_DEFINITION = "runtime-form-definition";
-    public static final String SEGMENT_COMPLETED_FORM_DEFINITION = "completed-form-definition";
     public static final String SEGMENT_DEPLOYMENT_RESOURCES = "deployments";
     public static final String SEGMENT_DEPLOYMENT_ARTIFACT_RESOURCE_CONTENT = "resourcedata";
-    public static final String SEGMENT_FORMS_RESOURCES = "forms";
+    public static final String SEGMENT_FORM_DEFINITIONS_RESOURCES = "form-definitions";
     public static final String SEGMENT_FORM_MODEL = "model";
+    public static final String SEGMENT_FORM_INSTANCE_MODEL = "form-instance-model";
     public static final String SEGMENT_FORM_INSTANCES_RESOURCES = "form-instances";
     public static final String SEGMENT_QUERY_RESOURCES = "query";
 
     /**
-     * URL template for a form collection: <i>/form/runtime-form-definition</i>
+     * URL template for a form model: <i>/form/model</i>
      */
-    public static final String[] URL_RUNTIME_TASK_FORM = { SEGMENT_FORM_RESOURCES, SEGMENT_RUNTIME_FORM_DEFINITION };
+    public static final String[] URL_FORM_MODEL = { SEGMENT_FORM_RESOURCES, SEGMENT_FORM_MODEL };
 
     /**
-     * URL template for a form collection: <i>/form/completed-form-definition</i>
+     * URL template for a form instance model: <i>/form/form-instance-model</i>
      */
-    public static final String[] URL_COMPLETED_TASK_FORM = { SEGMENT_FORM_RESOURCES, SEGMENT_COMPLETED_FORM_DEFINITION };
+    public static final String[] URL_FORM_INSTANCE_MODEL = { SEGMENT_FORM_RESOURCES, SEGMENT_FORM_INSTANCE_MODEL };
 
     /**
-     * URL template for a form collection: <i>/form-repository/forms/{0:formId}</i>
+     * URL template for a form collection: <i>/form-repository/form-definitions</i>
      */
-    public static final String[] URL_FORM_COLLECTION = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_FORMS_RESOURCES };
+    public static final String[] URL_FORM_DEFINITION_COLLECTION = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_FORM_DEFINITIONS_RESOURCES };
 
     /**
-     * URL template for a single form: <i>/form-repository/forms/{0:formId}</i>
+     * URL template for a single form: <i>/form-repository/form-definitions/{0:formDefinitionId}</i>
      */
-    public static final String[] URL_FORM = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_FORMS_RESOURCES, "{0}" };
+    public static final String[] URL_FORM_DEFINITION = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_FORM_DEFINITIONS_RESOURCES, "{0}" };
 
     /**
-     * URL template for a single form model: <i>/form-repository/forms/{0:formId}/model</i>
+     * URL template for a single form model: <i>/form-repository/form-definitions/{0:formDefinitionId}/model</i>
      */
-    public static final String[] URL_FORM_MODEL = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_FORM_RESOURCES, "{0}", SEGMENT_FORM_MODEL };
+    public static final String[] URL_FORM_DEFINITION_MODEL = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_FORM_DEFINITIONS_RESOURCES, "{0}", SEGMENT_FORM_MODEL };
 
     /**
-     * URL template for the resource of a single form: <i>/form-repository/forms/{0:formId}/resourcedata</i>
+     * URL template for the resource of a single form: <i>/form-repository/form-definitions/{0:formDefinitionId}/resourcedata</i>
      */
-    public static final String[] URL_FORM_RESOURCE_CONTENT = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_FORM_RESOURCES, "{0}", SEGMENT_DEPLOYMENT_ARTIFACT_RESOURCE_CONTENT };
+    public static final String[] URL_FORM_DEFINITION_RESOURCE_CONTENT = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_FORM_DEFINITIONS_RESOURCES, "{0}", SEGMENT_DEPLOYMENT_ARTIFACT_RESOURCE_CONTENT };
 
     /**
      * URL template for a deployment collection: <i>/form-repository/deployments</i>

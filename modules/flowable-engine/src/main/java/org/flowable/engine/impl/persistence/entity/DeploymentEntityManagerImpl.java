@@ -25,7 +25,6 @@ import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -273,16 +272,13 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
         query.processDefinitionVersionLowerThan(processDefinitionToBeRemoved.getVersion());
         query.orderByProcessDefinitionVersion().desc();
 
-        List<ProcessDefinition> processDefinitions = getProcessDefinitionEntityManager().findProcessDefinitionsByQueryCriteria(query, new Page(0, 1));
+        query.setFirstResult(0);
+        query.setMaxResults(1);
+        List<ProcessDefinition> processDefinitions = getProcessDefinitionEntityManager().findProcessDefinitionsByQueryCriteria(query);
         if (processDefinitions != null && processDefinitions.size() > 0) {
             return processDefinitions.get(0);
         }
         return null;
-    }
-
-    @Override
-    public DeploymentEntity findLatestDeploymentByName(String deploymentName) {
-        return deploymentDataManager.findLatestDeploymentByName(deploymentName);
     }
 
     @Override
@@ -291,8 +287,8 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
     }
 
     @Override
-    public List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery, Page page) {
-        return deploymentDataManager.findDeploymentsByQueryCriteria(deploymentQuery, page);
+    public List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery) {
+        return deploymentDataManager.findDeploymentsByQueryCriteria(deploymentQuery);
     }
 
     @Override
@@ -301,8 +297,8 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
     }
 
     @Override
-    public List<Deployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return deploymentDataManager.findDeploymentsByNativeQuery(parameterMap, firstResult, maxResults);
+    public List<Deployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap) {
+        return deploymentDataManager.findDeploymentsByNativeQuery(parameterMap);
     }
 
     @Override

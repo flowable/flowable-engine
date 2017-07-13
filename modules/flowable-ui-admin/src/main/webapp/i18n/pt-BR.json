@@ -4,18 +4,18 @@
     "NO":"Não",
     "ACTION":{
       "LOGOUT":"Sair",
-      "DISMISS-ALERT":"Clique para rejeitar esta mensagem",
-      "RETURN-TO-LIST":"Voltar para a Lista",
+      "DISMISS-ALERT":"Clique para ignorar esta mensagem",
+      "RETURN-TO-LIST":"Retornar à Lista",
       "SHOW-RESULTS":"Mostrar {{'GENERAL.RESULT-SIZES.' + resultSize.toString() | translate}} resultados",
       "REFRESH-LIST":"Atualizar lista",
-      "SORT-BY":"Ordenar por {{name | translate}}",
+      "SORT-BY":"Classificar por {{name | translate}}",
       "CLEAR-FILTERS":"Limpar filtros",
-      "CANCEL-AND-CLOSE":"Cancelar e Fechar",
+      "CANCEL-AND-CLOSE":"Cancelar e fechar",
       "CANCEL":"Cancelar",
-      "NEXT":"Avançar",
+      "NEXT":"Próximo",
       "PREVIOUS":"Anterior",
       "CLOSE":"Fechar",
-      "SHOWLICENSE":"Informações da Licença"
+      "SHOWLICENSE":"Informações da licença"
     },
     "TITLE":{
       "MAIN":"Administrador Activiti",
@@ -34,7 +34,7 @@
       "JOBS":"Trabalhos",
       "EVENT-SUBSCRIPTIONS":"Inscrições em eventos",
       "CONFIGURATION":"Configuração",
-      "CONFIGURATION-ENGINE":"Motor",
+      "CONFIGURATION-ENGINE":"Mecanismo",
       "DECISION-TABLES":"Tabelas de decisão",
       "CONTENT-ITEMS":"Itens de conteúdo"
     },
@@ -43,7 +43,7 @@
       "25":"25",
       "50":"50",
       "100":"100",
-      "100000000":"tudo"
+      "100000000":"todos"
     }
   },
   "PROCESS-DEFINITION":{
@@ -56,25 +56,25 @@
     "SUSPENDED":"Suspenso:",
     "DEPLOYMENT":"Implantação:",
     "TENANT":"Tenant:",
-    "START-FORM-DEFINED":"Formulário de inicio definido:",
+    "START-FORM-DEFINED":"Formulário inicial definido:",
     "GRAPHICAL-NOTATION-DEFINED":"Notação gráfica definida:",
-    "PROCESS-INSTANCES-SIZE":"A definição tem {{total}} instâncias de processos em execução",
-    "PROCESS-INSTANCES-SHOWING":", mostrando {{size}} mais recentemente iniciados",
-    "PROCESS-INSTANCES-EMPTY":"Definição não tem instâncias de processo em execução",
+    "PROCESS-INSTANCES-SIZE":"A definição tem {{total}} instâncias de processo em execução",
+    "PROCESS-INSTANCES-SHOWING":", mostrando {{size}} mais recentemente iniciadas",
+    "PROCESS-INSTANCES-EMPTY":"A definição não tem instâncias de processo em execução",
     "JOBS-SIZE":"A definição tem {{total}} trabalhos em execução",
-    "JOBS-EMPTY":"Definição não tem trabalhos em execução",
-    "DECISION-TABLES-SIZE":"A definição tem {{total}} tabelas de decião.",
+    "JOBS-EMPTY":"A definição não tem trabalhos em execução",
+    "DECISION-TABLES-SIZE":"A definição tem {{total}} tabelas de decisão.",
     "DECISION-TABLES-EMPTY":"A definição não tem tabelas de decisão.",
-    "FORM-DEFINITIONS-SIZE":"A definição tem {{total}} definições de formulários.",
-    "FORM-DEFINITIONS-EMPTY":"A definição não tem nenhuma definição de formulário.",
+    "FORM-DEFINITIONS-SIZE":"A definição tem {{total}} formulários.",
+    "FORM-DEFINITIONS-EMPTY":"A definição não tem formulários.",
     "TITLE":{
-      "PROCESS-INSTANCES":"Instâncias de processos",
+      "PROCESS-INSTANCES":"Instâncias de processo",
       "JOBS":"Trabalhos",
       "DECISION-TABLES":"Tabelas de decisão",
-      "FORMS":"Definições de formulários"
+      "FORMS":"Formulários"
     },
     "ACTION":{
-      "EDIT-CATEGORY":"Editar Categoria",
+      "EDIT-CATEGORY":"Editar categoria",
       "SHOW-ALL-JOBS":"Mostrar todos os trabalhos",
       "SHOW-ALL-PROCESSES":"Mostrar todos os processos",
       "SHOW-DIAGRAM":"Mostrar o diagrama de processo"
@@ -82,9 +82,9 @@
     "POPUP":{
       "EDIT-CATEGORY":{
         "TITLE":"Editar categoria para a definição",
-        "MESSAGE":"A categoria inicial para a definição está preenchida com o atributo targetNameSpace no BPMN 2.0 XML, mas, pode ser alterada após a implantação.",
+        "MESSAGE":"A categoria inicial da definição é preenchida com base no atributo targetNameSpace no XML do BPMN 2.0, mas pode ser alterada após a implantação.",
         "CATEGORY":"Categoria",
-        "CATEGORY-PLACEHOLDER":"Entre com a categoria",
+        "CATEGORY-PLACEHOLDER":"Insira uma categoria",
         "CONFIRM":"Atualizar categoria"
       },
       "SHOW-PROCESS-MODEL":{
@@ -94,17 +94,17 @@
   },
   "PROCESS-DEFINITIONS":{
     "LIST-MESSAGE":"Mostrando {{size}} resultados, de um total de {{total}} definições correspondentes.",
-    "LIST-MESSAGE-EMPTY":"Não há definições de processo correspondente.",
+    "LIST-MESSAGE-EMPTY":"Nenhuma definição de processo correspondente.",
     "FILTER":{
-      "NAME":"Nome (diferencia maiúsculas de minúsculas)",
-      "KEY":"Chave (diferencia maiúsculas de minúsculas)",
+      "NAME":"Nome (com diferenciação entre maiúsculas e minúsculas)",
+      "KEY":"Chave (com diferenciação entre maiúsculas e minúsculas)",
       "DEPLOYMENT-ID":"ID de implantação",
       "TENANT-ID":"ID do Tenant",
-      "LATEST":"Última versão",
-      "LATEST-HELP":"Mostrar apenas as últimas versões"
+      "LATEST":"Versão mais recente",
+      "LATEST-HELP":"Mostrar apenas as versões mais recentes"
     },
     "TITLE":{
-      "MAIN":"Definições de Processos"
+      "MAIN":"Definições de Processo"
     },
     "SORT":{
       "ID":"ID",
@@ -119,7 +119,7 @@
       "TENANT":"Tenant"
     },
     "ACTIONS":{
-      "UPLOAD-FROM-MODELER":"Fazer o upload a partir do Editor Flowable"
+      "UPLOAD-FROM-MODELER":"Carregar a partir do Editor Flowable"
     },
     "POPUP":{
       "UPLOAD-FROM-MODELER":{
@@ -127,7 +127,7 @@
         "PASSWORD":"Senha",
         "ERROR":"Não foi possível encontrar o Editor",
         "UNAUTHORIZED":"Credenciais inválidas",
-        "UPLOAD-DESCRIPTION":"O modelo de processo agora será identificado e implantado no cluster Flowable ativo. Selecione um nome apropriado para o pacote de implantação."
+        "UPLOAD-DESCRIPTION":"O modelo de processo agora será identificado e implantado no cluster Flowable ativo. Selecione um nome adequado para o pacote de implantação."
       }
     }
   },
@@ -156,20 +156,20 @@
     "SUBPROCESSES-SIZE":"Esta instância de processo tem {{total}} subprocessos.",
     "SUBPROCESSES-EMPTY":"Esta instância de processo não tem subprocessos.",
     "DECISION-TABLES-SIZE":"Esta instância de processo tem {{total}} tabelas de decisão.",
-    "DECISION-TABLES-EMPTY":"Esta instância de processo tem não tabelas de decisão.",
-    "FORM-INSTANCES-SIZE":"Esta instância de processo tem {{total}} instâncias de formularios.",
-    "FORM-INSTANCES-EMPTY":"Esta instância de processo tem não tem instâncias de formulário.",
+    "DECISION-TABLES-EMPTY":"Esta instância de processo não tem tabelas de decisão.",
+    "FORM-INSTANCES-SIZE":"Esta instância de processo tem {{total}} formulários.",
+    "FORM-INSTANCES-EMPTY":"Esta instância de processo não tem formulários.",
     "TITLE":{
       "TASKS":"Tarefas",
       "VARIABLES":"Variáveis",
       "JOBS":"Trabalhos",
       "SUBPROCESSES":"Subprocessos",
-      "DECISION-TABLES":"Tabelas de Decisão",
-      "FORM-INSTANCES":"Instâncias do formulário"
+      "DECISION-TABLES":"Tabelas de decisão",
+      "FORM-INSTANCES":"Formulários"
     },
     "ACTION":{
-      "DELETE":"Excluir a instância do processo",
-      "TERMINATE":"Encerrar a instância do processo",
+      "DELETE":"Excluir instância de processo",
+      "TERMINATE":"Encerrar instância de processo",
       "SHOW-ALL-TASKS":"Mostrar todas as tarefas",
       "SHOW-ALL-JOBS":"Mostrar todos os trabalhos",
       "SHOW-ALL-SUBPROCESSES":"Mostrar todos os subprocessos",
@@ -177,17 +177,17 @@
       "TITLE-VARIABLES":"Ações na variável selecionada",
       "DELETE-VARIABLE":"Excluir a variável",
       "UPDATE-VALUE":"Atualizar variável",
-      "ADD-VARIABLE":"Adicionar Variável"
+      "ADD-VARIABLE":"Adicionar variável"
     },
     "POPUP":{
       "DELETE":{
-        "TITLE":"Excluir a instância do processo",
-        "MESSAGE-DELETE":"Tem certeza que deseja excluir a instância do processo",
-        "MESSAGE-TERMINATE":"Tem certeza que deseja finalizar a instância do processo",
+        "TITLE":"Excluir instância de processo",
+        "MESSAGE-DELETE":"Tem certeza que deseja excluir a instância do processo?",
+        "MESSAGE-TERMINATE":"Tem certeza que deseja encerrar a instância do processo?",
         "DELETE-REASON":"Motivo da exclusão",
-        "DELETE-REASON-HELP":"Digite um motivo de exclusão (opcional)",
-        "CONFIRM-DELETE":"Excluir a instância do processo",
-        "CONFIRM-TERMINATE":"Encerrar a instância do processo"
+        "DELETE-REASON-HELP":"Insira um motivo de exclusão (opcional)",
+        "CONFIRM-DELETE":"Excluir instância de processo",
+        "CONFIRM-TERMINATE":"Encerrar instância de processo"
       },
       "SHOW-PROCESS-MODEL":{
         "TITLE":"Diagrama de processo"
@@ -195,7 +195,7 @@
       "CREATE-VARIABLE":{
         "TITLE":"Criar variável",
         "NAME":"Nome da variável",
-        "TYPE":"Tipo de variável activiti",
+        "TYPE":"Tipo de variável",
         "VALUE":"Valor da variável",
         "CREATE":"Criar"
       },
@@ -209,15 +209,15 @@
         "ACTION-UPDATE":"Atualizar"
       },
       "DELETE-VARIABLE":{
-        "TITLE":"Excluir a variável '{{name}}",
+        "TITLE":"Excluir a variável '{{name}}'",
         "MESSAGE":"Tem certeza que deseja remover essa variável?",
         "DELETE":"Excluir"
       }
     }
   },
   "PROCESS-INSTANCES":{
-    "TITLE":"Instâncias de processos",
-    "LIST-MESSAGE":"Mostrando {{size}} resultados, de um total de {{total}} instancias de processos correspondentes.",
+    "TITLE":"Instâncias de processo",
+    "LIST-MESSAGE":"Mostrando {{size}} resultados, de um total de {{total}} instâncias de processo correspondentes.",
     "LIST-MESSAGE-EMPTY":"Não há instâncias de processos correspondente.",
     "FILTER":{
       "NAME":"Nome",
@@ -226,9 +226,9 @@
       "BUSINESS-KEY":"Chave de negócios",
       "SUPER-PROCESS-INSTANCE-ID":"ID de instância do processo pai",
       "STARTED-BEFORE":"Iniciado antes",
-      "STARTED-AFTER":"Iniciado após",
+      "STARTED-AFTER":"Iniciado depois",
       "ENDED-BEFORE":"Finalizado antes",
-      "ENDED-AFTER":"Finalizado após",
+      "ENDED-AFTER":"Finalizado depois",
       "VARIABLE":"Variável",
       "VARIABLE-NAME":"Nome da variável",
       "VARIABLE-VALUE":"Valor da variável",
@@ -246,7 +246,7 @@
       "PROCESS-DEFINITION":"Definição de processo",
       "CREATE-TIME":"Criado em",
       "END-TIME":"Finalizado em",
-      "STATUS":"Estado"
+      "STATUS":"Status"
     }
   },
   "TASK":{
@@ -263,13 +263,13 @@
     "CATEGORY":"Categoria:",
     "TENANT-ID":"Tenant:",
     "PARENT":"Tarefa pai:",
-    "ASSIGNEE":"Responsável:",
-    "OWNER":"Autor:",
+    "ASSIGNEE":"Destinatário:",
+    "OWNER":"Proprietário:",
     "START-DATE":"Data de início:",
     "DUE-DATE":"Data de vencimento:",
     "END-DATE":"Data de término:",
     "DELETE-REASON":"Motivo de exclusão:",
-    "PROCESS-INSTANCE":"Instâncias de processos",
+    "PROCESS-INSTANCE":"Instância de processo",
     "PROCESS-DEFINITION":"Definição de processo",
     "EXECUTION-ID":"ID de execução:",
     "SUBTASKS-MESSAGE":"Esta tarefa tem {{total}} subtarefas, mostrando {{size}}.",
@@ -280,13 +280,13 @@
     "IDENTITY-LINKS-MESSAGE-EMPTY":"Esta tarefa não tem links de identidade.",
     "ACTION":{
       "EDIT":"Editar Tarefa",
-      "ASSIGN-CLAIM":"Atribuir/Reclamar tarefa",
+      "ASSIGN-CLAIM":"Atribuir/Assumir tarefa",
       "DELEGATE":"Delegar Tarefa",
       "RESOLVE":"Resolver tarefa",
       "COMPLETE":"Completar tarefa",
       "DELETE":"Excluir tarefa",
       "SHOW-ALL-SUBTASKS":"Mostrar todas as subtarefas",
-      "SHOW-SUBMITTED-FORM":"Visualizar formulário da instância"
+      "SHOW-SUBMITTED-FORM":"Mostrar formulário enviado"
     },
     "TITLE":{
       "SUBTASKS":"Subtarefas",
@@ -296,30 +296,30 @@
     "POPUP":{
       "ASSIGN":{
         "TITLE":"Atribuir tarefa",
-        "MESSAGE":"Tem certeza que deseja atribuir a tarefa",
+        "MESSAGE":"Tem certeza que deseja atribuir a tarefa?",
         "NEW-ASSIGNEE":"Novo destinatário",
         "NEW-ASSIGNEE-HELP":"Deixe o campo de destinatário vazio se você não quiser atribuir a tarefa a alguém.",
         "CONFIRM":"Atribuir tarefa"
       },
       "COMPLETE":{
         "TITLE":"Completar tarefa",
-        "MESSAGE":"Tem certeza que deseja completar a tarefa",
+        "MESSAGE":"Tem certeza que deseja completar a tarefa?",
         "CONFIRM":"Completar tarefa"
       },
       "DELEGATE":{
         "TITLE":"Delegar tarefa",
-        "MESSAGE":"Tens a certeza de que você deseja delegar a tarefa",
+        "MESSAGE":"Tem certeza que deseja delegar a tarefa?",
         "CONFIRM":"Delegar tarefa",
-        "DELEGATE-TO":"Usuário para delegar para"
+        "DELEGATE-TO":"Usuário ao qual delegar"
       },
       "RESOLVE":{
         "TITLE":"Resolver a tarefa",
-        "MESSAGE":"Tens a certeza de que você deseja resolver a tarefa",
+        "MESSAGE":"Tem certeza de deseja resolver a tarefa?",
         "CONFIRM":"Resolver tarefa"
       },
       "DELETE":{
         "TITLE":"Excluir tarefa",
-        "MESSAGE":"Tem certeza que deseja excluir a tarefa",
+        "MESSAGE":"Tem certeza que deseja excluir a tarefa?",
         "CONFIRM":"Excluir tarefa"
       },
       "EDIT":{
@@ -329,8 +329,8 @@
         "DESCRIPTION":"Descrição",
         "PRIORITY":"Prioridade",
         "CATEGORY":"Categoria",
-        "ASSIGNEE":"Responsável",
-        "OWNER":"Autor",
+        "ASSIGNEE":"Destinatário",
+        "OWNER":"Proprietário",
         "DUE-DATE":"Data de vencimento"
       }
     }
@@ -338,24 +338,24 @@
   "TASKS":{
     "TITLE":"Tarefas",
     "LIST-MESSAGE":"Mostrando {{size}} resultados, de um total de {{total}} tarefas correspondentes.",
-    "LIST-MESSAGE-EMPTY":"Não há tarefas correspondentes.",
+    "LIST-MESSAGE-EMPTY":"Nenhuma tarefa correspondente.",
     "FILTER":{
-      "NAME":"Nome (diferencia maiúsculas de minúsculas)",
-      "ASSIGNEE":"Responsável (diferencia maiúsculas de minúsculas)",
-      "STATUS":"Estado",
-      "STATUS-ANY":"Qualquer estado",
+      "NAME":"Nome (com diferenciação entre maiúsculas e minúsculas)",
+      "ASSIGNEE":"Destinatário (com diferenciação entre maiúsculas e minúsculas)",
+      "STATUS":"Status",
+      "STATUS-ANY":"Qualquer status",
       "STATUS-ACTIVE":"Tarefas ativas",
       "STATUS-COMPLETE":"Tarefas concluídas",
       "PROCESS-INSTANCE-ID":"ID da instância do processo",
       "TENANT-ID":"Identificador do tenant",
-      "OWNER":"Autor (diferencia maiúsculas de minúsculas)",
+      "OWNER":"Proprietário (com diferenciação entre maiúsculas e minúsculas)",
       "PARENT-TASK-ID":"ID da tarefa pai",
-      "CREATED-BEFORE":"Criado antes",
-      "CREATED-AFTER":"Criado após",
-      "ENDED-BEFORE":"Finalizado antes",
-      "ENDED-AFTER":"Finalizado após",
-      "DUE-BEFORE":"Com vencimento antes de",
-      "DUE-AFTER":"Vencimento após",
+      "CREATED-BEFORE":"Criado antes de",
+      "CREATED-AFTER":"Criado depois de",
+      "ENDED-BEFORE":"Finalizado antes de",
+      "ENDED-AFTER":"Finalizado depois de",
+      "DUE-BEFORE":"Vencido antes de",
+      "DUE-AFTER":"Vencido depois de",
       "TASK-VARIABLE":"Variável local da tarefa",
       "PROCESS-VARIABLE":"Variável do processo",
       "VARIABLE-NAME":"Nome da variável",
@@ -372,8 +372,8 @@
     "HEADER":{
       "ID":"ID",
       "NAME":"Nome",
-      "ASSIGNEE":"Responsável",
-      "OWNER":"Autor",
+      "ASSIGNEE":"Destinatário",
+      "OWNER":"Proprietário",
       "CREATE-TIME":"Criado em",
       "END-TIME":"Finalizado em",
       "PRIORITY":"Prioridade"
@@ -384,8 +384,8 @@
     "LIST-MESSAGE":"Mostrando {{size}} resultados, de um total de {{total}} implantações correspondentes.",
     "LIST-MESSAGE-EMPTY":"Nenhuma implantação correspondente.",
     "FILTER":{
-      "NAME":"Nome (diferencia maiúsculas de minúsculas)",
-      "TENANTID":"Identificador de tenant (diferencia maiúsculas de minúsculas)"
+      "NAME":"Nome (com diferenciação entre maiúsculas e minúsculas)",
+      "TENANTID":"Identificador de tenant (com diferenciação entre maiúsculas e minúsculas)"
     },
     "SORT":{
       "ID":"ID",
@@ -400,31 +400,31 @@
     },
     "ACTION":{
       "UPLOAD":"Carregar processo ou pacote",
-      "DELETE":"Excluir a implantação"
+      "DELETE":"Excluir implantação"
     },
     "POPUP":{
       "UPLOAD":{
-        "DESCRIPTION":"Selecione um arquivo de processo .bpmn ou .bpmn20.xml para implantar ou faça upload de um pacote de processos (com ativos) contidos no arquivo .zip ou .bar.",
-        "DROPZONE":"Ou arraste e solte um arquivo aqui",
-        "NO-DROP":"Arrastar e soltar arquivo não é suportado pelo seu navegador",
-        "CANCEL-UPLOAD":"Cancelar carregamento",
+        "DESCRIPTION":"Selecione um arquivo de processo .bpmn ou .bpmn20.xml para ser implantado ou carregue um pacote de processos (com ativos) contido em um arquivo .zip ou .bar.",
+        "DROPZONE":"Ou solte um arquivo aqui",
+        "NO-DROP":"Seu navegador não suporta a ação de Arrastar e soltar",
+        "CANCEL-UPLOAD":"Cancelar upload",
         "ERROR":"Não foi possível carregar este arquivo"
       },
       "DELETE":{
-        "CONFIRM-MESSAGE":"Excluir a implantação '{{name}}'?"
+        "CONFIRM-MESSAGE":"Você está prestes a excluir a implantação '{{name}}'. Se houver instâncias de processo associadas a ela, ativas ou concluídas, elas também serão excluídas. Tem certeza de que deseja excluir a implantação '{{name}}'?"
       }
     }
   },
   "DEPLOYMENT":{
     "ID":"ID:",
     "NAME":"Nome:",
-    "TIME":"Data de implantação:",
+    "TIME":"Hora da implantação:",
     "CATEGORY":"Categoria:",
     "TENANTID":"Identificador do tenant:",
-    "DEFINITIONS-MESSAGE":"Esta implantação tem {{total}} definições de processos, Mostrando {{size}}.",
-    "DEFINITIONS-MESSAGE-EMPTY":"Essa implantação não tem definição de processos.",
+    "DEFINITIONS-MESSAGE":"Esta implantação tem {{total}} definições de processo, mostrando {{size}}.",
+    "DEFINITIONS-MESSAGE-EMPTY":"Essa implantação não tem definições de processo.",
     "TITLE":{
-      "DEFINITIONS":"Definições de processos",
+      "DEFINITIONS":"Definições de processo",
       "RESOURCES":"Recursos"
     },
     "ACTION":{
@@ -437,7 +437,7 @@
       "EXCEPTION":"Exceção"
     },
     "ACTIONS":{
-      "EXECUTE":"Executar o trabalho",
+      "EXECUTE":"Executar trabalho",
       "DELETE":"Excluir trabalho"
     },
     "POPUP":{
@@ -465,9 +465,9 @@
       "PROCESS-INSTANCE-ID":"ID da instância do processo",
       "TENANT-ID":"Identificador do tenant",
       "DUE-BEFORE":"Vencimento antes de",
-      "DUE-AFTER":"Vencimento após",
+      "DUE-AFTER":"Vencimento depois de",
       "EXCEPTION":"Exceção",
-      "EXCEPTION-HELP":"Mostrar somente trabalhos com uma exceção"
+      "EXCEPTION-HELP":"Mostrar apenas trabalhos com uma exceção"
     },
     "SORT":{
       "ID":"ID do Trabalho",
@@ -478,7 +478,7 @@
       "ID":"ID",
       "DUE-DATE":"Data de vencimento",
       "PROCESS-DEFINITION":"Definição de processo",
-      "RETRIES":"Retentativas",
+      "RETRIES":"Novas tentativas",
       "EXCEPTION":"Exceção"
     }
   },
@@ -509,17 +509,17 @@
       "PROCESS-INSTANCE-ID":"ID da instância do processo",
       "TENANT-ID":"Identificador do tenant",
       "CREATED-BEFORE":"Criado antes",
-      "CREATED-AFTER":"Criado após"
+      "CREATED-AFTER":"Criado depois"
     },
     "SORT":{
-      "ID":"ID dá inscrição do evento",
+      "ID":"ID da inscrição do evento",
       "CREATE-DATE":"Criado em",
       "PROCESS-INSTANCE-ID":"ID da instância do processo"
     },
     "HEADER":{
       "ID":"ID",
       "CREATE-DATE":"Criado em",
-      "PROCESS-DEFINITION":"Definição de processo",
+      "PROCESS-DEFINITION":"Definição do processo",
       "EVENT-TYPE":"Tipo de evento",
       "EVENT-NAME":"Nome do evento"
     }
@@ -626,7 +626,7 @@
       "DELETE-CONFIGURATION":"Excluir a configuração-mestre"
     },
     "TITLE":{
-      "PROCESS-ENDPOINT":"Cofiguração da API do endpoint do processo",
+      "PROCESS-ENDPOINT":"Configuração da API do endpoint do processo",
       "DMN-ENDPOINT":"Configuração do endpoint para a API DMN",
       "FORM-ENDPOINT":"Configuração do endpoint para a API de formulários",
       "CONTENT-ENDPOINT":"Configuração do endpoint da API de conteúdo"
@@ -710,8 +710,8 @@
     },
     "ENGINE":{
       "ENDPOINT-UPDATED":"Endpoint '{{name}}' atualizado.",
-      "ENDPOINT-INVALID":"A configuração do endpoint para '{{name}}' esta invalida.",
-      "ENDPOINT-VALID":"Endpoint valido, Motor no endpoint: {{name}} - {{version}}"
+      "ENDPOINT-INVALID":"A configuração do endpoint para '{{name}}' esta inválida.",
+      "ENDPOINT-VALID":"Endpoint válido, Motor no endpoint: {{name}} - {{version}}"
     },
     "JOB":{
       "DELETED":"Trabalho '{{id}}' excluído com sucesso.",
@@ -722,7 +722,7 @@
     },
     "PROCESS-INSTANCE":{
       "DELETED":"Instância do processo '{{id}}' excluído com sucesso.",
-      "TERMINATED":"Instância de processo '{{id}}' finalizada com sucesso."
+      "TERMINATED":"Instância do processo '{{id}}' finalizada com sucesso."
     },
     "TASK":{
       "DELETED":"Tarefa '{{id}}' excluída com sucesso.",
@@ -757,8 +757,8 @@
     "LIST-MESSAGE":"Mostrando {{size}} resultados, de um total de {{total}} implantações correspondentes.",
     "LIST-MESSAGE-EMPTY":"Nenhuma implantação correspondente.",
     "FILTER":{
-      "NAME":"Nome (diferencia maiúsculas de minúsculas)",
-      "TENANTID":"Identificador de tenant (diferencia maiúsculas de minúsculas)"
+      "NAME":"Nome (com diferenciação entre maiúsculas e minúsculas)",
+      "TENANTID":"Identificador de tenant (com diferenciação entre maiúsculas e minúsculas)"
     },
     "SORT":{
       "ID":"ID",
@@ -880,7 +880,7 @@
       "FORM-INSTANCES":"Instâncias do formulário"
     },
     "FORM-INSTANCES-MESSAGE":"Esta definição tem {{total}} instâncias de formulários, mostrando {{size}}.",
-    "FORM-INSTANCES-MESSAGE-EMPTY":"Esta definição tem não tem instâncias de formulários",
+    "FORM-INSTANCES-MESSAGE-EMPTY":"Esta definição não tem instâncias de formulários",
     "ACTION":{
       "EDIT-CATEGORY":"Editar Categoria",
       "SHOW-ALL-JOBS":"Mostrar todos os trabalhos",
@@ -904,16 +904,16 @@
       "UPLOAD-VALUE":"Carregar ou importar conteúdo...",
       "RADIOS-OPTION1":"Opção 1",
       "SELECT-PERSON":"Selecione uma pessoa",
-      "SELECT-GROUP":"Selecionar um grupo"
+      "SELECT-GROUP":"Selecione um grupo"
     }
   },
   "FORM-DEPLOYMENTS":{
     "TITLE":"Implantações de formulário",
-    "LIST-MESSAGE":"Mostrando {{size}} resultados, de um total de {{total}} implantações de formularios correspondentes.",
+    "LIST-MESSAGE":"Mostrando {{size}} resultados, de um total de {{total}} implantações de formulários correspondentes.",
     "LIST-MESSAGE-EMPTY":"Nenhuma implantação de formulário correspondente.",
     "FILTER":{
-      "NAME":"Nome (diferencia maiúsculas de minúsculas)",
-      "TENANTID":"Identificador de tenant (diferencia maiúsculas de minúsculas)"
+      "NAME":"Nome (com diferenciação entre maiúsculas e minúsculas)",
+      "TENANTID":"Identificador de tenant (com diferenciação entre maiúsculas e minúsculas)"
     },
     "SORT":{
       "ID":"ID",
@@ -937,7 +937,7 @@
     "CATEGORY":"Categoria:",
     "TENANTID":"Identificador do tenant:",
     "PARENT-DEPLOYMENT-ID":"ID de implantação do pai",
-    "DEFINITIONS-MESSAGE":"Esta implantação tem {{total}} definições de formularios. Mostrando {{size}}.",
+    "DEFINITIONS-MESSAGE":"Esta implantação tem {{total}} definições de formulários. Mostrando {{size}}.",
     "DEFINITIONS-MESSAGE-EMPTY":"Essa implantação não tem nenhuma definição de formulário.",
     "TITLE":{
       "FORM-DEFINITIONS":"Definições de formulários",
@@ -950,7 +950,7 @@
   "FORM-INSTANCES":{
     "TITLE":"Instâncias do formulário",
     "LIST-MESSAGE":"Mostrando {{size}} resultados, de um total de {{total}} instâncias de formulários correspondentes.",
-    "LIST-MESSAGE-EMPTY":"Não há intâncias de formulários correspondente.",
+    "LIST-MESSAGE-EMPTY":"Não há instâncias de formulário correspondente.",
     "HEADER":{
       "ID":"ID",
       "PROCESS-INSTANCE-ID":"ID da instância de processo",
@@ -974,7 +974,7 @@
       "PROCESS-ID":"ID da instância de processo",
       "SUBMITTED":"Submetido em",
       "SUBMITTED-BY":"Submetido por",
-      "FORM-DEFINITION-ID":"ID de definição de formulário"
+      "FORM-DEFINITION-ID":"ID da definição do formulário"
     },
     "FORM-FIELD-VALUES-MESSAGE":"Esta definição tem {{total}} valores de campos de formulários, mostrando {{size}}",
     "FORM-FIELD-VALUES-MESSAGE-EMPTY":"Esta instância não tem valores de campo de formulário",
@@ -993,7 +993,7 @@
   },
   "CONTENT-ITEMS":{
     "TITLE":"Itens de conteúdo",
-    "LIST-MESSAGE":"Mostrando {{size}} resultados, de um total de {{total}} itens de conteudo correspondente.",
+    "LIST-MESSAGE":"Mostrando {{size}} resultados, de um total de {{total}} itens de conteúdo correspondente.",
     "LIST-MESSAGE-EMPTY":"Não há itens de conteúdo correspondente.",
     "HEADER":{
       "ID":"ID",
@@ -1001,7 +1001,7 @@
       "PROCESS-INSTANCE-ID":"ID da instância de processo",
       "TASK-ID":"ID da tarefa",
       "LAST-MODIFIED-ON":"Data da última modificação",
-      "LAST-MODIFIED-BY":"Modificação pela última vez por",
+      "LAST-MODIFIED-BY":"Modificado pela última vez por",
       "TENANT-ID":"ID do Tenant"
     },
     "FILTER":{
@@ -1018,7 +1018,7 @@
       "TASK-ID":"ID da tarefa",
       "PROCESS-INSTANCE-ID":"ID da instância de processo",
       "CREATED-ON":"Criado em",
-      "CREATED-BY":"Criada por",
+      "CREATED-BY":"Criado por",
       "LAST-MODIFIED-ON":"Data da última modificação",
       "LAST-MODIFIED-BY":"Última Modificação Por",
       "CONTENT-STORE-ID":"ID de armazenamento de conteúdo"

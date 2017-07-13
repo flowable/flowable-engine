@@ -35,7 +35,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
-@ComponentScan(basePackages = { "org.flowable.app.rest", "au.com.rds.modeler.customization"})
+@ComponentScan(value = { "org.flowable.app.rest.editor", "org.flowable.app.rest.idm.remote" , "au.com.rds.modeler.customization"})
 @EnableAsync
 public class AppDispatcherServletConfiguration extends WebMvcConfigurationSupport {
 

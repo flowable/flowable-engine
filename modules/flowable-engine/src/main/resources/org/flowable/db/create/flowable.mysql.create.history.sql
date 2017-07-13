@@ -1,5 +1,6 @@
 create table ACT_HI_PROCINST (
     ID_ varchar(64) not null,
+    REV_ integer default 1,
     PROC_INST_ID_ varchar(64) not null,
     BUSINESS_KEY_ varchar(255),
     PROC_DEF_ID_ varchar(64) not null,
@@ -19,6 +20,7 @@ create table ACT_HI_PROCINST (
 
 create table ACT_HI_ACTINST (
     ID_ varchar(64) not null,
+    REV_ integer default 1,
     PROC_DEF_ID_ varchar(64) not null,
     PROC_INST_ID_ varchar(64) not null,
     EXECUTION_ID_ varchar(64) not null,
@@ -38,6 +40,7 @@ create table ACT_HI_ACTINST (
 
 create table ACT_HI_TASKINST (
     ID_ varchar(64) not null,
+    REV_ integer default 1,
     PROC_DEF_ID_ varchar(64),
     TASK_DEF_KEY_ varchar(255),
     PROC_INST_ID_ varchar(64),
@@ -57,17 +60,18 @@ create table ACT_HI_TASKINST (
     FORM_KEY_ varchar(255),
     CATEGORY_ varchar(255),
     TENANT_ID_ varchar(255) default '',
+    LAST_UPDATED_TIME_ datetime(3),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
 create table ACT_HI_VARINST (
     ID_ varchar(64) not null,
+    REV_ integer default 1,
     PROC_INST_ID_ varchar(64),
     EXECUTION_ID_ varchar(64),
     TASK_ID_ varchar(64),
     NAME_ varchar(255) not null,
     VAR_TYPE_ varchar(100),
-    REV_ integer,
     BYTEARRAY_ID_ varchar(64),
     DOUBLE_ double,
     LONG_ bigint,
@@ -149,6 +153,7 @@ create index ACT_IDX_HI_DETAIL_TASK_ID on ACT_HI_DETAIL(TASK_ID_);
 create index ACT_IDX_HI_PROCVAR_PROC_INST on ACT_HI_VARINST(PROC_INST_ID_);
 create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_VARINST(NAME_, VAR_TYPE_);
 create index ACT_IDX_HI_PROCVAR_TASK_ID on ACT_HI_VARINST(TASK_ID_);
+create index ACT_IDX_HI_PROCVAR_EXE on ACT_HI_VARINST(EXECUTION_ID_);
 create index ACT_IDX_HI_ACT_INST_PROCINST on ACT_HI_ACTINST(PROC_INST_ID_, ACT_ID_);
 create index ACT_IDX_HI_ACT_INST_EXEC on ACT_HI_ACTINST(EXECUTION_ID_, ACT_ID_);
 create index ACT_IDX_HI_IDENT_LNK_USER on ACT_HI_IDENTITYLINK(USER_ID_);

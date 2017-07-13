@@ -79,7 +79,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             FormService formService = processEngineConfiguration.getFormEngineFormService();
             Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formModel, variables, outcome);
 
-            formService.createFormInstance(formVariables, formModel, task.getId(), task.getProcessInstanceId());
+            formService.saveFormInstance(formVariables, formModel, task.getId(), task.getProcessInstanceId());
 
             processUploadFieldsIfNeeded(formModel, task, commandContext);
 

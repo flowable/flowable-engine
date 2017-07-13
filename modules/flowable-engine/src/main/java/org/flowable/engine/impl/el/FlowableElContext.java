@@ -14,11 +14,10 @@ package org.flowable.engine.impl.el;
 
 import java.util.List;
 
-import javax.el.ELContext;
-import javax.el.ELResolver;
-import javax.el.FunctionMapper;
-import javax.el.VariableMapper;
-
+import org.flowable.engine.common.impl.javax.el.ELContext;
+import org.flowable.engine.common.impl.javax.el.ELResolver;
+import org.flowable.engine.common.impl.javax.el.FunctionMapper;
+import org.flowable.engine.common.impl.javax.el.VariableMapper;
 import org.flowable.engine.delegate.FlowableFunctionDelegate;
 
 /**

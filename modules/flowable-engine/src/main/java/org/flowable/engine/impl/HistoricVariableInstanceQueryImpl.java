@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.history.HistoricVariableInstanceQuery;
 import org.flowable.engine.impl.context.Context;
@@ -216,11 +215,11 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         return commandContext.getHistoricVariableInstanceEntityManager().findHistoricVariableInstanceCountByQueryCriteria(this);
     }
 
-    public List<HistoricVariableInstance> executeList(CommandContext commandContext, Page page) {
+    public List<HistoricVariableInstance> executeList(CommandContext commandContext) {
         checkQueryOk();
         ensureVariablesInitialized();
 
-        List<HistoricVariableInstance> historicVariableInstances = commandContext.getHistoricVariableInstanceEntityManager().findHistoricVariableInstancesByQueryCriteria(this, page);
+        List<HistoricVariableInstance> historicVariableInstances = commandContext.getHistoricVariableInstanceEntityManager().findHistoricVariableInstancesByQueryCriteria(this);
 
         if (!excludeVariableInitialization) {
             for (HistoricVariableInstance historicVariableInstance : historicVariableInstances) {

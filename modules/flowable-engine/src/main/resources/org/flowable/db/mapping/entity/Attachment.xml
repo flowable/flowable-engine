@@ -78,10 +78,15 @@
 
   <update id="updateAttachment" parameterType="org.flowable.engine.impl.persistence.entity.AttachmentEntityImpl">
     update ${prefix}ACT_HI_ATTACHMENT 
-    set
-      REV_ = #{revisionNext, jdbcType=INTEGER},
-      NAME_ = #{name, jdbcType=VARCHAR},
-      DESCRIPTION_ = #{description, jdbcType=TIMESTAMP}
+    <set>
+        REV_ = #{revisionNext, jdbcType=INTEGER},
+        <if test="originalPersistentState.name != name">
+          NAME_ = #{name, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.description != description">
+          DESCRIPTION_ = #{description, jdbcType=TIMESTAMP}
+        </if>
+    </set>
     where ID_ = #{id}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>

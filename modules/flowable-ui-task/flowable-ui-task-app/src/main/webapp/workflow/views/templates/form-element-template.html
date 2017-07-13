@@ -3,32 +3,32 @@
     <div ng-switch-when="text" class="form-group" ng-show="field.isVisible" ng-class="{'has-error': field.required && isEmpty(field)}">
         <label class="control-label">{{field.name}}</label>
         <span class="marker" ng-if="field.required">*</span>
-        <input id="{{activitiFieldIdPrefix + field.id}}" type="text" name="{{field.id}}" class="form-control" placeholder="{{field.placeholder}}" ng-model="field.value" ng-change="onFieldValueChange(field)" ng-blur="onFieldBlur(field)" ng-focus="onFieldFocus(field)" ng-required="field.required">
+        <input id="{{activitiFieldIdPrefix + field.id}}" type="text" name="{{field.id}}" class="form-control ng-valid-required ng-dirty ng-valid-parse ng-invalid ng-valid-pattern" placeholder="{{field.placeholder}}" ng-model="field.value" ng-change="onFieldValueChange(field)" ng-blur="onFieldBlur(field)" ng-focus="onFieldFocus(field)" ng-required="field.required" ng-minlength="{{field.params.minLength || ''}}" maxlength="{{field.params.maxLength || ''}}" ng-pattern="field.params.regexPattern || ''" ui-mask="{{field.params.mask || ''}}">
     </div>
 
     <div ng-switch-when="multi-line-text" class="form-group" ng-show="field.isVisible" ng-class="{'has-error': field.required && isEmpty(field)}">
         <label class="control-label">{{field.name}}</label>
         <span class="marker" ng-if="field.required">*</span>
-        <textarea id="{{activitiFieldIdPrefix + field.id}}" name="{{field.id}}" class="form-control" placeholder="{{field.placeholder}}" ng-model="field.value" ng-change="onFieldValueChange(field)" ng-blur="onFieldBlur(field)" ng-focus="onFieldFocus(field)" ng-required="field.required"></textarea>
+        <textarea id="{{activitiFieldIdPrefix + field.id}}" name="{{field.id}}" class="form-control ng-valid-required ng-dirty ng-valid-parse ng-invalid ng-valid-pattern" placeholder="{{field.placeholder}}" ng-model="field.value" ng-change="onFieldValueChange(field)" ng-blur="onFieldBlur(field)" ng-focus="onFieldFocus(field)" ng-required="field.required" ng-minlength="{{field.params.minLength || ''}}" maxlength="{{field.params.maxLength || ''}}" ng-pattern="field.params.regexPattern || ''" ui-mask="{{field.params.mask || ''}}"></textarea>
     </div>
 
     <div ng-switch-when="integer" class="form-group" ng-show="field.isVisible" ng-class="{'has-error': field.required && isEmpty(field)}">
         <label class="control-label">{{field.name}}</label>
         <span class="marker" ng-if="field.required">*</span>
-        <input id="{{activitiFieldIdPrefix + field.id}}" type="text" name="{{field.id}}" class="form-control" placeholder="{{field.placeholder}}" ng-model="field.value" ng-change="onFieldValueChange(field)" ng-blur="onFieldBlur(field)" ng-focus="onFieldFocus(field)" number-input-check ng-required="field.required">
+        <input id="{{activitiFieldIdPrefix + field.id}}" type="text" name="{{field.id}}" class="form-control ng-valid-required ng-dirty ng-valid-parse ng-invalid ng-valid-pattern" placeholder="{{field.placeholder}}" ng-model="field.value" ng-change="onFieldValueChange(field)" ng-blur="onFieldBlur(field)" ng-focus="onFieldFocus(field)" number-input-check ng-required="field.required" ng-minlength="{{field.params.minLength || ''}}" maxlength="{{field.params.maxLength || ''}}" ng-pattern="field.params.regexPattern || ''" ui-mask="{{field.params.mask || ''}}">
     </div>
     
     <div ng-switch-when="decimal" class="form-group" ng-show="field.isVisible" ng-class="{'has-error': field.required && isEmpty(field)}">
         <label class="control-label">{{field.name}}</label>
         <span class="marker" ng-if="field.required">*</span>
-        <input id="{{activitiFieldIdPrefix + field.id}}" type="text" name="{{field.id}}" class="form-control" placeholder="{{field.placeholder}}" ng-model="field.value" ng-change="onFieldValueChange(field)" ng-blur="onFieldBlur(field)" ng-focus="onFieldFocus(field)" decimal-number-input-check ng-required="field.required">
+        <input id="{{activitiFieldIdPrefix + field.id}}" type="text" name="{{field.id}}" class="form-control ng-valid-required ng-dirty ng-valid-parse ng-invalid ng-valid-pattern" placeholder="{{field.placeholder}}" ng-model="field.value" ng-change="onFieldValueChange(field)" ng-blur="onFieldBlur(field)" ng-focus="onFieldFocus(field)" decimal-number-input-check ng-required="field.required" ng-minlength="{{field.params.minLength || ''}}" maxlength="{{field.params.maxLength || ''}}" ng-pattern="field.params.regexPattern || ''" ui-mask="{{field.params.mask || ''}}">
     </div>
 
     <div ng-switch-when="date" class="form-group" ng-show="field.isVisible" ng-class="{'has-error': field.required && isEmpty(field)}">
         <label class="control-label"><i class="glyphicon glyphicon-calendar"></i> {{field.name}}</label>
         <span class="marker" ng-if="field.required">*</span>
         <span class="control-label" ng-if="field.acceptedFormat">({{field.acceptedFormat}})</span>
-        <input id="{{activitiFieldIdPrefix + field.id}}" name="{{field.id}}" type="text" class="form-control" placeholder="{{field.placeholder}}" ng-model="field.value" ng-change="onFieldValueChange(field)" bs-datepicker restrict-input template="{{appResourceRoot}}views/templates/date-picker-template.html" data-container="body" data-date-format="d-M-yyyy" trigger="focus" autoclose="true" ng-required="field.required">
+        <input id="{{activitiFieldIdPrefix + field.id}}" name="{{field.id}}" type="text" class="form-control " placeholder="{{field.placeholder}}" ng-model="field.value" ng-change="onFieldValueChange(field)" bs-datepicker restrict-input template="{{appResourceRoot}}views/templates/date-picker-template.html" data-container="body" data-date-format="d-M-yyyy" trigger="focus" autoclose="true" ng-required="field.required">
     </div>
 
     <div ng-switch-when="boolean" class="form-group" ng-show="field.isVisible" ng-class="{'has-error': field.required && isEmpty(field)}">
@@ -88,7 +88,7 @@
         </div>
     </div>
 
-    <div ng-switch-when="functional-group" class="form-group" ng-show="field.isVisible" ng-class="{'has-error': field.required &&  isEmpty(field)}">
+    <div ng-switch-when="functional-group" class="form-group" ng-show="field.isVisible" ng-class="{'has-error': field.required && isEmpty(field)}">
         <label class="control-label">{{field.name}}</label>
         <span class="marker" ng-if="field.required">*</span>
         <div id="{{activitiFieldIdPrefix + field.id}}" class="people-select">
@@ -97,8 +97,8 @@
                     on-group-selected="fieldGroupSelected(group, field)" restrict-with-group="field.params.restrictWithGroup">
                     <span ng-if="!field.value && !field.placeholder" translate="FORM.MESSAGE.SELECT-GROUP"></span>
                     <span ng-if="!field.value && field.placeholder" translate="{{field.placeholder}}"></span>
-                    <div>{{field.value.name}}</div>
-                    <div class="actions"  ng-if="field.value">
+                    <div ng-if="field.value && field.value.id && field.value.name">{{field.value.name}}</div>
+                    <div class="actions" ng-if="field.value && field.value.id && field.value.name">
                         <a ng-click="fieldGroupRemoved(field.value, field)"><i class="icon icon-remove"></i></a>
                     </div>
                 </li>
@@ -124,6 +124,13 @@
              ng-show="field.params.multiple || (!field.params.multiple && model.uploads[field.id].length != 1)"></div>
     </div>
     
+    <div ng-switch-when="hyperlink" class="form-group {{field.className}}" ng-show="field.isVisible">
+        <label class="control-label">{{field.name}}</label>
+        <div>
+             <a id="{{activitiFieldIdPrefix + field.id}}" ng-href="{{field.params.hyperlinkUrl}}" target="_blank">{{field.params.hyperlinkUrl}}</a>
+        </div>
+    </div>
+
     <div ng-switch-when="expression" class="form-group" ng-show="field.isVisible">
     	<div class="well well-sm" ng-style="{'font-size': field.params.size + 'em'}">
     		<div ng-show="!field.value && !field.expression">
@@ -170,13 +177,20 @@
         <label class="control-label">{{field.name}}</label>
         <span ng-if="!field.value || field.value.length == 0" translate="FORM.MESSAGE.EMPTY"></span>
         <ul class="simple-list selectable content-list">
-            <li ng-repeat="content in field.value" title="{{content.name}}">
+            <li ng-repeat="content in model.uploads[field.id]" title="{{content.name}}">
                 <document-preview content="content" editable="field.params.documentsEditable" read-only="true"></document-preview>
             </li>
         </ul>
         <div class="clearfix"></div>
     </div>
 
+   <div ng-switch-when="hyperlink" class="form-group {{field.className}} readonly" ng-show="field.isVisible">
+         <label class="control-label">{{field.name}}</label>
+         <div>
+             <a ng-href="{{field.params.hyperlinkUrl}}" target="_blank">{{field.params.hyperlinkUrl}}</a>
+         </div>
+    </div>	
+	
     <div ng-switch-when="radio-buttons" class="form-group" ng-show="field.isVisible">
         <label class="control-label">{{field.name}}</label>
         <div class="well well-sm">

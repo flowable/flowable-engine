@@ -18,7 +18,7 @@ import org.flowable.engine.JobNotFoundException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.AbstractJobEntity;
+import org.flowable.engine.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class MoveJobToDeadLetterJobCmd implements Command<DeadLetterJobEntity>, 
             throw new FlowableIllegalArgumentException("jobId and job is null");
         }
 
-        AbstractJobEntity job = commandContext.getTimerJobEntityManager().findById(jobId);
+        AbstractRuntimeJobEntity job = commandContext.getTimerJobEntityManager().findById(jobId);
         if (job == null) {
             job = commandContext.getJobEntityManager().findById(jobId);
         }

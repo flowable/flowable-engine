@@ -19,6 +19,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -57,7 +58,7 @@ public class HistoricActivityEventsTest extends PluggableFlowableTestCase {
      */
     @Deployment
     public void testHistoricActivityEventDispatched() {
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
 
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestActivityEvents");
             assertNotNull(processInstance);
@@ -67,70 +68,109 @@ public class HistoricActivityEventsTest extends PluggableFlowableTestCase {
             }
 
             List<FlowableEvent> events = listener.getEventsReceived();
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            
+            int processInstanceCreated = 0;
+            int mainStartActivityStarted = 0;
+            int mainStartActivityEnded = 0;
+            int subProcessActivityStarted = 0;
+            int subProcessActivityEnded = 0;
+            int subProcessStartActivityStarted = 0;
+            int subProcessStartActivityEnded = 0;
+            int aActivityStarted = 0;
+            int aActivityEnded = 0;
+            int bActivityStarted = 0;
+            int bActivityEnded = 0;
+            int subProcessEndActivityStarted = 0;
+            int subProcessEndActivityEnded = 0;
+            int mainEndActivityStarted = 0;
+            int mainEndActivityEnded = 0;
+            int processInstanceEnded = 0;
 
             // Process instance start
-            assertEquals(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, events.get(0).getType());
-
-            // main start
-            assertEquals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, events.get(1).getType());
-            assertEquals("mainStart", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(1)).getEntity()).getActivityId()));
-
-            assertEquals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, events.get(2).getType());
-            assertEquals("mainStart", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(2)).getEntity()).getActivityId()));
-            assertNotNull("mainStart", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(2)).getEntity()).getEndTime()));
-
-            // Subprocess start
-            assertEquals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, events.get(3).getType());
-            assertEquals("subProcess", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(3)).getEntity()).getActivityId()));
-
-            // subProcessStart
-            assertEquals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, events.get(4).getType());
-            assertEquals("subProcessStart", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(4)).getEntity()).getActivityId()));
-
-            assertEquals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, events.get(5).getType());
-            assertEquals("subProcessStart", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(5)).getEntity()).getActivityId()));
-            assertNotNull("subProcessStart", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(5)).getEntity()).getEndTime()));
-
-            // Task a
-            assertEquals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, events.get(6).getType());
-            assertEquals("a", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(6)).getEntity()).getActivityId()));
-
-            assertEquals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, events.get(7).getType());
-            assertEquals("a", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(7)).getEntity()).getActivityId()));
-            assertNotNull("a", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(7)).getEntity()).getEndTime()));
-
-            // Task b
-            assertEquals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, events.get(8).getType());
-            assertEquals("b", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(8)).getEntity()).getActivityId()));
-
-            assertEquals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, events.get(9).getType());
-            assertEquals("b", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(9)).getEntity()).getActivityId()));
-            assertNotNull("b", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(9)).getEntity()).getEndTime()));
-
-            // subProcessEnd
-            assertEquals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, events.get(10).getType());
-            assertEquals("subprocessEnd", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(10)).getEntity()).getActivityId()));
-
-            assertEquals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, events.get(11).getType());
-            assertEquals("subprocessEnd", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(11)).getEntity()).getActivityId()));
-            assertNotNull("subprocessEnd", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(11)).getEntity()).getEndTime()));
-
-            // subProcess end
-            assertEquals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, events.get(12).getType());
-            assertEquals("subProcess", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(12)).getEntity()).getActivityId()));
-            assertNotNull("subProcess", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(12)).getEntity()).getEndTime()));
-
-            // main end
-            assertEquals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, events.get(13).getType());
-            assertEquals("mainEnd", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(13)).getEntity()).getActivityId()));
-
-            assertEquals(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, events.get(14).getType());
-            assertEquals("mainEnd", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(14)).getEntity()).getActivityId()));
-            assertNotNull("mainEnd", (((HistoricActivityInstance) ((FlowableEntityEvent) events.get(14)).getEntity()).getEndTime()));
-
-            // Process instance end
-            assertEquals(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, events.get(15).getType());
-
+            for (FlowableEvent flowableEvent : events) {
+                if (FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED == flowableEvent.getType()) {
+                    processInstanceCreated++;
+                
+                } else if (FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED == flowableEvent.getType()) {
+                    FlowableEntityEvent flowableEntityEvent = (FlowableEntityEvent) flowableEvent;
+                    HistoricActivityInstance historicActivityInstance = (HistoricActivityInstance) flowableEntityEvent.getEntity();
+                    if ("mainStart".equals(historicActivityInstance.getActivityId())) {
+                        mainStartActivityStarted++;
+                        
+                    } else if ("subProcess".equals(historicActivityInstance.getActivityId())) {
+                        subProcessActivityStarted++;
+                    
+                    } else if ("subProcessStart".equals(historicActivityInstance.getActivityId())) {
+                        subProcessStartActivityStarted++;
+                    
+                    } else if ("a".equals(historicActivityInstance.getActivityId())) {
+                        aActivityStarted++;
+                    
+                    } else if ("b".equals(historicActivityInstance.getActivityId())) {
+                        bActivityStarted++;
+                    
+                    } else if ("subprocessEnd".equals(historicActivityInstance.getActivityId())) {
+                        subProcessEndActivityStarted++;
+                        
+                    } else if ("mainEnd".equals(historicActivityInstance.getActivityId())) {
+                        mainEndActivityStarted++;
+                    }
+                    
+                } else if (FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED == flowableEvent.getType()) {
+                    FlowableEntityEvent flowableEntityEvent = (FlowableEntityEvent) flowableEvent;
+                    HistoricActivityInstance historicActivityInstance = (HistoricActivityInstance) flowableEntityEvent.getEntity();
+                    if ("mainStart".equals(historicActivityInstance.getActivityId())) {
+                        assertNotNull(historicActivityInstance.getEndTime());
+                        mainStartActivityEnded++;
+                    
+                    } else if ("subProcess".equals(historicActivityInstance.getActivityId())) {
+                        assertNotNull(historicActivityInstance.getEndTime());
+                        subProcessActivityEnded++;
+                    
+                    } else if ("subProcessStart".equals(historicActivityInstance.getActivityId())) {
+                        assertNotNull(historicActivityInstance.getEndTime());
+                        subProcessStartActivityEnded++;
+                    
+                    } else if ("a".equals(historicActivityInstance.getActivityId())) {
+                        assertNotNull(historicActivityInstance.getEndTime());
+                        aActivityEnded++;
+                    
+                    } else if ("b".equals(historicActivityInstance.getActivityId())) {
+                        assertNotNull(historicActivityInstance.getEndTime());
+                        bActivityEnded++;
+                    
+                    } else if ("subprocessEnd".equals(historicActivityInstance.getActivityId())) {
+                        assertNotNull(historicActivityInstance.getEndTime());
+                        subProcessEndActivityEnded++;
+                    
+                    } else if ("mainEnd".equals(historicActivityInstance.getActivityId())) {
+                        assertNotNull(historicActivityInstance.getEndTime());
+                        mainEndActivityEnded++;
+                    }
+                    
+                } else if (FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED == flowableEvent.getType()) {
+                    processInstanceEnded++;
+                }
+            }
+            
+            assertEquals(1, processInstanceCreated);
+            assertEquals(1, mainStartActivityStarted);
+            assertEquals(1, mainStartActivityEnded);
+            assertEquals(1, subProcessActivityStarted);
+            assertEquals(1, subProcessActivityEnded);
+            assertEquals(1, subProcessStartActivityStarted);
+            assertEquals(1, subProcessStartActivityEnded);
+            assertEquals(1, aActivityStarted);
+            assertEquals(1, aActivityEnded);
+            assertEquals(1, bActivityStarted);
+            assertEquals(1, bActivityEnded);
+            assertEquals(1, subProcessEndActivityStarted);
+            assertEquals(1, subProcessEndActivityEnded);
+            assertEquals(1, mainEndActivityStarted);
+            assertEquals(1, mainEndActivityEnded);
+            assertEquals(1, processInstanceEnded);
         }
     }
 

@@ -13,107 +13,31 @@
 package org.flowable.form.engine.impl.cmd;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.form.api.FormInstance;
-import org.flowable.form.engine.impl.interceptor.Command;
-import org.flowable.form.engine.impl.interceptor.CommandContext;
+import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntity;
-import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntityManager;
-import org.flowable.form.model.FormField;
-import org.flowable.form.model.FormFieldTypes;
 import org.flowable.form.model.FormModel;
-import org.joda.time.LocalDate;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
  */
-public class CreateFormInstanceCmd implements Command<FormInstance>, Serializable {
+public class CreateFormInstanceCmd extends AbstractSaveFormInstanceCmd implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    protected FormModel formModel;
-    protected Map<String, Object> variables;
-    protected String taskId;
-    protected String processInstanceId;
-
     public CreateFormInstanceCmd(FormModel formModel, Map<String, Object> variables, String taskId, String processInstanceId) {
-        this.formModel = formModel;
-        this.variables = variables;
-        this.taskId = taskId;
-        this.processInstanceId = processInstanceId;
+        super(formModel, variables, taskId, processInstanceId);
+    }
+    
+    public CreateFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId) {
+        super(formModelId, variables, taskId, processInstanceId);
     }
 
-    public FormInstance execute(CommandContext commandContext) {
-
-        if (formModel == null || formModel.getId() == null) {
-            throw new FlowableException("Invalid form model provided");
-        }
-
-        ObjectMapper objectMapper = commandContext.getFormEngineConfiguration().getObjectMapper();
-        ObjectNode submittedFormValuesJson = objectMapper.createObjectNode();
-
-        ObjectNode valuesNode = submittedFormValuesJson.putObject("values");
-
-        // Loop over all form fields and see if a value was provided
-        Map<String, FormField> fieldMap = formModel.allFieldsAsMap();
-        for (String fieldId : fieldMap.keySet()) {
-            FormField formField = fieldMap.get(fieldId);
-
-            if (FormFieldTypes.EXPRESSION.equals(formField.getType()) || FormFieldTypes.CONTAINER.equals(formField.getType())) {
-                continue;
-            }
-
-            if (variables.containsKey(fieldId)) {
-                Object variableValue = variables.get(fieldId);
-                if (variableValue == null) {
-                    valuesNode.putNull(fieldId);
-                } else if (variableValue instanceof Long) {
-                    valuesNode.put(fieldId, (Long) variables.get(fieldId));
-
-                } else if (variableValue instanceof Double) {
-                    valuesNode.put(fieldId, (Double) variables.get(fieldId));
-
-                } else if (variableValue instanceof LocalDate) {
-                    valuesNode.put(fieldId, ((LocalDate) variableValue).toString());
-
-                } else {
-                    valuesNode.put(fieldId, variableValue.toString());
-                }
-            }
-        }
-
-        // Handle outcome
-        String outcomeVariable = null;
-        if (formModel.getOutcomeVariableName() != null) {
-            outcomeVariable = formModel.getOutcomeVariableName();
-        } else {
-            outcomeVariable = "form_" + formModel.getKey() + "_outcome";
-        }
-
-        if (variables.containsKey(outcomeVariable) && variables.get(outcomeVariable) != null) {
-            submittedFormValuesJson.put("flowable_form_outcome", variables.get(outcomeVariable).toString());
-        }
-
-        FormInstanceEntityManager formInstanceEntityManager = commandContext.getFormInstanceEntityManager();
-        FormInstanceEntity formInstanceEntity = formInstanceEntityManager.create();
-        formInstanceEntity.setFormDefinitionId(formModel.getId());
-        formInstanceEntity.setTaskId(taskId);
-        formInstanceEntity.setProcessInstanceId(processInstanceId);
-        formInstanceEntity.setSubmittedDate(new Date());
-        try {
-            formInstanceEntity.setFormValueBytes(objectMapper.writeValueAsBytes(submittedFormValuesJson));
-        } catch (Exception e) {
-            throw new FlowableException("Error setting form values JSON", e);
-        }
-
-        formInstanceEntityManager.insert(formInstanceEntity);
-
-        return formInstanceEntity;
+    @Override
+    protected FormInstanceEntity findExistingFormInstance(FormEngineConfiguration formEngineConfiguration) {
+        // We always want to create a formInstance.
+        return null;
     }
+
 }

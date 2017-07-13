@@ -20,7 +20,7 @@ import java.util.Date;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public interface TimerJobEntity extends AbstractJobEntity {
+public interface TimerJobEntity extends AbstractRuntimeJobEntity {
 
     String getLockOwner();
 

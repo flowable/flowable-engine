@@ -12,7 +12,7 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>6.0.1</version>
+    <version>6.1.0</version>
   </parent>
   
   <properties>
@@ -22,7 +22,7 @@
 		
 		<!-- Web container version -->
 		<tomcat.version>7.0.53</tomcat.version>
-        <flowable.version>6.0.0</flowable.version>
+        <flowable.version>6.1.0</flowable.version>
   </properties>
 
 	<prerequisites>

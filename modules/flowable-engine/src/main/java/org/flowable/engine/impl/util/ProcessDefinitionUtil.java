@@ -14,6 +14,7 @@ package org.flowable.engine.impl.util;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.Context;
@@ -51,7 +52,10 @@ public class ProcessDefinitionUtil {
     }
 
     public static Process getProcess(String processDefinitionId) {
-        if (Context.getProcessEngineConfiguration() == null) {
+        if (Context.getCommandContext() == null) {
+            throw new FlowableException("Cannot get process model: no current command context is active");
+            
+        } else if (Context.getProcessEngineConfiguration() == null) {
             return Flowable5Util.getFlowable5CompatibilityHandler().getProcessDefinitionProcessObject(processDefinitionId);
 
         } else {

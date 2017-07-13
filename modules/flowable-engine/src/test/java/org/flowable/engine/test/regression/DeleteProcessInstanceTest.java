@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.Job;
@@ -61,7 +62,7 @@ public class DeleteProcessInstanceTest extends PluggableFlowableTestCase {
         // Delete the process instance.
         runtimeService.deleteProcessInstance(instanceUser.getId(), null);
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // Retrieve the HistoricProcessInstance and assert that there is an
             // end time.
             HistoricProcessInstance hInstanceUser = historyService.createHistoricProcessInstanceQuery().processInstanceId(instanceUser.getId()).singleResult();
@@ -122,7 +123,7 @@ public class DeleteProcessInstanceTest extends PluggableFlowableTestCase {
         // Delete the process instance.
         runtimeService.deleteProcessInstance(instanceJava.getId(), null);
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // Retrieve the HistoricProcessInstance and assert that there is no
             // end time.
             HistoricProcessInstance hInstanceJava = historyService.createHistoricProcessInstanceQuery().processInstanceId(instanceJava.getId()).singleResult();

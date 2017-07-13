@@ -25,13 +25,13 @@
       "CONFIRM":"Confirmar",
       "CONFIRM-AND-CLOSE":"Confirmar e fechar",
       "NEW-FORM":"Novo formulário",
-      "CREATE-FORM":"Criar Formulário",
-      "NEW-DECISION-TABLE":"Nova Tabela de Decisão",
-      "CREATE-DECISION-TABLE":"Criar Tabela de Decisão"
+      "CREATE-FORM":"Criar formulário",
+      "NEW-DECISION-TABLE":"Nova tabela de decisão",
+      "CREATE-DECISION-TABLE":"Criar tabela de decisão"
     },
     "MESSAGE":{
       "SELECT-GROUP-HELP":"Use &uparrow; e &downarrow; para selecionar e pressione Enter para confirmar",
-      "PEOPLE-NO-MATCHING-RESULTS":"Nenhum usuario correspondente foi encontrado",
+      "PEOPLE-NO-MATCHING-RESULTS":"Nenhum usuário correspondente foi encontrado",
       "GROUP-NO-MATCHING-RESULTS":"Nenhum grupo correspondente foi encontrado",
       "GROUP-SOURCE-TYPE":"Grupo de origem",
       "GROUP-SOURCE-SEARCH-OPTION":"Pesquisa por grupo",
@@ -42,7 +42,7 @@
     "POPUP":{
       "UNSAVED-CHANGES":{
         "TITLE":"Você tem alterações não salvas",
-        "DESCRIPTION":"O que quer fazer com as suas alterações não salvas?",
+        "DESCRIPTION":"O que deseja fazer com as suas alterações não salvas?",
         "ACTION":{
           "SAVE":"Salvar as alterações",
           "DISCARD":"Descartar as alterações",
@@ -52,8 +52,8 @@
     }
   },
   "PROCESS-LIST":{
-    "TITLE":"Modelo de Processo de Negócio",
-    "SEARCH-PLACEHOLDER":"Busca",
+    "TITLE":"Modelo de processo de negócios",
+    "SEARCH-PLACEHOLDER":"Pesquisar",
     "ACTION":{
       "CREATE":"Criar processo",
       "IMPORT":"Importar processo"
@@ -66,7 +66,7 @@
       "PROCESSES-BPMN-HINT":"Crie um modelo BPMN usando o Editor Visual de BPMN.",
       "PROCESSES-BPMN-IMPORT-HINT":"Você também pode importar modelos BPMN existentes.",
       "FILTER-TEXT":", correspondente a \"{{filterText}}\"",
-      "FILTER-TEXT-EMPTY":"Não há processo modelo correspondente a \"{{filterText}}\"",
+      "FILTER-TEXT-EMPTY":"Não há modelo de processo correspondente a \"{{filterText}}\"",
       "RECENT":"Recente",
       "RECENT-COUNT":"{{total}} modelos usados recentemente",
       "RECENT-ONE":"Um modelo usado recentemente",
@@ -74,16 +74,16 @@
     },
     "SORT":{
       "MODIFIED-ASC":"Mais antigo",
-      "MODIFIED-DESC":"Último Modificado",
+      "MODIFIED-DESC":"Modificado por último",
       "NAME-ASC":"Nome, A-Z",
       "NAME-DESC":"Nome, Z-A"
     }
   },
   "FORMS-LIST":{
     "TITLE":"Formulários",
-    "SEARCH-PLACEHOLDER":"Busca",
+    "SEARCH-PLACEHOLDER":"Pesquisar",
     "ACTION":{
-      "CREATE":"Criar Formulário",
+      "CREATE":"Criar formulário",
       "CREATE-INLINE":"Crie um novo formulário agora!",
       "SHOW-MORE":"Mostrar mais..."
     },
@@ -121,14 +121,14 @@
     },
     "SORT":{
       "MODIFIED-ASC":"Mais antigo",
-      "MODIFIED-DESC":"Último Modificado",
+      "MODIFIED-DESC":"Modificado por último",
       "NAME-ASC":"Nome, A-Z",
       "NAME-DESC":"Nome, Z-A"
     }
   },
   "APPS-LIST":{
     "TITLE":"Definições de Aplicativo",
-    "SEARCH-PLACEHOLDER":"Busca",
+    "SEARCH-PLACEHOLDER":"Pesquisar",
     "ACTION":{
       "CREATE":"Criar Aplicativo",
       "IMPORT":"Importar aplicativo",
@@ -138,7 +138,7 @@
       "APPS":"Definições de Aplicativo",
       "APPS-COUNT":"Existem {{total}} definições de aplicativos",
       "APPS-ONE":"Há uma definição de aplicativo",
-      "APPS-EMPTY":"Não há definições de aplicativo. Para adicionar uma, clique em criar a definição de Aplicativo.",
+      "APPS-EMPTY":"Não há definições de aplicativo. Para adicionar uma, clique em criar definição de Aplicativo.",
       "FILTER-TEXT":", correspondente a \"{{filterText}}\"",
       "FILTER-TEXT-EMPTY":"Não há definições de aplicativo correspondentes a \"{{filterText}}\"",
       "NO-APPS":"Você pode criar uma definição de Aplicativo, através da publicação de um pacote de modelos de processo.",
@@ -147,7 +147,7 @@
     },
     "SORT":{
       "MODIFIED-ASC":"Mais antigo",
-      "MODIFIED-DESC":"Último Modificado",
+      "MODIFIED-DESC":"Modificado por último",
       "NAME-ASC":"Nome, A-Z",
       "NAME-DESC":"Nome, Z-A"
     }
@@ -203,7 +203,7 @@
       "ACTIONS":"Ações",
       "IMPORT":{
         "DROPZONE":"Arraste e solte um arquivo .bpmn ou bpmn20.xml",
-        "CANCEL-UPLOAD":"Cancelar o carregamento",
+        "CANCEL-UPLOAD":"Cancelar o upload",
         "ERROR":"Erro ao processar o arquivo XML BPMN",
         "NO-DROP":"Arrastar e soltar não suportado"
       }
@@ -232,7 +232,7 @@
     "DESCRIPTION":"Descrição",
     "ACTION":{
       "DETAILS":"Mostrar detalhes",
-      "EDIT":"Modificar propriedades de modelo",
+      "EDIT":"Modificar propriedades do modelo",
       "DELETE":"Excluir este formulário",
       "CREATE-CONFIRM":"Criar novo formulário",
       "DUPLICATE-CONFIRM":"Duplicar o formulário",
@@ -303,7 +303,7 @@
       "IMPORT-DESCRIPTION":"Por favor, procure ou arraste e solte uma definição de DMN XML com uma extensão .dmn ou .dmn.xml",
       "IMPORT-TITLE":"Importar um modelo DMN",
       "IMPORT":{
-        "DROPZONE":"Arraste e solete um arquivo DMN XML com extenção .dmn ou .dmn.xml",
+        "DROPZONE":"Arraste e solte um arquivo DMN XML com extensão .dmn ou .dmn.xml",
         "CANCEL-UPLOAD":"Cancelar o carregamento",
         "ERROR":"Erro ao processar o arquivo XML DMN",
         "NO-DROP":"Arrastar e soltar não suportado"
@@ -377,7 +377,7 @@
       "DELETE-TITLE":"Excluir a definição de aplicativo",
       "DELETE-DESCRIPTION":"Tem certeza que deseja excluir a definição do aplicativo \"{{name}}\"?",
       "DELETE-DESCRIPTION-WITH-RUNTIME":"Tem certeza que deseja excluir a definição do aplicativo \"{{name}}\"? Note que esta definição de aplicativo foi implantada como uma tarefa de página inicial, o aplicativo será removido da página inicial.",
-      "DELETE-CASCADE-FALSE":"Soment apagar a versão atual desta definição de aplicativo (v{{version}})",
+      "DELETE-CASCADE-FALSE":"Somente apagar a versão atual desta definição de aplicativo (v{{version}})",
       "DELETE-CASCADE-TRUE":"Também excluir todas as versões anteriores desta definição de aplicativo",
       "HAS-CUSTOM-STENCILITEM":"O modelo \"{{modelName}}\" usa um estêncil com itens de estêncil personalizado. Não é possível usar este modelo em uma definição de aplicativo.",
       "HAS-VALIDATIONERROR":"O modelo \"{{modelName}}\" tem erros de validação e não pode ser adicionado a uma definição de aplicativo. Abra o modelo no editor para ver mais detalhes sobre o(s) erro(s) de validação.",
@@ -406,7 +406,7 @@
   "FORM-BUILDER":{
     "PALLETTE":{
       "TEXT":"Texto",
-      "MULTILINE-TEXT":"Texto de múltiplas linhas",
+      "MULTILINE-TEXT":"Texto de multilinhas",
       "NUMBER":"Número",
       "CHECKBOX":"Caixa de seleção",
       "DATE":"Data",
@@ -416,17 +416,19 @@
       "GROUP-OF-PEOPLE":"Grupo de pessoas",
       "UPLOAD":"Carregar",
       "EXPRESSION":"Expressão",
-      "DECIMAL":"Decimal"
+      "DECIMAL":"Decimal",
+      "HYPERLINK":"Hiperlink"
     },
     "TABS":{
       "GENERAL":"Geral",
       "OPTIONS":"Opções",
-      "UPLOAD-OPTIONS":"Opções de carregamento"
+      "UPLOAD-OPTIONS":"Opções de carregamento",
+      "ADVANCED-OPTIONS":"Avançado"
     },
     "VERSION":"Versão {{version}}",
     "LAST-UPDATED":"Última atualização feita por {{lastUpdatedBy}}, {{lastUpdated | dateformat}}",
     "TITLE":{
-      "DESIGN":"Design",
+      "DESIGN":"Desenho",
       "OUTCOME":"Resultados"
     },
     "POPUP":{
@@ -454,14 +456,29 @@
       "READONLY":"Somente leitura",
       "EXPRESSION":"Expressão",
       "ADD-OPTION":"+ Adicionar uma nova opção",
-      "UPLOAD-ALLOW-MULTIPLE":"Permitir o upload de vários arquivos"
+      "UPLOAD-ALLOW-MULTIPLE":"Permitir o upload de vários arquivos",
+      "MAX-LENGTH":"Comprimento máximo:",
+      "MIN-LENGTH":"Comprimento mínimo:",
+      "HYPERLINK-URL": "URL de hiperlink",
+      "REGEX-PATTERN":"Padrão Regex",
+      "MASK":{
+        "TITLE":"Máscara de entrada",
+        "EXAMPLES":{
+          "TITLE":"Exemplos:",
+          "NUMBER":"Qualquer número",
+          "LETTER":"Qualquer letra",
+          "NUMBERORLETTER":"Qualquer letra ou número",
+          "OPTIONAL":"Torna a máscara opcional (não valida)",
+          "PHONE":"Dinheiro"
+        }
+      }
     },
     "OUTCOMES":{
       "DESCRIPTION":"Você pode definir várias saídas para esta tarefa. Quando concluir uma tarefa, os usuários seleciona uma das saídas disponíveis, que podem ser usados em, por exemplo, em uma condição futura no processo.",
       "NO-OUTCOMES-OPTION":"Não use as saídas personalizados, apenas mostre um botão 'Completar'.",
       "OUTCOMES-OPTION":"Use saídas personalizados para este formulário.",
       "POSSIBLE-OUTCOMES":"Saídas possíveis",
-      "NEW-OUTCOME-PLACEHOLDER":"Insira o nova saída",
+      "NEW-OUTCOME-PLACEHOLDER":"Insira uma nova saída",
       "ADD":"Adicionar saída",
       "REMOVE":"Excluir"
     }
@@ -559,7 +576,7 @@
   "PROPERTY.FEEDBACK.TITLE":"Por favor, nos envie seu feedback",
   "PROPERTY.ASSIGNMENT.TITLE":"Atribuição",
   "PROPERTY.ASSIGNMENT.TYPE":"Tipo",
-  "PROPERTY.ASSIGNMENT.TYPE.IDENTITYSTORE":"Armazenamento de identidade",
+  "PROPERTY.ASSIGNMENT.TYPE.IDENTITYSTORE":"Identidades",
   "PROPERTY.ASSIGNMENT.TYPE.STATIC":"Valores fixos",
   "PROPERTY.ASSIGNMENT.ASSIGNEE":"Responsável",
   "PROPERTY.ASSIGNMENT.MATCHING":"Use &uparrow; e &downarrow; para selecionar e pressione Enter para confirmar ou use o mouse",
@@ -604,6 +621,10 @@
   "PROPERTY.EXECUTIONLISTENERS.FIELDS.EMPTY":"Nenhum campo selecionado",
   "PROPERTY.FIELDS":"{{length}} campos",
   "PROPERTY.FIELDS.EMPTY":"Nenhum campo selecionado",
+  "PROPERTY.ASSIGNMENT.NONE" : "Nenhum...",
+  "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHUSER": "Pesquisar usuário",
+  "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHGROUP": "Pesquisar grupo",
+  "PROPERTY.ASSIGNMENT.SEARCH": "Pesquisa: ",
   "PROPERTY.FIELDS.NAME":"Nome",
   "PROPERTY.FIELDS.NAME.PLACEHOLDER":"Digite um nome",
   "PROPERTY.FIELDS.EXPRESSION":"Expressão",
@@ -709,7 +730,7 @@
   "PROPERTY.SEQUENCEFLOW.ORDER.EMPTY":"Nenhuma ordem de fluxo de sequência determinada",
   "PROPERTY.SEQUENCEFLOW.ORDER.NOT.EMPTY":"Conjunto de ordem de fluxo de sequência",
   "PROPERTY.SEQUENCEFLOW.ORDER.NO.OUTGOING.SEQUENCEFLOW.FOUND":"Não foi encontrado nenhum fluxo de sequência de saída.",
-  "PROPERTY.SEQUENCEFLOW.ORDER.DESCRIPTION":"Defina a ordem em que o fluxo de sequência precisa ser analizado:",
+  "PROPERTY.SEQUENCEFLOW.ORDER.DESCRIPTION":"Defina a ordem em que o fluxo de sequência precisa ser analisado:",
   "PROPERTY.SEQUENCEFLOW.ORDER.SEQUENCEFLOW.VALUE":"Fluxo de sequência para {{targetType}} {{targetTitle}}",
   "PROPERTY.SEQUENCEFLOW.CONDITION.TITLE":"Condição de fluxo de sequência",
   "PROPERTY.SEQUENCEFLOW.CONDITION.STATIC":"Expressão de condição",

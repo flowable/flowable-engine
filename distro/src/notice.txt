@@ -44,6 +44,7 @@ flowable-form-model<version><.jar | -source.jar | -javadoc.jar>
 flowable-form-rest<version><.jar | -source.jar | -javadoc.jar>
 flowable-form-spring<version><.jar | -source.jar | -javadoc.jar>
 flowable-form-spring-configurator<version><.jar | -source.jar | -javadoc.jar>
+flowable-http<version><.jar | -source.jar | -javadoc.jar>
 flowable-image-generator<version><.jar | -source.jar | -javadoc.jar>
 flowable-jms-spring-executor<version><.jar | -source.jar | -javadoc.jar>
 flowable-jmx<version><.jar | -source.jar | -javadoc.jar>
@@ -153,11 +154,11 @@ log4j							log4j						1.2.17			The Apache Software License, Version 2.0
 math.geom2d						javaGeom					0.11.1			Lesser General Public License version 2.0 (LGPLv2)
 org.apache.commons				commons-email				1.4				Apache License, Version 2.0
 org.apache.commons				commons-lang3				3.3.2			The Apache Software License, Version 2.0
-org.apache.httpcomponents		httpclient					4.3.5			Apache License, Version 2.0
+org.apache.httpcomponents		httpclient					4.5.3			Apache License, Version 2.0
 org.apache.httpcomponents		httpcore					4.3.2			Apache License, Version 2.0
 org.apache.geronimo.bundles		json						20090211_1		The Apache Software License, Version 2.0
 org.codehaus.groovy				groovy-all					2.4.8			The Apache Software License, Version 2.0
-org.liquibase					liquibase-core				3.1.0			Apache License, Version 2.0
+org.liquibase					liquibase-core				3.5.3			Apache License, Version 2.0
 org.mybatis						mybatis						3.4.1			The Apache Software License, Version 2.0
 org.mybatis						mybatis-spring				1.3.0			The Apache Software License, Version 2.0
 org.mvel						mvel2						2.2.6.Final		The Apache Software License, Version 2.0
@@ -181,6 +182,6 @@ org.springframework.security	spring-security-core		4.0.4.RELEASE	The Apache Soft
 org.springframework.security	spring-security-crypto		4.0.4.RELEASE	The Apache Software License, Version 2.0
 org.springframework.security	spring-security-web			4.0.4.RELEASE	The Apache Software License, Version 2.0
 org.tinyjee.jgraphx				jgraphx						1.10.4.1		JGraph Ltd - 3 clause BSD license
-org.yaml						snakeyaml					1.13			The Apache Software License, Version 2.0
+org.yaml						snakeyaml					1.17			The Apache Software License, Version 2.0
 xerces							xercesImpl					2.10.0			The Apache Software License, Version 2.0
 xml-apis						xml-apis					1.4.01			The Apache Software License, Version 2.0-The SAX License-The W3C License

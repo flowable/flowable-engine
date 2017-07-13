@@ -16,7 +16,6 @@ package org.flowable.idm.engine.impl;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.GroupQueryProperty;
@@ -134,9 +133,9 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
         return commandContext.getGroupEntityManager().findGroupCountByQueryCriteria(this);
     }
 
-    public List<Group> executeList(CommandContext commandContext, Page page) {
+    public List<Group> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getGroupEntityManager().findGroupByQueryCriteria(this, page);
+        return commandContext.getGroupEntityManager().findGroupByQueryCriteria(this);
     }
 
     // getters ////////////////////////////////////////////////////////

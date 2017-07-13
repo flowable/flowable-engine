@@ -168,6 +168,8 @@ ORYX = Object.extend(ORYX, {
 	
 	_loadPlugins: function(plugins) {
 	
+	    ORYX.availablePlugins.length = 0;
+	
 		// get plugins.xml content
 		var resultXml = jQuery.parseXML(plugins); //jquery parser
 

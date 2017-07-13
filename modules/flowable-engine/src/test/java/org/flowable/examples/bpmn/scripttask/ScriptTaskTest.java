@@ -12,8 +12,6 @@
  */
 package org.flowable.examples.bpmn.scripttask;
 
-import groovy.lang.MissingPropertyException;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +22,8 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import groovy.lang.MissingPropertyException;
 
 /**
  * @author Joram Barrez

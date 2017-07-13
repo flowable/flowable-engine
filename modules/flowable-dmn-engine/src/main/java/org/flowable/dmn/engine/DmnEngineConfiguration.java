@@ -550,10 +550,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration {
     // myBatis SqlSessionFactory
     // ////////////////////////////////////////////////
 
-    public String pathToEngineDbProperties() {
-        return "org/flowable/dmn/db/properties/" + databaseType + ".properties";
-    }
-
     public InputStream getMyBatisXmlConfigurationStream() {
         return getResourceAsStream(DEFAULT_MYBATIS_MAPPING_FILE);
     }

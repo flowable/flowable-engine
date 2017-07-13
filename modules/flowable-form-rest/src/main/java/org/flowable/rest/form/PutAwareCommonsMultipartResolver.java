@@ -1,9 +1,9 @@
 package org.flowable.rest.form;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-
-import javax.servlet.http.HttpServletRequest;
 
 public class PutAwareCommonsMultipartResolver extends CommonsMultipartResolver {
 

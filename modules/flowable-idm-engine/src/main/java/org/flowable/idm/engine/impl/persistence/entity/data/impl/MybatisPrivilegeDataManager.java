@@ -15,7 +15,6 @@ package org.flowable.idm.engine.impl.persistence.entity.data.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.PrivilegeQueryImpl;
@@ -45,8 +44,8 @@ public class MybatisPrivilegeDataManager extends AbstractDataManager<PrivilegeEn
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Privilege> findPrivilegeByQueryCriteria(PrivilegeQueryImpl query, Page page) {
-        return getDbSqlSession().selectList("selectPrivilegeByQueryCriteria", query, page);
+    public List<Privilege> findPrivilegeByQueryCriteria(PrivilegeQueryImpl query) {
+        return getDbSqlSession().selectList("selectPrivilegeByQueryCriteria", query);
     }
 
     @Override
@@ -56,8 +55,8 @@ public class MybatisPrivilegeDataManager extends AbstractDataManager<PrivilegeEn
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Privilege> findPrivilegeByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        return getDbSqlSession().selectListWithRawParameter("selectPrivilegeByNativeQuery", parameterMap, firstResult, maxResults);
+    public List<Privilege> findPrivilegeByNativeQuery(Map<String, Object> parameterMap) {
+        return getDbSqlSession().selectListWithRawParameter("selectPrivilegeByNativeQuery", parameterMap);
     }
 
     @Override

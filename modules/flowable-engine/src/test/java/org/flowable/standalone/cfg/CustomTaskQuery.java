@@ -15,7 +15,6 @@ package org.flowable.standalone.cfg;
 import java.util.List;
 
 import org.flowable.engine.ManagementService;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.impl.AbstractQuery;
 import org.flowable.engine.impl.TaskQueryProperty;
 import org.flowable.engine.impl.interceptor.CommandContext;
@@ -60,7 +59,7 @@ public class CustomTaskQuery extends AbstractQuery<CustomTaskQuery, CustomTask> 
     }
 
     @SuppressWarnings("unchecked")
-    public List<CustomTask> executeList(CommandContext commandContext, Page page) {
+    public List<CustomTask> executeList(CommandContext commandContext) {
         return commandContext.getDbSqlSession().selectList("selectCustomTaskByQueryCriteria", this);
     }
 

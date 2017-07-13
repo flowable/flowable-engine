@@ -24,6 +24,7 @@ import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EventGateway;
+import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.ExclusiveGateway;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.InclusiveGateway;
@@ -64,6 +65,7 @@ import org.flowable.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.DmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.EventSubProcessActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessErrorStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessMessageStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessSignalStartEventActivityBehavior;
@@ -280,6 +282,36 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
                 ShellActivityBehavior.class, fieldDeclarations);
     }
 
+    public ActivityBehavior createHttpActivityBehavior(ServiceTask serviceTask) {
+        try {
+            Class<?> theClass = null;
+            FieldExtension behaviorExtension = null;
+            for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
+                if ("httpActivityBehaviorClass".equals(fieldExtension.getFieldName()) && StringUtils.isNotEmpty(fieldExtension.getStringValue())) {
+                    theClass = Class.forName(fieldExtension.getStringValue());
+                    behaviorExtension = fieldExtension;
+                    break;
+                }
+            }
+
+            if (behaviorExtension != null) {
+                serviceTask.getFieldExtensions().remove(behaviorExtension);
+            }
+
+            if (theClass == null) {
+                // Default Http behavior class
+                theClass = Class.forName("org.flowable.http.impl.HttpActivityBehaviorImpl");
+            }
+
+            List<FieldDeclaration> fieldDeclarations = createFieldDeclarations(serviceTask.getFieldExtensions());
+            addExceptionMapAsFieldDeclaration(fieldDeclarations, serviceTask.getMapExceptions());
+            return (ActivityBehavior) ClassDelegate.defaultInstantiateDelegate(theClass, fieldDeclarations, serviceTask);
+
+        } catch (ClassNotFoundException e) {
+            throw new FlowableException("Could not find org.flowable.http.HttpActivityBehavior: ", e);
+        }
+    }
+
     public ActivityBehavior createBusinessRuleTaskActivityBehavior(BusinessRuleTask businessRuleTask) {
         BusinessRuleTaskDelegate ruleActivity = null;
         if (StringUtils.isNotEmpty(businessRuleTask.getClassName())) {
@@ -356,6 +388,10 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     public SubProcessActivityBehavior createSubprocessActivityBehavior(SubProcess subProcess) {
         return new SubProcessActivityBehavior();
     }
+    
+    public EventSubProcessActivityBehavior createEventSubprocessActivityBehavior(EventSubProcess eventSubProcess) {
+        return new EventSubProcessActivityBehavior();
+      }
 
     public EventSubProcessErrorStartEventActivityBehavior createEventSubProcessErrorStartEventActivityBehavior(StartEvent startEvent) {
         return new EventSubProcessErrorStartEventActivityBehavior();

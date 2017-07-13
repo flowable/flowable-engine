@@ -15,9 +15,7 @@ package org.flowable.app.rest.idm;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.app.model.common.UserRepresentation;
-import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.exception.NotFoundException;
-import org.flowable.app.service.exception.NotPermittedException;
 import org.flowable.app.service.idm.RemoteIdmService;
 import org.flowable.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +39,6 @@ public class UserResource {
 
         if (user == null) {
             throw new NotFoundException("User with id: " + userId + " does not exist or is inactive");
-        }
-
-        if (!user.getId().equals(SecurityUtils.getCurrentUserId())) {
-            throw new NotPermittedException("Can only get user details for authenticated user");
         }
 
         return new UserRepresentation(user);

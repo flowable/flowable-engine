@@ -12,10 +12,6 @@
  */
 package org.flowable.osgi;
 
-import org.osgi.service.url.AbstractURLStreamHandlerService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -23,6 +19,10 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+
+import org.osgi.service.url.AbstractURLStreamHandlerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A URL handler to transform a BPMN xml definition into an osgi bundle

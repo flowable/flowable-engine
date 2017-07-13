@@ -21,7 +21,7 @@ import org.flowable.engine.task.Task;
 
 public interface TaskEntityManager extends EntityManager<TaskEntity> {
 
-    void insert(TaskEntity taskEntity, ExecutionEntity execution);
+    void insert(TaskEntity taskEntity, ExecutionEntity execution, boolean fireCreateEvent);
 
     void changeTaskAssignee(TaskEntity taskEntity, String assignee);
 
@@ -37,7 +37,7 @@ public interface TaskEntityManager extends EntityManager<TaskEntity> {
 
     long findTaskCountByQueryCriteria(TaskQueryImpl taskQuery);
 
-    List<Task> findTasksByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults);
+    List<Task> findTasksByNativeQuery(Map<String, Object> parameterMap);
 
     long findTaskCountByNativeQuery(Map<String, Object> parameterMap);
 
@@ -49,6 +49,6 @@ public interface TaskEntityManager extends EntityManager<TaskEntity> {
 
     void deleteTasksByProcessInstanceId(String processInstanceId, String deleteReason, boolean cascade);
 
-    void deleteTask(TaskEntity task, String deleteReason, boolean cascade, boolean cancel);
+    void deleteTask(TaskEntity task, String deleteReason, boolean cascade, boolean cancel, boolean fireEvents);
 
 }

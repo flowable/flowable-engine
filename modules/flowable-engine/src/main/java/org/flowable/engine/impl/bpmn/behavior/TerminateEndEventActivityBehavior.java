@@ -12,28 +12,34 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.util.List;
+
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.SubProcess;
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
-
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
  */
 public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior {
+    
+    private static final Logger logger = LoggerFactory.getLogger(TerminateEndEventActivityBehavior.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -64,7 +70,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         String deleteReason = createDeleteReason(execution.getCurrentActivityId());
         deleteExecutionEntities(executionEntityManager, rootExecutionEntity, execution.getCurrentFlowElement(), deleteReason);
         endAllHistoricActivities(rootExecutionEntity.getId(), deleteReason);
-        commandContext.getHistoryManager().recordProcessInstanceEnd(rootExecutionEntity.getId(),
+        commandContext.getHistoryManager().recordProcessInstanceEnd(rootExecutionEntity,
                 deleteReason, execution.getCurrentActivityId());
     }
 
@@ -84,7 +90,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
 
             endAllHistoricActivities(scopeExecutionEntity.getId(), deleteReason);
             deleteExecutionEntities(executionEntityManager, scopeExecutionEntity, execution.getCurrentFlowElement(), deleteReason);
-            commandContext.getHistoryManager().recordProcessInstanceEnd(scopeExecutionEntity.getId(), deleteReason, execution.getCurrentActivityId());
+            commandContext.getHistoryManager().recordProcessInstanceEnd(scopeExecutionEntity, deleteReason, execution.getCurrentActivityId());
 
         } else if (scopeExecutionEntity.getCurrentFlowElement() != null
                 && scopeExecutionEntity.getCurrentFlowElement() instanceof SubProcess) { // SubProcess
@@ -111,18 +117,34 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
 
             ExecutionEntity callActivityExecution = scopeExecutionEntity.getSuperExecution();
             CallActivity callActivity = (CallActivity) callActivityExecution.getCurrentFlowElement();
+            
+            SubProcessActivityBehavior subProcessActivityBehavior = null;
+
+            // copy variables before destroying the ended sub process instance (call activity)
+            subProcessActivityBehavior = (SubProcessActivityBehavior) callActivity.getBehavior();
+            try {
+                subProcessActivityBehavior.completing(callActivityExecution, scopeExecutionEntity);
+            } catch (RuntimeException e) {
+                logger.error("Error while completing sub process of execution {}", scopeExecutionEntity, e);
+                throw e;
+            } catch (Exception e) {
+                logger.error("Error while completing sub process of execution {}", scopeExecutionEntity, e);
+                throw new FlowableException("Error while completing sub process of execution " + scopeExecutionEntity, e);
+            }
 
             if (callActivity.hasMultiInstanceLoopCharacteristics()) {
 
                 sendProcessInstanceCompletedEvent(scopeExecutionEntity, execution.getCurrentFlowElement());
                 MultiInstanceActivityBehavior multiInstanceBehavior = (MultiInstanceActivityBehavior) callActivity.getBehavior();
                 multiInstanceBehavior.leave(callActivityExecution);
-                executionEntityManager.deleteProcessInstanceExecutionEntity(scopeExecutionEntity.getId(), execution.getCurrentFlowElement().getId(), "terminate end event", false, false);
+                executionEntityManager.deleteProcessInstanceExecutionEntity(scopeExecutionEntity.getId(), 
+                                execution.getCurrentFlowElement().getId(), "terminate end event", false, false, false);
 
             } else {
 
                 sendProcessInstanceCompletedEvent(scopeExecutionEntity, execution.getCurrentFlowElement());
-                executionEntityManager.deleteProcessInstanceExecutionEntity(scopeExecutionEntity.getId(), execution.getCurrentFlowElement().getId(), "terminate end event", false, false);
+                executionEntityManager.deleteProcessInstanceExecutionEntity(scopeExecutionEntity.getId(), 
+                                execution.getCurrentFlowElement().getId(), "terminate end event", false, false, false);
                 ExecutionEntity superExecutionEntity = executionEntityManager.findById(scopeExecutionEntity.getSuperExecutionId());
                 commandContext.getAgenda().planTakeOutgoingSequenceFlowsOperation(superExecutionEntity, true);
 

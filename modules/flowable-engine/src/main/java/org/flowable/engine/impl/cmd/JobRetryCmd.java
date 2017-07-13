@@ -28,7 +28,7 @@ import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.calendar.DurationHelper;
 import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.AbstractJobEntity;
+import org.flowable.engine.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.slf4j.Logger;
@@ -61,13 +61,16 @@ public class JobRetryCmd implements Command<Object> {
 
         ExecutionEntity executionEntity = fetchExecutionEntity(commandContext, job.getExecutionId());
         FlowElement currentFlowElement = executionEntity != null ? executionEntity.getCurrentFlowElement() : null;
+        if (executionEntity != null) {
+            executionEntity.setActive(false);
+        }
 
         String failedJobRetryTimeCycleValue = null;
         if (currentFlowElement instanceof ServiceTask) {
             failedJobRetryTimeCycleValue = ((ServiceTask) currentFlowElement).getFailedJobRetryTimeCycleValue();
         }
 
-        AbstractJobEntity newJobEntity = null;
+        AbstractRuntimeJobEntity newJobEntity = null;
         if (currentFlowElement == null || failedJobRetryTimeCycleValue == null) {
 
             log.debug("activity or FailedJobRetryTimerCycleValue is null in job {}. Only decrementing retries.", jobId);

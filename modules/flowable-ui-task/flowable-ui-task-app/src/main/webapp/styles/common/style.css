@@ -1736,7 +1736,7 @@ h3+div > .dropzone {
 
 .people-select {
     overflow: auto;
-    max-width: 300px;
+    max-width: 100%;
 }
 
 .popover .people-select {
@@ -3266,3 +3266,13 @@ ul#strength > li:last-child {
   height:auto;
 }
 
+.form-control.ng-invalid {
+    border-color: #a94442 !important;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset, 0 0 8px rgba(255,0,0,0.5);
+}
+
+.control-label.ng-invalid {
+    color: #a94442 !important;
+    font-weight: bold;
+   
+}

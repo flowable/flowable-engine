@@ -93,6 +93,11 @@ angular.module('flowableModeler').directive('formBuilderElement', ['$rootScope',
                     "id": "upload",
                     "name": $translate.instant('FORM-BUILDER.TABS.UPLOAD-OPTIONS'),
                     "show": ['upload']
+                },
+                {
+                    "id": "advanced",
+                    "name": $translate.instant('FORM-BUILDER.TABS.ADVANCED-OPTIONS'),
+                    "show": ['text', 'multi-line-text', 'integer', 'decimal','hyperlink']
                 }
             ];
 
@@ -287,3 +292,21 @@ angular.module('flowableModeler').
             }
         };
     });
+
+angular.module('flowableModeler').
+    directive('hotAutoDestroy',["hotRegisterer",function(hotRegisterer) {
+    return {
+        restrict: 'A',
+        link: function (scope, element, attr){
+            element.on("$destroy", function() {
+                try{
+                    var hotInstance = hotRegisterer.getInstance(attr.hotId);
+                    hotInstance.destroy();
+                }
+                catch(er){
+                    console.log(er);
+                }
+            });
+        }
+    };
+}]);

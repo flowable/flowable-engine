@@ -15,7 +15,6 @@ package org.flowable.idm.engine.impl;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.PrivilegeQuery;
 import org.flowable.idm.engine.impl.interceptor.CommandContext;
@@ -121,8 +120,8 @@ public class PrivilegeQueryImpl extends AbstractQuery<PrivilegeQuery, Privilege>
     }
 
     @Override
-    public List<Privilege> executeList(CommandContext commandContext, Page page) {
-        return commandContext.getPrivilegeEntityManager().findPrivilegeByQueryCriteria(this, page);
+    public List<Privilege> executeList(CommandContext commandContext) {
+        return commandContext.getPrivilegeEntityManager().findPrivilegeByQueryCriteria(this);
     }
 
 }

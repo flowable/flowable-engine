@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:flowable="http://flowable.org/bpmn" 
+		xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+		xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+		xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+		typeLanguage="http://www.w3.org/2001/XMLSchema" 
+		expressionLanguage="http://www.w3.org/1999/XPath" 
+		targetNamespace="http://www.flowable.org/test">
+
+  <signal id="signalTest" name="signalTest" />
+		
+  <process id="signalBoundaryCatch" isExecutable="true">
+    <startEvent id="startevent1"></startEvent>
+    <userTask id="task" />
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="task" />
+    <boundaryEvent id="catchSignal" attachedToRef="task">
+  		<signalEventDefinition signalRef="signalTest" />
+	</boundaryEvent>
+    <userTask id="afterTask" />
+    <sequenceFlow id="flow3" sourceRef="catchSignal" targetRef="afterTask" />
+    <endEvent id="endevent1" />
+    <sequenceFlow id="flow4" sourceRef="afterTask" targetRef="endevent1" />
+    <sequenceFlow id="flow5" sourceRef="task" targetRef="endevent1" />
+  </process>
+</definitions>

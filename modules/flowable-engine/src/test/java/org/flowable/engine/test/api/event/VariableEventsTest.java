@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.api.event;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,15 +25,13 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableVariableEvent;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.hamcrest.CoreMatchers;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * Test case for all {@link FlowableEvent}s related to variables.
@@ -341,6 +342,9 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
 
             taskService.setVariable(newTask.getId(), "testVariable", 123);
             taskService.setVariable(newTask.getId(), "testVariable", 456);
+            
+            waitForJobExecutorToProcessAllHistoryJobs(5000, 200);
+            
             taskService.removeVariable(newTask.getId(), "testVariable");
 
             assertEquals(3, listener.getEventsReceived().size());
@@ -373,11 +377,10 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
             assertNull(event.getVariableValue());
         } finally {
 
-            // Cleanup task and history to ensure a clean DB after test
-            // success/failure
+            // Cleanup task and history to ensure a clean DB after test success/failure
             if (newTask.getId() != null) {
                 taskService.deleteTask(newTask.getId());
-                if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+                if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
                     historyService.deleteHistoricTaskInstance(newTask.getId());
                 }
             }

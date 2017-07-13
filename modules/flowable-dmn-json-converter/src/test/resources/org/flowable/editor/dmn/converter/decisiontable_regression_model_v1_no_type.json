@@ -1,0 +1,78 @@
+{
+  "id": "00b8a28c-5116-11e7-9807-a26608126000",
+  "name": "New Decision Table",
+  "key": "NewDecisionTable",
+  "hitIndicator": "FIRST",
+  "inputExpressions": [
+    {
+      "id": "3",
+      "variableId": "input1",
+      "variableType": null,
+      "type": null,
+      "label": "input one",
+      "entries": null,
+      "newVariable": false
+    },
+    {
+      "id": "5",
+      "variableId": "input2",
+      "variableType": null,
+      "type": null,
+      "label": "Input Two",
+      "entries": null,
+      "newVariable": false
+    },
+    {
+      "id": "7",
+      "variableId": "input3",
+      "variableType": null,
+      "type": null,
+      "label": "Input Three",
+      "entries": null,
+      "newVariable": false
+    },
+    {
+      "id": "9",
+      "variableId": "input4",
+      "variableType": null,
+      "type": null,
+      "label": "Input Four",
+      "entries": null,
+      "newVariable": false
+    }
+  ],
+  "outputExpressions": [
+    {
+      "id": "13",
+      "variableId": "output1",
+      "variableType": null,
+      "type": null,
+      "label": "Output One",
+      "entries": null,
+      "newVariable": false
+    }
+  ],
+  "rules": [
+    {
+      "3": "== \"TEST\"",
+      "5": "== 100",
+      "7": "== true",
+      "9": "fn_date('2017-06-01')",
+      "13": "\"WAS TEST\""
+    },
+    {
+      "3": "!= \"TEST\"",
+      "5": "!= 100",
+      "7": "== false",
+      "9": "!= fn_date('2017-06-01')",
+      "13": "\"WASN'T TEST\""
+    },
+    {
+      "3": "",
+      "5": "",
+      "7": "",
+      "9": "",
+      "13": "\"SOMETHING ELSE\""
+    }
+  ]
+}

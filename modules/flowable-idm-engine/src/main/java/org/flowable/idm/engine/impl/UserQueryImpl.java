@@ -16,7 +16,6 @@ package org.flowable.idm.engine.impl;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.Page;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 import org.flowable.idm.api.UserQueryProperty;
@@ -201,9 +200,9 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
         return commandContext.getUserEntityManager().findUserCountByQueryCriteria(this);
     }
 
-    public List<User> executeList(CommandContext commandContext, Page page) {
+    public List<User> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getUserEntityManager().findUserByQueryCriteria(this, page);
+        return commandContext.getUserEntityManager().findUserByQueryCriteria(this);
     }
 
     // getters //////////////////////////////////////////////////////////

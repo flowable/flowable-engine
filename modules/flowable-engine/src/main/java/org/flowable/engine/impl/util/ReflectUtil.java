@@ -15,6 +15,7 @@ package org.flowable.engine.impl.util;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Arrays;
@@ -23,6 +24,7 @@ import java.util.regex.Pattern;
 
 import org.flowable.engine.common.api.FlowableClassLoadingException;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.Context;
 import org.slf4j.Logger;
@@ -148,6 +150,34 @@ public abstract class ReflectUtil {
             throw new FlowableException("couldn't invoke " + methodName + " on " + target, e);
         }
     }
+    
+    public static void invokeSetterOrField(Object target, String name, Object value, boolean throwExceptionOnMissingField) {
+        Method setterMethod = getSetter(name, target.getClass(), value.getClass());
+
+        if (setterMethod != null) {
+            invokeSetter(setterMethod, target, name, value);
+            
+        } else {
+            Field field = ReflectUtil.getField(name, target);
+            if (field == null) {
+                if (throwExceptionOnMissingField) {
+                    throw new FlowableIllegalArgumentException("Field definition uses unexisting field '" + name + "' on class " + target.getClass().getName());
+                } else {
+                    return;
+                }
+            }
+
+            // Check if the delegate field's type is correct
+            if (!fieldTypeCompatible(value, field)) {
+                throw new FlowableIllegalArgumentException("Incompatible type set on field declaration '" + name
+                        + "' for class " + target.getClass().getName()
+                        + ". Declared value has type " + value.getClass().getName()
+                        + ", while expecting " + field.getType().getName());
+            }
+            
+            setField(field, target, value);
+        }
+    }
 
     /**
      * Returns the field of the given object or null if it doesn't exist.
@@ -209,6 +239,18 @@ public abstract class ReflectUtil {
             throw new FlowableException("Not allowed to access method " + setterName + " on class " + clazz.getCanonicalName());
         }
     }
+    
+    public static void invokeSetter(Method setterMethod, Object target, String name, Object value) {
+        try {
+            setterMethod.invoke(target, value);
+        } catch (IllegalArgumentException e) {
+            throw new FlowableException("Error while invoking '" + name + "' on class " + target.getClass().getName(), e);
+        } catch (IllegalAccessException e) {
+            throw new FlowableException("Illegal access when calling '" + name + "' on class " + target.getClass().getName(), e);
+        } catch (InvocationTargetException e) {
+            throw new FlowableException("Exception while invoking '" + name + "' on class " + target.getClass().getName(), e);
+        }
+    }
 
     private static Method findMethod(Class<? extends Object> clazz, String methodName, Object[] args) {
         for (Method method : clazz.getDeclaredMethods()) {
@@ -260,6 +302,15 @@ public abstract class ReflectUtil {
             }
         }
         return true;
+    }
+    
+    private static boolean fieldTypeCompatible(Object value, Field field) {
+        if (value != null) {
+            return field.getType().isAssignableFrom(value.getClass());
+        } else {
+            // Null can be set any field type
+            return true;
+        }
     }
 
     private static ClassLoader getCustomClassLoader() {

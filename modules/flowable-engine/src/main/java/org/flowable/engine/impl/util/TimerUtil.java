@@ -135,6 +135,9 @@ public class TimerUtil {
                     timer.setTenantId(executionEntity.getTenantId());
                 }
             }
+            
+        } else {
+            throw new FlowableException("Due date could not be determined for timer job " + dueDateString);
         }
 
         if (StringUtils.isNotEmpty(timerEventDefinition.getTimeCycle())) {

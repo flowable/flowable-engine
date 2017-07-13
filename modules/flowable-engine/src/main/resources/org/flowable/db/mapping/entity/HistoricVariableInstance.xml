@@ -87,15 +87,31 @@
   <!-- HISTORIC PROCESS VARIABLE UPDATE -->
   
   <update id="updateHistoricVariableInstance" parameterType="org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityImpl">
-    update ${prefix}ACT_HI_VARINST set
-      REV_ = #{revisionNext, jdbcType=INTEGER},
-      BYTEARRAY_ID_ = #{byteArrayRef, typeHandler=ByteArrayRefTypeHandler},
-      DOUBLE_ = #{doubleValue, jdbcType=DOUBLE},
-      LONG_ = #{longValue, jdbcType=BIGINT},
-      TEXT_ = #{textValue, jdbcType=VARCHAR},
-      TEXT2_ = #{textValue2, jdbcType=VARCHAR},
-      VAR_TYPE_ = #{variableType, jdbcType=VARCHAR},
-      LAST_UPDATED_TIME_ = #{lastUpdatedTime, jdbcType=TIMESTAMP}
+    update ${prefix}ACT_HI_VARINST
+      <set>
+          REV_ = #{revisionNext, jdbcType=INTEGER},
+          <if test="(byteArrayRef != null and originalPersistentState.byteArrayRef == null) or (byteArrayRef == null and originalPersistentState.byteArrayRef != null) or (originalPersistentState.byteArrayRef != byteArrayRef.id)">
+              BYTEARRAY_ID_ = #{byteArrayRef, typeHandler=ByteArrayRefTypeHandler},
+          </if>
+          <if test="originalPersistentState.doubleValue != doubleValue">
+              DOUBLE_ = #{doubleValue, jdbcType=DOUBLE},
+          </if>
+          <if test="originalPersistentState.longValue != longValue">
+              LONG_ = #{longValue, jdbcType=BIGINT},
+          </if>
+          <if test="originalPersistentState.textValue != textValue">
+              TEXT_ = #{textValue, jdbcType=VARCHAR},
+          </if>
+          <if test="originalPersistentState.textValue2 != textValue2">
+              TEXT2_ = #{textValue2, jdbcType=VARCHAR},
+          </if>
+          <if test="originalPersistentState.variableType != variableType">
+              VAR_TYPE_ = #{variableType, jdbcType=VARCHAR},
+          </if>
+          <if test="originalPersistentState.lastUpdatedTime != lastUpdatedTime">
+              LAST_UPDATED_TIME_ = #{lastUpdatedTime, jdbcType=TIMESTAMP}
+          </if>
+      </set>
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
@@ -134,11 +150,11 @@
   <!-- HISTORIC VARIABLE SELECT -->
 
   <select id="selectHistoricVariableInstanceByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricVariableInstanceQueryImpl" resultMap="historicProcessVariableResultMap">
-  	${limitBefore}
-    select RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectHistoricVariableInstanceByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
   <select id="selectHistoricVariableInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricVariableInstanceQueryImpl" resultType="long">
@@ -246,6 +262,10 @@
       <when test="queryVariableValue.operator.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
    </choose>
   </sql>
+  
+  <select id="selectHistoricVariableInstance" resultMap="historicProcessVariableResultMap">
+    select * from ${prefix}ACT_HI_VARINST where ID_ = #{variableInstanceId}
+  </select>
   
   <select id="selectHistoricVariableInstanceByVariableInstanceId" resultMap="historicProcessVariableResultMap">
     select * from ${prefix}ACT_HI_VARINST where ID_ = #{variableInstanceId}

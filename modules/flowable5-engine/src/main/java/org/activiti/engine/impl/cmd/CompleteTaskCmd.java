@@ -61,7 +61,7 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
             }
         }
 
-        task.complete(variables, localScope);
+        task.complete(variables, localScope, true);
         return null;
     }
 

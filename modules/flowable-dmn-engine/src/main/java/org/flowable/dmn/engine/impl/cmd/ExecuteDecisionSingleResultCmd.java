@@ -21,7 +21,6 @@ import org.flowable.dmn.model.Decision;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 
-import java.io.Serializable;
 import java.util.Map;
 
 /**

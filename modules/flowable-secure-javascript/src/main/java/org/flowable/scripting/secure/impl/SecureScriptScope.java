@@ -66,7 +66,6 @@ public class SecureScriptScope implements Scriptable {
 
     @Override
     public void put(String s, Scriptable scriptable, Object o) {
-        System.out.println("Putting " + s);
     }
 
     @Override

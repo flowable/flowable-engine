@@ -74,10 +74,16 @@
   <!-- PROCESSDEFINITION UPDATE -->
 
   <update id="updateProcessDefinition" parameterType="org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl">
-    update ${prefix}ACT_RE_PROCDEF set
-      REV_ = #{revisionNext, jdbcType=INTEGER},    
-      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
-      CATEGORY_ = #{category, jdbcType=VARCHAR}
+    update ${prefix}ACT_RE_PROCDEF
+      <set>
+          REV_ = #{revisionNext, jdbcType=INTEGER},
+          <if test="originalPersistentState.suspensionState != suspensionState">
+              SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
+          </if>
+          <if test="originalPersistentState.category != category">
+              CATEGORY_ = #{category, jdbcType=VARCHAR}
+          </if>
+      </set>
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
@@ -126,11 +132,11 @@
   </select>
 
   <select id="selectProcessDefinitionsByQueryCriteria" parameterType="org.flowable.engine.impl.ProcessDefinitionQueryImpl" resultMap="processDefinitionResultMap">
-  	${limitBefore}
-    select RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
   <select id="selectProcessDefinitionCountByQueryCriteria" parameterType="org.flowable.engine.impl.ProcessDefinitionQueryImpl" resultType="long">
@@ -300,11 +306,11 @@
   
   <!-- mysql specific sql -->
   <select id="selectProcessDefinitionsByQueryCriteria" databaseId="mysql" parameterType="org.flowable.engine.impl.ProcessDefinitionQueryImpl" resultMap="processDefinitionResultMap">
-  	${limitBefore}
-    select distinct RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
   <!-- mysql specific sql -->

@@ -14,7 +14,6 @@ package org.flowable.engine.impl.persistence.entity.data;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.JobQueryImpl;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
@@ -23,22 +22,10 @@ import org.flowable.engine.runtime.Job;
 /**
  * @author Joram Barrez
  */
-public interface JobDataManager extends DataManager<JobEntity> {
+public interface JobDataManager extends DataManager<JobEntity>, JobInfoDataManager<JobEntity> {
 
-    List<JobEntity> findJobsToExecute(Page page);
-
-    List<JobEntity> findJobsByExecutionId(final String executionId);
-
-    List<JobEntity> findJobsByProcessInstanceId(final String processInstanceId);
-
-    List<JobEntity> findExpiredJobs(Page page);
-
-    List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery, Page page);
+    List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery);
 
     long findJobCountByQueryCriteria(JobQueryImpl jobQuery);
-
-    void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
-
-    void resetExpiredJob(String jobId);
 
 }

@@ -43,10 +43,18 @@
   <!-- DEPLOYMENT UPDATE -->
   
   <update id="updateDeployment" parameterType="org.flowable.engine.impl.persistence.entity.DeploymentEntityImpl">
-    update ${prefix}ACT_RE_DEPLOYMENT set
-      CATEGORY_ = #{category, jdbcType=VARCHAR},
-      KEY_ = #{key, jdbcType=VARCHAR},
-      TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+    update ${prefix}ACT_RE_DEPLOYMENT
+      <set>
+          <if test="originalPersistentState.category != category">
+              CATEGORY_ = #{category, jdbcType=VARCHAR},
+          </if>
+          <if test="originalPersistentState.key != key">
+              KEY_ = #{key, jdbcType=VARCHAR},
+          </if>
+          <if test="originalPersistentState.tenantId != tenantId">
+              TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+          </if>
+      </set>
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
   
@@ -71,11 +79,11 @@
   <!-- DEPLOYMENT SELECT -->
 
   <select id="selectDeploymentsByQueryCriteria" parameterType="org.flowable.engine.impl.DeploymentQueryImpl" resultMap="deploymentResultMap">
-  	${limitBefore}
-    select distinct RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
   <select id="selectDeploymentCountByQueryCriteria" parameterType="org.flowable.engine.impl.DeploymentQueryImpl" resultType="long">
@@ -157,21 +165,17 @@
     </where>
   </sql>
     
-  <select id="selectDeploymentsByName" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="deploymentResultMap">
-    select * from ${prefix}ACT_RE_DEPLOYMENT D where NAME_=#{parameter} order by D.DEPLOY_TIME_ desc
-  </select>
-  
   <select id="selectDeployment" parameterType="string" resultMap="deploymentResultMap">
     select * from ${prefix}ACT_RE_DEPLOYMENT where ID_ = #{id, jdbcType=VARCHAR}
   </select>
 
   <!-- mysql specific -->
   <select id="selectDeploymentsByQueryCriteria" databaseId="mysql" parameterType="org.flowable.engine.impl.DeploymentQueryImpl" resultMap="deploymentResultMap">
-  	${limitBefore}
-    select distinct RES.* ${limitBetween}
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
    	${orderBy}
-    ${limitAfter}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
   <!-- mysql specific -->

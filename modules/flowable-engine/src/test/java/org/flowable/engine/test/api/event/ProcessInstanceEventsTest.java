@@ -405,10 +405,17 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertEquals("No task can be active for deleted process.", 0, this.taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
 
         List<FlowableEvent> taskCancelledEvents = listener.filterEvents(FlowableEngineEventType.ACTIVITY_CANCELLED);
-        assertEquals("ActivitiEventType.ACTIVITY_CANCELLED was expected 1 time.", 1, taskCancelledEvents.size());
+        assertEquals("ActivitiEventType.ACTIVITY_CANCELLED was expected 2 times.", 2, taskCancelledEvents.size());
+        
         FlowableActivityCancelledEvent activityCancelledEvent = (FlowableActivityCancelledEvent) taskCancelledEvents.get(0);
         assertTrue("The cause has to be the same as deleteProcessInstance method call", FlowableActivityCancelledEvent.class.isAssignableFrom(activityCancelledEvent.getClass()));
         assertEquals("The process instance has to point to the subprocess", subProcess.getId(), activityCancelledEvent.getProcessInstanceId());
+        assertEquals("The cause has to be the same as in deleteProcessInstance method call", "delete_test", activityCancelledEvent.getCause());
+        
+        activityCancelledEvent = (FlowableActivityCancelledEvent) taskCancelledEvents.get(1);
+        assertTrue("The cause has to be the same as deleteProcessInstance method call", FlowableActivityCancelledEvent.class.isAssignableFrom(activityCancelledEvent.getClass()));
+        assertEquals("The process instance has to point to the main process", processInstance.getId(), activityCancelledEvent.getProcessInstanceId());
+        assertEquals("expect callActivity type", "callActivity", activityCancelledEvent.getActivityType());
         assertEquals("The cause has to be the same as in deleteProcessInstance method call", "delete_test", activityCancelledEvent.getCause());
 
         listener.clearEventsReceived();
