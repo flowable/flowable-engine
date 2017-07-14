@@ -13,12 +13,12 @@
 
 package org.flowable.form.engine.impl.persistence;
 
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.form.engine.FormEngineConfiguration;
-import org.flowable.form.engine.impl.context.Context;
-import org.flowable.form.engine.impl.interceptor.CommandContext;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntityManager;
 import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntityManager;
-import org.flowable.form.engine.impl.persistence.entity.ResourceEntityManager;
+import org.flowable.form.engine.impl.persistence.entity.FormResourceEntityManager;
 
 /**
  * @author Tijs Rademakers
@@ -56,7 +56,7 @@ public abstract class AbstractManager {
         return getFormEngineConfiguration().getFormDefinitionEntityManager();
     }
 
-    protected ResourceEntityManager getResourceEntityManager() {
+    protected FormResourceEntityManager getResourceEntityManager() {
         return getFormEngineConfiguration().getResourceEntityManager();
     }
 

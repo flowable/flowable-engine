@@ -14,8 +14,8 @@ package org.flowable.engine.impl.persistence;
 
 import java.util.Collection;
 
+import org.flowable.engine.common.impl.persistence.cache.CachedEntity;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.engine.impl.persistence.cache.CachedEntity;
 
 /**
  * Interface to express a condition whether or not a cached entity should be used in the return result of a query.

@@ -45,29 +45,29 @@ public class MybatisDmnDeploymentDataManager extends AbstractDataManager<DmnDepl
 
     @Override
     public long findDeploymentCountByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery) {
-        return (Long) getDbSqlSession().selectOne("selectDeploymentCountByQueryCriteria", deploymentQuery);
+        return (Long) getDbSqlSession().selectOne("selectDmnDeploymentCountByQueryCriteria", deploymentQuery);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<DmnDeployment> findDeploymentsByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery) {
-        return getDbSqlSession().selectList("selectDeploymentsByQueryCriteria", deploymentQuery);
+        return getDbSqlSession().selectList("selectDmnDeploymentsByQueryCriteria", deploymentQuery);
     }
 
     @Override
     public List<String> getDeploymentResourceNames(String deploymentId) {
-        return getDbSqlSession().getSqlSession().selectList("selectResourceNamesByDeploymentId", deploymentId);
+        return getDbSqlSession().getSqlSession().selectList("selectDmnResourceNamesByDeploymentId", deploymentId);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<DmnDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap) {
-        return getDbSqlSession().selectListWithRawParameter("selectDeploymentByNativeQuery", parameterMap);
+        return getDbSqlSession().selectListWithRawParameter("selectDmnDeploymentByNativeQuery", parameterMap);
     }
 
     @Override
     public long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap) {
-        return (Long) getDbSqlSession().selectOne("selectDeploymentCountByNativeQuery", parameterMap);
+        return (Long) getDbSqlSession().selectOne("selectDmnDeploymentCountByNativeQuery", parameterMap);
     }
 
 }

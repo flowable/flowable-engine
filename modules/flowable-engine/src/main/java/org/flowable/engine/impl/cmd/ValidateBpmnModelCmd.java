@@ -16,8 +16,9 @@ import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ValidationError;
 
@@ -34,7 +35,7 @@ public class ValidateBpmnModelCmd implements Command<List<ValidationError>> {
 
     @Override
     public List<ValidationError> execute(CommandContext commandContext) {
-        ProcessValidator processValidator = commandContext.getProcessEngineConfiguration().getProcessValidator();
+        ProcessValidator processValidator = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessValidator();
         if (processValidator == null) {
             throw new FlowableException("No process validator defined");
         }

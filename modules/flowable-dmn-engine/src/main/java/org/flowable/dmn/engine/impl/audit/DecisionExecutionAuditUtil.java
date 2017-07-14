@@ -15,7 +15,7 @@ package org.flowable.dmn.engine.impl.audit;
 import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.engine.impl.context.Context;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionTable;
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ public class DecisionExecutionAuditUtil {
         String decisionName = decision.getName();
 
         return new DecisionExecutionAuditContainer(decisionKey, decisionName, decisionTable.getHitPolicy(),
-            Context.getDmnEngineConfiguration().isStrictMode(), inputVariables);
+            CommandContextUtil.getDmnEngineConfiguration().isStrictMode(), inputVariables);
     }
 
 }

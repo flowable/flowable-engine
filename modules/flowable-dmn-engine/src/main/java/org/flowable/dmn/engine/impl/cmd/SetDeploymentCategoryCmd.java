@@ -12,11 +12,12 @@
  */
 package org.flowable.dmn.engine.impl.cmd;
 
-import org.flowable.dmn.engine.impl.interceptor.Command;
-import org.flowable.dmn.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Tijs Rademakers
@@ -37,7 +38,7 @@ public class SetDeploymentCategoryCmd implements Command<Void> {
             throw new FlowableIllegalArgumentException("Deployment id is null");
         }
 
-        DmnDeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
+        DmnDeploymentEntity deployment = CommandContextUtil.getDeploymentEntityManager(commandContext).findById(deploymentId);
 
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("No deployment found for id = '" + deploymentId + "'");
@@ -45,7 +46,7 @@ public class SetDeploymentCategoryCmd implements Command<Void> {
 
         // Update category
         deployment.setCategory(category);
-        commandContext.getDeploymentEntityManager().update(deployment);
+        CommandContextUtil.getDeploymentEntityManager(commandContext).update(deployment);
 
         return null;
     }

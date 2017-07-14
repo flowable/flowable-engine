@@ -22,11 +22,11 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -58,7 +58,7 @@ public abstract class AbstractEventHandler implements EventHandler {
             }
         }
 
-        Context.getAgenda().planTriggerExecutionOperation(execution);
+        CommandContextUtil.getAgenda().planTriggerExecutionOperation(execution);
     }
 
     protected void dispatchActivitiesCanceledIfNeeded(EventSubscriptionEntity eventSubscription, ExecutionEntity execution, FlowElement currentFlowElement, CommandContext commandContext) {
@@ -77,7 +77,7 @@ public abstract class AbstractEventHandler implements EventHandler {
         }
 
         // call activities
-        ExecutionEntity subProcessInstance = commandContext.getExecutionEntityManager().findSubProcessInstanceBySuperExecutionId(execution.getId());
+        ExecutionEntity subProcessInstance = CommandContextUtil.getExecutionEntityManager(commandContext).findSubProcessInstanceBySuperExecutionId(execution.getId());
         if (subProcessInstance != null) {
             dispatchExecutionCancelled(eventSubscription, subProcessInstance, commandContext);
         }
@@ -95,14 +95,14 @@ public abstract class AbstractEventHandler implements EventHandler {
     protected void dispatchActivityCancelled(EventSubscriptionEntity eventSubscription, ExecutionEntity boundaryEventExecution, FlowNode flowNode, CommandContext commandContext) {
 
         // Scope
-        commandContext.getEventDispatcher().dispatchEvent(
+        CommandContextUtil.getEventDispatcher().dispatchEvent(
                 FlowableEventBuilder.createActivityCancelledEvent(flowNode.getId(), flowNode.getName(), boundaryEventExecution.getId(),
                         boundaryEventExecution.getProcessInstanceId(), boundaryEventExecution.getProcessDefinitionId(),
                         parseActivityType(flowNode), eventSubscription));
 
         if (flowNode instanceof SubProcess) {
             // The parent of the boundary event execution will be the one on which the boundary event is set
-            ExecutionEntity parentExecutionEntity = commandContext.getExecutionEntityManager().findById(boundaryEventExecution.getParentId());
+            ExecutionEntity parentExecutionEntity = CommandContextUtil.getExecutionEntityManager(commandContext).findById(boundaryEventExecution.getParentId());
             if (parentExecutionEntity != null) {
                 dispatchActivityCancelledForChildExecution(eventSubscription, parentExecutionEntity, boundaryEventExecution, commandContext);
             }
@@ -112,7 +112,7 @@ public abstract class AbstractEventHandler implements EventHandler {
     protected void dispatchActivityCancelledForChildExecution(EventSubscriptionEntity eventSubscription,
             ExecutionEntity parentExecutionEntity, ExecutionEntity boundaryEventExecution, CommandContext commandContext) {
 
-        List<ExecutionEntity> executionEntities = commandContext.getExecutionEntityManager().findChildExecutionsByParentExecutionId(parentExecutionEntity.getId());
+        List<ExecutionEntity> executionEntities = CommandContextUtil.getExecutionEntityManager(commandContext).findChildExecutionsByParentExecutionId(parentExecutionEntity.getId());
         for (ExecutionEntity childExecution : executionEntities) {
 
             if (!boundaryEventExecution.getId().equals(childExecution.getId())
@@ -120,7 +120,7 @@ public abstract class AbstractEventHandler implements EventHandler {
                     && childExecution.getCurrentFlowElement() instanceof FlowNode) {
 
                 FlowNode flowNode = (FlowNode) childExecution.getCurrentFlowElement();
-                commandContext.getEventDispatcher().dispatchEvent(
+                CommandContextUtil.getEventDispatcher().dispatchEvent(
                         FlowableEventBuilder.createActivityCancelledEvent(flowNode.getId(), flowNode.getName(), childExecution.getId(),
                                 childExecution.getProcessInstanceId(), childExecution.getProcessDefinitionId(),
                                 parseActivityType(flowNode), eventSubscription));

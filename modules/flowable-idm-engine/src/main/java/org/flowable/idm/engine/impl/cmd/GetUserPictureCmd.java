@@ -17,10 +17,11 @@ import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.User;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -39,7 +40,7 @@ public class GetUserPictureCmd implements Command<Picture>, Serializable {
             throw new FlowableIllegalArgumentException("userId is null");
         }
 
-        User user = commandContext.getIdmEngineConfiguration().getIdmIdentityService()
+        User user = CommandContextUtil.getIdmEngineConfiguration().getIdmIdentityService()
                 .createUserQuery().userId(userId)
                 .singleResult();
 
@@ -47,7 +48,7 @@ public class GetUserPictureCmd implements Command<Picture>, Serializable {
             throw new FlowableObjectNotFoundException("user " + userId + " doesn't exist", User.class);
         }
 
-        return commandContext.getUserEntityManager().getUserPicture(user);
+        return CommandContextUtil.getUserEntityManager(commandContext).getUserPicture(user);
     }
 
 }

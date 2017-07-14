@@ -15,8 +15,9 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -35,7 +36,7 @@ public class GetModelEditorSourceExtraCmd implements Command<byte[]>, Serializab
             throw new FlowableIllegalArgumentException("modelId is null");
         }
 
-        byte[] bytes = commandContext.getModelEntityManager().findEditorSourceExtraByModelId(modelId);
+        byte[] bytes = CommandContextUtil.getModelEntityManager(commandContext).findEditorSourceExtraByModelId(modelId);
 
         return bytes;
     }

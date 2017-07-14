@@ -17,8 +17,8 @@ import java.sql.Connection;
 
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.util.ReflectUtil;
 
 import junit.framework.TestCase;
 

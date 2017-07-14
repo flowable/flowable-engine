@@ -14,7 +14,7 @@ package org.flowable.engine.common.impl.transaction;
 
 import java.util.Stack;
 
-import org.flowable.engine.common.impl.cfg.BaseTransactionContext;
+import org.flowable.engine.common.impl.cfg.TransactionContext;
 
 /**
  * Holder for a threadlocal stack of {@link BaseTransactionContext} objects. Different engines (process/idm/dmn/form/...) use this 'shared' object to see if another engine has already started a
@@ -22,20 +22,19 @@ import org.flowable.engine.common.impl.cfg.BaseTransactionContext;
  * 
  * @author Joram Barrez
  */
-@SuppressWarnings("rawtypes")
 public class TransactionContextHolder {
 
-    protected static ThreadLocal<Stack<BaseTransactionContext>> transactionContextThreadLocal = new ThreadLocal<Stack<BaseTransactionContext>>();
+    protected static ThreadLocal<Stack<TransactionContext>> transactionContextThreadLocal = new ThreadLocal<Stack<TransactionContext>>();
 
-    public static BaseTransactionContext getTransactionContext() {
-        Stack<BaseTransactionContext> stack = getStack(transactionContextThreadLocal);
+    public static TransactionContext getTransactionContext() {
+        Stack<TransactionContext> stack = getStack(transactionContextThreadLocal);
         if (stack.isEmpty()) {
             return null;
         }
         return stack.peek();
     }
 
-    public static void setTransactionContext(BaseTransactionContext transactionContext) {
+    public static void setTransactionContext(TransactionContext transactionContext) {
         getStack(transactionContextThreadLocal).push(transactionContext);
     }
 

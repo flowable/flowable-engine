@@ -29,7 +29,7 @@
 
   <!-- DEPLOYMENT RESULTMAP -->
   
-  <resultMap id="deploymentResultMap" type="org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntityImpl">
+  <resultMap id="formDeploymentResultMap" type="org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
@@ -40,20 +40,20 @@
 
   <!-- DEPLOYMENT SELECT -->
 
-  <select id="selectDeploymentsByQueryCriteria" parameterType="org.flowable.form.engine.impl.FormDeploymentQueryImpl" resultMap="deploymentResultMap">
+  <select id="selectFormDeploymentsByQueryCriteria" parameterType="org.flowable.form.engine.impl.FormDeploymentQueryImpl" resultMap="formDeploymentResultMap">
   	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
     select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-    <include refid="selectDeploymentsByQueryCriteriaSql"/>
+    <include refid="selectFormDeploymentsByQueryCriteriaSql"/>
     ${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
-  <select id="selectDeploymentCountByQueryCriteria" parameterType="org.flowable.form.engine.impl.FormDeploymentQueryImpl" resultType="long">
+  <select id="selectFormDeploymentCountByQueryCriteria" parameterType="org.flowable.form.engine.impl.FormDeploymentQueryImpl" resultType="long">
     select count(distinct RES.ID_)
-    <include refid="selectDeploymentsByQueryCriteriaSql"/>
+    <include refid="selectFormDeploymentsByQueryCriteriaSql"/>
   </select>
   
-  <sql id="selectDeploymentsByQueryCriteriaSql">  
+  <sql id="selectFormDeploymentsByQueryCriteriaSql">  
     from ${prefix}ACT_FO_FORM_DEPLOYMENT RES
     <if test="formDefinitionKey != null or formDefinitionKeyLike != null">
     	inner join ${prefix}ACT_FO_FORM_DEFINITION FORM on RES.ID_ = FORM.DEPLOYMENT_ID_
@@ -98,30 +98,30 @@
     </where>
   </sql>
     
-  <select id="selectFormDeployment" parameterType="string" resultMap="deploymentResultMap">
+  <select id="selectFormDeployment" parameterType="string" resultMap="formDeploymentResultMap">
     select * from ${prefix}ACT_FO_FORM_DEPLOYMENT where ID_ = #{id, jdbcType=VARCHAR}
   </select>
 
   <!-- mysql specific -->
-  <select id="selectDeploymentsByQueryCriteria" databaseId="mysql" parameterType="org.flowable.form.engine.impl.FormDeploymentQueryImpl" resultMap="deploymentResultMap">
+  <select id="selectFormDeploymentsByQueryCriteria" databaseId="mysql" parameterType="org.flowable.form.engine.impl.FormDeploymentQueryImpl" resultMap="formDeploymentResultMap">
   	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
     select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-    <include refid="selectDeploymentsByQueryCriteriaSql"/>
+    <include refid="selectFormDeploymentsByQueryCriteriaSql"/>
    	${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
   <!-- mysql specific -->
-  <select id="selectDeploymentCountByQueryCriteria" databaseId="mysql" parameterType="org.flowable.form.engine.impl.FormDeploymentQueryImpl" resultType="long">
+  <select id="selectFormDeploymentCountByQueryCriteria" databaseId="mysql" parameterType="org.flowable.form.engine.impl.FormDeploymentQueryImpl" resultType="long">
     select distinct count(RES.ID_)
-    <include refid="selectDeploymentsByQueryCriteriaSql"/>
+    <include refid="selectFormDeploymentsByQueryCriteriaSql"/>
   </select>
 
-  <select id="selectDeploymentByNativeQuery" parameterType="java.util.Map" resultMap="deploymentResultMap">
+  <select id="selectFormDeploymentByNativeQuery" parameterType="java.util.Map" resultMap="formDeploymentResultMap">
     <include refid="org.flowable.form.engine.db.common.selectByNativeQuery"/>
   </select>
 
-  <select id="selectDeploymentCountByNativeQuery" parameterType="java.util.Map" resultType="long">
+  <select id="selectFormDeploymentCountByNativeQuery" parameterType="java.util.Map" resultType="long">
     ${sql}
   </select>
 

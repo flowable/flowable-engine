@@ -16,10 +16,10 @@ import java.io.Serializable;
 
 import org.flowable.engine.app.AppModel;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -39,7 +39,7 @@ public class GetAppResourceModelCmd implements Command<AppModel>, Serializable {
             throw new FlowableIllegalArgumentException("deploymentId is null");
         }
 
-        DeploymentManager deploymentManager = Context.getProcessEngineConfiguration().getDeploymentManager();
+        DeploymentManager deploymentManager = CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager();
         return deploymentManager.getAppResourceModel(deploymentId);
     }
 }

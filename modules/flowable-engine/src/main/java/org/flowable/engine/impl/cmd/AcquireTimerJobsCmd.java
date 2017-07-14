@@ -17,11 +17,12 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.flowable.engine.common.impl.Page;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.asyncexecutor.AcquiredTimerJobEntities;
 import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -36,7 +37,7 @@ public class AcquireTimerJobsCmd implements Command<AcquiredTimerJobEntities> {
 
     public AcquiredTimerJobEntities execute(CommandContext commandContext) {
         AcquiredTimerJobEntities acquiredJobs = new AcquiredTimerJobEntities();
-        List<TimerJobEntity> timerJobs = commandContext.getTimerJobEntityManager()
+        List<TimerJobEntity> timerJobs = CommandContextUtil.getTimerJobEntityManager(commandContext)
                 .findTimerJobsToExecute(new Page(0, asyncExecutor.getMaxAsyncJobsDuePerAcquisition()));
 
         for (TimerJobEntity job : timerJobs) {
@@ -53,7 +54,7 @@ public class AcquireTimerJobsCmd implements Command<AcquiredTimerJobEntities> {
         // try to lock, as the revision will not match.
 
         GregorianCalendar gregorianCalendar = new GregorianCalendar();
-        gregorianCalendar.setTime(commandContext.getProcessEngineConfiguration().getClock().getCurrentTime());
+        gregorianCalendar.setTime(CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime());
         gregorianCalendar.add(Calendar.MILLISECOND, lockTimeInMillis);
         job.setLockOwner(asyncExecutor.getLockOwner());
         job.setLockExpirationTime(gregorianCalendar.getTime());

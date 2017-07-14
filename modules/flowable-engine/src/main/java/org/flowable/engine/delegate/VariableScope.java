@@ -17,8 +17,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.history.HistoricVariableUpdate;
-import org.flowable.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.VariableInstance;
 

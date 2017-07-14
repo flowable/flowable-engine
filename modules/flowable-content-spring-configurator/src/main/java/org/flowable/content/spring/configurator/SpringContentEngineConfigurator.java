@@ -12,12 +12,11 @@
  */
 package org.flowable.content.spring.configurator;
 
-import javax.sql.DataSource;
-
 import org.flowable.content.engine.ContentEngine;
+import org.flowable.content.engine.configurator.ContentEngineConfigurator;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
-import org.flowable.engine.cfg.AbstractProcessEngineConfigurator;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 
@@ -25,7 +24,7 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class SpringContentEngineConfigurator extends AbstractProcessEngineConfigurator {
+public class SpringContentEngineConfigurator extends ContentEngineConfigurator {
 
     protected SpringContentEngineConfiguration contentEngineConfiguration;
 
@@ -34,25 +33,10 @@ public class SpringContentEngineConfigurator extends AbstractProcessEngineConfig
         if (contentEngineConfiguration == null) {
             contentEngineConfiguration = new SpringContentEngineConfiguration();
         }
-
-        if (processEngineConfiguration.getDataSource() != null) {
-            DataSource originalDatasource = processEngineConfiguration.getDataSource();
-            contentEngineConfiguration.setDataSource(originalDatasource);
-
-        } else {
-            throw new FlowableException("A datasource is required for initializing the Content engine ");
-        }
-
+        initialiseCommonProperties(processEngineConfiguration, contentEngineConfiguration, EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG);
         contentEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
-
-        contentEngineConfiguration.setDatabaseType(processEngineConfiguration.getDatabaseType());
-        contentEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
-        contentEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
-        contentEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
-
-        ContentEngine contentEngine = initContentEngine();
-        processEngineConfiguration.setContentEngineInitialized(true);
-        processEngineConfiguration.setContentService(contentEngine.getContentService());
+        
+        initContentEngine();
     }
 
     protected synchronized ContentEngine initContentEngine() {

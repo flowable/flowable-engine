@@ -19,10 +19,10 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.form.StartFormData;
 import org.flowable.engine.form.TaskFormData;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.scripting.ScriptingEngines;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -38,7 +38,7 @@ public class JuelFormEngine implements FormEngine {
             return null;
         }
         String formTemplateString = getFormTemplateString(startForm, startForm.getFormKey());
-        ScriptingEngines scriptingEngines = Context.getProcessEngineConfiguration().getScriptingEngines();
+        ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
         return scriptingEngines.evaluate(formTemplateString, ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE, null);
     }
 
@@ -47,7 +47,7 @@ public class JuelFormEngine implements FormEngine {
             return null;
         }
         String formTemplateString = getFormTemplateString(taskForm, taskForm.getFormKey());
-        ScriptingEngines scriptingEngines = Context.getProcessEngineConfiguration().getScriptingEngines();
+        ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
         TaskEntity task = (TaskEntity) taskForm.getTask();
         return scriptingEngines.evaluate(formTemplateString, ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE, task.getExecution());
     }
@@ -55,7 +55,7 @@ public class JuelFormEngine implements FormEngine {
     protected String getFormTemplateString(FormData formInstance, String formKey) {
         String deploymentId = formInstance.getDeploymentId();
 
-        ResourceEntity resourceStream = Context.getCommandContext().getResourceEntityManager().findResourceByDeploymentIdAndResourceName(deploymentId, formKey);
+        ResourceEntity resourceStream = CommandContextUtil.getResourceEntityManager().findResourceByDeploymentIdAndResourceName(deploymentId, formKey);
 
         if (resourceStream == null) {
             throw new FlowableObjectNotFoundException("Form with formKey '" + formKey + "' does not exist", String.class);

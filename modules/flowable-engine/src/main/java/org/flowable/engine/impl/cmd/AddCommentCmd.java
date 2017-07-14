@@ -15,13 +15,14 @@ package org.flowable.engine.impl.cmd;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.identity.Authentication;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.task.Comment;
@@ -56,7 +57,7 @@ public class AddCommentCmd implements Command<Comment> {
         TaskEntity task = null;
         // Validate task
         if (taskId != null) {
-            task = commandContext.getTaskEntityManager().findById(taskId);
+            task = CommandContextUtil.getTaskEntityManager(commandContext).findById(taskId);
 
             if (task == null) {
                 throw new FlowableObjectNotFoundException("Cannot find task with id " + taskId, Task.class);
@@ -69,7 +70,7 @@ public class AddCommentCmd implements Command<Comment> {
 
         ExecutionEntity execution = null;
         if (processInstanceId != null) {
-            execution = commandContext.getExecutionEntityManager().findById(processInstanceId);
+            execution = CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstanceId);
 
             if (execution == null) {
                 throw new FlowableObjectNotFoundException("execution " + processInstanceId + " doesn't exist", Execution.class);
@@ -93,10 +94,10 @@ public class AddCommentCmd implements Command<Comment> {
         }
 
         String userId = Authentication.getAuthenticatedUserId();
-        CommentEntity comment = commandContext.getCommentEntityManager().create();
+        CommentEntity comment = CommandContextUtil.getCommentEntityManager(commandContext).create();
         comment.setUserId(userId);
         comment.setType((type == null) ? CommentEntity.TYPE_COMMENT : type);
-        comment.setTime(commandContext.getProcessEngineConfiguration().getClock().getCurrentTime());
+        comment.setTime(CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime());
         comment.setTaskId(taskId);
         comment.setProcessInstanceId(processInstanceId);
         comment.setAction(Event.ACTION_ADD_COMMENT);
@@ -109,7 +110,7 @@ public class AddCommentCmd implements Command<Comment> {
 
         comment.setFullMessage(message);
 
-        commandContext.getCommentEntityManager().insert(comment);
+        CommandContextUtil.getCommentEntityManager(commandContext).insert(comment);
 
         return comment;
     }

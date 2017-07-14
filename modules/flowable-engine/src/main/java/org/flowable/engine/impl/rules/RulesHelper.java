@@ -16,9 +16,9 @@ package org.flowable.engine.impl.rules;
 import org.drools.KnowledgeBase;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Deployment;
 
 /**
@@ -27,15 +27,15 @@ import org.flowable.engine.repository.Deployment;
 public class RulesHelper {
 
     public static KnowledgeBase findKnowledgeBaseByDeploymentId(String deploymentId) {
-        DeploymentCache<Object> knowledgeBaseCache = Context.getProcessEngineConfiguration().getDeploymentManager().getKnowledgeBaseCache();
+        DeploymentCache<Object> knowledgeBaseCache = CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager().getKnowledgeBaseCache();
 
         KnowledgeBase knowledgeBase = (KnowledgeBase) knowledgeBaseCache.get(deploymentId);
         if (knowledgeBase == null) {
-            DeploymentEntity deployment = Context.getCommandContext().getDeploymentEntityManager().findById(deploymentId);
+            DeploymentEntity deployment = CommandContextUtil.getDeploymentEntityManager().findById(deploymentId);
             if (deployment == null) {
                 throw new FlowableObjectNotFoundException("no deployment with id " + deploymentId, Deployment.class);
             }
-            Context.getProcessEngineConfiguration().getDeploymentManager().deploy(deployment);
+            CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager().deploy(deployment);
             knowledgeBase = (KnowledgeBase) knowledgeBaseCache.get(deploymentId);
             if (knowledgeBase == null) {
                 throw new FlowableException("deployment " + deploymentId + " doesn't contain any rules");

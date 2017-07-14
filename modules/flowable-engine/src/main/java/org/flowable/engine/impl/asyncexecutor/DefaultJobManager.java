@@ -30,6 +30,8 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.cfg.TransactionState;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -37,9 +39,7 @@ import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.calendar.BusinessCalendar;
 import org.flowable.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.el.NoExecutionVariableScope;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.jobexecutor.AsyncJobAddedNotification;
 import org.flowable.engine.impl.jobexecutor.HistoryJobHandler;
@@ -58,6 +58,7 @@ import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.TimerUtil;
 import org.flowable.engine.runtime.HistoryJob;
@@ -130,8 +131,7 @@ public class DefaultJobManager implements JobManager {
     }
 
     private void sendTimerScheduledEvent(TimerJobEntity timerJob) {
-        CommandContext commandContext = Context.getCommandContext();
-        FlowableEventDispatcher eventDispatcher = commandContext.getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
         if (eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(
                     FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_SCHEDULED, timerJob));
@@ -156,8 +156,8 @@ public class DefaultJobManager implements JobManager {
             processEngineConfiguration.getTimerJobEntityManager().delete(timerJob);
             scheduleTimer(rescheduledTimerJob);
 
-            if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-                Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+            if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+                CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
                         FlowableEventBuilder.createJobRescheduledEvent(FlowableEngineEventType.JOB_RESCHEDULED, rescheduledTimerJob, timerJob.getId()));
             }
 
@@ -376,14 +376,14 @@ public class DefaultJobManager implements JobManager {
     protected void executeMessageJob(JobEntity jobEntity) {
         executeJobHandler(jobEntity);
         if (jobEntity.getId() != null) {
-            Context.getCommandContext().getJobEntityManager().delete(jobEntity);
+            CommandContextUtil.getJobEntityManager().delete(jobEntity);
         }
     }
     
     protected void executeHistoryJob(HistoryJobEntity historyJobEntity) {
         executeHistoryJobHandler(historyJobEntity);
         if (historyJobEntity.getId() != null) {
-            Context.getCommandContext().getHistoryJobEntityManager().delete(historyJobEntity);
+            CommandContextUtil.getHistoryJobEntityManager().delete(historyJobEntity);
         }
     }
 
@@ -536,7 +536,7 @@ public class DefaultJobManager implements JobManager {
     protected String getBusinessCalendarName(String calendarName, VariableScope variableScope) {
         String businessCalendarName = CycleBusinessCalendar.NAME;
         if (StringUtils.isNotEmpty(calendarName)) {
-            businessCalendarName = (String) Context.getProcessEngineConfiguration().getExpressionManager()
+            businessCalendarName = (String) CommandContextUtil.getProcessEngineConfiguration().getExpressionManager()
                     .createExpression(calendarName).getValue(variableScope);
         }
         return businessCalendarName;

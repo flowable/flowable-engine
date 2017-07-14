@@ -1,10 +1,10 @@
 package org.flowable.idm.engine.test.api.identity.authentication;
 
-import org.flowable.idm.api.PasswordEncoder;
-import org.flowable.idm.api.PasswordSalt;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import org.flowable.idm.api.PasswordEncoder;
+import org.flowable.idm.api.PasswordSalt;
 
 public class jBCryptHashing implements PasswordEncoder {
 

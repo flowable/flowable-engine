@@ -16,11 +16,11 @@ package org.flowable.engine.impl.app;
 import java.util.Map;
 
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.deploy.Deployer;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ public class AppDeployer implements Deployer {
     public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
         LOGGER.debug("Processing app deployment {}", deployment.getName());
 
-        ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         DeploymentManager deploymentManager = processEngineConfiguration.getDeploymentManager();
 
         Object appResourceObject = null;

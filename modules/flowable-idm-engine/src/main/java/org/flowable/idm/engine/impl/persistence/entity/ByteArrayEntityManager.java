@@ -19,15 +19,15 @@ import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 /**
  * @author Joram Barrez
  */
-public interface ByteArrayEntityManager extends EntityManager<ByteArrayEntity> {
+public interface ByteArrayEntityManager extends EntityManager<IdmByteArrayEntity> {
 
     /**
-     * Returns all {@link ByteArrayEntity}.
+     * Returns all {@link IdmByteArrayEntity}.
      */
-    List<ByteArrayEntity> findAll();
+    List<IdmByteArrayEntity> findAll();
 
     /**
-     * Deletes the {@link ByteArrayEntity} with the given id from the database. Important: this operation will NOT do any optimistic locking, to avoid loading the bytes in memory. So use this method
+     * Deletes the {@link IdmByteArrayEntity} with the given id from the database. Important: this operation will NOT do any optimistic locking, to avoid loading the bytes in memory. So use this method
      * only in conjunction with an entity that has optimistic locking!.
      */
     void deleteByteArrayById(String byteArrayEntityId);

@@ -24,13 +24,14 @@ import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.DataObjectImpl;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.VariableInstance;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.runtime.DataObject;
@@ -69,7 +70,7 @@ public class GetDataObjectsCmd implements Command<Map<String, DataObject>>, Seri
             throw new FlowableIllegalArgumentException("executionId is null");
         }
 
-        ExecutionEntity execution = commandContext.getExecutionEntityManager().findById(executionId);
+        ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager(commandContext).findById(executionId);
 
         if (execution == null) {
             throw new FlowableObjectNotFoundException("execution " + executionId + " doesn't exist", Execution.class);
@@ -109,7 +110,7 @@ public class GetDataObjectsCmd implements Command<Map<String, DataObject>>, Seri
                 String name = entry.getKey();
                 VariableInstance variableEntity = entry.getValue();
 
-                ExecutionEntity executionEntity = commandContext.getExecutionEntityManager().findById(variableEntity.getExecutionId());
+                ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager(commandContext).findById(variableEntity.getExecutionId());
                 while (!executionEntity.isScope()) {
                     executionEntity = executionEntity.getParent();
                 }
@@ -137,7 +138,7 @@ public class GetDataObjectsCmd implements Command<Map<String, DataObject>>, Seri
                 String localizedDescription = null;
 
                 if (locale != null && foundDataObject != null) {
-                    ObjectNode languageNode = Context.getLocalizationElementProperties(locale, foundDataObject.getId(),
+                    ObjectNode languageNode = BpmnOverrideContext.getLocalizationElementProperties(locale, foundDataObject.getId(),
                             execution.getProcessDefinitionId(), withLocalizationFallback);
 
                     if (languageNode != null) {

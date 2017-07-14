@@ -23,6 +23,6 @@ public interface SessionFactory {
 
     Class<?> getSessionType();
 
-    Session openSession(AbstractCommandContext commandContext);
+    Session openSession(CommandContext commandContext);
 
 }

@@ -13,13 +13,15 @@
 
 package org.flowable.engine.impl.jobexecutor;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContextCloseListener;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandContextCloseListener;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,21 +53,22 @@ public class FailedJobListener implements CommandContextCloseListener {
 
     @Override
     public void closed(CommandContext context) {
-        if (context.getEventDispatcher().isEnabled()) {
-            context.getEventDispatcher().dispatchEvent(
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+        if (eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(
                     FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_EXECUTION_SUCCESS, job));
         }
     }
 
     @Override
     public void closeFailure(CommandContext commandContext) {
-        if (commandContext.getEventDispatcher().isEnabled()) {
-            commandContext.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityExceptionEvent(
+        if (CommandContextUtil.getEventDispatcher().isEnabled()) {
+            CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityExceptionEvent(
                     FlowableEngineEventType.JOB_EXECUTION_FAILURE, job, commandContext.getException()));
         }
 
         CommandConfig commandConfig = commandExecutor.getDefaultConfig().transactionRequiresNew();
-        FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
+        FailedJobCommandFactory failedJobCommandFactory = CommandContextUtil.getFailedJobCommandFactory();
         Command<Object> cmd = failedJobCommandFactory.getCommand(job.getId(), commandContext.getException());
 
         LOGGER.trace("Using FailedJobCommandFactory '{}' and command of type '{}'", failedJobCommandFactory.getClass(), cmd.getClass());

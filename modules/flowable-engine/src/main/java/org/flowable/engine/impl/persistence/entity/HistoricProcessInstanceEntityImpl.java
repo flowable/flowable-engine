@@ -19,15 +19,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.db.BulkDeleteable;
+import org.flowable.engine.common.impl.context.Context;
 
 /**
  * @author Tom Baeyens
  * @author Christian Stettler
  * @author Joram Barrez
  */
-public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEntityImpl implements HistoricProcessInstanceEntity, BulkDeleteable {
+public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEntityImpl implements HistoricProcessInstanceEntity {
 
     private static final long serialVersionUID = 1L;
 

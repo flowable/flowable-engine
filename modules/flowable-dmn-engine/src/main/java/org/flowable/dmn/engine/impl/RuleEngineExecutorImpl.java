@@ -22,7 +22,6 @@ import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.FlowableDmnExpressionException;
 import org.flowable.dmn.engine.RuleEngineExecutor;
-import org.flowable.dmn.engine.impl.context.Context;
 import org.flowable.dmn.engine.impl.hitpolicy.AbstractHitPolicy;
 import org.flowable.dmn.engine.impl.hitpolicy.ComposeDecisionResultBehavior;
 import org.flowable.dmn.engine.impl.hitpolicy.ComposeRuleResultBehavior;
@@ -34,6 +33,7 @@ import org.flowable.dmn.engine.impl.mvel.MvelExecutionContextBuilder;
 import org.flowable.dmn.engine.impl.mvel.MvelExpressionExecutor;
 import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityManager;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
@@ -103,7 +103,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
             // end audit trail
             executionContext.getAuditContainer().stopAudit();
             
-            DmnEngineConfiguration dmnEngineConfiguration = Context.getDmnEngineConfiguration();
+            DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
             if (dmnEngineConfiguration.isHistoryEnabled()) {
                 HistoricDecisionExecutionEntityManager historicDecisionExecutionEntityManager = dmnEngineConfiguration.getHistoricDecisionExecutionEntityManager();
                 HistoricDecisionExecutionEntity decisionExecutionEntity = historicDecisionExecutionEntityManager.create();

@@ -12,10 +12,9 @@
  */
 package org.flowable.engine.impl.history.async;
 
-import org.flowable.engine.common.impl.interceptor.AbstractCommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.Session;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
-import org.flowable.engine.impl.interceptor.CommandContext;
 
 public class AsyncHistorySessionFactory implements SessionFactory {
 
@@ -27,7 +26,7 @@ public class AsyncHistorySessionFactory implements SessionFactory {
     }
 
     @Override
-    public Session openSession(AbstractCommandContext commandContext) {
+    public Session openSession(CommandContext commandContext) {
         return new AsyncHistorySession((CommandContext) commandContext, asyncHistoryListener);
     }
     

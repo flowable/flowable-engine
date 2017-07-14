@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.engine.cfg.ProcessEngineConfigurator;
+import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.interceptor.CommandInterceptor;
 
 /**
  * @author Joram Barrez

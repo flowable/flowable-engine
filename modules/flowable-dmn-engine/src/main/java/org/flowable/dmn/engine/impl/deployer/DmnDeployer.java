@@ -15,12 +15,11 @@ package org.flowable.dmn.engine.impl.deployer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.flowable.dmn.engine.impl.context.Context;
-import org.flowable.dmn.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.engine.impl.persistence.deploy.Deployer;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,8 +101,7 @@ public class DmnDeployer implements Deployer {
      * Saves each decision table. It is assumed that the deployment is new, the definitions have never been saved before, and that they have all their values properly set up.
      */
     protected void persistDecisionTables(ParsedDeployment parsedDeployment) {
-        CommandContext commandContext = Context.getCommandContext();
-        DecisionTableEntityManager decisionTableEntityManager = commandContext.getDecisionTableEntityManager();
+        DecisionTableEntityManager decisionTableEntityManager = CommandContextUtil.getDecisionTableEntityManager();
 
         for (DecisionTableEntity decisionTable : parsedDeployment.getAllDecisionTables()) {
             decisionTableEntityManager.insert(decisionTable);

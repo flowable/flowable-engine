@@ -17,11 +17,12 @@ import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Job;
 
 /**
@@ -46,13 +47,13 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
     }
 
     public Void execute(CommandContext commandContext) {
-        JobEntity job = commandContext.getJobEntityManager().findById(jobId);
+        JobEntity job = CommandContextUtil.getJobEntityManager(commandContext).findById(jobId);
         if (job != null) {
 
             job.setRetries(retries);
 
-            if (commandContext.getEventDispatcher().isEnabled()) {
-                commandContext.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, job));
+            if (CommandContextUtil.getEventDispatcher().isEnabled()) {
+                CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, job));
             }
         } else {
             throw new FlowableObjectNotFoundException("No job found with id '" + jobId + "'.", Job.class);

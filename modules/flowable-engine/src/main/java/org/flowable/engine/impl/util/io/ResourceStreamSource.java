@@ -16,8 +16,8 @@ import java.io.BufferedInputStream;
 import java.io.InputStream;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.common.impl.util.io.StreamSource;
-import org.flowable.engine.impl.util.ReflectUtil;
 
 /**
  * @author Tom Baeyens

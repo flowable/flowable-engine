@@ -16,10 +16,11 @@ import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.ProcessDefinition;
 
@@ -54,7 +55,7 @@ public class AddIdentityLinkForProcessDefinitionCmd implements Command<Void>, Se
     }
 
     public Void execute(CommandContext commandContext) {
-        ProcessDefinitionEntity processDefinition = commandContext.getProcessDefinitionEntityManager().findById(processDefinitionId);
+        ProcessDefinitionEntity processDefinition = CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findById(processDefinitionId);
 
         if (processDefinition == null) {
             throw new FlowableObjectNotFoundException("Cannot find process definition with id " + processDefinitionId, ProcessDefinition.class);
@@ -66,7 +67,7 @@ public class AddIdentityLinkForProcessDefinitionCmd implements Command<Void>, Se
             return null;
         }
 
-        commandContext.getIdentityLinkEntityManager().addIdentityLink(processDefinition, userId, groupId);
+        CommandContextUtil.getIdentityLinkEntityManager(commandContext).addIdentityLink(processDefinition, userId, groupId);
 
         return null;
     }

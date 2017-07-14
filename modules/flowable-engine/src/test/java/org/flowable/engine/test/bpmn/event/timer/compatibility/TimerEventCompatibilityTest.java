@@ -14,15 +14,16 @@ package org.flowable.engine.test.bpmn.event.timer.compatibility;
 
 import java.util.Date;
 
+import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.ProcessEngineImpl;
-import org.flowable.engine.impl.db.DbSqlSession;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 public abstract class TimerEventCompatibilityTest extends PluggableFlowableTestCase {
 
@@ -37,7 +38,7 @@ public abstract class TimerEventCompatibilityTest extends PluggableFlowableTestC
         commandExecutor.execute(config, new Command<Object>() {
 
             public Object execute(CommandContext commandContext) {
-                DbSqlSession session = commandContext.getDbSqlSession();
+                DbSqlSession session = CommandContextUtil.getDbSqlSession(commandContext);
                 session.delete(finalJob);
                 session.flush();
                 session.commit();
@@ -48,7 +49,7 @@ public abstract class TimerEventCompatibilityTest extends PluggableFlowableTestC
         commandExecutor.execute(config, new Command<Object>() {
 
             public Object execute(CommandContext commandContext) {
-                DbSqlSession session = commandContext.getDbSqlSession();
+                DbSqlSession session = CommandContextUtil.getDbSqlSession(commandContext);
 
                 finalJob.setJobHandlerConfiguration(finalActivityId);
                 finalJob.setId(null);

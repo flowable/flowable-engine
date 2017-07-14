@@ -17,11 +17,12 @@ import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.engine.impl.FormDefinitionQueryImpl;
-import org.flowable.form.engine.impl.interceptor.Command;
-import org.flowable.form.engine.impl.interceptor.CommandContext;
 import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntity;
+import org.flowable.form.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -46,22 +47,22 @@ public class SetDeploymentTenantIdCmd implements Command<Void>, Serializable {
 
         // Update all entities
 
-        FormDeploymentEntity deployment = commandContext.getDeploymentEntityManager().findById(deploymentId);
+        FormDeploymentEntity deployment = CommandContextUtil.getDeploymentEntityManager(commandContext).findById(deploymentId);
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("Could not find deployment with id " + deploymentId);
         }
 
         deployment.setTenantId(newTenantId);
 
-        commandContext.getFormDefinitionEntityManager().updateFormDefinitionTenantIdForDeployment(deploymentId, newTenantId);
+        CommandContextUtil.getFormDefinitionEntityManager(commandContext).updateFormDefinitionTenantIdForDeployment(deploymentId, newTenantId);
 
         // Doing decision tables in memory, cause we need to clear the decision table cache
         List<FormDefinition> formDefinitions = new FormDefinitionQueryImpl().deploymentId(deploymentId).list();
         for (FormDefinition formDefinition : formDefinitions) {
-            commandContext.getFormEngineConfiguration().getFormDefinitionCache().remove(formDefinition.getId());
+            CommandContextUtil.getFormEngineConfiguration().getFormDefinitionCache().remove(formDefinition.getId());
         }
 
-        commandContext.getDeploymentEntityManager().update(deployment);
+        CommandContextUtil.getDeploymentEntityManager(commandContext).update(deployment);
 
         return null;
 

@@ -18,8 +18,9 @@ import java.util.Map;
 
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.common.api.management.TableMetaData;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 
@@ -40,7 +41,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
             @Override
             public Void execute(CommandContext commandContext) {
-                List<PropertyEntity> properties = commandContext.getProcessEngineConfiguration().getPropertyEntityManager().findAll();
+                List<PropertyEntity> properties = Context.getProcessEngineConfiguration().getPropertyEntityManager().findAll();
                 for (PropertyEntity propertyEntity : properties) {
                     LOGGER.info("!!!Property {} {}", propertyEntity.getName(), propertyEntity.getValue());
                 }

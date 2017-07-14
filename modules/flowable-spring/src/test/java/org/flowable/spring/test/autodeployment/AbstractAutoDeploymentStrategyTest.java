@@ -13,6 +13,12 @@
 
 package org.flowable.spring.test.autodeployment;
 
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.when;
+
+import java.io.File;
+import java.io.InputStream;
+
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentBuilder;
@@ -21,12 +27,6 @@ import org.mockito.Mock;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
-
-import java.io.File;
-import java.io.InputStream;
-
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Tiese Barrell

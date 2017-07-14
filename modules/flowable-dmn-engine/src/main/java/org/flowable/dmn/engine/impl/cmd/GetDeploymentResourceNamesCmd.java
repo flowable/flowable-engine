@@ -15,9 +15,10 @@ package org.flowable.dmn.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
-import org.flowable.dmn.engine.impl.interceptor.Command;
-import org.flowable.dmn.engine.impl.interceptor.CommandContext;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
@@ -36,7 +37,7 @@ public class GetDeploymentResourceNamesCmd implements Command<List<String>>, Ser
             throw new FlowableIllegalArgumentException("deploymentId is null");
         }
 
-        return commandContext.getDeploymentEntityManager().getDeploymentResourceNames(deploymentId);
+        return CommandContextUtil.getDeploymentEntityManager(commandContext).getDeploymentResourceNames(deploymentId);
     }
 
 }

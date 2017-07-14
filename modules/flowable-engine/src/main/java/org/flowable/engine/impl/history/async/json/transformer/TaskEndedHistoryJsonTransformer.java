@@ -12,19 +12,20 @@
  */
 package org.flowable.engine.impl.history.async.json.transformer;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
     
@@ -43,7 +44,7 @@ public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransfor
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
-        HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager = commandContext.getHistoricTaskInstanceEntityManager();
+        HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager = CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext);
         HistoricTaskInstanceEntity historicTaskInstance = historicTaskInstanceEntityManager.findById(taskId);
         
         if (historicTaskInstance != null) {

@@ -22,7 +22,7 @@ import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
-import org.flowable.dmn.engine.impl.persistence.entity.ResourceEntity;
+import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntity;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -141,8 +141,8 @@ public class DeploymentManager {
 
         if (cachedDecision == null) {
             DmnDeploymentEntity deployment = engineConfig.getDeploymentEntityManager().findById(deploymentId);
-            List<ResourceEntity> resources = engineConfig.getResourceEntityManager().findResourcesByDeploymentId(deploymentId);
-            for (ResourceEntity resource : resources) {
+            List<DmnResourceEntity> resources = engineConfig.getResourceEntityManager().findResourcesByDeploymentId(deploymentId);
+            for (DmnResourceEntity resource : resources) {
                 deployment.addResource(resource);
             }
 

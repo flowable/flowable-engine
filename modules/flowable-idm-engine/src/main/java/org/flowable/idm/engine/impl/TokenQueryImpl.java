@@ -17,11 +17,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.Token;
 import org.flowable.idm.api.TokenQuery;
 import org.flowable.idm.api.TokenQueryProperty;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
-import org.flowable.idm.engine.impl.interceptor.CommandExecutor;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -181,12 +182,12 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
 
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getTokenEntityManager().findTokenCountByQueryCriteria(this);
+        return CommandContextUtil.getTokenEntityManager(commandContext).findTokenCountByQueryCriteria(this);
     }
 
     public List<Token> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getTokenEntityManager().findTokenByQueryCriteria(this);
+        return CommandContextUtil.getTokenEntityManager(commandContext).findTokenByQueryCriteria(this);
     }
 
     // getters //////////////////////////////////////////////////////////

@@ -23,13 +23,14 @@ import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.db.DbSqlSession;
+import org.flowable.dmn.engine.impl.db.DmnDbSchemaManager;
 import org.flowable.dmn.engine.impl.deployer.ParsedDeploymentBuilder;
-import org.flowable.dmn.engine.impl.interceptor.Command;
-import org.flowable.dmn.engine.impl.interceptor.CommandContext;
-import org.flowable.dmn.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,7 +140,7 @@ public abstract class DmnTestHelper {
      * Each test is assumed to clean up all DB content it entered. After a test method executed, this method scans all tables to see if the DB is completely clean. It throws AssertionFailed in case
      * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
      */
-    public static void assertAndEnsureCleanDb(DmnEngine dmnEngine) {
+    public static void assertAndEnsureCleanDb(final DmnEngine dmnEngine) {
         LOGGER.debug("verifying that db is clean after test");
         DmnEngineConfiguration dmnEngineConfiguration = dmnEngine.getDmnEngineConfiguration();
         DmnManagementService managementService = dmnEngine.getDmnManagementService();
@@ -166,9 +167,7 @@ public abstract class DmnTestHelper {
             CommandConfig config = new CommandConfig().transactionNotSupported();
             commandExecutor.execute(config, new Command<Object>() {
                 public Object execute(CommandContext commandContext) {
-                    DbSqlSession session = commandContext.getDbSqlSession();
-                    session.dbSchemaDrop();
-                    session.dbSchemaCreate();
+                    DmnDbSchemaManager.initSchema(dmnEngine.getDmnEngineConfiguration(), DmnEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE);
                     return null;
                 }
             });

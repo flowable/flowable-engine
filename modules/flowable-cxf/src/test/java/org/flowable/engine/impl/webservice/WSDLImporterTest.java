@@ -21,9 +21,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.data.SimpleStructureDefinition;
 import org.flowable.engine.impl.bpmn.data.StructureDefinition;
-import org.flowable.engine.impl.util.ReflectUtil;
 import org.junit.Before;
 import org.junit.Test;
 

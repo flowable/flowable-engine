@@ -19,10 +19,11 @@ import java.util.List;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.persistence.entity.SuspensionState;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.variable.VariableTypes;
 import org.flowable.engine.task.DelegationState;
 import org.flowable.engine.task.Task;
@@ -1161,11 +1162,11 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     protected List<String> getGroupsForCandidateUser(String candidateUser) {
-        return Context.getProcessEngineConfiguration().getCandidateManager().getGroupsForCandidateUser(candidateUser);
+        return CommandContextUtil.getProcessEngineConfiguration().getCandidateManager().getGroupsForCandidateUser(candidateUser);
     }
 
     protected void ensureVariablesInitialized() {
-        VariableTypes types = Context.getProcessEngineConfiguration().getVariableTypes();
+        VariableTypes types = CommandContextUtil.getProcessEngineConfiguration().getVariableTypes();
         for (QueryVariableValue var : queryVariableValues) {
             var.initialize(types);
         }
@@ -1288,12 +1289,12 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         checkQueryOk();
         List<Task> tasks = null;
         if (includeTaskLocalVariables || includeProcessVariables || includeIdentityLinks) {
-            tasks = commandContext.getTaskEntityManager().findTasksWithRelatedEntitiesByQueryCriteria(this);
+            tasks = CommandContextUtil.getTaskEntityManager(commandContext).findTasksWithRelatedEntitiesByQueryCriteria(this);
         } else {
-            tasks = commandContext.getTaskEntityManager().findTasksByQueryCriteria(this);
+            tasks = CommandContextUtil.getTaskEntityManager(commandContext).findTasksByQueryCriteria(this);
         }
 
-        if (tasks != null && Context.getProcessEngineConfiguration().getPerformanceSettings().isEnableLocalization()) {
+        if (tasks != null && CommandContextUtil.getProcessEngineConfiguration().getPerformanceSettings().isEnableLocalization()) {
             for (Task task : tasks) {
                 localize(task);
             }
@@ -1305,7 +1306,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
         checkQueryOk();
-        return commandContext.getTaskEntityManager().findTaskCountByQueryCriteria(this);
+        return CommandContextUtil.getTaskEntityManager(commandContext).findTaskCountByQueryCriteria(this);
     }
 
     protected void localize(Task task) {
@@ -1315,7 +1316,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         if (locale != null) {
             String processDefinitionId = task.getProcessDefinitionId();
             if (processDefinitionId != null) {
-                ObjectNode languageNode = Context.getLocalizationElementProperties(locale, task.getTaskDefinitionKey(), processDefinitionId, withLocalizationFallback);
+                ObjectNode languageNode = BpmnOverrideContext.getLocalizationElementProperties(locale, task.getTaskDefinitionKey(), processDefinitionId, withLocalizationFallback);
                 if (languageNode != null) {
                     JsonNode languageNameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
                     if (languageNameNode != null && !languageNameNode.isNull()) {

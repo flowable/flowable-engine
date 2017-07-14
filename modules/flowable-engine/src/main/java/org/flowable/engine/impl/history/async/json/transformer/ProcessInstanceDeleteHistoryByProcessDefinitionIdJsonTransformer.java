@@ -14,9 +14,10 @@ package org.flowable.engine.impl.history.async.json.transformer;
 
 import java.util.List;
 
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -35,7 +36,7 @@ public class ProcessInstanceDeleteHistoryByProcessDefinitionIdJsonTransformer ex
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         String processDefinitionId = getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_ID);
-        List<String> processInstanceIds = commandContext.getHistoricProcessInstanceEntityManager().findHistoricProcessInstanceIdsByProcessDefinitionId(processDefinitionId);
+        List<String> processInstanceIds = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findHistoricProcessInstanceIdsByProcessDefinitionId(processDefinitionId);
         for (String processInstanceId : processInstanceIds) {
             deleteProcessInstance(processInstanceId, commandContext);
         }

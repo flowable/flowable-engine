@@ -14,10 +14,10 @@ package org.flowable.form.engine.deployer;
 
 import java.util.Map;
 
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.deploy.Deployer;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.form.api.FormDeploymentBuilder;
 import org.flowable.form.api.FormRepositoryService;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ public class FormDeployer implements Deployer {
             if (resourceName.endsWith(".form")) {
                 LOGGER.info("FormDeployer: processing resource {}", resourceName);
                 if (formDeploymentBuilder == null) {
-                    FormRepositoryService formRepositoryService = Context.getProcessEngineConfiguration().getFormEngineRepositoryService();
+                    FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService();
                     formDeploymentBuilder = formRepositoryService.createDeployment();
                 }
 

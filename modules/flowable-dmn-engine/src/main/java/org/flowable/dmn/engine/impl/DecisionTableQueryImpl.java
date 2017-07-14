@@ -18,9 +18,10 @@ import java.util.Set;
 
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnDecisionTableQuery;
-import org.flowable.dmn.engine.impl.interceptor.CommandContext;
-import org.flowable.dmn.engine.impl.interceptor.CommandExecutor;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 
 /**
  * @author Tijs Rademakers
@@ -279,12 +280,12 @@ public class DecisionTableQueryImpl extends AbstractQuery<DmnDecisionTableQuery,
 
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getDecisionTableEntityManager().findDecisionTableCountByQueryCriteria(this);
+        return CommandContextUtil.getDecisionTableEntityManager(commandContext).findDecisionTableCountByQueryCriteria(this);
     }
 
     public List<DmnDecisionTable> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getDecisionTableEntityManager().findDecisionTablesByQueryCriteria(this);
+        return CommandContextUtil.getDecisionTableEntityManager(commandContext).findDecisionTablesByQueryCriteria(this);
     }
 
     public void checkQueryOk() {

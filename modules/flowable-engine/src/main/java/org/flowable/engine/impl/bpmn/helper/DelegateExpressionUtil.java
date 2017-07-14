@@ -18,7 +18,7 @@ import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -38,7 +38,7 @@ public class DelegateExpressionUtil {
 
         if (fieldDeclarations != null && fieldDeclarations.size() > 0) {
 
-            DelegateExpressionFieldInjectionMode injectionMode = Context.getProcessEngineConfiguration().getDelegateExpressionFieldInjectionMode();
+            DelegateExpressionFieldInjectionMode injectionMode = CommandContextUtil.getProcessEngineConfiguration().getDelegateExpressionFieldInjectionMode();
             if (injectionMode == DelegateExpressionFieldInjectionMode.COMPATIBILITY) {
                 ClassDelegate.applyFieldDeclaration(fieldDeclarations, delegate, true);
             } else if (injectionMode == DelegateExpressionFieldInjectionMode.MIXED) {

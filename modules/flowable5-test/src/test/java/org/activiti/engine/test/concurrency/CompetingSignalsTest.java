@@ -15,12 +15,12 @@ package org.activiti.engine.test.concurrency;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.engine.common.impl.cfg.CommandExecutorImpl;
+import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
+import org.flowable.engine.common.impl.interceptor.RetryInterceptor;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.RuntimeServiceImpl;
-import org.flowable.engine.impl.cfg.CommandExecutorImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
-import org.flowable.engine.impl.interceptor.CommandInterceptor;
-import org.flowable.engine.impl.interceptor.RetryInterceptor;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.slf4j.Logger;

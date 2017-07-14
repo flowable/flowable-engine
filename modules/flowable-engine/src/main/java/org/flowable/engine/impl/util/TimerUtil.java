@@ -27,7 +27,6 @@ import org.flowable.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.engine.impl.calendar.DurationBusinessCalendar;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.el.NoExecutionVariableScope;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -51,7 +50,7 @@ public class TimerUtil {
     public static TimerJobEntity createTimerEntityForTimerEventDefinition(TimerEventDefinition timerEventDefinition, boolean isInterruptingTimer,
             ExecutionEntity executionEntity, String jobHandlerType, String jobHandlerConfig) {
 
-        ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
 
         String businessCalendarRef = null;
         Expression expression = null;
@@ -117,7 +116,7 @@ public class TimerUtil {
 
         TimerJobEntity timer = null;
         if (duedate != null) {
-            timer = Context.getCommandContext().getTimerJobEntityManager().create();
+            timer = CommandContextUtil.getTimerJobEntityManager().create();
             timer.setJobType(JobEntity.JOB_TYPE_TIMER);
             timer.setRevision(1);
             timer.setJobHandlerType(jobHandlerType);
@@ -174,7 +173,7 @@ public class TimerUtil {
     public static String prepareRepeat(String dueDate) {
         if (dueDate.startsWith("R") && dueDate.split("/").length == 2) {
             DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
-            Clock clock = Context.getProcessEngineConfiguration().getClock();
+            Clock clock = CommandContextUtil.getProcessEngineConfiguration().getClock();
             Date now = clock.getCurrentTime();
             return dueDate.replace("/", "/" + fmt.print(new DateTime(now,
                     DateTimeZone.forTimeZone(clock.getCurrentTimeZone()))) + "/");

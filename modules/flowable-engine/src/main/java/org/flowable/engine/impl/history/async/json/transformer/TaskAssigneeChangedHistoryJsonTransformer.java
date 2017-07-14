@@ -13,12 +13,13 @@
 package org.flowable.engine.impl.history.async.json.transformer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.IdentityLinkType;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -72,7 +73,7 @@ public class TaskAssigneeChangedHistoryJsonTransformer extends AbstractNeedsTask
         
         String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
         if (StringUtils.isNotEmpty(taskId)) {
-            HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager = commandContext.getProcessEngineConfiguration().getHistoricIdentityLinkEntityManager();
+            HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoricIdentityLinkEntityManager();
             HistoricIdentityLinkEntity historicIdentityLinkEntity = historicIdentityLinkEntityManager.create();
             historicIdentityLinkEntity.setTaskId(taskId);
             historicIdentityLinkEntity.setType(IdentityLinkType.ASSIGNEE);

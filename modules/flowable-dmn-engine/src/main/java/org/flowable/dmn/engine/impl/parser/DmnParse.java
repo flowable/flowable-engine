@@ -19,10 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.context.Context;
 import org.flowable.dmn.engine.impl.io.ResourceStreamSource;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.constants.DmnXMLConstants;
@@ -84,7 +84,7 @@ public class DmnParse implements DmnXMLConstants {
 
             if (dmnDefinition != null && dmnDefinition.getDecisions() != null) {
                 for (Decision decision : dmnDefinition.getDecisions()) {
-                    DecisionTableEntity decisionTableEntity = Context.getDmnEngineConfiguration().getDecisionTableEntityManager().create();
+                    DecisionTableEntity decisionTableEntity = CommandContextUtil.getDmnEngineConfiguration().getDecisionTableEntityManager().create();
                     decisionTableEntity.setKey(decision.getId());
                     decisionTableEntity.setName(decision.getName());
                     decisionTableEntity.setResourceName(name);

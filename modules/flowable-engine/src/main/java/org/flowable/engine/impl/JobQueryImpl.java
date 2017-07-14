@@ -18,9 +18,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.JobQuery;
 
@@ -256,12 +256,12 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
 
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getJobEntityManager().findJobCountByQueryCriteria(this);
+        return CommandContextUtil.getJobEntityManager(commandContext).findJobCountByQueryCriteria(this);
     }
 
     public List<Job> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getJobEntityManager().findJobsByQueryCriteria(this);
+        return CommandContextUtil.getJobEntityManager(commandContext).findJobsByQueryCriteria(this);
     }
 
     // getters //////////////////////////////////////////
@@ -287,7 +287,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     }
 
     public Date getNow() {
-        return Context.getProcessEngineConfiguration().getClock().getCurrentTime();
+        return CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTime();
     }
 
     public boolean isWithException() {

@@ -19,11 +19,11 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Process;
+import org.flowable.engine.common.impl.event.FlowableEventSupport;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.delegate.event.impl.FlowableEventSupport;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +49,7 @@ public class ProcessParseHandler extends AbstractBpmnParseHandler<Process> {
     }
 
     protected ProcessDefinitionEntity transformProcess(BpmnParse bpmnParse, Process process) {
-        ProcessDefinitionEntity currentProcessDefinition = Context.getCommandContext().getProcessDefinitionEntityManager().create();
+        ProcessDefinitionEntity currentProcessDefinition = CommandContextUtil.getProcessDefinitionEntityManager().create();
         bpmnParse.setCurrentProcessDefinition(currentProcessDefinition);
 
         /*

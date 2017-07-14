@@ -16,9 +16,10 @@ package org.flowable.idm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.idm.api.User;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -37,6 +38,6 @@ public class CreateUserCmd implements Command<User>, Serializable {
     }
 
     public User execute(CommandContext commandContext) {
-        return commandContext.getUserEntityManager().createNewUser(userId);
+        return CommandContextUtil.getUserEntityManager(commandContext).createNewUser(userId);
     }
 }

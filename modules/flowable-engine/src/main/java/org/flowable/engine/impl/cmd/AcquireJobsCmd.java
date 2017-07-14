@@ -17,12 +17,13 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.flowable.engine.common.impl.Page;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.asyncexecutor.AcquiredJobEntities;
 import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
 import org.flowable.engine.impl.persistence.entity.JobInfoEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -61,7 +62,7 @@ public class AcquireJobsCmd implements Command<AcquiredJobEntities> {
 
     protected void lockJob(CommandContext commandContext, JobInfoEntity job, int lockTimeInMillis) {
         GregorianCalendar gregorianCalendar = new GregorianCalendar();
-        gregorianCalendar.setTime(commandContext.getProcessEngineConfiguration().getClock().getCurrentTime());
+        gregorianCalendar.setTime(CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime());
         gregorianCalendar.add(Calendar.MILLISECOND, lockTimeInMillis);
         job.setLockOwner(asyncExecutor.getLockOwner());
         job.setLockExpirationTime(gregorianCalendar.getTime());

@@ -16,8 +16,8 @@ package org.flowable.engine.impl.bpmn.listener;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.scripting.ScriptingEngines;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 public class ScriptExecutionListener implements ExecutionListener {
 
@@ -34,7 +34,7 @@ public class ScriptExecutionListener implements ExecutionListener {
 
         validateParameters();
 
-        ScriptingEngines scriptingEngines = Context.getProcessEngineConfiguration().getScriptingEngines();
+        ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
         Object result = scriptingEngines.evaluate(script.getExpressionText(), language.getExpressionText(), execution);
 
         if (resultVariable != null) {

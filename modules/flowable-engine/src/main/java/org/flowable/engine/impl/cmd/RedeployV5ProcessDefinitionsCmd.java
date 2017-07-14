@@ -19,9 +19,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.RepositoryService;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentBuilder;
@@ -38,7 +39,7 @@ public class RedeployV5ProcessDefinitionsCmd implements Command<Void> {
 
     @Override
     public Void execute(CommandContext commandContext) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
 
         RepositoryService repositoryService = processEngineConfiguration.getRepositoryService();
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()

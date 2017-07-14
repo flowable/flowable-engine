@@ -18,8 +18,9 @@ import java.util.Map;
 import org.flowable.bpmn.model.Task;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Yvo Swillens
@@ -30,8 +31,9 @@ public class MyTransactionalOperationTransactionDependentTaskListener extends Cu
     public void notify(String processInstanceId, String executionId, Task task, Map<String, Object> executionVariables, Map<String, Object> customPropertiesMap) {
         super.notify(processInstanceId, executionId, task, executionVariables, customPropertiesMap);
 
-        if (Context.getCommandContext().getProcessEngineConfiguration().getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-            HistoryService historyService = Context.getCommandContext().getProcessEngineConfiguration().getHistoryService();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoryService historyService = processEngineConfiguration.getHistoryService();
 
             // delete first historic instance
             List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();

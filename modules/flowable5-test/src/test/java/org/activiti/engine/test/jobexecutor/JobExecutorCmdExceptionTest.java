@@ -13,10 +13,11 @@
 package org.activiti.engine.test.jobexecutor;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Job;
 
 /**
@@ -42,7 +43,7 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
 
             public String execute(CommandContext commandContext) {
                 JobEntity message = createTweetExceptionMessage();
-                commandContext.getJobManager().scheduleAsyncJob(message);
+                CommandContextUtil.getJobManager(commandContext).scheduleAsyncJob(message);
                 return message.getId();
             }
         });
@@ -82,7 +83,7 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
 
             public String execute(CommandContext commandContext) {
                 JobEntity message = createTweetExceptionMessage();
-                commandContext.getJobManager().scheduleAsyncJob(message);
+                CommandContextUtil.getJobManager(commandContext).scheduleAsyncJob(message);
                 return message.getId();
             }
         });

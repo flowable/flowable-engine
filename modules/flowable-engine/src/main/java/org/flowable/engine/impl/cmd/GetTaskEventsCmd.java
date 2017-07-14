@@ -16,8 +16,9 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Event;
 
 /**
@@ -33,6 +34,6 @@ public class GetTaskEventsCmd implements Command<List<Event>>, Serializable {
     }
 
     public List<Event> execute(CommandContext commandContext) {
-        return commandContext.getCommentEntityManager().findEventsByTaskId(taskId);
+        return CommandContextUtil.getCommentEntityManager(commandContext).findEventsByTaskId(taskId);
     }
 }

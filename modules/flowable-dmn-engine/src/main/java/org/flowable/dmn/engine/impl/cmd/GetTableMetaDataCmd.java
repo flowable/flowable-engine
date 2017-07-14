@@ -14,10 +14,11 @@ package org.flowable.dmn.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.dmn.engine.impl.interceptor.Command;
-import org.flowable.dmn.engine.impl.interceptor.CommandContext;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.management.TableMetaData;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
@@ -35,7 +36,7 @@ public class GetTableMetaDataCmd implements Command<TableMetaData>, Serializable
         if (tableName == null) {
             throw new FlowableIllegalArgumentException("tableName is null");
         }
-        return commandContext.getTableDataManager().getTableMetaData(tableName);
+        return CommandContextUtil.getTableDataManager(commandContext).getTableMetaData(tableName);
     }
 
 }

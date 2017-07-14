@@ -16,9 +16,10 @@ package org.flowable.idm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.idm.api.Group;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -37,7 +38,7 @@ public class CreateGroupCmd implements Command<Group>, Serializable {
     }
 
     public Group execute(CommandContext commandContext) {
-        return commandContext.getGroupEntityManager().createNewGroup(groupId);
+        return CommandContextUtil.getGroupEntityManager(commandContext).createNewGroup(groupId);
     }
 
 }

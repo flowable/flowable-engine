@@ -16,8 +16,8 @@ package org.flowable.engine.impl.bpmn.listener;
 import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.TaskListener;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.scripting.ScriptingEngines;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Rich Kroll
@@ -38,7 +38,7 @@ public class ScriptTaskListener implements TaskListener {
     public void notify(DelegateTask delegateTask) {
         validateParameters();
 
-        ScriptingEngines scriptingEngines = Context.getProcessEngineConfiguration().getScriptingEngines();
+        ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
         Object result = scriptingEngines.evaluate(script.getExpressionText(), language.getExpressionText(), delegateTask, autoStoreVariables);
 
         if (resultVariable != null) {

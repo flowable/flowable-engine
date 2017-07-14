@@ -15,9 +15,9 @@ package org.flowable.engine.impl.cfg;
 import javax.transaction.TransactionManager;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.cfg.jta.JtaTransactionContextFactory;
-import org.flowable.engine.impl.interceptor.CommandInterceptor;
-import org.flowable.engine.impl.interceptor.JtaTransactionInterceptor;
+import org.flowable.engine.common.impl.cfg.jta.JtaTransactionContextFactory;
+import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
+import org.flowable.engine.common.impl.interceptor.JtaTransactionInterceptor;
 
 /**
  * @author Tom Baeyens

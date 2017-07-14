@@ -14,13 +14,13 @@
 package org.flowable.idm.engine.impl.persistence;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.idm.engine.IdmEngineConfiguration;
-import org.flowable.idm.engine.impl.context.Context;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
-import org.flowable.idm.engine.impl.interceptor.CommandExecutor;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.IdentityInfoEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.MembershipEntityManager;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -37,7 +37,7 @@ public abstract class AbstractManager {
     // Command scoped
 
     protected CommandContext getCommandContext() {
-        return Context.getCommandContext();
+        return CommandContextUtil.getCommandContext();
     }
 
     protected <T> T getSession(Class<T> sessionClass) {

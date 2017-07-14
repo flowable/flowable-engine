@@ -15,39 +15,39 @@ package org.flowable.idm.engine.impl.persistence.entity.data.impl;
 import java.util.List;
 
 import org.flowable.idm.engine.IdmEngineConfiguration;
-import org.flowable.idm.engine.impl.persistence.entity.ByteArrayEntity;
-import org.flowable.idm.engine.impl.persistence.entity.ByteArrayEntityImpl;
+import org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntity;
+import org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntityImpl;
 import org.flowable.idm.engine.impl.persistence.entity.data.AbstractDataManager;
 import org.flowable.idm.engine.impl.persistence.entity.data.ByteArrayDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisByteArrayDataManager extends AbstractDataManager<ByteArrayEntity> implements ByteArrayDataManager {
+public class MybatisByteArrayDataManager extends AbstractDataManager<IdmByteArrayEntity> implements ByteArrayDataManager {
 
     public MybatisByteArrayDataManager(IdmEngineConfiguration idmEngineConfiguration) {
         super(idmEngineConfiguration);
     }
 
     @Override
-    public ByteArrayEntity create() {
-        return new ByteArrayEntityImpl();
+    public IdmByteArrayEntity create() {
+        return new IdmByteArrayEntityImpl();
     }
 
     @Override
-    public Class<? extends ByteArrayEntity> getManagedEntityClass() {
-        return ByteArrayEntityImpl.class;
+    public Class<? extends IdmByteArrayEntity> getManagedEntityClass() {
+        return IdmByteArrayEntityImpl.class;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<ByteArrayEntity> findAll() {
-        return getDbSqlSession().selectList("selectByteArrays");
+    public List<IdmByteArrayEntity> findAll() {
+        return getDbSqlSession().selectList("selectIdmByteArrays");
     }
 
     @Override
     public void deleteByteArrayNoRevisionCheck(String byteArrayEntityId) {
-        getDbSqlSession().delete("deleteByteArrayNoRevisionCheck", byteArrayEntityId);
+        getDbSqlSession().delete("deleteIdmByteArrayNoRevisionCheck", byteArrayEntityId);
     }
 
 }

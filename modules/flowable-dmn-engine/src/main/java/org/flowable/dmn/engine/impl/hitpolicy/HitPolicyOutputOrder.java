@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.flowable.dmn.engine.impl.context.Context;
 import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.engine.common.api.FlowableException;
 
@@ -59,7 +59,7 @@ public class HitPolicyOutputOrder extends AbstractHitPolicy implements ComposeDe
                     return compareToBuilder.toComparison();
                     
                 } else {
-                    if (Context.getDmnEngineConfiguration().isStrictMode()) {
+                    if (CommandContextUtil.getDmnEngineConfiguration().isStrictMode()) {
                         throw new FlowableException(String.format("HitPolicy: %s; no output values present", getHitPolicyName()));
                     }
                     return 0;

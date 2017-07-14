@@ -14,7 +14,6 @@ package org.flowable.form.engine.impl.util;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.form.engine.FormEngineConfiguration;
-import org.flowable.form.engine.impl.context.Context;
 import org.flowable.form.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.form.engine.impl.persistence.deploy.FormDefinitionCacheEntry;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
@@ -36,19 +35,19 @@ public class FormUtil {
 
     public static FormDefinitionEntity getFormDefinitionEntity(String formDefinitionId, boolean checkCacheOnly) {
         if (checkCacheOnly) {
-            FormDefinitionCacheEntry cacheEntry = Context.getFormEngineConfiguration().getFormDefinitionCache().get(formDefinitionId);
+            FormDefinitionCacheEntry cacheEntry = CommandContextUtil.getFormEngineConfiguration().getFormDefinitionCache().get(formDefinitionId);
             if (cacheEntry != null) {
                 return cacheEntry.getFormDefinitionEntity();
             }
             return null;
         } else {
             // This will check the cache in the findDeployedFormDefinitionById method
-            return Context.getFormEngineConfiguration().getDeploymentManager().findDeployedFormDefinitionById(formDefinitionId);
+            return CommandContextUtil.getFormEngineConfiguration().getDeploymentManager().findDeployedFormDefinitionById(formDefinitionId);
         }
     }
 
     public static FormModel getFormDefinition(String formDefinitionId) {
-        FormEngineConfiguration formEngineConfiguration = Context.getFormEngineConfiguration();
+        FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration();
         DeploymentManager deploymentManager = formEngineConfiguration.getDeploymentManager();
 
         // This will check the cache in the findDeployedFormDefinitionById and resolveFormDefinition method
@@ -59,7 +58,7 @@ public class FormUtil {
     }
 
     public static FormModel getFormDefinitionFromCache(String formId) {
-        FormEngineConfiguration formEngineConfiguration = Context.getFormEngineConfiguration();
+        FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration();
         FormDefinitionCacheEntry cacheEntry = formEngineConfiguration.getFormDefinitionCache().get(formId);
         if (cacheEntry != null) {
             return formEngineConfiguration.getFormJsonConverter().convertToFormModel(cacheEntry.getFormDefinitionJson(),
@@ -69,7 +68,7 @@ public class FormUtil {
     }
 
     public static FormDefinitionEntity getFormDefinitionFromDatabase(String formDefinitionId) {
-        FormDefinitionEntityManager formDefinitionEntityManager = Context.getFormEngineConfiguration().getFormDefinitionEntityManager();
+        FormDefinitionEntityManager formDefinitionEntityManager = CommandContextUtil.getFormEngineConfiguration().getFormDefinitionEntityManager();
         FormDefinitionEntity formDefinition = formDefinitionEntityManager.findById(formDefinitionId);
         if (formDefinition == null) {
             throw new FlowableException("No form definitionfound with id " + formDefinitionId);

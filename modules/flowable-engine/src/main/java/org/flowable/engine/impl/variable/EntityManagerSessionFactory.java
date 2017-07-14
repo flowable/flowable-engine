@@ -16,7 +16,7 @@ package org.flowable.engine.impl.variable;
 import javax.persistence.EntityManagerFactory;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.AbstractCommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.Session;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
 
@@ -46,7 +46,7 @@ public class EntityManagerSessionFactory implements SessionFactory {
         return EntityManagerSession.class;
     }
 
-    public Session openSession(AbstractCommandContext commandContext) {
+    public Session openSession(CommandContext commandContext) {
         return new EntityManagerSessionImpl(entityManagerFactory, handleTransactions, closeEntityManager);
     }
 

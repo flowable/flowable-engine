@@ -15,11 +15,12 @@ package org.flowable.idm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.idm.api.Token;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
 import org.flowable.idm.engine.impl.persistence.entity.TokenEntity;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -38,14 +39,14 @@ public class SaveTokenCmd implements Command<Void>, Serializable {
             throw new FlowableIllegalArgumentException("token is null");
         }
 
-        if (commandContext.getTokenEntityManager().isNewToken(token)) {
+        if (CommandContextUtil.getTokenEntityManager(commandContext).isNewToken(token)) {
             if (token instanceof TokenEntity) {
-                commandContext.getTokenEntityManager().insert((TokenEntity) token, true);
+                CommandContextUtil.getTokenEntityManager(commandContext).insert((TokenEntity) token, true);
             } else {
-                commandContext.getDbSqlSession().insert((Entity) token);
+                CommandContextUtil.getDbSqlSession(commandContext).insert((Entity) token);
             }
         } else {
-            commandContext.getTokenEntityManager().updateToken(token);
+            CommandContextUtil.getTokenEntityManager(commandContext).updateToken(token);
         }
 
         return null;

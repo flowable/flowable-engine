@@ -29,7 +29,6 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailAssignmentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityImpl;
-import org.flowable.engine.impl.persistence.entity.HistoricDetailTransitionInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricFormPropertyEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
@@ -186,7 +185,6 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(HistoricVariableInstanceEntityImpl.class);
 
         DELETE_ORDER.add(HistoricDetailAssignmentEntityImpl.class);
-        DELETE_ORDER.add(HistoricDetailTransitionInstanceEntityImpl.class);
         DELETE_ORDER.add(HistoricDetailVariableInstanceUpdateEntityImpl.class);
         DELETE_ORDER.add(HistoricFormPropertyEntityImpl.class);
         DELETE_ORDER.add(HistoricDetailEntityImpl.class);
@@ -195,5 +193,5 @@ public class EntityDependencyOrder {
         Collections.reverse(INSERT_ORDER);
 
     }
-
+    
 }

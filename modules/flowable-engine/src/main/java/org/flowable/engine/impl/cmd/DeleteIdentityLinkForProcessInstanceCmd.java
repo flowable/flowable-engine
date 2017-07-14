@@ -17,10 +17,11 @@ import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 
 /**
@@ -62,7 +63,7 @@ public class DeleteIdentityLinkForProcessInstanceCmd implements Command<Object>,
     }
 
     public Void execute(CommandContext commandContext) {
-        ExecutionEntity processInstance = commandContext.getExecutionEntityManager().findById(processInstanceId);
+        ExecutionEntity processInstance = CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstanceId);
 
         if (processInstance == null) {
             throw new FlowableObjectNotFoundException("Cannot find process instance with id " + processInstanceId, ExecutionEntity.class);
@@ -74,8 +75,8 @@ public class DeleteIdentityLinkForProcessInstanceCmd implements Command<Object>,
             return null;
         }
 
-        commandContext.getIdentityLinkEntityManager().deleteIdentityLink(processInstance, userId, groupId, type);
-        commandContext.getHistoryManager().createProcessInstanceIdentityLinkComment(processInstanceId, userId, groupId, type, false);
+        CommandContextUtil.getIdentityLinkEntityManager(commandContext).deleteIdentityLink(processInstance, userId, groupId, type);
+        CommandContextUtil.getHistoryManager(commandContext).createProcessInstanceIdentityLinkComment(processInstanceId, userId, groupId, type, false);
 
         return null;
     }

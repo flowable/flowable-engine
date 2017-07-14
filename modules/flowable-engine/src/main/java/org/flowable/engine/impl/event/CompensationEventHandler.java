@@ -19,14 +19,14 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.helper.ScopeUtil;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 
 /**
@@ -45,7 +45,7 @@ public class CompensationEventHandler implements EventHandler {
             throw new FlowableException("Compensating execution not set for compensate event subscription with id " + eventSubscription.getId());
         }
 
-        ExecutionEntity compensatingExecution = commandContext.getExecutionEntityManager().findById(configuration);
+        ExecutionEntity compensatingExecution = CommandContextUtil.getExecutionEntityManager(commandContext).findById(configuration);
 
         String processDefinitionId = compensatingExecution.getProcessDefinitionId();
         Process process = ProcessDefinitionUtil.getProcess(processDefinitionId);
@@ -59,20 +59,20 @@ public class CompensationEventHandler implements EventHandler {
 
             // descend into scope:
             compensatingExecution.setScope(true);
-            List<CompensateEventSubscriptionEntity> eventsForThisScope = commandContext.getEventSubscriptionEntityManager().findCompensateEventSubscriptionsByExecutionId(compensatingExecution.getId());
+            List<CompensateEventSubscriptionEntity> eventsForThisScope = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findCompensateEventSubscriptionsByExecutionId(compensatingExecution.getId());
             ScopeUtil.throwCompensationEvent(eventsForThisScope, compensatingExecution, false);
 
         } else {
 
             try {
 
-                if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-                    commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
+                    CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().dispatchEvent(
                             FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPENSATE, flowElement.getId(), flowElement.getName(),
                                     compensatingExecution.getId(), compensatingExecution.getProcessInstanceId(), compensatingExecution.getProcessDefinitionId(), flowElement));
                 }
                 compensatingExecution.setCurrentFlowElement(flowElement);
-                Context.getAgenda().planContinueProcessInCompensation(compensatingExecution);
+                CommandContextUtil.getAgenda().planContinueProcessInCompensation(compensatingExecution);
 
             } catch (Exception e) {
                 throw new FlowableException("Error while handling compensation event " + eventSubscription, e);

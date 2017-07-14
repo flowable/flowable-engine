@@ -13,9 +13,9 @@
 
 package org.flowable.rest.service.api.engine.variable;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * @author Frederik Heremans

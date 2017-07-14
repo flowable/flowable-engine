@@ -34,6 +34,7 @@ public class FlowableTaskAlreadyClaimedException extends FlowableException {
         super("Task '" + taskId + "' is already claimed by someone else.");
         this.taskId = taskId;
         this.taskAssignee = taskAssignee;
+        this.reduceLogLevel = true;
     }
 
     public String getTaskId() {

@@ -15,6 +15,7 @@ package org.flowable.engine.impl.context;
 
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 
@@ -43,7 +44,7 @@ public class ExecutionContext {
 
     public DeploymentEntity getDeployment() {
         String deploymentId = getProcessDefinition().getDeploymentId();
-        DeploymentEntity deployment = Context.getCommandContext().getDeploymentEntityManager().findById(deploymentId);
+        DeploymentEntity deployment = CommandContextUtil.getDeploymentEntityManager().findById(deploymentId);
         return deployment;
     }
 }

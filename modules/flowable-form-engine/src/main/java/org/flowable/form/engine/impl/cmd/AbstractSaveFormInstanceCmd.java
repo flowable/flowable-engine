@@ -17,12 +17,13 @@ import java.util.Date;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.engine.FormEngineConfiguration;
-import org.flowable.form.engine.impl.interceptor.Command;
-import org.flowable.form.engine.impl.interceptor.CommandContext;
 import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntityManager;
+import org.flowable.form.engine.impl.util.CommandContextUtil;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormFieldTypes;
 import org.flowable.form.model.FormModel;
@@ -61,14 +62,14 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
             if (formModelId == null) {
                 throw new FlowableException("Invalid form model and no form model Id provided");
             }
-            formModel = commandContext.getFormEngineConfiguration().getFormRepositoryService().getFormModelById(formModelId);
+            formModel = CommandContextUtil.getFormEngineConfiguration().getFormRepositoryService().getFormModelById(formModelId);
         }
 
         if (formModel == null || formModel.getId() == null) {
             throw new FlowableException("Invalid form model provided");
         }
 
-        ObjectMapper objectMapper = commandContext.getFormEngineConfiguration().getObjectMapper();
+        ObjectMapper objectMapper = CommandContextUtil.getFormEngineConfiguration().getObjectMapper();
         ObjectNode submittedFormValuesJson = objectMapper.createObjectNode();
 
         ObjectNode valuesNode = submittedFormValuesJson.putObject("values");
@@ -113,8 +114,8 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
             submittedFormValuesJson.put("flowable_form_outcome", variables.get(outcomeVariable).toString());
         }
 
-        FormInstanceEntityManager formInstanceEntityManager = commandContext.getFormInstanceEntityManager();
-        FormInstanceEntity formInstanceEntity = findExistingFormInstance(commandContext.getFormEngineConfiguration());
+        FormInstanceEntityManager formInstanceEntityManager = CommandContextUtil.getFormInstanceEntityManager(commandContext);
+        FormInstanceEntity formInstanceEntity = findExistingFormInstance(CommandContextUtil.getFormEngineConfiguration());
 
         if (formInstanceEntity == null) {
             formInstanceEntity = formInstanceEntityManager.create();

@@ -13,9 +13,10 @@
 package org.flowable.engine.impl.persistence.entity;
 
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * Contains a predefined set of states for process definitions and process instances
@@ -100,14 +101,14 @@ public interface SuspensionState {
         }
 
         protected static void dispatchStateChangeEvent(Object entity, SuspensionState state) {
-            if (Context.getCommandContext() != null && Context.getCommandContext().getEventDispatcher().isEnabled()) {
+            if (Context.getCommandContext() != null && CommandContextUtil.getEventDispatcher().isEnabled()) {
                 FlowableEngineEventType eventType = null;
                 if (state == SuspensionState.ACTIVE) {
                     eventType = FlowableEngineEventType.ENTITY_ACTIVATED;
                 } else {
                     eventType = FlowableEngineEventType.ENTITY_SUSPENDED;
                 }
-                Context.getCommandContext().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(eventType, entity));
+                CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(eventType, entity));
             }
         }
     }

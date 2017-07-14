@@ -30,7 +30,7 @@ import org.flowable.cdi.FlowableCdiException;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.impl.context.ExecutionContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.runtime.Execution;

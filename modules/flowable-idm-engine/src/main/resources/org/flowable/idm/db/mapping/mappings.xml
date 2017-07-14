@@ -7,10 +7,10 @@
     <setting name="lazyLoadingEnabled" value="false" />
   </settings>
   <typeAliases>
-    <typeAlias type="org.flowable.idm.engine.impl.persistence.ByteArrayRefTypeHandler" alias="ByteArrayRefTypeHandler"/>
+    <typeAlias type="org.flowable.idm.engine.impl.persistence.ByteArrayRefTypeHandler" alias="IdmByteArrayRefTypeHandler"/>
   </typeAliases>
   <typeHandlers>
-    <typeHandler handler="ByteArrayRefTypeHandler" 
+    <typeHandler handler="IdmByteArrayRefTypeHandler" 
                  javaType="org.flowable.idm.engine.impl.persistence.entity.ByteArrayRef"
                  jdbcType="VARCHAR"/>
   </typeHandlers>

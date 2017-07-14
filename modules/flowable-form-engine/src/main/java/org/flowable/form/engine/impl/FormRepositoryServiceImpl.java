@@ -15,6 +15,8 @@ package org.flowable.form.engine.impl;
 import java.io.InputStream;
 import java.util.List;
 
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDefinitionQuery;
 import org.flowable.form.api.FormDeployment;
@@ -33,8 +35,6 @@ import org.flowable.form.engine.impl.cmd.GetFormModelCmd;
 import org.flowable.form.engine.impl.cmd.SetDeploymentCategoryCmd;
 import org.flowable.form.engine.impl.cmd.SetDeploymentTenantIdCmd;
 import org.flowable.form.engine.impl.cmd.SetFormDefinitionCategoryCmd;
-import org.flowable.form.engine.impl.interceptor.Command;
-import org.flowable.form.engine.impl.interceptor.CommandContext;
 import org.flowable.form.engine.impl.repository.FormDeploymentBuilderImpl;
 import org.flowable.form.model.FormModel;
 

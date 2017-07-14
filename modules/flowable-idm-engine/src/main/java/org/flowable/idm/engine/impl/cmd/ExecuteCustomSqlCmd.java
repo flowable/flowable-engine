@@ -1,8 +1,9 @@
 package org.flowable.idm.engine.impl.cmd;
 
 import org.flowable.engine.common.impl.cmd.CustomSqlExecution;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author jbarrez
@@ -19,7 +20,7 @@ public class ExecuteCustomSqlCmd<Mapper, ResultType> implements Command<ResultTy
 
     @Override
     public ResultType execute(CommandContext commandContext) {
-        Mapper mapper = commandContext.getDbSqlSession().getSqlSession().getMapper(mapperClass);
+        Mapper mapper = CommandContextUtil.getDbSqlSession(commandContext).getSqlSession().getMapper(mapperClass);
         return customSqlExecution.execute(mapper);
     }
 

@@ -14,9 +14,10 @@ package org.flowable.engine.impl.cmd;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * Command that adds an event-listener to the process engine.
@@ -45,9 +46,9 @@ public class AddEventListenerCommand implements Command<Void> {
         }
 
         if (types != null) {
-            commandContext.getProcessEngineConfiguration().getEventDispatcher().addEventListener(listener, types);
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().addEventListener(listener, types);
         } else {
-            commandContext.getProcessEngineConfiguration().getEventDispatcher().addEventListener(listener);
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().addEventListener(listener);
         }
 
         return null;

@@ -13,13 +13,14 @@
 package org.flowable.engine.impl.history.async.json.transformer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricFormPropertyEntity;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.engine.impl.persistence.entity.data.HistoricDetailDataManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -46,7 +47,7 @@ public class FormPropertiesSubmittedHistoryJsonTransformer extends AbstractHisto
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricDetailDataManager historicDetailDataManager = commandContext.getProcessEngineConfiguration().getHistoricDetailDataManager();
+        HistoricDetailDataManager historicDetailDataManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoricDetailDataManager();
         
         boolean hasMoreFormProperties = true;
         int counter = 1;
@@ -73,7 +74,7 @@ public class FormPropertiesSubmittedHistoryJsonTransformer extends AbstractHisto
                 historicFormPropertyEntity.setActivityInstanceId(activityInstance.getId());
             }
     
-            HistoricDetailEntityManager historicDetailEntityManager = commandContext.getProcessEngineConfiguration().getHistoricDetailEntityManager();
+            HistoricDetailEntityManager historicDetailEntityManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoricDetailEntityManager();
             historicDetailEntityManager.insert(historicFormPropertyEntity);
             
             counter++;

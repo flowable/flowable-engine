@@ -43,11 +43,11 @@ import org.flowable.engine.common.impl.javax.el.MapELResolver;
 import org.flowable.engine.common.impl.javax.el.ResourceBundleELResolver;
 import org.flowable.engine.common.impl.javax.el.ValueExpression;
 import org.flowable.engine.common.impl.javax.el.VariableMapper;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.data.ItemInstance;
 import org.flowable.engine.impl.el.DynamicBeanPropertyELResolver;
 import org.flowable.engine.impl.el.ExpressionFactoryResolver;
 import org.flowable.engine.impl.el.JsonNodeELResolver;
-import org.flowable.engine.impl.util.ReflectUtil;
 
 /**
  * ScriptEngine that used JUEL for script evaluation and compilation (JSR-223).

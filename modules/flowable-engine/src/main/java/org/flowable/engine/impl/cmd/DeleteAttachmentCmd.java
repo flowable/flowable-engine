@@ -15,13 +15,14 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 
 /**
@@ -38,12 +39,12 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
     }
 
     public Object execute(CommandContext commandContext) {
-        AttachmentEntity attachment = commandContext.getAttachmentEntityManager().findById(attachmentId);
+        AttachmentEntity attachment = CommandContextUtil.getAttachmentEntityManager().findById(attachmentId);
 
         String processInstanceId = attachment.getProcessInstanceId();
         String processDefinitionId = null;
         if (attachment.getProcessInstanceId() != null) {
-            ExecutionEntity process = commandContext.getExecutionEntityManager().findById(processInstanceId);
+            ExecutionEntity process = CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstanceId);
             if (process != null) {
                 processDefinitionId = process.getProcessDefinitionId();
                 if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, process.getProcessDefinitionId())) {
@@ -54,18 +55,18 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
             }
         }
 
-        commandContext.getAttachmentEntityManager().delete(attachment, false);
+        CommandContextUtil.getAttachmentEntityManager().delete(attachment, false);
 
         if (attachment.getContentId() != null) {
-            commandContext.getByteArrayEntityManager().deleteByteArrayById(attachment.getContentId());
+            CommandContextUtil.getByteArrayEntityManager().deleteByteArrayById(attachment.getContentId());
         }
 
         if (attachment.getTaskId() != null) {
-            commandContext.getHistoryManager().createAttachmentComment(attachment.getTaskId(), attachment.getProcessInstanceId(), attachment.getName(), false);
+            CommandContextUtil.getHistoryManager(commandContext).createAttachmentComment(attachment.getTaskId(), attachment.getProcessInstanceId(), attachment.getName(), false);
         }
 
-        if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            commandContext.getProcessEngineConfiguration().getEventDispatcher()
+        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
                     .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, attachment, processInstanceId, processInstanceId, processDefinitionId));
         }
         return null;

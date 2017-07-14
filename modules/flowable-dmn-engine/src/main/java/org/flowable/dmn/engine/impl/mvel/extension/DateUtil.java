@@ -12,12 +12,12 @@
  */
 package org.flowable.dmn.engine.impl.mvel.extension;
 
+import java.util.Date;
+
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-
-import java.util.Date;
 
 /**
  * @author Yvo Swillens

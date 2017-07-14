@@ -16,12 +16,13 @@ import java.util.LinkedList;
 
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +83,7 @@ public class DefaultFlowableEngineAgenda implements FlowableEngineAgenda {
         LOGGER.debug("Operation {} added to agenda", operation.getClass());
 
         if (executionEntity != null) {
-            commandContext.addInvolvedExecution(executionEntity);
+            CommandContextUtil.addInvolvedExecution(commandContext, executionEntity);
         }
     }
 
@@ -134,6 +135,16 @@ public class DefaultFlowableEngineAgenda implements FlowableEngineAgenda {
 
     public LinkedList<Runnable> getOperations() {
         return operations;
+    }
+
+    @Override
+    public void flush() {
+        
+    }
+
+    @Override
+    public void close() {
+        
     }
 
 }

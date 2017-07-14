@@ -45,29 +45,29 @@ public class MybatisFormDeploymentDataManager extends AbstractDataManager<FormDe
 
     @Override
     public long findDeploymentCountByQueryCriteria(FormDeploymentQueryImpl deploymentQuery) {
-        return (Long) getDbSqlSession().selectOne("selectDeploymentCountByQueryCriteria", deploymentQuery);
+        return (Long) getDbSqlSession().selectOne("selectFormDeploymentCountByQueryCriteria", deploymentQuery);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<FormDeployment> findDeploymentsByQueryCriteria(FormDeploymentQueryImpl deploymentQuery) {
-        return getDbSqlSession().selectList("selectDeploymentsByQueryCriteria", deploymentQuery);
+        return getDbSqlSession().selectList("selectFormDeploymentsByQueryCriteria", deploymentQuery);
     }
 
     @Override
     public List<String> getDeploymentResourceNames(String deploymentId) {
-        return getDbSqlSession().getSqlSession().selectList("selectResourceNamesByDeploymentId", deploymentId);
+        return getDbSqlSession().getSqlSession().selectList("selectFormResourceNamesByDeploymentId", deploymentId);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<FormDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap) {
-        return getDbSqlSession().selectListWithRawParameter("selectDeploymentByNativeQuery", parameterMap);
+        return getDbSqlSession().selectListWithRawParameter("selectFormDeploymentByNativeQuery", parameterMap);
     }
 
     @Override
     public long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap) {
-        return (Long) getDbSqlSession().selectOne("selectDeploymentCountByNativeQuery", parameterMap);
+        return (Long) getDbSqlSession().selectOne("selectFormDeploymentCountByNativeQuery", parameterMap);
     }
 
 }

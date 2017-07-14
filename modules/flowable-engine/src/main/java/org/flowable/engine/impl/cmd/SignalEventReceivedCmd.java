@@ -19,15 +19,15 @@ import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Execution;
 
@@ -68,12 +68,12 @@ public class SignalEventReceivedCmd implements Command<Void> {
 
         List<SignalEventSubscriptionEntity> signalEvents = null;
 
-        EventSubscriptionEntityManager eventSubscriptionEntityManager = commandContext.getEventSubscriptionEntityManager();
+        EventSubscriptionEntityManager eventSubscriptionEntityManager = CommandContextUtil.getEventSubscriptionEntityManager(commandContext);
         if (executionId == null) {
             signalEvents = eventSubscriptionEntityManager.findSignalEventSubscriptionsByEventName(eventName, tenantId);
         } else {
 
-            ExecutionEntity execution = commandContext.getExecutionEntityManager().findById(executionId);
+            ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager(commandContext).findById(executionId);
 
             if (execution == null) {
                 throw new FlowableObjectNotFoundException("Cannot find execution with id '" + executionId + "'", Execution.class);
@@ -106,7 +106,7 @@ public class SignalEventReceivedCmd implements Command<Void> {
                     compatibilityHandler.signalEventReceived(signalEventSubscriptionEntity, payload, async);
 
                 } else {
-                    Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
                             FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventName,
                                     payload, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(),
                                     signalEventSubscriptionEntity.getProcessDefinitionId()));

@@ -12,12 +12,6 @@
  */
 package org.flowable.engine;
 
-import org.flowable.content.api.ContentService;
-import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
-import org.flowable.form.api.FormRepositoryService;
-import org.flowable.idm.api.IdmIdentityService;
-
 /**
  * Provides access to all the services that expose the BPM and workflow operations.
  * 
@@ -66,16 +60,4 @@ public interface ProcessEngine {
     DynamicBpmnService getDynamicBpmnService();
 
     ProcessEngineConfiguration getProcessEngineConfiguration();
-
-    FormRepositoryService getFormEngineRepositoryService();
-
-    org.flowable.form.api.FormService getFormEngineFormService();
-
-    DmnRepositoryService getDmnRepositoryService();
-
-    DmnRuleService getDmnRuleService();
-
-    IdmIdentityService getIdmIdentityService();
-
-    ContentService getContentService();
 }

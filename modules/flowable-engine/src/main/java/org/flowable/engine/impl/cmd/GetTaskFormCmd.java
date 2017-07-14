@@ -17,11 +17,12 @@ import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.form.TaskFormData;
 import org.flowable.engine.impl.form.TaskFormHandler;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.FormHandlerUtil;
 import org.flowable.engine.task.Task;
 
@@ -39,7 +40,7 @@ public class GetTaskFormCmd implements Command<TaskFormData>, Serializable {
     }
 
     public TaskFormData execute(CommandContext commandContext) {
-        TaskEntity task = commandContext.getTaskEntityManager().findById(taskId);
+        TaskEntity task = CommandContextUtil.getTaskEntityManager(commandContext).findById(taskId);
         if (task == null) {
             throw new FlowableObjectNotFoundException("No task found for taskId '" + taskId + "'", Task.class);
         }

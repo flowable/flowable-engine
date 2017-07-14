@@ -28,6 +28,7 @@ import org.flowable.bpmn.model.Message;
 import org.flowable.bpmn.model.SendTask;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.Expression;
@@ -49,10 +50,9 @@ import org.flowable.engine.impl.bpmn.webservice.MessageImplicitDataOutputAssocia
 import org.flowable.engine.impl.bpmn.webservice.MessageInstance;
 import org.flowable.engine.impl.bpmn.webservice.Operation;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.el.ExpressionManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
-import org.flowable.engine.impl.util.ReflectUtil;
 import org.flowable.engine.impl.webservice.WSOperation;
 import org.flowable.engine.impl.webservice.WSService;
 
@@ -132,7 +132,7 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
 
             fillMessage(dataInputAssociations, execution);
 
-            ProcessEngineConfigurationImpl processEngineConfig = Context.getProcessEngineConfiguration();
+            ProcessEngineConfigurationImpl processEngineConfig = CommandContextUtil.getProcessEngineConfiguration();
             MessageInstance receivedMessage = operation.sendMessage(message,
                     processEngineConfig.getWsOverridenEndpointAddresses());
 
@@ -305,7 +305,7 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
             return new MessageImplicitDataInputAssociation(dataAssociationElement.getSourceRef(), dataAssociationElement.getTargetRef());
         } else {
             SimpleDataInputAssociation dataAssociation = new SimpleDataInputAssociation(dataAssociationElement.getSourceRef(), dataAssociationElement.getTargetRef());
-            ExpressionManager expressionManager = Context.getProcessEngineConfiguration().getExpressionManager();
+            ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
 
             for (org.flowable.bpmn.model.Assignment assignmentElement : dataAssociationElement.getAssignments()) {
                 if (StringUtils.isNotEmpty(assignmentElement.getFrom()) && StringUtils.isNotEmpty(assignmentElement.getTo())) {
@@ -323,7 +323,7 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
         if (StringUtils.isNotEmpty(dataAssociationElement.getSourceRef())) {
             return new MessageImplicitDataOutputAssociation(dataAssociationElement.getTargetRef(), dataAssociationElement.getSourceRef());
         } else {
-            ExpressionManager expressionManager = Context.getProcessEngineConfiguration().getExpressionManager();
+            ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
             Expression transformation = expressionManager.createExpression(dataAssociationElement.getTransformation());
             AbstractDataAssociation dataOutputAssociation = new TransformationDataOutputAssociation(null, dataAssociationElement.getTargetRef(), transformation);
             return dataOutputAssociation;

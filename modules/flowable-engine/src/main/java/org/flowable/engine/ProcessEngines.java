@@ -32,7 +32,7 @@ import org.flowable.engine.common.EngineInfo;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.util.IoUtil;
-import org.flowable.engine.impl.util.ReflectUtil;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,8 +71,7 @@ public abstract class ProcessEngines {
     public static synchronized void init() {
         if (!isInitialized()) {
             if (processEngines == null) {
-                // Create new map to store process-engines if current map is
-                // null
+                // Create new map to store process-engines if current map is null
                 processEngines = new HashMap<String, ProcessEngine>();
             }
             ClassLoader classLoader = ReflectUtil.getClassLoader();

@@ -17,8 +17,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.flowable.content.engine.ContentEngineConfiguration;
-import org.flowable.content.engine.impl.db.DbSqlSession;
 import org.flowable.content.engine.impl.persistence.AbstractManager;
+import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 

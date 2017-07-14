@@ -12,13 +12,13 @@
  */
 package org.flowable.crystalball.simulator.delegate.event.impl;
 
-import org.flowable.crystalball.simulator.SimulationEvent;
-import org.flowable.crystalball.simulator.delegate.event.Function;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+
+import org.flowable.crystalball.simulator.SimulationEvent;
+import org.flowable.crystalball.simulator.delegate.event.Function;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 
 /**
  * 

@@ -16,8 +16,9 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Attachment;
 
 /**
@@ -33,6 +34,6 @@ public class GetTaskAttachmentsCmd implements Command<List<? extends Attachment>
     }
 
     public List<? extends Attachment> execute(CommandContext commandContext) {
-        return commandContext.getAttachmentEntityManager().findAttachmentsByTaskId(taskId);
+        return CommandContextUtil.getAttachmentEntityManager().findAttachmentsByTaskId(taskId);
     }
 }

@@ -17,13 +17,13 @@ import java.io.Serializable;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
@@ -56,13 +56,13 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
 
         sendCancelEvent(jobToDelete);
 
-        commandContext.getJobEntityManager().delete(jobToDelete);
+        CommandContextUtil.getJobEntityManager(commandContext).delete(jobToDelete);
         return null;
     }
 
     protected void sendCancelEvent(JobEntity jobToDelete) {
-        if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
+        if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
         }
     }
 
@@ -74,7 +74,7 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
             LOGGER.debug("Deleting job {}", jobId);
         }
 
-        JobEntity job = commandContext.getJobEntityManager().findById(jobId);
+        JobEntity job = CommandContextUtil.getJobEntityManager(commandContext).findById(jobId);
         if (job == null) {
             throw new FlowableObjectNotFoundException("No job found with id '" + jobId + "'", Job.class);
         }

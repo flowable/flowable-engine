@@ -17,12 +17,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.cfg.TransactionContext;
 import org.flowable.engine.common.impl.cfg.TransactionState;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContextCloseListener;
 import org.flowable.engine.common.impl.interceptor.Session;
-import org.flowable.engine.impl.cfg.TransactionContext;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandContextCloseListener;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,7 @@ public class AsyncHistorySession implements Session {
         this.asyncHistoryListener = asyncHistoryJobListener;
         initCommandContextCloseListener();
         
-        if (commandContext.getProcessEngineConfiguration().isAsyncHistoryExecutorIsMessageQueueMode()) {
+        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).isAsyncHistoryExecutorIsMessageQueueMode()) {
             intitTransactionListener();
         }
     }
@@ -78,7 +79,7 @@ public class AsyncHistorySession implements Session {
 
     public void addHistoricData(String type, Map<String, String> data, String tenantId) {
         
-        data.put(HistoryJsonConstants.TIMESTAMP, AsyncHistoryDateUtil.formatDate(commandContext.getProcessEngineConfiguration().getClock().getCurrentTime()));
+        data.put(HistoryJsonConstants.TIMESTAMP, AsyncHistoryDateUtil.formatDate(CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime()));
         
         if (jobData == null) {
             jobData = new LinkedHashMap<>(); // linked: insertion order is important

@@ -36,17 +36,17 @@ import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.event.FlowableEventSupport;
 import org.flowable.engine.common.impl.util.io.InputStreamSource;
 import org.flowable.engine.common.impl.util.io.StreamSource;
 import org.flowable.engine.common.impl.util.io.StringStreamSource;
 import org.flowable.engine.common.impl.util.io.UrlStreamSource;
-import org.flowable.engine.delegate.event.impl.FlowableEventSupport;
 import org.flowable.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
 import org.flowable.engine.impl.bpmn.parser.factory.ListenerFactory;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.io.ResourceStreamSource;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ValidationError;
@@ -134,7 +134,7 @@ public class BpmnParse implements BpmnXMLConstants {
     public BpmnParse execute() {
         try {
 
-            ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
             BpmnXMLConverter converter = new BpmnXMLConverter();
 
             boolean enableSafeBpmnXml = false;

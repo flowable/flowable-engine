@@ -22,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
-import org.flowable.engine.impl.db.BulkDeleteable;
 import org.flowable.engine.runtime.JobInfo;
 
 /**
@@ -31,7 +30,7 @@ import org.flowable.engine.runtime.JobInfo;
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEntity, BulkDeleteable, Serializable {
+public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

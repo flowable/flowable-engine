@@ -26,11 +26,11 @@ import java.util.Map;
 import org.apache.ibatis.session.RowBounds;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.TablePageQueryImpl;
-import org.flowable.dmn.engine.impl.db.DbSqlSession;
 import org.flowable.dmn.engine.impl.persistence.AbstractManager;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.management.TableMetaData;
 import org.flowable.engine.common.api.management.TablePage;
+import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +54,8 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
         // DMN module
         entityToTableNameMap.put(DmnDeploymentEntity.class, "ACT_DMN_DEPLOYMENT");
         entityToTableNameMap.put(DecisionTableEntity.class, "ACT_DMN_DECISION_TABLE");
+        entityToTableNameMap.put(DmnResourceEntity.class, "ACT_DMN_DEPLOYMENT_RESOURCE");
         entityToTableNameMap.put(HistoricDecisionExecutionEntity.class, "ACT_DMN_HI_DECISION_EXECUTION");
-        entityToTableNameMap.put(ResourceEntity.class, "ACT_DMN_DEPLOYMENT_RESOURCE");
     }
 
     protected DbSqlSession getDbSqlSession() {

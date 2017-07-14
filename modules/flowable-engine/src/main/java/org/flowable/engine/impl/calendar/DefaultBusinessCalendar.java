@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -51,7 +51,7 @@ public class DefaultBusinessCalendar implements BusinessCalendar {
     }
 
     public Date resolveDuedate(String duedate) {
-        Date resolvedDuedate = Context.getProcessEngineConfiguration().getClock().getCurrentTime();
+        Date resolvedDuedate = CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTime();
 
         String[] tokens = duedate.split(" and ");
         for (String token : tokens) {

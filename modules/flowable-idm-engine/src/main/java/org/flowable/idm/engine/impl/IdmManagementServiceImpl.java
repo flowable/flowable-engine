@@ -18,17 +18,16 @@ import java.util.Map;
 import org.flowable.engine.common.api.management.TableMetaData;
 import org.flowable.engine.common.api.management.TablePageQuery;
 import org.flowable.engine.common.impl.cmd.CustomSqlExecution;
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.idm.api.IdmManagementService;
 import org.flowable.idm.engine.impl.cmd.ExecuteCustomSqlCmd;
 import org.flowable.idm.engine.impl.cmd.GetPropertiesCmd;
 import org.flowable.idm.engine.impl.cmd.GetTableCountCmd;
 import org.flowable.idm.engine.impl.cmd.GetTableMetaDataCmd;
 import org.flowable.idm.engine.impl.cmd.GetTableNameCmd;
-import org.flowable.idm.engine.impl.db.DbSqlSession;
-import org.flowable.idm.engine.impl.db.DbSqlSessionFactory;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.impl.db.IdmDbSchemaManager;
 
 /**
  * @author Tijs Rademakers
@@ -59,10 +58,7 @@ public class IdmManagementServiceImpl extends ServiceImpl implements IdmManageme
         CommandConfig config = commandExecutor.getDefaultConfig().transactionNotSupported();
         return commandExecutor.execute(config, new Command<String>() {
             public String execute(CommandContext commandContext) {
-                DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) commandContext.getSessionFactories().get(DbSqlSession.class);
-                DbSqlSession dbSqlSession = new DbSqlSession(dbSqlSessionFactory, connection, catalog, schema);
-                commandContext.getSessions().put(DbSqlSession.class, dbSqlSession);
-                return dbSqlSession.dbSchemaUpdate();
+                return IdmDbSchemaManager.dbSchemaUpdate();
             }
         });
     }

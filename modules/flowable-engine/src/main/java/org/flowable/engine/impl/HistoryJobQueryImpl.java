@@ -18,9 +18,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.HistoryJob;
 import org.flowable.engine.runtime.HistoryJobQuery;
 
@@ -161,12 +161,12 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
 
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getHistoryJobEntityManager().findHistoryJobCountByQueryCriteria(this);
+        return CommandContextUtil.getHistoryJobEntityManager(commandContext).findHistoryJobCountByQueryCriteria(this);
     }
 
     public List<HistoryJob> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getHistoryJobEntityManager().findHistoryJobsByQueryCriteria(this);
+        return CommandContextUtil.getHistoryJobEntityManager(commandContext).findHistoryJobsByQueryCriteria(this);
     }
 
     // getters //////////////////////////////////////////
@@ -180,7 +180,7 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
     }
 
     public Date getNow() {
-        return Context.getProcessEngineConfiguration().getClock().getCurrentTime();
+        return CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTime();
     }
 
     public boolean isWithException() {

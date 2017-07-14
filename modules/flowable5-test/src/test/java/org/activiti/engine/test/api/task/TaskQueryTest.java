@@ -2524,7 +2524,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertEquals(1, query.listPage(10, 1).size());
 
         // Verifying odd usages
-        assertEquals(0, query.listPage(-1, -1).size());
+        assertEquals(0, query.listPage(0, 0).size());
         assertEquals(0, query.listPage(11, 2).size()); // 10 is the last index with a result
         assertEquals(11, query.listPage(0, 15).size()); // there are only 11 tasks
     }

@@ -15,16 +15,15 @@ package org.flowable.dmn.engine.configurator;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.deployer.DmnDeployer;
 import org.flowable.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
-import org.flowable.engine.cfg.AbstractProcessEngineConfigurator;
+import org.flowable.dmn.engine.impl.db.EntityDependencyOrder;
+import org.flowable.engine.cfg.AbstractEngineConfigurator;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.transaction.TransactionContextAwareDataSource;
-import org.flowable.engine.common.impl.transaction.TransactionContextAwareTransactionFactory;
+import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.deploy.Deployer;
 
@@ -32,61 +31,46 @@ import org.flowable.engine.impl.persistence.deploy.Deployer;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class DmnEngineConfigurator extends AbstractProcessEngineConfigurator {
+public class DmnEngineConfigurator extends AbstractEngineConfigurator {
 
     protected DmnEngineConfiguration dmnEngineConfiguration;
-
+    
     @Override
-    public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-
-        List<Deployer> deployers = null;
-        if (processEngineConfiguration.getCustomPostDeployers() != null) {
-            deployers = processEngineConfiguration.getCustomPostDeployers();
-        } else {
-            deployers = new ArrayList<Deployer>();
-        }
+    public int getPriority() {
+        return EngineConfigurationConstants.PRIORITY_ENGINE_DMN;
+    }
+    
+    @Override
+    protected List<Deployer> getCustomDeployers() {
+        List<Deployer> deployers = new ArrayList<>();
         deployers.add(new DmnDeployer());
-        processEngineConfiguration.setCustomPostDeployers(deployers);
+        return deployers;
+    }
+    
+    @Override
+    protected String getMybatisCfgPath() {
+        return DmnEngineConfiguration.DEFAULT_MYBATIS_MAPPING_FILE;
     }
 
     @Override
     public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (dmnEngineConfiguration == null) {
             dmnEngineConfiguration = new StandaloneInMemDmnEngineConfiguration();
-
-            if (processEngineConfiguration.getDataSource() != null) {
-                DataSource originalDatasource = processEngineConfiguration.getDataSource();
-                if (processEngineConfiguration.isTransactionsExternallyManaged()) {
-                    dmnEngineConfiguration.setDataSource(originalDatasource);
-                } else {
-                    dmnEngineConfiguration.setDataSource(new TransactionContextAwareDataSource(originalDatasource));
-                }
-
-            } else {
-                throw new FlowableException("A datasource is required for initializing the DMN engine ");
-            }
-
-            dmnEngineConfiguration.setDatabaseType(processEngineConfiguration.getDatabaseType());
-            dmnEngineConfiguration.setDatabaseCatalog(processEngineConfiguration.getDatabaseCatalog());
-            dmnEngineConfiguration.setDatabaseSchema(processEngineConfiguration.getDatabaseSchema());
-            dmnEngineConfiguration.setDatabaseSchemaUpdate(processEngineConfiguration.getDatabaseSchemaUpdate());
-            dmnEngineConfiguration.setDatabaseTablePrefix(processEngineConfiguration.getDatabaseTablePrefix());
-            dmnEngineConfiguration.setDatabaseWildcardEscapeCharacter(processEngineConfiguration.getDatabaseWildcardEscapeCharacter());
-
-            if (processEngineConfiguration.isTransactionsExternallyManaged()) {
-                dmnEngineConfiguration.setTransactionsExternallyManaged(true);
-            } else {
-                dmnEngineConfiguration.setTransactionFactory(
-                        new TransactionContextAwareTransactionFactory<org.flowable.dmn.engine.impl.cfg.TransactionContext>(
-                                org.flowable.dmn.engine.impl.cfg.TransactionContext.class));
-            }
         }
+        
+        initialiseCommonProperties(processEngineConfiguration, dmnEngineConfiguration, EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
 
-        DmnEngine dmnEngine = initDmnEngine();
-
-        processEngineConfiguration.setDmnEngineInitialized(true);
-        processEngineConfiguration.setDmnEngineRepositoryService(dmnEngine.getDmnRepositoryService());
-        processEngineConfiguration.setDmnEngineRuleService(dmnEngine.getDmnRuleService());
+        initDmnEngine();
+    }
+    
+    @Override
+    protected List<Class<? extends Entity>> getEntityInsertionOrder() {
+        return EntityDependencyOrder.INSERT_ORDER;
+    }
+    
+    @Override
+    protected List<Class<? extends Entity>> getEntityDeletionOrder() {
+        return EntityDependencyOrder.DELETE_ORDER;
     }
 
     protected synchronized DmnEngine initDmnEngine() {

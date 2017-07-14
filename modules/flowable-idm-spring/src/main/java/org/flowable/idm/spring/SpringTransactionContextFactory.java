@@ -13,16 +13,15 @@
 
 package org.flowable.idm.spring;
 
+import org.flowable.engine.common.impl.cfg.TransactionContext;
 import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
-import org.flowable.idm.engine.impl.cfg.TransactionContext;
-import org.flowable.idm.engine.impl.cfg.TransactionListener;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * @author Tijs Rademakers
  */
-public class SpringTransactionContextFactory implements TransactionContextFactory<TransactionListener, CommandContext> {
+public class SpringTransactionContextFactory implements TransactionContextFactory {
 
     protected PlatformTransactionManager transactionManager;
     protected Integer transactionSynchronizationAdapterOrder;

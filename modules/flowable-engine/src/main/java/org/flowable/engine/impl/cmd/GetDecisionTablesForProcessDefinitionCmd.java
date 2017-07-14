@@ -26,8 +26,9 @@ import org.flowable.dmn.api.DmnDecisionTableQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 
@@ -57,15 +58,11 @@ public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<Dm
             throw new FlowableObjectNotFoundException("Cannot find bpmn model for process definition id: " + processDefinitionId, BpmnModel.class);
         }
 
-        if (!commandContext.getProcessEngineConfiguration().isDmnEngineInitialized()) {
-            throw new FlowableException("DMN Engine is not initialized");
-        } else {
-            if (commandContext.getProcessEngineConfiguration().getDmnEngineRepositoryService() == null) {
-                throw new FlowableException("DMN repository service is not available");
-            }
+        if (CommandContextUtil.getDmnRepositoryService() == null) {
+            throw new FlowableException("DMN repository service is not available");
         }
 
-        dmnRepositoryService = commandContext.getProcessEngineConfiguration().getDmnEngineRepositoryService();
+        dmnRepositoryService = CommandContextUtil.getDmnRepositoryService();
         List<DmnDecisionTable> decisionTables = getDecisionTablesFromModel(bpmnModel, processDefinition);
 
         return decisionTables;

@@ -14,9 +14,10 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.List;
 
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.event.EventLogEntry;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -43,13 +44,13 @@ public class GetEventLogEntriesCmd implements Command<List<EventLogEntry>> {
     @Override
     public List<EventLogEntry> execute(CommandContext commandContext) {
         if (processInstanceId != null) {
-            return commandContext.getEventLogEntryEntityManager().findEventLogEntriesByProcessInstanceId(processInstanceId);
+            return CommandContextUtil.getEventLogEntryEntityManager(commandContext).findEventLogEntriesByProcessInstanceId(processInstanceId);
 
         } else if (startLogNr != null) {
-            return commandContext.getEventLogEntryEntityManager().findEventLogEntries(startLogNr, pageSize != null ? pageSize : -1);
+            return CommandContextUtil.getEventLogEntryEntityManager(commandContext).findEventLogEntries(startLogNr, pageSize != null ? pageSize : -1);
 
         } else {
-            return commandContext.getEventLogEntryEntityManager().findAllEventLogEntries();
+            return CommandContextUtil.getEventLogEntryEntityManager(commandContext).findAllEventLogEntries();
         }
     }
 

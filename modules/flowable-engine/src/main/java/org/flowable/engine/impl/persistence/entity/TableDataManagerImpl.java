@@ -27,6 +27,7 @@ import org.apache.ibatis.session.RowBounds;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.management.TableMetaData;
 import org.flowable.engine.common.api.management.TablePage;
+import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricDetail;
@@ -37,7 +38,6 @@ import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.impl.TablePageQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.db.DbSqlSession;
 import org.flowable.engine.impl.persistence.AbstractManager;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
@@ -98,7 +98,6 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
 
         // a couple of stuff goes to the same table
         entityToTableNameMap.put(HistoricDetailAssignmentEntity.class, "ACT_HI_DETAIL");
-        entityToTableNameMap.put(HistoricDetailTransitionInstanceEntity.class, "ACT_HI_DETAIL");
         entityToTableNameMap.put(HistoricFormPropertyEntity.class, "ACT_HI_DETAIL");
         entityToTableNameMap.put(HistoricDetailVariableInstanceUpdateEntity.class, "ACT_HI_DETAIL");
         entityToTableNameMap.put(HistoricDetailEntity.class, "ACT_HI_DETAIL");

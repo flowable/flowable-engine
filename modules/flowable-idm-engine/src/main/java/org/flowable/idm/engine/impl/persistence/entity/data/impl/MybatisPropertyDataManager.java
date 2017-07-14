@@ -15,33 +15,33 @@ package org.flowable.idm.engine.impl.persistence.entity.data.impl;
 import java.util.List;
 
 import org.flowable.idm.engine.IdmEngineConfiguration;
-import org.flowable.idm.engine.impl.persistence.entity.PropertyEntity;
-import org.flowable.idm.engine.impl.persistence.entity.PropertyEntityImpl;
+import org.flowable.idm.engine.impl.persistence.entity.IdmPropertyEntity;
+import org.flowable.idm.engine.impl.persistence.entity.IdmPropertyEntityImpl;
 import org.flowable.idm.engine.impl.persistence.entity.data.AbstractDataManager;
 import org.flowable.idm.engine.impl.persistence.entity.data.PropertyDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisPropertyDataManager extends AbstractDataManager<PropertyEntity> implements PropertyDataManager {
+public class MybatisPropertyDataManager extends AbstractDataManager<IdmPropertyEntity> implements PropertyDataManager {
 
     public MybatisPropertyDataManager(IdmEngineConfiguration idmEngineConfiguration) {
         super(idmEngineConfiguration);
     }
 
     @Override
-    public Class<? extends PropertyEntity> getManagedEntityClass() {
-        return PropertyEntityImpl.class;
+    public Class<? extends IdmPropertyEntity> getManagedEntityClass() {
+        return IdmPropertyEntityImpl.class;
     }
 
     @Override
-    public PropertyEntity create() {
-        return new PropertyEntityImpl();
+    public IdmPropertyEntity create() {
+        return new IdmPropertyEntityImpl();
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<PropertyEntity> findAll() {
+    public List<IdmPropertyEntity> findAll() {
         return getDbSqlSession().selectList("selectProperties");
     }
 

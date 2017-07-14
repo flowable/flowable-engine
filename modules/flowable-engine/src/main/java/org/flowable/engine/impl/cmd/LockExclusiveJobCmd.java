@@ -15,9 +15,10 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,9 +50,9 @@ public class LockExclusiveJobCmd implements Command<Object>, Serializable {
 
         if (job.isExclusive()) {
             if (job.getExecutionId() != null) {
-                ExecutionEntity execution = commandContext.getExecutionEntityManager().findById(job.getExecutionId());
+                ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager(commandContext).findById(job.getExecutionId());
                 if (execution != null) {
-                    commandContext.getExecutionEntityManager().updateProcessInstanceLockTime(execution.getProcessInstanceId());
+                    CommandContextUtil.getExecutionEntityManager(commandContext).updateProcessInstanceLockTime(execution.getProcessInstanceId());
                 }
             }
         }

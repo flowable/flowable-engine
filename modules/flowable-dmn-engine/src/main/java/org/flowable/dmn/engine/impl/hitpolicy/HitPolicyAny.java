@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.dmn.engine.impl.context.Context;
 import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.engine.common.api.FlowableException;
 
@@ -32,7 +32,7 @@ public class HitPolicyAny extends AbstractHitPolicy implements ComposeDecisionRe
     }
 
     public void composeDecisionResults(final MvelExecutionContext executionContext) {
-        if (Context.getDmnEngineConfiguration().isStrictMode()) {
+        if (CommandContextUtil.getDmnEngineConfiguration().isStrictMode()) {
 
             for (Map.Entry<Integer, Map<String, Object>> ruleResults : executionContext.getRuleResults().entrySet()) {
 

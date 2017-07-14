@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.impl.cmd.JobRetryCmd;
-import org.flowable.engine.impl.interceptor.Command;
 
 /**
  * @author Saeid Mirzaei

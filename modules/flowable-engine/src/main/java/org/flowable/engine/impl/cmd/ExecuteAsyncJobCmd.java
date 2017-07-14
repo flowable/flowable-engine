@@ -15,12 +15,13 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
 import org.flowable.engine.impl.persistence.entity.JobInfoEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +50,7 @@ public class ExecuteAsyncJobCmd implements Command<Object>, Serializable {
     public Object execute(CommandContext commandContext) {
         
         if (jobEntityManager == null) {
-            jobEntityManager = commandContext.getJobEntityManager(); // Backwards compatibility
+            jobEntityManager = CommandContextUtil.getJobEntityManager(commandContext); // Backwards compatibility
         }
 
         if (jobId == null) {
@@ -73,10 +74,10 @@ public class ExecuteAsyncJobCmd implements Command<Object>, Serializable {
             LOGGER.debug("Executing async job {}", job.getId());
         }
 
-        commandContext.getJobManager().execute(job);
+        CommandContextUtil.getJobManager(commandContext).execute(job);
 
-        if (commandContext.getEventDispatcher().isEnabled()) {
-            commandContext.getEventDispatcher().dispatchEvent(
+        if (CommandContextUtil.getEventDispatcher().isEnabled()) {
+            CommandContextUtil.getEventDispatcher().dispatchEvent(
                     FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_EXECUTION_SUCCESS, job));
         }
 

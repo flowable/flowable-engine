@@ -15,9 +15,10 @@ package org.flowable.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.idm.api.PrivilegeQuery;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -27,6 +28,6 @@ public class CreatePrivilegeQueryCmd implements Command<PrivilegeQuery>, Seriali
     private static final long serialVersionUID = 1L;
 
     public PrivilegeQuery execute(CommandContext commandContext) {
-        return commandContext.getPrivilegeEntityManager().createNewPrivilegeQuery();
+        return CommandContextUtil.getPrivilegeEntityManager(commandContext).createNewPrivilegeQuery();
     }
 }

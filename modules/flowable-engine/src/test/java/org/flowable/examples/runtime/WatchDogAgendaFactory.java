@@ -15,8 +15,8 @@ package org.flowable.examples.runtime;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.FlowableEngineAgendaFactory;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.agenda.DefaultFlowableEngineAgenda;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
@@ -112,6 +112,18 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
         @Override
         public void planOperation(Runnable operation) {
             agenda.planOperation(operation);
+        }
+
+        @Override
+        public void flush() {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void close() {
+            // TODO Auto-generated method stub
+            
         }
 
     }

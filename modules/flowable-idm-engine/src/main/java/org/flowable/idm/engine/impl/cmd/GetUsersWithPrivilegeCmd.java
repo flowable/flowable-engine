@@ -17,9 +17,10 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.idm.api.User;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -38,6 +39,6 @@ public class GetUsersWithPrivilegeCmd implements Command<List<User>>, Serializab
     }
 
     public List<User> execute(CommandContext commandContext) {
-        return commandContext.getUserEntityManager().findUsersByPrivilegeId(name);
+        return CommandContextUtil.getUserEntityManager(commandContext).findUsersByPrivilegeId(name);
     }
 }

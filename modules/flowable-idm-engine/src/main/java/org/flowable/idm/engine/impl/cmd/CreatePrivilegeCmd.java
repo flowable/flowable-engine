@@ -16,10 +16,11 @@ package org.flowable.idm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.idm.api.Privilege;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntity;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -38,14 +39,14 @@ public class CreatePrivilegeCmd implements Command<Privilege>, Serializable {
     }
 
     public Privilege execute(CommandContext commandContext) {
-        long count = commandContext.getPrivilegeEntityManager().createNewPrivilegeQuery().privilegeName(name).count();
+        long count = CommandContextUtil.getPrivilegeEntityManager(commandContext).createNewPrivilegeQuery().privilegeName(name).count();
         if (count > 0) {
             throw new FlowableIllegalArgumentException("Provided privilege name already exists");
         }
 
-        PrivilegeEntity entity = commandContext.getPrivilegeEntityManager().create();
+        PrivilegeEntity entity = CommandContextUtil.getPrivilegeEntityManager(commandContext).create();
         entity.setName(name);
-        commandContext.getPrivilegeEntityManager().insert(entity);
+        CommandContextUtil.getPrivilegeEntityManager(commandContext).insert(entity);
         return entity;
     }
 }

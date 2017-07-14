@@ -16,8 +16,9 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -57,6 +58,6 @@ public class DeleteTaskCmd implements Command<Void>, Serializable {
     }
 
     protected void deleteTask(CommandContext commandContext, String taskId) {
-        commandContext.getTaskEntityManager().deleteTask(taskId, deleteReason, cascade);
+        CommandContextUtil.getTaskEntityManager(commandContext).deleteTask(taskId, deleteReason, cascade);
     }
 }

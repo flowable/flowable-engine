@@ -16,12 +16,13 @@ import java.io.Serializable;
 
 import org.flowable.editor.form.converter.FormJsonConverter;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.form.engine.FormEngineConfiguration;
-import org.flowable.form.engine.impl.interceptor.Command;
-import org.flowable.form.engine.impl.interceptor.CommandContext;
 import org.flowable.form.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.form.engine.impl.persistence.deploy.FormDefinitionCacheEntry;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
+import org.flowable.form.engine.impl.util.CommandContextUtil;
 import org.flowable.form.model.FormModel;
 
 /**
@@ -52,7 +53,7 @@ public class GetFormModelCmd implements Command<FormModel>, Serializable {
     }
 
     public FormModel execute(CommandContext commandContext) {
-        DeploymentManager deploymentManager = commandContext.getFormEngineConfiguration().getDeploymentManager();
+        DeploymentManager deploymentManager = CommandContextUtil.getFormEngineConfiguration().getDeploymentManager();
 
         // Find the form definition
         FormDefinitionEntity formDefinitionEntity = null;
@@ -98,7 +99,7 @@ public class GetFormModelCmd implements Command<FormModel>, Serializable {
         }
 
         FormDefinitionCacheEntry formDefinitionCacheEntry = deploymentManager.resolveFormDefinition(formDefinitionEntity);
-        FormJsonConverter formJsonConverter = commandContext.getFormEngineConfiguration().getFormJsonConverter();
+        FormJsonConverter formJsonConverter = CommandContextUtil.getFormEngineConfiguration().getFormJsonConverter();
         return formJsonConverter.convertToFormModel(formDefinitionCacheEntry.getFormDefinitionJson(),
                 formDefinitionEntity.getId(), formDefinitionEntity.getVersion());
     }

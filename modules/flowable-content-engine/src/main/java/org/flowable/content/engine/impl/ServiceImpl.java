@@ -13,7 +13,7 @@
 package org.flowable.content.engine.impl;
 
 import org.flowable.content.engine.ContentEngineConfiguration;
-import org.flowable.content.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 
 public abstract class ServiceImpl {
 

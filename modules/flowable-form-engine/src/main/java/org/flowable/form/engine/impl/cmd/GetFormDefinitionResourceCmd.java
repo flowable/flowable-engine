@@ -17,9 +17,10 @@ import java.io.InputStream;
 import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.form.engine.impl.interceptor.Command;
-import org.flowable.form.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
+import org.flowable.form.engine.impl.util.CommandContextUtil;
 
 /**
  * Gives access to a deployed form model, e.g., a Form JSON file, through a stream of bytes.
@@ -39,7 +40,7 @@ public class GetFormDefinitionResourceCmd implements Command<InputStream>, Seria
     }
 
     public InputStream execute(CommandContext commandContext) {
-        FormDefinitionEntity formDefinition = commandContext.getFormEngineConfiguration().getDeploymentManager()
+        FormDefinitionEntity formDefinition = CommandContextUtil.getFormEngineConfiguration().getDeploymentManager()
                 .findDeployedFormDefinitionById(formDefinitionId);
 
         String deploymentId = formDefinition.getDeploymentId();

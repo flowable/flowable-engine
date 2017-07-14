@@ -13,11 +13,12 @@
 
 package org.flowable.engine.impl.event;
 
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.agenda.ContinueProcessOperation;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.jobexecutor.JobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * Continue in the broken process execution
@@ -35,6 +36,6 @@ public class BreakpointJobHandler implements JobHandler {
 
     @Override
     public void execute(JobEntity job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
-        commandContext.getAgenda().planOperation(new ContinueProcessOperation(commandContext, execution, true, false), execution);
+        CommandContextUtil.getAgenda(commandContext).planOperation(new ContinueProcessOperation(commandContext, execution, true, false), execution);
     }
 }

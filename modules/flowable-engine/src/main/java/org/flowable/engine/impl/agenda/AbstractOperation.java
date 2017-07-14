@@ -15,11 +15,12 @@ package org.flowable.engine.impl.agenda;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.HasExecutionListeners;
 import org.flowable.engine.FlowableEngineAgenda;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 
 /**
@@ -42,7 +43,7 @@ public abstract class AbstractOperation implements Runnable {
     public AbstractOperation(CommandContext commandContext, ExecutionEntity execution) {
         this.commandContext = commandContext;
         this.execution = execution;
-        this.agenda = commandContext.getAgenda();
+        this.agenda = CommandContextUtil.getAgenda(commandContext);
     }
 
     /**
@@ -73,7 +74,7 @@ public abstract class AbstractOperation implements Runnable {
      */
     protected void executeExecutionListeners(HasExecutionListeners elementWithExecutionListeners,
             ExecutionEntity executionEntity, String eventType) {
-        commandContext.getProcessEngineConfiguration().getListenerNotificationHelper()
+        CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper()
                 .executeExecutionListeners(elementWithExecutionListeners, executionEntity, eventType);
     }
 
@@ -81,7 +82,7 @@ public abstract class AbstractOperation implements Runnable {
      * Returns the first parent execution of the provided execution that is a scope.
      */
     protected ExecutionEntity findFirstParentScopeExecution(ExecutionEntity executionEntity) {
-        ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExecutionEntity parentScopeExecution = null;
         ExecutionEntity currentlyExaminedExecution = executionEntityManager.findById(executionEntity.getParentId());
         while (currentlyExaminedExecution != null && parentScopeExecution == null) {

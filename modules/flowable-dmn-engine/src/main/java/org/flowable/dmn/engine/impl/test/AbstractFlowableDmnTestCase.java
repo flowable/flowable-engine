@@ -23,12 +23,7 @@ import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.db.DbSqlSession;
-import org.flowable.dmn.engine.impl.interceptor.Command;
-import org.flowable.dmn.engine.impl.interceptor.CommandContext;
-import org.flowable.dmn.engine.impl.interceptor.CommandExecutor;
 import org.flowable.dmn.engine.test.DmnTestHelper;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.junit.Assert;
 
 import junit.framework.AssertionFailedError;
@@ -141,17 +136,6 @@ public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
             LOGGER.error(outputMessage.toString());
 
             LOGGER.info("dropping and recreating db");
-
-            CommandExecutor commandExecutor = dmnEngine.getDmnEngineConfiguration().getCommandExecutor();
-            CommandConfig config = new CommandConfig().transactionNotSupported();
-            commandExecutor.execute(config, new Command<Object>() {
-                public Object execute(CommandContext commandContext) {
-                    DbSqlSession session = commandContext.getDbSqlSession();
-                    session.dbSchemaDrop();
-                    session.dbSchemaCreate();
-                    return null;
-                }
-            });
 
             if (exception != null) {
                 throw exception;

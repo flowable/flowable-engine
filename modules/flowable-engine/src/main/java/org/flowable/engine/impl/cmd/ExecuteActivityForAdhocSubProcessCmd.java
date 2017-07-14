@@ -20,10 +20,10 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;
 
 /**
@@ -41,7 +41,7 @@ public class ExecuteActivityForAdhocSubProcessCmd implements Command<Execution>,
     }
 
     public Execution execute(CommandContext commandContext) {
-        ExecutionEntity execution = commandContext.getExecutionEntityManager().findById(executionId);
+        ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager(commandContext).findById(executionId);
         if (execution == null) {
             throw new FlowableObjectNotFoundException("No execution found for id '" + executionId + "'", ExecutionEntity.class);
         }
@@ -73,9 +73,9 @@ public class ExecuteActivityForAdhocSubProcessCmd implements Command<Execution>,
             throw new FlowableException("The requested activity with id " + activityId + " can not be enabled");
         }
 
-        ExecutionEntity activityExecution = Context.getCommandContext().getExecutionEntityManager().createChildExecution(execution);
+        ExecutionEntity activityExecution = CommandContextUtil.getExecutionEntityManager().createChildExecution(execution);
         activityExecution.setCurrentFlowElement(foundNode);
-        Context.getAgenda().planContinueProcessOperation(activityExecution);
+        CommandContextUtil.getAgenda().planContinueProcessOperation(activityExecution);
 
         return activityExecution;
     }

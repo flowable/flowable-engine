@@ -15,10 +15,10 @@ package org.flowable.engine.impl.webservice;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.webservice.BpmnInterface;
 import org.flowable.engine.impl.bpmn.webservice.BpmnInterfaceImplementation;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.util.ReflectUtil;
 
 /**
  * Represents a WS implementation of a {@link BpmnInterface}

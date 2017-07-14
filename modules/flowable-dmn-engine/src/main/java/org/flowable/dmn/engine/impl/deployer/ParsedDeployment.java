@@ -18,7 +18,7 @@ import java.util.Map;
 import org.flowable.dmn.engine.impl.parser.DmnParse;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
-import org.flowable.dmn.engine.impl.persistence.entity.ResourceEntity;
+import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntity;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnDefinition;
 
@@ -35,12 +35,12 @@ public class ParsedDeployment {
 
     protected List<DecisionTableEntity> decisionTables;
     protected Map<DecisionTableEntity, DmnParse> mapDecisionTablesToParses;
-    protected Map<DecisionTableEntity, ResourceEntity> mapDecisionTablesToResources;
+    protected Map<DecisionTableEntity, DmnResourceEntity> mapDecisionTablesToResources;
 
     public ParsedDeployment(
             DmnDeploymentEntity entity, List<DecisionTableEntity> decisionTables,
             Map<DecisionTableEntity, DmnParse> mapDecisionTablesToParses,
-            Map<DecisionTableEntity, ResourceEntity> mapDecisionTablesToResources) {
+            Map<DecisionTableEntity, DmnResourceEntity> mapDecisionTablesToResources) {
 
         this.deploymentEntity = entity;
         this.decisionTables = decisionTables;
@@ -56,7 +56,7 @@ public class ParsedDeployment {
         return decisionTables;
     }
 
-    public ResourceEntity getResourceForDecisionTable(DecisionTableEntity decisionTable) {
+    public DmnResourceEntity getResourceForDecisionTable(DecisionTableEntity decisionTable) {
         return mapDecisionTablesToResources.get(decisionTable);
     }
 

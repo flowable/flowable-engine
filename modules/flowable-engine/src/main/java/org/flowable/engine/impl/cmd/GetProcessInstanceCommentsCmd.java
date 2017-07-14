@@ -17,8 +17,9 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Comment;
 
 /**
@@ -42,10 +43,10 @@ public class GetProcessInstanceCommentsCmd implements Command<List<Comment>>, Se
     @SuppressWarnings("unchecked")
     public List<Comment> execute(CommandContext commandContext) {
         if (StringUtils.isNotBlank(type)) {
-            List<Comment> commentsByProcessInstanceId = commandContext.getCommentEntityManager().findCommentsByProcessInstanceId(processInstanceId, type);
+            List<Comment> commentsByProcessInstanceId = CommandContextUtil.getCommentEntityManager(commandContext).findCommentsByProcessInstanceId(processInstanceId, type);
             return commentsByProcessInstanceId;
         } else {
-            return commandContext.getCommentEntityManager().findCommentsByProcessInstanceId(processInstanceId);
+            return CommandContextUtil.getCommentEntityManager(commandContext).findCommentsByProcessInstanceId(processInstanceId);
         }
     }
 }

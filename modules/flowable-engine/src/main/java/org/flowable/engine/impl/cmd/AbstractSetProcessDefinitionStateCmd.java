@@ -21,11 +21,11 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.jobexecutor.JobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerChangeProcessDefinitionSuspensionStateJobHandler;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
@@ -34,6 +34,7 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManage
 import org.flowable.engine.impl.persistence.entity.SuspensionState;
 import org.flowable.engine.impl.persistence.entity.SuspensionState.SuspensionStateUtil;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -110,7 +111,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
         }
 
         List<ProcessDefinitionEntity> processDefinitionEntities = new ArrayList<ProcessDefinitionEntity>();
-        ProcessDefinitionEntityManager processDefinitionManager = commandContext.getProcessDefinitionEntityManager();
+        ProcessDefinitionEntityManager processDefinitionManager = CommandContextUtil.getProcessDefinitionEntityManager(commandContext);
 
         if (processDefinitionId != null) {
 
@@ -149,7 +150,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
             if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext))
                 continue;
 
-            TimerJobEntity timer = commandContext.getTimerJobEntityManager().create();
+            TimerJobEntity timer = CommandContextUtil.getTimerJobEntityManager(commandContext).create();
             timer.setJobType(JobEntity.JOB_TYPE_TIMER);
             timer.setProcessDefinitionId(processDefinition.getId());
 
@@ -161,7 +162,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
             timer.setDuedate(executionDate);
             timer.setJobHandlerType(getDelayedExecutionJobHandlerType());
             timer.setJobHandlerConfiguration(TimerChangeProcessDefinitionSuspensionStateJobHandler.createJobHandlerConfiguration(includeProcessInstances));
-            commandContext.getJobManager().scheduleTimerJob(timer);
+            CommandContextUtil.getJobManager(commandContext).scheduleTimerJob(timer);
         }
     }
 
@@ -174,7 +175,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
             SuspensionStateUtil.setSuspensionState(processDefinition, getProcessDefinitionSuspensionState());
 
             // Evict cache
-            commandContext.getProcessEngineConfiguration().getDeploymentManager().getProcessDefinitionCache().remove(processDefinition.getId());
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getDeploymentManager().getProcessDefinitionCache().remove(processDefinition.getId());
 
             // Suspend process instances (if needed)
             if (includeProcessInstances) {
@@ -200,10 +201,10 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
 
         if (SuspensionState.ACTIVE.equals(getProcessDefinitionSuspensionState())) {
             return new ProcessInstanceQueryImpl(commandContext).processDefinitionId(processDefinition.getId()).suspended()
-                    .listPage(currentPageStartIndex, commandContext.getProcessEngineConfiguration().getBatchSizeProcessInstances());
+                    .listPage(currentPageStartIndex, CommandContextUtil.getProcessEngineConfiguration(commandContext).getBatchSizeProcessInstances());
         } else {
             return new ProcessInstanceQueryImpl(commandContext).processDefinitionId(processDefinition.getId()).active()
-                    .listPage(currentPageStartIndex, commandContext.getProcessEngineConfiguration().getBatchSizeProcessInstances());
+                    .listPage(currentPageStartIndex, CommandContextUtil.getProcessEngineConfiguration(commandContext).getBatchSizeProcessInstances());
         }
     }
 

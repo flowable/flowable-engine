@@ -16,7 +16,7 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.impl.variable.CacheableVariable;
 import org.flowable.engine.impl.variable.JPAEntityListVariableType;
 import org.flowable.engine.impl.variable.JPAEntityVariableType;
