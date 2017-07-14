@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.cfg;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.ibatis.type.JdbcType;
@@ -25,6 +25,8 @@ import org.flowable.engine.impl.persistence.deploy.Deployer;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
 import org.flowable.idm.engine.impl.db.EntityDependencyOrder;
+import org.flowable.idm.engine.impl.persistence.ByteArrayRefTypeHandler;
+import org.flowable.idm.engine.impl.persistence.entity.ByteArrayRef;
 
 /**
  * @author Tijs Rademakers
@@ -51,15 +53,15 @@ public class IdmEngineConfigurator extends AbstractEngineConfigurator {
     
     @Override
     protected List<CustomMybatisTypeAliasConfig> getMybatisTypeAliases() {
-        return Arrays.asList(new CustomMybatisTypeAliasConfig("IdmByteArrayRefTypeHandler", org.flowable.idm.engine.impl.persistence.ByteArrayRefTypeHandler.class));
+        return Collections.singletonList(new CustomMybatisTypeAliasConfig("IdmByteArrayRefTypeHandler", ByteArrayRefTypeHandler.class));
     }
     
     @Override
     protected List<CustomMyBatisTypeHandlerConfig> getMybatisTypeHandlers() {
-        return Arrays.asList(new CustomMyBatisTypeHandlerConfig(
-                org.flowable.idm.engine.impl.persistence.entity.ByteArrayRef.class, 
-                JdbcType.VARCHAR, 
-                org.flowable.idm.engine.impl.persistence.ByteArrayRefTypeHandler.class));
+        return Collections.singletonList(new CustomMyBatisTypeHandlerConfig(
+                ByteArrayRef.class,
+                JdbcType.VARCHAR,
+                ByteArrayRefTypeHandler.class));
     }
     
     @Override

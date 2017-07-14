@@ -99,7 +99,7 @@ public class MessageBasedJobManager extends DefaultJobManager {
             });
             
         } else {
-            LOGGER.warn("Could not send message for job " + job.getId() + ": no transaction context active nor is it a history job");
+            LOGGER.warn("Could not send message for job {}: no transaction context active nor is it a history job", job.getId());
         }
     }
     

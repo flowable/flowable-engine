@@ -13,6 +13,8 @@
 
 package org.flowable.compatibility;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
@@ -48,7 +50,6 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.javax.el.PropertyNotFoundException;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
@@ -73,8 +74,6 @@ import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez

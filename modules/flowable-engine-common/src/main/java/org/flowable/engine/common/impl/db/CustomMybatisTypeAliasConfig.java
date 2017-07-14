@@ -12,8 +12,6 @@
  */
 package org.flowable.engine.common.impl.db;
 
-import org.apache.ibatis.type.JdbcType;
-
 /**
  * @author Joram Barrez
  */

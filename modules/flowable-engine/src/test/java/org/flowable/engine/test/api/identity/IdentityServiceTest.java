@@ -355,7 +355,7 @@ public class IdentityServiceTest extends PluggableFlowableTestCase {
             identityService.saveUser(user);
             User johndoe = identityService.createUserQuery().userId("johndoe").list().get(0);
             assertFalse(johndoe.getPassword().equals("xxx"));
-            assertTrue(johndoe.getFirstName().equals("John Doe"));
+            assertEquals("John Doe", johndoe.getFirstName());
             assertTrue(identityService.checkPassword("johndoe", "xxx"));
     
             user = identityService.createUserQuery().userId("johndoe").list().get(0);

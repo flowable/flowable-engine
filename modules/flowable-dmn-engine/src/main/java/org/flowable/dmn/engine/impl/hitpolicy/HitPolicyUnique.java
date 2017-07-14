@@ -13,7 +13,7 @@
 package org.flowable.dmn.engine.impl.hitpolicy;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +63,7 @@ public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleVa
                     }
                 }
             }
-            decisionResult = Arrays.asList(lastResult);
+            decisionResult = Collections.singletonList(lastResult);
             
         } else {
             decisionResult = ruleResults;
