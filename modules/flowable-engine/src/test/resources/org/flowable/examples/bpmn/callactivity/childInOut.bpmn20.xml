@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" targetNamespace="http://flowable.org/bpmn20"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL">
+
+    <process id="child" name="Child Process">
+
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
+        <userTask id="theTask" name="task 1" flowable:assignee="Bob">
+            <extensionElements>
+                <flowable:taskListener event="create" class="org.flowable.examples.bpmn.tasklistener.VariablesListener"/>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="flow2" sourceRef="theStart" targetRef="theEnd" />
+        <endEvent id="theEnd" />
+
+    </process>
+
+</definitions>
