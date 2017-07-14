@@ -14,15 +14,15 @@
 package org.flowable.engine.test.bpmn.subprocess;
 
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.io.InputStreamSource;
 import org.flowable.engine.common.impl.util.io.StreamSource;
+import org.flowable.engine.delegate.DelegateTask;
+import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.history.HistoricVariableInstance;
@@ -31,6 +31,7 @@ import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.examples.bpmn.tasklistener.VariablesListener;
 
 public class CallActivityTest extends ResourceFlowableTestCase {
 
@@ -44,6 +45,47 @@ public class CallActivityTest extends ResourceFlowableTestCase {
     public CallActivityTest() {
         super("org/flowable/standalone/parsing/encoding.flowable.cfg.xml");
     }
+
+    public void testCallActivityInOut() {
+        VariablesListener.messages.clear();
+        processEngine.getRepositoryService().createDeployment()
+            .addClasspathResource("org/flowable/examples/bpmn/callactivity/childInOut.bpmn20.xml")
+            .deploy();
+        Deployment parentDeployment = processEngine.getRepositoryService().createDeployment()
+            .addClasspathResource("org/flowable/examples/bpmn/callactivity/parentInOut.bpmn20.xml")
+            .deploy();
+        ProcessDefinition parentProcessDefinition = processEngine.getRepositoryService().createProcessDefinitionQuery()
+            .deploymentId(parentDeployment.getId())
+            .singleResult();
+        Map<String,String> variables = new HashMap<>();
+        variables.put("variableParent", "valueOfVariableParent");
+        processEngine.getFormService().submitStartFormData(
+            parentProcessDefinition.getId(),
+            variables
+        );
+        assertEquals(Arrays.asList("create: {variableChild=valueOfVariableParent}"), VariablesListener.messages);
+    }
+
+    public void testCallActivityIoSpecification() {
+        VariablesListener.messages.clear();
+        processEngine.getRepositoryService().createDeployment()
+            .addClasspathResource("org/flowable/examples/bpmn/callactivity/childInOut.bpmn20.xml")
+            .deploy();
+        Deployment parentDeployment = processEngine.getRepositoryService().createDeployment()
+            .addClasspathResource("org/flowable/examples/bpmn/callactivity/parentIoSpecification.bpmn20.xml")
+            .deploy();
+        ProcessDefinition parentProcessDefinition = processEngine.getRepositoryService().createProcessDefinitionQuery()
+            .deploymentId(parentDeployment.getId())
+            .singleResult();
+        Map<String,String> variables = new HashMap<>();
+        variables.put("variableParent", "valueOfVariableParent");
+        processEngine.getFormService().submitStartFormData(
+            parentProcessDefinition.getId(),
+            variables
+        );
+        assertEquals(Arrays.asList("create: {variableChild=valueOfVariableParent}"), VariablesListener.messages);
+    }
+
 
     public void testInstantiateProcessByMessage() throws Exception {
         BpmnModel messageTriggeredBpmnModel = loadBPMNModel(MESSAGE_TRIGGERED_PROCESS_RESOURCE);

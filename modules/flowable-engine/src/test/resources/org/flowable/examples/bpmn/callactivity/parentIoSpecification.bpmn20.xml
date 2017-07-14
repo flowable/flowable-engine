@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" targetNamespace="http://flowable.org/bpmn20"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL">
+
+    <process id="parent" name="Parent Process">
+        <property id="variableParent"/>
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="callActivity" />
+        <callActivity id="callActivity" calledElement="child">
+            <ioSpecification>
+                <dataInput id="variableChild" name="variableChild"/>
+                <inputSet>
+                    <dataInputRefs>variableChild</dataInputRefs>
+                </inputSet>
+                <outputSet/>
+            </ioSpecification>
+            <dataInputAssociation>
+                <sourceRef>variableParent</sourceRef>
+                <targetRef>variableChild</targetRef>
+            </dataInputAssociation>
+        </callActivity>
+        <sequenceFlow id="flow2" sourceRef="theStart" targetRef="theEnd" />
+        <endEvent id="theEnd" />
+    </process>
+
+</definitions>
