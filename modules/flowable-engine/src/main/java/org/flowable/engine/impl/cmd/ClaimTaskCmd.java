@@ -17,6 +17,7 @@ import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.flowable.engine.task.IdentityLinkType;
 
 /**
  * @author Joram Barrez
@@ -54,12 +55,20 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
                 commandContext.getTaskEntityManager().changeTaskAssignee(task, userId);
             }
             
+            commandContext.getHistoryManager().createUserIdentityLinkComment(taskId, userId, IdentityLinkType.ASSIGNEE, true);
+            
         } else {
-            // Task claim time should be null
-            task.setClaimTime(null);
-
-            // Task should be assigned to no one
-            commandContext.getTaskEntityManager().changeTaskAssignee(task, null);
+            if (task.getAssignee() != null) {
+                // Task claim time should be null
+                task.setClaimTime(null);
+                
+                String oldAssigneeId = task.getAssignee();
+    
+                // Task should be assigned to no one
+                commandContext.getTaskEntityManager().changeTaskAssignee(task, null);
+                
+                commandContext.getHistoryManager().createUserIdentityLinkComment(taskId, oldAssigneeId, IdentityLinkType.ASSIGNEE, true, true);
+            }
         }
 
         return null;

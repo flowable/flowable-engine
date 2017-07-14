@@ -13,8 +13,11 @@
 
 package org.flowable.engine.test.api.task;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
+import org.flowable.engine.history.HistoricIdentityLink;
 import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -31,6 +34,9 @@ import junit.framework.AssertionFailedError;
  * @author Falko Menge
  */
 public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
+    
+    private static final String IDENTITY_LINKS_PROCESS_BPMN20_XML = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml";
+    private static final String IDENTITY_LINKS_PROCESS = "IdentityLinksProcess";
 
     @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
     public void testCandidateUserLink() {
@@ -99,14 +105,178 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
     }
-
-    private Event findTaskEvent(List<Event> taskEvents, String action) {
-        for (Event event : taskEvents) {
-            if (action.equals(event.getAction())) {
-                return event;
-            }
+    
+    @Deployment(resources = IDENTITY_LINKS_PROCESS_BPMN20_XML)
+    public void testAssigneeIdentityLinkHistory() {
+        if (!HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            return;
         }
-        throw new AssertionFailedError("no task event found with action " + action);
+
+        runtimeService.startProcessInstanceByKey(IDENTITY_LINKS_PROCESS);
+
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+
+        taskService.setAssignee(taskId, "kermit");
+
+        assertEquals(1, taskService.getIdentityLinksForTask(taskId).size());
+
+        assertTaskEvent(taskId, 1, Event.ACTION_ADD_USER_LINK, "kermit", IdentityLinkType.ASSIGNEE);
+
+        taskService.setAssignee(taskId, null);
+
+        assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
+
+        assertTaskEvent(taskId, 2, Event.ACTION_DELETE_USER_LINK, "kermit", IdentityLinkType.ASSIGNEE);
+
+        List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
+        assertEquals(2, history.size());
+        
+        Collections.sort(history, new Comparator<HistoricIdentityLink>() {
+
+            @Override
+            public int compare(HistoricIdentityLink hi1, HistoricIdentityLink hi2) {
+               return hi1.getCreateTime().compareTo(hi2.getCreateTime());
+            }
+            
+        });
+        
+        HistoricIdentityLink assigned = history.get(0);
+        assertEquals(IdentityLinkType.ASSIGNEE, assigned.getType());
+        assertEquals("kermit", assigned.getUserId());
+        HistoricIdentityLink unassigned = history.get(1);
+        assertEquals(null, unassigned.getUserId());
+        assertEquals(IdentityLinkType.ASSIGNEE, unassigned.getType());
+        assertEquals(null, unassigned.getUserId());
+    }
+
+    @Deployment(resources = IDENTITY_LINKS_PROCESS_BPMN20_XML)
+    public void testClaimingIdentityLinkHistory() {
+        if (!HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            return;
+        }
+
+        runtimeService.startProcessInstanceByKey(IDENTITY_LINKS_PROCESS);
+
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+
+        taskService.claim(taskId, "kermit");
+
+        assertEquals(1, taskService.getIdentityLinksForTask(taskId).size());
+
+        assertTaskEvent(taskId, 1, Event.ACTION_ADD_USER_LINK, "kermit", IdentityLinkType.ASSIGNEE);
+
+        taskService.unclaim(taskId);
+
+        assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
+
+        assertTaskEvent(taskId, 2, Event.ACTION_DELETE_USER_LINK, "kermit", IdentityLinkType.ASSIGNEE);
+
+        List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
+        assertEquals(2, history.size());
+        
+        Collections.sort(history, new Comparator<HistoricIdentityLink>() {
+
+            @Override
+            public int compare(HistoricIdentityLink hi1, HistoricIdentityLink hi2) {
+               return hi1.getCreateTime().compareTo(hi2.getCreateTime());
+            }
+            
+        });
+        
+        HistoricIdentityLink assigned = history.get(0);
+        assertEquals(IdentityLinkType.ASSIGNEE, assigned.getType());
+        assertEquals("kermit", assigned.getUserId());
+        HistoricIdentityLink unassigned = history.get(1);
+        assertEquals(null, unassigned.getUserId());
+        assertEquals(IdentityLinkType.ASSIGNEE, unassigned.getType());
+        assertEquals(null, unassigned.getUserId());
+    }
+
+    @Deployment(resources = IDENTITY_LINKS_PROCESS_BPMN20_XML)
+    public void testOwnerIdentityLinkHistory() {
+        if (!HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            return;
+        }
+
+        runtimeService.startProcessInstanceByKey(IDENTITY_LINKS_PROCESS);
+
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+
+        taskService.setOwner(taskId, "kermit");
+
+        assertEquals(1, taskService.getIdentityLinksForTask(taskId).size());
+
+        assertTaskEvent(taskId, 1, Event.ACTION_ADD_USER_LINK, "kermit", IdentityLinkType.OWNER);
+
+        taskService.setOwner(taskId, null);
+
+        assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
+
+        assertTaskEvent(taskId, 2, Event.ACTION_DELETE_USER_LINK, "kermit", IdentityLinkType.OWNER);
+
+        List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
+        assertEquals(2, history.size());
+        Collections.sort(history, new Comparator<HistoricIdentityLink>() {
+
+            @Override
+            public int compare(HistoricIdentityLink hi1, HistoricIdentityLink hi2) {
+               return hi1.getCreateTime().compareTo(hi2.getCreateTime());
+            }
+            
+        });
+        
+        HistoricIdentityLink assigned = history.get(0);
+        assertEquals(IdentityLinkType.OWNER, assigned.getType());
+        assertEquals("kermit", assigned.getUserId());
+        HistoricIdentityLink unassigned = history.get(1);
+        assertEquals(null, unassigned.getUserId());
+        assertEquals(IdentityLinkType.OWNER, unassigned.getType());
+        assertEquals(null, unassigned.getUserId());
+    }
+    
+    @Deployment(resources = IDENTITY_LINKS_PROCESS_BPMN20_XML)
+    public void testUnchangedIdentityIdCreatesNoLinks() {
+        if (!HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            return;
+        }
+
+        runtimeService.startProcessInstanceByKey(IDENTITY_LINKS_PROCESS);
+
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+
+        // two claims in succession, one comment
+        taskService.claim(taskId, "kermit");
+        taskService.setAssignee(taskId, "kermit");
+
+        assertEquals(1, taskService.getIdentityLinksForTask(taskId).size());
+
+        assertTaskEvent(taskId, 1, Event.ACTION_ADD_USER_LINK, "kermit", IdentityLinkType.ASSIGNEE);
+
+        List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
+        assertEquals(1, history.size());
+        HistoricIdentityLink assigned = history.get(0);
+        assertEquals(IdentityLinkType.ASSIGNEE, assigned.getType());
+        assertEquals("kermit", assigned.getUserId());
+    }
+
+    @Deployment(resources = IDENTITY_LINKS_PROCESS_BPMN20_XML)
+    public void testNullIdentityIdCreatesNoLinks() {
+        if (!HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            return;
+        }
+
+        runtimeService.startProcessInstanceByKey(IDENTITY_LINKS_PROCESS);
+
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+
+        taskService.claim(taskId, null);
+        taskService.setAssignee(taskId, null);
+
+        assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
+
+        assertTaskEvent(taskId, 0, null, null, null);
+        List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
+        assertEquals(0, history.size());
     }
 
     @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
@@ -243,5 +413,32 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
                 assertEquals("kermit", userId);
             }
         }
+    }
+    
+    private void assertTaskEvent(String taskId, int expectedCount, String expectedAction,
+                    String expectedIdentityId, String expectedIdentityType) {
+        
+        List<Event> taskEvents = taskService.getTaskEvents(taskId);
+        assertEquals(expectedCount, taskEvents.size());
+
+        if (expectedCount == 0) {
+            return;
+        }
+
+        Event lastEvent = taskEvents.get(0);
+        assertEquals(expectedAction, lastEvent.getAction());
+        List<String> taskEventMessageParts = lastEvent.getMessageParts();
+        assertEquals(expectedIdentityId, taskEventMessageParts.get(0));
+        assertEquals(expectedIdentityType, taskEventMessageParts.get(1));
+        assertEquals(2, taskEventMessageParts.size());
+    }
+    
+    private Event findTaskEvent(List<Event> taskEvents, String action) {
+        for (Event event : taskEvents) {
+            if (action.equals(event.getAction())) {
+                return event;
+            }
+        }
+        throw new AssertionFailedError("no task event found with action " + action);
     }
 }

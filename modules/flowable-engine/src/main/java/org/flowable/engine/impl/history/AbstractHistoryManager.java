@@ -93,7 +93,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
             comment.setTime(getClock().getCurrentTime());
             comment.setTaskId(taskId);
             if (userId != null || forceNullUserId) {
-                if (create) {
+                if (create && !forceNullUserId) {
                     comment.setAction(Event.ACTION_ADD_USER_LINK);
                 } else {
                     comment.setAction(Event.ACTION_DELETE_USER_LINK);
@@ -127,7 +127,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
             comment.setTime(getClock().getCurrentTime());
             comment.setProcessInstanceId(processInstanceId);
             if (userId != null || forceNullUserId) {
-                if (create) {
+                if (create && !forceNullUserId) {
                     comment.setAction(Event.ACTION_ADD_USER_LINK);
                 } else {
                     comment.setAction(Event.ACTION_DELETE_USER_LINK);

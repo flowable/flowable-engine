@@ -72,14 +72,39 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
             return null;
         }
 
+        String oldAssigneeId = task.getAssignee();
+        String oldOwnerId = task.getOwner();
+        
         boolean assignedToNoOne = false;
         if (IdentityLinkType.ASSIGNEE.equals(identityType)) {
+            
+            if (oldAssigneeId == null && identityId == null) {
+                return null;
+            }
+            
+            if (oldAssigneeId != null && oldAssigneeId.equals(identityId)) {
+                return null;
+            }
+            
             commandContext.getTaskEntityManager().changeTaskAssignee(task, identityId);
             assignedToNoOne = identityId == null;
+            
         } else if (IdentityLinkType.OWNER.equals(identityType)) {
+            
+            if (oldOwnerId == null && identityId == null) {
+                return null;
+            }
+            
+            if (oldOwnerId != null && oldOwnerId.equals(identityId)) {
+                return null;
+            }
+            
             commandContext.getTaskEntityManager().changeTaskOwner(task, identityId);
+            assignedToNoOne = identityId == null;
+            
         } else if (IDENTITY_USER == identityIdType) {
             task.addUserIdentityLink(identityId, identityType);
+            
         } else if (IDENTITY_GROUP == identityIdType) {
             task.addGroupIdentityLink(identityId, identityType);
         }
@@ -89,7 +114,11 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
             // ACT-1317: Special handling when assignee is set to NULL, a
             // CommentEntity notifying of assignee-delete should be created
             forceNullUserId = true;
-
+            if (IdentityLinkType.ASSIGNEE.equals(identityType)) { 
+                identityId = oldAssigneeId;
+            } else {
+                identityId = oldOwnerId;
+            }
         }
 
         if (IDENTITY_USER == identityIdType) {
