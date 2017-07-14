@@ -58,6 +58,10 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
         getIdmIdentityService().saveUser(user);
     }
 
+    public void updateUserPassword(User user) {
+        getIdmIdentityService().updateUserPassword(user);
+    }
+
     public UserQuery createUserQuery() {
         return getIdmIdentityService().createUserQuery();
     }

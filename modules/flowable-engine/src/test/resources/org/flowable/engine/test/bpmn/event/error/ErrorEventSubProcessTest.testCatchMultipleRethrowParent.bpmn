@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <message id="globalError" name="Global error"></message>
+  <process id="helloWorldWithBothSubProcessTypes" name="Hello World With Both Sub Process Types" isExecutable="true">
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="subprocess1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <subProcess id="subprocess1" name="Sub Process">
+      <subProcess id="subprocess2" name="Embedded Sub Process">
+        <startEvent id="startevent3" name="Start"></startEvent>
+        <endEvent id="endevent3" name="End"></endEvent>
+        <serviceTask id="throwTask" name="Throw or not throw" activiti:class="org.flowable.engine.test.bpmn.event.error.ThrowingDelegate"></serviceTask>
+        <sequenceFlow id="flow15" sourceRef="startevent3" targetRef="throwTask"></sequenceFlow>
+        <sequenceFlow id="flow16" sourceRef="throwTask" targetRef="endevent3"></sequenceFlow>
+      </subProcess>
+      <startEvent id="startevent2" name="Start"></startEvent>
+      <sequenceFlow id="flow13" sourceRef="startevent2" targetRef="exclusivegateway2"></sequenceFlow>
+      <endEvent id="endevent2" name="End"></endEvent>
+      <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="endFlow"></exclusiveGateway>
+      <sequenceFlow id="flow14" sourceRef="subprocess2" targetRef="exclusivegateway1"></sequenceFlow>
+      <sequenceFlow id="endFlow" sourceRef="exclusivegateway1" targetRef="endevent2"></sequenceFlow>
+      <endEvent id="globalErrorEndevent" name="globalErrorEndevent">
+        <errorEventDefinition></errorEventDefinition>
+      </endEvent>
+      <sequenceFlow id="globalErrorFlow" sourceRef="exclusivegateway1" targetRef="globalErrorEndevent">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${globalError == true}]]></conditionExpression>
+      </sequenceFlow>
+      <boundaryEvent id="boundaryerror2" name="Error" attachedToRef="subprocess2">
+        <errorEventDefinition></errorEventDefinition>
+      </boundaryEvent>
+      <scriptTask id="localErrorHandlingTask" name="Local Error Handling Task" scriptFormat="javascript" activiti:autoStoreVariables="false">
+        <script><![CDATA[print("Local error handling - route to throw")]]></script>
+      </scriptTask>
+      <sequenceFlow id="flow17" sourceRef="boundaryerror2" targetRef="localErrorHandlingTask"></sequenceFlow>
+      <sequenceFlow id="flow18" sourceRef="localErrorHandlingTask" targetRef="globalErrorEndevent"></sequenceFlow>
+      <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway" default="embeddedSubprocessFlow"></exclusiveGateway>
+      <sequenceFlow id="embeddedSubprocessFlow" sourceRef="exclusivegateway2" targetRef="subprocess2"></sequenceFlow>
+      <callActivity id="callactivity1" name="Standalone subprocess" calledElement="standaloneSimpleSubprocess" activiti:inheritVariables="false">
+        <extensionElements>
+          <activiti:in source="localError" target="localError"></activiti:in>
+          <activiti:in source="globalError" target="globalError"></activiti:in>
+          <activiti:in source="localErrorWithoutCatch" target="localErrorWithoutCatch"></activiti:in>
+          <activiti:out source="globalError" target="globalError"></activiti:out>
+        </extensionElements>
+      </callActivity>
+      <sequenceFlow id="standaloneSubprocessFlow" sourceRef="exclusivegateway2" targetRef="callactivity1">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${standalone == true}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow21" sourceRef="callactivity1" targetRef="exclusivegateway1"></sequenceFlow>
+    </subProcess>
+    <sequenceFlow id="flow2" sourceRef="subprocess1" targetRef="endevent1"></sequenceFlow>
+    <boundaryEvent id="boundaryerror1" name="Error" attachedToRef="subprocess1">
+      <errorEventDefinition></errorEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow11" sourceRef="boundaryerror1" targetRef="endevent1"></sequenceFlow>
+  </process>
+</definitions>

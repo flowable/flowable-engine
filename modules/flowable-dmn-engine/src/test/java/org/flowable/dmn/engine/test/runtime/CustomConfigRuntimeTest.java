@@ -12,19 +12,21 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
-import java.util.HashMap;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertSame;
+
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
-import org.flowable.dmn.api.RuleEngineExecutionSingleResult;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -51,15 +53,16 @@ public class CustomConfigRuntimeTest {
         DmnEngine dmnEngine = activitiRule1.getDmnEngine();
         DmnRuleService ruleService = dmnEngine.getDmnRuleService();
 
-        Map<String, Object> processVariablesInput = new HashMap<String, Object>();
-
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
         LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
 
-        processVariablesInput.put("input1", localDate.toDate());
-        Map<String, Object> result = ruleService.executeDecisionByKeySingleResult("decision", processVariablesInput);
-        Assert.assertSame(String.class, result.get("output1").getClass());
-        Assert.assertEquals("test2", result.get("output1"));
+        Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
+                .decisionKey("decision")
+                .variable("input1", localDate.toDate())
+                .executeWithSingleResult();
+        
+        assertSame(String.class, result.get("output1").getClass());
+        assertEquals("test2", result.get("output1"));
     }
 
     @Test
@@ -69,15 +72,15 @@ public class CustomConfigRuntimeTest {
         DmnEngine dmnEngine = activitiRule2.getDmnEngine();
         DmnRuleService ruleService = dmnEngine.getDmnRuleService();
 
-        Map<String, Object> processVariablesInput = new HashMap<String, Object>();
-
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
         LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
 
-        processVariablesInput.put("input1", localDate.toDate());
-        RuleEngineExecutionSingleResult result = ruleService.executeDecisionByKeySingleResultWithAuditTrail("decision", processVariablesInput);
-
-        Assert.assertNull(result.getDecisionResult());
-        Assert.assertNotEquals(true, StringUtils.isEmpty(result.getAuditTrail().getRuleExecutions().get(2).getConditionResults().get(1).getException()));
+        DecisionExecutionAuditContainer result = ruleService.createExecuteDecisionBuilder()
+                .decisionKey("decision")
+                .variable("input1", localDate.toDate())
+                .executeWithAuditTrail();
+        
+        assertEquals(0, result.getDecisionResult().size());
+        assertNotEquals(true, StringUtils.isEmpty(result.getRuleExecutions().get(2).getConditionResults().iterator().next().getException()));
     }
 }

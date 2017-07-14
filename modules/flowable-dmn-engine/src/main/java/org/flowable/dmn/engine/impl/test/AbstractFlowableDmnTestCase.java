@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
@@ -50,6 +51,7 @@ public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
     protected DmnManagementService managementService;
     protected DmnRepositoryService repositoryService;
     protected DmnRuleService ruleService;
+    protected DmnHistoryService historyService;
 
     protected abstract void initializeDmnEngine();
 
@@ -62,6 +64,7 @@ public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
         managementService = null;
         repositoryService = null;
         ruleService = null;
+        historyService = null;
     }
 
     @Override
@@ -149,6 +152,7 @@ public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
         managementService = dmnEngine.getDmnManagementService();
         repositoryService = dmnEngine.getDmnRepositoryService();
         ruleService = dmnEngine.getDmnRuleService();
+        historyService = dmnEngine.getDmnHistoryService();
     }
 
 }

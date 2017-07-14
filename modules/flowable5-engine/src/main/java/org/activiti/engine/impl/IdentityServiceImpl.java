@@ -12,8 +12,6 @@
  */
 package org.activiti.engine.impl;
 
-import java.util.List;
-
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.identity.Authentication;
@@ -26,6 +24,8 @@ import org.flowable.idm.api.NativeUserQuery;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
+
+import java.util.List;
 
 /**
  * @author Tom Baeyens
@@ -54,6 +54,10 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
 
     public void saveUser(User user) {
         getIdmIdentityService().saveUser(user);
+    }
+
+    public void updateUserPassword(User user) {
+        getIdmIdentityService().updateUserPassword(user);
     }
 
     public UserQuery createUserQuery() {

@@ -529,14 +529,18 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
             for (ExecutionEntity childExecution : childExecutions) {
                 if (!childExecution.isDeleted()) {
                     collectedChildExecution.add(childExecution);
-                    collectChildren(childExecution, collectedChildExecution);
                 }
+                
+                collectChildren(childExecution, collectedChildExecution);
             }
         }
 
         ExecutionEntity subProcessInstance = executionEntity.getSubProcessInstance();
-        if (subProcessInstance != null && !subProcessInstance.isDeleted()) {
-            collectedChildExecution.add(subProcessInstance);
+        if (subProcessInstance != null) {
+            if (!subProcessInstance.isDeleted()) {
+                collectedChildExecution.add(subProcessInstance);
+            }
+            
             collectChildren(subProcessInstance, collectedChildExecution);
         }
     }

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -71,9 +72,10 @@ public class UserResource extends BaseUserResource {
         }
         if (userRequest.isPasswordChanged()) {
             user.setPassword(userRequest.getPassword());
+            identityService.updateUserPassword(user);
+        } else {
+            identityService.saveUser(user);
         }
-
-        identityService.saveUser(user);
 
         return restResponseFactory.createUserResponse(user, false);
     }

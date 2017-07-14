@@ -12,6 +12,7 @@
  */
 package org.flowable.dmn.engine;
 
+import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
@@ -35,6 +36,8 @@ public interface DmnEngine {
     DmnRepositoryService getDmnRepositoryService();
 
     DmnRuleService getDmnRuleService();
+    
+    DmnHistoryService getDmnHistoryService();
 
     DmnEngineConfiguration getDmnEngineConfiguration();
 }

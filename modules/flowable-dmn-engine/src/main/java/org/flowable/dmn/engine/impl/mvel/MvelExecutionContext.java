@@ -30,7 +30,6 @@ import org.mvel2.integration.PropertyHandler;
 public class MvelExecutionContext {
 
     protected Map<Integer, Map<String, Object>> ruleResults = new LinkedHashMap<>();
-    protected List<Map<String, Object>> decisionResults;
     protected Map<String, Object> stackVariables;
     protected ParserContext parserContext;
     protected Map<Class<?>, PropertyHandler> propertyHandlers = new HashMap<>();
@@ -60,11 +59,11 @@ public class MvelExecutionContext {
     }
 
     public void addRuleResult(int ruleNumber, String outputName, Object outputValue) {
-        Map ruleResult;
+        Map<String, Object> ruleResult;
         if (ruleResults.containsKey(ruleNumber)) {
             ruleResult = ruleResults.get(ruleNumber);
         } else {
-            ruleResult = new HashMap();
+            ruleResult = new HashMap<>();
             ruleResults.put(ruleNumber, ruleResult);
         }
         ruleResult.put(outputName, outputValue);
@@ -116,14 +115,6 @@ public class MvelExecutionContext {
 
     public void addOutputValues(String outputName, List<Object> outputValues) {
         this.outputValues.put(outputName, outputValues);
-    }
-
-    public void setDecisionResults(List<Map<String, Object>> decisionResults) {
-        this.decisionResults = decisionResults;
-    }
-
-    public List<Map<String, Object>> getDecisionResults() {
-        return decisionResults;
     }
 
     public BuiltinAggregator getAggregator() {

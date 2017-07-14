@@ -16,6 +16,7 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityManager;
+import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.db.DbSqlSession;
@@ -73,6 +74,14 @@ public class CommandContextUtil {
     
     public static DecisionTableEntityManager getDecisionTableEntityManager(CommandContext commandContext) {
         return getDmnEngineConfiguration(commandContext).getDecisionTableEntityManager();
+    }
+    
+    public static HistoricDecisionExecutionEntityManager getHistoricDecisionExecutionEntityManager() {
+        return getHistoricDecisionExecutionEntityManager(getCommandContext());
+    }
+    
+    public static HistoricDecisionExecutionEntityManager getHistoricDecisionExecutionEntityManager(CommandContext commandContext) {
+        return getDmnEngineConfiguration().getHistoricDecisionExecutionEntityManager();
     }
     
     public static CommandContext getCommandContext() {

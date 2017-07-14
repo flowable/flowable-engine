@@ -12,5 +12,6 @@
     	<property name="databaseSchema" value="@jdbc.schema@" />
     	
     	<property name="databaseSchemaUpdate" value="drop-create" />
+        <property name="historyEnabled" value="true" />
     </bean>
 </beans>

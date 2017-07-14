@@ -13,7 +13,6 @@
 package org.flowable.dmn.engine.impl.hitpolicy;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +55,7 @@ public class HitPolicyAny extends AbstractHitPolicy implements ComposeDecisionRe
 
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
         if (!ruleResults.isEmpty()) {
-            executionContext.setDecisionResults(Arrays.asList(ruleResults.get(ruleResults.size() - 1)));
+            executionContext.getAuditContainer().addDecisionResultObject(ruleResults.get(ruleResults.size() - 1));
         }
     }
 

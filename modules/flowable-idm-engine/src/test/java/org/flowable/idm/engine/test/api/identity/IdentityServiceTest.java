@@ -13,10 +13,6 @@
 
 package org.flowable.idm.engine.test.api.identity;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
@@ -24,7 +20,12 @@ import org.flowable.idm.api.Group;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.Token;
 import org.flowable.idm.api.User;
+import org.flowable.idm.engine.impl.authentication.ApacheDigester;
 import org.flowable.idm.engine.test.PluggableFlowableIdmTestCase;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Frederik Heremans
@@ -336,6 +337,35 @@ public class IdentityServiceTest extends PluggableFlowableIdmTestCase {
         assertFalse(idmIdentityService.checkPassword("userId", null));
         assertFalse(idmIdentityService.checkPassword(null, "passwd"));
         assertFalse(idmIdentityService.checkPassword(null, null));
+    }
+
+    public void testChangePassword() {
+
+        idmEngineConfiguration.setPasswordEncoder(new ApacheDigester(ApacheDigester.Digester.MD5));
+
+        User user = idmIdentityService.newUser("johndoe");
+        user.setPassword("xxx");
+        idmIdentityService.saveUser(user);
+
+        user = idmIdentityService.createUserQuery().userId("johndoe").list().get(0);
+        user.setFirstName("John Doe");
+        idmIdentityService.saveUser(user);
+        User johndoe = idmIdentityService.createUserQuery().userId("johndoe").list().get(0);
+        assertFalse(johndoe.getPassword().equals("xxx"));
+        assertTrue(johndoe.getFirstName().equals("John Doe"));
+        assertTrue(idmIdentityService.checkPassword("johndoe", "xxx"));
+
+        user = idmIdentityService.createUserQuery().userId("johndoe").list().get(0);
+        user.setPassword("yyy");
+        idmIdentityService.saveUser(user);
+        assertTrue(idmIdentityService.checkPassword("johndoe", "xxx"));
+
+        user = idmIdentityService.createUserQuery().userId("johndoe").list().get(0);
+        user.setPassword("yyy");
+        idmIdentityService.updateUserPassword(user);
+        assertTrue(idmIdentityService.checkPassword("johndoe", "yyy"));
+
+        idmIdentityService.deleteUser("johndoe");
     }
 
     public void testUserOptimisticLockingException() {

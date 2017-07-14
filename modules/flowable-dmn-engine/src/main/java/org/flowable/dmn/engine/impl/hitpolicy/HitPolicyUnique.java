@@ -51,7 +51,7 @@ public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleVa
 
     public void composeDecisionResults(MvelExecutionContext executionContext) {
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
-        List<Map<String, Object>> decisionResult;
+        List<Map<String, Object>> decisionResult = null;
 
         if (CommandContextUtil.getDmnEngineConfiguration().isStrictMode() == false) {
             Map<String, Object> lastResult = new HashMap<>();
@@ -64,10 +64,11 @@ public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleVa
                 }
             }
             decisionResult = Arrays.asList(lastResult);
+            
         } else {
             decisionResult = ruleResults;
         }
 
-        executionContext.setDecisionResults(decisionResult);
+        executionContext.getAuditContainer().setDecisionResult(decisionResult);
     }
 }

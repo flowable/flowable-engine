@@ -63,6 +63,12 @@ public class BPMNDIExport implements BpmnXMLConstants {
                         // the key is the element. the value is the collapsed subprocess.
                         collapsedSubProcessChildren.put(element.getId(), elementId);
                     }
+
+                    // include artifacts
+                    for (Artifact element : subProcess.getArtifacts()) {
+                        // the key is the element. the value is the collapsed subprocess.
+                        collapsedSubProcessChildren.put(element.getId(), elementId);
+                    }
                     collapsedSubProcessMap.put(elementId, subProcess);
                 }
             }
@@ -147,6 +153,18 @@ public class BPMNDIExport implements BpmnXMLConstants {
                     }
                 }
             }
+
+            for (Artifact child : collapsedSubProcess.getArtifacts()){
+                
+                if (child instanceof Association){
+                      createBpmnEdge(model,child.getId(),xtw);
+                  } else {
+                      GraphicInfo graphicInfo = model.getGraphicInfo(child.getId());
+                      if (graphicInfo != null) {
+                          createBpmnShape(model, child.getId(), xtw);
+                      }
+                  }
+              }
 
             xtw.writeEndElement();
             xtw.writeEndElement();

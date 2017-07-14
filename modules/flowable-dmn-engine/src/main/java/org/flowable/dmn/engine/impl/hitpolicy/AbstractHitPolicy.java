@@ -53,6 +53,6 @@ public abstract class AbstractHitPolicy implements ContinueEvaluatingBehavior, C
     @Override
     public void composeDecisionResults(MvelExecutionContext executionContext) {
         List<Map<String, Object>> decisionResults = new ArrayList<>(executionContext.getRuleResults().values());
-        executionContext.setDecisionResults(decisionResults);
+        executionContext.getAuditContainer().setDecisionResult(decisionResults);
     }
 }

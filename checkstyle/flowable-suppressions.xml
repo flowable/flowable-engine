@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC
+        "-//Puppy Crawl//DTD Suppressions 1.0//EN"
+        "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
+
+<suppressions>
+    <!-- Examples of suppressions -->
+    <!-- <suppress checks="JavadocStyleCheck"
+              files="GeneratedObject.java"
+              lines="50-9999"/> -->
+    <!-- <suppress files="TheClassToIgnore\.java" checks=".*"/> -->
+
+    <!-- Version 5 JUEL code -->
+    <suppress files=".*[\\/]activiti[\\/]engine[\\/]impl[\\/]juel[\\/].*" checks=".*" />
+
+    <!-- JSON code -->
+    <suppress files=".*[\\/]impl[\\/]util[\\/]json[\\/].*" checks=".*" />
+
+    <!-- Version 6 JUEL code -->
+    <suppress files=".*[\\/]odysseus[\\/].*" checks=".*" />
+</suppressions>

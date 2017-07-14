@@ -41,8 +41,11 @@ public class StandaloneRuntimeTest {
         inputVariables.put("inputVariable1", 2);
         inputVariables.put("inputVariable2", "test2");
 
-        Map<String, Object> result = dmnRuleService.executeDecisionByKeySingleResult("decision1", inputVariables);
-
+        Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variables(inputVariables)
+                .executeWithSingleResult();
+        
         Assert.assertEquals("result2", result.get("outputVariable1"));
     }
 }

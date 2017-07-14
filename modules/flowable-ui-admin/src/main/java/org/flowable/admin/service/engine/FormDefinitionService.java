@@ -32,7 +32,7 @@ public class FormDefinitionService {
     protected FlowableClientService clientUtil;
 
     public JsonNode listForms(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
-        URIBuilder builder = clientUtil.createUriBuilder("form-repository/forms");
+        URIBuilder builder = clientUtil.createUriBuilder("form-repository/form-definitions");
 
         for (String name : parameterMap.keySet()) {
             builder.addParameter(name, parameterMap.get(name)[0]);
@@ -43,11 +43,6 @@ public class FormDefinitionService {
 
     public JsonNode getForm(ServerConfig serverConfig, String formId) {
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "form-repository/form-definitions/" + formId));
-        return clientUtil.executeRequest(get, serverConfig);
-    }
-
-    public JsonNode getProcessDefinitionStartForm(ServerConfig serverConfig, String processDefinitionId) {
-        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "enterprise/process-definitions/" + processDefinitionId + "/start-form"));
         return clientUtil.executeRequest(get, serverConfig);
     }
 
