@@ -141,8 +141,8 @@ public class SubProcessMultiDiagramConverterTest extends AbstractConverterTest {
         assertEquals(1, subList.size());
     	Map<String, List<GraphicInfo>> multiMainEdgeMap = (Map<String, List<GraphicInfo>>) baseBpmnDI.get(process.getId()).get(ELEMENT_DI_EDGE);
     	Map<String, GraphicInfo> multiMainShapeMap = (Map<String, GraphicInfo>) baseBpmnDI.get(process.getId()).get(ELEMENT_DI_SHAPE);
-    	Map<String, List<GraphicInfo>> multiSubEdgeMap = (Map<String, List<GraphicInfo>>) baseBpmnDI.get(subList.get(0).getId()).get(ELEMENT_DI_EDGE);;
-    	Map<String, GraphicInfo> multiSubShapeMap = (Map<String, GraphicInfo>) baseBpmnDI.get(subList.get(0).getId()).get(ELEMENT_DI_SHAPE);
+    	Map<String, List<GraphicInfo>> multiSubEdgeMap = (Map<String, List<GraphicInfo>>) baseBpmnDI.get(subList.get(0).getId()).get(ELEMENT_DI_EDGE);
+        Map<String, GraphicInfo> multiSubShapeMap = (Map<String, GraphicInfo>) baseBpmnDI.get(subList.get(0).getId()).get(ELEMENT_DI_SHAPE);
 
     	assertEquals(4, multiMainEdgeMap.size());
     	assertEquals(5, multiMainShapeMap.size());
@@ -156,8 +156,9 @@ public class SubProcessMultiDiagramConverterTest extends AbstractConverterTest {
     	assertTrue(multiSubEdgeMap.containsKey("association2"));
 
     	// verify sequence flows/edges
-        List<GraphicInfo> info, diInfo;
-    	for (String id : flowLocationMap.keySet()) {
+        List<GraphicInfo> info;
+        List<GraphicInfo> diInfo;
+        for (String id : flowLocationMap.keySet()) {
     		info = new ArrayList<GraphicInfo>(flowLocationMap.get(id));
     		diInfo = multiMainEdgeMap.get(id);
     		// if not found in main process, must be in subprocess

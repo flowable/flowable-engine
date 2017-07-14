@@ -13,7 +13,7 @@
 package org.flowable.form.engine.configurator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.ibatis.type.JdbcType;
@@ -30,6 +30,8 @@ import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.deployer.FormDeployer;
 import org.flowable.form.engine.impl.cfg.StandaloneFormEngineConfiguration;
 import org.flowable.form.engine.impl.db.EntityDependencyOrder;
+import org.flowable.form.engine.impl.persistence.ResourceRefTypeHandler;
+import org.flowable.form.engine.impl.persistence.entity.ResourceRef;
 
 /**
  * @author Tijs Rademakers
@@ -58,14 +60,14 @@ public class FormEngineConfigurator extends AbstractEngineConfigurator {
     
     @Override
     protected List<CustomMybatisTypeAliasConfig> getMybatisTypeAliases() {
-        return Arrays.asList(new CustomMybatisTypeAliasConfig("ResourceRefTypeHandler", org.flowable.form.engine.impl.persistence.ResourceRefTypeHandler.class));
+        return Collections.singletonList(new CustomMybatisTypeAliasConfig("ResourceRefTypeHandler", ResourceRefTypeHandler.class));
     }
     
     @Override
     protected List<CustomMyBatisTypeHandlerConfig> getMybatisTypeHandlers() {
-        return Arrays.asList(new CustomMyBatisTypeHandlerConfig(org.flowable.form.engine.impl.persistence.entity.ResourceRef.class, 
-                JdbcType.VARCHAR, 
-                org.flowable.form.engine.impl.persistence.ResourceRefTypeHandler.class));
+        return Collections.singletonList(new CustomMyBatisTypeHandlerConfig(ResourceRef.class,
+                JdbcType.VARCHAR,
+                ResourceRefTypeHandler.class));
     }
 
     @Override

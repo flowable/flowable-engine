@@ -124,8 +124,8 @@ public class ErrorPropagation {
                     for (String refId : eventMap.keySet()) {
                         List<Event> events = eventMap.get(refId);
                         if (CollectionUtil.isNotEmpty(events) && events.get(0) instanceof StartEvent) {
-                            String refActivityId = refId.substring(0, refId.indexOf("#"));
-                            String refProcessDefinitionId = refId.substring(refId.indexOf("#") + 1);
+                            String refActivityId = refId.substring(0, refId.indexOf('#'));
+                            String refProcessDefinitionId = refId.substring(refId.indexOf('#') + 1);
                             if (parentExecution.getProcessDefinitionId().equals(refProcessDefinitionId) && 
                                             currentContainer.getFlowElement(refActivityId) != null) {
                                 

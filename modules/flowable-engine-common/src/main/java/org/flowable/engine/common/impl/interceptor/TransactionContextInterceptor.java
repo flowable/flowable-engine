@@ -15,7 +15,6 @@ package org.flowable.engine.common.impl.interceptor;
 
 import org.flowable.engine.common.impl.cfg.TransactionContext;
 import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
-import org.flowable.engine.common.impl.cfg.TransactionListener;
 import org.flowable.engine.common.impl.context.Context;
 
 /**

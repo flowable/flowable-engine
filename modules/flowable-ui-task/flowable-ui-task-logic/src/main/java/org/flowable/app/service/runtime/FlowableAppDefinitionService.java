@@ -15,6 +15,7 @@ package org.flowable.app.service.runtime;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,9 +172,7 @@ public class FlowableAppDefinitionService {
     protected List<String> convertToList(String commaSeperatedString) {
         List<String> resultList = new ArrayList<>();
         String[] stringArray = commaSeperatedString.split(",");
-        for (String value : stringArray) {
-            resultList.add(value);
-        }
+        resultList.addAll(Arrays.asList(stringArray));
         
         return resultList;
     }
