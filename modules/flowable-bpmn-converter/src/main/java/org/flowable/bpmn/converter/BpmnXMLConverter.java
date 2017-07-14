@@ -599,7 +599,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                 xtw.writeEndElement();
             }
 
-            MultiInstanceExport.writeMultiInstance(subProcess, xtw);
+            MultiInstanceExport.writeMultiInstance(subProcess, model, xtw);
 
             if (subProcess instanceof AdhocSubProcess) {
                 AdhocSubProcess adhocSubProcess = (AdhocSubProcess) subProcess;

@@ -213,7 +213,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
 
         if (baseElement instanceof Activity) {
             final Activity activity = (Activity) baseElement;
-            MultiInstanceExport.writeMultiInstance(activity, xtw);
+            MultiInstanceExport.writeMultiInstance(activity, model, xtw);
 
         }
 
