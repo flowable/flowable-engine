@@ -26,6 +26,39 @@
 
 <h1>Flowable Release Notes</h1>
 
+<h3>Release Notes - Flowable - 6.1.1</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+</ul>
+
+<h4>Upgrade notes</h4>
+
+<p>
+As a result of a refactoring that involved consolidating various classes and moving them to the <i>flowable-engine-common</i> module, following <i>internal</i> classes have changed packages.
+</p>
+
+<p>
+The following applies to all engines (process, dmn, form, content and idm):
+</p>
+
+<ul>
+    <li>The <i>CommandContext</i> class is now in the <i>org.flowable.engine.common.impl.interceptor</i> package.</li>
+    <li>The various getter methods on the <i>CommandContext</i> that gave quick-access to various internal components are removed 
+    (because the CommandContext is now shared between all engines). All engines now have a <i>CommandContextUtil</i> class that 
+    should be used instead and which has said getter methods. The <i>org.flowable.engine.impl.context.Context</i> utlity class 
+    in the process engine is still there for backwards compatibility and can be used as before, but simply delegates to the <i>CommandContextUtil</i> methods.</li>
+    <li>The classes related to the command stack interceptors (<i>Command</i>, <i>CommandContextInterceptor</i>, <i>CommandExecutor</i>, <i>Log/Jta/RetryInterceptor</i>) are now in the <i>org.flowable.engine.common.impl.interceptor</i> package.</li>
+    <li>The <i>DbSqlSession</i> and <i>DbSqlSessionFactory</i> classes are now found in the <i>org.flowable.engine.common.impl.db</i> package.</li>
+    <li>Database schema management logic has moved from the <i>DbSqlSession</i> class to implementations of the <i>org.flowable.engine.common.impl.db.DbSchemaManager</i> interface.</li>
+    <li>The <i>GenericManagerFactory</i> class is now in the <i>org.flowable.engine.common.impl.persistence</i> package.</li>
+</ul>
+
+<p>
+The process engine now has the <i>org.flowable.engine.impl.util.EngineServiceUtil</i> utility class that can be used to get easily access to the configuration and services of the other engines.
+</p>
+
 <h3>Release Notes - Flowable - 6.1.0</h3>
 
 <h4>Highlights</h4>
