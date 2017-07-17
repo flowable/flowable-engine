@@ -59,6 +59,7 @@ import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
 import org.flowable.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
 import org.flowable.idm.engine.impl.cfg.StandaloneInMemIdmEngineConfiguration;
 import org.flowable.idm.engine.impl.db.EntityDependencyOrder;
+import org.flowable.idm.engine.impl.db.IdmDbSchemaManager;
 import org.flowable.idm.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.ByteArrayEntityManagerImpl;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntityManager;
@@ -188,6 +189,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
         if (usingRelationalDatabase) {
             initDataSource();
+            initDbSchemaManager();
         }
 
         initBeans();
@@ -200,6 +202,12 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         initEntityManagers();
         initClock();
         initEventDispatcher();
+    }
+    
+    public void initDbSchemaManager() {
+        if (this.dbSchemaManager == null) {
+            this.dbSchemaManager = new IdmDbSchemaManager();
+        }
     }
 
     // services

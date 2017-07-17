@@ -15,6 +15,7 @@ package org.flowable.form.engine.impl.db;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.db.DbSchemaManager;
 import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
@@ -26,9 +27,9 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
-public class FormDbSchemaManager {
+public class FormDbSchemaManager implements DbSchemaManager {
     
-    public static void dbSchemaCreate() {
+    public void dbSchemaCreate() {
         Liquibase liquibase = createLiquibaseInstance();
         try {
             liquibase.update("form");
@@ -37,13 +38,19 @@ public class FormDbSchemaManager {
         }
     }
 
-    public static void dbSchemaDrop() {
+    public void dbSchemaDrop() {
         Liquibase liquibase = createLiquibaseInstance();
         try {
             liquibase.dropAll();
         } catch (Exception e) {
             throw new FlowableException("Error dropping form engine tables", e);
         }
+    }
+    
+    @Override
+    public String dbSchemaUpdate() {
+        dbSchemaCreate();
+        return null;
     }
 
     protected static Liquibase createLiquibaseInstance() {
@@ -69,7 +76,7 @@ public class FormDbSchemaManager {
             return liquibase;
 
         } catch (Exception e) {
-            throw new FlowableException("Error dropping form engine tables", e);
+            throw new FlowableException("Error creating liquibase instance", e);
         }
     }
 

@@ -19,6 +19,7 @@ import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.ProcessEngineImpl;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -31,7 +32,7 @@ public class DbSchemaUpdate {
         CommandConfig config = new CommandConfig().transactionNotSupported();
         commandExecutor.execute(config, new Command<Object>() {
             public Object execute(CommandContext commandContext) {
-                DbSchemaManager.dbSchemaUpdate();
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager().dbSchemaUpdate();
                 return null;
             }
         });

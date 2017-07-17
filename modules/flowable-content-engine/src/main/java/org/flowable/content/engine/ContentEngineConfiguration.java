@@ -36,6 +36,7 @@ import org.flowable.content.engine.impl.ContentServiceImpl;
 import org.flowable.content.engine.impl.ServiceImpl;
 import org.flowable.content.engine.impl.cfg.StandaloneContentEngineConfiguration;
 import org.flowable.content.engine.impl.cfg.StandaloneInMemContentEngineConfiguration;
+import org.flowable.content.engine.impl.db.ContentDbSchemaManager;
 import org.flowable.content.engine.impl.db.EntityDependencyOrder;
 import org.flowable.content.engine.impl.fs.SimpleFileSystemContentStorage;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntityManager;
@@ -149,6 +150,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
 
         if (usingRelationalDatabase) {
             initDataSource();
+            initDbSchemaManager();
             initDbSchema();
         }
 
@@ -215,6 +217,12 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
     }
 
     // data model ///////////////////////////////////////////////////////////////
+    
+    public void initDbSchemaManager() {
+        if (this.dbSchemaManager == null) {
+            this.dbSchemaManager = new ContentDbSchemaManager();
+        }
+    }
 
     public void initDbSchema() {
         try {

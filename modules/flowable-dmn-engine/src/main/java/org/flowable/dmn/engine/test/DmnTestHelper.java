@@ -23,9 +23,10 @@ import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.db.DmnDbSchemaManager;
 import org.flowable.dmn.engine.impl.deployer.ParsedDeploymentBuilder;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.db.DbSchemaManager;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -166,7 +167,9 @@ public abstract class DmnTestHelper {
             CommandConfig config = new CommandConfig().transactionNotSupported();
             commandExecutor.execute(config, new Command<Object>() {
                 public Object execute(CommandContext commandContext) {
-                    DmnDbSchemaManager.initSchema(dmnEngine.getDmnEngineConfiguration(), DmnEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE);
+                    DbSchemaManager dbSchemaManager = CommandContextUtil.getDmnEngineConfiguration().getDbSchemaManager();
+                    dbSchemaManager.dbSchemaDrop();
+                    dbSchemaManager.dbSchemaCreate();
                     return null;
                 }
             });

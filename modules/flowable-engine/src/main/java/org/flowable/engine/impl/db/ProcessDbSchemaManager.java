@@ -30,6 +30,7 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableWrongDbException;
+import org.flowable.engine.common.impl.db.DbSchemaManager;
 import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.util.IoUtil;
@@ -42,9 +43,9 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DbSchemaManager {
+public class ProcessDbSchemaManager implements DbSchemaManager {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(DbSchemaManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessDbSchemaManager.class);
     
     protected static final Pattern CLEAN_VERSION_REGEX = Pattern.compile("\\d\\.\\d*");
     
@@ -114,7 +115,7 @@ public class DbSchemaManager {
         FLOWABLE_VERSIONS.add(new FlowableVersion(ProcessEngine.VERSION));
     }
     
-    public static void dbSchemaCheckVersion() {
+    public void dbSchemaCheckVersion() {
         try {
             String dbVersion = getDbVersion();
             if (!ProcessEngine.VERSION.equals(dbVersion)) {
@@ -150,20 +151,20 @@ public class DbSchemaManager {
         LOGGER.debug("flowable db schema check successful");
     }
 
-    protected static String addMissingComponent(String missingComponents, String component) {
+    protected String addMissingComponent(String missingComponents, String component) {
         if (missingComponents == null) {
             return "Tables missing for component(s) " + component;
         }
         return missingComponents + ", " + component;
     }
 
-    protected static String getDbVersion() {
+    protected String getDbVersion() {
         DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
         String selectSchemaVersionStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.engine.impl.persistence.entity.PropertyEntityImpl.selectDbSchemaVersion");
         return (String) dbSqlSession.getSqlSession().selectOne(selectSchemaVersionStatement);
     }
 
-    public static void dbSchemaCreate() {
+    public void dbSchemaCreate() {
         if (isEngineTablePresent()) {
             String dbVersion = getDbVersion();
             if (!ProcessEngine.VERSION.equals(dbVersion)) {
@@ -178,34 +179,34 @@ public class DbSchemaManager {
         }
     }
 
-    protected static void dbSchemaCreateHistory() {
+    protected void dbSchemaCreateHistory() {
         executeMandatorySchemaResource("create", "history");
     }
 
-    protected static void dbSchemaCreateEngine() {
+    protected void dbSchemaCreateEngine() {
         executeMandatorySchemaResource("create", "engine");
     }
 
-    public static void dbSchemaDrop() {
+    public void dbSchemaDrop() {
         executeMandatorySchemaResource("drop", "engine");
         if (CommandContextUtil.getDbSqlSession().getDbSqlSessionFactory().isDbHistoryUsed()) {
             executeMandatorySchemaResource("drop", "history");
         }
     }
 
-    public static void dbSchemaPrune() {
+    public void dbSchemaPrune() {
         if (isHistoryTablePresent() && !CommandContextUtil.getDbSqlSession().getDbSqlSessionFactory().isDbHistoryUsed()) {
             executeMandatorySchemaResource("drop", "history");
         }
     }
 
-    public static void executeMandatorySchemaResource(String operation, String component) {
+    public void executeMandatorySchemaResource(String operation, String component) {
         executeSchemaResource(operation, component, getResourceForDbOperation(operation, operation, component), false);
     }
 
     public static String[] JDBC_METADATA_TABLE_TYPES = { "TABLE" };
 
-    public static String dbSchemaUpdate() {
+    public String dbSchemaUpdate() {
 
         String feedback = null;
         boolean isUpgradeNeeded = false;
@@ -272,7 +273,7 @@ public class DbSchemaManager {
     /**
      * Returns the index in the list of {@link #FLOWABLE_VERSIONS} matching the provided string version. Returns -1 if no match can be found.
      */
-    protected static int findMatchingVersionIndex(String dbVersion) {
+    protected int findMatchingVersionIndex(String dbVersion) {
         int index = 0;
         int matchingVersionIndex = -1;
         while (matchingVersionIndex < 0 && index < FLOWABLE_VERSIONS.size()) {
@@ -285,15 +286,15 @@ public class DbSchemaManager {
         return matchingVersionIndex;
     }
 
-    public static boolean isEngineTablePresent() {
+    public boolean isEngineTablePresent() {
         return isTablePresent("ACT_RU_EXECUTION");
     }
 
-    public static boolean isHistoryTablePresent() {
+    public boolean isHistoryTablePresent() {
         return isTablePresent("ACT_HI_PROCINST");
     }
 
-    public static boolean isTablePresent(String tableName) {
+    public boolean isTablePresent(String tableName) {
         // ACT-1610: in case the prefix IS the schema itself, we don't add the
         // prefix, since the check is already aware of the schema
         DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
@@ -348,7 +349,7 @@ public class DbSchemaManager {
         }
     }
 
-    protected static boolean isUpgradeNeeded(String versionInDatabase) {
+    protected boolean isUpgradeNeeded(String versionInDatabase) {
         if (ProcessEngine.VERSION.equals(versionInDatabase)) {
             return false;
         }
@@ -373,7 +374,7 @@ public class DbSchemaManager {
         return true;
     }
 
-    protected static String getCleanVersion(String versionString) {
+    protected String getCleanVersion(String versionString) {
         Matcher matcher = CLEAN_VERSION_REGEX.matcher(versionString);
         if (!matcher.find()) {
             throw new FlowableException("Illegal format for version: " + versionString);
@@ -389,11 +390,11 @@ public class DbSchemaManager {
         }
     }
 
-    protected static String prependDatabaseTablePrefix(String tableName) {
+    protected String prependDatabaseTablePrefix(String tableName) {
         return CommandContextUtil.getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix() + tableName;
     }
 
-    protected static void dbSchemaUpgrade(final String component, final int currentDatabaseVersionsIndex) {
+    protected void dbSchemaUpgrade(final String component, final int currentDatabaseVersionsIndex) {
         FlowableVersion version = FLOWABLE_VERSIONS.get(currentDatabaseVersionsIndex);
         String dbVersion = version.getMainVersion();
         LOGGER.info("upgrading flowable {} schema from {} to {}", component, dbVersion, ProcessEngine.VERSION);
@@ -415,12 +416,12 @@ public class DbSchemaManager {
         }
     }
 
-    public static String getResourceForDbOperation(String directory, String operation, String component) {
+    public String getResourceForDbOperation(String directory, String operation, String component) {
         String databaseType = CommandContextUtil.getDbSqlSession().getDbSqlSessionFactory().getDatabaseType();
         return "org/flowable/db/" + directory + "/flowable." + databaseType + "." + operation + "." + component + ".sql";
     }
 
-    public static void executeSchemaResource(String operation, String component, String resourceName, boolean isOptional) {
+    public void executeSchemaResource(String operation, String component, String resourceName, boolean isOptional) {
         InputStream inputStream = null;
         try {
             inputStream = ReflectUtil.getResourceAsStream(resourceName);
@@ -439,7 +440,7 @@ public class DbSchemaManager {
         }
     }
 
-    private static void executeSchemaResource(String operation, String component, String resourceName, InputStream inputStream) {
+    private void executeSchemaResource(String operation, String component, String resourceName, InputStream inputStream) {
         LOGGER.info("performing {} on {} with resource {}", operation, component, resourceName);
         String sqlStatement = null;
         String exceptionSqlStatement = null;
@@ -557,18 +558,18 @@ public class DbSchemaManager {
      * 
      * If using the DDL files directly (which is a sane choice in production env.), there is a distinction between MySQL version < 5.6.
      */
-    protected static String updateDdlForMySqlVersionLowerThan56(String ddlStatements) {
+    protected String updateDdlForMySqlVersionLowerThan56(String ddlStatements) {
         return ddlStatements.replace("timestamp(3)", "timestamp").replace("datetime(3)", "datetime").replace("TIMESTAMP(3)", "TIMESTAMP").replace("DATETIME(3)", "DATETIME");
     }
 
-    protected static String addSqlStatementPiece(String sqlStatement, String line) {
+    protected String addSqlStatementPiece(String sqlStatement, String line) {
         if (sqlStatement == null) {
             return line;
         }
         return sqlStatement + " \n" + line;
     }
 
-    protected static String readNextTrimmedLine(BufferedReader reader) throws IOException {
+    protected String readNextTrimmedLine(BufferedReader reader) throws IOException {
         String line = reader.readLine();
         if (line != null) {
             line = line.trim();
@@ -576,7 +577,7 @@ public class DbSchemaManager {
         return line;
     }
 
-    protected static boolean isMissingTablesException(Exception e) {
+    protected boolean isMissingTablesException(Exception e) {
         String exceptionMessage = e.getMessage();
         if (e.getMessage() != null) {
             // Matches message returned from H2
@@ -597,7 +598,7 @@ public class DbSchemaManager {
         return false;
     }
 
-    public static void performSchemaOperationsProcessEngineBuild() {
+    public void performSchemaOperationsProcessEngineBuild() {
         String databaseSchemaUpdate = CommandContextUtil.getProcessEngineConfiguration().getDatabaseSchemaUpdate();
         LOGGER.debug("Executing performSchemaOperationsProcessEngineBuild with setting {}", databaseSchemaUpdate);
         if (ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
@@ -619,7 +620,7 @@ public class DbSchemaManager {
         }
     }
 
-    public static void performSchemaOperationsProcessEngineClose() {
+    public void performSchemaOperationsProcessEngineClose() {
         String databaseSchemaUpdate = CommandContextUtil.getProcessEngineConfiguration().getDatabaseSchemaUpdate();
         if (org.flowable.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)) {
             dbSchemaDrop();

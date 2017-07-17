@@ -169,6 +169,7 @@ import org.flowable.engine.impl.cmd.ValidateV5EntitiesCmd;
 import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.impl.db.EntityDependencyOrder;
 import org.flowable.engine.impl.db.IbatisVariableTypeHandler;
+import org.flowable.engine.impl.db.ProcessDbSchemaManager;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
 import org.flowable.engine.impl.el.DefaultExpressionManager;
 import org.flowable.engine.impl.el.ExpressionManager;
@@ -862,6 +863,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         if (usingRelationalDatabase) {
             initDataSource();
+            initDbSchemaManager();
         }
 
         initHelpers();
@@ -1014,6 +1016,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         // Especially with executions, with 100 as default, this limit is passed.
         if (DATABASE_TYPE_MSSQL.equals(databaseType)) {
             maxNrOfStatementsInBulkInsert = DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER;
+        }
+    }
+    
+    public void initDbSchemaManager() {
+        if (this.dbSchemaManager == null) {
+            this.dbSchemaManager = new ProcessDbSchemaManager();
         }
     }
 

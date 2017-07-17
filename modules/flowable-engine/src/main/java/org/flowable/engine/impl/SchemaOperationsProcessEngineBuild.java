@@ -14,7 +14,8 @@ package org.flowable.engine.impl;
 
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.db.DbSchemaManager;
+import org.flowable.engine.impl.db.ProcessDbSchemaManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -23,7 +24,7 @@ import org.flowable.engine.impl.db.DbSchemaManager;
 public class SchemaOperationsProcessEngineBuild implements Command<Object> {
 
     public Object execute(CommandContext commandContext) {
-        DbSchemaManager.performSchemaOperationsProcessEngineBuild();
+        ((ProcessDbSchemaManager) CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager()).performSchemaOperationsProcessEngineBuild();
         return null;
     }
 }

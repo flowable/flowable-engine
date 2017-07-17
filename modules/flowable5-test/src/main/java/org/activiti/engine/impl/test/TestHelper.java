@@ -29,13 +29,14 @@ import org.activiti.engine.test.mock.NoOpServiceTasks;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.db.DbSchemaManager;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.db.DbSchemaManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -261,8 +262,9 @@ public abstract class TestHelper {
                     .getProcessEngineConfiguration().getCommandExecutor()
                     .execute(new Command<Object>() {
                         public Object execute(CommandContext commandContext) {
-                            DbSchemaManager.dbSchemaDrop();
-                            DbSchemaManager.dbSchemaCreate();
+                            DbSchemaManager dbSchemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager();
+                            dbSchemaManager.dbSchemaDrop();
+                            dbSchemaManager.dbSchemaCreate();
                             return null;
                         }
                     });

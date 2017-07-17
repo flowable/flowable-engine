@@ -14,7 +14,8 @@ package org.flowable.engine.impl;
 
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.db.DbSchemaManager;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.db.ProcessDbSchemaManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
@@ -24,8 +25,9 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 public class SchemaOperationProcessEngineClose implements Command<Void> {
 
     public Void execute(CommandContext commandContext) {
-        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).isUsingRelationalDatabase()) {
-            DbSchemaManager.performSchemaOperationsProcessEngineClose();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        if (processEngineConfiguration.isUsingRelationalDatabase()) {
+            ((ProcessDbSchemaManager) (processEngineConfiguration.getDbSchemaManager())).performSchemaOperationsProcessEngineClose();
         }
         return null;
     }
