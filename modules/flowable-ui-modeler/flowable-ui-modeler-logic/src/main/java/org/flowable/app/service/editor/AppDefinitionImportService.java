@@ -182,7 +182,7 @@ public class AppDefinitionImportService {
 
                     String modelFileName = null;
                     if (zipEntryName.contains("/")) {
-                        modelFileName = zipEntryName.substring(zipEntryName.indexOf("/") + 1);
+                        modelFileName = zipEntryName.substring(zipEntryName.indexOf('/') + 1);
                     } else {
                         modelFileName = zipEntryName;
                     }

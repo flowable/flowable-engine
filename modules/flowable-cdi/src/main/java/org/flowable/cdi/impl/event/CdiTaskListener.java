@@ -29,8 +29,6 @@ import org.flowable.cdi.impl.util.BeanManagerLookup;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;

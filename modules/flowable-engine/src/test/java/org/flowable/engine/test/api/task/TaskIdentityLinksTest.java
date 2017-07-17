@@ -145,9 +145,9 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         assertEquals(IdentityLinkType.ASSIGNEE, assigned.getType());
         assertEquals("kermit", assigned.getUserId());
         HistoricIdentityLink unassigned = history.get(1);
-        assertEquals(null, unassigned.getUserId());
+        assertNull(unassigned.getUserId());
         assertEquals(IdentityLinkType.ASSIGNEE, unassigned.getType());
-        assertEquals(null, unassigned.getUserId());
+        assertNull(unassigned.getUserId());
     }
 
     @Deployment(resources = IDENTITY_LINKS_PROCESS_BPMN20_XML)
@@ -189,9 +189,9 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         assertEquals(IdentityLinkType.ASSIGNEE, assigned.getType());
         assertEquals("kermit", assigned.getUserId());
         HistoricIdentityLink unassigned = history.get(1);
-        assertEquals(null, unassigned.getUserId());
+        assertNull(unassigned.getUserId());
         assertEquals(IdentityLinkType.ASSIGNEE, unassigned.getType());
-        assertEquals(null, unassigned.getUserId());
+        assertNull(unassigned.getUserId());
     }
 
     @Deployment(resources = IDENTITY_LINKS_PROCESS_BPMN20_XML)
@@ -232,9 +232,9 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         assertEquals(IdentityLinkType.OWNER, assigned.getType());
         assertEquals("kermit", assigned.getUserId());
         HistoricIdentityLink unassigned = history.get(1);
-        assertEquals(null, unassigned.getUserId());
+        assertNull(unassigned.getUserId());
         assertEquals(IdentityLinkType.OWNER, unassigned.getType());
-        assertEquals(null, unassigned.getUserId());
+        assertNull(unassigned.getUserId());
     }
     
     @Deployment(resources = IDENTITY_LINKS_PROCESS_BPMN20_XML)

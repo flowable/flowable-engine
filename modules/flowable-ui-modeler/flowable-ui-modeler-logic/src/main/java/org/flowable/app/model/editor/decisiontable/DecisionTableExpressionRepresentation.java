@@ -13,7 +13,6 @@
 package org.flowable.app.model.editor.decisiontable;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Yvo Swillens
