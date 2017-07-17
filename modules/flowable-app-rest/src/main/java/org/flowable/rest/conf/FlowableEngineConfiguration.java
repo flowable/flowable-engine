@@ -2,8 +2,10 @@ package org.flowable.rest.conf;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
+import org.flowable.content.spring.SpringContentEngineConfiguration;
 import org.flowable.content.spring.configurator.SpringContentEngineConfigurator;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnRepositoryService;
@@ -37,6 +39,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class FlowableEngineConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowableEngineConfiguration.class);
+    
+    protected static final String PROP_FS_ROOT = "contentstorage.fs.rootFolder";
+    protected static final String PROP_FS_CREATE_ROOT = "contentstorage.fs.createRoot";
 
     @Autowired
     protected DataSource dataSource;
@@ -91,10 +96,51 @@ public class FlowableEngineConfiguration {
         processEngineConfiguration.setTransactionManager(transactionManager);
         processEngineConfiguration.setAsyncExecutorActivate(Boolean.valueOf(environment.getProperty("engine.process.asyncexecutor.activate", "true")));
         processEngineConfiguration.setHistory(environment.getProperty("engine.process.history.level", "full"));
+        
+        String emailHost = environment.getProperty("email.host");
+        if (StringUtils.isNotEmpty(emailHost)) {
+            processEngineConfiguration.setMailServerHost(emailHost);
+            processEngineConfiguration.setMailServerPort(environment.getRequiredProperty("email.port", Integer.class));
+
+            Boolean useCredentials = environment.getProperty("email.useCredentials", Boolean.class);
+            if (Boolean.TRUE.equals(useCredentials)) {
+                processEngineConfiguration.setMailServerUsername(environment.getProperty("email.username"));
+                processEngineConfiguration.setMailServerPassword(environment.getProperty("email.password"));
+            }
+            
+            Boolean useSSL = environment.getProperty("email.useSSL", Boolean.class);
+            if (Boolean.TRUE.equals(useSSL)) {
+                processEngineConfiguration.setMailServerUseSSL(true);
+            }
+            
+            Boolean useTLS = environment.getProperty("email.useTLS", Boolean.class);
+            if (Boolean.TRUE.equals(useTLS)) {
+                processEngineConfiguration.setMailServerUseTLS(useTLS);
+            }
+        }
+
+        // Limit process definition cache
+        processEngineConfiguration.setProcessDefinitionCacheLimit(environment.getProperty("flowable.process-definitions.cache.max", Integer.class, 128));
+
+        // Enable safe XML. See http://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml
+        processEngineConfiguration.setEnableSafeBpmnXml(true);
 
         processEngineConfiguration.addConfigurator(new SpringFormEngineConfigurator());
         processEngineConfiguration.addConfigurator(new SpringDmnEngineConfigurator());
-        processEngineConfiguration.addConfigurator(new SpringContentEngineConfigurator());
+        
+        SpringContentEngineConfiguration contentEngineConfiguration = new SpringContentEngineConfiguration();
+        String contentRootFolder = environment.getProperty(PROP_FS_ROOT);
+        if (contentRootFolder != null) {
+            contentEngineConfiguration.setContentRootFolder(contentRootFolder);
+        }
+
+        Boolean createRootFolder = environment.getProperty(PROP_FS_CREATE_ROOT, Boolean.class);
+        if (createRootFolder != null) {
+            contentEngineConfiguration.setCreateContentRootFolder(createRootFolder);
+        }
+
+        SpringContentEngineConfigurator springContentEngineConfigurator = new SpringContentEngineConfigurator();
+        springContentEngineConfigurator.setContentEngineConfiguration(contentEngineConfiguration);
 
         return processEngineConfiguration;
     }

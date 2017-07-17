@@ -143,6 +143,16 @@ public class FlowableEngineConfiguration {
                 processEngineConfiguration.setMailServerUsername(environment.getProperty("email.username"));
                 processEngineConfiguration.setMailServerPassword(environment.getProperty("email.password"));
             }
+            
+            Boolean useSSL = environment.getProperty("email.useSSL", Boolean.class);
+            if (Boolean.TRUE.equals(useSSL)) {
+                processEngineConfiguration.setMailServerUseSSL(true);
+            }
+            
+            Boolean useTLS = environment.getProperty("email.useTLS", Boolean.class);
+            if (Boolean.TRUE.equals(useTLS)) {
+                processEngineConfiguration.setMailServerUseTLS(useTLS);
+            }
         }
 
         // Limit process definition cache
