@@ -15,7 +15,7 @@ package org.flowable.http.impl.handler;
 
 import java.util.List;
 
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.client.HttpClient;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.AbstractClassDelegate;
@@ -48,7 +48,7 @@ public class ClassDelegateHttpHandler extends AbstractClassDelegate implements H
     }
     
     @Override
-    public void handleHttpRequest(DelegateExecution execution, HttpRequest httpRequest, CloseableHttpClient client) {
+    public void handleHttpRequest(DelegateExecution execution, HttpRequest httpRequest, HttpClient client) {
         HttpRequestHandler httpRequestHandler = getHttpRequestHandlerInstance();
         CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new HttpRequestHandlerInvocation(httpRequestHandler, execution, httpRequest, client));
     }

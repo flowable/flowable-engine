@@ -12,7 +12,7 @@
  */
 package org.flowable.http.impl.delegate;
 
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.client.HttpClient;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.invocation.DelegateInvocation;
 import org.flowable.http.HttpRequest;
@@ -28,10 +28,10 @@ public class HttpRequestHandlerInvocation extends DelegateInvocation {
     protected final HttpRequestHandler httpRequestHandlerInstance;
     protected final DelegateExecution delegateExecution;
     protected final HttpRequest httpRequest;
-    protected final CloseableHttpClient client;
+    protected final HttpClient client;
 
     public HttpRequestHandlerInvocation(HttpRequestHandler httpRequestHandlerInstance, DelegateExecution delegateExecution,
-                    HttpRequest httpRequest, CloseableHttpClient client) {
+                    HttpRequest httpRequest, HttpClient client) {
         
         this.httpRequestHandlerInstance = httpRequestHandlerInstance;
         this.delegateExecution = delegateExecution;

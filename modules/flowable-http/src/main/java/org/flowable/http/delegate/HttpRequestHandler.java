@@ -15,7 +15,7 @@ package org.flowable.http.delegate;
 
 import java.io.Serializable;
 
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.client.HttpClient;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.http.HttpRequest;
 
@@ -24,5 +24,5 @@ import org.flowable.http.HttpRequest;
  */
 public interface HttpRequestHandler extends Serializable {
 
-    void handleHttpRequest(DelegateExecution execution, HttpRequest httpRequest, CloseableHttpClient client);
+    void handleHttpRequest(DelegateExecution execution, HttpRequest httpRequest, HttpClient client);
 }
