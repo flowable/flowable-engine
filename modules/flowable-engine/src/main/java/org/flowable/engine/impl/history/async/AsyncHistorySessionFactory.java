@@ -27,7 +27,7 @@ public class AsyncHistorySessionFactory implements SessionFactory {
 
     @Override
     public Session openSession(CommandContext commandContext) {
-        return new AsyncHistorySession((CommandContext) commandContext, asyncHistoryListener);
+        return new AsyncHistorySession(commandContext, asyncHistoryListener);
     }
     
     public AsyncHistoryListener getAsyncHistoryListener() {

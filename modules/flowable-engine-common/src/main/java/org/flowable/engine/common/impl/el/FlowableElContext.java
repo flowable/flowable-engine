@@ -15,7 +15,6 @@ package org.flowable.engine.common.impl.el;
 import java.util.List;
 
 import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
-import org.flowable.engine.common.impl.el.FlowableFunctionMapper;
 import org.flowable.engine.common.impl.javax.el.ELContext;
 import org.flowable.engine.common.impl.javax.el.ELResolver;
 import org.flowable.engine.common.impl.javax.el.FunctionMapper;

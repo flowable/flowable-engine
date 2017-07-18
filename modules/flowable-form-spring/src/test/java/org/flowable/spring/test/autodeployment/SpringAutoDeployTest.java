@@ -60,12 +60,12 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         createAppContext("org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml");
         List<FormDefinition> formDefinitions = repositoryService.createFormDefinitionQuery().orderByFormDefinitionKey().asc().list();
 
-        Set<String> formDefinitionKeys = new HashSet<String>();
+        Set<String> formDefinitionKeys = new HashSet<>();
         for (FormDefinition formDefinition : formDefinitions) {
             formDefinitionKeys.add(formDefinition.getKey());
         }
 
-        Set<String> expectedFormDefinitionKeys = new HashSet<String>();
+        Set<String> expectedFormDefinitionKeys = new HashSet<>();
         expectedFormDefinitionKeys.add("form1");
         expectedFormDefinitionKeys.add("form2");
 

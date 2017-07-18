@@ -44,7 +44,7 @@ public class StandaloneMybatisTransactionContext implements TransactionContext {
     protected Map<TransactionState, List<TransactionListener>> stateTransactionListeners;
 
     public StandaloneMybatisTransactionContext(CommandContext commandContext) {
-        this.commandContext = (CommandContext) commandContext;
+        this.commandContext = commandContext;
         this.dbSqlSession = Context.getCommandContext().getSession(DbSqlSession.class);
     }
 

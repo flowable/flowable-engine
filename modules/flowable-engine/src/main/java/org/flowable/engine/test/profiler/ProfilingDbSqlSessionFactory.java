@@ -24,7 +24,6 @@ public class ProfilingDbSqlSessionFactory extends DbSqlSessionFactory {
 
     @Override
     public Session openSession(CommandContext commandContext) {
-        CommandContext currentCommandContext = (CommandContext) commandContext;
-        return new ProfilingDbSqlSession(this, CommandContextUtil.getEntityCache(currentCommandContext));
+        return new ProfilingDbSqlSession(this, CommandContextUtil.getEntityCache(commandContext));
     }
 }
