@@ -42,10 +42,10 @@ public abstract class IdmEngines {
     public static final String NAME_DEFAULT = "default";
 
     protected static boolean isInitialized;
-    protected static Map<String, IdmEngine> idmEngines = new HashMap<String, IdmEngine>();
-    protected static Map<String, EngineInfo> idmEngineInfosByName = new HashMap<String, EngineInfo>();
-    protected static Map<String, EngineInfo> idmEngineInfosByResourceUrl = new HashMap<String, EngineInfo>();
-    protected static List<EngineInfo> idmEngineInfos = new ArrayList<EngineInfo>();
+    protected static Map<String, IdmEngine> idmEngines = new HashMap<>();
+    protected static Map<String, EngineInfo> idmEngineInfosByName = new HashMap<>();
+    protected static Map<String, EngineInfo> idmEngineInfosByResourceUrl = new HashMap<>();
+    protected static List<EngineInfo> idmEngineInfos = new ArrayList<>();
 
     /**
      * Initializes all idm engines that can be found on the classpath for resources <code>flowable.idm.cfg.xml</code> and for resources <code>flowable-idm-context.xml</code> (Spring style
@@ -55,7 +55,7 @@ public abstract class IdmEngines {
         if (!isInitialized()) {
             if (idmEngines == null) {
                 // Create new map to store idm engines if current map is null
-                idmEngines = new HashMap<String, IdmEngine>();
+                idmEngines = new HashMap<>();
             }
             ClassLoader classLoader = IdmEngines.class.getClassLoader();
             Enumeration<URL> resources = null;
@@ -67,7 +67,7 @@ public abstract class IdmEngines {
 
             // Remove duplicated configuration URL's using set. Some
             // classloaders may return identical URL's twice, causing duplicate startups
-            Set<URL> configUrls = new HashSet<URL>();
+            Set<URL> configUrls = new HashSet<>();
             while (resources.hasMoreElements()) {
                 configUrls.add(resources.nextElement());
             }
@@ -232,8 +232,8 @@ public abstract class IdmEngines {
      */
     public static synchronized void destroy() {
         if (isInitialized()) {
-            Map<String, IdmEngine> engines = new HashMap<String, IdmEngine>(idmEngines);
-            idmEngines = new HashMap<String, IdmEngine>();
+            Map<String, IdmEngine> engines = new HashMap<>(idmEngines);
+            idmEngines = new HashMap<>();
 
             for (String idmEngineName : engines.keySet()) {
                 IdmEngine idmEngine = engines.get(idmEngineName);

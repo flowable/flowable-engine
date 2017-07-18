@@ -34,7 +34,7 @@ import junit.framework.AssertionFailedError;
  */
 public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
 
-    private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = new ArrayList<String>();
+    private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = new ArrayList<>();
 
     static {
         TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_DMN_DATABASECHANGELOG");
@@ -44,7 +44,7 @@ public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
     protected DmnEngine dmnEngine;
 
     protected String deploymentIdFromDeploymentAnnotation;
-    protected List<String> deploymentIdsForAutoCleanup = new ArrayList<String>();
+    protected List<String> deploymentIdsForAutoCleanup = new ArrayList<>();
     protected Throwable exception;
 
     protected DmnEngineConfiguration dmnEngineConfiguration;

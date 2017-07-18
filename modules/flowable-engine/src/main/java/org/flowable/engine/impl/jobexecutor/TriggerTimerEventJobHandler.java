@@ -49,7 +49,7 @@ public class TriggerTimerEventJobHandler implements JobHandler {
         }
 
         if (execution.getCurrentFlowElement() instanceof BoundaryEvent) {
-            List<String> processedElements = new ArrayList<String>();
+            List<String> processedElements = new ArrayList<>();
             dispatchExecutionTimeOut(job, execution, processedElements, commandContext);
         }
     }

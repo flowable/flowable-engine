@@ -52,7 +52,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Users" }, description = "Manage Users", authorizations = { @Authorization(value = "basicAuth") })
 public class UserCollectionResource {
 
-    protected static HashMap<String, QueryProperty> properties = new HashMap<String, QueryProperty>();
+    protected static HashMap<String, QueryProperty> properties = new HashMap<>();
 
     static {
         properties.put("id", UserQueryProperty.USER_ID);

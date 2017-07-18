@@ -63,7 +63,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testTaskCompleteWithTransientVariables() {
-        Map<String, Object> persistentVars = new HashMap<String, Object>();
+        Map<String, Object> persistentVars = new HashMap<>();
         persistentVars.put("persistentVar1", "Hello World");
         persistentVars.put("persistentVar2", 987654321);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transientVarsTest", persistentVars);
@@ -72,7 +72,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertEquals("My Task", task.getName());
 
         persistentVars.clear();
-        Map<String, Object> transientVars = new HashMap<String, Object>();
+        Map<String, Object> transientVars = new HashMap<>();
         transientVars.put("unusedTransientVar", "Hello there");
         transientVars.put("transientVar", "OK");
         taskService.complete(task.getId(), persistentVars, transientVars);
@@ -92,7 +92,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testTaskResolveWithTransientVariables() {
-        Map<String, Object> persistentVars = new HashMap<String, Object>();
+        Map<String, Object> persistentVars = new HashMap<>();
         persistentVars.put("persistentVar1", "Hello World");
         persistentVars.put("persistentVar2", 987654321);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transientVarsTest", persistentVars);
@@ -101,7 +101,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertEquals("My Task", task.getName());
 
         persistentVars.clear();
-        Map<String, Object> transientVars = new HashMap<String, Object>();
+        Map<String, Object> transientVars = new HashMap<>();
         transientVars.put("unusedTransientVar", "Hello there");
         transientVars.put("transientVar", "OK");
         taskService.complete(task.getId(), persistentVars, transientVars);
@@ -360,7 +360,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
     public static class MergeVariableValues implements JavaDelegate {
         public void execute(DelegateExecution execution) {
             Map<String, Object> vars = execution.getVariables();
-            List<String> varNames = new ArrayList<String>(vars.keySet());
+            List<String> varNames = new ArrayList<>(vars.keySet());
             Collections.sort(varNames);
 
             StringBuilder strb = new StringBuilder();

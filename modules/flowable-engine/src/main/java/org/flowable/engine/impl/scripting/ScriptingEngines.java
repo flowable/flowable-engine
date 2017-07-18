@@ -49,7 +49,7 @@ public class ScriptingEngines {
 
     public ScriptingEngines(ScriptEngineManager scriptEngineManager) {
         this.scriptEngineManager = scriptEngineManager;
-        cachedEngines = new HashMap<String, ScriptEngine>();
+        cachedEngines = new HashMap<>();
     }
 
     public ScriptingEngines addScriptEngineFactory(ScriptEngineFactory scriptEngineFactory) {

@@ -61,7 +61,7 @@ public class JndiEmailTest extends SpringFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/spring/test/email/EmailTaskUsingJndi.bpmn20.xml" })
     public void testEmailUsingJndi() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("EmailJndiProcess", variables);
         assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
     }

@@ -125,7 +125,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         // process template-defined data objects
         subProcessInstance.setVariables(processDataObjects(subProcess.getDataObjects()));
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
 
         if (callActivity.isInheritVariables()) {
             Map<String, Object> executionVariables = execution.getVariables();
@@ -199,10 +199,10 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     }
 
     protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
-        Map<String, Object> variablesMap = new HashMap<String, Object>();
+        Map<String, Object> variablesMap = new HashMap<>();
         // convert data objects to process variables
         if (dataObjects != null) {
-            variablesMap = new HashMap<String, Object>(dataObjects.size());
+            variablesMap = new HashMap<>(dataObjects.size());
             for (ValuedDataObject dataObject : dataObjects) {
                 variablesMap.put(dataObject.getName(), dataObject.getValue());
             }

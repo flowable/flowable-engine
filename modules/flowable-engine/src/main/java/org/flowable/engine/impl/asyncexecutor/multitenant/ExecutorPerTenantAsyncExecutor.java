@@ -39,7 +39,7 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
     protected TenantInfoHolder tenantInfoHolder;
     protected TenantAwareAsyncExecutorFactory tenantAwareAyncExecutorFactory;
 
-    protected Map<String, AsyncExecutor> tenantExecutors = new HashMap<String, AsyncExecutor>();
+    protected Map<String, AsyncExecutor> tenantExecutors = new HashMap<>();
 
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
     protected boolean active;

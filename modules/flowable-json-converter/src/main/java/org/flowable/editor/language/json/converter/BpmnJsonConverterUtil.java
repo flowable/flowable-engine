@@ -504,7 +504,7 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
     }
 
     public static List<ValuedDataObject> convertJsonToDataProperties(JsonNode objectNode, BaseElement element) {
-        List<ValuedDataObject> dataObjects = new ArrayList<ValuedDataObject>();
+        List<ValuedDataObject> dataObjects = new ArrayList<>();
 
         if (objectNode != null) {
             if (objectNode.isValueNode() && StringUtils.isNotEmpty(objectNode.asText())) {

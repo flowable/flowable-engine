@@ -41,7 +41,7 @@ public class FormInstanceQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, FormInstanceQueryProperty> properties = new HashMap<String, FormInstanceQueryProperty>();
+    private static final Map<String, FormInstanceQueryProperty> properties = new HashMap<>();
 
     public static final FormInstanceQueryProperty SUBMITTED_DATE = new FormInstanceQueryProperty("RES.SUBMITTED_DATE_");
     public static final FormInstanceQueryProperty TENANT_ID = new FormInstanceQueryProperty("RES.TENANT_ID_");

@@ -53,7 +53,7 @@ public class HistoricTaskInstanceResponse {
     protected Date dueDate;
     protected String parentTaskId;
     protected String url;
-    protected List<RestVariable> variables = new ArrayList<RestVariable>();
+    protected List<RestVariable> variables = new ArrayList<>();
     protected String tenantId;
     protected String category;
 

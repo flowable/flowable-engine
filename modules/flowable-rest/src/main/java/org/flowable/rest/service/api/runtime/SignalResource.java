@@ -65,7 +65,7 @@ public class SignalResource {
 
         Map<String, Object> signalVariables = null;
         if (signalRequest.getVariables() != null) {
-            signalVariables = new HashMap<String, Object>();
+            signalVariables = new HashMap<>();
             for (RestVariable variable : signalRequest.getVariables()) {
                 if (variable.getName() == null) {
                     throw new FlowableIllegalArgumentException("Variable name is required.");

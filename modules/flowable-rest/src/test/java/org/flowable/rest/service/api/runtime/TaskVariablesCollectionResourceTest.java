@@ -55,7 +55,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         Calendar cal = Calendar.getInstance();
 
         // Start process with all types of variables
-        Map<String, Object> processVariables = new HashMap<String, Object>();
+        Map<String, Object> processVariables = new HashMap<>();
         processVariables.put("stringProcVar", "This is a ProcVariable");
         processVariables.put("intProcVar", 123);
         processVariables.put("longProcVar", 1234L);
@@ -70,7 +70,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         // Set local task variables, including one that has the same name as one
         // that is defined in the parent scope (process instance)
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        Map<String, Object> taskVariables = new HashMap<String, Object>();
+        Map<String, Object> taskVariables = new HashMap<>();
         taskVariables.put("stringTaskVar", "This is a TaskVariable");
         taskVariables.put("intTaskVar", 123);
         taskVariables.put("longTaskVar", 1234L);
@@ -226,7 +226,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
             InputStream binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
 
             // Add name, type and scope
-            Map<String, String> additionalFields = new HashMap<String, String>();
+            Map<String, String> additionalFields = new HashMap<>();
             additionalFields.put("name", "binaryVariable");
             additionalFields.put("type", "binary");
             additionalFields.put("scope", "local");
@@ -278,7 +278,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
             InputStream binaryContent = new ByteArrayInputStream(buffer.toByteArray());
 
             // Add name, type and scope
-            Map<String, String> additionalFields = new HashMap<String, String>();
+            Map<String, String> additionalFields = new HashMap<>();
             additionalFields.put("name", "serializableVariable");
             additionalFields.put("type", "serializable");
             additionalFields.put("scope", "local");
@@ -538,13 +538,13 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     @Deployment
     public void testDeleteAllLocalVariables() throws Exception {
         // Start process with all types of variables
-        Map<String, Object> processVariables = new HashMap<String, Object>();
+        Map<String, Object> processVariables = new HashMap<>();
         processVariables.put("var1", "This is a ProcVariable");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", processVariables);
 
         // Set local task variables
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        Map<String, Object> taskVariables = new HashMap<String, Object>();
+        Map<String, Object> taskVariables = new HashMap<>();
         taskVariables.put("var1", "This is a TaskVariable");
         taskVariables.put("var2", 123);
         taskService.setVariablesLocal(task.getId(), taskVariables);

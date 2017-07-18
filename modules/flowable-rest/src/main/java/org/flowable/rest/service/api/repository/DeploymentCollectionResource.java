@@ -59,7 +59,7 @@ public class DeploymentCollectionResource {
 
     protected static final String DEPRECATED_API_DEPLOYMENT_SEGMENT = "deployment";
 
-    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<String, QueryProperty>();
+    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();
 
     static {
         allowedSortProperties.put("id", DeploymentQueryProperty.DEPLOYMENT_ID);

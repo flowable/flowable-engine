@@ -31,7 +31,7 @@ public class BpmnEdgeParser implements BpmnXMLConstants {
     public void parse(XMLStreamReader xtr, BpmnModel model) throws Exception {
 
         String id = xtr.getAttributeValue(null, ATTRIBUTE_DI_BPMNELEMENT);
-        List<GraphicInfo> wayPointList = new ArrayList<GraphicInfo>();
+        List<GraphicInfo> wayPointList = new ArrayList<>();
         while (xtr.hasNext()) {
             xtr.next();
             if (xtr.isStartElement() && ELEMENT_DI_LABEL.equalsIgnoreCase(xtr.getLocalName())) {

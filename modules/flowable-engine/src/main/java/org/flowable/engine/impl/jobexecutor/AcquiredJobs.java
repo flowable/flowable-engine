@@ -23,8 +23,8 @@ import java.util.Set;
  */
 public class AcquiredJobs {
 
-    protected List<List<String>> acquiredJobBatches = new ArrayList<List<String>>();
-    protected Set<String> acquiredJobs = new HashSet<String>();
+    protected List<List<String>> acquiredJobBatches = new ArrayList<>();
+    protected Set<String> acquiredJobs = new HashSet<>();
 
     public List<List<String>> getJobIdBatches() {
         return acquiredJobBatches;

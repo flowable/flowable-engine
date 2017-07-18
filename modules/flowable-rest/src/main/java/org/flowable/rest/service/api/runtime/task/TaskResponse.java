@@ -59,7 +59,7 @@ public class TaskResponse {
     protected String processDefinitionId;
     protected String processDefinitionUrl;
 
-    protected List<RestVariable> variables = new ArrayList<RestVariable>();
+    protected List<RestVariable> variables = new ArrayList<>();
 
     public TaskResponse(Task task) {
         setId(task.getId());

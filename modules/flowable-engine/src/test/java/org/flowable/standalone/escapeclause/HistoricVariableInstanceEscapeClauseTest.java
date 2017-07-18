@@ -47,12 +47,12 @@ public class HistoricVariableInstanceEscapeClauseTest extends AbstractEscapeClau
                 .deploy()
                 .getId();
 
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("var%", "One%");
         processInstance1 = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", vars, "One%");
         runtimeService.setProcessInstanceName(processInstance1.getId(), "One%");
 
-        vars = new HashMap<String, Object>();
+        vars = new HashMap<>();
         vars.put("var_", "Two_");
         processInstance2 = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", vars, "Two_");
         runtimeService.setProcessInstanceName(processInstance2.getId(), "Two_");

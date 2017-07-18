@@ -132,7 +132,7 @@ public class DelegateHelper {
         if (flowElement instanceof TaskWithFieldExtensions) {
             return ((TaskWithFieldExtensions) flowElement).getFieldExtensions();
         }
-        return new ArrayList<FieldExtension>();
+        return new ArrayList<>();
     }
 
     public static List<FieldExtension> getListenerFields(DelegateExecution execution) {

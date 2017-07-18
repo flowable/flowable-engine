@@ -72,7 +72,7 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     }
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("startTime", startTime);
         persistentState.put("endTime", endTime);
         persistentState.put("businessKey", businessKey);
@@ -212,7 +212,7 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     }
 
     public Map<String, Object> getProcessVariables() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (HistoricVariableInstanceEntity variableInstance : queryVariables) {
                 if (variableInstance.getId() != null && variableInstance.getTaskId() == null) {

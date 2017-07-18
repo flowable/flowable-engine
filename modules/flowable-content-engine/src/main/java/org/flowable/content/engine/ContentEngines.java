@@ -42,10 +42,10 @@ public abstract class ContentEngines {
     public static final String NAME_DEFAULT = "default";
 
     protected static boolean isInitialized;
-    protected static Map<String, ContentEngine> contentEngines = new HashMap<String, ContentEngine>();
-    protected static Map<String, EngineInfo> contentEngineInfosByName = new HashMap<String, EngineInfo>();
-    protected static Map<String, EngineInfo> contentEngineInfosByResourceUrl = new HashMap<String, EngineInfo>();
-    protected static List<EngineInfo> contentEngineInfos = new ArrayList<EngineInfo>();
+    protected static Map<String, ContentEngine> contentEngines = new HashMap<>();
+    protected static Map<String, EngineInfo> contentEngineInfosByName = new HashMap<>();
+    protected static Map<String, EngineInfo> contentEngineInfosByResourceUrl = new HashMap<>();
+    protected static List<EngineInfo> contentEngineInfos = new ArrayList<>();
 
     /**
      * Initializes all dmn engines that can be found on the classpath for resources <code>flowable.content.cfg.xml</code> and for resources <code>flowable-dmn-context.xml</code> (Spring style
@@ -55,7 +55,7 @@ public abstract class ContentEngines {
         if (!isInitialized()) {
             if (contentEngines == null) {
                 // Create new map to store content engines if current map is null
-                contentEngines = new HashMap<String, ContentEngine>();
+                contentEngines = new HashMap<>();
             }
             ClassLoader classLoader = ContentEngines.class.getClassLoader();
             Enumeration<URL> resources = null;
@@ -67,7 +67,7 @@ public abstract class ContentEngines {
 
             // Remove duplicated configuration URL's using set. Some
             // classloaders may return identical URL's twice, causing duplicate startups
-            Set<URL> configUrls = new HashSet<URL>();
+            Set<URL> configUrls = new HashSet<>();
             while (resources.hasMoreElements()) {
                 configUrls.add(resources.nextElement());
             }
@@ -234,8 +234,8 @@ public abstract class ContentEngines {
      */
     public static synchronized void destroy() {
         if (isInitialized()) {
-            Map<String, ContentEngine> engines = new HashMap<String, ContentEngine>(contentEngines);
-            contentEngines = new HashMap<String, ContentEngine>();
+            Map<String, ContentEngine> engines = new HashMap<>(contentEngines);
+            contentEngines = new HashMap<>();
 
             for (String contentEngineName : engines.keySet()) {
                 ContentEngine contentEngine = engines.get(contentEngineName);

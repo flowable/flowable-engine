@@ -55,7 +55,7 @@ public class FindActiveActivityIdsCmd implements Command<List<String>>, Serializ
     }
 
     public List<String> findActiveActivityIds(ExecutionEntity executionEntity) {
-        List<String> activeActivityIds = new ArrayList<String>();
+        List<String> activeActivityIds = new ArrayList<>();
         collectActiveActivityIds(executionEntity, activeActivityIds);
         return activeActivityIds;
     }

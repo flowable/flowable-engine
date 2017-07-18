@@ -25,7 +25,7 @@ public class MapBusinessCalendarManager implements BusinessCalendarManager {
     private final Map<String, BusinessCalendar> businessCalendars;
 
     public MapBusinessCalendarManager() {
-        this.businessCalendars = new HashMap<String, BusinessCalendar>();
+        this.businessCalendars = new HashMap<>();
     }
 
     public MapBusinessCalendarManager(Map<String, BusinessCalendar> businessCalendars) {
@@ -33,7 +33,7 @@ public class MapBusinessCalendarManager implements BusinessCalendarManager {
             throw new IllegalArgumentException("businessCalendars can not be null");
         }
 
-        this.businessCalendars = new HashMap<String, BusinessCalendar>(businessCalendars);
+        this.businessCalendars = new HashMap<>(businessCalendars);
     }
 
     public BusinessCalendar getBusinessCalendar(String businessCalendarRef) {

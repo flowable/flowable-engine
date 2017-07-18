@@ -423,7 +423,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     }
 
     private Map<String, Object> createVariables(long count, String prefix) {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         for (int i = 0; i < count; i++) {
             vars.put(prefix + "_var0" + i, prefix + "+values0" + i);
         }

@@ -28,7 +28,7 @@ public class ExecutionQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, ExecutionQueryProperty> properties = new HashMap<String, ExecutionQueryProperty>();
+    private static final Map<String, ExecutionQueryProperty> properties = new HashMap<>();
 
     public static final ExecutionQueryProperty PROCESS_INSTANCE_ID = new ExecutionQueryProperty("RES.ID_");
     public static final ExecutionQueryProperty PROCESS_DEFINITION_KEY = new ExecutionQueryProperty("ProcessDefinitionKey");

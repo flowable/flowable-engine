@@ -31,7 +31,7 @@ import org.flowable.idm.engine.impl.persistence.entity.UserEntityManager;
 public class CommandContextUtil {
     
     public static IdmEngineConfiguration getIdmEngineConfiguration() {
-        return (IdmEngineConfiguration) getIdmEngineConfiguration(getCommandContext());
+        return getIdmEngineConfiguration(getCommandContext());
     }
     
     public static IdmEngineConfiguration getIdmEngineConfiguration(CommandContext commandContext) {

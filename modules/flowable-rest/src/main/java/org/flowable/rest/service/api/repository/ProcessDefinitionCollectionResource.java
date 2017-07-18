@@ -46,7 +46,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionCollectionResource {
 
-    private static final Map<String, QueryProperty> properties = new HashMap<String, QueryProperty>();
+    private static final Map<String, QueryProperty> properties = new HashMap<>();
 
     static {
         properties.put("id", ProcessDefinitionQueryProperty.PROCESS_DEFINITION_ID);

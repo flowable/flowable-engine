@@ -52,7 +52,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Groups" }, description = "Manage Groups", authorizations = { @Authorization(value = "basicAuth") })
 public class GroupCollectionResource {
 
-    protected static HashMap<String, QueryProperty> properties = new HashMap<String, QueryProperty>();
+    protected static HashMap<String, QueryProperty> properties = new HashMap<>();
 
     static {
         properties.put("id", GroupQueryProperty.GROUP_ID);

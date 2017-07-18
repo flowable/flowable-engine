@@ -46,7 +46,7 @@ public class GetExecutionsVariablesCmd implements Command<List<VariableInstance>
             throw new FlowableIllegalArgumentException("Set of executionIds is empty");
         }
 
-        List<VariableInstance> instances = new ArrayList<VariableInstance>();
+        List<VariableInstance> instances = new ArrayList<>();
         List<VariableInstanceEntity> entities = CommandContextUtil.getVariableInstanceEntityManager(commandContext).findVariableInstancesByExecutionIds(executionIds);
         for (VariableInstanceEntity entity : entities) {
             entity.getValue();

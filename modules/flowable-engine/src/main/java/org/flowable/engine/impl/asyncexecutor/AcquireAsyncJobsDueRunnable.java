@@ -110,7 +110,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
     }
 
     protected List<JobInfoEntity> offerJobs(AcquiredJobEntities acquiredJobs) {
-        List<JobInfoEntity> rejected = new ArrayList<JobInfoEntity>();
+        List<JobInfoEntity> rejected = new ArrayList<>();
         for (JobInfoEntity job : acquiredJobs.getJobs()) {
             boolean jobSuccessFullyOffered = asyncExecutor.executeAsyncJob(job);
             if (!jobSuccessFullyOffered) {

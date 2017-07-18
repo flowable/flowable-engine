@@ -24,7 +24,7 @@ public class TestVariableEventListener implements FlowableEventListener {
     private List<FlowableEvent> eventsReceived;
 
     public TestVariableEventListener() {
-        eventsReceived = new ArrayList<FlowableEvent>();
+        eventsReceived = new ArrayList<>();
     }
 
     public List<FlowableEvent> getEventsReceived() {

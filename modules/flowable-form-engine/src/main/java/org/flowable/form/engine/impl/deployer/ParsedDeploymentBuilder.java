@@ -42,9 +42,9 @@ public class ParsedDeploymentBuilder {
     }
 
     public ParsedDeployment build() {
-        List<FormDefinitionEntity> formDefinitions = new ArrayList<FormDefinitionEntity>();
-        Map<FormDefinitionEntity, FormDefinitionParse> formDefinitionToParseMap = new LinkedHashMap<FormDefinitionEntity, FormDefinitionParse>();
-        Map<FormDefinitionEntity, FormResourceEntity> formDefinitionToResourceMap = new LinkedHashMap<FormDefinitionEntity, FormResourceEntity>();
+        List<FormDefinitionEntity> formDefinitions = new ArrayList<>();
+        Map<FormDefinitionEntity, FormDefinitionParse> formDefinitionToParseMap = new LinkedHashMap<>();
+        Map<FormDefinitionEntity, FormResourceEntity> formDefinitionToResourceMap = new LinkedHashMap<>();
 
         for (FormResourceEntity resource : deployment.getResources().values()) {
             if (isFormResource(resource.getName())) {

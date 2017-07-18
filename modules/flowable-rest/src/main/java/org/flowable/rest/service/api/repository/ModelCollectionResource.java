@@ -47,7 +47,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Models" }, description = "Manage Models", authorizations = { @Authorization(value = "basicAuth") })
 public class ModelCollectionResource extends BaseModelResource {
 
-    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<String, QueryProperty>();
+    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();
 
     static {
         allowedSortProperties.put("id", ModelQueryProperty.MODEL_ID);

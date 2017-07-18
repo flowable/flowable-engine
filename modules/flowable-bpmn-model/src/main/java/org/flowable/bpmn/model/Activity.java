@@ -24,11 +24,11 @@ public abstract class Activity extends FlowNode {
     protected boolean forCompensation;
     protected MultiInstanceLoopCharacteristics loopCharacteristics;
     protected IOSpecification ioSpecification;
-    protected List<DataAssociation> dataInputAssociations = new ArrayList<DataAssociation>();
-    protected List<DataAssociation> dataOutputAssociations = new ArrayList<DataAssociation>();
-    protected List<BoundaryEvent> boundaryEvents = new ArrayList<BoundaryEvent>();
+    protected List<DataAssociation> dataInputAssociations = new ArrayList<>();
+    protected List<DataAssociation> dataOutputAssociations = new ArrayList<>();
+    protected List<BoundaryEvent> boundaryEvents = new ArrayList<>();
     protected String failedJobRetryTimeCycleValue;
-    protected List<MapExceptionEntry> mapExceptions = new ArrayList<MapExceptionEntry>();
+    protected List<MapExceptionEntry> mapExceptions = new ArrayList<>();
 
     public String getFailedJobRetryTimeCycleValue() {
         return failedJobRetryTimeCycleValue;
@@ -118,14 +118,14 @@ public abstract class Activity extends FlowNode {
             setIoSpecification(otherActivity.getIoSpecification().clone());
         }
 
-        dataInputAssociations = new ArrayList<DataAssociation>();
+        dataInputAssociations = new ArrayList<>();
         if (otherActivity.getDataInputAssociations() != null && !otherActivity.getDataInputAssociations().isEmpty()) {
             for (DataAssociation association : otherActivity.getDataInputAssociations()) {
                 dataInputAssociations.add(association.clone());
             }
         }
 
-        dataOutputAssociations = new ArrayList<DataAssociation>();
+        dataOutputAssociations = new ArrayList<>();
         if (otherActivity.getDataOutputAssociations() != null && !otherActivity.getDataOutputAssociations().isEmpty()) {
             for (DataAssociation association : otherActivity.getDataOutputAssociations()) {
                 dataOutputAssociations.add(association.clone());

@@ -23,7 +23,7 @@ public class TestFlowableEventListener implements FlowableEventListener {
     private List<FlowableEvent> eventsReceived;
 
     public TestFlowableEventListener() {
-        eventsReceived = new ArrayList<FlowableEvent>();
+        eventsReceived = new ArrayList<>();
     }
 
     public List<FlowableEvent> getEventsReceived() {

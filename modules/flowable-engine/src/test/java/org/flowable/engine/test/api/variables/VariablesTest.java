@@ -52,7 +52,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     }
 
     private Map<String, Object> generateVariables() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
 
         // 10 Strings
         for (int i = 0; i < 10; i++) {
@@ -508,7 +508,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals("localTaskVarValue", taskService.getVariableLocal(task.getId(), "localTaskVar"));
 
         // Override process variable
-        Collection<String> varNames = new ArrayList<String>();
+        Collection<String> varNames = new ArrayList<>();
         varNames.add("stringVar1");
         assertEquals("stringVarValue-1", taskService.getVariable(task.getId(), "stringVar1"));
         assertEquals("stringVarValue-1", taskService.getVariable(task.getId(), "stringVar1"));

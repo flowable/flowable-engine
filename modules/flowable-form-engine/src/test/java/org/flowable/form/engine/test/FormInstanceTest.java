@@ -33,7 +33,7 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
     public void submitSimpleForm() throws Exception {
         FormModel formModel = repositoryService.getFormModelByKey("form1");
 
-        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        Map<String, Object> valuesMap = new HashMap<>();
         valuesMap.put("input1", "test");
         Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formModel, valuesMap, "default");
         assertEquals("test", formValues.get("input1"));
@@ -57,7 +57,7 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
     public void submitDateForm() throws Exception {
         FormModel formDefinition = repositoryService.getFormModelByKey("dateform");
 
-        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        Map<String, Object> valuesMap = new HashMap<>();
         valuesMap.put("input1", "test");
         valuesMap.put("date1", "2016-01-01");
         valuesMap.put("date2", "2017-01-01");
@@ -83,7 +83,7 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         String taskId = "123456";
         FormModel formModel = repositoryService.getFormModelByKey("form1");
 
-        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        Map<String, Object> valuesMap = new HashMap<>();
         valuesMap.put("input1", "test");
         Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formModel, valuesMap, "default");
 
@@ -100,7 +100,7 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         assertEquals("input1", formField.getId());
         assertEquals("test", formField.getValue());
 
-        valuesMap = new HashMap<String, Object>();
+        valuesMap = new HashMap<>();
         valuesMap.put("input1", "updatedValue");
         formValues = formService.getVariablesFromFormSubmission(formModel, valuesMap, "updatedOutcome");
 

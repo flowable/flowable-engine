@@ -27,7 +27,7 @@ public class FormQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, FormQueryProperty> properties = new HashMap<String, FormQueryProperty>();
+    private static final Map<String, FormQueryProperty> properties = new HashMap<>();
 
     public static final FormQueryProperty FORM_DEFINITION_KEY = new FormQueryProperty("RES.KEY_");
     public static final FormQueryProperty FORM_CATEGORY = new FormQueryProperty("RES.CATEGORY_");

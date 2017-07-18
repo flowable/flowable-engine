@@ -65,7 +65,7 @@ public class DmnDeployer implements Deployer {
      */
     protected Map<DecisionTableEntity, DecisionTableEntity> getPreviousVersionsOfDecisionTables(ParsedDeployment parsedDeployment) {
 
-        Map<DecisionTableEntity, DecisionTableEntity> result = new LinkedHashMap<DecisionTableEntity, DecisionTableEntity>();
+        Map<DecisionTableEntity, DecisionTableEntity> result = new LinkedHashMap<>();
 
         for (DecisionTableEntity newDefinition : parsedDeployment.getAllDecisionTables()) {
             DecisionTableEntity existingDefinition = dmnDeploymentHelper.getMostRecentVersionOfDecisionTable(newDefinition);

@@ -102,7 +102,7 @@ public class FormDataResource {
             throw new FlowableIllegalArgumentException("The taskId or processDefinitionId property has to be provided");
         }
 
-        Map<String, String> propertyMap = new HashMap<String, String>();
+        Map<String, String> propertyMap = new HashMap<>();
         if (submitRequest.getProperties() != null) {
             for (RestFormProperty formProperty : submitRequest.getProperties()) {
                 propertyMap.put(formProperty.getId(), formProperty.getValue());

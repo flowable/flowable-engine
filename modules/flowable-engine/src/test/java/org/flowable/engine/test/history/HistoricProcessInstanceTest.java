@@ -175,7 +175,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKeyIn(Arrays.asList("undefined1", "undefined2")).count());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKey("businessKey123").count());
 
-        List<String> excludeIds = new ArrayList<String>();
+        List<String> excludeIds = new ArrayList<>();
         excludeIds.add("unexistingProcessDefinition");
 
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKeyNotIn(excludeIds).count());
@@ -275,7 +275,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().processDefinitionKey("oneTaskProcess").processDefinitionId("undefined").endOr().count());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessKey("businessKey123").processDefinitionId("undefined").endOr().count());
 
-        List<String> excludeIds = new ArrayList<String>();
+        List<String> excludeIds = new ArrayList<>();
         excludeIds.add("unexistingProcessDefinition");
 
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().processDefinitionKeyNotIn(excludeIds).processDefinitionId("undefined").endOr().count());
@@ -516,7 +516,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
 
         String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml").tenantId(tenantId).deploy().getId();
 
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("name", "Kermit");
         vars.put("age", 60);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", vars, tenantId);

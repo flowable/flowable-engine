@@ -31,7 +31,7 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
                 .addClasspathResource(DEPLOYMENT_FILE_PATH)
                 .deploy();
 
-        Map<String, Object> startMap = new HashMap<String, Object>();
+        Map<String, Object> startMap = new HashMap<>();
         startMap.put("test", 123);
         runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, startMap);
 

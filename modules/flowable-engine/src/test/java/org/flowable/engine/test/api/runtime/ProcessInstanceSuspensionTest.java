@@ -439,7 +439,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
         // Setting variables on the task should fail
         try {
-            HashMap<String, String> variables = new HashMap<String, String>();
+            HashMap<String, String> variables = new HashMap<>();
             variables.put("varOne", "one");
             variables.put("varTwo", "two");
             taskService.setVariables(task.getId(), variables);
@@ -450,7 +450,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
         // Setting variables on the task should fail
         try {
-            HashMap<String, String> variables = new HashMap<String, String>();
+            HashMap<String, String> variables = new HashMap<>();
             variables.put("varOne", "one");
             variables.put("varTwo", "two");
             taskService.setVariablesLocal(task.getId(), variables);

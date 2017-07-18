@@ -60,7 +60,7 @@ public class EventLogger implements FlowableEventListener {
     protected ObjectMapper objectMapper;
 
     // Mapping of type -> handler
-    protected Map<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>> eventHandlers = new HashMap<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>>();
+    protected Map<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>> eventHandlers = new HashMap<>();
 
     // Listeners for new events
     protected List<EventLoggerListener> listeners;
@@ -202,7 +202,7 @@ public class EventLogger implements FlowableEventListener {
 
     public void addEventLoggerListener(EventLoggerListener listener) {
         if (listeners == null) {
-            listeners = new ArrayList<EventLoggerListener>(1);
+            listeners = new ArrayList<>(1);
         }
         listeners.add(listener);
     }

@@ -159,7 +159,7 @@ public class SubProcessMultiDiagramConverterTest extends AbstractConverterTest {
         List<GraphicInfo> info;
         List<GraphicInfo> diInfo;
         for (String id : flowLocationMap.keySet()) {
-    		info = new ArrayList<GraphicInfo>(flowLocationMap.get(id));
+    		info = new ArrayList<>(flowLocationMap.get(id));
     		diInfo = multiMainEdgeMap.get(id);
     		// if not found in main process, must be in subprocess
     		if (diInfo == null) {

@@ -74,7 +74,7 @@ public class DeleteCommentCmd implements Command<Void>, Serializable {
 
         } else {
             // Delete all comments on a task of process
-            ArrayList<Comment> comments = new ArrayList<Comment>();
+            ArrayList<Comment> comments = new ArrayList<>();
             if (processInstanceId != null) {
 
                 ExecutionEntity execution = (ExecutionEntity) CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstanceId);

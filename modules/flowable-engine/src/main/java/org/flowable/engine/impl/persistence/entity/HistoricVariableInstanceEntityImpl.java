@@ -53,7 +53,7 @@ public class HistoricVariableInstanceEntityImpl extends AbstractEntity implement
 
     @Override
     public Object getPersistentState() {
-        HashMap<String, Object> persistentState = new HashMap<String, Object>();
+        HashMap<String, Object> persistentState = new HashMap<>();
 
         persistentState.put("name", name);
         persistentState.put("textValue", textValue);

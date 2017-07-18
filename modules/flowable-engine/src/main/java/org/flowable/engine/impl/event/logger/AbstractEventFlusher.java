@@ -23,7 +23,7 @@ import org.flowable.engine.impl.event.logger.handler.EventLoggerEventHandler;
  */
 public abstract class AbstractEventFlusher implements EventFlusher {
 
-    protected List<EventLoggerEventHandler> eventHandlers = new ArrayList<EventLoggerEventHandler>();
+    protected List<EventLoggerEventHandler> eventHandlers = new ArrayList<>();
 
     @Override
     public void closed(CommandContext commandContext) {

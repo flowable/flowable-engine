@@ -39,7 +39,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
 
     private static final String TEST_TENANT_ID = "myTenantId";
 
-    private List<String> autoCleanedUpDeploymentIds = new ArrayList<String>();
+    private List<String> autoCleanedUpDeploymentIds = new ArrayList<>();
 
     @Override
     protected void setUp() throws Exception {

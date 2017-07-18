@@ -45,7 +45,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
 
     @Deployment
     public void testGetFormData() throws Exception {
-        Map<String, Object> variableMap = new HashMap<String, Object>();
+        Map<String, Object> variableMap = new HashMap<>();
         variableMap.put("SpeakerName", "John Doe");
         Address address = new Address();
         variableMap.put("address", address);
@@ -58,7 +58,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertEquals(7, responseNode.get("formProperties").size());
-        Map<String, JsonNode> mappedProperties = new HashMap<String, JsonNode>();
+        Map<String, JsonNode> mappedProperties = new HashMap<>();
         for (JsonNode propNode : responseNode.get("formProperties")) {
             mappedProperties.put(propNode.get("id").asText(), propNode);
         }
@@ -136,7 +136,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
         assertFalse(propNode.get("required").asBoolean());
         JsonNode enumValues = propNode.get("enumValues");
         assertEquals(4, enumValues.size());
-        Map<String, String> mappedEnums = new HashMap<String, String>();
+        Map<String, String> mappedEnums = new HashMap<>();
         for (JsonNode enumNode : enumValues) {
             mappedEnums.put(enumNode.get("id").asText(), enumNode.get("name").asText());
         }
@@ -184,7 +184,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
 
     @Deployment
     public void testSubmitFormData() throws Exception {
-        Map<String, Object> variableMap = new HashMap<String, Object>();
+        Map<String, Object> variableMap = new HashMap<>();
         variableMap.put("SpeakerName", "John Doe");
         Address address = new Address();
         variableMap.put("address", address);
@@ -219,7 +219,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         assertNull(processInstance);
         List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).list();
-        Map<String, HistoricVariableInstance> historyMap = new HashMap<String, HistoricVariableInstance>();
+        Map<String, HistoricVariableInstance> historyMap = new HashMap<>();
         for (HistoricVariableInstance historicVariableInstance : variables) {
             historyMap.put(historicVariableInstance.getVariableName(), historicVariableInstance);
         }

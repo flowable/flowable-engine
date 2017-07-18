@@ -81,7 +81,7 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> extends Abs
     @SuppressWarnings("unchecked")
     protected List<EntityImpl> getList(String dbQueryName, Object parameter) {
         Collection<EntityImpl> result = getDbSqlSession().selectList(dbQueryName, parameter);
-        return new ArrayList<EntityImpl>(result);
+        return new ArrayList<>(result);
     }
 
 }

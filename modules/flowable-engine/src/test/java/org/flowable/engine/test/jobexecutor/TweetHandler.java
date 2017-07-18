@@ -23,7 +23,7 @@ import org.junit.Assert;
 
 public class TweetHandler implements JobHandler {
 
-    List<String> messages = new ArrayList<String>();
+    List<String> messages = new ArrayList<>();
 
     public String getType() {
         return "tweet";

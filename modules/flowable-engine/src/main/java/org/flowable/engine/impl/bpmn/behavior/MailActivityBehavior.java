@@ -80,8 +80,8 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
             String textStr = textVar == null ? getStringFromField(text, execution) : getStringFromField(getExpression(execution, textVar), execution);
             String htmlStr = htmlVar == null ? getStringFromField(html, execution) : getStringFromField(getExpression(execution, htmlVar), execution);
             String charSetStr = getStringFromField(charset, execution);
-            List<File> files = new LinkedList<File>();
-            List<DataSource> dataSources = new LinkedList<DataSource>();
+            List<File> files = new LinkedList<>();
+            List<DataSource> dataSources = new LinkedList<>();
             getFilesFromFields(attachments, execution, files, dataSources);
 
             email = createEmail(textStr, htmlStr, attachmentsExist(files, dataSources));

@@ -36,7 +36,7 @@ public class ScriptBindings implements Bindings {
      * 
      * This list contains the keywords for JUEL, Javascript and Groovy.
      */
-    protected static final Set<String> UNSTORED_KEYS = new HashSet<String>(Arrays.asList("out", "out:print", "lang:import", "context", "elcontext", "print", "println", "nashorn.global"));
+    protected static final Set<String> UNSTORED_KEYS = new HashSet<>(Arrays.asList("out", "out:print", "lang:import", "context", "elcontext", "print", "println", "nashorn.global"));
 
     protected List<Resolver> scriptResolvers;
     protected VariableScope variableScope;

@@ -352,7 +352,7 @@ public class BPMNLayout extends mxGraphLayout {
      */
     protected TreeNode dfs(Object cell, Object parent, Set<Object> visited) {
         if (visited == null) {
-            visited = new HashSet<Object>();
+            visited = new HashSet<>();
         }
 
         TreeNode node = null;

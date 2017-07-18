@@ -52,7 +52,7 @@ public class SpringJmsTest {
                 .addClasspathResource("org/flowable/test/spring/executor/jms/SpringJmsTest.testMessageQueueAsyncExecutor.bpmn20.xml")
                 .deploy();
 
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("input1", 123);
         vars.put("input2", 456);
         processEngine.getRuntimeService().startProcessInstanceByKey("AsyncProcess", vars);

@@ -109,7 +109,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String locale;
     protected boolean withLocalizationFallback;
     protected boolean orActive;
-    protected List<TaskQueryImpl> orQueryObjects = new ArrayList<TaskQueryImpl>();
+    protected List<TaskQueryImpl> orQueryObjects = new ArrayList<>();
     protected TaskQueryImpl currentOrQueryObject;
 
     private List<String> cachedCandidateGroups;
@@ -213,7 +213,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
 
         final int nameListSize = nameList.size();
-        final List<String> caseIgnoredNameList = new ArrayList<String>(nameListSize);
+        final List<String> caseIgnoredNameList = new ArrayList<>(nameListSize);
         for (String name : nameList) {
             caseIgnoredNameList.add(name.toLowerCase());
         }
@@ -1139,7 +1139,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public List<String> getCandidateGroups() {
         if (candidateGroup != null) {
-            List<String> candidateGroupList = new ArrayList<String>(1);
+            List<String> candidateGroupList = new ArrayList<>(1);
             candidateGroupList.add(candidateGroup);
             return candidateGroupList;
 

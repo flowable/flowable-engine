@@ -215,7 +215,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
         // -----------------------------------------------------------------------------
         // Simple test, Start process with JPA entities as variables
         // -----------------------------------------------------------------------------
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("simpleEntityFieldAccess", simpleEntityFieldAccess);
         variables.put("simpleEntityPropertyAccess", simpleEntityPropertyAccess);
         variables.put("subclassFieldAccess", subclassFieldAccess);
@@ -269,7 +269,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
         // Test all allowed types of ID values
         // -----------------------------------------------------------------------------
 
-        variables = new HashMap<String, Object>();
+        variables = new HashMap<>();
         variables.put("byteIdJPAEntity", byteIdJPAEntity);
         variables.put("shortIdJPAEntity", shortIdJPAEntity);
         variables.put("integerIdJPAEntity", integerIdJPAEntity);
@@ -341,7 +341,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
         // -----------------------------------------------------------------------------
         // Simple test, Start process with lists of JPA entities as variables
         // -----------------------------------------------------------------------------
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("simpleEntityFieldAccess", Arrays.asList(simpleEntityFieldAccess, simpleEntityFieldAccess, simpleEntityFieldAccess));
         variables.put("simpleEntityPropertyAccess", Arrays.asList(simpleEntityPropertyAccess, simpleEntityPropertyAccess, simpleEntityPropertyAccess));
         variables.put("subclassFieldAccess", Arrays.asList(subclassFieldAccess, subclassFieldAccess, subclassFieldAccess));
@@ -391,7 +391,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
         // Test using mixed JPA-entities which are not serializable, should not
         // be picked up by JPA list type en therefor fail
         // due to serialization error
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("simpleEntityFieldAccess", Arrays.asList(simpleEntityFieldAccess, simpleEntityPropertyAccess));
 
         try {
@@ -402,7 +402,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
         }
 
         // Test updating value to an empty list and back
-        variables = new HashMap<String, Object>();
+        variables = new HashMap<>();
         variables.put("list", Arrays.asList(simpleEntityFieldAccess, simpleEntityFieldAccess));
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables);
@@ -471,7 +471,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
         setupIllegalJPAEntities();
         // Starting process instance with a variable that has a compound primary
         // key, which is not supported.
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("compoundIdJPAEntity", compoundIdJPAEntity);
 
         try {
@@ -483,7 +483,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
         }
 
         // Starting process instance with a variable that has null as ID-value
-        variables = new HashMap<String, Object>();
+        variables = new HashMap<>();
         variables.put("nullValueEntity", new FieldAccessJPAEntity());
 
         try {
@@ -498,7 +498,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
         // the class is
         // present in the PU when creating EntityManagerFactory, but we test it
         // *just in case*
-        variables = new HashMap<String, Object>();
+        variables = new HashMap<>();
         IllegalIdClassJPAEntity illegalIdTypeEntity = new IllegalIdClassJPAEntity();
         illegalIdTypeEntity.setId(Calendar.getInstance());
         variables.put("illegalTypeId", illegalIdTypeEntity);
@@ -513,7 +513,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
         // Start process instance with JPA-entity which has an ID but isn't
         // persisted. When reading
         // the variable we should get an exception.
-        variables = new HashMap<String, Object>();
+        variables = new HashMap<>();
         FieldAccessJPAEntity nonPersistentEntity = new FieldAccessJPAEntity();
         nonPersistentEntity.setId(9999L);
         variables.put("nonPersistentEntity", nonPersistentEntity);
@@ -532,7 +532,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
     public void testQueryJPAVariable() {
         setupQueryJPAEntity();
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("entityToQuery", entityToQuery);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables);
@@ -586,7 +586,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
     @Deployment
     public void testUpdateJPAEntityValues() {
         setupJPAEntityToUpdate();
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("entityToUpdate", entityToUpdate);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("UpdateJPAValuesProcess", variables);

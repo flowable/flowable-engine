@@ -112,7 +112,7 @@ public class HistoricActivityInstanceCollectionResourceTest extends BaseSpringRe
 
         // Check presence of ID's
         if (expectedActivityIds != null) {
-            List<String> toBeFound = new ArrayList<String>(Arrays.asList(expectedActivityIds));
+            List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedActivityIds));
             Iterator<JsonNode> it = dataNode.iterator();
             while (it.hasNext()) {
                 String activityId = it.next().get("activityId").textValue();

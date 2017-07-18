@@ -41,7 +41,7 @@ public class ExecutionTreeUtil {
         }
 
         // Collect all child executions now we have the parent
-        List<ExecutionEntity> allExecutions = new ArrayList<ExecutionEntity>();
+        List<ExecutionEntity> allExecutions = new ArrayList<>();
         allExecutions.add(parentExecution);
         collectChildExecutions(parentExecution, allExecutions);
         return buildExecutionTree(allExecutions);
@@ -63,7 +63,7 @@ public class ExecutionTreeUtil {
         ExecutionTree executionTree = new ExecutionTree();
 
         // Map the executions to their parents. Catch and store the root element (process instance execution) while were at it
-        Map<String, List<ExecutionEntity>> parentMapping = new HashMap<String, List<ExecutionEntity>>();
+        Map<String, List<ExecutionEntity>> parentMapping = new HashMap<>();
         for (ExecutionEntity executionEntity : executions) {
             String parentId = executionEntity.getParentId();
 
@@ -93,7 +93,7 @@ public class ExecutionTreeUtil {
         }
 
         // Map the executions to their parents. Catch and store the root element (process instance execution) while were at it
-        Map<String, List<ExecutionEntity>> parentMapping = new HashMap<String, List<ExecutionEntity>>();
+        Map<String, List<ExecutionEntity>> parentMapping = new HashMap<>();
         for (ExecutionEntity executionEntity : executions) {
             String parentId = executionEntity.getParentId();
 
@@ -117,7 +117,7 @@ public class ExecutionTreeUtil {
         }
 
         // Now build the tree, top-down
-        LinkedList<ExecutionTreeNode> executionsToHandle = new LinkedList<ExecutionTreeNode>();
+        LinkedList<ExecutionTreeNode> executionsToHandle = new LinkedList<>();
         executionsToHandle.add(executionTree.getRoot());
 
         while (!executionsToHandle.isEmpty()) {
@@ -125,7 +125,7 @@ public class ExecutionTreeUtil {
             String parentId = parentNode.getExecutionEntity().getId();
             if (parentMapping.containsKey(parentId)) {
                 List<ExecutionEntity> childExecutions = parentMapping.get(parentId);
-                List<ExecutionTreeNode> childNodes = new ArrayList<ExecutionTreeNode>(childExecutions.size());
+                List<ExecutionTreeNode> childNodes = new ArrayList<>(childExecutions.size());
 
                 for (ExecutionEntity childExecutionEntity : childExecutions) {
 

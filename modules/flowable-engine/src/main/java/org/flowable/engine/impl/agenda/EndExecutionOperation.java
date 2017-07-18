@@ -374,7 +374,7 @@ public class EndExecutionOperation extends AbstractOperation {
     }
 
     protected List<ExecutionEntity> getActiveChildExecutionsForExecution(ExecutionEntityManager executionEntityManager, String executionId) {
-        List<ExecutionEntity> activeChildExecutions = new ArrayList<ExecutionEntity>();
+        List<ExecutionEntity> activeChildExecutions = new ArrayList<>();
         List<ExecutionEntity> executions = executionEntityManager.findChildExecutionsByParentExecutionId(executionId);
 
         for (ExecutionEntity activeExecution : executions) {

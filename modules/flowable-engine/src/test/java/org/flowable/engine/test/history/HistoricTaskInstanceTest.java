@@ -40,7 +40,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testHistoricTaskInstance() throws Exception {
-        Map<String, Object> varMap = new HashMap<String, Object>();
+        Map<String, Object> varMap = new HashMap<>();
         varMap.put("formKeyVar", "expressionFormKey");
         String processInstanceId = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest", varMap).getId();
 
@@ -191,7 +191,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertEquals(0, historyService.createHistoricTaskInstanceQuery().processDefinitionKey("unexistingdefinitionkey").count());
 
         // Process definition key in
-        List<String> includeIds = new ArrayList<String>();
+        List<String> includeIds = new ArrayList<>();
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().processDefinitionKeyIn(includeIds).count());
         includeIds.add("unexistingProcessDefinition");
         assertEquals(0, historyService.createHistoricTaskInstanceQuery().processDefinitionKeyIn(includeIds).count());
@@ -493,7 +493,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertEquals(0, historyService.createHistoricTaskInstanceQuery().or().taskName("unexistingname").endOr().count());
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().or().taskNameLike("Clean u%").endOr().count());
         assertEquals(0, historyService.createHistoricTaskInstanceQuery().or().taskNameLike("%unexistingname%").endOr().count());
-        final List<String> taskNameList = new ArrayList<String>(1);
+        final List<String> taskNameList = new ArrayList<>(1);
         taskNameList.add("Clean up");
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().or().taskNameIn(taskNameList).endOr().count());
         taskNameList.clear();
@@ -560,7 +560,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
         // Process definition key in
-        List<String> includeIds = new ArrayList<String>();
+        List<String> includeIds = new ArrayList<>();
         assertEquals(0, historyService.createHistoricTaskInstanceQuery().or().processDefinitionKey("unexistingdefinitionkey").processDefinitionKeyIn(includeIds).endOr().count());
         includeIds.add("unexistingProcessDefinition");
         assertEquals(0, historyService.createHistoricTaskInstanceQuery().or().processDefinitionKey("unexistingdefinitionkey").processDefinitionKeyIn(includeIds).endOr().count());

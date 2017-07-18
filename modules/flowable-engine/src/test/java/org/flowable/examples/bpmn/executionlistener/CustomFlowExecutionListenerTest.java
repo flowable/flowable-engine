@@ -31,7 +31,7 @@ public class CustomFlowExecutionListenerTest extends ResourceFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/CustomFlowExecutionListenerTest.bpmn20.xml" })
     public void testScriptExecutionListener() {
-        Map<String, Object> variableMap = new HashMap<String, Object>();
+        Map<String, Object> variableMap = new HashMap<>();
         variableMap.put("customFlowBean", new CustomFlowBean());
         runtimeService.startProcessInstanceByKey("scriptExecutionListenerProcess", variableMap);
         HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().variableName("flow1_activiti_conditions").singleResult();

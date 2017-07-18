@@ -244,7 +244,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
 
     protected void parseChildElements(String elementName, BaseElement parentElement, Map<String, BaseChildElementParser> additionalParsers, BpmnModel model, XMLStreamReader xtr) throws Exception {
 
-        Map<String, BaseChildElementParser> childParsers = new HashMap<String, BaseChildElementParser>();
+        Map<String, BaseChildElementParser> childParsers = new HashMap<>();
         if (additionalParsers != null) {
             childParsers.putAll(additionalParsers);
         }

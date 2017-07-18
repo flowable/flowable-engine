@@ -93,8 +93,8 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected boolean useTLS;
     protected String mailServerDefaultFrom = "flowable@localhost";
     protected String mailSessionJndi;
-    protected Map<String, MailServerInfo> mailServers = new HashMap<String, MailServerInfo>();
-    protected Map<String, String> mailSessionsJndi = new HashMap<String, String>();
+    protected Map<String, MailServerInfo> mailServers = new HashMap<>();
+    protected Map<String, String> mailSessionsJndi = new HashMap<>();
 
     // Set Http Client config defaults
     protected HttpClientConfig httpClientConfig = new HttpClientConfig();

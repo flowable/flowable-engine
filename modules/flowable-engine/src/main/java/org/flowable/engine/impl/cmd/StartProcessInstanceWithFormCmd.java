@@ -115,7 +115,7 @@ public class StartProcessInstanceWithFormCmd implements Command<ProcessInstance>
     }
 
     protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
-        Map<String, Object> variablesMap = new HashMap<String, Object>();
+        Map<String, Object> variablesMap = new HashMap<>();
         // convert data objects to process variables
         if (dataObjects != null) {
             for (ValuedDataObject dataObject : dataObjects) {

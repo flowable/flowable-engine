@@ -140,7 +140,7 @@ public abstract class ELContext {
 			throw new NullPointerException("key is null");
 		}
 		if (context == null) {
-			context = new HashMap<Class<?>, Object>();
+			context = new HashMap<>();
 		}
 		context.put(key, contextObject);
 	}

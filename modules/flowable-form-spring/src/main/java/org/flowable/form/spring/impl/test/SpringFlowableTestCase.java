@@ -33,7 +33,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 public abstract class SpringFlowableTestCase extends AbstractFlowableTestCase implements ApplicationContextAware {
 
     // we need a data structure to store all the resolved FormEngines and map them to something
-    protected Map<Object, FormEngine> cachedFormEngines = new ConcurrentHashMap<Object, FormEngine>();
+    protected Map<Object, FormEngine> cachedFormEngines = new ConcurrentHashMap<>();
 
     protected TestContextManager testContextManager;
 

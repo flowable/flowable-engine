@@ -49,7 +49,7 @@ public class GetPotentialStarterUsersCmd implements Command<List<User>>, Seriali
 
         IdentityService identityService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getIdentityService();
 
-        List<String> userIds = new ArrayList<String>();
+        List<String> userIds = new ArrayList<>();
         List<IdentityLink> identityLinks = (List) processDefinition.getIdentityLinks();
         for (IdentityLink identityLink : identityLinks) {
             if (identityLink.getUserId() != null && identityLink.getUserId().length() > 0) {
@@ -64,7 +64,7 @@ public class GetPotentialStarterUsersCmd implements Command<List<User>>, Seriali
             return identityService.createUserQuery().userIds(userIds).list();
 
         } else {
-            return new ArrayList<User>();
+            return new ArrayList<>();
         }
     }
 

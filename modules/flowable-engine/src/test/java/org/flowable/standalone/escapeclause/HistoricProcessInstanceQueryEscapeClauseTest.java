@@ -50,12 +50,12 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
                 .deploy()
                 .getId();
 
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("var1", "One%");
         processInstance1 = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", vars, "One%");
         runtimeService.setProcessInstanceName(processInstance1.getId(), "One%");
 
-        vars = new HashMap<String, Object>();
+        vars = new HashMap<>();
         vars.put("var1", "Two_");
         processInstance2 = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", vars, "Two_");
         runtimeService.setProcessInstanceName(processInstance2.getId(), "Two_");
@@ -79,16 +79,16 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
     public void testQueryByProcessKeyNotIn() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processKeyNotIn
-            List<String> processDefinitionKeyNotIn1 = new ArrayList<String>();
+            List<String> processDefinitionKeyNotIn1 = new ArrayList<>();
             processDefinitionKeyNotIn1.add("%\\%%");
 
-            List<String> processDefinitionKeyNotIn2 = new ArrayList<String>();
+            List<String> processDefinitionKeyNotIn2 = new ArrayList<>();
             processDefinitionKeyNotIn2.add("%\\_%");
 
-            List<String> processDefinitionKeyNotIn3 = new ArrayList<String>();
+            List<String> processDefinitionKeyNotIn3 = new ArrayList<>();
             processDefinitionKeyNotIn3.add("%");
 
-            List<String> processDefinitionKeyNotIn4 = new ArrayList<String>();
+            List<String> processDefinitionKeyNotIn4 = new ArrayList<>();
             processDefinitionKeyNotIn4.add("______________");
 
             HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().processDefinitionKeyNotIn(processDefinitionKeyNotIn1);

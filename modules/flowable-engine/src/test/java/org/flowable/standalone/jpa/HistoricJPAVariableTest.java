@@ -88,7 +88,7 @@ public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
         // -----------------------------------------------------------------------------
         // Simple test, Start process with JPA entities as variables
         // -----------------------------------------------------------------------------
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("simpleEntityFieldAccess", simpleEntityFieldAccess);
 
         // Start the process with the JPA-entities as variables. They will be stored in the DB.
@@ -113,7 +113,7 @@ public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
         // -----------------------------------------------------------------------------
         // Simple test, Start process with JPA entities as variables
         // -----------------------------------------------------------------------------
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("simpleEntityFieldAccess", simpleEntityFieldAccess);
 
         // Start the process with the JPA-entities as variables. They will be stored in the DB.
@@ -143,7 +143,7 @@ public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
         // -----------------------------------------------------------------------------
         // Simple test, Start process with JPA entities as variables
         // -----------------------------------------------------------------------------
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("simpleEntityFieldAccess", simpleEntityFieldAccess);
 
         // Start the process with the JPA-entities as variables. They will be stored in the DB.

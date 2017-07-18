@@ -35,7 +35,7 @@ public class ExecutionQueryResourceTest extends BaseSpringRestTestCase {
      */
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
     public void testQueryExecutionWithVariables() throws Exception {
-        HashMap<String, Object> processVariables = new HashMap<String, Object>();
+        HashMap<String, Object> processVariables = new HashMap<>();
         processVariables.put("stringVar", "Azerty");
         processVariables.put("intVar", 67890);
         processVariables.put("booleanVar", false);

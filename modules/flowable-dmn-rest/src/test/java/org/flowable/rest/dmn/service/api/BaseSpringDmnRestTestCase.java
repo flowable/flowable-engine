@@ -83,7 +83,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
     protected static DmnRuleService dmnRuleService;
 
     protected static CloseableHttpClient client;
-    protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<CloseableHttpResponse>();
+    protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
 
     static {
 
@@ -247,7 +247,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
         assertEquals(numberOfResultsExpected, dataNode.size());
 
         // Check presence of ID's
-        List<String> toBeFound = new ArrayList<String>(Arrays.asList(expectedResourceIds));
+        List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
         Iterator<JsonNode> it = dataNode.iterator();
         while (it.hasNext()) {
             String id = it.next().get("id").textValue();
@@ -275,7 +275,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
 
             // Check presence of ID's
             if (expectedResourceIds != null) {
-                List<String> toBeFound = new ArrayList<String>(Arrays.asList(expectedResourceIds));
+                List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
                 Iterator<JsonNode> it = dataNode.iterator();
                 while (it.hasNext()) {
                     String id = it.next().get("id").textValue();

@@ -55,8 +55,8 @@ public class JobExecutorTest extends JobExecutorTestCase {
 
         waitForJobExecutorToProcessAllJobs(8000L, 200L);
 
-        Set<String> messages = new HashSet<String>(tweetHandler.getMessages());
-        Set<String> expectedMessages = new HashSet<String>();
+        Set<String> messages = new HashSet<>(tweetHandler.getMessages());
+        Set<String> expectedMessages = new HashSet<>();
         expectedMessages.add("message-one");
         expectedMessages.add("message-two");
         expectedMessages.add("message-three");
@@ -64,6 +64,6 @@ public class JobExecutorTest extends JobExecutorTestCase {
         expectedMessages.add("timer-one");
         expectedMessages.add("timer-two");
 
-        assertEquals(new TreeSet<String>(expectedMessages), new TreeSet<String>(messages));
+        assertEquals(new TreeSet<>(expectedMessages), new TreeSet<>(messages));
     }
 }

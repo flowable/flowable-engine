@@ -42,7 +42,7 @@ public class HistoricProcessInstanceResponse {
     protected String endActivityId;
     protected String deleteReason;
     protected String superProcessInstanceId;
-    protected List<RestVariable> variables = new ArrayList<RestVariable>();
+    protected List<RestVariable> variables = new ArrayList<>();
     protected String tenantId;
 
     public String getId() {

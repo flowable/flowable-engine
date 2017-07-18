@@ -24,7 +24,7 @@ import org.flowable.engine.common.impl.cfg.TransactionContext;
  */
 public class TransactionContextHolder {
 
-    protected static ThreadLocal<Stack<TransactionContext>> transactionContextThreadLocal = new ThreadLocal<Stack<TransactionContext>>();
+    protected static ThreadLocal<Stack<TransactionContext>> transactionContextThreadLocal = new ThreadLocal<>();
 
     public static TransactionContext getTransactionContext() {
         Stack<TransactionContext> stack = getStack(transactionContextThreadLocal);
@@ -49,7 +49,7 @@ public class TransactionContextHolder {
     protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {
         Stack<T> stack = threadLocal.get();
         if (stack == null) {
-            stack = new Stack<T>();
+            stack = new Stack<>();
             threadLocal.set(stack);
         }
         return stack;

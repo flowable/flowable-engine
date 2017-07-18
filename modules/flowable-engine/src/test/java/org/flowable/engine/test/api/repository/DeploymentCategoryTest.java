@@ -48,7 +48,7 @@ public class DeploymentCategoryTest extends PluggableFlowableTestCase {
 
             Set<String> deploymentNames = getDeploymentNames(repositoryService.createDeploymentQuery().deploymentCategory("one").list());
 
-            Set<String> expectedDeploymentNames = new HashSet<String>();
+            Set<String> expectedDeploymentNames = new HashSet<>();
             expectedDeploymentNames.add("1");
 
             assertEquals(expectedDeploymentNames, deploymentNames);
@@ -103,7 +103,7 @@ public class DeploymentCategoryTest extends PluggableFlowableTestCase {
 
             Set<String> deploymentNames = getDeploymentNames(repositoryService.createDeploymentQuery().deploymentKey("one").list());
 
-            Set<String> expectedDeploymentNames = new HashSet<String>();
+            Set<String> expectedDeploymentNames = new HashSet<>();
             expectedDeploymentNames.add("1");
 
             assertEquals(expectedDeploymentNames, deploymentNames);
@@ -132,7 +132,7 @@ public class DeploymentCategoryTest extends PluggableFlowableTestCase {
     }
 
     private Set<String> getDeploymentNames(List<Deployment> deployments) {
-        Set<String> deploymentNames = new HashSet<String>();
+        Set<String> deploymentNames = new HashSet<>();
         for (Deployment deployment : deployments) {
             deploymentNames.add(deployment.getName());
         }

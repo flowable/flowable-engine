@@ -46,7 +46,7 @@ public class MybatisPrivilegeMappingDataManager extends AbstractDataManager<Priv
 
     @Override
     public void deleteByPrivilegeIdAndUserId(String privilegeId, String userId) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("privilegeId", privilegeId);
         params.put("userId", userId);
         getDbSqlSession().delete("deleteByPrivilegeIdAndUserId", params);
@@ -54,7 +54,7 @@ public class MybatisPrivilegeMappingDataManager extends AbstractDataManager<Priv
 
     @Override
     public void deleteByPrivilegeIdAndGroupId(String privilegeId, String groupId) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("privilegeId", privilegeId);
         params.put("groupId", groupId);
         getDbSqlSession().delete("deleteByPrivilegeIdAndGroupId", params);

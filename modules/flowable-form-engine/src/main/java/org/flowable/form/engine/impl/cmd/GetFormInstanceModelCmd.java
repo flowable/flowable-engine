@@ -116,7 +116,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
         if (variables != null) {
             this.variables = variables;
         } else {
-            this.variables = new HashMap<String, Object>();
+            this.variables = new HashMap<>();
         }
     }
 
@@ -126,7 +126,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
         List<FormField> allFields = formInstanceModel.listAllFields();
         if (allFields != null) {
 
-            Map<String, JsonNode> formInstanceFieldMap = new HashMap<String, JsonNode>();
+            Map<String, JsonNode> formInstanceFieldMap = new HashMap<>();
             if (formInstance != null) {
                 fillFormInstanceValues(formInstanceModel, formInstance, formInstanceFieldMap, formEngineConfiguration.getObjectMapper());
                 fillVariablesWithFormValues(formInstanceFieldMap, allFields);

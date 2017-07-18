@@ -114,7 +114,7 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
         assertEquals(numberOfResultsExpected, dataNode.size());
 
         // Check presence of ID's
-        List<String> toBeFound = new ArrayList<String>(Arrays.asList(expectedResourceIds));
+        List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
         Iterator<JsonNode> it = dataNode.iterator();
         while (it.hasNext()) {
             String id = it.next().get("id").textValue();

@@ -50,7 +50,7 @@ public class Context {
     }
     
     public static TransactionContext getTransactionContext() {
-        return (TransactionContext) TransactionContextHolder.getTransactionContext();
+        return TransactionContextHolder.getTransactionContext();
     }
 
     public static Flowable5CompatibilityHandler getFlowable5CompatibilityHandler() {

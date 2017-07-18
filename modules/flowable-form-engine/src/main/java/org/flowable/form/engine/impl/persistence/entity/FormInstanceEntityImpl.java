@@ -39,7 +39,7 @@ public class FormInstanceEntityImpl extends AbstractEntityNoRevision implements 
     protected String tenantId = FormEngineConfiguration.NO_TENANT_ID;
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         if (resourceRef != null && resourceRef.getId() != null) {
             persistentState.put("formValuesId", resourceRef.getId());
         }

@@ -35,10 +35,10 @@ public class IOSpecification {
     protected List<DataRef> dataOutputRefs;
 
     public IOSpecification() {
-        this.dataInputs = new ArrayList<Data>();
-        this.dataOutputs = new ArrayList<Data>();
-        this.dataInputRefs = new ArrayList<DataRef>();
-        this.dataOutputRefs = new ArrayList<DataRef>();
+        this.dataInputs = new ArrayList<>();
+        this.dataOutputs = new ArrayList<>();
+        this.dataInputRefs = new ArrayList<>();
+        this.dataOutputRefs = new ArrayList<>();
     }
 
     public void initialize(DelegateExecution execution) {

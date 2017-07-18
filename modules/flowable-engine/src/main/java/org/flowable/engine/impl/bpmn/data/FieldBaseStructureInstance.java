@@ -28,7 +28,7 @@ public class FieldBaseStructureInstance implements StructureInstance {
 
     public FieldBaseStructureInstance(FieldBaseStructureDefinition structureDefinition) {
         this.structureDefinition = structureDefinition;
-        this.fieldValues = new HashMap<String, Object>();
+        this.fieldValues = new HashMap<>();
     }
 
     public Object getFieldValue(String fieldName) {

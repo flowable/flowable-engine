@@ -43,7 +43,7 @@ public class DeleteProcessInstanceTest extends PluggableFlowableTestCase {
 
         // Set the inputs for the first process instance, which we will be able
         // to completely delete.
-        Map<String, Object> inputParamsUser = new HashMap<String, Object>();
+        Map<String, Object> inputParamsUser = new HashMap<>();
         inputParamsUser.put("taskType", "user");
 
         // Start the process instance & ensure it's started.
@@ -76,7 +76,7 @@ public class DeleteProcessInstanceTest extends PluggableFlowableTestCase {
 
         // Set the inputs for the second process instance, which we will NOT be
         // able to completely delete.
-        Map<String, Object> inputParamsJava = new HashMap<String, Object>();
+        Map<String, Object> inputParamsJava = new HashMap<>();
         inputParamsJava.put("taskType", "java");
 
         // Start the process instance & ensure it's started.

@@ -37,7 +37,7 @@ public class JpaRestTest extends BaseJPARestTestCase {
         assertEquals("Hello World", message.getText());
 
         // add the entity to the process variables and start the process
-        Map<String, Object> processVariables = new HashMap<String, Object>();
+        Map<String, Object> processVariables = new HashMap<>();
         processVariables.put("message", message);
 
         ProcessInstance processInstance = processEngine.getRuntimeService().startProcessInstanceByKey("jpa-process", processVariables);
@@ -69,7 +69,7 @@ public class JpaRestTest extends BaseJPARestTestCase {
         assertEquals("Hello World", message.getText());
 
         // add the entity to the process variables and start the process
-        Map<String, Object> processVariables = new HashMap<String, Object>();
+        Map<String, Object> processVariables = new HashMap<>();
         processVariables.put("message", message);
 
         ProcessInstance processInstance = processEngine.getRuntimeService().startProcessInstanceByKey("jpa-process", processVariables);
@@ -105,7 +105,7 @@ public class JpaRestTest extends BaseJPARestTestCase {
         assertEquals("Hello World", message.getText());
 
         // add the entity to the process variables and start the process
-        Map<String, Object> processVariables = new HashMap<String, Object>();
+        Map<String, Object> processVariables = new HashMap<>();
         processVariables.put("message", message);
 
         ProcessInstance processInstance = processEngine.getRuntimeService().startProcessInstanceByKey("jpa-process", processVariables);
@@ -141,7 +141,7 @@ public class JpaRestTest extends BaseJPARestTestCase {
         assertEquals("Hello World", message.getText());
 
         // add the entity to the process variables and start the process
-        Map<String, Object> processVariables = new HashMap<String, Object>();
+        Map<String, Object> processVariables = new HashMap<>();
         processVariables.put("message", message);
 
         ProcessInstance processInstance = processEngine.getRuntimeService().startProcessInstanceByKey("jpa-process", processVariables);

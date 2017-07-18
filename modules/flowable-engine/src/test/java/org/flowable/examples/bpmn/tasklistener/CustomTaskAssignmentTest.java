@@ -83,10 +83,10 @@ public class CustomTaskAssignmentTest extends PluggableFlowableTestCase {
     @Deployment
     public void testOverwriteExistingAssignmentsFromVariable() {
         // prepare variables
-        Map<String, String> assigneeMappingTable = new HashMap<String, String>();
+        Map<String, String> assigneeMappingTable = new HashMap<>();
         assigneeMappingTable.put("fozzie", "gonzo");
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("assigneeMappingTable", assigneeMappingTable);
 
         // start process instance

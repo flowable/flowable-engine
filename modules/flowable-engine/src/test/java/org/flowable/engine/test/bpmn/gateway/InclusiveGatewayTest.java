@@ -48,7 +48,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         for (int i = 1; i <= 3; i++) {
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveGwDiverging", CollectionUtil.singletonMap("input", i));
             List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
-            List<String> expectedNames = new ArrayList<String>();
+            List<String> expectedNames = new ArrayList<>();
             if (i == 1) {
                 expectedNames.add(TASK1_NAME);
             }
@@ -173,7 +173,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnBeanProperty", CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(150)));
         List<Task> tasks = taskService.createTaskQuery().list();
         assertEquals(2, tasks.size());
-        Map<String, String> expectedNames = new HashMap<String, String>();
+        Map<String, String> expectedNames = new HashMap<>();
         expectedNames.put(BEAN_TASK2_NAME, BEAN_TASK2_NAME);
         expectedNames.put(BEAN_TASK3_NAME, BEAN_TASK3_NAME);
         for (Task task : tasks) {
@@ -184,7 +184,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testDecideBasedOnListOrArrayOfBeans() {
-        List<InclusiveGatewayTestOrder> orders = new ArrayList<InclusiveGatewayTestOrder>();
+        List<InclusiveGatewayTestOrder> orders = new ArrayList<>();
         orders.add(new InclusiveGatewayTestOrder(50));
         orders.add(new InclusiveGatewayTestOrder(300));
         orders.add(new InclusiveGatewayTestOrder(175));
@@ -207,7 +207,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
         assertNotNull(tasks);
         assertEquals(2, tasks.size());
-        List<String> expectedNames = new ArrayList<String>();
+        List<String> expectedNames = new ArrayList<>();
         expectedNames.add(BEAN_TASK2_NAME);
         expectedNames.add(BEAN_TASK3_NAME);
         for (Task t : tasks) {
@@ -242,7 +242,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnBeanMethod", CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(125)));
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
         assertEquals(2, tasks.size());
-        List<String> expectedNames = new ArrayList<String>();
+        List<String> expectedNames = new ArrayList<>();
         expectedNames.add(BEAN_TASK2_NAME);
         expectedNames.add(BEAN_TASK3_NAME);
         for (Task t : tasks) {
@@ -275,7 +275,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveGwDefaultSequenceFlow", CollectionUtil.singletonMap("input", 1));
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
         assertEquals(2, tasks.size());
-        Map<String, String> expectedNames = new HashMap<String, String>();
+        Map<String, String> expectedNames = new HashMap<>();
         expectedNames.put("Input is one", "Input is one");
         expectedNames.put("Input is three or one", "Input is three or one");
         for (Task t : tasks) {
@@ -305,7 +305,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         pi = runtimeService.startProcessInstanceByKey("inclusiveNoIdOnSequenceFlow", CollectionUtil.singletonMap("input", 1));
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
         assertEquals(2, tasks.size());
-        Map<String, String> expectedNames = new HashMap<String, String>();
+        Map<String, String> expectedNames = new HashMap<>();
         expectedNames.put("Input is one", "Input is one");
         expectedNames.put("Input is more than one", "Input is more than one");
         for (Task t : tasks) {
@@ -336,7 +336,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
     @Deployment
     public void testJoinAfterSubprocesses() {
         // Test case to test act-1204
-        Map<String, Object> variableMap = new HashMap<String, Object>();
+        Map<String, Object> variableMap = new HashMap<>();
         variableMap.put("a", 1);
         variableMap.put("b", 1);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("InclusiveGateway", variableMap);
@@ -357,7 +357,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(processInstance);
 
-        variableMap = new HashMap<String, Object>();
+        variableMap = new HashMap<>();
         variableMap.put("a", 1);
         variableMap.put("b", 2);
         processInstance = runtimeService.startProcessInstanceByKey("InclusiveGateway", variableMap);
@@ -377,7 +377,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(processInstance);
 
-        variableMap = new HashMap<String, Object>();
+        variableMap = new HashMap<>();
         variableMap.put("a", 2);
         variableMap.put("b", 2);
         try {
@@ -460,7 +460,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testDirectSequenceFlow() {
-        Map<String, Object> varMap = new HashMap<String, Object>();
+        Map<String, Object> varMap = new HashMap<>();
         varMap.put("input", 1);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("inclusiveGwDirectSequenceFlow", varMap);
         Task task = taskService.createTaskQuery().singleResult();
@@ -469,7 +469,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
         assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
 
-        varMap = new HashMap<String, Object>();
+        varMap = new HashMap<>();
         varMap.put("input", 3);
         processInstance = runtimeService.startProcessInstanceByKey("inclusiveGwDirectSequenceFlow", varMap);
         List<Task> tasks = taskService.createTaskQuery().list();
@@ -478,7 +478,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         taskService.complete(tasks.get(1).getId());
         assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
 
-        varMap = new HashMap<String, Object>();
+        varMap = new HashMap<>();
         varMap.put("input", 0);
         processInstance = runtimeService.startProcessInstanceByKey("inclusiveGwDirectSequenceFlow", varMap);
         assertTrue(processInstance.isEnded());
@@ -486,7 +486,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testSkipExpression() {
-        Map<String, Object> varMap = new HashMap<String, Object>();
+        Map<String, Object> varMap = new HashMap<>();
         varMap.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
         varMap.put("input", 10);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("inclusiveGwSkipExpression", varMap);
@@ -496,7 +496,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
         assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
 
-        varMap = new HashMap<String, Object>();
+        varMap = new HashMap<>();
         varMap.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
         varMap.put("input", 30);
         processInstance = runtimeService.startProcessInstanceByKey("inclusiveGwSkipExpression", varMap);
@@ -506,7 +506,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         taskService.complete(tasks.get(1).getId());
         assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
 
-        varMap = new HashMap<String, Object>();
+        varMap = new HashMap<>();
         varMap.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
         varMap.put("input", 3);
         processInstance = runtimeService.startProcessInstanceByKey("inclusiveGwSkipExpression", varMap);
@@ -555,7 +555,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
     }
 
     protected List<Execution> getInactiveExecutionsInActivityId(String activityId) {
-        List<Execution> result = new ArrayList<Execution>();
+        List<Execution> result = new ArrayList<>();
         List<Execution> executions = runtimeService.createExecutionQuery().list();
         Iterator<Execution> iterator = executions.iterator();
         while (iterator.hasNext()) {

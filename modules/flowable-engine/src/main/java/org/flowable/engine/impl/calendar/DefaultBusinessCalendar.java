@@ -26,7 +26,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
  */
 public class DefaultBusinessCalendar implements BusinessCalendar {
 
-    private static Map<String, Integer> units = new HashMap<String, Integer>();
+    private static Map<String, Integer> units = new HashMap<>();
     static {
         units.put("millis", Calendar.MILLISECOND);
         units.put("seconds", Calendar.SECOND);

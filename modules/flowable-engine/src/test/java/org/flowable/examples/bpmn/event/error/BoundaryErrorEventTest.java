@@ -45,7 +45,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
 
         // After starting the process, a task should be assigned to the
         // 'initiator' (normally set by GUI)
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("details", "very interesting");
         variables.put("customerName", "Alfresco");
         String procId = runtimeService.startProcessInstanceByKey("reviewSaledLead", variables).getId();
@@ -62,7 +62,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         // Complete the management task by stating that not enough info was
         // provided
         // This should throw the error event, which closes the subprocess
-        variables = new HashMap<String, Object>();
+        variables = new HashMap<>();
         variables.put("notEnoughInformation", true);
         taskService.complete(profitabilityTask.getId(), variables);
 

@@ -25,7 +25,7 @@ import org.springframework.messaging.MessageHeaders;
  */
 public class ProcessVariableHeaderMapper implements HeaderMapper<Map<String, Object>> {
 
-    private final Set<String> keysToPreserve = new ConcurrentSkipListSet<String>();
+    private final Set<String> keysToPreserve = new ConcurrentSkipListSet<>();
 
     public ProcessVariableHeaderMapper(Set<String> sync) {
         this.keysToPreserve.addAll(sync);

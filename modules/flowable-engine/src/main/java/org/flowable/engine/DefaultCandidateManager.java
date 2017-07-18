@@ -29,7 +29,7 @@ public class DefaultCandidateManager extends AbstractManager implements Candidat
     public List<String> getGroupsForCandidateUser(String candidateUser) {
         IdentityService identityService = getProcessEngineConfiguration().getIdentityService();
         List<Group> groups = identityService.createGroupQuery().groupMember(candidateUser).list();
-        List<String> groupIds = new ArrayList<String>();
+        List<String> groupIds = new ArrayList<>();
         for (Group group : groups) {
             groupIds.add(group.getId());
         }

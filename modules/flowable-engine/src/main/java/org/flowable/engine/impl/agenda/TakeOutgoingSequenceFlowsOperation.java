@@ -140,7 +140,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
         }
 
         // Determine which sequence flows can be used for leaving
-        List<SequenceFlow> outgoingSequenceFlows = new ArrayList<SequenceFlow>();
+        List<SequenceFlow> outgoingSequenceFlows = new ArrayList<>();
         for (SequenceFlow sequenceFlow : flowNode.getOutgoingFlows()) {
 
             String skipExpressionString = sequenceFlow.getSkipExpression();
@@ -184,7 +184,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
             // Leave, and reuse the incoming sequence flow, make executions for all the others (if applicable)
 
             ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-            List<ExecutionEntity> outgoingExecutions = new ArrayList<ExecutionEntity>(flowNode.getOutgoingFlows().size());
+            List<ExecutionEntity> outgoingExecutions = new ArrayList<>(flowNode.getOutgoingFlows().size());
 
             SequenceFlow sequenceFlow = outgoingSequenceFlows.get(0);
 
@@ -303,7 +303,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
             if (CollectionUtil.isNotEmpty(activity.getBoundaryEvents())) {
 
                 // Cancel events are not removed
-                List<String> notToDeleteEvents = new ArrayList<String>();
+                List<String> notToDeleteEvents = new ArrayList<>();
                 for (BoundaryEvent event : activity.getBoundaryEvents()) {
                     if (CollectionUtil.isNotEmpty(event.getEventDefinitions()) &&
                             event.getEventDefinitions().get(0) instanceof CancelEventDefinition) {

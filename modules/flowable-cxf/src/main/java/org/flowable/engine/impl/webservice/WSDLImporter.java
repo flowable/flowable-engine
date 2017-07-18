@@ -62,11 +62,11 @@ import com.sun.tools.xjc.api.XJC;
  */
 public class WSDLImporter implements XMLImporter {
 
-    protected Map<String, WSService> wsServices = new HashMap<String, WSService>();
+    protected Map<String, WSService> wsServices = new HashMap<>();
 
-    protected Map<String, WSOperation> wsOperations = new HashMap<String, WSOperation>();
+    protected Map<String, WSOperation> wsOperations = new HashMap<>();
 
-    protected Map<String, StructureDefinition> structures = new HashMap<String, StructureDefinition>();
+    protected Map<String, StructureDefinition> structures = new HashMap<>();
 
     protected String wsdlLocation;
 

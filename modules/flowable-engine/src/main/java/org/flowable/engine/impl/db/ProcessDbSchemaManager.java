@@ -51,7 +51,7 @@ public class ProcessDbSchemaManager implements DbSchemaManager {
     
     protected static final String LAST_V5_VERSION = "5.99.0.0";
 
-    protected static final List<FlowableVersion> FLOWABLE_VERSIONS = new ArrayList<FlowableVersion>();
+    protected static final List<FlowableVersion> FLOWABLE_VERSIONS = new ArrayList<>();
     static {
 
         /* Previous */

@@ -115,7 +115,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersFieldInjectionProcess.bpmn20.xml" })
     public void testExecutionListenerFieldInjection() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("myVar", "listening!");
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("executionListenersProcess", variables);

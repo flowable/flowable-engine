@@ -62,7 +62,7 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
 
         if (inputStream != null) {
             // Stream given, write to store and save a reference to the content object
-            Map<String, Object> metaData = new HashMap<String, Object>();
+            Map<String, Object> metaData = new HashMap<>();
             if (contentItem.getTaskId() != null) {
                 metaData.put(ContentMetaDataKeys.TASK_ID, contentItem.getTaskId());
             } else {

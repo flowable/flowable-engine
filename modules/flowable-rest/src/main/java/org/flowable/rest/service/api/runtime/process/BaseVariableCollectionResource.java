@@ -42,8 +42,8 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
     protected ObjectMapper objectMapper;
 
     protected List<RestVariable> processVariables(Execution execution, String scope, int variableType) {
-        List<RestVariable> result = new ArrayList<RestVariable>();
-        Map<String, RestVariable> variableMap = new HashMap<String, RestVariable>();
+        List<RestVariable> result = new ArrayList<>();
+        Map<String, RestVariable> variableMap = new HashMap<>();
 
         // Check if it's a valid execution to get the variables for
         RestVariableScope variableScope = RestVariable.getScopeFromString(scope);
@@ -79,8 +79,8 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
             result = setBinaryVariable((MultipartHttpServletRequest) request, execution, variableType, true);
         } else {
 
-            List<RestVariable> inputVariables = new ArrayList<RestVariable>();
-            List<RestVariable> resultVariables = new ArrayList<RestVariable>();
+            List<RestVariable> inputVariables = new ArrayList<>();
+            List<RestVariable> resultVariables = new ArrayList<>();
             result = resultVariables;
 
             try {
@@ -100,7 +100,7 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
 
             RestVariableScope sharedScope = null;
             RestVariableScope varScope = null;
-            Map<String, Object> variablesToSet = new HashMap<String, Object>();
+            Map<String, Object> variablesToSet = new HashMap<>();
 
             for (RestVariable var : inputVariables) {
                 // Validate if scopes match

@@ -45,7 +45,7 @@ public class BoundaryTimerEventRepeatWithStartAndDurationTest extends PluggableF
         nextTimeCal.setTime(baseTime);
         processEngineConfiguration.getClock().setCurrentTime(nextTimeCal.getTime());
 
-        HashMap<String, Object> variables = new HashMap<String, Object>();
+        HashMap<String, Object> variables = new HashMap<>();
         variables.put("StartDate", baseTime);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("repeatWithStartAndDuration", variables);
 

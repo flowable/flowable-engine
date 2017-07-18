@@ -25,7 +25,7 @@ public class FlowableListener extends BaseElement {
     protected String event;
     protected String implementationType;
     protected String implementation;
-    protected List<FieldExtension> fieldExtensions = new ArrayList<FieldExtension>();
+    protected List<FieldExtension> fieldExtensions = new ArrayList<>();
     protected String onTransaction;
     protected String customPropertiesResolverImplementationType;
     protected String customPropertiesResolverImplementation;
@@ -108,7 +108,7 @@ public class FlowableListener extends BaseElement {
         setImplementation(otherListener.getImplementation());
         setImplementationType(otherListener.getImplementationType());
 
-        fieldExtensions = new ArrayList<FieldExtension>();
+        fieldExtensions = new ArrayList<>();
         if (otherListener.getFieldExtensions() != null && !otherListener.getFieldExtensions().isEmpty()) {
             for (FieldExtension extension : otherListener.getFieldExtensions()) {
                 fieldExtensions.add(extension.clone());

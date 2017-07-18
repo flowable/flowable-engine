@@ -60,7 +60,7 @@ public class FormDefinitionParse {
     protected FormDeploymentEntity deployment;
 
     /** The end result of the parsing: a list of decision tables. */
-    protected List<FormDefinitionEntity> formDefinitions = new ArrayList<FormDefinitionEntity>();
+    protected List<FormDefinitionEntity> formDefinitions = new ArrayList<>();
 
     public FormDefinitionParse deployment(FormDeploymentEntity deployment) {
         this.deployment = deployment;

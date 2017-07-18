@@ -41,7 +41,7 @@ public class HistoricProcessInstanceQueryResourceTest extends BaseSpringRestTest
      */
     @Deployment
     public void testQueryProcessInstancesWithVariables() throws Exception {
-        HashMap<String, Object> processVariables = new HashMap<String, Object>();
+        HashMap<String, Object> processVariables = new HashMap<>();
         processVariables.put("stringVar", "Azerty");
         processVariables.put("intVar", 67890);
         processVariables.put("booleanVar", false);

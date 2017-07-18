@@ -38,8 +38,8 @@ public class FlowableEventSupport {
     protected Map<FlowableEventType, List<FlowableEventListener>> typedListeners;
 
     public FlowableEventSupport() {
-        eventListeners = new CopyOnWriteArrayList<FlowableEventListener>();
-        typedListeners = new HashMap<FlowableEventType, List<FlowableEventListener>>();
+        eventListeners = new CopyOnWriteArrayList<>();
+        typedListeners = new HashMap<>();
     }
 
     public synchronized void addEventListener(FlowableEventListener listenerToAdd) {
@@ -117,7 +117,7 @@ public class FlowableEventSupport {
         List<FlowableEventListener> listeners = typedListeners.get(type);
         if (listeners == null) {
             // Add an empty list of listeners for this type
-            listeners = new CopyOnWriteArrayList<FlowableEventListener>();
+            listeners = new CopyOnWriteArrayList<>();
             typedListeners.put(type, listeners);
         }
 

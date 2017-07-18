@@ -36,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ExecutionBaseResource {
 
-    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<String, QueryProperty>();
+    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();
 
     static {
         allowedSortProperties.put("processDefinitionId", ExecutionQueryProperty.PROCESS_DEFINITION_ID);
@@ -189,7 +189,7 @@ public class ExecutionBaseResource {
     }
 
     protected Map<String, Object> getVariablesToSet(List<RestVariable> restVariables) {
-        Map<String, Object> variablesToSet = new HashMap<String, Object>();
+        Map<String, Object> variablesToSet = new HashMap<>();
         for (RestVariable var : restVariables) {
             if (var.getName() == null) {
                 throw new FlowableIllegalArgumentException("Variable name is required");

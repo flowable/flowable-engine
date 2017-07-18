@@ -257,7 +257,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
             Task task = taskService.createTaskQuery().singleResult();
 
             // Complete first task
-            Map<String, Object> taskParams = new HashMap<String, Object>();
+            Map<String, Object> taskParams = new HashMap<>();
             taskService.complete(task.getId(), taskParams, true);
 
             FlowableEntityEvent event = (FlowableEntityEvent) tlistener.getEventsReceived().get(0);

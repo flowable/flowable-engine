@@ -26,7 +26,7 @@ public class JobQueryProperties {
     public static Map<String, QueryProperty> PROPERTIES;
 
     static {
-        PROPERTIES = new HashMap<String, QueryProperty>();
+        PROPERTIES = new HashMap<>();
         PROPERTIES.put("id", JobQueryProperty.JOB_ID);
         PROPERTIES.put("dueDate", JobQueryProperty.DUEDATE);
         PROPERTIES.put("executionId", JobQueryProperty.EXECUTION_ID);

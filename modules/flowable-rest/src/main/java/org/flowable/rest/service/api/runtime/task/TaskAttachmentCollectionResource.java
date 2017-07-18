@@ -62,7 +62,7 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
     })
     @RequestMapping(value = "/runtime/tasks/{taskId}/attachments", method = RequestMethod.GET, produces = "application/json")
     public List<AttachmentResponse> getAttachments(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
-        List<AttachmentResponse> result = new ArrayList<AttachmentResponse>();
+        List<AttachmentResponse> result = new ArrayList<>();
         HistoricTaskInstance task = getHistoricTaskFromRequest(taskId);
 
         for (Attachment attachment : taskService.getTaskAttachments(task.getId())) {

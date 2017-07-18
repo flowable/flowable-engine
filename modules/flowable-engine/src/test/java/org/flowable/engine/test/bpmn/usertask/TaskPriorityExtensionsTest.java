@@ -33,7 +33,7 @@ public class TaskPriorityExtensionsTest extends PluggableFlowableTestCase {
     }
 
     private void testPriorityExtension(int priority) throws Exception {
-        final Map<String, Object> variables = new HashMap<String, Object>();
+        final Map<String, Object> variables = new HashMap<>();
         variables.put("taskPriority", priority);
 
         // Start process-instance, passing priority that should be used as task

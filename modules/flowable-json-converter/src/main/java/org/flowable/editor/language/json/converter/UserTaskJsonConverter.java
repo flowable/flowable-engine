@@ -105,7 +105,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
                 List<ExtensionElement> idmCandidateUserList = userTask.getExtensionElements().get("activiti-idm-candidate-user");
                 if (CollectionUtils.isNotEmpty(userTask.getCandidateUsers()) && CollectionUtils.isNotEmpty(idmCandidateUserList)) {
 
-                    List<String> candidateUserIds = new ArrayList<String>();
+                    List<String> candidateUserIds = new ArrayList<>();
 
                     if (userTask.getCandidateUsers().size() == 1 && userTask.getCandidateUsers().get(0).contains("${taskAssignmentBean.assignTaskToCandidateUsers(")) {
                         idmNode.put("type", "users");
@@ -114,7 +114,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
                         candidateUsersString = candidateUsersString.replace("${taskAssignmentBean.assignTaskToCandidateUsers('", "");
                         candidateUsersString = candidateUsersString.replace("', execution)}", "");
 
-                        List<String> candidateFieldIds = new ArrayList<String>();
+                        List<String> candidateFieldIds = new ArrayList<>();
 
                         String[] candidateUserArray = candidateUsersString.split(",");
                         for (String candidate : candidateUserArray) {
@@ -161,7 +161,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
                 List<ExtensionElement> idmCandidateGroupList = userTask.getExtensionElements().get("activiti-idm-candidate-group");
                 if (CollectionUtils.isNotEmpty(userTask.getCandidateGroups()) && CollectionUtils.isNotEmpty(idmCandidateGroupList)) {
 
-                    List<String> candidateGroupIds = new ArrayList<String>();
+                    List<String> candidateGroupIds = new ArrayList<>();
 
                     if (userTask.getCandidateGroups().size() == 1 && userTask.getCandidateGroups().get(0).contains("${taskAssignmentBean.assignTaskToCandidateGroups(")) {
                         idmNode.put("type", "groups");
@@ -170,7 +170,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
                         candidateGroupsString = candidateGroupsString.replace("${taskAssignmentBean.assignTaskToCandidateGroups('", "");
                         candidateGroupsString = candidateGroupsString.replace("', execution)}", "");
 
-                        List<String> candidateFieldIds = new ArrayList<String>();
+                        List<String> candidateFieldIds = new ArrayList<>();
 
                         String[] candidateGroupArray = candidateGroupsString.split(",");
                         for (String candidate : candidateGroupArray) {
@@ -404,10 +404,10 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
     }
 
     protected void fillCandidateUsers(JsonNode idmDefNode, JsonNode canCompleteTaskNode, UserTask task) {
-        List<String> candidateUsers = new ArrayList<String>();
+        List<String> candidateUsers = new ArrayList<>();
         JsonNode candidateUsersNode = idmDefNode.get("candidateUsers");
         if (candidateUsersNode != null && candidateUsersNode.isArray()) {
-            List<String> emails = new ArrayList<String>();
+            List<String> emails = new ArrayList<>();
             for (JsonNode userNode : candidateUsersNode) {
                 if (userNode != null && !userNode.isNull()) {
                     JsonNode idNode = userNode.get("id");
@@ -472,7 +472,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
     }
 
     protected void fillCandidateGroups(JsonNode idmDefNode, JsonNode canCompleteTaskNode, UserTask task) {
-        List<String> candidateGroups = new ArrayList<String>();
+        List<String> candidateGroups = new ArrayList<>();
         JsonNode candidateGroupsNode = idmDefNode.get("candidateGroups");
         if (candidateGroupsNode != null && candidateGroupsNode.isArray()) {
             for (JsonNode groupNode : candidateGroupsNode) {

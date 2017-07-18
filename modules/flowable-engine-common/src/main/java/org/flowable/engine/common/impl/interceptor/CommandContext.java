@@ -37,12 +37,12 @@ public class CommandContext {
     protected AbstractEngineConfiguration currentEngineConfiguration;
     protected Command<?> command;
     protected Map<Class<?>, SessionFactory> sessionFactories;
-    protected Map<Class<?>, Session> sessions = new HashMap<Class<?>, Session>();
+    protected Map<Class<?>, Session> sessions = new HashMap<>();
     protected Throwable exception;
     protected List<CommandContextCloseListener> closeListeners;
     protected Map<String, Object> attributes; // General-purpose storing of anything during the lifetime of a command context
     protected boolean reused;
-    protected LinkedList<Object> resultStack = new LinkedList<Object>(); // needs to be a stack, as JavaDelegates can do api calls again
+    protected LinkedList<Object> resultStack = new LinkedList<>(); // needs to be a stack, as JavaDelegates can do api calls again
 
     public CommandContext(Command<?> command) {
         this.command = command;
@@ -218,7 +218,7 @@ public class CommandContext {
 
     public void addAttribute(String key, Object value) {
         if (attributes == null) {
-            attributes = new HashMap<String, Object>(1);
+            attributes = new HashMap<>(1);
         }
         attributes.put(key, value);
     }

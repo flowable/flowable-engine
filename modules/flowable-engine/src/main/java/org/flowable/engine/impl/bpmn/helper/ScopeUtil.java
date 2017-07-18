@@ -78,7 +78,7 @@ public class ScopeUtil {
         EventSubscriptionEntityManager eventSubscriptionEntityManager = CommandContextUtil.getEventSubscriptionEntityManager();
         List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionEntityManager.findEventSubscriptionsByExecutionAndType(subProcessExecution.getId(), "compensate");
 
-        List<CompensateEventSubscriptionEntity> compensateEventSubscriptions = new ArrayList<CompensateEventSubscriptionEntity>();
+        List<CompensateEventSubscriptionEntity> compensateEventSubscriptions = new ArrayList<>();
         for (EventSubscriptionEntity event : eventSubscriptions) {
             if (event instanceof CompensateEventSubscriptionEntity) {
                 compensateEventSubscriptions.add((CompensateEventSubscriptionEntity) event);

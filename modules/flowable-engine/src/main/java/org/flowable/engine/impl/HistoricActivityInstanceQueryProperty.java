@@ -28,7 +28,7 @@ public class HistoricActivityInstanceQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, HistoricActivityInstanceQueryProperty> properties = new HashMap<String, HistoricActivityInstanceQueryProperty>();
+    private static final Map<String, HistoricActivityInstanceQueryProperty> properties = new HashMap<>();
 
     public static final HistoricActivityInstanceQueryProperty HISTORIC_ACTIVITY_INSTANCE_ID = new HistoricActivityInstanceQueryProperty("ID_");
     public static final HistoricActivityInstanceQueryProperty PROCESS_INSTANCE_ID = new HistoricActivityInstanceQueryProperty("PROC_INST_ID_");

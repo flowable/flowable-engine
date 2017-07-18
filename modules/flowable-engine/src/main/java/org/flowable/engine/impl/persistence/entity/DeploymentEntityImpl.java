@@ -54,7 +54,7 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
 
     public void addResource(ResourceEntity resource) {
         if (resources == null) {
-            resources = new HashMap<String, ResourceEntity>();
+            resources = new HashMap<>();
         }
         resources.put(resource.getName(), resource);
     }
@@ -64,7 +64,7 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
     public Map<String, ResourceEntity> getResources() {
         if (resources == null && id != null) {
             List<ResourceEntity> resourcesList = CommandContextUtil.getResourceEntityManager().findResourcesByDeploymentId(id);
-            resources = new HashMap<String, ResourceEntity>();
+            resources = new HashMap<>();
             for (ResourceEntity resource : resourcesList) {
                 resources.put(resource.getName(), resource);
             }
@@ -73,7 +73,7 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
     }
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("category", this.category);
         persistentState.put("key", this.key);
         persistentState.put("tenantId", tenantId);
@@ -84,13 +84,13 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
 
     public void addDeployedArtifact(Object deployedArtifact) {
         if (deployedArtifacts == null) {
-            deployedArtifacts = new HashMap<Class<?>, List<Object>>();
+            deployedArtifacts = new HashMap<>();
         }
 
         Class<?> clazz = deployedArtifact.getClass();
         List<Object> artifacts = deployedArtifacts.get(clazz);
         if (artifacts == null) {
-            artifacts = new ArrayList<Object>();
+            artifacts = new ArrayList<>();
             deployedArtifacts.put(clazz, artifacts);
         }
 

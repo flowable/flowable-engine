@@ -572,7 +572,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         private List<FlowableEvent> eventsReceived;
 
         public CallActivityEventListener() {
-            eventsReceived = new ArrayList<FlowableEvent>();
+            eventsReceived = new ArrayList<>();
 
         }
 

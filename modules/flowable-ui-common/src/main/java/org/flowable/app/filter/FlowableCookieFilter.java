@@ -122,7 +122,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
                             throw new FlowableException("user not found " + userId);
                         }
 
-                        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
+                        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
                         for (String privilege : user.getPrivileges()) {
                             grantedAuthorities.add(new SimpleGrantedAuthority(privilege));
                         }

@@ -42,7 +42,7 @@ class ProcessScopeTestEngine {
     }
 
     private StatefulObject run() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("customerId", customerId);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("component-waiter", vars);

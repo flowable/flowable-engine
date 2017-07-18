@@ -46,7 +46,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
     // related to https://activiti.atlassian.net/browse/ACT-1992
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
     public void testGetProcessInstancesByBusinessKeyAndIncludeVariables() throws Exception {
-        HashMap<String, Object> variables = new HashMap<String, Object>();
+        HashMap<String, Object> variables = new HashMap<>();
         variables.put("myVar1", "myVar1");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne", "myBusinessKey", variables);
         String processId = processInstance.getId();

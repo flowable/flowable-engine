@@ -29,8 +29,8 @@ import org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl;
 
 public class EntityDependencyOrder {
 
-    public static List<Class<? extends Entity>> DELETE_ORDER = new ArrayList<Class<? extends Entity>>();
-    public static List<Class<? extends Entity>> INSERT_ORDER = new ArrayList<Class<? extends Entity>>();
+    public static List<Class<? extends Entity>> DELETE_ORDER = new ArrayList<>();
+    public static List<Class<? extends Entity>> INSERT_ORDER = new ArrayList<>();
 
     static {
 
@@ -44,7 +44,7 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(PrivilegeMappingEntityImpl.class);
         DELETE_ORDER.add(PrivilegeEntityImpl.class);
         
-        INSERT_ORDER = new ArrayList<Class<? extends Entity>>(DELETE_ORDER);
+        INSERT_ORDER = new ArrayList<>(DELETE_ORDER);
         Collections.reverse(INSERT_ORDER);
 
     }

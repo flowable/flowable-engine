@@ -50,7 +50,7 @@ public class DeployCmd<T> implements Command<FormDeployment>, Serializable {
 
         if (deploymentBuilder.isDuplicateFilterEnabled()) {
 
-            List<FormDeployment> existingDeployments = new ArrayList<FormDeployment>();
+            List<FormDeployment> existingDeployments = new ArrayList<>();
             if (deployment.getTenantId() == null || FormEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
                 List<FormDeployment> deploymentEntities = new FormDeploymentQueryImpl(CommandContextUtil.getFormEngineConfiguration().getCommandExecutor()).deploymentName(deployment.getName()).listPage(0, 1);
                 if (!deploymentEntities.isEmpty()) {
@@ -69,7 +69,7 @@ public class DeployCmd<T> implements Command<FormDeployment>, Serializable {
             if (!existingDeployments.isEmpty()) {
                 existingDeployment = (FormDeploymentEntity) existingDeployments.get(0);
 
-                Map<String, FormResourceEntity> resourceMap = new HashMap<String, FormResourceEntity>();
+                Map<String, FormResourceEntity> resourceMap = new HashMap<>();
                 List<FormResourceEntity> resourceList = CommandContextUtil.getResourceEntityManager().findResourcesByDeploymentId(existingDeployment.getId());
                 for (FormResourceEntity resourceEntity : resourceList) {
                     resourceMap.put(resourceEntity.getName(), resourceEntity);

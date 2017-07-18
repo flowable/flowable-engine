@@ -38,8 +38,8 @@ public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior imple
 
     private static final long serialVersionUID = 1L;
 
-    protected Set<Expression> variablesInputExpressions = new HashSet<Expression>();
-    protected Set<Expression> rulesExpressions = new HashSet<Expression>();
+    protected Set<Expression> variablesInputExpressions = new HashSet<>();
+    protected Set<Expression> rulesExpressions = new HashSet<>();
     protected boolean exclude;
     protected String resultVariable;
 
@@ -77,7 +77,7 @@ public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior imple
 
         Collection<Object> ruleOutputObjects = ksession.getObjects();
         if (ruleOutputObjects != null && !ruleOutputObjects.isEmpty()) {
-            Collection<Object> outputVariables = new ArrayList<Object>();
+            Collection<Object> outputVariables = new ArrayList<>();
             outputVariables.addAll(ruleOutputObjects);
             execution.setVariable(resultVariable, outputVariables);
         }

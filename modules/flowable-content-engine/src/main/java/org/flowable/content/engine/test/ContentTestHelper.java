@@ -33,7 +33,7 @@ public abstract class ContentTestHelper {
 
     public static final String EMPTY_LINE = "\n";
 
-    static Map<String, ContentEngine> contentEngines = new HashMap<String, ContentEngine>();
+    static Map<String, ContentEngine> contentEngines = new HashMap<>();
 
     // Engine startup and shutdown helpers
     // ///////////////////////////////////////////////////

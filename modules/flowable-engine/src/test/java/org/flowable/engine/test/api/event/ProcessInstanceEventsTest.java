@@ -758,7 +758,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
         public TestInitializedEntityEventListener() {
 
-            eventsReceived = new ArrayList<FlowableEvent>();
+            eventsReceived = new ArrayList<>();
         }
 
         public List<FlowableEvent> getEventsReceived() {
@@ -788,7 +788,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
         public List<FlowableEvent> filterEvents(FlowableEngineEventType eventType) {// count
             // timer cancelled events
-            List<FlowableEvent> filteredEvents = new ArrayList<FlowableEvent>();
+            List<FlowableEvent> filteredEvents = new ArrayList<>();
             List<FlowableEvent> eventsReceived = listener.getEventsReceived();
             for (FlowableEvent eventReceived : eventsReceived) {
                 if (eventType == eventReceived.getType()) {

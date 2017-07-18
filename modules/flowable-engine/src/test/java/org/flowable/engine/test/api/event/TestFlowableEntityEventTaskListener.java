@@ -30,7 +30,7 @@ public class TestFlowableEntityEventTaskListener extends TestFlowableEntityEvent
 
     public TestFlowableEntityEventTaskListener(Class<?> entityClass) {
         super(entityClass);
-        tasks = new ArrayList<Task>();
+        tasks = new ArrayList<>();
     }
 
     @Override

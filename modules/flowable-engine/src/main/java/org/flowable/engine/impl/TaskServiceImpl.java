@@ -303,7 +303,7 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
         if (variableName == null) {
             throw new FlowableIllegalArgumentException("variableName is null");
         }
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put(variableName, value);
         commandExecutor.execute(new SetTaskVariablesCmd(taskId, variables, false));
     }
@@ -312,7 +312,7 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
         if (variableName == null) {
             throw new FlowableIllegalArgumentException("variableName is null");
         }
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put(variableName, value);
         commandExecutor.execute(new SetTaskVariablesCmd(taskId, variables, true));
     }
@@ -326,13 +326,13 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     }
 
     public void removeVariable(String taskId, String variableName) {
-        Collection<String> variableNames = new ArrayList<String>();
+        Collection<String> variableNames = new ArrayList<>();
         variableNames.add(variableName);
         commandExecutor.execute(new RemoveTaskVariablesCmd(taskId, variableNames, false));
     }
 
     public void removeVariableLocal(String taskId, String variableName) {
-        Collection<String> variableNames = new ArrayList<String>(1);
+        Collection<String> variableNames = new ArrayList<>(1);
         variableNames.add(variableName);
         commandExecutor.execute(new RemoveTaskVariablesCmd(taskId, variableNames, true));
     }
