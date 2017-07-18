@@ -51,6 +51,7 @@
         	
         	var definitionId = $('#bpmnModel').attr('data-definition-id');
         	var instanceId = $('#bpmnModel').attr('data-instance-id');
+        	var historyInstanceId = $('#bpmnModel').attr('data-history-id');
         	var serverId = $('#bpmnModel').attr('data-server-id');
          
             var elementsAdded = new Array();
@@ -235,11 +236,18 @@
         	
         	function _showProcessDiagram() {
 	        	var request;
-	        	if (instanceId != null) {
+	        	if (historyInstanceId != null) {
+	        	   request = $.ajax({
+                        type: 'get',
+                        url: './app/rest/admin/process-instances/' + instanceId + '/history-model-json?processDefinitionId=' + definitionId + '&nocaching=' + new Date().getTime()
+                    });
+                    
+	        	} else if (instanceId != null) {
 					request = $.ajax({
 					    type: 'get',
 					    url: './app/rest/admin/process-instances/' + instanceId + '/model-json?processDefinitionId=' + definitionId + '&nocaching=' + new Date().getTime()
 					});
+					
 	        	} else {
 					request = $.ajax({
 					    type: 'get',

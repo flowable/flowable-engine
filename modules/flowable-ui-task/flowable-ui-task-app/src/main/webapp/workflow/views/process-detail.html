@@ -45,7 +45,7 @@
             <button ng-if="!model.processInstance.ended" class="btn" ng-click="cancelProcess()" translate="PROCESS.ACTION.CANCEL"></button>
             <button ng-if="model.processInstance.ended" class="btn" ng-click="deleteProcess()" translate="PROCESS.ACTION.DELETE"></button>
         </div>
-        <div class="btn-group pull-right" ng-show="model.processInstance.graphicalNotationDefined && !model.processInstance.ended">
+        <div class="btn-group pull-right" ng-show="model.processInstance.graphicalNotationDefined">
             <button class="btn" id="processDiagramTrigger" translate="PROCESS.ACTION.SHOW-DIAGRAM" ng-click="showDiagram()"></button>
         </div>
         <h2> {{model.processInstance.name && model.processInstance.name ||

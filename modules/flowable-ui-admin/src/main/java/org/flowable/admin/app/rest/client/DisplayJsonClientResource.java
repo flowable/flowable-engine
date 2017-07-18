@@ -12,11 +12,6 @@
  */
 package org.flowable.admin.app.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -57,6 +52,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
 public class DisplayJsonClientResource extends AbstractClientResource {
@@ -168,13 +168,64 @@ public class DisplayJsonClientResource extends AbstractClientResource {
 
         return displayNode;
     }
+    
+    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/history-model-json", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getHistoryProcessInstanceModelJSON(@PathVariable String processInstanceId, @RequestParam(required = true) String processDefinitionId) {
+        ObjectNode displayNode = objectMapper.createObjectNode();
+
+        ServerConfig config = retrieveServerConfig(EndpointType.PROCESS);
+        BpmnModel pojoModel = clientService.getProcessDefinitionModel(config, processDefinitionId);
+
+        if (!pojoModel.getLocationMap().isEmpty()) {
+
+            // Fetch process-instance activities
+            List<String> completedActivityInstances = processInstanceService.getCompletedActivityInstancesAndProcessDefinitionId(config, processInstanceId);
+            
+            // Gather completed flows
+            List<String> completedFlows = gatherCompletedFlows(completedActivityInstances, null, pojoModel);
+
+            try {
+                GraphicInfo diagramInfo = new GraphicInfo();
+                Set<String> completedElements = new HashSet<String>(completedActivityInstances);
+                completedElements.addAll(completedFlows);
+
+                processProcessElements(config, pojoModel, displayNode, diagramInfo, completedElements, null);
+
+                displayNode.put("diagramBeginX", diagramInfo.getX());
+                displayNode.put("diagramBeginY", diagramInfo.getY());
+                displayNode.put("diagramWidth", diagramInfo.getWidth());
+                displayNode.put("diagramHeight", diagramInfo.getHeight());
+
+                if (completedActivityInstances != null) {
+                    ArrayNode completedActivities = displayNode.putArray("completedActivities");
+                    for (String completed : completedActivityInstances) {
+                        completedActivities.add(completed);
+                    }
+                }
+
+                if (completedFlows != null) {
+                    ArrayNode completedSequenceFlows = displayNode.putArray("completedSequenceFlows");
+                    for (String current : completedFlows) {
+                        completedSequenceFlows.add(current);
+                    }
+                }
+
+            } catch (Exception e) {
+                LOGGER.error("Error creating model JSON", e);
+            }
+        }
+
+        return displayNode;
+    }
 
     protected List<String> gatherCompletedFlows(List<String> completedActivityInstances,
             List<String> currentActivityinstances, BpmnModel pojoModel) {
 
         List<String> completedFlows = new ArrayList<String>();
         List<String> activities = new ArrayList<String>(completedActivityInstances);
-        activities.addAll(currentActivityinstances);
+        if (currentActivityinstances != null) {
+            activities.addAll(currentActivityinstances);
+        }
 
         // TODO: not a robust way of checking when parallel paths are active, should be revisited
         // Go over all activities and check if it's possible to match any outgoing paths against the activities

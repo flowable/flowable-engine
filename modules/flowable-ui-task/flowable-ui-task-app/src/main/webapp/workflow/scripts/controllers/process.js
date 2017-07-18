@@ -190,11 +190,10 @@ angular.module('flowableApp')
                 jQuery("#bpmnModel").attr('data-model-type', 'runtime');
 
                 // in case we want to show a historic model, include additional attribute on the div
-                /*
-                  if(!$scope.model.process.latestVersion) {
-                    jQuery("#bpmnModel").attr('data-history-id', $routeParams.processModelHistoryId);
-                  }
-                */
+                if ($scope.model.processInstance.ended) {
+                    jQuery("#bpmnModel").attr('data-history-id', $scope.model.processInstance.id);
+                }
+                
                 var viewerUrl = appResourceRoot + "../display/displaymodel.html?version=" + Date.now();
 
                 // If Flowable has been deployed inside an AMD environment Raphael will fail to register
