@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
+import org.flowable.dmn.engine.impl.el.ELExecutionContext;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.engine.common.api.FlowableException;
@@ -35,35 +35,39 @@ public class HitPolicyOutputOrder extends AbstractHitPolicy implements ComposeDe
     }
 
     @Override
-    public void composeDecisionResults(final MvelExecutionContext executionContext) {
+    public void composeDecisionResults(final ELExecutionContext executionContext) {
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
+        
+        boolean outputValuesPresent = false;
+        for (Map.Entry<String, List<Object>> entry : executionContext.getOutputValues().entrySet()) {
+            List<Object> outputValues = entry.getValue();
+            if (outputValues != null && !outputValues.isEmpty()) {
+                outputValuesPresent = true;
+            }
+        }
+        
+        if (!outputValuesPresent) {
+            if (CommandContextUtil.getDmnEngineConfiguration().isStrictMode()) {
+                throw new FlowableException(String.format("HitPolicy: %s; no output values present", getHitPolicyName()));
+            }
+        }
 
         // sort on predefined list(s) of output values
-        Collections.sort(ruleResults, new Comparator<Object>() {
-            boolean noOutputValuesPresent = true;
+        Collections.sort(ruleResults, new Comparator<Map<String, Object>>() {
 
-            @SuppressWarnings("unchecked")
-            public int compare(Object o1, Object o2) {
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                
                 CompareToBuilder compareToBuilder = new CompareToBuilder();
                 for (Map.Entry<String, List<Object>> entry : executionContext.getOutputValues().entrySet()) {
                     List<Object> outputValues = entry.getValue();
-                    if (outputValues != null || !outputValues.isEmpty()) {
-                        noOutputValuesPresent = false;
-                        compareToBuilder.append(((Map<String, Object>) o1).get(entry.getKey()), 
-                                        ((Map<String, Object>) o2).get(entry.getKey()), 
+                    if (outputValues != null && !outputValues.isEmpty()) {
+                        compareToBuilder.append(o1.get(entry.getKey()), o2.get(entry.getKey()), 
                                         new OutputOrderComparator<>(outputValues.toArray(new Comparable[outputValues.size()])));
+                        compareToBuilder.toComparison();
                     }
                 }
-
-                if (!noOutputValuesPresent) {
-                    return compareToBuilder.toComparison();
-                    
-                } else {
-                    if (CommandContextUtil.getDmnEngineConfiguration().isStrictMode()) {
-                        throw new FlowableException(String.format("HitPolicy: %s; no output values present", getHitPolicyName()));
-                    }
-                    return 0;
-                }
+                
+                return compareToBuilder.toComparison();
             }
         });
 

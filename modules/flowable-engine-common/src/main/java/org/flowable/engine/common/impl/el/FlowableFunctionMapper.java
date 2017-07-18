@@ -11,13 +11,13 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.el;
+package org.flowable.engine.common.impl.el;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
+import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.impl.javax.el.FunctionMapper;
-import org.flowable.engine.delegate.FlowableFunctionDelegate;
 
 /**
  * A date function mapper that can be used in EL expressions

@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
+import org.flowable.dmn.engine.impl.el.ELExecutionContext;
 import org.flowable.dmn.model.BuiltinAggregator;
 import org.flowable.dmn.model.HitPolicy;
 
@@ -34,7 +34,7 @@ public class HitPolicyCollect extends AbstractHitPolicy implements ComposeDecisi
         return HitPolicy.COLLECT.getValue();
     }
 
-    public void composeDecisionResults(MvelExecutionContext executionContext) {
+    public void composeDecisionResults(ELExecutionContext executionContext) {
         List<Map<String, Object>> decisionResults = new ArrayList<>();
         if (executionContext.getRuleResults() != null && !executionContext.getRuleResults().isEmpty()) {
             if (executionContext.getAggregator() == null) {
@@ -72,7 +72,7 @@ public class HitPolicyCollect extends AbstractHitPolicy implements ComposeDecisi
         executionContext.getAuditContainer().setDecisionResult(decisionResults);
     }
 
-    protected Map.Entry<String, List<Double>> createDistinctOutputDoubleValues(MvelExecutionContext executionContext) {
+    protected Map.Entry<String, List<Double>> createDistinctOutputDoubleValues(ELExecutionContext executionContext) {
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
         Set<Map<String, Object>> distinctRuleResults = new HashSet<>(ruleResults);
         Map<String, List<Double>> distinctOutputDoubleValues = new HashMap<>();

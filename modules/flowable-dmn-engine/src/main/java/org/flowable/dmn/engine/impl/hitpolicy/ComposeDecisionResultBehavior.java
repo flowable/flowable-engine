@@ -12,12 +12,12 @@
  */
 package org.flowable.dmn.engine.impl.hitpolicy;
 
-import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
+import org.flowable.dmn.engine.impl.el.ELExecutionContext;
 
 /**
  * @author Yvo Swillens
  */
 public interface ComposeDecisionResultBehavior {
 
-    void composeDecisionResults(MvelExecutionContext executionContext);
+    void composeDecisionResults(ELExecutionContext executionContext);
 }

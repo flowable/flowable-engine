@@ -10,13 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.el;
+package org.flowable.dmn.engine.impl.el;
 
 import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
-import org.flowable.engine.common.impl.el.DynamicBeanPropertyELResolver;
+import org.flowable.engine.common.impl.el.ExpressionFactoryResolver;
 import org.flowable.engine.common.impl.el.FlowableElContext;
 import org.flowable.engine.common.impl.el.JsonNodeELResolver;
 import org.flowable.engine.common.impl.el.ParsingElContext;
@@ -30,11 +30,6 @@ import org.flowable.engine.common.impl.javax.el.ExpressionFactory;
 import org.flowable.engine.common.impl.javax.el.ListELResolver;
 import org.flowable.engine.common.impl.javax.el.MapELResolver;
 import org.flowable.engine.common.impl.javax.el.ValueExpression;
-import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.bpmn.data.ItemInstance;
-import org.flowable.engine.impl.interceptor.DelegateInterceptor;
-import org.flowable.engine.impl.persistence.entity.VariableScopeImpl;
 
 /**
  * <p>
@@ -47,11 +42,12 @@ import org.flowable.engine.impl.persistence.entity.VariableScopeImpl;
  * Then also this class is used as an entry point for runtime evaluation of the expressions.
  * </p>
  *
- * @author Tijs Rademakers
+ * @author Tom Baeyens
+ * @author Dave Syer
+ * @author Frederik Heremans
  */
-public abstract class AbstractExpressionManager implements ExpressionManager {
+public class DefaultExpressionManager implements ExpressionManager {
 
-    protected DelegateInterceptor delegateInterceptor;
     protected ExpressionFactory expressionFactory;
     protected List<FlowableFunctionDelegate> functionDelegates;
 
@@ -59,6 +55,15 @@ public abstract class AbstractExpressionManager implements ExpressionManager {
     protected ELContext parsingElContext;
     protected Map<Object, Object> beans;
 
+    public DefaultExpressionManager() {
+        this(null);
+    }
+
+    public DefaultExpressionManager(Map<Object, Object> beans) {
+        this.expressionFactory = ExpressionFactoryResolver.resolveExpressionFactory();
+        this.beans = beans;
+    }
+    
     @Override
     public Expression createExpression(String expression) {
         if (parsingElContext == null) {
@@ -66,38 +71,25 @@ public abstract class AbstractExpressionManager implements ExpressionManager {
         }
 
         ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expression.trim(), Object.class);
-        return new JuelExpression(this, this.delegateInterceptor, valueExpression, expression);
+        return new JuelExpression(this, valueExpression, expression);
     }
 
     public void setExpressionFactory(ExpressionFactory expressionFactory) {
         this.expressionFactory = expressionFactory;
     }
-
-    public ELContext getElContext(VariableScope variableScope) {
-        ELContext elContext = null;
-        if (variableScope instanceof VariableScopeImpl) {
-            VariableScopeImpl variableScopeImpl = (VariableScopeImpl) variableScope;
-            elContext = variableScopeImpl.getCachedElContext();
-        }
-
-        if (elContext == null) {
-            elContext = createElContext(variableScope);
-            if (variableScope instanceof VariableScopeImpl) {
-                ((VariableScopeImpl) variableScope).setCachedElContext(elContext);
-            }
-        }
-
-        return elContext;
+    
+    public ELContext getElContext(Map<String, Object> variables) {
+        return createElContext(variables);
     }
 
-    protected FlowableElContext createElContext(VariableScope variableScope) {
-        ELResolver elResolver = createElResolver(variableScope);
+    protected FlowableElContext createElContext(Map<String, Object> variables) {
+        ELResolver elResolver = createElResolver(variables);
         return new FlowableElContext(elResolver, functionDelegates);
     }
 
-    protected ELResolver createElResolver(VariableScope variableScope) {
+    protected ELResolver createElResolver(Map<String, Object> variables) {
         CompositeELResolver elResolver = new CompositeELResolver();
-        elResolver.add(new VariableScopeElResolver(variableScope));
+        elResolver.add(new VariableScopeElResolver(variables));
 
         if (beans != null) {
             // ACT-1102: Also expose all beans in configuration when using
@@ -109,7 +101,6 @@ public abstract class AbstractExpressionManager implements ExpressionManager {
         elResolver.add(new ListELResolver());
         elResolver.add(new MapELResolver());
         elResolver.add(new JsonNodeELResolver());
-        elResolver.add(new DynamicBeanPropertyELResolver(ItemInstance.class, "getFieldValue", "setFieldValue"));
         elResolver.add(new BeanELResolver());
         return elResolver;
     }

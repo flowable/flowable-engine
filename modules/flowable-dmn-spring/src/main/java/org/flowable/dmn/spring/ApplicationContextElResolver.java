@@ -11,37 +11,39 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.el;
+package org.flowable.dmn.spring;
 
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
-import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.javax.el.ELContext;
 import org.flowable.engine.common.impl.javax.el.ELResolver;
+import org.springframework.context.ApplicationContext;
 
 /**
- * An {@link ELResolver} that exposed object values in the map, under the name of the entry's key. The values in the map are only returned when requested property has no 'base', meaning it's a
- * root-object.
- * 
- * @author Frederik Heremans
+ * @author Tijs Rademakers
+ * @author Joram Barrez
  */
-public class ReadOnlyMapELResolver extends ELResolver {
+public class ApplicationContextElResolver extends ELResolver {
 
-    protected Map<Object, Object> wrappedMap;
+    protected ApplicationContext applicationContext;
 
-    public ReadOnlyMapELResolver(Map<Object, Object> map) {
-        this.wrappedMap = map;
+    public ApplicationContextElResolver(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 
     public Object getValue(ELContext context, Object base, Object property) {
         if (base == null) {
-            if (wrappedMap.containsKey(property)) {
+            // according to javadoc, can only be a String
+            String key = (String) property;
+
+            if (applicationContext.containsBean(key)) {
                 context.setPropertyResolved(true);
-                return wrappedMap.get(property);
+                return applicationContext.getBean(key);
             }
         }
+
         return null;
     }
 
@@ -51,8 +53,9 @@ public class ReadOnlyMapELResolver extends ELResolver {
 
     public void setValue(ELContext context, Object base, Object property, Object value) {
         if (base == null) {
-            if (wrappedMap.containsKey(property)) {
-                throw new FlowableException("Cannot set value of '" + property + "', it's readonly!");
+            String key = (String) property;
+            if (applicationContext.containsBean(key)) {
+                throw new FlowableException("Cannot set value of '" + property + "', it resolves to a bean defined in the Spring application-context.");
             }
         }
     }

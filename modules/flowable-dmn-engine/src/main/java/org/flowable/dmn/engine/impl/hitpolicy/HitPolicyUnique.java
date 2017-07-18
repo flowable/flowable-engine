@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.dmn.api.RuleExecutionAuditContainer;
-import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
+import org.flowable.dmn.engine.impl.el.ELExecutionContext;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.engine.common.api.FlowableException;
@@ -35,7 +35,7 @@ public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleVa
     }
 
     @Override
-    public void evaluateRuleValidity(int ruleNumber, MvelExecutionContext executionContext) {
+    public void evaluateRuleValidity(int ruleNumber, ELExecutionContext executionContext) {
         //TODO: not on audit container
         for (Map.Entry<Integer, RuleExecutionAuditContainer> entry : executionContext.getAuditContainer().getRuleExecutions().entrySet()) {
             if (entry.getKey().equals(ruleNumber) == false && entry.getValue().isValid()) {
@@ -49,7 +49,7 @@ public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleVa
         }
     }
 
-    public void composeDecisionResults(MvelExecutionContext executionContext) {
+    public void composeDecisionResults(ELExecutionContext executionContext) {
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
         List<Map<String, Object>> decisionResult = null;
 

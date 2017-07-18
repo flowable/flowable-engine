@@ -10,28 +10,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.dmn.engine.impl.mvel;
-
-import java.io.Serializable;
+package org.flowable.dmn.engine.impl.el;
 
 import org.flowable.dmn.engine.FlowableDmnExpressionException;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.LiteralExpression;
 import org.flowable.dmn.model.OutputClause;
 import org.flowable.dmn.model.UnaryTests;
-import org.mvel2.MVEL;
-import org.mvel2.integration.PropertyHandlerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Yvo Swillens
  */
-public class MvelExpressionExecutor {
+public class ELExpressionExecutor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MvelExpressionExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ELExpressionExecutor.class);
 
-    public static Boolean executeInputExpression(InputClause inputClause, UnaryTests inputEntry, MvelExecutionContext executionContext) {
+    public static Boolean executeInputExpression(InputClause inputClause, UnaryTests inputEntry, ExpressionManager expressionManager, ELExecutionContext executionContext) {
         if (inputClause == null) {
             throw new IllegalArgumentException("input clause is required");
         }
@@ -44,34 +40,25 @@ public class MvelExpressionExecutor {
         if (executionContext == null) {
             throw new IllegalArgumentException("execution context is required");
         }
-
-        for (Class<?> variableClass : executionContext.getPropertyHandlers().keySet()) {
-            PropertyHandlerFactory.registerPropertyHandler(variableClass, executionContext.getPropertyHandlers().get(variableClass));
-        }
-
-        // check if variable is present MVEL execution context
-        executionContext.checkExecutionContext(inputClause.getInputExpression().getText());
-
+        
+        String inputExpression = inputClause.getInputExpression().getText();
+        executionContext.checkExecutionContext(inputExpression);
+        
         // pre parse expression
-        String parsedExpression = MvelConditionExpressionPreParser.parse(inputEntry.getText(), inputClause.getInputExpression().getText(), inputClause.getInputExpression().getTypeRef());
+        String parsedExpression = ELConditionExpressionPreParser.parse(inputEntry.getText(), inputExpression, inputClause.getInputExpression().getTypeRef());
 
-        // compile MVEL expression
-        Serializable compiledExpression = MVEL.compileExpression(parsedExpression, executionContext.getParserContext());
-
-        // execute MVEL expression
-        Boolean result;
-
+        Expression expression = expressionManager.createExpression(parsedExpression);
+        RuleExpressionCondition condition = new RuleExpressionCondition(expression);
+        
         try {
-            result = MVEL.executeExpression(compiledExpression, executionContext.getStackVariables(), Boolean.class);
+            return condition.evaluate(executionContext.getStackVariables());
         } catch (Exception ex) {
             LOGGER.warn("Error while executing input entry: {}", parsedExpression, ex);
             throw new FlowableDmnExpressionException("error while executing input entry", parsedExpression, ex);
         }
-
-        return result;
     }
 
-    public static Object executeOutputExpression(OutputClause outputClause, LiteralExpression outputEntry, MvelExecutionContext executionContext) {
+    public static Object executeOutputExpression(OutputClause outputClause, LiteralExpression outputEntry, ExpressionManager expressionManager, ELExecutionContext executionContext) {
         if (outputClause == null) {
             throw new IllegalArgumentException("output clause is required");
         }
@@ -81,20 +68,17 @@ public class MvelExpressionExecutor {
         if (executionContext == null) {
             throw new IllegalArgumentException("execution context is required");
         }
-
-        // compile MVEL expression
-        Serializable compiledExpression = MVEL.compileExpression(outputEntry.getText(), executionContext.getParserContext());
-
-        // execute MVEL expression
-        Object result = null;
+        
+        String parsedExpression = ELOutputExpressionPreParser.parse(outputEntry.getText());
+        
+        Expression expression = expressionManager.createExpression(parsedExpression);
+        RuleExpressionOutput outputExpression = new RuleExpressionOutput(expression);
 
         try {
-            result = MVEL.executeExpression(compiledExpression, executionContext.getStackVariables());
+            return outputExpression.getValue(executionContext.getStackVariables());
         } catch (Exception ex) {
             LOGGER.warn("Error while executing output entry: {}", outputEntry.getText(), ex);
             throw new FlowableDmnExpressionException("error while executing output entry", outputEntry.getText(), ex);
         }
-
-        return result;
     }
 }

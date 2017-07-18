@@ -11,22 +11,34 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.delegate;
+package org.flowable.dmn.engine.impl.el;
 
 import java.lang.reflect.Method;
 
+import org.flowable.dmn.engine.impl.el.util.DateUtil;
+import org.flowable.engine.common.impl.el.AbstractFlowableFunctionDelegate;
+
 /**
- * Interface for pluggable functions that can be used in the EL expressions
+ * A date function mapper that can be used in EL expressions
  * 
  * @author Tijs Rademakers
  */
-public interface FlowableFunctionDelegate {
+public class FlowableSubtractDateFunctionDelegate extends AbstractFlowableFunctionDelegate {
 
-    String prefix();
+    public String prefix() {
+        return "date";
+    }
 
-    String localName();
+    public String localName() {
+        return "subtractDate";
+    }
 
-    Method functionMethod();
+    public Class<?> functionClass() {
+        return DateUtil.class;
+    }
 
-    Class<?> functionClass();
+    public Method functionMethod() {
+        return getFourObjectParameterMethod();
+    }
+
 }

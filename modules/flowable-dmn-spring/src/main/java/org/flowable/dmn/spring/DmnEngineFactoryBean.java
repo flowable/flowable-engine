@@ -45,10 +45,17 @@ public class DmnEngineFactoryBean implements FactoryBean<DmnEngine>, DisposableB
     }
 
     public DmnEngine getObject() throws Exception {
+        configureExpressionManager();
         configureExternallyManagedTransactions();
 
         this.dmnEngine = dmnEngineConfiguration.buildDmnEngine();
         return this.dmnEngine;
+    }
+    
+    protected void configureExpressionManager() {
+        if (dmnEngineConfiguration.getExpressionManager() == null && applicationContext != null) {
+            dmnEngineConfiguration.setExpressionManager(new SpringDmnExpressionManager(applicationContext, dmnEngineConfiguration.getBeans()));
+        }
     }
 
     protected void configureExternallyManagedTransactions() {

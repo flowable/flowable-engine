@@ -10,34 +10,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.flowable.engine.impl.el;
+package org.flowable.dmn.engine.test;
 
 import java.lang.reflect.Method;
 
+import org.flowable.dmn.engine.impl.el.util.DateUtil;
 import org.flowable.engine.common.impl.el.AbstractFlowableFunctionDelegate;
 
 /**
- * A date function mapper that can be used in EL expressions
- * 
  * @author Tijs Rademakers
  */
-public class FlowableDateFunctionDelegate extends AbstractFlowableFunctionDelegate {
+public class TestCustomFunctionDelegate extends AbstractFlowableFunctionDelegate {
 
+    @Override
     public String prefix() {
-        return "date";
+        return "custom";
     }
 
+    @Override
     public String localName() {
-        return "format";
+        return "testFunctionName";
     }
 
+    @Override
     public Class<?> functionClass() {
         return DateUtil.class;
     }
-
+    
+    @Override
     public Method functionMethod() {
-        return getSingleObjectParameterMethod();
+        return getSingleObjectParameterMethod("toDate");
     }
-
 }

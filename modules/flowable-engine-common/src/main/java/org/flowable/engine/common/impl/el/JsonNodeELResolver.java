@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.el;
+package org.flowable.engine.common.impl.el;
 
 import java.beans.FeatureDescriptor;
 import java.math.BigDecimal;

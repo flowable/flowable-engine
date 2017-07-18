@@ -10,10 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.dmn.engine.impl.mvel;
+
+package org.flowable.engine.common.api.delegate;
+
+import java.lang.reflect.Method;
 
 /**
- * @author Yvo Swillens
+ * Interface for pluggable functions that can be used in the EL expressions
+ * 
+ * @author Tijs Rademakers
  */
-public interface MvelExpressionPreParser {
+public interface FlowableFunctionDelegate {
+
+    String prefix();
+
+    String localName();
+
+    Method functionMethod();
+
+    Class<?> functionClass();
 }

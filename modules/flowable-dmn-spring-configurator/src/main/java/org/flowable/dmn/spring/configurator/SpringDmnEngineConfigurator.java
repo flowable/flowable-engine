@@ -15,6 +15,7 @@ package org.flowable.dmn.spring.configurator;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.configurator.DmnEngineConfigurator;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
+import org.flowable.dmn.spring.SpringDmnExpressionManager;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -34,7 +35,11 @@ public class SpringDmnEngineConfigurator extends DmnEngineConfigurator {
             dmnEngineConfiguration = new SpringDmnEngineConfiguration();
         }
         initialiseCommonProperties(processEngineConfiguration, dmnEngineConfiguration, EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
-        dmnEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
+        
+        SpringProcessEngineConfiguration springProcessEngineConfiguration = (SpringProcessEngineConfiguration) processEngineConfiguration;
+        dmnEngineConfiguration.setTransactionManager(springProcessEngineConfiguration.getTransactionManager());
+        dmnEngineConfiguration.setExpressionManager(new SpringDmnExpressionManager(
+                        springProcessEngineConfiguration.getApplicationContext(), springProcessEngineConfiguration.getBeans()));
 
         initDmnEngine();
     }

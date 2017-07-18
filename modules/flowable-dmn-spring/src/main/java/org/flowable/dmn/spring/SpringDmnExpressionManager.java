@@ -11,10 +11,12 @@
  * limitations under the License.
  */
 
-package org.flowable.spring;
+package org.flowable.dmn.spring;
 
 import java.util.Map;
 
+import org.flowable.dmn.engine.impl.el.DefaultExpressionManager;
+import org.flowable.dmn.engine.impl.el.VariableScopeElResolver;
 import org.flowable.engine.common.impl.el.JsonNodeELResolver;
 import org.flowable.engine.common.impl.el.ReadOnlyMapELResolver;
 import org.flowable.engine.common.impl.javax.el.ArrayELResolver;
@@ -23,17 +25,14 @@ import org.flowable.engine.common.impl.javax.el.CompositeELResolver;
 import org.flowable.engine.common.impl.javax.el.ELResolver;
 import org.flowable.engine.common.impl.javax.el.ListELResolver;
 import org.flowable.engine.common.impl.javax.el.MapELResolver;
-import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.el.DefaultExpressionManager;
-import org.flowable.engine.impl.el.VariableScopeElResolver;
 import org.springframework.context.ApplicationContext;
 
 /**
  * {@link DefaultExpressionManager} that exposes the full application-context or a limited set of beans in expressions.
  * 
- * @author Tom Baeyens
+ * @author Tijs Rademakers
  */
-public class SpringExpressionManager extends DefaultExpressionManager {
+public class SpringDmnExpressionManager extends DefaultExpressionManager {
 
     protected ApplicationContext applicationContext;
 
@@ -43,15 +42,15 @@ public class SpringExpressionManager extends DefaultExpressionManager {
      * @param beans
      *            a map of custom beans to expose. If null, all beans in the application-context will be exposed.
      */
-    public SpringExpressionManager(ApplicationContext applicationContext, Map<Object, Object> beans) {
+    public SpringDmnExpressionManager(ApplicationContext applicationContext, Map<Object, Object> beans) {
         super(beans);
         this.applicationContext = applicationContext;
     }
 
     @Override
-    protected ELResolver createElResolver(VariableScope variableScope) {
+    protected ELResolver createElResolver(Map<String, Object> variables) {
         CompositeELResolver compositeElResolver = new CompositeELResolver();
-        compositeElResolver.add(new VariableScopeElResolver(variableScope));
+        compositeElResolver.add(new VariableScopeElResolver(variables));
 
         if (beans != null) {
             // Only expose limited set of beans in expressions

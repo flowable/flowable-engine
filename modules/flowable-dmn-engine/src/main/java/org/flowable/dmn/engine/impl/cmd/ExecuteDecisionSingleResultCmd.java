@@ -59,8 +59,7 @@ public class ExecuteDecisionSingleResultCmd extends AbstractExecuteDecisionCmd i
         DmnDecisionTable decisionTable = resolveDecisionTable(dmnEngineConfiguration.getDeploymentManager());
         Decision decision = resolveDecision(dmnEngineConfiguration.getDeploymentManager(), decisionTable);
 
-        DecisionExecutionAuditContainer executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decision, executeDecisionInfo,
-                dmnEngineConfiguration.getCustomExpressionFunctions(), dmnEngineConfiguration.getCustomPropertyHandlers());
+        DecisionExecutionAuditContainer executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decision, executeDecisionInfo);
 
         Map<String, Object> decisionResult = null;
         if (executionResult != null && executionResult.getDecisionResult() != null && !executionResult.getDecisionResult().isEmpty()) {

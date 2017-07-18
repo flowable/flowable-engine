@@ -10,11 +10,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.dmn.engine.impl.mvel.extension;
+package org.flowable.dmn.engine.impl.el.util;
 
 import java.util.Date;
 
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -24,42 +23,53 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class DateUtil {
 
-    public static Date toDate(String dateString) {
+    public static Date toDate(Object dateString) {
 
-        if (StringUtils.isEmpty(dateString)) {
+        if (dateString == null) {
             throw new IllegalArgumentException("date string cannot be empty");
         }
 
         DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd");
-        LocalDate dateTime = dtf.parseLocalDate(dateString);
+        LocalDate dateTime = dtf.parseLocalDate((String) dateString);
 
         return dateTime.toDate();
     }
 
-    public static Date addDate(Date startDate, Integer years, Integer months, Integer days) {
+    public static Date addDate(Object startDate, Object years, Object months, Object days) {
 
         LocalDate currentDate = new LocalDate(startDate);
-
-        currentDate = currentDate.plusYears(years);
-        currentDate = currentDate.plusMonths(months);
-        currentDate = currentDate.plusDays(days);
+        
+        currentDate = currentDate.plusYears(intValue(years));
+        currentDate = currentDate.plusMonths(intValue(months));
+        currentDate = currentDate.plusDays(intValue(days));
 
         return currentDate.toDate();
     }
 
-    public static Date subtractDate(Date startDate, Integer years, Integer months, Integer days) {
+    public static Date subtractDate(Object startDate, Object years, Object months, Object days) {
 
         LocalDate currentDate = new LocalDate(startDate);
 
-        currentDate = currentDate.minusYears(years);
-        currentDate = currentDate.minusMonths(months);
-        currentDate = currentDate.minusDays(days);
+        currentDate = currentDate.minusYears(intValue(years));
+        currentDate = currentDate.minusMonths(intValue(months));
+        currentDate = currentDate.minusDays(intValue(days));
 
         return currentDate.toDate();
     }
 
-    public static Date getCurrentDate() {
+    public static Date now() {
 
         return new LocalDate().toDate();
+    }
+    
+    protected static Integer intValue(Object value) {
+        Integer intValue = null;
+        if (value instanceof Integer) {
+            intValue = (Integer) value;
+        } else {
+            intValue = Integer.valueOf(value.toString());
+        }
+        
+        return intValue;
     }
 }

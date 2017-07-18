@@ -10,15 +10,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.dmn.engine;
-
-import java.lang.reflect.Method;
-import java.util.Map;
+package org.flowable.dmn.engine.impl.el;
 
 /**
- * @author Yvo Swillens
+ * @author Tijs Rademakers
  */
-public interface CustomExpressionFunctionRegistry {
+public class ELOutputExpressionPreParser {
 
-    Map<String, Method> getCustomExpressionMethods();
+    public static String parse(String expression) {
+
+        StringBuilder parsedExpressionBuilder = new StringBuilder();
+        parsedExpressionBuilder
+            .append("#{")
+            .append(expression)
+            .append("}");
+        
+        return parsedExpressionBuilder.toString();
+    }
 }

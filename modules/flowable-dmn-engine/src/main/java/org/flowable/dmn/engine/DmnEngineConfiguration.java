@@ -13,7 +13,6 @@
 package org.flowable.dmn.engine;
 
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,6 +44,12 @@ import org.flowable.dmn.engine.impl.deployer.CachingAndArtifactsManager;
 import org.flowable.dmn.engine.impl.deployer.DmnDeployer;
 import org.flowable.dmn.engine.impl.deployer.DmnDeploymentHelper;
 import org.flowable.dmn.engine.impl.deployer.ParsedDeploymentBuilderFactory;
+import org.flowable.dmn.engine.impl.el.DefaultExpressionManager;
+import org.flowable.dmn.engine.impl.el.ExpressionManager;
+import org.flowable.dmn.engine.impl.el.FlowableAddDateFunctionDelegate;
+import org.flowable.dmn.engine.impl.el.FlowableCurrentDateFunctionDelegate;
+import org.flowable.dmn.engine.impl.el.FlowableSubtractDateFunctionDelegate;
+import org.flowable.dmn.engine.impl.el.FlowableToDateFunctionDelegate;
 import org.flowable.dmn.engine.impl.hitpolicy.AbstractHitPolicy;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyAny;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyCollect;
@@ -53,7 +58,6 @@ import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyOutputOrder;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyPriority;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyRuleOrder;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyUnique;
-import org.flowable.dmn.engine.impl.mvel.config.DefaultCustomExpressionFunctionRegistry;
 import org.flowable.dmn.engine.impl.parser.DmnParseFactory;
 import org.flowable.dmn.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
@@ -80,6 +84,7 @@ import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnDeplo
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnResourceDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisHistoricDecisionExecutionDataManager;
 import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
 import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
@@ -95,7 +100,6 @@ import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.runtime.Clock;
-import org.mvel2.integration.PropertyHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,6 +138,11 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
     protected DmnResourceEntityManager resourceEntityManager;
     protected HistoricDecisionExecutionEntityManager historicDecisionExecutionEntityManager;
     protected TableDataManager tableDataManager;
+    
+    // EXPRESSION MANAGER /////////////////////////////////////////////
+    protected ExpressionManager expressionManager;
+    protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
+    protected List<FlowableFunctionDelegate> customFlowableFunctionDelegates;
 
     // DEPLOYERS
     // ////////////////////////////////////////////////////////////////
@@ -154,13 +163,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
     protected DeploymentCache<DecisionTableCacheEntry> decisionCache;
     
     protected ObjectMapper objectMapper = new ObjectMapper();
-
-    // CUSTOM EXPRESSION FUNCTIONS
-    // ////////////////////////////////////////////////////////////////
-    protected CustomExpressionFunctionRegistry customExpressionFunctionRegistry;
-    protected CustomExpressionFunctionRegistry postCustomExpressionFunctionRegistry;
-    protected Map<String, Method> customExpressionFunctions = new HashMap<String, Method>();
-    protected Map<Class<?>, PropertyHandler> customPropertyHandlers = new HashMap<Class<?>, PropertyHandler>();
 
     // HIT POLICIES
     protected Map<String, AbstractHitPolicy> hitPolicyBehaviors;
@@ -223,6 +225,8 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
     // /////////////////////////////////////////////////////////////////////
 
     protected void init() {
+        initFunctionDelegates();
+        initExpressionManager();
         initCommandContextFactory();
         initTransactionContextFactory();
         initCommandExecutors();
@@ -244,7 +248,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         initEntityManagers();
         initDeployers();
         initClock();
-        initCustomExpressionFunctions();
         initHitPolicyBehaviors();
         initRuleEngineExecutor();
     }
@@ -421,6 +424,28 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
     public CommandInterceptor createTransactionInterceptor() {
         return null;
     }
+    
+    public void initFunctionDelegates() {
+        if (this.flowableFunctionDelegates == null) {
+            this.flowableFunctionDelegates = new ArrayList<>();
+            this.flowableFunctionDelegates.add(new FlowableToDateFunctionDelegate());
+            this.flowableFunctionDelegates.add(new FlowableSubtractDateFunctionDelegate());
+            this.flowableFunctionDelegates.add(new FlowableAddDateFunctionDelegate());
+            this.flowableFunctionDelegates.add(new FlowableCurrentDateFunctionDelegate());
+        }
+
+        if (this.customFlowableFunctionDelegates != null) {
+            this.flowableFunctionDelegates.addAll(this.customFlowableFunctionDelegates);
+        }
+    }
+    
+    public void initExpressionManager() {
+        if (expressionManager == null) {
+            expressionManager = new DefaultExpressionManager(beans);
+        }
+
+        expressionManager.setFunctionDelegates(flowableFunctionDelegates);
+    }
 
     // deployers
     // ////////////////////////////////////////////////////////////////
@@ -506,20 +531,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         }
     }
 
-    // custom expression functions
-    // ////////////////////////////////////////////////////////////////
-    protected void initCustomExpressionFunctions() {
-        if (customExpressionFunctionRegistry == null) {
-            customExpressionFunctions.putAll(new DefaultCustomExpressionFunctionRegistry().getCustomExpressionMethods());
-        } else {
-            customExpressionFunctions.putAll(customExpressionFunctionRegistry.getCustomExpressionMethods());
-        }
-
-        if (postCustomExpressionFunctionRegistry != null) {
-            customExpressionFunctions.putAll(postCustomExpressionFunctionRegistry.getCustomExpressionMethods());
-        }
-    }
-
     // myBatis SqlSessionFactory
     // ////////////////////////////////////////////////
 
@@ -577,7 +588,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
     // rule engine executor
     /////////////////////////////////////////////////////////////
     public void initRuleEngineExecutor() {
-        ruleEngineExecutor = new RuleEngineExecutorImpl(hitPolicyBehaviors, objectMapper);
+        ruleEngineExecutor = new RuleEngineExecutorImpl(hitPolicyBehaviors, expressionManager, objectMapper);
     }
 
 
@@ -718,6 +729,33 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
     }
 
     public DmnEngineConfiguration getDmnEngineConfiguration() {
+        return this;
+    }
+
+    public ExpressionManager getExpressionManager() {
+        return expressionManager;
+    }
+
+    public DmnEngineConfiguration setExpressionManager(ExpressionManager expressionManager) {
+        this.expressionManager = expressionManager;
+        return this;
+    }
+
+    public List<FlowableFunctionDelegate> getFlowableFunctionDelegates() {
+        return flowableFunctionDelegates;
+    }
+
+    public DmnEngineConfiguration setFlowableFunctionDelegates(List<FlowableFunctionDelegate> flowableFunctionDelegates) {
+        this.flowableFunctionDelegates = flowableFunctionDelegates;
+        return this;
+    }
+
+    public List<FlowableFunctionDelegate> getCustomFlowableFunctionDelegates() {
+        return customFlowableFunctionDelegates;
+    }
+
+    public DmnEngineConfiguration setCustomFlowableFunctionDelegates(List<FlowableFunctionDelegate> customFlowableFunctionDelegates) {
+        this.customFlowableFunctionDelegates = customFlowableFunctionDelegates;
         return this;
     }
 
@@ -922,42 +960,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
 
     public DmnEngineConfiguration setClock(Clock clock) {
         this.clock = clock;
-        return this;
-    }
-
-    public CustomExpressionFunctionRegistry getCustomExpressionFunctionRegistry() {
-        return customExpressionFunctionRegistry;
-    }
-
-    public DmnEngineConfiguration setCustomExpressionFunctionRegistry(CustomExpressionFunctionRegistry customExpressionFunctionRegistry) {
-        this.customExpressionFunctionRegistry = customExpressionFunctionRegistry;
-        return this;
-    }
-
-    public CustomExpressionFunctionRegistry getPostCustomExpressionFunctionRegistry() {
-        return postCustomExpressionFunctionRegistry;
-    }
-
-    public DmnEngineConfiguration setPostCustomExpressionFunctionRegistry(CustomExpressionFunctionRegistry postCustomExpressionFunctionRegistry) {
-        this.postCustomExpressionFunctionRegistry = postCustomExpressionFunctionRegistry;
-        return this;
-    }
-
-    public Map<String, Method> getCustomExpressionFunctions() {
-        return customExpressionFunctions;
-    }
-
-    public DmnEngineConfiguration setCustomExpressionFunctions(Map<String, Method> customExpressionFunctions) {
-        this.customExpressionFunctions = customExpressionFunctions;
-        return this;
-    }
-
-    public Map<Class<?>, PropertyHandler> getCustomPropertyHandlers() {
-        return customPropertyHandlers;
-    }
-
-    public DmnEngineConfiguration setCustomPropertyHandlers(Map<Class<?>, PropertyHandler> customPropertyHandlers) {
-        this.customPropertyHandlers = customPropertyHandlers;
         return this;
     }
 

@@ -10,9 +10,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.dmn.engine.impl.mvel;
+package org.flowable.dmn.engine.impl.el;
 
-import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,43 +23,22 @@ import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.OutputClause;
 import org.flowable.engine.common.api.FlowableException;
 import org.joda.time.LocalDate;
-import org.mvel2.ParserContext;
-import org.mvel2.integration.PropertyHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Yvo Swillens
  */
-public class MvelExecutionContextBuilder {
+public class ELExecutionContextBuilder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MvelExecutionContextBuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ELExecutionContextBuilder.class);
 
-    public static MvelExecutionContext build(Decision decision, Map<String, Object> inputVariables,
-            Map<String, Method> customExpressionFunctions, Map<Class<?>, PropertyHandler> propertyHandlers) {
+    public static ELExecutionContext build(Decision decision, Map<String, Object> inputVariables) {
 
-        MvelExecutionContext executionContext = new MvelExecutionContext();
+        ELExecutionContext executionContext = new ELExecutionContext();
 
         // initialize audit trail
         executionContext.setAuditContainer(DecisionExecutionAuditUtil.initializeRuleExecutionAudit(decision, inputVariables));
-
-        ParserContext parserContext = new ParserContext();
-
-        // add custom functions to context
-        if (customExpressionFunctions != null && !customExpressionFunctions.isEmpty()) {
-            for (Map.Entry<String, Method> config : customExpressionFunctions.entrySet()) {
-                parserContext.addImport(config.getKey(), config.getValue());
-            }
-        }
-
-        executionContext.setParserContext(parserContext);
-
-        // add property handlers to context
-        if (propertyHandlers != null) {
-            for (Class<?> variableClass : propertyHandlers.keySet()) {
-                executionContext.addPropertyHandler(variableClass, propertyHandlers.get(variableClass));
-            }
-        }
 
         DecisionTable decisionTable = (DecisionTable) decision.getExpression();
 

@@ -10,15 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.el;
+package org.flowable.dmn.engine.impl.el;
 
 import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.impl.javax.el.ELContext;
-import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.delegate.VariableScope;
 
 /**
  * Used as an entry point for runtime evaluation of the expressions.
@@ -26,10 +24,10 @@ import org.flowable.engine.delegate.VariableScope;
  * @author Tijs Rademakers
  */
 public interface ExpressionManager {
-
-    Expression createExpression(String expression);
     
-    ELContext getElContext(VariableScope variableScope);
+    Expression createExpression(String expression);
+
+    ELContext getElContext(Map<String, Object> variables);
     
     Map<Object, Object> getBeans();
     

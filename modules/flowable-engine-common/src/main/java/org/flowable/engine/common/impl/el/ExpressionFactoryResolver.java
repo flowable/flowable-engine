@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.el;
+package org.flowable.engine.common.impl.el;
 
 import org.flowable.engine.common.impl.javax.el.ExpressionFactory;
 

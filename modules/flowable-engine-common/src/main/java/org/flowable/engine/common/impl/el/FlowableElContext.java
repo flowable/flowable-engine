@@ -10,15 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.el;
+package org.flowable.engine.common.impl.el;
 
 import java.util.List;
 
+import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
+import org.flowable.engine.common.impl.el.FlowableFunctionMapper;
 import org.flowable.engine.common.impl.javax.el.ELContext;
 import org.flowable.engine.common.impl.javax.el.ELResolver;
 import org.flowable.engine.common.impl.javax.el.FunctionMapper;
 import org.flowable.engine.common.impl.javax.el.VariableMapper;
-import org.flowable.engine.delegate.FlowableFunctionDelegate;
 
 /**
  * @author Tom Baeyens

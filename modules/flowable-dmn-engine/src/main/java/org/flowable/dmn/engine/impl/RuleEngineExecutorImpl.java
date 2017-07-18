@@ -12,7 +12,6 @@
  */
 package org.flowable.dmn.engine.impl;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,17 +19,17 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.FlowableDmnExpressionException;
 import org.flowable.dmn.engine.RuleEngineExecutor;
+import org.flowable.dmn.engine.impl.el.ELExecutionContext;
+import org.flowable.dmn.engine.impl.el.ELExecutionContextBuilder;
+import org.flowable.dmn.engine.impl.el.ELExpressionExecutor;
+import org.flowable.dmn.engine.impl.el.ExecutionVariableFactory;
+import org.flowable.dmn.engine.impl.el.ExpressionManager;
 import org.flowable.dmn.engine.impl.hitpolicy.AbstractHitPolicy;
 import org.flowable.dmn.engine.impl.hitpolicy.ComposeDecisionResultBehavior;
 import org.flowable.dmn.engine.impl.hitpolicy.ComposeRuleResultBehavior;
 import org.flowable.dmn.engine.impl.hitpolicy.ContinueEvaluatingBehavior;
 import org.flowable.dmn.engine.impl.hitpolicy.EvaluateRuleValidityBehavior;
-import org.flowable.dmn.engine.impl.mvel.ExecutionVariableFactory;
-import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
-import org.flowable.dmn.engine.impl.mvel.MvelExecutionContextBuilder;
-import org.flowable.dmn.engine.impl.mvel.MvelExpressionExecutor;
 import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityManager;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
@@ -42,7 +41,6 @@ import org.flowable.dmn.model.LiteralExpression;
 import org.flowable.dmn.model.RuleInputClauseContainer;
 import org.flowable.dmn.model.RuleOutputClauseContainer;
 import org.flowable.engine.common.api.FlowableException;
-import org.mvel2.integration.PropertyHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,10 +54,12 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(RuleEngineExecutorImpl.class);
 
     protected Map<String, AbstractHitPolicy> hitPolicyBehaviors;
+    protected ExpressionManager expressionManager;
     protected ObjectMapper objectMapper;
 
-    public RuleEngineExecutorImpl(Map<String, AbstractHitPolicy> hitPolicyBehaviors, ObjectMapper objectMapper) {
+    public RuleEngineExecutorImpl(Map<String, AbstractHitPolicy> hitPolicyBehaviors, ExpressionManager expressionManager, ObjectMapper objectMapper) {
         this.hitPolicyBehaviors = hitPolicyBehaviors;
+        this.expressionManager = expressionManager;
         this.objectMapper = objectMapper;
     }
 
@@ -71,8 +71,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
      * @return updated execution variables map
      */
     @Override
-    public DecisionExecutionAuditContainer execute(Decision decision, ExecuteDecisionInfo executeDecisionInfo,
-                    Map<String, Method> customExpressionFunctions, Map<Class<?>, PropertyHandler> propertyHandlers) {
+    public DecisionExecutionAuditContainer execute(Decision decision, ExecuteDecisionInfo executeDecisionInfo) {
         
         if (decision == null) {
             throw new IllegalArgumentException("no decision provided");
@@ -85,8 +84,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         DecisionTable currentDecisionTable = (DecisionTable) decision.getExpression();
 
         // create execution context and audit trail
-        MvelExecutionContext executionContext = MvelExecutionContextBuilder.build(decision, executeDecisionInfo.getVariables(),
-            customExpressionFunctions, propertyHandlers);
+        ELExecutionContext executionContext = ELExecutionContextBuilder.build(decision, executeDecisionInfo.getVariables());
 
         try {
             sanityCheckDecisionTable(currentDecisionTable);
@@ -134,7 +132,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         return executionContext.getAuditContainer();
     }
 
-    protected void evaluateDecisionTable(DecisionTable decisionTable, MvelExecutionContext executionContext) {
+    protected void evaluateDecisionTable(DecisionTable decisionTable, ELExecutionContext executionContext) {
         LOGGER.debug("Start table evaluation: {}", decisionTable.getId());
 
 
@@ -192,7 +190,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         LOGGER.debug("End table evaluation: {}", decisionTable.getId());
     }
 
-    protected boolean executeRule(DecisionRule rule, MvelExecutionContext executionContext) {
+    protected boolean executeRule(DecisionRule rule, ELExecutionContext executionContext) {
         if (rule == null) {
             throw new FlowableException("rule cannot be null");
         }
@@ -208,38 +206,33 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         for (RuleInputClauseContainer conditionContainer : rule.getInputEntries()) {
 
             // resetting value
+            String inputEntryId = conditionContainer.getInputEntry().getId();
             conditionResult = false;
 
             try {
                 // if condition is empty condition or has dash symbol result is TRUE
-                if (StringUtils.isEmpty(conditionContainer.getInputEntry().getText()) || "-".equals(conditionContainer.getInputEntry().getText())) {
+                String inputEntryText = conditionContainer.getInputEntry().getText();
+                if (StringUtils.isEmpty(inputEntryText) || "-".equals(inputEntryText)) {
                     conditionResult = true;
                 } else {
                     conditionResult = executeInputExpressionEvaluation(conditionContainer, executionContext);
                 }
 
                 // add audit entry
-                executionContext.getAuditContainer().addInputEntry(rule.getRuleNumber(), conditionContainer.getInputEntry().getId(), conditionResult);
+                executionContext.getAuditContainer().addInputEntry(rule.getRuleNumber(), inputEntryId, conditionResult);
 
-                LOGGER.debug("input entry {} ( {} {} ): {} ", conditionContainer.getInputEntry().getId(),
+                LOGGER.debug("input entry {} ( {} {} ): {} ", inputEntryId,
                     conditionContainer.getInputClause().getInputExpression().getText(),
-                    conditionContainer.getInputEntry().getText(), conditionResult);
-                
-            } catch (FlowableDmnExpressionException adee) {
-                // add failed audit entry
-                executionContext.getAuditContainer().addInputEntry(rule.getRuleNumber(), 
-                    conditionContainer.getInputEntry().getId(), getExceptionMessage(adee), conditionResult);
+                    inputEntryText, conditionResult);
                 
             } catch (FlowableException ade) {
                 // add failed audit entry and rethrow
-                executionContext.getAuditContainer().addInputEntry(rule.getRuleNumber(),
-                    conditionContainer.getInputEntry().getId(), getExceptionMessage(ade), null);
+                executionContext.getAuditContainer().addInputEntry(rule.getRuleNumber(), inputEntryId, getExceptionMessage(ade), null);
                 throw ade;
                 
             } catch (Exception e) {
                 // add failed audit entry and rethrow
-                executionContext.getAuditContainer().addInputEntry(rule.getRuleNumber(),
-                    conditionContainer.getInputEntry().getId(), getExceptionMessage(e), null);
+                executionContext.getAuditContainer().addInputEntry(rule.getRuleNumber(), inputEntryId, getExceptionMessage(e), null);
                 throw new FlowableException(getExceptionMessage(e), e);
             }
 
@@ -259,11 +252,11 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         return conditionResult;
     }
 
-    protected Boolean executeInputExpressionEvaluation(RuleInputClauseContainer ruleContainer, MvelExecutionContext executionContext) {
-        return MvelExpressionExecutor.executeInputExpression(ruleContainer.getInputClause(), ruleContainer.getInputEntry(), executionContext);
+    protected Boolean executeInputExpressionEvaluation(RuleInputClauseContainer ruleContainer, ELExecutionContext executionContext) {
+        return ELExpressionExecutor.executeInputExpression(ruleContainer.getInputClause(), ruleContainer.getInputEntry(), expressionManager, executionContext);
     }
 
-    protected void executeOutputEntryAction(int ruleNumber, List<RuleOutputClauseContainer> ruleOutputContainers, HitPolicy hitPolicy, MvelExecutionContext executionContext) {
+    protected void executeOutputEntryAction(int ruleNumber, List<RuleOutputClauseContainer> ruleOutputContainers, HitPolicy hitPolicy, ELExecutionContext executionContext) {
         LOGGER.debug("Start conclusion processing");
 
         for (RuleOutputClauseContainer clauseContainer : ruleOutputContainers) {
@@ -273,7 +266,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         LOGGER.debug("End conclusion processing");
     }
 
-    protected void composeOutputEntryResult(int ruleNumber, RuleOutputClauseContainer ruleClauseContainer, HitPolicy hitPolicy, MvelExecutionContext executionContext) {
+    protected void composeOutputEntryResult(int ruleNumber, RuleOutputClauseContainer ruleClauseContainer, HitPolicy hitPolicy, ELExecutionContext executionContext) {
         LOGGER.debug("Start evaluation conclusion {} of valid rule {}", ruleClauseContainer.getOutputClause().getOutputNumber(), ruleNumber);
 
         String outputVariableId = ruleClauseContainer.getOutputClause().getName();
@@ -284,7 +277,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         if (StringUtils.isNotEmpty(outputEntryExpression.getText())) {
             Object executionVariable = null;
             try {
-                Object resultValue = MvelExpressionExecutor.executeOutputExpression(ruleClauseContainer.getOutputClause(), outputEntryExpression, executionContext);
+                Object resultValue = ELExpressionExecutor.executeOutputExpression(ruleClauseContainer.getOutputClause(), outputEntryExpression, expressionManager, executionContext);
                 executionVariable = ExecutionVariableFactory.getExecutionVariable(outputVariableType, resultValue);
 
                 // create result

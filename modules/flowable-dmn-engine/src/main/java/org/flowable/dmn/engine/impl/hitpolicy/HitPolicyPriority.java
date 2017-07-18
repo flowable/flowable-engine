@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
+import org.flowable.dmn.engine.impl.el.ELExecutionContext;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.engine.common.api.FlowableException;
@@ -34,7 +34,7 @@ public class HitPolicyPriority extends AbstractHitPolicy implements ComposeDecis
         return HitPolicy.PRIORITY.getValue();
     }
 
-    public void composeDecisionResults(final MvelExecutionContext executionContext) {
+    public void composeDecisionResults(final ELExecutionContext executionContext) {
 
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
 

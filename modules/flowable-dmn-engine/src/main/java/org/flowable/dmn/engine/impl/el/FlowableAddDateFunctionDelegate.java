@@ -11,10 +11,11 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.el;
+package org.flowable.dmn.engine.impl.el;
 
 import java.lang.reflect.Method;
 
+import org.flowable.dmn.engine.impl.el.util.DateUtil;
 import org.flowable.engine.common.impl.el.AbstractFlowableFunctionDelegate;
 
 /**
@@ -22,14 +23,14 @@ import org.flowable.engine.common.impl.el.AbstractFlowableFunctionDelegate;
  * 
  * @author Tijs Rademakers
  */
-public class FlowableDateFunctionDelegate extends AbstractFlowableFunctionDelegate {
+public class FlowableAddDateFunctionDelegate extends AbstractFlowableFunctionDelegate {
 
     public String prefix() {
         return "date";
     }
 
     public String localName() {
-        return "format";
+        return "addDate";
     }
 
     public Class<?> functionClass() {
@@ -37,7 +38,7 @@ public class FlowableDateFunctionDelegate extends AbstractFlowableFunctionDelega
     }
 
     public Method functionMethod() {
-        return getSingleObjectParameterMethod();
+        return getFourObjectParameterMethod();
     }
 
 }

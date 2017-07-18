@@ -58,8 +58,7 @@ public class ExecuteDecisionWithAuditTrailCmd extends AbstractExecuteDecisionCmd
         DmnDecisionTable decisionTable = resolveDecisionTable(dmnEngineConfiguration.getDeploymentManager());
         Decision decision = resolveDecision(dmnEngineConfiguration.getDeploymentManager(), decisionTable);
 
-        DecisionExecutionAuditContainer executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decision, executeDecisionInfo,
-                dmnEngineConfiguration.getCustomExpressionFunctions(), dmnEngineConfiguration.getCustomPropertyHandlers());
+        DecisionExecutionAuditContainer executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decision, executeDecisionInfo);
 
         return executionResult;
     }

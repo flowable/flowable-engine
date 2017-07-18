@@ -10,30 +10,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.dmn.engine.impl.mvel;
+package org.flowable.dmn.engine.impl.el;
 
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Yvo Swillens
  */
-public class MvelConditionExpressionPreParser implements MvelExpressionPreParser {
+public class ELConditionExpressionPreParser {
 
     protected static String[] OPERATORS = new String[]{"==", "!=", "<", ">", ">=", "<="};
 
     public static String parse(String expression, String inputVariable, String inputVariableType) {
+        
+        expression = expression.replaceAll("fn_date", "date:toDate");
+        expression = expression.replaceAll("fn_subtractDate", "date:subtractDate");
+        expression = expression.replaceAll("fn_addDate", "date:addDate");
+        expression = expression.replaceAll("fn_now", "date:now");
 
-        String parsedExpression = inputVariable;
+        if (expression.startsWith("#{") || expression.startsWith("${")) {
+            return expression;
+        }
+        
+        StringBuilder parsedExpressionBuilder = new StringBuilder();
+        parsedExpressionBuilder
+            .append("#{")
+            .append(inputVariable);
         if ("date".equals(inputVariableType) || "number".equals(inputVariableType)) {
-            parsedExpression += parseSegmentWithOperator(expression);
+            parsedExpressionBuilder.append(parseSegmentWithOperator(expression));
         } else {
             if (expression.startsWith(".")) {
-                parsedExpression += expression;
+                parsedExpressionBuilder.append(expression);
             } else {
-                parsedExpression += parseSegmentWithOperator(expression);
+                parsedExpressionBuilder.append(parseSegmentWithOperator(expression));
             }
         }
-        return parsedExpression;
+        parsedExpressionBuilder.append("}");
+        
+        return parsedExpressionBuilder.toString();
     }
 
     protected static String parseSegmentWithOperator(String expression) {

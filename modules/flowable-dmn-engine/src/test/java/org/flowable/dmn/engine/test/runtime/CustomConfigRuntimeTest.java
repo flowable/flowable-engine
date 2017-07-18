@@ -13,12 +13,10 @@
 package org.flowable.dmn.engine.test.runtime;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertSame;
 
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
@@ -41,16 +39,16 @@ public class CustomConfigRuntimeTest {
     protected static final String ENGINE_CONFIG_2 = "custom2.flowable.dmn.cfg.xml";
 
     @Rule
-    public FlowableDmnRule activitiRule1 = new FlowableDmnRule(ENGINE_CONFIG_1);
+    public FlowableDmnRule flowableRule1 = new FlowableDmnRule(ENGINE_CONFIG_1);
 
     @Rule
-    public FlowableDmnRule activitiRule2 = new FlowableDmnRule(ENGINE_CONFIG_2);
+    public FlowableDmnRule flowableRule2 = new FlowableDmnRule(ENGINE_CONFIG_2);
 
     @Test
     @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/post_custom_expression_function_expression_1.dmn")
-    public void executeDecision_post_custom_expression_function() {
+    public void postCustomExpressionFunction() {
 
-        DmnEngine dmnEngine = activitiRule1.getDmnEngine();
+        DmnEngine dmnEngine = flowableRule1.getDmnEngine();
         DmnRuleService ruleService = dmnEngine.getDmnRuleService();
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
@@ -67,9 +65,9 @@ public class CustomConfigRuntimeTest {
 
     @Test
     @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/post_custom_expression_function_expression_1.dmn")
-    public void executeDecision_custom_expression_function_missing_default_function() {
+    public void customExpressionFunctionMissingDefaultFunction() {
 
-        DmnEngine dmnEngine = activitiRule2.getDmnEngine();
+        DmnEngine dmnEngine = flowableRule2.getDmnEngine();
         DmnRuleService ruleService = dmnEngine.getDmnRuleService();
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
@@ -81,6 +79,6 @@ public class CustomConfigRuntimeTest {
                 .executeWithAuditTrail();
         
         assertEquals(0, result.getDecisionResult().size());
-        assertNotEquals(true, StringUtils.isEmpty(result.getRuleExecutions().get(2).getConditionResults().iterator().next().getException()));
+        assertEquals(true, result.isFailed());
     }
 }

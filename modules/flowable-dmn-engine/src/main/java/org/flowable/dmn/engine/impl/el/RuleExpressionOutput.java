@@ -10,21 +10,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.dmn.engine.impl.mvel;
+
+package org.flowable.dmn.engine.impl.el;
+
+import java.util.Map;
 
 /**
- * @author Yvo Swillens
+ * Resolves an EL expression value at runtime.
+ * 
+ * @author Joram Barrez
+ * @author Tijs Rademakers
  */
-public class MvelConclusionExpressionPreParser implements MvelExpressionPreParser {
+public class RuleExpressionOutput {
 
-    public static String parse(String expression, String inputVariable) {
+    protected Expression expression;
 
-        String parsedExpression = inputVariable;
-        if (expression.startsWith(".")) {
-            parsedExpression += expression;
-        } else {
-            parsedExpression += " " + expression;
-        }
-        return parsedExpression;
+    public RuleExpressionOutput(Expression expression) {
+        this.expression = expression;
     }
+
+    public Object getValue(Map<String, Object> variables) {
+        Object value = expression.getValue(variables);
+        return value;
+    }
+
 }
