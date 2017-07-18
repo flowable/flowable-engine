@@ -33,7 +33,7 @@ public class AgendaSessionFactory implements SessionFactory {
 
     @Override
     public Session openSession(CommandContext commandContext) {
-        return flowableEngineAgendaFactory.createAgenda((CommandContext) commandContext);
+        return flowableEngineAgendaFactory.createAgenda(commandContext);
     }
 
 }

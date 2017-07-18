@@ -86,7 +86,7 @@ public class CommandContextUtil {
     // IDM ENGINE
     
     public static IdmEngineConfiguration getIdmEngineConfiguration() {
-        return (IdmEngineConfiguration) getIdmEngineConfiguration(getCommandContext());
+        return getIdmEngineConfiguration(getCommandContext());
     }
     
     public static IdmEngineConfiguration getIdmEngineConfiguration(CommandContext commandContext) {
@@ -106,7 +106,7 @@ public class CommandContextUtil {
     // DMN ENGINE
     
     public static DmnEngineConfigurationApi getDmnEngineConfiguration() {
-        return (DmnEngineConfigurationApi) getDmnEngineConfiguration(getCommandContext());
+        return getDmnEngineConfiguration(getCommandContext());
     }
     
     public static DmnEngineConfigurationApi getDmnEngineConfiguration(CommandContext commandContext) {
@@ -146,7 +146,7 @@ public class CommandContextUtil {
     // FORM ENGINE
     
     public static FormEngineConfigurationApi getFormEngineConfiguration() {
-        return (FormEngineConfigurationApi) getFormEngineConfiguration(getCommandContext());
+        return getFormEngineConfiguration(getCommandContext());
     }
     
     public static FormEngineConfigurationApi getFormEngineConfiguration(CommandContext commandContext) {
@@ -186,7 +186,7 @@ public class CommandContextUtil {
     // CONTENT ENGINE
     
     public static ContentEngineConfigurationApi getContentEngineConfiguration() {
-        return (ContentEngineConfigurationApi) getContentEngineConfiguration(getCommandContext());
+        return getContentEngineConfiguration(getCommandContext());
     }
     
     public static ContentEngineConfigurationApi getContentEngineConfiguration(CommandContext commandContext) {
