@@ -147,7 +147,7 @@ public class DmnJsonConverterTest {
         RuleInputClauseContainer ruleClauseContainer12 = rules.get(0).getInputEntries().get(1);
         UnaryTests inputEntry12 = ruleClauseContainer12.getInputEntry();
         assertNotNull(inputEntry12);
-        assertEquals("<= fn_date('1977-09-18')", inputEntry12.getText());
+        assertEquals("<= date:toDate('1977-09-18')", inputEntry12.getText());
         assertSame(condition2, ruleClauseContainer12.getInputClause());
 
         // output expression 1
@@ -169,7 +169,7 @@ public class DmnJsonConverterTest {
         RuleInputClauseContainer ruleClauseContainer22 = rules.get(1).getInputEntries().get(1);
         UnaryTests inputEntry22 = ruleClauseContainer22.getInputEntry();
         assertNotNull(inputEntry22);
-        assertEquals("> fn_date('1977-09-18')", inputEntry22.getText());
+        assertEquals("> date:toDate('1977-09-18')", inputEntry22.getText());
         assertSame(condition2, ruleClauseContainer22.getInputClause());
 
         // output expression 1
@@ -313,17 +313,17 @@ public class DmnJsonConverterTest {
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
 
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
-        assertEquals("fn_date('2017-06-01')", decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("date:toDate('2017-06-01')", decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("-", decisionTable.getRules().get(0).getInputEntries().get(1).getInputEntry().getText());
         assertNotNull(decisionTable.getRules().get(0).getInputEntries().get(0).getInputClause());
         assertNotNull(decisionTable.getRules().get(0).getInputEntries().get(1).getInputClause());
 
-        assertEquals("fn_date('2017-06-02')", decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("date:toDate('2017-06-02')", decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("-", decisionTable.getRules().get(1).getInputEntries().get(1).getInputEntry().getText());
         assertNotNull(decisionTable.getRules().get(1).getInputEntries().get(0).getInputClause());
         assertNotNull(decisionTable.getRules().get(1).getInputEntries().get(1).getInputClause());
 
-        assertEquals("fn_date('2017-06-03')", decisionTable.getRules().get(0).getOutputEntries().get(0).getOutputEntry().getText());
+        assertEquals("date:toDate('2017-06-03')", decisionTable.getRules().get(0).getOutputEntries().get(0).getOutputEntry().getText());
         assertEquals("", decisionTable.getRules().get(1).getOutputEntries().get(0).getOutputEntry().getText());
         assertNotNull(decisionTable.getRules().get(0).getOutputEntries().get(0).getOutputClause());
         assertNotNull(decisionTable.getRules().get(1).getOutputEntries().get(0).getOutputClause());
@@ -355,22 +355,22 @@ public class DmnJsonConverterTest {
         assertEquals("\"TEST\"", rule1.getInputEntries().get(0).getInputEntry().getText());
         assertEquals("100", rule1.getInputEntries().get(1).getInputEntry().getText());
         assertEquals("true", rule1.getInputEntries().get(2).getInputEntry().getText());
-        assertEquals("fn_date('2017-06-01')", rule1.getInputEntries().get(3).getInputEntry().getText());
+        assertEquals("date:toDate('2017-06-01')", rule1.getInputEntries().get(3).getInputEntry().getText());
 
         assertEquals("\"WAS TEST\"", rule1.getOutputEntries().get(0).getOutputEntry().getText());
         assertEquals("100", rule1.getOutputEntries().get(1).getOutputEntry().getText());
         assertEquals("true", rule1.getOutputEntries().get(2).getOutputEntry().getText());
-        assertEquals("fn_date('2017-06-01')", rule1.getOutputEntries().get(3).getOutputEntry().getText());
+        assertEquals("date:toDate('2017-06-01')", rule1.getOutputEntries().get(3).getOutputEntry().getText());
 
         assertEquals("!= \"TEST\"", rule2.getInputEntries().get(0).getInputEntry().getText());
         assertEquals("!= 100", rule2.getInputEntries().get(1).getInputEntry().getText());
         assertEquals("false", rule2.getInputEntries().get(2).getInputEntry().getText());
-        assertEquals("!= fn_date('2017-06-01')", rule2.getInputEntries().get(3).getInputEntry().getText());
+        assertEquals("!= date:toDate('2017-06-01')", rule2.getInputEntries().get(3).getInputEntry().getText());
 
         assertEquals("\"WASN'T TEST\"", rule2.getOutputEntries().get(0).getOutputEntry().getText());
         assertEquals("1", rule2.getOutputEntries().get(1).getOutputEntry().getText());
         assertEquals("false", rule2.getOutputEntries().get(2).getOutputEntry().getText());
-        assertEquals("fn_date('2016-06-01')", rule2.getOutputEntries().get(3).getOutputEntry().getText());
+        assertEquals("date:toDate('2016-06-01')", rule2.getOutputEntries().get(3).getOutputEntry().getText());
     }
 
     @Test
