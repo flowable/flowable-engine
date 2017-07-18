@@ -93,10 +93,10 @@ public class ChangeActivityStateCmd implements Command<Void> {
             }
         }
 
-        executionEntityManager.deleteExecutionAndRelatedData(activeExecutionEntity, "Change activity to " + startActivityId, false);
+        executionEntityManager.deleteExecutionAndRelatedData(activeExecutionEntity, "Change activity to " + startActivityId);
 
         if (deleteParentExecution) {
-            executionEntityManager.deleteExecutionAndRelatedData(parentExecution, "Change activity to " + startActivityId, false);
+            executionEntityManager.deleteExecutionAndRelatedData(parentExecution, "Change activity to " + startActivityId);
         }
 
         ExecutionEntity newChildExecution = executionEntityManager.createChildExecution(execution);

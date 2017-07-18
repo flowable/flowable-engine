@@ -12,7 +12,6 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.bpmn.model.BoundaryEvent;
@@ -41,16 +40,9 @@ public class TriggerTimerEventJobHandler implements JobHandler {
     }
 
     public void execute(JobEntity job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
-
         CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(execution);
-
         if (CommandContextUtil.getEventDispatcher().isEnabled()) {
             CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_FIRED, job));
-        }
-
-        if (execution.getCurrentFlowElement() instanceof BoundaryEvent) {
-            List<String> processedElements = new ArrayList<>();
-            dispatchExecutionTimeOut(job, execution, processedElements, commandContext);
         }
     }
 

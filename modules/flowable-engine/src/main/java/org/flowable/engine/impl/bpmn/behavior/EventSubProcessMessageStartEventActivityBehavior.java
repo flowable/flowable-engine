@@ -75,7 +75,7 @@ public class EventSubProcessMessageStartEventActivityBehavior extends AbstractBp
                 ExecutionEntity childExecutionEntity = childExecutions.get(i);
                 if (!childExecutionEntity.isEnded() && !childExecutionEntity.getId().equals(executionEntity.getId())) {
                     executionEntityManager.deleteExecutionAndRelatedData(childExecutionEntity,
-                            DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")", false);
+                            DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")");
                 }
             }
 

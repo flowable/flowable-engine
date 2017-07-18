@@ -49,6 +49,6 @@ public interface TaskEntityManager extends EntityManager<TaskEntity> {
 
     void deleteTasksByProcessInstanceId(String processInstanceId, String deleteReason, boolean cascade);
 
-    void deleteTask(TaskEntity task, String deleteReason, boolean cascade, boolean cancel, boolean fireEvents);
+    void deleteTask(TaskEntity task, String deleteReason, boolean cascade, boolean fireEvents);
 
 }
