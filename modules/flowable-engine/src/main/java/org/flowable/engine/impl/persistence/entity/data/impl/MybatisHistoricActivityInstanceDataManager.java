@@ -51,7 +51,7 @@ public class MybatisHistoricActivityInstanceDataManager extends AbstractDataMana
 
     @Override
     public List<HistoricActivityInstanceEntity> findUnfinishedHistoricActivityInstancesByExecutionAndActivityId(final String executionId, final String activityId) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("executionId", executionId);
         params.put("activityId", activityId);
         return getList("selectUnfinishedHistoricActivityInstanceExecutionIdAndActivityId", params, unfinishedHistoricActivityInstanceMatcher, true);
@@ -59,7 +59,7 @@ public class MybatisHistoricActivityInstanceDataManager extends AbstractDataMana
     
     @Override
     public List<HistoricActivityInstanceEntity> findHistoricActivityInstancesByExecutionIdAndActivityId(final String executionId, final String activityId) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("executionId", executionId);
         params.put("activityId", activityId);
         return getList("selectHistoricActivityInstanceExecutionIdAndActivityId", params, historicActivityInstanceMatcher, true);
@@ -67,7 +67,7 @@ public class MybatisHistoricActivityInstanceDataManager extends AbstractDataMana
 
     @Override
     public List<HistoricActivityInstanceEntity> findUnfinishedHistoricActivityInstancesByProcessInstanceId(final String processInstanceId) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("processInstanceId", processInstanceId);
         return getList("selectUnfinishedHistoricActivityInstanceExecutionIdAndActivityId", params, unfinishedHistoricActivityInstanceMatcher, true);
     }

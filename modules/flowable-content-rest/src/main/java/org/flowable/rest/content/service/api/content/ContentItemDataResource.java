@@ -88,7 +88,7 @@ public class ContentItemDataResource extends ContentItemBaseResource {
         }
 
         try {
-            return new ResponseEntity<byte[]>(IOUtils.toByteArray(dataStream), responseHeaders, HttpStatus.OK);
+            return new ResponseEntity<>(IOUtils.toByteArray(dataStream), responseHeaders, HttpStatus.OK);
         } catch (Exception e) {
             throw new FlowableException("Error getting content item data " + contentItemId, e);
         }

@@ -45,9 +45,9 @@ public abstract class DmnTestHelper {
 
     public static final String EMPTY_LINE = "\n";
 
-    static Map<String, DmnEngine> dmnEngines = new HashMap<String, DmnEngine>();
+    static Map<String, DmnEngine> dmnEngines = new HashMap<>();
     
-    private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = new ArrayList<String>();
+    private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = new ArrayList<>();
     
     static {
         TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_DMN_DATABASECHANGELOG");

@@ -175,7 +175,7 @@ public class TaskResource extends TaskBaseResource {
         Map<String, Object> transientVariablesToSet = null;
 
         if (actionRequest.getVariables() != null) {
-            variablesToSet = new HashMap<String, Object>();
+            variablesToSet = new HashMap<>();
             for (RestVariable var : actionRequest.getVariables()) {
                 if (var.getName() == null) {
                     throw new FlowableIllegalArgumentException("Variable name is required");
@@ -187,7 +187,7 @@ public class TaskResource extends TaskBaseResource {
         }
 
         if (actionRequest.getTransientVariables() != null) {
-            transientVariablesToSet = new HashMap<String, Object>();
+            transientVariablesToSet = new HashMap<>();
             for (RestVariable var : actionRequest.getTransientVariables()) {
                 if (var.getName() == null) {
                     throw new FlowableIllegalArgumentException("Transient variable name is required");

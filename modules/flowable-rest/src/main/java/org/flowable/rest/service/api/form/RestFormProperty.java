@@ -28,7 +28,7 @@ public class RestFormProperty {
     protected boolean writable;
     protected boolean required;
     protected String datePattern;
-    protected List<RestEnumFormProperty> enumValues = new ArrayList<RestEnumFormProperty>();
+    protected List<RestEnumFormProperty> enumValues = new ArrayList<>();
 
     public String getId() {
         return id;

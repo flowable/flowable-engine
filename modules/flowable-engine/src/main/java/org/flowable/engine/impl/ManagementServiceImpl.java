@@ -231,7 +231,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     @Override
     public <MapperType, ResultType> ResultType executeCustomSql(CustomSqlExecution<MapperType, ResultType> customSqlExecution) {
         Class<MapperType> mapperClass = customSqlExecution.getMapperClass();
-        return commandExecutor.execute(new ExecuteCustomSqlCmd<MapperType, ResultType>(mapperClass, customSqlExecution));
+        return commandExecutor.execute(new ExecuteCustomSqlCmd<>(mapperClass, customSqlExecution));
     }
 
     @Override

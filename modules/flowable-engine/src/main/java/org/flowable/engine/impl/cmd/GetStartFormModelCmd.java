@@ -100,7 +100,7 @@ public class GetStartFormModelCmd implements Command<FormModel>, Serializable {
 
                     } else if (formField.getValue() instanceof String) {
                         String[] splittedString = ((String) formField.getValue()).split(",");
-                        contentItemIds = new ArrayList<String>();
+                        contentItemIds = new ArrayList<>();
                         Collections.addAll(contentItemIds, splittedString);
                     }
 

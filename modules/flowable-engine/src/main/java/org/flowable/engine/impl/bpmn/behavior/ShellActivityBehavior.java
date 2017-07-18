@@ -84,7 +84,7 @@ public class ShellActivityBehavior extends AbstractBpmnActivityBehavior {
 
         readFields(execution);
 
-        List<String> argList = new ArrayList<String>();
+        List<String> argList = new ArrayList<>();
         argList.add(commandStr);
 
         if (arg1Str != null)

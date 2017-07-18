@@ -45,7 +45,7 @@ public class IdmDbSchemaManager implements DbSchemaManager {
     
     protected static final Pattern CLEAN_VERSION_REGEX = Pattern.compile("\\d\\.\\d*");
 
-    protected static final List<FlowableIdmVersion> FLOWABLE_IDM_VERSIONS = new ArrayList<FlowableIdmVersion>();
+    protected static final List<FlowableIdmVersion> FLOWABLE_IDM_VERSIONS = new ArrayList<>();
 
     static {
 

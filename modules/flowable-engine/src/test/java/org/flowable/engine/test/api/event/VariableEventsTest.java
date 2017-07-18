@@ -92,7 +92,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         listener.clearEventsReceived();
 
         // Create, update and delete multiple variables
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("test", 123);
         vars.put("test2", 456);
         runtimeService.setVariables(processInstance.getId(), vars);
@@ -115,7 +115,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testStartEndProcessInstanceVariableEvents() throws Exception {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("var1", "value1");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
 
@@ -135,7 +135,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testProcessInstanceVariableEventsOnStart() throws Exception {
 
-        HashMap<String, Object> vars = new HashMap<String, Object>();
+        HashMap<String, Object> vars = new HashMap<>();
         vars.put("testVariable", "The value");
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
@@ -391,7 +391,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/processVariableEvent.bpmn20.xml" })
     public void testProcessInstanceVariableEventsForModeledDataObjectOnStart() throws Exception {
 
-        HashMap<String, Object> vars = new HashMap<String, Object>();
+        HashMap<String, Object> vars = new HashMap<>();
         vars.put("var2", "The value");
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processVariableEvent", vars);

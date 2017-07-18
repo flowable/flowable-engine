@@ -46,8 +46,8 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TableDataManagerImpl.class);
 
-    public static Map<Class<?>, String> apiTypeToTableNameMap = new HashMap<Class<?>, String>();
-    public static Map<Class<? extends Entity>, String> entityToTableNameMap = new HashMap<Class<? extends Entity>, String>();
+    public static Map<Class<?>, String> apiTypeToTableNameMap = new HashMap<>();
+    public static Map<Class<? extends Entity>, String> entityToTableNameMap = new HashMap<>();
 
     static {
 
@@ -64,7 +64,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
 
     @Override
     public Map<String, Long> getTableCount() {
-        Map<String, Long> tableCount = new HashMap<String, Long>();
+        Map<String, Long> tableCount = new HashMap<>();
         try {
             for (String tableName : getTablesPresentInDatabase()) {
                 tableCount.put(tableName, getTableCount(tableName));
@@ -78,7 +78,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
 
     @Override
     public List<String> getTablesPresentInDatabase() {
-        List<String> tableNames = new ArrayList<String>();
+        List<String> tableNames = new ArrayList<>();
         Connection connection = null;
         try {
             connection = getDbSqlSession().getSqlSession().getConnection();

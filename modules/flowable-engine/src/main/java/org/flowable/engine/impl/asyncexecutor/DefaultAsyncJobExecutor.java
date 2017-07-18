@@ -135,7 +135,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
     protected void initAsyncJobExecutionThreadPool() {
         if (threadPoolQueue == null) {
             LOGGER.info("Creating thread pool queue of size {}", queueSize);
-            threadPoolQueue = new ArrayBlockingQueue<Runnable>(queueSize);
+            threadPoolQueue = new ArrayBlockingQueue<>(queueSize);
         }
 
         if (executorService == null) {

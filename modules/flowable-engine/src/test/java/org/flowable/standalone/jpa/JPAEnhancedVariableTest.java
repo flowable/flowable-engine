@@ -114,7 +114,7 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
         }
 
         // start process with enhanced jpa variables
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("fieldEntity", fieldEntity);
         params.put("propertyEntity", propertyEntity);
         ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params);
@@ -142,7 +142,7 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
         }
 
         // start process with lists of enhanced jpa variables
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("list1", Arrays.asList(fieldEntity, fieldEntity));
         params.put("list2", Arrays.asList(propertyEntity, propertyEntity));
         ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params);
@@ -185,7 +185,7 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
 
         // start process with mixed jpa entities in list
         try {
-            params = new HashMap<String, Object>();
+            params = new HashMap<>();
             params.put("list", Arrays.asList(fieldEntity, propertyEntity));
             instance = processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params);
             fail();

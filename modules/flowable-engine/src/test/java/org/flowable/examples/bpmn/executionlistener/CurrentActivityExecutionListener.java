@@ -28,7 +28,7 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
  */
 public class CurrentActivityExecutionListener implements ExecutionListener {
 
-    private static List<CurrentActivity> currentActivities = new ArrayList<CurrentActivity>();
+    private static List<CurrentActivity> currentActivities = new ArrayList<>();
 
     public static class CurrentActivity {
         private final String activityId;

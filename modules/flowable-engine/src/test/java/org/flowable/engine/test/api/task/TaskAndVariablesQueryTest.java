@@ -76,7 +76,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         assertEquals(0, task.getProcessVariables().size());
         assertEquals(0, task.getTaskLocalVariables().size());
 
-        Map<String, Object> startMap = new HashMap<String, Object>();
+        Map<String, Object> startMap = new HashMap<>();
         startMap.put("processVar", true);
         startMap.put("binaryVariable", "This is a binary process variable".getBytes());
         runtimeService.startProcessInstanceByKey("oneTaskProcess", startMap);
@@ -222,7 +222,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testOrQuery() {
-        Map<String, Object> startMap = new HashMap<String, Object>();
+        Map<String, Object> startMap = new HashMap<>();
         startMap.put("anotherProcessVar", 123);
         runtimeService.startProcessInstanceByKey("oneTaskProcess", startMap);
 
@@ -251,7 +251,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testOrQueryMultipleVariableValues() {
-        Map<String, Object> startMap = new HashMap<String, Object>();
+        Map<String, Object> startMap = new HashMap<>();
         startMap.put("aProcessVar", 1);
         startMap.put("anotherProcessVar", 123);
         runtimeService.startProcessInstanceByKey("oneTaskProcess", startMap);
@@ -277,7 +277,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
      * Generates some test tasks. - 2 tasks where kermit is a candidate and 1 task where gonzo is assignee
      */
     private List<String> generateTestTasks() throws Exception {
-        List<String> ids = new ArrayList<String>();
+        List<String> ids = new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
         // 2 tasks for kermit
@@ -315,7 +315,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
      * Generates 100 test tasks.
      */
     private List<String> generateMultipleTestTasks() throws Exception {
-        List<String> ids = new ArrayList<String>();
+        List<String> ids = new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
         processEngineConfiguration.getClock().setCurrentTime(sdf.parse("01/01/2001 01:01:01.000"));

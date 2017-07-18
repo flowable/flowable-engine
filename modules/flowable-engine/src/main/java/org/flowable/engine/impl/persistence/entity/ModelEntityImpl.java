@@ -46,7 +46,7 @@ public class ModelEntityImpl extends AbstractEntity implements ModelEntity, Seri
     }
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("name", this.name);
         persistentState.put("key", key);
         persistentState.put("category", this.category);

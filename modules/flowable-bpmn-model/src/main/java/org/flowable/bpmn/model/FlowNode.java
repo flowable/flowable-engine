@@ -26,8 +26,8 @@ public abstract class FlowNode extends FlowElement {
     protected boolean asynchronous;
     protected boolean notExclusive;
 
-    protected List<SequenceFlow> incomingFlows = new ArrayList<SequenceFlow>();
-    protected List<SequenceFlow> outgoingFlows = new ArrayList<SequenceFlow>();
+    protected List<SequenceFlow> incomingFlows = new ArrayList<>();
+    protected List<SequenceFlow> outgoingFlows = new ArrayList<>();
 
     @JsonIgnore
     protected Object behavior;

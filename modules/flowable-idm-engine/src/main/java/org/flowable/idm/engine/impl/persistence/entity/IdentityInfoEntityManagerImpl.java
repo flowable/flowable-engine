@@ -64,10 +64,10 @@ public class IdentityInfoEntityManagerImpl extends AbstractEntityManager<Identit
             identityInfoDataManager.update(identityInfoEntity);
 
             if (accountDetails == null) {
-                accountDetails = new HashMap<String, String>();
+                accountDetails = new HashMap<>();
             }
 
-            Set<String> newKeys = new HashSet<String>(accountDetails.keySet());
+            Set<String> newKeys = new HashSet<>(accountDetails.keySet());
             List<IdentityInfoEntity> identityInfoDetails = identityInfoDataManager.findIdentityInfoDetails(identityInfoEntity.getId());
             for (IdentityInfoEntity identityInfoDetail : identityInfoDetails) {
                 String detailKey = identityInfoDetail.getKey();

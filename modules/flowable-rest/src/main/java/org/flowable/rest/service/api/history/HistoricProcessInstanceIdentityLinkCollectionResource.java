@@ -60,6 +60,6 @@ public class HistoricProcessInstanceIdentityLinkCollectionResource {
             return restResponseFactory.createHistoricIdentityLinkResponseList(identityLinks);
         }
 
-        return new ArrayList<HistoricIdentityLinkResponse>();
+        return new ArrayList<>();
     }
 }

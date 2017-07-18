@@ -134,7 +134,7 @@ public class ExtensionElementConverterTest extends AbstractConverterTest {
             List<DmnExtensionElement> attributesExtension = bObj.getExtensionElements().get(ELEMENT_ATTRIBUTES);
 
             if (null != attributesExtension && !attributesExtension.isEmpty()) {
-                attributes = new HashMap<String, String>();
+                attributes = new HashMap<>();
                 List<DmnExtensionElement> attributeExtensions = attributesExtension.get(0).getChildElements().get(ELEMENT_ATTRIBUTE);
 
                 for (DmnExtensionElement attributeExtension : attributeExtensions) {

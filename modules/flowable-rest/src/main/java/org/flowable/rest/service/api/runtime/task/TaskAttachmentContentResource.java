@@ -82,7 +82,7 @@ public class TaskAttachmentContentResource extends TaskBaseResource {
         }
 
         try {
-            return new ResponseEntity<byte[]>(IOUtils.toByteArray(attachmentStream), responseHeaders, HttpStatus.OK);
+            return new ResponseEntity<>(IOUtils.toByteArray(attachmentStream), responseHeaders, HttpStatus.OK);
         } catch (Exception e) {
             throw new FlowableException("Error creating attachment data", e);
         }

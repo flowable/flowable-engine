@@ -52,7 +52,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignalExpression.bpmn20.xml",
             "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalExpression.bpmn20.xml" })
     public void testSignalCatchIntermediateExpression() {
-        Map<String, Object> variableMap = new HashMap<String, Object>();
+        Map<String, Object> variableMap = new HashMap<>();
         variableMap.put("mySignalName", "testSignal");
         runtimeService.startProcessInstanceByKey("catchSignal", variableMap);
 
@@ -82,11 +82,11 @@ public class SignalEventTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignalBoundaryWithReceiveTask.bpmn20.xml",
             "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml" })
     public void testSignalCatchBoundaryWithVariables() {
-        HashMap<String, Object> variables1 = new HashMap<String, Object>();
+        HashMap<String, Object> variables1 = new HashMap<>();
         variables1.put("processName", "catchSignal");
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("catchSignal", variables1);
 
-        HashMap<String, Object> variables2 = new HashMap<String, Object>();
+        HashMap<String, Object> variables2 = new HashMap<>();
         variables2.put("processName", "throwSignal");
         runtimeService.startProcessInstanceByKey("throwSignal", variables2);
 

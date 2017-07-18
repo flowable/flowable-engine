@@ -29,7 +29,7 @@ public class ModelQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, ModelQueryProperty> properties = new HashMap<String, ModelQueryProperty>();
+    private static final Map<String, ModelQueryProperty> properties = new HashMap<>();
 
     public static final ModelQueryProperty MODEL_CATEGORY = new ModelQueryProperty("RES.CATEGORY_");
     public static final ModelQueryProperty MODEL_ID = new ModelQueryProperty("RES.ID_");

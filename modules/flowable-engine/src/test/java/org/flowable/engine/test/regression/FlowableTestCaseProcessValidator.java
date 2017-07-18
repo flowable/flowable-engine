@@ -30,7 +30,7 @@ public class FlowableTestCaseProcessValidator implements ProcessValidator {
 
     @Override
     public List<ValidationError> validate(BpmnModel bpmnModel) {
-        List<ValidationError> errorList = new ArrayList<ValidationError>();
+        List<ValidationError> errorList = new ArrayList<>();
         CustomParseValidator customParseValidator = new CustomParseValidator();
 
         for (Process process : bpmnModel.getProcesses()) {

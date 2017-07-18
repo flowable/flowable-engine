@@ -24,7 +24,7 @@ public abstract class AbstractFlowableHttpHandler extends BaseElement {
 
     protected String implementationType;
     protected String implementation;
-    protected List<FieldExtension> fieldExtensions = new ArrayList<FieldExtension>();
+    protected List<FieldExtension> fieldExtensions = new ArrayList<>();
 
     @JsonIgnore
     protected Object instance; // Can be used to set an instance of the listener directly. That instance will then always be reused.
@@ -67,7 +67,7 @@ public abstract class AbstractFlowableHttpHandler extends BaseElement {
         setImplementation(otherHandler.getImplementation());
         setImplementationType(otherHandler.getImplementationType());
 
-        fieldExtensions = new ArrayList<FieldExtension>();
+        fieldExtensions = new ArrayList<>();
         if (otherHandler.getFieldExtensions() != null && !otherHandler.getFieldExtensions().isEmpty()) {
             for (FieldExtension extension : otherHandler.getFieldExtensions()) {
                 fieldExtensions.add(extension.clone());

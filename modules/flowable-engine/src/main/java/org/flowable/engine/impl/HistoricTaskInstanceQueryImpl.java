@@ -107,7 +107,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected boolean includeProcessVariables;
     protected Integer taskVariablesLimit;
     protected boolean includeIdentityLinks;
-    protected List<HistoricTaskInstanceQueryImpl> orQueryObjects = new ArrayList<HistoricTaskInstanceQueryImpl>();
+    protected List<HistoricTaskInstanceQueryImpl> orQueryObjects = new ArrayList<>();
     protected HistoricTaskInstanceQueryImpl currentOrQueryObject;
     protected boolean inOrStatement;
 
@@ -411,7 +411,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
 
         final int nameListSize = taskNameList.size();
-        final List<String> caseIgnoredTaskNameList = new ArrayList<String>(nameListSize);
+        final List<String> caseIgnoredTaskNameList = new ArrayList<>(nameListSize);
         for (String taskName : taskNameList) {
             caseIgnoredTaskNameList.add(taskName.toLowerCase());
         }
@@ -1271,7 +1271,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public List<String> getCandidateGroups() {
         if (candidateGroup != null) {
-            List<String> candidateGroupList = new ArrayList<String>(1);
+            List<String> candidateGroupList = new ArrayList<>(1);
             candidateGroupList.add(candidateGroup);
             return candidateGroupList;
 

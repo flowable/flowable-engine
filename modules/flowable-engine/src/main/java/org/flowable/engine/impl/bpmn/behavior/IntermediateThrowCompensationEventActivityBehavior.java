@@ -63,7 +63,7 @@ public class IntermediateThrowCompensationEventActivityBehavior extends FlowNode
         CommandContext commandContext = Context.getCommandContext();
         EventSubscriptionEntityManager eventSubscriptionEntityManager = CommandContextUtil.getEventSubscriptionEntityManager(commandContext);
 
-        List<CompensateEventSubscriptionEntity> eventSubscriptions = new ArrayList<CompensateEventSubscriptionEntity>();
+        List<CompensateEventSubscriptionEntity> eventSubscriptions = new ArrayList<>();
         if (StringUtils.isNotEmpty(activityRef)) {
 
             // If an activity ref is provided, only that activity is compensated

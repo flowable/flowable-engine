@@ -24,8 +24,8 @@ public class CustomBusinessRuleTask implements BusinessRuleTaskDelegate {
 
     private static final long serialVersionUID = 1L;
 
-    public static List<Expression> ruleInputVariables = new ArrayList<Expression>();
-    public static List<Expression> ruleIds = new ArrayList<Expression>();
+    public static List<Expression> ruleInputVariables = new ArrayList<>();
+    public static List<Expression> ruleIds = new ArrayList<>();
     public static Boolean exclude;
     public static String resultVariableName;
 

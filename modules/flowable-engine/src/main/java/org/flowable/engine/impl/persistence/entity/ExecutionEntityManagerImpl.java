@@ -133,7 +133,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         ExecutionEntity rootExecution = null;
 
         // Collect executions
-        Map<String, ExecutionEntity> executionMap = new HashMap<String, ExecutionEntity>(executions.size());
+        Map<String, ExecutionEntity> executionMap = new HashMap<>(executions.size());
         for (ExecutionEntity executionEntity : executions) {
             if (executionEntity.getId().equals(rootProcessInstanceId)) {
                 rootExecution = executionEntity;
@@ -518,7 +518,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
     }
 
     public List<ExecutionEntity> collectChildren(ExecutionEntity executionEntity) {
-        List<ExecutionEntity> childExecutions = new ArrayList<ExecutionEntity>();
+        List<ExecutionEntity> childExecutions = new ArrayList<>();
         collectChildren(executionEntity, childExecutions);
         return childExecutions;
     }

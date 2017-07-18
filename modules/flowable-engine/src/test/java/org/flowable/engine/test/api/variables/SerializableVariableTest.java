@@ -30,7 +30,7 @@ public class SerializableVariableTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testUpdateSerializableInServiceTask() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("myVar", new TestSerializableVariable(1));
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testUpdateSerializableInServiceTask", vars);
 

@@ -233,7 +233,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertNotNull(subProcessInstance);
 
         Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateEnd").singleResult();
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("input", 1);
         taskService.complete(task.getId(), variables);
 
@@ -246,7 +246,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample-terminateAfterExclusiveGateway");
 
         Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateEnd").singleResult();
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("input", 1);
         taskService.complete(task.getId(), variables);
 
@@ -275,7 +275,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
         // Other task will now finish the process instance
         Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateEnd").singleResult();
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("input", 1);
         taskService.complete(task.getId(), variables);
 
@@ -966,7 +966,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
     // Unit test for ACT-4101 : NPE when there are multiple routes to terminateEndEvent, and both are reached
     @Deployment
     public void testThreeExecutionsArrivingInTerminateEndEvent() {
-        Map<String, Object> variableMap = new HashMap<String, Object>();
+        Map<String, Object> variableMap = new HashMap<>();
         variableMap.put("passed_QC", false);
         variableMap.put("has_bad_pixel_pattern", true);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("skybox_image_pull_request", variableMap);

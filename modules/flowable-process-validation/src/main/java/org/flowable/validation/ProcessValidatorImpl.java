@@ -29,11 +29,11 @@ public class ProcessValidatorImpl implements ProcessValidator {
     @Override
     public List<ValidationError> validate(BpmnModel bpmnModel) {
 
-        List<ValidationError> allErrors = new ArrayList<ValidationError>();
+        List<ValidationError> allErrors = new ArrayList<>();
 
         for (ValidatorSet validatorSet : validatorSets) {
             for (Validator validator : validatorSet.getValidators()) {
-                List<ValidationError> validatorErrors = new ArrayList<ValidationError>();
+                List<ValidationError> validatorErrors = new ArrayList<>();
                 validator.validate(bpmnModel, validatorErrors);
                 if (!validatorErrors.isEmpty()) {
                     for (ValidationError error : validatorErrors) {
@@ -56,7 +56,7 @@ public class ProcessValidatorImpl implements ProcessValidator {
 
     public void addValidatorSet(ValidatorSet validatorSet) {
         if (validatorSets == null) {
-            validatorSets = new ArrayList<ValidatorSet>();
+            validatorSets = new ArrayList<>();
         }
         validatorSets.add(validatorSet);
     }

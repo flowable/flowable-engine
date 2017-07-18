@@ -33,7 +33,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 public abstract class SpringFlowableTestCase extends AbstractFlowableTestCase implements ApplicationContextAware {
 
     // we need a data structure to store all the resolved ProcessEngines and map them to something
-    protected Map<Object, ProcessEngine> cachedProcessEngines = new ConcurrentHashMap<Object, ProcessEngine>();
+    protected Map<Object, ProcessEngine> cachedProcessEngines = new ConcurrentHashMap<>();
 
     // protected static Map<String, ProcessEngine> cachedProcessEngines = new
     // HashMap<String, ProcessEngine>();

@@ -53,7 +53,7 @@ public class ProcessEngineInitializationTest extends AbstractTestCase {
         SqlSession sqlSession = sqlSessionFactory.openSession();
         boolean success = false;
         try {
-            Map<String, Object> parameters = new HashMap<String, Object>();
+            Map<String, Object> parameters = new HashMap<>();
             parameters.put("name", "schema.version");
             parameters.put("value", "25.7");
             parameters.put("revision", 1);

@@ -47,7 +47,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class BeanELResolver extends ELResolver {
 	protected static final class BeanProperties {
-		private final Map<String, BeanProperty> map = new HashMap<String, BeanProperty>();
+		private final Map<String, BeanProperty> map = new HashMap<>();
 
 		public BeanProperties(Class<?> baseClass) {
 			PropertyDescriptor[] descriptors;
@@ -162,7 +162,7 @@ public class BeanELResolver extends ELResolver {
 	 */
 	public BeanELResolver(boolean readOnly) {
 		this.readOnly = readOnly;
-		this.cache = new ConcurrentHashMap<Class<?>, BeanProperties>();
+		this.cache = new ConcurrentHashMap<>();
 	}
 
 	/**

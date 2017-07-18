@@ -25,7 +25,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
  */
 public class StaticTestFlowableEventListener implements FlowableEventListener {
 
-    private static List<FlowableEvent> eventsReceived = new ArrayList<FlowableEvent>();
+    private static List<FlowableEvent> eventsReceived = new ArrayList<>();
 
     public static List<FlowableEvent> getEventsReceived() {
         return eventsReceived;

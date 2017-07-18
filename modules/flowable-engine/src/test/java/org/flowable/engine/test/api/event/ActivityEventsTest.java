@@ -579,7 +579,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
 
         // Check timeout-events have been dispatched
         assertEquals(4, listener.getEventsReceived().size());
-        List<String> eventIdList = new ArrayList<String>();
+        List<String> eventIdList = new ArrayList<>();
         for (FlowableEvent event : listener.getEventsReceived()) {
             assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
             assertTrue("TIMER is the cause of the cancellation", ((FlowableActivityCancelledEvent) event).getCause() instanceof JobEntity);
@@ -606,7 +606,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
 
         // Check timeout-events have been dispatched
         assertEquals(4, listener.getEventsReceived().size());
-        List<String> eventIdList = new ArrayList<String>();
+        List<String> eventIdList = new ArrayList<>();
         for (FlowableEvent event : listener.getEventsReceived()) {
             assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
             assertTrue("TIMER is the cause of the cancellation", ((FlowableActivityCancelledEvent) event).getCause() instanceof JobEntity);

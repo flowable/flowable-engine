@@ -23,7 +23,7 @@ import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
  */
 public class AcquiredJobEntities {
 
-    protected Map<String, JobInfoEntity> acquiredJobs = new HashMap<String, JobInfoEntity>();
+    protected Map<String, JobInfoEntity> acquiredJobs = new HashMap<>();
 
     public void addJob(JobInfoEntity job) {
         acquiredJobs.put(job.getId(), job);

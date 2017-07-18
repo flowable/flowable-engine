@@ -58,7 +58,7 @@ public class ExecuteInactiveBehaviorsOperation extends AbstractOperation {
         for (ExecutionEntity executionEntity : involvedExecutions) {
 
             Process process = ProcessDefinitionUtil.getProcess(executionEntity.getProcessDefinitionId());
-            Collection<String> flowNodeIdsWithInactivatedBehavior = new ArrayList<String>();
+            Collection<String> flowNodeIdsWithInactivatedBehavior = new ArrayList<>();
             for (FlowNode flowNode : process.findFlowElementsOfType(FlowNode.class)) {
                 if (flowNode.getBehavior() instanceof InactiveActivityBehavior) {
                     flowNodeIdsWithInactivatedBehavior.add(flowNode.getId());

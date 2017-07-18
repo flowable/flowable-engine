@@ -27,8 +27,8 @@ public class DefaultVariableTypes implements VariableTypes, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final List<VariableType> typesList = new ArrayList<VariableType>();
-    private final Map<String, VariableType> typesMap = new HashMap<String, VariableType>();
+    private final List<VariableType> typesList = new ArrayList<>();
+    private final Map<String, VariableType> typesMap = new HashMap<>();
 
     public DefaultVariableTypes addType(VariableType type) {
         return addType(type, typesList.size());

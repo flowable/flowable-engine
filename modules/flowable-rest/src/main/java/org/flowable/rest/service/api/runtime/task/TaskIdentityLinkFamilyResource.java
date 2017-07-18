@@ -60,7 +60,7 @@ public class TaskIdentityLinkFamilyResource extends TaskBaseResource {
         }
 
         boolean isUser = family.equals(RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS);
-        List<RestIdentityLink> results = new ArrayList<RestIdentityLink>();
+        List<RestIdentityLink> results = new ArrayList<>();
 
         List<IdentityLink> allLinks = taskService.getIdentityLinksForTask(task.getId());
         for (IdentityLink link : allLinks) {

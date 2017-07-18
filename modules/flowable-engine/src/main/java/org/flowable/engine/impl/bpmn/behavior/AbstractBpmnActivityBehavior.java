@@ -84,7 +84,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
         Process process = getProcessDefinition(processDefinitionId);
 
         // This could be cached or could be done at parsing time
-        List<BoundaryEvent> results = new ArrayList<BoundaryEvent>(1);
+        List<BoundaryEvent> results = new ArrayList<>(1);
         Collection<BoundaryEvent> boundaryEvents = process.findFlowElementsOfType(BoundaryEvent.class, true);
         for (BoundaryEvent boundaryEvent : boundaryEvents) {
             if (boundaryEvent.getAttachedToRefId() != null && boundaryEvent.getAttachedToRefId().equals(flowElement.getId())) {

@@ -41,7 +41,7 @@ public class SequenceFlow extends FlowElement {
      * 
      * Added during parsing of a process definition.
      */
-    protected List<Integer> waypoints = new ArrayList<Integer>();
+    protected List<Integer> waypoints = new ArrayList<>();
 
     public SequenceFlow() {
 

@@ -70,7 +70,7 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
 
     public ExecuteDecisionBuilder variables(Map<String, Object> variables) {
         if (this.variables == null) {
-            this.variables = new HashMap<String, Object>();
+            this.variables = new HashMap<>();
         }
         if (variables != null) {
             for (String variableName : variables.keySet()) {
@@ -82,7 +82,7 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
 
     public ExecuteDecisionBuilder variable(String variableName, Object value) {
         if (this.variables == null) {
-            this.variables = new HashMap<String, Object>();
+            this.variables = new HashMap<>();
         }
         this.variables.put(variableName, value);
         return this;

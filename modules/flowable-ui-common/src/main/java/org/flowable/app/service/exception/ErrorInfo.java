@@ -68,7 +68,7 @@ public class ErrorInfo {
 
     public void addParameter(String name, Object value) {
         if (customData == null) {
-            customData = new HashMap<String, Object>();
+            customData = new HashMap<>();
         }
         customData.put(name, value);
     }

@@ -167,7 +167,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
 
         // now complete the task to end the process instance
         Task task = taskService.createTaskQuery().processDefinitionKey("checkCreditProcess").singleResult();
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("creditApproved", true);
         taskService.complete(task.getId(), map);
         
@@ -181,7 +181,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml", "org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
     public void testHistoricProcessInstanceQueryByProcessInstanceIds() {
-        HashSet<String> processInstanceIds = new HashSet<String>();
+        HashSet<String> processInstanceIds = new HashSet<>();
         for (int i = 0; i < 4; i++) {
             processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i)).getId());
         }
@@ -304,7 +304,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
 
-        List<String> deploymentIds = new ArrayList<String>();
+        List<String> deploymentIds = new ArrayList<>();
         deploymentIds.add(deployment.getId());
         deploymentIds.add("invalid");
         HistoricProcessInstanceQuery processInstanceQuery = historyService.createHistoricProcessInstanceQuery().deploymentIdIn(deploymentIds);
@@ -314,7 +314,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertNotNull(processInstances);
         assertEquals(5, processInstances.size());
 
-        deploymentIds = new ArrayList<String>();
+        deploymentIds = new ArrayList<>();
         deploymentIds.add("invalid");
         processInstanceQuery = historyService.createHistoricProcessInstanceQuery().deploymentIdIn(deploymentIds);
         assertEquals(0, processInstanceQuery.count());
@@ -351,7 +351,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
 
-        List<String> deploymentIds = new ArrayList<String>();
+        List<String> deploymentIds = new ArrayList<>();
         deploymentIds.add(deployment.getId());
         HistoricTaskInstanceQuery taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().deploymentIdIn(deploymentIds);
         assertEquals(5, taskInstanceQuery.count());
@@ -364,7 +364,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().deploymentIdIn(deploymentIds);
         assertEquals(5, taskInstanceQuery.count());
 
-        deploymentIds = new ArrayList<String>();
+        deploymentIds = new ArrayList<>();
         deploymentIds.add("invalid");
         taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().deploymentIdIn(deploymentIds);
         assertEquals(0, taskInstanceQuery.count());
@@ -465,7 +465,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
 
-        List<String> deploymentIds = new ArrayList<String>();
+        List<String> deploymentIds = new ArrayList<>();
         deploymentIds.add(deployment.getId());
         HistoricTaskInstanceQuery taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().or().deploymentIdIn(deploymentIds).processDefinitionId("invalid").endOr();
         assertEquals(5, taskInstanceQuery.count());
@@ -478,7 +478,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().or().deploymentIdIn(deploymentIds).processDefinitionId("invalid").endOr();
         assertEquals(5, taskInstanceQuery.count());
 
-        deploymentIds = new ArrayList<String>();
+        deploymentIds = new ArrayList<>();
         deploymentIds.add("invalid");
         taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().or().deploymentIdIn(deploymentIds).processDefinitionId("invalid").endOr();
         assertEquals(0, taskInstanceQuery.count());
@@ -540,13 +540,13 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/concurrentExecution.bpmn20.xml" })
     public void testHistoricVariableInstancesOnParallelExecution() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("rootValue", "test");
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("concurrent", vars);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
         for (Task task : tasks) {
-            Map<String, Object> variables = new HashMap<String, Object>();
+            Map<String, Object> variables = new HashMap<>();
             // set token local variable
             LOGGER.debug("setting variables on task {}, execution {}", task.getId(), task.getExecutionId());
             runtimeService.setVariableLocal(task.getExecutionId(), "parallelValue1", task.getName());
@@ -569,18 +569,18 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
      */
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testQueryStringVariable() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("stringVar", "abcdef");
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult().getId());
 
-        vars = new HashMap<String, Object>();
+        vars = new HashMap<>();
         vars.put("stringVar", "abcdef");
         vars.put("stringVar2", "ghijkl");
         ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult().getId());
 
-        vars = new HashMap<String, Object>();
+        vars = new HashMap<>();
         vars.put("stringVar", "azerty");
         ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance3.getId()).singleResult().getId());
@@ -620,7 +620,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         processInstances = historyService.createHistoricProcessInstanceQuery().variableValueLessThan("stringVar", "abcdeg").list();
         assertEquals(2, processInstances.size());
         List<String> expectedIds = Arrays.asList(processInstance1.getId(), processInstance2.getId());
-        List<String> ids = new ArrayList<String>(Arrays.asList(processInstances.get(0).getId(), processInstances.get(1).getId()));
+        List<String> ids = new ArrayList<>(Arrays.asList(processInstances.get(0).getId(), processInstances.get(1).getId()));
         ids.removeAll(expectedIds);
         assertTrue(ids.isEmpty());
 
@@ -631,7 +631,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         processInstances = historyService.createHistoricProcessInstanceQuery().variableValueLessThanOrEqual("stringVar", "abcdef").list();
         assertEquals(2, processInstances.size());
         expectedIds = Arrays.asList(processInstance1.getId(), processInstance2.getId());
-        ids = new ArrayList<String>(Arrays.asList(processInstances.get(0).getId(), processInstances.get(1).getId()));
+        ids = new ArrayList<>(Arrays.asList(processInstances.get(0).getId(), processInstances.get(1).getId()));
         ids.removeAll(expectedIds);
         assertTrue(ids.isEmpty());
 
@@ -662,7 +662,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         processInstances = historyService.createHistoricProcessInstanceQuery().variableValueEquals("abcdef").list();
         assertEquals(2, processInstances.size());
         expectedIds = Arrays.asList(processInstance1.getId(), processInstance2.getId());
-        ids = new ArrayList<String>(Arrays.asList(processInstances.get(0).getId(), processInstances.get(1).getId()));
+        ids = new ArrayList<>(Arrays.asList(processInstances.get(0).getId(), processInstances.get(1).getId()));
         ids.removeAll(expectedIds);
         assertTrue(ids.isEmpty());
 
@@ -678,7 +678,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testQueryEqualsIgnoreCase() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("mixed", "AbCdEfG");
         vars.put("lower", "ABCDEFG");
         vars.put("upper", "abcdefg");
@@ -726,7 +726,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
      */
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testQueryDateVariable() throws Exception {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         Date date1 = Calendar.getInstance().getTime();
         vars.put("dateVar", date1);
 
@@ -734,7 +734,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult().getId());
 
         Date date2 = Calendar.getInstance().getTime();
-        vars = new HashMap<String, Object>();
+        vars = new HashMap<>();
         vars.put("dateVar", date1);
         vars.put("dateVar2", date2);
         ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
@@ -742,7 +742,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
 
         Calendar nextYear = Calendar.getInstance();
         nextYear.add(Calendar.YEAR, 1);
-        vars = new HashMap<String, Object>();
+        vars = new HashMap<>();
         vars.put("dateVar", nextYear.getTime());
         ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance3.getId()).singleResult().getId());
@@ -804,7 +804,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertEquals(2, processInstances.size());
 
         List<String> expectedIds = Arrays.asList(processInstance1.getId(), processInstance2.getId());
-        List<String> ids = new ArrayList<String>(Arrays.asList(processInstances.get(0).getId(), processInstances.get(1).getId()));
+        List<String> ids = new ArrayList<>(Arrays.asList(processInstances.get(0).getId(), processInstances.get(1).getId()));
         ids.removeAll(expectedIds);
         assertTrue(ids.isEmpty());
 
@@ -825,7 +825,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         processInstances = historyService.createHistoricProcessInstanceQuery().variableValueEquals(date1).list();
         assertEquals(2, processInstances.size());
         expectedIds = Arrays.asList(processInstance1.getId(), processInstance2.getId());
-        ids = new ArrayList<String>(Arrays.asList(processInstances.get(0).getId(), processInstances.get(1).getId()));
+        ids = new ArrayList<>(Arrays.asList(processInstances.get(0).getId(), processInstances.get(1).getId()));
         ids.removeAll(expectedIds);
         assertTrue(ids.isEmpty());
 

@@ -44,7 +44,7 @@ public class WSDLImporterTest {
         URL url = ReflectUtil.getResource("org/flowable/engine/impl/webservice/counter.wsdl");
         importer.importFrom(url.toString());
 
-        List<WSService> services = new ArrayList<WSService>(importer.getServices().values());
+        List<WSService> services = new ArrayList<>(importer.getServices().values());
         assertEquals(1, services.size());
         WSService service = services.get(0);
 
@@ -85,7 +85,7 @@ public class WSDLImporterTest {
         URL url = ReflectUtil.getResource("org/flowable/engine/impl/webservice/counterWithImport.wsdl");
         importer.importFrom(url.toString());
 
-        List<WSService> services = new ArrayList<WSService>(importer.getServices().values());
+        List<WSService> services = new ArrayList<>(importer.getServices().values());
         assertEquals(1, services.size());
         WSService service = services.get(0);
 
@@ -122,7 +122,7 @@ public class WSDLImporterTest {
     }
 
     private List<WSOperation> sortOperations() {
-        List<WSOperation> operations = new ArrayList<WSOperation>(importer.getOperations().values());
+        List<WSOperation> operations = new ArrayList<>(importer.getOperations().values());
         Collections.sort(operations, new Comparator<WSOperation>() {
             public int compare(WSOperation o1, WSOperation o2) {
                 return o1.getName().compareTo(o2.getName());
@@ -132,7 +132,7 @@ public class WSDLImporterTest {
     }
 
     private List<StructureDefinition> sortStructures() {
-        List<StructureDefinition> structures = new ArrayList<StructureDefinition>(importer.getStructures().values());
+        List<StructureDefinition> structures = new ArrayList<>(importer.getStructures().values());
         Collections.sort(structures, new Comparator<StructureDefinition>() {
             public int compare(StructureDefinition o1, StructureDefinition o2) {
                 return o1.getId().compareTo(o2.getId());

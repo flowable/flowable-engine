@@ -32,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class HistoricTaskInstanceBaseResource {
 
-    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<String, QueryProperty>();
+    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();
 
     static {
         allowedSortProperties.put("deleteReason", HistoricTaskInstanceQueryProperty.DELETE_REASON);

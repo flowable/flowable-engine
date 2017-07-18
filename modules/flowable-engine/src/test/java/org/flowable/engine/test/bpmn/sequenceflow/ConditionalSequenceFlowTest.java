@@ -42,7 +42,7 @@ public class ConditionalSequenceFlowTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testSkipExpression() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("input", "right");
         variables.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
         variables.put("skipLeft", true);

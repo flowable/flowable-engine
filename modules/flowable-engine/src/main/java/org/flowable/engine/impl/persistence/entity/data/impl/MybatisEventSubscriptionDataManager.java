@@ -46,7 +46,7 @@ import org.flowable.engine.runtime.EventSubscription;
  */
 public class MybatisEventSubscriptionDataManager extends AbstractDataManager<EventSubscriptionEntity> implements EventSubscriptionDataManager {
 
-    private static List<Class<? extends EventSubscriptionEntity>> ENTITY_SUBCLASSES = new ArrayList<Class<? extends EventSubscriptionEntity>>();
+    private static List<Class<? extends EventSubscriptionEntity>> ENTITY_SUBCLASSES = new ArrayList<>();
 
     static {
         ENTITY_SUBCLASSES.add(MessageEventSubscriptionEntityImpl.class);
@@ -120,7 +120,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractDataManager<Eve
 
     @Override
     public List<MessageEventSubscriptionEntity> findMessageEventSubscriptionsByProcessInstanceAndEventName(final String processInstanceId, final String eventName) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("processInstanceId", processInstanceId);
         params.put("eventName", eventName);
         return toMessageEventSubscriptionEntityList(getList("selectMessageEventSubscriptionsByProcessInstanceAndEventName",
@@ -131,7 +131,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractDataManager<Eve
     public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByEventName(final String eventName, final String tenantId) {
         final String query = "selectSignalEventSubscriptionsByEventName";
 
-        final Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<>();
         params.put("eventName", eventName);
         if (tenantId != null && !tenantId.equals(ProcessEngineConfiguration.NO_TENANT_ID)) {
             params.put("tenantId", tenantId);
@@ -144,7 +144,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractDataManager<Eve
     @Override
     public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByProcessInstanceAndEventName(final String processInstanceId, final String eventName) {
         final String query = "selectSignalEventSubscriptionsByProcessInstanceAndEventName";
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("processInstanceId", processInstanceId);
         params.put("eventName", eventName);
         return toSignalEventSubscriptionEntityList(getList(query, params, signalEventSubscriptionByProcInstAndEventNameMatcher, true));
@@ -152,7 +152,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractDataManager<Eve
 
     @Override
     public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByNameAndExecution(final String name, final String executionId) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("executionId", executionId);
         params.put("eventName", name);
         return toSignalEventSubscriptionEntityList(getList("selectSignalEventSubscriptionsByNameAndExecution", params, signalEventSubscriptionByNameAndExecutionMatcher, true));
@@ -160,7 +160,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractDataManager<Eve
 
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByExecutionAndType(final String executionId, final String type) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("executionId", executionId);
         params.put("eventType", type);
         return getList("selectEventSubscriptionsByExecutionAndType", params, eventSubscriptionsByExecutionAndTypeMatcher, true);
@@ -168,7 +168,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractDataManager<Eve
 
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceAndActivityId(final String processInstanceId, final String activityId, final String type) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("processInstanceId", processInstanceId);
         params.put("eventType", type);
         params.put("activityId", activityId);
@@ -184,7 +184,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractDataManager<Eve
     @SuppressWarnings("unchecked")
     public List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId) {
         final String query = "selectEventSubscriptionsByTypeAndProcessDefinitionId";
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         if (type != null) {
             params.put("eventType", type);
         }
@@ -198,7 +198,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractDataManager<Eve
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByName(final String type, final String eventName, final String tenantId) {
 
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("eventType", type);
         params.put("eventName", eventName);
         if (tenantId != null && !tenantId.equals(ProcessEngineConfiguration.NO_TENANT_ID)) {
@@ -212,7 +212,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractDataManager<Eve
     @SuppressWarnings("unchecked")
     public List<EventSubscriptionEntity> findEventSubscriptionsByNameAndExecution(String type, String eventName, String executionId) {
         final String query = "selectEventSubscriptionsByNameAndExecution";
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("eventType", type);
         params.put("eventName", eventName);
         params.put("executionId", executionId);
@@ -221,7 +221,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractDataManager<Eve
 
     @Override
     public MessageEventSubscriptionEntity findMessageStartEventSubscriptionByName(String messageName, String tenantId) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("eventName", messageName);
         if (tenantId != null && !tenantId.equals(ProcessEngineConfiguration.NO_TENANT_ID)) {
             params.put("tenantId", tenantId);
@@ -232,7 +232,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractDataManager<Eve
 
     @Override
     public void updateEventSubscriptionTenantId(String oldTenantId, String newTenantId) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("oldTenantId", oldTenantId);
         params.put("newTenantId", newTenantId);
         getDbSqlSession().update("updateTenantIdOfEventSubscriptions", params);
@@ -244,7 +244,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractDataManager<Eve
     }
 
     protected List<SignalEventSubscriptionEntity> toSignalEventSubscriptionEntityList(List<EventSubscriptionEntity> result) {
-        List<SignalEventSubscriptionEntity> signalEventSubscriptionEntities = new ArrayList<SignalEventSubscriptionEntity>(result.size());
+        List<SignalEventSubscriptionEntity> signalEventSubscriptionEntities = new ArrayList<>(result.size());
         for (EventSubscriptionEntity eventSubscriptionEntity : result) {
             signalEventSubscriptionEntities.add((SignalEventSubscriptionEntity) eventSubscriptionEntity);
         }
@@ -252,7 +252,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractDataManager<Eve
     }
 
     protected List<MessageEventSubscriptionEntity> toMessageEventSubscriptionEntityList(List<EventSubscriptionEntity> result) {
-        List<MessageEventSubscriptionEntity> messageEventSubscriptionEntities = new ArrayList<MessageEventSubscriptionEntity>(result.size());
+        List<MessageEventSubscriptionEntity> messageEventSubscriptionEntities = new ArrayList<>(result.size());
         for (EventSubscriptionEntity eventSubscriptionEntity : result) {
             messageEventSubscriptionEntities.add((MessageEventSubscriptionEntity) eventSubscriptionEntity);
         }

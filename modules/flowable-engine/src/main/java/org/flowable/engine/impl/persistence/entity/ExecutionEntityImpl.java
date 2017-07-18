@@ -211,20 +211,20 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
      */
     public static ExecutionEntityImpl createWithEmptyRelationshipCollections() {
         ExecutionEntityImpl execution = new ExecutionEntityImpl();
-        execution.executions = new ArrayList<ExecutionEntityImpl>(1);
-        execution.tasks = new ArrayList<TaskEntity>(1);
-        execution.variableInstances = new HashMap<String, VariableInstanceEntity>(1);
-        execution.jobs = new ArrayList<JobEntity>(1);
-        execution.timerJobs = new ArrayList<TimerJobEntity>(1);
-        execution.eventSubscriptions = new ArrayList<EventSubscriptionEntity>(1);
-        execution.identityLinks = new ArrayList<IdentityLinkEntity>(1);
+        execution.executions = new ArrayList<>(1);
+        execution.tasks = new ArrayList<>(1);
+        execution.variableInstances = new HashMap<>(1);
+        execution.jobs = new ArrayList<>(1);
+        execution.timerJobs = new ArrayList<>(1);
+        execution.eventSubscriptions = new ArrayList<>(1);
+        execution.identityLinks = new ArrayList<>(1);
         return execution;
     }
 
     // persistent state /////////////////////////////////////////////////////////
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("processDefinitionId", this.processDefinitionId);
         persistentState.put("businessKey", this.businessKey);
         persistentState.put("activityId", this.activityId);
@@ -815,7 +815,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
     }
 
     public Map<String, Object> getProcessVariables() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (VariableInstanceEntity variableInstance : queryVariables) {
                 if (variableInstance.getId() != null && variableInstance.getTaskId() == null) {

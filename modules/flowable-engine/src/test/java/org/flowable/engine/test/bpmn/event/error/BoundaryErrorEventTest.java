@@ -312,7 +312,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         assertEquals(5, tasks.size());
 
         // Complete two subprocesses, just to make it a bit more complex
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("throwError", false);
         taskService.complete(tasks.get(2).getId(), vars);
         taskService.complete(tasks.get(3).getId(), vars);
@@ -330,7 +330,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         String procId = runtimeService.startProcessInstanceByKey("catchErrorOnSequentialMi").getId();
 
         // complete one task
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("throwError", false);
         Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId(), vars);
@@ -432,7 +432,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testCatchErrorThrownByJavaDelegateOnMultiInstanceServiceTaskSequential() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("executionsBeforeError", 2);
         String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnMultiInstanceServiceTaskSequential", variables).getId();
         assertThatErrorHasBeenCaught(procId);
@@ -440,7 +440,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testCatchErrorThrownByJavaDelegateOnMultiInstanceServiceTaskParallel() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("executionsBeforeError", 2);
         String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnMultiInstanceServiceTaskParallel", variables).getId();
         assertThatErrorHasBeenCaught(procId);
@@ -480,7 +480,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testCatchErrorThrownByExpressionOnServiceTask() {
-        HashMap<String, Object> variables = new HashMap<String, Object>();
+        HashMap<String, Object> variables = new HashMap<>();
         variables.put("bpmnErrorBean", new BpmnErrorBean());
         String procId = runtimeService.startProcessInstanceByKey("testCatchErrorThrownByExpressionOnServiceTask", variables).getId();
         assertThatErrorHasBeenCaught(procId);
@@ -488,7 +488,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testCatchErrorThrownByDelegateExpressionOnServiceTask() {
-        HashMap<String, Object> variables = new HashMap<String, Object>();
+        HashMap<String, Object> variables = new HashMap<>();
         variables.put("bpmnErrorBean", new BpmnErrorBean());
         String procId = runtimeService.startProcessInstanceByKey("testCatchErrorThrownByDelegateExpressionOnServiceTask", variables).getId();
         assertThatErrorHasBeenCaught(procId);
@@ -496,7 +496,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testCatchErrorThrownByJavaDelegateProvidedByDelegateExpressionOnServiceTask() {
-        HashMap<String, Object> variables = new HashMap<String, Object>();
+        HashMap<String, Object> variables = new HashMap<>();
         variables.put("bpmnErrorBean", new BpmnErrorBean());
         String procId = runtimeService.startProcessInstanceByKey("testCatchErrorThrownByJavaDelegateProvidedByDelegateExpressionOnServiceTask", variables).getId();
         assertThatErrorHasBeenCaught(procId);

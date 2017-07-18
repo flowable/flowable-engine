@@ -33,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ContentItemBaseResource {
 
-    private static HashMap<String, QueryProperty> properties = new HashMap<String, QueryProperty>();
+    private static HashMap<String, QueryProperty> properties = new HashMap<>();
 
     static {
         properties.put("created", ContentItemQueryProperty.CREATED_DATE);

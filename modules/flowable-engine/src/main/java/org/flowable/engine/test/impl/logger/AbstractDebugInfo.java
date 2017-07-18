@@ -20,7 +20,7 @@ import java.util.List;
  */
 public abstract class AbstractDebugInfo implements DebugInfo {
 
-    protected List<DebugInfoExecutionTree> executionTrees = new ArrayList<DebugInfoExecutionTree>();
+    protected List<DebugInfoExecutionTree> executionTrees = new ArrayList<>();
 
     public List<DebugInfoExecutionTree> getExecutionTrees() {
         return executionTrees;

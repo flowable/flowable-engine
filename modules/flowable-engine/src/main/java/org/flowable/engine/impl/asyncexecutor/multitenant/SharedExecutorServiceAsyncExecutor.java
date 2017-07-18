@@ -40,14 +40,14 @@ public class SharedExecutorServiceAsyncExecutor extends DefaultAsyncJobExecutor 
 
     protected TenantInfoHolder tenantInfoHolder;
 
-    protected Map<String, Thread> timerJobAcquisitionThreads = new HashMap<String, Thread>();
-    protected Map<String, TenantAwareAcquireTimerJobsRunnable> timerJobAcquisitionRunnables = new HashMap<String, TenantAwareAcquireTimerJobsRunnable>();
+    protected Map<String, Thread> timerJobAcquisitionThreads = new HashMap<>();
+    protected Map<String, TenantAwareAcquireTimerJobsRunnable> timerJobAcquisitionRunnables = new HashMap<>();
 
-    protected Map<String, Thread> asyncJobAcquisitionThreads = new HashMap<String, Thread>();
-    protected Map<String, TenantAwareAcquireAsyncJobsDueRunnable> asyncJobAcquisitionRunnables = new HashMap<String, TenantAwareAcquireAsyncJobsDueRunnable>();
+    protected Map<String, Thread> asyncJobAcquisitionThreads = new HashMap<>();
+    protected Map<String, TenantAwareAcquireAsyncJobsDueRunnable> asyncJobAcquisitionRunnables = new HashMap<>();
 
-    protected Map<String, Thread> resetExpiredJobsThreads = new HashMap<String, Thread>();
-    protected Map<String, TenantAwareResetExpiredJobsRunnable> resetExpiredJobsRunnables = new HashMap<String, TenantAwareResetExpiredJobsRunnable>();
+    protected Map<String, Thread> resetExpiredJobsThreads = new HashMap<>();
+    protected Map<String, TenantAwareResetExpiredJobsRunnable> resetExpiredJobsRunnables = new HashMap<>();
 
     public SharedExecutorServiceAsyncExecutor(TenantInfoHolder tenantInfoHolder) {
         this.tenantInfoHolder = tenantInfoHolder;

@@ -25,7 +25,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
  */
 public class SetVariablesDelegate implements JavaDelegate {
 
-    public static Map<Object, Integer> variablesMap = new HashMap<Object, Integer>();
+    public static Map<Object, Integer> variablesMap = new HashMap<>();
 
     // activiti creates a single instance of the delegate
     protected int lastInt;

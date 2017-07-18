@@ -68,7 +68,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     protected String category;
 
     protected boolean isIdentityLinksInitialized;
-    protected List<IdentityLinkEntity> taskIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
+    protected List<IdentityLinkEntity> taskIdentityLinkEntities = new ArrayList<>();
 
     protected String executionId;
     protected ExecutionEntity execution;
@@ -106,7 +106,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
 
     @Override
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("assignee", this.assignee);
         persistentState.put("owner", this.owner);
         persistentState.put("name", this.name);
@@ -253,7 +253,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
 
     @Override
     public Set<IdentityLink> getCandidates() {
-        Set<IdentityLink> potentialOwners = new HashSet<IdentityLink>();
+        Set<IdentityLink> potentialOwners = new HashSet<>();
         for (IdentityLinkEntity identityLinkEntity : getIdentityLinks()) {
             if (IdentityLinkType.CANDIDATE.equals(identityLinkEntity.getType())) {
                 potentialOwners.add(identityLinkEntity);
@@ -612,7 +612,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
 
     @Override
     public Map<String, Object> getTaskLocalVariables() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (VariableInstanceEntity variableInstance : queryVariables) {
                 if (variableInstance.getId() != null && variableInstance.getTaskId() != null) {
@@ -625,7 +625,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
 
     @Override
     public Map<String, Object> getProcessVariables() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (VariableInstanceEntity variableInstance : queryVariables) {
                 if (variableInstance.getId() != null && variableInstance.getTaskId() == null) {

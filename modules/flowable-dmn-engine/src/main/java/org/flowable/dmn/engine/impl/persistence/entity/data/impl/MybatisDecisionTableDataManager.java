@@ -51,7 +51,7 @@ public class MybatisDecisionTableDataManager extends AbstractDataManager<Decisio
 
     @Override
     public DecisionTableEntity findLatestDecisionTableByKeyAndTenantId(String decisionTableKey, String tenantId) {
-        Map<String, Object> params = new HashMap<String, Object>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put("decisionTableKey", decisionTableKey);
         params.put("tenantId", tenantId);
         return (DecisionTableEntity) getDbSqlSession().selectOne("selectLatestDecisionTableByKeyAndTenantId", params);
@@ -59,7 +59,7 @@ public class MybatisDecisionTableDataManager extends AbstractDataManager<Decisio
 
     @Override
     public DecisionTableEntity findLatestDecisionTableByKeyAndParentDeploymentId(String decisionTableKey, String parentDeploymentId) {
-        Map<String, Object> params = new HashMap<String, Object>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put("decisionTableKey", decisionTableKey);
         params.put("parentDeploymentId", parentDeploymentId);
         return (DecisionTableEntity) getDbSqlSession().selectOne("selectLatestDecisionTableByKeyAndParentDeploymentId", params);
@@ -67,7 +67,7 @@ public class MybatisDecisionTableDataManager extends AbstractDataManager<Decisio
 
     @Override
     public DecisionTableEntity findLatestDecisionTableByKeyParentDeploymentIdAndTenantId(String decisionTableKey, String parentDeploymentId, String tenantId) {
-        Map<String, Object> params = new HashMap<String, Object>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put("decisionTableKey", decisionTableKey);
         params.put("parentDeploymentId", parentDeploymentId);
         params.put("tenantId", tenantId);
@@ -92,7 +92,7 @@ public class MybatisDecisionTableDataManager extends AbstractDataManager<Decisio
 
     @Override
     public DecisionTableEntity findDecisionTableByDeploymentAndKey(String deploymentId, String decisionTableKey) {
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("deploymentId", deploymentId);
         parameters.put("decisionTableKey", decisionTableKey);
         return (DecisionTableEntity) getDbSqlSession().selectOne("selectDecisionTableByDeploymentAndKey", parameters);
@@ -100,7 +100,7 @@ public class MybatisDecisionTableDataManager extends AbstractDataManager<Decisio
 
     @Override
     public DecisionTableEntity findDecisionTableByDeploymentAndKeyAndTenantId(String deploymentId, String decisionTableKey, String tenantId) {
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("deploymentId", deploymentId);
         parameters.put("decisionTableKey", decisionTableKey);
         parameters.put("tenantId", tenantId);
@@ -109,7 +109,7 @@ public class MybatisDecisionTableDataManager extends AbstractDataManager<Decisio
 
     @Override
     public DecisionTableEntity findDecisionTableByKeyAndVersion(String decisionTableKey, Integer decisionTableVersion) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("decisionTableKey", decisionTableKey);
         params.put("decisionTableVersion", decisionTableVersion);
         List<DecisionTableEntity> results = getDbSqlSession().selectList("selectDecisionTablesByKeyAndVersion", params);
@@ -124,7 +124,7 @@ public class MybatisDecisionTableDataManager extends AbstractDataManager<Decisio
     @Override
     @SuppressWarnings("unchecked")
     public DecisionTableEntity findDecisionTableByKeyAndVersionAndTenantId(String decisionTableKey, Integer decisionTableVersion, String tenantId) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("decisionTableKey", decisionTableKey);
         params.put("decisionTableVersion", decisionTableVersion);
         params.put("tenantId", tenantId);
@@ -150,7 +150,7 @@ public class MybatisDecisionTableDataManager extends AbstractDataManager<Decisio
 
     @Override
     public void updateDecisionTableTenantIdForDeployment(String deploymentId, String newTenantId) {
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
         getDbSqlSession().update("updateDecisionTableTenantIdForDeploymentId", params);

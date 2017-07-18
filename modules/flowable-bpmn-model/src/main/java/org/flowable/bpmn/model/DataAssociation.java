@@ -20,7 +20,7 @@ public class DataAssociation extends BaseElement {
     protected String sourceRef;
     protected String targetRef;
     protected String transformation;
-    protected List<Assignment> assignments = new ArrayList<Assignment>();
+    protected List<Assignment> assignments = new ArrayList<>();
 
     public String getSourceRef() {
         return sourceRef;
@@ -65,7 +65,7 @@ public class DataAssociation extends BaseElement {
         setTargetRef(otherAssociation.getTargetRef());
         setTransformation(otherAssociation.getTransformation());
 
-        assignments = new ArrayList<Assignment>();
+        assignments = new ArrayList<>();
         if (otherAssociation.getAssignments() != null && !otherAssociation.getAssignments().isEmpty()) {
             for (Assignment assignment : otherAssociation.getAssignments()) {
                 assignments.add(assignment.clone());

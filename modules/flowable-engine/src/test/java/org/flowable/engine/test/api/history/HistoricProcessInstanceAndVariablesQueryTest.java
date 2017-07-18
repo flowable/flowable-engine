@@ -48,10 +48,10 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
                 .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess3.bpmn20.xml")
                 .deploy();
 
-        Map<String, Object> startMap = new HashMap<String, Object>();
+        Map<String, Object> startMap = new HashMap<>();
         startMap.put("test", "test");
         startMap.put("test2", "test2");
-        processInstanceIds = new ArrayList<String>();
+        processInstanceIds = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
             processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, String.valueOf(i), startMap).getId());
             if (i == 0) {

@@ -30,7 +30,7 @@ public abstract class BaseNativeQuery<T extends NativeQuery<?, ?>, U> implements
     protected int firstResult = -1;
     protected ResultType resultType;
 
-    protected Map<String, Object> parameters = new HashMap<String, Object>();
+    protected Map<String, Object> parameters = new HashMap<>();
     protected String sqlStatement;
 
     @SuppressWarnings("unchecked")
@@ -75,7 +75,7 @@ public abstract class BaseNativeQuery<T extends NativeQuery<?, ?>, U> implements
     }
 
     protected Map<String, Object> __generateParameterMap() {
-        HashMap<String, Object> parameterMap = new HashMap<String, Object>();
+        HashMap<String, Object> parameterMap = new HashMap<>();
         parameterMap.put("sql", sqlStatement);
         parameterMap.putAll(parameters);
         return parameterMap;

@@ -27,7 +27,7 @@ public class DecisionTableQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, DecisionTableQueryProperty> properties = new HashMap<String, DecisionTableQueryProperty>();
+    private static final Map<String, DecisionTableQueryProperty> properties = new HashMap<>();
 
     public static final DecisionTableQueryProperty DECISION_TABLE_KEY = new DecisionTableQueryProperty("RES.KEY_");
     public static final DecisionTableQueryProperty DECISION_TABLE_CATEGORY = new DecisionTableQueryProperty("RES.CATEGORY_");

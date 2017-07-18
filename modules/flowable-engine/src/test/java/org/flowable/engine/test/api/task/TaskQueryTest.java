@@ -189,7 +189,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     }
 
     public void testQueryByNameIn() {
-        final List<String> taskNameList = new ArrayList<String>(2);
+        final List<String> taskNameList = new ArrayList<>(2);
         taskNameList.add("testTask");
         taskNameList.add("gonzoTask");
 
@@ -206,7 +206,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     }
 
     public void testQueryByNameInIgnoreCase() {
-        final List<String> taskNameList = new ArrayList<String>(2);
+        final List<String> taskNameList = new ArrayList<>(2);
         taskNameList.add("testtask");
         taskNameList.add("gonzotask");
 
@@ -223,7 +223,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     }
 
     public void testQueryByNameInOr() {
-        final List<String> taskNameList = new ArrayList<String>(2);
+        final List<String> taskNameList = new ArrayList<>(2);
         taskNameList.add("testTask");
         taskNameList.add("gonzoTask");
 
@@ -240,7 +240,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     }
 
     public void testQueryByNameInIgnoreCaseOr() {
-        final List<String> taskNameList = new ArrayList<String>(2);
+        final List<String> taskNameList = new ArrayList<>(2);
         taskNameList.add("testtask");
         taskNameList.add("gonzotask");
 
@@ -257,7 +257,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     }
 
     public void testQueryByInvalidNameIn() {
-        final List<String> taskNameList = new ArrayList<String>(1);
+        final List<String> taskNameList = new ArrayList<>(1);
         taskNameList.add("invalid");
 
         TaskQuery query = taskService.createTaskQuery().taskNameIn(taskNameList);
@@ -273,7 +273,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     }
 
     public void testQueryByInvalidNameInIgnoreCase() {
-        final List<String> taskNameList = new ArrayList<String>(1);
+        final List<String> taskNameList = new ArrayList<>(1);
         taskNameList.add("invalid");
 
         TaskQuery query = taskService.createTaskQuery().taskNameInIgnoreCase(taskNameList);
@@ -289,7 +289,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     }
 
     public void testQueryByInvalidNameInOr() {
-        final List<String> taskNameList = new ArrayList<String>(2);
+        final List<String> taskNameList = new ArrayList<>(2);
         taskNameList.add("invalid");
 
         TaskQuery query = taskService.createTaskQuery().or().taskNameIn(taskNameList).taskId("invalid");
@@ -305,7 +305,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     }
 
     public void testQueryByInvalidNameInIgnoreCaseOr() {
-        final List<String> taskNameList = new ArrayList<String>(2);
+        final List<String> taskNameList = new ArrayList<>(2);
         taskNameList.add("invalid");
 
         TaskQuery query = taskService.createTaskQuery().or().taskNameInIgnoreCase(taskNameList).taskId("invalid");
@@ -806,7 +806,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
         // if dbIdentityUsed set false in process engine configuration of using
         // custom session factory of GroupIdentityManager
-        ArrayList<String> candidateGroups = new ArrayList<String>();
+        ArrayList<String> candidateGroups = new ArrayList<>();
         candidateGroups.add("management");
         candidateGroups.add("accountancy");
         candidateGroups.add("noexist");
@@ -847,7 +847,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
         // if dbIdentityUsed set false in process engine configuration of using
         // custom session factory of GroupIdentityManager
-        ArrayList<String> candidateGroups = new ArrayList<String>();
+        ArrayList<String> candidateGroups = new ArrayList<>();
         candidateGroups.add("management");
         candidateGroups.add("accountancy");
         candidateGroups.add("noexist");
@@ -1269,7 +1269,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertEquals(0, taskService.createTaskQuery().taskVariableValueEquals("unexistingVar", "value").count());
 
         // Create a map with a variable for all default types
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("longVar", 928374L);
         variables.put("shortVar", (short) 123);
         variables.put("integerVar", 1234);
@@ -1354,7 +1354,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertEquals(0, taskService.createTaskQuery().or().taskId("invalid").taskVariableValueEquals("unexistingVar", "value").count());
 
         // Create a map with a variable for all default types
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("longVar", 928374L);
         variables.put("shortVar", (short) 123);
         variables.put("integerVar", 1234);
@@ -1432,7 +1432,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testProcessVariableValueEquals() throws Exception {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("longVar", 928374L);
         variables.put("shortVar", (short) 123);
         variables.put("integerVar", 1234);
@@ -1517,7 +1517,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessVariableValueEquals.bpmn20.xml" })
     public void testProcessVariableValueEqualsOn() throws Exception {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("longVar", 928374L);
         variables.put("shortVar", (short) 123);
         variables.put("integerVar", 1234);
@@ -1594,7 +1594,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("mixed", "AzerTY");
         variables.put("upper", "AZERTY");
         variables.put("lower", "azerty");
@@ -1629,7 +1629,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
     public void testProcessVariableValueEqualsIgnoreCase() throws Exception {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("mixed", "AzerTY");
         variables.put("upper", "AZERTY");
         variables.put("lower", "azerty");
@@ -1651,7 +1651,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
     public void testProcessVariableValueLike() throws Exception {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("mixed", "AzerTY");
 
         runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
@@ -1663,7 +1663,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
     public void testProcessVariableValueLikeIgnoreCase() throws Exception {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("mixed", "AzerTY");
 
         runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
@@ -1675,7 +1675,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
     public void testProcessVariableValueGreaterThan() throws Exception {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("number", 10);
 
         runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
@@ -1686,7 +1686,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
     public void testProcessVariableValueGreaterThanOrEquals() throws Exception {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("number", 10);
 
         runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
@@ -1698,7 +1698,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
     public void testProcessVariableValueLessThan() throws Exception {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("number", 10);
 
         runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
@@ -1709,7 +1709,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
     public void testProcessVariableValueLessThanOrEquals() throws Exception {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("number", 10);
 
         runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
@@ -1784,7 +1784,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml" })
     public void testProcessDefinitionKeyIn() throws Exception {
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        List<String> includeIds = new ArrayList<String>();
+        List<String> includeIds = new ArrayList<>();
 
         assertEquals(13, taskService.createTaskQuery().processDefinitionKeyIn(includeIds).count());
         includeIds.add("unexisting");
@@ -1797,7 +1797,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     public void testProcessDefinitionKeyInOr() throws Exception {
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        List<String> includeIds = new ArrayList<String>();
+        List<String> includeIds = new ArrayList<>();
         assertEquals(0, taskService.createTaskQuery()
                 .or().taskId("invalid")
                 .processDefinitionKeyIn(includeIds)
@@ -2383,7 +2383,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     public void testQueryByDeploymentIdIn() throws Exception {
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        List<String> deploymentIds = new ArrayList<String>();
+        List<String> deploymentIds = new ArrayList<>();
         deploymentIds.add(deployment.getId());
         assertNotNull(taskService.createTaskQuery().deploymentIdIn(deploymentIds).singleResult());
         assertEquals(1, taskService.createTaskQuery().deploymentIdIn(deploymentIds).count());
@@ -2392,7 +2392,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertNotNull(taskService.createTaskQuery().deploymentIdIn(deploymentIds).singleResult());
         assertEquals(1, taskService.createTaskQuery().deploymentIdIn(deploymentIds).count());
 
-        deploymentIds = new ArrayList<String>();
+        deploymentIds = new ArrayList<>();
         deploymentIds.add("invalid");
         assertNull(taskService.createTaskQuery().deploymentIdIn(deploymentIds).singleResult());
         assertEquals(0, taskService.createTaskQuery().deploymentIdIn(deploymentIds).count());
@@ -2402,7 +2402,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     public void testQueryByDeploymentIdInOr() throws Exception {
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        List<String> deploymentIds = new ArrayList<String>();
+        List<String> deploymentIds = new ArrayList<>();
         deploymentIds.add(deployment.getId());
         assertNotNull(taskService.createTaskQuery().or().taskId("invalid").deploymentIdIn(deploymentIds).singleResult());
 
@@ -2413,7 +2413,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
         assertEquals(1, taskService.createTaskQuery().or().taskId("invalid").deploymentIdIn(deploymentIds).count());
 
-        deploymentIds = new ArrayList<String>();
+        deploymentIds = new ArrayList<>();
         deploymentIds.add("invalid");
         assertNull(taskService.createTaskQuery().deploymentIdIn(deploymentIds).singleResult());
         assertEquals(0, taskService.createTaskQuery().or().taskId("invalid").deploymentIdIn(deploymentIds).count());
@@ -2730,7 +2730,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
      * assigned to both the management and accountancy group
      */
     private List<String> generateTestTasks() throws Exception {
-        List<String> ids = new ArrayList<String>();
+        List<String> ids = new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
         // 6 tasks for kermit

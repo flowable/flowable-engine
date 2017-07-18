@@ -27,7 +27,7 @@ public class RetryFailingDelegate implements JavaDelegate {
     public static List<Long> times;
 
     public static void resetTimeList() {
-        times = new ArrayList<Long>();
+        times = new ArrayList<>();
     }
 
     @Override

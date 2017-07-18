@@ -25,7 +25,7 @@ import org.flowable.engine.delegate.TaskListener;
 public class TaskSimpleCompleteListener implements TaskListener {
 
     private static final long serialVersionUID = 1L;
-    private static List<String> messages = new ArrayList<String>();
+    private static List<String> messages = new ArrayList<>();
 
     public static List<String> getCurrentMessages() {
         return messages;

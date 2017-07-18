@@ -36,7 +36,7 @@ public class MDCLoggingTest extends PluggableFlowableTestCase {
         console.activateOptions();
         console.setName("MemoryAppender");
 
-        appenders = new ArrayList<Appender>();
+        appenders = new ArrayList<>();
         Enumeration<?> appendersEnum = Logger.getRootLogger().getAllAppenders();
 
         while (appendersEnum.hasMoreElements()) {

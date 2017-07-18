@@ -30,7 +30,7 @@ public abstract class IdmTestHelper {
 
     public static final String EMPTY_LINE = "\n";
 
-    static Map<String, IdmEngine> idmEngines = new HashMap<String, IdmEngine>();
+    static Map<String, IdmEngine> idmEngines = new HashMap<>();
 
     public static IdmEngine getIdmEngine(String configurationResource) {
         IdmEngine idmEngine = idmEngines.get(configurationResource);

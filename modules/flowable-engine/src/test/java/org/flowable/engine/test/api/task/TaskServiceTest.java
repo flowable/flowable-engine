@@ -669,7 +669,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertEquals("First task", task.getName());
 
         // Complete first task
-        Map<String, Object> taskParams = new HashMap<String, Object>();
+        Map<String, Object> taskParams = new HashMap<>();
         taskParams.put("myParam", "myValue");
         taskService.complete(task.getId(), taskParams);
 
@@ -692,7 +692,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertEquals("First task", task.getName());
 
         // Complete first task
-        Map<String, Object> taskParams = new HashMap<String, Object>();
+        Map<String, Object> taskParams = new HashMap<>();
         taskParams.put("myParam", "myValue");
         taskService.complete(task.getId(), taskParams, false); // Only
                                                                // difference
@@ -717,7 +717,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().singleResult();
 
         // Complete first task
-        Map<String, Object> taskParams = new HashMap<String, Object>();
+        Map<String, Object> taskParams = new HashMap<>();
         taskParams.put("a", 1);
         taskParams.put("b", 1);
         taskService.complete(task.getId(), taskParams, true);
@@ -1297,7 +1297,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         Task currentTask = taskService.createTaskQuery().singleResult();
 
-        Map<String, Object> varsToDelete = new HashMap<String, Object>();
+        Map<String, Object> varsToDelete = new HashMap<>();
         varsToDelete.put("variable1", "value1");
         varsToDelete.put("variable2", "value2");
         taskService.setVariables(currentTask.getId(), varsToDelete);
@@ -1372,7 +1372,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         assertEquals(1, ((CountingTaskEntity) currentTask).getVariableCount());
 
-        Map<String, Object> localVars = new HashMap<String, Object>();
+        Map<String, Object> localVars = new HashMap<>();
         localVars.put("localVar1", "localValue1");
         localVars.put("localVar2", "localValue2");
         localVars.put("localVar3", "localValue3");
@@ -1417,7 +1417,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         Task currentTask = taskService.createTaskQuery().singleResult();
 
-        Map<String, Object> varsToDelete = new HashMap<String, Object>();
+        Map<String, Object> varsToDelete = new HashMap<>();
         varsToDelete.put("variable1", "value1");
         varsToDelete.put("variable2", "value2");
         taskService.setVariablesLocal(currentTask.getId(), varsToDelete);
@@ -1612,7 +1612,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         taskService.delegateTask(task.getId(), "johndoe");
 
         // Resolve first task
-        Map<String, Object> taskParams = new HashMap<String, Object>();
+        Map<String, Object> taskParams = new HashMap<>();
         taskParams.put("myParam", "myValue");
         taskService.resolveTask(task.getId(), taskParams);
 

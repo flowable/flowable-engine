@@ -130,7 +130,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
                 .name("childProcessDeployment")
                 .addBpmnModel("childProcess.bpmn20.xml", childBpmnModel).deploy();
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("var1", "String test value");
         variables.put("var2", true);
         variables.put("var3", 12345);
@@ -167,7 +167,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
                 .name("mainProcessDeployment")
                 .addBpmnModel("mainProcess.bpmn20.xml", mainBpmnModel).deploy();
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("var1", "String test value");
         variables.put("var2", true);
         variables.put("var3", 12345);

@@ -39,7 +39,7 @@ public class HistoricIdentityLinkEntityImpl extends AbstractEntityNoRevision imp
     }
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("id", this.id);
         persistentState.put("type", this.type);
 

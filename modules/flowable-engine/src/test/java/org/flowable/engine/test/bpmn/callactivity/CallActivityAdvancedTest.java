@@ -77,7 +77,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
             // Should contain a start-event, the task and an end-event
             assertEquals(3L, historicInstances.size());
-            Set<String> expectedActivities = new HashSet<String>(Arrays.asList(new String[] { "theStart", "task", "theEnd" }));
+            Set<String> expectedActivities = new HashSet<>(Arrays.asList(new String[]{"theStart", "task", "theEnd"}));
 
             for (HistoricActivityInstance act : historicInstances) {
                 expectedActivities.remove(act.getActivityId());
@@ -255,7 +255,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataInputOutput.bpmn20.xml",
             "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
     public void testSubProcessWithDataInputOutput() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("superVariable", "Hello from the super process.");
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessDataInputOutput", vars);

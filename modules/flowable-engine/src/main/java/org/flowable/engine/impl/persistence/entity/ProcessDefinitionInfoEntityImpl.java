@@ -34,7 +34,7 @@ public class ProcessDefinitionInfoEntityImpl extends AbstractEntity implements P
     }
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("processDefinitionId", this.processDefinitionId);
         persistentState.put("infoJsonId", this.infoJsonId);
         return persistentState;

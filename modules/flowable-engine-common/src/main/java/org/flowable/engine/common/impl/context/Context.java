@@ -26,7 +26,7 @@ import org.flowable.engine.common.impl.transaction.TransactionContextHolder;
  */
 public class Context {
 
-    protected static ThreadLocal<Stack<CommandContext>> commandContextThreadLocal = new ThreadLocal<Stack<CommandContext>>();
+    protected static ThreadLocal<Stack<CommandContext>> commandContextThreadLocal = new ThreadLocal<>();
 
     public static CommandContext getCommandContext() {
         Stack<CommandContext> stack = getStack(commandContextThreadLocal);
@@ -59,7 +59,7 @@ public class Context {
     protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {
         Stack<T> stack = threadLocal.get();
         if (stack == null) {
-            stack = new Stack<T>();
+            stack = new Stack<>();
             threadLocal.set(stack);
         }
         return stack;

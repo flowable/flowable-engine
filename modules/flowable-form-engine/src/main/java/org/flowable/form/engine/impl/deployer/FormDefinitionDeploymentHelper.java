@@ -39,7 +39,7 @@ public class FormDefinitionDeploymentHelper {
      *             if any two decision tables have the same key
      */
     public void verifyFormsDoNotShareKeys(Collection<FormDefinitionEntity> forms) {
-        Set<String> keySet = new LinkedHashSet<String>();
+        Set<String> keySet = new LinkedHashSet<>();
         for (FormDefinitionEntity form : forms) {
             if (keySet.contains(form.getKey())) {
                 throw new FlowableException("The deployment contains forms with the same key, this is not allowed");

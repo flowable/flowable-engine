@@ -121,7 +121,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensateTwoSubprocesses.bpmn20.xml" })
     public void testCompensateTwoSubprocesses() {
 
-        Map<String, Object> initialVariables = new HashMap<String, Object>();
+        Map<String, Object> initialVariables = new HashMap<>();
         initialVariables.put("test", "begin");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess", initialVariables);
 

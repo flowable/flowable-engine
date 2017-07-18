@@ -71,7 +71,7 @@ public class SubmitStartFormCmd extends NeedsActiveProcessDefinitionCmd<ProcessI
     }
 
     protected Map<String, Object> convertPropertiesToVariablesMap() {
-        Map<String, Object> vars = new HashMap<String, Object>(properties.size());
+        Map<String, Object> vars = new HashMap<>(properties.size());
         for (String key : properties.keySet()) {
             vars.put(key, properties.get(key));
         }

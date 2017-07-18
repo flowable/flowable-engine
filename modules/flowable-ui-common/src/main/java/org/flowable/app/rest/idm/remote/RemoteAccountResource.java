@@ -46,7 +46,7 @@ public class RemoteAccountResource {
                 userRepresentation = new UserRepresentation(remoteUser);
 
                 if (remoteUser.getGroups() != null && remoteUser.getGroups().size() > 0) {
-                    List<GroupRepresentation> groups = new ArrayList<GroupRepresentation>();
+                    List<GroupRepresentation> groups = new ArrayList<>();
                     for (RemoteGroup remoteGroup : remoteUser.getGroups()) {
                         groups.add(new GroupRepresentation(remoteGroup));
                     }

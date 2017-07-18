@@ -49,7 +49,7 @@ public class SpringDmnEngineConfiguration extends DmnEngineConfiguration impleme
     protected String deploymentMode = "default";
     protected ApplicationContext applicationContext;
     protected Integer transactionSynchronizationAdapterOrder;
-    protected Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<AutoDeploymentStrategy>();
+    protected Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<>();
 
     public SpringDmnEngineConfiguration() {
         this.transactionsExternallyManaged = true;

@@ -208,7 +208,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         if (activity instanceof CallActivity) {
             ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
             if (executionToUse != null) {
-                List<String> callActivityExecutionIds = new ArrayList<String>();
+                List<String> callActivityExecutionIds = new ArrayList<>();
 
                 // Find all execution entities that are at the call activity
                 List<ExecutionEntity> childExecutions = executionEntityManager.collectChildren(executionToUse);

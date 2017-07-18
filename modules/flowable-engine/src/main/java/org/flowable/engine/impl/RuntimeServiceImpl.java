@@ -238,7 +238,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
         if (variableName == null) {
             throw new FlowableIllegalArgumentException("variableName is null");
         }
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put(variableName, value);
         commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, false));
     }
@@ -247,7 +247,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
         if (variableName == null) {
             throw new FlowableIllegalArgumentException("variableName is null");
         }
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put(variableName, value);
         commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, true));
     }
@@ -261,13 +261,13 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     }
 
     public void removeVariable(String executionId, String variableName) {
-        Collection<String> variableNames = new ArrayList<String>(1);
+        Collection<String> variableNames = new ArrayList<>(1);
         variableNames.add(variableName);
         commandExecutor.execute(new RemoveExecutionVariablesCmd(executionId, variableNames, false));
     }
 
     public void removeVariableLocal(String executionId, String variableName) {
-        Collection<String> variableNames = new ArrayList<String>();
+        Collection<String> variableNames = new ArrayList<>();
         variableNames.add(variableName);
         commandExecutor.execute(new RemoveExecutionVariablesCmd(executionId, variableNames, true));
     }

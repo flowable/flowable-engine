@@ -23,7 +23,7 @@ public class CommaSplitter {
 
     // split the given spring using commas if they are not inside an expression
     public static List<String> splitCommas(String st) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         int offset = 0;
 
         boolean inExpression = false;

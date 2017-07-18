@@ -45,7 +45,7 @@ public class InclusiveGatewayDefaultFlowTest extends PluggableFlowableTestCase {
     }
 
     public void testCompatibleConditionFlow() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("var1", "true");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, variables);
 

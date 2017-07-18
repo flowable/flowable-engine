@@ -46,14 +46,14 @@ public class ProcessDefinitionEntityImpl extends AbstractEntity implements Proce
     protected boolean hasStartFormKey;
     protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
     protected boolean isIdentityLinksInitialized;
-    protected List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
+    protected List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<>();
     protected IOSpecification ioSpecification;
 
     // Backwards compatibility
     protected String engineVersion;
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("suspensionState", this.suspensionState);
         persistentState.put("category", this.category);
         return persistentState;

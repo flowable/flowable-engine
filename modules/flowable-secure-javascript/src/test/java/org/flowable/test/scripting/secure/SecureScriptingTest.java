@@ -88,7 +88,7 @@ public class SecureScriptingTest extends SecureScriptingBaseTest {
         addWhiteListedClass("java.lang.Integer");
         addWhiteListedClass("org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl");
 
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("a", 123);
         vars.put("b", 456);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("useExecutionAndVars", vars);

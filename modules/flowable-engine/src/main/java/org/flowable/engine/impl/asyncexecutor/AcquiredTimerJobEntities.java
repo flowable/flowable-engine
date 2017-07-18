@@ -23,7 +23,7 @@ import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
  */
 public class AcquiredTimerJobEntities {
 
-    protected Map<String, TimerJobEntity> acquiredJobs = new HashMap<String, TimerJobEntity>();
+    protected Map<String, TimerJobEntity> acquiredJobs = new HashMap<>();
 
     public void addJob(TimerJobEntity job) {
         acquiredJobs.put(job.getId(), job);

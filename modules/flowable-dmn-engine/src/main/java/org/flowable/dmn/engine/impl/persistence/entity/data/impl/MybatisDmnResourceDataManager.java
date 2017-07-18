@@ -48,7 +48,7 @@ public class MybatisDmnResourceDataManager extends AbstractDataManager<DmnResour
 
     @Override
     public DmnResourceEntity findResourceByDeploymentIdAndResourceName(String deploymentId, String resourceName) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("resourceName", resourceName);
         return (DmnResourceEntity) getDbSqlSession().selectOne("selectDmnResourceByDeploymentIdAndResourceName", params);

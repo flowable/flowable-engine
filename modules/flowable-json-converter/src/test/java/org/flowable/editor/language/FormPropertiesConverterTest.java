@@ -77,9 +77,9 @@ public class FormPropertiesConverterTest extends AbstractConverterTest {
             } else if (formProperty.getId().equals("new_property_5")) {
                 checkFormProperty(formProperty, "v100", true, false, false);
 
-                List<Map<String, Object>> formValues = new ArrayList<Map<String, Object>>();
+                List<Map<String, Object>> formValues = new ArrayList<>();
                 for (FormValue formValue : formProperty.getFormValues()) {
-                    Map<String, Object> formValueMap = new HashMap<String, Object>();
+                    Map<String, Object> formValueMap = new HashMap<>();
                     formValueMap.put("id", formValue.getId());
                     formValueMap.put("name", formValue.getName());
                     formValues.add(formValueMap);
@@ -119,9 +119,9 @@ public class FormPropertiesConverterTest extends AbstractConverterTest {
             } else if (formProperty.getId().equals("new_property_5")) {
                 checkFormProperty(formProperty, "v100", true, false, false);
 
-                List<Map<String, Object>> formValues = new ArrayList<Map<String, Object>>();
+                List<Map<String, Object>> formValues = new ArrayList<>();
                 for (FormValue formValue : formProperty.getFormValues()) {
-                    Map<String, Object> formValueMap = new HashMap<String, Object>();
+                    Map<String, Object> formValueMap = new HashMap<>();
                     formValueMap.put("id", formValue.getId());
                     formValueMap.put("name", formValue.getName());
                     formValues.add(formValueMap);
@@ -149,19 +149,19 @@ public class FormPropertiesConverterTest extends AbstractConverterTest {
     }
 
     private void checkFormPropertyFormValues(List<Map<String, Object>> formValues) {
-        List<Map<String, Object>> expectedFormValues = new ArrayList<Map<String, Object>>();
-        Map<String, Object> formValue1 = new HashMap<String, Object>();
+        List<Map<String, Object>> expectedFormValues = new ArrayList<>();
+        Map<String, Object> formValue1 = new HashMap<>();
         formValue1.put("id", "value1");
         formValue1.put("name", "Value 1");
-        Map<String, Object> formValue2 = new HashMap<String, Object>();
+        Map<String, Object> formValue2 = new HashMap<>();
         formValue2.put("id", "value2");
         formValue2.put("name", "Value 2");
 
-        Map<String, Object> formValue3 = new HashMap<String, Object>();
+        Map<String, Object> formValue3 = new HashMap<>();
         formValue3.put("id", "value3");
         formValue3.put("name", "Value 3");
 
-        Map<String, Object> formValue4 = new HashMap<String, Object>();
+        Map<String, Object> formValue4 = new HashMap<>();
         formValue4.put("id", "value4");
         formValue4.put("name", "Value 4");
 

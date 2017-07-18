@@ -40,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class TaskBaseResource {
 
-    private static HashMap<String, QueryProperty> properties = new HashMap<String, QueryProperty>();
+    private static HashMap<String, QueryProperty> properties = new HashMap<>();
 
     static {
         properties.put("id", TaskQueryProperty.TASK_ID);

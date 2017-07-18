@@ -40,7 +40,7 @@ public class CancelJobsCmd implements Command<Void>, Serializable {
     }
 
     public CancelJobsCmd(String jobId) {
-        this.jobIds = new ArrayList<String>();
+        this.jobIds = new ArrayList<>();
         jobIds.add(jobId);
     }
 

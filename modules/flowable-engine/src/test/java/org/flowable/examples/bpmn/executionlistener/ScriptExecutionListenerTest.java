@@ -34,7 +34,7 @@ public class ScriptExecutionListenerTest extends PluggableFlowableTestCase {
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricVariableInstance> historicVariables = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list();
-            Map<String, Object> varMap = new HashMap<String, Object>();
+            Map<String, Object> varMap = new HashMap<>();
             for (HistoricVariableInstance historicVariableInstance : historicVariables) {
                 varMap.put(historicVariableInstance.getVariableName(), historicVariableInstance.getValue());
             }

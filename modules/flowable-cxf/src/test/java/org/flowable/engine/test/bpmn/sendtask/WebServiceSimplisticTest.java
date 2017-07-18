@@ -32,7 +32,7 @@ public class WebServiceSimplisticTest extends AbstractWebServiceTaskTest {
     public void testAsyncInvocationWithSimplisticDataFlow() throws Exception {
         assertEquals(-1, webServiceMock.getCount());
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("NewCounterValueVariable", 23);
 
         processEngine.getRuntimeService().startProcessInstanceByKey("asyncWebServiceInvocationWithSimplisticDataFlow", variables);

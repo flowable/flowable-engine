@@ -99,7 +99,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
         assertEquals(3, messages.size());
 
         // sort recipients for easy assertion
-        List<String> recipients = new ArrayList<String>();
+        List<String> recipients = new ArrayList<>();
         for (WiserMessage message : messages) {
             recipients.add(message.getEnvelopeReceiver());
         }
@@ -118,7 +118,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
         String recipientName = "Mr. Fozzie";
         String subject = "Fozzie, you should see this!";
 
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("sender", sender);
         vars.put("recipient", recipient);
         vars.put("recipientName", recipientName);
@@ -160,7 +160,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
     @Deployment
     public void testVariableTemplatedMail() throws Exception {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("gender", "male");
         vars.put("html", "<![CDATA[<html><body>Hello ${gender == 'male' ? 'Mr' : 'Ms' }. <b>Kermit</b><body></html>]]");
         runtimeService.startProcessInstanceByKey("variableTemplatedMail", vars);
@@ -173,7 +173,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
     @Deployment
     public void testTextMailWithFileAttachment() throws Exception {
-        HashMap<String, Object> vars = new HashMap<String, Object>();
+        HashMap<String, Object> vars = new HashMap<>();
         vars.put("attachmentsBean", new AttachmentsBean());
         runtimeService.startProcessInstanceByKey("textMailWithFileAttachment", vars);
 
@@ -188,7 +188,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
     @Deployment
     public void testTextMailWithFileAttachments() throws Exception {
-        HashMap<String, Object> vars = new HashMap<String, Object>();
+        HashMap<String, Object> vars = new HashMap<>();
         vars.put("attachmentsBean", new AttachmentsBean());
         runtimeService.startProcessInstanceByKey("textMailWithFileAttachments", vars);
 
@@ -206,7 +206,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
     @Deployment
     public void testTextMailWithFileAttachmentsByPath() throws Exception {
-        HashMap<String, Object> vars = new HashMap<String, Object>();
+        HashMap<String, Object> vars = new HashMap<>();
         vars.put("attachmentsBean", new AttachmentsBean());
         runtimeService.startProcessInstanceByKey("textMailWithFileAttachmentsByPath", vars);
 
@@ -226,7 +226,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
     public void testTextMailWithDataSourceAttachment() throws Exception {
         String fileName = "file-name-to-be-displayed";
         String fileContent = "This is the file content";
-        HashMap<String, Object> vars = new HashMap<String, Object>();
+        HashMap<String, Object> vars = new HashMap<>();
         vars.put("attachmentsBean", new AttachmentsBean());
         vars.put("fileContent", fileContent);
         vars.put("fileName", fileName);
@@ -243,7 +243,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
     @Deployment
     public void testTextMailWithNotExistingFileAttachment() throws Exception {
-        HashMap<String, Object> vars = new HashMap<String, Object>();
+        HashMap<String, Object> vars = new HashMap<>();
         vars.put("attachmentsBean", new AttachmentsBean());
         runtimeService.startProcessInstanceByKey("textMailWithNotExistingFileAttachment", vars);
 
@@ -255,7 +255,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
     @Deployment
     public void testHtmlMailWithFileAttachment() throws Exception {
-        HashMap<String, Object> vars = new HashMap<String, Object>();
+        HashMap<String, Object> vars = new HashMap<>();
         vars.put("attachmentsBean", new AttachmentsBean());
         vars.put("gender", "male");
         runtimeService.startProcessInstanceByKey("htmlMailWithFileAttachment", vars);

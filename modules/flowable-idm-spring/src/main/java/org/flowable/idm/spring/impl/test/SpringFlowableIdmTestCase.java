@@ -33,7 +33,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 public abstract class SpringFlowableIdmTestCase extends AbstractFlowableIdmTestCase implements ApplicationContextAware {
 
     // we need a data structure to store all the resolved ProcessEngines and map them to something
-    protected Map<Object, IdmEngine> cachedIdmEngines = new ConcurrentHashMap<Object, IdmEngine>();
+    protected Map<Object, IdmEngine> cachedIdmEngines = new ConcurrentHashMap<>();
 
     // protected static Map<String, ProcessEngine> cachedProcessEngines = new
     // HashMap<String, ProcessEngine>();

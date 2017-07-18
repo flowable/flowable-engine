@@ -18,7 +18,7 @@ public class JpaTest extends SpringFlowableTestCase {
 
     public void testJpaVariableHappyPath() {
         before();
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("customerName", "John Doe");
         variables.put("amount", 15000L);
 
@@ -35,7 +35,7 @@ public class JpaTest extends SpringFlowableTestCase {
         assertFalse(request.isApproved());
 
         // We will approve the request, which will update the entity
-        variables = new HashMap<String, Object>();
+        variables = new HashMap<>();
         variables.put("approvedByManager", Boolean.TRUE);
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -53,7 +53,7 @@ public class JpaTest extends SpringFlowableTestCase {
     public void testJpaVariableDisapprovalPath() {
 
         before();
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("customerName", "Jane Doe");
         variables.put("amount", 50000);
 
@@ -70,7 +70,7 @@ public class JpaTest extends SpringFlowableTestCase {
         assertFalse(request.isApproved());
 
         // We will disapprove the request, which will update the entity
-        variables = new HashMap<String, Object>();
+        variables = new HashMap<>();
         variables.put("approvedByManager", Boolean.FALSE);
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();

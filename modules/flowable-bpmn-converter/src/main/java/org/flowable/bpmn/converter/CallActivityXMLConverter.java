@@ -32,7 +32,7 @@ import org.flowable.bpmn.model.IOParameter;
  */
 public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
 
-    protected Map<String, BaseChildElementParser> childParserMap = new HashMap<String, BaseChildElementParser>();
+    protected Map<String, BaseChildElementParser> childParserMap = new HashMap<>();
 
     public CallActivityXMLConverter() {
         InParameterParser inParameterParser = new InParameterParser();

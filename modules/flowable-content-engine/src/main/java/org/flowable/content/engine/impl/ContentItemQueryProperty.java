@@ -27,7 +27,7 @@ public class ContentItemQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, ContentItemQueryProperty> properties = new HashMap<String, ContentItemQueryProperty>();
+    private static final Map<String, ContentItemQueryProperty> properties = new HashMap<>();
 
     public static final ContentItemQueryProperty CREATED_DATE = new ContentItemQueryProperty("RES.CREATED_");
     public static final ContentItemQueryProperty TENANT_ID = new ContentItemQueryProperty("RES.TENANT_ID_");

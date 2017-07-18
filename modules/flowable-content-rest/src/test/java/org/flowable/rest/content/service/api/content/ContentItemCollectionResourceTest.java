@@ -91,7 +91,7 @@ public class ContentItemCollectionResourceTest extends BaseSpringContentRestTest
             InputStream binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
 
             // Add name, type and scope
-            Map<String, String> additionalFields = new HashMap<String, String>();
+            Map<String, String> additionalFields = new HashMap<>();
             additionalFields.put("name", "Simple content item");
             additionalFields.put("mimeType", "application/pdf");
             additionalFields.put("taskId", "12345");

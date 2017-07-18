@@ -33,7 +33,7 @@ public class ProcessInstanceResponse {
     protected String processDefinitionId;
     protected String processDefinitionUrl;
     protected String activityId;
-    protected List<RestVariable> variables = new ArrayList<RestVariable>();
+    protected List<RestVariable> variables = new ArrayList<>();
     protected String tenantId;
 
     // Added by Ryan Johnston

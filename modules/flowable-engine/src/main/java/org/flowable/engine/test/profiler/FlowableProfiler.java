@@ -28,7 +28,7 @@ public class FlowableProfiler implements ProcessEngineConfigurator {
     protected static FlowableProfiler INSTANCE = new FlowableProfiler();
 
     protected ProfileSession currentProfileSession;
-    protected List<ProfileSession> profileSessions = new ArrayList<ProfileSession>();
+    protected List<ProfileSession> profileSessions = new ArrayList<>();
 
     public static FlowableProfiler getInstance() {
         return INSTANCE;
@@ -38,7 +38,7 @@ public class FlowableProfiler implements ProcessEngineConfigurator {
     public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
 
         // Command interceptor
-        List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
+        List<CommandInterceptor> interceptors = new ArrayList<>();
         interceptors.add(new TotalExecutionTimeCommandInterceptor());
         processEngineConfiguration.setCustomPreCommandInterceptors(interceptors);
 

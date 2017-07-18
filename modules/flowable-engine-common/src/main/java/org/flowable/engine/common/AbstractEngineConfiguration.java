@@ -379,7 +379,7 @@ public abstract class AbstractEngineConfiguration {
 
     public void initBeans() {
         if (beans == null) {
-            beans = new HashMap<Object, Object>();
+            beans = new HashMap<>();
         }
     }
 

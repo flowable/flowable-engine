@@ -25,7 +25,7 @@ public class PrivilegeMappingEntityImpl extends AbstractEntity implements Privil
 
     @Override
     public Object getPersistentState() {
-        Map<String, String> state = new HashMap<String, String>();
+        Map<String, String> state = new HashMap<>();
         state.put("id", id);
         state.put("privilegeId", privilegeId);
         state.put("userId", userId);

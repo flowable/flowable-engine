@@ -35,7 +35,7 @@ public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCas
     }
 
     protected List<String> deploy(List<String> xmlFileNameList) throws Exception {
-        List<String> deploymentIdList = new ArrayList<String>();
+        List<String> deploymentIdList = new ArrayList<>();
         for (String xmlFileName : xmlFileNameList) {
             String deploymentId = repositoryService
                     .createDeployment()
@@ -60,7 +60,7 @@ public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCas
                 "name_testProcess1_two.bpmn20.xml", "name_testProcess2_one.bpmn20.xml");
         List<String> deploymentIdList = deploy(xmlFileNameList);
 
-        List<String> processDefinitionIdList = new ArrayList<String>();
+        List<String> processDefinitionIdList = new ArrayList<>();
         for (String deploymentId : deploymentIdList) {
             String processDefinitionId = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).list().get(0).getId();
             processDefinitionIdList.add(processDefinitionId);

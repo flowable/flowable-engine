@@ -28,7 +28,7 @@ public class HistoricDecisionExecutionQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, HistoricDecisionExecutionQueryProperty> properties = new HashMap<String, HistoricDecisionExecutionQueryProperty>();
+    private static final Map<String, HistoricDecisionExecutionQueryProperty> properties = new HashMap<>();
 
     public static final HistoricDecisionExecutionQueryProperty START_TIME = new HistoricDecisionExecutionQueryProperty("RES.START_TIME_");
     public static final HistoricDecisionExecutionQueryProperty END_TIME = new HistoricDecisionExecutionQueryProperty("RES.END_TIME_");

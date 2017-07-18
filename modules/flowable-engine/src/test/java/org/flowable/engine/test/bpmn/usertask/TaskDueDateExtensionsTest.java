@@ -40,7 +40,7 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
     public void testDueDateExtension() throws Exception {
 
         Date date = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").parse("06-07-1986 12:10:00");
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("dateVariable", date);
 
         // Start process-instance, passing date that should be used as dueDate
@@ -55,7 +55,7 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
     @Deployment
     public void testDueDateStringExtension() throws Exception {
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("dateVariable", "1986-07-06T12:10:00");
 
         // Start process-instance, passing date that should be used as dueDate
@@ -72,7 +72,7 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
     public void testRelativeDueDateStringExtension() throws Exception {
         Clock clock = processEngineConfiguration.getClock();
         clock.setCurrentCalendar(new GregorianCalendar(2015, 0, 1));
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("dateVariable", "P2DT5H40M");
 
         // Start process-instance, passing ISO8601 duration formatted String
@@ -92,7 +92,7 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
     @Deployment
     public void testRelativeDueDateStringWithCalendarNameExtension() throws Exception {
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("dateVariable", "P2DT5H40M");
 
         // Start process-instance, passing ISO8601 duration formatted String that should be used to calculate dueDate

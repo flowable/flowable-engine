@@ -54,7 +54,7 @@ public class MybatisIdentityInfoDataManager extends AbstractDataManager<Identity
 
     @Override
     public IdentityInfoEntity findUserInfoByUserIdAndKey(String userId, String key) {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("userId", userId);
         parameters.put("key", key);
         return (IdentityInfoEntity) getDbSqlSession().selectOne("selectIdentityInfoByUserIdAndKey", parameters);
@@ -63,7 +63,7 @@ public class MybatisIdentityInfoDataManager extends AbstractDataManager<Identity
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<String> findUserInfoKeysByUserIdAndType(String userId, String type) {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("userId", userId);
         parameters.put("type", type);
         return (List) getDbSqlSession().getSqlSession().selectList("selectIdentityInfoKeysByUserIdAndType", parameters);

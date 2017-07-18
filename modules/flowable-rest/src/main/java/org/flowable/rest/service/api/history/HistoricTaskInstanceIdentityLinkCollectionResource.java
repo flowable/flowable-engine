@@ -59,6 +59,6 @@ public class HistoricTaskInstanceIdentityLinkCollectionResource {
             return restResponseFactory.createHistoricIdentityLinkResponseList(identityLinks);
         }
 
-        return new ArrayList<HistoricIdentityLinkResponse>();
+        return new ArrayList<>();
     }
 }

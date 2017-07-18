@@ -170,7 +170,7 @@ public class TaskCollectionResource extends TaskBaseResource {
 
         if (requestParams.containsKey("candidateGroups")) {
             String[] candidateGroups = requestParams.get("candidateGroups").split(",");
-            List<String> groups = new ArrayList<String>(candidateGroups.length);
+            List<String> groups = new ArrayList<>(candidateGroups.length);
             Collections.addAll(groups, candidateGroups);
             request.setCandidateGroupIn(groups);
         }

@@ -42,7 +42,7 @@ public class DefaultFlowableEngineAgenda implements FlowableEngineAgenda {
 
     protected CommandContext commandContext;
 
-    protected LinkedList<Runnable> operations = new LinkedList<Runnable>();
+    protected LinkedList<Runnable> operations = new LinkedList<>();
 
     public DefaultFlowableEngineAgenda(CommandContext commandContext) {
         this.commandContext = commandContext;

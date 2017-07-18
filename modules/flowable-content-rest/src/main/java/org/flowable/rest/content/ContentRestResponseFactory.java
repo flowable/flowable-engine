@@ -38,7 +38,7 @@ public class ContentRestResponseFactory {
 
     public List<ContentItemResponse> createContentItemResponseList(List<ContentItem> contentItems) {
         ContentRestUrlBuilder urlBuilder = createUrlBuilder();
-        List<ContentItemResponse> responseList = new ArrayList<ContentItemResponse>();
+        List<ContentItemResponse> responseList = new ArrayList<>();
         for (ContentItem contentItem : contentItems) {
             responseList.add(createContentItemResponse(contentItem, urlBuilder));
         }

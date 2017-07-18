@@ -67,8 +67,8 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
     @RequestMapping(value = "/runtime/tasks/{taskId}/variables", method = RequestMethod.GET, produces = "application/json")
     public List<RestVariable> getVariables(@ApiParam(name = "taskId") @PathVariable String taskId, @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
 
-        List<RestVariable> result = new ArrayList<RestVariable>();
-        Map<String, RestVariable> variableMap = new HashMap<String, RestVariable>();
+        List<RestVariable> result = new ArrayList<>();
+        Map<String, RestVariable> variableMap = new HashMap<>();
 
         // Check if it's a valid task to get the variables for
         Task task = getTaskFromRequest(taskId);
@@ -124,8 +124,8 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
             result = setBinaryVariable((MultipartHttpServletRequest) request, task, true);
         } else {
 
-            List<RestVariable> inputVariables = new ArrayList<RestVariable>();
-            List<RestVariable> resultVariables = new ArrayList<RestVariable>();
+            List<RestVariable> inputVariables = new ArrayList<>();
+            List<RestVariable> resultVariables = new ArrayList<>();
             result = resultVariables;
 
             try {
@@ -145,7 +145,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
 
             RestVariableScope sharedScope = null;
             RestVariableScope varScope = null;
-            Map<String, Object> variablesToSet = new HashMap<String, Object>();
+            Map<String, Object> variablesToSet = new HashMap<>();
 
             for (RestVariable var : inputVariables) {
                 // Validate if scopes match

@@ -39,7 +39,7 @@ public class HistoricDecisionExecutionEntityImpl extends AbstractEntityNoRevisio
     protected String executionJson;
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("decisionDefinitionId", this.decisionDefinitionId);
         persistentState.put("deploymentId", this.deploymentId);
         persistentState.put("instanceId", this.instanceId);

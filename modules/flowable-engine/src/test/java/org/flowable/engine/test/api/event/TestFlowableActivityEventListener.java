@@ -31,7 +31,7 @@ public class TestFlowableActivityEventListener implements FlowableEventListener 
     private boolean ignoreRawActivityEvents;
 
     public TestFlowableActivityEventListener(boolean ignoreRawActivityEvents) {
-        eventsReceived = new ArrayList<FlowableEvent>();
+        eventsReceived = new ArrayList<>();
         this.ignoreRawActivityEvents = ignoreRawActivityEvents;
     }
 
