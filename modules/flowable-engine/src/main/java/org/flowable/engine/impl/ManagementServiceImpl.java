@@ -49,7 +49,6 @@ import org.flowable.engine.impl.cmd.MoveTimerToExecutableJobCmd;
 import org.flowable.engine.impl.cmd.RescheduleTimerJobCmd;
 import org.flowable.engine.impl.cmd.SetJobRetriesCmd;
 import org.flowable.engine.impl.cmd.SetTimerJobRetriesCmd;
-import org.flowable.engine.impl.db.DbSchemaManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.DeadLetterJobQuery;
 import org.flowable.engine.runtime.HistoryJobQuery;
@@ -207,7 +206,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
                 DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) commandContext.getSessionFactories().get(DbSqlSession.class);
                 DbSqlSession dbSqlSession = new DbSqlSession(dbSqlSessionFactory, CommandContextUtil.getEntityCache(commandContext), connection, catalog, schema);
                 commandContext.getSessions().put(DbSqlSession.class, dbSqlSession);
-                return DbSchemaManager.dbSchemaUpdate();
+                return CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager().dbSchemaUpdate();
             }
         });
     }

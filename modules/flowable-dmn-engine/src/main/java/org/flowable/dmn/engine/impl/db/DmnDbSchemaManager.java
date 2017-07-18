@@ -13,10 +13,13 @@
 
 package org.flowable.dmn.engine.impl.db;
 
+import java.sql.SQLException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.db.DbSchemaManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,40 +28,25 @@ import liquibase.database.Database;
 import liquibase.database.DatabaseConnection;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.DatabaseException;
+import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
-public class DmnDbSchemaManager {
+public class DmnDbSchemaManager implements DbSchemaManager {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(DmnDbSchemaManager.class);
     
-    public static void initSchema() {
+    public void initSchema() {
         initSchema(CommandContextUtil.getDmnEngineConfiguration());
     }
     
-    public static void initSchema(DmnEngineConfiguration dmnEngineConfiguration) {
+    public void initSchema(DmnEngineConfiguration dmnEngineConfiguration) {
         initSchema(dmnEngineConfiguration, dmnEngineConfiguration.getDatabaseSchemaUpdate());
     }
     
-    public static void initSchema(DmnEngineConfiguration dmnEngineConfiguration, String databaseSchemaUpdate) {
+    public void initSchema(DmnEngineConfiguration dmnEngineConfiguration, String databaseSchemaUpdate) {
         try {
-            DatabaseConnection connection = new JdbcConnection(dmnEngineConfiguration.getDataSource().getConnection());
-            Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
-            database.setDatabaseChangeLogTableName(DmnEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
-            database.setDatabaseChangeLogLockTableName(DmnEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
-
-            String databaseSchema = dmnEngineConfiguration.getDatabaseSchema();
-            if (StringUtils.isNotEmpty(databaseSchema)) {
-                database.setDefaultSchemaName(databaseSchema);
-                database.setLiquibaseSchemaName(databaseSchema);
-            }
-
-            String databaseCatalog = dmnEngineConfiguration.getDatabaseCatalog();
-            if (StringUtils.isNotEmpty(databaseCatalog)) {
-                database.setDefaultCatalogName(databaseCatalog);
-                database.setLiquibaseCatalogName(databaseCatalog);
-            }
-
-            Liquibase liquibase = new Liquibase("org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
+            Liquibase liquibase = createLiquibaseInstance(dmnEngineConfiguration);
             if (DmnEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
                 LOGGER.debug("Dropping and creating schema DMN");
                 liquibase.dropAll();
@@ -74,5 +62,56 @@ public class DmnDbSchemaManager {
             throw new FlowableException("Error initialising dmn data model");
         }
     }
+
+    protected Liquibase createLiquibaseInstance(DmnEngineConfiguration dmnEngineConfiguration)
+            throws SQLException, DatabaseException, LiquibaseException {
+        DatabaseConnection connection = new JdbcConnection(dmnEngineConfiguration.getDataSource().getConnection());
+        Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
+        database.setDatabaseChangeLogTableName(DmnEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
+        database.setDatabaseChangeLogLockTableName(DmnEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
+
+        String databaseSchema = dmnEngineConfiguration.getDatabaseSchema();
+        if (StringUtils.isNotEmpty(databaseSchema)) {
+            database.setDefaultSchemaName(databaseSchema);
+            database.setLiquibaseSchemaName(databaseSchema);
+        }
+
+        String databaseCatalog = dmnEngineConfiguration.getDatabaseCatalog();
+        if (StringUtils.isNotEmpty(databaseCatalog)) {
+            database.setDefaultCatalogName(databaseCatalog);
+            database.setLiquibaseCatalogName(databaseCatalog);
+        }
+
+        Liquibase liquibase = new Liquibase("org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
+        return liquibase;
+    }
+
+    @Override
+    public void dbSchemaCreate() {
+        try {
+            Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getDmnEngineConfiguration());
+            liquibase.update("dmn");
+        } catch (Exception e) {
+            throw new FlowableException("Error creating DMN engine tables", e);
+        }
+    }
+
+    @Override
+    public void dbSchemaDrop() {
+        try {
+            Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getDmnEngineConfiguration());
+            liquibase.dropAll();
+        } catch (Exception e) {
+            throw new FlowableException("Error dropping DMN engine tables", e);
+        }
+    }
+
+    @Override
+    public String dbSchemaUpdate() {
+        dbSchemaCreate();
+        return null;
+    }
+    
+    
 
 }

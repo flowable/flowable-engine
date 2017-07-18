@@ -234,6 +234,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
 
         if (usingRelationalDatabase) {
             initDataSource();
+            initDbSchemaManager();
             initDbSchema();
         }
         
@@ -306,9 +307,15 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
 
     // data model
     // ///////////////////////////////////////////////////////////////
+    
+    public void initDbSchemaManager() {
+        if (this.dbSchemaManager == null) {
+            this.dbSchemaManager = new DmnDbSchemaManager();
+        }
+    }
 
     public void initDbSchema() {
-        DmnDbSchemaManager.initSchema(this);
+        ((DmnDbSchemaManager) this.dbSchemaManager).initSchema(this);
     }
 
     // session factories ////////////////////////////////////////////////////////

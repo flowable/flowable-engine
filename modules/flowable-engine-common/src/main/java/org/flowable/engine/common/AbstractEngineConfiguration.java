@@ -46,6 +46,7 @@ import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
 import org.flowable.engine.common.impl.db.CustomMyBatisTypeHandlerConfig;
 import org.flowable.engine.common.impl.db.CustomMybatisTypeAliasConfig;
+import org.flowable.engine.common.impl.db.DbSchemaManager;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.event.EventDispatchAction;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
@@ -101,6 +102,7 @@ public abstract class AbstractEngineConfiguration {
     protected int jdbcPingConnectionNotUsedFor;
     protected int jdbcDefaultTransactionIsolationLevel;
     protected DataSource dataSource;
+    protected DbSchemaManager dbSchemaManager;
 
     protected String databaseSchemaUpdate = DB_SCHEMA_UPDATE_FALSE;
 
@@ -566,6 +568,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
+        return this;
+    }
+    
+    public DbSchemaManager getDbSchemaManager() {
+        return dbSchemaManager;
+    }
+
+    public AbstractEngineConfiguration setDbSchemaManager(DbSchemaManager dbSchemaManager) {
+        this.dbSchemaManager = dbSchemaManager;
         return this;
     }
 

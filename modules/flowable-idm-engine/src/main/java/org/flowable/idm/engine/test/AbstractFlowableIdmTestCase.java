@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.db.DbSchemaManager;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -25,7 +26,7 @@ import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
-import org.flowable.idm.engine.impl.db.IdmDbSchemaManager;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 import org.junit.Assert;
 
 import junit.framework.AssertionFailedError;
@@ -112,8 +113,9 @@ public abstract class AbstractFlowableIdmTestCase extends AbstractTestCase {
             CommandConfig config = new CommandConfig().transactionNotSupported();
             commandExecutor.execute(config, new Command<Object>() {
                 public Object execute(CommandContext commandContext) {
-                    IdmDbSchemaManager.dbSchemaCreate();
-                    IdmDbSchemaManager.dbSchemaDrop();
+                    DbSchemaManager dbSchemaManager = CommandContextUtil.getIdmEngineConfiguration(commandContext).getDbSchemaManager();
+                    dbSchemaManager.dbSchemaCreate();
+                    dbSchemaManager.dbSchemaDrop();
                     return null;
                 }
             });

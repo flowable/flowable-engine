@@ -49,6 +49,7 @@ import org.flowable.form.engine.impl.ServiceImpl;
 import org.flowable.form.engine.impl.cfg.StandaloneFormEngineConfiguration;
 import org.flowable.form.engine.impl.cfg.StandaloneInMemFormEngineConfiguration;
 import org.flowable.form.engine.impl.db.EntityDependencyOrder;
+import org.flowable.form.engine.impl.db.FormDbSchemaManager;
 import org.flowable.form.engine.impl.deployer.CachingAndArtifactsManager;
 import org.flowable.form.engine.impl.deployer.FormDefinitionDeployer;
 import org.flowable.form.engine.impl.deployer.FormDefinitionDeploymentHelper;
@@ -191,6 +192,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
 
         if (usingRelationalDatabase) {
             initDataSource();
+            initDbSchemaManager();
             initDbSchema();
         }
 
@@ -264,6 +266,12 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
 
     // data model ///////////////////////////////////////////////////////////////
 
+    public void initDbSchemaManager() {
+        if (this.dbSchemaManager == null) {
+            this.dbSchemaManager = new FormDbSchemaManager();
+        }
+    }
+    
     public void initDbSchema() {
         try {
             DatabaseConnection connection = new JdbcConnection(dataSource.getConnection());

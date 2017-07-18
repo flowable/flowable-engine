@@ -27,7 +27,7 @@ import org.flowable.idm.engine.impl.cmd.GetPropertiesCmd;
 import org.flowable.idm.engine.impl.cmd.GetTableCountCmd;
 import org.flowable.idm.engine.impl.cmd.GetTableMetaDataCmd;
 import org.flowable.idm.engine.impl.cmd.GetTableNameCmd;
-import org.flowable.idm.engine.impl.db.IdmDbSchemaManager;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -58,7 +58,7 @@ public class IdmManagementServiceImpl extends ServiceImpl implements IdmManageme
         CommandConfig config = commandExecutor.getDefaultConfig().transactionNotSupported();
         return commandExecutor.execute(config, new Command<String>() {
             public String execute(CommandContext commandContext) {
-                return IdmDbSchemaManager.dbSchemaUpdate();
+                return CommandContextUtil.getIdmEngineConfiguration().getDbSchemaManager().dbSchemaUpdate();
             }
         });
     }

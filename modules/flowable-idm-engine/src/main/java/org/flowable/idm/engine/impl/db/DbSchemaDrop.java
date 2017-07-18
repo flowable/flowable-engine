@@ -19,6 +19,7 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngines;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -31,7 +32,7 @@ public class DbSchemaDrop {
         CommandConfig config = new CommandConfig().transactionNotSupported();
         commandExecutor.execute(config, new Command<Object>() {
             public Object execute(CommandContext commandContext) {
-                IdmDbSchemaManager.dbSchemaDrop();
+                CommandContextUtil.getIdmEngineConfiguration(commandContext).getDbSchemaManager().dbSchemaDrop();
                 return null;
             }
         });
