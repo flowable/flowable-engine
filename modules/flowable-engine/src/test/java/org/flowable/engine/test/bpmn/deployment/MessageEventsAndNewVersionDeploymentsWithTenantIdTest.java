@@ -465,7 +465,7 @@ public class MessageEventsAndNewVersionDeploymentsWithTenantIdTest extends Plugg
                 .desc()
                 .list();
 
-        List<String> executionIds = new ArrayList<String>();
+        List<String> executionIds = new ArrayList<>();
         for (EventSubscription eventSubscription : eventSubscriptions) {
             executionIds.add(eventSubscription.getExecutionId());
         }

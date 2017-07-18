@@ -322,7 +322,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
 
     public void initSessionFactories() {
         if (sessionFactories == null) {
-            sessionFactories = new HashMap<Class<?>, SessionFactory>();
+            sessionFactories = new HashMap<>();
 
             if (usingRelationalDatabase) {
                 initDbSqlSessionFactory();
@@ -388,7 +388,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
 
     public void initCommandInterceptors() {
         if (commandInterceptors == null) {
-            commandInterceptors = new ArrayList<CommandInterceptor>();
+            commandInterceptors = new ArrayList<>();
             if (customPreCommandInterceptors != null) {
                 commandInterceptors.addAll(customPreCommandInterceptors);
             }
@@ -402,7 +402,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
 
     public Collection<? extends CommandInterceptor> getDefaultCommandInterceptors() {
         if (defaultCommandInterceptors == null) {
-            List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
+            List<CommandInterceptor> interceptors = new ArrayList<>();
             interceptors.add(new LogInterceptor());
             
             CommandInterceptor transactionInterceptor = createTransactionInterceptor();
@@ -463,7 +463,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         }
 
         if (this.dmnDeployer == null) {
-            this.deployers = new ArrayList<Deployer>();
+            this.deployers = new ArrayList<>();
             if (customPreDeployers != null) {
                 this.deployers.addAll(customPreDeployers);
             }
@@ -476,9 +476,9 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         // Decision cache
         if (decisionCache == null) {
             if (decisionCacheLimit <= 0) {
-                decisionCache = new DefaultDeploymentCache<DecisionTableCacheEntry>();
+                decisionCache = new DefaultDeploymentCache<>();
             } else {
-                decisionCache = new DefaultDeploymentCache<DecisionTableCacheEntry>(decisionCacheLimit);
+                decisionCache = new DefaultDeploymentCache<>(decisionCacheLimit);
             }
         }
 
@@ -489,7 +489,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
     }
 
     public Collection<? extends Deployer> getDefaultDeployers() {
-        List<Deployer> defaultDeployers = new ArrayList<Deployer>();
+        List<Deployer> defaultDeployers = new ArrayList<>();
 
         if (dmnDeployer == null) {
             dmnDeployer = new DmnDeployer();

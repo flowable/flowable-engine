@@ -32,7 +32,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
 
     private static final long serialVersionUID = 1L;
 
-    protected List<QueryVariableValue> queryVariableValues = new ArrayList<QueryVariableValue>();
+    protected List<QueryVariableValue> queryVariableValues = new ArrayList<>();
 
     public AbstractVariableQueryImpl() {
     }

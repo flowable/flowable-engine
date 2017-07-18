@@ -100,7 +100,7 @@ public class CallActivityJsonConverter extends BaseBpmnJsonConverter {
     }
 
     private List<IOParameter> convertToIOParameters(String propertyName, String valueName, JsonNode elementNode) {
-        List<IOParameter> ioParameters = new ArrayList<IOParameter>();
+        List<IOParameter> ioParameters = new ArrayList<>();
         JsonNode parametersNode = getProperty(propertyName, elementNode);
         if (parametersNode != null) {
             parametersNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);

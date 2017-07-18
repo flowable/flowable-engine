@@ -62,7 +62,7 @@ public class MessageIntermediateEventTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testSingleIntermediateMessageExpressionEvent() {
-        Map<String, Object> variableMap = new HashMap<String, Object>();
+        Map<String, Object> variableMap = new HashMap<>();
         variableMap.put("myMessageName", "testMessage");
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("process", variableMap);
 

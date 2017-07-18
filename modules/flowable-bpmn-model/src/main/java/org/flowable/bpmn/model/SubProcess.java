@@ -25,10 +25,10 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class SubProcess extends Activity implements FlowElementsContainer {
 
-    protected Map<String, FlowElement> flowElementMap = new LinkedHashMap<String, FlowElement>();
-    protected List<FlowElement> flowElementList = new ArrayList<FlowElement>();
-    protected List<Artifact> artifactList = new ArrayList<Artifact>();
-    protected List<ValuedDataObject> dataObjects = new ArrayList<ValuedDataObject>();
+    protected Map<String, FlowElement> flowElementMap = new LinkedHashMap<>();
+    protected List<FlowElement> flowElementList = new ArrayList<>();
+    protected List<Artifact> artifactList = new ArrayList<>();
+    protected List<ValuedDataObject> dataObjects = new ArrayList<>();
 
     public FlowElement getFlowElement(String id) {
         FlowElement foundElement = null;
@@ -139,7 +139,7 @@ public class SubProcess extends Activity implements FlowElementsContainer {
             }
         }
 
-        dataObjects = new ArrayList<ValuedDataObject>();
+        dataObjects = new ArrayList<>();
         if (otherElement.getDataObjects() != null && !otherElement.getDataObjects().isEmpty()) {
             for (ValuedDataObject dataObject : otherElement.getDataObjects()) {
                 ValuedDataObject clone = dataObject.clone();

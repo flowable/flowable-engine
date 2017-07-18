@@ -42,7 +42,7 @@ public class MybatisMembershipDataManager extends AbstractDataManager<Membership
 
     @Override
     public void deleteMembership(String userId, String groupId) {
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("userId", userId);
         parameters.put("groupId", groupId);
         getDbSqlSession().delete("deleteMembership", parameters);

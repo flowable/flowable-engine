@@ -303,7 +303,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
      */
     @Deployment
     public void testQueryTasksWithVariables() throws Exception {
-        HashMap<String, Object> processVariables = new HashMap<String, Object>();
+        HashMap<String, Object> processVariables = new HashMap<>();
         processVariables.put("stringVar", "Azerty");
         processVariables.put("intVar", 67890);
         processVariables.put("booleanVar", false);
@@ -311,7 +311,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", processVariables);
         Task processTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
-        HashMap<String, Object> variables = new HashMap<String, Object>();
+        HashMap<String, Object> variables = new HashMap<>();
         variables.put("stringVar", "Abcdef");
         variables.put("intVar", 12345);
         variables.put("booleanVar", true);
@@ -570,7 +570,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             adhocTaskCreate.set(Calendar.MILLISECOND, 0);
 
             processEngineConfiguration.getClock().setCurrentTime(adhocTaskCreate.getTime());
-            List<String> taskIdList = new ArrayList<String>();
+            List<String> taskIdList = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
                 Task adhocTask = taskService.newTask();
                 adhocTask.setAssignee("gonzo");

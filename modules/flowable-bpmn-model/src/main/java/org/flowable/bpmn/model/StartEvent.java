@@ -23,7 +23,7 @@ public class StartEvent extends Event {
     protected String initiator;
     protected String formKey;
     protected boolean isInterrupting = true;
-    protected List<FormProperty> formProperties = new ArrayList<FormProperty>();
+    protected List<FormProperty> formProperties = new ArrayList<>();
 
     public String getInitiator() {
         return initiator;
@@ -69,7 +69,7 @@ public class StartEvent extends Event {
         setFormKey(otherEvent.getFormKey());
         setInterrupting(otherEvent.isInterrupting);
 
-        formProperties = new ArrayList<FormProperty>();
+        formProperties = new ArrayList<>();
         if (otherEvent.getFormProperties() != null && !otherEvent.getFormProperties().isEmpty()) {
             for (FormProperty property : otherEvent.getFormProperties()) {
                 formProperties.add(property.clone());

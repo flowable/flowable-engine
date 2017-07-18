@@ -38,7 +38,7 @@ public class DecisionTableEntityImpl extends AbstractEntityNoRevision implements
     protected String tenantId = DmnEngineConfiguration.NO_TENANT_ID;
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("category", this.category);
         persistentState.put("tenantId", this.tenantId);
         return persistentState;

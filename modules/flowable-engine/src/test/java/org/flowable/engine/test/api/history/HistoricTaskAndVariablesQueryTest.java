@@ -80,7 +80,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             assertEquals(0, task.getProcessVariables().size());
             assertEquals(0, task.getTaskLocalVariables().size());
 
-            Map<String, Object> startMap = new HashMap<String, Object>();
+            Map<String, Object> startMap = new HashMap<>();
             startMap.put("processVar", true);
             runtimeService.startProcessInstanceByKey("oneTaskProcess", startMap);
             
@@ -188,7 +188,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             assertEquals(0, task.getProcessVariables().size());
             assertEquals(0, task.getTaskLocalVariables().size());
 
-            Map<String, Object> startMap = new HashMap<String, Object>();
+            Map<String, Object> startMap = new HashMap<>();
             startMap.put("processVar", true);
             runtimeService.startProcessInstanceByKey("oneTaskProcess", startMap);
             
@@ -326,7 +326,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
     @Deployment
     public void testOrQueryMultipleVariableValues() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            Map<String, Object> startMap = new HashMap<String, Object>();
+            Map<String, Object> startMap = new HashMap<>();
             startMap.put("processVar", true);
             startMap.put("anotherProcessVar", 123);
             runtimeService.startProcessInstanceByKey("oneTaskProcess", startMap);
@@ -373,7 +373,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
 
             tasks = historyService.createHistoricTaskInstanceQuery().taskCandidateGroup("management").list();
             assertEquals(1, tasks.size());
-            List<String> groups = new ArrayList<String>();
+            List<String> groups = new ArrayList<>();
             groups.add("management");
             groups.add("accountancy");
             tasks = historyService.createHistoricTaskInstanceQuery().taskCandidateGroupIn(groups).list();
@@ -559,7 +559,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
      * Generates some test tasks. - 2 tasks where kermit is a candidate and 1 task where gonzo is assignee
      */
     private List<String> generateTestTasks() throws Exception {
-        List<String> ids = new ArrayList<String>();
+        List<String> ids = new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
         // 2 tasks for kermit

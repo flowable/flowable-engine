@@ -40,14 +40,14 @@ public class WSService implements BpmnInterfaceImplementation {
     public WSService(String name, String location, String wsdlLocation) {
         this.name = name;
         this.location = location;
-        this.operations = new HashMap<String, WSOperation>();
+        this.operations = new HashMap<>();
         this.wsdlLocation = wsdlLocation;
     }
 
     public WSService(String name, String location, SyncWebServiceClient client) {
         this.name = name;
         this.location = location;
-        this.operations = new HashMap<String, WSOperation>();
+        this.operations = new HashMap<>();
         this.client = client;
     }
 

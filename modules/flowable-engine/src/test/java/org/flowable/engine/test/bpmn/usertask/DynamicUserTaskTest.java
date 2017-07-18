@@ -387,7 +387,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
     @Deployment
     public void testChangeFormKeyWithExpression() {
         // first test without changing the form key
-        Map<String, Object> varMap = new HashMap<String, Object>();
+        Map<String, Object> varMap = new HashMap<>();
         varMap.put("start", "test");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask", varMap);
         String processDefinitionId = processInstance.getProcessDefinitionId();
@@ -402,7 +402,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         ObjectNode infoNode = dynamicBpmnService.changeUserTaskFormKey("task1", "${anotherKey}");
         dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, infoNode);
 
-        varMap = new HashMap<String, Object>();
+        varMap = new HashMap<>();
         varMap.put("anotherKey", "test2");
         processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask", varMap);
 

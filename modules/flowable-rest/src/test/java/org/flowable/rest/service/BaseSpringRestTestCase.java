@@ -116,7 +116,7 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
     protected static ManagementService managementService;
 
     protected static CloseableHttpClient client;
-    protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<CloseableHttpResponse>();
+    protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
 
     protected ISO8601DateFormat dateFormat = new ISO8601DateFormat();
 
@@ -444,7 +444,7 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
         assertEquals(numberOfResultsExpected, dataNode.size());
 
         // Check presence of ID's
-        List<String> toBeFound = new ArrayList<String>(Arrays.asList(expectedResourceIds));
+        List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
         Iterator<JsonNode> it = dataNode.iterator();
         while (it.hasNext()) {
             String id = it.next().get("id").textValue();
@@ -489,7 +489,7 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
 
             // Check presence of ID's
             if (expectedResourceIds != null) {
-                List<String> toBeFound = new ArrayList<String>(Arrays.asList(expectedResourceIds));
+                List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
                 Iterator<JsonNode> it = dataNode.iterator();
                 while (it.hasNext()) {
                     String id = it.next().get("id").textValue();

@@ -86,7 +86,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected String nameLikeIgnoreCase;
     protected String deploymentId;
     protected List<String> deploymentIds;
-    protected List<ExecutionQueryImpl> orQueryObjects = new ArrayList<ExecutionQueryImpl>();
+    protected List<ExecutionQueryImpl> orQueryObjects = new ArrayList<>();
 
     public ExecutionQueryImpl() {
     }
@@ -281,7 +281,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
             throw new FlowableIllegalArgumentException("event type is null");
         }
         if (eventSubscriptions == null) {
-            eventSubscriptions = new ArrayList<EventSubscriptionQueryValue>();
+            eventSubscriptions = new ArrayList<>();
         }
         eventSubscriptions.add(new EventSubscriptionQueryValue(eventName, eventType));
         return this;

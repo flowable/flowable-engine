@@ -42,10 +42,10 @@ public abstract class FormEngines {
     public static final String NAME_DEFAULT = "default";
 
     protected static boolean isInitialized;
-    protected static Map<String, FormEngine> formEngines = new HashMap<String, FormEngine>();
-    protected static Map<String, EngineInfo> formEngineInfosByName = new HashMap<String, EngineInfo>();
-    protected static Map<String, EngineInfo> formEngineInfosByResourceUrl = new HashMap<String, EngineInfo>();
-    protected static List<EngineInfo> formEngineInfos = new ArrayList<EngineInfo>();
+    protected static Map<String, FormEngine> formEngines = new HashMap<>();
+    protected static Map<String, EngineInfo> formEngineInfosByName = new HashMap<>();
+    protected static Map<String, EngineInfo> formEngineInfosByResourceUrl = new HashMap<>();
+    protected static List<EngineInfo> formEngineInfos = new ArrayList<>();
 
     /**
      * Initializes all form engines that can be found on the classpath for resources <code>flowable.form.cfg.xml</code> and for resources <code>flowable-dmn-context.xml</code> (Spring style
@@ -55,7 +55,7 @@ public abstract class FormEngines {
         if (!isInitialized()) {
             if (formEngines == null) {
                 // Create new map to store dmn engines if current map is null
-                formEngines = new HashMap<String, FormEngine>();
+                formEngines = new HashMap<>();
             }
             ClassLoader classLoader = FormEngines.class.getClassLoader();
             Enumeration<URL> resources = null;
@@ -67,7 +67,7 @@ public abstract class FormEngines {
 
             // Remove duplicated configuration URL's using set. Some
             // classloaders may return identical URL's twice, causing duplicate startups
-            Set<URL> configUrls = new HashSet<URL>();
+            Set<URL> configUrls = new HashSet<>();
             while (resources.hasMoreElements()) {
                 configUrls.add(resources.nextElement());
             }
@@ -232,8 +232,8 @@ public abstract class FormEngines {
      */
     public static synchronized void destroy() {
         if (isInitialized()) {
-            Map<String, FormEngine> engines = new HashMap<String, FormEngine>(formEngines);
-            formEngines = new HashMap<String, FormEngine>();
+            Map<String, FormEngine> engines = new HashMap<>(formEngines);
+            formEngines = new HashMap<>();
 
             for (String formEngineName : engines.keySet()) {
                 FormEngine formEngine = engines.get(formEngineName);

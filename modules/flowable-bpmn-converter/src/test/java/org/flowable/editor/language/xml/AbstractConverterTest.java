@@ -50,7 +50,7 @@ public abstract class AbstractConverterTest implements BpmnXMLConstants {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	protected Map<String, Map> parseBPMNDI(byte[] xml) throws Exception {
-    	Map<String, Map> bpmnDIMap = new HashMap<String, Map>();
+    	Map<String, Map> bpmnDIMap = new HashMap<>();
     	Map<String, List<GraphicInfo>> edgesMap = null;
     	Map<String, GraphicInfo> shapesMap = null;
 
@@ -68,7 +68,7 @@ public abstract class AbstractConverterTest implements BpmnXMLConstants {
 
     			// initialize diagram map if it doesn't exist yet
     			if (null == diagramMap) {
-    				diagramMap = new HashMap<String, Map>();
+    				diagramMap = new HashMap<>();
     			}
 
     			// store shapes and edges for current diagram
@@ -82,7 +82,7 @@ public abstract class AbstractConverterTest implements BpmnXMLConstants {
 
     						// initialize shapes map if it doesn't exist yet
     						if (null == shapesMap) {
-    							shapesMap = new HashMap<String, GraphicInfo>();
+    							shapesMap = new HashMap<>();
     						}
 
     						// check for shape bounds
@@ -107,11 +107,11 @@ public abstract class AbstractConverterTest implements BpmnXMLConstants {
     					} else if (xtr.getLocalName().equalsIgnoreCase(ELEMENT_DI_EDGE)) {
     						// retrieve edges map
     						edgesMap = diagramMap.get(ELEMENT_DI_EDGE);
-    						List<GraphicInfo> waypointList = new ArrayList<GraphicInfo>();
+    						List<GraphicInfo> waypointList = new ArrayList<>();
 
     						// initialize shapes map if it doesn't exist yet
     						if (null == edgesMap) {
-    							edgesMap = new HashMap<String, List<GraphicInfo>>();
+    							edgesMap = new HashMap<>();
     						}
 
     						// check for edge waypoints

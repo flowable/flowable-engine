@@ -44,11 +44,11 @@ public class ExecutionQueryEscapeClauseTest extends AbstractEscapeClauseTestCase
                 .deploy()
                 .getId();
 
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("var1", "One%");
         processInstance1 = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", vars, "One%");
 
-        vars = new HashMap<String, Object>();
+        vars = new HashMap<>();
         vars.put("var1", "Two_");
         processInstance2 = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", vars, "Two_");
 

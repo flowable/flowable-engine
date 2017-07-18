@@ -45,9 +45,9 @@ public class ParsedDeploymentBuilder {
     }
 
     public ParsedDeployment build() {
-        List<DecisionTableEntity> decisionTables = new ArrayList<DecisionTableEntity>();
-        Map<DecisionTableEntity, DmnParse> decisionTablesToDmnParseMap = new LinkedHashMap<DecisionTableEntity, DmnParse>();
-        Map<DecisionTableEntity, DmnResourceEntity> decisionTablesToResourceMap = new LinkedHashMap<DecisionTableEntity, DmnResourceEntity>();
+        List<DecisionTableEntity> decisionTables = new ArrayList<>();
+        Map<DecisionTableEntity, DmnParse> decisionTablesToDmnParseMap = new LinkedHashMap<>();
+        Map<DecisionTableEntity, DmnResourceEntity> decisionTablesToResourceMap = new LinkedHashMap<>();
 
         for (DmnResourceEntity resource : deployment.getResources().values()) {
             if (isDmnResource(resource.getName())) {

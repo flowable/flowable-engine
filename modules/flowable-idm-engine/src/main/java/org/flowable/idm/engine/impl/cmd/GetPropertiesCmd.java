@@ -33,7 +33,7 @@ public class GetPropertiesCmd implements Command<Map<String, String>>, Serializa
     public Map<String, String> execute(CommandContext commandContext) {
         List<IdmPropertyEntity> propertyEntities = CommandContextUtil.getPropertyEntityManager(commandContext).findAll();
 
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, String> properties = new HashMap<>();
         for (IdmPropertyEntity propertyEntity : propertyEntities) {
             properties.put(propertyEntity.getName(), propertyEntity.getValue());
         }

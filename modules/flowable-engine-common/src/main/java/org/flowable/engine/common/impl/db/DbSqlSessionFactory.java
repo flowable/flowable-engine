@@ -38,7 +38,7 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
  */
 public class DbSqlSessionFactory implements SessionFactory {
     
-    protected Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<String, Map<String, String>>();
+    protected Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<>();
     
     protected String databaseType;
     protected String databaseTablePrefix = "";
@@ -50,18 +50,18 @@ public class DbSqlSessionFactory implements SessionFactory {
     protected IdGenerator idGenerator;
     protected Map<String, String> statementMappings;
 
-    protected Map<Class<?>, String> insertStatements = new ConcurrentHashMap<Class<?>, String>();
-    protected Map<Class<?>, String> updateStatements = new ConcurrentHashMap<Class<?>, String>();
-    protected Map<Class<?>, String> deleteStatements = new ConcurrentHashMap<Class<?>, String>();
-    protected Map<Class<?>, String> selectStatements = new ConcurrentHashMap<Class<?>, String>();
+    protected Map<Class<?>, String> insertStatements = new ConcurrentHashMap<>();
+    protected Map<Class<?>, String> updateStatements = new ConcurrentHashMap<>();
+    protected Map<Class<?>, String> deleteStatements = new ConcurrentHashMap<>();
+    protected Map<Class<?>, String> selectStatements = new ConcurrentHashMap<>();
     
-    protected List<Class<? extends Entity>> insertionOrder = new ArrayList<Class<? extends Entity>>();
-    protected List<Class<? extends Entity>> deletionOrder = new ArrayList<Class<? extends Entity>>();
+    protected List<Class<? extends Entity>> insertionOrder = new ArrayList<>();
+    protected List<Class<? extends Entity>> deletionOrder = new ArrayList<>();
 
     protected boolean isDbHistoryUsed = true;
     
     protected Set<Class<? extends Entity>> bulkInserteableEntityClasses = new HashSet<>();
-    protected Map<Class<?>, String> bulkInsertStatements = new ConcurrentHashMap<Class<?>, String>();
+    protected Map<Class<?>, String> bulkInsertStatements = new ConcurrentHashMap<>();
     
     protected int maxNrOfStatementsInBulkInsert = 100;
 
@@ -139,7 +139,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     protected void addDatabaseSpecificStatement(String databaseType, String activitiStatement, String ibatisStatement) {
         Map<String, String> specificStatements = databaseSpecificStatements.get(databaseType);
         if (specificStatements == null) {
-            specificStatements = new HashMap<String, String>();
+            specificStatements = new HashMap<>();
             databaseSpecificStatements.put(databaseType, specificStatements);
         }
         specificStatements.put(activitiStatement, ibatisStatement);

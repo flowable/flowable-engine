@@ -67,9 +67,9 @@ public class CxfWSDLImporter implements XMLImporter {
 
     protected static final String JAXB_BINDINGS_RESOURCE = "flowable-bindings.xjc";
 
-    protected Map<String, WSService> wsServices = new HashMap<String, WSService>();
-    protected Map<String, WSOperation> wsOperations = new HashMap<String, WSOperation>();
-    protected Map<String, StructureDefinition> structures = new HashMap<String, StructureDefinition>();
+    protected Map<String, WSService> wsServices = new HashMap<>();
+    protected Map<String, WSOperation> wsOperations = new HashMap<>();
+    protected Map<String, StructureDefinition> structures = new HashMap<>();
 
     protected String wsdlLocation;
     protected String namespace;

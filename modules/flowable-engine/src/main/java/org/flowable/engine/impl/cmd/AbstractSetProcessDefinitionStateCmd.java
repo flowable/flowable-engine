@@ -110,7 +110,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
             throw new FlowableIllegalArgumentException("Process definition id or key cannot be null");
         }
 
-        List<ProcessDefinitionEntity> processDefinitionEntities = new ArrayList<ProcessDefinitionEntity>();
+        List<ProcessDefinitionEntity> processDefinitionEntities = new ArrayList<>();
         ProcessDefinitionEntityManager processDefinitionManager = CommandContextUtil.getProcessDefinitionEntityManager(commandContext);
 
         if (processDefinitionId != null) {

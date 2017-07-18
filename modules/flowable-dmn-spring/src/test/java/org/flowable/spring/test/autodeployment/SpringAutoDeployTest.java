@@ -60,12 +60,12 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         createAppContext("org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml");
         List<DmnDecisionTable> decisionTables = repositoryService.createDecisionTableQuery().orderByDecisionTableKey().asc().list();
 
-        Set<String> decisionTableKeys = new HashSet<String>();
+        Set<String> decisionTableKeys = new HashSet<>();
         for (DmnDecisionTable decisionTable : decisionTables) {
             decisionTableKeys.add(decisionTable.getKey());
         }
 
-        Set<String> expectedDecisionTableKeys = new HashSet<String>();
+        Set<String> expectedDecisionTableKeys = new HashSet<>();
         expectedDecisionTableKeys.add("decision");
         expectedDecisionTableKeys.add("decision2");
 

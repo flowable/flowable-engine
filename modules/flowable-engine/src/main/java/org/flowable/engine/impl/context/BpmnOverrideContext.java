@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class BpmnOverrideContext {
 
-    protected static ThreadLocal<Map<String, ObjectNode>> bpmnOverrideContextThreadLocal = new ThreadLocal<Map<String, ObjectNode>>();
+    protected static ThreadLocal<Map<String, ObjectNode>> bpmnOverrideContextThreadLocal = new ThreadLocal<>();
 
     protected static ResourceBundle.Control resourceBundleControl = new ResourceBundleControl();
 
@@ -50,7 +50,7 @@ public class BpmnOverrideContext {
                         language, id, definitionInfoNode);
 
             } else {
-                HashSet<Locale> candidateLocales = new LinkedHashSet<Locale>();
+                HashSet<Locale> candidateLocales = new LinkedHashSet<>();
                 candidateLocales.addAll(resourceBundleControl.getCandidateLocales(id, Locale.forLanguageTag(language)));
                 for (Locale locale : candidateLocales) {
                     localizationProperties = CommandContextUtil.getProcessEngineConfiguration().getDynamicBpmnService().getLocalizationElementProperties(
@@ -85,7 +85,7 @@ public class BpmnOverrideContext {
     protected static Map<String, ObjectNode> getBpmnOverrideContext() {
         Map<String, ObjectNode> bpmnOverrideMap = bpmnOverrideContextThreadLocal.get();
         if (bpmnOverrideMap == null) {
-            bpmnOverrideMap = new HashMap<String, ObjectNode>();
+            bpmnOverrideMap = new HashMap<>();
         }
         return bpmnOverrideMap;
     }
@@ -93,7 +93,7 @@ public class BpmnOverrideContext {
     protected static void addBpmnOverrideElement(String id, ObjectNode infoNode) {
         Map<String, ObjectNode> bpmnOverrideMap = bpmnOverrideContextThreadLocal.get();
         if (bpmnOverrideMap == null) {
-            bpmnOverrideMap = new HashMap<String, ObjectNode>();
+            bpmnOverrideMap = new HashMap<>();
             bpmnOverrideContextThreadLocal.set(bpmnOverrideMap);
         }
         bpmnOverrideMap.put(id, infoNode);

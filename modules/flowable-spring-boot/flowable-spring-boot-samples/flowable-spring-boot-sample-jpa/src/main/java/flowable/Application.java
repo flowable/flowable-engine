@@ -63,13 +63,13 @@ class PhotoService {
     }
 
     public void launchPhotoProcess(String... photoLabels) {
-        List<Photo> photos = new ArrayList<Photo>();
+        List<Photo> photos = new ArrayList<>();
         for (String l : photoLabels) {
             Photo x = this.photoRepository.save(new Photo(l));
             photos.add(x);
         }
 
-        Map<String, Object> procVars = new HashMap<String, Object>();
+        Map<String, Object> procVars = new HashMap<>();
         procVars.put("photos", photos);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dogeProcess", procVars);
 

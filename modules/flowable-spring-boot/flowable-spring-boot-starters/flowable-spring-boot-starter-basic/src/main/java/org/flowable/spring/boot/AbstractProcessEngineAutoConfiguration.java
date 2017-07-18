@@ -103,7 +103,7 @@ public abstract class AbstractProcessEngineAutoConfiguration
         }
 
         if (flowableProperties.getCustomMybatisXMLMappers() != null) {
-            conf.setCustomMybatisXMLMappers(new HashSet<String>(flowableProperties.getCustomMybatisXMLMappers()));
+            conf.setCustomMybatisXMLMappers(new HashSet<>(flowableProperties.getCustomMybatisXMLMappers()));
         }
 
         if (flowableProperties.getCustomMybatisMappers() != null) {
@@ -111,7 +111,7 @@ public abstract class AbstractProcessEngineAutoConfiguration
         }
 
         if (flowableProperties.getCustomMybatisXMLMappers() != null) {
-            conf.setCustomMybatisXMLMappers(new HashSet<String>(flowableProperties.getCustomMybatisXMLMappers()));
+            conf.setCustomMybatisXMLMappers(new HashSet<>(flowableProperties.getCustomMybatisXMLMappers()));
         }
 
         if (processEngineConfigurationConfigurer != null) {
@@ -122,7 +122,7 @@ public abstract class AbstractProcessEngineAutoConfiguration
     }
 
     protected Set<Class<?>> getCustomMybatisMapperClasses(List<String> customMyBatisMappers) {
-        Set<Class<?>> mybatisMappers = new HashSet<Class<?>>();
+        Set<Class<?>> mybatisMappers = new HashSet<>();
         for (String customMybatisMapperClassName : customMyBatisMappers) {
             try {
                 Class customMybatisClass = Class.forName(customMybatisMapperClassName);

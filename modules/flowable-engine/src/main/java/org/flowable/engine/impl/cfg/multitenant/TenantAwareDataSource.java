@@ -37,7 +37,7 @@ import org.flowable.engine.common.api.FlowableException;
 public class TenantAwareDataSource implements DataSource {
 
     protected TenantInfoHolder tenantInfoHolder;
-    protected Map<Object, DataSource> dataSources = new HashMap<Object, DataSource>();
+    protected Map<Object, DataSource> dataSources = new HashMap<>();
 
     public TenantAwareDataSource(TenantInfoHolder tenantInfoHolder) {
         this.tenantInfoHolder = tenantInfoHolder;

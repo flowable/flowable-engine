@@ -40,7 +40,7 @@ public class IdentityInfoEntityImpl extends AbstractEntity implements IdentityIn
     }
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("value", value);
         persistentState.put("password", passwordBytes);
         return persistentState;

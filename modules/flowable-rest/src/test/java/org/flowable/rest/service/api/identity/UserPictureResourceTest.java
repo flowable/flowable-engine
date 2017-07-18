@@ -141,7 +141,7 @@ public class UserPictureResourceTest extends BaseSpringRestTestCase {
             identityService.saveUser(newUser);
             savedUser = newUser;
 
-            Map<String, String> additionalFields = new HashMap<String, String>();
+            Map<String, String> additionalFields = new HashMap<>();
             additionalFields.put("mimeType", MediaType.IMAGE_PNG.toString());
 
             HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_PICTURE, newUser.getId()));

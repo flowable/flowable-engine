@@ -110,7 +110,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         // Set the clock fixed
         Date startTime = new Date();
 
-        HashMap<String, Object> variables = new HashMap<String, Object>();
+        HashMap<String, Object> variables = new HashMap<>();
         variables.put("duration", "PT1H");
 
         // After process start, there should be a timer created
@@ -141,7 +141,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     @Deployment
     public void testNullExpressionOnTimer() {
 
-        HashMap<String, Object> variables = new HashMap<String, Object>();
+        HashMap<String, Object> variables = new HashMap<>();
         variables.put("duration", null);
 
         // After process start, there should be a timer created
@@ -223,7 +223,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         Date currentTime = simpleDateFormat.parse("2015.10.01 11:01");
         processEngineConfiguration.getClock().setCurrentTime(currentTime);
 
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("timerString", "R/2015-10-01T11:00:00/PT24H");
         runtimeService.startProcessInstanceByKey("testTimerErrors", vars);
 
@@ -288,7 +288,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         Date currentTime = simpleDateFormat.parse("2015.10.01 11:01");
         processEngineConfiguration.getClock().setCurrentTime(currentTime);
 
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("patient", "kermit");
         runtimeService.startProcessInstanceByKey("process1", vars);
 
@@ -399,7 +399,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         calendar.add(Calendar.HOUR, 1);
         long startTimeInMillis = calendar.getTime().getTime();
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("startDate", calendar.getTime());
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("rescheduleTimer", variables);
 
@@ -459,7 +459,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         calendar.add(Calendar.HOUR, 1);
         long startTimeInMillis = calendar.getTime().getTime();
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("startDate", calendar.getTime());
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("rescheduleTimer", variables);
 
@@ -520,7 +520,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         calendar.add(Calendar.HOUR, 1);
         long startTimeInMillis = calendar.getTime().getTime();
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("startDate", calendar.getTime());
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("rescheduleTimer", variables);
 

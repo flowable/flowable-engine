@@ -50,7 +50,7 @@ public class FormDeploymentEntityImpl extends AbstractEntityNoRevision implement
 
     public void addResource(FormResourceEntity resource) {
         if (resources == null) {
-            resources = new HashMap<String, FormResourceEntity>();
+            resources = new HashMap<>();
         }
         resources.put(resource.getName(), resource);
     }
@@ -60,7 +60,7 @@ public class FormDeploymentEntityImpl extends AbstractEntityNoRevision implement
     }
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("category", this.category);
         persistentState.put("tenantId", tenantId);
         return persistentState;
@@ -70,13 +70,13 @@ public class FormDeploymentEntityImpl extends AbstractEntityNoRevision implement
 
     public void addDeployedArtifact(Object deployedArtifact) {
         if (deployedArtifacts == null) {
-            deployedArtifacts = new HashMap<Class<?>, List<Object>>();
+            deployedArtifacts = new HashMap<>();
         }
 
         Class<?> clazz = deployedArtifact.getClass();
         List<Object> artifacts = deployedArtifacts.get(clazz);
         if (artifacts == null) {
-            artifacts = new ArrayList<Object>();
+            artifacts = new ArrayList<>();
             deployedArtifacts.put(clazz, artifacts);
         }
 

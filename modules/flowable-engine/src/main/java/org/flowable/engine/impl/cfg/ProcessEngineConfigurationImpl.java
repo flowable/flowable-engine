@@ -735,7 +735,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected int historicProcessInstancesQueryLimit = 20000;
 
     protected String wsSyncFactoryClassName = DEFAULT_WS_SYNC_FACTORY;
-    protected ConcurrentMap<QName, URL> wsOverridenEndpointAddresses = new ConcurrentHashMap<QName, URL>();
+    protected ConcurrentMap<QName, URL> wsOverridenEndpointAddresses = new ConcurrentHashMap<>();
 
     protected DelegateInterceptor delegateInterceptor;
 
@@ -946,7 +946,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initCommandInterceptors() {
         if (commandInterceptors == null) {
-            commandInterceptors = new ArrayList<CommandInterceptor>();
+            commandInterceptors = new ArrayList<>();
             if (customPreCommandInterceptors != null) {
                 commandInterceptors.addAll(customPreCommandInterceptors);
             }
@@ -964,7 +964,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public Collection<? extends CommandInterceptor> getDefaultCommandInterceptors() {
         if (defaultCommandInterceptors == null) {
-            List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
+            List<CommandInterceptor> interceptors = new ArrayList<>();
             interceptors.add(new LogInterceptor());
     
             CommandInterceptor transactionInterceptor = createTransactionInterceptor();
@@ -1267,7 +1267,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initSessionFactories() {
         if (sessionFactories == null) {
-            sessionFactories = new HashMap<Class<?>, SessionFactory>();
+            sessionFactories = new HashMap<>();
 
             if (usingRelationalDatabase) {
                 initDbSqlSessionFactory();
@@ -1355,7 +1355,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initConfigurators() {
 
-        allConfigurators = new ArrayList<ProcessEngineConfigurator>();
+        allConfigurators = new ArrayList<>();
 
         if (!disableIdmEngine) {
             if (idmProcessEngineConfigurator != null) {
@@ -1438,9 +1438,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initProcessDefinitionCache() {
         if (processDefinitionCache == null) {
             if (processDefinitionCacheLimit <= 0) {
-                processDefinitionCache = new DefaultDeploymentCache<ProcessDefinitionCacheEntry>();
+                processDefinitionCache = new DefaultDeploymentCache<>();
             } else {
-                processDefinitionCache = new DefaultDeploymentCache<ProcessDefinitionCacheEntry>(processDefinitionCacheLimit);
+                processDefinitionCache = new DefaultDeploymentCache<>(processDefinitionCacheLimit);
             }
         }
     }
@@ -1458,9 +1458,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initAppResourceCache() {
         if (appResourceCache == null) {
             if (appResourceCacheLimit <= 0) {
-                appResourceCache = new DefaultDeploymentCache<Object>();
+                appResourceCache = new DefaultDeploymentCache<>();
             } else {
-                appResourceCache = new DefaultDeploymentCache<Object>(appResourceCacheLimit);
+                appResourceCache = new DefaultDeploymentCache<>(appResourceCacheLimit);
             }
         }
     }
@@ -1468,16 +1468,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initKnowledgeBaseCache() {
         if (knowledgeBaseCache == null) {
             if (knowledgeBaseCacheLimit <= 0) {
-                knowledgeBaseCache = new DefaultDeploymentCache<Object>();
+                knowledgeBaseCache = new DefaultDeploymentCache<>();
             } else {
-                knowledgeBaseCache = new DefaultDeploymentCache<Object>(knowledgeBaseCacheLimit);
+                knowledgeBaseCache = new DefaultDeploymentCache<>(knowledgeBaseCacheLimit);
             }
         }
     }
 
     public void initDeployers() {
         if (this.deployers == null) {
-            this.deployers = new ArrayList<Deployer>();
+            this.deployers = new ArrayList<>();
             if (customPreDeployers != null) {
                 this.deployers.addAll(customPreDeployers);
             }
@@ -1542,7 +1542,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public Collection<? extends Deployer> getDefaultDeployers() {
-        List<Deployer> defaultDeployers = new ArrayList<Deployer>();
+        List<Deployer> defaultDeployers = new ArrayList<>();
 
         if (bpmnDeployer == null) {
             bpmnDeployer = new BpmnDeployer();
@@ -1600,7 +1600,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         bpmnParser.setActivityBehaviorFactory(activityBehaviorFactory);
         bpmnParser.setListenerFactory(listenerFactory);
 
-        List<BpmnParseHandler> parseHandlers = new ArrayList<BpmnParseHandler>();
+        List<BpmnParseHandler> parseHandlers = new ArrayList<>();
         if (getPreBpmnParseHandlers() != null) {
             parseHandlers.addAll(getPreBpmnParseHandlers());
         }
@@ -1617,7 +1617,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public List<BpmnParseHandler> getDefaultBpmnParseHandlers() {
 
         // Alphabetic list of default parse handler classes
-        List<BpmnParseHandler> bpmnParserHandlers = new ArrayList<BpmnParseHandler>();
+        List<BpmnParseHandler> bpmnParserHandlers = new ArrayList<>();
         bpmnParserHandlers.add(new BoundaryEventParseHandler());
         bpmnParserHandlers.add(new BusinessRuleParseHandler());
         bpmnParserHandlers.add(new CallActivityParseHandler());
@@ -1653,7 +1653,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         // Replace any default handler if the user wants to replace them
         if (customDefaultBpmnParseHandlers != null) {
 
-            Map<Class<?>, BpmnParseHandler> customParseHandlerMap = new HashMap<Class<?>, BpmnParseHandler>();
+            Map<Class<?>, BpmnParseHandler> customParseHandlerMap = new HashMap<>();
             for (BpmnParseHandler bpmnParseHandler : customDefaultBpmnParseHandlers) {
                 for (Class<?> handledType : bpmnParseHandler.getHandledTypes()) {
                     customParseHandlerMap.put(handledType, bpmnParseHandler);
@@ -1691,7 +1691,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public void initJobHandlers() {
-        jobHandlers = new HashMap<String, JobHandler>();
+        jobHandlers = new HashMap<>();
 
         AsyncContinuationJobHandler asyncContinuationJobHandler = new AsyncContinuationJobHandler();
         jobHandlers.put(asyncContinuationJobHandler.getType(), asyncContinuationJobHandler);
@@ -1721,7 +1721,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     
     protected void initHistoryJobHandlers() {
         if (isAsyncHistoryEnabled) {
-            historyJobHandlers = new HashMap<String, HistoryJobHandler>();
+            historyJobHandlers = new HashMap<>();
             
             AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler();
             asyncHistoryJobHandler.initDefaultTransformers();
@@ -1944,7 +1944,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initFormEngines() {
         if (formEngines == null) {
-            formEngines = new HashMap<String, FormEngine>();
+            formEngines = new HashMap<>();
             FormEngine defaultFormEngine = new JuelFormEngine();
             formEngines.put(null, defaultFormEngine); // default form engine is
                                                       // looked up with null
@@ -1975,7 +1975,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initScriptingEngines() {
         if (resolverFactories == null) {
-            resolverFactories = new ArrayList<ResolverFactory>();
+            resolverFactories = new ArrayList<>();
             resolverFactories.add(new VariableScopeResolverFactory());
             resolverFactories.add(new BeansResolverFactory());
         }
@@ -2017,7 +2017,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initEventHandlers() {
         if (eventHandlers == null) {
-            eventHandlers = new HashMap<String, EventHandler>();
+            eventHandlers = new HashMap<>();
 
             SignalEventHandler signalEventHandler = new SignalEventHandler();
             eventHandlers.put(signalEventHandler.getEventHandlerType(), signalEventHandler);
@@ -2338,7 +2338,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl addConfigurator(ProcessEngineConfigurator configurator) {
         if (this.configurators == null) {
-            this.configurators = new ArrayList<ProcessEngineConfigurator>();
+            this.configurators = new ArrayList<>();
         }
         this.configurators.add(configurator);
         return this;

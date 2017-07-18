@@ -49,7 +49,7 @@ public class GetEnabledActivitiesForAdhocSubProcessCmd implements Command<List<F
             throw new FlowableException("The current flow element of the requested execution is not an ad-hoc sub process");
         }
 
-        List<FlowNode> enabledFlowNodes = new ArrayList<FlowNode>();
+        List<FlowNode> enabledFlowNodes = new ArrayList<>();
 
         AdhocSubProcess adhocSubProcess = (AdhocSubProcess) execution.getCurrentFlowElement();
 

@@ -39,7 +39,7 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
         taskService.complete(tasks.get(0).getId());
         assertEquals(0, taskService.createTaskQuery().list().size());
 
-        Map<String, Object> variables2 = new HashMap<String, Object>();
+        Map<String, Object> variables2 = new HashMap<>();
         variables2.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
         variables2.put("skip", false);
         ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("skipExpressionUserTask", variables2);
@@ -48,7 +48,7 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
         taskService.complete(tasks2.get(0).getId());
         assertEquals(0, taskService.createTaskQuery().list().size());
 
-        Map<String, Object> variables3 = new HashMap<String, Object>();
+        Map<String, Object> variables3 = new HashMap<>();
         variables3.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
         variables3.put("skip", true);
         ProcessInstance pi3 = runtimeService.startProcessInstanceByKey("skipExpressionUserTask", variables3);
@@ -58,7 +58,7 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testWithCandidateGroups() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
         vars.put("skip", true);
         runtimeService.startProcessInstanceByKey("skipExpressionUserTask", vars);
@@ -67,7 +67,7 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testSkipMultipleTasks() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
         variables.put("skip1", true);
         variables.put("skip2", true);
@@ -84,7 +84,7 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
         SkipFlowableEventListener eventListener = new SkipFlowableEventListener();
         processEngine.getRuntimeService().addEventListener(eventListener);
         
-        Map<String, Object> variables2 = new HashMap<String, Object>();
+        Map<String, Object> variables2 = new HashMap<>();
         variables2.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
         variables2.put("skip", false);
         runtimeService.startProcessInstanceByKey("skipExpressionUserTask", variables2);
@@ -98,7 +98,7 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
         
         eventListener.clearEvents();
 
-        Map<String, Object> variables3 = new HashMap<String, Object>();
+        Map<String, Object> variables3 = new HashMap<>();
         variables3.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
         variables3.put("skip", true);
         ProcessInstance skipPi = runtimeService.startProcessInstanceByKey("skipExpressionUserTask", variables3);

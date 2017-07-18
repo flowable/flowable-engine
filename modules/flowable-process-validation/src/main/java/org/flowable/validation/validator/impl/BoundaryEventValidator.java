@@ -42,11 +42,11 @@ public class BoundaryEventValidator extends ProcessLevelValidator {
 
         // Only one boundary event of type 'cancel' can be attached to the same
         // element, so we store the count temporarily here
-        HashMap<String, Integer> cancelBoundaryEventsCounts = new HashMap<String, Integer>();
+        HashMap<String, Integer> cancelBoundaryEventsCounts = new HashMap<>();
 
         // Only one boundary event of type 'compensate' can be attached to the
         // same element, so we store the count temporarily here
-        HashMap<String, Integer> compensateBoundaryEventsCounts = new HashMap<String, Integer>();
+        HashMap<String, Integer> compensateBoundaryEventsCounts = new HashMap<>();
 
         for (int i = 0; i < boundaryEvents.size(); i++) {
 

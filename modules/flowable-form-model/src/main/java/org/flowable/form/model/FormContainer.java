@@ -23,7 +23,7 @@ public class FormContainer extends FormField {
 
     private static final long serialVersionUID = 1L;
 
-    protected List<List<FormField>> fields = new ArrayList<List<FormField>>();
+    protected List<List<FormField>> fields = new ArrayList<>();
 
     public List<List<FormField>> getFields() {
         return fields;

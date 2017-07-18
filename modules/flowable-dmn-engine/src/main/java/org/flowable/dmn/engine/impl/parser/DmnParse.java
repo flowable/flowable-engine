@@ -61,7 +61,7 @@ public class DmnParse implements DmnXMLConstants {
     protected DmnDeploymentEntity deployment;
 
     /** The end result of the parsing: a list of decision tables. */
-    protected List<DecisionTableEntity> decisionTables = new ArrayList<DecisionTableEntity>();
+    protected List<DecisionTableEntity> decisionTables = new ArrayList<>();
 
     public DmnParse deployment(DmnDeploymentEntity deployment) {
         this.deployment = deployment;

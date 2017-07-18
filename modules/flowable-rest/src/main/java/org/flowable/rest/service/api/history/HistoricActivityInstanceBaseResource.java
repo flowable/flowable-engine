@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class HistoricActivityInstanceBaseResource {
 
-    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<String, QueryProperty>();
+    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();
 
     static {
         allowedSortProperties.put("activityId", HistoricActivityInstanceQueryProperty.ACTIVITY_ID);

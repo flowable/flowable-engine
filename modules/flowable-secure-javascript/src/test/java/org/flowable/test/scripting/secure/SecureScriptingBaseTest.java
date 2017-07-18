@@ -40,7 +40,7 @@ public abstract class SecureScriptingBaseTest {
     public void initProcessEngine() {
 
         SecureJavascriptConfigurator configurator = new SecureJavascriptConfigurator()
-                .setWhiteListedClasses(new HashSet<String>(Collections.singletonList("java.util.ArrayList")))
+                .setWhiteListedClasses(new HashSet<>(Collections.singletonList("java.util.ArrayList")))
                 .setMaxStackDepth(10).setMaxScriptExecutionTime(3000L)
                 .setMaxMemoryUsed(3145728L);
 

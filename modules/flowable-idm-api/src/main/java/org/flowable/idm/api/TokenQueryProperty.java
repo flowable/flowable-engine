@@ -27,7 +27,7 @@ public class TokenQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, TokenQueryProperty> properties = new HashMap<String, TokenQueryProperty>();
+    private static final Map<String, TokenQueryProperty> properties = new HashMap<>();
 
     public static final TokenQueryProperty TOKEN_ID = new TokenQueryProperty("RES.ID_");
     public static final TokenQueryProperty TOKEN_DATE = new TokenQueryProperty("RES.TOKEN_DATE_");

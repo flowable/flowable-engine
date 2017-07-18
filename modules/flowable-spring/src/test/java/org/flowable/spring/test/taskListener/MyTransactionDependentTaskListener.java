@@ -25,7 +25,7 @@ import org.flowable.engine.delegate.TransactionDependentTaskListener;
  */
 public class MyTransactionDependentTaskListener implements TransactionDependentTaskListener {
 
-    protected List<CurrentTask> currentTasks = new ArrayList<CurrentTask>();
+    protected List<CurrentTask> currentTasks = new ArrayList<>();
 
     @Override
     public void notify(String processInstanceId, String executionId, Task task, Map<String, Object> executionVariables, Map<String, Object> customPropertiesMap) {

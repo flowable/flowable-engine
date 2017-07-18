@@ -91,7 +91,7 @@ public class IntermediateCatchEventActivityBehavior extends AbstractBpmnActivity
 
         // Gather all activity ids for the events after the event based gateway that need to be destroyed
         List<SequenceFlow> outgoingSequenceFlows = eventGateway.getOutgoingFlows();
-        Set<String> eventActivityIds = new HashSet<String>(outgoingSequenceFlows.size() - 1); // -1, the event being triggered does not need to be deleted
+        Set<String> eventActivityIds = new HashSet<>(outgoingSequenceFlows.size() - 1); // -1, the event being triggered does not need to be deleted
         for (SequenceFlow outgoingSequenceFlow : outgoingSequenceFlows) {
             if (outgoingSequenceFlow.getTargetFlowElement() != null
                     && !outgoingSequenceFlow.getTargetFlowElement().getId().equals(execution.getCurrentActivityId())) {

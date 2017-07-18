@@ -38,9 +38,9 @@ public class ExecutionTreeBfsIterator implements Iterator<ExecutionTreeNode> {
     }
 
     protected void flattenTree() {
-        flattenedList = new LinkedList<ExecutionTreeNode>();
+        flattenedList = new LinkedList<>();
 
-        LinkedList<ExecutionTreeNode> nodesToHandle = new LinkedList<ExecutionTreeNode>();
+        LinkedList<ExecutionTreeNode> nodesToHandle = new LinkedList<>();
         nodesToHandle.add(rootNode);
         while (!nodesToHandle.isEmpty()) {
 

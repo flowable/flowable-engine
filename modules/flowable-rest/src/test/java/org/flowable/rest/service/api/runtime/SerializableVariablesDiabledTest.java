@@ -125,7 +125,7 @@ public class SerializableVariablesDiabledTest {
         InputStream binaryContent = new ByteArrayInputStream(buffer.toByteArray());
 
         // Add name, type and scope
-        Map<String, String> additionalFields = new HashMap<String, String>();
+        Map<String, String> additionalFields = new HashMap<>();
         additionalFields.put("name", "serializableVariable");
         additionalFields.put("type", "serializable");
 
@@ -160,7 +160,7 @@ public class SerializableVariablesDiabledTest {
         InputStream binaryContent = new ByteArrayInputStream(buffer.toByteArray());
 
         // Add name, type and scope
-        Map<String, String> additionalFields = new HashMap<String, String>();
+        Map<String, String> additionalFields = new HashMap<>();
         additionalFields.put("name", "serializableVariable");
         additionalFields.put("type", "serializable");
 

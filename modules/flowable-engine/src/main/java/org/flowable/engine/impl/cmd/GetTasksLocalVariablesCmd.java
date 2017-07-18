@@ -46,7 +46,7 @@ public class GetTasksLocalVariablesCmd implements Command<List<VariableInstance>
             throw new FlowableIllegalArgumentException("Set of taskIds is empty");
         }
 
-        List<VariableInstance> instances = new ArrayList<VariableInstance>();
+        List<VariableInstance> instances = new ArrayList<>();
         List<VariableInstanceEntity> entities = CommandContextUtil.getVariableInstanceEntityManager(commandContext).findVariableInstancesByTaskIds(taskIds);
         for (VariableInstanceEntity entity : entities) {
             entity.getValue();

@@ -99,7 +99,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
         if (variables != null) {
             this.variables = variables;
         } else {
-            this.variables = new HashMap<String, Object>();
+            this.variables = new HashMap<>();
         }
     }
 
@@ -109,7 +109,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
         List<FormField> allFields = formDefinition.listAllFields();
         if (allFields != null) {
 
-            Map<String, JsonNode> formInstanceFieldMap = new HashMap<String, JsonNode>();
+            Map<String, JsonNode> formInstanceFieldMap = new HashMap<>();
             if (formInstance != null) {
                 fillFormInstanceValues(formInstance, formInstanceFieldMap, formEngineConfiguration.getObjectMapper());
                 fillVariablesWithFormInstanceValues(formInstanceFieldMap, allFields);

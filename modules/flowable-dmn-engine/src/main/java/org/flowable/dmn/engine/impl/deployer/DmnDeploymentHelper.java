@@ -39,7 +39,7 @@ public class DmnDeploymentHelper {
      *             if any two decision tables have the same key
      */
     public void verifyDecisionTablesDoNotShareKeys(Collection<DecisionTableEntity> decisionTables) {
-        Set<String> keySet = new LinkedHashSet<String>();
+        Set<String> keySet = new LinkedHashSet<>();
         for (DecisionTableEntity decisionTable : decisionTables) {
             if (keySet.contains(decisionTable.getKey())) {
                 throw new FlowableException(

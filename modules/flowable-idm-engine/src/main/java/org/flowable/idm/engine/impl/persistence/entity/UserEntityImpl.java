@@ -41,7 +41,7 @@ public class UserEntityImpl extends AbstractEntity implements UserEntity, Serial
 
     @Override
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("firstName", firstName);
         persistentState.put("lastName", lastName);
         persistentState.put("email", email);

@@ -68,7 +68,7 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
         expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize,  processEngineConfiguration.getJobEntityManager()));
         assertTrue(expiredJobs.size() > 0);
 
-        List<String> jobIds = new ArrayList<String>();
+        List<String> jobIds = new ArrayList<>();
         for (JobInfoEntity jobEntity : expiredJobs) {
             jobIds.add(jobEntity.getId());
         }
@@ -121,7 +121,7 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
         assertEquals(job.getId(), expiredJobs.get(0).getId());
         assertJobDetails(false);
 
-        List<String> jobIds = new ArrayList<String>();
+        List<String> jobIds = new ArrayList<>();
         for (JobInfoEntity j : expiredJobs) {
             jobIds.add(j.getId());
         }

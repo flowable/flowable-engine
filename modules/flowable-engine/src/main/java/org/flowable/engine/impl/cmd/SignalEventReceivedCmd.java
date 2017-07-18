@@ -47,7 +47,7 @@ public class SignalEventReceivedCmd implements Command<Void> {
         this.eventName = eventName;
         this.executionId = executionId;
         if (processVariables != null) {
-            this.payload = new HashMap<String, Object>(processVariables);
+            this.payload = new HashMap<>(processVariables);
 
         } else {
             this.payload = null;

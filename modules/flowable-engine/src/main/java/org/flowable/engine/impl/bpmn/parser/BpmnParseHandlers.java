@@ -33,7 +33,7 @@ public class BpmnParseHandlers {
     protected Map<Class<? extends BaseElement>, List<BpmnParseHandler>> parseHandlers;
 
     public BpmnParseHandlers() {
-        this.parseHandlers = new HashMap<Class<? extends BaseElement>, List<BpmnParseHandler>>();
+        this.parseHandlers = new HashMap<>();
     }
 
     public List<BpmnParseHandler> getHandlersFor(Class<? extends BaseElement> clazz) {
@@ -50,7 +50,7 @@ public class BpmnParseHandlers {
         for (Class<? extends BaseElement> type : bpmnParseHandler.getHandledTypes()) {
             List<BpmnParseHandler> handlers = parseHandlers.get(type);
             if (handlers == null) {
-                handlers = new ArrayList<BpmnParseHandler>();
+                handlers = new ArrayList<>();
                 parseHandlers.put(type, handlers);
             }
             handlers.add(bpmnParseHandler);

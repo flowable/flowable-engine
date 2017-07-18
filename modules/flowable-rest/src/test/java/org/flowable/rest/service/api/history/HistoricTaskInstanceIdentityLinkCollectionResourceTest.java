@@ -42,7 +42,7 @@ public class HistoricTaskInstanceIdentityLinkCollectionResourceTest extends Base
      */
     @Deployment
     public void testGetIdentityLinks() throws Exception {
-        HashMap<String, Object> processVariables = new HashMap<String, Object>();
+        HashMap<String, Object> processVariables = new HashMap<>();
         processVariables.put("stringVar", "Azerty");
         processVariables.put("intVar", 67890);
         processVariables.put("booleanVar", false);
@@ -62,7 +62,7 @@ public class HistoricTaskInstanceIdentityLinkCollectionResourceTest extends Base
         JsonNode linksArray = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertEquals(2, linksArray.size());
-        Map<String, JsonNode> linksMap = new HashMap<String, JsonNode>();
+        Map<String, JsonNode> linksMap = new HashMap<>();
         for (JsonNode linkNode : linksArray) {
             linksMap.put(linkNode.get("type").asText(), linkNode);
         }

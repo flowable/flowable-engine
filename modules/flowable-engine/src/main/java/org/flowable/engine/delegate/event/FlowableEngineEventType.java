@@ -300,7 +300,7 @@ public enum FlowableEngineEventType implements FlowableEventType {
      *             when one of the given string is not a valid type name
      */
     public static FlowableEngineEventType[] getTypesFromString(String string) {
-        List<FlowableEngineEventType> result = new ArrayList<FlowableEngineEventType>();
+        List<FlowableEngineEventType> result = new ArrayList<>();
         if (string != null && !string.isEmpty()) {
             String[] split = StringUtils.split(string, ",");
             for (String typeName : split) {

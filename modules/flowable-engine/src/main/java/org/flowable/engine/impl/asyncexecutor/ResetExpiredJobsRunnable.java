@@ -62,7 +62,7 @@ public class ResetExpiredJobsRunnable implements Runnable {
                 List<? extends JobInfoEntity> expiredJobs = asyncExecutor.getProcessEngineConfiguration().getCommandExecutor()
                         .execute(new FindExpiredJobsCmd(asyncExecutor.getResetExpiredJobsPageSize(), jobEntityManager));
 
-                List<String> expiredJobIds = new ArrayList<String>(expiredJobs.size());
+                List<String> expiredJobIds = new ArrayList<>(expiredJobs.size());
                 for (JobInfoEntity expiredJob : expiredJobs) {
                     expiredJobIds.add(expiredJob.getId());
                 }

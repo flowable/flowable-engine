@@ -25,7 +25,7 @@ public class AttachmentQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, AttachmentQueryProperty> properties = new HashMap<String, AttachmentQueryProperty>();
+    private static final Map<String, AttachmentQueryProperty> properties = new HashMap<>();
 
     public static final AttachmentQueryProperty ATTACHMENT_ID = new AttachmentQueryProperty("RES.ID_");
     public static final AttachmentQueryProperty NAME = new AttachmentQueryProperty("RES.NAME_");

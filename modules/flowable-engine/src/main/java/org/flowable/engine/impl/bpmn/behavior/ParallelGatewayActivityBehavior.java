@@ -118,7 +118,7 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
     }
 
     protected Collection<ExecutionEntity> cleanJoinedExecutions(Collection<ExecutionEntity> joinedExecutions, DelegateExecution multiInstanceExecution) {
-        List<ExecutionEntity> cleanedExecutions = new ArrayList<ExecutionEntity>();
+        List<ExecutionEntity> cleanedExecutions = new ArrayList<>();
         for (ExecutionEntity executionEntity : joinedExecutions) {
             if (isChildOfMultiInstanceExecution(executionEntity, multiInstanceExecution)) {
                 cleanedExecutions.add(executionEntity);

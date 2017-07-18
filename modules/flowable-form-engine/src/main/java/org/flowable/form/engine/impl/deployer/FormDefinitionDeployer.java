@@ -65,7 +65,7 @@ public class FormDefinitionDeployer implements Deployer {
      */
     protected Map<FormDefinitionEntity, FormDefinitionEntity> getPreviousVersionsOfFormDefinitions(ParsedDeployment parsedDeployment) {
 
-        Map<FormDefinitionEntity, FormDefinitionEntity> result = new LinkedHashMap<FormDefinitionEntity, FormDefinitionEntity>();
+        Map<FormDefinitionEntity, FormDefinitionEntity> result = new LinkedHashMap<>();
 
         for (FormDefinitionEntity newDefinition : parsedDeployment.getAllFormDefinitions()) {
             FormDefinitionEntity existingFormDefinition = formDeploymentHelper.getMostRecentVersionOfForm(newDefinition);

@@ -34,7 +34,7 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
     @Deployment
     public void testChangeClassName() {
         // first test without changing the class name
-        Map<String, Object> varMap = new HashMap<String, Object>();
+        Map<String, Object> varMap = new HashMap<>();
         varMap.put("count", 0);
         varMap.put("count2", 0);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
@@ -51,7 +51,7 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
 
         // now test with changing the class name
-        varMap = new HashMap<String, Object>();
+        varMap = new HashMap<>();
         varMap.put("count", 0);
         varMap.put("count2", 0);
         processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
@@ -76,7 +76,7 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
     public void testChangeExpression() {
         // first test without changing the class name
         DummyTestBean testBean = new DummyTestBean();
-        Map<String, Object> varMap = new HashMap<String, Object>();
+        Map<String, Object> varMap = new HashMap<>();
         varMap.put("bean", testBean);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
 
@@ -96,7 +96,7 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
 
         // now test with changing the class name
         testBean = new DummyTestBean();
-        varMap = new HashMap<String, Object>();
+        varMap = new HashMap<>();
         varMap.put("bean2", testBean);
         processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
 
@@ -123,7 +123,7 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
     public void testChangeDelegateExpression() {
         // first test without changing the class name
         DummyTestDelegateBean testBean = new DummyTestDelegateBean();
-        Map<String, Object> varMap = new HashMap<String, Object>();
+        Map<String, Object> varMap = new HashMap<>();
         varMap.put("bean", testBean);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
 
@@ -143,7 +143,7 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
 
         // now test with changing the class name
         testBean = new DummyTestDelegateBean();
-        varMap = new HashMap<String, Object>();
+        varMap = new HashMap<>();
         varMap.put("bean2", testBean);
         processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
 

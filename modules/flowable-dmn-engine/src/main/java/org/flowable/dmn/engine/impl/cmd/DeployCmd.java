@@ -51,7 +51,7 @@ public class DeployCmd<T> implements Command<DmnDeployment>, Serializable {
 
         if (deploymentBuilder.isDuplicateFilterEnabled()) {
 
-            List<DmnDeployment> existingDeployments = new ArrayList<DmnDeployment>();
+            List<DmnDeployment> existingDeployments = new ArrayList<>();
             if (deployment.getTenantId() == null || DmnEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
                 List<DmnDeployment> deploymentEntities = new DmnDeploymentQueryImpl(CommandContextUtil.getDmnEngineConfiguration().getCommandExecutor()).deploymentName(deployment.getName()).listPage(0, 1);
                 if (!deploymentEntities.isEmpty()) {
@@ -74,7 +74,7 @@ public class DeployCmd<T> implements Command<DmnDeployment>, Serializable {
             if (!existingDeployments.isEmpty()) {
                 existingDeployment = (DmnDeploymentEntity) existingDeployments.get(0);
 
-                Map<String, DmnResourceEntity> resourceMap = new HashMap<String, DmnResourceEntity>();
+                Map<String, DmnResourceEntity> resourceMap = new HashMap<>();
                 List<DmnResourceEntity> resourceList = CommandContextUtil.getResourceEntityManager().findResourcesByDeploymentId(existingDeployment.getId());
                 for (DmnResourceEntity resourceEntity : resourceList) {
                     resourceMap.put(resourceEntity.getName(), resourceEntity);
@@ -93,7 +93,7 @@ public class DeployCmd<T> implements Command<DmnDeployment>, Serializable {
         CommandContextUtil.getDeploymentEntityManager(commandContext).insert(deployment);
 
         // Deployment settings
-        Map<String, Object> deploymentSettings = new HashMap<String, Object>();
+        Map<String, Object> deploymentSettings = new HashMap<>();
         deploymentSettings.put(DeploymentSettings.IS_DMN_XSD_VALIDATION_ENABLED, deploymentBuilder.isDmnXsdValidationEnabled());
 
         // Actually deploy

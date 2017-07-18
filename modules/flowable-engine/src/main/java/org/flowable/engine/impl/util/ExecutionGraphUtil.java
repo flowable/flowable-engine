@@ -34,10 +34,10 @@ public class ExecutionGraphUtil {
      * Takes in a collection of executions belonging to the same process instance. Orders the executions in a list, first elements are the leaf, last element is the root elements.
      */
     public static List<ExecutionEntity> orderFromRootToLeaf(Collection<ExecutionEntity> executions) {
-        List<ExecutionEntity> orderedList = new ArrayList<ExecutionEntity>(executions.size());
+        List<ExecutionEntity> orderedList = new ArrayList<>(executions.size());
 
         // Root elements
-        HashSet<String> previousIds = new HashSet<String>();
+        HashSet<String> previousIds = new HashSet<>();
         for (ExecutionEntity execution : executions) {
             if (execution.getParentId() == null) {
                 orderedList.add(execution);
@@ -95,7 +95,7 @@ public class ExecutionGraphUtil {
             throw new FlowableException("Invalid targetElementId '" + targetElementId + "': no element found for this id n process definition '" + processDefinitionId + "'");
         }
 
-        Set<String> visitedElements = new HashSet<String>();
+        Set<String> visitedElements = new HashSet<>();
         return isReachable(process, sourceElement, targetElement, visitedElements);
     }
 

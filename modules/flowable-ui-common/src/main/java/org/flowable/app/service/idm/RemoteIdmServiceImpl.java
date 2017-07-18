@@ -106,7 +106,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         if (json != null) {
             return parseUsersInfo(json);
         }
-        return new ArrayList<RemoteUser>();
+        return new ArrayList<>();
     }
     
     @Override
@@ -115,7 +115,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         if (json != null) {
             return parseUsersInfo(json);
         }
-        return new ArrayList<RemoteUser>();
+        return new ArrayList<>();
     }
     
     @Override
@@ -133,7 +133,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         if (json != null) {
             return parseGroupsInfo(json);
         }
-        return new ArrayList<RemoteGroup>();
+        return new ArrayList<>();
     }
 
     protected JsonNode callRemoteIdmService(String url, String username, String password) {
@@ -174,7 +174,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
     }
 
     protected List<RemoteUser> parseUsersInfo(JsonNode json) {
-        List<RemoteUser> result = new ArrayList<RemoteUser>();
+        List<RemoteUser> result = new ArrayList<>();
         if (json != null && json.isArray()) {
             ArrayNode array = (ArrayNode) json;
             for (JsonNode userJson : array) {
@@ -208,7 +208,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
     }
 
     protected List<RemoteGroup> parseGroupsInfo(JsonNode json) {
-        List<RemoteGroup> result = new ArrayList<RemoteGroup>();
+        List<RemoteGroup> result = new ArrayList<>();
         if (json != null && json.isArray()) {
             ArrayNode array = (ArrayNode) json;
             for (JsonNode userJson : array) {

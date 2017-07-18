@@ -35,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class BaseProcessInstanceResource {
 
-    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<String, QueryProperty>();
+    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();
 
     static {
         allowedSortProperties.put("processDefinitionId", ProcessInstanceQueryProperty.PROCESS_DEFINITION_ID);

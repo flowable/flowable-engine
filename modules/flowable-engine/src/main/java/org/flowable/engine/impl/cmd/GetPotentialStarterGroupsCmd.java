@@ -49,7 +49,7 @@ public class GetPotentialStarterGroupsCmd implements Command<List<Group>>, Seria
 
         IdentityService identityService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getIdentityService();
 
-        List<String> groupIds = new ArrayList<String>();
+        List<String> groupIds = new ArrayList<>();
         List<IdentityLink> identityLinks = (List) processDefinition.getIdentityLinks();
         for (IdentityLink identityLink : identityLinks) {
             if (identityLink.getGroupId() != null && identityLink.getGroupId().length() > 0) {
@@ -64,7 +64,7 @@ public class GetPotentialStarterGroupsCmd implements Command<List<Group>>, Seria
             return identityService.createGroupQuery().groupIds(groupIds).list();
 
         } else {
-            return new ArrayList<Group>();
+            return new ArrayList<>();
         }
     }
 

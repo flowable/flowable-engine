@@ -294,7 +294,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
     public void initSessionFactories() {
         if (sessionFactories == null) {
-            sessionFactories = new HashMap<Class<?>, SessionFactory>();
+            sessionFactories = new HashMap<>();
 
             if (usingRelationalDatabase) {
                 initDbSqlSessionFactory();
@@ -370,7 +370,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
     public void initCommandInterceptors() {
         if (commandInterceptors == null) {
-            commandInterceptors = new ArrayList<CommandInterceptor>();
+            commandInterceptors = new ArrayList<>();
             if (customPreCommandInterceptors != null) {
                 commandInterceptors.addAll(customPreCommandInterceptors);
             }
@@ -384,7 +384,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
     public Collection<? extends CommandInterceptor> getDefaultCommandInterceptors() {
         if (defaultCommandInterceptors == null) {
-            List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
+            List<CommandInterceptor> interceptors = new ArrayList<>();
             interceptors.add(new LogInterceptor());
             
             CommandInterceptor transactionInterceptor = createTransactionInterceptor();

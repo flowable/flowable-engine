@@ -220,14 +220,14 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
     public void deleteIdentityLink(TaskEntity taskEntity, String userId, String groupId, String type) {
         List<IdentityLinkEntity> identityLinks = findIdentityLinkByTaskUserGroupAndType(taskEntity.getId(), userId, groupId, type);
 
-        List<String> identityLinkIds = new ArrayList<String>();
+        List<String> identityLinkIds = new ArrayList<>();
         for (IdentityLinkEntity identityLink : identityLinks) {
             deleteIdentityLink(identityLink, true);
             identityLinkIds.add(identityLink.getId());
         }
 
         // fix deleteCandidate() in create TaskListener
-        List<IdentityLinkEntity> removedIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
+        List<IdentityLinkEntity> removedIdentityLinkEntities = new ArrayList<>();
         for (IdentityLinkEntity identityLinkEntity : taskEntity.getIdentityLinks()) {
             if (IdentityLinkType.CANDIDATE.equals(identityLinkEntity.getType()) &&
                     !identityLinkIds.contains(identityLinkEntity.getId())) {

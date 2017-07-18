@@ -58,7 +58,7 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
     protected String jobType;
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("retries", retries);
         persistentState.put("createTime", createTime);
         persistentState.put("duedate", duedate);

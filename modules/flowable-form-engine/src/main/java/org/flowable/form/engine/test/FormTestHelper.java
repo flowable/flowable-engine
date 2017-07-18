@@ -38,7 +38,7 @@ public abstract class FormTestHelper {
 
     public static final String EMPTY_LINE = "\n";
 
-    static Map<String, FormEngine> formEngines = new HashMap<String, FormEngine>();
+    static Map<String, FormEngine> formEngines = new HashMap<>();
 
     // Test annotation support /////////////////////////////////////////////
 

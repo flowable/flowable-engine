@@ -32,7 +32,7 @@ public class GroupEntityImpl extends AbstractEntity implements GroupEntity, Seri
     }
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("name", name);
         persistentState.put("type", type);
         return persistentState;

@@ -44,7 +44,7 @@ public class RetryInterceptorTest {
     public void setupProcessEngine() {
         ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) new StandaloneInMemProcessEngineConfiguration();
         processEngineConfiguration.setJdbcUrl("jdbc:h2:mem:retryInterceptorTest");
-        List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
+        List<CommandInterceptor> interceptors = new ArrayList<>();
         retryInterceptor = new RetryInterceptor();
         interceptors.add(retryInterceptor);
         processEngineConfiguration.setCustomPreCommandInterceptors(interceptors);

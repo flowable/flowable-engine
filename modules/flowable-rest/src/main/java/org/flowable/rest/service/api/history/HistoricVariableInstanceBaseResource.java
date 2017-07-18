@@ -32,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class HistoricVariableInstanceBaseResource {
 
-    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<String, QueryProperty>();
+    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();
 
     static {
         allowedSortProperties.put("processInstanceId", HistoricVariableInstanceQueryProperty.PROCESS_INSTANCE_ID);

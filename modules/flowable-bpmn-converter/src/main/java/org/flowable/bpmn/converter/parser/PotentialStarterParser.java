@@ -33,7 +33,7 @@ public class PotentialStarterParser implements BpmnXMLConstants {
         if (StringUtils.isNotEmpty(resourceElement) && "resourceAssignmentExpression".equals(resourceElement)) {
             String expression = XMLStreamReaderUtil.moveDown(xtr);
             if (StringUtils.isNotEmpty(expression) && "formalExpression".equals(expression)) {
-                List<String> assignmentList = new ArrayList<String>();
+                List<String> assignmentList = new ArrayList<>();
                 String assignmentText = xtr.getElementText();
                 if (assignmentText.contains(",")) {
                     String[] assignmentArray = assignmentText.split(",");

@@ -101,10 +101,10 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
     @Deployment
     public void testExpression() {
         // Set the clock fixed
-        HashMap<String, Object> variables1 = new HashMap<String, Object>();
+        HashMap<String, Object> variables1 = new HashMap<>();
         variables1.put("dueDate", new Date());
 
-        HashMap<String, Object> variables2 = new HashMap<String, Object>();
+        HashMap<String, Object> variables2 = new HashMap<>();
         variables2.put("dueDate", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()));
 
         // After process start, there should be timer created
@@ -164,7 +164,7 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
         calendar.add(Calendar.HOUR, 1);
         long startTimeInMillis = calendar.getTime().getTime();
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("startDate", calendar.getTime());
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("rescheduleTimer", variables);
 

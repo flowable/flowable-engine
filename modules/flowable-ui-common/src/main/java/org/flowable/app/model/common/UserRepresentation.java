@@ -27,8 +27,8 @@ public class UserRepresentation extends AbstractRepresentation {
     protected String lastName;
     protected String email;
     protected String fullName;
-    protected List<GroupRepresentation> groups = new ArrayList<GroupRepresentation>();
-    protected List<String> privileges = new ArrayList<String>();
+    protected List<GroupRepresentation> groups = new ArrayList<>();
+    protected List<String> privileges = new ArrayList<>();
 
     public UserRepresentation() {
 

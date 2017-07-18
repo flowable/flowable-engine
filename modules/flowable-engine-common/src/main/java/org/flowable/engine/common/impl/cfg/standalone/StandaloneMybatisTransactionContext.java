@@ -50,11 +50,11 @@ public class StandaloneMybatisTransactionContext implements TransactionContext {
 
     public void addTransactionListener(TransactionState transactionState, TransactionListener transactionListener) {
         if (stateTransactionListeners == null) {
-            stateTransactionListeners = new HashMap<TransactionState, List<TransactionListener>>();
+            stateTransactionListeners = new HashMap<>();
         }
         List<TransactionListener> transactionListeners = stateTransactionListeners.get(transactionState);
         if (transactionListeners == null) {
-            transactionListeners = new ArrayList<TransactionListener>();
+            transactionListeners = new ArrayList<>();
             stateTransactionListeners.put(transactionState, transactionListeners);
         }
         transactionListeners.add(transactionListener);

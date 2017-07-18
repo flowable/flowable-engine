@@ -38,7 +38,7 @@ public class FormDefinitionEntityImpl extends AbstractEntityNoRevision implement
     protected String tenantId = FormEngineConfiguration.NO_TENANT_ID;
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("category", this.category);
         return persistentState;
     }

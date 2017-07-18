@@ -26,11 +26,11 @@ import org.flowable.engine.impl.identity.Authentication;
  */
 public class DummyTenantInfoHolder implements TenantInfoHolder {
 
-    protected Map<String, List<String>> tenantToUserMapping = new HashMap<String, List<String>>();
-    protected Map<String, String> userToTenantMapping = new HashMap<String, String>();
+    protected Map<String, List<String>> tenantToUserMapping = new HashMap<>();
+    protected Map<String, String> userToTenantMapping = new HashMap<>();
 
-    protected ThreadLocal<String> currentUserId = new ThreadLocal<String>();
-    protected ThreadLocal<String> currentTenantId = new ThreadLocal<String>();
+    protected ThreadLocal<String> currentUserId = new ThreadLocal<>();
+    protected ThreadLocal<String> currentTenantId = new ThreadLocal<>();
 
     public Collection<String> getAllTenants() {
         return tenantToUserMapping.keySet();

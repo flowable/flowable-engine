@@ -77,7 +77,7 @@ public class ProcessInstanceDiagramResource extends BaseProcessInstanceResource 
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set("Content-Type", "image/png");
             try {
-                return new ResponseEntity<byte[]>(IOUtils.toByteArray(resource), responseHeaders, HttpStatus.OK);
+                return new ResponseEntity<>(IOUtils.toByteArray(resource), responseHeaders, HttpStatus.OK);
             } catch (Exception e) {
                 throw new FlowableIllegalArgumentException("Error exporting diagram", e);
             }

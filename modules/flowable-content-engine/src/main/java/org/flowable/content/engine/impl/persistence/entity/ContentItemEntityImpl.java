@@ -44,7 +44,7 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
     protected String tenantId = ContentEngineConfiguration.NO_TENANT_ID;
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("name", this.name);
         persistentState.put("mimeType", this.mimeType);
         persistentState.put("taskId", this.taskId);

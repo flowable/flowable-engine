@@ -182,7 +182,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
     // with one parameter
     @Deployment
     public void testCandidateExpressionOneParam() {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("testBean", new TestBean());
 
         runtimeService.startProcessInstanceByKey("candidateWithExpression", params);
@@ -194,7 +194,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
     // with two parameters
     @Deployment
     public void testCandidateExpressionTwoParams() {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("testBean", new TestBean());
 
         runtimeService.startProcessInstanceByKey("candidateWithExpression", params);

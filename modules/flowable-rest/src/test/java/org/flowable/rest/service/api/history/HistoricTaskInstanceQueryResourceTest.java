@@ -52,7 +52,7 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
      */
     @Deployment
     public void testQueryTaskInstances() throws Exception {
-        HashMap<String, Object> processVariables = new HashMap<String, Object>();
+        HashMap<String, Object> processVariables = new HashMap<>();
         processVariables.put("stringVar", "Azerty");
         processVariables.put("intVar", 67890);
         processVariables.put("booleanVar", false);
@@ -247,7 +247,7 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
 
         // Check presence of ID's
         if (expectedTaskIds != null) {
-            List<String> toBeFound = new ArrayList<String>(Arrays.asList(expectedTaskIds));
+            List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedTaskIds));
             Iterator<JsonNode> it = dataNode.iterator();
             while (it.hasNext()) {
                 String id = it.next().get("id").textValue();

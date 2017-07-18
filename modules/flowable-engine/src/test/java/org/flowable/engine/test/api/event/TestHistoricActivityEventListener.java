@@ -27,7 +27,7 @@ public class TestHistoricActivityEventListener implements FlowableEventListener 
     private List<FlowableEvent> eventsReceived;
 
     public TestHistoricActivityEventListener() {
-        eventsReceived = new ArrayList<FlowableEvent>();
+        eventsReceived = new ArrayList<>();
     }
 
     public List<FlowableEvent> getEventsReceived() {

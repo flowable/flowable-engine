@@ -110,17 +110,17 @@ public class BpmnAutoLayout {
 
         // Subprocesses are handled in a new instance of BpmnAutoLayout, hence they instantiations of new maps here.
 
-        handledFlowElements = new HashMap<String, FlowElement>();
-        handledArtifacts = new HashMap<String, Artifact>();
-        generatedVertices = new HashMap<String, Object>();
-        generatedSequenceFlowEdges = new HashMap<String, Object>();
-        generatedAssociationEdges = new HashMap<String, Object>();
+        handledFlowElements = new HashMap<>();
+        handledArtifacts = new HashMap<>();
+        generatedVertices = new HashMap<>();
+        generatedSequenceFlowEdges = new HashMap<>();
+        generatedAssociationEdges = new HashMap<>();
 
-        associations = new HashMap<String, Association>(); // Associations are gathered and processed afterwards, because we must be sure we already found source and target
-        textAnnotations = new HashMap<String, TextAnnotation>(); // Text Annotations are gathered and processed afterwards, because we must be sure we already found the parent.
+        associations = new HashMap<>(); // Associations are gathered and processed afterwards, because we must be sure we already found source and target
+        textAnnotations = new HashMap<>(); // Text Annotations are gathered and processed afterwards, because we must be sure we already found the parent.
 
-        sequenceFlows = new HashMap<String, SequenceFlow>(); // Sequence flow are gathered and processed afterwards,because we must be sure we already found source and target
-        boundaryEvents = new ArrayList<BoundaryEvent>(); // Boundary events are gathered and processed afterwards, because we must be sure we have its parent
+        sequenceFlows = new HashMap<>(); // Sequence flow are gathered and processed afterwards,because we must be sure we already found source and target
+        boundaryEvents = new ArrayList<>(); // Boundary events are gathered and processed afterwards, because we must be sure we have its parent
 
         // Process all elements
         for (FlowElement flowElement : flowElementsContainer.getFlowElements()) {
@@ -254,14 +254,14 @@ public class BpmnAutoLayout {
 
     protected void handleSequenceFlow() {
 
-        Hashtable<String, Object> edgeStyle = new Hashtable<String, Object>();
+        Hashtable<String, Object> edgeStyle = new Hashtable<>();
         edgeStyle.put(mxConstants.STYLE_ORTHOGONAL, true);
         edgeStyle.put(mxConstants.STYLE_EDGE, mxEdgeStyle.ElbowConnector);
         edgeStyle.put(mxConstants.STYLE_ENTRY_X, 0.0);
         edgeStyle.put(mxConstants.STYLE_ENTRY_Y, 0.5);
         graph.getStylesheet().putCellStyle(STYLE_SEQUENCEFLOW, edgeStyle);
 
-        Hashtable<String, Object> boundaryEdgeStyle = new Hashtable<String, Object>();
+        Hashtable<String, Object> boundaryEdgeStyle = new Hashtable<>();
         boundaryEdgeStyle.put(mxConstants.STYLE_EXIT_X, 0.5);
         boundaryEdgeStyle.put(mxConstants.STYLE_EXIT_Y, 1.0);
         boundaryEdgeStyle.put(mxConstants.STYLE_ENTRY_X, 0.5);
@@ -292,14 +292,14 @@ public class BpmnAutoLayout {
 
     protected void handleAssociations() {
 
-        Hashtable<String, Object> edgeStyle = new Hashtable<String, Object>();
+        Hashtable<String, Object> edgeStyle = new Hashtable<>();
         edgeStyle.put(mxConstants.STYLE_ORTHOGONAL, true);
         edgeStyle.put(mxConstants.STYLE_EDGE, mxEdgeStyle.ElbowConnector);
         edgeStyle.put(mxConstants.STYLE_ENTRY_X, 0.0);
         edgeStyle.put(mxConstants.STYLE_ENTRY_Y, 0.5);
         graph.getStylesheet().putCellStyle(STYLE_SEQUENCEFLOW, edgeStyle);
 
-        Hashtable<String, Object> boundaryEdgeStyle = new Hashtable<String, Object>();
+        Hashtable<String, Object> boundaryEdgeStyle = new Hashtable<>();
         boundaryEdgeStyle.put(mxConstants.STYLE_EXIT_X, 0.5);
         boundaryEdgeStyle.put(mxConstants.STYLE_EXIT_Y, 1.0);
         boundaryEdgeStyle.put(mxConstants.STYLE_ENTRY_X, 0.5);
@@ -331,7 +331,7 @@ public class BpmnAutoLayout {
     protected void createEventVertex(FlowElement flowElement) {
         // Add styling for events if needed
         if (!graph.getStylesheet().getStyles().containsKey(STYLE_EVENT)) {
-            Hashtable<String, Object> eventStyle = new Hashtable<String, Object>();
+            Hashtable<String, Object> eventStyle = new Hashtable<>();
             eventStyle.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ELLIPSE);
             graph.getStylesheet().putCellStyle(STYLE_EVENT, eventStyle);
         }
@@ -344,7 +344,7 @@ public class BpmnAutoLayout {
     protected void createGatewayVertex(FlowElement flowElement) {
         // Add styling for gateways if needed
         if (graph.getStylesheet().getStyles().containsKey(STYLE_GATEWAY)) {
-            Hashtable<String, Object> style = new Hashtable<String, Object>();
+            Hashtable<String, Object> style = new Hashtable<>();
             style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RHOMBUS);
             graph.getStylesheet().putCellStyle(STYLE_GATEWAY, style);
         }
@@ -442,7 +442,7 @@ public class BpmnAutoLayout {
     // JGraphX sometime generates points that visually are not really necessary.
     // This method will remove any such points.
     protected List<mxPoint> optimizeEdgePoints(List<mxPoint> unoptimizedPointsList) {
-        List<mxPoint> optimizedPointsList = new ArrayList<mxPoint>();
+        List<mxPoint> optimizedPointsList = new ArrayList<>();
         for (int i = 0; i < unoptimizedPointsList.size(); i++) {
 
             boolean keepPoint = true;
@@ -485,7 +485,7 @@ public class BpmnAutoLayout {
     }
 
     protected void createDiagramInterchangeInformation(BaseElement element, List<mxPoint> waypoints) {
-        List<GraphicInfo> graphicInfoForWaypoints = new ArrayList<GraphicInfo>();
+        List<GraphicInfo> graphicInfoForWaypoints = new ArrayList<>();
         for (mxPoint waypoint : waypoints) {
             GraphicInfo graphicInfo = new GraphicInfo();
             graphicInfo.setElement(element);
@@ -516,7 +516,7 @@ public class BpmnAutoLayout {
         double subProcessX = subProcessGraphicInfo.getX();
         double subProcessY = subProcessGraphicInfo.getY();
 
-        List<SubProcess> nestedSubProcesses = new ArrayList<SubProcess>();
+        List<SubProcess> nestedSubProcesses = new ArrayList<>();
         for (FlowElement flowElement : subProcess.getFlowElements()) {
 
             if (flowElement instanceof SequenceFlow) {

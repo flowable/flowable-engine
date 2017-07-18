@@ -63,9 +63,9 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         processInstance2 = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", "Two_", "Two_");
         runtimeService.setProcessInstanceName(processInstance2.getId(), "Two_");
 
-        Map<String, Object> vars1 = new HashMap<String, Object>();
+        Map<String, Object> vars1 = new HashMap<>();
         vars1.put("var1", "One%");
-        Map<String, Object> vars2 = new HashMap<String, Object>();
+        Map<String, Object> vars2 = new HashMap<>();
         vars2.put("var1", "Two_");
 
         task1 = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();

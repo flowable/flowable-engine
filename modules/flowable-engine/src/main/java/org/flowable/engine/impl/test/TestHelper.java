@@ -56,7 +56,7 @@ public abstract class TestHelper {
 
     public static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Collections.singletonList("ACT_GE_PROPERTY");
 
-    static Map<String, ProcessEngine> processEngines = new HashMap<String, ProcessEngine>();
+    static Map<String, ProcessEngine> processEngines = new HashMap<>();
 
     // Assertion methods ///////////////////////////////////////////////////
 

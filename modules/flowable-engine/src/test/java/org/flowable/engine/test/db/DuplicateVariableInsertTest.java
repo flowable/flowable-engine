@@ -41,7 +41,7 @@ public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
         final CyclicBarrier startBarrier = new CyclicBarrier(2);
         final CyclicBarrier endBarrier = new CyclicBarrier(2);
 
-        final List<Exception> exceptions = new ArrayList<Exception>();
+        final List<Exception> exceptions = new ArrayList<>();
 
         Thread firstInsertThread = new Thread(new Runnable() {
             @Override
@@ -94,7 +94,7 @@ public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
         final CyclicBarrier startBarrier = new CyclicBarrier(2);
         final CyclicBarrier endBarrier = new CyclicBarrier(2);
 
-        final List<Exception> exceptions = new ArrayList<Exception>();
+        final List<Exception> exceptions = new ArrayList<>();
 
         Thread firstInsertThread = new Thread(new Runnable() {
             @Override

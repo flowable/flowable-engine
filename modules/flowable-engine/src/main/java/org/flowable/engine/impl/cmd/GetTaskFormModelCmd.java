@@ -63,7 +63,7 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
             throw new FlowableObjectNotFoundException("Task not found with id " + taskId);
         }
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         if (task.getProcessInstanceId() != null) {
             List<HistoricVariableInstance> variableInstances = processEngineConfiguration.getHistoryService()
                     .createHistoricVariableInstanceQuery()
@@ -118,7 +118,7 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
 
                     } else if (formField.getValue() instanceof String) {
                         String[] splittedString = ((String) formField.getValue()).split(",");
-                        contentItemIds = new ArrayList<String>();
+                        contentItemIds = new ArrayList<>();
                         Collections.addAll(contentItemIds, splittedString);
                     }
 

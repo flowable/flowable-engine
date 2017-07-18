@@ -30,8 +30,8 @@ public class SimpleStructureDefinition implements FieldBaseStructureDefinition {
 
     public SimpleStructureDefinition(String id) {
         this.id = id;
-        this.fieldNames = new ArrayList<String>();
-        this.fieldTypes = new ArrayList<Class<?>>();
+        this.fieldNames = new ArrayList<>();
+        this.fieldTypes = new ArrayList<>();
     }
 
     public int getFieldSize() {

@@ -39,7 +39,7 @@ import junit.framework.AssertionFailedError;
  */
 public abstract class AbstractFlowableTestCase extends AbstractTestCase {
 
-    private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = new ArrayList<String>();
+    private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = new ArrayList<>();
 
     static {
         TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_FO_DATABASECHANGELOG");
@@ -49,7 +49,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     protected FormEngine formEngine;
 
     protected String deploymentIdFromDeploymentAnnotation;
-    protected List<String> deploymentIdsForAutoCleanup = new ArrayList<String>();
+    protected List<String> deploymentIdsForAutoCleanup = new ArrayList<>();
     protected Throwable exception;
 
     protected FormEngineConfiguration formEngineConfiguration;

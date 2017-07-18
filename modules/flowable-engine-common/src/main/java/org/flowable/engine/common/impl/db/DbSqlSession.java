@@ -52,10 +52,10 @@ public class DbSqlSession implements Session {
     protected String connectionMetadataDefaultCatalog;
     protected String connectionMetadataDefaultSchema;
 
-    protected Map<Class<? extends Entity>, Map<String, Entity>> insertedObjects = new HashMap<Class<? extends Entity>, Map<String, Entity>>();
-    protected Map<Class<? extends Entity>, Map<String, Entity>> deletedObjects = new HashMap<Class<? extends Entity>, Map<String, Entity>>();
-    protected Map<Class<? extends Entity>, List<BulkDeleteOperation>> bulkDeleteOperations = new HashMap<Class<? extends Entity>, List<BulkDeleteOperation>>();
-    protected List<Entity> updatedObjects = new ArrayList<Entity>();
+    protected Map<Class<? extends Entity>, Map<String, Entity>> insertedObjects = new HashMap<>();
+    protected Map<Class<? extends Entity>, Map<String, Entity>> deletedObjects = new HashMap<>();
+    protected Map<Class<? extends Entity>, List<BulkDeleteOperation>> bulkDeleteOperations = new HashMap<>();
+    protected List<Entity> updatedObjects = new ArrayList<>();
     
     public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, EntityCache entityCache) {
         this.dbSqlSessionFactory = dbSqlSessionFactory;
@@ -255,7 +255,7 @@ public class DbSqlSession implements Session {
             return loadedObjects;
         }
 
-        List<Entity> filteredObjects = new ArrayList<Entity>(loadedObjects.size());
+        List<Entity> filteredObjects = new ArrayList<>(loadedObjects.size());
         for (Object loadedObject : loadedObjects) {
             Entity cachedEntity = cacheLoadOrStore((Entity) loadedObject);
             filteredObjects.add(cachedEntity);
@@ -302,7 +302,7 @@ public class DbSqlSession implements Session {
         for (Class<? extends Entity> entityClass : deletedObjects.keySet()) {
 
             // Collect ids of deleted entities + remove duplicates
-            Set<String> ids = new HashSet<String>();
+            Set<String> ids = new HashSet<>();
             Iterator<Entity> entitiesToDeleteIterator = deletedObjects.get(entityClass).values().iterator();
             while (entitiesToDeleteIterator.hasNext()) {
                 Entity entityToDelete = entitiesToDeleteIterator.next();
@@ -325,7 +325,7 @@ public class DbSqlSession implements Session {
     }
 
     public void determineUpdatedObjects() {
-        updatedObjects = new ArrayList<Entity>();
+        updatedObjects = new ArrayList<>();
         Map<Class<?>, Map<String, CachedEntity>> cachedObjects = entityCache.getAllCachedEntities();
         for (Class<?> clazz : cachedObjects.keySet()) {
 
@@ -454,7 +454,7 @@ public class DbSqlSession implements Session {
         Boolean hasRevision = null;
 
         while (entityIterator.hasNext()) {
-            List<Entity> subList = new ArrayList<Entity>();
+            List<Entity> subList = new ArrayList<>();
             int index = 0;
             while (entityIterator.hasNext() && index < dbSqlSessionFactory.getMaxNrOfStatementsInBulkInsert()) {
                 Entity entity = entityIterator.next();

@@ -41,10 +41,10 @@ public class DeploymentPersistenceTest extends PluggableFlowableTestCase {
 
         String deploymentId = deployment.getId();
         List<String> resourceNames = repositoryService.getDeploymentResourceNames(deploymentId);
-        Set<String> expectedResourceNames = new HashSet<String>();
+        Set<String> expectedResourceNames = new HashSet<>();
         expectedResourceNames.add("org/flowable/test/HelloWorld.string");
         expectedResourceNames.add("org/flowable/test/TheAnswer.string");
-        assertEquals(expectedResourceNames, new HashSet<String>(resourceNames));
+        assertEquals(expectedResourceNames, new HashSet<>(resourceNames));
 
         InputStream resourceStream = repositoryService.getResourceAsStream(deploymentId, "org/flowable/test/HelloWorld.string");
         assertTrue(Arrays.equals("hello world".getBytes(), IoUtil.readInputStream(resourceStream, "test")));

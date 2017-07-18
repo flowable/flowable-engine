@@ -49,7 +49,7 @@ public class BpmnDeploymentHelper {
      */
     public void verifyProcessDefinitionsDoNotShareKeys(
             Collection<ProcessDefinitionEntity> processDefinitions) {
-        Set<String> keySet = new LinkedHashSet<String>();
+        Set<String> keySet = new LinkedHashSet<>();
         for (ProcessDefinitionEntity processDefinition : processDefinitions) {
             if (keySet.contains(processDefinition.getKey())) {
                 throw new FlowableException(

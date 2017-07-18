@@ -314,7 +314,7 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
             InputStream binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
 
             // Add name, type and scope
-            Map<String, String> additionalFields = new HashMap<String, String>();
+            Map<String, String> additionalFields = new HashMap<>();
             additionalFields.put("name", "An attachment");
             additionalFields.put("description", "An attachment description");
             additionalFields.put("type", "myType");

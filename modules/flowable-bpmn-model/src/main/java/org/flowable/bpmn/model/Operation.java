@@ -21,7 +21,7 @@ public class Operation extends BaseElement {
     protected String implementationRef;
     protected String inMessageRef;
     protected String outMessageRef;
-    protected List<String> errorMessageRef = new ArrayList<String>();
+    protected List<String> errorMessageRef = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -76,7 +76,7 @@ public class Operation extends BaseElement {
         setInMessageRef(otherElement.getInMessageRef());
         setOutMessageRef(otherElement.getOutMessageRef());
 
-        errorMessageRef = new ArrayList<String>();
+        errorMessageRef = new ArrayList<>();
         if (otherElement.getErrorMessageRef() != null && !otherElement.getErrorMessageRef().isEmpty()) {
             errorMessageRef.addAll(otherElement.getErrorMessageRef());
         }

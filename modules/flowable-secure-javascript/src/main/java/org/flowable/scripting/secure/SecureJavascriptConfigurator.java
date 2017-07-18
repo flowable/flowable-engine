@@ -100,7 +100,7 @@ public class SecureJavascriptConfigurator extends AbstractProcessEngineConfigura
         // Init parse handler that will set the secure javascript task to the activity
         List<BpmnParseHandler> customDefaultBpmnParseHandlers = processEngineConfiguration.getCustomDefaultBpmnParseHandlers();
         if (customDefaultBpmnParseHandlers == null) {
-            customDefaultBpmnParseHandlers = new ArrayList<BpmnParseHandler>();
+            customDefaultBpmnParseHandlers = new ArrayList<>();
             processEngineConfiguration.setCustomDefaultBpmnParseHandlers(customDefaultBpmnParseHandlers);
         }
         customDefaultBpmnParseHandlers.add(new SecureJavascriptTaskParseHandler());
@@ -160,7 +160,7 @@ public class SecureJavascriptConfigurator extends AbstractProcessEngineConfigura
 
     public SecureJavascriptConfigurator addWhiteListedClass(String whiteListedClass) {
         if (this.whiteListedClasses == null) {
-            this.whiteListedClasses = new HashSet<String>();
+            this.whiteListedClasses = new HashSet<>();
         }
         this.whiteListedClasses.add(whiteListedClass);
         return this;

@@ -35,7 +35,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
     @Deployment
     public void testDecisionFunctionality() {
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
 
         // Test with input == 1
         variables.put("input", 1);

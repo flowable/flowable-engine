@@ -54,7 +54,7 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
 
     public static final String JOB_TYPE = "async-history";
 
-    protected Map<String, List<HistoryJsonTransformer>> historyJsonTransformers = new HashMap<String, List<HistoryJsonTransformer>>();
+    protected Map<String, List<HistoryJsonTransformer>> historyJsonTransformers = new HashMap<>();
 
     @Override
     public String getType() {

@@ -27,7 +27,7 @@ public class SecureScriptClassShutter implements ClassShutter {
     /**
      * A collection of whitelisted classnames. For each Java class used in a script, this collection will be checked.
      */
-    protected Set<String> whiteListedClasses = new HashSet<String>();
+    protected Set<String> whiteListedClasses = new HashSet<>();
 
     @Override
     public boolean visibleToScripts(String fullClassName) {

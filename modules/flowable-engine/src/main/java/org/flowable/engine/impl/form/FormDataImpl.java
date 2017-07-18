@@ -29,7 +29,7 @@ public abstract class FormDataImpl implements FormData, Serializable {
 
     protected String formKey;
     protected String deploymentId;
-    protected List<FormProperty> formProperties = new ArrayList<FormProperty>();
+    protected List<FormProperty> formProperties = new ArrayList<>();
 
     // getters and setters
     // //////////////////////////////////////////////////////

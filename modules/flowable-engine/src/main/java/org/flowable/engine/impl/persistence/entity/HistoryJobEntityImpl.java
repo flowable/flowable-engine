@@ -50,7 +50,7 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
     protected Date createTime;
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("retries", retries);
         persistentState.put("exceptionMessage", exceptionMessage);
         persistentState.put("jobHandlerType", jobHandlerType);

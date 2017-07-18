@@ -31,7 +31,7 @@ import org.flowable.bpmn.model.TextAnnotation;
  */
 public class TextAnnotationXMLConverter extends BaseBpmnXMLConverter {
 
-    protected Map<String, BaseChildElementParser> childParserMap = new HashMap<String, BaseChildElementParser>();
+    protected Map<String, BaseChildElementParser> childParserMap = new HashMap<>();
 
     public TextAnnotationXMLConverter() {
         TextAnnotationTextParser annotationTextParser = new TextAnnotationTextParser();

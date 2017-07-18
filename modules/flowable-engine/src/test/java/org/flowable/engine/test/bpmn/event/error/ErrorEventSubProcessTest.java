@@ -92,7 +92,7 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
     @Deployment(resources = {"org/flowable/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchMultipleRethrowParent.bpmn",
                     "org/flowable/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchMultipleRethrowSubProcess.bpmn"})
     public void testMultipleRethrowEvents() {
-        Map<String, Object> variableMap = new HashMap<String, Object>();
+        Map<String, Object> variableMap = new HashMap<>();
         variableMap.put(LOCAL_ERROR_FLAG_VARIABLE_NAME, true);
         variableMap.put(STANDALONE_SUBPROCESS_FLAG_VARIABLE_NAME, true);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY_UNDER_TEST, variableMap);

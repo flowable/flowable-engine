@@ -57,7 +57,7 @@ public class StartEventValidator extends ProcessLevelValidator {
     protected void validateMultipleStartEvents(List<StartEvent> startEvents, Process process, List<ValidationError> errors) {
 
         // Multiple none events are not supported
-        List<StartEvent> noneStartEvents = new ArrayList<StartEvent>();
+        List<StartEvent> noneStartEvents = new ArrayList<>();
         for (StartEvent startEvent : startEvents) {
             if (startEvent.getEventDefinitions() == null || startEvent.getEventDefinitions().isEmpty()) {
                 noneStartEvents.add(startEvent);

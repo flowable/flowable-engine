@@ -461,7 +461,7 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
                 .desc()
                 .list();
 
-        List<String> executionIds = new ArrayList<String>();
+        List<String> executionIds = new ArrayList<>();
         for (EventSubscription eventSubscription : eventSubscriptions) {
             executionIds.add(eventSubscription.getExecutionId());
         }

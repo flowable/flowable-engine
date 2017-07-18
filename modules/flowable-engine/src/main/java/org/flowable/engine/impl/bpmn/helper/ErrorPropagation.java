@@ -91,7 +91,7 @@ public class ErrorPropagation {
     }
 
     protected static void executeCatch(Map<String, List<Event>> eventMap, DelegateExecution delegateExecution, String errorId) {
-        Set<String> toDeleteProcessInstanceIds = new HashSet<String>();
+        Set<String> toDeleteProcessInstanceIds = new HashSet<>();
         
         Event matchingEvent = null;
         ExecutionEntity currentExecution = (ExecutionEntity) delegateExecution;
@@ -236,7 +236,7 @@ public class ErrorPropagation {
     }
 
     protected static Map<String, List<Event>> findCatchingEventsForProcess(String processDefinitionId, String errorCode) {
-        Map<String, List<Event>> eventMap = new HashMap<String, List<Event>>();
+        Map<String, List<Event>> eventMap = new HashMap<>();
         Process process = ProcessDefinitionUtil.getProcess(processDefinitionId);
         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
 
@@ -252,7 +252,7 @@ public class ErrorPropagation {
                         String eventErrorCode = retrieveErrorCode(bpmnModel, errorEventDef.getErrorCode());
 
                         if (eventErrorCode == null || compareErrorCode == null || eventErrorCode.equals(compareErrorCode)) {
-                            List<Event> startEvents = new ArrayList<Event>();
+                            List<Event> startEvents = new ArrayList<>();
                             startEvents.add(startEvent);
                             eventMap.put(eventSubProcess.getId() + "#" + processDefinitionId, startEvents);
                         }
@@ -271,7 +271,7 @@ public class ErrorPropagation {
                 if (eventErrorCode == null || compareErrorCode == null || eventErrorCode.equals(compareErrorCode)) {
                     List<Event> elementBoundaryEvents = null;
                     if (!eventMap.containsKey(boundaryEvent.getAttachedToRefId() + "#" + processDefinitionId)) {
-                        elementBoundaryEvents = new ArrayList<Event>();
+                        elementBoundaryEvents = new ArrayList<>();
                         eventMap.put(boundaryEvent.getAttachedToRefId() + "#" + processDefinitionId, elementBoundaryEvents);
                     } else {
                         elementBoundaryEvents = eventMap.get(boundaryEvent.getAttachedToRefId() + "#" + processDefinitionId);

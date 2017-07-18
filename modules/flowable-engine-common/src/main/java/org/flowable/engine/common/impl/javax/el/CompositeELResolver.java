@@ -41,7 +41,7 @@ import java.util.List;
  * from all child ELResolvers for these methods.
  */
 public class CompositeELResolver extends ELResolver {
-	private final List<ELResolver> resolvers = new ArrayList<ELResolver>();
+	private final List<ELResolver> resolvers = new ArrayList<>();
 
 	/**
 	 * Adds the given resolver to the list of component resolvers. Resolvers are consulted in the

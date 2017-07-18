@@ -71,7 +71,7 @@ public class UserPictureResource extends BaseUserResource {
         }
 
         try {
-            return new ResponseEntity<byte[]>(IOUtils.toByteArray(userPicture.getInputStream()), responseHeaders, HttpStatus.OK);
+            return new ResponseEntity<>(IOUtils.toByteArray(userPicture.getInputStream()), responseHeaders, HttpStatus.OK);
         } catch (Exception e) {
             throw new FlowableException("Error exporting picture: " + e.getMessage(), e);
         }

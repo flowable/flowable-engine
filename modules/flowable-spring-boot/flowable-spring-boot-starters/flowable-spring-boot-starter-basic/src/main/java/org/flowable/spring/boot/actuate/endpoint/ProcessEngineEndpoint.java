@@ -45,27 +45,27 @@ public class ProcessEngineEndpoint extends AbstractEndpoint<Map<String, Object>>
     @Override
     public Map<String, Object> invoke() {
 
-        Map<String, Object> metrics = new HashMap<String, Object>();
+        Map<String, Object> metrics = new HashMap<>();
 
         // Process definitions
         metrics.put("processDefinitionCount", processEngine.getRepositoryService().createProcessDefinitionQuery().count());
 
         // List of all process definitions
         List<ProcessDefinition> processDefinitions = processEngine.getRepositoryService().createProcessDefinitionQuery().orderByProcessDefinitionKey().asc().list();
-        List<String> processDefinitionKeys = new ArrayList<String>();
+        List<String> processDefinitionKeys = new ArrayList<>();
         for (ProcessDefinition processDefinition : processDefinitions) {
             processDefinitionKeys.add(processDefinition.getKey() + " (v" + processDefinition.getVersion() + ")");
         }
         metrics.put("deployedProcessDefinitions", processDefinitionKeys);
 
         // Process instances
-        Map<String, Object> processInstanceCountMap = new HashMap<String, Object>();
+        Map<String, Object> processInstanceCountMap = new HashMap<>();
         metrics.put("runningProcessInstanceCount", processInstanceCountMap);
         for (ProcessDefinition processDefinition : processDefinitions) {
             processInstanceCountMap.put(processDefinition.getKey() + " (v" + processDefinition.getVersion() + ")",
                     processEngine.getRuntimeService().createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).count());
         }
-        Map<String, Object> completedProcessInstanceCountMap = new HashMap<String, Object>();
+        Map<String, Object> completedProcessInstanceCountMap = new HashMap<>();
         metrics.put("completedProcessInstanceCount", completedProcessInstanceCountMap);
         for (ProcessDefinition processDefinition : processDefinitions) {
             completedProcessInstanceCountMap.put(processDefinition.getKey() + " (v" + processDefinition.getVersion() + ")",

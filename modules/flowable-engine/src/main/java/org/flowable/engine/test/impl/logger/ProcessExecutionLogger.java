@@ -29,12 +29,12 @@ public class ProcessExecutionLogger {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessExecutionLogger.class);
 
-    protected Map<String, List<DebugInfo>> debugInfoMap = new HashMap<String, List<DebugInfo>>();
+    protected Map<String, List<DebugInfo>> debugInfoMap = new HashMap<>();
 
     // To avoid going to the db (and thus influencing process execution/tests), we store all encountered executions here,
     // to build up a tree representation with that information afterwards.
-    protected Map<String, ExecutionEntity> createdExecutions = new HashMap<String, ExecutionEntity>();
-    protected Map<String, ExecutionEntity> deletedExecutions = new HashMap<String, ExecutionEntity>();
+    protected Map<String, ExecutionEntity> createdExecutions = new HashMap<>();
+    protected Map<String, ExecutionEntity> deletedExecutions = new HashMap<>();
 
     public ProcessExecutionLogger() {
 
@@ -62,8 +62,8 @@ public class ProcessExecutionLogger {
     protected List<DebugInfoExecutionTree> generateExecutionTrees() {
 
         // Gather information
-        List<ExecutionEntity> processInstances = new ArrayList<ExecutionEntity>();
-        Map<String, List<ExecutionEntity>> parentMapping = new HashMap<String, List<ExecutionEntity>>();
+        List<ExecutionEntity> processInstances = new ArrayList<>();
+        Map<String, List<ExecutionEntity>> parentMapping = new HashMap<>();
 
         for (ExecutionEntity executionEntity : createdExecutions.values()) {
             if (!deletedExecutions.containsKey(executionEntity.getId())) {
@@ -79,7 +79,7 @@ public class ProcessExecutionLogger {
         }
 
         // Build tree representation
-        List<DebugInfoExecutionTree> executionTrees = new ArrayList<DebugInfoExecutionTree>();
+        List<DebugInfoExecutionTree> executionTrees = new ArrayList<>();
         for (ExecutionEntity processInstance : processInstances) {
 
             DebugInfoExecutionTree executionTree = new DebugInfoExecutionTree();

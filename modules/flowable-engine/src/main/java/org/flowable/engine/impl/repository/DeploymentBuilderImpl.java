@@ -52,7 +52,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
     protected boolean isProcessValidationEnabled = true;
     protected boolean isDuplicateFilterEnabled;
     protected Date processDefinitionsActivationDate;
-    protected Map<String, Object> deploymentProperties = new HashMap<String, Object>();
+    protected Map<String, Object> deploymentProperties = new HashMap<>();
 
     public DeploymentBuilderImpl(RepositoryServiceImpl repositoryService) {
         this.repositoryService = repositoryService;

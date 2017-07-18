@@ -55,7 +55,7 @@ public class ProcessDefinitionImageResource extends BaseProcessDefinitionResourc
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set("Content-Type", "image/png");
             try {
-                return new ResponseEntity<byte[]>(IOUtils.toByteArray(imageStream), responseHeaders, HttpStatus.OK);
+                return new ResponseEntity<>(IOUtils.toByteArray(imageStream), responseHeaders, HttpStatus.OK);
             } catch (Exception e) {
                 throw new FlowableException("Error reading image stream", e);
             }

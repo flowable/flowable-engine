@@ -77,7 +77,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     protected String tenantIdLike;
     protected boolean withoutTenantId;
 
-    protected List<ProcessInstanceQueryImpl> orQueryObjects = new ArrayList<ProcessInstanceQueryImpl>();
+    protected List<ProcessInstanceQueryImpl> orQueryObjects = new ArrayList<>();
     protected ProcessInstanceQueryImpl currentOrQueryObject;
     protected boolean inOrStatement;
 

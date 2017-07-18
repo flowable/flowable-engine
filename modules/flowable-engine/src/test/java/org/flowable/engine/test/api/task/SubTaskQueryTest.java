@@ -226,7 +226,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
      * - 2 root task where gonzo is assignee with 3 + 2 subtasks assigned to gonzo
      */
     private List<String> generateTestSubTasks() throws Exception {
-        List<String> ids = new ArrayList<String>();
+        List<String> ids = new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
         // 1 parent task for kermit

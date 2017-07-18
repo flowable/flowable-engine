@@ -61,12 +61,12 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         createAppContext("org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml");
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
 
-        Set<String> processDefinitionKeys = new HashSet<String>();
+        Set<String> processDefinitionKeys = new HashSet<>();
         for (ProcessDefinition processDefinition : processDefinitions) {
             processDefinitionKeys.add(processDefinition.getKey());
         }
 
-        Set<String> expectedProcessDefinitionKeys = new HashSet<String>();
+        Set<String> expectedProcessDefinitionKeys = new HashSet<>();
         expectedProcessDefinitionKeys.add("a");
         expectedProcessDefinitionKeys.add("b");
         expectedProcessDefinitionKeys.add("c");

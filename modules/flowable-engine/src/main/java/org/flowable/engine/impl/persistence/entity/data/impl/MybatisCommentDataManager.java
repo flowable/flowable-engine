@@ -52,7 +52,7 @@ public class MybatisCommentDataManager extends AbstractDataManager<CommentEntity
     @Override
     @SuppressWarnings("unchecked")
     public List<Comment> findCommentsByTaskIdAndType(String taskId, String type) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("taskId", taskId);
         params.put("type", type);
         return getDbSqlSession().selectListWithRawParameter("selectCommentsByTaskIdAndType", params);
@@ -95,7 +95,7 @@ public class MybatisCommentDataManager extends AbstractDataManager<CommentEntity
     @Override
     @SuppressWarnings("unchecked")
     public List<Comment> findCommentsByProcessInstanceId(String processInstanceId, String type) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("processInstanceId", processInstanceId);
         params.put("type", type);
         return getDbSqlSession().selectListWithRawParameter("selectCommentsByProcessInstanceIdAndType", params);

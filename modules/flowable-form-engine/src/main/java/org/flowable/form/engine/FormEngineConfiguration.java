@@ -311,7 +311,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void initSessionFactories() {
         if (sessionFactories == null) {
-            sessionFactories = new HashMap<Class<?>, SessionFactory>();
+            sessionFactories = new HashMap<>();
 
             if (usingRelationalDatabase) {
                 initDbSqlSessionFactory();
@@ -377,7 +377,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void initCommandInterceptors() {
         if (commandInterceptors == null) {
-            commandInterceptors = new ArrayList<CommandInterceptor>();
+            commandInterceptors = new ArrayList<>();
             if (customPreCommandInterceptors != null) {
                 commandInterceptors.addAll(customPreCommandInterceptors);
             }
@@ -391,7 +391,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public Collection<? extends CommandInterceptor> getDefaultCommandInterceptors() {
         if (defaultCommandInterceptors == null) {
-            List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
+            List<CommandInterceptor> interceptors = new ArrayList<>();
             interceptors.add(new LogInterceptor());
             
             CommandInterceptor transactionInterceptor = createTransactionInterceptor();
@@ -429,7 +429,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
         }
 
         if (this.formDeployer == null) {
-            this.deployers = new ArrayList<Deployer>();
+            this.deployers = new ArrayList<>();
             if (customPreDeployers != null) {
                 this.deployers.addAll(customPreDeployers);
             }
@@ -442,9 +442,9 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
         // Decision cache
         if (formDefinitionCache == null) {
             if (formDefinitionCacheLimit <= 0) {
-                formDefinitionCache = new DefaultDeploymentCache<FormDefinitionCacheEntry>();
+                formDefinitionCache = new DefaultDeploymentCache<>();
             } else {
-                formDefinitionCache = new DefaultDeploymentCache<FormDefinitionCacheEntry>(formDefinitionCacheLimit);
+                formDefinitionCache = new DefaultDeploymentCache<>(formDefinitionCacheLimit);
             }
         }
 
@@ -455,7 +455,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     public Collection<? extends Deployer> getDefaultDeployers() {
-        List<Deployer> defaultDeployers = new ArrayList<Deployer>();
+        List<Deployer> defaultDeployers = new ArrayList<>();
 
         if (formDeployer == null) {
             formDeployer = new FormDefinitionDeployer();

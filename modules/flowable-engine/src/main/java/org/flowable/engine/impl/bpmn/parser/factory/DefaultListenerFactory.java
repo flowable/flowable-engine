@@ -66,7 +66,7 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
         this(new DefaultClassDelegateFactory());
     }
 
-    public static final Map<String, Class<?>> ENTITY_MAPPING = new HashMap<String, Class<?>>();
+    public static final Map<String, Class<?>> ENTITY_MAPPING = new HashMap<>();
     static {
         ENTITY_MAPPING.put("attachment", Attachment.class);
         ENTITY_MAPPING.put("comment", Comment.class);

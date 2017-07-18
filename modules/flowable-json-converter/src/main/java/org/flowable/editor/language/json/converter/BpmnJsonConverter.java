@@ -75,8 +75,8 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
-    protected static Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap = new HashMap<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>>();
-    protected static Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap = new HashMap<String, Class<? extends BaseBpmnJsonConverter>>();
+    protected static Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap = new HashMap<>();
+    protected static Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap = new HashMap<>();
 
     public static final String MODELER_NAMESPACE = "http://flowable.org/modeler";
     protected static final DateFormat defaultFormat = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -133,9 +133,9 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         DataStoreJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
     }
 
-    private static final List<String> DI_CIRCLES = new ArrayList<String>();
-    private static final List<String> DI_RECTANGLES = new ArrayList<String>();
-    private static final List<String> DI_GATEWAY = new ArrayList<String>();
+    private static final List<String> DI_CIRCLES = new ArrayList<>();
+    private static final List<String> DI_RECTANGLES = new ArrayList<>();
+    private static final List<String> DI_GATEWAY = new ArrayList<>();
 
     static {
         DI_CIRCLES.add(STENCIL_EVENT_START_ERROR);
@@ -305,7 +305,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
                 Process process = model.getProcess(pool.getId());
                 if (process != null) {
-                    Map<String, ArrayNode> laneMap = new HashMap<String, ArrayNode>();
+                    Map<String, ArrayNode> laneMap = new HashMap<>();
                     for (Lane lane : process.getLanes()) {
                         GraphicInfo laneGraphicInfo = model.getGraphicInfo(lane.getId());
                         if (laneGraphicInfo == null)
@@ -440,10 +440,10 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         BpmnModel bpmnModel = new BpmnModel();
 
         bpmnModel.setTargetNamespace("http://activiti.org/test");
-        Map<String, JsonNode> shapeMap = new HashMap<String, JsonNode>();
-        Map<String, JsonNode> sourceRefMap = new HashMap<String, JsonNode>();
-        Map<String, JsonNode> edgeMap = new HashMap<String, JsonNode>();
-        Map<String, List<JsonNode>> sourceAndTargetMap = new HashMap<String, List<JsonNode>>();
+        Map<String, JsonNode> shapeMap = new HashMap<>();
+        Map<String, JsonNode> sourceRefMap = new HashMap<>();
+        Map<String, JsonNode> edgeMap = new HashMap<>();
+        Map<String, List<JsonNode>> sourceAndTargetMap = new HashMap<>();
 
         readShapeDI(modelNode, 0, 0, shapeMap, sourceRefMap, bpmnModel);
         filterAllEdges(modelNode, edgeMap, sourceAndTargetMap, shapeMap, sourceRefMap);
@@ -456,7 +456,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         }
 
         boolean nonEmptyPoolFound = false;
-        Map<String, Lane> elementInLaneMap = new HashMap<String, Lane>();
+        Map<String, Lane> elementInLaneMap = new HashMap<>();
         // first create the pool structure
         for (JsonNode shapeNode : shapesArrayNode) {
             String stencilId = BpmnJsonConverterUtil.getStencilId(shapeNode);
@@ -597,7 +597,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         }
 
         // sequence flows are now all on root level
-        Map<String, SubProcess> subShapesMap = new HashMap<String, SubProcess>();
+        Map<String, SubProcess> subShapesMap = new HashMap<>();
         for (Process process : bpmnModel.getProcesses()) {
             for (FlowElement flowElement : process.findFlowElementsOfType(SubProcess.class)) {
                 SubProcess subProcess = (SubProcess) flowElement;
@@ -605,7 +605,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
             }
 
             if (subShapesMap.size() > 0) {
-                List<String> removeSubFlowsList = new ArrayList<String>();
+                List<String> removeSubFlowsList = new ArrayList<>();
                 for (FlowElement flowElement : process.findFlowElementsOfType(SequenceFlow.class)) {
                     SequenceFlow sequenceFlow = (SequenceFlow) flowElement;
                     if (subShapesMap.containsKey(sequenceFlow.getSourceRef())) {
@@ -637,8 +637,8 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
             }
         }
 
-        Map<String, FlowWithContainer> allFlowMap = new HashMap<String, FlowWithContainer>();
-        List<Gateway> gatewayWithOrderList = new ArrayList<Gateway>();
+        Map<String, FlowWithContainer> allFlowMap = new HashMap<>();
+        List<Gateway> gatewayWithOrderList = new ArrayList<>();
         
         // post handling of process elements
         for (Process process : bpmnModel.getProcesses()) {
@@ -868,7 +868,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                     JsonNode targetNode = childNode.get("target");
                     if (targetNode != null && !targetNode.isNull()) {
                         String targetRefId = targetNode.get(EDITOR_SHAPE_ID).asText();
-                        List<JsonNode> sourceAndTargetList = new ArrayList<JsonNode>();
+                        List<JsonNode> sourceAndTargetList = new ArrayList<>();
                         sourceAndTargetList.add(sourceRefMap.get(childNode.get(EDITOR_SHAPE_ID).asText()));
                         sourceAndTargetList.add(shapeMap.get(targetRefId));
                         sourceAndTargetMap.put(childEdgeId, sourceAndTargetList);
@@ -929,7 +929,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
             String sourceRefStencilId = BpmnJsonConverterUtil.getStencilId(sourceRefNode);
             String targetRefStencilId = BpmnJsonConverterUtil.getStencilId(targetRefNode);
 
-            List<GraphicInfo> graphicInfoList = new ArrayList<GraphicInfo>();
+            List<GraphicInfo> graphicInfoList = new ArrayList<>();
 
             AbstractContinuousCurve2D source2D = null;
             if (DI_CIRCLES.contains(sourceRefStencilId)) {

@@ -228,7 +228,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         deployTwoTasksTestProcess();
         
         // Generate data
-        Map<String, Object> startVars = new HashMap<String, Object>();
+        Map<String, Object> startVars = new HashMap<>();
         startVars.put("startVar", "hello");
         String processInstanceId = runtimeService.startProcessInstanceByKey("twoTasksProcess", startVars).getId();
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
@@ -298,11 +298,11 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
     public void testHistoricVariableQueryByExecutionIds() {
         deployTwoTasksTestProcess();
 
-        Set<String> processInstanceIds = new HashSet<String>();
-        Set<String> testProcessInstanceIds = new HashSet<String>();
+        Set<String> processInstanceIds = new HashSet<>();
+        Set<String> testProcessInstanceIds = new HashSet<>();
         for (int i = 0; i < 3; i++) {
             // Generate data
-            Map<String, Object> startVars = new HashMap<String, Object>();
+            Map<String, Object> startVars = new HashMap<>();
             if (i == 1) {
                 startVars.put("startVar2", "hello2");
             } else {
@@ -337,11 +337,11 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/api/runtime/variableScope.bpmn20.xml"
     })
     public void testHistoricVariableQueryByExecutionIdsForScope() {
-        Map<String, Object> processVars = new HashMap<String, Object>();
+        Map<String, Object> processVars = new HashMap<>();
         processVars.put("processVar", "processVar");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variableScopeProcess", processVars);
 
-        Set<String> executionIds = new HashSet<String>();
+        Set<String> executionIds = new HashSet<>();
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
         for (Execution execution : executions) {
             if (!processInstance.getId().equals(execution.getId())) {
@@ -357,7 +357,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         
         waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
-        Set<String> processInstanceIds = new HashSet<String>();
+        Set<String> processInstanceIds = new HashSet<>();
         processInstanceIds.add(processInstance.getId());
         List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery().executionIds(processInstanceIds).list();
         assertEquals(1, historicVariableInstances.size());
@@ -382,7 +382,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         
         waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
-        Set<String> taskIds = new HashSet<String>();
+        Set<String> taskIds = new HashSet<>();
         taskIds.add(tasks.get(0).getId());
         taskIds.add(tasks.get(1).getId());
         List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery().taskIds(taskIds).list();
@@ -393,7 +393,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         assertEquals("taskVar2", historicVariableInstances.get(1).getVariableName());
         assertEquals("hello2", historicVariableInstances.get(1).getValue());
 
-        taskIds = new HashSet<String>();
+        taskIds = new HashSet<>();
         taskIds.add(tasks.get(0).getId());
         historicVariableInstances = historyService.createHistoricVariableInstanceQuery().taskIds(taskIds).list();
         assertEquals(1, historyService.createHistoricVariableInstanceQuery().taskIds(taskIds).count());
@@ -406,7 +406,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/api/runtime/variableScope.bpmn20.xml"
     })
     public void testHistoricVariableQueryByTaskIdsForScope() {
-        Map<String, Object> processVars = new HashMap<String, Object>();
+        Map<String, Object> processVars = new HashMap<>();
         processVars.put("processVar", "processVar");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variableScopeProcess", processVars);
 
@@ -418,7 +418,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         }
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        Set<String> taskIds = new HashSet<String>();
+        Set<String> taskIds = new HashSet<>();
         for (Task task : tasks) {
             taskService.setVariableLocal(task.getId(), "taskVar", "taskVar");
             taskIds.add(task.getId());
@@ -437,7 +437,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testHistoricProcessVariableOnDeletion() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
-            HashMap<String, Object> variables = new HashMap<String, Object>();
+            HashMap<String, Object> variables = new HashMap<>();
             variables.put("testVar", "Hallo Christian");
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
             runtimeService.deleteProcessInstance(processInstance.getId(), "deleted");
@@ -454,7 +454,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("ProcessWithSubProcess");
 
             Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-            Map<String, Object> variables = new HashMap<String, Object>();
+            Map<String, Object> variables = new HashMap<>();
             variables.put("test", "1");
             taskService.complete(task.getId(), variables);
 
@@ -473,7 +473,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             List<HistoricDetail> updates = historyService.createHistoricDetailQuery().processInstanceId(pi.getId()).variableUpdates().list();
             assertEquals(2, updates.size());
 
-            Map<String, HistoricVariableUpdate> updatesMap = new HashMap<String, HistoricVariableUpdate>();
+            Map<String, HistoricVariableUpdate> updatesMap = new HashMap<>();
             HistoricVariableUpdate update = (HistoricVariableUpdate) updates.get(0);
             updatesMap.put((String) update.getValue(), update);
             update = (HistoricVariableUpdate) updates.get(1);
@@ -510,13 +510,13 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
 
-            Map<String, Object> variables = new HashMap<String, Object>();
+            Map<String, Object> variables = new HashMap<>();
             variables.put("var1", "value1");
             variables.put("var2", "value2");
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProcess", variables);
             assertNotNull(processInstance);
 
-            variables = new HashMap<String, Object>();
+            variables = new HashMap<>();
             variables.put("var3", "value3");
             variables.put("var4", "value4");
             ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("myProcess", variables);
@@ -563,7 +563,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             String tableName = managementService.getTableName(HistoricVariableInstance.class);
             String baseQuerySql = "SELECT * FROM " + tableName;
 
-            Map<String, Object> variables = new HashMap<String, Object>();
+            Map<String, Object> variables = new HashMap<>();
             variables.put("var1", "value1");
             variables.put("var2", "value2");
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc", variables);
@@ -596,7 +596,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             String tableName = managementService.getTableName(HistoricDetail.class);
             String baseQuerySql = "SELECT * FROM " + tableName;
 
-            Map<String, Object> variables = new HashMap<String, Object>();
+            Map<String, Object> variables = new HashMap<>();
             variables.put("var1", "value1");
             variables.put("var2", "value2");
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc", variables);
@@ -613,7 +613,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             assertEquals(2, historyService.createNativeHistoricDetailQuery().sql(sqlWithConditions).parameter("name", "var%").list().size());
 
             Task task = taskService.createTaskQuery().singleResult();
-            Map<String, String> formDatas = new HashMap<String, String>();
+            Map<String, String> formDatas = new HashMap<>();
             formDatas.put("field1", "field value 1");
             formDatas.put("field2", "field value 2");
             formService.submitTaskFormData(task.getId(), formDatas);

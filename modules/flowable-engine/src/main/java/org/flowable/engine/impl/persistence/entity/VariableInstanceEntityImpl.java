@@ -53,7 +53,7 @@ public class VariableInstanceEntityImpl extends AbstractEntity implements Variab
     }
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("name", name);
         if (type != null) {
             persistentState.put("typeName", type.getTypeName());
