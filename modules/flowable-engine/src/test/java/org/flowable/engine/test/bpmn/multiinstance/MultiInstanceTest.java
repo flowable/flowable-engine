@@ -32,6 +32,7 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
@@ -752,22 +753,82 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         assertProcessEnded(procId);
     }
 
-    @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialCallActivity.bpmn20.xml",
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testCallActivityLocalVariables.bpmn20.xml",
             "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
-    public void testSequentialCallActivity() {
-        String procId = runtimeService.startProcessInstanceByKey("miSequentialCallActivity").getId();
+    public void testCallActivityLocalVariables() {
+        Map<String, Object> variables = Collections.singletonMap("name", (Object) "test");
+        String procId = runtimeService.startProcessInstanceByKey("miSubProcessLocalVariables", variables).getId();
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 4; i++) {
             List<Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
             assertEquals(2, tasks.size());
             assertEquals("task one", tasks.get(0).getName());
             assertEquals("task two", tasks.get(1).getName());
-            taskService.complete(tasks.get(0).getId());
+            
+            Map<String, Object> taskVariables = Collections.singletonMap("output", (Object) ("run" + i + 1));
+            taskService.complete(tasks.get(0).getId(), taskVariables);
             taskService.complete(tasks.get(1).getId());
+            
+            Task task = taskService.createTaskQuery().processInstanceId(procId).singleResult();
+            assertNotNull(task);
+            assertEquals("task", task.getTaskDefinitionKey());
+            
+            ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().processInstanceId(procId).activityId("task").singleResult();
+            assertEquals("run" + i + 1, runtimeService.getVariableLocal(execution.getId(), "output"));
+            assertNull(runtimeService.getVariable(procId, "output"));
+            
+            taskService.complete(task.getId());
         }
 
         assertProcessEnded(procId);
     }
+    
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testCallActivityNormalVariables.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
+        public void testCallActivityNormalVariables() {
+        Map<String, Object> variables = Collections.singletonMap("name", (Object) "test");
+        String procId = runtimeService.startProcessInstanceByKey("miSubProcessNormalVariables", variables).getId();
+        
+        for (int i = 0; i < 4; i++) {
+            List<Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+            assertEquals(2, tasks.size());
+            assertEquals("task one", tasks.get(0).getName());
+            assertEquals("task two", tasks.get(1).getName());
+            
+            Map<String, Object> taskVariables = Collections.singletonMap("output", (Object) ("run" + i + 1));
+            taskService.complete(tasks.get(0).getId(), taskVariables);
+            taskService.complete(tasks.get(1).getId());
+            
+            Task task = taskService.createTaskQuery().processInstanceId(procId).singleResult();
+            assertNotNull(task);
+            assertEquals("task", task.getTaskDefinitionKey());
+            
+            ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().processInstanceId(procId).activityId("task").singleResult();
+            assertNull(runtimeService.getVariableLocal(execution.getId(), "output"));
+            assertEquals("run" + i + 1, runtimeService.getVariable(procId, "output"));
+            
+            taskService.complete(task.getId());
+        }
+        
+        assertProcessEnded(procId);
+    }
+    
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialCallActivity.bpmn20.xml",
+    "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
+public void testSequentialCallActivity() {
+String procId = runtimeService.startProcessInstanceByKey("miSequentialCallActivity").getId();
+
+for (int i = 0; i < 3; i++) {
+    List<Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+    assertEquals(2, tasks.size());
+    assertEquals("task one", tasks.get(0).getName());
+    assertEquals("task two", tasks.get(1).getName());
+    taskService.complete(tasks.get(0).getId());
+    taskService.complete(tasks.get(1).getId());
+}
+
+assertProcessEnded(procId);
+}
 
     @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialCallActivityWithList.bpmn20.xml")
     public void testSequentialCallActivityWithList() {

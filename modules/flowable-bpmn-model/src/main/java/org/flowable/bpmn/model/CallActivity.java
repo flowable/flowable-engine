@@ -26,6 +26,7 @@ public class CallActivity extends Activity {
     protected List<IOParameter> outParameters = new ArrayList<>();
     protected String businessKey;
     protected boolean inheritBusinessKey;
+    protected boolean useLocalScopeForOutParameters;
 
     public String getCalledElement() {
         return calledElement;
@@ -75,6 +76,14 @@ public class CallActivity extends Activity {
         this.inheritBusinessKey = inheritBusinessKey;
     }
 
+    public boolean isUseLocalScopeForOutParameters() {
+        return useLocalScopeForOutParameters;
+    }
+
+    public void setUseLocalScopeForOutParameters(boolean useLocalScopeForOutParameters) {
+        this.useLocalScopeForOutParameters = useLocalScopeForOutParameters;
+    }
+
     public CallActivity clone() {
         CallActivity clone = new CallActivity();
         clone.setValues(this);
@@ -86,6 +95,7 @@ public class CallActivity extends Activity {
         setCalledElement(otherElement.getCalledElement());
         setBusinessKey(otherElement.getBusinessKey());
         setInheritBusinessKey(otherElement.isInheritBusinessKey());
+        setUseLocalScopeForOutParameters(otherElement.isUseLocalScopeForOutParameters());
 
         inParameters = new ArrayList<>();
         if (otherElement.getInParameters() != null && !otherElement.getInParameters().isEmpty()) {

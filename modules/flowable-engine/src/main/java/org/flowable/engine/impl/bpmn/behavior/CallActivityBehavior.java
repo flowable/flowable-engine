@@ -180,7 +180,12 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             } else {
                 value = subProcessInstance.getVariable(ioParameter.getSource());
             }
-            execution.setVariable(ioParameter.getTarget(), value);
+            
+            if (callActivity.isUseLocalScopeForOutParameters()) {
+                execution.setVariableLocal(ioParameter.getTarget(), value);
+            } else {
+                execution.setVariable(ioParameter.getTarget(), value);
+            }
         }
     }
 
