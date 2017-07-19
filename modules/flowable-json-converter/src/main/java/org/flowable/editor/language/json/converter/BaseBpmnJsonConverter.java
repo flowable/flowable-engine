@@ -107,7 +107,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         } else {
             stencilId = getStencilId(baseElement);
         }
-
+        
         flowElementNode = BpmnJsonConverterUtil.createChildShape(baseElement.getId(), stencilId, graphicInfo.getX() - subProcessX + graphicInfo.getWidth(),
                 graphicInfo.getY() - subProcessY + graphicInfo.getHeight(), graphicInfo.getX() - subProcessX, graphicInfo.getY() - subProcessY);
         shapesArrayNode.add(flowElementNode);

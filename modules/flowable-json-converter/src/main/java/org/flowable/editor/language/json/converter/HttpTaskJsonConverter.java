@@ -16,7 +16,7 @@ import java.util.Map;
 
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.ServiceTask;
+import org.flowable.bpmn.model.HttpServiceTask;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -48,7 +48,7 @@ public class HttpTaskJsonConverter extends BaseBpmnJsonConverter {
     }
 
     protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
-        ServiceTask task = new ServiceTask();
+        HttpServiceTask task = new HttpServiceTask();
         task.setType("http");
         addField("requestMethod", PROPERTY_HTTPTASK_REQ_METHOD, elementNode, task);
         addField("requestUrl", PROPERTY_HTTPTASK_REQ_URL, elementNode, task);

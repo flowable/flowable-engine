@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.editor.language.json.model.ModelInfo;
@@ -44,6 +45,7 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
 
     public static void fillBpmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
         convertersToJsonMap.put(ServiceTask.class, ServiceTaskJsonConverter.class);
+        convertersToJsonMap.put(HttpServiceTask.class, ServiceTaskJsonConverter.class);
     }
 
     protected String getStencilId(BaseElement baseElement) {

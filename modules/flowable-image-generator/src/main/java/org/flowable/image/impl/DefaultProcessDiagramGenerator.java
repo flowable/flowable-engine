@@ -44,6 +44,7 @@ import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.Gateway;
 import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.InclusiveGateway;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.Lane;
@@ -210,6 +211,15 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 } else {
                     processDiagramCanvas.drawServiceTask(serviceTask.getName(), graphicInfo, scaleFactor);
                 }
+            }
+        });
+        
+        // http service task
+        activityDrawInstructions.put(HttpServiceTask.class, new ActivityDrawInstruction() {
+
+            public void draw(DefaultProcessDiagramCanvas processDiagramCanvas, BpmnModel bpmnModel, FlowNode flowNode) {
+                GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(flowNode.getId());
+                processDiagramCanvas.drawHttpTask(flowNode.getName(), graphicInfo, scaleFactor);
             }
         });
 

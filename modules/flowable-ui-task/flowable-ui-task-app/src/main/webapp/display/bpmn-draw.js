@@ -204,6 +204,13 @@ function _drawServiceTask(element)
 	_addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
 }
 
+function _drawHttpServiceTask(element)
+{
+    _drawTask(element);
+    _drawHttpTaskIcon(paper, element.x + 4, element.y + 4);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+}
+
 function _drawCallActivity(element)
 {
     var width = element.width - (CALL_ACTIVITY_STROKE / 2);
