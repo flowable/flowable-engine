@@ -69,7 +69,7 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
     }
 
     public void close() {
-        if (closeEntityManager && entityManager != null && !entityManager.isOpen()) {
+        if (closeEntityManager && entityManager != null && entityManager.isOpen()) {
             try {
                 entityManager.close();
             } catch (IllegalStateException ise) {
