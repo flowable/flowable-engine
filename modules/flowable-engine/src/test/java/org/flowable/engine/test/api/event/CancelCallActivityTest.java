@@ -165,20 +165,17 @@ public class CancelCallActivityTest extends PluggableFlowableTestCase {
         TaskEntity taskEntity = (TaskEntity) entityEvent.getEntity();
         assertEquals("User Task2 in External", taskEntity.getName());
 
-        // activityId is the call activity and the execution is the boundary event as we have seen before
-        // We get this event in workflow but we ignore the activityType of "callActivity"
-        activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(14);
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
-        assertEquals("callActivity", activityEvent.getActivityType());
-        assertEquals(boundaryExecutionId, activityEvent.getExecutionId());
-
-        FlowableActivityCancelledEvent taskCancelledEvent = (FlowableActivityCancelledEvent) mylistener.getEventsReceived().get(15);
+        FlowableActivityCancelledEvent taskCancelledEvent = (FlowableActivityCancelledEvent) mylistener.getEventsReceived().get(14);
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, taskCancelledEvent.getType());
         assertEquals(taskEntity.getName(), taskCancelledEvent.getActivityName());
 
-        FlowableCancelledEvent processCancelledEvent = (FlowableCancelledEvent) mylistener.getEventsReceived().get(16);
+        FlowableCancelledEvent processCancelledEvent = (FlowableCancelledEvent) mylistener.getEventsReceived().get(15);
         assertEquals(FlowableEngineEventType.PROCESS_CANCELLED, processCancelledEvent.getType());
         assertEquals(processCancelledEvent.getProcessInstanceId(), processCancelledEvent.getExecutionId());
+        
+        activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(16);
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
+        assertEquals("callActivity", activityEvent.getActivityType());
 
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(17);
         assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());

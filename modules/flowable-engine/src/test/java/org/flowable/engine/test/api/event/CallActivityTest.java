@@ -511,12 +511,6 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertEquals(subprocessInstance.getId(), ((FlowableEngineEntityEvent)entityEvent).getExecutionId());
         assertEquals(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT, entityEvent.getType());
 
-        // ACTIVITY_CANCELLED instead of ACTIVITY_COMPLETED due to terminate end event
-        activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
-        assertEquals("terminateEnd2", activityEvent.getActivityId());
-        assertEquals("endEvent", activityEvent.getActivityType());
-
         // PROBLEM:
         // Test fails because unexpected PROCESS_COMPLETED event received. We already received
         // the PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT for the external subprocess

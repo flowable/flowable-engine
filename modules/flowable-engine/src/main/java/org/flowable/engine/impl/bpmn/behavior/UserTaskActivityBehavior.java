@@ -218,7 +218,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             }
             
         } else {
-            taskEntityManager.deleteTask(task, null, false, false, false);
+            taskEntityManager.deleteTask(task, null, false, false);
             leave(execution);
         }
     }

@@ -12,13 +12,12 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
-import java.util.Collection;
+import java.util.Arrays;
 
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -139,31 +138,22 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
         CommandContextUtil.getAgenda(commandContext).planTakeOutgoingSequenceFlowsOperation(nonInterruptingExecution, true);
     }
 
-    protected void deleteChildExecutions(ExecutionEntity parentExecution, ExecutionEntity notToDeleteExecution, CommandContext commandContext) {
+    protected void deleteChildExecutions(ExecutionEntity parentExecution, ExecutionEntity outgoingExecutionEntity, CommandContext commandContext) {
 
-        // TODO: would be good if this deleteChildExecutions could be removed and the one on the executionEntityManager is used
-        // The problem however, is that the 'notToDeleteExecution' is passed here.
-        // This could be solved by not reusing an execution, but creating a new
-
-        // Delete all child executions
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        Collection<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByParentExecutionId(parentExecution.getId());
-        if (CollectionUtil.isNotEmpty(childExecutions)) {
-            for (ExecutionEntity childExecution : childExecutions) {
-                if (!childExecution.getId().equals(notToDeleteExecution.getId())) {
-                    deleteChildExecutions(childExecution, notToDeleteExecution, commandContext);
-                }
-            }
-        }
-
-        String deleteReason = DeleteReason.BOUNDARY_EVENT_INTERRUPTING + " (" + notToDeleteExecution.getCurrentActivityId() + ")";
+        String deleteReason = DeleteReason.BOUNDARY_EVENT_INTERRUPTING + " (" + outgoingExecutionEntity.getCurrentActivityId() + ")";
+        executionEntityManager.deleteChildExecutions(parentExecution, Arrays.asList(outgoingExecutionEntity.getId()), 
+                deleteReason, true, outgoingExecutionEntity.getCurrentFlowElement());
+        
+        /*
         ExecutionEntity subProcessExecution = executionEntityManager.findSubProcessInstanceBySuperExecutionId(parentExecution.getId());
         if (subProcessExecution != null) {
             executionEntityManager.deleteProcessInstanceExecutionEntity(subProcessExecution.getId(),
                     subProcessExecution.getCurrentActivityId(), deleteReason, true, true, true);
         }   
+        */
 
-        executionEntityManager.deleteExecutionAndRelatedData(parentExecution, deleteReason, false);
+        executionEntityManager.deleteExecutionAndRelatedData(parentExecution, deleteReason, true, outgoingExecutionEntity.getCurrentFlowElement());
     }
 
     public boolean isInterrupting() {

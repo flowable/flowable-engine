@@ -175,12 +175,12 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
                                 task.getProcessDefinitionId(), "userTask", deleteReason));
             }
 
-            deleteTask(task, deleteReason, cascade, false, true);
+            deleteTask(task, deleteReason, cascade, true);
         }
     }
 
     @Override
-    public void deleteTask(TaskEntity task, String deleteReason, boolean cascade, boolean cancel, boolean fireEvents) {
+    public void deleteTask(TaskEntity task, String deleteReason, boolean cascade, boolean fireEvents) {
         if (!task.isDeleted()) {
             if (fireEvents) {
                 getProcessEngineConfiguration().getListenerNotificationHelper()
@@ -197,7 +197,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
 
             List<Task> subTasks = findTasksByParentTaskId(taskId);
             for (Task subTask : subTasks) {
-                deleteTask((TaskEntity) subTask, deleteReason, cascade, cancel, fireEvents);
+                deleteTask((TaskEntity) subTask, deleteReason, cascade, fireEvents);
             }
 
             boolean isTaskRelatedEntityCountEnabled = isTaskRelatedEntityCountEnabled(task);
@@ -217,21 +217,11 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             }
 
             delete(task, false);
-
+            
             if (getEventDispatcher().isEnabled() && fireEvents) {
-                if (cancel && !task.isCanceled()) {
-                    task.setCanceled(true);
-                    getEventDispatcher().dispatchEvent(
-                            FlowableEventBuilder.createActivityCancelledEvent(task.getExecution() != null ? task.getExecution().getActivityId() : null,
-                                    task.getName(), task.getExecutionId(),
-                                    task.getProcessInstanceId(),
-                                    task.getProcessDefinitionId(),
-                                    "userTask",
-                                    deleteReason));
-                }
-
                 getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, task));
             }
+
         }
     }
 
@@ -303,7 +293,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
                 return;
             }
 
-            deleteTask(task, deleteReason, cascade, false, true);
+            deleteTask(task, deleteReason, cascade, true);
         } else if (cascade) {
             getHistoricTaskInstanceEntityManager().delete(taskId);
         }

@@ -47,9 +47,9 @@ public abstract class AbstractEventHandler implements EventHandler {
             execution.setVariables(processVariables);
         }
 
-        if (currentFlowElement instanceof BoundaryEvent || currentFlowElement instanceof EventSubProcess) {
+        if (currentFlowElement instanceof EventSubProcess) {
             try {
-                dispatchActivitiesCanceledIfNeeded(eventSubscription, execution, currentFlowElement, commandContext);
+                dispatchActivitiesCancelledIfNeeded(eventSubscription, execution, currentFlowElement, commandContext);
 
             } catch (RuntimeException e) {
                 throw e;
@@ -61,7 +61,7 @@ public abstract class AbstractEventHandler implements EventHandler {
         CommandContextUtil.getAgenda().planTriggerExecutionOperation(execution);
     }
 
-    protected void dispatchActivitiesCanceledIfNeeded(EventSubscriptionEntity eventSubscription, ExecutionEntity execution, FlowElement currentFlowElement, CommandContext commandContext) {
+    protected void dispatchActivitiesCancelledIfNeeded(EventSubscriptionEntity eventSubscription, ExecutionEntity execution, FlowElement currentFlowElement, CommandContext commandContext) {
         if (currentFlowElement instanceof BoundaryEvent) {
             BoundaryEvent boundaryEvent = (BoundaryEvent) currentFlowElement;
             if (boundaryEvent.isCancelActivity()) {
@@ -80,15 +80,6 @@ public abstract class AbstractEventHandler implements EventHandler {
         ExecutionEntity subProcessInstance = CommandContextUtil.getExecutionEntityManager(commandContext).findSubProcessInstanceBySuperExecutionId(execution.getId());
         if (subProcessInstance != null) {
             dispatchExecutionCancelled(eventSubscription, subProcessInstance, commandContext);
-        }
-
-        // activity with message/signal boundary events
-        FlowElement flowElement = execution.getCurrentFlowElement();
-        if (flowElement instanceof BoundaryEvent) {
-            BoundaryEvent boundaryEvent = (BoundaryEvent) flowElement;
-            if (boundaryEvent.getAttachedToRef() != null) {
-                dispatchActivityCancelled(eventSubscription, execution, boundaryEvent.getAttachedToRef(), commandContext);
-            }
         }
     }
 

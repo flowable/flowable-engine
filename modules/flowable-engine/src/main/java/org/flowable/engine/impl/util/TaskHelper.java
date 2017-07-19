@@ -73,7 +73,7 @@ public class TaskHelper {
             }
         }
 
-        CommandContextUtil.getTaskEntityManager(commandContext).deleteTask(taskEntity, null, false, false, true);
+        CommandContextUtil.getTaskEntityManager(commandContext).deleteTask(taskEntity, null, false, true);
 
         // Continue process (if not a standalone task)
         if (taskEntity.getExecutionId() != null) {
