@@ -35,6 +35,8 @@
 
 <h4>Upgrade notes</h4>
 
+<p><b>CommandContext and related classes package changes:</b></p>
+
 <p>
 As a result of a refactoring that involved consolidating various classes and moving them to the <i>flowable-engine-common</i> module, following <i>internal</i> classes have changed packages.
 </p>
@@ -57,6 +59,20 @@ The following applies to all engines (process, dmn, form, content and idm):
 
 <p>
 The process engine now has the <i>org.flowable.engine.impl.util.EngineServiceUtil</i> utility class that can be used to get easily access to the configuration and services of the other engines.
+</p>
+
+<p><b>FlowableCancelledEvent.getCause() return value change</b></p>
+
+<p>
+The value that's passed in the <i>cause</i> of a <i>org.flowable.engine.delegate.event.FlowableCancelledEvent</i> has changed in the following cases:
+<ul>
+    <li>The event that is thrown for activities cancelled by a <i>message boundary event</i>.</li>
+    <li>The event that is thrown for activities cancelled by a <i>signal boundary event</i>.</li>
+    <li>The event that is thrown for activities cancelled by a <i>timer boundary event</i>.</li>
+</ul>
+Instead of passing an entity instance (MessageEventSubscriptionEntity, SignalEventSubscriptionEntity or JobEntity respectively) the BpmnModel
+counterpart, as an instance of a subclass of <i>org.flowable.bpmn.model.FlowElement</i>, is passed instead which is consistent with the general value of the <i>cause</i> property.
+Do note that due to the fact the return type of <i>getCause()</i> is <i>Object</i>, the compiler will not notice this, so best to look at the usage of the <i>FlowableCancelledEvent</i> in your code.
 </p>
 
 <h3>Release Notes - Flowable - 6.1.0</h3>
