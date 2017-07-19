@@ -78,7 +78,9 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         if (callActivity.isUseLocalScopeForOutParameters()) {
             writeQualifiedAttribute(ATTRIBUTE_CALL_ACTIVITY_USE_LOCALSCOPE_FOR_OUTPARAMETERS, "true", xtw);
         }
-        xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CALL_ACTIVITY_INHERITVARIABLES, String.valueOf(callActivity.isInheritVariables()));
+        if (callActivity.isInheritVariables()) {
+            writeQualifiedAttribute(ATTRIBUTE_CALL_ACTIVITY_INHERITVARIABLES, "true", xtw);
+        }
     }
 
     @Override
