@@ -139,52 +139,31 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         assertEquals("endEvent1", activityEvent.getActivityId());
 
         // cancelled event for one of the multi-instance user task instances
-        activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
-        FlowableActivityCancelledEvent cancelledEvent = (FlowableActivityCancelledEvent) activityEvent;
-        assertEquals("task2", cancelledEvent.getActivityId());
-        assertEquals("userTask", cancelledEvent.getActivityType());
-        assertEquals("Multi User Task-${loopCounter}", cancelledEvent.getActivityName());
-
-        activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
-        cancelledEvent = (FlowableActivityCancelledEvent) activityEvent;
-        // cancelled event for one of the multi-instance user task instances
-        if ("task2".equals(cancelledEvent.getActivityId())) {
-            assertEquals("task2", cancelledEvent.getActivityId());
-            assertEquals("userTask", cancelledEvent.getActivityType());
-            assertEquals("Multi User Task-${loopCounter}", cancelledEvent.getActivityName());
-
+        for (int i=0; i<4; i++) {
             activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
             assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
-            cancelledEvent = (FlowableActivityCancelledEvent) activityEvent;
-            assertEquals("cancelBoundaryEvent1", cancelledEvent.getActivityId());
-
-            // cancelled event for the root of the multi-instance user task
-            activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-            assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
-            cancelledEvent = (FlowableActivityCancelledEvent) activityEvent;
-            assertEquals("task2", cancelledEvent.getActivityId());
-            assertEquals("userTask", cancelledEvent.getActivityType());
-            assertEquals("Multi User Task-${loopCounter}", cancelledEvent.getActivityName());
-        } else {
-            assertEquals("cancelBoundaryEvent1", cancelledEvent.getActivityId());
-
-            // cancelled event for one of the multi-instance user task instances
-            activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-            assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
-            cancelledEvent = (FlowableActivityCancelledEvent) activityEvent;
-            assertEquals("task2", cancelledEvent.getActivityId());
-            assertEquals("userTask", cancelledEvent.getActivityType());
-            assertEquals("Multi User Task-${loopCounter}", cancelledEvent.getActivityName());
-
-            // cancelled event for the root of the multi-instance user task
-            activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-            assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
-            cancelledEvent = (FlowableActivityCancelledEvent) activityEvent;
-            assertEquals("task2", cancelledEvent.getActivityId());
-            assertEquals("userTask", cancelledEvent.getActivityType());
-            assertEquals("Multi User Task-${loopCounter}", cancelledEvent.getActivityName());
+            FlowableActivityCancelledEvent cancelledEvent = (FlowableActivityCancelledEvent) activityEvent;
+            
+            if ("task2".equals(cancelledEvent.getActivityId())) {
+                assertEquals("task2", cancelledEvent.getActivityId());
+                assertEquals("userTask", cancelledEvent.getActivityType());
+                assertEquals("Multi User Task-${loopCounter}", cancelledEvent.getActivityName());
+                
+            } else if ("cancelBoundaryEvent1".equals(cancelledEvent.getActivityId())) {
+                assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
+                cancelledEvent = (FlowableActivityCancelledEvent) activityEvent;
+                assertEquals("cancelBoundaryEvent1", cancelledEvent.getActivityId());
+                
+            } else {
+                // cancelled event for the root of the multi-instance user task
+                activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
+                assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
+                cancelledEvent = (FlowableActivityCancelledEvent) activityEvent;
+                assertEquals("task2", cancelledEvent.getActivityId());
+                assertEquals("userTask", cancelledEvent.getActivityType());
+                assertEquals("Multi User Task-${loopCounter}", cancelledEvent.getActivityName());
+                
+            }
         }
 
         entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
