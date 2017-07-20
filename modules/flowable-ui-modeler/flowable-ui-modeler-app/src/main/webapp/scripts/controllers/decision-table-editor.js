@@ -325,6 +325,11 @@ angular.module('flowableModeler')
                     $scope.currentDecisionTable.inputExpressions.push(newInputExpression);
                 }
 
+                // update data model with initial values
+                $scope.model.rulesData.forEach(function (rowData) {
+                    rowData[newInputExpression.id + '_expression'] = '-';
+                });
+
                 // update column definitions off the source model
                 $scope.evaluateDecisionHeaders($scope.currentDecisionTable);
             };
@@ -534,8 +539,20 @@ angular.module('flowableModeler')
 
                 if (type === 'date') {
                     columnDefinition.dateFormat = dateFormat;
+                    columnDefinition.validator = function(value, callback) {
+                        if (value === '-') {
+                            callback(true);
+                        } else {
+                            Handsontable.DateValidator.call(this, value, callback);
+                        }
+                    }
+
                 } else if (type === 'dropdown') {
                     columnDefinition.source = ['true', 'false', '-'];
+                }
+
+                if (type !== 'string') {
+                    columnDefinition.allowEmpty = false;
                 }
 
                 return columnDefinition;
@@ -697,9 +714,9 @@ angular.module('flowableModeler')
                     if (columnDefinition.expressionType === 'input-operator') {
                         defaultRow[columnDefinition.data] = '==';
                     }
-                    // else if (columnDefinition.expressionType === 'input-expression') {
-                    //     defaultRow[columnDefinition.data] = '-';
-                    // }
+                    else if (columnDefinition.expressionType === 'input-expression') {
+                        defaultRow[columnDefinition.data] = '-';
+                    }
                     else if (columnDefinition.expressionType === 'output') {
                         defaultRow[columnDefinition.data] = '';
                     }
