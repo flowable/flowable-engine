@@ -338,10 +338,6 @@ public class DefaultJobManager implements JobManager {
                 newHistoryJobEntity.setRetries(newHistoryJobEntity.getRetries() - 1);
                 processEngineConfiguration.getHistoryJobEntityManager().insert(newHistoryJobEntity);
                 
-            } else {
-                // delete the job, because the history info could not be written
-                //DeadLetterJobEntity deadLetterJob = createDeadLetterJobFromOtherJob(newHistoryJobEntity);
-                //processEngineConfiguration.getDeadLetterJobEntityManager().insert(deadLetterJob);
             }
             
             processEngineConfiguration.getHistoryJobEntityManager().deleteNoCascade(historyJobEntity);

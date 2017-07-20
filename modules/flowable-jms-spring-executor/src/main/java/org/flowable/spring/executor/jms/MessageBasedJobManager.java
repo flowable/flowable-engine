@@ -67,7 +67,7 @@ public class MessageBasedJobManager extends DefaultJobManager {
     }
 
     @Override
-    public void unacquire(final JobInfo job) {
+    public void unacquire(JobInfo job) {
 
         if (job instanceof JobInfoEntity) {
             JobInfoEntity jobInfoEntity = (JobInfoEntity) job;
@@ -78,6 +78,21 @@ public class MessageBasedJobManager extends DefaultJobManager {
         }
 
         sendMessage(job);
+    }
+    
+    @Override
+    public void unacquireWithDecrementRetries(JobInfo job) {
+        if (job instanceof HistoryJob) {
+            HistoryJobEntity historyJobEntity = (HistoryJobEntity) job;
+            if (historyJobEntity.getRetries() > 0) {
+                historyJobEntity.setRetries(historyJobEntity.getRetries() - 1);
+                unacquire(historyJobEntity);
+            } else {
+                processEngineConfiguration.getHistoryJobEntityManager().deleteNoCascade(historyJobEntity);
+            }
+        } else {
+            unacquire(job);
+        }
     }
 
     protected void sendMessage(final JobInfo job) {
