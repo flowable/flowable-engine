@@ -22,6 +22,8 @@ import java.util.Map;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
+import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.Job;
@@ -552,6 +554,10 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().taskDefinitionKey("usertask1").singleResult();
         taskService.claim(task.getId(), "user");
         taskService.complete(task.getId());
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            // trigger history comment handling when necessary
+        }
 
         task = taskService.createTaskQuery().singleResult();
 
@@ -737,10 +743,12 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         taskService.claim(firstTask.getId(), "user");
         // create the file
         FileExistsMock.getInstance().touchFile();
-        // complete the task - this should cancel all tasks waiting in "Add a file"
-        // using the "fileAddedSignal"
-        // FIXME: this causes the exception:
+        
         taskService.complete(firstTask.getId());
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            // trigger history comment handling when necessary
+        }
 
         List<Task> usingTask = taskService.createTaskQuery().taskName("Use the file").list();
         assertEquals(1, usingTask.size());
