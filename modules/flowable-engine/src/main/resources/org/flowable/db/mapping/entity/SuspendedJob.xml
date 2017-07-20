@@ -139,7 +139,7 @@
             REPEAT_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
-            CREATE_TIME,
+            CREATE_TIME_,
             TENANT_ID_) VALUES
             (#{job.id, jdbcType=VARCHAR},
             #{job.revision, jdbcType=INTEGER},
