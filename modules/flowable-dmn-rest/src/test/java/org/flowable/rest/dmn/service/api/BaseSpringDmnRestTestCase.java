@@ -12,11 +12,6 @@
  */
 package org.flowable.rest.dmn.service.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -45,6 +40,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.server.Server;
+import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
@@ -59,6 +55,11 @@ import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import junit.framework.AssertionFailedError;
 
@@ -81,6 +82,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
     protected static DmnEngineConfiguration dmnEngineConfiguration;
     protected static DmnRepositoryService dmnRepositoryService;
     protected static DmnRuleService dmnRuleService;
+    protected static DmnHistoryService dmnHistoryService;
 
     protected static CloseableHttpClient client;
     protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
@@ -98,6 +100,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
         dmnEngineConfiguration = appContext.getBean(DmnEngineConfiguration.class);
         dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
         dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
+        dmnHistoryService = dmnEngineConfiguration.getDmnHistoryService();
 
         // Create http client for all tests
         CredentialsProvider provider = new BasicCredentialsProvider();

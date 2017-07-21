@@ -46,6 +46,7 @@ public class SuspendedJobEntity extends AbstractJobEntity {
         this.processInstanceId = te.getProcessInstanceId();
         this.processDefinitionId = te.getProcessDefinitionId();
         this.exceptionMessage = te.getExceptionMessage();
+        this.createTime = te.getCreateTime();
         setExceptionStacktrace(te.getExceptionStacktrace());
 
         // Inherit tenant

@@ -88,6 +88,9 @@
       <if test="decisionDefinitionId != null">
         and RES.DECISION_DEFINITION_ID_ = #{decisionDefinitionId}
       </if>
+      <if test="deploymentId != null">
+        and RES.DEPLOYMENT_ID_ = #{deploymentId}
+      </if>
       <if test="decisionKey != null">
         and DEF.KEY_ = #{decisionKey}
       </if>
@@ -99,6 +102,9 @@
       </if>
       <if test="activityId != null">
         and RES.ACTIVITY_ID_ = #{activityId}
+      </if>
+      <if test="failed != null">
+        and RES.FAILED_ = #{failed}
       </if>
       <if test="tenantId != null">
         and RES.TENANT_ID_ = #{tenantId}

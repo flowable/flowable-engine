@@ -12,6 +12,7 @@
  */
 package org.flowable.rest.dmn.conf.engine;
 
+import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
@@ -30,6 +31,7 @@ public class FlowableDmnEngineConfiguration {
     public DmnEngine ruleEngine() {
         DmnEngineConfiguration dmnEngineConfiguration = new StandaloneInMemDmnEngineConfiguration();
         dmnEngineConfiguration.setDatabaseSchemaUpdate(AbstractEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+        dmnEngineConfiguration.setHistoryEnabled(true);
         return dmnEngineConfiguration.buildDmnEngine();
     }
 
@@ -46,5 +48,10 @@ public class FlowableDmnEngineConfiguration {
     @Bean
     public DmnRuleService dmnRuleService() {
         return ruleEngine().getDmnRuleService();
+    }
+    
+    @Bean
+    public DmnHistoryService dmnHistoryService() {
+        return ruleEngine().getDmnHistoryService();
     }
 }

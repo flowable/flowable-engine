@@ -33,7 +33,7 @@ public interface Job extends JobInfo {
      */
     Date getDuedate();
 
-    /**
+    /**x
      * Returns the id of the process instance which execution created the job.
      */
     String getProcessInstanceId();
@@ -57,5 +57,10 @@ public interface Job extends JobInfo {
      * Get the job type for this job.
      */
     String getJobType();
+    
+    /**
+     * Returns the create datetime of the job.
+     */
+    Date getCreateTime();
 
 }

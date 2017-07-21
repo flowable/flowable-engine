@@ -10,6 +10,7 @@ import org.flowable.content.spring.configurator.SpringContentEngineConfigurator;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
@@ -126,7 +127,12 @@ public class FlowableEngineConfiguration {
         processEngineConfiguration.setEnableSafeBpmnXml(true);
 
         processEngineConfiguration.addConfigurator(new SpringFormEngineConfigurator());
-        processEngineConfiguration.addConfigurator(new SpringDmnEngineConfigurator());
+        
+        SpringDmnEngineConfiguration dmnEngineConfiguration = new SpringDmnEngineConfiguration();
+        dmnEngineConfiguration.setHistoryEnabled(true);
+        SpringDmnEngineConfigurator dmnEngineConfigurator = new SpringDmnEngineConfigurator();
+        dmnEngineConfigurator.setDmnEngineConfiguration(dmnEngineConfiguration);
+        processEngineConfiguration.addConfigurator(dmnEngineConfigurator);
         
         SpringContentEngineConfiguration contentEngineConfiguration = new SpringContentEngineConfiguration();
         String contentRootFolder = environment.getProperty(PROP_FS_ROOT);

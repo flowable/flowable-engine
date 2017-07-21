@@ -33,6 +33,9 @@ public interface DmnHistoricDecisionExecutionQuery extends Query<DmnHistoricDeci
     /** Only select decision executions with the given definition id. */
     DmnHistoricDecisionExecutionQuery decisionDefinitionId(String decisionDefinitionId);
     
+    /** Only select decision executions with the given deployment id. */
+    DmnHistoricDecisionExecutionQuery deploymentId(String deploymentId);
+    
     /** Only select decision executions with the given definition key. */
     DmnHistoricDecisionExecutionQuery decisionKey(String decisionKey);
 
@@ -44,6 +47,9 @@ public interface DmnHistoricDecisionExecutionQuery extends Query<DmnHistoricDeci
     
     /** Only select decision executions with the given activity id. */
     DmnHistoricDecisionExecutionQuery activityId(String activityId);
+    
+    /** Only select decision executions with the given failed state. */
+    DmnHistoricDecisionExecutionQuery failed(Boolean failed);
 
     /**
      * Only select decision executions that have the given tenant id.

@@ -981,6 +981,7 @@ public class RestResponseFactory {
         response.setProcessDefinitionId(job.getProcessDefinitionId());
         response.setProcessInstanceId(job.getProcessInstanceId());
         response.setRetries(job.getRetries());
+        response.setCreateTime(job.getCreateTime());
         response.setTenantId(job.getTenantId());
 
         response.setUrl(urlBuilder.buildUrl(RestUrls.URL_JOB, job.getId()));

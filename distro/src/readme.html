@@ -34,7 +34,22 @@
     <li>Introduction of audit history in the DMN Engine. When history is enabled in the DMN Engine, an audit log of each decision execution is stored in the DMN database.
     By default the history is disabled.</li>
     <li>Replaced the MVEL expression language in the DMN Engine with the same JUEL expression language as used in the BPMN and Form Engine.</li>
+    <li>Refactored DmnRuleService with new ExecuteDecisionBuilder and deprecated old execute decision methods.</li>
+    <li>Call activity - allow to set output parameters a local variables for multi instance executions.</li>
+    <li>Easier usage of async history in combination with a message queue (see <a href="https://github.com/flowable/flowable-examples/tree/master/async-history">https://github.com/flowable/flowable-examples/tree/master/async-history</a>)</li>
+    <li>Performance improvement: introduce grouping and compression for async history data</li>
     <li>Various small bugfixes all around.</li>
+</ul>
+
+<h4>Community contributors</h4>
+
+<ul>
+    <li>Faizal Abdul Manan (faizal-manan)</li>
+    <li>David Malkovsky (dbmalkovsky)</li>
+    <li>Harsha Teja Kanna (h7kanna)</li>
+    <li>Lori Small (lsmall)</li>
+    <li>bsydow</li>
+    <li>stephraleigh</li>
 </ul>
 
 <h4>Upgrade notes</h4>

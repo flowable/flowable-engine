@@ -43,6 +43,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
     protected int revision;
 
     protected Date duedate;
+    protected Date createTime;
 
     protected String executionId;
     protected String processInstanceId;
@@ -135,6 +136,14 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
 
     public void setDuedate(Date duedate) {
         this.duedate = duedate;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     public String getExecutionId() {
