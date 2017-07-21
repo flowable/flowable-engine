@@ -21,7 +21,7 @@ public interface FormEngine {
     /**
      * the version of the flowable form library
      */
-    public static String VERSION = "6.1.1.0";
+    public static String VERSION = "6.2.0.0";
 
     /**
      * The name as specified in 'form-engine-name' in the flowable.form.cfg.xml configuration file. The default name for a process engine is 'default
