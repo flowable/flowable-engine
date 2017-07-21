@@ -19,5 +19,7 @@ public interface DmnEngineConfigurationApi {
     DmnRuleService getDmnRuleService();
     
     DmnManagementService getDmnManagementService();
+    
+    DmnHistoryService getDmnHistoryService();
 
 }

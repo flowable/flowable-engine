@@ -22,6 +22,7 @@ import org.flowable.content.api.ContentService;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
 import org.flowable.content.spring.configurator.SpringContentEngineConfigurator;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
+import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
@@ -259,6 +260,11 @@ public class FlowableEngineConfiguration {
     @Bean
     public DmnRuleService dmnRuleService() {
         return dmnEngineConfiguration().getDmnRuleService();
+    }
+    
+    @Bean
+    public DmnHistoryService dmnHistoryService() {
+        return dmnEngineConfiguration().getDmnHistoryService();
     }
 
     @Bean
