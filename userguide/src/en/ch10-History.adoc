@@ -189,9 +189,9 @@ Following history levels can be configured:
 
 [[asyncHistoryConfig]]
 
-=== Async history configuration
+=== Async History configuration
 
-[Experimental] Async history has been introduced with Flowable 6.1.0 and allows historic data to be persisted asynchronously using a history job executor.
+[Experimental] Async History has been introduced with Flowable 6.1.0 and allows historic data to be persisted asynchronously using a history job executor.
 
 
 [source,xml,linenums]
@@ -204,12 +204,20 @@ Following history levels can be configured:
 </bean>
 ----
 
-With the ++asyncHistoryExecutorActivate++ property the history job executor can be started automatically when booting the process engine. Only in test cases this would be set to false (or if async history is not enabled of course).
-The ++asyncHistoryExecutorNumberOfRetries++ property configures the amount of retries for an async history job. This property is a bit different then for a normal async job, because a history job may need some cycles before it can be handled succesfully. For example, a historic task first has to be created in the ACT_HI_TASK_ table before the assignee can be updated by another history job. The default value for this property is set to 10 in the process engine configuration. When the amount of retries has been reached the history job will be ignored (and not written to a deadletter job table).
+With the ++asyncHistoryExecutorActivate++ property, the history job executor can be started automatically when booting the Process Engine. This would be only set to false for test cases (or if Async History is not enabled of course).
+The ++asyncHistoryExecutorNumberOfRetries++ property configures the number of retries for an Async History job. This property is a bit different than that for a normal async job, because a history job may need more cycles before it can be handled succesfully. For example, a historic task first has to be created in the ACT_HI_TASK_ table before the assignee can be updated by another history job. The default value for this property is set to 10 in the Process Engine configuration. When the number of retries has been reached, the history job will be ignored (and not written to a deadletter job table).
 
 In addition to these properties, the ++asyncHistoryExecutor++ property can be used to configure an AsyncExecutor in a similar way that you can do for the normal async job executor. 
 
-It's also possible to overwrite the async history job handlers to persist the historic data in other database tables than the default Flowable history tables or to persist it in a NoSQL database like Elasticsearch. Using the ++historyJobHandlers++ property a map with all the custom history job handlers can be configured and with the ++customHistoryJobHandlers++ array, you can overwrite specific default history job handlers. 
+When the history data is not to be persisted in the default history tables, but for example, is required in a NoSQL database (such as Elasticsearch, MongoDb, Cassandra and so on), or something completely different is to be done with it, the handler that is responsible for handling the job can be overridden:
+
+* Using the ++historyJobHandlers++ property, which is a map of all the custom history job handlers
+* Or, configure the ++customHistoryJobHandlers++ list with all instances will be added to the ++historyJobHandlers++ map at boot time.
+
+Alternatively, it is also possible to use a Message Queue and configure the engine in such a way that a message will be sent when a new history job is available. This way, the historical data can be processed on different servers to where the engines are run. It's also possible to configure the engine and Message Queue using JTA (when using JMS) and not store the historical data in a job, but send it all data to a Message Queue that participates in a global transaction.
+
+See link:$$https://github.com/flowable/flowable-examples/tree/master/async-history$$[the Flowable Async History Examples] for various examples on how to configure the Async History, including the default way, using a JMS queue, using JTA or using a Message Queue and a Spring Boot application that acts as a message listener. 
+
 
 [[historyFormAuditPurposes]]
 

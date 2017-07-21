@@ -64,7 +64,7 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         return this;
     }
 
-    public HistoryJobQueryImpl handlerType(String handlerType) {
+    public HistoryJobQuery handlerType(String handlerType) {
         if (handlerType == null) {
             throw new FlowableIllegalArgumentException("Provided handlerType is null");
         }
