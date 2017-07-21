@@ -83,8 +83,12 @@ public class RdsFormResource
   }
 
   @RequestMapping(value = "", method = RequestMethod.POST, produces = "application/json")
-  public FormRepresentation saveForm(@RequestBody String json)
+  public @ResponseBody ResponseEntity<JsonNode> saveForm(@RequestBody String json)
   {
-    return formService.saveForm(json);
+    ObjectNode responseData = JsonUtils.objectNode();
+    FormRepresentation formRep = formService.saveForm(json);
+    long lastUpdated = formRep.getLastUpdated().getTime();
+    responseData.set("lastUpdated", JsonUtils.numberNode(lastUpdated));
+    return new ResponseEntity<JsonNode>(responseData, HttpStatus.OK);
   }
 }

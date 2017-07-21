@@ -26,6 +26,7 @@ import org.flowable.app.repository.editor.ModelRepository;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.api.ModelService;
 import org.flowable.app.service.exception.BadRequestException;
+import org.flowable.app.service.exception.ConflictingRequestException;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.flowable.form.model.FormModel;
 import org.flowable.idm.api.User;
@@ -142,17 +143,23 @@ public class FlowableFormService {
       throw new InternalServerErrorException("Could not deserialize form definition");
     }
     String formkey = jsonNode.get("key").textValue();
-
+    long lastUpdated = jsonNode.get("lastUpdated").asLong();
+    boolean newVersion = jsonNode.get("newVersion") !=null ? jsonNode.get("newVersion").asBoolean() : false;
+    
     User user = SecurityUtils.getCurrentUserObject();
     List<Model> models = modelRepository.findByKeyAndType(formkey, AbstractModel.MODEL_TYPE_FORM_RDS);
     Model model = models.get(0);
-
+    
+    if(model.getLastUpdated().getTime()!=lastUpdated && !newVersion) {
+      throw new ConflictingRequestException("Form has been updated by " + model.getLastUpdatedBy() + " in meantime");
+    }
+    
     String editorJson = jsonNode.get("definition").toString();
 
     String filteredImageString = jsonNode.get("formImageBase64").textValue().replace("data:image/png;base64,", "");
     byte[] imageBytes = Base64.decodeBase64(filteredImageString);
 
-    model = modelService.saveModel(model, editorJson, imageBytes, false, "", user);
+    model = modelService.saveModel(model, editorJson, imageBytes, newVersion, "", user);
     FormRepresentation result = new FormRepresentation(model);
     // result.setFormDefinition(saveRepresentation.getFormRepresentation().getFormDefinition());
     return result;
