@@ -17,6 +17,8 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.api.delegate.event.FlowableEventType;
+import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventDispatcher;
+import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
@@ -28,6 +30,7 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
 
     protected FlowableEventSupport eventSupport;
+    protected TransactionDependentFlowableEventDispatcher transactioFlowableEventDispatcher;
     protected boolean enabled = true;
 
     public FlowableEventDispatcherImpl() {
@@ -58,9 +61,25 @@ public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
     }
 
     @Override
+    public void addEventListener(TransactionDependentFlowableEventListener listenerToAdd) {
+        transactioFlowableEventDispatcher.addEventListener(listenerToAdd);
+    }
+
+    @Override
+    public void addEventListener(TransactionDependentFlowableEventListener listenerToAdd, FlowableEventType... types) {
+        transactioFlowableEventDispatcher.addEventListener(listenerToAdd, types);
+    }
+
+    @Override
+    public void removeEventListener(TransactionDependentFlowableEventListener listenerToRemove) {
+        transactioFlowableEventDispatcher.removeEventListener(listenerToRemove);
+    }
+
+    @Override
     public void dispatchEvent(FlowableEvent event) {
         if (enabled) {
             eventSupport.dispatchEvent(event);
+            transactioFlowableEventDispatcher.dispatchEvent(event);
         }
 
         CommandContext commandContext = Context.getCommandContext();
@@ -72,6 +91,10 @@ public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
                 }
             }
         }
+    }
+
+    public void setTransactioFlowableEventDispatcher(TransactionDependentFlowableEventDispatcher transactioFlowableEventDispatcher) {
+        this.transactioFlowableEventDispatcher = transactioFlowableEventDispatcher;
     }
 
     public FlowableEventSupport getEventSupport() {

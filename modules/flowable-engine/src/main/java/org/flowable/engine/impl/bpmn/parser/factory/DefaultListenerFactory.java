@@ -12,9 +12,6 @@
  */
 package org.flowable.engine.impl.bpmn.parser.factory;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.flowable.bpmn.model.EventListener;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.ImplementationType;
@@ -49,6 +46,9 @@ import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.IdentityLink;
 import org.flowable.engine.task.Task;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Default implementation of the {@link ListenerFactory}. Used when no custom {@link ListenerFactory} is injected on the {@link ProcessEngineConfigurationImpl}.

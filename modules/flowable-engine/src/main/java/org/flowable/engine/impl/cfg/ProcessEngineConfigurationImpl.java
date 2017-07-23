@@ -13,26 +13,7 @@
 
 package org.flowable.engine.impl.cfg;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import javax.xml.namespace.QName;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.mapping.Environment;
@@ -61,6 +42,7 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
@@ -86,6 +68,7 @@ import org.flowable.engine.compatibility.DefaultFlowable5CompatibilityHandlerFac
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandlerFactory;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.delegate.event.TransactionDependentFlowableEventDispatcherImpl;
 import org.flowable.engine.delegate.event.impl.BpmnModelEventDispatchAction;
 import org.flowable.engine.form.AbstractFormType;
 import org.flowable.engine.impl.DynamicBpmnServiceImpl;
@@ -362,7 +345,26 @@ import org.flowable.validation.ProcessValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.InputStream;
+import java.io.Reader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.ServiceLoader;
+import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.xml.namespace.QName;
 
 /**
  * @author Tom Baeyens
@@ -907,6 +909,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initDeployers();
         initEventHandlers();
         initFailedJobCommandFactory();
+        initTransactionDependentEventDispatcher();
         initEventDispatcher();
         initProcessValidator();
         initDatabaseEventLogging();
@@ -2070,6 +2073,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initEventDispatcher() {
         if (this.eventDispatcher == null) {
             this.eventDispatcher = new FlowableEventDispatcherImpl();
+            ((FlowableEventDispatcherImpl) eventDispatcher).setTransactioFlowableEventDispatcher(transactionDependentEventDispatcher);
         }
         
         if (this.additionalEventDispatchActions == null) {
@@ -2092,6 +2096,32 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
                 for (FlowableEventListener listenerToAdd : listenersToAdd.getValue()) {
                     this.eventDispatcher.addEventListener(listenerToAdd, types);
+                }
+            }
+        }
+
+    }
+
+    public void initTransactionDependentEventDispatcher() {
+        if (this.transactionDependentEventDispatcher == null) {
+            this.transactionDependentEventDispatcher = new TransactionDependentFlowableEventDispatcherImpl();
+        }
+
+        this.transactionDependentEventDispatcher.setEnabled(enableEventDispatcher);
+
+        if (transactionDependentEventListeners != null) {
+            for (TransactionDependentFlowableEventListener listenerToAdd : transactionDependentEventListeners) {
+                this.transactionDependentEventDispatcher.addEventListener(listenerToAdd);
+            }
+        }
+
+        if (transactionDependentTypedEventListeners != null) {
+            for (Entry<String, List<TransactionDependentFlowableEventListener>> listenersToAdd : transactionDependentTypedEventListeners.entrySet()) {
+                // Extract types from the given string
+                FlowableEngineEventType[] types = FlowableEngineEventType.getTypesFromString(listenersToAdd.getKey());
+
+                for (TransactionDependentFlowableEventListener listenerToAdd : listenersToAdd.getValue()) {
+                    this.transactionDependentEventDispatcher.addEventListener(listenerToAdd, types);
                 }
             }
         }

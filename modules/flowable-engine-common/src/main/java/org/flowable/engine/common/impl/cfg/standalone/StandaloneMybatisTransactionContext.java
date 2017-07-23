@@ -12,11 +12,6 @@
  */
 package org.flowable.engine.common.impl.cfg.standalone;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.ibatis.session.SqlSession;
 import org.flowable.engine.common.impl.cfg.TransactionContext;
 import org.flowable.engine.common.impl.cfg.TransactionListener;
@@ -30,6 +25,11 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tom Baeyens
@@ -58,6 +58,8 @@ public class StandaloneMybatisTransactionContext implements TransactionContext {
             stateTransactionListeners.put(transactionState, transactionListeners);
         }
         transactionListeners.add(transactionListener);
+
+        LOGGER.debug("Listener registered {}", transactionListener.getClass().getSimpleName());
     }
 
     public void commit() {
