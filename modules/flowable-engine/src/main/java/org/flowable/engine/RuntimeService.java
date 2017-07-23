@@ -75,7 +75,7 @@ public interface RuntimeService {
      * @param processDefinitionKey
      *            key of process definition, cannot be null.
      * @param businessKey
-     *            a key that uniquely identifies the process instance in the context or the given process definition.
+     *            a key that identifies the process instance and can be used to retrieve the process instance later via the query API.
      * @throws FlowableObjectNotFoundException
      *             when no process definition is deployed with the given key.
      */
@@ -100,14 +100,12 @@ public interface RuntimeService {
      * id. This business key can then be used to easily look up that process instance , see {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business key is definitely
      * a best practice.
      * 
-     * The combination of processdefinitionKey-businessKey must be unique.
-     * 
      * @param processDefinitionKey
      *            key of process definition, cannot be null.
      * @param variables
      *            the variables to pass, can be null.
      * @param businessKey
-     *            a key that uniquely identifies the process instance in the context or the given process definition.
+     *            a key that identifies the process instance and can be used to retrieve the process instance later via the query API.
      * @throws FlowableObjectNotFoundException
      *             when no process definition is deployed with the given key.
      */
@@ -153,7 +151,7 @@ public interface RuntimeService {
      * @param processDefinitionId
      *            the id of the process definition, cannot be null.
      * @param businessKey
-     *            a key that uniquely identifies the process instance in the context or the given process definition.
+     *            a key that identifies the process instance and can be used to retrieve the process instance later via the query API.
      * @throws FlowableObjectNotFoundException
      *             when no process definition is deployed with the given key.
      */
