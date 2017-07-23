@@ -91,7 +91,12 @@ public class ParsedDeploymentBuilder {
             bpmnParse.setValidateProcess(false);
         }
 
-        bpmnParse.execute();
+        try {
+            bpmnParse.execute();
+        } catch (Exception e) {
+            LOGGER.error("Could not parse resource {}", resource.getName(), e);
+            throw e;
+        }
         return bpmnParse;
     }
 
