@@ -44,6 +44,8 @@ import org.xml.sax.SAXException;
  */
 public abstract class AbstractEngineConfigurator implements ProcessEngineConfigurator {
     
+    protected boolean enableMybatisXmlMappingValidation;
+    
     @Override
     public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
         registerCustomDeployers(processEngineConfiguration);
@@ -93,7 +95,7 @@ public abstract class AbstractEngineConfigurator implements ProcessEngineConfigu
         if (cfgPath != null) {
             Set<String> resources = new HashSet<>();
             try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(cfgPath)) {
-                DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilderFactory docBuilderFactory = createDocumentBuilderFactory();
                 DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
                 Document document = docBuilder.parse(inputStream);
                 NodeList nodeList = document.getElementsByTagName("mapper");
@@ -113,6 +115,18 @@ public abstract class AbstractEngineConfigurator implements ProcessEngineConfigu
                 processEngineConfiguration.getCustomMybatisXMLMappers().addAll(resources);
             }
         }
+    }
+    
+    protected DocumentBuilderFactory createDocumentBuilderFactory() throws ParserConfigurationException {
+        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+        if (!enableMybatisXmlMappingValidation) {
+            docBuilderFactory.setValidating(false);
+            docBuilderFactory.setNamespaceAware(false);
+            docBuilderFactory.setExpandEntityReferences(false);
+            docBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            docBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+        }
+        return docBuilderFactory;
     }
     
     /**
@@ -203,8 +217,16 @@ public abstract class AbstractEngineConfigurator implements ProcessEngineConfigu
         targetEngineConfiguration.setClock(processEngineConfiguration.getClock());
     }
     
-    protected abstract List<Class<? extends Entity>> getEntityInsertionOrder() ;
+    protected abstract List<Class<? extends Entity>> getEntityInsertionOrder();
     
-    protected abstract List<Class<? extends Entity>> getEntityDeletionOrder() ;
+    protected abstract List<Class<? extends Entity>> getEntityDeletionOrder();
+
+    public boolean isEnableMybatisXmlMappingValidation() {
+        return enableMybatisXmlMappingValidation;
+    }
+
+    public void setEnableMybatisXmlMappingValidation(boolean enableMybatisXmlMappingValidation) {
+        this.enableMybatisXmlMappingValidation = enableMybatisXmlMappingValidation;
+    }
     
 }
