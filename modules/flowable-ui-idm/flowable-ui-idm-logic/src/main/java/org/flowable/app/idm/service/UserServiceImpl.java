@@ -123,7 +123,7 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
 
         User savedUser = identityService.createUserQuery().userEmail(email).singleResult();
         savedUser.setPassword(password);
-        identityService.updateUserPassword(user);
+        identityService.updateUserPassword(savedUser);
 
         return user;
     }
