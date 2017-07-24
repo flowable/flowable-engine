@@ -102,6 +102,12 @@ public class ProfileSession {
     public Map<String, CommandStats> calculateSummaryStatistics() {
         Map<String, CommandStats> result = new HashMap<>();
         for (String className : commandExecutionResults.keySet()) {
+            
+            // ignore GetNextIdBlockCmd
+            if (className.endsWith("GetNextIdBlockCmd")) {
+                continue;
+            }
+            
             List<CommandExecutionResult> executions = commandExecutionResults.get(className);
             CommandStats commandStats = new CommandStats(executions);
             result.put(className, commandStats);
