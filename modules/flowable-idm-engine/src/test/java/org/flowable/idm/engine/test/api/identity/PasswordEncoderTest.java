@@ -22,12 +22,14 @@ import org.flowable.idm.engine.test.PluggableFlowableIdmTestCase;
 import org.flowable.idm.engine.test.api.identity.authentication.JasyptPasswordEncryptor;
 import org.flowable.idm.engine.test.api.identity.authentication.jBCryptHashing;
 import org.jasypt.util.password.StrongPasswordEncryptor;
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Created by faizal on 6/10/17.
  */
+@Ignore
 public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PasswordEncoderTest.class);
