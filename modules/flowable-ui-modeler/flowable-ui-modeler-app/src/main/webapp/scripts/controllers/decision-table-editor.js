@@ -435,7 +435,8 @@ angular.module('flowableModeler')
                         id: decisionTable.id,
                         name: decisionTable.name,
                         key: decisionTable.decisionTableDefinition.key,
-                        description: decisionTable.description
+                        description: decisionTable.description,
+                        lastUpdated: decisionTable.lastUpdated //added by Simon for optimistic locking
                     };
 
                     if (!$rootScope.currentDecisionTable.hitIndicator) {

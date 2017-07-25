@@ -124,7 +124,7 @@ angular.module('flowableModeler').service('DecisionTableService', [ '$rootScope'
 	                	success(function (response, status, headers, config) {
 
                             if (saveCallback) {
-                                saveCallback();
+                                saveCallback(response);
                             }
                         }).
                         error(function (response, status, headers, config) {

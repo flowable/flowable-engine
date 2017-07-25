@@ -40,6 +40,7 @@ import org.flowable.app.repository.editor.ModelSort;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.api.ModelService;
 import org.flowable.app.service.exception.BadRequestException;
+import org.flowable.app.service.exception.ConflictingRequestException;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.flowable.app.util.XmlUtil;
 import org.flowable.dmn.model.DmnDefinition;
@@ -262,7 +263,16 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
 
         User user = SecurityUtils.getCurrentUserObject();
         Model model = getModel(decisionTableId, false, false);
-
+        
+        //added by Simon for optimistic locking start
+        long lastUpdated = saveRepresentation.getLastUpdated().getTime();
+        boolean newVersion = saveRepresentation.isNewVersion();
+        
+        if(model.getLastUpdated().getTime()!=lastUpdated && !newVersion) {
+          throw new ConflictingRequestException("Decision table has been updated by " + model.getLastUpdatedBy() + " in meantime");
+        }
+        //added by Simon for optimistic locking end
+        
         String decisionKey = saveRepresentation.getDecisionTableRepresentation().getKey();
         ModelKeyRepresentation modelKeyInfo = modelService.validateModelKey(model, model.getModelType(), decisionKey);
         if (modelKeyInfo.isKeyAlreadyExists()) {
