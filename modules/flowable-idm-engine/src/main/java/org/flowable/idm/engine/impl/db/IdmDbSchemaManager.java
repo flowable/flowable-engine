@@ -55,6 +55,7 @@ public class IdmDbSchemaManager implements DbSchemaManager {
         FLOWABLE_IDM_VERSIONS.add(new FlowableIdmVersion("6.0.1.0"));
         FLOWABLE_IDM_VERSIONS.add(new FlowableIdmVersion("6.1.0.0"));
         FLOWABLE_IDM_VERSIONS.add(new FlowableIdmVersion("6.1.1.0"));
+        FLOWABLE_IDM_VERSIONS.add(new FlowableIdmVersion("6.1.2.0"));
 
         /* Current */
         FLOWABLE_IDM_VERSIONS.add(new FlowableIdmVersion(IdmEngine.VERSION));

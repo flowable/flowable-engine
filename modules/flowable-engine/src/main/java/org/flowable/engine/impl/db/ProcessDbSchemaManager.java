@@ -111,6 +111,7 @@ public class ProcessDbSchemaManager implements DbSchemaManager {
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.0.1.0"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.1.0.0"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.1.1.0"));
+        FLOWABLE_VERSIONS.add(new FlowableVersion("6.1.2.0"));
 
         /* Current */
         FLOWABLE_VERSIONS.add(new FlowableVersion(ProcessEngine.VERSION));
