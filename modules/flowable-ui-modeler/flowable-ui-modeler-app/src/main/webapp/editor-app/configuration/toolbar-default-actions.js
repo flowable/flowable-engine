@@ -437,6 +437,9 @@ angular.module('flowableModeler').controller('SaveModelCtrl', [ '$rootScope', '$
                     $scope.error.userFullName = data.customData.userFullName;
                     $scope.error.isNewVersionAllowed = data.customData.newVersionAllowed;
                     $scope.error.saveAs = modelMetaData.name + "_2";
+                } else if(status == 500 && data && data.indexOf('ConflictingRequestException') >0 ) {
+                  //added by Simon to show proper message when someone else has updated the model.
+                  $scope.saveDialog.errorMessage = "Process has been updated by someone else, you can save a new version!";                  
                 } else {
                 	$scope.error = undefined;
                     $scope.saveDialog.errorMessage = data.message;

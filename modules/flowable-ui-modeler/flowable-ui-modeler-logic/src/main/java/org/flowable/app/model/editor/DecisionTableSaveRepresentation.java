@@ -12,6 +12,8 @@
  */
 package org.flowable.app.model.editor;
 
+import java.util.Date;
+
 import org.flowable.app.model.common.AbstractRepresentation;
 import org.flowable.app.model.editor.decisiontable.DecisionTableRepresentation;
 
@@ -22,6 +24,7 @@ public class DecisionTableSaveRepresentation extends AbstractRepresentation {
     protected String comment;
     protected String decisionTableImageBase64;
     protected DecisionTableRepresentation decisionTableRepresentation;
+    protected Date lastUpdated;
 
     public boolean isReusable() {
         return reusable;
@@ -62,4 +65,15 @@ public class DecisionTableSaveRepresentation extends AbstractRepresentation {
     public void setDecisionTableRepresentation(DecisionTableRepresentation decisionTableRepresentation) {
         this.decisionTableRepresentation = decisionTableRepresentation;
     }
+
+    public Date getLastUpdated()
+    {
+      return lastUpdated;
+    }
+
+    public void setLastUpdated(Date lastUpdated)
+    {
+      this.lastUpdated = lastUpdated;
+    }
+    
 }
