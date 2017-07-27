@@ -183,24 +183,58 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
 
         assertEquals(6, listener.getEventsReceived().size());
-        FlowableVariableEvent event = (FlowableVariableEvent) listener.getEventsReceived().get(0);
-        assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_CREATED));
-        assertThat(event.getVariableName(), is("parentVar1"));
-        event = (FlowableVariableEvent) listener.getEventsReceived().get(1);
-        assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_CREATED));
-        assertThat(event.getVariableName(), is("subVar1"));
-        event = (FlowableVariableEvent) listener.getEventsReceived().get(2);
-        assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_CREATED));
-        assertThat(event.getVariableName(), is("parentVar2"));
-        event = (FlowableVariableEvent) listener.getEventsReceived().get(3);
-        assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_DELETED));
-        assertThat(event.getVariableName(), is("subVar1"));
-        event = (FlowableVariableEvent) listener.getEventsReceived().get(4);
-        assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_DELETED));
-        assertThat(event.getVariableName(), is("parentVar2"));
-        event = (FlowableVariableEvent) listener.getEventsReceived().get(5);
-        assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_DELETED));
-        assertThat(event.getVariableName(), is("parentVar1"));
+        int nrOfCreated = 0;
+        int nrOfDeleted = 0;
+        for (int i = 0; i < listener.getEventsReceived().size(); i++) {
+            FlowableVariableEvent event = (FlowableVariableEvent) listener.getEventsReceived().get(i);
+            if (event.getType() == FlowableEngineEventType.VARIABLE_CREATED) {
+                
+                nrOfCreated++;
+                
+                if (event.getVariableName().equals("parentVar1")) {
+                    assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_CREATED));
+                    assertThat(event.getVariableName(), is("parentVar1"));
+                    
+                } else if (event.getVariableName().equals("subVar1")) {
+                    assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_CREATED));
+                    assertThat(event.getVariableName(), is("subVar1"));
+                    
+                } else if (event.getVariableName().equals("parentVar2")) {
+                    assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_CREATED));
+                    assertThat(event.getVariableName(), is("parentVar2"));
+                    
+                } else {
+                    fail("Unknown variable name " + event.getVariableName());
+                }
+                
+            } else if (event.getType() == FlowableEngineEventType.VARIABLE_DELETED) {
+                
+                nrOfDeleted++;
+                
+                if (event.getVariableName().equals("parentVar1")) {
+                    assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_DELETED));
+                    assertThat(event.getVariableName(), is("parentVar1"));
+                    
+                } else if (event.getVariableName().equals("subVar1")) {
+                    assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_DELETED));
+                    assertThat(event.getVariableName(), is("subVar1"));
+                    
+                } else if (event.getVariableName().equals("parentVar2")) {
+                    assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_DELETED));
+                    assertThat(event.getVariableName(), is("parentVar2"));
+                    
+                } else {
+                    fail("Unknown variable name " + event.getVariableName());
+                }
+                
+            } else {
+                fail("Unknown event type " + event.getType());
+            }
+            
+        }
+        
+        assertEquals(3, nrOfCreated);
+        assertEquals(3, nrOfDeleted);
     }
 
     /**
