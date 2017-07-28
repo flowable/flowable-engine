@@ -95,12 +95,12 @@ angular.module('flowableModeler')
 	  $scope.loadTags = function() {
 	    var params = {modelType:0}
 	    $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/modeltags', params: params}).
-      success(function(data, status, headers, config) {
-        $scope.model.tags = data;        
-        }).
-        error(function(data, status, headers, config) {
-           console.log('Something went wrong: ' + data);           
-        });
+    	    success(function(data, status, headers, config) {
+    	        $scope.model.tags = data;        
+            }).
+            error(function(data, status, headers, config) {
+                console.log('Something went wrong: ' + data);           
+            });
 	  }
 	  
 	  $scope.activateTag = function(tagId) {
