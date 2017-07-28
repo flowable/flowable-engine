@@ -32,7 +32,8 @@ var flowableModeler = angular.module('flowableModeler', [
   'angularSpectrumColorpicker',
   'duScroll',
   'dndLists',
-  'ngHandsontable'
+  'ngHandsontable',
+  'ui.select'
 ]);
 
 var flowableModule = flowableModeler;

@@ -12,7 +12,10 @@
  */
 package org.flowable.app.model.editor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.domain.editor.Model;
@@ -37,6 +40,8 @@ public class ModelRepresentation extends AbstractRepresentation {
     protected int version;
     protected String comment;
     protected Integer modelType;
+    
+    protected List<String> tags = new ArrayList<String>();
 
     public ModelRepresentation(AbstractModel model) {
         initialize(model);
@@ -57,6 +62,11 @@ public class ModelRepresentation extends AbstractRepresentation {
         this.lastUpdatedBy = model.getLastUpdatedBy();
         this.comment = model.getComment();
         this.modelType = model.getModelType();
+        
+        String strTags = model.getTags();
+        if(strTags != null) {
+          this.tags = Arrays.asList(strTags.split(";"));
+        }
 
         // When based on a ProcessModel and not history, this is always the latest version
         if (model instanceof Model) {
@@ -168,5 +178,21 @@ public class ModelRepresentation extends AbstractRepresentation {
         model.setDescription(this.description);
         model.setName(this.name);
         model.setKey(this.key);
+        if(this.tags.size()>0) {
+          model.setTags(String.join(";", this.tags));
+        } else {
+          model.setTags(null);
+        }
+        
+    }
+
+    public List<String> getTags()
+    {
+      return tags;
+    }
+
+    public void setTags(List<String> tags)
+    {
+      this.tags = tags;
     }
 }

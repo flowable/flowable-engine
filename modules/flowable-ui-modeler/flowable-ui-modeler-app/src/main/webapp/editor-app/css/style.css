@@ -1140,10 +1140,6 @@ hot-table .column-header.label {
     transition: 0.3s width;
 }
 
-.close {
-    width: 0px !important;
-}
-
 #contentCanvasWrapper {
     padding-left: 300px;
     transition: 0.3s padding-left;
@@ -1197,6 +1193,10 @@ hot-table .column-header.label {
 
 .current-process {
     border: 1px solid green;
+}
+
+.bottom-buffer {
+	margin-bottom: 5px; 
 }
 
 .glyphicon.spinning {

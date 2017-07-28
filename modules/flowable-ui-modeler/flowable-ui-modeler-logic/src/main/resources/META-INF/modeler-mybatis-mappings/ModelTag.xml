@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.app.domain.editor.ModelTag">
+
+  <resultMap id="modelResultMap" type="org.flowable.app.domain.editor.ModelTag">
+    <id property="id" column="id" jdbcType="VARCHAR" />
+    <result property="name" column="name" jdbcType="VARCHAR" />    
+    <result property="created" column="created" jdbcType="TIMESTAMP" />
+    <result property="createdBy" column="created_by" jdbcType="VARCHAR" />
+    <result property="updated" column="updated" jdbcType="TIMESTAMP" />
+    <result property="updatedBy" column="updated_by" jdbcType="VARCHAR" />
+  </resultMap>
+
+    <insert id="insertModelTag" parameterType="org.flowable.app.domain.editor.ModelTag">
+        insert into ${prefix}ACT_DE_MODEL_TAG (
+            id,
+            name,            
+            created,
+            created_by,
+            updated,
+            updated_by) 
+         values (
+            #{id, jdbcType=VARCHAR},
+            #{name, jdbcType=VARCHAR},            
+            #{created, jdbcType=TIMESTAMP},
+            #{createdBy, jdbcType=VARCHAR},
+            #{updated, jdbcType=TIMESTAMP},
+            #{updatedBy, jdbcType=VARCHAR}
+          )
+    </insert>
+    
+    <update id="updateModelTag" parameterType="org.flowable.app.domain.editor.ModelTag">
+        update ${prefix}ACT_DE_MODEL_TAG
+        <set>
+            name = #{name, jdbcType=VARCHAR},               
+            updated = #{updated, jdbcType=TIMESTAMP},
+            updated_by = #{updatedBy, jdbcType=VARCHAR}            
+        </set>
+        where id = #{id, jdbcType=VARCHAR}
+    </update>
+    
+  <select id="selectModelTagById" parameterType="string" resultMap="modelResultMap">
+    select * from ${prefix}ACT_DE_MODEL_TAG where id = #{id, jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectAll" resultMap="modelResultMap">
+    select * from ${prefix}ACT_DE_MODEL_TAG order by name
+  </select>
+  
+  <delete id="deleteModelTag" parameterType="org.flowable.app.domain.editor.ModelTag">
+    delete from ${prefix}ACT_DE_MODEL_TAG where id = #{id}
+  </delete>
+  
+  <select id="countModelByTagId" parameterType="string" resultType="long">
+     select count(m.id) from ${prefix}ACT_DE_MODEL m 
+     where m.tags like '%'||#{tagId, jdbcType=VARCHAR}||'%'
+  </select>
+    
+</mapper>

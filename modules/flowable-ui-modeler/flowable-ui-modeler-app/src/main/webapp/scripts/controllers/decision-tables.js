@@ -54,6 +54,7 @@ angular.module('flowableModeler')
 	  }
 
 	  $scope.activateFilter = function(filter) {
+	      delete $scope.model.activeTagId
 		  $scope.model.activeFilter = filter;
 		  $rootScope.decisionTableFilter.filter = filter;
 		  $scope.loadDecisionTables();
@@ -83,6 +84,10 @@ angular.module('flowableModeler')
 		  if ($scope.model.filterText && $scope.model.filterText != '') {
 		    params.filterText = $scope.model.filterText;
 		  }
+		  
+          if ($scope.model.activeTagId) {
+            params.tagId = $scope.model.activeTagId;
+          }
 
 		  $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models', params: params}).
 		  	success(function(data, status, headers, config) {
@@ -93,6 +98,27 @@ angular.module('flowableModeler')
 	           $scope.model.loading = false;
 	        });
 	  };
+	  
+	  $scope.loadTags = function() {
+          var params = {modelType:0}
+          $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/modeltags', params: params}).
+          success(function(data, status, headers, config) {
+            $scope.model.tags = data;        
+            }).
+            error(function(data, status, headers, config) {
+               console.log('Something went wrong: ' + data);           
+            });
+      }
+          
+      $scope.activateTag = function(tagId) {
+          $scope.model.activeTagId = tagId;
+          $scope.loadDecisionTables();
+      }
+        
+      $scope.clearTag = function() {
+          delete $scope.model.activeTagId;
+          $scope.loadDecisionTables();
+      }
 
 	  var timeoutFilter = function() {
 	    $scope.model.isFilterDelayed = true;
@@ -110,6 +136,7 @@ angular.module('flowableModeler')
 	  };
 
 	  $scope.filterDelayed = function() {
+	    delete $scope.model.activeTagId;
 	    if($scope.model.isFilterDelayed) {
 	      $scope.model.isFilterUpdated = true;
 	    } else {
@@ -148,6 +175,7 @@ angular.module('flowableModeler')
 
 	  // Finally, load initial decisionTables
 	  $scope.loadDecisionTables();
+	  $scope.loadTags();
   }]);
 
 

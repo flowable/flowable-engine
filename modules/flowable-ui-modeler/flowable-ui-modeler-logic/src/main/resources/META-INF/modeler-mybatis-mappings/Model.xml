@@ -18,6 +18,7 @@
 		<result property="modelEditorJson" column="model_editor_json" jdbcType="VARCHAR" />
 		<result property="modelType" column="model_type" jdbcType="INTEGER" />
 		<result property="thumbnail" column="thumbnail" jdbcType="${blobType}" />
+        <result property="tags" column="tags" jdbcType="VARCHAR" />
 	</resultMap>
 
     <insert id="insertModel" parameterType="org.flowable.app.domain.editor.Model">
@@ -34,7 +35,8 @@
             version,
             model_editor_json,
             model_type,
-            thumbnail) 
+            thumbnail,
+            tags) 
          values (
             #{id, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
@@ -48,7 +50,8 @@
             #{version, jdbcType=INTEGER},
             #{modelEditorJson, jdbcType=VARCHAR},
             #{modelType, jdbcType=INTEGER},
-            #{thumbnail, jdbcType=${blobType}}
+            #{thumbnail, jdbcType=${blobType}},
+            #{tags, jdbcType=VARCHAR}
           )
     </insert>
     
@@ -66,7 +69,8 @@
             version = #{version, jdbcType=INTEGER},
             model_editor_json = #{modelEditorJson, jdbcType=VARCHAR},
             model_type = #{modelType, jdbcType=INTEGER},
-            thumbnail = #{thumbnail, jdbcType=${blobType}}
+            thumbnail = #{thumbnail, jdbcType=${blobType}},
+            tags = #{tags, jdbcType=VARCHAR}
         </set>
         where id = #{id, jdbcType=VARCHAR}
     </update>
@@ -109,6 +113,32 @@
 	        </if>
       	</if>
 	</select>
+  
+    <select id="selectModelByTypeAndTag" parameterType="map" resultMap="modelResultMap">
+      select * from ${prefix}ACT_DE_MODEL
+        <where> 
+          <if test="modelType != null">
+             model_type = #{modelType, jdbcType=VARCHAR}
+          </if>
+          <if test="tagId != null">
+             and tags like #{tagId, jdbcType=VARCHAR} 
+          </if>
+        </where>
+        <if test="sort != null">
+          <if test="sort == 'nameAsc'">
+              order by name asc
+          </if>
+          <if test="sort == 'nameDesc'">
+              order by name desc
+          </if>
+          <if test="sort == 'modifiedAsc'">
+              order by last_updated asc
+          </if>
+          <if test="sort == 'modifiedDesc'">
+              order by last_updated desc
+          </if>
+        </if>
+    </select>
 	
 	<select id="countByModelTypeAndCreatedBy" parameterType="map">
 	   select count(m.id) from ${prefix}ACT_DE_MODEL m 

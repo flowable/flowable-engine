@@ -33,5 +33,7 @@ public interface ModelRepository {
     List<Model> findByParentModelId(String parentModelId);
 
     Long countByModelTypeAndCreatedBy(int modelType, String createdBy);
+    
+    List<Model> findByModelTypeAndTag(int modelType, String tagId, String sort);
 
 }

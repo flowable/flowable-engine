@@ -20,7 +20,13 @@
 				<li ng-repeat="filter in model.filters" ng-class="{'current' : filter.id == model.activeFilter.id}">
 					<a ng-click="activateFilter(filter)">{{'PROCESS-LIST.FILTER.' + filter.labelKey | translate}}</a>
 				</li>
-			</ul>
+			</ul>                      
+            <ul class="filter-list">
+              <li ng-class="{'current' : !model.activeTagId}"><a ng-click="clearTag()">All tags</a></li>
+              <li ng-repeat="tag in model.tags" ng-class="{'current' : tag.id == model.activeTagId}">
+                <a ng-click="activateTag(tag.id)">{{tag.name}}</a>
+              </li>
+            </ul>
 		</div>
 
 		<div class="col-xs-10 item-wrapper" id="list-items">

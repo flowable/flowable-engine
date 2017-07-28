@@ -13,8 +13,8 @@
 'use strict';
 
 angular.module('flowableModeler')
-.controller('EditModelPopupCtrl', ['$rootScope', '$scope', '$http', '$translate', '$location',
-    function ($rootScope, $scope, $http, $translate, $location) {
+.controller('EditModelPopupCtrl', ['$rootScope', '$scope', '$http', '$translate', '$location', '$modal',
+    function ($rootScope, $scope, $http, $translate, $location, $modal) {
 
         var model;
         var popupType;
@@ -26,7 +26,7 @@ angular.module('flowableModeler')
             popupType = 'FORM';
         } else if ($scope.model.decisionTable) {
             model = $scope.model.decisionTable;
-            popupType = 'DECISION-TABLE';
+            popupType = 'DECISION-TABLE';            
         } else {
             model = $scope.model.app;
             popupType = 'APP';
@@ -38,6 +38,7 @@ angular.module('flowableModeler')
         	modelName: model.name,
         	modelKey: model.key,
         	modelDescription: model.description,
+        	modelTags: model.tags,
     		id: model.id
     	};
 
@@ -52,12 +53,14 @@ angular.module('flowableModeler')
         	$scope.model.name = $scope.popup.modelName;
         	$scope.model.key = $scope.popup.modelKey;
         	$scope.model.description = $scope.popup.modelDescription;
+        	$scope.model.tags = $scope.popup.modelTags;
 
     		$scope.popup.loading = true;
     		var updateData = {
     			name: $scope.model.name, 
     			key: $scope.model.key, description: 
-    			$scope.model.description
+    			$scope.model.description,
+    			tags: $scope.model.tags
     		};
 
     		$http({method: 'PUT', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.popup.id, data: updateData}).
@@ -98,6 +101,30 @@ angular.module('flowableModeler')
     			$scope.$hide();
     		}
     	};
+    	
+    	$scope.loadTags = function() {
+            var params = {}
+            $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/modeltags', params: params}).
+            success(function(data, status, headers, config) {
+              $scope.tags = data;        
+              }).
+              error(function(data, status, headers, config) {
+                 console.log('Something went wrong: ' + data);           
+              });
+        }
+    	
+    	$scope.openEditModelTagDialog = function() {
+    	  _internalCreateModal(
+    	      {
+                  template: 'views/popup/model-tag-edit.html',
+                  scope: $scope,
+                  backdrop: false
+        	  }, 
+        	  $modal, 
+        	  $scope);
+    	}
+    	
+    	$scope.loadTags();
 }]);
 
 angular.module('flowableModeler')
@@ -256,3 +283,81 @@ angular.module('flowableModeler')
 		}
 	};
 }]);
+
+angular.module('flowableModeler')
+.controller('EditModelTagPopupCtrl', ['$rootScope', '$scope', '$http', '$translate', '$location', '$window', function ($rootScope, $scope, $http, $translate, $location, $window) {
+  
+  $scope.remove = function (tagId) {
+    var paras = {}
+    $http({method: 'DELETE', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/modeltags/' + tagId, data: paras}).
+    success(function(data, status, headers, config) {
+      $scope.loadTags();
+      if(data)
+        $window.alert("Tag is deleted!");
+      else 
+        $window.alert("Tag cannot be deleted! already in use!");
+    }).
+    error(function(data, status, headers, config) {
+      $window.alert("Something went wrong!")
+    });
+  }
+  
+  $scope.update = function (tagId, name) {
+    if(!tagId||!name) {
+      $window.alert("Tag cannot be empty!");
+      return;
+    }
+    var paras = {'name': name};
+    $http({method: 'PUT', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/modeltags/' + tagId, data: paras}).
+    success(function(data, status, headers, config) {
+      $scope.loadTags();
+      $window.alert("Tag is updated!");
+    }).
+    error(function(data, status, headers, config) {
+      console.log("Something went wrong!")
+    });
+  }
+  
+  $scope.add = function () {
+    if(!$scope.newTagName) {
+      $window.alert("Tag cannot be empty!");
+      return;
+    }
+    var paras = {
+      'name': $scope.newTagName
+    };
+    
+    $scope.newTagName = undefined;
+    
+    $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/modeltags/', data: paras}).
+    success(function(data, status, headers, config) {
+      $scope.loadTags();
+      $window.alert("Tag has been added!");
+    }).
+    error(function(data, status, headers, config) {
+      $window.alert("Something went wrong!")
+    });
+  };
+  
+  $scope.close = function () {
+    if($scope.$parent.$parent.loadTags) {
+      $scope.$parent.$parent.loadTags();
+    }
+    $scope.$hide();
+  };
+  
+  $scope.loadTags = function() {
+    var params = {}
+    $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/modeltags', params: params}).
+    success(function(data, status, headers, config) {
+      $scope.tags = data;        
+      }).
+      error(function(data, status, headers, config) {
+         console.log('Something went wrong: ' + data);           
+      });
+  }
+  
+  $scope.loadTags();
+  
+}]);
+
