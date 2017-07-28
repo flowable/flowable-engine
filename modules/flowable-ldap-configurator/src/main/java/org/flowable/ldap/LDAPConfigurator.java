@@ -40,8 +40,8 @@ public class LDAPConfigurator extends IdmEngineConfigurator {
     @Override
     public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
         
-        super.configure(processEngineConfiguration);
-
+        this.idmEngineConfiguration = new LdapIdmEngineConfiguration();
+        
         if (ldapConfiguration == null) {
             throw new FlowableException("ldapConfiguration is not set");
         }
@@ -55,7 +55,9 @@ public class LDAPConfigurator extends IdmEngineConfigurator {
                 ldapGroupCache.setLdapCacheListener(ldapConfiguration.getGroupCacheListener());
             }
         }
-
+        
+        super.configure(processEngineConfiguration);
+        
         EngineServiceUtil.getIdmEngineConfiguration(processEngineConfiguration)
                 .setIdmIdentityService(new LDAPIdentityServiceImpl(ldapConfiguration, ldapGroupCache));
     }

@@ -146,10 +146,14 @@ public abstract class AbstractEngineConfigurator implements ProcessEngineConfigu
     protected void initialiseCommonProperties(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration, String engineKey) {
         initEngineConfigurations(processEngineConfiguration, targetEngineConfiguration, engineKey);
         initCommandContextFactory(processEngineConfiguration, targetEngineConfiguration);
-        initDataSource(processEngineConfiguration, targetEngineConfiguration);
-        initDbSqlSessionFactory(processEngineConfiguration, targetEngineConfiguration);
+        
+        if (targetEngineConfiguration.isUsingRelationalDatabase()) {
+            initDataSource(processEngineConfiguration, targetEngineConfiguration);
+            initDbSqlSessionFactory(processEngineConfiguration, targetEngineConfiguration);
+            initDbProperties(processEngineConfiguration, targetEngineConfiguration);
+        }
+        
         initSessionFactories(processEngineConfiguration, targetEngineConfiguration);
-        initDbProperties(processEngineConfiguration, targetEngineConfiguration);
         initEventDispatcher(processEngineConfiguration, targetEngineConfiguration);
         initClock(processEngineConfiguration, targetEngineConfiguration);
     }
