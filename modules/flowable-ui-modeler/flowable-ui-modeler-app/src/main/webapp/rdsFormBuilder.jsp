@@ -34,6 +34,7 @@
 </body>
 <script src="libs/html2canvas_0.4.1/html2canvas.js"></script>
 <script src="js/sfb-config.js"></script>
+<script src="app/jsconfig/externalJsAppCfg"></script>
 <script src="rds-schemaform-designer-vendor.js"></script>
 <script src="rds-schemaform-designer.js"></script>
 
