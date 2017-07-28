@@ -12,9 +12,9 @@
  */
 package org.flowable.ldap;
 
-import org.flowable.engine.cfg.AbstractProcessEngineConfigurator;
 import org.flowable.engine.cfg.ProcessEngineConfigurator;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.impl.cfg.IdmEngineConfigurator;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.EngineServiceUtil;
 
@@ -28,7 +28,7 @@ import org.flowable.engine.impl.util.EngineServiceUtil;
  * 
  * @author Joram Barrez
  */
-public class LDAPConfigurator extends AbstractProcessEngineConfigurator {
+public class LDAPConfigurator extends IdmEngineConfigurator {
 
     protected LDAPConfiguration ldapConfiguration;
 
@@ -40,6 +40,8 @@ public class LDAPConfigurator extends AbstractProcessEngineConfigurator {
     @Override
     public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
         
+        super.configure(processEngineConfiguration);
+
         if (ldapConfiguration == null) {
             throw new FlowableException("ldapConfiguration is not set");
         }
