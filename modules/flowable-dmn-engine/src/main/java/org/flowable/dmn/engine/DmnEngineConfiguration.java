@@ -242,7 +242,11 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
 
         initBeans();
         initTransactionFactory();
-        initSqlSessionFactory();
+        
+        if (usingRelationalDatabase) {
+            initSqlSessionFactory();
+        }
+        
         initSessionFactories();
         initServices();
         initDataManagers();

@@ -198,7 +198,11 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
 
         initBeans();
         initTransactionFactory();
-        initSqlSessionFactory();
+        
+        if (usingRelationalDatabase) {
+            initSqlSessionFactory();
+        }
+        
         initSessionFactories();
         initServices();
         initDataManagers();

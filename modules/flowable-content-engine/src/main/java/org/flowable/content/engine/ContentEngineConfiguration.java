@@ -156,7 +156,11 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
 
         initBeans();
         initTransactionFactory();
-        initSqlSessionFactory();
+        
+        if (usingRelationalDatabase) {
+            initSqlSessionFactory();
+        }
+        
         initSessionFactories();
         initServices();
         initDataManagers();
