@@ -168,6 +168,7 @@
     },
     "PROCESS": {
       "NAME": "Model name",
+      "TAG": "Model tags",
       "KEY": "Model key",
       "DESCRIPTION": "Description",
       "VERSION-COMMENT": "Version comment",

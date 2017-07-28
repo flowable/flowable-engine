@@ -125,5 +125,33 @@
 			referencedColumnNames="id" referencedTableName="ACT_DE_MODEL" />
 			
 	</changeSet>
+    
+    <changeSet id="rds-1" author="flowable">
+      <addColumn tableName="ACT_DE_MODEL">
+        <column name="tags" type="varchar(1024)"/>
+      </addColumn>
+      
+      <createTable tableName="ACT_DE_MODEL_TAG">
+        <column name="id" type="varchar(255)">
+          <constraints primaryKey="true" nullable="false" />
+        </column>
+        <column name="name" type="varchar(400)">
+          <constraints nullable="false" />
+        </column>
+        <column name="created" type="datetime(6)">
+          <constraints nullable="true" />
+        </column>
+        <column name="created_by" type="varchar(255)">
+          <constraints nullable="true" />
+        </column>
+        <column name="updated" type="datetime(6)">
+          <constraints nullable="true" />
+        </column>
+        <column name="updated_by" type="varchar(255)">
+          <constraints nullable="true" />
+        </column>
+      </createTable>
+      
+    </changeSet>
 
 </databaseChangeLog>

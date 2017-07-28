@@ -20,7 +20,16 @@
             	<div class="form-group">
             	    <label for="editPocessDescription">{{'PROCESS.DESCRIPTION' | translate}}</label>
             		<textarea ng-disabled="popup.loading" class="form-control" id="editProcessDescription" rows="5" ng-model="popup.modelDescription"></textarea>
-            	</div>
+            	</div>              
+                <div class="from-group">
+                    <a ng-click="openEditModelTagDialog()"><lable>{{'PROCESS.TAG' | translate }}</lable>...</a>
+                    <ui-select multiple ng-model="popup.modelTags" theme="bootstrap" ng-disabled="popup.loading" close-on-select="true" title="Select tags">
+                        <ui-select-match placeholder="Select tags...">{{$item.name}}</ui-select-match>
+                        <ui-select-choices repeat="tag.id as tag in tags">
+                          {{tag.name}}
+                        </ui-select-choices>
+                    </ui-select>
+                </div>
             </div>
 
             <div class="modal-footer">

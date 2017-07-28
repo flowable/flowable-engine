@@ -13,6 +13,7 @@
 package org.flowable.app.domain.editor;
 
 import java.util.Date;
+import java.util.List;
 
 public class AbstractModel {
 
@@ -34,6 +35,8 @@ public class AbstractModel {
   protected String modelEditorJson;
   protected String comment;
   protected Integer modelType;
+  
+  protected String tags;
 
   public AbstractModel() {
     this.created = new Date();
@@ -135,4 +138,14 @@ public class AbstractModel {
     this.modelType = modelType;
   }
 
+  public String getTags()
+  {
+    return tags;
+  }
+
+  public void setTags(String tags)
+  {
+    this.tags = tags;
+  }
+  
 }

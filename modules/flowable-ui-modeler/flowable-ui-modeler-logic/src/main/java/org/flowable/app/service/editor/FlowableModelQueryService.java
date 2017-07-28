@@ -83,11 +83,14 @@ public class FlowableModelQueryService {
 
         // need to parse the filterText parameter ourselves, due to encoding issues with the default parsing.
         String filterText = null;
+        String tagId = null;
         List<NameValuePair> params = URLEncodedUtils.parse(request.getQueryString(), Charset.forName("UTF-8"));
         if (params != null) {
             for (NameValuePair nameValuePair : params) {
                 if ("filterText".equalsIgnoreCase(nameValuePair.getName())) {
                     filterText = nameValuePair.getValue();
+                } else if("tagId".equalsIgnoreCase(nameValuePair.getName())) {
+                  tagId = nameValuePair.getValue();
                 }
             }
         }
@@ -96,8 +99,10 @@ public class FlowableModelQueryService {
         List<Model> models = null;
 
         String validFilter = makeValidFilterText(filterText);
-
-        if (validFilter != null) {
+        
+        if(tagId !=null) {
+          models = modelRepository.findByModelTypeAndTag(modelType, tagId, sort);
+        } else if (validFilter != null) {
             models = modelRepository.findByModelTypeAndFilter(modelType, validFilter, sort);
 
         } else {

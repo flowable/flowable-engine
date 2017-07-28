@@ -95,4 +95,15 @@ public class ModelRepositoryImpl implements ModelRepository {
         sqlSessionTemplate.delete(NAMESPACE + "deleteModel", model);
     }
 
+    @Override
+    public List<Model> findByModelTypeAndTag(int modelType, String tagId, String sort)
+    {
+      tagId = "%" + tagId + "%";
+      Map<String, Object> params = new HashMap<String, Object>();
+      params.put("modelType", modelType);
+      params.put("tagId", tagId);
+      params.put("sort", sort);
+      return sqlSessionTemplate.selectList(NAMESPACE + "selectModelByTypeAndTag", params);
+    }
+
 }

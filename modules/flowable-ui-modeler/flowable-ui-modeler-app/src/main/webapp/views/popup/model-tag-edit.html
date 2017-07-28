@@ -1,0 +1,33 @@
+<div class="modal" ng-controller="EditModelTagPopupCtrl">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h2>Edit Tags</h2>
+            </div>
+            <div class="modal-body">
+              <div class="container" style="width:95%;">
+                <div class="row bottom-buffer" ng-repeat="tag in tags" >
+                    <input class="col-sm-10" ng-model="tag.name"></input>  
+                    <span class="col-sm-1"><a ng-click="remove(tag.id)">Delete</a></a></span>
+                    <span class="col-sm-1"><a ng-click="update(tag.id, tag.name)">Update</a></span>               
+                </div>
+                <div class="row bottom-buffer">
+                    <input class="col-sm-10" ng-model="newTagName"></input>
+                    <span class="col-sm-2"><a ng-click="add()" ng-disabled="!newTagName">Add</a></span> 
+                </div>
+              </div>                          
+            </div>
+
+            <div class="modal-footer">
+              <div class="pull-right">
+                <button type="button" class="btn btn-sm btn-default" ng-click="close()" ng-disabled="popup.loading" auto-focus>
+                  Close
+                </button>                
+              </div>
+              <div class="loading pull-right" ng-show="popup.loading">
+                <div class="l1"></div><div class="l2"></div><div class="l2"></div>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
