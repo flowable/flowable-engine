@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by faizal on 6/10/17.
  */
-@Ignore
 public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PasswordEncoderTest.class);
