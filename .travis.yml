@@ -5,8 +5,7 @@ sudo: required
 
 jdk:
   - oraclejdk8
-  # remove the jdk7 version because of class version issues with 'org/mindrot/jbcrypt/BCrypt' in PasswordEncoderTest.testjBCrytpEncoderInstance test
-  #- oraclejdk7
+  - openjdk7
 
 cache:
   directories:
