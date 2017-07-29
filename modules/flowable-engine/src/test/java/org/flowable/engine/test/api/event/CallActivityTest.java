@@ -10,6 +10,7 @@ import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.impl.event.logger.EventLogger;
@@ -124,8 +125,8 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertNotNull(executionEntity.getParentId());
         assertEquals(processExecutionId, executionEntity.getParentId());
 
-        FlowableEvent activitiEvent = mylistener.getEventsReceived().get(2);
-        assertEquals(FlowableEngineEventType.PROCESS_STARTED, activitiEvent.getType());
+        FlowableEvent flowableEvent = mylistener.getEventsReceived().get(2);
+        assertEquals(FlowableEngineEventType.PROCESS_STARTED, flowableEvent.getType());
 
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(3);
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
@@ -152,8 +153,8 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertEquals("calledtask1", executionEntity.getActivityId());
 
         // external subprocess
-        activitiEvent = mylistener.getEventsReceived().get(8);
-        assertEquals(FlowableEngineEventType.PROCESS_STARTED, activitiEvent.getType());
+        flowableEvent = mylistener.getEventsReceived().get(8);
+        assertEquals(FlowableEngineEventType.PROCESS_STARTED, flowableEvent.getType());
 
         // start event in external subprocess
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(9);
@@ -291,8 +292,8 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertNotNull(executionEntity.getParentId());
         assertEquals(processExecutionId, executionEntity.getParentId());
 
-        FlowableEvent activitiEvent = mylistener.getEventsReceived().get(2);
-        assertEquals(FlowableEngineEventType.PROCESS_STARTED, activitiEvent.getType());
+        FlowableEvent flowableEvent = mylistener.getEventsReceived().get(2);
+        assertEquals(FlowableEngineEventType.PROCESS_STARTED, flowableEvent.getType());
 
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(3);
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
@@ -319,8 +320,8 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertEquals("calledtask1", executionEntity.getActivityId());
 
         // external subprocess
-        activitiEvent = mylistener.getEventsReceived().get(8);
-        assertEquals(FlowableEngineEventType.PROCESS_STARTED, activitiEvent.getType());
+        flowableEvent = mylistener.getEventsReceived().get(8);
+        assertEquals(FlowableEngineEventType.PROCESS_STARTED, flowableEvent.getType());
 
         // start event in external subprocess
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(9);
@@ -435,8 +436,8 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertNotNull(executionEntity.getParentId());
         assertEquals(processExecutionId, executionEntity.getParentId());
 
-        FlowableEvent activitiEvent = mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.PROCESS_STARTED, activitiEvent.getType());
+        FlowableEvent flowableEvent = mylistener.getEventsReceived().get(idx++);
+        assertEquals(FlowableEngineEventType.PROCESS_STARTED, flowableEvent.getType());
 
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
@@ -463,8 +464,10 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertEquals("calledtask1", executionEntity.getActivityId());
 
         // external subprocess
-        activitiEvent = mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.PROCESS_STARTED, activitiEvent.getType());
+        flowableEvent = mylistener.getEventsReceived().get(idx++);
+        assertEquals(FlowableEngineEventType.PROCESS_STARTED, flowableEvent.getType());
+        executionEntity = (ExecutionEntity) ((FlowableProcessStartedEvent) flowableEvent).getEntity();
+        assertEquals(subprocessInstance.getId(), executionEntity.getParentId());
 
         // start event in external subprocess
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(idx++);
@@ -511,15 +514,8 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertEquals(subprocessInstance.getId(), ((FlowableEngineEntityEvent)entityEvent).getExecutionId());
         assertEquals(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT, entityEvent.getType());
 
-        // PROBLEM:
-        // Test fails because unexpected PROCESS_COMPLETED event received. We already received
-        // the PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT for the external subprocess
-        // so we should not be getting a PROCESS_COMPLETED event here.
-        FlowableEvent flowableEvent = mylistener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, flowableEvent.getType());
-
-        // the external subprocess (callActivity)
-        activityEvent = (FlowableActivityEvent) flowableEvent;
+        //the external subprocess (callActivity)
+        activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
         assertEquals("callActivity", activityEvent.getActivityType());
 
