@@ -246,13 +246,27 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
         }
         setElementProperty(id, USER_TASK_CANDIDATE_GROUPS, candidateGroupsNode, infoNode);
     }
+    
+    @Override
+    public ObjectNode changeMultiInstanceCompletionCondition(String id, String completionCondition) {
+        ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        changeMultiInstanceCompletionCondition(id, completionCondition, infoNode);
+        return infoNode;
+    }
 
+    @Override
+    public void changeMultiInstanceCompletionCondition(String id, String completionCondition, ObjectNode infoNode) {
+        setElementProperty(id, MULTI_INSTANCE_COMPLETION_CONDITION, completionCondition, infoNode);
+    }
+
+    @Override
     public ObjectNode changeDmnTaskDecisionTableKey(String id, String decisionTableKey) {
         ObjectNode infoNode = processEngineConfiguration.getObjectMapper().createObjectNode();
         changeDmnTaskDecisionTableKey(id, decisionTableKey, infoNode);
         return infoNode;
     }
 
+    @Override
     public void changeDmnTaskDecisionTableKey(String id, String decisionTableKey, ObjectNode infoNode) {
         setElementProperty(id, DMN_TASK_DECISION_TABLE_KEY, decisionTableKey, infoNode);
     }

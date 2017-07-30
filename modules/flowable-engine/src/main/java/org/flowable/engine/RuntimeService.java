@@ -1268,6 +1268,30 @@ public interface RuntimeService {
      * Create a {@link ChangeActivityStateBuilder}, that allows to set various options for changing the state of a process instance.
      */
     ChangeActivityStateBuilder createChangeActivityStateBuilder();
+    
+    /**
+     * Adds a new execution to a running multi-instance parent execution
+     * 
+     * @param activityId
+     *            id of the multi-instance activity (id attribute in the BPMN XML)
+     * @param parentExecutionId
+     *            can be the process instance id, in case there's one multi-instance execution for the provided activity id. 
+     *            In case of multiple multi-instance executions with the same activity id this can be a specific parent execution id.
+     * @param executionVariables
+     *            variables to be set on as local variable on the newly created multi-instance execution
+     * @return the newly created multi-instance execution
+     */                       
+    Execution addMultiInstanceExecution(String activityId, String parentExecutionId, Map<String, Object> executionVariables);
+    
+    /**
+     * Deletes a multi-instance execution
+     * 
+     * @param executionId
+     *            id of the multi-instance execution to be deleted
+     * @param executionIsCompleted
+     *            defines if the deleted execution should be marked as completed on the parent multi-instance execution
+     */
+    void deleteMultiInstanceExecution(String executionId, boolean executionIsCompleted);
 
     /** The all events related to the given Process Instance. */
     List<Event> getProcessInstanceEvents(String processInstanceId);

@@ -61,7 +61,7 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
 
         // completion condition
         if (StringUtils.isNotEmpty(loopCharacteristics.getCompletionCondition())) {
-            miActivityBehavior.setCompletionConditionExpression(expressionManager.createExpression(loopCharacteristics.getCompletionCondition()));
+            miActivityBehavior.setCompletionCondition(loopCharacteristics.getCompletionCondition());
         }
 
         // activiti:collection
