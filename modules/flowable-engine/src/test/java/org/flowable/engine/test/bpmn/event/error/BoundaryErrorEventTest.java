@@ -407,7 +407,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorOnJavaScriptScriptTask.bpmn20.xml" })
     public void testCatchErrorOnJavaScriptScriptTask() {
-        if (JvmUtil.isAtLeastJDK7()) {
+        if (JvmUtil.isJDK8()) {
             String procId = runtimeService.startProcessInstanceByKey("catchErrorOnScriptTask").getId();
             assertProcessEnded(procId);
         }

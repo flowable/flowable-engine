@@ -16,6 +16,8 @@ import java.util.List;
 
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowElementsContainer;
+import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.context.Context;
@@ -31,6 +33,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -217,11 +220,33 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
             if ((execution.isProcessInstanceType() && execution.getSuperExecutionId() == null) ||
                     (execution.getParentId() == null && execution.getSuperExecutionId() != null)) {
 
-                CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher()
+                // This event should only be fired if terminate end event is part of the process definition for the process instance execution,
+                // otherwise a regular cancel event of the process instance will be fired (see above).
+                boolean fireEvent = true;
+                if (!terminateAll) {
+                    Process processForExecution = ProcessDefinitionUtil.getProcess(execution.getProcessDefinitionId());
+                    Process processForTerminateEndEvent = getProcessForTerminateEndEvent(terminateEndEvent);
+                    fireEvent = processForExecution.getId().equals(processForTerminateEndEvent.getId());
+                }
+                
+                if (fireEvent) {
+                    CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher()
                         .dispatchEvent(FlowableEventBuilder.createTerminateEvent(execution, terminateEndEvent));
+                }
+                
             }
         }
 
+    }
+    
+    protected Process getProcessForTerminateEndEvent(FlowElement terminateEndEvent) {
+        FlowElementsContainer parent = terminateEndEvent.getParentContainer();
+        while (!(parent instanceof Process)) {
+            // FlowElementsContainer can only be Process or SubProcess (and its subtypes)
+            SubProcess subProcess = (SubProcess) parent;
+            parent = subProcess.getParentContainer();
+        }
+        return (Process) parent;
     }
 
     protected String createDeleteReason(String activityId) {

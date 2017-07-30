@@ -524,9 +524,9 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
         assertProcessEnded(pi.getId());
         List<FlowableEvent> processTerminatedEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
-        assertEquals("There should be exactly two FlowableEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT events after the task complete.", 2,
+        assertEquals("There should be exactly one FlowableEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT events after the task complete.", 1,
                 processTerminatedEvents.size());
-        FlowableEngineEntityEvent processCompletedEvent = (FlowableEngineEntityEvent) processTerminatedEvents.get(1);
+        FlowableEngineEntityEvent processCompletedEvent = (FlowableEngineEntityEvent) processTerminatedEvents.get(0);
         assertThat(processCompletedEvent.getProcessInstanceId(), is(pi.getProcessInstanceId()));
         assertThat(processCompletedEvent.getProcessDefinitionId(), containsString("terminateParentProcess"));
 
