@@ -493,7 +493,7 @@ a.dropdown-toggle {
 /* Navigation */
 
 .navbar {
-    background-color: #333333;
+    background-color: white;
     border: none;
     min-height: 40px;
 }
@@ -512,13 +512,9 @@ a.dropdown-toggle {
     font-size: 13px;
 }
 
-.navbar .btn-group .btn-default:hover, .navbar .btn-group .btn-default:focus {
-    background-color: #121212;
-}
-
 .navbar .btn-group .btn-default {
     border: none;
-    color: #ffffff;
+    color: #121212;
     background-color: transparent;
 }
 
@@ -546,6 +542,10 @@ a.dropdown-toggle {
     font-size: 17px;
     padding: 10px 35px 10px 35px;
     color: #ffffff;
+}
+
+.navbar-inverse .navbar-nav > li > a:hover {
+    color: #080808;
 }
 
 .navbar-nav > li.active:after {
