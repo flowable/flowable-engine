@@ -136,7 +136,7 @@
     <!-- BUILD -->
     <build>
 
-        <finalName>flowable-idm</finalName>
+        <finalName>rds-idm</finalName>
 
         <resources>
             <resource>
@@ -237,7 +237,7 @@
                         <groupId>org.apache.tomcat.maven</groupId>
                         <artifactId>tomcat7-maven-plugin</artifactId>
                         <configuration>
-                            <path>/flowable-idm</path>
+                            <path>/rds-idm</path>
                             <port>8080</port>
                             <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
                             <systemProperties>
@@ -263,7 +263,7 @@
                         <groupId>org.apache.tomcat.maven</groupId>
                         <artifactId>tomcat7-maven-plugin</artifactId>
                         <configuration>
-                            <path>/flowable-idm</path>
+                            <path>/rds-idm</path>
                             <port>8080</port>
                             <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
                             <systemProperties>
@@ -297,7 +297,7 @@
                                 </goals>
                                 <phase>package</phase>
                                 <configuration>
-                                    <path>/flowable-idm</path>
+                                    <path>/rds-idm</path>
                                 </configuration>
                             </execution>
                         </executions>
@@ -332,7 +332,7 @@
                                 </goals>
                                 <phase>package</phase>
                                 <configuration>
-                                    <path>/flowable-idm</path>
+                                    <path>/rds-idm</path>
                                 </configuration>
                             </execution>
                         </executions>

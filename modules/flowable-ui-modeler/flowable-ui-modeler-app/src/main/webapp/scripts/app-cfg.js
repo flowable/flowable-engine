@@ -27,5 +27,5 @@ FLOWABLE.CONFIG = {
 	  "name": "localhost",
 	  "url": "http://localhost:8080/runtime/workflow/deploy"
 	}],
-	'appTitle': 'RDS Designer'
+	'appTitle': 'RDS System Builder'
 };

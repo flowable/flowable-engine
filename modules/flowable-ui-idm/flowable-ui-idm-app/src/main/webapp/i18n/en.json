@@ -1,6 +1,6 @@
 {
    "GENERAL": {
-        "MAIN-TITLE": "Flowable",
+        "MAIN-TITLE": "RDS",
         "ERROR": {
             "GENERIC": "Sorry, an error occured...",
             "UNKNOWN": "Sorry, an error occured while performing the requested operation.",
@@ -79,7 +79,7 @@
     },
     "IDM": {
       "GENERAL" : {
-        "MAIN-TITLE": "Flowable - Identity Management",
+        "MAIN-TITLE": "RDS - Identity Management",
         "NAVIGATION": {
             "PROFILE": "Personal",
             "USER-MGMT": "Users",

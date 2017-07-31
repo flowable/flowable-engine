@@ -19,8 +19,8 @@ var FLOWABLE = FLOWABLE || {};
 
 FLOWABLE.CONFIG = {
 	'onPremise' : true,
-	'contextRoot' : '/flowable-idm',
-	'webContextRoot' : '/flowable-idm',
+	'contextRoot' : '/rds-idm',
+	'webContextRoot' : '/rds-idm',
     'datesLocalization' : false
 };
 
