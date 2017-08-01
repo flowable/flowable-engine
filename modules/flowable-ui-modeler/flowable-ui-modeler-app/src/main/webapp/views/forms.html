@@ -23,7 +23,7 @@
             <ul class="filter-list">
               <li ng-class="{'current' : !model.activeTagId}"><a ng-click="clearTag()">All tags</a></li>
               <li ng-repeat="tag in model.tags" ng-class="{'current' : tag.id == model.activeTagId}">
-                <a ng-click="activateTag(tag.id)">{{tag.name}}</a>
+                <a ng-click="activateTag(tag.id, tag.name)">{{tag.name}}</a>
               </li>
             </ul>
         </div>
@@ -46,14 +46,15 @@
                 </div>
                 <div ng-if="!model.loading">
                     <span ng-if="model.forms.size > 1">{{'FORMS-LIST.FILTER.' + model.activeFilter.labelKey + '-COUNT' | translate:model.forms}}</span>
-                    <span ng-if="model.forms.size == 1">{{'FORMS-LIST.FILTER.' + model.activeFilter.labelKey + '-ONE' | translate}}</span>
-                    <span ng-if="model.forms.size == 0 && (!model.filterText || model.filterText == '')">{{'FORMS-LIST.FILTER.' + model.activeFilter.labelKey + '-EMPTY' | translate}}</span>
+                    <span ng-if="model.forms.size == 1">{{'FORMS-LIST.FILTER.' + model.activeFilter.labelKey + '-ONE' | translate}}</span>                    
+                    <span ng-if="model.forms.size > 0 && model.activeTagName !='' && model.activeTagName !== undefined">{{'FORMS-LIST.FILTER.TAG' | translate:model}}</span>
+                    <span ng-if="model.forms.size == 0 && model.activeTagName !='' && model.activeTagName !== undefined">{{'FORMS-LIST.FILTER.TAG-EMPTY' | translate:model}}</span>
                     <span ng-if="model.forms.size > 0 && model.filterText !='' && model.filterText !== undefined">{{'FORMS-LIST.FILTER.FILTER-TEXT' | translate:model}}</span>
                     <span ng-if="model.forms.size == 0 && model.filterText !='' && model.filterText !== undefined">{{'FORMS-LIST.FILTER.FILTER-TEXT-EMPTY' | translate:model}}</span>
                 </div>
             </div>
             
-            <div class="create-inline" ng-if="model.forms.size == 0 && (!model.filterText || model.filterText == '')">
+            <div class="create-inline" ng-if="!model.loading && model.forms.size == 0 && (!model.filterText || model.filterText == '') && !model.activeTagId">
                 <span>{{'FORMS-LIST.FILTER.' + model.activeFilter.labelKey + '-EMPTY' | translate}}</span>
                 <span><button type="button" class="btn btn-default" ng-click="createForm()">
                     <i class="glyphicon glyphicon-plus-sign"></i>{{'FORMS-LIST.ACTION.CREATE-INLINE' | translate}}
