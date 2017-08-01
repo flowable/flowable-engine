@@ -70,6 +70,8 @@
             "PROCESSES-BPMN-IMPORT-HINT": "You can also import existing BPMN models.",
             "FILTER-TEXT": ", matching \"{{filterText}}\"",
             "FILTER-TEXT-EMPTY": "There are no process models matching \"{{filterText}}\"",
+            "TAG": ", matching tag \"{{activeTagName}}\"",
+            "TAG-EMPTY": "There are no process models matching tag \"{{activeTagName}}\"",
             "RECENT": "Recent",
             "RECENT-COUNT": "{{total}} recently used models",
             "RECENT-ONE": "One recently used models",
@@ -99,7 +101,9 @@
             "FORMS-ONE": "There is one form",
             "FORMS-EMPTY": "There are no forms.  To add one, click Create Form.",
             "FILTER-TEXT": ", matching \"{{filterText}}\"",
-            "FILTER-TEXT-EMPTY": "There is no form matching \"{{filterText}}\""
+            "FILTER-TEXT-EMPTY": "There is no form matching \"{{filterText}}\"",
+            "TAG": ", matching tag \"{{activeTagName}}\"",
+            "TAG-EMPTY": "There is no form matching tag \"{{activeTagName}}\""
         },
 
         "SORT": {
@@ -126,7 +130,9 @@
             "DECISION-TABLES-ONE": "There is one decision table",
             "DECISION-TABLES-EMPTY": "There are no decision tables. To add one, click Create Decision Table.",
             "FILTER-TEXT": ", matching \"{{filterText}}\"",
-            "FILTER-TEXT-EMPTY": "There are no decision table matching \"{{filterText}}\""
+            "FILTER-TEXT-EMPTY": "There are no decision table matching \"{{filterText}}\"",
+            "TAG": ", matching tag \"{{activeTagName}}\"",
+            "TAG-EMPTY": "There is no decision table matching tag \"{{activeTagName}}\""
         },
 
         "SORT": {

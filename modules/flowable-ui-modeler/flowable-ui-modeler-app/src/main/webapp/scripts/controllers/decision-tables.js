@@ -54,7 +54,8 @@ angular.module('flowableModeler')
 	  }
 
 	  $scope.activateFilter = function(filter) {
-	      delete $scope.model.activeTagId
+	      delete $scope.model.activeTagId;
+	      delete $scope.model.activeTagName;
 		  $scope.model.activeFilter = filter;
 		  $rootScope.decisionTableFilter.filter = filter;
 		  $scope.loadDecisionTables();
@@ -110,13 +111,19 @@ angular.module('flowableModeler')
             });
       }
           
-      $scope.activateTag = function(tagId) {
+      $scope.activateTag = function(tagId, tagName) {
+          delete $scope.model.filterText;
+          delete $scope.model.pendingFilterText;
           $scope.model.activeTagId = tagId;
+          $scope.model.activeTagName = tagName
           $scope.loadDecisionTables();
       }
         
       $scope.clearTag = function() {
           delete $scope.model.activeTagId;
+          delete $scope.model.activeTagName;
+          delete $scope.model.filterText;
+          delete $scope.model.pendingFilterText;
           $scope.loadDecisionTables();
       }
 
@@ -137,6 +144,7 @@ angular.module('flowableModeler')
 
 	  $scope.filterDelayed = function() {
 	    delete $scope.model.activeTagId;
+	    delete $scope.model.activeTagName;
 	    if($scope.model.isFilterDelayed) {
 	      $scope.model.isFilterUpdated = true;
 	    } else {
