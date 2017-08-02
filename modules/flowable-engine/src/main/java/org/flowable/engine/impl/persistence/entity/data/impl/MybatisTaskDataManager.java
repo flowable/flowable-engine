@@ -22,7 +22,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CachedEntityMatcher;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.TaskDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.TasksByExecutionIdMatcher;
 import org.flowable.engine.task.Task;
@@ -30,7 +30,7 @@ import org.flowable.engine.task.Task;
 /**
  * @author Joram Barrez
  */
-public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> implements TaskDataManager {
+public class MybatisTaskDataManager extends AbstractProcessDataManager<TaskEntity> implements TaskDataManager {
 
     protected CachedEntityMatcher<TaskEntity> tasksByExecutionIdMatcher = new TasksByExecutionIdMatcher();
 

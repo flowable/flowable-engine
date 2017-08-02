@@ -20,7 +20,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CachedEntityMatcher;
 import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.DeadLetterJobDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.DeadLetterJobsByExecutionIdMatcher;
 import org.flowable.engine.runtime.Job;
@@ -28,7 +28,7 @@ import org.flowable.engine.runtime.Job;
 /**
  * @author Tijs Rademakers
  */
-public class MybatisDeadLetterJobDataManager extends AbstractDataManager<DeadLetterJobEntity> implements DeadLetterJobDataManager {
+public class MybatisDeadLetterJobDataManager extends AbstractProcessDataManager<DeadLetterJobEntity> implements DeadLetterJobDataManager {
 
     protected CachedEntityMatcher<DeadLetterJobEntity> deadLetterByExecutionIdMatcher = new DeadLetterJobsByExecutionIdMatcher();
 

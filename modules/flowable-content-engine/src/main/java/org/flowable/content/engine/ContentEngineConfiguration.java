@@ -15,7 +15,6 @@ package org.flowable.content.engine;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,16 +47,10 @@ import org.flowable.content.engine.impl.persistence.entity.data.impl.MybatisCont
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
-import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
-import org.flowable.engine.common.impl.interceptor.CommandContextFactory;
-import org.flowable.engine.common.impl.interceptor.CommandContextInterceptor;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
-import org.flowable.engine.common.impl.interceptor.DefaultCommandInvoker;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.common.impl.interceptor.LogInterceptor;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
-import org.flowable.engine.common.impl.interceptor.TransactionContextInterceptor;
 import org.flowable.engine.common.impl.persistence.GenericManagerFactory;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
@@ -325,12 +318,6 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
         initCommandExecutor();
     }
 
-    public void initCommandInvoker() {
-        if (commandInvoker == null) {
-            commandInvoker = new DefaultCommandInvoker();
-        }
-    }
-
     public void initCommandInterceptors() {
         if (commandInterceptors == null) {
             commandInterceptors = new ArrayList<>();
@@ -345,50 +332,13 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
         }
     }
 
-    public Collection<? extends CommandInterceptor> getDefaultCommandInterceptors() {
-        if (defaultCommandInterceptors == null) {
-            List<CommandInterceptor> interceptors = new ArrayList<>();
-            interceptors.add(new LogInterceptor());
-            
-            CommandInterceptor transactionInterceptor = createTransactionInterceptor();
-            if (transactionInterceptor != null) {
-                interceptors.add(transactionInterceptor);
-            }
-            
-            if (commandContextFactory != null) {
-                CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory);
-                engineConfigurations.put(EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG, this);
-                commandContextInterceptor.setEngineConfigurations(engineConfigurations);
-                commandContextInterceptor.setCurrentEngineConfigurationKey(EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG);
-                interceptors.add(commandContextInterceptor);
-            }
-           
-            if (transactionContextFactory != null) {
-                interceptors.add(new TransactionContextInterceptor(transactionContextFactory));
-            }
-            
-            defaultCommandInterceptors = interceptors;
-        }
-        return defaultCommandInterceptors;
+    @Override
+    public String getEngineCfgKey() {
+        return EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG;
     }
 
     public CommandInterceptor createTransactionInterceptor() {
         return null;
-    }
-
-    // OTHER
-    // ////////////////////////////////////////////////////////////////////
-
-    public void initCommandContextFactory() {
-        if (commandContextFactory == null) {
-            commandContextFactory = new CommandContextFactory();
-        }
-    }
-
-    public void initTransactionContextFactory() {
-        if (transactionContextFactory == null) {
-            transactionContextFactory = new StandaloneMybatisTransactionContextFactory();
-        }
     }
 
     // myBatis SqlSessionFactory

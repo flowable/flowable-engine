@@ -99,7 +99,6 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     // Set Http Client config defaults
     protected HttpClientConfig httpClientConfig = new HttpClientConfig();
 
-    protected boolean isDbHistoryUsed = true;
     protected HistoryLevel historyLevel;
 
     protected String jpaPersistenceUnitName;
@@ -374,15 +373,6 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setHistoryLevel(HistoryLevel historyLevel) {
         this.historyLevel = historyLevel;
-        return this;
-    }
-
-    public boolean isDbHistoryUsed() {
-        return isDbHistoryUsed;
-    }
-
-    public ProcessEngineConfiguration setDbHistoryUsed(boolean isDbHistoryUsed) {
-        this.isDbHistoryUsed = isDbHistoryUsed;
         return this;
     }
 

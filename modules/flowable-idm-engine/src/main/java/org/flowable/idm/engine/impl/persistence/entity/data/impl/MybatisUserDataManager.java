@@ -20,13 +20,13 @@ import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.UserQueryImpl;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntity;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl;
-import org.flowable.idm.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.idm.engine.impl.persistence.entity.data.AbstractIdmDataManager;
 import org.flowable.idm.engine.impl.persistence.entity.data.UserDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisUserDataManager extends AbstractDataManager<UserEntity> implements UserDataManager {
+public class MybatisUserDataManager extends AbstractIdmDataManager<UserEntity> implements UserDataManager {
 
     public MybatisUserDataManager(IdmEngineConfiguration idmEngineConfiguration) {
         super(idmEngineConfiguration);

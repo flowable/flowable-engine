@@ -18,14 +18,14 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CachedEntityMatcher;
 import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoricIdentityLinkDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.HistoricIdentityLinksByProcInstMatcher;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisHistoricIdentityLinkDataManager extends AbstractDataManager<HistoricIdentityLinkEntity> implements HistoricIdentityLinkDataManager {
+public class MybatisHistoricIdentityLinkDataManager extends AbstractProcessDataManager<HistoricIdentityLinkEntity> implements HistoricIdentityLinkDataManager {
 
     protected CachedEntityMatcher<HistoricIdentityLinkEntity> historicIdentityLinksByProcInstMatcher = new HistoricIdentityLinksByProcInstMatcher();
 

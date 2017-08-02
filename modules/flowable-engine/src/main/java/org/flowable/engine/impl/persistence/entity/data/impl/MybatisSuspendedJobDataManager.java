@@ -20,7 +20,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CachedEntityMatcher;
 import org.flowable.engine.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.engine.impl.persistence.entity.SuspendedJobEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.SuspendedJobDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.SuspendedJobsByExecutionIdMatcher;
 import org.flowable.engine.runtime.Job;
@@ -28,7 +28,7 @@ import org.flowable.engine.runtime.Job;
 /**
  * @author Tijs Rademakers
  */
-public class MybatisSuspendedJobDataManager extends AbstractDataManager<SuspendedJobEntity> implements SuspendedJobDataManager {
+public class MybatisSuspendedJobDataManager extends AbstractProcessDataManager<SuspendedJobEntity> implements SuspendedJobDataManager {
 
     protected CachedEntityMatcher<SuspendedJobEntity> suspendedJobsByExecutionIdMatcher = new SuspendedJobsByExecutionIdMatcher();
 

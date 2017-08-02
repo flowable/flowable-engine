@@ -19,13 +19,13 @@ import java.util.Map;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityImpl;
-import org.flowable.dmn.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.dmn.engine.impl.persistence.entity.data.AbstractDmnDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DmnResourceDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisDmnResourceDataManager extends AbstractDataManager<DmnResourceEntity> implements DmnResourceDataManager {
+public class MybatisDmnResourceDataManager extends AbstractDmnDataManager<DmnResourceEntity> implements DmnResourceDataManager {
 
     public MybatisDmnResourceDataManager(DmnEngineConfiguration dmnEngineConfiguration) {
         super(dmnEngineConfiguration);

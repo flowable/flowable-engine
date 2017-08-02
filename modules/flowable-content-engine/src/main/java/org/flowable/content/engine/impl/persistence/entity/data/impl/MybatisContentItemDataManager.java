@@ -19,13 +19,13 @@ import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.ContentItemQueryImpl;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntity;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntityImpl;
-import org.flowable.content.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.content.engine.impl.persistence.entity.data.AbstractContentDataManager;
 import org.flowable.content.engine.impl.persistence.entity.data.ContentItemDataManager;
 
 /**
  * @author Tijs Rademakers
  */
-public class MybatisContentItemDataManager extends AbstractDataManager<ContentItemEntity> implements ContentItemDataManager {
+public class MybatisContentItemDataManager extends AbstractContentDataManager<ContentItemEntity> implements ContentItemDataManager {
 
     public MybatisContentItemDataManager(ContentEngineConfiguration contentEngineConfiguration) {
         super(contentEngineConfiguration);

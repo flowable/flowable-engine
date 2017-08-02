@@ -22,14 +22,14 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CachedEntityMatcher;
 import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.VariableInstanceEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.VariableInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.VariableByExecutionIdMatcher;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisVariableInstanceDataManager extends AbstractDataManager<VariableInstanceEntity> implements VariableInstanceDataManager {
+public class MybatisVariableInstanceDataManager extends AbstractProcessDataManager<VariableInstanceEntity> implements VariableInstanceDataManager {
 
     protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceEntity = new VariableByExecutionIdMatcher();
 

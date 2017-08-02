@@ -61,9 +61,7 @@ import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyUnique;
 import org.flowable.dmn.engine.impl.parser.DmnParseFactory;
 import org.flowable.dmn.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
-import org.flowable.dmn.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.dmn.engine.impl.persistence.deploy.Deployer;
-import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManagerImpl;
@@ -86,18 +84,14 @@ import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisHistoric
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
-import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
-import org.flowable.engine.common.impl.interceptor.CommandContextFactory;
-import org.flowable.engine.common.impl.interceptor.CommandContextInterceptor;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
-import org.flowable.engine.common.impl.interceptor.DefaultCommandInvoker;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.common.impl.interceptor.LogInterceptor;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
-import org.flowable.engine.common.impl.interceptor.TransactionContextInterceptor;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
+import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
+import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.runtime.Clock;
 import org.slf4j.Logger;
@@ -384,52 +378,9 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         initCommandExecutor();
     }
 
-    public void initCommandInvoker() {
-        if (commandInvoker == null) {
-            commandInvoker = new DefaultCommandInvoker();
-        }
-    }
-
-    public void initCommandInterceptors() {
-        if (commandInterceptors == null) {
-            commandInterceptors = new ArrayList<>();
-            if (customPreCommandInterceptors != null) {
-                commandInterceptors.addAll(customPreCommandInterceptors);
-            }
-            commandInterceptors.addAll(getDefaultCommandInterceptors());
-            if (customPostCommandInterceptors != null) {
-                commandInterceptors.addAll(customPostCommandInterceptors);
-            }
-            commandInterceptors.add(commandInvoker);
-        }
-    }
-
-    public Collection<? extends CommandInterceptor> getDefaultCommandInterceptors() {
-        if (defaultCommandInterceptors == null) {
-            List<CommandInterceptor> interceptors = new ArrayList<>();
-            interceptors.add(new LogInterceptor());
-            
-            CommandInterceptor transactionInterceptor = createTransactionInterceptor();
-            if (transactionInterceptor != null) {
-                interceptors.add(transactionInterceptor);
-            }
-            
-            if (commandContextFactory != null) {
-                CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory);
-                engineConfigurations.put(EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG, this);
-                commandContextInterceptor.setEngineConfigurations(engineConfigurations);
-                commandContextInterceptor.setCurrentEngineConfigurationKey(EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
-                interceptors.add(commandContextInterceptor);
-            }
-            
-            if (transactionContextFactory != null) {
-                interceptors.add(new TransactionContextInterceptor(transactionContextFactory));
-            } 
-          
-            
-            defaultCommandInterceptors = interceptors;
-        }
-        return defaultCommandInterceptors;
+    @Override
+    public String getEngineCfgKey() {
+        return EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG;
     }
 
     public CommandInterceptor createTransactionInterceptor() {
@@ -524,21 +475,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
 
         if (cachingAndArtifactsManager == null) {
             cachingAndArtifactsManager = new CachingAndArtifactsManager();
-        }
-    }
-
-    // OTHER
-    // ////////////////////////////////////////////////////////////////////
-
-    public void initCommandContextFactory() {
-        if (commandContextFactory == null) {
-            commandContextFactory = new CommandContextFactory();
-        }
-    }
-
-    public void initTransactionContextFactory() {
-        if (transactionContextFactory == null) {
-            transactionContextFactory = new StandaloneMybatisTransactionContextFactory();
         }
     }
 

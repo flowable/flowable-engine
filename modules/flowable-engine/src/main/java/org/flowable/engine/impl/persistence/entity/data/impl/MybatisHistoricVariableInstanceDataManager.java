@@ -21,7 +21,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CachedEntityMatcher;
 import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoricVariableInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.HistoricVariableInstanceByProcInstMatcher;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.HistoricVariableInstanceByTaskIdMatcher;
@@ -29,7 +29,7 @@ import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.Histor
 /**
  * @author Joram Barrez
  */
-public class MybatisHistoricVariableInstanceDataManager extends AbstractDataManager<HistoricVariableInstanceEntity> implements HistoricVariableInstanceDataManager {
+public class MybatisHistoricVariableInstanceDataManager extends AbstractProcessDataManager<HistoricVariableInstanceEntity> implements HistoricVariableInstanceDataManager {
 
     protected CachedEntityMatcher<HistoricVariableInstanceEntity> historicVariableInstanceByTaskIdMatcher = new HistoricVariableInstanceByTaskIdMatcher();
 

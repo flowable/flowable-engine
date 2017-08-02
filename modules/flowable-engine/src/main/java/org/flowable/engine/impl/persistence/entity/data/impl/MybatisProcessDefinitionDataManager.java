@@ -21,14 +21,14 @@ import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionDataManager;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisProcessDefinitionDataManager extends AbstractDataManager<ProcessDefinitionEntity> implements ProcessDefinitionDataManager {
+public class MybatisProcessDefinitionDataManager extends AbstractProcessDataManager<ProcessDefinitionEntity> implements ProcessDefinitionDataManager {
 
     public MybatisProcessDefinitionDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);

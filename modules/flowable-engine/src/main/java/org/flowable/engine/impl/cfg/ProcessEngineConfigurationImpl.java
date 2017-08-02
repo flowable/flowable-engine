@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -62,23 +63,19 @@ import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
-import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
-import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.event.FlowableEventDispatcherImpl;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandContextFactory;
-import org.flowable.engine.common.impl.interceptor.CommandContextInterceptor;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.common.impl.interceptor.LogInterceptor;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
-import org.flowable.engine.common.impl.interceptor.TransactionContextInterceptor;
 import org.flowable.engine.common.impl.persistence.GenericManagerFactory;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
+import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
+import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.common.runtime.Clock;
@@ -212,9 +209,7 @@ import org.flowable.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandle
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
-import org.flowable.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.impl.persistence.deploy.Deployer;
-import org.flowable.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionInfoCache;
@@ -784,16 +779,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      */
     protected boolean isBulkInsertEnabled = true;
 
-    /**
-     * Some databases have a limit of how many parameters one sql insert can have (eg SQL Server, 2000 params (!= insert statements) ). Tweak this parameter in case of exceptions indicating too much
-     * is being put into one bulk insert, or make it higher if your database can cope with it and there are inserts with a huge amount of data.
-     *
-     * By default: 100 (75 for mssql server as it has a hard limit of 2000 parameters in a statement)
-     */
-    protected int maxNrOfStatementsInBulkInsert = 100;
-
-    public int DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER = 70; // currently Execution has most params (28). 2000 / 28 = 71.
-
     protected ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -943,52 +928,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             }
         }
     }
-
-    public void initCommandInterceptors() {
-        if (commandInterceptors == null) {
-            commandInterceptors = new ArrayList<>();
-            if (customPreCommandInterceptors != null) {
-                commandInterceptors.addAll(customPreCommandInterceptors);
-            }
-            
-            commandInterceptors.addAll(getDefaultCommandInterceptors());
-            
-            commandInterceptors.add(new BpmnOverrideContextInterceptor());
-            
-            if (customPostCommandInterceptors != null) {
-                commandInterceptors.addAll(customPostCommandInterceptors);
-            }
-            commandInterceptors.add(commandInvoker);
-        }
-    }
-
-    public Collection<? extends CommandInterceptor> getDefaultCommandInterceptors() {
-        if (defaultCommandInterceptors == null) {
-            List<CommandInterceptor> interceptors = new ArrayList<>();
-            interceptors.add(new LogInterceptor());
     
-            CommandInterceptor transactionInterceptor = createTransactionInterceptor();
-            if (transactionInterceptor != null) {
-                interceptors.add(transactionInterceptor);
-            }
-    
-            if (commandContextFactory != null) {
-                CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory);
-                engineConfigurations.put(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG, this);
-                commandContextInterceptor.setEngineConfigurations(engineConfigurations);
-                commandContextInterceptor.setCurrentEngineConfigurationKey(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
-                interceptors.add(commandContextInterceptor);
-            }
-    
-            if (transactionContextFactory != null) {
-                interceptors.add(new TransactionContextInterceptor(transactionContextFactory));
-            }
-    
-            defaultCommandInterceptors = interceptors;
-        }
-        return defaultCommandInterceptors;
+    @Override
+    public String getEngineCfgKey() {
+        return EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG;
     }
     
+    @Override
+    public List<CommandInterceptor> getAdditionalDefaultCommandInterceptors() {
+        return Arrays.<CommandInterceptor>asList(new BpmnOverrideContextInterceptor());
+    }
+
     // services
     // /////////////////////////////////////////////////////////////////
 
@@ -1294,25 +1244,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     }
 
-    public void initDbSqlSessionFactory() {
-        if (dbSqlSessionFactory == null) {
-            dbSqlSessionFactory = createDbSqlSessionFactory();
-        }
-        dbSqlSessionFactory.setDatabaseType(databaseType);
-        dbSqlSessionFactory.setIdGenerator(idGenerator);
-        dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
-        dbSqlSessionFactory.setDbHistoryUsed(isDbHistoryUsed);
-        dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
-        dbSqlSessionFactory.setTablePrefixIsSchema(tablePrefixIsSchema);
-        dbSqlSessionFactory.setDatabaseCatalog(databaseCatalog);
-        dbSqlSessionFactory.setDatabaseSchema(databaseSchema);
-        dbSqlSessionFactory.setMaxNrOfStatementsInBulkInsert(maxNrOfStatementsInBulkInsert);
-        
-        initDbSqlSessionFactoryEntitySettings();
-        
-        addSessionFactory(dbSqlSessionFactory);
-    }
-
     protected void initDbSqlSessionFactoryEntitySettings() {
         for (Class<? extends Entity> clazz : EntityDependencyOrder.INSERT_ORDER) {
             // All entities except one of the bpmn engine are bulk inserteable
@@ -1333,10 +1264,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
-    public DbSqlSessionFactory createDbSqlSessionFactory() {
-        return new DbSqlSessionFactory();
-    }
-    
     public void initAsyncHistorySessionFactory() {
         AsyncHistorySessionFactory asyncHistorySessionFactory = new AsyncHistorySessionFactory();
         if (asyncHistoryListener == null) {
@@ -1863,18 +1790,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // OTHER
     // ////////////////////////////////////////////////////////////////////
-
-    public void initCommandContextFactory() {
-        if (commandContextFactory == null) {
-            commandContextFactory = new CommandContextFactory();
-        }
-    }
-
-    public void initTransactionContextFactory() {
-        if (transactionContextFactory == null) {
-            transactionContextFactory = new StandaloneMybatisTransactionContextFactory();
-        }
-    }
 
     @Override
     public void initTransactionFactory() {
@@ -3017,15 +2932,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setBulkInsertEnabled(boolean isBulkInsertEnabled) {
         this.isBulkInsertEnabled = isBulkInsertEnabled;
-        return this;
-    }
-
-    public int getMaxNrOfStatementsInBulkInsert() {
-        return maxNrOfStatementsInBulkInsert;
-    }
-
-    public ProcessEngineConfigurationImpl setMaxNrOfStatementsInBulkInsert(int maxNrOfStatementsInBulkInsert) {
-        this.maxNrOfStatementsInBulkInsert = maxNrOfStatementsInBulkInsert;
         return this;
     }
 

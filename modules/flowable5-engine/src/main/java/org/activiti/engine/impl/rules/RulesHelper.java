@@ -19,7 +19,7 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.repository.Deployment;
 import org.drools.KnowledgeBase;
-import org.flowable.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 
 /**
  * @author Tom Baeyens

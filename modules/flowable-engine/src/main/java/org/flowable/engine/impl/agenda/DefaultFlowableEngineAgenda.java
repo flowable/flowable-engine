@@ -12,10 +12,8 @@
  */
 package org.flowable.engine.impl.agenda;
 
-import java.util.LinkedList;
-
 import org.flowable.engine.FlowableEngineAgenda;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.agenda.AbstractAgenda;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -36,43 +34,12 @@ import org.slf4j.LoggerFactory;
  *
  * @author Joram Barrez
  */
-public class DefaultFlowableEngineAgenda implements FlowableEngineAgenda {
-
+public class DefaultFlowableEngineAgenda extends AbstractAgenda implements FlowableEngineAgenda {
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFlowableEngineAgenda.class);
 
-    protected CommandContext commandContext;
-
-    protected LinkedList<Runnable> operations = new LinkedList<>();
-
     public DefaultFlowableEngineAgenda(CommandContext commandContext) {
-        this.commandContext = commandContext;
-    }
-
-    public boolean isEmpty() {
-        return operations.isEmpty();
-    }
-
-    public Runnable getNextOperation() {
-        assertOperationsNotEmpty();
-        return operations.poll();
-    }
-
-    public Runnable peekOperation() {
-        assertOperationsNotEmpty();
-        return operations.peek();
-    }
-
-    private void assertOperationsNotEmpty() {
-        if (operations.isEmpty()) {
-            throw new FlowableException("Unable to peek empty agenda.");
-        }
-    }
-
-    /**
-     * Generic method to plan a {@link Runnable}.
-     */
-    public void planOperation(Runnable operation) {
-        planOperation(operation, null);
+        super(commandContext);
     }
 
     /**
@@ -123,28 +90,6 @@ public class DefaultFlowableEngineAgenda implements FlowableEngineAgenda {
 
     public void planExecuteInactiveBehaviorsOperation() {
         planOperation(new ExecuteInactiveBehaviorsOperation(commandContext));
-    }
-
-    public CommandContext getCommandContext() {
-        return commandContext;
-    }
-
-    public void setCommandContext(CommandContext commandContext) {
-        this.commandContext = commandContext;
-    }
-
-    public LinkedList<Runnable> getOperations() {
-        return operations;
-    }
-
-    @Override
-    public void flush() {
-        
-    }
-
-    @Override
-    public void close() {
-        
     }
 
 }

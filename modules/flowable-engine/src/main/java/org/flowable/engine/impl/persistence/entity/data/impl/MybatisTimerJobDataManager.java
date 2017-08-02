@@ -23,7 +23,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CachedEntityMatcher;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.TimerJobDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.TimerJobsByExecutionIdMatcher;
 import org.flowable.engine.runtime.Job;
@@ -32,7 +32,7 @@ import org.flowable.engine.runtime.Job;
  * @author Tijs Rademakers
  * @author Vasile Dirla
  */
-public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEntity> implements TimerJobDataManager {
+public class MybatisTimerJobDataManager extends AbstractProcessDataManager<TimerJobEntity> implements TimerJobDataManager {
 
     protected CachedEntityMatcher<TimerJobEntity> timerJobsByExecutionIdMatcher = new TimerJobsByExecutionIdMatcher();
 

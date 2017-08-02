@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog 
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext 
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="1" author="flowable">
+
+        <createTable tableName="ACT_CMMN_RE_DEPLOYMENT">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="NAME_" type="varchar(255)" />
+            <column name="CATEGORY_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="DEPLOY_TIME_" type="datetime">
+                <constraints nullable="true" />
+            </column>
+            <column name="TENANT_ID_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="PARENT_DEPLOYMENT_ID_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+
+        <createTable tableName="ACT_CMMN_RE_DEPLOYMENT_RESOURCE">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="NAME_" type="varchar(255)" />
+            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
+            <column name="RESOURCE_BYTES_" type="longblob">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+
+        <createTable tableName="ACT_CMMN_RE_CASEDEF">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="REV_" type="integer" />
+            <column name="NAME_" type="varchar(255)" />
+            <column name="KEY_" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="VERSION_" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="CATEGORY_" type="varchar(255)" />
+            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
+            <column name="RESOURCE_NAME_" type="varchar(4000)" />
+            <column name="DESCRIPTION_" type="varchar(4000)" />
+            <column name="HAS_GRAPHICAL_NOTATION_" type="boolean" />
+            <column name="TENANT_ID_" type="varchar(255)" defaultValue="">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint 
+            constraintName="ACT_FK_CASE_DEF_DPLY" 
+            referencedTableName="ACT_CMMN_RE_DEPLOYMENT"
+            referencedColumnNames="ID_" 
+            baseTableName="ACT_CMMN_RE_CASEDEF" 
+            baseColumnNames="DEPLOYMENT_ID_" />
+
+    </changeSet>
+
+</databaseChangeLog>

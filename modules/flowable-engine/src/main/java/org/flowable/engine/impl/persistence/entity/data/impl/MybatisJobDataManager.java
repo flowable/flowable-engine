@@ -23,7 +23,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CachedEntityMatcher;
 import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.persistence.entity.JobEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.JobDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.JobsByExecutionIdMatcher;
 import org.flowable.engine.runtime.Job;
@@ -32,7 +32,7 @@ import org.flowable.engine.runtime.Job;
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implements JobDataManager {
+public class MybatisJobDataManager extends AbstractProcessDataManager<JobEntity> implements JobDataManager {
 
     protected CachedEntityMatcher<JobEntity> jobsByExecutionIdMatcher = new JobsByExecutionIdMatcher();
 

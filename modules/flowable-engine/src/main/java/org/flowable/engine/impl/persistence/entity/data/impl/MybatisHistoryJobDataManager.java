@@ -23,14 +23,14 @@ import org.flowable.engine.impl.HistoryJobQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoryJobDataManager;
 import org.flowable.engine.runtime.HistoryJob;
 
 /**
  * @author Tijs Rademakers
  */
-public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJobEntity> implements HistoryJobDataManager {
+public class MybatisHistoryJobDataManager extends AbstractProcessDataManager<HistoryJobEntity> implements HistoryJobDataManager {
 
     public MybatisHistoryJobDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);

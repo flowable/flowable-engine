@@ -26,13 +26,13 @@ import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanc
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricFormPropertyEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricFormPropertyEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoricDetailDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisHistoricDetailDataManager extends AbstractDataManager<HistoricDetailEntity> implements HistoricDetailDataManager {
+public class MybatisHistoricDetailDataManager extends AbstractProcessDataManager<HistoricDetailEntity> implements HistoricDetailDataManager {
 
     public MybatisHistoricDetailDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);
