@@ -1,36 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions id="definition" 
-  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:activiti="http://activiti.org/bpmn"
-  targetNamespace="Examples">
-  
-  <process id="process" name="process1">
-  
-    <startEvent id="startevent1" name="Start" />
-    
-    <callActivity id="callActivity1" name="Call activity" calledElement="callActivityProcess">
-      <multiInstanceLoopCharacteristics isSequential="true" activiti:collection="assignees" activiti:elementVariable="assignee"></multiInstanceLoopCharacteristics>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="Examples" id="definition">
+  <process id="process" name="process1" isExecutable="true">
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <callActivity id="callActivity1" name="Call activity" calledElement="callActivityProcess" activiti:inheritVariables="false">
+      <multiInstanceLoopCharacteristics isSequential="true" activiti:collection="${assignees}" activiti:elementVariable="assignee"></multiInstanceLoopCharacteristics>
     </callActivity>
-    
-    <boundaryEvent id="boundaryerror1" cancelActivity="true" attachedToRef="callActivity1">
+    <boundaryEvent id="boundaryerror1" attachedToRef="callActivity1">
       <errorEventDefinition errorRef="errorId1"></errorEventDefinition>
     </boundaryEvent>
-    
-    <sequenceFlow id="flow1" name="" sourceRef="startevent1" targetRef="callActivity1" />
-    
-    <endEvent id="endevent1" name="End" />
-    
-    <sequenceFlow id="flow2" name="" sourceRef="callActivity1" targetRef="endevent1"/>
-    
-    <userTask id="handleErrorTask" name="Handle Error"/>
-    
-    <sequenceFlow id="flow3" name="" sourceRef="boundaryerror1" targetRef="handleErrorTask"/>
-    
-    <endEvent id="endevent2" name="End"/>
-    
-    <sequenceFlow id="flow4" name="" sourceRef="handleErrorTask" targetRef="endevent2"/>
-    
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="callActivity1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow2" sourceRef="callActivity1" targetRef="endevent1"></sequenceFlow>
+    <userTask id="handleErrorTask" name="Handle Error"></userTask>
+    <sequenceFlow id="flow3" sourceRef="boundaryerror1" targetRef="handleErrorTask"></sequenceFlow>
+    <endEvent id="endevent2" name="End"></endEvent>
+    <sequenceFlow id="flow4" sourceRef="handleErrorTask" targetRef="endevent2"></sequenceFlow>
   </process>
-  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_process">
+    <bpmndi:BPMNPlane bpmnElement="process" id="BPMNPlane_process">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="0.0" y="15.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="callActivity1" id="BPMNShape_callActivity1">
+        <omgdc:Bounds height="60.0" width="100.0" x="80.0" y="0.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundaryerror1" id="BPMNShape_boundaryerror1">
+        <omgdc:Bounds height="30.0" width="30.0" x="145.0" y="45.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="230.0" y="15.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="handleErrorTask" id="BPMNShape_handleErrorTask">
+        <omgdc:Bounds height="60.0" width="100.0" x="0.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent2" id="BPMNShape_endevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="150.0" y="135.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="35.0" y="32.0"></omgdi:waypoint>
+        <omgdi:waypoint x="42.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="42.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="80.0" y="30.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="180.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="192.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="192.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="230.0" y="32.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="160.0" y="75.0"></omgdi:waypoint>
+        <omgdi:waypoint x="160.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="50.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="50.0" y="180.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="100.0" y="150.0"></omgdi:waypoint>
+        <omgdi:waypoint x="150.0" y="152.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
 </definitions>

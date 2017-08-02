@@ -4,7 +4,7 @@
     <startEvent id="start"></startEvent>
     <endEvent id="end"></endEvent>
     <subProcess id="subprocess1" name="Sub Process">
-      <multiInstanceLoopCharacteristics isSequential="true" activiti:collection="collection"></multiInstanceLoopCharacteristics>
+      <multiInstanceLoopCharacteristics isSequential="true" activiti:collection="${collection}"></multiInstanceLoopCharacteristics>
       <startEvent id="startevent1" name="Start"></startEvent>
       <userTask id="usertask1" name="User Task"></userTask>
       <endEvent id="endevent1" name="End"></endEvent>
