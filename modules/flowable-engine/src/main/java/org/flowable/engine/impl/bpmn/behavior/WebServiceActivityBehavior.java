@@ -276,12 +276,16 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
                     wsServiceMap.putAll(importerInstance.getServices());
                     wsOperationMap.putAll(importerInstance.getOperations());
 
+                } catch (ClassNotFoundException e) {
+                    throw new FlowableException("Could not find importer class for type " + theImport.getImportType(),
+                            e);
                 } catch (Exception e) {
-                    throw new FlowableException("Could not find importer for type " + theImport.getImportType());
+                    throw new FlowableException(String.format("Error importing '%s' as '%s'", theImport.getLocation(),
+                            theImport.getImportType()), e);
                 }
 
             } else {
-                throw new FlowableException("Could not import item of type " + theImport.getImportType());
+                throw new FlowableException(String.format("Unsupported import type '%s'", theImport.getImportType()));
             }
         }
     }
