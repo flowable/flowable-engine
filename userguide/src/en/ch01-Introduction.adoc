@@ -63,3 +63,12 @@ All classes that have +.impl.+ in the package name are internal implementation c
 === Internal implementation classes
 
 In the JAR files, all classes in packages that have +.impl.+ (e.g. ++org.flowable.engine.impl.db++) in their name are implementation classes and should be considered internal use only. No stability guarantees are given on classes or interfaces that are in implementation classes.
+
+
+=== Versioning Strategy
+
+Versions are denoted using a standard triplet of integers: *MAJOR.MINOR.MICRO*. The intention is that *MAJOR* versions are for evolutions of the core engines. *MINOR* versions are for new features and new APIs. *MICRO* versions are for bug fixes and improvements.
+
+In general, Flowable attempts to remain "source compatible" in *MINOR* and *MICRO* releases for all non internal implementation classes. We define "source compatible" to mean an application will continue to build without error and the semantics have remained unchanged. Flowable also attempts to remain "binary compatible" in *MINOR* and *MICRO* releases. We define "binary compatible" to mean that this new version of Flowable can be dropped as a jar replacement into a compiled application and continue to function properly.
+
+In case an API change is introduced in a *MINOR* release, the strategy is that a backwards compatible version is kept in it, annotated with _@Deprecated_. Such deprecated APIs will then be removed two *MINOR* versions later.
