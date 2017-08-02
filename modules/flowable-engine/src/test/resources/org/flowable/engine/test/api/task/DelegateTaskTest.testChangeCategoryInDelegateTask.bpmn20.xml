@@ -1,47 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-    xmlns:activiti="http://activiti.org/bpmn" 
-    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
-    xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
-    xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
-    typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
-    
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
   <process id="delegateTaskTest" isExecutable="true">
-  
     <startEvent id="startevent1" name="Start"></startEvent>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="approvalTask"></sequenceFlow>
-    
     <userTask id="approvalTask" name="Approval" activiti:category="approval">
-        <extensionElements>
-            <activiti:taskListener event="complete" class="org.flowable.engine.impl.bpmn.listener.ScriptTaskListener" >
-              <activiti:field name="script">
-                <activiti:string>
-                <![CDATA[
-                
-                  // Update category based on outcome 
+      <extensionElements>
+        <activiti:taskListener event="complete" class="org.flowable.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="script">
+            <activiti:string><![CDATA[// Update category based on outcome 
                   var outcome = task.getVariableLocal('outcome');
                   if (outcome == 'approve') {
                      task.setCategory('approved');
                   } else {
                      task.setCategory('rejected');
                   }
-                  taskService.saveTask(task);
-                  
-                ]]>  
-                </activiti:string>
-              </activiti:field>
-              <activiti:field name="language" stringValue="JavaScript" />
-            </activiti:taskListener>
-        </extensionElements>
-        <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="${approvers}" activiti:elementVariable="approver">
-            <loopDataInputRef>approvers</loopDataInputRef>
-            <inputDataItem name="approver" />
-        </multiInstanceLoopCharacteristics>
+                  taskService.saveTask(task);]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="language">
+            <activiti:string><![CDATA[JavaScript]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="${approvers}" activiti:elementVariable="approver"></multiInstanceLoopCharacteristics>
     </userTask>
     <sequenceFlow id="flow2" sourceRef="approvalTask" targetRef="theEnd"></sequenceFlow>
-    
     <endEvent id="theEnd" name="End"></endEvent>
-    
   </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_delegateTaskTest">
+    <bpmndi:BPMNPlane bpmnElement="delegateTaskTest" id="BPMNPlane_delegateTaskTest">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="0.0" y="15.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="approvalTask" id="BPMNShape_approvalTask">
+        <omgdc:Bounds height="60.0" width="100.0" x="80.0" y="0.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="theEnd" id="BPMNShape_theEnd">
+        <omgdc:Bounds height="35.0" width="35.0" x="230.0" y="15.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="35.0" y="32.0"></omgdi:waypoint>
+        <omgdi:waypoint x="42.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="42.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="80.0" y="30.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="180.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="192.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="192.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="230.0" y="32.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
 </definitions>

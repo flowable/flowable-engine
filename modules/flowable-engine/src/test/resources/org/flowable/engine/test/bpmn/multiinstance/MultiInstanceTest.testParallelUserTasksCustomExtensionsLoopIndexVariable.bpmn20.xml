@@ -1,37 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="Examples" id="definition">
-  <process id="miParallelUserTasksLoopVariable" isExecutable="true">
-    <startEvent id="theStart"></startEvent>
-    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="miTasks"></sequenceFlow>
-    <userTask id="miTasks" name="My Task ${loopValueIndex}" activiti:assignee="${assignee}">
-      <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="${assigneeList}" activiti:elementVariable="assignee"></multiInstanceLoopCharacteristics>
+<definitions id="definition" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="miParallelUserTasksLoopVariable">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="miTasks" />
+    
+    <userTask id="miTasks" name="My Task ${loopValueIndex}" activiti:assignee="${assignee}" >
+      <multiInstanceLoopCharacteristics isSequential="false"
+              activiti:collection="${assigneeList}" activiti:elementVariable="assignee"
+              activiti:elementIndexVariable="loopValueIndex"/>
     </userTask>
-    <sequenceFlow id="flow3" sourceRef="miTasks" targetRef="theEnd"></sequenceFlow>
-    <endEvent id="theEnd"></endEvent>
+    
+    <sequenceFlow id="flow3" sourceRef="miTasks" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
   </process>
-  <bpmndi:BPMNDiagram id="BPMNDiagram_miParallelUserTasksLoopVariable">
-    <bpmndi:BPMNPlane bpmnElement="miParallelUserTasksLoopVariable" id="BPMNPlane_miParallelUserTasksLoopVariable">
-      <bpmndi:BPMNShape bpmnElement="theStart" id="BPMNShape_theStart">
-        <omgdc:Bounds height="35.0" width="35.0" x="0.0" y="15.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="miTasks" id="BPMNShape_miTasks">
-        <omgdc:Bounds height="60.0" width="100.0" x="80.0" y="0.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="theEnd" id="BPMNShape_theEnd">
-        <omgdc:Bounds height="35.0" width="35.0" x="230.0" y="15.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
-        <omgdi:waypoint x="35.0" y="32.0"></omgdi:waypoint>
-        <omgdi:waypoint x="42.0" y="30.0"></omgdi:waypoint>
-        <omgdi:waypoint x="42.0" y="30.0"></omgdi:waypoint>
-        <omgdi:waypoint x="80.0" y="30.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
-        <omgdi:waypoint x="180.0" y="30.0"></omgdi:waypoint>
-        <omgdi:waypoint x="192.0" y="30.0"></omgdi:waypoint>
-        <omgdi:waypoint x="192.0" y="30.0"></omgdi:waypoint>
-        <omgdi:waypoint x="230.0" y="32.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-    </bpmndi:BPMNPlane>
-  </bpmndi:BPMNDiagram>
+
 </definitions>
