@@ -32,12 +32,8 @@ import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricFormProperty;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.history.HistoricVariableInstance;
-import org.flowable.engine.history.HistoricVariableInstanceQuery;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
-import org.flowable.engine.impl.variable.EntityManagerSession;
-import org.flowable.engine.impl.variable.EntityManagerSessionFactory;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
@@ -45,6 +41,10 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.api.runtime.DummySerializable;
 import org.flowable.engine.test.history.SerializableVariable;
 import org.flowable.standalone.jpa.FieldAccessJPAEntity;
+import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.variable.service.history.HistoricVariableInstanceQuery;
+import org.flowable.variable.service.impl.types.EntityManagerSession;
+import org.flowable.variable.service.impl.types.EntityManagerSessionFactory;
 
 /**
  * @author Tom Baeyens

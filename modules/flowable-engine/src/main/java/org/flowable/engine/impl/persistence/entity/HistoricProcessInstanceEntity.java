@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.flowable.engine.common.impl.db.HasRevision;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 /**
  * @author Joram Barrez

@@ -35,6 +35,8 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.DelegationState;
 import org.flowable.engine.task.IdentityLink;
 import org.flowable.engine.task.IdentityLinkType;
+import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Tom Baeyens
@@ -177,7 +179,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
 
     @Override
     protected List<VariableInstanceEntity> loadVariableInstances() {
-        return CommandContextUtil.getVariableInstanceEntityManager().findVariableInstancesByTaskId(id);
+        return CommandContextUtil.getVariableService().findVariableInstancesByTaskId(id);
     }
 
     @Override
@@ -373,7 +375,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         if (commandContext == null) {
             throw new FlowableException("lazy loading outside command context");
         }
-        VariableInstanceEntity variableInstance = CommandContextUtil.getVariableInstanceEntityManager(commandContext).findVariableInstanceByTaskAndName(id, variableName);
+        VariableInstanceEntity variableInstance = CommandContextUtil.getVariableService().findVariableInstanceByTaskAndName(id, variableName);
 
         return variableInstance;
     }
@@ -384,7 +386,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         if (commandContext == null) {
             throw new FlowableException("lazy loading outside command context");
         }
-        return CommandContextUtil.getVariableInstanceEntityManager(commandContext).findVariableInstancesByTaskAndNames(id, variableNames);
+        return CommandContextUtil.getVariableService().findVariableInstancesByTaskAndNames(id, variableNames);
     }
 
     // regular getters and setters ////////////////////////////////////////////////////////

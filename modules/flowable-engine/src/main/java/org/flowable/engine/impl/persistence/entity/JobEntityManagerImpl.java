@@ -22,6 +22,7 @@ import org.flowable.engine.impl.JobQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.data.JobDataManager;
+import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.runtime.Job;
 
 /**
@@ -65,7 +66,7 @@ public class JobEntityManagerImpl extends JobInfoEntityManagerImpl<JobEntity> im
                     jobEntity.setTenantId(execution.getTenantId());
                 }
 
-                if (isExecutionRelatedEntityCountEnabled(execution)) {
+                if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(execution)) {
                     CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
                     countingExecutionEntity.setJobCount(countingExecutionEntity.getJobCount() + 1);
                 }
@@ -106,9 +107,9 @@ public class JobEntityManagerImpl extends JobInfoEntityManagerImpl<JobEntity> im
 
     @Override
     public void delete(JobEntity entity, boolean fireDeleteEvent) {
-        if (entity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
+        if (entity.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
             CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(entity.getExecutionId());
-            if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
+            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
                 executionEntity.setJobCount(executionEntity.getJobCount() - 1);
             }
         }

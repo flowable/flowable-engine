@@ -26,9 +26,9 @@ import org.activiti.engine.impl.persistence.entity.SuspensionState;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.impl.variable.VariableTypes;
 import org.flowable.engine.task.DelegationState;
 import org.flowable.idm.api.Group;
+import org.flowable.variable.service.impl.types.VariableTypes;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;

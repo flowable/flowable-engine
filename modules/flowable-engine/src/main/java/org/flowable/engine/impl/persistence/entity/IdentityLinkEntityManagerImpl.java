@@ -24,6 +24,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.CountingTaskEntity;
 import org.flowable.engine.impl.persistence.entity.data.IdentityLinkDataManager;
+import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.task.IdentityLinkType;
 
 /**
@@ -50,14 +51,14 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
         super.insert(entity, fireCreateEvent);
         getHistoryManager().recordIdentityLinkCreated(entity);
 
-        if (entity.getTask() != null && isTaskRelatedEntityCountEnabledGlobally()) {
+        if (entity.getTask() != null && CountingEntityUtil.isTaskRelatedEntityCountEnabledGlobally()) {
             CountingTaskEntity countingTaskEntity = (CountingTaskEntity) entity.getTask();
-            if (isTaskRelatedEntityCountEnabled(countingTaskEntity)) {
+            if (CountingEntityUtil.isTaskRelatedEntityCountEnabled(countingTaskEntity)) {
                 countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() + 1);
             }
-        } else if (entity.getProcessInstanceId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
+        } else if (entity.getProcessInstanceId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
             CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(entity.getProcessInstanceId());
-            if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
+            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
                 executionEntity.setIdentityLinkCount(executionEntity.getIdentityLinkCount() + 1);
             }
         }
@@ -70,15 +71,15 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
             getHistoryManager().recordIdentityLinkDeleted(identityLink.getId());
         }
 
-        if (identityLink.getTask() != null && isTaskRelatedEntityCountEnabledGlobally()) {
+        if (identityLink.getTask() != null && CountingEntityUtil.isTaskRelatedEntityCountEnabledGlobally()) {
             CountingTaskEntity countingTaskEntity = (CountingTaskEntity) identityLink.getTask();
-            if (isTaskRelatedEntityCountEnabled(countingTaskEntity)) {
+            if (CountingEntityUtil.isTaskRelatedEntityCountEnabled(countingTaskEntity)) {
                 countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() - 1);
             }
             
-        } else if (identityLink.getProcessInstanceId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
+        } else if (identityLink.getProcessInstanceId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
             CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(identityLink.getProcessInstanceId());
-            if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
+            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
                 executionEntity.setIdentityLinkCount(executionEntity.getIdentityLinkCount() - 1);
             }
         }

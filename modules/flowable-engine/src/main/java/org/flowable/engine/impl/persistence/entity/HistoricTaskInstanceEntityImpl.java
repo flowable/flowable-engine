@@ -23,6 +23,8 @@ import java.util.Map;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInitializingList;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 /**
  * @author Tom Baeyens

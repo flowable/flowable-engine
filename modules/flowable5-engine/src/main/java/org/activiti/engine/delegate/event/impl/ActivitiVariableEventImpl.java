@@ -13,8 +13,8 @@
 package org.activiti.engine.delegate.event.impl;
 
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.delegate.event.FlowableVariableEvent;
-import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.variable.service.event.FlowableVariableEvent;
+import org.flowable.variable.service.impl.types.VariableType;
 
 /**
  * Implementation of {@link FlowableVariableEvent}.

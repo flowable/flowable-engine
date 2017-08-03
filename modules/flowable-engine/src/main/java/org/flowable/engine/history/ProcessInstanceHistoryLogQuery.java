@@ -13,6 +13,7 @@
 package org.flowable.engine.history;
 
 import org.flowable.engine.task.Comment;
+import org.flowable.variable.service.history.HistoricVariableInstance;
 
 /**
  * Allows to fetch the {@link ProcessInstanceHistoryLog} for a process instance.

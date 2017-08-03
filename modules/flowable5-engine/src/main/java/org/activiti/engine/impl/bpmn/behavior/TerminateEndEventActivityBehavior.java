@@ -24,7 +24,6 @@ import org.activiti.engine.impl.HistoricActivityInstanceQueryImpl;
 import org.activiti.engine.impl.bpmn.helper.ScopeUtil;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
@@ -33,6 +32,7 @@ import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.TerminateEventDefinition;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 

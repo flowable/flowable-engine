@@ -12,10 +12,10 @@
  */
 package org.flowable.app.model.runtime;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import org.flowable.app.model.common.AbstractRepresentation;
 import org.flowable.engine.repository.ProcessDefinition;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * REST representation of a process definition.

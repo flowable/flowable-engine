@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.task.TaskQuery;

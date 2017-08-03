@@ -24,6 +24,9 @@ public interface EngineConfigurationConstants {
     
     String KEY_CONTENT_ENGINE_CONFIG = "cfg.contentEngine";
     
+    String KEY_TASK_SERVICE_CONFIG = "cfg.taskService";
+    
+    String KEY_VARIABLE_SERVICE_CONFIG = "cfg.variableService";
     
     int PRIORITY_ENGINE_IDM = 100000;
     

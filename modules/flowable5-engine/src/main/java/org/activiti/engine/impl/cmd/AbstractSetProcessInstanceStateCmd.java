@@ -23,9 +23,9 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
 import org.activiti.engine.impl.persistence.entity.SuspendedJobEntity;
 import org.activiti.engine.impl.persistence.entity.SuspensionState;
+import org.activiti.engine.impl.persistence.entity.SuspensionState.SuspensionStateUtil;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.persistence.entity.TimerJobEntity;
-import org.activiti.engine.impl.persistence.entity.SuspensionState.SuspensionStateUtil;
 import org.activiti.engine.runtime.Execution;
 import org.flowable.engine.runtime.Job;
 

@@ -12,9 +12,6 @@
  */
 package org.activiti.engine.impl.event.logger.handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,10 +27,13 @@ import org.activiti.engine.impl.variable.SerializableType;
 import org.activiti.engine.impl.variable.ShortType;
 import org.activiti.engine.impl.variable.StringType;
 import org.activiti.engine.impl.variable.UUIDType;
-import org.flowable.engine.delegate.event.FlowableVariableEvent;
-import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.variable.service.event.FlowableVariableEvent;
+import org.flowable.variable.service.impl.types.VariableType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez

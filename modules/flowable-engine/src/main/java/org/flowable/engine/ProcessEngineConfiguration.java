@@ -23,11 +23,11 @@ import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.cfg.MailServerInfo;
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.image.ProcessDiagramGenerator;
 
 /**

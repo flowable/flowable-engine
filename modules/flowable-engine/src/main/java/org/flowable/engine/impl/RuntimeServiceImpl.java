@@ -64,7 +64,6 @@ import org.flowable.engine.impl.cmd.StartProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceWithFormCmd;
 import org.flowable.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.TriggerCmd;
-import org.flowable.engine.impl.persistence.entity.VariableInstance;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
@@ -81,6 +80,7 @@ import org.flowable.engine.task.Event;
 import org.flowable.engine.task.IdentityLink;
 import org.flowable.engine.task.IdentityLinkType;
 import org.flowable.form.model.FormModel;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
 
 /**
  * @author Tom Baeyens

@@ -19,10 +19,10 @@ import java.util.Map;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;

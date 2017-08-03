@@ -1,5 +1,15 @@
 package org.flowable.crystalball.simulator.impl.replay;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.flowable.crystalball.simulator.ReplaySimulationRun;
 import org.flowable.crystalball.simulator.SimpleEventCalendar;
 import org.flowable.crystalball.simulator.SimulationDebugger;
@@ -17,23 +27,13 @@ import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.event.EventLogEntry;
-import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.NoExecutionVariableScope;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
+import org.flowable.variable.service.history.HistoricVariableInstance;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author martin.grofcik

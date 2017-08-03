@@ -14,8 +14,8 @@ package org.activiti.engine.impl.variable;
 
 import java.util.Date;
 
-import org.flowable.engine.impl.variable.ValueFields;
-import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.variable.service.impl.types.ValueFields;
+import org.flowable.variable.service.impl.types.VariableType;
 
 /**
  * @author Tom Baeyens

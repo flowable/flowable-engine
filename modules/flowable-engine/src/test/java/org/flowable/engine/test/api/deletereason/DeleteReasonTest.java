@@ -14,10 +14,10 @@ package org.flowable.engine.test.api.deletereason;
 
 import java.util.List;
 
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;

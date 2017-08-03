@@ -16,9 +16,9 @@ import java.io.ByteArrayInputStream;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Task;
 

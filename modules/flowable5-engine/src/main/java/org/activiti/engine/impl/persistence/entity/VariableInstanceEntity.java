@@ -22,9 +22,9 @@ import org.activiti.engine.impl.db.HasRevision;
 import org.activiti.engine.impl.db.PersistentObject;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
-import org.flowable.engine.impl.persistence.entity.VariableInstance;
-import org.flowable.engine.impl.variable.ValueFields;
-import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.types.ValueFields;
+import org.flowable.variable.service.impl.types.VariableType;
 
 /**
  * @author Tom Baeyens

@@ -14,7 +14,7 @@ package org.activiti.standalone.escapeclause;
 
 import java.util.List;
 
-import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;

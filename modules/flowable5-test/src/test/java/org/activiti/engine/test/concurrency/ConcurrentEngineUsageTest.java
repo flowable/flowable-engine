@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.apache.ibatis.exceptions.PersistenceException;
-import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;

@@ -17,13 +17,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.HistoricTaskInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.data.HistoricTaskInstanceDataManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 
 /**
@@ -107,7 +108,7 @@ public class HistoricTaskInstanceEntityManagerImpl extends AbstractEntityManager
                 }
 
                 getHistoricDetailEntityManager().deleteHistoricDetailsByTaskId(id);
-                getHistoricVariableInstanceEntityManager().deleteHistoricVariableInstancesByTaskId(id);
+                CommandContextUtil.getHistoricVariableService().deleteHistoricVariableInstancesByTaskId(id);
                 getHistoricIdentityLinkEntityManager().deleteHistoricIdentityLinksByTaskId(id);
 
                 delete(historicTaskInstance);

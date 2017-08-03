@@ -32,7 +32,6 @@ import org.flowable.engine.history.HistoricFormProperty;
 import org.flowable.engine.history.HistoricIdentityLink;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.repository.Deployment;
@@ -91,6 +90,7 @@ import org.flowable.rest.variable.LongRestVariableConverter;
 import org.flowable.rest.variable.RestVariableConverter;
 import org.flowable.rest.variable.ShortRestVariableConverter;
 import org.flowable.rest.variable.StringRestVariableConverter;
+import org.flowable.variable.service.history.HistoricVariableInstance;
 
 /**
  * Default implementation of a {@link RestResponseFactory}.

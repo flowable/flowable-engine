@@ -21,7 +21,7 @@ import org.flowable.engine.common.api.query.Query;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.impl.variable.VariableTypes;
+import org.flowable.variable.service.impl.types.VariableTypes;
 
 /**
  * Abstract query class that adds methods to query for variable values.

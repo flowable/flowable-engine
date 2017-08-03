@@ -12,8 +12,6 @@
  */
 package org.activiti.engine.impl.event.logger;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +44,8 @@ import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez

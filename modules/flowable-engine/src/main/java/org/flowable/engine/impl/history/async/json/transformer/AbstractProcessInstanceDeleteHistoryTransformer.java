@@ -27,7 +27,7 @@ public abstract class AbstractProcessInstanceDeleteHistoryTransformer extends Ab
         HistoricProcessInstanceEntity historicProcessInstance = historicProcessInstanceEntityManager.findById(processInstanceId);
         
         CommandContextUtil.getHistoricDetailEntityManager(commandContext).deleteHistoricDetailsByProcessInstanceId(processInstanceId);
-        CommandContextUtil.getHistoricVariableInstanceEntityManager(commandContext).deleteHistoricVariableInstanceByProcessInstanceId(processInstanceId);
+        CommandContextUtil.getHistoricVariableService().deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
         CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).deleteHistoricActivityInstancesByProcessInstanceId(processInstanceId);
         CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).deleteHistoricTaskInstancesByProcessInstanceId(processInstanceId);
         CommandContextUtil.getHistoricIdentityLinkEntityManager(commandContext).deleteHistoricIdentityLinksByProcInstance(processInstanceId);

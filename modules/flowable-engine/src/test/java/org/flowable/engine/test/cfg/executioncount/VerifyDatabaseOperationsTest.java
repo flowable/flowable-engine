@@ -18,10 +18,10 @@ import java.util.Map;
 
 import org.flowable.engine.common.impl.cfg.CommandExecutorImpl;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.history.AbstractHistoryManager;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.task.Task;
@@ -219,7 +219,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         }
     }
 
-    public void testExlusiveGateway() {
+    public void testExclusiveGateway() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             deployStartProcessInstanceAndProfile("process05.bpmn20.xml", "process05");
     
@@ -487,7 +487,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             String dbInsert = (String) expectedInserts[i];
             Long count = (Long) expectedInserts[i + 1];
 
-            Assert.assertEquals("Insert count for " + dbInsert + " not correct", count, stats.getDbInserts().get("org.flowable.engine.impl.persistence.entity." + dbInsert));
+            Assert.assertEquals("Insert count for " + dbInsert + " not correct", count, stats.getDbInserts().get(getQualifiedClassName(dbInsert)));
         }
     }
 
@@ -501,8 +501,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         for (int i = 0; i < expectedDeletes.length; i += 2) {
             String dbDelete = (String) expectedDeletes[i];
             Long count = (Long) expectedDeletes[i + 1];
-
-            Assert.assertEquals("Delete count count for " + dbDelete + " not correct", count, stats.getDbDeletes().get("org.flowable.engine.impl.persistence.entity." + dbDelete));
+            
+            Assert.assertEquals("Delete count count for " + dbDelete + " not correct", count, stats.getDbDeletes().get(getQualifiedClassName(dbDelete)));
         }
     }
 
@@ -574,4 +574,14 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         new ConsoleLogger(profiler).log();
     }
 
+    protected String getQualifiedClassName(String className) {
+        String fullClassName = null;
+        if (className.startsWith("VariableInstanceEntityImpl") || className.startsWith("HistoricVariableInstanceEntityImpl")) {
+            fullClassName = "org.flowable.variable.service.impl.persistence.entity." + className;
+        } else {
+            fullClassName = "org.flowable.engine.impl.persistence.entity." + className;
+        }
+        
+        return fullClassName;
+    }
 }

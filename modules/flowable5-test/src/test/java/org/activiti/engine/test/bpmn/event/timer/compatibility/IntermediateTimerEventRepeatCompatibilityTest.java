@@ -17,9 +17,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;

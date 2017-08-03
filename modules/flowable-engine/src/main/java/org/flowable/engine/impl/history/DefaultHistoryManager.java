@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -29,11 +30,12 @@ import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanc
 import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
-import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.IdentityLinkType;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,7 +133,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstanceId);
 
             getHistoricDetailEntityManager().deleteHistoricDetailsByProcessInstanceId(processInstanceId);
-            getHistoricVariableInstanceEntityManager().deleteHistoricVariableInstanceByProcessInstanceId(processInstanceId);
+            CommandContextUtil.getHistoricVariableService().deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
             getHistoricActivityInstanceEntityManager().deleteHistoricActivityInstancesByProcessInstanceId(processInstanceId);
             getHistoricTaskInstanceEntityManager().deleteHistoricTaskInstancesByProcessInstanceId(processInstanceId);
             getHistoricIdentityLinkEntityManager().deleteHistoricIdentityLinksByProcInstance(processInstanceId);
@@ -313,7 +315,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     public void recordVariableCreate(VariableInstanceEntity variable) {
         // Historic variables
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
-            getHistoricVariableInstanceEntityManager().copyAndInsert(variable);
+            CommandContextUtil.getHistoricVariableService().copyAndInsert(variable);
         }
     }
 
@@ -337,13 +339,13 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricVariableInstanceEntity historicProcessVariable = getEntityCache().findInCache(HistoricVariableInstanceEntity.class, variable.getId());
             if (historicProcessVariable == null) {
-                historicProcessVariable = getHistoricVariableInstanceEntityManager().findHistoricVariableInstanceByVariableInstanceId(variable.getId());
+                historicProcessVariable = CommandContextUtil.getHistoricVariableService().getHistoricVariableInstance(variable.getId());
             }
 
             if (historicProcessVariable != null) {
-                getHistoricVariableInstanceEntityManager().copyVariableValue(historicProcessVariable, variable);
+                CommandContextUtil.getHistoricVariableService().copyVariableValue(historicProcessVariable, variable);
             } else {
-                getHistoricVariableInstanceEntityManager().copyAndInsert(variable);
+                CommandContextUtil.getHistoricVariableService().copyAndInsert(variable);
             }
         }
     }
@@ -405,12 +407,11 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
                     .findInCache(HistoricVariableInstanceEntity.class, variable.getId());
             
             if (historicProcessVariable == null) {
-                historicProcessVariable = getHistoricVariableInstanceEntityManager()
-                        .findHistoricVariableInstanceByVariableInstanceId(variable.getId());
+                historicProcessVariable = CommandContextUtil.getHistoricVariableService().getHistoricVariableInstance(variable.getId());
             }
 
             if (historicProcessVariable != null) {
-                getHistoricVariableInstanceEntityManager().delete(historicProcessVariable);
+                CommandContextUtil.getHistoricVariableService().deleteHistoricVariableInstance(historicProcessVariable);
             }
         }
     }

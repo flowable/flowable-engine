@@ -19,10 +19,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 

@@ -30,6 +30,7 @@ import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.data.TimerJobDataManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,7 +138,7 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
                     jobEntity.setTenantId(execution.getTenantId());
                 }
 
-                if (isExecutionRelatedEntityCountEnabled(execution)) {
+                if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(execution)) {
                     CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
                     countingExecutionEntity.setTimerJobCount(countingExecutionEntity.getTimerJobCount() + 1);
                 }
@@ -162,9 +163,9 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
         deleteExceptionByteArrayRef(jobEntity);
         removeExecutionLink(jobEntity);
 
-        if (jobEntity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
+        if (jobEntity.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
             CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(jobEntity.getExecutionId());
-            if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
+            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
                 executionEntity.setTimerJobCount(executionEntity.getTimerJobCount() - 1);
             }
         }

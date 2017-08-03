@@ -385,6 +385,16 @@
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
+				<artifactId>flowable-variable-service</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
+				<artifactId>flowable-task-service</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
 				<artifactId>flowable-camel</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -861,6 +871,8 @@
 		<module>modules/flowable-dmn-model</module>
 		<module>modules/flowable-dmn-api</module>
 		<module>modules/flowable-content-api</module>
+		<module>modules/flowable-variable-service</module>
+		<!-- <module>modules/flowable-task-service</module> -->
 		<module>modules/flowable-engine</module>
 	</modules>
 
