@@ -45,6 +45,7 @@ import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.io.InputStreamProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -266,6 +267,10 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             
             Stage parentStage = planItem.getParentStage();
             PlanItemDefinition planItemDefinition = parentStage.findPlanItemDefinition(planItem.getDefinitionRef());
+            if (planItemDefinition == null) {
+                throw new FlowableException("No matching plan item definition found for reference " 
+                        + planItem.getDefinitionRef() + " of plan item " + planItem.getId());
+            }
             planItem.setPlanItemDefinition(planItemDefinition);
             
             if (!planItem.getEntryCriteria().isEmpty()) {
@@ -298,13 +303,25 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
     protected void resolveEntryCriteria(HasEntryCriteria hasEntryCriteria) {
         for (Criterion entryCriterion : hasEntryCriteria.getEntryCriteria()) {
-            entryCriterion.setSentry(entryCriterion.getParent().findSentry(entryCriterion.getSentryRef()));
+            Sentry sentry = entryCriterion.getParent().findSentry(entryCriterion.getSentryRef());
+            if (sentry != null) {
+                entryCriterion.setSentry(sentry);
+            } else {
+                throw new FlowableException("No sentry found for reference " 
+                        + entryCriterion.getSentryRef() + " of entry criterion " + entryCriterion.getId());
+            }
         }
     }
     
     protected void resolveExitCriteriaSentry(HasExitCriteria hasExitCriteria) {
         for (Criterion exitCriterion : hasExitCriteria.getExitCriteria()) {
-            exitCriterion.setSentry(exitCriterion.getParent().findSentry(exitCriterion.getSentryRef()));
+            Sentry sentry = exitCriterion.getParent().findSentry(exitCriterion.getSentryRef());
+            if (sentry != null) {
+                exitCriterion.setSentry(sentry);
+            } else {
+                throw new FlowableException("No sentry found for reference " 
+                        + exitCriterion.getSentryRef() + " of exit criterion " + exitCriterion.getId());
+            }
         }
     }
     
@@ -312,7 +329,12 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         for (Sentry sentry : planFragment.getSentries()) {
             for (SentryOnPart onPart : sentry.getOnParts()) {
                 PlanItem planItem = sentry.getParent().findPlanItem(onPart.getSourceRef());
-                onPart.setSource(planItem);
+                if (planItem != null) {
+                    onPart.setSource(planItem);
+                } else {
+                    throw new FlowableException("Could not resolve on part source reference " 
+                            + onPart.getSourceRef() + " of sentry " + sentry.getId());
+                }
             }
         }
     }

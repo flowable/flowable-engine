@@ -10,24 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine;
+package org.flowable.cmmn.engine.impl.cmd;
+
+import java.util.Map;
+
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
- * Provides access to all services that expose CMMN and case management operations.
- * 
  * @author Joram Barrez
  */
-public interface CmmnEngine {
-    
-    /** the version of the flowable CMMN library */
-    public static String VERSION = "6.2.0.0";
+public class GetTableCountsCmd implements Command<Map<String, Long>> {
 
-    String getName();
-
-    void close();
-    
-    CmmnManagementService getCmmnManagementService();
-    
-    CmmnRepositoryService getCmmnRepositoryService();
-    
+    @Override
+    public Map<String, Long> execute(CommandContext commandContext) {
+        return CommandContextUtil.getTableDataManager().getTableCount();
+    }
+   
 }

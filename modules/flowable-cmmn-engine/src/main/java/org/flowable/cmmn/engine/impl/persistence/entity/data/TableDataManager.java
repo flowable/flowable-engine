@@ -10,24 +10,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine;
+package org.flowable.cmmn.engine.impl.persistence.entity.data;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
- * Provides access to all services that expose CMMN and case management operations.
- * 
  * @author Joram Barrez
  */
-public interface CmmnEngine {
-    
-    /** the version of the flowable CMMN library */
-    public static String VERSION = "6.2.0.0";
+public interface TableDataManager {
 
-    String getName();
+    Map<String, Long> getTableCount();
 
-    void close();
-    
-    CmmnManagementService getCmmnManagementService();
-    
-    CmmnRepositoryService getCmmnRepositoryService();
-    
+    Collection<String> getTablesPresentInDatabase();
+
+    String getTableName(Class<?> entityClass, boolean withPrefix);
+
 }

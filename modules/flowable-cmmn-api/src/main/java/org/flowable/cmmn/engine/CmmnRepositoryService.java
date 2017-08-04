@@ -15,7 +15,9 @@ package org.flowable.cmmn.engine;
 import java.io.InputStream;
 import java.util.List;
 
+import org.flowable.cmmn.engine.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.engine.repository.CmmnDeploymentBuilder;
+import org.flowable.cmmn.engine.repository.CmmnDeploymentQuery;
 import org.flowable.cmmn.model.CmmnModel;
 
 public interface CmmnRepositoryService {
@@ -27,5 +29,11 @@ public interface CmmnRepositoryService {
     InputStream getResourceAsStream(String deploymentId, String resourceName);
 
     CmmnModel getCmmnModel(String caseDefinitionId);
+    
+    void deleteDeploymentAndRelatedData(String deploymentId);
+    
+    CmmnDeploymentQuery createDeploymentQuery();
+    
+    CaseDefinitionQuery createCaseDefinitionQuery();
 
 }

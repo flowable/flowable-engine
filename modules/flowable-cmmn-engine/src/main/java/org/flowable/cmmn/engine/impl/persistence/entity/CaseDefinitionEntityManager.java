@@ -12,7 +12,10 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.List;
+
 import org.flowable.cmmn.engine.repository.CaseDefinition;
+import org.flowable.cmmn.engine.repository.CaseDefinitionQuery;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 
 /**
@@ -29,5 +32,11 @@ public interface CaseDefinitionEntityManager extends EntityManager<CaseDefinitio
     CaseDefinitionEntity findCaseDefinitionByDeploymentAndKeyAndTenantId(String deploymentId, String caseDefinitionKey, String tenantId);
 
     CaseDefinition findCaseDefinitionByKeyAndVersionAndTenantId(String caseDefinitionKey, Integer caseDefinitionVersion, String tenantId);
+    
+    CaseDefinitionQuery createCaseDefinitionQuery();
+    
+    List<CaseDefinition> findCaseDefinitionsByQueryCriteria(CaseDefinitionQuery caseDefinitionQuery);
+
+    long findCaseDefinitionCountByQueryCriteria(CaseDefinitionQuery caseDefinitionQuery);
 
 }

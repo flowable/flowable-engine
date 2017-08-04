@@ -14,7 +14,10 @@ package org.flowable.engine;
 
 /**
  * This interface exposes independent agenda methods.
+ * 
+ * @deprecated in 6.2.0-SNAPSHOT, use the {@link org.flowable.engine.common.impl.agenda.Agenda} in the common module instead.
  */
+@Deprecated
 public interface Agenda extends org.flowable.engine.common.impl.agenda.Agenda {
     
 }

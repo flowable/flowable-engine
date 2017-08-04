@@ -13,9 +13,13 @@
 
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.List;
+
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataManager;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl;
 import org.flowable.cmmn.engine.repository.CaseDefinition;
+import org.flowable.cmmn.engine.repository.CaseDefinitionQuery;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 
@@ -63,6 +67,21 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
         } else {
             return caseDefinitionDataManager.findCaseDefinitionByKeyAndVersionAndTenantId(caseDefinitionKey, caseDefinitionVersion, tenantId);
         }
+    }
+    
+    @Override
+    public CaseDefinitionQuery createCaseDefinitionQuery() {
+        return new CaseDefinitionQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
+    }
+
+    @Override
+    public List<CaseDefinition> findCaseDefinitionsByQueryCriteria(CaseDefinitionQuery caseDefinitionQuery) {
+        return caseDefinitionDataManager.findCaseDefinitionsByQueryCriteria((CaseDefinitionQueryImpl) caseDefinitionQuery);
+    }
+
+    @Override
+    public long findCaseDefinitionCountByQueryCriteria(CaseDefinitionQuery caseDefinitionQuery) {
+        return caseDefinitionDataManager.findCaseDefinitionCountByQueryCriteria((CaseDefinitionQueryImpl) caseDefinitionQuery);
     }
 
     public CaseDefinitionDataManager getCaseDefinitionDataManager() {

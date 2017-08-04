@@ -12,22 +12,16 @@
  */
 package org.flowable.cmmn.engine;
 
+import java.util.Collection;
+import java.util.Map;
+
 /**
- * Provides access to all services that expose CMMN and case management operations.
- * 
  * @author Joram Barrez
  */
-public interface CmmnEngine {
-    
-    /** the version of the flowable CMMN library */
-    public static String VERSION = "6.2.0.0";
+public interface CmmnManagementService {
 
-    String getName();
-
-    void close();
+    Map<String, Long> getTableCounts();
     
-    CmmnManagementService getCmmnManagementService();
-    
-    CmmnRepositoryService getCmmnRepositoryService();
+    Collection<String> getTableNames();
     
 }

@@ -37,7 +37,7 @@
   
   <!-- RESOURCE DELETE -->
 
-  <delete id="deleteCmnResourcesByDeploymentId" parameterType="string">
+  <delete id="deleteCmmnResourcesByDeploymentId" parameterType="string">
     delete from ${prefix}ACT_CMMN_RE_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{id}
   </delete>
   

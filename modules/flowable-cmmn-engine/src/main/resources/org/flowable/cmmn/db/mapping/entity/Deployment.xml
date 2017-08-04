@@ -53,5 +53,54 @@
   <select id="selectCmmnDeployment" parameterType="string" resultMap="cmmnDeploymentResultMap">
     select * from ${prefix}ACT_CMMN_RE_DEPLOYMENT where ID_ = #{id, jdbcType=VARCHAR}
   </select>
+  
+  <select id="selectCmmnDeploymentsByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl" resultMap="cmmnDeploymentResultMap">
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select distinct RES.* <if test="nullHandlingColumn != null">, ${nullHandlingColumn}</if> <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <include refid="selectCmmnDeploymentsByQueryCriteriaSql"/>
+    ${orderBy}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+  </select>
 
+  <select id="selectCmmnDeploymentCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectCmmnDeploymentsByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectCmmnDeploymentsByQueryCriteriaSql">  
+    from ${prefix}ACT_CMMN_RE_DEPLOYMENT RES
+    <where>
+      <if test="deploymentId != null">
+        RES.ID_ = #{deploymentId}
+      </if>
+      <if test="name != null">
+        and RES.NAME_ = #{name}
+      </if>
+      <if test="nameLike != null">
+        and RES.NAME_ like #{nameLike}
+      </if>
+      <if test="category != null">
+        and RES.CATEGORY_ = #{category}
+      </if>
+      <if test="categoryNotEquals != null">
+        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals} OR RES.CATEGORY_ is null )  
+      </if>
+      <if test="withoutTenantId">
+        and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+      </if>
+      <if test="parentDeploymentId != null">
+        and RES.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId}
+      </if>
+      <if test="parentDeploymentIdLike != null">
+        and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike}
+      </if>
+       <if test="tenantId != null">
+        and RES.TENANT_ID_ = #{tenantId}
+      </if>
+      <if test="tenantIdLike != null">
+        and RES.TENANT_ID_ like #{tenantIdLike}
+      </if>
+    </where>
+  </sql>
+  
 </mapper>

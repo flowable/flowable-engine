@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl;
 
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnRepositoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +25,13 @@ public class CmmnEngineImpl implements CmmnEngine {
 
     protected String name;
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    protected CmmnManagementService cmmnManagementService;
     protected CmmnRepositoryService cmmnRepositoryService;
     
     public CmmnEngineImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
         this.name = cmmnEngineConfiguration.getEngineName();
+        this.cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
         this.cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
 
         LOGGER.info("CmmnEngine {} created", name);
@@ -55,6 +58,14 @@ public class CmmnEngineImpl implements CmmnEngine {
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
     
+    public CmmnManagementService getCmmnManagementService() {
+        return cmmnManagementService;
+    }
+
+    public void setCmmnManagementService(CmmnManagementService cmmnManagementService) {
+        this.cmmnManagementService = cmmnManagementService;
+    }
+
     public CmmnRepositoryService getCmmnRepositoryService() {
         return cmmnRepositoryService;
     }

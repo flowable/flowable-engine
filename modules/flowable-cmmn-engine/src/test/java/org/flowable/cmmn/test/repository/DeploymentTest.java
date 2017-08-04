@@ -19,36 +19,21 @@ import static org.junit.Assert.assertTrue;
 import java.io.InputStream;
 import java.util.List;
 
-import org.flowable.cmmn.engine.CmmnEngine;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.CmmnRepositoryService;
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
-import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
 import org.flowable.cmmn.engine.repository.CaseDefinition;
-import org.flowable.cmmn.engine.repository.CmmnDeployment;
+import org.flowable.cmmn.engine.test.CmmnDeployment;
+import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author Joram Barrez
  */
-public class DeploymentTest {
-    
-    private CmmnEngine cmmnEngine;
-    private CmmnRepositoryService cmmnRepositoryService;
-    
-    @Before
-    public void setupCmmnEngine() {
-        CmmnEngineConfiguration config = new StandaloneInMemCmmnEngineConfiguration();
-        config.setDatabaseSchemaUpdate(CmmnEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP);
-        this.cmmnEngine = config.build();
-        this.cmmnRepositoryService = cmmnEngine.getCmmnRepositoryService();
-    }
+public class DeploymentTest extends FlowableCmmnTestCase {
     
     /**
      * Simplest test possible: deploy the simple-case.cmmn (from the cmmn-converter module) and see if 
@@ -59,21 +44,18 @@ public class DeploymentTest {
      * - case definition properties set
      */
     @Test
+    @CmmnDeployment
     public void testCaseDefinitionDeployed() throws Exception {
-        CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeployment()
-            .addClasspathResource("org/flowable/cmmn/test/repository/simple-case.cmmn")
-            .deploy();
+        org.flowable.cmmn.engine.repository.CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeploymentQuery().singleResult();
         assertNotNull(cmmnDeployment);
         
         List<String> resourceNames = cmmnRepositoryService.getDeploymentResourceNames(cmmnDeployment.getId());
         assertEquals(1, resourceNames.size());
-        assertEquals("org/flowable/cmmn/test/repository/simple-case.cmmn", resourceNames.get(0));
+        assertEquals("org/flowable/cmmn/test/repository/DeploymentTest.testCaseDefinitionDeployed.cmmn", resourceNames.get(0));
         
         InputStream inputStream = cmmnRepositoryService.getResourceAsStream(cmmnDeployment.getId(), resourceNames.get(0));
         assertNotNull(inputStream);
         inputStream.close();
-        
-        // TODO: next steps: add query capabilities for deployment / case definition
         
         DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache = ((CmmnEngineImpl) cmmnEngine).getCmmnEngineConfiguration().getCaseDefinitionCache();
         assertEquals(1, ((DefaultDeploymentCache<CaseDefinitionCacheEntry>) caseDefinitionCache).getAll().size());
@@ -89,6 +71,13 @@ public class DeploymentTest {
         assertNotNull(caseDefinition.getKey());
         assertNotNull(caseDefinition.getResourceName());
         assertTrue(caseDefinition.getVersion() > 0);
+        
+        caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(cmmnDeployment.getId()).singleResult();
+        assertNotNull(caseDefinition.getId());
+        assertNotNull(caseDefinition.getDeploymentId());
+        assertNotNull(caseDefinition.getKey());
+        assertNotNull(caseDefinition.getResourceName());
+        assertEquals(1, caseDefinition.getVersion());
         
         CmmnModel cmmnModel = cmmnRepositoryService.getCmmnModel(caseDefinition.getId());
         assertNotNull(cmmnModel);

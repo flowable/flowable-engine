@@ -21,6 +21,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataManager;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl;
+import org.flowable.cmmn.engine.repository.CaseDefinition;
 import org.flowable.engine.common.api.FlowableException;
 
 /**
@@ -113,6 +115,17 @@ public class MybatisCaseDefinitionDataManager extends AbstractCmmnDataManager<Ca
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
         getDbSqlSession().update("updateCaseDefinitionTenantIdForDeploymentId", params);
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<CaseDefinition> findCaseDefinitionsByQueryCriteria(CaseDefinitionQueryImpl caseDefinitionQuery) {
+        return getDbSqlSession().selectList("selectCaseDefinitionsByQueryCriteria", caseDefinitionQuery);
+    }
+
+    @Override
+    public long findCaseDefinitionCountByQueryCriteria(CaseDefinitionQueryImpl caseDefinitionQuery) {
+        return (Long) getDbSqlSession().selectOne("selectCaseDefinitionCountByQueryCriteria", caseDefinitionQuery);
     }
 
 }

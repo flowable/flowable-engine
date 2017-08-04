@@ -17,7 +17,9 @@ import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 
@@ -55,12 +57,28 @@ public class CommandContextUtil {
         return getCmmnEngineConfiguration(commandContext).getCaseDefinitionEntityManager();
     }
     
+    public static TableDataManager getTableDataManager() {
+        return getTableDataManager(getCommandContext());
+    }
+    
+    public static TableDataManager getTableDataManager(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getTableDataManager();
+    }
+    
     public static CmmnEngineAgenda getAgenda() {
         return getAgenda(getCommandContext());
     }
     
     public static CmmnEngineAgenda getAgenda(CommandContext commandContext) {
         return commandContext.getSession(CmmnEngineAgenda.class);
+    }
+    
+    public static DbSqlSession getDbSqlSession() {
+        return getDbSqlSession(getCommandContext());
+    }
+    
+    public static DbSqlSession getDbSqlSession(CommandContext commandContext) {
+        return commandContext.getSession(DbSqlSession.class);
     }
     
     public static CommandContext getCommandContext() {

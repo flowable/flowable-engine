@@ -19,11 +19,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
+import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnRepositoryServiceImpl;
 import org.flowable.cmmn.engine.impl.ServiceImpl;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaFactory;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaSessionFactory;
 import org.flowable.cmmn.engine.impl.agenda.DefaultCmmnEngineAgendaFactory;
+import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.db.CmmnDbSchemaManager;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
@@ -43,11 +45,14 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityManage
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnResourceDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseDefinitionDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCmmnDeploymentDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.TableDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
 import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
@@ -70,11 +75,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     
     protected CmmnEngineAgendaFactory cmmnEngineAgendaFactory;
     
+    protected CmmnManagementService cmmnManagementService = new CmmnManagementServiceImpl();
     protected CmmnRepositoryService cmmnRepositoryService = new CmmnRepositoryServiceImpl();
     
     protected CmmnDeploymentDataManager deploymentDataManager;
     protected CmmnResourceDataManager resourceDataManager;
     protected CaseDefinitionDataManager caseDefinitionDataManager;
+    protected TableDataManager tableDataManager;
     
     protected CmmnDeploymentEntityManager cmmnDeploymentEntityManager;
     protected CmmnResourceEntityManager cmmnResourceEntityManager;
@@ -92,7 +99,35 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected int caseDefinitionCacheLimit = -1;
     protected DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache;
     
-    public CmmnEngine build() {
+    public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
+        return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
+    }
+
+    public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResource(String resource) {
+        return createCmmnEngineConfigurationFromResource(resource, "cmmnEngineConfiguration");
+    }
+
+    public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResource(String resource, String beanName) {
+        return (CmmnEngineConfiguration) BeansConfigurationHelper.parseEngineConfigurationFromResource(resource, beanName);
+    }
+
+    public static CmmnEngineConfiguration createCmmnEngineConfigurationFromInputStream(InputStream inputStream) {
+        return createCmmnEngineConfigurationFromInputStream(inputStream, "cmmnEngineConfiguration");
+    }
+
+    public static CmmnEngineConfiguration createCmmnEngineConfigurationFromInputStream(InputStream inputStream, String beanName) {
+        return (CmmnEngineConfiguration) BeansConfigurationHelper.parseEngineConfigurationFromInputStream(inputStream, beanName);
+    }
+
+    public static CmmnEngineConfiguration createStandaloneCmmnEngineConfiguration() {
+        return new CmmnEngineConfiguration();
+    }
+
+    public static CmmnEngineConfiguration createStandaloneInMemCmmnEngineConfiguration() {
+        return new StandaloneInMemCmmnEngineConfiguration();
+    }
+    
+    public CmmnEngine buildCmmnEngine() {
         init();
         return new CmmnEngineImpl(this);
     }
@@ -173,6 +208,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     }
     
     protected void initServices() {
+        initService(cmmnManagementService);
         initService(cmmnRepositoryService);
     }
 
@@ -192,6 +228,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         }
         if (caseDefinitionDataManager == null) {
             caseDefinitionDataManager = new MybatisCaseDefinitionDataManager(this);
+        }
+        if (tableDataManager == null) {
+            tableDataManager = new TableDataManagerImpl();
         }
     }
     
@@ -310,6 +349,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.cmmnEngineName = cmmnEngineName;
         return this;
     }
+    
+    public CmmnManagementService getCmmnManagementService() {
+        return cmmnManagementService;
+    }
+
+    public CmmnEngineConfiguration setCmmnManagementService(CmmnManagementService cmmnManagementService) {
+        this.cmmnManagementService = cmmnManagementService;
+        return this;
+    }
 
     public CmmnRepositoryService getCmmnRepositoryService() {
         return cmmnRepositoryService;
@@ -353,6 +401,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public CmmnEngineConfiguration setCaseDefinitionDataManager(CaseDefinitionDataManager caseDefinitionDataManager) {
         this.caseDefinitionDataManager = caseDefinitionDataManager;
+        return this;
+    }
+    
+    public TableDataManager getTableDataManager() {
+        return tableDataManager;
+    }
+
+    public CmmnEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
+        this.tableDataManager = tableDataManager;
         return this;
     }
 

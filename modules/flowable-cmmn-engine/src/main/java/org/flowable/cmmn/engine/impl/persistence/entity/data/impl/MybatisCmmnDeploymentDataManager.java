@@ -19,6 +19,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataManager;
+import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl;
+import org.flowable.cmmn.engine.repository.CmmnDeployment;
 
 /**
  * @author Joram Barrez
@@ -51,6 +53,17 @@ public class MybatisCmmnDeploymentDataManager extends AbstractCmmnDataManager<Cm
     @Override
     public List<String> getDeploymentResourceNames(String deploymentId) {
         return getDbSqlSession().getSqlSession().selectList("selectCmmnResourceNamesByDeploymentId", deploymentId);
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<CmmnDeployment> findDeploymentsByQueryCriteria(CmmnDeploymentQueryImpl deploymentQuery) {
+        return getDbSqlSession().selectList("selectCmmnDeploymentsByQueryCriteria", deploymentQuery);
+    }
+    
+    @Override
+    public long findDeploymentCountByQueryCriteria(CmmnDeploymentQueryImpl deploymentQuery) {
+        return (Long) getDbSqlSession().selectOne("selectCmmnDeploymentCountByQueryCriteria", deploymentQuery);
     }
 
 }

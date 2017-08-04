@@ -14,6 +14,8 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.cmmn.engine.repository.CmmnDeployment;
+import org.flowable.cmmn.engine.repository.CmmnDeploymentQuery;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 
 /**
@@ -26,5 +28,11 @@ public interface CmmnDeploymentEntityManager extends EntityManager<CmmnDeploymen
     List<String> getDeploymentResourceNames(String deploymentId);
 
     void deleteDeploymentAndRelatedData(String deploymentId);
+    
+    CmmnDeploymentQuery createDeploymentQuery();
+    
+    List<CmmnDeployment> findDeploymentsByQueryCriteria(CmmnDeploymentQuery deploymentQuery);
+    
+    long findDeploymentCountByQueryCriteria(CmmnDeploymentQuery deploymentQuery);
 
 }

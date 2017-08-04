@@ -17,6 +17,9 @@ import java.util.List;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataManager;
+import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl;
+import org.flowable.cmmn.engine.repository.CmmnDeployment;
+import org.flowable.cmmn.engine.repository.CmmnDeploymentQuery;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
@@ -60,6 +63,21 @@ public class CmmnDeploymentEntityManagerImpl extends AbstractCmmnEntityManager<C
     @Override
     public List<String> getDeploymentResourceNames(String deploymentId) {
         return deploymentDataManager.getDeploymentResourceNames(deploymentId);
+    }
+    
+    @Override
+    public CmmnDeploymentQuery createDeploymentQuery() {
+        return new CmmnDeploymentQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
+    }
+    
+    @Override
+    public List<CmmnDeployment> findDeploymentsByQueryCriteria(CmmnDeploymentQuery deploymentQuery) {
+        return deploymentDataManager.findDeploymentsByQueryCriteria((CmmnDeploymentQueryImpl) deploymentQuery);
+    }
+    
+    @Override
+    public long findDeploymentCountByQueryCriteria(CmmnDeploymentQuery deploymentQuery) {
+        return deploymentDataManager.findDeploymentCountByQueryCriteria((CmmnDeploymentQueryImpl) deploymentQuery);
     }
 
     public CmmnDeploymentDataManager getDeploymentDataManager() {
