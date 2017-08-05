@@ -70,6 +70,11 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
     @Override
     public CaseDefinitionQuery caseDefinitionIds(Set<String> caseDefinitionIds) {
+        if (caseDefinitionIds == null) {
+            throw new FlowableIllegalArgumentException("caseDefinitionIds is null");
+        } else if (caseDefinitionIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Empty caseDefinitionIds");
+        }
         this.ids = caseDefinitionIds;
         return this;
     }
@@ -125,6 +130,8 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
     public CaseDefinitionQueryImpl deploymentIds(Set<String> deploymentIds) {
         if (deploymentIds == null) {
             throw new FlowableIllegalArgumentException("ids are null");
+        } else if (deploymentIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("ids is an empty collection");
         }
         this.deploymentIds = deploymentIds;
         return this;
