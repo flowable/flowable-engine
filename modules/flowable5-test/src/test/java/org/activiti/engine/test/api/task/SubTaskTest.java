@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;

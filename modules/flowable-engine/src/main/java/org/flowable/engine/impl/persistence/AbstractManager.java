@@ -34,7 +34,6 @@ import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.engine.impl.persistence.entity.JobEntityManager;
 import org.flowable.engine.impl.persistence.entity.ModelEntityManager;
@@ -44,7 +43,6 @@ import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
 import org.flowable.engine.impl.persistence.entity.SuspendedJobEntityManager;
 import org.flowable.engine.impl.persistence.entity.TaskEntityManager;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntityManager;
-import org.flowable.engine.impl.persistence.entity.VariableInstanceEntityManager;
 
 /**
  * @author Tom Baeyens
@@ -138,10 +136,6 @@ public abstract class AbstractManager {
         return getProcessEngineConfiguration().getEventSubscriptionEntityManager();
     }
 
-    protected VariableInstanceEntityManager getVariableInstanceEntityManager() {
-        return getProcessEngineConfiguration().getVariableInstanceEntityManager();
-    }
-
     protected JobEntityManager getJobEntityManager() {
         return getProcessEngineConfiguration().getJobEntityManager();
     }
@@ -168,10 +162,6 @@ public abstract class AbstractManager {
 
     protected HistoricActivityInstanceEntityManager getHistoricActivityInstanceEntityManager() {
         return getProcessEngineConfiguration().getHistoricActivityInstanceEntityManager();
-    }
-
-    protected HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {
-        return getProcessEngineConfiguration().getHistoricVariableInstanceEntityManager();
     }
 
     protected HistoricTaskInstanceEntityManager getHistoricTaskInstanceEntityManager() {

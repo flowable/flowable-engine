@@ -21,6 +21,7 @@ import org.flowable.engine.impl.DeadLetterJobQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.data.DeadLetterJobDataManager;
+import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,9 +72,9 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
                 jobEntity.setTenantId(execution.getTenantId());
             }
 
-            if (isExecutionRelatedEntityCountEnabledGlobally()) {
+            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
                 CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
-                if (isExecutionRelatedEntityCountEnabled(countingExecutionEntity)) {
+                if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(countingExecutionEntity)) {
                     countingExecutionEntity.setDeadLetterJobCount(countingExecutionEntity.getDeadLetterJobCount() + 1);
                 }
             }
@@ -94,9 +95,9 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
 
         deleteExceptionByteArrayRef(jobEntity);
 
-        if (jobEntity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
+        if (jobEntity.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
             CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(jobEntity.getExecutionId());
-            if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
+            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
                 executionEntity.setDeadLetterJobCount(executionEntity.getDeadLetterJobCount() - 1);
             }
         }

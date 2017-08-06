@@ -27,6 +27,8 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.CountingTaskEntity;
 import org.flowable.engine.impl.persistence.entity.data.TaskDataManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.task.IdentityLinkType;
 import org.flowable.engine.task.Task;
@@ -53,7 +55,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     public TaskEntity create() {
         TaskEntity taskEntity = super.create();
         taskEntity.setCreateTime(getClock().getCurrentTime());
-        if (isTaskRelatedEntityCountEnabledGlobally()) {
+        if (CountingEntityUtil.isTaskRelatedEntityCountEnabledGlobally()) {
             ((CountingTaskEntity) taskEntity).setCountEnabled(true);
         }
         return taskEntity;
@@ -90,7 +92,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
 
         insert(taskEntity, true);
 
-        if (execution != null && isExecutionRelatedEntityCountEnabled(execution)) {
+        if (execution != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabled(execution)) {
             CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
             countingExecutionEntity.setTaskCount(countingExecutionEntity.getTaskCount() + 1);
         }
@@ -200,14 +202,14 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
                 deleteTask((TaskEntity) subTask, deleteReason, cascade, fireEvents);
             }
 
-            boolean isTaskRelatedEntityCountEnabled = isTaskRelatedEntityCountEnabled(task);
+            boolean isTaskRelatedEntityCountEnabled = CountingEntityUtil.isTaskRelatedEntityCountEnabled(task);
 
             if (!isTaskRelatedEntityCountEnabled || (isTaskRelatedEntityCountEnabled && ((CountingTaskEntity) task).getIdentityLinkCount() > 0)) {
                 getIdentityLinkEntityManager().deleteIdentityLinksByTaskId(taskId);
             }
 
             if (!isTaskRelatedEntityCountEnabled || (isTaskRelatedEntityCountEnabled && ((CountingTaskEntity) task).getVariableCount() > 0)) {
-                getVariableInstanceEntityManager().deleteVariableInstanceByTask(task);
+                CommandContextUtil.getVariableService().deleteVariableInstanceMap(task.getVariableInstanceEntities());
             }
 
             if (cascade) {
@@ -229,9 +231,9 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     public void delete(TaskEntity entity, boolean fireDeleteEvent) {
         super.delete(entity, fireDeleteEvent);
 
-        if (entity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
+        if (entity.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
             CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) entity.getExecution();
-            if (isExecutionRelatedEntityCountEnabled(countingExecutionEntity)) {
+            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(countingExecutionEntity)) {
                 countingExecutionEntity.setTaskCount(countingExecutionEntity.getTaskCount() - 1);
             }
         }

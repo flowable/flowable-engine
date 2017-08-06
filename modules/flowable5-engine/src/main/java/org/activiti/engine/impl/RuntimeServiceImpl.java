@@ -61,8 +61,8 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.form.FormData;
-import org.flowable.engine.impl.persistence.entity.VariableInstance;
 import org.flowable.engine.task.IdentityLink;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
 
 /**
  * @author Tom Baeyens

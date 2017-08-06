@@ -32,14 +32,14 @@ import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
 import org.flowable.engine.delegate.event.FlowableProcessTerminatedEvent;
 import org.flowable.engine.delegate.event.FlowableSequenceFlowTakenEvent;
 import org.flowable.engine.delegate.event.FlowableSignalEvent;
-import org.flowable.engine.delegate.event.FlowableVariableEvent;
 import org.flowable.engine.impl.context.ExecutionContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.IdentityLinkEntity;
-import org.flowable.engine.impl.variable.VariableType;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.task.Task;
+import org.flowable.variable.service.event.FlowableVariableEvent;
+import org.flowable.variable.service.impl.types.VariableType;
 
 /**
  * Builder class used to create {@link FlowableEvent} implementations.

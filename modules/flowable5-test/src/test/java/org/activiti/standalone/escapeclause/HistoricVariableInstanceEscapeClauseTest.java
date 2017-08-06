@@ -15,11 +15,11 @@ package org.activiti.standalone.escapeclause;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.history.HistoricVariableInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
+import org.flowable.variable.service.history.HistoricVariableInstance;
 
 public class HistoricVariableInstanceEscapeClauseTest extends AbstractEscapeClauseTestCase {
 

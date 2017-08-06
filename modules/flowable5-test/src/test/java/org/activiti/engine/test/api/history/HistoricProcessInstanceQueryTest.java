@@ -15,8 +15,8 @@ package org.activiti.engine.test.api.history;
 import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;

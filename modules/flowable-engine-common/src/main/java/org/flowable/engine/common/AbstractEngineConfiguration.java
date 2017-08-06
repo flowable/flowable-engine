@@ -122,6 +122,7 @@ public abstract class AbstractEngineConfiguration {
     protected List<CommandInterceptor> commandInterceptors;
     
     protected Map<String, AbstractEngineConfiguration> engineConfigurations = new HashMap<>();
+    protected Map<String, AbstractServiceConfiguration> serviceConfigurations = new HashMap<>();
 
     protected ClassLoader classLoader;
     /**
@@ -819,6 +820,22 @@ public abstract class AbstractEngineConfiguration {
             engineConfigurations = new HashMap<>();
         }
         engineConfigurations.put(key, engineConfiguration);
+    }
+    
+    public Map<String, AbstractServiceConfiguration> getServiceConfigurations() {
+        return serviceConfigurations;
+    }
+
+    public AbstractEngineConfiguration setServiceConfigurations(Map<String, AbstractServiceConfiguration> serviceConfigurations) {
+        this.serviceConfigurations = serviceConfigurations;
+        return this;
+    }
+    
+    public void addServiceConfiguration(String key, AbstractServiceConfiguration serviceConfiguration) {
+        if (serviceConfigurations == null) {
+            serviceConfigurations = new HashMap<>();
+        }
+        serviceConfigurations.put(key, serviceConfiguration);
     }
 
     public Collection<? extends CommandInterceptor> getDefaultCommandInterceptors() {

@@ -19,6 +19,7 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.identity.Authentication;

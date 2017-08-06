@@ -22,9 +22,9 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
-import org.flowable.engine.impl.persistence.entity.VariableInstance;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Task;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
 
 public class GetTaskVariableInstancesCmd implements Command<Map<String, VariableInstance>>, Serializable {
 

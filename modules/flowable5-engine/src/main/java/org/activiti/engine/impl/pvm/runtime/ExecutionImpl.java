@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.PvmException;
 import org.activiti.engine.impl.pvm.PvmExecution;
@@ -33,11 +34,10 @@ import org.activiti.engine.impl.pvm.delegate.SignallableActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.impl.pvm.process.TransitionImpl;
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.FlowElement;
-import org.flowable.engine.impl.persistence.entity.VariableInstance;
-import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

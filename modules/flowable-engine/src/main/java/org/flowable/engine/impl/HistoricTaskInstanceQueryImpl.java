@@ -27,7 +27,7 @@ import org.flowable.engine.history.HistoricTaskInstanceQuery;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.impl.variable.VariableTypes;
+import org.flowable.variable.service.impl.types.VariableTypes;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;

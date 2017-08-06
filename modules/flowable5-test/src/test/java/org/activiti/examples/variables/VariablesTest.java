@@ -22,14 +22,14 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.history.HistoricVariableInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
-import org.flowable.engine.impl.persistence.entity.VariableInstance;
-import org.flowable.engine.impl.variable.ValueFields;
-import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.types.ValueFields;
+import org.flowable.variable.service.impl.types.VariableType;
 
 /**
  * @author Tom Baeyens

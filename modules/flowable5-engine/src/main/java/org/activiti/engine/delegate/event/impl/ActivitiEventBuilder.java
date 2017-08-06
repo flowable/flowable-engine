@@ -32,12 +32,12 @@ import org.flowable.engine.delegate.event.FlowableMessageEvent;
 import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
 import org.flowable.engine.delegate.event.FlowableSequenceFlowTakenEvent;
 import org.flowable.engine.delegate.event.FlowableSignalEvent;
-import org.flowable.engine.delegate.event.FlowableVariableEvent;
-import org.flowable.engine.impl.variable.VariableType;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Job;
 import org.flowable.idm.api.event.FlowableIdmEventType;
 import org.flowable.idm.api.event.FlowableIdmMembershipEvent;
+import org.flowable.variable.service.event.FlowableVariableEvent;
+import org.flowable.variable.service.impl.types.VariableType;
 
 /**
  * Builder class used to create {@link FlowableEvent} implementations.

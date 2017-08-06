@@ -25,11 +25,11 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.AbstractFlowableTestCase;
-import org.flowable.engine.impl.variable.EntityManagerSession;
-import org.flowable.engine.impl.variable.EntityManagerSessionFactory;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.variable.service.impl.types.EntityManagerSession;
+import org.flowable.variable.service.impl.types.EntityManagerSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

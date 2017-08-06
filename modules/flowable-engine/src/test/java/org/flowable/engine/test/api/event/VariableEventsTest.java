@@ -21,9 +21,8 @@ import java.util.Map;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventType;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.delegate.event.FlowableVariableEvent;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -31,6 +30,7 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.variable.service.event.FlowableVariableEvent;
 import org.hamcrest.CoreMatchers;
 
 /**

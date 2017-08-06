@@ -28,9 +28,9 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.javax.el.ELContext;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.persistence.entity.TransientVariableInstance;
-import org.flowable.engine.impl.persistence.entity.VariableInstance;
-import org.flowable.engine.impl.variable.VariableType;
-import org.flowable.engine.impl.variable.VariableTypes;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.service.impl.types.VariableTypes;
 
 /**
  * @author Tom Baeyens

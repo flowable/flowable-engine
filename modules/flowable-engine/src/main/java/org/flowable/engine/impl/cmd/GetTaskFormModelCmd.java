@@ -29,7 +29,6 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -37,6 +36,7 @@ import org.flowable.form.api.FormService;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormFieldTypes;
 import org.flowable.form.model.FormModel;
+import org.flowable.variable.service.history.HistoricVariableInstance;
 
 /**
  * @author Tijs Rademakers

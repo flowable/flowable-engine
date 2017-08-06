@@ -16,13 +16,13 @@ package org.flowable.engine.impl;
 import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.impl.variable.ByteArrayType;
-import org.flowable.engine.impl.variable.JPAEntityListVariableType;
-import org.flowable.engine.impl.variable.JPAEntityVariableType;
-import org.flowable.engine.impl.variable.VariableType;
-import org.flowable.engine.impl.variable.VariableTypes;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.types.ByteArrayType;
+import org.flowable.variable.service.impl.types.JPAEntityListVariableType;
+import org.flowable.variable.service.impl.types.JPAEntityVariableType;
+import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.service.impl.types.VariableTypes;
 
 /**
  * Represents a variable value used in queries.
@@ -56,7 +56,7 @@ public class QueryVariableValue implements Serializable {
                 throw new FlowableIllegalArgumentException("Variables containing a list of JPA entities cannot be used to query");
             } else {
                 // Type implementation determines which fields are set on the entity
-                variableInstanceEntity = CommandContextUtil.getVariableInstanceEntityManager().create(name, type, value);
+                variableInstanceEntity = CommandContextUtil.getVariableService().createVariableInstance(name, type, value);
             }
         }
     }

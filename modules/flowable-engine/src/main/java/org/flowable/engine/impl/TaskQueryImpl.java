@@ -24,10 +24,10 @@ import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.persistence.entity.SuspensionState;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.impl.variable.VariableTypes;
 import org.flowable.engine.task.DelegationState;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.task.TaskQuery;
+import org.flowable.variable.service.impl.types.VariableTypes;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;

@@ -21,7 +21,7 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.query.Query;
-import org.flowable.engine.impl.variable.VariableTypes;
+import org.flowable.variable.service.impl.types.VariableTypes;
 
 /**
  * Abstract query class that adds methods to query for variable values.

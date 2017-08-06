@@ -12,8 +12,6 @@
  */
 package org.activiti.engine.impl.event.logger.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.Date;
 import java.util.Map;
 
@@ -28,6 +26,8 @@ import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez

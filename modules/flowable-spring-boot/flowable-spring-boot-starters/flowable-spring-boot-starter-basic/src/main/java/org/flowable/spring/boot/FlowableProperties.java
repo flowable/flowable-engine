@@ -15,7 +15,7 @@ package org.flowable.spring.boot;
 import java.util.Arrays;
 import java.util.List;
 
-import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**

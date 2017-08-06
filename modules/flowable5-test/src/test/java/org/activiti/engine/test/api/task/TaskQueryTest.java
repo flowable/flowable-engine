@@ -25,14 +25,14 @@ import java.util.Map;
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
-import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.DelegationState;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.task.TaskQuery;
 import org.flowable.engine.test.Deployment;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 

@@ -15,9 +15,9 @@ package org.flowable.engine.test.api.event;
 import java.io.ByteArrayInputStream;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;

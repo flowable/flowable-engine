@@ -20,7 +20,7 @@ import java.util.Set;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
 
 /**
  * Interface for class that acts as a scope for variables: i.e. the implementation can be used to set and get variables.

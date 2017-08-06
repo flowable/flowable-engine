@@ -35,7 +35,6 @@ import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityImp
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricScopeInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityImpl;
-import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntityImpl;
 import org.flowable.engine.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.engine.impl.persistence.entity.JobEntityImpl;
@@ -49,7 +48,9 @@ import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity
 import org.flowable.engine.impl.persistence.entity.SuspendedJobEntityImpl;
 import org.flowable.engine.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntityImpl;
-import org.flowable.engine.impl.persistence.entity.VariableInstanceEntityImpl;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
+import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityImpl;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 
 /**
  * Maintains a list of all the entities in order of dependency.
@@ -116,6 +117,7 @@ public class EntityDependencyOrder {
          * FK to DeploymentEntity
          */
         DELETE_ORDER.add(ByteArrayEntityImpl.class);
+        DELETE_ORDER.add(VariableByteArrayEntityImpl.class);
 
         /*
          * FK from ModelEntity FK from JobEntity FK from VariableInstanceEntity

@@ -22,17 +22,19 @@ import org.flowable.engine.history.HistoricDetailQuery;
 import org.flowable.engine.history.HistoricIdentityLink;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.history.HistoricTaskInstanceQuery;
-import org.flowable.engine.history.HistoricVariableInstanceQuery;
 import org.flowable.engine.history.NativeHistoricActivityInstanceQuery;
 import org.flowable.engine.history.NativeHistoricDetailQuery;
 import org.flowable.engine.history.NativeHistoricProcessInstanceQuery;
 import org.flowable.engine.history.NativeHistoricTaskInstanceQuery;
-import org.flowable.engine.history.NativeHistoricVariableInstanceQuery;
 import org.flowable.engine.history.ProcessInstanceHistoryLogQuery;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.DeleteHistoricProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
 import org.flowable.engine.impl.cmd.GetHistoricIdentityLinksForTaskCmd;
+import org.flowable.variable.service.history.HistoricVariableInstanceQuery;
+import org.flowable.variable.service.history.NativeHistoricVariableInstanceQuery;
+import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
+import org.flowable.variable.service.impl.NativeHistoricVariableInstanceQueryImpl;
 
 /**
  * @author Tom Baeyens

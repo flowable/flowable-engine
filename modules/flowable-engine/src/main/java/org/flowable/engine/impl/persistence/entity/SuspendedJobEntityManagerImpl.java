@@ -21,6 +21,7 @@ import org.flowable.engine.impl.SuspendedJobQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.data.SuspendedJobDataManager;
+import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +77,7 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
                 jobEntity.setTenantId(execution.getTenantId());
             }
 
-            if (isExecutionRelatedEntityCountEnabled(execution)) {
+            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(execution)) {
                 CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
                 countingExecutionEntity.setSuspendedJobCount(countingExecutionEntity.getSuspendedJobCount() + 1);
             }
@@ -97,9 +98,9 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
 
         deleteExceptionByteArrayRef(jobEntity);
 
-        if (jobEntity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
+        if (jobEntity.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
             CountingExecutionEntity executionEntity = (CountingExecutionEntity) getExecutionEntityManager().findById(jobEntity.getExecutionId());
-            if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
+            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
                 executionEntity.setSuspendedJobCount(executionEntity.getSuspendedJobCount() - 1);
             }
         }

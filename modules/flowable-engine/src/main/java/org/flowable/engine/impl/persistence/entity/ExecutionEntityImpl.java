@@ -32,6 +32,8 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Tom Baeyens
@@ -517,7 +519,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     @Override
     protected Collection<VariableInstanceEntity> loadVariableInstances() {
-        return CommandContextUtil.getVariableInstanceEntityManager().findVariableInstancesByExecutionId(id);
+        return CommandContextUtil.getVariableService().findVariableInstancesByExecutionId(id);
     }
 
     @Override
@@ -570,7 +572,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         if (commandContext == null) {
             throw new FlowableException("lazy loading outside command context");
         }
-        VariableInstanceEntity variableInstance = CommandContextUtil.getVariableInstanceEntityManager(commandContext).findVariableInstanceByExecutionAndName(id, variableName);
+        VariableInstanceEntity variableInstance = CommandContextUtil.getVariableService().findVariableInstanceByExecutionAndName(id, variableName);
 
         return variableInstance;
     }
@@ -581,7 +583,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         if (commandContext == null) {
             throw new FlowableException("lazy loading outside command context");
         }
-        return CommandContextUtil.getVariableInstanceEntityManager(commandContext).findVariableInstancesByExecutionAndNames(id, variableNames);
+        return CommandContextUtil.getVariableService().findVariableInstancesByExecutionAndNames(id, variableNames);
     }
 
     // event subscription support //////////////////////////////////////////////

@@ -21,15 +21,15 @@ import java.util.Objects;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.AbstractHistoryManager;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstancePropertyChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
-import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 public class AsyncHistoryManager extends AbstractHistoryManager {
 

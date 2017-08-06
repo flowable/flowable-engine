@@ -33,8 +33,6 @@ import org.flowable.engine.delegate.event.impl.FlowableActivityEventImpl;
 import org.flowable.engine.delegate.event.impl.FlowableSignalEventImpl;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.event.logger.EventLogger;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.Job;

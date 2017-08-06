@@ -15,6 +15,8 @@ package org.flowable.engine.history;
 
 import java.util.Date;
 
+import org.flowable.engine.common.impl.history.HistoricData;
+
 /**
  * Base class for all kinds of information that is related to either a {@link HistoricProcessInstance} or a {@link HistoricActivityInstance}.
  * 

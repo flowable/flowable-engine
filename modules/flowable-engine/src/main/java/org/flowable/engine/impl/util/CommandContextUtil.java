@@ -46,7 +46,6 @@ import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntityManager;
 import org.flowable.engine.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.engine.impl.persistence.entity.JobEntityManager;
@@ -59,7 +58,6 @@ import org.flowable.engine.impl.persistence.entity.SuspendedJobEntityManager;
 import org.flowable.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.engine.impl.persistence.entity.TaskEntityManager;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntityManager;
-import org.flowable.engine.impl.persistence.entity.VariableInstanceEntityManager;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
@@ -67,6 +65,9 @@ import org.flowable.form.api.FormService;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityManager;
+import org.flowable.variable.service.HistoricVariableService;
+import org.flowable.variable.service.VariableService;
+import org.flowable.variable.service.VariableServiceConfiguration;
 
 public class CommandContextUtil {
     
@@ -81,6 +82,35 @@ public class CommandContextUtil {
             return (ProcessEngineConfigurationImpl) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
         return null;
+    }
+    
+    // VARIABLE SERVICE
+    public static VariableServiceConfiguration getVariableServiceConfiguration() {
+        return getVariableServiceConfiguration(getCommandContext());
+    }
+    
+    public static VariableServiceConfiguration getVariableServiceConfiguration(CommandContext commandContext) {
+        return (VariableServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
+    }
+    
+    public static VariableService getVariableService() {
+        VariableService variableService = null;
+        VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration();
+        if (variableServiceConfiguration != null) {
+            variableService = variableServiceConfiguration.getVariableService();
+        }
+        
+        return variableService;
+    }
+    
+    public static HistoricVariableService getHistoricVariableService() {
+        HistoricVariableService historicVariableService = null;
+        VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration();
+        if (variableServiceConfiguration != null) {
+            historicVariableService = variableServiceConfiguration.getHistoricVariableService();
+        }
+        
+        return historicVariableService;
     }
     
     // IDM ENGINE
@@ -327,14 +357,6 @@ public class CommandContextUtil {
         return getProcessEngineConfiguration(commandContext).getTaskEntityManager();
     }
     
-    public static VariableInstanceEntityManager getVariableInstanceEntityManager() {
-        return getVariableInstanceEntityManager(getCommandContext());
-    }
-    
-    public static VariableInstanceEntityManager getVariableInstanceEntityManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getVariableInstanceEntityManager();
-    }
-    
     public static JobEntityManager getJobEntityManager() {
         return getJobEntityManager(getCommandContext());
     }
@@ -441,14 +463,6 @@ public class CommandContextUtil {
     
     public static HistoricActivityInstanceEntityManager getHistoricActivityInstanceEntityManager(CommandContext commandContext) {
         return getProcessEngineConfiguration(commandContext).getHistoricActivityInstanceEntityManager();
-    }
-    
-    public static HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {
-        return getHistoricVariableInstanceEntityManager(getCommandContext());
-    }
-    
-    public static HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getHistoricVariableInstanceEntityManager();
     }
     
     public static HistoryManager getHistoryManager(CommandContext commandContext) {

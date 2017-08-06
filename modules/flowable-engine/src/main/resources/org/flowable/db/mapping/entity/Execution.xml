@@ -362,15 +362,15 @@
     <result property="deadLetterJobCount" column="DEADLETTER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
-    <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.engine.impl.persistence.entity.VariableInstanceEntityImpl">
+    <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
       <id property="id" column="VAR_ID_"/>
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR" />
-      <result property="type" column="VAR_TYPE_" javaType="org.flowable.engine.impl.variable.VariableType" jdbcType="VARCHAR" />
+      <result property="type" column="VAR_TYPE_" javaType="org.flowable.variable.service.impl.types.VariableType" jdbcType="VARCHAR" />
       <result property="revision" column="VAR_REV_" jdbcType="INTEGER" />
       <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="VARCHAR" />
       <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="VARCHAR" />
       <result property="taskId" column="VAR_TASK_ID_" jdbcType="VARCHAR" />
-      <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="ByteArrayRefTypeHandler"/>
+      <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler"/>
       <result property="doubleValue" column="VAR_DOUBLE_" jdbcType="DOUBLE" />
       <result property="textValue" column="VAR_TEXT_" jdbcType="VARCHAR" />
       <result property="textValue2" column="VAR_TEXT2_" jdbcType="VARCHAR" />
@@ -413,15 +413,15 @@
     <result property="deadLetterJobCount" column="DEADLETTER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
-    <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.engine.impl.persistence.entity.VariableInstanceEntityImpl">
+    <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
       <id property="id" column="VAR_ID_"/>
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR" />
-      <result property="type" column="VAR_TYPE_" javaType="org.flowable.engine.impl.variable.VariableType" jdbcType="VARCHAR" />
+      <result property="type" column="VAR_TYPE_" javaType="org.flowable.variable.service.impl.types.VariableType" jdbcType="VARCHAR" />
       <result property="revision" column="VAR_REV_" jdbcType="INTEGER" />
       <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="VARCHAR" />
       <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="VARCHAR" />
       <result property="taskId" column="VAR_TASK_ID_" jdbcType="VARCHAR" />
-      <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="ByteArrayRefTypeHandler"/>
+      <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler"/>
       <result property="doubleValue" column="VAR_DOUBLE_" jdbcType="DOUBLE" />
       <result property="textValue" column="VAR_TEXT_" jdbcType="VARCHAR" />
       <result property="textValue2" column="VAR_TEXT2_" jdbcType="VARCHAR" />

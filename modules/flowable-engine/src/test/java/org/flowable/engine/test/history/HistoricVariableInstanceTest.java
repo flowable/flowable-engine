@@ -20,13 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricDetail;
-import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.history.HistoricVariableUpdate;
-import org.flowable.engine.impl.history.HistoryLevel;
-import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
@@ -34,6 +32,8 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.task.TaskQuery;
 import org.flowable.engine.test.Deployment;
+import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 /**
  * @author Joram Barrez

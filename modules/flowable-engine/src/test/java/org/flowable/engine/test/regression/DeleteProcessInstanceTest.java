@@ -15,8 +15,8 @@ package org.flowable.engine.test.regression;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;

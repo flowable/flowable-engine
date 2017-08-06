@@ -29,8 +29,11 @@ import org.flowable.engine.common.impl.javax.el.ELContext;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.impl.variable.VariableType;
-import org.flowable.engine.impl.variable.VariableTypes;
+import org.flowable.engine.impl.util.CountingEntityUtil;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.service.impl.types.VariableTypes;
 
 /**
  * @author Tom Baeyens
@@ -820,7 +823,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
     }
 
     protected void deleteVariableInstanceForExplicitUserCall(VariableInstanceEntity variableInstance, ExecutionEntity sourceActivityExecution) {
-        CommandContextUtil.getVariableInstanceEntityManager().delete(variableInstance);
+        CommandContextUtil.getVariableService().deleteVariableInstance(variableInstance);
+        CountingEntityUtil.handleDeleteVariableInstanceEntityCount(variableInstance, true);
         variableInstance.setValue(null);
 
         // Record historic variable deletion
@@ -859,10 +863,11 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
         VariableType type = variableTypes.findVariableType(value);
 
-        VariableInstanceEntity variableInstance = CommandContextUtil.getVariableInstanceEntityManager().create(variableName, type, value);
+        VariableInstanceEntity variableInstance = CommandContextUtil.getVariableService().createVariableInstance(variableName, type, value);
         initializeVariableInstanceBackPointer(variableInstance);
-        CommandContextUtil.getVariableInstanceEntityManager().insert(variableInstance);
-
+        CommandContextUtil.getVariableService().insertVariableInstance(variableInstance);
+        CountingEntityUtil.handleInsertVariableInstanceEntityCount(variableInstance);
+        
         if (variableInstances != null) {
             variableInstances.put(variableName, variableInstance);
         }

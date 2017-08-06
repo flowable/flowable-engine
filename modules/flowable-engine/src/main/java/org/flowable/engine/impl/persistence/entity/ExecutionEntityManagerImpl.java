@@ -39,10 +39,13 @@ import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.data.ExecutionDataManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.IdentityLinkType;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -213,7 +216,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         
         ExecutionEntity processInstanceExecution = executionDataManager.create();
 
-        if (isExecutionRelatedEntityCountEnabledGlobally()) {
+        if (CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
             ((CountingExecutionEntity) processInstanceExecution).setCountEnabled(true);
         }
 
@@ -669,7 +672,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         executionEntity.setEnded(true);
         executionEntity.setActive(false);
 
-        boolean enableExecutionRelationshipCounts = isExecutionRelatedEntityCountEnabled(executionEntity);
+        boolean enableExecutionRelationshipCounts = CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity);
 
         if (executionEntity.getId().equals(executionEntity.getProcessInstanceId())
                 && (!enableExecutionRelationshipCounts
@@ -693,8 +696,9 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
 
                 VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
 
-                VariableInstanceEntityManager variableInstanceEntityManager = getVariableInstanceEntityManager();
-                variableInstanceEntityManager.delete(variableInstanceEntity);
+                CommandContextUtil.getVariableService().deleteVariableInstance(variableInstanceEntity);
+                CountingEntityUtil.handleDeleteVariableInstanceEntityCount(variableInstanceEntity, true);
+                
                 if (variableInstanceEntity.getByteArrayRef() != null && variableInstanceEntity.getByteArrayRef().getId() != null) {
                     getByteArrayEntityManager().deleteByteArrayById(variableInstanceEntity.getByteArrayRef().getId());
                 }

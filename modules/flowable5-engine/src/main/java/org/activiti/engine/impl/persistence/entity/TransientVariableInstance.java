@@ -13,7 +13,7 @@
 package org.activiti.engine.impl.persistence.entity;
 
 import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
 
 /**
  * A dummy implementation of {@link VariableInstance}, used for storing transient variables on a {@link VariableScope}, as the {@link VariableScope} works with instances of {@link VariableInstance}
