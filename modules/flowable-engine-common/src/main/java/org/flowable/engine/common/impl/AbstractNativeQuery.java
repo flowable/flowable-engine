@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl;
+package org.flowable.engine.common.impl;
 
 import java.util.List;
 import java.util.Map;

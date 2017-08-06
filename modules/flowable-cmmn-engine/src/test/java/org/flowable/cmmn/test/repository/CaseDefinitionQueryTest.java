@@ -54,9 +54,9 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
         
         // v3 of simple-case
         this.deploymentId3 = cmmnRepositoryService.createDeployment()
-                .addClasspathResource("org/flowable/cmmn/test/repository/simple-case.cmmn")
-                .deploy()
-                .getId();
+            .addClasspathResource("org/flowable/cmmn/test/repository/simple-case.cmmn")
+            .deploy()
+            .getId();
     }
     
     @After

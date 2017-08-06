@@ -18,6 +18,7 @@ import java.util.Map;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.api.NativeHistoricDecisionExecutionQuery;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.common.impl.AbstractNativeQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 

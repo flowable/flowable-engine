@@ -18,6 +18,7 @@ import java.util.Map;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.NativeDecisionTableQuery;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.common.impl.AbstractNativeQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 

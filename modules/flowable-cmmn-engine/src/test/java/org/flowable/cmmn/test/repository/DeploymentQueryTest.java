@@ -167,7 +167,5 @@ public class DeploymentQueryTest extends FlowableCmmnTestCase {
         assertEquals(2, cmmnRepositoryService.createDeploymentQuery().orderByDeploymentName().desc().list().size());
         assertEquals(2, cmmnRepositoryService.createDeploymentQuery().orderByDeploymentName().desc().count());
     }
-    
-    
 
 }

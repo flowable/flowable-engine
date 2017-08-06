@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.content.engine.impl;
+package org.flowable.engine.common.impl;
 
 import java.io.Serializable;
 import java.util.List;
@@ -19,7 +19,6 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.query.Query;
 import org.flowable.engine.common.api.query.QueryProperty;
-import org.flowable.engine.common.impl.Direction;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.db.ListQueryParameterObject;
 import org.flowable.engine.common.impl.interceptor.Command;
@@ -28,7 +27,7 @@ import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 
 /**
  * Abstract superclass for all query types.
- * 
+ *
  * @author Joram Barrez
  */
 public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryParameterObject implements Command<Object>, Query<T, U>, Serializable {
@@ -38,11 +37,11 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
     protected transient CommandExecutor commandExecutor;
     protected transient CommandContext commandContext;
 
-    public AbstractQuery() {
+    protected AbstractQuery() {
         parameter = this;
     }
 
-    public AbstractQuery(CommandExecutor commandExecutor) {
+    protected AbstractQuery(CommandExecutor commandExecutor) {
         this.commandExecutor = commandExecutor;
     }
 
@@ -55,11 +54,13 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     public T orderBy(QueryProperty property) {
         this.orderProperty = property;
         return (T) this;
     }
 
+    @SuppressWarnings("unchecked")
     public T orderBy(QueryProperty property, NullHandlingOnOrder nullHandlingOnOrder) {
         orderBy(property);
         this.nullHandlingOnOrder = nullHandlingOnOrder;
