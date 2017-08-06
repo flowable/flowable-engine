@@ -21,11 +21,12 @@ import org.flowable.engine.common.impl.event.EventDispatchAction;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.common.runtime.Clock;
 
+/**
+ * @author Tijs Rademakers
+ */
 public abstract class AbstractServiceConfiguration {
 
     /** The tenant id indicating 'no tenant' */
-    public static final String NO_TENANT_ID = "";
-
     protected CommandExecutor commandExecutor;
     
     protected boolean enableEventDispatcher = true;

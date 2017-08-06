@@ -28,7 +28,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public class CountingEntityUtil {
 
-    public static void handleVariableInstanceEntityCount(VariableInstanceEntity variableInstance, boolean fireDeleteEvent) {
+    public static void handleDeleteVariableInstanceEntityCount(VariableInstanceEntity variableInstance, boolean fireDeleteEvent) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         if (variableInstance.getTaskId() != null && isTaskRelatedEntityCountEnabledGlobally()) {
             CountingTaskEntity countingTaskEntity = (CountingTaskEntity) CommandContextUtil.getTaskEntityManager(commandContext).findById(variableInstance.getTaskId());
@@ -41,12 +41,27 @@ public class CountingEntityUtil {
                 executionEntity.setVariableCount(executionEntity.getVariableCount() - 1);
             }
         }
-
+        
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
         if (fireDeleteEvent && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, variableInstance));
     
             eventDispatcher.dispatchEvent(createVariableDeleteEvent(variableInstance));
+        }
+    }
+    
+    public static void handleInsertVariableInstanceEntityCount(VariableInstanceEntity variableInstance) {
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        if (variableInstance.getTaskId() != null && isTaskRelatedEntityCountEnabledGlobally()) {
+            CountingTaskEntity countingTaskEntity = (CountingTaskEntity) CommandContextUtil.getTaskEntityManager(commandContext).findById(variableInstance.getTaskId());
+            if (isTaskRelatedEntityCountEnabled(countingTaskEntity)) {
+                countingTaskEntity.setVariableCount(countingTaskEntity.getVariableCount() + 1);
+            }
+        } else if (variableInstance.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
+            CountingExecutionEntity executionEntity = (CountingExecutionEntity) CommandContextUtil.getExecutionEntityManager(commandContext).findById(variableInstance.getExecutionId());
+            if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
+                executionEntity.setVariableCount(executionEntity.getVariableCount() + 1);
+            }
         }
     }
     

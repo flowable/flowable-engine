@@ -697,7 +697,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
                 VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
 
                 CommandContextUtil.getVariableService().deleteVariableInstance(variableInstanceEntity);
-                CountingEntityUtil.handleVariableInstanceEntityCount(variableInstanceEntity, true);
+                CountingEntityUtil.handleDeleteVariableInstanceEntityCount(variableInstanceEntity, true);
                 
                 if (variableInstanceEntity.getByteArrayRef() != null && variableInstanceEntity.getByteArrayRef().getId() != null) {
                     getByteArrayEntityManager().deleteByteArrayById(variableInstanceEntity.getByteArrayRef().getId());

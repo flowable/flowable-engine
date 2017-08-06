@@ -55,6 +55,9 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * @author Tijs Rademakers
+ */
 public class VariableServiceConfiguration extends AbstractServiceConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(VariableServiceConfiguration.class);

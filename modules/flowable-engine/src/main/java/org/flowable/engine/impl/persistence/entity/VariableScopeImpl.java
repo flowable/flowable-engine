@@ -28,8 +28,6 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.javax.el.ELContext;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.persistence.CountingExecutionEntity;
-import org.flowable.engine.impl.persistence.CountingTaskEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
@@ -826,7 +824,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     protected void deleteVariableInstanceForExplicitUserCall(VariableInstanceEntity variableInstance, ExecutionEntity sourceActivityExecution) {
         CommandContextUtil.getVariableService().deleteVariableInstance(variableInstance);
-        CountingEntityUtil.handleVariableInstanceEntityCount(variableInstance, true);
+        CountingEntityUtil.handleDeleteVariableInstanceEntityCount(variableInstance, true);
         variableInstance.setValue(null);
 
         // Record historic variable deletion
@@ -868,20 +866,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         VariableInstanceEntity variableInstance = CommandContextUtil.getVariableService().createVariableInstance(variableName, type, value);
         initializeVariableInstanceBackPointer(variableInstance);
         CommandContextUtil.getVariableService().insertVariableInstance(variableInstance);
+        CountingEntityUtil.handleInsertVariableInstanceEntityCount(variableInstance);
         
-        CommandContext commandContext = CommandContextUtil.getCommandContext();
-        if (variableInstance.getTaskId() != null && isTaskRelatedEntityCountEnabledGlobally()) {
-            CountingTaskEntity countingTaskEntity = (CountingTaskEntity) CommandContextUtil.getTaskEntityManager(commandContext).findById(variableInstance.getTaskId());
-            if (isTaskRelatedEntityCountEnabled(countingTaskEntity)) {
-                countingTaskEntity.setVariableCount(countingTaskEntity.getVariableCount() + 1);
-            }
-        } else if (variableInstance.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
-            CountingExecutionEntity executionEntity = (CountingExecutionEntity) CommandContextUtil.getExecutionEntityManager(commandContext).findById(variableInstance.getExecutionId());
-            if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
-                executionEntity.setVariableCount(executionEntity.getVariableCount() + 1);
-            }
-        }
-
         if (variableInstances != null) {
             variableInstances.put(variableName, variableInstance);
         }
@@ -1014,47 +1000,6 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
      */
     protected boolean isActivityIdUsedForDetails() {
         return true;
-    }
-    
-    protected boolean isExecutionRelatedEntityCountEnabledGlobally() {
-        return CommandContextUtil.getProcessEngineConfiguration().getPerformanceSettings().isEnableExecutionRelationshipCounts();
-    }
-    
-    protected boolean isTaskRelatedEntityCountEnabledGlobally() {
-        return CommandContextUtil.getProcessEngineConfiguration().getPerformanceSettings().isEnableTaskRelationshipCounts();
-    }
-    
-    protected boolean isExecutionRelatedEntityCountEnabled(ExecutionEntity executionEntity) {
-        if (executionEntity instanceof CountingExecutionEntity) {
-            return isExecutionRelatedEntityCountEnabled((CountingExecutionEntity) executionEntity);
-        }
-        return false;
-    }
-    
-    /**
-     * There are two flags here: a global flag and a flag on the execution entity. The global flag can be switched on and off between different reboots, however the flag on the executionEntity refers
-     * to the state at that particular moment.
-     * 
-     * Global flag / ExecutionEntity flag : result
-     * 
-     * T / T : T (all true, regular mode with flags enabled) T / F : F (global is true, but execution was of a time when it was disabled, thus treating it as disabled) F / T : F (execution was of time
-     * when counting was done. But this is overruled by the global flag and thus the queries will be done) F / F : F (all disabled)
-     * 
-     * From this table it is clear that only when both are true, the result should be true, which is the regular AND rule for booleans.
-     */
-    protected boolean isExecutionRelatedEntityCountEnabled(CountingExecutionEntity executionEntity) {
-        return isExecutionRelatedEntityCountEnabledGlobally() && executionEntity.isCountEnabled();
-    }
-    
-    protected boolean isTaskRelatedEntityCountEnabled(TaskEntity taskEntity) {
-        if (taskEntity instanceof CountingTaskEntity) {
-            return isTaskRelatedEntityCountEnabled((CountingTaskEntity) taskEntity);
-        }
-        return false;
-    }
-    
-    protected boolean isTaskRelatedEntityCountEnabled(CountingTaskEntity taskEntity) {
-        return isTaskRelatedEntityCountEnabledGlobally() && taskEntity.isCountEnabled();
     }
 
     // getters and setters
