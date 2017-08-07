@@ -18,7 +18,7 @@ import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
-import org.flowable.engine.task.IdentityLinkType;
+import org.flowable.identitylink.service.IdentityLinkType;
 
 /**
  * @author Joram Barrez

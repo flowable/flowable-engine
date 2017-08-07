@@ -32,6 +32,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -645,7 +646,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     protected void ensureIdentityLinksInitialized() {
         if (identityLinks == null) {
-            identityLinks = CommandContextUtil.getIdentityLinkEntityManager().findIdentityLinksByProcessInstanceId(id);
+            identityLinks = CommandContextUtil.getIdentityLinkService().findIdentityLinksByProcessInstanceId(id);
         }
     }
 

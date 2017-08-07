@@ -23,9 +23,9 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.IdentityLinkType;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.identitylink.service.IdentityLinkType;
 
 /**
  * @author Daniel Meyer

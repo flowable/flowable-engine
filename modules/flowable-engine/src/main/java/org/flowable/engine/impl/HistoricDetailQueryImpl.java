@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.query.AbstractQuery;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricDetailQuery;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;

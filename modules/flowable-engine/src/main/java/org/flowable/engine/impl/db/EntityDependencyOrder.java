@@ -31,12 +31,10 @@ import org.flowable.engine.impl.persistence.entity.HistoricDetailAssignmentEntit
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricFormPropertyEntityImpl;
-import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricScopeInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntityImpl;
-import org.flowable.engine.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.engine.impl.persistence.entity.JobEntityImpl;
 import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ModelEntityImpl;
@@ -48,6 +46,8 @@ import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity
 import org.flowable.engine.impl.persistence.entity.SuspendedJobEntityImpl;
 import org.flowable.engine.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntityImpl;
+import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;

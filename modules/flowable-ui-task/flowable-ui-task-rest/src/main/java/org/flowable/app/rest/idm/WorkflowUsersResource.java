@@ -23,7 +23,7 @@ import org.flowable.app.model.common.UserRepresentation;
 import org.flowable.app.service.idm.RemoteIdmService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.task.IdentityLink;
+import org.flowable.identitylink.service.IdentityLink;
 import org.flowable.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;

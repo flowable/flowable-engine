@@ -43,11 +43,9 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntityManager;
-import org.flowable.engine.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.engine.impl.persistence.entity.JobEntityManager;
 import org.flowable.engine.impl.persistence.entity.ModelEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
@@ -62,6 +60,9 @@ import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.identitylink.service.HistoricIdentityLinkService;
+import org.flowable.identitylink.service.IdentityLinkService;
+import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityManager;
@@ -111,6 +112,35 @@ public class CommandContextUtil {
         }
         
         return historicVariableService;
+    }
+    
+    // IDENTITY LINK SERVICE
+    public static IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration() {
+        return getIdentityLinkServiceConfiguration(getCommandContext());
+    }
+    
+    public static IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration(CommandContext commandContext) {
+        return (IdentityLinkServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG);
+    }
+    
+    public static IdentityLinkService getIdentityLinkService() {
+        IdentityLinkService identityLinkService = null;
+        IdentityLinkServiceConfiguration identityLinkServiceConfiguration = getIdentityLinkServiceConfiguration();
+        if (identityLinkServiceConfiguration != null) {
+            identityLinkService = identityLinkServiceConfiguration.getIdentityLinkService();
+        }
+        
+        return identityLinkService;
+    }
+    
+    public static HistoricIdentityLinkService getHistoricIdentityLinkService() {
+        HistoricIdentityLinkService historicIdentityLinkService = null;
+        IdentityLinkServiceConfiguration identityLinkServiceConfiguration = getIdentityLinkServiceConfiguration();
+        if (identityLinkServiceConfiguration != null) {
+            historicIdentityLinkService = identityLinkServiceConfiguration.getHistoricIdentityLinkService();
+        }
+        
+        return historicIdentityLinkService;
     }
     
     // IDM ENGINE
@@ -405,14 +435,6 @@ public class CommandContextUtil {
         return getProcessEngineConfiguration(commandContext).getEventSubscriptionEntityManager();
     }
     
-    public static IdentityLinkEntityManager getIdentityLinkEntityManager() {
-        return getIdentityLinkEntityManager(getCommandContext());
-    }
-    
-    public static IdentityLinkEntityManager getIdentityLinkEntityManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getIdentityLinkEntityManager();
-    }
-    
     public static PrivilegeEntityManager getPrivilegeEntityManager() {
         return getPrivilegeEntityManager(getCommandContext());
     }
@@ -475,14 +497,6 @@ public class CommandContextUtil {
     
     public static HistoricDetailEntityManager getHistoricDetailEntityManager(CommandContext commandContext) {
         return getProcessEngineConfiguration(commandContext).getHistoricDetailEntityManager();
-    }
-    
-    public static HistoricIdentityLinkEntityManager getHistoricIdentityLinkEntityManager() {
-        return getHistoricIdentityLinkEntityManager(getCommandContext());
-    }
-    
-    public static HistoricIdentityLinkEntityManager getHistoricIdentityLinkEntityManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getHistoricIdentityLinkEntityManager();
     }
     
     public static HistoryJobEntityManager getHistoryJobEntityManager() {

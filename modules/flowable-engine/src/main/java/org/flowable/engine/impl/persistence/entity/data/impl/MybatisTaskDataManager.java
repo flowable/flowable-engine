@@ -17,9 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.db.CachedEntityMatcher;
 import org.flowable.engine.impl.TaskQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.CachedEntityMatcher;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;

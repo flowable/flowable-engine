@@ -313,7 +313,7 @@
       <result property="textValue2" column="VAR_TEXT2_" jdbcType="VARCHAR" />
       <result property="longValue" column="VAR_LONG_" jdbcType="BIGINT" />
     </collection>
-    <collection property="queryIdentityLinks" column="TASK_ID_" javaType="ArrayList" ofType="org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityImpl">
+    <collection property="queryIdentityLinks" column="TASK_ID_" javaType="ArrayList" ofType="org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl">
       <id property="id" column="ILINK_ID_"/>
       <result property="type" column="ILINK_TYPE_" jdbcType="VARCHAR" />
       <result property="userId" column="ILINK_USER_ID_" jdbcType="VARCHAR" />

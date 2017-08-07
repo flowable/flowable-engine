@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.query.AbstractNativeQuery;
 import org.flowable.idm.api.NativeTokenQuery;
 import org.flowable.idm.api.Token;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;

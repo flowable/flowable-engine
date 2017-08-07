@@ -24,7 +24,7 @@ import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.task.DelegationState;
-import org.flowable.engine.task.IdentityLinkType;
+import org.flowable.identitylink.service.IdentityLinkType;
 
 /**
  * @author Joram Barrez
@@ -61,7 +61,7 @@ public class TaskHelper {
         CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
         if (Authentication.getAuthenticatedUserId() != null && taskEntity.getProcessInstanceId() != null) {
             ExecutionEntity processInstanceEntity = CommandContextUtil.getExecutionEntityManager(commandContext).findById(taskEntity.getProcessInstanceId());
-            CommandContextUtil.getIdentityLinkEntityManager(commandContext).involveUser(processInstanceEntity, Authentication.getAuthenticatedUserId(), IdentityLinkType.PARTICIPANT);
+            IdentityLinkUtil.createProcessInstanceIdentityLink(processInstanceEntity, Authentication.getAuthenticatedUserId(), null, IdentityLinkType.PARTICIPANT);
         }
 
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();

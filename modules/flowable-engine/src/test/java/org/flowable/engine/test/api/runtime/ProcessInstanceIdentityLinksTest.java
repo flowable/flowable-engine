@@ -19,9 +19,9 @@ import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Event;
-import org.flowable.engine.task.IdentityLink;
-import org.flowable.engine.task.IdentityLinkType;
 import org.flowable.engine.test.Deployment;
+import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.service.IdentityLinkType;
 
 import junit.framework.AssertionFailedError;
 

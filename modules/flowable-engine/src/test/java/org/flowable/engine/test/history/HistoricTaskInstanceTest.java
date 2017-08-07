@@ -24,13 +24,13 @@ import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.history.HistoricIdentityLink;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.IdentityLinkType;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.service.history.HistoricIdentityLink;
 
 /**
  * @author Tom Baeyens

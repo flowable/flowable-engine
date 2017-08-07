@@ -20,6 +20,7 @@ import org.flowable.dmn.api.NativeDecisionTableQuery;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.query.AbstractNativeQuery;
 
 public class NativeDecisionTableQueryImpl extends AbstractNativeQuery<NativeDecisionTableQuery, DmnDecisionTable> implements NativeDecisionTableQuery {
 

@@ -23,6 +23,7 @@ import java.util.Map;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
@@ -294,7 +295,7 @@ public class HistoricTaskInstanceEntityImpl extends HistoricScopeInstanceEntityI
     public List<HistoricIdentityLinkEntity> getIdentityLinks() {
         if (!isIdentityLinksInitialized) {
             if (queryIdentityLinks == null) {
-                identityLinks = CommandContextUtil.getHistoricIdentityLinkEntityManager().findHistoricIdentityLinksByTaskId(id);
+                identityLinks = CommandContextUtil.getHistoricIdentityLinkService().findHistoricIdentityLinksByTaskId(id);
             } else {
                 identityLinks = queryIdentityLinks;
             }

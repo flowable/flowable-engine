@@ -27,13 +27,14 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.task.IdentityLinkType;
+import org.flowable.identitylink.service.HistoricIdentityLinkService;
+import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
@@ -136,7 +137,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             CommandContextUtil.getHistoricVariableService().deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
             getHistoricActivityInstanceEntityManager().deleteHistoricActivityInstancesByProcessInstanceId(processInstanceId);
             getHistoricTaskInstanceEntityManager().deleteHistoricTaskInstancesByProcessInstanceId(processInstanceId);
-            getHistoricIdentityLinkEntityManager().deleteHistoricIdentityLinksByProcInstance(processInstanceId);
+            CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLinksByProcessInstanceId(processInstanceId);
             getCommentEntityManager().deleteCommentsByProcessInstanceId(processInstanceId);
 
             if (historicProcessInstance != null) {
@@ -300,13 +301,14 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     }
     
     protected void createHistoricIdentityLink(String taskId, String type, String userId) {
-        HistoricIdentityLinkEntity historicIdentityLinkEntity = getHistoricIdentityLinkEntityManager().create();
+        HistoricIdentityLinkService historicIdentityLinkService = CommandContextUtil.getHistoricIdentityLinkService();
+        HistoricIdentityLinkEntity historicIdentityLinkEntity = historicIdentityLinkService.createHistoricIdentityLink();
         historicIdentityLinkEntity.setTaskId(taskId);
         historicIdentityLinkEntity.setType(type);
         historicIdentityLinkEntity.setUserId(userId);
         Date time = getClock().getCurrentTime();
         historicIdentityLinkEntity.setCreateTime(time);
-        getHistoricIdentityLinkEntityManager().insert(historicIdentityLinkEntity, false);
+        historicIdentityLinkService.insertHistoricIdentityLink(historicIdentityLinkEntity, false);
     }
 
     // Variables related history
@@ -366,21 +368,22 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         // It makes no sense storing historic counterpart for an identity-link that is related
         // to a process-definition only as this is never kept in history
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT) && (identityLink.getProcessInstanceId() != null || identityLink.getTaskId() != null)) {
-            HistoricIdentityLinkEntity historicIdentityLinkEntity = getHistoricIdentityLinkEntityManager().create();
+            HistoricIdentityLinkService historicIdentityLinkService = CommandContextUtil.getHistoricIdentityLinkService();
+            HistoricIdentityLinkEntity historicIdentityLinkEntity = historicIdentityLinkService.createHistoricIdentityLink();
             historicIdentityLinkEntity.setId(identityLink.getId());
             historicIdentityLinkEntity.setGroupId(identityLink.getGroupId());
             historicIdentityLinkEntity.setProcessInstanceId(identityLink.getProcessInstanceId());
             historicIdentityLinkEntity.setTaskId(identityLink.getTaskId());
             historicIdentityLinkEntity.setType(identityLink.getType());
             historicIdentityLinkEntity.setUserId(identityLink.getUserId());
-            getHistoricIdentityLinkEntityManager().insert(historicIdentityLinkEntity, false);
+            historicIdentityLinkService.insertHistoricIdentityLink(historicIdentityLinkEntity, false);
         }
     }
     
     @Override
     public void recordIdentityLinkDeleted(String identityLinkId) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            getHistoricIdentityLinkEntityManager().delete(identityLinkId);
+            CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLink(identityLinkId);
         }
     }
 

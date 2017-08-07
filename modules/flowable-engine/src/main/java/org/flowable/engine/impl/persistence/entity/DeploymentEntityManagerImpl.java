@@ -36,6 +36,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.data.DeploymentDataManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.TimerUtil;
 import org.flowable.engine.repository.Deployment;
@@ -111,7 +112,7 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
     }
 
     protected void deleteProcessDefinitionIdentityLinks(ProcessDefinition processDefinition) {
-        getIdentityLinkEntityManager().deleteIdentityLinksByProcDef(processDefinition.getId());
+        CommandContextUtil.getIdentityLinkService().deleteIdentityLinksByProcessDefinitionId(processDefinition.getId());
     }
 
     protected void deleteEventSubscriptions(ProcessDefinition processDefinition) {

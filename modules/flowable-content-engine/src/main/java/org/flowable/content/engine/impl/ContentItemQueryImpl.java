@@ -24,6 +24,7 @@ import org.flowable.content.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.query.AbstractQuery;
 
 /**
  * @author Tijs Rademakers

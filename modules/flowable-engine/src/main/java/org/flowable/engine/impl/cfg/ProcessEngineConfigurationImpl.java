@@ -239,16 +239,12 @@ import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntit
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityManagerImpl;
-import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntityManagerImpl;
-import org.flowable.engine.impl.persistence.entity.IdentityLinkEntityManager;
-import org.flowable.engine.impl.persistence.entity.IdentityLinkEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.JobEntityManager;
 import org.flowable.engine.impl.persistence.entity.JobEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.ModelEntityManager;
@@ -279,11 +275,9 @@ import org.flowable.engine.impl.persistence.entity.data.EventSubscriptionDataMan
 import org.flowable.engine.impl.persistence.entity.data.ExecutionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoricActivityInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoricDetailDataManager;
-import org.flowable.engine.impl.persistence.entity.data.HistoricIdentityLinkDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoricProcessInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoricTaskInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoryJobDataManager;
-import org.flowable.engine.impl.persistence.entity.data.IdentityLinkDataManager;
 import org.flowable.engine.impl.persistence.entity.data.JobDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ModelDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionDataManager;
@@ -303,11 +297,9 @@ import org.flowable.engine.impl.persistence.entity.data.impl.MybatisEventSubscri
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisExecutionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoricActivityInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoricDetailDataManager;
-import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoricIdentityLinkDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoricProcessInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoricTaskInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoryJobDataManager;
-import org.flowable.engine.impl.persistence.entity.data.impl.MybatisIdentityLinkDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisJobDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisModelDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefinitionDataManager;
@@ -324,6 +316,9 @@ import org.flowable.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.parse.BpmnParseHandler;
+import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
+import org.flowable.identitylink.service.impl.persistence.entity.data.HistoricIdentityLinkDataManager;
+import org.flowable.identitylink.service.impl.persistence.entity.data.IdentityLinkDataManager;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
@@ -424,10 +419,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected ExecutionEntityManager executionEntityManager;
     protected HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager;
     protected HistoricDetailEntityManager historicDetailEntityManager;
-    protected HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager;
     protected HistoricProcessInstanceEntityManager historicProcessInstanceEntityManager;
     protected HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager;
-    protected IdentityLinkEntityManager identityLinkEntityManager;
     protected JobEntityManager jobEntityManager;
     protected TimerJobEntityManager timerJobEntityManager;
     protected SuspendedJobEntityManager suspendedJobEntityManager;
@@ -466,6 +459,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected List<ProcessEngineConfigurator> allConfigurators; // Including auto-discovered configurators
 
     protected VariableServiceConfiguration variableServiceConfiguration;
+    protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
     protected ProcessEngineConfigurator idmProcessEngineConfigurator;
 
     // DEPLOYERS //////////////////////////////////////////////////////////////////
@@ -902,6 +896,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initDatabaseEventLogging();
         initFlowable5CompatibilityHandler();
         initVariableServiceConfiguration();
+        initIdentityLinkServiceConfiguration();
         configuratorsAfterInit();
     }
 
@@ -1086,17 +1081,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (historicDetailDataManager == null) {
             historicDetailDataManager = new MybatisHistoricDetailDataManager(this);
         }
-        if (historicIdentityLinkDataManager == null) {
-            historicIdentityLinkDataManager = new MybatisHistoricIdentityLinkDataManager(this);
-        }
         if (historicProcessInstanceDataManager == null) {
             historicProcessInstanceDataManager = new MybatisHistoricProcessInstanceDataManager(this);
         }
         if (historicTaskInstanceDataManager == null) {
             historicTaskInstanceDataManager = new MybatisHistoricTaskInstanceDataManager(this);
-        }
-        if (identityLinkDataManager == null) {
-            identityLinkDataManager = new MybatisIdentityLinkDataManager(this);
         }
         if (jobDataManager == null) {
             jobDataManager = new MybatisJobDataManager(this);
@@ -1163,17 +1152,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (historicDetailEntityManager == null) {
             historicDetailEntityManager = new HistoricDetailEntityManagerImpl(this, historicDetailDataManager);
         }
-        if (historicIdentityLinkEntityManager == null) {
-            historicIdentityLinkEntityManager = new HistoricIdentityLinkEntityManagerImpl(this, historicIdentityLinkDataManager);
-        }
         if (historicProcessInstanceEntityManager == null) {
             historicProcessInstanceEntityManager = new HistoricProcessInstanceEntityManagerImpl(this, historicProcessInstanceDataManager);
         }
         if (historicTaskInstanceEntityManager == null) {
             historicTaskInstanceEntityManager = new HistoricTaskInstanceEntityManagerImpl(this, historicTaskInstanceDataManager);
-        }
-        if (identityLinkEntityManager == null) {
-            identityLinkEntityManager = new IdentityLinkEntityManagerImpl(this, identityLinkDataManager);
         }
         if (jobEntityManager == null) {
             jobEntityManager = new JobEntityManagerImpl(this, jobDataManager);
@@ -1432,6 +1415,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.variableServiceConfiguration.init();
         
         addServiceConfiguration(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG, this.variableServiceConfiguration);
+    }
+    
+    public void initIdentityLinkServiceConfiguration() {
+        this.identityLinkServiceConfiguration = new IdentityLinkServiceConfiguration();
+        this.identityLinkServiceConfiguration.setCommandExecutor(this.commandExecutor);
+        this.identityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
+        this.identityLinkServiceConfiguration.setClock(this.clock);
+        this.identityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
+        this.identityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        
+        this.identityLinkServiceConfiguration.init();
+        
+        addServiceConfiguration(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG, this.identityLinkServiceConfiguration);
     }
 
     public void configuratorsAfterInit() {
@@ -3382,15 +3378,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public HistoricIdentityLinkEntityManager getHistoricIdentityLinkEntityManager() {
-        return historicIdentityLinkEntityManager;
-    }
-
-    public ProcessEngineConfigurationImpl setHistoricIdentityLinkEntityManager(HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager) {
-        this.historicIdentityLinkEntityManager = historicIdentityLinkEntityManager;
-        return this;
-    }
-
     public HistoricProcessInstanceEntityManager getHistoricProcessInstanceEntityManager() {
         return historicProcessInstanceEntityManager;
     }
@@ -3406,15 +3393,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setHistoricTaskInstanceEntityManager(HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager) {
         this.historicTaskInstanceEntityManager = historicTaskInstanceEntityManager;
-        return this;
-    }
-
-    public IdentityLinkEntityManager getIdentityLinkEntityManager() {
-        return identityLinkEntityManager;
-    }
-
-    public ProcessEngineConfigurationImpl setIdentityLinkEntityManager(IdentityLinkEntityManager identityLinkEntityManager) {
-        this.identityLinkEntityManager = identityLinkEntityManager;
         return this;
     }
 

@@ -19,8 +19,8 @@ import java.util.Set;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.task.DelegationState;
-import org.flowable.engine.task.IdentityLink;
-import org.flowable.engine.task.IdentityLinkType;
+import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.service.IdentityLinkType;
 
 /**
  * @author Joram Barrez

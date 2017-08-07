@@ -19,6 +19,7 @@ import java.util.List;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.query.Query;
 import org.flowable.engine.history.HistoricTaskInstanceQuery;
+import org.flowable.identitylink.service.IdentityLink;
 
 /**
  * Interface containing shared methods between the {@link TaskQuery} and the {@link HistoricTaskInstanceQuery}.

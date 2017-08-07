@@ -19,6 +19,7 @@ import java.util.Set;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.query.AbstractQuery;
 import org.flowable.variable.service.history.HistoricVariableInstance;
 import org.flowable.variable.service.history.HistoricVariableInstanceQuery;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;

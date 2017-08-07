@@ -20,7 +20,7 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.task.IdentityLinkType;
-import org.flowable.engine.task.IdentityLink;
+import org.flowable.identitylink.service.IdentityLink;
 
 /**
  * @author Joram Barrez
