@@ -1,26 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn"
-	typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
-	targetNamespace="http://www.activiti.org/test">
-	<process id="MultiInstanceTest" name="MultiInstanceTest">
-		<documentation>Place documentation for the 'MultiInstanceTest' processhere.</documentation>
-		<startEvent id="startevent1" name="Start"></startEvent>
-		<subProcess id="subprocess1" name="Sub Process">
-			<extensionElements>
-				<activiti:executionListener event="start" class="org.flowable.engine.test.bpmn.multiinstance.MultiInstanceTest$TestStartExecutionListener"></activiti:executionListener>
-				<activiti:executionListener event="end" class="org.flowable.engine.test.bpmn.multiinstance.MultiInstanceTest$TestEndExecutionListener"></activiti:executionListener>
-			</extensionElements>
-			<multiInstanceLoopCharacteristics isSequential="false">
-				<loopDataInputRef>assignees</loopDataInputRef>
-				<inputDataItem name="assignee"></inputDataItem>
-			</multiInstanceLoopCharacteristics>
-			<startEvent id="startevent2" name="Start"></startEvent>
-			<endEvent id="endevent2" name="End"></endEvent>
-			<sequenceFlow id="flow3" name="" sourceRef="startevent2" targetRef="endevent2"></sequenceFlow>
-		</subProcess>
-		<endEvent id="endevent1" name="End"></endEvent>
-		<sequenceFlow id="flow1" name="" sourceRef="startevent1" targetRef="subprocess1"></sequenceFlow>
-		<sequenceFlow id="flow2" name="" sourceRef="subprocess1" targetRef="endevent1"></sequenceFlow>
-	</process>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="MultiInstanceTest" name="MultiInstanceTest" isExecutable="true">
+    <documentation>Place documentation for the 'MultiInstanceTest' processhere.</documentation>
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <subProcess id="subprocess1" name="Sub Process">
+      <extensionElements>
+        <activiti:executionListener event="start" class="org.flowable.engine.test.bpmn.multiinstance.MultiInstanceTest$TestStartExecutionListener"></activiti:executionListener>
+        <activiti:executionListener event="end" class="org.flowable.engine.test.bpmn.multiinstance.MultiInstanceTest$TestEndExecutionListener"></activiti:executionListener>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="${assignees}" activiti:elementVariable="assignee"></multiInstanceLoopCharacteristics>
+      <startEvent id="startevent2" name="Start"></startEvent>
+      <endEvent id="endevent2" name="End"></endEvent>
+      <sequenceFlow id="flow3" sourceRef="startevent2" targetRef="endevent2"></sequenceFlow>
+    </subProcess>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="subprocess1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="subprocess1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_MultiInstanceTest">
+    <bpmndi:BPMNPlane bpmnElement="MultiInstanceTest" id="BPMNPlane_MultiInstanceTest">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="0.0" y="20.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subprocess1" id="BPMNShape_subprocess1">
+        <omgdc:Bounds height="70.0" width="150.0" x="80.0" y="0.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent2" id="BPMNShape_startevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="100.0" y="20.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent2" id="BPMNShape_endevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="180.0" y="20.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="280.0" y="20.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="135.0" y="37.0"></omgdi:waypoint>
+        <omgdi:waypoint x="142.0" y="35.0"></omgdi:waypoint>
+        <omgdi:waypoint x="142.0" y="35.0"></omgdi:waypoint>
+        <omgdi:waypoint x="180.0" y="37.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="35.0" y="37.0"></omgdi:waypoint>
+        <omgdi:waypoint x="42.0" y="35.0"></omgdi:waypoint>
+        <omgdi:waypoint x="42.0" y="35.0"></omgdi:waypoint>
+        <omgdi:waypoint x="80.0" y="35.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="230.0" y="35.0"></omgdi:waypoint>
+        <omgdi:waypoint x="280.0" y="37.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
 </definitions>

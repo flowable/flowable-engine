@@ -4,7 +4,7 @@
     <startEvent id="start" name="Start"></startEvent>
     <endEvent id="end" name="End"></endEvent>
     <userTask id="multi" name="Multi">
-      <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="multi_users" activiti:elementVariable="assignee"></multiInstanceLoopCharacteristics>
+      <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="${multi_users}" activiti:elementVariable="assignee"></multiInstanceLoopCharacteristics>
     </userTask>
     <sequenceFlow id="flow1" sourceRef="start" targetRef="multi"></sequenceFlow>
     <sequenceFlow id="flow2" sourceRef="multi" targetRef="end"></sequenceFlow>

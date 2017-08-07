@@ -12,7 +12,7 @@
     
     <userTask id="miTasks" name="My Task ${loopValueIndex}" activiti:assignee="${assignee}" >
       <multiInstanceLoopCharacteristics isSequential="false"
-              activiti:collection="assigneeList" activiti:elementVariable="assignee"
+              activiti:collection="${assigneeList}" activiti:elementVariable="assignee"
               activiti:elementIndexVariable="loopValueIndex"/>
     </userTask>
     
