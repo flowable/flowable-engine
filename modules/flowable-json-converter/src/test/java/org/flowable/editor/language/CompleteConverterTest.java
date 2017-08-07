@@ -25,6 +25,8 @@ import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 public class CompleteConverterTest extends AbstractConverterTest {
 
     @Test
@@ -70,5 +72,8 @@ public class CompleteConverterTest extends AbstractConverterTest {
         assertNotNull(flowElement);
         assertTrue(flowElement instanceof ReceiveTask);
         assertEquals("receiveTask", flowElement.getId());
+
+        assertEquals(Arrays.asList("user1","user2"), model.getMainProcess().getCandidateStarterUsers());
+        assertEquals(Arrays.asList("group1","group2"), model.getMainProcess().getCandidateStarterGroups());
     }
 }
