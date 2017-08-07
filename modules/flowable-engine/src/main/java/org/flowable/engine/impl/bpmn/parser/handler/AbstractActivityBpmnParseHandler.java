@@ -66,11 +66,7 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
 
         // activiti:collection
         if (StringUtils.isNotEmpty(loopCharacteristics.getInputDataItem())) {
-            if (loopCharacteristics.getInputDataItem().contains("{")) {
-                miActivityBehavior.setCollectionExpression(expressionManager.createExpression(loopCharacteristics.getInputDataItem()));
-            } else {
-                miActivityBehavior.setCollectionVariable(loopCharacteristics.getInputDataItem());
-            }
+            miActivityBehavior.setCollectionExpression(expressionManager.createExpression(loopCharacteristics.getInputDataItem()));
         }
 
         // activiti:elementVariable

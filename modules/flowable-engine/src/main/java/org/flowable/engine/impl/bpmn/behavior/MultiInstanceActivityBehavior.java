@@ -267,7 +267,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     @SuppressWarnings("rawtypes")
     protected void executeOriginalBehavior(DelegateExecution execution, int loopCounter) {
         if (usesCollection() && collectionElementVariable != null) {
-            Collection collection = (Collection) resolveCollection(execution);
+            Collection collection = (Collection) resolveAndValidateCollection(execution);
 
             Object value = null;
             int index = 0;
@@ -286,24 +286,23 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     @SuppressWarnings("rawtypes")
     protected Collection resolveAndValidateCollection(DelegateExecution execution) {
         Object obj = resolveCollection(execution);
-        if (collectionExpression != null) {
-            if (!(obj instanceof Collection)) {
-                throw new FlowableIllegalArgumentException(collectionExpression.getExpressionText() + "' didn't resolve to a Collection");
-            }
-
-        } else if (collectionVariable != null) {
-            if (obj == null) {
+        if (obj instanceof Collection) {
+            return (Collection) obj;
+            
+        } else if (obj instanceof String) {
+            Object collectionVariable = execution.getVariable((String) obj);
+            if (collectionVariable instanceof Collection) {
+                return (Collection) collectionVariable;
+            } else if (collectionVariable == null){
                 throw new FlowableIllegalArgumentException("Variable " + collectionVariable + " is not found");
-            }
-
-            if (!(obj instanceof Collection)) {
+            } else {
                 throw new FlowableIllegalArgumentException("Variable " + collectionVariable + "' is not a Collection");
             }
-
+            
         } else {
             throw new FlowableIllegalArgumentException("Couldn't resolve collection expression nor variable reference");
+            
         }
-        return (Collection) obj;
     }
 
     protected Object resolveCollection(DelegateExecution execution) {
