@@ -75,7 +75,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     protected Expression loopCardinalityExpression;
     protected String completionCondition;
     protected Expression collectionExpression;
-    protected String collectionVariable;
+    protected String collectionVariable; // Not used anymore. Left here for backwards compatibility.
     protected String collectionElementVariable;
     // default variable name for loop counter for inner instances (as described in the spec)
     protected String collectionElementIndexVariable = "loopCounter";
