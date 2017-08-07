@@ -17,6 +17,7 @@ import java.util.List;
 import org.flowable.engine.common.impl.db.HasRevision;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 
 /**
  * @author Joram Barrez

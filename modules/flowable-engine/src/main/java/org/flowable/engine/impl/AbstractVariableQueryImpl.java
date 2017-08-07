@@ -20,6 +20,7 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.query.Query;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.query.AbstractQuery;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.service.impl.types.VariableTypes;
 

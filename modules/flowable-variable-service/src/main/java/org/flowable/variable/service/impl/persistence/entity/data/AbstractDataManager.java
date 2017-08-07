@@ -18,15 +18,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.flowable.engine.common.impl.db.CachedEntityMatcher;
 import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.db.SingleCachedEntityMatcher;
 import org.flowable.engine.common.impl.persistence.cache.CachedEntity;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.AbstractManager;
-import org.flowable.variable.service.impl.persistence.CachedEntityMatcher;
-import org.flowable.variable.service.impl.persistence.SingleCachedEntityMatcher;
 
 /**
  * @author Tijs Rademakers

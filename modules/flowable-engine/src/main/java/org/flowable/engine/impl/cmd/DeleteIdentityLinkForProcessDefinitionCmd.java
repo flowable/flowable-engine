@@ -68,7 +68,7 @@ public class DeleteIdentityLinkForProcessDefinitionCmd implements Command<Object
             return null;
         }
 
-        CommandContextUtil.getIdentityLinkEntityManager(commandContext).deleteIdentityLink(processDefinition, userId, groupId);
+        CommandContextUtil.getIdentityLinkService().deleteProcessDefinitionIdentityLink(processDefinition.getId(), userId, groupId);
 
         return null;
     }

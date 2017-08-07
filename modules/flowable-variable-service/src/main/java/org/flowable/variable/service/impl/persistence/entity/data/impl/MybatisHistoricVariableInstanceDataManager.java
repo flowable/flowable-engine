@@ -15,10 +15,10 @@ package org.flowable.variable.service.impl.persistence.entity.data.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.db.CachedEntityMatcher;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
-import org.flowable.variable.service.impl.persistence.CachedEntityMatcher;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.data.AbstractDataManager;

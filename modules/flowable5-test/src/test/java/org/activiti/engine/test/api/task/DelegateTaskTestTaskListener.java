@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
-import org.flowable.engine.task.IdentityLink;
+import org.flowable.identitylink.service.IdentityLink;
 
 public class DelegateTaskTestTaskListener implements TaskListener {
 

@@ -31,10 +31,8 @@ import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManage
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.engine.impl.persistence.entity.JobEntityManager;
 import org.flowable.engine.impl.persistence.entity.ModelEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
@@ -128,10 +126,6 @@ public abstract class AbstractManager {
         return getProcessEngineConfiguration().getTaskEntityManager();
     }
 
-    protected IdentityLinkEntityManager getIdentityLinkEntityManager() {
-        return getProcessEngineConfiguration().getIdentityLinkEntityManager();
-    }
-
     protected EventSubscriptionEntityManager getEventSubscriptionEntityManager() {
         return getProcessEngineConfiguration().getEventSubscriptionEntityManager();
     }
@@ -166,10 +160,6 @@ public abstract class AbstractManager {
 
     protected HistoricTaskInstanceEntityManager getHistoricTaskInstanceEntityManager() {
         return getProcessEngineConfiguration().getHistoricTaskInstanceEntityManager();
-    }
-
-    protected HistoricIdentityLinkEntityManager getHistoricIdentityLinkEntityManager() {
-        return getProcessEngineConfiguration().getHistoricIdentityLinkEntityManager();
     }
 
     protected AttachmentEntityManager getAttachmentEntityManager() {

@@ -16,6 +16,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.identitylink.service.IdentityLinkInfo;
+
 /**
  * @author Joram Barrez
  */

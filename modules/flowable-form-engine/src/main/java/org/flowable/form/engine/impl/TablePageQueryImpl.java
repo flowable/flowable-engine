@@ -19,6 +19,7 @@ import org.flowable.engine.common.api.management.TablePageQuery;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.query.AbstractQuery;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
 
 /**

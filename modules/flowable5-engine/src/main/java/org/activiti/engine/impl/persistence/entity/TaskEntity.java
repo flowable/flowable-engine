@@ -45,7 +45,7 @@ import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.task.DelegationState;
-import org.flowable.engine.task.IdentityLink;
+import org.flowable.identitylink.service.IdentityLink;
 
 /**
  * @author Tom Baeyens

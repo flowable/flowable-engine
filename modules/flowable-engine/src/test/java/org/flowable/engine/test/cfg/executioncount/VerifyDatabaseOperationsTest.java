@@ -373,7 +373,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             assertDatabaseInserts("DeleteIdentityLinkCmd", "CommentEntityImpl", 5L);
             // TODO: some selects can be removed. No need to query the DB if the "identityLinkCount" is zero
             assertDatabaseSelects("DeleteIdentityLinkCmd", "selectById org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 5L,
-                    "selectIdentityLinkByTaskUserGroupAndType", 5L, "selectById org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityImpl", 2L,
+                    "selectIdentityLinkByTaskUserGroupAndType", 5L, "selectById org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl", 2L,
                     "selectIdentityLinksByTask", 5L);
             assertDatabaseUpdates("DeleteIdentityLinkCmd", "org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 2L);
         }
@@ -416,7 +416,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             assertDatabaseInserts("DeleteIdentityLinkCmd", "CommentEntityImpl", 5L);
             // TODO: some selects can be removed. No need to query the DB if the "identityLinkCount" is zero
             assertDatabaseSelects("DeleteIdentityLinkCmd", "selectById org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 5L,
-                    "selectIdentityLinkByTaskUserGroupAndType", 5L, "selectById org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityImpl", 2L,
+                    "selectIdentityLinkByTaskUserGroupAndType", 5L, "selectById org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl", 2L,
                     "selectIdentityLinksByTask", 5L);
             assertDatabaseUpdates("DeleteIdentityLinkCmd", "org.flowable.engine.impl.persistence.entity.TaskEntityImpl", 2L);
         }
@@ -578,6 +578,10 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         String fullClassName = null;
         if (className.startsWith("VariableInstanceEntityImpl") || className.startsWith("HistoricVariableInstanceEntityImpl")) {
             fullClassName = "org.flowable.variable.service.impl.persistence.entity." + className;
+            
+        } else if (className.startsWith("IdentityLinkEntityImpl") || className.startsWith("HistoricIdentityLinkEntityImpl")) {
+            fullClassName = "org.flowable.identitylink.service.impl.persistence.entity." + className;
+            
         } else {
             fullClassName = "org.flowable.engine.impl.persistence.entity." + className;
         }

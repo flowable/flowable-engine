@@ -109,7 +109,7 @@ public class HistoricTaskInstanceEntityManagerImpl extends AbstractEntityManager
 
                 getHistoricDetailEntityManager().deleteHistoricDetailsByTaskId(id);
                 CommandContextUtil.getHistoricVariableService().deleteHistoricVariableInstancesByTaskId(id);
-                getHistoricIdentityLinkEntityManager().deleteHistoricIdentityLinksByTaskId(id);
+                CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLinksByTaskId(id);
 
                 delete(historicTaskInstance);
             }

@@ -22,6 +22,7 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.task.Task;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**

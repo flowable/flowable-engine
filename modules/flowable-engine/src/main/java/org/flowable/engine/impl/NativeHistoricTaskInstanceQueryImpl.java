@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.query.AbstractNativeQuery;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.history.NativeHistoricTaskInstanceQuery;
 import org.flowable.engine.impl.util.CommandContextUtil;

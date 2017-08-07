@@ -14,9 +14,9 @@ package org.flowable.standalone.cfg;
 
 import java.util.List;
 
-import org.flowable.engine.ManagementService;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.AbstractQuery;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.query.AbstractQuery;
 import org.flowable.engine.impl.TaskQueryProperty;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
@@ -32,8 +32,8 @@ public class CustomTaskQuery extends AbstractQuery<CustomTaskQuery, CustomTask> 
     protected String taskId;
     protected String owner;
 
-    public CustomTaskQuery(ManagementService managementService) {
-        super(managementService);
+    public CustomTaskQuery(CommandExecutor commandExecutor) {
+        super(commandExecutor);
     }
 
     public CustomTaskQuery taskId(String taskId) {

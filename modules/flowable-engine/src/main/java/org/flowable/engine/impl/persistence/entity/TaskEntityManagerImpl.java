@@ -30,8 +30,10 @@ import org.flowable.engine.impl.persistence.entity.data.TaskDataManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
-import org.flowable.engine.task.IdentityLinkType;
+import org.flowable.engine.impl.util.IdentityLinkUtil;
 import org.flowable.engine.task.Task;
+import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 
 /**
  * @author Tom Baeyens
@@ -150,7 +152,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
 
     protected void addAssigneeIdentityLinks(TaskEntity taskEntity) {
         if (taskEntity.getAssignee() != null && taskEntity.getProcessInstance() != null) {
-            getIdentityLinkEntityManager().involveUser(taskEntity.getProcessInstance(), taskEntity.getAssignee(), IdentityLinkType.PARTICIPANT);
+            IdentityLinkUtil.createProcessInstanceIdentityLink(taskEntity.getProcessInstance(), taskEntity.getAssignee(), null, IdentityLinkType.PARTICIPANT);
         }
     }
 
@@ -160,7 +162,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         }
 
         if (owner != null && taskEntity.getProcessInstanceId() != null) {
-            getIdentityLinkEntityManager().involveUser(taskEntity.getProcessInstance(), owner, IdentityLinkType.PARTICIPANT);
+            IdentityLinkUtil.createProcessInstanceIdentityLink(taskEntity.getProcessInstance(), owner, null, IdentityLinkType.PARTICIPANT);
         }
     }
 
@@ -205,7 +207,8 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             boolean isTaskRelatedEntityCountEnabled = CountingEntityUtil.isTaskRelatedEntityCountEnabled(task);
 
             if (!isTaskRelatedEntityCountEnabled || (isTaskRelatedEntityCountEnabled && ((CountingTaskEntity) task).getIdentityLinkCount() > 0)) {
-                getIdentityLinkEntityManager().deleteIdentityLinksByTaskId(taskId);
+                List<IdentityLinkEntity> identityLinks = CommandContextUtil.getIdentityLinkService().deleteIdentityLinksByTaskId(taskId);
+                IdentityLinkUtil.handleTaskIdentityLinkDeletions(task, identityLinks, false);
             }
 
             if (!isTaskRelatedEntityCountEnabled || (isTaskRelatedEntityCountEnabled && ((CountingTaskEntity) task).getVariableCount() > 0)) {

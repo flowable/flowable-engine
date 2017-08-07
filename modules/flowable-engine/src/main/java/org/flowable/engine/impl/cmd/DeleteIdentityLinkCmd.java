@@ -19,7 +19,8 @@ import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
-import org.flowable.engine.task.IdentityLinkType;
+import org.flowable.engine.impl.util.IdentityLinkUtil;
+import org.flowable.identitylink.service.IdentityLinkType;
 
 /**
  * @author Tom Baeyens
@@ -81,7 +82,7 @@ public class DeleteIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
         } else if (IdentityLinkType.OWNER.equals(type)) {
             CommandContextUtil.getTaskEntityManager(commandContext).changeTaskOwner(task, null);
         } else {
-            CommandContextUtil.getIdentityLinkEntityManager(commandContext).deleteIdentityLink(task, userId, groupId, type);
+            IdentityLinkUtil.deleteTaskIdentityLinks(task, userId, groupId, type);
         }
 
         CommandContextUtil.getHistoryManager(commandContext).createIdentityLinkComment(taskId, userId, groupId, type, false);

@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.query.AbstractNativeQuery;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.NativeFormDefinitionQuery;
 import org.flowable.form.engine.impl.util.CommandContextUtil;

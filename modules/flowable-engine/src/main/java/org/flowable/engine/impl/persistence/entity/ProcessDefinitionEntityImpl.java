@@ -22,6 +22,7 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 import org.flowable.engine.impl.bpmn.data.IOSpecification;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 
 /**
  * @author Joram Barrez
@@ -64,7 +65,7 @@ public class ProcessDefinitionEntityImpl extends AbstractEntity implements Proce
 
     public List<IdentityLinkEntity> getIdentityLinks() {
         if (!isIdentityLinksInitialized) {
-            definitionIdentityLinkEntities = CommandContextUtil.getIdentityLinkEntityManager().findIdentityLinksByProcessDefinitionId(id);
+            definitionIdentityLinkEntities = CommandContextUtil.getIdentityLinkService().findIdentityLinksByProcessDefinitionId(id);
             isIdentityLinksInitialized = true;
         }
 

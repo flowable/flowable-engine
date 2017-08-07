@@ -12,7 +12,7 @@ import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.task.IdentityLink;
+import org.flowable.identitylink.service.IdentityLink;
 
 public interface HistoryManager extends Session {
 
