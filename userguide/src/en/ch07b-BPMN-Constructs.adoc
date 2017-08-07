@@ -3572,8 +3572,8 @@ Http task is implemented as a dedicated <<bpmnJavaServiceTask,Service Task>> and
 ----
 <serviceTask id="httpGet" flowable:type="http">
 ----
-Also its possible to override default Http Task behavior by providing custom implementation.
-Custom implemention should extend org.flowable.http.HttpActivityBehavior and override perform() method.
+Also its possible to override default Http Task behavior by providing a custom implementation.
+Custom implementations should extend org.flowable.http.HttpActivityBehavior and override the perform() method.
 Field 'httpActivityBehaviorClass' should be set in the task definition.
 Default value for this field is 'org.flowable.http.impl.HttpActivityBehaviorImpl'.
 Currently 'HttpActivityBehaviorImpl' is based on Apache Http Client. As Apache Http Client can be customized in many ways, all possible options are not used in Http Client config.

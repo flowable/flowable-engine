@@ -810,7 +810,7 @@ However, it could be a specific version of a supported and tested database does 
 [[advancedSecureScripting]]
 === Secure Scripting
 
-By default, when using a <<bpmnScriptTask, script task>>, the script that is executed has similar capabilities as a Java delegate. It has full access to the JVM, can run forever (due to infinite loops) or use up a lot of memory. However, Java delegates need to be written and put on the classpath in a jar and they have a different lifecyle from a process definitions. End-users generally will not write Java delegates, as this is a typical the job of a developer.
+By default, when using a <<bpmnScriptTask, script task>>, the script that is executed has similar capabilities as a Java delegate. It has full access to the JVM, can run forever (due to infinite loops) or use up a lot of memory. However, Java delegates need to be written and put on the classpath in a jar and they have a different life cyle from a process definitions. End-users generally will not write Java delegates, as this is a typical the job of a developer.
 
 Scripts on the other hand are part of the process definition and its lifecycle is the same. Script tasks don't need the extra step of a jar deployment, but can be executed from the moment the process definition is deployed. Sometimes, scripts for script tasks are not written by developers. Yet, this poses a problem as stated above: a script has full access to the JVM and it is possible to block many system resources when executing the script. Allowing scripts from just about anyone is thus not a good idea.
 
