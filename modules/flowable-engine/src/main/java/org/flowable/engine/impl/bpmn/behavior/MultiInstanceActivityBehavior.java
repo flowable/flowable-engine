@@ -77,6 +77,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     protected Expression collectionExpression;
     protected String collectionVariable; // Not used anymore. Left here for backwards compatibility.
     protected String collectionElementVariable;
+    protected String collectionString;
     // default variable name for loop counter for inner instances (as described in the spec)
     protected String collectionElementIndexVariable = "loopCounter";
 
@@ -312,12 +313,14 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
         } else if (collectionVariable != null) {
             collection = execution.getVariable(collectionVariable);
+        } else if (collectionString != null) {
+// TODO add collection parsing function here
         }
         return collection;
     }
 
     protected boolean usesCollection() {
-        return collectionExpression != null || collectionVariable != null;
+        return collectionExpression != null || collectionVariable != null || collectionString != null;
     }
 
     protected boolean isExtraScopeNeeded(FlowNode flowNode) {
@@ -431,6 +434,14 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
     public void setCollectionElementVariable(String collectionElementVariable) {
         this.collectionElementVariable = collectionElementVariable;
+    }
+
+    public String getCollectionString() {
+        return collectionString;
+    }
+
+    public void setCollectionString(String collectionString) {
+        this.collectionString = collectionString;
     }
 
     public String getCollectionElementIndexVariable() {
