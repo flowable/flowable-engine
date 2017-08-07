@@ -48,8 +48,8 @@ public class WorkflowUsersResource {
 
     @RequestMapping(value = "/rest/workflow-users", method = RequestMethod.GET)
     public ResultListDataRepresentation getUsers(@RequestParam(value = "filter", required = false) String filter,
-            @RequestParam(value = "excludeTaskId", required = false) String excludeTaskId,
-            @RequestParam(value = "excludeProcessId", required = false) String excludeProcessId) {
+                                                 @RequestParam(value = "excludeTaskId", required = false) String excludeTaskId,
+                                                 @RequestParam(value = "excludeProcessId", required = false) String excludeProcessId) {
 
         List<? extends User> matchingUsers = remoteIdmService.findUsersByNameFilter(filter);
 
@@ -60,7 +60,7 @@ public class WorkflowUsersResource {
             filterUsersInvolvedInProcess(excludeProcessId, matchingUsers);
         }
 
-        List<UserRepresentation> userRepresentations = new ArrayList<UserRepresentation>(matchingUsers.size());
+        List<UserRepresentation> userRepresentations = new ArrayList<>(matchingUsers.size());
         for (User user : matchingUsers) {
             userRepresentations.add(new UserRepresentation(user));
         }
@@ -83,7 +83,7 @@ public class WorkflowUsersResource {
     protected Set<String> getInvolvedUsersAsSet(List<IdentityLink> involvedPeople) {
         Set<String> involved = null;
         if (involvedPeople.size() > 0) {
-            involved = new HashSet<String>();
+            involved = new HashSet<>();
             for (IdentityLink link : involvedPeople) {
                 if (link.getUserId() != null) {
                     involved.add(link.getUserId());

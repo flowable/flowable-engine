@@ -28,7 +28,7 @@ public class RemoteIdmAuthenticationProvider implements AuthenticationProvider {
             throw new FlowableException("user not found " + authentication.getPrincipal());
         }
 
-        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
+        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         for (String privilege : user.getPrivileges()) {
             grantedAuthorities.add(new SimpleGrantedAuthority(privilege));
         }

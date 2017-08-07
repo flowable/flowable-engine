@@ -42,7 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Centralized service for all permission-checks.
- * 
+ *
  * @author Frederik Heremans
  */
 @Service
@@ -104,7 +104,7 @@ public class PermissionService {
     }
 
     private List<String> getGroupIdsForUser(User user) {
-        List<String> groupIds = new ArrayList<String>();
+        List<String> groupIds = new ArrayList<>();
         for (Group group : remoteIdmService.getUser(user.getId()).getGroups()) {
             groupIds.add(String.valueOf(group.getId()));
         }

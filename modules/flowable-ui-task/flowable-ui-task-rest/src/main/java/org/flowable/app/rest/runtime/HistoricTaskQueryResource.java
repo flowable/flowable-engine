@@ -12,6 +12,9 @@
  */
 package org.flowable.app.rest.runtime;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,9 +37,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
 public class HistoricTaskQueryResource {
@@ -88,7 +88,7 @@ public class HistoricTaskQueryResource {
     }
 
     protected List<TaskRepresentation> convertTaskInfoList(List<HistoricTaskInstance> tasks) {
-        List<TaskRepresentation> result = new ArrayList<TaskRepresentation>();
+        List<TaskRepresentation> result = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(tasks)) {
             TaskRepresentation representation = null;
             for (HistoricTaskInstance task : tasks) {

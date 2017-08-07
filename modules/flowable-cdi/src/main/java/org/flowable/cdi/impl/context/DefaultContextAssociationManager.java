@@ -40,9 +40,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of the business process association manager. Uses a fallback-strategy to associate the process instance with the "broadest" active scope, starting with the conversation.
- * <p />
+ * <p/>
  * Subclass in order to implement custom association schemes and association with custom scopes.
- * 
+ *
  * @author Daniel Meyer
  */
 @SuppressWarnings("serial")
@@ -55,7 +55,7 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
         @Inject
         private RuntimeService runtimeService;
 
-        protected Map<String, Object> cachedVariables = new HashMap<String, Object>();
+        protected Map<String, Object> cachedVariables = new HashMap<>();
         protected Execution execution;
         protected Task task;
 
@@ -125,11 +125,11 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
 
     /**
      * Override to add different / additional contexts.
-     * 
+     *
      * @return a list of {@link Scope}-types, which are used in the given order to resolve the broadest active context (@link #getBroadestActiveContext()})
      */
     protected List<Class<? extends ScopedAssociation>> getAvailableScopedAssociationClasses() {
-        ArrayList<Class<? extends ScopedAssociation>> scopeTypes = new ArrayList<Class<? extends ScopedAssociation>>();
+        ArrayList<Class<? extends ScopedAssociation>> scopeTypes = new ArrayList<>();
         scopeTypes.add(ConversationScopedAssociation.class);
         scopeTypes.add(RequestScopedAssociation.class);
         return scopeTypes;

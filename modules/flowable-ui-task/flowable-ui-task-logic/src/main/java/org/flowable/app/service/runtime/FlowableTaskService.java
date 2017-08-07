@@ -80,7 +80,7 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
 
     protected List<UserRepresentation> getInvolvedUsers(String taskId) {
         List<HistoricIdentityLink> idLinks = historyService.getHistoricIdentityLinksForTask(taskId);
-        List<UserRepresentation> result = new ArrayList<UserRepresentation>(idLinks.size());
+        List<UserRepresentation> result = new ArrayList<>(idLinks.size());
 
         for (HistoricIdentityLink link : idLinks) {
             // Only include users and non-assignee links

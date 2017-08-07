@@ -13,6 +13,8 @@
 
 package org.flowable.engine.impl.cfg;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
@@ -350,8 +352,6 @@ import org.flowable.variable.service.impl.types.VariableTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -407,7 +407,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected PropertyDataManager propertyDataManager;
     protected ResourceDataManager resourceDataManager;
     protected TaskDataManager taskDataManager;
-    
+
     // ENTITY MANAGERS ///////////////////////////////////////////////////////////
 
     protected AttachmentEntityManager attachmentEntityManager;
@@ -441,7 +441,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // History Manager
 
     protected HistoryManager historyManager;
-    
+
     protected boolean isAsyncHistoryEnabled;
     protected boolean isAsyncHistoryJsonGzipCompressionEnabled;
     protected boolean isAsyncHistoryJsonGroupingEnabled;
@@ -497,7 +497,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected List<JobHandler> customJobHandlers;
     protected Map<String, JobHandler> jobHandlers;
     protected AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler;
-    
+
     protected List<HistoryJobHandler> customHistoryJobHandlers;
     protected Map<String, HistoryJobHandler> historyJobHandlers;
 
@@ -511,7 +511,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      * The number of retries for a job.
      */
     protected int asyncExecutorNumberOfRetries = 3;
-    protected int asyncHistoryExecutorNumberOfRetries = 10; 
+    protected int asyncHistoryExecutorNumberOfRetries = 10;
 
     /**
      * The minimal number of threads that are kept alive in the threadpool for job execution. Default value = 2. (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
@@ -526,7 +526,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * The time (in milliseconds) a thread used for job execution must be kept alive before it is destroyed. Default setting is 5 seconds. Having a setting > 0 takes resources, but in the case of many
      * job executions it avoids creating new threads all the time. If 0, threads will be destroyed after they've been used for job execution.
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected long asyncExecutorThreadKeepAliveTime = 5000L;
@@ -539,36 +539,36 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     /**
      * The queue onto which jobs will be placed before they are actually executed. Threads form the async executor threadpool will take work from this queue.
-     *
+     * <p>
      * By default null. If null, an {@link ArrayBlockingQueue} will be created of size {@link #asyncExecutorThreadPoolQueueSize}.
-     *
+     * <p>
      * When the queue is full, the job will be executed by the calling thread (ThreadPoolExecutor.CallerRunsPolicy())
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected BlockingQueue<Runnable> asyncExecutorThreadPoolQueue;
 
     /**
      * The time (in seconds) that is waited to gracefully shut down the threadpool used for job execution when the a shutdown on the executor (or process engine) is requested. Default value = 60.
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected long asyncExecutorSecondsToWaitOnShutdown = 60L;
 
     /**
      * The number of timer jobs that are acquired during one query (before a job is executed, an acquirement thread fetches jobs from the database and puts them on the queue).
-     *
+     * <p>
      * Default value = 1, as this lowers the potential on optimistic locking exceptions. Change this value if you know what you are doing.
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected int asyncExecutorMaxTimerJobsPerAcquisition = 1;
 
     /**
      * The number of async jobs that are acquired during one query (before a job is executed, an acquirement thread fetches jobs from the database and puts them on the queue).
-     *
+     * <p>
      * Default value = 1, as this lowers the potential on optimistic locking exceptions. Change this value if you know what you are doing.
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected int asyncExecutorMaxAsyncJobsDuePerAcquisition = 1;
@@ -576,7 +576,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * The time (in milliseconds) the timer acquisition thread will wait to execute the next acquirement query. This happens when no new timer jobs were found or when less timer jobs have been fetched
      * than set in {@link #asyncExecutorMaxTimerJobsPerAcquisition}. Default value = 10 seconds.
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected int asyncExecutorDefaultTimerJobAcquireWaitTime = 10 * 1000;
@@ -584,7 +584,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * The time (in milliseconds) the async job acquisition thread will wait to execute the next acquirement query. This happens when no new async jobs were found or when less async jobs have been
      * fetched than set in {@link #asyncExecutorMaxAsyncJobsDuePerAcquisition}. Default value = 10 seconds.
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected int asyncExecutorDefaultAsyncJobAcquireWaitTime = 10 * 1000;
@@ -597,29 +597,29 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     /**
      * When a job is acquired, it is locked so other async executors can't lock and execute it. While doing this, the 'name' of the lock owner is written into a column of the job.
-     *
+     * <p>
      * By default, a random UUID will be generated when the executor is created.
-     *
+     * <p>
      * It is important that each async executor instance in a cluster of Flowable engines has a different name!
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected String asyncExecutorLockOwner;
 
     /**
      * The amount of time (in milliseconds) a timer job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
-     *
+     * <p>
      * Default value = 5 minutes;
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected int asyncExecutorTimerLockTimeInMillis = 5 * 60 * 1000;
 
     /**
      * The amount of time (in milliseconds) an async job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
-     *
+     * <p>
      * Default value = 5 minutes;
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected int asyncExecutorAsyncJobLockTimeInMillis = 5 * 60 * 1000;
@@ -627,20 +627,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * The amount of time (in milliseconds) that is between two consecutive checks of 'expired jobs'. Expired jobs are jobs that were locked (a lock owner + time was written by some executor, but the
      * job was never completed).
-     *
+     * <p>
      * During such a check, jobs that are expired are again made available, meaning the lock owner and lock time will be removed. Other executors will now be able to pick it up.
-     *
+     * <p>
      * A job is deemed expired if the current time has passed the lock time.
-     *
+     * <p>
      * By default one minute.
      */
     protected int asyncExecutorResetExpiredJobsInterval = 60 * 1000;
-    
+
     /**
      * The amount of time (in milliseconds) a job can maximum be in the 'executable' state before being deemed expired.
      * Note that this won't happen when using the threadpool based executor, as the acquire thread will fetch these kind of jobs earlier.
      * However, in the message queue based execution, it could be some job is posted to a queue but then never is locked nor executed.
-     * 
+     * <p>
      * By default 24 hours, as this should be a very exceptional case.
      */
     protected int asyncExecutorResetExpiredJobsMaxTimeout = 24 * 60 * 60 * 1000;
@@ -653,7 +653,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     /**
      * Experimental!
-     *
+     * <p>
      * Set this to true when using the message queue based job executor.
      */
     protected boolean asyncExecutorMessageQueueMode;
@@ -661,7 +661,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     /**
      * Allows to define a custom factory for creating the {@link Runnable} that is executed by the async executor.
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected ExecuteAsyncRunnableFactory asyncExecutorExecuteAsyncRunnableFactory;
@@ -697,11 +697,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     /**
      * This flag determines whether variables of the type 'serializable' will be tracked. This means that, when true, in a JavaDelegate you can write
-     *
+     * <p>
      * MySerializableVariable myVariable = (MySerializableVariable) execution.getVariable("myVariable"); myVariable.setNumber(123);
-     *
+     * <p>
      * And the changes to the java object will be reflected in the database. Otherwise, a manual call to setVariable will be needed.
-     *
+     * <p>
      * By default true for backwards compatibility.
      */
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
@@ -730,7 +730,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     /**
      * Set this to true if you want to have extra checks on the BPMN xml that is parsed. See http://www.jorambarrez.be/blog/2013/02/19/uploading-a-funny-xml -can-bring-down-your-server/
-     *
+     * <p>
      * Unfortunately, this feature is not available on some platforms (JDK 6, JBoss), hence the reason why it is disabled by default. If your platform allows the use of StaxSource during XML parsing,
      * do enable it.
      */
@@ -739,7 +739,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * The following settings will determine the amount of entities loaded at once when the engine needs to load multiple entities (eg. when suspending a process definition with all its process
      * instances).
-     *
+     * <p>
      * The default setting is quite low, as not to surprise anyone with sudden memory spikes. Change it to something higher if the environment Flowable runs in allows it.
      */
     protected int batchSizeProcessInstances = 25;
@@ -751,7 +751,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * Using field injection together with a delegate expression for a service task / execution listener / task listener is not thread-sade , see user guide section 'Field Injection' for more
      * information.
-     *
+     * <p>
      * Set this flag to false to throw an exception at runtime when a field is injected and a delegateExpression is used.
      *
      * @since 5.21
@@ -771,7 +771,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * Some databases have a limit of how many parameters one sql insert can have (eg SQL Server, 2000 params (!= insert statements) ). Tweak this parameter in case of exceptions indicating too much
      * is being put into one bulk insert, or make it higher if your database can cope with it and there are inserts with a huge amount of data.
-     *
+     * <p>
      * By default: 100 (75 for mssql server as it has a hard limit of 2000 parameters in a statement)
      */
     protected int maxNrOfStatementsInBulkInsert = 100;
@@ -936,11 +936,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             if (customPreCommandInterceptors != null) {
                 commandInterceptors.addAll(customPreCommandInterceptors);
             }
-            
+
             commandInterceptors.addAll(getDefaultCommandInterceptors());
-            
+
             commandInterceptors.add(new BpmnOverrideContextInterceptor());
-            
+
             if (customPostCommandInterceptors != null) {
                 commandInterceptors.addAll(customPostCommandInterceptors);
             }
@@ -952,12 +952,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (defaultCommandInterceptors == null) {
             List<CommandInterceptor> interceptors = new ArrayList<>();
             interceptors.add(new LogInterceptor());
-    
+
             CommandInterceptor transactionInterceptor = createTransactionInterceptor();
             if (transactionInterceptor != null) {
                 interceptors.add(transactionInterceptor);
             }
-    
+
             if (commandContextFactory != null) {
                 CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory);
                 engineConfigurations.put(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG, this);
@@ -966,16 +966,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 commandContextInterceptor.setCurrentEngineConfigurationKey(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                 interceptors.add(commandContextInterceptor);
             }
-    
+
             if (transactionContextFactory != null) {
                 interceptors.add(new TransactionContextInterceptor(transactionContextFactory));
             }
-    
+
             defaultCommandInterceptors = interceptors;
         }
         return defaultCommandInterceptors;
     }
-    
+
     // services
     // /////////////////////////////////////////////////////////////////
 
@@ -1005,7 +1005,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             maxNrOfStatementsInBulkInsert = DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER;
         }
     }
-    
+
     public void initDbSchemaManager() {
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new ProcessDbSchemaManager();
@@ -1235,17 +1235,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             if (usingRelationalDatabase) {
                 initDbSqlSessionFactory();
             }
-            
+
             if (isAsyncHistoryEnabled) {
                 initAsyncHistorySessionFactory();
             }
-            
+
             if (agendaFactory != null) {
                 addSessionFactory(new AgendaSessionFactory(agendaFactory));
             }
 
             addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
-            
+
             commandContextFactory.setSessionFactories(sessionFactories);
         }
 
@@ -1270,9 +1270,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         dbSqlSessionFactory.setDatabaseCatalog(databaseCatalog);
         dbSqlSessionFactory.setDatabaseSchema(databaseSchema);
         dbSqlSessionFactory.setMaxNrOfStatementsInBulkInsert(maxNrOfStatementsInBulkInsert);
-        
+
         initDbSqlSessionFactoryEntitySettings();
-        
+
         addSessionFactory(dbSqlSessionFactory);
     }
 
@@ -1280,17 +1280,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         for (Class<? extends Entity> clazz : EntityDependencyOrder.INSERT_ORDER) {
             // All entities except one of the bpmn engine are bulk inserteable
             dbSqlSessionFactory.getInsertionOrder().add(clazz);
-            
+
             if (isBulkInsertEnabled) {
                 dbSqlSessionFactory.getBulkInserteableEntityClasses().add(clazz);
             }
         }
-        
+
         // Oracle doesn't support bulk inserting for event log entries
         if (isBulkInsertEnabled && "oracle".equals(databaseType)) {
             dbSqlSessionFactory.getBulkInserteableEntityClasses().remove(EventLogEntryEntityImpl.class);
         }
-        
+
         for (Class<? extends Entity> clazz : EntityDependencyOrder.DELETE_ORDER) {
             dbSqlSessionFactory.getDeletionOrder().add(clazz);
         }
@@ -1299,7 +1299,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public DbSqlSessionFactory createDbSqlSessionFactory() {
         return new DbSqlSessionFactory();
     }
-    
+
     public void initAsyncHistorySessionFactory() {
         AsyncHistorySessionFactory asyncHistorySessionFactory = new AsyncHistorySessionFactory();
         if (asyncHistoryListener == null) {
@@ -1387,7 +1387,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             configurator.beforeInit(this);
         }
     }
-    
+
     public void initVariableServiceConfiguration() {
         this.variableServiceConfiguration = new VariableServiceConfiguration();
         this.variableServiceConfiguration.setCommandExecutor(this.commandExecutor);
@@ -1395,25 +1395,25 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.variableServiceConfiguration.setClock(this.clock);
         this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
         this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
-        
+
         if (this.customPreVariableTypes != null) {
             this.variableServiceConfiguration.setCustomPreVariableTypes(this.customPreVariableTypes);
         }
-        
-        List<VariableType> processEngineVariableTypes = new ArrayList<VariableType>();
+
+        List<VariableType> processEngineVariableTypes = new ArrayList<>();
         processEngineVariableTypes.add(new CustomObjectType("item", ItemInstance.class));
         processEngineVariableTypes.add(new CustomObjectType("message", MessageInstance.class));
         if (this.customPostVariableTypes != null) {
             processEngineVariableTypes.addAll(this.customPostVariableTypes);
         }
-        
+
         this.variableServiceConfiguration.setCustomPostVariableTypes(processEngineVariableTypes);
-        
+
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
         this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
-        
+
         this.variableServiceConfiguration.init();
-        
+
         addServiceConfiguration(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG, this.variableServiceConfiguration);
     }
     
@@ -1723,21 +1723,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             }
         }
     }
-    
+
     protected void initHistoryJobHandlers() {
         if (isAsyncHistoryEnabled) {
             historyJobHandlers = new HashMap<>();
-            
+
             AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler();
             asyncHistoryJobHandler.initDefaultTransformers();
             asyncHistoryJobHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
             historyJobHandlers.put(asyncHistoryJobHandler.getType(), asyncHistoryJobHandler);
-            
+
             AsyncHistoryJobZippedHandler asyncHistoryJobZippedHandler = new AsyncHistoryJobZippedHandler();
             asyncHistoryJobZippedHandler.initDefaultTransformers();
             asyncHistoryJobZippedHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
             historyJobHandlers.put(asyncHistoryJobZippedHandler.getType(), asyncHistoryJobZippedHandler);
-    
+
             if (getCustomHistoryJobHandlers() != null) {
                 for (HistoryJobHandler customJobHandler : getCustomHistoryJobHandlers()) {
                     historyJobHandlers.put(customJobHandler.getType(), customJobHandler);
@@ -1797,11 +1797,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         asyncExecutor.setProcessEngineConfiguration(this);
         asyncExecutor.setAutoActivate(asyncExecutorActivate);
     }
-    
+
     public void initAsyncHistoryExecutor() {
         if (asyncHistoryExecutor == null) {
             DefaultAsyncJobExecutor defaultAsyncHistoryExecutor = new DefaultAsyncHistoryJobExecutor();
-            
+
             // Message queue mode
             defaultAsyncHistoryExecutor.setMessageQueueMode(asyncHistoryExecutorMessageQueueMode);
 
@@ -1952,7 +1952,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             formEngines = new HashMap<>();
             FormEngine defaultFormEngine = new JuelFormEngine();
             formEngines.put(null, defaultFormEngine); // default form engine is
-                                                      // looked up with null
+            // looked up with null
             formEngines.put(defaultFormEngine.getName(), defaultFormEngine);
         }
         if (customFormEngines != null) {
@@ -2076,7 +2076,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (this.eventDispatcher == null) {
             this.eventDispatcher = new FlowableEventDispatcherImpl();
         }
-        
+
         if (this.additionalEventDispatchActions == null) {
             this.additionalEventDispatchActions = new ArrayList<>();
             this.additionalEventDispatchActions.add(new BpmnModelEventDispatchAction());
@@ -2144,7 +2144,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
             if (flowable5CompatibilityHandler != null) {
                 LOGGER.info("Found compatibility handler instance : {}", flowable5CompatibilityHandler.getClass());
-                
+
                 flowable5CompatibilityHandler.setFlowable6ProcessEngineConfiguration(this);
             }
         }
@@ -2467,10 +2467,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * Add or replace the address of the given web-service endpoint with the given value
      *
-     * @param endpointName
-     *            The endpoint name for which a new address must be set
-     * @param address
-     *            The new address of the endpoint
+     * @param endpointName The endpoint name for which a new address must be set
+     * @param address      The new address of the endpoint
      */
     public ProcessEngineConfiguration addWsEndpointAddress(QName endpointName, URL address) {
         this.wsOverridenEndpointAddresses.put(endpointName, address);
@@ -2480,8 +2478,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * Remove the address definition of the given web-service endpoint
      *
-     * @param endpointName
-     *            The endpoint name for which the address definition must be removed
+     * @param endpointName The endpoint name for which the address definition must be removed
      */
     public ProcessEngineConfiguration removeWsEndpointAddress(QName endpointName) {
         this.wsOverridenEndpointAddresses.remove(endpointName);
@@ -2630,7 +2627,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.jobHandlers = jobHandlers;
         return this;
     }
-    
+
     public Map<String, HistoryJobHandler> getHistoryJobHandlers() {
         return historyJobHandlers;
     }
@@ -2684,7 +2681,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.customJobHandlers = customJobHandlers;
         return this;
     }
-    
+
     public List<HistoryJobHandler> getCustomHistoryJobHandlers() {
         return customHistoryJobHandlers;
     }
@@ -3229,7 +3226,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.deadLetterJobDataManager = deadLetterJobDataManager;
         return this;
     }
-    
+
     public HistoryJobDataManager getHistoryJobDataManager() {
         return historyJobDataManager;
     }
@@ -3431,7 +3428,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.deadLetterJobEntityManager = deadLetterJobEntityManager;
         return this;
     }
-    
+
     public HistoryJobEntityManager getHistoryJobEntityManager() {
         return historyJobEntityManager;
     }
@@ -3511,18 +3508,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void setCandidateManager(CandidateManager candidateManager) {
         this.candidateManager = candidateManager;
     }
-    
+
     public AsyncRunnableExecutionExceptionHandler getAsyncRunnableExecutionExceptionHandler() {
         return asyncRunnableExecutionExceptionHandler;
     }
 
     public ProcessEngineConfigurationImpl setAsyncRunnableExecutionExceptionHandler(
-                    AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler) {
-        
+            AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler) {
+
         this.asyncRunnableExecutionExceptionHandler = asyncRunnableExecutionExceptionHandler;
         return this;
     }
-    
+
     public HistoryManager getHistoryManager() {
         return historyManager;
     }
@@ -3549,7 +3546,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.isAsyncHistoryJsonGzipCompressionEnabled = isAsyncHistoryJsonGzipCompressionEnabled;
         return this;
     }
-    
+
     public boolean isAsyncHistoryJsonGroupingEnabled() {
         return isAsyncHistoryJsonGroupingEnabled;
     }
@@ -3558,7 +3555,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.isAsyncHistoryJsonGroupingEnabled = isAsyncHistoryJsonGroupingEnabled;
         return this;
     }
-    
+
     public int getAsyncHistoryJsonGroupingThreshold() {
         return asyncHistoryJsonGroupingThreshold;
     }
@@ -3767,7 +3764,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.asyncExecutorNumberOfRetries = asyncExecutorNumberOfRetries;
         return this;
     }
-    
+
     public int getAsyncHistoryExecutorNumberOfRetries() {
         return asyncHistoryExecutorNumberOfRetries;
     }
@@ -3902,7 +3899,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.asyncExecutorResetExpiredJobsInterval = asyncExecutorResetExpiredJobsInterval;
         return this;
     }
-    
+
     public int getAsyncExecutorResetExpiredJobsMaxTimeout() {
         return asyncExecutorResetExpiredJobsMaxTimeout;
     }
@@ -3920,7 +3917,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.asyncExecutorExecuteAsyncRunnableFactory = asyncExecutorExecuteAsyncRunnableFactory;
         return this;
     }
-    
+
     public int getAsyncExecutorResetExpiredJobsPageSize() {
         return asyncExecutorResetExpiredJobsPageSize;
     }

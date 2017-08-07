@@ -12,6 +12,8 @@
  */
 package org.flowable.app.service.runtime;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,8 +40,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
@@ -111,7 +111,7 @@ public class FlowableTaskFormService {
         List<HistoricVariableInstance> historicVariables = historyService.createHistoricVariableInstanceQuery().processInstanceId(task.getProcessInstanceId()).list();
 
         // Get all process-variables to extract values from
-        Map<String, ProcessInstanceVariableRepresentation> processInstanceVariables = new HashMap<String, ProcessInstanceVariableRepresentation>();
+        Map<String, ProcessInstanceVariableRepresentation> processInstanceVariables = new HashMap<>();
 
         for (HistoricVariableInstance historicVariableInstance : historicVariables) {
             ProcessInstanceVariableRepresentation processInstanceVariableRepresentation = new ProcessInstanceVariableRepresentation(
@@ -119,7 +119,7 @@ public class FlowableTaskFormService {
             processInstanceVariables.put(historicVariableInstance.getId(), processInstanceVariableRepresentation);
         }
 
-        List<ProcessInstanceVariableRepresentation> processInstanceVariableRepresenations = new ArrayList<ProcessInstanceVariableRepresentation>(processInstanceVariables.values());
+        List<ProcessInstanceVariableRepresentation> processInstanceVariableRepresenations = new ArrayList<>(processInstanceVariables.values());
         return processInstanceVariableRepresenations;
     }
 

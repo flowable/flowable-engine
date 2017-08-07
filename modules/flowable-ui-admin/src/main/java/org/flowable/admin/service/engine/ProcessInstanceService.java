@@ -208,7 +208,7 @@ public class ProcessInstanceService {
     }
 
     public JsonNode getJobs(ServerConfig serverConfig, String processInstanceId) {
-        return jobService.listJobs(serverConfig, Collections.singletonMap("processInstanceId", new String[] { processInstanceId }));
+        return jobService.listJobs(serverConfig, Collections.singletonMap("processInstanceId", new String[]{processInstanceId}));
     }
 
     public List<String> getCompletedActivityInstancesAndProcessDefinitionId(ServerConfig serverConfig, String processInstanceId) {
@@ -222,7 +222,7 @@ public class ProcessInstanceService {
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
         JsonNode node = clientUtil.executeRequest(get, serverConfig);
 
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         if (node.has("data") && node.get("data").isArray()) {
             ArrayNode data = (ArrayNode) node.get("data");
             ObjectNode activity = null;
@@ -242,7 +242,7 @@ public class ProcessInstanceService {
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
         JsonNode node = clientUtil.executeRequest(get, serverConfig);
 
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         if (node.isArray()) {
             ArrayNode data = (ArrayNode) node;
             for (int i = 0; i < data.size(); i++) {

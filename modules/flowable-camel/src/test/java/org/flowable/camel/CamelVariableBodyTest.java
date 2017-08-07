@@ -56,10 +56,10 @@ public class CamelVariableBodyTest extends SpringFlowableTestCase {
         }
     }
 
-    @Deployment(resources = { "process/HelloCamelBody.bpmn20.xml" })
+    @Deployment(resources = {"process/HelloCamelBody.bpmn20.xml"})
     public void testCamelBody() throws Exception {
         service1.expectedBodiesReceived("hello world");
-        Map<String, Object> varMap = new HashMap<String, Object>();
+        Map<String, Object> varMap = new HashMap<>();
         varMap.put("camelBody", "hello world");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("HelloCamel", varMap);
         // Ensure that the variable is equal to the expected value.

@@ -42,20 +42,20 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
 /**
  * This abstract class takes the place of the now-deprecated CamelBehaviour class (which can still be used for legacy compatibility) and significantly improves on its flexibility. Additional
  * implementations can be created that change the way in which Flowable interacts with Camel per your specific needs.
- * 
+ * <p>
  * Three out-of-the-box implementations of CamelBehavior are provided: (1) CamelBehaviorDefaultImpl: Works just like CamelBehaviour does; copies variables into and out of Camel as or from properties.
  * (2) CamelBehaviorBodyAsMapImpl: Works by copying variables into and out of Camel using a Map<String,Object> object in the body. (3) CamelBehaviorCamelBodyImpl: Works by copying a single variable
  * value into Camel as a String body and copying the Camel body into that same variable. The process variable in must be named "camelBody".
- * 
+ * <p>
  * The chosen implementation should be set within your ProcessEngineConfiguration. To specify the implementation using Spring, include the following line in your configuration file as part of the
  * properties for "org.flowable.spring.SpringProcessEngineConfiguration":
- * 
+ * <p>
  * <property name="camelBehaviorClass" value="org.flowable.camel.impl.CamelBehaviorCamelBodyImpl"/>
- * 
+ * <p>
  * Note also that the manner in which variables are copied to the process engine from Camel has changed. It will always copy Camel properties to the process variables set; they can safely be ignored,
  * of course, if not required. It will conditionally copy the Camel body to the "camelBody" variable if it is of type java.lang.String, OR it will copy the Camel body to individual variables within
  * the process engine if it is of type Map<String,Object>.
- * 
+ *
  * @author Ryan Johnston (@rjfsu), Tijs Rademakers, Saeid Mirzaei
  * @version 5.12
  */
@@ -89,16 +89,16 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
 
     protected void copyVariables(Map<String, Object> variables, Exchange exchange, FlowableEndpoint endpoint) {
         switch (toTargetType) {
-        case BODY_AS_MAP:
-            copyVariablesToBodyAsMap(variables, exchange);
-            break;
+            case BODY_AS_MAP:
+                copyVariablesToBodyAsMap(variables, exchange);
+                break;
 
-        case BODY:
-            copyVariablesToBody(variables, exchange);
-            break;
+            case BODY:
+                copyVariablesToBody(variables, exchange);
+                break;
 
-        case PROPERTIES:
-            copyVariablesToProperties(variables, exchange);
+            case PROPERTIES:
+                copyVariablesToProperties(variables, exchange);
         }
     }
 
@@ -195,7 +195,7 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
     }
 
     protected void copyVariablesToBodyAsMap(Map<String, Object> variables, Exchange exchange) {
-        exchange.getIn().setBody(new HashMap<String, Object>(variables));
+        exchange.getIn().setBody(new HashMap<>(variables));
     }
 
     protected void copyVariablesToBody(Map<String, Object> variables, Exchange exchange) {

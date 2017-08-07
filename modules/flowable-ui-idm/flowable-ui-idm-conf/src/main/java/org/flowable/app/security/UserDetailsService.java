@@ -44,7 +44,7 @@ public class UserDetailsService implements org.springframework.security.core.use
 
     @Autowired
     protected UserService userService;
-    
+
     @Autowired
     protected Environment environment;
 
@@ -64,7 +64,7 @@ public class UserDetailsService implements org.springframework.security.core.use
         if (!environment.getProperty("ldap.enabled", Boolean.class, false)) {
             actualLogin = login.toLowerCase();
             userFromDatabase = identityService.createUserQuery().userIdIgnoreCase(actualLogin).singleResult();
-            
+
         } else {
             userFromDatabase = identityService.createUserQuery().userId(actualLogin).singleResult();
         }
@@ -74,7 +74,7 @@ public class UserDetailsService implements org.springframework.security.core.use
             throw new UsernameNotFoundException("User " + actualLogin + " was not found in the database");
         }
 
-        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
+        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         UserInformation userInformation = userService.getUserInformation(userFromDatabase.getId());
         for (String privilege : userInformation.getPrivileges()) {
             grantedAuthorities.add(new SimpleGrantedAuthority(privilege));

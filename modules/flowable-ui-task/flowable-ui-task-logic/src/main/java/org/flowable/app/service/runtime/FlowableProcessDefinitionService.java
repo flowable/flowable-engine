@@ -12,6 +12,8 @@
  */
 package org.flowable.app.service.runtime;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,8 +44,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
@@ -163,7 +163,7 @@ public class FlowableProcessDefinitionService {
     }
 
     protected List<ProcessDefinitionRepresentation> convertDefinitionList(List<ProcessDefinition> definitions) {
-        List<ProcessDefinitionRepresentation> result = new ArrayList<ProcessDefinitionRepresentation>();
+        List<ProcessDefinitionRepresentation> result = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(definitions)) {
             for (ProcessDefinition processDefinition : definitions) {
                 ProcessDefinitionRepresentation rep = new ProcessDefinitionRepresentation(processDefinition);

@@ -59,7 +59,7 @@ public class FlowableCommentService {
         List<Comment> comments = getCommentsForTask(taskId);
 
         // Create representation for all comments
-        List<CommentRepresentation> commentList = new ArrayList<CommentRepresentation>();
+        List<CommentRepresentation> commentList = new ArrayList<>();
         for (Comment comment : comments) {
             commentList.add(new CommentRepresentation(comment));
         }
@@ -94,7 +94,7 @@ public class FlowableCommentService {
         List<Comment> comments = getCommentsForProcessInstance(processInstanceId);
 
         // Create representation for all comments
-        List<CommentRepresentation> commentList = new ArrayList<CommentRepresentation>();
+        List<CommentRepresentation> commentList = new ArrayList<>();
         for (Comment comment : comments) {
             commentList.add(new CommentRepresentation(comment));
         }

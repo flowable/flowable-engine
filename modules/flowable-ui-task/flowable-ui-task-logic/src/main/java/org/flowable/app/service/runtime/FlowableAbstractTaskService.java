@@ -82,11 +82,11 @@ public abstract class FlowableAbstractTaskService {
                         }
                     }
 
-                    Map<String, Object> variableMap = new HashMap<String, Object>();
+                    Map<String, Object> variableMap = new HashMap<>();
                     if ((CollectionUtils.isNotEmpty(userTask.getCandidateGroups()) && userTask.getCandidateGroups().size() == 1
                             && userTask.getCandidateGroups().get(0).contains("${taskAssignmentBean.assignTaskToCandidateGroups('"))
                             || (CollectionUtils.isNotEmpty(userTask.getCandidateUsers()) && userTask.getCandidateUsers().size() == 1
-                                    && userTask.getCandidateUsers().get(0).contains("${taskAssignmentBean.assignTaskToCandidateUsers('"))) {
+                            && userTask.getCandidateUsers().get(0).contains("${taskAssignmentBean.assignTaskToCandidateUsers('"))) {
 
                         List<HistoricVariableInstance> processVariables = historyService.createHistoricVariableInstanceQuery().processInstanceId(task.getProcessInstanceId()).list();
                         if (CollectionUtils.isNotEmpty(processVariables)) {
@@ -100,7 +100,7 @@ public abstract class FlowableAbstractTaskService {
                         List<? extends Group> groups = remoteIdmService.getUser(currentUser.getId()).getGroups();
                         if (CollectionUtils.isNotEmpty(groups)) {
 
-                            List<String> groupIds = new ArrayList<String>();
+                            List<String> groupIds = new ArrayList<>();
                             if (userTask.getCandidateGroups().size() == 1 && userTask.getCandidateGroups().get(0).contains("${taskAssignmentBean.assignTaskToCandidateGroups('")) {
 
                                 String candidateGroupString = userTask.getCandidateGroups().get(0);

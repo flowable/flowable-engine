@@ -81,9 +81,9 @@ public class AppDefinitionImportService {
 
             AppDefinitionRepresentation appDefinition = createAppDefinitionRepresentation(appModel);
 
-            Map<String, Model> existingProcessModelMap = new HashMap<String, Model>();
-            Map<String, Model> existingFormModelMap = new HashMap<String, Model>();
-            Map<String, Model> existingDecisionTableMap = new HashMap<String, Model>();
+            Map<String, Model> existingProcessModelMap = new HashMap<>();
+            Map<String, Model> existingFormModelMap = new HashMap<>();
+            Map<String, Model> existingDecisionTableMap = new HashMap<>();
             if (appDefinition.getDefinition() != null && CollectionUtils.isNotEmpty(appDefinition.getDefinition().getModels())) {
                 for (AppModelDefinition modelDef : appDefinition.getDefinition().getModels()) {
                     Model processModel = modelService.getModel(modelDef.getId());
@@ -110,13 +110,13 @@ public class AppDefinitionImportService {
     }
 
     protected AppDefinitionRepresentation importAppDefinition(HttpServletRequest request, InputStream is, String fileName, Model existingAppModel, Map<String, Model> existingProcessModelMap,
-            Map<String, Model> existingFormModelMap, Map<String, Model> existingDecisionTableModelMap) {
+                                                              Map<String, Model> existingFormModelMap, Map<String, Model> existingDecisionTableModelMap) {
 
         if (fileName != null && (fileName.endsWith(".zip"))) {
-            Map<String, String> formMap = new HashMap<String, String>();
-            Map<String, String> decisionTableMap = new HashMap<String, String>();
-            Map<String, String> bpmnModelMap = new HashMap<String, String>();
-            Map<String, byte[]> thumbnailMap = new HashMap<String, byte[]>();
+            Map<String, String> formMap = new HashMap<>();
+            Map<String, String> decisionTableMap = new HashMap<>();
+            Map<String, String> bpmnModelMap = new HashMap<>();
+            Map<String, byte[]> thumbnailMap = new HashMap<>();
 
             Model appDefinitionModel = readZipFile(is, formMap, decisionTableMap, bpmnModelMap, thumbnailMap);
             if (StringUtils.isNotEmpty(appDefinitionModel.getKey()) && StringUtils.isNotEmpty(appDefinitionModel.getModelEditorJson())) {
@@ -169,7 +169,7 @@ public class AppDefinitionImportService {
     }
 
     protected Model readZipFile(InputStream inputStream, Map<String, String> formMap, Map<String, String> decisionTableMap,
-            Map<String, String> bpmnModelMap, Map<String, byte[]> thumbnailMap) {
+                                Map<String, String> bpmnModelMap, Map<String, byte[]> thumbnailMap) {
 
         Model appDefinitionModel = null;
         ZipInputStream zipInputStream = null;
@@ -233,7 +233,7 @@ public class AppDefinitionImportService {
 
     protected Map<String, Model> importForms(Map<String, String> formMap, Map<String, byte[]> thumbnailMap, Map<String, Model> existingFormModelMap) {
 
-        Map<String, Model> oldFormIdAndModelMap = new HashMap<String, Model>();
+        Map<String, Model> oldFormIdAndModelMap = new HashMap<>();
 
         for (String formKey : formMap.keySet()) {
 
@@ -271,9 +271,9 @@ public class AppDefinitionImportService {
     }
 
     protected Map<String, Model> importDecisionTables(Map<String, String> decisionTableMap, Map<String, byte[]> thumbnailMap,
-            Map<String, Model> existingDecisionTableMap) {
+                                                      Map<String, Model> existingDecisionTableMap) {
 
-        Map<String, Model> oldDecisionTableIdAndModelMap = new HashMap<String, Model>();
+        Map<String, Model> oldDecisionTableIdAndModelMap = new HashMap<>();
 
         for (String decisionTableKey : decisionTableMap.keySet()) {
 
@@ -311,9 +311,9 @@ public class AppDefinitionImportService {
     }
 
     protected Map<String, Model> importBpmnModels(Map<String, String> bpmnModelMap, Map<String, Model> formKeyAndModelMap,
-            Map<String, Model> decisionTableKeyAndModelMap, Map<String, byte[]> thumbnailMap, Map<String, Model> existingProcessModelMap) {
+                                                  Map<String, Model> decisionTableKeyAndModelMap, Map<String, byte[]> thumbnailMap, Map<String, Model> existingProcessModelMap) {
 
-        Map<String, Model> bpmnModelIdAndModelMap = new HashMap<String, Model>();
+        Map<String, Model> bpmnModelIdAndModelMap = new HashMap<>();
         for (String bpmnModelKey : bpmnModelMap.keySet()) {
 
             Model existingModel = null;
@@ -333,16 +333,16 @@ public class AppDefinitionImportService {
                 throw new InternalServerErrorException("Error reading BPMN json for " + bpmnModelKey);
             }
 
-            Map<String, String> oldFormIdFormKeyMap = new HashMap<String, String>();
-            Map<String, ModelInfo> formKeyModelIdMap = new HashMap<String, ModelInfo>();
+            Map<String, String> oldFormIdFormKeyMap = new HashMap<>();
+            Map<String, ModelInfo> formKeyModelIdMap = new HashMap<>();
             for (String oldFormId : formKeyAndModelMap.keySet()) {
                 Model formModel = formKeyAndModelMap.get(oldFormId);
                 oldFormIdFormKeyMap.put(oldFormId, formModel.getKey());
                 formKeyModelIdMap.put(formModel.getKey(), new ModelInfo(formModel.getId(), formModel.getName(), formModel.getKey()));
             }
 
-            Map<String, String> oldDecisionTableIdDecisionTableKeyMap = new HashMap<String, String>();
-            Map<String, ModelInfo> decisionTableKeyModelIdMap = new HashMap<String, ModelInfo>();
+            Map<String, String> oldDecisionTableIdDecisionTableKeyMap = new HashMap<>();
+            Map<String, ModelInfo> decisionTableKeyModelIdMap = new HashMap<>();
             for (String oldDecisionTableId : decisionTableKeyAndModelMap.keySet()) {
                 Model decisionTableModel = decisionTableKeyAndModelMap.get(oldDecisionTableId);
                 oldDecisionTableIdDecisionTableKeyMap.put(oldDecisionTableId, decisionTableModel.getKey());
