@@ -44,7 +44,7 @@ public class IdmPrivilegesResource {
     @RequestMapping(value = "/rest/admin/privileges", method = RequestMethod.GET)
     public List<PrivilegeRepresentation> getPrivileges() {
         List<Privilege> privileges = privilegeService.findPrivileges();
-        List<PrivilegeRepresentation> representations = new ArrayList<PrivilegeRepresentation>(privileges.size());
+        List<PrivilegeRepresentation> representations = new ArrayList<>(privileges.size());
         for (Privilege privilege : privileges) {
             representations.add(new PrivilegeRepresentation(privilege.getId(), privilege.getName()));
         }
@@ -84,7 +84,7 @@ public class IdmPrivilegesResource {
 
     @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/users", method = RequestMethod.POST)
     public void addUserPrivilege(@PathVariable String privilegeId,
-            @RequestBody AddUserPrivilegeRepresentation representation) {
+                                 @RequestBody AddUserPrivilegeRepresentation representation) {
         privilegeService.addUserPrivilege(privilegeId, representation.getUserId());
     }
 
@@ -100,7 +100,7 @@ public class IdmPrivilegesResource {
 
     @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/groups", method = RequestMethod.POST)
     public void addGroupPrivilege(@PathVariable String privilegeId,
-            @RequestBody AddGroupPrivilegeRepresentation representation) {
+                                  @RequestBody AddGroupPrivilegeRepresentation representation) {
         privilegeService.addGroupPrivilege(privilegeId, representation.getGroupId());
     }
 

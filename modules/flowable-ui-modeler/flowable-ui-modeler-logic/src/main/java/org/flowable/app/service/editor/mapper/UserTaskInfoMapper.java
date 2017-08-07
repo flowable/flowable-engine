@@ -31,7 +31,7 @@ public class UserTaskInfoMapper extends AbstractInfoMapper {
         createPropertyNode("Form key", userTask.getFormKey());
         createPropertyNode("Priority", userTask.getPriority());
         if (CollectionUtils.isNotEmpty(userTask.getFormProperties())) {
-            List<String> formPropertyValues = new ArrayList<String>();
+            List<String> formPropertyValues = new ArrayList<>();
             for (FormProperty formProperty : userTask.getFormProperties()) {
                 StringBuilder propertyBuilder = new StringBuilder();
                 if (StringUtils.isNotEmpty(formProperty.getName())) {

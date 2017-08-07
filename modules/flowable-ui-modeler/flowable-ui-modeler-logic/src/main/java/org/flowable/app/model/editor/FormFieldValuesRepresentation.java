@@ -21,7 +21,7 @@ public class FormFieldValuesRepresentation extends AbstractRepresentation {
 
     protected Long formId;
     protected String formName;
-    protected List<FormFieldSummaryRepresentation> fields = new ArrayList<FormFieldSummaryRepresentation>();
+    protected List<FormFieldSummaryRepresentation> fields = new ArrayList<>();
 
     public Long getFormId() {
         return formId;

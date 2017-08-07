@@ -18,8 +18,8 @@ import org.slf4j.LoggerFactory;
 public class BlueprintELResolver extends ELResolver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BlueprintELResolver.class);
-    private Map<String, JavaDelegate> delegateMap = new HashMap<String, JavaDelegate>();
-    private Map<String, ActivityBehavior> activityBehaviourMap = new HashMap<String, ActivityBehavior>();
+    private Map<String, JavaDelegate> delegateMap = new HashMap<>();
+    private Map<String, ActivityBehavior> activityBehaviourMap = new HashMap<>();
 
     public Object getValue(ELContext context, Object base, Object property) {
         if (base == null) {

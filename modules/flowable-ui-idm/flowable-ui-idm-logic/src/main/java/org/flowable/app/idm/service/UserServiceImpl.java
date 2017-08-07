@@ -12,6 +12,11 @@
  */
 package org.flowable.app.idm.service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.idm.model.UserInformation;
 import org.flowable.app.service.exception.BadRequestException;
@@ -23,11 +28,6 @@ import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author Joram Barrez
@@ -136,14 +136,14 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
         }
 
         List<Privilege> userPrivileges = identityService.createPrivilegeQuery().userId(userId).list();
-        Set<String> privilegeNames = new HashSet<String>();
+        Set<String> privilegeNames = new HashSet<>();
         for (Privilege userPrivilege : userPrivileges) {
             privilegeNames.add(userPrivilege.getName());
         }
 
         List<Group> groups = identityService.createGroupQuery().groupMember(userId).list();
         if (groups.size() > 0) {
-            List<String> groupIds = new ArrayList<String>();
+            List<String> groupIds = new ArrayList<>();
             for (Group group : groups) {
                 groupIds.add(group.getId());
             }
@@ -154,7 +154,7 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
             }
         }
 
-        return new UserInformation(user, groups, new ArrayList<String>(privilegeNames));
+        return new UserInformation(user, groups, new ArrayList<>(privilegeNames));
     }
 
 }

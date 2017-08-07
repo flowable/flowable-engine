@@ -46,7 +46,7 @@ public class AppVersionService {
                 LOGGER.warn("Could not load version.properties", e);
             }
 
-            Map<String, String> temp = new HashMap<String, String>();
+            Map<String, String> temp = new HashMap<>();
             putIfExists(properties, TYPE, temp, "type");
             putIfExists(properties, MAJOR_VERSION, temp, "majorVersion");
             putIfExists(properties, MINOR_VERSION, temp, "minorVersion");

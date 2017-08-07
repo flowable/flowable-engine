@@ -12,6 +12,9 @@
  */
 package org.flowable.app.service.editor;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -26,14 +29,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * Wrapper around parameters that should be passed trough to the delegated service call.
- * 
- * @author Frederik Heremans
  *
+ * @author Frederik Heremans
  */
 public class ServiceParameters {
 
@@ -41,7 +40,7 @@ public class ServiceParameters {
     protected Set<String> validParameterNames;
 
     public ServiceParameters() {
-        parameters = new HashMap<String, Object>();
+        parameters = new HashMap<>();
     }
 
     public void addParameter(String name, Object value) {
@@ -66,7 +65,7 @@ public class ServiceParameters {
 
     public void addValidParameterNames(String[] validParameters) {
         if (validParameterNames == null) {
-            validParameterNames = new HashSet<String>();
+            validParameterNames = new HashSet<>();
         }
         this.validParameterNames.addAll(Arrays.asList(validParameters));
     }
@@ -80,7 +79,7 @@ public class ServiceParameters {
             return Collections.unmodifiableMap(parameters);
         } else {
             // Only return valid parameters
-            Map<String, Object> result = new HashMap<String, Object>();
+            Map<String, Object> result = new HashMap<>();
             for (Entry<String, Object> parameter : parameters.entrySet()) {
                 if (validParameterNames.contains(parameter.getKey())) {
                     result.put(parameter.getKey(), parameter.getValue());

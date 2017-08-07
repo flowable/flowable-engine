@@ -35,7 +35,7 @@ public class WorkflowGroupsResource {
     public ResultListDataRepresentation getGroups(@RequestParam(value = "filter", required = false) String filter) {
 
         List<? extends Group> matchingGroups = remoteIdmService.findGroupsByNameFilter(filter);
-        List<GroupRepresentation> groupRepresentations = new ArrayList<GroupRepresentation>();
+        List<GroupRepresentation> groupRepresentations = new ArrayList<>();
         for (Group group : matchingGroups) {
             groupRepresentations.add(new GroupRepresentation(group));
         }

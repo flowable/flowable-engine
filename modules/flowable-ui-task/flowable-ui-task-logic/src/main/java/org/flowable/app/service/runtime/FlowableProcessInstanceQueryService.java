@@ -12,6 +12,9 @@
  */
 package org.flowable.app.service.runtime;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,9 +37,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -76,7 +76,7 @@ public class FlowableProcessInstanceQueryService {
             // Results need to be filtered in an app-context. We need to fetch the deployment id for this app and use that in the query
             List<Deployment> deployments = repositoryService.createDeploymentQuery().deploymentKey(deploymentKeyNode.asText()).list();
 
-            List<String> deploymentIds = new ArrayList<String>();
+            List<String> deploymentIds = new ArrayList<>();
             for (Deployment deployment : deployments) {
                 deploymentIds.add(deployment.getId());
             }
@@ -144,7 +144,7 @@ public class FlowableProcessInstanceQueryService {
     }
 
     protected List<ProcessInstanceRepresentation> convertInstanceList(List<HistoricProcessInstance> instances) {
-        List<ProcessInstanceRepresentation> result = new ArrayList<ProcessInstanceRepresentation>();
+        List<ProcessInstanceRepresentation> result = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(instances)) {
 
             for (HistoricProcessInstance processInstance : instances) {

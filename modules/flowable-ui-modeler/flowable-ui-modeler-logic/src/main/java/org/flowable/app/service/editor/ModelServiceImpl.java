@@ -12,6 +12,11 @@
  */
 package org.flowable.app.service.editor;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -64,11 +69,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Service
 @Transactional
@@ -172,7 +172,7 @@ public class ModelServiceImpl implements ModelService {
 
         return modelKeyResponse;
     }
-    
+
     @Override
     public String createModelJson(ModelRepresentation model) {
         String json = null;
@@ -243,7 +243,7 @@ public class ModelServiceImpl implements ModelService {
             stencilNode.put("id", "StartNoneEvent");
             json = editorNode.toString();
         }
-        
+
         return json;
     }
 
@@ -350,14 +350,14 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public Model saveModel(String modelId, String name, String key, String description, String editorJson,
-            boolean newVersion, String newVersionComment, User updatedBy) {
+                           boolean newVersion, String newVersionComment, User updatedBy) {
 
         Model modelObject = modelRepository.get(modelId);
         return internalSave(name, key, description, editorJson, newVersion, newVersionComment, null, updatedBy, modelObject);
     }
 
     protected Model internalSave(String name, String key, String description, String editorJson, boolean newVersion,
-            String newVersionComment, byte[] imageBytes, User updatedBy, Model modelObject) {
+                                 String newVersionComment, byte[] imageBytes, User updatedBy, Model modelObject) {
 
         if (!newVersion) {
 
@@ -419,7 +419,7 @@ public class ModelServiceImpl implements ModelService {
         // Hence, we remove first all relations, comments, etc. while collecting all models.
         // Then, once all foreign key problem makers are removed, we remove the models
 
-        List<Model> allModels = new ArrayList<Model>();
+        List<Model> allModels = new ArrayList<>();
         internalDeleteModelAndChildren(model, allModels);
 
         for (Model modelToDelete : allModels) {
@@ -484,8 +484,8 @@ public class ModelServiceImpl implements ModelService {
     public BpmnModel getBpmnModel(AbstractModel model) {
         BpmnModel bpmnModel = null;
         try {
-            Map<String, Model> formMap = new HashMap<String, Model>();
-            Map<String, Model> decisionTableMap = new HashMap<String, Model>();
+            Map<String, Model> formMap = new HashMap<>();
+            Map<String, Model> decisionTableMap = new HashMap<>();
 
             List<Model> referencedModels = modelRepository.findByParentModelId(model.getId());
             for (Model childModel : referencedModels) {
@@ -511,12 +511,12 @@ public class ModelServiceImpl implements ModelService {
     public BpmnModel getBpmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap) {
         try {
             ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(model.getModelEditorJson());
-            Map<String, String> formKeyMap = new HashMap<String, String>();
+            Map<String, String> formKeyMap = new HashMap<>();
             for (Model formModel : formMap.values()) {
                 formKeyMap.put(formModel.getId(), formModel.getKey());
             }
 
-            Map<String, String> decisionTableKeyMap = new HashMap<String, String>();
+            Map<String, String> decisionTableKeyMap = new HashMap<>();
             for (Model decisionTableModel : decisionTableMap.values()) {
                 decisionTableKeyMap.put(decisionTableModel.getId(), decisionTableModel.getKey());
             }
@@ -636,7 +636,7 @@ public class ModelServiceImpl implements ModelService {
             return;
         }
 
-        Set<String> alreadyPersistedModelIds = new HashSet<String>(persistedModelRelations.size());
+        Set<String> alreadyPersistedModelIds = new HashSet<>(persistedModelRelations.size());
         for (ModelRelation persistedModelRelation : persistedModelRelations) {
             if (!idsReferencedInJson.contains(persistedModelRelation.getModelId())) {
                 // model used to be referenced, but not anymore. Delete it.

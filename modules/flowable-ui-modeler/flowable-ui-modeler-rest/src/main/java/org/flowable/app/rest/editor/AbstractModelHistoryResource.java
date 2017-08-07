@@ -12,6 +12,8 @@
  */
 package org.flowable.app.rest.editor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +25,6 @@ import org.flowable.app.repository.editor.ModelHistoryRepository;
 import org.flowable.app.service.api.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 public class AbstractModelHistoryResource {
@@ -44,7 +44,7 @@ public class AbstractModelHistoryResource {
         List<ModelHistory> history = modelHistoryRepository.findByModelId(model.getId());
         ResultListDataRepresentation result = new ResultListDataRepresentation();
 
-        List<ModelRepresentation> representations = new ArrayList<ModelRepresentation>();
+        List<ModelRepresentation> representations = new ArrayList<>();
 
         // Also include the latest version of the model
         if (Boolean.TRUE.equals(includeLatestVersion)) {

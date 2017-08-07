@@ -33,7 +33,7 @@ public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
 
         List<ResolverFactory> resolverFactories = configImpl.getResolverFactories();
         if (resolverFactories == null) {
-            resolverFactories = new ArrayList<ResolverFactory>();
+            resolverFactories = new ArrayList<>();
             resolverFactories.add(new VariableScopeResolverFactory());
             resolverFactories.add(new BeansResolverFactory());
         }
@@ -43,7 +43,7 @@ public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
     }
 
     public class BlueprintExpressionManager extends AbstractExpressionManager {
-        
+
         public BlueprintExpressionManager() {
             this.delegateInterceptor = new DefaultDelegateInterceptor();
             this.expressionFactory = new ExpressionFactoryImpl();

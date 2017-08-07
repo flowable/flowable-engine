@@ -258,7 +258,7 @@ public abstract class AbstractRelatedContentResource {
     }
 
     protected ResultListDataRepresentation createResultRepresentation(List<ContentItem> results) {
-        List<ContentItemRepresentation> resultList = new ArrayList<ContentItemRepresentation>(results.size());
+        List<ContentItemRepresentation> resultList = new ArrayList<>(results.size());
 
         for (ContentItem content : results) {
             resultList.add(createContentItemResponse(content));

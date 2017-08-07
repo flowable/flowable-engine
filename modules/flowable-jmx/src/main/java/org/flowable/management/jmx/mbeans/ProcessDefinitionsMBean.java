@@ -42,9 +42,9 @@ public class ProcessDefinitionsMBean {
     @ManagedAttribute(description = "List of Process definitions")
     public List<List<String>> getProcessDefinitions() {
         List<ProcessDefinition> deployments = repositoryService.createProcessDefinitionQuery().list();
-        List<List<String>> result = new ArrayList<List<String>>(deployments.size());
+        List<List<String>> result = new ArrayList<>(deployments.size());
         for (ProcessDefinition deployment : deployments) {
-            List<String> item = new ArrayList<String>(3);
+            List<String> item = new ArrayList<>(3);
             item.add(deployment.getId());
             item.add(deployment.getName());
             item.add(Integer.toString(deployment.getVersion()));
@@ -59,7 +59,7 @@ public class ProcessDefinitionsMBean {
     @ManagedOperation(description = "get a specific process definition")
     public List<String> getProcessDefinitionById(String id) {
         ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().processDefinitionId(id).singleResult();
-        List<String> item = new ArrayList<String>(3);
+        List<String> item = new ArrayList<>(3);
         item.add(pd.getId());
         item.add(pd.getName());
         item.add(Integer.toString(pd.getVersion()));
@@ -73,9 +73,9 @@ public class ProcessDefinitionsMBean {
     @ManagedAttribute(description = "List of deployed Processes")
     public List<List<String>> getDeployments() {
         List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
-        List<List<String>> result = new ArrayList<List<String>>(deployments.size());
+        List<List<String>> result = new ArrayList<>(deployments.size());
         for (Deployment deployment : deployments) {
-            List<String> item = new ArrayList<String>(3);
+            List<String> item = new ArrayList<>(3);
             item.add(deployment.getId());
             item.add(deployment.getName());
             item.add(deployment.getTenantId());

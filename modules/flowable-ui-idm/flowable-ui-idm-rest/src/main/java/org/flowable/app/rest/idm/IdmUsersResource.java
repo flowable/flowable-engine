@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 
  * @author Frederik Heremans
  * @author Joram Barrez
  */
@@ -61,7 +60,7 @@ public class IdmUsersResource {
     }
 
     protected List<UserRepresentation> convertToUserRepresentations(List<User> users) {
-        List<UserRepresentation> result = new ArrayList<UserRepresentation>(users.size());
+        List<UserRepresentation> result = new ArrayList<>(users.size());
         for (User user : users) {
             result.add(new UserRepresentation(user));
         }
