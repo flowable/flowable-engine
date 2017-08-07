@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.app.model.common.RemoteUser;
 import org.flowable.app.service.exception.NotFoundException;
 import org.flowable.app.service.exception.NotPermittedException;
 import org.flowable.app.service.idm.RemoteIdmService;
@@ -33,6 +34,8 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.history.HistoricTaskInstanceQuery;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.task.IdentityLink;
 import org.flowable.engine.task.Task;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
@@ -105,6 +108,12 @@ public class PermissionService {
 
     private List<String> getGroupIdsForUser(User user) {
         List<String> groupIds = new ArrayList<String>();
+        RemoteUser remoteUser;
+        if(user instanceof RemoteUser) {
+            remoteUser = (RemoteUser) user;
+        } else {
+            remoteUser = remoteIdmService.getUser(user.getId());
+        }
         for (Group group : remoteIdmService.getUser(user.getId()).getGroups()) {
             groupIds.add(String.valueOf(group.getId()));
         }
@@ -235,6 +244,62 @@ public class PermissionService {
         }
 
         return canDelete;
+    }
+
+    public boolean canStartProcess(User user, ProcessDefinition definition) {
+        List<String> startUserIds = getPotentialStarterUserIds(definition.getId());
+        List<String> startGroupIds = getPotentialStarterGroupIds(definition.getId());
+
+        // If no potential starters are defined then every user can start the process
+        if(startUserIds.isEmpty() && startGroupIds.isEmpty()) {
+            return true;
+        }
+
+        if(startUserIds.contains(user.getId())) {
+            return true;
+        }
+
+        List<String> groupsIds = getGroupIdsForUser(user);
+
+        for(String startGroupId: startGroupIds) {
+            if(groupsIds.contains(startGroupId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected List<String> getPotentialStarterGroupIds(String processDefinitionId) {
+        List<String> groupIds = new ArrayList<>();
+        List<IdentityLink> identityLinks = repositoryService.getIdentityLinksForProcessDefinition(processDefinitionId);
+        for (IdentityLink identityLink : identityLinks) {
+            if (identityLink.getGroupId() != null && identityLink.getGroupId().length() > 0) {
+
+                if (!groupIds.contains(identityLink.getGroupId())) {
+                    groupIds.add(identityLink.getGroupId());
+                }
+            }
+        }
+
+        return groupIds;
+    }
+
+    protected List<String> getPotentialStarterUserIds(String processDefinitionId) {
+
+        List<String> userIds = new ArrayList<>();
+        List<IdentityLink> identityLinks = repositoryService.getIdentityLinksForProcessDefinition(processDefinitionId);
+        for (IdentityLink identityLink : identityLinks) {
+            if (identityLink.getUserId() != null && identityLink.getUserId().length() > 0) {
+
+                if (!userIds.contains(identityLink.getUserId())) {
+                    userIds.add(identityLink.getUserId());
+                }
+            }
+        }
+
+        return userIds;
+
     }
 
 }

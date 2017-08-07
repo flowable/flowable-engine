@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.model.common.ResultListDataRepresentation;
 import org.flowable.app.model.runtime.ProcessDefinitionRepresentation;
+import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.flowable.app.service.exception.NotFoundException;
@@ -29,6 +30,8 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
+import org.flowable.engine.CandidateManager;
+import org.flowable.engine.IdentityService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.repository.Deployment;
@@ -37,6 +40,8 @@ import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormModel;
+import org.flowable.idm.api.Group;
+import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +64,9 @@ public class FlowableProcessDefinitionService {
 
     @Autowired
     protected FormRepositoryService formRepositoryService;
+
+    @Autowired
+    protected PermissionService permissionService;
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -100,7 +108,15 @@ public class FlowableProcessDefinitionService {
         }
 
         List<ProcessDefinition> definitions = definitionQuery.list();
-        ResultListDataRepresentation result = new ResultListDataRepresentation(convertDefinitionList(definitions));
+
+        List<ProcessDefinition> startableDefinitions = new ArrayList<>();
+        for(ProcessDefinition definition : definitions) {
+            if(SecurityUtils.getCurrentUserObject() == null || permissionService.canStartProcess(SecurityUtils.getCurrentUserObject(), definition)) {
+                startableDefinitions.add(definition);
+            }
+        }
+
+        ResultListDataRepresentation result = new ResultListDataRepresentation(convertDefinitionList(startableDefinitions));
         return result;
     }
 

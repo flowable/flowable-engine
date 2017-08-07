@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.app.service.idm.RemoteIdmCandidateManager;
+import org.flowable.app.service.idm.RemoteIdmService;
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
@@ -27,15 +29,7 @@ import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator;
-import org.flowable.engine.FlowableEngineAgendaFactory;
-import org.flowable.engine.FormService;
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.ManagementService;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
+import org.flowable.engine.*;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.impl.agenda.DebugFlowableEngineAgendaFactory;
 import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
@@ -83,6 +77,9 @@ public class FlowableEngineConfiguration {
 
     @Autowired
     protected Environment environment;
+
+    @Autowired
+    protected RemoteIdmService remoteIdmService;
 
     @Bean(name = "processEngine")
     public ProcessEngineFactoryBean processEngineFactoryBean() {
@@ -164,6 +161,7 @@ public class FlowableEngineConfiguration {
         processEngineConfiguration.setEnableSafeBpmnXml(true);
 
         processEngineConfiguration.setDisableIdmEngine(true);
+        processEngineConfiguration.setCandidateManager(candidateManager());
         processEngineConfiguration.addConfigurator(new SpringFormEngineConfigurator());
         
         SpringDmnEngineConfiguration dmnEngineConfiguration = new SpringDmnEngineConfiguration();
@@ -204,6 +202,11 @@ public class FlowableEngineConfiguration {
         asyncExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(5000);
         asyncExecutor.setDefaultTimerJobAcquireWaitTimeInMillis(5000);
         return asyncExecutor;
+    }
+
+    @Bean
+    public CandidateManager candidateManager() {
+        return new RemoteIdmCandidateManager(remoteIdmService);
     }
 
     @Bean(name = "clock")
