@@ -97,6 +97,7 @@ public interface Problems {
     String THROW_EVENT_INVALID_EVENTDEFINITION = "flowable-throw-event-invalid-eventdefinition";
 
     String MULTI_INSTANCE_MISSING_COLLECTION = "flowable-multi-instance-missing-collection";
+    String MULTI_INSTANCE_MISSING_COLLECTION_FUNCTION_PARAMETERS = "flowable-multi-instance-missing-collection-parameters";
 
     String MESSAGE_MISSING_NAME = "flowable-message-missing-name";
     String MESSAGE_INVALID_ITEM_REF = "flowable-message-invalid-item-ref";

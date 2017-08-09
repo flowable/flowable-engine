@@ -260,11 +260,74 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     }
 
     @Deployment
-    public void testParallelUserTasksCustomCollectionExtension() {
-    	checkParallelUserTasksCustomCollectionExtension("miParallelUserTasksCollection");
+    public void testParallelUserTasksCustomCollectionStringExtension() {
+    	checkParallelUserTasksCustomCollectionStringExtension("miParallelUserTasksCollection");
     }
 
-    private void checkParallelUserTasksCustomCollectionExtension(String processDefinitionKey) {
+    private void checkParallelUserTasksCustomCollectionStringExtension(String processDefinitionKey) {
+    	ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
+
+        List<Task> tasks = taskService.createTaskQuery().taskCandidateUser("wfuser1").list();
+        assertEquals(1, tasks.size());
+        assertEquals("My Task 0", tasks.get(0).getName());
+
+        tasks = taskService.createTaskQuery().taskCandidateUser("wfuser2").list();
+        assertEquals(1, tasks.size());
+        assertEquals("My Task 1", tasks.get(0).getName());
+
+        // should be 2 tasks total
+        tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+        assertEquals(2, tasks.size());
+        assertEquals("My Task 0", tasks.get(0).getName());
+        assertEquals("My Task 1", tasks.get(1).getName());
+
+        // Completing 3 tasks will trigger completion condition
+        taskService.complete(tasks.get(0).getId());
+        taskService.complete(tasks.get(1).getId());
+        assertEquals(0, taskService.createTaskQuery().count());
+        assertProcessEnded(processInstance.getProcessInstanceId());
+    }
+
+    @Deployment
+    public void testParallelUserTasksCustomCollectionExpressionExtension() {
+    	checkParallelUserTasksCustomCollectionExpressionExtension("miParallelUserTasksCollection");
+    }
+
+    private void checkParallelUserTasksCustomCollectionExpressionExtension(String processDefinitionKey) {
+        ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
+
+        // add custom function delegate
+        expressionManager.getFunctionDelegates().add(new FlowableCollectionFunctionDelegate());
+
+    	ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
+
+        List<Task> tasks = taskService.createTaskQuery().taskCandidateUser("wfuser1").list();
+        assertEquals(1, tasks.size());
+        assertEquals("My Task 0", tasks.get(0).getName());
+
+        tasks = taskService.createTaskQuery().taskCandidateUser("wfuser2").list();
+        assertEquals(1, tasks.size());
+        assertEquals("My Task 1", tasks.get(0).getName());
+
+        // should be 2 tasks total
+        tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+        assertEquals(2, tasks.size());
+        assertEquals("My Task 0", tasks.get(0).getName());
+        assertEquals("My Task 1", tasks.get(1).getName());
+
+        // Completing 3 tasks will trigger completion condition
+        taskService.complete(tasks.get(0).getId());
+        taskService.complete(tasks.get(1).getId());
+        assertEquals(0, taskService.createTaskQuery().count());
+        assertProcessEnded(processInstance.getProcessInstanceId());
+    }
+
+    @Deployment
+    public void testParallelUserTasksCustomExtensionsCollection() {
+    	checkParallelUserTasksCustomExtensionsCollection("miParallelUserTasksCollection");
+    }
+
+    private void checkParallelUserTasksCustomExtensionsCollection(String processDefinitionKey) {
         ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
 
         // add custom function delegate

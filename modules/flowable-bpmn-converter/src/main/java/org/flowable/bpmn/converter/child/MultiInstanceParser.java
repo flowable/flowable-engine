@@ -78,7 +78,9 @@ public class MultiInstanceParser extends BaseChildElementParser {
                             	if (childElement.containsKey(ELEMENT_MULTIINSTANCE_COLLECTION_STRING)) {
                             		// it is a string value
                                     multiInstanceDef.setCollectionString((childElement.get(ELEMENT_MULTIINSTANCE_COLLECTION_STRING).get(0)).getElementText());
-                            	} else if (childElement.containsKey(ELEMENT_MULTIINSTANCE_COLLECTION_EXPRESSION)) {
+                                    multiInstanceDef.setFunctionPrefix(extensionElement.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_MULTIINSTANCE_COLLECTION_FUNCTION_PREFIX));
+                                    multiInstanceDef.setFunctionName(extensionElement.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_MULTIINSTANCE_COLLECTION_FUNCTION_NAME));
+                                    } else if (childElement.containsKey(ELEMENT_MULTIINSTANCE_COLLECTION_EXPRESSION)) {
                             		// it is an expression
                                     multiInstanceDef.setInputDataItem((childElement.get(ELEMENT_MULTIINSTANCE_COLLECTION_EXPRESSION).get(0)).getElementText());
                             	}

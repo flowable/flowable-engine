@@ -80,6 +80,8 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     protected String collectionVariable; // Not used anymore. Left here for backwards compatibility.
     protected String collectionElementVariable;
     protected String collectionString;
+	protected String functionPrefix;
+    protected String functionName;
     // default variable name for loop counter for inner instances (as described in the spec)
     protected String collectionElementIndexVariable = "loopCounter";
 
@@ -326,10 +328,14 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
             // remove \n and \r characters
             String escString = getCollectionString().replaceAll("\\r\\n|\\r|\\n"," ");
-            // escape the JSON string value because JUEL doesn't support '[]'
-            escString = StringEscapeUtils.escapeJson(escString);
 
-            collection = expressionManager.createExpression("${json:parseJson(\"" + escString + "\")}").getValue(execution);
+            // check to see if string is JSON
+            if (functionPrefix.equals("json")) {
+            	// escape the JSON string value because JUEL doesn't support '[]'
+            	escString = StringEscapeUtils.escapeJson(escString);
+            }
+
+            collection = expressionManager.createExpression("${" + functionPrefix + ":" + functionName + "(\"" + escString + "\")}").getValue(execution);
         }
         return collection;
     }
@@ -459,7 +465,23 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         this.collectionString = collectionString;
     }
 
-    public String getCollectionElementIndexVariable() {
+    public String getFunctionPrefix() {
+		return functionPrefix;
+	}
+
+	public void setFunctionPrefix(String functionPrefix) {
+		this.functionPrefix = functionPrefix;
+	}
+
+	public String getFunctionName() {
+		return functionName;
+	}
+
+	public void setFunctionName(String functionName) {
+		this.functionName = functionName;
+	}
+
+	public String getCollectionElementIndexVariable() {
         return collectionElementIndexVariable;
     }
 
