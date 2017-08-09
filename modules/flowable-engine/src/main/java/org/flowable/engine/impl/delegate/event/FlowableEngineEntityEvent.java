@@ -13,6 +13,7 @@
 package org.flowable.engine.impl.delegate.event;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEvent;
 
 public interface FlowableEngineEntityEvent extends FlowableEntityEvent, FlowableEngineEvent {
 

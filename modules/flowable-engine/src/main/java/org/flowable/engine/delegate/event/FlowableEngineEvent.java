@@ -10,9 +10,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.delegate.event;
+package org.flowable.engine.delegate.event;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.delegate.DelegateExecution;
 
 public interface FlowableEngineEvent extends FlowableEvent {
 
@@ -20,6 +21,11 @@ public interface FlowableEngineEvent extends FlowableEvent {
      * @return the id of the execution this event is associated with. Returns null, if the event was not dispatched from within an active execution.
      */
     String getExecutionId();
+
+    /**
+     * return the execution this event is associated with. Returns null, if the event was not dispatched from within an active execution.
+     */
+    DelegateExecution getExecution();
 
     /**
      * @return the id of the process instance this event is associated with. Returns null, if the event was not dispatched from within an active execution.

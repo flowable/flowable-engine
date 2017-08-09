@@ -13,7 +13,6 @@
 package org.flowable.engine.delegate.event;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
 
 /**
  * An {@link FlowableEvent} that indicates a certain sequence flow has been taken.

@@ -25,7 +25,7 @@ import org.flowable.engine.common.impl.util.DefaultClockImpl;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEvent;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
