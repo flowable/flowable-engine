@@ -18,6 +18,7 @@ import java.util.List;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataManager;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl;
+import org.flowable.cmmn.engine.repository.CaseDefinition;
 import org.flowable.cmmn.engine.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.repository.CmmnDeploymentQuery;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
@@ -51,6 +52,11 @@ public class CmmnDeploymentEntityManagerImpl extends AbstractCmmnEntityManager<C
 
     @Override
     public void deleteDeploymentAndRelatedData(String deploymentId) {
+        CaseDefinitionEntityManager caseDefinitionEntityManager = getCaseDefinitionEntityManager();
+        List<CaseDefinition> caseDefinitions = caseDefinitionEntityManager.createCaseDefinitionQuery().deploymentId(deploymentId).list();
+        for (CaseDefinition caseDefinition : caseDefinitions) {
+            caseDefinitionEntityManager.deleteCaseDefinitionAndRelatedData(caseDefinition.getId());
+        }
         getCmmnResourceEntityManager().deleteResourcesByDeploymentId(deploymentId);
         delete(findById(deploymentId));
     }

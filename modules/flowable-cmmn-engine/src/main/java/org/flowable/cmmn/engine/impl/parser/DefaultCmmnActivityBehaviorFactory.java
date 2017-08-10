@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.parser;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.behavior.MilestoneActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.StageActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.TaskActivityBehavior;
@@ -34,7 +35,13 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     
     @Override
     public MilestoneActivityBehavior createMilestoneActivityBehavior(PlanItem planItem, Milestone milestone) {
-        return new MilestoneActivityBehavior();
+        String name = null;
+        if (!StringUtils.isEmpty(planItem.getName())) {
+            name = planItem.getName();
+        } else if (StringUtils.isNotEmpty(milestone.getName())) {
+            name = milestone.getName();
+        }
+        return new MilestoneActivityBehavior(name);
     }
 
 }

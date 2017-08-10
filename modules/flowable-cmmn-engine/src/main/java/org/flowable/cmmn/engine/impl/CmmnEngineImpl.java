@@ -16,21 +16,27 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnRepositoryService;
+import org.flowable.cmmn.engine.CmmnRuntimeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author Joram Barrez
+ */
 public class CmmnEngineImpl implements CmmnEngine {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnEngineImpl.class);
 
     protected String name;
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    protected CmmnRuntimeService cmmnRuntimeService;
     protected CmmnManagementService cmmnManagementService;
     protected CmmnRepositoryService cmmnRepositoryService;
     
     public CmmnEngineImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
         this.name = cmmnEngineConfiguration.getEngineName();
+        this.cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
         this.cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
         this.cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
 
@@ -58,6 +64,14 @@ public class CmmnEngineImpl implements CmmnEngine {
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
     
+    public CmmnRuntimeService getCmmnRuntimeService() {
+        return cmmnRuntimeService;
+    }
+
+    public void setCmmnRuntimeService(CmmnRuntimeService cmmnRuntimeService) {
+        this.cmmnRuntimeService = cmmnRuntimeService;
+    }
+
     public CmmnManagementService getCmmnManagementService() {
         return cmmnManagementService;
     }

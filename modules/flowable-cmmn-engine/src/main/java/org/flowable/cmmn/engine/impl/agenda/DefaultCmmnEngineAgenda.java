@@ -12,16 +12,53 @@
  */
 package org.flowable.cmmn.engine.impl.agenda;
 
+import org.flowable.cmmn.engine.impl.agenda.operation.ActivatePlanItemOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.CmmnOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.CompletePlanItemOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateCriteriaOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.InitStageOperation;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.engine.common.impl.agenda.AbstractAgenda;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
  */
 public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngineAgenda {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCmmnEngineAgenda.class);
 
     public DefaultCmmnEngineAgenda(CommandContext commandContext) {
         super(commandContext);
+    }
+    
+    public void addOperation(CmmnOperation operation) {
+        operations.add(operation);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Planned " + operation);
+        }
+    }
+    
+    @Override
+    public void planInitStageOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new InitStageOperation(commandContext, planItemInstanceEntity));
+    }
+    
+    @Override
+    public void planEvaluateCriteria(String caseInstanceEntityId) {
+        addOperation(new EvaluateCriteriaOperation(commandContext, caseInstanceEntityId));
+    }
+    
+    @Override
+    public void planActivatePlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new ActivatePlanItemOperation(commandContext, planItemInstanceEntity));
+    }
+    
+    @Override
+    public void planCompletePlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new CompletePlanItemOperation(commandContext, planItemInstanceEntity));
     }
 
 }

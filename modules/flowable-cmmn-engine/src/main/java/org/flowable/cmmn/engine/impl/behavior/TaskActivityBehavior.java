@@ -12,6 +12,10 @@
  */
 package org.flowable.cmmn.engine.impl.behavior;
 
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
+
 /**
  * @author Joram Barrez
  */
@@ -21,6 +25,19 @@ public class TaskActivityBehavior implements CmmnTriggerableActivityBehavior {
     
     public TaskActivityBehavior(boolean isBlocking) {
         this.isBlocking = isBlocking;
+    }
+
+
+    @Override
+    public void execute(DelegatePlanItemInstance planItemInstance) {
+        if (!isBlocking) {
+            CommandContextUtil.getAgenda().planCompletePlanItem((PlanItemInstanceEntity) planItemInstance);
+        }
+    }
+
+    @Override
+    public void trigger(DelegatePlanItemInstance planItemInstance) {
+        
     }
 
 }

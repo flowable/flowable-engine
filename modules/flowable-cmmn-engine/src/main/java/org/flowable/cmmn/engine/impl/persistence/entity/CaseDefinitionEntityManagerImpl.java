@@ -70,6 +70,16 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
     }
     
     @Override
+    public void deleteCaseDefinitionAndRelatedData(String caseDefinitionId) {
+        getMilestoneInstanceEntityManager().deleteByCaseDefinitionId(caseDefinitionId);
+        getPlanItemInstanceEntityManager().deleteByCaseDefinitionId(caseDefinitionId);
+        getCaseInstanceEntityManager().deleteByCaseDefinitionId(caseDefinitionId);
+        
+        CaseDefinitionEntity caseDefinitionEntity = findById(caseDefinitionId);
+        delete(caseDefinitionEntity);
+    }
+    
+    @Override
     public CaseDefinitionQuery createCaseDefinitionQuery() {
         return new CaseDefinitionQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
     }

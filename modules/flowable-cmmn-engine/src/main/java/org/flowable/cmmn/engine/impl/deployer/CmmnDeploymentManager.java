@@ -121,7 +121,7 @@ public class CmmnDeploymentManager {
         deploymentEntityManager.deleteDeploymentAndRelatedData(deploymentId);
         
         for (CaseDefinition caseDefinition : new CaseDefinitionQueryImpl().deploymentId(deploymentId).list()) {
-            caseDefinitionEntityManager.delete(caseDefinition.getId());
+            caseDefinitionEntityManager.deleteCaseDefinitionAndRelatedData(caseDefinition.getId());
             caseDefinitionCache.remove(caseDefinition.getId());
         }
     }

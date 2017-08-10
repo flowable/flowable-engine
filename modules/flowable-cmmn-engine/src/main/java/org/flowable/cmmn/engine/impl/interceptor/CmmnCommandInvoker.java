@@ -34,7 +34,7 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
     @Override
     public <T> T execute(final CommandConfig config, final Command<T> command) {
         final CommandContext commandContext = Context.getCommandContext();
-        if (!commandContext.isReused()) {
+        if (commandContext.isReused()) {
             commandContext.setResult(command.execute(commandContext));
         } else {
             CommandContextUtil.getAgenda(commandContext).planOperation(new Runnable() {

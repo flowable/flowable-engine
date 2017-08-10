@@ -11,5 +11,8 @@
     <mapper resource="org/flowable/cmmn/db/mapping/entity/Deployment.xml" />
     <mapper resource="org/flowable/cmmn/db/mapping/entity/Resource.xml" />
     <mapper resource="org/flowable/cmmn/db/mapping/entity/CaseDefinition.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/CaseInstance.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/PlanItemInstance.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/MilestoneInstance.xml" />
   </mappers>
 </configuration>

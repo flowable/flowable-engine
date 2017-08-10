@@ -17,10 +17,16 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 
+/**
+ * @author Joram Barrez
+ */
 public class EntityDependencyOrder {
 
     public static List<Class<? extends Entity>> DELETE_ORDER = new ArrayList<>();
@@ -28,6 +34,9 @@ public class EntityDependencyOrder {
 
     static {
 
+        DELETE_ORDER.add(MilestoneInstanceEntityImpl.class);
+        DELETE_ORDER.add(PlanItemInstanceEntityImpl.class);
+        DELETE_ORDER.add(CaseInstanceEntityImpl.class);
         DELETE_ORDER.add(CaseDefinitionEntityImpl.class);
         DELETE_ORDER.add(CmmnResourceEntityImpl.class);
         DELETE_ORDER.add(CmmnDeploymentEntityImpl.class);

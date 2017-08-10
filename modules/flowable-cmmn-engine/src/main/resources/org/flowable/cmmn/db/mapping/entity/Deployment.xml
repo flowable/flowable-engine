@@ -9,12 +9,12 @@
   <insert id="insertCmmnDeployment" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityImpl">
     insert into ${prefix}ACT_CMMN_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
     values(
-    	#{id, jdbcType=VARCHAR}, 
-    	#{name, jdbcType=VARCHAR}, 
-    	#{category, jdbcType=VARCHAR}, 
-    	#{tenantId, jdbcType=VARCHAR}, 
-    	#{deploymentTime, jdbcType=TIMESTAMP},
-    	#{parentDeploymentId, jdbcType=VARCHAR} 
+        #{id, jdbcType=VARCHAR},
+        #{name, jdbcType=VARCHAR},
+        #{category, jdbcType=VARCHAR},
+        #{tenantId, jdbcType=VARCHAR},
+        #{deploymentTime, jdbcType=TIMESTAMP},
+        #{parentDeploymentId, jdbcType=VARCHAR}
     )
   </insert>
 

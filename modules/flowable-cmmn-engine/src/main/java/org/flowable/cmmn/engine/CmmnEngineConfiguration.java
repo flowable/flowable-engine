@@ -38,19 +38,34 @@ import org.flowable.cmmn.engine.impl.parser.CmmnParserImpl;
 import org.flowable.cmmn.engine.impl.parser.DefaultCmmnActivityBehaviorFactory;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManagerImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityManagerImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManagerImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnResourceDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.MilestoneInstanceDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseDefinitionDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCmmnDeploymentDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisMilestoneInstanceDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisPlanItemInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.TableDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
+import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
+import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelperImpl;
+import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
@@ -75,17 +90,26 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     
     protected CmmnEngineAgendaFactory cmmnEngineAgendaFactory;
     
+    protected CmmnRuntimeService cmmnRuntimeService = new CmmnRuntimeServiceImpl();
     protected CmmnManagementService cmmnManagementService = new CmmnManagementServiceImpl();
     protected CmmnRepositoryService cmmnRepositoryService = new CmmnRepositoryServiceImpl();
     
     protected CmmnDeploymentDataManager deploymentDataManager;
     protected CmmnResourceDataManager resourceDataManager;
     protected CaseDefinitionDataManager caseDefinitionDataManager;
+    protected CaseInstanceDataManager caseInstanceDataManager;
+    protected PlanItemInstanceDataManager planItemInstanceDataManager;
+    protected MilestoneInstanceDataManager milestoneInstanceDataManager;
     protected TableDataManager tableDataManager;
     
     protected CmmnDeploymentEntityManager cmmnDeploymentEntityManager;
     protected CmmnResourceEntityManager cmmnResourceEntityManager;
     protected CaseDefinitionEntityManager caseDefinitionEntityManager;
+    protected CaseInstanceEntityManager caseInstanceEntityManager;
+    protected PlanItemInstanceEntityManager planItemInstanceEntityManager;
+    protected MilestoneInstanceEntityManager milestoneInstanceEntityManager;
+    
+    protected CaseInstanceHelper caseInstanceHelper;
     
     protected boolean enableSafeCmmnXml;
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
@@ -137,6 +161,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         initTransactionContextFactory();
         initCommandExecutors();
         initIdGenerator();
+        initCmmnEngineAgendaFactory();
 
         if (usingRelationalDatabase) {
             initDataSource();
@@ -159,6 +184,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         initDeployers();
         initCaseDefinitionCache();
         initDeploymentManager();
+        initCaseInstanceHelper();
         initClock();
     }
     
@@ -192,9 +218,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
                 initDbSqlSessionFactory();
             }
             
-            if (cmmnEngineAgendaFactory != null) {
-                addSessionFactory(new CmmnEngineAgendaSessionFactory(cmmnEngineAgendaFactory));
-            }
+            addSessionFactory(new CmmnEngineAgendaSessionFactory(cmmnEngineAgendaFactory));
 
             addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
             commandContextFactory.setSessionFactories(sessionFactories);
@@ -208,6 +232,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     }
     
     protected void initServices() {
+        initService(cmmnRuntimeService);
         initService(cmmnManagementService);
         initService(cmmnRepositoryService);
     }
@@ -220,6 +245,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     }
     
     public void initDataManagers() {
+        if (tableDataManager == null) {
+            tableDataManager = new TableDataManagerImpl();
+        }
         if (deploymentDataManager == null) {
             deploymentDataManager = new MybatisCmmnDeploymentDataManager(this);
         }
@@ -229,8 +257,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         if (caseDefinitionDataManager == null) {
             caseDefinitionDataManager = new MybatisCaseDefinitionDataManager(this);
         }
-        if (tableDataManager == null) {
-            tableDataManager = new TableDataManagerImpl();
+        if (caseInstanceDataManager == null) {
+            caseInstanceDataManager = new MybatisCaseInstanceDataManagerImpl(this);
+        }
+        if (planItemInstanceDataManager == null) {
+            planItemInstanceDataManager = new MybatisPlanItemInstanceDataManagerImpl(this);
+        }
+        if (milestoneInstanceDataManager == null) {
+            milestoneInstanceDataManager = new MybatisMilestoneInstanceDataManager(this);
         }
     }
     
@@ -243,6 +277,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         }
         if (caseDefinitionEntityManager == null) {
             caseDefinitionEntityManager = new CaseDefinitionEntityManagerImpl(this, caseDefinitionDataManager);
+        }
+        if (caseInstanceEntityManager == null) {
+            caseInstanceEntityManager = new CaseInstanceEntityManagerImpl(this, caseInstanceDataManager);
+        }
+        if (planItemInstanceEntityManager == null) {
+            planItemInstanceEntityManager = new PlanItemInstanceEntityManagerImpl(this, planItemInstanceDataManager);
+        }
+        if (milestoneInstanceEntityManager == null) {
+            milestoneInstanceEntityManager = new MilestoneInstanceEntityManagerImpl(this, milestoneInstanceDataManager);
         }
     }
     
@@ -310,6 +353,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         }
     }
     
+    public void initCaseInstanceHelper() {
+        if (caseInstanceHelper == null) {
+            caseInstanceHelper = new CaseInstanceHelperImpl();
+        }
+    }
+    
     @Override
     public String getEngineCfgKey() {
         return EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG;
@@ -350,6 +399,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
     
+    public CmmnRuntimeService getCmmnRuntimeService() {
+        return cmmnRuntimeService;
+    }
+
+    public CmmnEngineConfiguration setCmmnRuntimeService(CmmnRuntimeService cmmnRuntimeService) {
+        this.cmmnRuntimeService = cmmnRuntimeService;
+        return this;
+    }
+
     public CmmnManagementService getCmmnManagementService() {
         return cmmnManagementService;
     }
@@ -374,6 +432,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public CmmnEngineConfiguration setCmmnEngineAgendaFactory(CmmnEngineAgendaFactory cmmnEngineAgendaFactory) {
         this.cmmnEngineAgendaFactory = cmmnEngineAgendaFactory;
+        return this;
+    }
+    
+    public TableDataManager getTableDataManager() {
+        return tableDataManager;
+    }
+
+    public CmmnEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
+        this.tableDataManager = tableDataManager;
         return this;
     }
 
@@ -404,12 +471,30 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
     
-    public TableDataManager getTableDataManager() {
-        return tableDataManager;
+    public CaseInstanceDataManager getCaseInstanceDataManager() {
+        return caseInstanceDataManager;
     }
 
-    public CmmnEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
-        this.tableDataManager = tableDataManager;
+    public CmmnEngineConfiguration setCaseInstanceDataManager(CaseInstanceDataManager caseInstanceDataManager) {
+        this.caseInstanceDataManager = caseInstanceDataManager;
+        return this;
+    }
+
+    public PlanItemInstanceDataManager getPlanItemInstanceDataManager() {
+        return planItemInstanceDataManager;
+    }
+
+    public CmmnEngineConfiguration setPlanItemInstanceDataManager(PlanItemInstanceDataManager planItemInstanceDataManager) {
+        this.planItemInstanceDataManager = planItemInstanceDataManager;
+        return this;
+    }
+    
+    public MilestoneInstanceDataManager getMilestoneInstanceDataManager() {
+        return milestoneInstanceDataManager;
+    }
+
+    public CmmnEngineConfiguration setMilestoneInstanceDataManager(MilestoneInstanceDataManager milestoneInstanceDataManager) {
+        this.milestoneInstanceDataManager = milestoneInstanceDataManager;
         return this;
     }
 
@@ -440,6 +525,41 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
     
+    public CaseInstanceEntityManager getCaseInstanceEntityManager() {
+        return caseInstanceEntityManager;
+    }
+
+    public CmmnEngineConfiguration setCaseInstanceEntityManager(CaseInstanceEntityManager caseInstanceEntityManager) {
+        this.caseInstanceEntityManager = caseInstanceEntityManager;
+        return this;
+    }
+    
+    public PlanItemInstanceEntityManager getPlanItemInstanceEntityManager() {
+        return planItemInstanceEntityManager;
+    }
+
+    public CmmnEngineConfiguration setPlanItemInstanceEntityManager(PlanItemInstanceEntityManager planItemInstanceEntityManager) {
+        this.planItemInstanceEntityManager = planItemInstanceEntityManager;
+        return this;
+    }
+    
+    public MilestoneInstanceEntityManager getMilestoneInstanceEntityManager() {
+        return milestoneInstanceEntityManager;
+    }
+
+    public void setMilestoneInstanceEntityManager(MilestoneInstanceEntityManager milestoneInstanceEntityManager) {
+        this.milestoneInstanceEntityManager = milestoneInstanceEntityManager;
+    }
+
+    public CaseInstanceHelper getCaseInstanceHelper() {
+        return caseInstanceHelper;
+    }
+
+    public CmmnEngineConfiguration setCaseInstanceHelper(CaseInstanceHelper caseInstanceHelper) {
+        this.caseInstanceHelper = caseInstanceHelper;
+        return this;
+    }
+
     public boolean isEnableSafeCmmnXml() {
         return enableSafeCmmnXml;
     }

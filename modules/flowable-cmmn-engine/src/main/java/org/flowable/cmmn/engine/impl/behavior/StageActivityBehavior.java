@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.behavior;
 
+import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
 import org.flowable.cmmn.model.Stage;
 
 /**
@@ -23,6 +24,16 @@ public class StageActivityBehavior implements CmmnTriggerableActivityBehavior {
     
     public StageActivityBehavior(Stage stage) {
         this.stage = stage;
+    }
+
+    @Override
+    public void execute(DelegatePlanItemInstance delegatePlanItemInstance) {
+        
+    }
+    
+    @Override
+    public void trigger(DelegatePlanItemInstance planItemInstance) {
+        
     }
 
 }

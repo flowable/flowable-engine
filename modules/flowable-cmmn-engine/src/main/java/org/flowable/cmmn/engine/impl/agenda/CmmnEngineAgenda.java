@@ -12,11 +12,20 @@
  */
 package org.flowable.cmmn.engine.impl.agenda;
 
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.engine.common.impl.agenda.Agenda;
 
 /**
  * @author Joram Barrez
  */
 public interface CmmnEngineAgenda extends Agenda {
+    
+    void planInitStageOperation(PlanItemInstanceEntity planItemInstanceEntity);
+    
+    void planEvaluateCriteria(String caseInstanceEntityId);
+    
+    void planActivatePlanItem(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void planCompletePlanItem(PlanItemInstanceEntity planItemInstanceEntity);
     
 }

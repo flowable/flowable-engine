@@ -26,6 +26,8 @@ public interface CmmnEngine {
 
     void close();
     
+    CmmnRuntimeService getCmmnRuntimeService();
+    
     CmmnManagementService getCmmnManagementService();
     
     CmmnRepositoryService getCmmnRepositoryService();

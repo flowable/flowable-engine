@@ -33,6 +33,8 @@ public interface CaseDefinitionEntityManager extends EntityManager<CaseDefinitio
 
     CaseDefinition findCaseDefinitionByKeyAndVersionAndTenantId(String caseDefinitionKey, Integer caseDefinitionVersion, String tenantId);
     
+    void deleteCaseDefinitionAndRelatedData(String caseDefinitionId);
+    
     CaseDefinitionQuery createCaseDefinitionQuery();
     
     List<CaseDefinition> findCaseDefinitionsByQueryCriteria(CaseDefinitionQuery caseDefinitionQuery);

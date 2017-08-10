@@ -12,11 +12,13 @@
  */
 package org.flowable.cmmn.engine.impl.behavior;
 
+import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
+
 /**
  * @author Joram Barrez
  */
 public interface CmmnTriggerableActivityBehavior extends CmmnActivityBehavior {
     
-    // TODO: trigger method
+    void trigger(DelegatePlanItemInstance planItemInstance);
 
 }

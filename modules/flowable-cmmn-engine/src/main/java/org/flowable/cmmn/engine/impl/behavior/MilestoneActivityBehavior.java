@@ -12,9 +12,39 @@
  */
 package org.flowable.cmmn.engine.impl.behavior;
 
+import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+
 /**
  * @author Joram Barrez
  */
 public class MilestoneActivityBehavior implements CmmnActivityBehavior {
+    
+    // TODO: should be expression
+    protected String milestoneName;
+    
+    public MilestoneActivityBehavior(String milestoneName) {
+        this.milestoneName = milestoneName;
+    }
+
+    @Override
+    public void execute(DelegatePlanItemInstance delegatePlanItemInstance) {
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        
+        MilestoneInstanceEntityManager milestoneInstanceEntityManager = CommandContextUtil.getMilestoneInstanceEntityManager(commandContext);
+        MilestoneInstanceEntity milestoneInstanceEntity = milestoneInstanceEntityManager.create();
+        milestoneInstanceEntity.setName(milestoneName);
+        milestoneInstanceEntity.setTimeStamp(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
+        milestoneInstanceEntity.setCaseInstanceId(delegatePlanItemInstance.getCaseInstanceId());
+        milestoneInstanceEntity.setCaseDefinitionId(delegatePlanItemInstance.getCaseDefinitionId());
+        milestoneInstanceEntity.setElementId(delegatePlanItemInstance.getElementId());
+        milestoneInstanceEntityManager.insert(milestoneInstanceEntity);
+        
+        CommandContextUtil.getAgenda(commandContext).planCompletePlanItem((PlanItemInstanceEntity) delegatePlanItemInstance);
+    }
     
 }
