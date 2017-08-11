@@ -12,6 +12,9 @@
  */
 package org.flowable.dmn.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Yvo Swillens
  */
@@ -19,6 +22,7 @@ public class Decision extends NamedElement {
 
     protected String question;
     protected String allowedAnswers;
+    protected List<InformationRequirement> informationRequirements = new ArrayList<>();
     protected Expression expression;
 
     public String getQuestion() {
@@ -35,6 +39,14 @@ public class Decision extends NamedElement {
 
     public void setAllowedAnswers(String allowedAnswers) {
         this.allowedAnswers = allowedAnswers;
+    }
+
+    public void addInformationRequirement(InformationRequirement informationRequirement) {
+        this.informationRequirements.add(informationRequirement);
+    }
+
+    public List<InformationRequirement> getInformationRequirements() {
+        return this.informationRequirements;
     }
 
     public Expression getExpression() {

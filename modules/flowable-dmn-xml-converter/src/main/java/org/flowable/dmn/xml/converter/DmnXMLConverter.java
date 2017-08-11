@@ -40,8 +40,10 @@ import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnElement;
+import org.flowable.dmn.model.DmnElementReference;
 import org.flowable.dmn.model.DmnExtensionElement;
 import org.flowable.dmn.model.HitPolicy;
+import org.flowable.dmn.model.InformationRequirement;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.ItemDefinition;
 import org.flowable.dmn.model.OutputClause;
@@ -171,6 +173,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
     public DmnDefinition convertToDmnModel(XMLStreamReader xtr) {
         DmnDefinition model = new DmnDefinition();
         DmnElement parentElement = null;
+        Decision currentDecision = null;
         DecisionTable currentDecisionTable = null;
 
         // reset element counters
@@ -202,6 +205,30 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     decision.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
                     decision.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
                     parentElement = decision;
+                    currentDecision = decision;
+                } else if (ELEMENT_INFORMATION_REQUIREMENT.equals(xtr.getLocalName())) {
+                    InformationRequirement informationRequirement = new InformationRequirement();
+                    boolean readyWithInformationRequirement = false;
+                    try {
+                        while (!readyWithInformationRequirement && xtr.hasNext()) {
+                            xtr.next();
+                            if (xtr.isStartElement() && ELEMENT_REQUIRED_DECISION.equalsIgnoreCase(xtr.getLocalName())) {
+                                DmnElementReference elementReference = new DmnElementReference();
+                                elementReference.setHref(xtr.getAttributeValue(null, ATTRIBUTE_HREF));
+                                informationRequirement.setRequiredDecision(elementReference);
+                            } else if (xtr.isStartElement() && ELEMENT_REQUIRED_INPUT.equalsIgnoreCase(xtr.getLocalName())) {
+                                DmnElementReference elementReference = new DmnElementReference();
+                                elementReference.setHref(xtr.getAttributeValue(null, ATTRIBUTE_HREF));
+                                informationRequirement.setRequiredInput(elementReference);
+                            } else if (xtr.isEndElement() && ELEMENT_INFORMATION_REQUIREMENT.equals(xtr.getLocalName())) {
+                                readyWithInformationRequirement = true;
+                            }
+                        }
+                    } catch (Exception e) {
+                        LOGGER.warn("Error parsing information requirement", e);
+                    }
+
+                    currentDecision.addInformationRequirement(informationRequirement);
                 } else if (ELEMENT_DECISION_TABLE.equals(xtr.getLocalName())) {
                     currentDecisionTable = new DecisionTable();
                     currentDecisionTable.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
@@ -301,6 +328,20 @@ public class DmnXMLConverter implements DmnXMLConstants {
 
                 DmnXMLUtil.writeElementDescription(decision, xtw);
                 DmnXMLUtil.writeExtensionElements(decision, xtw);
+
+                for (InformationRequirement informationRequirement : decision.getInformationRequirements()) {
+                    xtw.writeStartElement(ELEMENT_INFORMATION_REQUIREMENT);
+                    if (informationRequirement.getRequiredDecision() != null) {
+                        xtw.writeStartElement(ELEMENT_REQUIRED_DECISION);
+                        xtw.writeAttribute(ATTRIBUTE_HREF, informationRequirement.getRequiredDecision().getHref());
+                        xtw.writeEndElement();
+                    } else if (informationRequirement.getRequiredInput() != null) {
+                        xtw.writeStartElement(ELEMENT_REQUIRED_INPUT);
+                        xtw.writeAttribute(ATTRIBUTE_HREF, informationRequirement.getRequiredInput().getHref());
+                        xtw.writeEndElement();
+                    }
+                    xtw.writeEndElement();
+                }
 
                 DecisionTable decisionTable = (DecisionTable) decision.getExpression();
                 xtw.writeStartElement(ELEMENT_DECISION_TABLE);
