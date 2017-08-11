@@ -79,6 +79,9 @@ public class FormDesignJsonServiceDesignTimeImpl extends FormDesignJsonServiceBa
     result.set("referencedBy", referencedByArrayNode);
     
     result.set("lastUpdated", JsonUtils.numberNode(model.getLastUpdated().getTime()));
+    result.set("name", JsonUtils.textNode(model.getName()));
+    result.set("desc", JsonUtils.textNode(model.getDescription()));
+    result.set("id", JsonUtils.textNode(model.getId()));
     return result;
   }
 

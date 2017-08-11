@@ -142,13 +142,19 @@ public class FlowableFormService {
     {
       throw new InternalServerErrorException("Could not deserialize form definition");
     }
-    String formkey = jsonNode.get("key").textValue();
+    String id = jsonNode.get("id").textValue();
+    String name = jsonNode.get("name") != null ? jsonNode.get("name").textValue() : "";
+    String desc = jsonNode.get("desc") != null ? jsonNode.get("desc").textValue() : "";
+    String formkey = jsonNode.get("key").textValue();    
     long lastUpdated = jsonNode.get("lastUpdated").asLong();
     boolean newVersion = jsonNode.get("newVersion") !=null ? jsonNode.get("newVersion").asBoolean() : false;
     
     User user = SecurityUtils.getCurrentUserObject();
-    List<Model> models = modelRepository.findByKeyAndType(formkey, AbstractModel.MODEL_TYPE_FORM_RDS);
-    Model model = models.get(0);
+    Model model = modelRepository.get(id);
+    
+    model.setKey(formkey);
+    model.setName(name);
+    model.setDescription(desc);
     
     if(model.getLastUpdated().getTime()!=lastUpdated && !newVersion) {
       throw new ConflictingRequestException("Form has been updated by " + model.getLastUpdatedBy() + " in meantime");
