@@ -14,14 +14,17 @@ package org.flowable.engine.delegate.event.impl;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.event.FlowableEngineEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * Base class for all {@link FlowableEvent} implementations.
  * 
  * @author Frederik Heremans
  */
-public class FlowableEventImpl implements FlowableEvent {
+public class FlowableEventImpl implements FlowableEngineEvent {
 
     protected FlowableEngineEventType type;
     protected String executionId;
@@ -78,6 +81,11 @@ public class FlowableEventImpl implements FlowableEvent {
 
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
+    }
+
+    @Override
+    public DelegateExecution getExecution() {
+        return executionId == null ? null : CommandContextUtil.getExecutionEntityManager().findById(executionId);
     }
 
     @Override

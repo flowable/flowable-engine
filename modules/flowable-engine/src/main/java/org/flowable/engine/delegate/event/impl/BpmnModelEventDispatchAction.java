@@ -19,7 +19,7 @@ import org.flowable.engine.common.impl.event.EventDispatchAction;
 import org.flowable.engine.common.impl.event.FlowableEventSupport;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEvent;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;

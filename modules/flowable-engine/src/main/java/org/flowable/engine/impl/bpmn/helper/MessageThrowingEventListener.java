@@ -17,7 +17,7 @@ import java.util.List;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
+import org.flowable.engine.delegate.event.FlowableEngineEvent;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
